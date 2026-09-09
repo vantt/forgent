@@ -48,6 +48,21 @@
             "heavy": "lightweight"
           }
         }
+      },
+      "code:implement": {
+        "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)"
+      },
+      "code:review": {
+        "description": "Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      },
+      "code:test": {
+        "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      },
+      "code:debug": {
+        "description": "Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
+      },
+      "code:refactor": {
+        "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md)."
       }
     },
     "executors": {
@@ -455,6 +470,37 @@
             "args": []
           }
         ]
+      },
+      "pi": {
+        "kind": "agent",
+        "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ]
+          }
+        ],
+        "providerModel": "openai-codex",
+        "rigorOverrides": {
+          "light": "lightweight",
+          "standard": "lightweight",
+          "heavy": "lightweight"
+        }
       }
     },
     "timeoutMs": 2100000,

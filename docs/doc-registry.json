@@ -5400,6 +5400,366 @@
       "lineage": null,
       "createdAt": "2026-09-03T16:48:00.069Z",
       "updatedAt": "2026-09-03T16:48:00.069Z"
+    },
+    {
+      "topicId": "worker-prompt-iron-law-evidence-timing",
+      "purposeSlug": "worker-prompt-iron-law-evidence-timing",
+      "purposeTitle": "worker-prompt-iron-law-evidence-timing",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:14:59.556Z",
+      "updatedAt": "2026-09-04T03:14:59.556Z"
+    },
+    {
+      "topicId": "iron-law-classification-recipe-path",
+      "purposeSlug": "iron-law-classification-recipe-path",
+      "purposeTitle": "iron-law-classification-recipe-path",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:19:44.654Z",
+      "updatedAt": "2026-09-04T03:19:44.654Z"
+    },
+    {
+      "topicId": "sync-root-error-propagation",
+      "purposeSlug": "sync-root-error-propagation",
+      "purposeTitle": "sync-root-error-propagation",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:23:39.546Z",
+      "updatedAt": "2026-09-04T03:23:39.546Z"
+    },
+    {
+      "topicId": "worker-prompt-inline-completion-signal",
+      "purposeSlug": "worker-prompt-inline-completion-signal",
+      "purposeTitle": "worker-prompt-inline-completion-signal",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:26:49.851Z",
+      "updatedAt": "2026-09-04T03:26:49.851Z"
+    },
+    {
+      "topicId": "footprint-diff-research-md-noise",
+      "purposeSlug": "footprint-diff-research-md-noise",
+      "purposeTitle": "footprint-diff-research-md-noise",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:29:40.062Z",
+      "updatedAt": "2026-09-04T03:29:40.062Z"
+    },
+    {
+      "topicId": "write-rejected-trust-branchheadattake",
+      "purposeSlug": "write-rejected-trust-branchheadattake",
+      "purposeTitle": "write-rejected-trust-branchheadattake",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:32:53.681Z",
+      "updatedAt": "2026-09-04T03:32:53.681Z"
+    },
+    {
+      "topicId": "dispatch-config-cache-scope-narrowed",
+      "purposeSlug": "dispatch-config-cache-scope-narrowed",
+      "purposeTitle": "dispatch-config-cache-scope-narrowed",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:35:44.295Z",
+      "updatedAt": "2026-09-04T03:35:44.295Z"
+    },
+    {
+      "topicId": "fanout-batch-per-child-sync-spawn-and-listwork",
+      "purposeSlug": "fanout-batch-per-child-sync-spawn-and-listwork",
+      "purposeTitle": "fanout-batch-per-child-sync-spawn-and-listwork",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:38:53.233Z",
+      "updatedAt": "2026-09-04T03:38:53.233Z"
+    },
+    {
+      "topicId": "main-checkout-lock-scope-audit",
+      "purposeSlug": "main-checkout-lock-scope-audit",
+      "purposeTitle": "main-checkout-lock-scope-audit",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:41:41.505Z",
+      "updatedAt": "2026-09-04T03:41:41.505Z"
+    },
+    {
+      "topicId": "d3-goal-check-rationale-trace",
+      "purposeSlug": "d3-goal-check-rationale-trace",
+      "purposeTitle": "d3-goal-check-rationale-trace",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:44:44.411Z",
+      "updatedAt": "2026-09-04T03:44:44.411Z"
+    },
+    {
+      "topicId": "main-checkout-lock-release-early-compound-cleanup",
+      "purposeSlug": "main-checkout-lock-release-early-compound-cleanup",
+      "purposeTitle": "main-checkout-lock-release-early-compound-cleanup",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:47:44.422Z",
+      "updatedAt": "2026-09-04T03:47:44.422Z"
+    },
+    {
+      "topicId": "write-rejected-no-diff-check",
+      "purposeSlug": "write-rejected-no-diff-check",
+      "purposeTitle": "write-rejected-no-diff-check",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:50:40.021Z",
+      "updatedAt": "2026-09-04T03:50:40.021Z"
+    },
+    {
+      "topicId": "glm-openrouter-executor",
+      "purposeSlug": "glm-openrouter-executor",
+      "purposeTitle": "glm-openrouter-executor",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:53:53.352Z",
+      "updatedAt": "2026-09-04T03:53:53.352Z"
+    },
+    {
+      "topicId": "catchup-spurious-not-uptodate-merge-refusal",
+      "purposeSlug": "catchup-spurious-not-uptodate-merge-refusal",
+      "purposeTitle": "catchup-spurious-not-uptodate-merge-refusal",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T03:56:53.763Z",
+      "updatedAt": "2026-09-04T03:56:53.763Z"
+    },
+    {
+      "topicId": "restore-verifiedsha-docs-on-main",
+      "purposeSlug": "restore-verifiedsha-docs-on-main",
+      "purposeTitle": "restore-verifiedsha-docs-on-main",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:08:59.585Z",
+      "updatedAt": "2026-09-04T04:08:59.585Z"
+    },
+    {
+      "topicId": "compound-learn-artifact-registry",
+      "purposeSlug": "compound-learn-artifact-registry",
+      "purposeTitle": "compound-learn-artifact-registry",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:12:47.878Z",
+      "updatedAt": "2026-09-04T04:12:47.878Z"
+    },
+    {
+      "topicId": "fgos-preflight-verb",
+      "purposeSlug": "fgos-preflight-verb",
+      "purposeTitle": "fgos-preflight-verb",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:15:40.542Z",
+      "updatedAt": "2026-09-04T04:15:40.542Z"
+    },
+    {
+      "topicId": "catchup-movework-reopens-fgos-divergence",
+      "purposeSlug": "catchup-movework-reopens-fgos-divergence",
+      "purposeTitle": "catchup-movework-reopens-fgos-divergence",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:18:49.871Z",
+      "updatedAt": "2026-09-04T04:18:49.871Z"
+    },
+    {
+      "topicId": "branch-content-mismatch-fgos-exclusion",
+      "purposeSlug": "branch-content-mismatch-fgos-exclusion",
+      "purposeTitle": "branch-content-mismatch-fgos-exclusion",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:21:47.613Z",
+      "updatedAt": "2026-09-04T04:21:47.613Z"
+    },
+    {
+      "topicId": "fgos-lifecycle-tracking-concurrent-desync",
+      "purposeSlug": "fgos-lifecycle-tracking-concurrent-desync",
+      "purposeTitle": "fgos-lifecycle-tracking-concurrent-desync",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:24:52.599Z",
+      "updatedAt": "2026-09-04T04:24:52.599Z"
+    },
+    {
+      "topicId": "runtime-claim-doing-separation",
+      "purposeSlug": "runtime-claim-doing-separation",
+      "purposeTitle": "runtime-claim-doing-separation",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:27:49.804Z",
+      "updatedAt": "2026-09-04T04:27:49.804Z"
+    },
+    {
+      "topicId": "fgos-gateway-lifecycle-verb",
+      "purposeSlug": "fgos-gateway-lifecycle-verb",
+      "purposeTitle": "fgos-gateway-lifecycle-verb",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:31:43.591Z",
+      "updatedAt": "2026-09-04T04:31:43.591Z"
+    },
+    {
+      "topicId": "dispatch-plan-protocol-redesign",
+      "purposeSlug": "dispatch-plan-protocol-redesign",
+      "purposeTitle": "dispatch-plan-protocol-redesign",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:34:48.237Z",
+      "updatedAt": "2026-09-04T04:34:48.237Z"
+    },
+    {
+      "topicId": "decide-for-prefer-fix-and-dispatchplan-minimal",
+      "purposeSlug": "decide-for-prefer-fix-and-dispatchplan-minimal",
+      "purposeTitle": "decide-for-prefer-fix-and-dispatchplan-minimal",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:37:43.273Z",
+      "updatedAt": "2026-09-04T04:37:43.273Z"
+    },
+    {
+      "topicId": "cross-provider-egress-governance",
+      "purposeSlug": "cross-provider-egress-governance",
+      "purposeTitle": "cross-provider-egress-governance",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:40:40.770Z",
+      "updatedAt": "2026-09-04T04:40:40.770Z"
+    },
+    {
+      "topicId": "herdr-spawn-adapter-fresh-pane",
+      "purposeSlug": "herdr-spawn-adapter-fresh-pane",
+      "purposeTitle": "herdr-spawn-adapter-fresh-pane",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T04:45:35.248Z",
+      "updatedAt": "2026-09-04T04:45:35.248Z"
+    },
+    {
+      "topicId": "settleclaim-revision-drift-self-caused",
+      "purposeSlug": "settleclaim-revision-drift-self-caused",
+      "purposeTitle": "settleclaim-revision-drift-self-caused",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T05:16:57.139Z",
+      "updatedAt": "2026-09-04T05:16:57.139Z"
+    },
+    {
+      "topicId": "d0026-native-first-dispatch-narrative-reconciliation",
+      "purposeSlug": "d0026-native-first-dispatch-narrative-reconciliation",
+      "purposeTitle": "d0026-native-first-dispatch-narrative-reconciliation",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T05:25:49.146Z",
+      "updatedAt": "2026-09-04T05:25:49.146Z"
+    },
+    {
+      "topicId": "assert-plan-evidence-current-tree-fallback",
+      "purposeSlug": "assert-plan-evidence-current-tree-fallback",
+      "purposeTitle": "assertPlanEvidence current-tree fallback for branch-less heavy-risk items",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T06:48:07.851Z",
+      "updatedAt": "2026-09-04T06:48:07.851Z"
+    },
+    {
+      "topicId": "extract-dispatch-result-normalization-ladder",
+      "purposeSlug": "extract-dispatch-result-normalization-ladder",
+      "purposeTitle": "Extracting the dispatch result normalization ladder into its own pure helper",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T06:58:57.007Z",
+      "updatedAt": "2026-09-04T06:58:57.007Z"
+    },
+    {
+      "topicId": "dispatch-result-confidence-reader",
+      "purposeSlug": "dispatch-result-confidence-reader",
+      "purposeTitle": "dispatch-result-confidence-reader",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T07:07:51.969Z",
+      "updatedAt": "2026-09-04T07:07:51.969Z"
+    },
+    {
+      "topicId": "herdr-orchestrator-terminology-boundary",
+      "purposeSlug": "herdr-orchestrator-terminology-boundary",
+      "purposeTitle": "Herdr's PaneOrchestrator vocabulary vs fgOS's dispatch orchestrator glossary",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T07:11:18.256Z",
+      "updatedAt": "2026-09-04T07:11:18.256Z"
+    },
+    {
+      "topicId": "main-checkout-reset-ancestor-commit-loss-guard",
+      "purposeSlug": "main-checkout-reset-ancestor-commit-loss-guard",
+      "purposeTitle": "main-checkout-reset guard's ancestor/commit-loss check",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T07:15:08.535Z",
+      "updatedAt": "2026-09-04T07:15:08.535Z"
+    },
+    {
+      "topicId": "orphaned-runtime-claim-recovery-unclaim-verb",
+      "purposeSlug": "orphaned-runtime-claim-recovery-unclaim-verb",
+      "purposeTitle": "orphaned-runtime-claim-recovery-unclaim-verb",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T07:43:55.172Z",
+      "updatedAt": "2026-09-04T07:43:55.172Z"
+    },
+    {
+      "topicId": "submit-dependency-scan-delivered-blindspot",
+      "purposeSlug": "submit-dependency-scan-delivered-blindspot",
+      "purposeTitle": "submit-dependency-scan-delivered-blindspot",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T07:56:00.410Z",
+      "updatedAt": "2026-09-04T07:56:00.410Z"
+    },
+    {
+      "topicId": "approve-cas-mismatch-block",
+      "purposeSlug": "approve-cas-mismatch-block",
+      "purposeTitle": "approve-cas-mismatch-block",
+      "entities": [],
+      "status": "active",
+      "lineage": null,
+      "createdAt": "2026-09-04T08:06:17.395Z",
+      "updatedAt": "2026-09-04T08:06:17.395Z"
     }
   ],
   "docs": [
@@ -8819,10 +9179,11 @@
         "docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md"
       ],
       "sourceCaptureIds": [
-        "docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md"
+        "docs/explanation/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+        "tsk-gli"
       ],
       "createdAt": "2026-08-26T00:18:05.329Z",
-      "updatedAt": "2026-08-27T08:26:34.576Z"
+      "updatedAt": "2026-09-04T05:29:17.087Z"
     },
     {
       "docId": "why-fgos-s-concurrency-tests-batch-spawned-processes-to-reduce-peak-events-lock-contention-instead-of-scaling-the-lock-timeout-budget:why-concurrency-tests-batch-processes-instead-of-a-fixed-lock-timeout",
@@ -10468,10 +10829,11 @@
         "docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md"
       ],
       "sourceCaptureIds": [
-        "docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md"
+        "docs/explanation/why-the-launcher-vocabulary-word-guard-was-retired-right-after-tsk-1s5-fixed-it.md",
+        "tsk-4ah"
       ],
       "createdAt": "2026-08-26T00:19:04.671Z",
-      "updatedAt": "2026-08-27T08:27:14.124Z"
+      "updatedAt": "2026-09-04T05:23:26.274Z"
     },
     {
       "docId": "why-the-main-checkout-lock-hook-used-to-block-worktree-commits-it-had-no-reason-to-touch:why-the-main-checkout-lock-hook-used-to-block-worktree-commits",
@@ -12227,10 +12589,12 @@
       "currentPath": "docs/explanation/events-jsonl-opportunistic-truncation-check.md",
       "aliases": [],
       "sourceCaptureIds": [
-        "tsk-1ji"
+        "tsk-1ji",
+        "tsk-46v",
+        "tsk-myq"
       ],
       "createdAt": "2026-09-03T13:54:44.131Z",
-      "updatedAt": "2026-09-03T13:55:27.469Z"
+      "updatedAt": "2026-09-04T07:53:25.893Z"
     },
     {
       "docId": "dispatch-execute-repo-root-cwd-separation:overview",
@@ -12242,10 +12606,12 @@
       "currentPath": "docs/explanation/dispatch-execute-repo-root-cwd-separation.md",
       "aliases": [],
       "sourceCaptureIds": [
-        "tsk-43z"
+        "tsk-43z",
+        "tsk-322",
+        "tsk-22bm"
       ],
       "createdAt": "2026-09-03T13:57:35.006Z",
-      "updatedAt": "2026-09-03T13:58:01.338Z"
+      "updatedAt": "2026-09-04T07:34:58.053Z"
     },
     {
       "docId": "gitignore-docs-history-reverify:overview",
@@ -12938,6 +13304,583 @@
       ],
       "createdAt": "2026-09-03T16:48:01.772Z",
       "updatedAt": "2026-09-03T16:48:12.985Z"
+    },
+    {
+      "docId": "worker-prompt-iron-law-evidence-timing:overview",
+      "topicId": "worker-prompt-iron-law-evidence-timing",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/worker-prompt-iron-law-evidence-timing.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-3ys"
+      ],
+      "createdAt": "2026-09-04T03:15:04.409Z",
+      "updatedAt": "2026-09-04T03:15:50.065Z"
+    },
+    {
+      "docId": "iron-law-classification-recipe-path:overview",
+      "topicId": "iron-law-classification-recipe-path",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/iron-law-classification-recipe-path.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-ri8"
+      ],
+      "createdAt": "2026-09-04T03:19:50.791Z",
+      "updatedAt": "2026-09-04T03:20:44.917Z"
+    },
+    {
+      "docId": "sync-root-error-propagation:overview",
+      "topicId": "sync-root-error-propagation",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/sync-root-error-propagation.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-3tv"
+      ],
+      "createdAt": "2026-09-04T03:23:40.212Z",
+      "updatedAt": "2026-09-04T03:24:10.070Z"
+    },
+    {
+      "docId": "worker-prompt-inline-completion-signal:overview",
+      "topicId": "worker-prompt-inline-completion-signal",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/worker-prompt-inline-completion-signal.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-3km"
+      ],
+      "createdAt": "2026-09-04T03:26:51.898Z",
+      "updatedAt": "2026-09-04T03:27:35.938Z"
+    },
+    {
+      "docId": "footprint-diff-research-md-noise:overview",
+      "topicId": "footprint-diff-research-md-noise",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/footprint-diff-research-md-noise.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-67o"
+      ],
+      "createdAt": "2026-09-04T03:29:40.740Z",
+      "updatedAt": "2026-09-04T03:30:18.549Z"
+    },
+    {
+      "docId": "write-rejected-trust-branchheadattake:overview",
+      "topicId": "write-rejected-trust-branchheadattake",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/write-rejected-trust-branchheadattake.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-4s6"
+      ],
+      "createdAt": "2026-09-04T03:32:54.236Z",
+      "updatedAt": "2026-09-04T03:33:26.859Z"
+    },
+    {
+      "docId": "dispatch-config-cache-scope-narrowed:overview",
+      "topicId": "dispatch-config-cache-scope-narrowed",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/dispatch-config-cache-scope-narrowed.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-4sr"
+      ],
+      "createdAt": "2026-09-04T03:35:44.830Z",
+      "updatedAt": "2026-09-04T03:36:22.651Z"
+    },
+    {
+      "docId": "fanout-batch-per-child-sync-spawn-and-listwork:overview",
+      "topicId": "fanout-batch-per-child-sync-spawn-and-listwork",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-2ewi"
+      ],
+      "createdAt": "2026-09-04T03:38:53.795Z",
+      "updatedAt": "2026-09-04T03:39:35.848Z"
+    },
+    {
+      "docId": "main-checkout-lock-scope-audit:overview",
+      "topicId": "main-checkout-lock-scope-audit",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/main-checkout-lock-scope-audit.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-2e7"
+      ],
+      "createdAt": "2026-09-04T03:41:42.039Z",
+      "updatedAt": "2026-09-04T03:42:06.738Z"
+    },
+    {
+      "docId": "d3-goal-check-rationale-trace:overview",
+      "topicId": "d3-goal-check-rationale-trace",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/d3-goal-check-rationale-trace.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-3i6"
+      ],
+      "createdAt": "2026-09-04T03:44:44.979Z",
+      "updatedAt": "2026-09-04T03:45:18.808Z"
+    },
+    {
+      "docId": "main-checkout-lock-release-early-compound-cleanup:overview",
+      "topicId": "main-checkout-lock-release-early-compound-cleanup",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/main-checkout-lock-release-early-compound-cleanup.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5zv"
+      ],
+      "createdAt": "2026-09-04T03:47:44.998Z",
+      "updatedAt": "2026-09-04T03:48:26.825Z"
+    },
+    {
+      "docId": "write-rejected-no-diff-check:overview",
+      "topicId": "write-rejected-no-diff-check",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/write-rejected-no-diff-check.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-198"
+      ],
+      "createdAt": "2026-09-04T03:50:40.602Z",
+      "updatedAt": "2026-09-04T03:51:15.902Z"
+    },
+    {
+      "docId": "glm-openrouter-executor:overview",
+      "topicId": "glm-openrouter-executor",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/glm-openrouter-executor.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-gb3",
+        "tsk-3gr"
+      ],
+      "createdAt": "2026-09-04T03:53:53.899Z",
+      "updatedAt": "2026-09-04T04:00:57.620Z"
+    },
+    {
+      "docId": "catchup-spurious-not-uptodate-merge-refusal:overview",
+      "topicId": "catchup-spurious-not-uptodate-merge-refusal",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5et"
+      ],
+      "createdAt": "2026-09-04T03:56:54.302Z",
+      "updatedAt": "2026-09-04T03:57:42.336Z"
+    },
+    {
+      "docId": "restore-verifiedsha-docs-on-main:overview",
+      "topicId": "restore-verifiedsha-docs-on-main",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/restore-verifiedsha-docs-on-main.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-os6"
+      ],
+      "createdAt": "2026-09-04T04:09:00.309Z",
+      "updatedAt": "2026-09-04T04:09:25.651Z"
+    },
+    {
+      "docId": "compound-learn-artifact-registry:overview",
+      "topicId": "compound-learn-artifact-registry",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/compound-learn-artifact-registry.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-28x",
+        "tsk-28x-1",
+        "tsk-28x-2",
+        "tsk-28x-3",
+        "tsk-28x-4",
+        "tsk-28x-5",
+        "tsk-28x-6",
+        "tsk-28x-7",
+        "tsk-28x-8",
+        "tsk-28x-9",
+        "tsk-28x-10",
+        "tsk-28x-11",
+        "tsk-28x-12",
+        "tsk-3uc",
+        "tsk-1uj",
+        "tsk-ozk",
+        "tsk-5mh",
+        "tsk-43q"
+      ],
+      "createdAt": "2026-09-04T04:12:48.433Z",
+      "updatedAt": "2026-09-04T08:14:59.565Z"
+    },
+    {
+      "docId": "fgos-preflight-verb:overview",
+      "topicId": "fgos-preflight-verb",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/fgos-preflight-verb.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-4e1"
+      ],
+      "createdAt": "2026-09-04T04:15:41.113Z",
+      "updatedAt": "2026-09-04T04:16:06.113Z"
+    },
+    {
+      "docId": "catchup-movework-reopens-fgos-divergence:overview",
+      "topicId": "catchup-movework-reopens-fgos-divergence",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/catchup-movework-reopens-fgos-divergence.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-tr9"
+      ],
+      "createdAt": "2026-09-04T04:18:50.423Z",
+      "updatedAt": "2026-09-04T04:19:18.483Z"
+    },
+    {
+      "docId": "branch-content-mismatch-fgos-exclusion:overview",
+      "topicId": "branch-content-mismatch-fgos-exclusion",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-52p"
+      ],
+      "createdAt": "2026-09-04T04:21:48.164Z",
+      "updatedAt": "2026-09-04T04:22:17.628Z"
+    },
+    {
+      "docId": "fgos-lifecycle-tracking-concurrent-desync:overview",
+      "topicId": "fgos-lifecycle-tracking-concurrent-desync",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-38i"
+      ],
+      "createdAt": "2026-09-04T04:24:53.160Z",
+      "updatedAt": "2026-09-04T04:25:24.205Z"
+    },
+    {
+      "docId": "runtime-claim-doing-separation:overview",
+      "topicId": "runtime-claim-doing-separation",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/runtime-claim-doing-separation.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-40m",
+        "tsk-1sl",
+        "tsk-4kn",
+        "tsk-4lh"
+      ],
+      "createdAt": "2026-09-04T04:27:50.381Z",
+      "updatedAt": "2026-09-04T07:59:57.177Z"
+    },
+    {
+      "docId": "fgos-gateway-lifecycle-verb:overview",
+      "topicId": "fgos-gateway-lifecycle-verb",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/fgos-gateway-lifecycle-verb.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-31v",
+        "tsk-2n2"
+      ],
+      "createdAt": "2026-09-04T04:31:44.158Z",
+      "updatedAt": "2026-09-04T05:13:55.031Z"
+    },
+    {
+      "docId": "dispatch-plan-protocol-redesign:overview",
+      "topicId": "dispatch-plan-protocol-redesign",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/dispatch-plan-protocol-redesign.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5x7",
+        "tsk-3rn"
+      ],
+      "createdAt": "2026-09-04T04:34:48.813Z",
+      "updatedAt": "2026-09-04T07:38:03.872Z"
+    },
+    {
+      "docId": "decide-for-prefer-fix-and-dispatchplan-minimal:overview",
+      "topicId": "decide-for-prefer-fix-and-dispatchplan-minimal",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/decide-for-prefer-fix-and-dispatchplan-minimal.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5x7-1",
+        "tsk-4jo"
+      ],
+      "createdAt": "2026-09-04T04:37:43.865Z",
+      "updatedAt": "2026-09-04T07:04:53.298Z"
+    },
+    {
+      "docId": "cross-provider-egress-governance:overview",
+      "topicId": "cross-provider-egress-governance",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/cross-provider-egress-governance.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5x7-2"
+      ],
+      "createdAt": "2026-09-04T04:40:41.346Z",
+      "updatedAt": "2026-09-04T04:41:13.413Z"
+    },
+    {
+      "docId": "herdr-spawn-adapter-fresh-pane:overview",
+      "topicId": "herdr-spawn-adapter-fresh-pane",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/herdr-spawn-adapter-fresh-pane.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-5x7-3",
+        "tsk-5jl",
+        "tsk-2ii",
+        "tsk-10j",
+        "tsk-4zi",
+        "tsk-2rr",
+        "tsk-5cr",
+        "tsk-r81",
+        "tsk-by0"
+      ],
+      "createdAt": "2026-09-04T04:45:37.226Z",
+      "updatedAt": "2026-09-04T07:47:01.811Z"
+    },
+    {
+      "docId": "settleclaim-revision-drift-self-caused:overview",
+      "topicId": "settleclaim-revision-drift-self-caused",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/settleclaim-revision-drift-self-caused.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-1hq",
+        "tsk-1ht",
+        "tsk-2uh",
+        "tsk-1sr"
+      ],
+      "createdAt": "2026-09-04T05:16:57.707Z",
+      "updatedAt": "2026-09-04T07:23:10.705Z"
+    },
+    {
+      "docId": "d0026-native-first-dispatch-narrative-reconciliation:overview",
+      "topicId": "d0026-native-first-dispatch-narrative-reconciliation",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-17m",
+        "tsk-4he",
+        "tsk-1dd"
+      ],
+      "createdAt": "2026-09-04T05:25:51.821Z",
+      "updatedAt": "2026-09-04T07:49:51.574Z"
+    },
+    {
+      "docId": "assert-plan-evidence-current-tree-fallback:overview",
+      "topicId": "assert-plan-evidence-current-tree-fallback",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/assert-plan-evidence-current-tree-fallback.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-2jg"
+      ],
+      "createdAt": "2026-09-04T06:48:13.289Z",
+      "updatedAt": "2026-09-04T06:48:53.009Z"
+    },
+    {
+      "docId": "extract-dispatch-result-normalization-ladder:overview",
+      "topicId": "extract-dispatch-result-normalization-ladder",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/dispatch-result-normalization-ladder-extraction.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-2tr"
+      ],
+      "createdAt": "2026-09-04T06:59:02.055Z",
+      "updatedAt": "2026-09-04T06:59:32.433Z"
+    },
+    {
+      "docId": "dispatch-result-confidence-reader:overview",
+      "topicId": "dispatch-result-confidence-reader",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/dispatch-result-confidence-reader.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-1g6"
+      ],
+      "createdAt": "2026-09-04T07:07:55.037Z",
+      "updatedAt": "2026-09-04T07:08:29.417Z"
+    },
+    {
+      "docId": "herdr-orchestrator-terminology-boundary:overview",
+      "topicId": "herdr-orchestrator-terminology-boundary",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-10n"
+      ],
+      "createdAt": "2026-09-04T07:11:22.426Z",
+      "updatedAt": "2026-09-04T07:11:54.110Z"
+    },
+    {
+      "docId": "main-checkout-reset-ancestor-commit-loss-guard:overview",
+      "topicId": "main-checkout-reset-ancestor-commit-loss-guard",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-1ck"
+      ],
+      "createdAt": "2026-09-04T07:15:12.018Z",
+      "updatedAt": "2026-09-04T07:15:47.146Z"
+    },
+    {
+      "docId": "orphaned-runtime-claim-recovery-unclaim-verb:overview",
+      "topicId": "orphaned-runtime-claim-recovery-unclaim-verb",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-uio"
+      ],
+      "createdAt": "2026-09-04T07:44:00.039Z",
+      "updatedAt": "2026-09-04T07:44:36.547Z"
+    },
+    {
+      "docId": "submit-dependency-scan-delivered-blindspot:overview",
+      "topicId": "submit-dependency-scan-delivered-blindspot",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/submit-dependency-scan-delivered-blindspot.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-68j"
+      ],
+      "createdAt": "2026-09-04T07:56:04.889Z",
+      "updatedAt": "2026-09-04T07:56:37.650Z"
+    },
+    {
+      "docId": "approve-cas-mismatch-block:overview",
+      "topicId": "approve-cas-mismatch-block",
+      "role": "overview",
+      "framework": "diataxis",
+      "mode": "explanation",
+      "docLifecycle": "active",
+      "currentPath": "docs/explanation/approve-cas-mismatch-block.md",
+      "aliases": [],
+      "sourceCaptureIds": [
+        "tsk-4p6"
+      ],
+      "createdAt": "2026-09-04T08:06:23.595Z",
+      "updatedAt": "2026-09-04T08:07:23.055Z"
     }
   ]
 }

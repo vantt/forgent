@@ -3238,3 +3238,219 @@ generated: true
 - Docs:
   - `overview` (active): `docs/explanation/fanout-batch-concurrent-dispatch.md`
 
+### worker-prompt-iron-law-evidence-timing (`worker-prompt-iron-law-evidence-timing`)
+- Status: **active**
+- Purpose Slug: `worker-prompt-iron-law-evidence-timing`
+- Docs:
+  - `overview` (active): `docs/explanation/worker-prompt-iron-law-evidence-timing.md`
+
+### iron-law-classification-recipe-path (`iron-law-classification-recipe-path`)
+- Status: **active**
+- Purpose Slug: `iron-law-classification-recipe-path`
+- Docs:
+  - `overview` (active): `docs/explanation/iron-law-classification-recipe-path.md`
+
+### sync-root-error-propagation (`sync-root-error-propagation`)
+- Status: **active**
+- Purpose Slug: `sync-root-error-propagation`
+- Docs:
+  - `overview` (active): `docs/explanation/sync-root-error-propagation.md`
+
+### worker-prompt-inline-completion-signal (`worker-prompt-inline-completion-signal`)
+- Status: **active**
+- Purpose Slug: `worker-prompt-inline-completion-signal`
+- Docs:
+  - `overview` (active): `docs/explanation/worker-prompt-inline-completion-signal.md`
+
+### footprint-diff-research-md-noise (`footprint-diff-research-md-noise`)
+- Status: **active**
+- Purpose Slug: `footprint-diff-research-md-noise`
+- Docs:
+  - `overview` (active): `docs/explanation/footprint-diff-research-md-noise.md`
+
+### write-rejected-trust-branchheadattake (`write-rejected-trust-branchheadattake`)
+- Status: **active**
+- Purpose Slug: `write-rejected-trust-branchheadattake`
+- Docs:
+  - `overview` (active): `docs/explanation/write-rejected-trust-branchheadattake.md`
+
+### dispatch-config-cache-scope-narrowed (`dispatch-config-cache-scope-narrowed`)
+- Status: **active**
+- Purpose Slug: `dispatch-config-cache-scope-narrowed`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-config-cache-scope-narrowed.md`
+
+### fanout-batch-per-child-sync-spawn-and-listwork (`fanout-batch-per-child-sync-spawn-and-listwork`)
+- Status: **active**
+- Purpose Slug: `fanout-batch-per-child-sync-spawn-and-listwork`
+- Docs:
+  - `overview` (active): `docs/explanation/fanout-batch-per-child-sync-spawn-and-listwork.md`
+
+### main-checkout-lock-scope-audit (`main-checkout-lock-scope-audit`)
+- Status: **active**
+- Purpose Slug: `main-checkout-lock-scope-audit`
+- Docs:
+  - `overview` (active): `docs/explanation/main-checkout-lock-scope-audit.md`
+
+### d3-goal-check-rationale-trace (`d3-goal-check-rationale-trace`)
+- Status: **active**
+- Purpose Slug: `d3-goal-check-rationale-trace`
+- Docs:
+  - `overview` (active): `docs/explanation/d3-goal-check-rationale-trace.md`
+
+### main-checkout-lock-release-early-compound-cleanup (`main-checkout-lock-release-early-compound-cleanup`)
+- Status: **active**
+- Purpose Slug: `main-checkout-lock-release-early-compound-cleanup`
+- Docs:
+  - `overview` (active): `docs/explanation/main-checkout-lock-release-early-compound-cleanup.md`
+
+### write-rejected-no-diff-check (`write-rejected-no-diff-check`)
+- Status: **active**
+- Purpose Slug: `write-rejected-no-diff-check`
+- Docs:
+  - `overview` (active): `docs/explanation/write-rejected-no-diff-check.md`
+
+### glm-openrouter-executor (`glm-openrouter-executor`)
+- Status: **active**
+- Purpose Slug: `glm-openrouter-executor`
+- Docs:
+  - `overview` (active): `docs/explanation/glm-openrouter-executor.md`
+
+### catchup-spurious-not-uptodate-merge-refusal (`catchup-spurious-not-uptodate-merge-refusal`)
+- Status: **active**
+- Purpose Slug: `catchup-spurious-not-uptodate-merge-refusal`
+- Docs:
+  - `overview` (active): `docs/explanation/catchup-spurious-not-uptodate-merge-refusal.md`
+
+### restore-verifiedsha-docs-on-main (`restore-verifiedsha-docs-on-main`)
+- Status: **active**
+- Purpose Slug: `restore-verifiedsha-docs-on-main`
+- Docs:
+  - `overview` (active): `docs/explanation/restore-verifiedsha-docs-on-main.md`
+
+### compound-learn-artifact-registry (`compound-learn-artifact-registry`)
+- Status: **active**
+- Purpose Slug: `compound-learn-artifact-registry`
+- Docs:
+  - `overview` (active): `docs/explanation/compound-learn-artifact-registry.md`
+
+### fgos-preflight-verb (`fgos-preflight-verb`)
+- Status: **active**
+- Purpose Slug: `fgos-preflight-verb`
+- Docs:
+  - `overview` (active): `docs/explanation/fgos-preflight-verb.md`
+
+### catchup-movework-reopens-fgos-divergence (`catchup-movework-reopens-fgos-divergence`)
+- Status: **active**
+- Purpose Slug: `catchup-movework-reopens-fgos-divergence`
+- Docs:
+  - `overview` (active): `docs/explanation/catchup-movework-reopens-fgos-divergence.md`
+
+### branch-content-mismatch-fgos-exclusion (`branch-content-mismatch-fgos-exclusion`)
+- Status: **active**
+- Purpose Slug: `branch-content-mismatch-fgos-exclusion`
+- Docs:
+  - `overview` (active): `docs/explanation/branch-content-mismatch-fgos-exclusion.md`
+
+### fgos-lifecycle-tracking-concurrent-desync (`fgos-lifecycle-tracking-concurrent-desync`)
+- Status: **active**
+- Purpose Slug: `fgos-lifecycle-tracking-concurrent-desync`
+- Docs:
+  - `overview` (active): `docs/explanation/fgos-lifecycle-tracking-concurrent-desync.md`
+
+### runtime-claim-doing-separation (`runtime-claim-doing-separation`)
+- Status: **active**
+- Purpose Slug: `runtime-claim-doing-separation`
+- Docs:
+  - `overview` (active): `docs/explanation/runtime-claim-doing-separation.md`
+
+### fgos-gateway-lifecycle-verb (`fgos-gateway-lifecycle-verb`)
+- Status: **active**
+- Purpose Slug: `fgos-gateway-lifecycle-verb`
+- Docs:
+  - `overview` (active): `docs/explanation/fgos-gateway-lifecycle-verb.md`
+
+### dispatch-plan-protocol-redesign (`dispatch-plan-protocol-redesign`)
+- Status: **active**
+- Purpose Slug: `dispatch-plan-protocol-redesign`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-plan-protocol-redesign.md`
+
+### decide-for-prefer-fix-and-dispatchplan-minimal (`decide-for-prefer-fix-and-dispatchplan-minimal`)
+- Status: **active**
+- Purpose Slug: `decide-for-prefer-fix-and-dispatchplan-minimal`
+- Docs:
+  - `overview` (active): `docs/explanation/decide-for-prefer-fix-and-dispatchplan-minimal.md`
+
+### cross-provider-egress-governance (`cross-provider-egress-governance`)
+- Status: **active**
+- Purpose Slug: `cross-provider-egress-governance`
+- Docs:
+  - `overview` (active): `docs/explanation/cross-provider-egress-governance.md`
+
+### herdr-spawn-adapter-fresh-pane (`herdr-spawn-adapter-fresh-pane`)
+- Status: **active**
+- Purpose Slug: `herdr-spawn-adapter-fresh-pane`
+- Docs:
+  - `overview` (active): `docs/explanation/herdr-spawn-adapter-fresh-pane.md`
+
+### settleclaim-revision-drift-self-caused (`settleclaim-revision-drift-self-caused`)
+- Status: **active**
+- Purpose Slug: `settleclaim-revision-drift-self-caused`
+- Docs:
+  - `overview` (active): `docs/explanation/settleclaim-revision-drift-self-caused.md`
+
+### d0026-native-first-dispatch-narrative-reconciliation (`d0026-native-first-dispatch-narrative-reconciliation`)
+- Status: **active**
+- Purpose Slug: `d0026-native-first-dispatch-narrative-reconciliation`
+- Docs:
+  - `overview` (active): `docs/explanation/d0026-native-first-dispatch-narrative-reconciliation.md`
+
+### assertPlanEvidence current-tree fallback for branch-less heavy-risk items (`assert-plan-evidence-current-tree-fallback`)
+- Status: **active**
+- Purpose Slug: `assert-plan-evidence-current-tree-fallback`
+- Docs:
+  - `overview` (active): `docs/explanation/assert-plan-evidence-current-tree-fallback.md`
+
+### Extracting the dispatch result normalization ladder into its own pure helper (`extract-dispatch-result-normalization-ladder`)
+- Status: **active**
+- Purpose Slug: `extract-dispatch-result-normalization-ladder`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-result-normalization-ladder-extraction.md`
+
+### dispatch-result-confidence-reader (`dispatch-result-confidence-reader`)
+- Status: **active**
+- Purpose Slug: `dispatch-result-confidence-reader`
+- Docs:
+  - `overview` (active): `docs/explanation/dispatch-result-confidence-reader.md`
+
+### Herdr's PaneOrchestrator vocabulary vs fgOS's dispatch orchestrator glossary (`herdr-orchestrator-terminology-boundary`)
+- Status: **active**
+- Purpose Slug: `herdr-orchestrator-terminology-boundary`
+- Docs:
+  - `overview` (active): `docs/explanation/herdr-orchestrator-terminology-boundary.md`
+
+### main-checkout-reset guard's ancestor/commit-loss check (`main-checkout-reset-ancestor-commit-loss-guard`)
+- Status: **active**
+- Purpose Slug: `main-checkout-reset-ancestor-commit-loss-guard`
+- Docs:
+  - `overview` (active): `docs/explanation/main-checkout-reset-ancestor-commit-loss-guard.md`
+
+### orphaned-runtime-claim-recovery-unclaim-verb (`orphaned-runtime-claim-recovery-unclaim-verb`)
+- Status: **active**
+- Purpose Slug: `orphaned-runtime-claim-recovery-unclaim-verb`
+- Docs:
+  - `overview` (active): `docs/explanation/orphaned-runtime-claim-recovery-unclaim-verb.md`
+
+### submit-dependency-scan-delivered-blindspot (`submit-dependency-scan-delivered-blindspot`)
+- Status: **active**
+- Purpose Slug: `submit-dependency-scan-delivered-blindspot`
+- Docs:
+  - `overview` (active): `docs/explanation/submit-dependency-scan-delivered-blindspot.md`
+
+### approve-cas-mismatch-block (`approve-cas-mismatch-block`)
+- Status: **active**
+- Purpose Slug: `approve-cas-mismatch-block`
+- Docs:
+  - `overview` (active): `docs/explanation/approve-cas-mismatch-block.md`
+

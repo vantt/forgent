@@ -3603,7 +3603,7 @@
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/use-fgos-group-thinking.md",
-    "title": "How to use the `fgos-group-thinking` skill",
+    "title": "How to use group thinking",
     "sourceCaptureId": null
   },
   {
