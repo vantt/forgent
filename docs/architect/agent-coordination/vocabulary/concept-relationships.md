@@ -107,6 +107,8 @@ Coordination Protocol != CoordinationSession requirement
 Herdr state != Evidence
 Synthesis != Approval
 Job != Assignment/Run/Task
+Capability != Purpose (purpose/--for is a compatibility alias for Capability, not a third routing identity)
+Job != Capability/Executor-id (Job is unused, reserved for a future scheduler; it is never a dispatch target)
 ```
 
 ## Lifecycle And Isolation

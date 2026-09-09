@@ -243,6 +243,16 @@ Design status: Proposed.
 
 ## Dispatch And Execution Layer
 
+### Capability
+
+An abstract behavior promise, resolved through `runner.capabilities.<capability>`
+(`prefer`/`overrides`) to a registered Executor's `for[]` declaration. Together
+with Executor-id, Capability is one of exactly two target identities the
+Dispatch And Execution Engine resolves against — see the
+[Dispatch Control Plane](../architecture/dispatch-control-plane.md)'s Routing
+Identities section. `purpose` and the `--for` CLI flag are compatibility
+terminology for Capability, not a separate concept.
+
 ### DispatchPlan
 
 The resolved execution decision for a selected Assignment: executor target,

@@ -6047,6 +6047,25 @@ test('compileDispatchPlan never throws over a policy mismatch on a synthesized (
   assert.ok(plan.reasonCodes.includes('policy.executor-mismatch-ignored'));
 });
 
+test('compileDispatchPlan preserves the requested capability\'s provenance when an explicit executor-id overrides it (Slice E required proof case: explicit executor override preserves requested capability provenance)', () => {
+  const cfg = {
+    executors: {
+      agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true },
+    },
+    models: SLICE_D_MODELS,
+  };
+  // Caller explicitly names BOTH an executor override AND the capability it
+  // is overriding for -- selector.type must report "executor" (the winning
+  // target), but `capability` must still carry the caller's originally
+  // requested capability, never silently discarded or replaced by
+  // whatever the resolved executor happens to declare in its own `for[]`.
+  const plan = compileDispatchPlan(cfg, { executorId: 'agy', for: 'code:implement' });
+  assert.equal(plan.selector.type, 'executor');
+  assert.equal(plan.selector.value, 'agy');
+  assert.equal(plan.executorId, 'agy');
+  assert.equal(plan.capability, 'code:implement');
+});
+
 test('compileDispatchPlan governance-blocked and unavailable branches never populate the new policy fields (no partial/misleading merge)', () => {
   const blockedCfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
