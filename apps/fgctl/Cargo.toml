@@ -1,0 +1,8 @@
+[package]
+name = "fgctl"
+version = "0.1.0"
+edition.workspace = true
+
+[dependencies]
+fgos-distribution = { path = "../../packages/distribution/rust" }
+serde_json = { workspace = true }

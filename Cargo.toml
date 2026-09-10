@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "apps/fgos",
+    "apps/fgctl",
     "packages/host-runtime/rust",
     "packages/distribution/rust",
 ]
