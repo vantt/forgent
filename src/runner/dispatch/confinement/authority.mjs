@@ -29,10 +29,10 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
 }
 
 function adapterConsumesPreparedSandbox(adapterName) {
-  // herdr starts a provider by kind and forwards only provider argv; it does
-  // not execute Authority's prepared command/args. Treating its dispatch as
-  // bwrap-enforced would be a false attestation.
-  return adapterName !== 'herdr-spawn';
+  // Only adapters that execute Authority's prepared command and argv may
+  // receive a bwrap enforcement attestation. New adapters intentionally
+  // default to unverified until they prove that contract.
+  return adapterName === 'cli-spawn';
 }
 
 /**
@@ -64,6 +64,10 @@ export function buildConfinementAttestation({
 
   let hasHostWriteDeny = false;
   let hasProcessIsolation = false;
+  let hasSessionIsolation = false;
+  let hasPrivateHome = false;
+  let hasOwnWorkspace = false;
+  let declaredHomeTarget = null;
   const writableBinds = [];
 
   if (hasBwrapCmd && Array.isArray(request.invocation?.args)) {
@@ -96,6 +100,9 @@ export function buildConfinementAttestation({
           hasWiderWritableRebind = true;
         } else if (parts[2]) {
           writableBinds.push({ src: parts[1], dest: parts[2] });
+          if (request.context?.repoRoot && parts[1] === request.context.repoRoot && parts[2] !== parts[1]) {
+            hasOwnWorkspace = true;
+          }
         }
       } else if (arg === "--ro-bind" || arg === "--ro-bind-try") {
         const src = bwrapOptions[i + 1];
@@ -117,9 +124,23 @@ export function buildConfinementAttestation({
           hasWiderWritableRebind = true;
         } else if (typeof dest === "string" && dest) {
           writableBinds.push({ src, dest });
+          if (request.context?.repoRoot && src === request.context.repoRoot && dest !== src) {
+            hasOwnWorkspace = true;
+          }
         }
+      } else if (arg === '--setenv' && bwrapOptions[i + 1] === 'HOME' && typeof bwrapOptions[i + 2] === 'string') {
+        declaredHomeTarget = bwrapOptions[i + 2];
+        i += 2;
+      }
+
+      if (arg === "--unshare-ipc" || arg === "--unshare-all") {
+        hasSessionIsolation = true;
       }
     }
+
+    hasPrivateHome = Boolean(declaredHomeTarget) && writableBinds.some(
+      (bind) => bind.dest === declaredHomeTarget && bind.src !== declaredHomeTarget,
+    );
 
     if (hasRoRoot && !hasWiderWritableRebind) {
       hasHostWriteDeny = true;
@@ -153,13 +174,13 @@ export function buildConfinementAttestation({
   }
 
   if (legacy?.controls?.session === "isolated") {
-    coverage["control:session"] = "satisfied";
+    coverage["control:session"] = hasSessionIsolation ? "satisfied" : "unverified";
   }
   if (legacy?.controls?.workspace === "own") {
-    coverage["control:workspace"] = "satisfied";
+    coverage["control:workspace"] = hasOwnWorkspace ? "satisfied" : "unverified";
   }
   if (legacy?.controls?.home === "private") {
-    coverage["control:home"] = "satisfied";
+    coverage["control:home"] = hasPrivateHome ? "satisfied" : "unverified";
   }
 
   // LOW-2: Legacy grants name an abstract resource (e.g. 'private-home') whose concrete filesystem
@@ -432,7 +453,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       },
       mismatches: assessment.mismatches,
     };
-    savePlanRecord(backendPlan, request.context, backendPlan.resources);
+    savePlanRecord(backendPlan, request.context);
 
     if (backendPlan.decision === "refuse") {
       const refusedAttestation = buildConfinementAttestation({
@@ -441,7 +462,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         outcome: "refused",
       });
       applyBackendPlanToAttestation(refusedAttestation, backendPlan);
-      saveAttestationRecord(refusedAttestation, request.context, backendPlan.resources);
+      saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
         "confinement-unsupported",
         `required confinement refused for capability "${request.capability}": ${assessment.mismatches.map((m) => m.detail).join("; ")}`,
@@ -463,7 +484,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       outcome: "unknown",
     });
     applyBackendPlanToAttestation(prepAttestation, backendPlan);
-    saveAttestationRecord(prepAttestation, request.context, backendPlan.resources);
+    saveAttestationRecord(prepAttestation, request.context);
   }
 
   // R3: Resolve adapter function through Authority
@@ -534,7 +555,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       error: err,
     });
     applyBackendPlanToAttestation(failedAttestation, backendPlan);
-    saveAttestationRecord(failedAttestation, request.context, backendPlan?.resources);
+    saveAttestationRecord(failedAttestation, request.context);
     if (err instanceof DispatchError) {
       err.contract = "confinement-execution.v1";
       err.status = "failed";
@@ -572,9 +593,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   const attestation = buildConfinementAttestation({
     request,
     phase: "completed",
+    outcome: preparedConfinement ? "enforced" : undefined,
   });
   applyBackendPlanToAttestation(attestation, backendPlan);
-  saveAttestationRecord(attestation, request.context, backendPlan?.resources);
+  saveAttestationRecord(attestation, request.context);
 
   return {
     ...adapterResult,

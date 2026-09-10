@@ -193,13 +193,13 @@ test('R2: resolveConfinementResources resolves run-output, workspace, private-ho
     const homeRes = resolved.find((r) => r.resource === 'private-home');
     assert.ok(homeRes);
     assert.equal(homeRes.allocation, 'temporary');
-    assert.ok(fs.existsSync(homeRes.hostTarget));
+    assert.equal(fs.existsSync(homeRes.hostTarget), false, 'assessment plans but does not allocate private home');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
-test('H2/M2: bwrap refuses unknown or missing required controls and unresolved credentials', () => {
+test('H2/M2: bwrap refuses unknown or missing required controls while unresolved optional credentials stay unverified', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-control-refusal-'));
   try {
     const base = {
@@ -219,7 +219,9 @@ test('H2/M2: bwrap refuses unknown or missing required controls and unresolved c
     assert.ok(missing.mismatches.some((m) => m.detail.includes('missing control "hostWrite"')));
     const credentials = assessBwrap({ ...base, requirement: { ...base.requirement, policy: { ...base.requirement.policy, grants: [{ resource: 'executor-credentials', access: 'read', scope: 'dispatch' }] } } }, { id: 'bwrap', config: { type: 'bwrap' } });
     assert.equal(credentials.coverage['grant:executor-credentials'], 'unverified');
-    assert.ok(credentials.mismatches.some((m) => m.detail.includes('no provider credential source')));
+    assert.equal(credentials.mismatches.some((m) => m.detail.includes('credential source')), false);
+    const requiredCredentials = assessBwrap({ ...base, requirement: { ...base.requirement, policy: { ...base.requirement.policy, grants: [{ resource: 'executor-credentials', access: 'read', scope: 'dispatch', optional: false }] } } }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.ok(requiredCredentials.mismatches.some((m) => m.detail.includes('required executor credentials')));
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
@@ -571,10 +573,8 @@ test('R6: validateAttestationCompleteness enforces 4 phases and 5 required chann
 
 test('R6: saveAttestationRecord persists records outside write grants and createRedactedAttestationReference creates digest', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-attest-test-'));
-  const oldStore = process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
   try {
-    process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = path.join(tmp, 'machine-state', 'attestations');
-    const context = { fgosDir: tmp };
+    const context = { fgosDir: tmp, attestationStoreDir: path.join(tmp, 'machine-state', 'attestations') };
 
     for (const phase of ['prepared', 'completed', 'failed', 'refused']) {
       const att = {
@@ -601,11 +601,7 @@ test('R6: saveAttestationRecord persists records outside write grants and create
       assert.ok(ref.digest.startsWith('sha256:'));
       assert.equal(ref.ref, `attestation:${att.dispatchId}:${phase}`);
     }
-  } finally {
-    if (oldStore === undefined) delete process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
-    else process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = oldStore;
-    fs.rmSync(tmp, { recursive: true, force: true });
-  }
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
 // =========================================================================
@@ -835,6 +831,7 @@ test('Authority Door: required mode with bwrap backend assesses, prepares, execu
       backendId: 'bwrap',
     });
 
+    req.context.attestationStoreDir = path.join(tmp, 'machine-state', 'attestations');
     const execResult = await executeThroughConfinement(req, fakeAdapter);
     assert.equal(adapterSpawned, true);
     assert.equal(execResult.status, 'completed');
@@ -842,9 +839,11 @@ test('Authority Door: required mode with bwrap backend assesses, prepares, execu
     assert.equal(execResult.attestation.phase, 'completed');
 
     // Attestation records persisted outside write grants
-    const loadedPrep = loadAttestationRecord(req.dispatchId, 'prepared', { fgosDir: tmp });
+    const storeContext = { attestationStoreDir: req.context.attestationStoreDir };
+    const loadedPrep = loadAttestationRecord(req.dispatchId, 'prepared', storeContext);
     assert.ok(loadedPrep);
-    const loadedTerm = loadAttestationRecord(req.dispatchId, 'completed', { fgosDir: tmp });
+    const loadedTerm = loadAttestationRecord(req.dispatchId, 'completed', storeContext);
+    assert.equal(execResult.attestation.outcome, 'enforced');
     assert.ok(loadedTerm);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });

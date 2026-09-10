@@ -275,6 +275,8 @@ interface ResourceGrantV1 {
   resource: string;
   access: 'read' | 'write' | 'read-write';
   scope: 'dispatch';
+  // Defaults to true: an unavailable optional resource is unverified, not a refusal.
+  optional?: boolean;
 }
 ```
 
@@ -408,6 +410,12 @@ Hai built-in cho phép private-home nhưng không bắt dùng: provider normaliz
 khai need/binding khi CLI cần home ghi được. home host không có nghĩa cấp quyền
 ghi host home. Credential/plugin/config đọc từ host qua hostRead allow; provider
 phải chứng minh cách load khi dùng private home, không tự copy toàn bộ home.
+
+Grant mặc định là optional khi runtime không resolve được resource đó: coverage
+của grant là `unverified`, không biến cả required dispatch thành refusal. Caller
+có thể đặt `optional: false` trên grant của policy riêng để biến absence thành
+mismatch/refusal. Hai built-in giữ credentials optional để required mode usable
+trên máy chưa có credential source.
 
 Machine registry tương ứng:
 
@@ -670,7 +678,8 @@ public, nhưng run record cục bộ phải đủ thông tin để audit grant.
 resources; identity/location nằm ở resources, không suy từ string path.
 
 `required` cộng bất kỳ control nào `unsatisfied|unknown` dẫn tới
-`refuse`. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
+`refuse`; grant optional không resolve là ngoại lệ hẹp: nó là `unverified`
+nhưng không mismatch. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
 attestation. `coverage` phải có entry cho toàn bộ control và grant trong
 `requested.policy`; thiếu entry là `unknown` và bị từ chối trong `required`.
 Không có degrade âm thầm.

@@ -11,7 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanupConfinementResource } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker } from '../cleanup.mjs';
 import { resolveConfinementResources } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 
@@ -179,23 +179,28 @@ export function assessBwrap(request, backend) {
       coverage['control:process'] = 'unsatisfied';
     }
 
-    // home: host or private
-    if (controls.home === 'host' || controls.home === 'private') {
+    // host is directly represented by the root mount; private needs a
+    // dedicated HOME mount, which this driver does not yet emit.
+    if (controls.home === 'host') {
       coverage['control:home'] = 'satisfied';
+    } else if (controls.home === 'private') {
+      coverage['control:home'] = 'unverified';
     } else {
       coverage['control:home'] = 'unknown';
     }
 
-    // session: shared
+    // Shared is the host context. Isolated needs an explicit namespace flag.
     if (controls.session === 'shared') {
       coverage['control:session'] = 'satisfied';
     } else {
-      coverage['control:session'] = 'satisfied'; // normalized context requirement
+      coverage['control:session'] = 'unverified';
     }
 
-    // workspace: shared or own
-    if (controls.workspace === 'shared' || controls.workspace === 'own') {
+    // The default mount shares the workspace. Own needs a distinct target.
+    if (controls.workspace === 'shared') {
       coverage['control:workspace'] = 'satisfied';
+    } else if (controls.workspace === 'own') {
+      coverage['control:workspace'] = 'unverified';
     } else {
       coverage['control:workspace'] = 'unknown';
     }
@@ -244,13 +249,16 @@ export function assessBwrap(request, backend) {
 
   // No provider credential source is currently resolved or mounted by this
   // driver. Never turn that absence into a satisfied security claim.
-  if (policyGrants.some((grant) => grant.resource === 'executor-credentials') &&
+  const credentialsGrant = policyGrants.find((grant) => grant.resource === 'executor-credentials');
+  if (credentialsGrant &&
       !resolvedResources.some((resource) => resource.resource === 'executor-credentials')) {
     coverage['grant:executor-credentials'] = 'unverified';
-    mismatches.push({
-      code: 'confinement-unsupported',
-      detail: 'executor credentials were requested but no provider credential source was resolved for mounting.',
-    });
+    if (credentialsGrant.optional === false) {
+      mismatches.push({
+        code: 'confinement-unsupported',
+        detail: 'required executor credentials were requested but no provider credential source was resolved for mounting.',
+      });
+    }
   }
 
   // Readiness: check if all resourceNeeds have matching resolved resources with sufficient access
@@ -310,6 +318,8 @@ export async function prepareBwrap(plan, request, backend) {
       if (!res.hostTarget || !res.executionTarget?.path) continue;
 
       if (res.allocation === 'temporary') {
+        fs.mkdirSync(res.hostTarget, { recursive: true });
+        writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         allocatedPaths.push(res.hostTarget);
       }
 

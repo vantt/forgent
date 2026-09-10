@@ -13,7 +13,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { writeOwnershipMarker } from './cleanup.mjs';
 
 export class ConfinementResourceError extends Error {
   constructor(code, message) {
@@ -252,11 +251,6 @@ export function resolveConfinementResources({
     // Validate before any mutation: a hostile dispatchId must never leave an
     // escaped directory behind when validation refuses it.
     const { hostTarget } = canonicalizeAndVerifySubpath(allocatedHome, tempRoot, 'private-home');
-
-    fs.mkdirSync(hostTarget, { recursive: true });
-
-    // Write ownership marker (R5)
-    writeOwnershipMarker(hostTarget, { dispatchId, resource: 'private-home' });
 
     resolved.push({
       resource: 'private-home',
