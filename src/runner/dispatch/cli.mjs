@@ -14,6 +14,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
@@ -24,11 +25,11 @@ import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentity } from './resolve.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
-import { executeThroughConfinement } from './confinement/authority.mjs';
+import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { buildPrompt } from './prepare.mjs';
@@ -250,6 +251,11 @@ function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
 }
 
 function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
+  // LOW-3: Accepted R2 tradeoff: openDispatchRun always allocates a real runDir
+  // (under fgosDir when present, or os.tmpdir()/fgos-dispatch-runs when absent)
+  // so that executeThroughConfinement always receives a verified non-empty runDir at the
+  // dispatch seam per R2 specification. Run directories in os.tmpdir() are managed by OS
+  // temp cleanup and retain post-mortem audit records for unconfigured/test dispatches.
   const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-dispatch-runs');
   const runDir = path.join(baseDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
   fs.mkdirSync(runDir, { recursive: true });
@@ -343,63 +349,110 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
   const stageSkill = executorId;
   const targetStage = opts.stage ?? work?.stage ?? 'executing';
-  const domain = resolveDomainName(work?.domain);
-  let curatedCapability = work?.capability ?? opts.capability;
-  if (!curatedCapability && domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement')) {
-    curatedCapability = 'code:implement';
-  }
-  const capability = curatedCapability ?? stageSkill ?? '(unknown-capability)';
-
-  const confinementRequest = buildConfinementRequest({
-    capability,
-    stageSkill,
-    executorId: resolvedExecutorId ?? executorId,
+  const capability = resolveCapabilityIdentity({
     cfg,
-    invocation: {
-      command,
-      args,
-      argsTemplate,
-      prompt,
-      env,
-      liveOutput,
-      interactiveMode,
-      promptDelivery,
-      permissionMode,
-      confinement,
-      adapter,
-      method,
-      url,
-      headers,
-      body,
-    },
-    context: {
-      cwd,
-      repoRoot: repoRootForWatch,
-      runDir: workerRunDir,
-      fgosDir: opts.fgosDir,
-      timeoutMs,
-      idleTimeoutMs,
-      maxBuffer,
-      onChunk: opts.onChunk,
-      workId: work.id,
-      tier,
-      model,
-    },
+    work,
+    stage: targetStage,
+    executorId,
+    resolvedExecutor: executorForTier,
   });
+
+  let confinementRequest;
+  try {
+    confinementRequest = buildConfinementRequest({
+      capability,
+      stageSkill,
+      executorId: resolvedExecutorId ?? executorId,
+      cfg,
+      invocation: {
+        command,
+        args,
+        argsTemplate,
+        prompt,
+        env,
+        liveOutput,
+        interactiveMode,
+        promptDelivery,
+        permissionMode,
+        confinement,
+        adapter,
+        method,
+        url,
+        headers,
+        body,
+      },
+      context: {
+        cwd,
+        repoRoot: repoRootForWatch,
+        runDir: workerRunDir,
+        fgosDir: opts.fgosDir,
+        timeoutMs,
+        idleTimeoutMs,
+        maxBuffer,
+        onChunk: opts.onChunk,
+        workId: work.id,
+        tier,
+        model,
+      },
+    });
+  } catch (err) {
+    closeRun('settled');
+    const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+    const refusedAttestation = buildConfinementAttestation({
+      request: {
+        contract: 'confinement-request.v1',
+        dispatchId,
+        capability: capability ?? executorId ?? '(unknown-capability)',
+        stageSkill,
+        executorId: resolvedExecutorId ?? executorId,
+        requirement: { mode: 'required', error: err.message },
+        context: { cwd, runDir: workerRunDir },
+      },
+      phase: 'refused',
+      outcome: 'refused',
+      error: err,
+    });
+    throw new DispatchError(
+      'confinement-policy-error',
+      err.message,
+      {
+        contract: 'confinement-execution.v1',
+        status: 'refused',
+        dispatchId,
+        capability: capability ?? executorId ?? '(unknown-capability)',
+        stageSkill,
+        executorId: resolvedExecutorId ?? executorId,
+        attestation: refusedAttestation,
+        cause: err,
+      },
+    );
+  }
 
   return executeThroughConfinement(confinementRequest).then(
     // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
     // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
     // only — every field this function already returned stays exactly
     // where it was.
-    (result) => {
+    (doorResult) => {
       closeRun('settled');
       // Settling says the worker finished. It does not say where.
       const strayPaths = outsideWatch.strayPaths();
       if (strayPaths.length > 0) {
         throw strayWriteError({ workId: work.id, tier, model, cwd, repoRoot: repoRootForWatch, strayPaths });
       }
-      return { ...result, templateName, templateHash, executorId, provider, command, baseCommit, headRef, governance };
+      const execResult = doorResult?.result ?? doorResult;
+      return {
+        ...execResult,
+        attestation: doorResult?.attestation,
+        templateName,
+        templateHash,
+        executorId,
+        provider,
+        command,
+        baseCommit,
+        headRef,
+        governance,
+      };
     },
     (err) => {
       // `died` is the one failure that says something about the worker's own
@@ -630,11 +683,14 @@ export async function executeExecutorCli(
   // for a direct executorId call — whichever capabilities that executor
   // itself declares serving (executor.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  let curatedCapability = work?.capability;
-  if (!curatedCapability && (executorIdArg === 'fgos-coding-implement' || (stage === 'executing' && (!work?.domain || work?.domain === DEFAULT_DOMAIN)))) {
-    curatedCapability = 'code:implement';
-  }
-  const capabilityIdentity = purpose ?? curatedCapability ?? (resolvedExecutor?.for?.[0]) ?? executorIdArg ?? '(unknown-capability)';
+  const capabilityIdentity = resolveCapabilityIdentity({
+    cfg,
+    work,
+    stage,
+    executorId: executorIdArg,
+    resolvedExecutor,
+    purpose,
+  });
   const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
@@ -642,23 +698,58 @@ export async function executeExecutorCli(
     const agentType = resolvedExecutor?.agentType;
     const stageSkill = executorIdArg;
     const inProcRunDir = runDir || path.join(os.tmpdir(), 'fgos-in-process', String(executorId), String(Date.now()));
-    const confinementRequest = buildConfinementRequest({
-      capability: capabilityIdentity,
-      stageSkill,
-      executorId,
-      cfg,
-      authorityScope: 'external-harness',
-      invocation: {
-        agentType,
-        prompt,
-      },
-      context: {
-        cwd,
-        repoRoot: root,
-        runDir: inProcRunDir,
-        fgosDir,
-      },
-    });
+    let confinementRequest;
+    try {
+      confinementRequest = buildConfinementRequest({
+        capability: capabilityIdentity,
+        stageSkill,
+        executorId,
+        cfg,
+        authorityScope: 'external-harness',
+        invocation: {
+          agentType,
+          prompt,
+        },
+        context: {
+          cwd,
+          repoRoot: root,
+          runDir: inProcRunDir,
+          fgosDir,
+        },
+      });
+    } catch (err) {
+      const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+      const refusedAttestation = buildConfinementAttestation({
+        request: {
+          contract: 'confinement-request.v1',
+          dispatchId,
+          capability: capabilityIdentity,
+          stageSkill,
+          executorId,
+          authorityScope: 'external-harness',
+          requirement: { mode: 'required', error: err.message },
+          context: { cwd, runDir: inProcRunDir },
+        },
+        phase: 'refused',
+        outcome: 'refused',
+        error: err,
+      });
+      throw new DispatchError(
+        'confinement-policy-error',
+        err.message,
+        {
+          contract: 'confinement-execution.v1',
+          status: 'refused',
+          dispatchId,
+          capability: capabilityIdentity,
+          stageSkill,
+          executorId,
+          authorityScope: 'external-harness',
+          attestation: refusedAttestation,
+          cause: err,
+        },
+      );
+    }
 
     const doorResult = await executeThroughConfinement(confinementRequest);
 
@@ -801,42 +892,76 @@ export async function executeExecutorCli(
       : openDispatchRun({ fgosDir, workId: work?.id, executorId, cwd });
     const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
-    const confinementRequest = buildConfinementRequest({
-      capability: capabilityIdentity,
-      stageSkill: executorIdArg,
-      executorId,
-      cfg,
-      invocation: {
-        command,
-        args,
-        argsTemplate,
-        prompt,
-        env,
-        liveOutput,
-        interactiveMode,
-        promptDelivery,
-        permissionMode,
-        confinement,
-        adapter,
-        method,
-        url,
-        headers,
-        body,
-      },
-      context: {
-        cwd,
-        repoRoot: root,
-        runDir: opened.runDir,
-        fgosDir,
-        timeoutMs,
-        idleTimeoutMs,
-        maxBuffer,
-        onChunk,
-        workId: executorId,
-        tier,
-        model,
-      },
-    });
+    let confinementRequest;
+    try {
+      confinementRequest = buildConfinementRequest({
+        capability: capabilityIdentity,
+        stageSkill: executorIdArg,
+        executorId,
+        cfg,
+        invocation: {
+          command,
+          args,
+          argsTemplate,
+          prompt,
+          env,
+          liveOutput,
+          interactiveMode,
+          promptDelivery,
+          permissionMode,
+          confinement,
+          adapter,
+          method,
+          url,
+          headers,
+          body,
+        },
+        context: {
+          cwd,
+          repoRoot: root,
+          runDir: opened.runDir,
+          fgosDir,
+          timeoutMs,
+          idleTimeoutMs,
+          maxBuffer,
+          onChunk,
+          workId: executorId,
+          tier,
+          model,
+        },
+      });
+    } catch (err) {
+      opened.closeRun('settled');
+      const dispatchId = `disp_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+      const refusedAttestation = buildConfinementAttestation({
+        request: {
+          contract: 'confinement-request.v1',
+          dispatchId,
+          capability: capabilityIdentity,
+          stageSkill: executorIdArg,
+          executorId,
+          requirement: { mode: 'required', error: err.message },
+          context: { cwd, runDir: opened.runDir },
+        },
+        phase: 'refused',
+        outcome: 'refused',
+        error: err,
+      });
+      throw new DispatchError(
+        'confinement-policy-error',
+        err.message,
+        {
+          contract: 'confinement-execution.v1',
+          status: 'refused',
+          dispatchId,
+          capability: capabilityIdentity,
+          stageSkill: executorIdArg,
+          executorId,
+          attestation: refusedAttestation,
+          cause: err,
+        },
+      );
+    }
 
     let result;
     try {
@@ -866,7 +991,12 @@ export async function executeExecutorCli(
         );
       }
     }
-    const base = buildDispatchResult({ mechanism, result, headBefore, headAfter, lostUncommittedPaths, provider, command });
+    const execResult = result?.result ?? result;
+    const resultToBuild = {
+      ...execResult,
+      attestation: result?.attestation,
+    };
+    const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
     lockRes.release();

@@ -10,7 +10,7 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier } from './config.mjs';
-import { DOMAINS, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
 
 /**
  * Executor identifier for a work item's executing-stage dispatch (D3,
@@ -465,3 +465,149 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     governance,
   };
 }
+
+/**
+ * Resolves canonical capability identity across both dispatch doors
+ * (`spawnWorker` and `executeExecutorCli`), covering the full catalog
+ * with single, order-independent resolution rules (MED-1, MED-2, MED-3).
+ *
+ * 1. Consistently folds `work?.domain` via `resolveDomainName(work?.domain)`.
+ * 2. Resolves explicit `purpose` if provided (with alias resolution).
+ * 3. Aggregates candidates from domain stage/step/skill, executor declared capabilities (`for`),
+ *    capabilities with `prefer` targeting the executor, and stage names.
+ * 4. Chooses deterministically: required-confinement candidates win first, then candidates with
+ *    explicit confinement policies, then canonical/curated capabilities, then alphabetically.
+ *    Never depends on array ordering in `executor.for`.
+ * 5. No speculative reads of `work?.capability` or `opts.capability` (LOW-1).
+ */
+export function resolveCapabilityIdentity({
+  cfg,
+  work,
+  stage,
+  executorId,
+  resolvedExecutor,
+  purpose,
+} = {}) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+
+  function resolveAlias(name) {
+    if (!name || typeof name !== 'string') return name;
+    if (capabilities[name]) return name;
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {
+        return capName;
+      }
+    }
+    return name;
+  }
+
+  if (purpose && typeof purpose === 'string' && purpose.trim()) {
+    return resolveAlias(purpose.trim());
+  }
+
+  const domain = resolveDomainName(work?.domain);
+  const domainObj = DOMAINS[domain];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  const stageSkill = skillForStage(domainObj, targetStage) ?? (typeof executorId === 'string' ? executorId : null);
+
+  const candidateSet = new Set();
+
+  // Curated mapping: executing / fgos-coding-implement -> code:implement for coding domain
+  if (domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement')) {
+    candidateSet.add('code:implement');
+  }
+
+  // Step mapping: e.g. executing -> Execute -> execute
+  const step = domainObj?.stepMap?.[targetStage];
+  if (step && typeof step === 'string') {
+    candidateSet.add(step.toLowerCase());
+  }
+
+  // Domain-folded stage name itself (e.g. discovery, exploring, planning, validating, executing)
+  if (targetStage && typeof targetStage === 'string') {
+    candidateSet.add(targetStage);
+  }
+
+  // Stage skill name itself (e.g. fgos-coding-implement, fgos-coding-planning)
+  if (stageSkill && typeof stageSkill === 'string') {
+    candidateSet.add(stageSkill);
+  }
+
+  // Work properties (kind, role)
+  if (work?.kind && typeof work.kind === 'string') {
+    candidateSet.add(work.kind);
+  }
+  if (work?.role && typeof work.role === 'string') {
+    candidateSet.add(work.role);
+    if (work.role === 'advisor') candidateSet.add('advise');
+    if (work.role === 'reviewer') candidateSet.add('code:review');
+  }
+
+  // Executor declared capabilities (`for: [...]`)
+  if (Array.isArray(resolvedExecutor?.for)) {
+    for (const f of resolvedExecutor.for) {
+      if (typeof f === 'string' && f.trim()) {
+        candidateSet.add(f.trim());
+      }
+    }
+  }
+
+  // Capabilities in config that `prefer` this executor
+  if (executorId || resolvedExecutor) {
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
+        candidateSet.add(capName);
+      }
+    }
+  }
+
+  // Executor ID itself
+  if (executorId && typeof executorId === 'string') {
+    candidateSet.add(executorId);
+  }
+
+  // Normalize all candidates through aliases
+  const normalizedCandidates = Array.from(candidateSet)
+    .map((c) => resolveAlias(c))
+    .filter(Boolean);
+
+  if (normalizedCandidates.length === 0) {
+    return stageSkill ?? executorId ?? '(unknown-capability)';
+  }
+
+  // Order-independent resolution rule:
+  // 1. Any candidate with required confinement (confinement.mode === 'required') wins!
+  const requiredCandidates = normalizedCandidates.filter(
+    (c) => capabilities[c]?.confinement?.mode === 'required',
+  );
+  if (requiredCandidates.length > 0) {
+    requiredCandidates.sort();
+    return requiredCandidates[0];
+  }
+
+  // 2. Any candidate with configured confinement wins next
+  const configuredConfinementCandidates = normalizedCandidates.filter(
+    (c) => Boolean(capabilities[c]?.confinement),
+  );
+  if (configuredConfinementCandidates.length > 0) {
+    configuredConfinementCandidates.sort();
+    return configuredConfinementCandidates[0];
+  }
+
+  // 3. Prefer curated 'code:implement' if coding executing
+  if (domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement') && normalizedCandidates.includes('code:implement')) {
+    return 'code:implement';
+  }
+
+  // 4. Prefer registered capabilities in cfg.capabilities
+  const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
+  if (registeredCandidates.length > 0) {
+    registeredCandidates.sort();
+    return registeredCandidates[0];
+  }
+
+  // 5. Fallback: sorted candidates first
+  normalizedCandidates.sort();
+  return normalizedCandidates[0];
+}
+

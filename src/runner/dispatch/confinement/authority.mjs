@@ -32,20 +32,36 @@ export function buildConfinementAttestation({
   }
 
   const legacy = request.requirement?.legacy;
-  const isBwrap =
-    request.invocation?.command === "bwrap" ||
-    request.executorId?.includes?.("bwrap") ||
-    (Array.isArray(request.invocation?.args) && request.invocation.args.includes("bwrap"));
+  const hasBwrapCmd = request.invocation?.command === "bwrap";
+  const hasBwrapArgs =
+    Array.isArray(request.invocation?.args) &&
+    request.invocation.args.some(
+      (a) =>
+        typeof a === "string" &&
+        (a === "--ro-bind" ||
+          a === "--bind" ||
+          a === "--unshare-all" ||
+          a === "--unshare-user"),
+    );
+  const isVerifiedBwrap = hasBwrapCmd && hasBwrapArgs;
+  const isHeuristicBwrap =
+    !isVerifiedBwrap &&
+    (request.invocation?.command === "bwrap" ||
+      request.executorId?.includes?.("bwrap") ||
+      (Array.isArray(request.invocation?.args) && request.invocation.args.includes("bwrap")));
 
   const effectiveControls = {
     ...(legacy?.controls ? { ...legacy.controls } : {}),
-    ...(isBwrap ? { hostWrite: "deny", process: "isolated" } : {}),
+    ...(isVerifiedBwrap ? { hostWrite: "deny", process: "isolated" } : {}),
   };
 
   const coverage = {};
-  if (isBwrap) {
+  if (isVerifiedBwrap) {
     coverage["control:hostWrite"] = "satisfied";
     coverage["control:process"] = "satisfied";
+  } else if (isHeuristicBwrap) {
+    coverage["control:hostWrite"] = "unverified";
+    coverage["control:process"] = "unverified";
   }
   if (legacy?.controls?.session === "isolated") {
     coverage["control:session"] = "satisfied";
@@ -57,10 +73,19 @@ export function buildConfinementAttestation({
     coverage["control:home"] = "satisfied";
   }
 
+  // LOW-2: Legacy grants name an abstract resource (e.g. 'private-home') whose concrete filesystem
+  // path is allocated downstream by the adapter runtime (e.g. herdr private HOME), unlike the
+  // bwrap run-output grant where runDir was already allocated at the dispatch seam. When request.context?.homeDir
+  // is known, target uses it; otherwise it preserves g.resource as an abstract target descriptor.
   const grants = [
-    ...(legacy?.grants ? legacy.grants.map((g) => ({ ...g, target: g.resource })) : []),
+    ...(legacy?.grants
+      ? legacy.grants.map((g) => ({
+          ...g,
+          target: request.context?.homeDir ?? g.resource,
+        }))
+      : []),
   ];
-  if (isBwrap && !grants.some((g) => g.resource === "run-output")) {
+  if (isVerifiedBwrap && !grants.some((g) => g.resource === "run-output")) {
     grants.push({
       resource: "run-output",
       access: "write",
@@ -79,21 +104,25 @@ export function buildConfinementAttestation({
     : [
         {
           name: "filesystem",
-          coverage: isBwrap ? "covered" : "unknown",
-          detail: isBwrap
+          coverage: isVerifiedBwrap ? "covered" : isHeuristicBwrap ? "unverified" : "unknown",
+          detail: isVerifiedBwrap
             ? "observed hand-written bwrap sandbox"
-            : (request.requirement?.policyId
-                ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
-                : "observe-mode: no policy declared"),
+            : isHeuristicBwrap
+              ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
+              : (request.requirement?.policyId
+                  ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
+                  : "observe-mode: no policy declared"),
         },
         {
           name: "inherited-fd",
-          coverage: isBwrap ? "covered" : "unknown",
-          detail: isBwrap
+          coverage: isVerifiedBwrap ? "covered" : isHeuristicBwrap ? "unverified" : "unknown",
+          detail: isVerifiedBwrap
             ? "observed hand-written bwrap sandbox"
-            : (request.requirement?.policyId
-                ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
-                : "observe-mode: no policy declared"),
+            : isHeuristicBwrap
+              ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
+              : (request.requirement?.policyId
+                  ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
+                  : "observe-mode: no policy declared"),
         },
         {
           name: "stdio",
@@ -121,10 +150,16 @@ export function buildConfinementAttestation({
       freshness: "current",
     },
   ];
-  if (isBwrap) {
+  if (isVerifiedBwrap) {
     evidence.push({
       kind: "structural-observation",
       ref: `bwrap-argv:${request.executorId}`,
+      freshness: "current",
+    });
+  } else if (isHeuristicBwrap) {
+    evidence.push({
+      kind: "structural-observation",
+      ref: `bwrap-heuristic:${request.executorId}`,
       freshness: "current",
     });
   }
@@ -193,10 +228,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       );
     }
     return {
+      ...request.invocation,
       contract: "confinement-execution.v1",
       status: "completed",
       result: request.invocation,
-      ...request.invocation,
       attestation: null,
       authorityScope: "external-harness",
     };
@@ -324,10 +359,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   });
 
   return {
+    ...adapterResult,
     contract: "confinement-execution.v1",
     status: "completed",
     result: adapterResult,
-    ...adapterResult,
     attestation,
   };
 }

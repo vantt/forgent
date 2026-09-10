@@ -71,7 +71,8 @@ test("fake adapter receives only prepared invocation through Authority (R1-R3)",
 
   const res = await executeThroughConfinement(req, fakeAdapter);
 
-  assert.equal(res.status, 0);
+  assert.equal(res.status, "completed");
+  assert.equal(res.result.status, 0);
   assert.equal(res.stdout, "fake stdout");
   assert.ok(res.attestation, "attestation is attached to result");
   assert.equal(res.attestation.contract, "confinement-attestation.v1");
@@ -468,9 +469,325 @@ test("Red-team MEDIUM: ExecutorResult attaches confinement attestation per R5 de
   });
 
   const res = await executeThroughConfinement(req, fakeAdapter);
-  assert.equal(res.status, 0);
+  assert.equal(res.status, "completed");
+  assert.equal(res.result.status, 0);
   assert.equal(res.stdout, "output");
   assert.equal(res.stderr, "");
   assert.ok("attestation" in res, "attestation key is present per R5 contract");
   assert.equal(res.attestation.contract, "confinement-attestation.v1");
+});
+
+test("HIGH-1 regression: fake adapter returning status/contract/result does not clobber spec 6.9 tokens", async () => {
+  const fakeAdapter = async () => ({
+    status: 123,
+    contract: "custom-adapter.v9",
+    result: { custom: true },
+    stdout: "adapter stdout",
+    stderr: "",
+  });
+
+  const req = buildConfinementRequest({
+    capability: "high1-cap",
+    executorId: "high1-exec",
+    invocation: { command: "echo", args: [] },
+    context: { cwd: "/cwd", runDir: "/runDir" },
+  });
+
+  const res = await executeThroughConfinement(req, fakeAdapter);
+  assert.equal(res.contract, "confinement-execution.v1", "spec 6.9 contract token is preserved");
+  assert.equal(res.status, "completed", "spec 6.9 status token is completed, not adapter status 123");
+  assert.ok(res.attestation, "attestation is attached");
+  assert.equal(res.result.status, 123, "wrapped result preserves adapter status");
+  assert.equal(res.result.contract, "custom-adapter.v9", "wrapped result preserves adapter contract");
+  assert.deepEqual(res.result.result, { custom: true }, "wrapped result preserves adapter result key");
+});
+
+test("MED-1: required policy on execute, advise, and stage names binds on spawnWorker", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med1-test-"));
+  try {
+    const baseCfg = {
+      executors: {
+        claude: {
+          command: "claude",
+          adapter: "cli-spawn",
+          args: ["-p", "{prompt}"],
+          invocations: [{ via: "cli", command: "claude", args: ["-p", "{prompt}"] }],
+        },
+      },
+      executor: {
+        command: "claude",
+        adapter: "cli-spawn",
+        args: ["-p", "{prompt}"],
+        invocations: [{ via: "cli", command: "claude", args: ["-p", "{prompt}"] }],
+      },
+      modelPolicies: {
+        claude: { standard: "sonnet" },
+      },
+    };
+
+    // 1. Required policy on 'execute'
+    const cfgExecute = {
+      ...baseCfg,
+      capabilities: {
+        execute: { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+    };
+    await assert.rejects(
+      () => spawnWorker({ id: "w-exec", domain: "coding", stage: "executing", tier: "standard" }, cfgExecute, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.equal(err.capability, "execute");
+        return true;
+      },
+    );
+
+    // 2. Required policy on 'advise'
+    const cfgAdvise = {
+      ...baseCfg,
+      capabilities: {
+        advise: { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+    };
+    await assert.rejects(
+      () => spawnWorker({ id: "w-adv", domain: "coding", stage: "exploring", kind: "advise", tier: "standard" }, cfgAdvise, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.equal(err.capability, "advise");
+        return true;
+      },
+    );
+
+    // 3. Required policy on domain-folded stage name 'discovery'
+    const cfgDiscovery = {
+      ...baseCfg,
+      capabilities: {
+        discovery: { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+    };
+    await assert.rejects(
+      () => spawnWorker({ id: "w-disc", domain: "coding", stage: "discovery", tier: "standard" }, cfgDiscovery, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.equal(err.capability, "discovery");
+        return true;
+      },
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for research domain", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med2-test-"));
+  try {
+    const cfg = {
+      capabilities: {
+        "code:implement": { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+      executors: {
+        "agy-cli": {
+          command: "agy",
+          adapter: "cli-spawn",
+          args: ["-p", "{prompt}"],
+          invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
+        },
+      },
+      executor: {
+        command: "agy",
+        adapter: "cli-spawn",
+        args: ["-p", "{prompt}"],
+        invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
+      },
+      modelPolicies: {
+        claude: { standard: "sonnet" },
+        gemini: { standard: "gemini-flash" },
+      },
+    };
+
+    const researchWork = { id: "w-research", domain: "research", stage: "executing", tier: "standard" };
+
+    let spawnRefusedCap;
+    try {
+      await spawnWorker(researchWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") });
+    } catch (err) {
+      spawnRefusedCap = err.capability;
+    }
+    assert.equal(spawnRefusedCap, "code:implement", "spawnWorker folded research domain to coding and resolved code:implement");
+
+    let cliRefusedCap;
+    try {
+      await executeExecutorCli("fgos-coding-implement", {
+        work: researchWork,
+        stage: "executing",
+        repoRoot: tmpDir,
+        cwd: tmpDir,
+        runnerConfig: cfg,
+        fgosDir: path.join(tmpDir, ".fgos"),
+        tier: "standard",
+      });
+    } catch (err) {
+      cliRefusedCap = err.capability;
+    }
+    assert.equal(cliRefusedCap, "code:implement", "executeExecutorCli folded research domain to coding and resolved code:implement identically");
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test("MED-3: executor for[] order does not affect capability resolution or required refusal", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med3-test-"));
+  try {
+    const cfgA = {
+      capabilities: {
+        "code:review": { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+      executors: {
+        "multi-order-a": {
+          command: "echo",
+          adapter: "cli-spawn",
+          allowCrossProvider: true,
+          for: ["advise", "code:review"],
+          invocations: [{ via: "cli", command: "echo", args: [] }],
+        },
+      },
+      modelPolicies: { claude: { standard: "sonnet" } },
+    };
+
+    const cfgB = {
+      capabilities: {
+        "code:review": { confinement: { mode: "required", policy: "workspace-write" } },
+      },
+      executors: {
+        "multi-order-b": {
+          command: "echo",
+          adapter: "cli-spawn",
+          allowCrossProvider: true,
+          for: ["code:review", "advise"],
+          invocations: [{ via: "cli", command: "echo", args: [] }],
+        },
+      },
+      modelPolicies: { claude: { standard: "sonnet" } },
+    };
+
+    let refusedCapA;
+    try {
+      await executeExecutorCli("multi-order-a", {
+        repoRoot: tmpDir,
+        cwd: tmpDir,
+        runnerConfig: cfgA,
+        fgosDir: path.join(tmpDir, ".fgos"),
+        tier: "standard",
+      });
+    } catch (err) {
+      refusedCapA = err.capability;
+    }
+
+    let refusedCapB;
+    try {
+      await executeExecutorCli("multi-order-b", {
+        repoRoot: tmpDir,
+        cwd: tmpDir,
+        runnerConfig: cfgB,
+        fgosDir: path.join(tmpDir, ".fgos"),
+        tier: "standard",
+      });
+    } catch (err) {
+      refusedCapB = err.capability;
+    }
+
+    assert.equal(refusedCapA, "code:review", "order ['advise', 'code:review'] binds required policy");
+    assert.equal(refusedCapB, "code:review", "order ['code:review', 'advise'] binds required policy identically");
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test("MED-4: executor named bwrap without real bwrap invocation does not claim satisfied/covered", () => {
+  const req = buildConfinementRequest({
+    capability: "nobwrap-cap",
+    executorId: "claude-nobwrap-fallback",
+    invocation: {
+      command: "claude",
+      args: ["-p", "hi"],
+    },
+    context: { cwd: "/cwd", runDir: "/runDir" },
+  });
+
+  const att = buildConfinementAttestation({ request: req });
+  assert.notEqual(att.effectiveControls.hostWrite, "deny", "must not claim hostWrite: deny without verified bwrap");
+  assert.notEqual(att.effectiveControls.process, "isolated", "must not claim process: isolated without verified bwrap");
+  assert.notEqual(att.coverage["control:hostWrite"], "satisfied", "must not claim satisfied coverage");
+  assert.notEqual(att.coverage["control:process"], "satisfied", "must not claim satisfied coverage");
+  const fsChannel = att.channels.find((c) => c.name === "filesystem");
+  assert.notEqual(fsChannel?.coverage, "covered", "filesystem channel must not be covered");
+  assert.ok(
+    fsChannel?.detail.includes("unverified") || fsChannel?.detail.includes("no policy declared"),
+    "detail must state unverified or no policy declared",
+  );
+  assert.ok(!att.evidence.some((e) => e.ref.startsWith("bwrap-argv:")), "must not emit bwrap-argv evidence");
+});
+
+test("MED-5: fail-closed policy errors produce structured DispatchError with attestation and settled run.json", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med5-test-"));
+  const fgosDir = path.join(tmpDir, ".fgos");
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  try {
+    const cfg = {
+      capabilities: {
+        "code:implement": {
+          confinement: { mode: "required", policy: "non-existent-policy" },
+        },
+      },
+      executors: {
+        "agy-cli": {
+          command: "agy",
+          adapter: "cli-spawn",
+          args: ["-p", "{prompt}"],
+          invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
+        },
+      },
+      executor: {
+        command: "agy",
+        adapter: "cli-spawn",
+        args: ["-p", "{prompt}"],
+        invocations: [{ via: "cli", command: "agy", args: ["-p", "{prompt}"] }],
+      },
+      modelPolicies: { claude: { standard: "sonnet" }, gemini: { standard: "gemini-flash" } },
+    };
+
+    let caughtErr;
+    try {
+      await spawnWorker(
+        { id: "wleak", domain: "coding", stage: "executing", tier: "standard" },
+        cfg,
+        tmpDir,
+        { fgosDir },
+      );
+    } catch (err) {
+      caughtErr = err;
+    }
+
+    assert.ok(caughtErr, "error must be thrown");
+    assert.ok(caughtErr instanceof DispatchError, "must be a DispatchError");
+    assert.equal(caughtErr.errorClass, "confinement-policy-error");
+    assert.equal(caughtErr.status, "refused");
+    assert.ok(caughtErr.dispatchId, "dispatchId must be present");
+    assert.ok(caughtErr.attestation, "attestation must be attached");
+    assert.equal(caughtErr.attestation.phase, "refused");
+    assert.equal(caughtErr.attestation.outcome, "refused");
+
+    // Check that run.json is NOT left at status 'running'
+    const runsBase = path.join(fgosDir, "dispatch-runs", "wleak");
+    const runSubdirs = fs.readdirSync(runsBase);
+    assert.ok(runSubdirs.length > 0, "run directory must exist");
+    const runJsonPath = path.join(runsBase, runSubdirs[0], "run.json");
+    const runRecord = JSON.parse(fs.readFileSync(runJsonPath, "utf8"));
+    assert.equal(runRecord.status, "settled", "run.json must be closed at settled, never stuck at running");
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
