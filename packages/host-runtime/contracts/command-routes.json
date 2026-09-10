@@ -1,0 +1,659 @@
+{
+  "add": {
+    "selector": "add",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "answer": {
+    "selector": "answer",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "approve": {
+    "selector": "approve",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "ask": {
+    "selector": "ask",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "authoritative-match": {
+    "selector": "authoritative-match",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "catchup": {
+    "selector": "catchup",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "check": {
+    "selector": "check",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "cleanup": {
+    "selector": "cleanup",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "compound": {
+    "selector": "compound",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "conflicts": {
+    "selector": "conflicts",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "context-render": {
+    "selector": "context-render",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "coordination": {
+    "selector": "coordination",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "decision": {
+    "selector": "decision",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "decision-index": {
+    "selector": "decision-index",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "discover": {
+    "selector": "discover",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "dispatch": {
+    "selector": "dispatch",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "dispatch-report": {
+    "selector": "dispatch-report",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "doc": {
+    "selector": "doc",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "doc-registry": {
+    "selector": "doc-registry",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "doc-sources": {
+    "selector": "doc-sources",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "docs-index": {
+    "selector": "docs-index",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "doctor": {
+    "selector": "doctor",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "edit": {
+    "selector": "edit",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "evolve": {
+    "selector": "evolve",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "faults": {
+    "selector": "faults",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "gate-approve": {
+    "selector": "gate-approve",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "gate-bypass": {
+    "selector": "gate-bypass",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "gate-check": {
+    "selector": "gate-check",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "gateway": {
+    "selector": "gateway",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "goal": {
+    "selector": "goal",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "graph": {
+    "selector": "graph",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "handoff": {
+    "selector": "handoff",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "handoff-return": {
+    "selector": "handoff-return",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "init": {
+    "selector": "init",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "knowledge": {
+    "selector": "knowledge",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "list": {
+    "selector": "list",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "lock-status": {
+    "selector": "lock-status",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "main-checkout-reset": {
+    "selector": "main-checkout-reset",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "merge": {
+    "selector": "merge",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "move": {
+    "selector": "move",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "pick": {
+    "selector": "pick",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "plan": {
+    "selector": "plan",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "preflight": {
+    "selector": "preflight",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "promote-to-component": {
+    "selector": "promote-to-component",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "ready": {
+    "selector": "ready",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "rebuild": {
+    "selector": "rebuild",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "recheck-blocked": {
+    "selector": "recheck-blocked",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "reject": {
+    "selector": "reject",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "repair": {
+    "selector": "repair",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "report": {
+    "selector": "report",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "resolve-park-reason": {
+    "selector": "resolve-park-reason",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "resync-worktree": {
+    "selector": "resync-worktree",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "retrospective": {
+    "selector": "retrospective",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "return": {
+    "selector": "return",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "review": {
+    "selector": "review",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "rollup": {
+    "selector": "rollup",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "schedule": {
+    "selector": "schedule",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "session": {
+    "selector": "session",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "setup": {
+    "selector": "setup",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "show": {
+    "selector": "show",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "slots": {
+    "selector": "slots",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "stale": {
+    "selector": "stale",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "submit": {
+    "selector": "submit",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "sync-root": {
+    "selector": "sync-root",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "take": {
+    "selector": "take",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "tool": {
+    "selector": "tool",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "topic": {
+    "selector": "topic",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "triage": {
+    "selector": "triage",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "unclaim": {
+    "selector": "unclaim",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "uninstall": {
+    "selector": "uninstall",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "unlock": {
+    "selector": "unlock",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "version": {
+    "selector": "version",
+    "route_kind": "native",
+    "operation_id": "distribution.build.show",
+    "owner_path": "packages/distribution/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "workflow": {
+    "selector": "workflow",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  }
+}
