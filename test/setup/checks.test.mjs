@@ -115,6 +115,11 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'trust-store-readable',
       'executor-confinement',
       'herdr-executor-kinds',
+      // Phase 09: rust-host-r1-kernel release tree builder and doctor.
+      'rust-host-binary-present',
+      'rust-host-target-supported',
+      'legacy-node-payload-present',
+      'command-routes-drift',
     ].sort(),
   );
 });

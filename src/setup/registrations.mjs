@@ -3558,3 +3558,245 @@ registerCheck({
   },
 });
 
+// ─── Rust Host Release and Packaging Checks (Phase 09) ───────────────────────
+
+function resolveActiveReleaseForDoctor(dir) {
+  const root = resolveMainCheckout(dir) ?? dir;
+  const candidateDirs = [dir, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+
+  // 1. Explicit env vars
+  if (process.env.FGOS_ACTIVE_RELEASE_PATH) {
+    const releasePath = process.env.FGOS_ACTIVE_RELEASE_PATH;
+    const manifestPath = process.env.FGOS_ACTIVE_MANIFEST_PATH ||
+      (fs.existsSync(path.join(releasePath, 'manifest.json'))
+        ? path.join(releasePath, 'manifest.json')
+        : path.join(releasePath, 'target', 'dev-manifest.json'));
+    if (fs.existsSync(manifestPath)) {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        return { releasePath, manifestPath, manifest };
+      } catch (_) {}
+    }
+    return { releasePath, manifestPath: null, manifest: null };
+  }
+
+  // 2. Workspace activation binding (.fgos/installation/activation.json)
+  for (const candidate of candidateDirs) {
+    const activationPath = path.join(candidate, '.fgos', 'installation', 'activation.json');
+    if (fs.existsSync(activationPath)) {
+      try {
+        const act = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+        if (act.releasePath) {
+          const manifestPath = path.join(act.releasePath, 'manifest.json');
+          if (fs.existsSync(manifestPath)) {
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+            return { releasePath: act.releasePath, manifestPath, manifest };
+          }
+          return { releasePath: act.releasePath, manifestPath: null, manifest: null };
+        }
+      } catch (_) {}
+    }
+  }
+
+  // 3. Staged release manifest in candidate dirs
+  for (const candidate of candidateDirs) {
+    const rootManifest = path.join(candidate, 'manifest.json');
+    if (fs.existsSync(rootManifest)) {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(rootManifest, 'utf8'));
+        return { releasePath: candidate, manifestPath: rootManifest, manifest };
+      } catch (_) {}
+    }
+  }
+
+  // 4. Dev manifest in target/dev-manifest.json
+  for (const candidate of candidateDirs) {
+    const devManifest = path.join(candidate, 'target', 'dev-manifest.json');
+    if (fs.existsSync(devManifest)) {
+      try {
+        const manifest = JSON.parse(fs.readFileSync(devManifest, 'utf8'));
+        return { releasePath: candidate, manifestPath: devManifest, manifest };
+      } catch (_) {}
+    }
+  }
+
+  // 5. Source checkout dev fallback -- any directory with a package.json is
+  // NOT a sufficient signal (fgOS runs globally against other projects,
+  // D-ADR0035, and nearly every Node project has a package.json); require
+  // the Rust host workspace marker unique to this repo's own checkout.
+  for (const candidate of candidateDirs) {
+    if (fs.existsSync(path.join(candidate, 'apps', 'fgos', 'Cargo.toml'))) {
+      return { releasePath: candidate, manifestPath: null, manifest: null, isDevCheckout: true };
+    }
+  }
+  return { releasePath: dir, manifestPath: null, manifest: null, isDevCheckout: false };
+}
+
+function checkRustHostBinaryPresent(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+  const releaseInfo = resolveActiveReleaseForDoctor(cwd);
+  let binaryPath = null;
+
+  if (releaseInfo.manifest) {
+    const fgosEntry = releaseInfo.manifest.entries?.fgos;
+    if (!fgosEntry) {
+      return { passed: false, message: 'active release manifest missing entries.fgos' };
+    }
+    binaryPath = path.resolve(releaseInfo.releasePath, fgosEntry);
+  } else if (releaseInfo.isDevCheckout) {
+    for (const candidate of candidateDirs) {
+      const releaseTarget = path.join(candidate, 'target', 'release', 'fgos');
+      const debugTarget = path.join(candidate, 'target', 'debug', 'fgos');
+      if (fs.existsSync(releaseTarget)) {
+        binaryPath = releaseTarget;
+        break;
+      } else if (fs.existsSync(debugTarget)) {
+        binaryPath = debugTarget;
+        break;
+      }
+    }
+    if (!binaryPath) {
+      binaryPath = path.join(cwd, 'target', 'release', 'fgos');
+    }
+  } else {
+    // No active release, no manifest, and not this repo's own Rust host
+    // checkout -- fgOS runs globally against other projects (D-ADR0035)
+    // that legitimately have no rust host binary at all. Not applicable
+    // here is not a failure; matches command-routes-drift's own
+    // pass-with-skip pattern below.
+    return {
+      passed: true,
+      message: 'no active fgos rust host release or dev checkout found -- rust-host-binary-present skipped',
+    };
+  }
+
+  if (!fs.existsSync(binaryPath)) {
+    return { passed: false, message: `rust host binary does not exist at ${binaryPath}` };
+  }
+
+  try {
+    fs.accessSync(binaryPath, fs.constants.X_OK);
+    return { passed: true, message: `rust host binary present and executable: ${binaryPath}` };
+  } catch (err) {
+    return { passed: false, message: `rust host binary at ${binaryPath} is not executable: ${err.message}` };
+  }
+}
+
+function checkRustHostTargetSupported() {
+  const approvedTargets = ['x86_64-unknown-linux-gnu'];
+  const isApproved = process.platform === 'linux' && process.arch === 'x64';
+  if (isApproved) {
+    return {
+      passed: true,
+      message: 'current platform (x86_64-unknown-linux-gnu) is an approved rust host target',
+    };
+  }
+  return {
+    passed: false,
+    message: `current platform (${process.arch}-${process.platform}) is not an approved rust host target (approved: ${approvedTargets.join(', ')})`,
+  };
+}
+
+function checkLegacyNodePayloadPresent(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+  const releaseInfo = resolveActiveReleaseForDoctor(cwd);
+  let payloadPath = null;
+
+  if (releaseInfo.manifest) {
+    const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';
+    const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';
+    payloadPath = path.resolve(releaseInfo.releasePath, rootDir, entry);
+  } else if (releaseInfo.isDevCheckout) {
+    for (const candidate of candidateDirs) {
+      const candidatePayload = path.join(candidate, 'bin', 'fgos.mjs');
+      if (fs.existsSync(candidatePayload)) {
+        payloadPath = candidatePayload;
+        break;
+      }
+    }
+    if (!payloadPath) {
+      payloadPath = path.join(cwd, 'bin', 'fgos.mjs');
+    }
+  } else {
+    // Same "not applicable" reasoning as checkRustHostBinaryPresent above:
+    // fgOS runs globally against other projects (D-ADR0035) with no rust
+    // host release of their own.
+    return {
+      passed: true,
+      message: 'no active fgos rust host release or dev checkout found -- legacy-node-payload-present skipped',
+    };
+  }
+
+  if (fs.existsSync(payloadPath) && fs.statSync(payloadPath).isFile()) {
+    return { passed: true, message: `legacy node payload present: ${payloadPath}` };
+  }
+  return { passed: false, message: `legacy node payload does not exist at ${payloadPath}` };
+}
+
+function checkCommandRoutesDrift(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+  let scriptPath = null;
+  let runCwd = cwd;
+
+  for (const candidate of candidateDirs) {
+    const p = path.join(candidate, 'scripts', 'export-command-selectors.mjs');
+    if (fs.existsSync(p)) {
+      scriptPath = p;
+      runCwd = candidate;
+      break;
+    }
+  }
+
+  if (!scriptPath) {
+    return {
+      passed: true,
+      message: 'scripts/export-command-selectors.mjs not present (release tree install -- command-routes-drift skipped)',
+    };
+  }
+  try {
+    execFileSync(process.execPath, [scriptPath, '--check'], {
+      cwd: runCwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return {
+      passed: true,
+      message: 'command routes descriptor matches current command registry and annotations with no drift',
+    };
+  } catch (err) {
+    const detail = (err.stderr || err.stdout || err.message || '').trim();
+    return {
+      passed: false,
+      message: `command routes drift detected: ${detail}`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'rust-host-binary-present',
+  description: 'the active release\'s entries.fgos binary exists and is executable',
+  check: (cwd) => checkRustHostBinaryPresent(cwd),
+});
+
+registerCheck({
+  id: 'rust-host-target-supported',
+  description: 'current OS and architecture is an approved target for the fgos rust host (x86_64-unknown-linux-gnu)',
+  check: () => checkRustHostTargetSupported(),
+});
+
+registerCheck({
+  id: 'legacy-node-payload-present',
+  description: 'the legacy node payload components.legacyNode.root/entry resolves to a real file',
+  check: (cwd) => checkLegacyNodePayloadPresent(cwd),
+});
+
+registerCheck({
+  id: 'command-routes-drift',
+  description: 'command routes descriptor matches current command registry and route annotations with no drift',
+  check: (cwd) => checkCommandRoutesDrift(cwd),
+});
+
+
