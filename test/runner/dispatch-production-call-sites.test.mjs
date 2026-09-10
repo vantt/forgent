@@ -423,3 +423,114 @@ test('dirt that was already there is not blamed on the worker', async () => {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('production dispatch attaches confinement attestation to ExecutorResult (R5, R7)', async () => {
+  const root = fixtureRepo();
+  mockHerdr(root);
+  try {
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: root,
+      tier: 'standard',
+    }));
+    assert.equal(res.status, 0);
+    assert.ok(res.attestation, 'attestation is attached to executeExecutorCli result');
+    assert.equal(res.attestation.contract, 'confinement-attestation.v1');
+    assert.equal(res.attestation.outcome, 'unknown', 'legacy omitted policy gets unknown attestation in observe mode');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('in-process dispatch through executeExecutorCli gets authorityScope: external-harness (R6)', async () => {
+  const root = fixtureRepo(() => ({
+    kind: 'agent',
+    agentType: 'general-assistant',
+  }));
+  try {
+    const res = await executeExecutorCli('herdr-worker', {
+      prompt: 'in process prompt',
+      repoRoot: root,
+      cwd: root,
+      hasLiveTaskAccess: true,
+    });
+    assert.equal(res.mechanism, 'in-process');
+    assert.equal(res.authorityScope, 'external-harness');
+    assert.equal(res.attestation, null);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('in-process dispatch with required confinement refuses without trusted harness (R6)', async () => {
+  const root = fixtureRepo(() => ({
+    kind: 'agent',
+    agentType: 'general-assistant',
+  }));
+  // Add required confinement to the capability in config
+  const cfgPath = path.join(root, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.capabilities[IMPLEMENT_CAPABILITY].confinement = {
+    mode: 'required',
+    policy: 'host-write-denied',
+  };
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  try {
+    await assert.rejects(
+      () => executeExecutorCli('herdr-worker', {
+        prompt: 'in process prompt',
+        repoRoot: root,
+        cwd: root,
+        hasLiveTaskAccess: true,
+        for: IMPLEMENT_CAPABILITY,
+      }),
+      (err) => {
+        assert.equal(err.errorClass, 'confinement-unsupported');
+        assert.match(err.message, /in-process dispatch has no trusted harness attestation contract/);
+        return true;
+      },
+    );
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('http adapter routes through executeThroughConfinement and returns result with attestation', async () => {
+  // Spawn a tiny test HTTP server
+  const http = await import('node:http');
+  const server = http.createServer((req, res) => {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const port = server.address().port;
+
+  const root = fixtureRepo(() => ({
+    kind: 'tool',
+    command: 'curl',
+    args: [],
+    adapter: 'http',
+    allowCrossProvider: true,
+    method: 'GET',
+    url: `http://127.0.0.1:${port}/test`,
+  }));
+
+  try {
+    const res = await executeExecutorCli('herdr-worker', {
+      prompt: 'ping',
+      repoRoot: root,
+      cwd: root,
+      tier: 'standard',
+    });
+    assert.equal(res.status, 200);
+    assert.ok(res.attestation, 'http adapter result receives attestation through authority');
+    assert.equal(res.attestation.contract, 'confinement-attestation.v1');
+    assert.equal(res.attestation.outcome, 'unknown');
+  } finally {
+    server.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
