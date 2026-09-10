@@ -1,0 +1,4 @@
+# clippy.toml - Smallest config satisfying workspace clippy gates
+# Intentionally empty: no lint threshold needs a non-default value yet. Kept
+# as the anchor file Phase 05+ writes real settings into, rather than adding
+# it fresh once a real option is needed.

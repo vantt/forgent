@@ -57,3 +57,26 @@ jobs:
 
       - name: cargo test
         run: cargo test --manifest-path herdr-plugin/Cargo.toml
+
+  # One OS, no toolchain action, same reasoning as the herdr-plugin job just
+  # above: x86_64-unknown-linux-gnu is the only target this track's Decisions
+  # table covers (plan.md), and ubuntu-latest's preinstalled toolchain is
+  # trusted the same way herdr-plugin's job already trusts it.
+  rust-workspace:
+    name: cargo (workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: rustup show && cargo --version
+
+      - name: cargo fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test --workspace
+
