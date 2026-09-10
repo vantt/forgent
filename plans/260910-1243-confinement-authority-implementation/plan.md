@@ -242,3 +242,4 @@ gates: P04, P06, P07. Known pre-existing red tests (not regressions):
 
 | Cell | Merge commit | Review / red-team | Deferred findings |
 |---|---|---|---|
+| P00 | `ce886620` | 3 sessions (`--p00` dead/no partialPolicy, `--p00b`/`--p00c` real rounds); reviewer 2 HIGH + several MEDIUM/LOW across rounds, red-team 1 HIGH (session-engine.mjs), all applied; final pass clean | `http`/`httpAdapter` scope (P02 open); `dispatch.mjs` adapter-symbol re-export (P02 open); `src/runner/loop.mjs` lease gap (P02 open); two lease-glob overlaps (inert under MAX_PARALLEL_CELLS:1); phase-00 file's own Verification grep (5 terms, misses 2 symbols); spec §2's stale 0/17 denominator (P07); `codex-readonly`'s retired sandbox (P04) — full detail: `docs/architect/agent-coordination/verification/confinement-authority-implementation/P00.md` |
