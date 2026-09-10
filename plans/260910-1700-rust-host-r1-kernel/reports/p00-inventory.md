@@ -23,14 +23,35 @@ Cross-checked against
 `docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md`
 §3/§5 and `plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md`
 §6–§8 — no conflict found; the plan.md table already carries these settled
-values verbatim.
+values verbatim. This check covers the 6 rows named by phase-00 R1 (target
+matrix, preview-vs-stable, Node compatibility window, performance budgets,
+selector classification, `distribution.build.show` owner) — the full
+Decisions table has 15 rows (`plan.md:130-144`); the 9 fgctl/install rows
+added by the 2026-09-10 scope widening are outside R1's named scope and are
+not examined here.
+
+`rust-cli-and-proof-components-plan.md` §3 (`:76-78`) separately directs that
+decisions 1/5/6 (target matrix, preview-vs-stable, compatibility window) be
+recorded in `docs/architect/packaging-distribution/`. This track's P16
+docs-closeout lease covers `CHANGELOG.md`, `docs/specs/distribution.md`,
+`docs/specs/reading-map.md`, and `docs/architect/host-invocation-routing/**`
+only — no cell in this track's Product Gates writes to
+`docs/architect/packaging-distribution/`. Flagged as an open gap for the
+Lead to resolve at or before P16 (either widen P16's lease or accept
+`plan.md`'s Decisions table as the recorded location and note the deviation
+from §3 explicitly).
 
 ## R2 — 73-selector classification
 
-`grep -c "^    name:" src/cli/command-registry.mjs` → **73**. All 73 top-level
-`name` entries enumerated below (one selector per `sub`-positional group, per
-`legacy-cli-transition.md` §3 — `coordination`, `dispatch`, `session`, `tool`,
-`doc`, `workflow` each count once regardless of their `sub` enum arms).
+`grep -c "^    name:" src/cli/command-registry.mjs` → **73**; the only other
+`name:` match in the file (`:1343`) is a JSON-Schema property inside a
+registry entry, not a 74th selector. All 73 top-level `name` entries
+enumerated below (one selector per `sub`-positional group — this phase's own
+R2 instruction states the rule directly; `legacy-cli-transition.md` §3
+`:58-64` supports it only by implication at `:62` and does not state it
+outright, so the rule is this phase's own, not a citable fact from that
+section — `coordination`, `dispatch`, `session`, `tool`, `doc`, `workflow`
+each count once regardless of their `sub` enum arms).
 
 Classification: exactly **1 native** (`version` → operation
 `distribution.build.show`, owner_path = `fgos-distribution` crate,
@@ -118,7 +139,7 @@ manifest).
 Count = 73, matches `grep -c` above. Source: `src/cli/command-registry.mjs`
 lines 52–1522 (`grep -n "^    name:"`).
 
-## R3 — Nine real call sites (file:line, resolver)
+## R3 — Nine real call sites (file:line, resolver), plus three the phase's own grep method missed
 
 Grep basis: `rg -n "bin/fgos\.mjs" scripts/fgos-shell-integration.sh
 herdr-plugin/src/fgos.rs herdr-plugin/src/gateway.rs herdr-plugin/src/main.rs
@@ -126,14 +147,32 @@ src/runner/dispatch/cli.mjs src/evolve/iron-law.mjs
 src/setup/registrations.mjs core/skills/_shared/fgos-cli-fallback.md
 package.json`. Every real-call hit below has a file:line; comment-only hits
 (noted per file) are excluded per `legacy-cli-transition.md` §2 ("Comments are
-not callers").
+not callers"). Four hits this exact grep prints are neither call sites nor
+explicitly annotated above as comments — recorded here for R7/Verification
+completeness: `scripts/fgos-shell-integration.sh:15` (comment, tier-1
+narrative), `scripts/fgos-shell-integration.sh:100` (error-message string, not
+an exec), `herdr-plugin/src/main.rs:205` (doc comment), and
+`src/runner/dispatch/cli.mjs:41` (comment — its "fixed sibling" wording is
+stale once P10 lands and should be rewritten then, not in this phase per R8).
+
+**This nine-site list is the set `legacy-cli-transition.md` §2 itself names,
+confirmed exact against the repo — it is not a claim that grepping the
+literal string `bin/fgos.mjs` across the whole repo finds only nine hits.**
+Live review + red-team against this report (2026-09-10) found three more real,
+non-comment callers a whole-repo sweep for `bin/fgos.mjs`-composing code (not
+just the literal string, since these compose the path via `path.join`/
+`path.resolve` rather than writing the literal string inline) surfaces; they
+are recorded as items 10-12 below rather than folded into the nine because
+`legacy-cli-transition.md` §2's own text does not name them, and P10's "nine
+inventoried call sites" scope (`plan.md` Goal 6, `:64-66`) should be
+re-confirmed against this wider list before that cell closes:
 
 1. `scripts/fgos-shell-integration.sh` — `fgos()` shell function, tier-1
    branch: `scripts/fgos-shell-integration.sh:69` (`if [ -f
    "$root/bin/fgos.mjs" ]`), exec at `:71`/`:73` (`node "$root/bin/fgos.mjs"
    "$@" [--dir "$root"]`). Resolver: the shell function's own inline tier
-   logic (no shared resolver module — shell has none yet, per plan R6/`plan.md`
-   §"tier 0" work in P10).
+   logic (no shared resolver module — shell has none yet, per `plan.md` Goal 6
+   `:64-66`, the "tier 0" work P10 does).
 2. `herdr-plugin/src/fgos.rs::run_fgos` —
    `herdr-plugin/src/fgos.rs:363` (`vec![root.join("bin/fgos.mjs")...]`).
    Resolver: none yet (planned `resolve_fgos` in P10).
@@ -173,9 +212,28 @@ not callers").
    shared resolver module (same shell-side gap as #1).
 9. `package.json` `bin.fgos` — `package.json:10` (`"fgos": "bin/fgos.mjs"`).
    `package.json:29` (`"cli": "node bin/fgos.mjs"`, the `npm run cli` script)
-   is a tenth textual hit but not one of the nine inventoried call sites per
-   `legacy-cli-transition.md` §2's own list (which names only `package.json`
-   `bin`); flagged here for completeness, not added to the nine.
+   is a tenth textual hit in this same file, included in scope here (both
+   lines are in the file R3 already names) but not one of the nine
+   inventoried call sites per `legacy-cli-transition.md` §2's own list (which
+   names only `package.json` `bin`).
+10. `scripts/herdr-cockpit-notify.mjs:45` — `spawnSync(process.execPath,
+    [path.join(repoRoot, 'bin', 'fgos.mjs'), 'list', '--all', '--json'], ...)`.
+    Not a comment, not under `test/`; `scripts/` is inside `package.json`
+    `files` (`:13-24`) so it ships in the legacy payload. Resolver: none
+    (hardcoded `path.join`). **P10's tier-0 resolver work (`plan.md` Goal 6,
+    `:64-66`) and its Product Gate exit (`plan.md:160`) must account for this
+    caller or it is left on the hardcoded path after cutover.**
+11. `scripts/knowledge-canary.mjs:23` — `path.resolve(...,'bin',
+    'fgos.mjs')`, `execSync`'d four times (`:27,:31,:42` and one more).
+    Outside `test/`, so the "~75 Node tests are fixtures" carve-out below
+    does not cover it by name; classified here as fixture-class (a canary
+    script exercising the Node payload's own behavior, same rationale as the
+    test fixtures) but flagged since it was not previously named explicitly.
+12. `plugins/fgOS/skills/terminal/rename.sh:51-52` — `[ -f
+    "$project_root/bin/fgos.mjs" ] || exit 0` then `node
+    "$project_root/bin/fgos.mjs" tool query --capability pane-labeling ...`.
+    Fail-closed capability probe, not under `test/`. Resolver: none (inline
+    file-existence check). Same P10 accounting note as #10 applies.
 
 **~75 Node tests spawning `bin/fgos.mjs` directly confirmed as fixtures, not
 callers to migrate** — per `legacy-cli-transition.md` §2's own statement
@@ -224,12 +282,22 @@ Exact ownership rule content to state (derived from §2's three-row table at
 `legacy-node` payload entry, staged whole under a release's
 `components.legacyNode.root` and exec'd by the Rust host at
 `components.legacyNode.entry` — never relocated, never renamed in the source
-tree. The public `fgos` executable is the Rust host; this file is reached
-only through the release manifest's legacy-payload resolution, never PATH,
-never cwd, never hardcoded outside the manifest."** P07 applies this header
-text (word-for-word or Lead-adjusted at that time) to `bin/fgos.mjs` and adds
-the matching ownership note to the root `AGENTS.md`; **not applied in this
-phase** (R8).
+tree. The Rust host resolves this file only through the release manifest's
+`components.legacyNode` fields, never PATH, never cwd, never hardcoded
+outside the manifest. This does not mean this file becomes unreachable any
+other way: `plan.md` (`:21-22`) keeps the global npm `bin.fgos` as a
+compatibility channel, and `legacy-cli-transition.md` (`:39`) keeps `node
+bin/fgos.mjs` as the fallback for a project that has not run `fgctl init` —
+both call this same file directly, outside the Rust host's own manifest
+resolution."** The corrected wording drops the earlier "reached only
+through... never hardcoded outside the manifest" phrasing (which conflated
+how the *Rust host* resolves the payload with the file's own reachability —
+the two npm/fallback paths above call it directly, hardcoded, by design) and
+scopes the "never PATH/never cwd/never hardcoded" claim to the Rust host's
+own resolution mechanism only, matching `legacy-cli-transition.md:35`. P07
+applies this header text (word-for-word or Lead-adjusted at that time) to
+`bin/fgos.mjs` and adds the matching ownership note to the root `AGENTS.md`;
+**not applied in this phase** (R8).
 
 ## R6 — Wave-2 lease overlap check
 
@@ -259,6 +327,17 @@ match both `packages/host-runtime/contracts/**` and
 Node cell (P01) and one Rust cell (P04) concurrently as `plan.md`'s Parallel
 Execution Map states.
 
+**Lease map (full, beyond the wave-2 overlap check above):** `plan.md:150`
+lists a "lease map" among P00's exit artifacts; the wave-2 overlap check
+above is the only lease cross-reference this phase originally produced. Two
+paths this track touches carry no lease entry in `plan.md`'s Shared-File
+Lease Rule table (`:187-245`) at all: `src/cli/command-registry.mjs` (read by
+P01's `scripts/export-command-selectors.mjs` generator but not itself listed
+in any lease block — P01 should either add it to `node-harness` or note it as
+read-only input) and `scripts/herdr-cockpit-notify.mjs` (item #10 above,
+uninventoried by any lease — falls under no existing lease block; the Lead
+should assign it a lease, most likely `resolver`, when P10 touches it).
+
 ## Verification (per phase-00 Verification section)
 
 - `git diff --stat` — only this report file added under `reports/` (checked
@@ -266,4 +345,16 @@ Execution Map states.
 - `grep -c "^    name:" src/cli/command-registry.mjs` → 73, all 73 accounted
   for in R2's table.
 - The nine-site `rg` command's every hit is either a listed R3 call site or
-  explicitly marked comment/non-caller above.
+  explicitly marked comment/non-caller above — confirmed complete after this
+  revision (the four previously-unaccounted hits are now listed at the top of
+  R3).
+
+## Revision note (post-review)
+
+This report was revised after its own review + red-team pass
+(`rust-host-r1-kernel--cell-01`, superseded by session
+`rust-host-r1-kernel--p00` — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md`
+for the full disposition). All 9 findings (1 HIGH, 4 MEDIUM, 4 LOW) from the
+reviewer pass and both non-LOW findings from the red-team pass are accepted
+and fixed in this revision; the 3 LOW/"not found" red-team findings needed no
+change. No open, unaddressed finding remains.
