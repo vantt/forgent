@@ -24,7 +24,7 @@ function mkTempDir(prefix) {
 function writeStub(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   // Executable by default: a real fgos binary at any tier is executable,
-  // and tier 0's resolver now requires X_OK (round-2 red-team HIGH).
+  // and tier 0's resolver requires X_OK.
   fs.writeFileSync(filePath, '#!/usr/bin/env node\n', { mode: 0o755 });
 }
 
@@ -233,8 +233,8 @@ test('resolveWorkspaceInstallationBin returns null when manifest entries.fgos es
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
 });
 
-// Regression for round-2 red-team HIGH: a non-executable manifest entry
-// was selected as tier 0 instead of falling through.
+// Regression: a non-executable manifest entry was selected as tier 0
+// instead of falling through.
 test('resolveWorkspaceInstallationBin returns null when the resolved entry is not executable', () => {
   const dir = mkTempDir('bin-discovery-tier0-noexec-');
   const installDir = path.join(dir, '.fgos', 'installation');
@@ -251,9 +251,9 @@ test('resolveWorkspaceInstallationBin returns null when the resolved entry is no
   assert.equal(resolveWorkspaceInstallationBin(dir), null);
 });
 
-// Regression for round-2 red-team HIGH: a lexically-confined manifest
-// entry that is itself a symlink escaping the release root (real target
-// outside it) was selected as tier 0 instead of falling through.
+// Regression: a lexically-confined manifest entry that is itself a
+// symlink escaping the release root (real target outside it) was
+// selected as tier 0 instead of falling through.
 test('resolveWorkspaceInstallationBin returns null when the resolved entry is a symlink escaping the release root', () => {
   const dir = mkTempDir('bin-discovery-tier0-symlink-escape-');
   const installDir = path.join(dir, '.fgos', 'installation');

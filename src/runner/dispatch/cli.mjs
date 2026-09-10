@@ -45,9 +45,9 @@ import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
 // topology, a dispatch CLI running from a worktree still resolves tier 0
 // against the module's own checkout root, not the caller's dispatch root
 // -- unreachable from a worktree even when the main checkout has a real
-// workspace installation. Accepted for this phase (falls back to today's
-// exact behavior, R4's own literal text is satisfied); the cutover track
-// can make this resolve per-call against the dispatch root instead.
+// workspace installation. Accepted for now (falls back to today's exact
+// behavior); the cutover track can make this resolve per-call against
+// the dispatch root instead.
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {

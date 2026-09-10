@@ -416,4 +416,28 @@ test('fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos exists bu
   fs.rmSync(repoRoot, { recursive: true, force: true });
 });
 
+// Regression: `-x` follows a symlink chain transparently, so a tier-0
+// shim that is itself an executable symlink whose real target escapes
+// the installation root was accepted and executed instead of falling
+// through to bin/fgos.mjs.
+test('fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos is a symlink escaping the installation root', () => {
+  const repoRoot = setupRepo();
+  const installBinDir = path.join(repoRoot, '.fgos', 'installation', 'bin');
+  fs.mkdirSync(installBinDir, { recursive: true });
+
+  const outsideDir = mkTempDir('fgos-shell-integration-outside-');
+  const outsideTarget = path.join(outsideDir, 'sh-stub');
+  fs.writeFileSync(outsideTarget, '#!/usr/bin/env bash\necho "TIER0_MARKER" "$@"\n');
+  fs.chmodSync(outsideTarget, 0o755);
+  fs.symlinkSync(outsideTarget, path.join(installBinDir, 'fgos'));
+
+  const out = runBash(repoRoot, `source "${scriptPath}"; fgos --x`);
+
+  assert.match(out, /FGOS_MARKER/);
+  assert.doesNotMatch(out, /TIER0_MARKER/);
+
+  fs.rmSync(repoRoot, { recursive: true, force: true });
+  fs.rmSync(outsideDir, { recursive: true, force: true });
+});
+
 

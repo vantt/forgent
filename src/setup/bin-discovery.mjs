@@ -64,9 +64,11 @@ export function resolveWorkspaceInstallationBin(cwd) {
     // A lexically-confined path can still be a symlink whose real target
     // escapes the release root (e.g. entries.fgos pointing at an in-root
     // symlink to /bin/sh) -- resolve the real path and re-confirm
-    // containment against the release root's own real path too, matching
-    // the same discipline shell/Herdr's tier-0 checks apply implicitly by
-    // executing the resolved path directly.
+    // containment against the release root's own real path too. Shell's
+    // `-x` and Herdr's executable-metadata check both follow the same
+    // symlink chain and execute whatever it resolves to, so they need the
+    // matching realpath confinement too -- see fgos-shell-integration.sh
+    // and herdr-plugin/src/fgos.rs.
     let realBin;
     let realBase;
     try {
@@ -79,7 +81,7 @@ export function resolveWorkspaceInstallationBin(cwd) {
       return null;
     }
 
-    // R2/R3's shell (`-x`) and Herdr (`mode & 0o111`) tier-0 checks both
+    // The shell (`-x`) and Herdr (`mode & 0o111`) tier-0 checks both
     // require the resolved entry be executable, not merely present --
     // fall through to tier 1 here too rather than handing a mode-644 file
     // to a caller that will exec it directly and fail with EACCES.
@@ -176,7 +178,8 @@ export function refreshGlobalBinCache(globalConfigPath = undefined) {
 }
 
 /**
- * The full 4-tier resolution (D2 + Phase 10 tier 0), in priority order:
+ * The full 4-tier resolution (D2 plus the tier-0 workspace-installation
+ * shim), in priority order:
  * workspace installation (tier 0) > dev-checkout (tier 1) >
  * project-local (tier 2) > global (tier 3, cache-first with a live
  * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or
