@@ -593,6 +593,24 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // closes one paused on a provider limit -- that screen is the only place
     // the reset time is written.
     closeAlways = false,
+    // A pane already sitting in the caller's own tab (one lead's coding panel
+    // or fanout batch), so this round's fresh pane lands beside it instead of
+    // wherever the operator happens to be focused. Absent for a standalone
+    // dispatch -- today's implicit-focus behaviour is unchanged.
+    //
+    // `dispatch.mjs execute`, the generic CLI door, has no flag for this --
+    // "pane" is herdr's own vocabulary, not something the adapter-agnostic
+    // dispatch surface should have to know about. A cross-process caller
+    // (fanout's independently-launched children) that wants to group its own
+    // batch sets FGOS_HERDR_ANCHOR_PANE in the dispatching process's own env
+    // instead, the same door FGOS_HERDR_BIN/FGOS_HERDR_MODEL already use for
+    // herdr-only knobs. An in-process caller (assignment-runner.mjs, from one
+    // coordination round's own driver) passes `opts.anchorPaneId` directly.
+    anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE,
+    // A lazily-created batch tab handle (see `createBatchTab`), for a batch
+    // whose first round doesn't yet know an explicit anchor pane. In-process
+    // only -- there is no environment-variable equivalent for a live handle.
+    anchorTab,
   } = opts;
 
   const depth = currentDispatchDepth();
@@ -636,6 +654,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     transportDeadlines: opts.transportDeadlines,
     trustStore,
     runDir: optsRunDir,
+    anchorPaneId,
+    anchorTab,
     paneEnv: resolvedEnv,
     cwd,
     repoRoot: opts.repoRoot,

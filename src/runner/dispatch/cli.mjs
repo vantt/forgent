@@ -512,6 +512,17 @@ export async function executeExecutorCli(
     // all before (it computed tier/model with its own inline logic that
     // never checked either list), without requiring any caller to opt in.
     options,
+    // A pane already sitting in the caller's own tab -- passed straight
+    // through to a herdr-family adapter so a batch of related dispatches (one
+    // coding-panel round, one fanout wave) lands in one tab instead of
+    // scattering across whichever tab happens to be focused. Ignored by every
+    // adapter that isn't herdr-backed.
+    anchorPaneId,
+    // A lazily-created batch tab handle -- see `createBatchTab` in
+    // herdr-agent.mjs. An in-process caller (assignment-runner.mjs) passes
+    // this instead of `anchorPaneId` when it wants the FIRST herdr round of
+    // its batch to create the tab, not just join one that already exists.
+    anchorTab,
   } = {},
 ) {
   if (!executorIdArg && !purpose) {
@@ -742,7 +753,7 @@ export async function executeExecutorCli(
     try {
       result = await adapterFn(
         { command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement },
-        { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir: opened.runDir },
+        { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir: opened.runDir, anchorPaneId, anchorTab },
       );
     } catch (err) {
       opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');

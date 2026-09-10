@@ -644,19 +644,43 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const {
     herdrBin, fullEnv, repoRoot, agentKind, agentArgs, delivery, exitCommand,
     trustStore, paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
+    // A pane already sitting in the caller's own tab -- e.g. one lead's coding
+    // panel or fanout batch -- so every sibling round of that same batch lands
+    // beside it instead of wherever the operator happens to be focused. Absent
+    // for a standalone dispatch, which keeps today's implicit-focus behaviour.
+    anchorPaneId,
+    // A lazily-created batch tab shared by every round of one caller's batch
+    // (one coordination round's actors, one fanout wave): `ensure(client)`
+    // creates the tab on the first round that needs it and memoizes the
+    // result, so later rounds of the same batch reuse it without a second
+    // `tab create` call. Ignored when `anchorPaneId` is already explicit.
+    anchorTab,
   } = ctx;
 
   const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
   // ordinary variables, which is exactly what this relies on.
   const effectivePaneEnv = workerHomePath ? { ...paneEnv, HOME: workerHomePath } : paneEnv;
+  const anchor = anchorPaneId ?? anchorTab?.ensure(client);
   try {
-    round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
+    round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+    round.note({ status: 'pane-created', paneId: round.paneId });
   } catch (err) {
-    throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
-      `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+    if (!anchor) {
+      throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
+        `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+    }
+    // Grouping is a visibility nicety, not a dispatch requirement: an anchor
+    // pane closed since it was created (operator action, a prior round's own
+    // cleanup) must never fail a round that would otherwise succeed on its own.
+    try {
+      round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
+      round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
+    } catch (retryErr) {
+      throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
+        `executor failed to start for work "${workId}": herdr could not open a pane (${retryErr.code ?? 'unknown'}): ${retryErr.message}`);
+    }
   }
-  round.note({ status: 'pane-created', paneId: round.paneId });
 
   // A confined run needs no seeding here: its private HOME is provisioned with
   // the workspace already trusted, so writing to the operator's own store for
