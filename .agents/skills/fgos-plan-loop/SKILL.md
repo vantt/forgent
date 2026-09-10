@@ -142,6 +142,12 @@ filename.
    git worktree add ../<track>-<cell-id> -b <track>--<cell-id> <base-branch>
    ```
 
+   The full open / verify-before-every-dispatch / close procedure (branch
+   reuse without `-b`, `npm ci` in the worktree, the not-main-checkout and
+   right-branch checks, the doer-side branch guard) is the shared
+   [`../_shared/private-cell-worktree.md`](../_shared/private-cell-worktree.md)
+   with `<prefix>` = `<track>`; this skill does not restate it.
+
 2. **Compose `open.json`** dispatching the fixture's required first pass
    -- `produce-candidate` (Doer, real mutating work) then
    `review-candidate` + `red-team-candidate` (Reviewer/Red-Team, always

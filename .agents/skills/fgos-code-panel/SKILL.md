@@ -132,11 +132,38 @@ of these for a specific change (a security-sensitive diff wants an even
 sharper red-team persona), but keep the roster shape and the
 executor/tier mapping unless there is a real reason to diverge.
 
-## 1. Open the cell
+## 0. Private branch and worktree — always, before anything else
+
+A code-panel change never runs in the main checkout and never on the base
+branch. Open its own worktree on its own branch first, as a plain git
+operation, following
+[`../_shared/private-cell-worktree.md`](../_shared/private-cell-worktree.md)
+with `<prefix>` = `code-panel`:
 
 ```sh
-git worktree add ../<change-slug> -b code-panel--<change-slug> <base-branch>
+main=$(git rev-parse --show-toplevel)
+base=$(git -C "$main" rev-parse --abbrev-ref HEAD)
+wt="$main/../code-panel-<change-slug>"
+git -C "$main" worktree add "$wt" -b code-panel--<change-slug> "$base"   # reuse the branch without -b if it already exists
+[ -f "$wt/package-lock.json" ] && npm ci --prefix "$wt" --silent
 ```
+
+Then verify, and re-verify before every later `run` on this cell:
+
+```sh
+[ "$(git -C "$wt" rev-parse --show-toplevel)" != "$main" ]
+[ "$(git -C "$wt" rev-parse --abbrev-ref HEAD)" = "code-panel--<change-slug>" ]
+```
+
+Why the ceremony: the engine already refuses `mutation: "mutating"` when
+`--cwd` is the main checkout, but a refusal is the good outcome — the bad one
+is a worker whose transport started it in the wrong directory (a herdr pane
+is the operator's own shell; a headless spawn has ignored its cwd before) and
+which then commits somewhere else. That is why the doer's objective below
+carries its own branch guard and why the Lead reads `git log` in `$wt`, not
+the worker's summary.
+
+## 1. Open the cell
 
 `open.json`:
 
@@ -159,7 +186,7 @@ git worktree add ../<change-slug> -b code-panel--<change-slug> <base-branch>
       "operationId": "produce-candidate",
       "targetActorId": "doer",
       "taskKey": "produce-candidate-doer",
-      "objective": "Implement <exact file(s)/behavior>. Land a real commit on this worktree's own branch; run <the target project's real test command> and confirm it passes before reporting done.",
+      "objective": "First run `git rev-parse --abbrev-ref HEAD` and stop immediately if it is not `code-panel--<change-slug>`. Then implement <exact file(s)/behavior>. Land a real commit on this worktree's own branch; run <the target project's real test command> and confirm it passes before reporting done.",
       "expectedOutputs": ["a real git commit on this worktree's branch", "agent-result.json (status, summary, the test command's real outcome)"],
       "mutation": "mutating"
     },
@@ -187,10 +214,11 @@ git worktree add ../<change-slug> -b code-panel--<change-slug> <base-branch>
 }
 ```
 
-Dispatch, pointed at the worktree:
+Dispatch, pointed at the worktree opened in section 0 (explicit path, never
+the shell's cwd):
 
 ```sh
-fgos coordination run --cwd ../<change-slug> --file open.json
+fgos coordination run --cwd "$wt" --file open.json
 ```
 
 `--cwd` is required for `mutation: "mutating"` to be legal on `produce`
@@ -243,7 +271,7 @@ step per position, all resuming the same `coordinationId`:
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
-    { "type": "operation", "as": "revise", "operationId": "revise-candidate", "targetActorId": "fixer", "taskKey": "revise-candidate-fixer", "objective": "Apply the accepted findings. Land a real commit; re-run the target project's real test command.", "expectedOutputs": ["a real git commit", "agent-result.json (status, summary, the test command's real outcome)"], "mutation": "mutating" },
+    { "type": "operation", "as": "revise", "operationId": "revise-candidate", "targetActorId": "fixer", "taskKey": "revise-candidate-fixer", "objective": "First run `git rev-parse --abbrev-ref HEAD` and stop immediately if it is not `code-panel--<change-slug>`. Then apply the accepted findings. Land a real commit; re-run the target project's real test command.", "expectedOutputs": ["a real git commit", "agent-result.json (status, summary, the test command's real outcome)"], "mutation": "mutating" },
     { "type": "authorize", "as": "authReviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "authorizationId": "auth_codepanel_<change-slug>_fix1_reviewer_recheck", "invocationKey": "code-panel:<change-slug>:fix1:reviewer-recheck:1", "reason": "Revision landed; recheck against the original finding." },
     { "type": "operation", "as": "reviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "taskKey": "reviewer-recheck-reviewer", "objective": "Recheck the revised commit against the accepted findings.", "expectedOutputs": ["agent-result.json (status, summary)"], "contextRefs": ["$ref:revise"] },
     { "type": "authorize", "as": "authRedTeamRecheck", "operationId": "red-team-recheck", "targetActorId": "red-team", "authorizationId": "auth_codepanel_<change-slug>_fix1_red_team_recheck", "invocationKey": "code-panel:<change-slug>:fix1:red-team-recheck:1", "reason": "Revision landed; re-attempt the same class of attack." },
@@ -256,7 +284,7 @@ Dispatch (still pointed at the worktree -- `revise-candidate` is the one
 recheck-round operation declaring `result.kind: work-product`):
 
 ```sh
-fgos coordination run --cwd ../<change-slug> --file fix-1.json
+fgos coordination run --cwd "$wt" --file fix-1.json
 ```
 
 Repeat with `fix-2.json`, ... (new `authorizationId`/`invocationKey`
@@ -297,15 +325,18 @@ test command passes:
 ```
 
 ```sh
-fgos coordination run --cwd ../<change-slug> --file close.json
+fgos coordination run --cwd "$wt" --file close.json
 ```
 
 Then, outside this skill and outside the coordination session entirely
--- the Lead's own git operation, never a coordination request:
+-- the Lead's own git operation, never a coordination request (the merge
+target is the `$base` recorded in section 0; run `worktree remove` from the
+main checkout, never from inside `$wt`):
 
 ```sh
-git -C <main checkout> merge --no-ff code-panel--<change-slug>
-git worktree remove ../<change-slug>
+git -C "$main" merge --no-ff code-panel--<change-slug>
+git -C "$main" worktree remove "$wt"
+git -C "$main" branch -d code-panel--<change-slug>
 ```
 
 No `index.md`, no track directory, no cross-cell sequencing -- one
