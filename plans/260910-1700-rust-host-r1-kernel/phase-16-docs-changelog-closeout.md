@@ -1,7 +1,7 @@
-# Phase 11 — Docs, Changelog, Closeout
+# Phase 16 — Docs, Changelog, Closeout
 
-Depends on: Phase 10 closed and merged. This is the track's last cell — by
-this point every cell (P00-P10, including the Rust lane P04-P08) is merged.
+Depends on: Phase 15 closed and merged. This is the track's last cell — by
+this point every cell (P00-P15: Node lane, Rust lane, fgctl lane, install, CI) is merged.
 
 ## Objective
 

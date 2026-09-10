@@ -1,8 +1,8 @@
-# Rust Host R1 Kernel Track
+# Rust Host R1 Track
 
-Status: READY FOR PLAN-LOOP EXECUTION (after the three prerequisites below) | Created: 2026-09-10 | Owner: Lead session
+Status: READY FOR PLAN-LOOP EXECUTION (after the three prerequisites below) | Created: 2026-09-10 | Widened 2026-09-10 (fgctl + install.sh + CI release) | Owner: Lead session
 
-Execution track: `rust-host-r1-kernel`
+Execution track: `rust-host-r1-kernel` (id kept from the original kernel-only scope; `fgos coordination chain` groups on it)
 
 This is a Work-independent implementation track. Do not create, claim, move,
 approve, or route any Work item for this plan. Every cell runs through
@@ -11,11 +11,16 @@ CoordinationSession / group-thinking plan-loop mechanics
 red-team, dispositions, fix rounds, merges, and proof collection outside the
 Work component.
 
-Scope: the Rust `fgos` host up to and including a staged release tree that
-`fgctl` can consume — the plan's P0–P5 plus the release-tree half of P6. The
-installed-entry flip, `fgctl init/upgrade/repair` proof, and P7–P9 are a
-second track opened only once the packaging stream's `fgctl` walking skeleton
-exists (plan §4 node `PK`).
+Scope (widened 2026-09-10): the Rust `fgos` host, the staged release tree,
+**and the `fgctl` walking skeleton that installs it** — `fgctl` Rust bootstrap
+binary, release store + activation, `install.sh` that installs `fgctl`
+straight from a GitHub release without cloning, and the CI release workflow
+that publishes those assets. This track therefore delivers the whole of the
+plan's R1 for one target: a person on a clean machine runs one `curl | sh`,
+then `fgctl init` in a project, and `fgos` in that project is the Rust host.
+The per-project flip happens through `fgctl init`; the global npm `bin.fgos`
+stays as the compatibility channel. P7–P9 (external process, gateway route,
+next native read) remain a later track.
 
 ## Authority Entering The Plan
 
@@ -58,7 +63,22 @@ A Rust `fgos` binary that:
    to `fgos doctor` through the existing check registry;
 6. adds tier 0 (workspace shim) to each runtime's single `fgos` resolver so the
    nine inventoried call sites are ready for cutover without touching them
-   again.
+   again;
+7. ships `fgctl` (Rust): `stage`/`init`/`upgrade`/`repair`/`status` over a
+   content-addressed release store, a workspace installation capsule
+   (`.fgos/installation/{activation.json,bin/fgos,bin/fgos-runner}`), atomic
+   activation, rollback to the previous digest, quarantine on digest mismatch,
+   and the `fgos init → doctor --fix → doctor` tail — per
+   `runtime-identity-and-activation.md` §11–§14;
+8. ships `install.sh`: downloads the `fgctl` asset for the current target from
+   a GitHub release, verifies `SHA256SUMS`, installs it under
+   `~/.local/bin`, and prints the `fgctl init` next step — no clone, no
+   npm, no Rust toolchain on the consumer machine;
+9. ships `.github/workflows/release.yml`: on a `v*` tag, builds the release
+   tree and `fgctl` for the target matrix, writes `SHA256SUMS`, and uploads
+   the assets with `gh`; plus an external-consumer CI job that runs the same
+   `install.sh → fgctl init → fgos version --runtime-json → one legacy verb`
+   proof against locally served assets on every push.
 
 ## Non-Negotiable Boundaries
 
@@ -84,8 +104,18 @@ A Rust `fgos` binary that:
   `OperationKey`, `ProviderResponse`, `ProviderCall` or any alias fails review.
 - No `setup` verb anywhere new; new local behavior registers as `init` /
   `doctor --fix`.
-- No installer, no `fgctl`, no `.fgos/installation/` writer in this track.
-  P09 builds the tree `fgctl` consumes; it does not activate it.
+- `fgctl` is the only writer of the release store and of
+  `.fgos/installation/activation.json`; `fgos init` / `doctor --fix` never
+  select, download, or activate a release; `fgos doctor` never mutates.
+  Activation is atomic (write-then-rename); a digest mismatch quarantines,
+  never patches. No automatic state migration.
+- `install.sh` installs `fgctl` only. It never installs `fgos`, never touches
+  a project, never writes shell rc files without printing exactly what it
+  would add, and refuses to run as root by default.
+- No signatures, no marketplace, no auto-update daemon in R1: `SHA256SUMS`
+  integrity only; upgrade is an explicit `fgctl upgrade`.
+- CI publishes assets only from a `v*` tag; the external-consumer job never
+  reaches the network for assets (it serves the just-built ones locally).
 - `herdr-plugin/` stays outside the new Cargo workspace and keeps building on
   its own (`cargo test --manifest-path herdr-plugin/Cargo.toml`).
 - Three crates only: `fgos` (`apps/fgos`), `fgos-host-runtime`
@@ -102,7 +132,16 @@ A Rust `fgos` binary that:
 | Node compatibility window | Two releases after a selector goes native before its Node path may be deleted. | plan §3.6 |
 | Performance budgets | legacy exec overhead ≤ 25 ms p50; native `version` ≤ 10 ms p50; measured warm, same machine, by the P02 harness. | plan §6 |
 | Selector classification | All 73 selectors `legacy-cli` except `version` (`native`, `distribution.build.show`). | plan §5 |
-| `distribution.build.show` owner | `fgos-distribution` crate (`packages/distribution/rust`). | kernel §9 |
+| `distribution.build.show` owner | `fgos-distribution` crate (`packages/distribution/rust`); the same crate owns manifest parsing, release-tree canonicalization, and digest verification, shared by `fgos` and `fgctl`. | kernel §9 |
+| Machine release store | `${XDG_STATE_HOME:-$HOME/.local/state}/fgos/` (`releases/<artifactDigest>/`, `installs/`, `install.lock`, `quarantine/`); release directory is **digest-only**, version lives in the manifest. | topology §4, runtime-identity §3, §15.2 |
+| Workspace topology for `fgctl` V1 | Workspace root = the git main checkout (parent of `git rev-parse --git-common-dir`); linked worktrees share that checkout's `.fgos/installation/`. `workspaceId` = first 16 hex of sha256(realpath of the main root); `workStateId` = `workspaceId` in V1 (no separate work-state root yet). | topology §2, §15.1 |
+| Stable shim | POSIX `sh` script at `.fgos/installation/bin/fgos` (and `fgos-runner`) that reads only `activation.json`'s `releasePath` and `exec`s `<releasePath>/bin/fgos` (`entries.fgos`/`entries.fgosRunner` are fixed at those paths by P09 for every release this track stages, so the shim need not parse the manifest). Rust shim only if a target lacks `sh`. | runtime-identity §6, §15.3 |
+| Acquisition sources | `fgctl init/upgrade --from <release-tree dir | .tar.gz | github>`; `github` (default) resolves `vantt/forgent` latest release, or the tag pinned in tracked `.fgos/distribution.json`. | runtime-identity §13, §15.4 |
+| Preflight before activation | manifest `artifactDigest` recomputes identically; every `files[]` digest matches; `requires.node` satisfied by the `node` on PATH; `bin/fgos` executable; `bin/fgos version --runtime-json` succeeds against the staged tree. No host-visible projection writes. | runtime-identity §11, §15.5 |
+| Mutating lease | V1 reuses the existing `.fgos/main-checkout.lock` liveness: `fgctl` refuses to publish a new activation while that lock is held live. Per-invocation lease files are a later change. | runtime-identity §7, §12 |
+| Retention / quarantine | Keep the previous release directory for rollback; no GC in R1. Quarantine at `<store>/quarantine/<digest>/`. | runtime-identity §11, §15.6–7 |
+| GitHub release assets | `fgos-<version>-<target>.tar.gz` (release tree), `fgctl-<version>-<target>.tar.gz`, `SHA256SUMS`; tag `v<package.json version>`; `install.sh` also attached and served from `raw.githubusercontent.com/vantt/forgent/main/install.sh`. | this track |
+| `install.sh` prefix | `${FGCTL_INSTALL_DIR:-$HOME/.local/bin}`; `FGCTL_VERSION=<tag>` pins; `FGCTL_ASSET_BASE_URL=<url>` redirects to a local server (CI/offline). | this track |
 
 ## Product Gates
 
@@ -119,7 +158,12 @@ A Rust `fgos` binary that:
 | 08 | [Native `version`](phase-08-native-version.md) | `code:implement` | `fgos-distribution` provides `distribution.build.show`; CLI projector/presenter produce exactly one `fgos.v1` envelope byte-compatible with Node (`version --json`) per P03 vectors; process spy proves no Node child; P02 harness records both performance budgets and they pass. |
 | 09 | [Release tree builder and doctor](phase-09-release-tree-builder-and-doctor.md) | `code:implement` | `scripts/build-rust-distribution.mjs` stages `bin/fgos`, `bin/fgos-runner` shim, `libexec/legacy-node/` (= `package.json` `files`), and `manifest.json` (§5 fields, release-tree digest); P02 harness passes against the staged tree from a directory outside the checkout; doctor checks registered for Rust binary/target, payload presence, manifest/descriptor drift. **Full-suite gate.** |
 | 10 | [Tier-0 resolver](phase-10-tier-zero-resolver.md) | `code:implement` | Workspace-shim tier added to `src/setup/bin-discovery.mjs`, the shell function, and one Herdr `resolve_fgos`; the nine inventoried call sites use their runtime's resolver; absence of `.fgos/installation/` falls back to today's behavior; tests cover both. |
-| 11 | [Docs, changelog, closeout](phase-11-docs-changelog-closeout.md) | `code:review` | `CHANGELOG.md` Unreleased rows; `docs/specs/distribution.md` doctor rows; `docs/specs/reading-map.md` entry for `host-invocation-routing/`; `reports/track-closeout.md` with every merge commit, deferred finding, and reproduction command. **Full-suite gate.** |
+| 11 | [fgctl crate, manifest verify, release store](phase-11-fgctl-crate-and-release-store.md) | `code:implement` | `apps/fgctl` binary; `fgos-distribution` gains manifest parse + canonical-tree digest + verify; `fgctl stage --from <dir|tar.gz>` stages a release under `<store>/releases/<digest>/` under `install.lock`, quarantines on mismatch; `fgctl status` reads the store. Tested against P09's staged tree. |
+| 12 | [fgctl init and workspace activation](phase-12-fgctl-init-and-activation.md) | `code:implement` | `fgctl init` resolves the main checkout, runs preflight, writes the `sh` shims and `root.json`, publishes `activation.json` atomically, then runs `fgos init → doctor --fix → doctor` through the active release; `fgos version --runtime-json` (Rust host) reports the identity fields of runtime-identity §14; idempotent re-run; refuses while `main-checkout.lock` is live. |
+| 13 | [fgctl upgrade, repair, rollback](phase-13-fgctl-upgrade-repair-rollback.md) | `code:implement` | `fgctl upgrade --from` stages a second release and re-activates; `fgctl repair` rolls back to `previousArtifactDigest` with the preserved directory; state-schema read/write range checked before publish; `ready-degraded` when the post-publish tail fails; quarantine path exercised by a corrupted-file test. **Full-suite gate.** |
+| 14 | [install.sh from GitHub release](phase-14-install-script.md) | `code:implement` | `install.sh` detects target, downloads `fgctl-<version>-<target>.tar.gz` + `SHA256SUMS` from `FGCTL_ASSET_BASE_URL` (default GitHub release), verifies, installs to `~/.local/bin`, prints PATH hint and `fgctl init` next step; `test/install/install-sh.test.mjs` serves fixture assets from a local HTTP server and proves success, checksum-mismatch refusal, and pinned-version; README install section rewritten. |
+| 15 | [CI release and external-consumer proof](phase-15-ci-release-and-external-consumer.md) | `code:implement` | `.github/workflows/release.yml` on `v*`: build, stage, tar, `SHA256SUMS`, `gh release upload`; `scripts/ci-external-consumer.sh` (also runnable locally): serve built assets → `install.sh` into a temp HOME → `fgctl init` in a temp project → `fgos version --runtime-json` + one legacy verb; `ci.yml` runs it on every push. Lead cuts a prerelease tag after merge as the real proof. **Full-suite gate.** |
+| 16 | [Docs, changelog, closeout](phase-16-docs-changelog-closeout.md) | `code:review` | `CHANGELOG.md` Unreleased rows; `docs/specs/distribution.md` doctor rows; `docs/specs/reading-map.md` entry for `host-invocation-routing/`; `reports/track-closeout.md` with every merge commit, deferred finding, the prerelease tag, and reproduction commands. **Full-suite gate.** |
 
 ## Parallel Execution Map
 
@@ -135,7 +179,10 @@ concurrently once P00 is merged. P07 needs both lanes merged.
 | 4 | P08 | First native operation; needs P03 vectors and P06 pipeline. |
 | 5 | P09 | Release tree; needs a real binary and a passing harness. |
 | 6 | P10 | Resolver; independent of P09 but placed after so the staged tree exists for its fixture. |
-| 7 | P11 | Closeout. |
+| 7 | P11 → P12 → P13 | fgctl lane; consumes P09's release tree, activates the shim P10's resolvers already look for. |
+| 8 | P14 ∥ P13 allowed | `install.sh` only needs a `fgctl` binary (P11) and the asset naming decision; may run beside P13 (disjoint leases). |
+| 9 | P15 | CI release + external-consumer proof; needs everything above. |
+| 10 | P16 | Closeout. |
 
 ## Shared-File Lease Rule
 
@@ -175,8 +222,24 @@ resolver =
   core/skills/_shared/fgos-cli-fallback.md   (then `npm run build:skills`),
   package.json                              (bin map)
 
+fgctl =
+  apps/fgctl/**,
+  packages/distribution/rust/**   (after P08; manifest/digest/verify modules),
+  apps/fgos/src/cli_projector.rs, apps/fgos/src/cli_presenter.rs   (P12 only: `version --runtime-json`),
+  test/rust-host/fgctl-*.test.mjs
+
+install =
+  install.sh,
+  test/install/**,
+  README.md                         (install section)
+
+ci =
+  .github/workflows/release.yml,
+  .github/workflows/ci.yml          (after P04),
+  scripts/ci-external-consumer.sh
+
 docs-closeout =
-  CHANGELOG.md, README.md,
+  CHANGELOG.md,
   docs/specs/distribution.md, docs/specs/reading-map.md,
   docs/architect/host-invocation-routing/**
 ```
@@ -230,6 +293,16 @@ Rust cells (P04–P08) dispatch the Doer at tier `heavy`; every other cell at
 - Staged release tree runs the harness from outside the checkout; manifest
   digest recomputes identically.
 - Doctor reports every new binary/payload/artifact dependency.
+- On a clean temp HOME with no clone, no npm, no Rust toolchain:
+  `install.sh` (assets served locally) installs `fgctl`; `fgctl init` in a
+  temp project activates the release; `.fgos/installation/bin/fgos version
+  --runtime-json` reports the digest, workspaceId, release version, state
+  schema range, legacy payload identity, and `host: rust`; one legacy verb
+  runs byte-identically through the shim; `fgctl upgrade` then `fgctl repair`
+  round-trips to the previous digest with no work-state mutation.
+- One prerelease tag (`v0.2.0-rc.1` or the Lead's choice) published by
+  `release.yml` carries `fgos-*.tar.gz`, `fgctl-*.tar.gz`, `SHA256SUMS`,
+  `install.sh`, and the same proof passes against the real GitHub assets.
 - User-visible behavior recorded in `CHANGELOG.md`.
 
 ## Execution Inputs
@@ -249,10 +322,12 @@ FULL_TEST: FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs' 
 FOCUSED_NODE: FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/rust-host/*.test.mjs'
 FOCUSED_RUST: cargo test --workspace
 SMOKE_DECIDE: node src/runner/dispatch.mjs decide --for code:implement --has-live-task-access
+EXTERNAL_CONSUMER: scripts/ci-external-consumer.sh   (P15+; temp HOME, local asset server)
 REFERENCE_TARGET: x86_64-unknown-linux-gnu (cargo 1.96, node 24)
+GITHUB_REPO: vantt/forgent
 ```
 
-Full-suite gates: P07, P09, P11. Known pre-existing red tests (not
+Full-suite gates: P07, P09, P13, P15, P16. Known pre-existing red tests (not
 regressions): `cohort-planner` "buildCandidateInventory against the real
 committed", `check-decision-citation-drift`.
 
@@ -280,7 +355,8 @@ Proven live 2026-09-10 (`herdr-smoke--cell-01`,
 ]
 ```
 
-For P04–P08 set `doer`/`fixer` `tier` to `heavy` (gemini flash-high). Resolved
+For the Rust cells P04–P08 and P11–P13 set `doer`/`fixer` `tier` to `heavy`
+(gemini flash-high). Resolved
 models otherwise: doer/fixer gemini-3.8-flash-medium, reviewer opus, red-team
 gpt-5.6-terra; codex on `CODEX_HOME=~/.codex-fgovn`.
 

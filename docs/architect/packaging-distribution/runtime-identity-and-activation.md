@@ -1032,6 +1032,11 @@ identity. The first release tree may use the existing Node `fgos` host; Rust
 
 ## 15. Open Decisions
 
+The `rust-host-r1-kernel` track (`plans/260910-1700-rust-host-r1-kernel/plan.md`,
+Decisions table, 2026-09-10) fixes V1 defaults for every item below so its
+`fgctl` cells can execute; a default becomes settled here only when the track's
+proof lands, and any override is recorded there first.
+
 1. Exact path encoding for the workspace installation capsule once
    `TopologyContext` supplies the workspace roots.
 2. Exact release directory name: digest-only, version-plus-digest, or both.
