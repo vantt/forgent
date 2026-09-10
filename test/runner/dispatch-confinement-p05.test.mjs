@@ -410,6 +410,57 @@ test("R5: direct establishConfinement with permissionMode: 'bypass' and only own
   fs.rmSync(tmpBase, { recursive: true, force: true });
 });
 
+test("R5: direct establishConfinement with permissionMode: 'bypass' and only v1 controls.workspace='own' hard-refuses via evaluateBypassPairing", async () => {
+  // Same incomplete-pairing scenario as the legacy-flag test above, but
+  // expressed as confinement-policy.v1-shaped input (controls.workspace)
+  // instead of the legacy ownWorktree flag, to prove both input shapes are
+  // refused identically at this entry point.
+  const tmpBase = mkTemp("p05-direct-bypass-v1-");
+  const repoRoot = path.join(tmpBase, "repo");
+  const cwd = path.join(repoRoot, "worktree");
+  fs.mkdirSync(cwd, { recursive: true });
+
+  const mockRound = {
+    workId: "w-direct-bypass-v1-incomplete",
+    agentName: "worker-direct-bypass-v1",
+    note: () => {},
+    fail: (errorClass, reason, message) => {
+      const err = new Error(message);
+      err.errorClass = errorClass;
+      err.reason = reason;
+      return err;
+    },
+  };
+
+  await assert.rejects(
+    () =>
+      establishConfinement({
+        confinement: {
+          contract: "confinement-policy.v1",
+          controls: { workspace: "own" }, // incomplete: no home/session controls
+        },
+        round: mockRound,
+        fullEnv: { HOME: os.homedir() },
+        cwd,
+        repoRoot,
+        permissionMode: "bypass",
+      }),
+    (err) => {
+      assert.equal(err.errorClass, "invalid-config");
+      assert.equal(err.reason, "bypass-confinement-incomplete");
+      assert.match(err.message, /permissionMode "bypass" requires full confinement/);
+      assert.match(err.message, /home: private \(privateHome\)/);
+      assert.match(err.message, /session: isolated \(isolatedSession\)/);
+      // controls.workspace: "own" must be recognized as satisfying ownWorktree,
+      // so "workspace: own (ownWorktree)" must NOT be listed as missing.
+      assert.doesNotMatch(err.message, /workspace: own \(ownWorktree\)/);
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpBase, { recursive: true, force: true });
+});
+
 test("R5: evaluateBypassPairing table test covers valid and invalid pairings", () => {
   // 1. Non-bypass cases always pass regardless of controls
   assert.deepEqual(
