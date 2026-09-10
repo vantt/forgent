@@ -396,3 +396,90 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
   );
 });
 
+export function findExecutorAdapterCallSites(files = mjsFilesUnder('src')) {
+  const sites = [];
+  for (const rel of files) {
+    const fullPath = path.join(root, rel);
+    const source = fs.readFileSync(fullPath, 'utf8');
+    const lines = source.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (trimmed.startsWith('//') || trimmed.startsWith('*')) continue;
+      if (line.includes('EXECUTOR_ADAPTERS[')) {
+        sites.push({ file: rel, line: i + 1, callText: trimmed });
+      }
+    }
+  }
+  return sites;
+}
+
+export function checkExecutorAdapterCallSitePostures(sites) {
+  const violations = [];
+  for (const site of sites) {
+    if (site.file !== 'src/runner/dispatch/confinement/authority.mjs') {
+      violations.push(`${site.file}:${site.line} direct EXECUTOR_ADAPTERS[...] lookup outside authority.mjs: ${site.callText}`);
+    }
+  }
+  return violations;
+}
+
+test('R8 one-door confinement authority: EXECUTOR_ADAPTERS execute-handle lookups in src/** are confined to authority.mjs', () => {
+  const sites = findExecutorAdapterCallSites();
+  assert.deepEqual(
+    checkExecutorAdapterCallSitePostures(sites),
+    [],
+    'direct EXECUTOR_ADAPTERS[...] lookup reintroduced in production dispatch code outside authority.mjs',
+  );
+  assert.equal(
+    sites.length,
+    1,
+    `expected exactly one EXECUTOR_ADAPTERS[...] lookup in authority.mjs, found ${sites.length} (in: ${sites.map((s) => s.file).join(', ')})`,
+  );
+  assert.equal(sites[0].file, 'src/runner/dispatch/confinement/authority.mjs');
+
+  // Also assert that no production files other than authority.mjs, transport.mjs (definition),
+  // and config.mjs (metadata reader) import or reference EXECUTOR_ADAPTERS.
+  const allowedReferences = new Set([
+    'src/runner/dispatch/confinement/authority.mjs',
+    'src/runner/dispatch/transport.mjs',
+    'src/runner/dispatch/config.mjs',
+  ]);
+  const invalidRefFiles = [];
+  for (const file of mjsFilesUnder('src')) {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    const clean = source.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+    if (clean.includes('EXECUTOR_ADAPTERS') && !allowedReferences.has(file)) {
+      invalidRefFiles.push(file);
+    }
+  }
+  assert.deepEqual(
+    invalidRefFiles,
+    [],
+    `production files illegally referencing EXECUTOR_ADAPTERS: ${invalidRefFiles.join(', ')}`,
+  );
+});
+
+test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site violation', () => {
+  assert.ok(
+    checkExecutorAdapterCallSitePostures([
+      { file: 'src/runner/dispatch/cli.mjs', line: 312, callText: 'const adapterFn = EXECUTOR_ADAPTERS[adapter];' },
+    ]).length > 0,
+    'a direct EXECUTOR_ADAPTERS[...] lookup in cli.mjs must be flagged as a violation',
+  );
+  assert.ok(
+    checkExecutorAdapterCallSitePostures([
+      { file: 'src/runner/dispatch/transport.mjs', line: 100, callText: 'EXECUTOR_ADAPTERS[name]()' },
+    ]).length > 0,
+    'a direct lookup in transport.mjs must be flagged',
+  );
+  assert.deepEqual(
+    checkExecutorAdapterCallSitePostures([
+      { file: 'src/runner/dispatch/confinement/authority.mjs', line: 80, callText: 'adapterFn = EXECUTOR_ADAPTERS[adapterName];' },
+    ]),
+    [],
+    'authority.mjs lookup must be valid',
+  );
+});
+
+

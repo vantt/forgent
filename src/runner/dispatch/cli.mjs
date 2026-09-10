@@ -26,7 +26,9 @@ import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } f
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork } from './resolve.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
-import { resolveExecutorCommand, EXECUTOR_ADAPTERS, DispatchError } from './transport.mjs';
+import { resolveExecutorCommand, DispatchError } from './transport.mjs';
+import { executeThroughConfinement } from './confinement/authority.mjs';
+import { buildConfinementRequest } from './confinement/request.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { buildPrompt } from './prepare.mjs';
 import { compileDispatchPlan } from './plan.mjs';
@@ -297,7 +299,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // door's "bypass requires full confinement" invariant is enforced at load
   // and void at dispatch -- the profile would claim a confined worker and
   // this call would run an unconfined one in the operator's own session.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -309,10 +311,6 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     attestRoot: cwd,
     resolvedAgentType,
   });
-  const adapterFn = EXECUTOR_ADAPTERS[adapter];
-  if (!adapterFn) {
-    throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
-  }
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs;
   const idleTimeoutMs = opts.idleTimeoutMs ?? cfg.idleTimeoutMs;
   const maxBuffer = opts.maxBuffer ?? 10 * 1024 * 1024;
@@ -343,18 +341,43 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const repoRootForWatch = opts.fgosDir ? path.dirname(opts.fgosDir) : undefined;
   const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: repoRootForWatch, cwd });
 
-  return adapterFn({ command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement }, {
-    cwd,
-    repoRoot: opts.fgosDir ? path.dirname(opts.fgosDir) : undefined,
-    runDir: workerRunDir,
-    timeoutMs,
-    idleTimeoutMs,
-    maxBuffer,
-    onChunk: opts.onChunk,
-    workId: work.id,
-    tier,
-    model,
-  }).then(
+  const confinementRequest = buildConfinementRequest({
+    capability: opts.stage ? executorIdForWork(work, opts.stage) : executorId,
+    executorId: resolvedExecutorId ?? executorId,
+    cfg,
+    invocation: {
+      command,
+      args,
+      argsTemplate,
+      prompt,
+      env,
+      liveOutput,
+      interactiveMode,
+      promptDelivery,
+      permissionMode,
+      confinement,
+      adapter,
+      method,
+      url,
+      headers,
+      body,
+    },
+    context: {
+      cwd,
+      repoRoot: repoRootForWatch,
+      runDir: workerRunDir,
+      fgosDir: opts.fgosDir,
+      timeoutMs,
+      idleTimeoutMs,
+      maxBuffer,
+      onChunk: opts.onChunk,
+      workId: work.id,
+      tier,
+      model,
+    },
+  });
+
+  return executeThroughConfinement(confinementRequest).then(
     // executorId/provider (D7, tsk-62v)/baseCommit/headRef (tsk-4hl)/command
     // (tsk-33w D9)/governance (self-review finding, 2026-08-25): additive
     // only — every field this function already returned stays exactly
@@ -491,7 +514,8 @@ export async function executeExecutorCli(
     runnerConfig,
     model: modelOverride,
     tier: tierOverride,
-    for: purpose,
+    for: purposeArg,
+    purpose: optionsPurpose,
     carries,
     hasLiveTaskAccess = false,
     timeoutMs: timeoutOverride,
@@ -514,6 +538,7 @@ export async function executeExecutorCli(
     options,
   } = {},
 ) {
+  const purpose = purposeArg ?? optionsPurpose;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
@@ -596,15 +621,23 @@ export async function executeExecutorCli(
   // for a direct executorId call — whichever capabilities that executor
   // itself declares serving (executor.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
+  const capabilityLabel = purpose ?? (cfg?.capabilities?.[executorIdArg] ? executorIdArg : (resolvedExecutor?.for?.join(',') || '(none declared)'));
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
   if (mechanism === 'in-process') {
+    const capConfinement = cfg?.capabilities?.[capabilityLabel]?.confinement ?? (purpose ? cfg?.capabilities?.[purpose]?.confinement : undefined) ?? (executorIdArg ? cfg?.capabilities?.[executorIdArg]?.confinement : undefined);
+    if (capConfinement?.mode === 'required') {
+      throw new DispatchError(
+        'confinement-unsupported',
+        `required confinement refused for "${capabilityLabel}": in-process dispatch has no trusted harness attestation contract.`,
+        { capability: capabilityLabel, executorId, requirement: capConfinement, authorityScope: 'external-harness' },
+      );
+    }
     const agentType = resolvedExecutor?.agentType;
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
     );
-    const base = { mechanism, agentType, prompt };
+    const base = { mechanism, agentType, prompt, authorityScope: 'external-harness', attestation: null };
     return resolvedByPurpose ? { ...base, executorId } : base;
   }
 
@@ -669,7 +702,7 @@ export async function executeExecutorCli(
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -679,10 +712,6 @@ export async function executeExecutorCli(
     attestRoot: cwd,
     resolvedAgentType,
   });
-  const adapterFn = EXECUTOR_ADAPTERS[adapter];
-  if (!adapterFn) {
-    throw new RunnerConfigError(`no executor adapter registered for "${adapter}".`);
-  }
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
@@ -738,12 +767,45 @@ export async function executeExecutorCli(
       : openDispatchRun({ fgosDir, workId: work?.id, executorId, cwd });
     const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
+    const confinementRequest = buildConfinementRequest({
+      capability: capabilityLabel,
+      executorId,
+      cfg,
+      invocation: {
+        command,
+        args,
+        argsTemplate,
+        prompt,
+        env,
+        liveOutput,
+        interactiveMode,
+        promptDelivery,
+        permissionMode,
+        confinement,
+        adapter,
+        method,
+        url,
+        headers,
+        body,
+      },
+      context: {
+        cwd,
+        repoRoot: root,
+        runDir: opened.runDir,
+        fgosDir,
+        timeoutMs,
+        idleTimeoutMs,
+        maxBuffer,
+        onChunk,
+        workId: executorId,
+        tier,
+        model,
+      },
+    });
+
     let result;
     try {
-      result = await adapterFn(
-        { command, args, argsTemplate, prompt, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement },
-        { cwd, repoRoot: root, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId: executorId, tier, model, runDir: opened.runDir },
-      );
+      result = await executeThroughConfinement(confinementRequest);
     } catch (err) {
       opened.closeRun(err?.outcome === 'died' ? 'died' : 'settled');
       throw err;
