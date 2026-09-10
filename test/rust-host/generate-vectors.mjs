@@ -146,6 +146,34 @@ export function generateEnvelopeVectors() {
  * 6. nested arrays/maps
  * 7. null/booleans
  */
+
+/**
+ * Walks `value` recursively and returns the dot-path/bracket-index of every
+ * location holding IEEE754 negative zero (Object.is(x, -0)). Used to derive
+ * negative-zero.json's negative_zero_paths field from the real value instead
+ * of a hand-typed literal that could drift out of sync with it.
+ */
+export function findNegativeZeroPaths(value, prefix = "") {
+  const paths = [];
+  if (typeof value === "number" && Object.is(value, -0)) {
+    paths.push(prefix);
+    return paths;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, i) => {
+      paths.push(...findNegativeZeroPaths(item, `${prefix}[${i}]`));
+    });
+    return paths;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, val] of Object.entries(value)) {
+      const nextPrefix = prefix ? `${prefix}.${key}` : key;
+      paths.push(...findNegativeZeroPaths(val, nextPrefix));
+    }
+  }
+  return paths;
+}
+
 export function generateSerializationCorpus() {
   const corpus = new Map();
 
@@ -207,7 +235,14 @@ export function generateSerializationCorpus() {
     // ITS OWN serializer reproduces compact_bytes/pretty_bytes exactly --
     // never trust input_value's own (sign-lost) numeric fields for these
     // paths (red-team HIGH finding, P03 round 1).
-    negative_zero_paths: ["neg_zero", "array_neg_zero[0]", "nested.value"],
+    //
+    // Derived by walking negZeroValue itself (MEDIUM-2, P03 round 2), not a
+    // hand-typed literal: a hardcoded list can silently drift out of sync
+    // with a future edit to negZeroValue (adding a fourth -0 would still
+    // regenerate compact_bytes/pretty_bytes correctly via the drift guard,
+    // but a hand-typed path list would keep reporting only the original
+    // three paths, under-reporting where -0 actually lives).
+    negative_zero_paths: findNegativeZeroPaths(negZeroValue),
     input_value: negZeroValue,
     compact_bytes: JSON.stringify(negZeroValue),
     pretty_bytes: JSON.stringify(negZeroValue, null, 2),

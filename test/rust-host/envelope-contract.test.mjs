@@ -224,6 +224,20 @@ test("R5 split: envelope key order and 2-space pretty-rendering", () => {
   }
 });
 
+/**
+ * A genuinely valid ISO-8601 timestamp is a fixed point under
+ * parse -> toISOString: reserializing its own parsed epoch reproduces the
+ * exact original string. Date.parse silently NORMALIZES an impossible
+ * calendar date (e.g. day 30 of February) into a different, valid date
+ * rather than rejecting it, so this round-trip is what actually catches
+ * that class of input -- the regex/min_year/max_year checks above do not.
+ */
+function isCanonicalIsoTimestamp(str) {
+  const epoch = Date.parse(str);
+  if (Number.isNaN(epoch)) return false;
+  return new Date(epoch).toISOString() === str;
+}
+
 test("R5 split: timestamp shape and range predicate (never exact string equality)", () => {
   const vectors = generateEnvelopeVectors();
   for (const [filename, vector] of vectors) {
@@ -253,6 +267,25 @@ test("R5 split: timestamp shape and range predicate (never exact string equality
       !regex.test("9999-12-31T23:59:59.999Z") ||
         new Date(Date.parse("9999-12-31T23:59:59.999Z")).getUTCFullYear() > predicate.max_year,
       "An absurdly future timestamp must fail min_year/max_year range checking even though it satisfies the regex"
+    );
+    // Red-team MEDIUM (P03 round 2): Date.parse silently NORMALIZES an
+    // impossible calendar date (e.g. 2100-02-29, since 2100 is not a leap
+    // year -- divisible by 100, not by 400) into the following day/month
+    // instead of rejecting it, so regex+min_year+max_year alone accept it.
+    // A canonical round-trip (re-serialize the parsed epoch and compare
+    // against the original string) catches it: a genuinely valid timestamp
+    // is its own fixed point under parse->toISOString, an invalid one is not.
+    assert.ok(
+      isCanonicalIsoTimestamp(vector.envelope.generated_at),
+      "Vector timestamp must be a canonical round-trip fixed point (parse -> toISOString -> same string)"
+    );
+    assert.ok(
+      !isCanonicalIsoTimestamp("2100-02-29T12:34:56.789Z"),
+      "An impossible calendar date must fail the canonical round-trip check even though it satisfies regex/min_year/max_year"
+    );
+    assert.ok(
+      isCanonicalIsoTimestamp("2100-02-28T12:34:56.789Z"),
+      "A real, valid date must pass the canonical round-trip check (control case for the assertion above)"
     );
 
     // 3. Live envelope check: fresh wrapEnvelope produces a different timestamp,
