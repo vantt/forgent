@@ -1,0 +1,22 @@
+{
+  "category": "null/booleans",
+  "description": "Literal null, boolean true, boolean false across object, array, and scalar contexts",
+  "input_value": {
+    "val_null": null,
+    "val_true": true,
+    "val_false": false,
+    "array_null_bool": [
+      null,
+      true,
+      false,
+      null
+    ],
+    "nested": {
+      "is_active": false,
+      "is_ready": true,
+      "error": null
+    }
+  },
+  "compact_bytes": "{\"val_null\":null,\"val_true\":true,\"val_false\":false,\"array_null_bool\":[null,true,false,null],\"nested\":{\"is_active\":false,\"is_ready\":true,\"error\":null}}",
+  "pretty_bytes": "{\n  \"val_null\": null,\n  \"val_true\": true,\n  \"val_false\": false,\n  \"array_null_bool\": [\n    null,\n    true,\n    false,\n    null\n  ],\n  \"nested\": {\n    \"is_active\": false,\n    \"is_ready\": true,\n    \"error\": null\n  }\n}"
+}

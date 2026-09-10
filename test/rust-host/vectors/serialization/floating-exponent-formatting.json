@@ -1,0 +1,13 @@
+{
+  "category": "floating exponent formatting",
+  "description": "Floating point exponent notation in V8/ECMAScript (lowercase e, plus sign where applicable)",
+  "input_value": {
+    "small_exp": 1.23e-7,
+    "large_exp": 1e+21,
+    "fraction": 0.000001,
+    "tiny": 5e-324,
+    "large_float": 1.7976931348623157e+308
+  },
+  "compact_bytes": "{\"small_exp\":1.23e-7,\"large_exp\":1e+21,\"fraction\":0.000001,\"tiny\":5e-324,\"large_float\":1.7976931348623157e+308}",
+  "pretty_bytes": "{\n  \"small_exp\": 1.23e-7,\n  \"large_exp\": 1e+21,\n  \"fraction\": 0.000001,\n  \"tiny\": 5e-324,\n  \"large_float\": 1.7976931348623157e+308\n}"
+}

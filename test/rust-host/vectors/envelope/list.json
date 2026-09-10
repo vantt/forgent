@@ -1,0 +1,66 @@
+{
+  "name": "work_list",
+  "description": "fgos.v1 envelope wrapping an array/list payload",
+  "data": [
+    {
+      "id": "tsk-001",
+      "title": "Parity harness",
+      "status": "done",
+      "stage": "validating",
+      "tags": [
+        "rust",
+        "harness"
+      ]
+    },
+    {
+      "id": "tsk-002",
+      "title": "Envelope vectors and serialization corpus",
+      "status": "in-progress",
+      "stage": "executing",
+      "tags": [
+        "rust",
+        "vectors",
+        "serialization"
+      ]
+    }
+  ],
+  "compact_hash_input": "[{\"id\":\"tsk-001\",\"title\":\"Parity harness\",\"status\":\"done\",\"stage\":\"validating\",\"tags\":[\"rust\",\"harness\"]},{\"id\":\"tsk-002\",\"title\":\"Envelope vectors and serialization corpus\",\"status\":\"in-progress\",\"stage\":\"executing\",\"tags\":[\"rust\",\"vectors\",\"serialization\"]}]",
+  "data_hash": "78763bed8612d221afb8e0fb5ab3d0ffd4cb1da1c7bc8033d2dfc30ab7ac043d",
+  "envelope": {
+    "contract": "fgos.v1",
+    "generated_at": "2026-09-10T17:00:00.000Z",
+    "data_hash": "78763bed8612d221afb8e0fb5ab3d0ffd4cb1da1c7bc8033d2dfc30ab7ac043d",
+    "data": [
+      {
+        "id": "tsk-001",
+        "title": "Parity harness",
+        "status": "done",
+        "stage": "validating",
+        "tags": [
+          "rust",
+          "harness"
+        ]
+      },
+      {
+        "id": "tsk-002",
+        "title": "Envelope vectors and serialization corpus",
+        "status": "in-progress",
+        "stage": "executing",
+        "tags": [
+          "rust",
+          "vectors",
+          "serialization"
+        ]
+      }
+    ]
+  },
+  "envelope_bytes": "{\n  \"contract\": \"fgos.v1\",\n  \"generated_at\": \"2026-09-10T17:00:00.000Z\",\n  \"data_hash\": \"78763bed8612d221afb8e0fb5ab3d0ffd4cb1da1c7bc8033d2dfc30ab7ac043d\",\n  \"data\": [\n    {\n      \"id\": \"tsk-001\",\n      \"title\": \"Parity harness\",\n      \"status\": \"done\",\n      \"stage\": \"validating\",\n      \"tags\": [\n        \"rust\",\n        \"harness\"\n      ]\n    },\n    {\n      \"id\": \"tsk-002\",\n      \"title\": \"Envelope vectors and serialization corpus\",\n      \"status\": \"in-progress\",\n      \"stage\": \"executing\",\n      \"tags\": [\n        \"rust\",\n        \"vectors\",\n        \"serialization\"\n      ]\n    }\n  ]\n}\n",
+  "timestamp_predicate": {
+    "format": "iso-8601",
+    "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+    "min_year": 2026,
+    "max_year": 2100
+  },
+  "has_trailing_newline": true,
+  "exit_code": 0
+}
