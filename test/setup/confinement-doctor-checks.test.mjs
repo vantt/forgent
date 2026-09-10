@@ -326,10 +326,14 @@ test('confinement-bwrap-platform reports ready when platform is Linux and bwrap 
 
 // ─── Check 4: confinement-probe-freshness ───────────────────────────────────
 
-test('confinement-probe-freshness passes placeholder check', () => {
+test('confinement-probe-freshness reports probe results through the real probe harness', () => {
   const res = checkConfinementProbeFreshness();
   assert.equal(res.passed, true);
-  assert.match(res.message, /placeholder/);
+  if (os.platform() === 'linux') {
+    assert.match(res.message, /probes passed|fresh/);
+  } else {
+    assert.match(res.message, /not Linux/);
+  }
 });
 
 // ─── Check 5: confinement-strict-readiness ──────────────────────────────────

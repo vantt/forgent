@@ -5,6 +5,12 @@ import path from "node:path";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError } from "../transport.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { validateConfinementRequest } from "./request.mjs";
+import { saveAttestationRecord, savePlanRecord } from "./attestation-store.mjs";
+import {
+  loadMachineBackendRegistry,
+  createBackendRegistrySnapshot,
+  getBackendDriver,
+} from "./backend-registry.mjs";
 
 export { DispatchError };
 
@@ -314,26 +320,121 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     };
   }
 
-  // R7 / Phase 02 Observe Mode:
-  // Required confinement must refuse before spawn since bwrap enforcement is not active in this phase
+  // R7 / Phase 02 Observe Mode / Phase 03 Backend Resolution:
+  let backendInstance = null;
+  let driver = null;
+  let backendPlan = null;
+  let preparedConfinement = null;
+
+  if (request.backendId) {
+    const registryDoc = loadMachineBackendRegistry();
+    const snapshot = createBackendRegistrySnapshot(registryDoc);
+    backendInstance = snapshot.resolve(request.backendId);
+    if (!backendInstance) {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-backend-unknown",
+        `confinement backend instance "${request.backendId}" not found or disabled in machine registry.`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+    driver = getBackendDriver(backendInstance.type);
+  }
+
   if (request.requirement?.mode === "required") {
-    const refusedAttestation = buildConfinementAttestation({
-      request,
-      phase: "refused",
-      outcome: "refused",
-    });
-    throw new DispatchError(
-      "confinement-unsupported",
-      `required confinement refused for capability "${request.capability}": no confinement backend available in observe mode.`,
-      {
-        contract: "confinement-execution.v1",
-        status: "refused",
-        dispatchId: request.dispatchId,
-        capability: request.capability,
-        requirement: request.requirement,
-        attestation: refusedAttestation,
+    if (!backendInstance || !driver) {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-unsupported",
+        `required confinement refused for capability "${request.capability}": no confinement backend available in observe mode.`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+
+    const assessment = driver.assess(request, backendInstance);
+    backendPlan = {
+      contract: "confinement-plan.v1",
+      dispatchId: request.dispatchId,
+      decision: assessment.mismatches.length > 0 ? "refuse" : "execute",
+      requested: request.requirement,
+      coverage: assessment.coverage,
+      resources: assessment.resources,
+      readiness: assessment.readiness,
+      grants: (request.requirement?.policy?.grants || []).map((g) => {
+        const match = assessment.resources.find((r) => r.resource === g.resource);
+        return {
+          resource: g.resource,
+          access: g.access,
+          resolvedTarget: match?.executionTarget?.path || g.resource,
+        };
+      }),
+      backend: {
+        id: backendInstance.id,
+        type: backendInstance.type,
+        version: driver.version,
+        configDigest: "",
       },
-    );
+      mismatches: assessment.mismatches,
+    };
+    savePlanRecord(backendPlan, request.context);
+
+    if (backendPlan.decision === "refuse") {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      refusedAttestation.mismatches = assessment.mismatches;
+      refusedAttestation.coverage = assessment.coverage;
+      refusedAttestation.resources = assessment.resources;
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-unsupported",
+        `required confinement refused for capability "${request.capability}": ${assessment.mismatches.map((m) => m.detail).join("; ")}`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+
+    preparedConfinement = await driver.prepare(backendPlan, request, backendInstance);
+    const prepAttestation = buildConfinementAttestation({
+      request,
+      phase: "prepared",
+      outcome: "unknown",
+    });
+    prepAttestation.coverage = backendPlan.coverage;
+    prepAttestation.resources = backendPlan.resources;
+    saveAttestationRecord(prepAttestation, request.context);
   }
 
   // R3: Resolve adapter function through Authority
@@ -361,21 +462,22 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   }
 
   // Prepare invocation
+  const sourceInvocation = preparedConfinement?.invocation || request.invocation;
   const preparedInvocation = {
-    command: request.invocation.command,
-    args: request.invocation.args,
-    argsTemplate: request.invocation.argsTemplate,
-    prompt: request.invocation.prompt,
-    env: request.invocation.env,
-    liveOutput: request.invocation.liveOutput,
-    interactiveMode: request.invocation.interactiveMode,
-    promptDelivery: request.invocation.promptDelivery,
-    permissionMode: request.invocation.permissionMode,
-    confinement: request.invocation.confinement,
-    method: request.invocation.transport?.method ?? request.invocation.method,
-    url: request.invocation.transport?.url ?? request.invocation.url,
-    headers: request.invocation.transport?.headers ?? request.invocation.headers,
-    body: request.invocation.transport?.body ?? request.invocation.body,
+    command: sourceInvocation.command,
+    args: sourceInvocation.args,
+    argsTemplate: sourceInvocation.argsTemplate,
+    prompt: sourceInvocation.prompt,
+    env: sourceInvocation.env,
+    liveOutput: sourceInvocation.liveOutput,
+    interactiveMode: sourceInvocation.interactiveMode,
+    promptDelivery: sourceInvocation.promptDelivery,
+    permissionMode: sourceInvocation.permissionMode,
+    confinement: sourceInvocation.confinement,
+    method: sourceInvocation.transport?.method ?? sourceInvocation.method,
+    url: sourceInvocation.transport?.url ?? sourceInvocation.url,
+    headers: sourceInvocation.transport?.headers ?? sourceInvocation.headers,
+    body: sourceInvocation.transport?.body ?? sourceInvocation.body,
   };
 
   const adapterOpts = {
@@ -404,6 +506,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       outcome: "unknown",
       error: err,
     });
+    saveAttestationRecord(failedAttestation, request.context);
     if (err instanceof DispatchError) {
       err.contract = "confinement-execution.v1";
       err.status = "failed";
@@ -428,12 +531,25 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         cause: err.message,
       },
     );
+  } finally {
+    if (preparedConfinement?.cleanup) {
+      try {
+        await preparedConfinement.cleanup();
+      } catch {
+        // cleanup failure preserved
+      }
+    }
   }
 
   const attestation = buildConfinementAttestation({
     request,
     phase: "completed",
   });
+  if (backendPlan) {
+    attestation.coverage = backendPlan.coverage;
+    attestation.resources = backendPlan.resources;
+  }
+  saveAttestationRecord(attestation, request.context);
 
   return {
     ...adapterResult,
