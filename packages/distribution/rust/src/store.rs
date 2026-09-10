@@ -150,17 +150,12 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
     // 1. Acquire create-exclusive install.lock
     let _lock = InstallLockGuard::acquire(store_root)?;
 
-    // Testing delay hook to allow deterministic concurrency testing without flakes
-    if let Ok(delay_str) = std::env::var("__FGCTL_STAGE_LOCK_DELAY_MS") {
-        if let Ok(ms) = delay_str.parse::<u64>() {
-            std::thread::sleep(std::time::Duration::from_millis(ms));
-        }
-    }
-
     let timestamp = now_millis();
     let temp_sibling = store_root.join(format!(".stage_tmp_{}_{}", std::process::id(), timestamp));
 
-    // 2. Prepare temp sibling from source input (extract or copy)
+    // 2. Prepare temp sibling from source input (extract or copy). Any failure in
+    // this phase (including a refused archive entry) must not leave a partial
+    // temp directory behind under the store root.
     let is_tar_gz = from_path.is_file()
         || from_path
             .file_name()
@@ -168,22 +163,30 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
             .map(|s| s.ends_with(".tar.gz") || s.ends_with(".tgz"))
             .unwrap_or(false);
 
-    if is_tar_gz {
-        std::fs::create_dir_all(&temp_sibling)?;
-        extract_tar_gz(from_path, &temp_sibling)?;
+    let prepare_result: Result<(), StageError> = (|| {
+        if is_tar_gz {
+            std::fs::create_dir_all(&temp_sibling)?;
+            extract_tar_gz(from_path, &temp_sibling)?;
 
-        if !temp_sibling.join("manifest.json").exists() {
-            let resolved = resolve_extracted_release_root(&temp_sibling);
-            if resolved != temp_sibling {
-                let temp_mv =
-                    store_root.join(format!(".stage_mv_{}_{}", std::process::id(), timestamp));
-                std::fs::rename(&resolved, &temp_mv)?;
-                let _ = std::fs::remove_dir_all(&temp_sibling);
-                std::fs::rename(&temp_mv, &temp_sibling)?;
+            if !temp_sibling.join("manifest.json").exists() {
+                let resolved = resolve_extracted_release_root(&temp_sibling);
+                if resolved != temp_sibling {
+                    let temp_mv =
+                        store_root.join(format!(".stage_mv_{}_{}", std::process::id(), timestamp));
+                    std::fs::rename(&resolved, &temp_mv)?;
+                    let _ = std::fs::remove_dir_all(&temp_sibling);
+                    std::fs::rename(&temp_mv, &temp_sibling)?;
+                }
             }
+        } else {
+            copy_dir_all(from_path, &temp_sibling)?;
         }
-    } else {
-        copy_dir_all(from_path, &temp_sibling)?;
+        Ok(())
+    })();
+
+    if let Err(err) = prepare_result {
+        let _ = std::fs::remove_dir_all(&temp_sibling);
+        return Err(err);
     }
 
     // 3. Read manifest from temp sibling

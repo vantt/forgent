@@ -22,6 +22,8 @@ pub enum CanonicalError {
     SymlinkRefused(String),
     #[error("case-insensitive path collision in release manifest: {0}")]
     CaseCollision(String),
+    #[error("malformed path segment in release manifest: {0}")]
+    MalformedSegment(String),
 }
 
 /// Normalizes a path string to `/`-separated UTF-8 NFC form.
@@ -70,6 +72,15 @@ pub fn canonicalize_manifest_files(
         for seg in normalized.split('/') {
             if seg == ".." {
                 return Err(CanonicalError::PathTraversal(raw_path.clone()));
+            }
+            // The canonicalization table (runtime-identity-and-activation.md §5)
+            // defines only UTF-8 NFC + `/`-separator normalization; it does not
+            // define a rule collapsing `.`/empty segments before the collision
+            // check, so `./bin/fgos` and `bin/fgos` would otherwise escape the
+            // case-collision check and mint two different artifactDigests for
+            // identical bytes. Refuse rather than silently normalize.
+            if seg == "." || seg.is_empty() {
+                return Err(CanonicalError::MalformedSegment(raw_path.clone()));
             }
         }
 
@@ -194,6 +205,32 @@ mod tests {
         ]);
         let err = canonicalize_manifest_files(&manifest).unwrap_err();
         assert!(matches!(err, CanonicalError::CaseCollision(_)));
+    }
+
+    #[test]
+    fn test_refuse_dot_segment() {
+        let manifest = dummy_manifest(vec![ManifestFileEntry {
+            path: "./bin/fgos".to_string(),
+            kind: "file".to_string(),
+            digest: "sha256:abc".to_string(),
+            mode: "755".to_string(),
+            class: "immutable-entry".to_string(),
+        }]);
+        let err = canonicalize_manifest_files(&manifest).unwrap_err();
+        assert!(matches!(err, CanonicalError::MalformedSegment(_)));
+    }
+
+    #[test]
+    fn test_refuse_empty_segment() {
+        let manifest = dummy_manifest(vec![ManifestFileEntry {
+            path: "bin//fgos".to_string(),
+            kind: "file".to_string(),
+            digest: "sha256:abc".to_string(),
+            mode: "755".to_string(),
+            class: "immutable-entry".to_string(),
+        }]);
+        let err = canonicalize_manifest_files(&manifest).unwrap_err();
+        assert!(matches!(err, CanonicalError::MalformedSegment(_)));
     }
 
     #[test]
