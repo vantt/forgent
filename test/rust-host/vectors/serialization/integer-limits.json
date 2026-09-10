@@ -1,0 +1,15 @@
+{
+  "category": "integer limits",
+  "description": "Boundary integer values including zero, signed 32-bit limits, and 53-bit safe integer limits",
+  "input_value": {
+    "zero": 0,
+    "pos_one": 1,
+    "neg_one": -1,
+    "i32_max": 2147483647,
+    "i32_min": -2147483648,
+    "max_safe_integer": 9007199254740991,
+    "min_safe_integer": -9007199254740991
+  },
+  "compact_bytes": "{\"zero\":0,\"pos_one\":1,\"neg_one\":-1,\"i32_max\":2147483647,\"i32_min\":-2147483648,\"max_safe_integer\":9007199254740991,\"min_safe_integer\":-9007199254740991}",
+  "pretty_bytes": "{\n  \"zero\": 0,\n  \"pos_one\": 1,\n  \"neg_one\": -1,\n  \"i32_max\": 2147483647,\n  \"i32_min\": -2147483648,\n  \"max_safe_integer\": 9007199254740991,\n  \"min_safe_integer\": -9007199254740991\n}"
+}

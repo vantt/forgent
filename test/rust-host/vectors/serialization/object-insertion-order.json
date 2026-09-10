@@ -1,0 +1,16 @@
+{
+  "category": "object insertion order",
+  "description": "Key insertion order is preserved across serialization and must not be sorted lexicographically",
+  "input_value": {
+    "z_tail": "inserted first, must serialize first",
+    "a_head": "inserted second, must serialize second",
+    "m_mid": "inserted third, must serialize third",
+    "nested": {
+      "omega": 24,
+      "alpha": 1,
+      "beta": 2
+    }
+  },
+  "compact_bytes": "{\"z_tail\":\"inserted first, must serialize first\",\"a_head\":\"inserted second, must serialize second\",\"m_mid\":\"inserted third, must serialize third\",\"nested\":{\"omega\":24,\"alpha\":1,\"beta\":2}}",
+  "pretty_bytes": "{\n  \"z_tail\": \"inserted first, must serialize first\",\n  \"a_head\": \"inserted second, must serialize second\",\n  \"m_mid\": \"inserted third, must serialize third\",\n  \"nested\": {\n    \"omega\": 24,\n    \"alpha\": 1,\n    \"beta\": 2\n  }\n}"
+}

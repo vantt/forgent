@@ -1,0 +1,14 @@
+{
+  "category": "Unicode/control characters",
+  "description": "RFC 8259 mandatory control character escapes and literal UTF-8 unicode encoding",
+  "input_value": {
+    "ascii_control": "\u0000\u0001\u001f",
+    "common_escapes": "\b\f\n\r\t\"\\",
+    "utf8_vietnamese": "Hệ điều hành cho agent: ranh giới rõ ràng, không tùm lum",
+    "utf8_multilingual": "English, Tiếng Việt, 日本語, 한국어, 中文, العربية, Русский",
+    "emoji_and_symbols": "🚀 🦀 ✨ 𝄞 🤖",
+    "del_char": ""
+  },
+  "compact_bytes": "{\"ascii_control\":\"\\u0000\\u0001\\u001f\",\"common_escapes\":\"\\b\\f\\n\\r\\t\\\"\\\\\",\"utf8_vietnamese\":\"Hệ điều hành cho agent: ranh giới rõ ràng, không tùm lum\",\"utf8_multilingual\":\"English, Tiếng Việt, 日本語, 한국어, 中文, العربية, Русский\",\"emoji_and_symbols\":\"🚀 🦀 ✨ 𝄞 🤖\",\"del_char\":\"\"}",
+  "pretty_bytes": "{\n  \"ascii_control\": \"\\u0000\\u0001\\u001f\",\n  \"common_escapes\": \"\\b\\f\\n\\r\\t\\\"\\\\\",\n  \"utf8_vietnamese\": \"Hệ điều hành cho agent: ranh giới rõ ràng, không tùm lum\",\n  \"utf8_multilingual\": \"English, Tiếng Việt, 日本語, 한국어, 中文, العربية, Русский\",\n  \"emoji_and_symbols\": \"🚀 🦀 ✨ 𝄞 🤖\",\n  \"del_char\": \"\"\n}"
+}

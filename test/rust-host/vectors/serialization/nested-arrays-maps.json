@@ -1,0 +1,57 @@
+{
+  "category": "nested arrays/maps",
+  "description": "Arbitrary nesting depth, empty collections, and mixed object/array hierarchies",
+  "input_value": {
+    "empty_object": {},
+    "empty_array": [],
+    "nested_arrays": [
+      [],
+      [
+        1,
+        [
+          2,
+          [
+            3,
+            []
+          ]
+        ]
+      ]
+    ],
+    "nested_objects": {
+      "level1": {
+        "level2": {
+          "level3": {
+            "leaf": "value"
+          }
+        }
+      }
+    },
+    "array_of_objects": [
+      {
+        "id": 1,
+        "name": "item 1",
+        "tags": [
+          "a",
+          "b"
+        ]
+      },
+      {
+        "id": 2,
+        "name": "item 2",
+        "tags": []
+      }
+    ],
+    "object_with_mixed_arrays": {
+      "records": [
+        {
+          "metadata": {
+            "count": 0,
+            "active": true
+          }
+        }
+      ]
+    }
+  },
+  "compact_bytes": "{\"empty_object\":{},\"empty_array\":[],\"nested_arrays\":[[],[1,[2,[3,[]]]]],\"nested_objects\":{\"level1\":{\"level2\":{\"level3\":{\"leaf\":\"value\"}}}},\"array_of_objects\":[{\"id\":1,\"name\":\"item 1\",\"tags\":[\"a\",\"b\"]},{\"id\":2,\"name\":\"item 2\",\"tags\":[]}],\"object_with_mixed_arrays\":{\"records\":[{\"metadata\":{\"count\":0,\"active\":true}}]}}",
+  "pretty_bytes": "{\n  \"empty_object\": {},\n  \"empty_array\": [],\n  \"nested_arrays\": [\n    [],\n    [\n      1,\n      [\n        2,\n        [\n          3,\n          []\n        ]\n      ]\n    ]\n  ],\n  \"nested_objects\": {\n    \"level1\": {\n      \"level2\": {\n        \"level3\": {\n          \"leaf\": \"value\"\n        }\n      }\n    }\n  },\n  \"array_of_objects\": [\n    {\n      \"id\": 1,\n      \"name\": \"item 1\",\n      \"tags\": [\n        \"a\",\n        \"b\"\n      ]\n    },\n    {\n      \"id\": 2,\n      \"name\": \"item 2\",\n      \"tags\": []\n    }\n  ],\n  \"object_with_mixed_arrays\": {\n    \"records\": [\n      {\n        \"metadata\": {\n          \"count\": 0,\n          \"active\": true\n        }\n      }\n    ]\n  }\n}"
+}

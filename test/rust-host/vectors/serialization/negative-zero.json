@@ -1,0 +1,16 @@
+{
+  "category": "negative zero",
+  "description": "ECMAScript specification serializes -0 as 0 in both compact and pretty JSON",
+  "input_value": {
+    "neg_zero": 0,
+    "array_neg_zero": [
+      0,
+      0
+    ],
+    "nested": {
+      "value": 0
+    }
+  },
+  "compact_bytes": "{\"neg_zero\":0,\"array_neg_zero\":[0,0],\"nested\":{\"value\":0}}",
+  "pretty_bytes": "{\n  \"neg_zero\": 0,\n  \"array_neg_zero\": [\n    0,\n    0\n  ],\n  \"nested\": {\n    \"value\": 0\n  }\n}"
+}
