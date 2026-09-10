@@ -1,6 +1,7 @@
 // authority.mjs — Agent Confinement Authority runtime execution door
 // (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).
 
+import path from "node:path";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError } from "../transport.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { validateConfinementRequest } from "./request.mjs";
@@ -33,36 +34,97 @@ export function buildConfinementAttestation({
 
   const legacy = request.requirement?.legacy;
   const hasBwrapCmd = request.invocation?.command === "bwrap";
-  const hasBwrapArgs =
-    Array.isArray(request.invocation?.args) &&
-    request.invocation.args.some(
-      (a) =>
-        typeof a === "string" &&
-        (a === "--ro-bind" ||
-          a === "--bind" ||
-          a === "--unshare-all" ||
-          a === "--unshare-user"),
-    );
-  const isVerifiedBwrap = hasBwrapCmd && hasBwrapArgs;
+
+  let hasHostWriteDeny = false;
+  let hasProcessIsolation = false;
+  const writableBinds = [];
+
+  if (hasBwrapCmd && Array.isArray(request.invocation?.args)) {
+    const rawArgs = request.invocation.args;
+    const dashDashIdx = rawArgs.indexOf("--");
+    const bwrapOptions = dashDashIdx >= 0 ? rawArgs.slice(0, dashDashIdx) : rawArgs;
+
+    let hasRoRoot = false;
+    let hasWiderWritableRebind = false;
+
+    for (let i = 0; i < bwrapOptions.length; i++) {
+      const arg = bwrapOptions[i];
+      if (typeof arg !== "string") continue;
+
+      if (arg === "--unshare-pid" || arg === "--unshare-all") {
+        hasProcessIsolation = true;
+      } else if (arg.startsWith("--ro-bind ") || arg.startsWith("--ro-bind-try ")) {
+        const parts = arg.trim().split(/\s+/);
+        if ((parts[1] === "/" || parts[1] === "") && (parts[2] === "/" || parts[2] === "")) {
+          hasRoRoot = true;
+        }
+      } else if (
+        arg.startsWith("--bind ") ||
+        arg.startsWith("--bind-try ") ||
+        arg.startsWith("--dev-bind ") ||
+        arg.startsWith("--dev-bind-try ")
+      ) {
+        const parts = arg.trim().split(/\s+/);
+        if (parts[2] === "/" || parts[2] === "") {
+          hasWiderWritableRebind = true;
+        } else if (parts[2]) {
+          writableBinds.push({ src: parts[1], dest: parts[2] });
+        }
+      } else if (arg === "--ro-bind" || arg === "--ro-bind-try") {
+        const src = bwrapOptions[i + 1];
+        const dest = bwrapOptions[i + 2];
+        i += 2;
+        if ((src === "/" || src === "") && (dest === "/" || dest === "")) {
+          hasRoRoot = true;
+        }
+      } else if (
+        arg === "--bind" ||
+        arg === "--bind-try" ||
+        arg === "--dev-bind" ||
+        arg === "--dev-bind-try"
+      ) {
+        const src = bwrapOptions[i + 1];
+        const dest = bwrapOptions[i + 2];
+        i += 2;
+        if (dest === "/" || dest === "") {
+          hasWiderWritableRebind = true;
+        } else if (typeof dest === "string" && dest) {
+          writableBinds.push({ src, dest });
+        }
+      }
+    }
+
+    if (hasRoRoot && !hasWiderWritableRebind) {
+      hasHostWriteDeny = true;
+    }
+  }
+
+  const isVerifiedBwrap = hasHostWriteDeny || hasProcessIsolation;
   const isHeuristicBwrap =
     !isVerifiedBwrap &&
-    (request.invocation?.command === "bwrap" ||
+    (hasBwrapCmd ||
       request.executorId?.includes?.("bwrap") ||
       (Array.isArray(request.invocation?.args) && request.invocation.args.includes("bwrap")));
 
   const effectiveControls = {
     ...(legacy?.controls ? { ...legacy.controls } : {}),
-    ...(isVerifiedBwrap ? { hostWrite: "deny", process: "isolated" } : {}),
+    ...(hasHostWriteDeny ? { hostWrite: "deny" } : {}),
+    ...(hasProcessIsolation ? { process: "isolated" } : {}),
   };
 
   const coverage = {};
-  if (isVerifiedBwrap) {
+  if (hasHostWriteDeny) {
     coverage["control:hostWrite"] = "satisfied";
-    coverage["control:process"] = "satisfied";
-  } else if (isHeuristicBwrap) {
+  } else if (hasBwrapCmd || isHeuristicBwrap) {
     coverage["control:hostWrite"] = "unverified";
+  }
+
+  if (hasProcessIsolation) {
+    coverage["control:process"] = "satisfied";
+  } else if (hasBwrapCmd || isHeuristicBwrap) {
     coverage["control:process"] = "unverified";
   }
+
   if (legacy?.controls?.session === "isolated") {
     coverage["control:session"] = "satisfied";
   }
@@ -92,6 +154,21 @@ export function buildConfinementAttestation({
       target: request.context?.runDir ?? "run-output",
     });
   }
+  if (hasHostWriteDeny) {
+    for (const wb of writableBinds) {
+      const resource =
+        wb.dest.endsWith(".fgos/assignments") || wb.dest.endsWith("/assignments")
+          ? "assignments"
+          : (path.basename(wb.dest) || "writable-exception");
+      if (!grants.some((g) => g.target === wb.dest || g.resource === resource)) {
+        grants.push({
+          resource,
+          access: "read-write",
+          target: wb.dest,
+        });
+      }
+    }
+  }
 
   const channels = isExplicitUnconfined
     ? [
@@ -104,10 +181,10 @@ export function buildConfinementAttestation({
     : [
         {
           name: "filesystem",
-          coverage: isVerifiedBwrap ? "covered" : isHeuristicBwrap ? "unverified" : "unknown",
-          detail: isVerifiedBwrap
+          coverage: hasHostWriteDeny ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
+          detail: hasHostWriteDeny
             ? "observed hand-written bwrap sandbox"
-            : isHeuristicBwrap
+            : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
                   ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
@@ -115,10 +192,10 @@ export function buildConfinementAttestation({
         },
         {
           name: "inherited-fd",
-          coverage: isVerifiedBwrap ? "covered" : isHeuristicBwrap ? "unverified" : "unknown",
+          coverage: isVerifiedBwrap ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
           detail: isVerifiedBwrap
             ? "observed hand-written bwrap sandbox"
-            : isHeuristicBwrap
+            : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
                   ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`

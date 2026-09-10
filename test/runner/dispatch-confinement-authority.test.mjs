@@ -285,7 +285,7 @@ test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap obse
     executorId: "claude-bwrap",
     invocation: {
       command: "bwrap",
-      args: ["--ro-bind", "/", "/"],
+      args: ["--ro-bind", "/", "/", "--unshare-pid"],
       confinement: {
         isolatedSession: true,
         ownWorktree: true,
@@ -791,3 +791,143 @@ test("MED-5: fail-closed policy errors produce structured DispatchError with att
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+test("MED-A: production bwrap executor argvs yield process: unverified while hostWrite: deny is satisfied and writable exception recorded as grant", () => {
+  const prodExecutors = [
+    {
+      executorId: "claude-bwrap",
+      args: [
+        "--ro-bind", "/", "/",
+        "--dev", "/dev",
+        "--proc", "/proc",
+        "--bind", "/home/vantt/projects/forgentX/.fgos/assignments", "/home/vantt/projects/forgentX/.fgos/assignments",
+        "--", "claude", "-p", "{prompt}", "--model", "{model}", "--permission-mode", "acceptEdits",
+      ],
+    },
+    {
+      executorId: "agy-bwrap",
+      args: [
+        "--ro-bind", "/", "/",
+        "--dev", "/dev",
+        "--proc", "/proc",
+        "--bind", "/home/vantt/projects/forgentX/.fgos/assignments", "/home/vantt/projects/forgentX/.fgos/assignments",
+        "--", "agy", "-p", "{prompt}", "--mode", "accept-edits", "--print-timeout", "30m", "--model", "{model}",
+      ],
+    },
+    {
+      executorId: "codex-bwrap",
+      args: [
+        "--ro-bind", "/", "/",
+        "--dev", "/dev",
+        "--proc", "/proc",
+        "--tmpfs", "/tmp",
+        "--ro-bind", "/home/vantt/.codex-fgovn/auth.json", "/tmp/cdxhome/auth.json",
+        "--setenv", "CODEX_HOME", "/tmp/cdxhome",
+        "--bind", "/home/vantt/projects/forgentX/.fgos/assignments", "/home/vantt/projects/forgentX/.fgos/assignments",
+        "--", "codex", "exec", "--skip-git-repo-check", "-s", "danger-full-access", "--model", "{model}", "{prompt}",
+      ],
+    },
+  ];
+
+  for (const { executorId, args } of prodExecutors) {
+    const req = buildConfinementRequest({
+      capability: "advise",
+      executorId,
+      invocation: {
+        command: "bwrap",
+        args,
+      },
+      context: {
+        cwd: "/repo",
+        runDir: "/repo/.fgos/assignments/asgn_test/runs/01",
+      },
+    });
+
+    const att = buildConfinementAttestation({ request: req });
+
+    // hostWrite must be satisfied and deny because --ro-bind / / is present without wider writable re-bind
+    assert.equal(att.effectiveControls.hostWrite, "deny", `${executorId}: hostWrite must be deny`);
+    assert.equal(att.coverage["control:hostWrite"], "satisfied", `${executorId}: control:hostWrite must be satisfied`);
+    const fsChannel = att.channels.find((c) => c.name === "filesystem");
+    assert.equal(fsChannel?.coverage, "covered", `${executorId}: filesystem channel must be covered`);
+
+    // process must be unverified because none of the production executors pass --unshare-pid today
+    assert.notEqual(att.effectiveControls.process, "isolated", `${executorId}: process must not be claimed isolated`);
+    assert.equal(att.coverage["control:process"], "unverified", `${executorId}: control:process must be unverified`);
+
+    // Writable exception on top of ro-bind (/home/.../.fgos/assignments) must be recorded as a grant, not contradicting hostWrite
+    const assignmentGrant = att.grants.find((g) => g.resource === "assignments");
+    assert.ok(assignmentGrant, `${executorId}: must record assignments writable exception as a grant`);
+    assert.equal(assignmentGrant.access, "read-write", `${executorId}: assignments grant access must be read-write`);
+    assert.ok(assignmentGrant.target.includes(".fgos/assignments"), `${executorId}: assignments grant target must match path`);
+
+    // Verified bwrap evidence must be emitted
+    assert.ok(att.evidence.some((e) => e.ref === `bwrap-argv:${executorId}`), `${executorId}: bwrap-argv evidence must be emitted`);
+  }
+
+  // Probe MED-A live falsification cases:
+  // 1. `bwrap --bind / / -- sh` confines nothing; must not claim hostWrite: deny or process: isolated
+  const bindAllReq = buildConfinementRequest({
+    capability: "advise",
+    executorId: "bwrap-bind-all",
+    invocation: {
+      command: "bwrap",
+      args: ["--bind", "/", "/", "--", "sh", "-c", "echo pwned"],
+    },
+    context: { cwd: "/repo", runDir: "/repo/runs/1" },
+  });
+  const bindAllAtt = buildConfinementAttestation({ request: bindAllReq });
+  assert.notEqual(bindAllAtt.effectiveControls.hostWrite, "deny", "bwrap --bind / / must not earn hostWrite: deny");
+  assert.notEqual(bindAllAtt.effectiveControls.process, "isolated", "bwrap --bind / / must not earn process: isolated");
+  assert.equal(bindAllAtt.coverage["control:hostWrite"], "unverified");
+  assert.equal(bindAllAtt.coverage["control:process"], "unverified");
+  assert.notEqual(bindAllAtt.channels.find((c) => c.name === "filesystem")?.coverage, "covered");
+  assert.ok(!bindAllAtt.evidence.some((e) => e.ref.startsWith("bwrap-argv:")), "must not emit bwrap-argv evidence");
+
+  // 2. `bwrap --unshare-user -- sh` does not isolate PID; must not claim process: isolated
+  const unshareUserReq = buildConfinementRequest({
+    capability: "advise",
+    executorId: "bwrap-unshare-user",
+    invocation: {
+      command: "bwrap",
+      args: ["--unshare-user", "--", "sh"],
+    },
+    context: { cwd: "/repo", runDir: "/repo/runs/1" },
+  });
+  const unshareUserAtt = buildConfinementAttestation({ request: unshareUserReq });
+  assert.notEqual(unshareUserAtt.effectiveControls.process, "isolated", "bwrap --unshare-user must not earn process: isolated");
+  assert.notEqual(unshareUserAtt.effectiveControls.hostWrite, "deny", "bwrap --unshare-user must not earn hostWrite: deny");
+  assert.equal(unshareUserAtt.coverage["control:process"], "unverified");
+  assert.equal(unshareUserAtt.coverage["control:hostWrite"], "unverified");
+
+  // 3. `bwrap --ro-bind / / --bind / /` has wider writable re-bind; hostWrite must be unverified
+  const widerRebindReq = buildConfinementRequest({
+    capability: "advise",
+    executorId: "bwrap-wider-rebind",
+    invocation: {
+      command: "bwrap",
+      args: ["--ro-bind", "/", "/", "--bind", "/", "/"],
+    },
+    context: { cwd: "/repo", runDir: "/repo/runs/1" },
+  });
+  const widerRebindAtt = buildConfinementAttestation({ request: widerRebindReq });
+  assert.notEqual(widerRebindAtt.effectiveControls.hostWrite, "deny", "--ro-bind / / with --bind / / must not earn hostWrite: deny");
+  assert.equal(widerRebindAtt.coverage["control:hostWrite"], "unverified");
+
+  // 4. `bwrap --unshare-pid` grants process: isolated independently of ro-bind
+  const pidOnlyReq = buildConfinementRequest({
+    capability: "advise",
+    executorId: "bwrap-pid-only",
+    invocation: {
+      command: "bwrap",
+      args: ["--unshare-pid", "--", "sh"],
+    },
+    context: { cwd: "/repo", runDir: "/repo/runs/1" },
+  });
+  const pidOnlyAtt = buildConfinementAttestation({ request: pidOnlyReq });
+  assert.equal(pidOnlyAtt.effectiveControls.process, "isolated", "--unshare-pid grants process: isolated");
+  assert.equal(pidOnlyAtt.coverage["control:process"], "satisfied");
+  assert.notEqual(pidOnlyAtt.effectiveControls.hostWrite, "deny");
+  assert.equal(pidOnlyAtt.coverage["control:hostWrite"], "unverified");
+});
+
