@@ -443,6 +443,32 @@ test('production dispatch attaches confinement attestation to ExecutorResult (R5
   }
 });
 
+test('production dispatch inherits a distinct configured capability anchor', async () => {
+  const root = fixtureRepo(() => ({ ...HERDR_EXECUTOR, for: ['code:review'] }));
+  const mock = mockHerdr(root);
+  const cfgPath = path.join(root, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.capabilities['generic-fallback'] = { prefer: 'herdr-worker' };
+  cfg.runner.capabilities['code:review'] = { confinement: { mode: 'unconfined' } };
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  try {
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => executeExecutorCli('herdr-worker', {
+      prompt: 'do the thing',
+      repoRoot: root,
+      cwd: root,
+      tier: 'standard',
+      for: 'generic-fallback',
+    }));
+    assert.equal(res.status, 0);
+    assert.equal(res.attestation.outcome, 'unconfined');
+    assert.equal(res.attestation.requested.mode, 'unconfined');
+    assert.ok(mock.calls().some((c) => c[0] === 'pane' && c[1] === 'split'));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('in-process dispatch through executeExecutorCli gets authorityScope: external-harness (R6)', async () => {
   const root = fixtureRepo(() => ({
     kind: 'agent',
@@ -533,4 +559,3 @@ test('http adapter routes through executeThroughConfinement and returns result w
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
-

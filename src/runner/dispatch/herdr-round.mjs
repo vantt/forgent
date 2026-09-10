@@ -247,7 +247,7 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
       round.note({ workerSession: session.sessionName });
       return { workerHomePath, sessionEnv: session.env, confined: true, status: 'confined' };
     }
-    if (hasPrivateHome || hasOwnWorktree) {
+    if (hasPrivateHome) {
       return { workerHomePath, sessionEnv: fullEnv, confined: true, status: 'confined' };
     }
     return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'unconfined' };

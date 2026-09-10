@@ -25,6 +25,7 @@ import { DEFAULT_CAPABILITY_SLOTS } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { loadRunnerConfig } from "../../src/runner/dispatch/config.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
+import { resolveCapabilityIdentityDetails } from "../../src/runner/dispatch/resolve.mjs";
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -758,6 +759,39 @@ test("R6 / F-c: capability fallback carries the same confinement policy and anch
   assert.equal(req.requirement.policy.contract, "confinement-policy.v1");
 });
 
+test("R6 / F-c: resolver retains a distinct configured anchor for a generic requested capability", () => {
+  const cfg = {
+    capabilities: {
+      "generic-fallback": { prefer: "reviewer" },
+      "code:review": { confinement: { mode: "required", policy: "host-write-denied" } },
+    },
+    executors: { reviewer: { for: ["code:review"] } },
+  };
+  const resolvedExecutor = cfg.executors.reviewer;
+  const resolution = resolveCapabilityIdentityDetails({
+    cfg,
+    executorId: "reviewer",
+    resolvedExecutor,
+    purpose: "generic-fallback",
+  });
+
+  assert.deepEqual(resolution, {
+    capability: "generic-fallback",
+    anchorCapability: "code:review",
+  });
+
+  const req = buildConfinementRequest({
+    ...resolution,
+    fallbackFrom: resolution.anchorCapability,
+    executorId: "reviewer",
+    cfg,
+    context: { cwd: "/tmp", runDir: "/tmp" },
+  });
+  assert.equal(req.requirement.mode, "required");
+  assert.equal(req.requirement.policyId, "host-write-denied");
+  assert.equal(req.requirement.anchor, "code:review");
+});
+
 test("R6 / F-d: establishConfinement returns confined: false, status: unconfined when nothing was confined", async () => {
   const tmpBase = mkTemp("p04-repo-base-");
   const repoRoot = path.join(tmpBase, "repo");
@@ -807,6 +841,18 @@ test("R6 / F-d: establishConfinement returns confined: false, status: unconfined
   assert.equal(resultConfined.confined, true);
   assert.equal(resultConfined.status, "confined");
   assert.ok(resultConfined.workerHomePath);
+
+  // 3. A worktree location is checked but does not provision isolation.
+  const resultOwnWorktreeOnly = await establishConfinement({
+    confinement: { ownWorktree: true },
+    round: mockRound,
+    fullEnv: { HOME: tmpHome },
+    cwd,
+    repoRoot,
+  });
+  assert.equal(resultOwnWorktreeOnly.confined, false);
+  assert.equal(resultOwnWorktreeOnly.status, "unconfined");
+  assert.equal(resultOwnWorktreeOnly.workerHomePath, null);
 
   fs.rmSync(tmpHome, { recursive: true, force: true });
   fs.rmSync(tmpBase, { recursive: true, force: true });

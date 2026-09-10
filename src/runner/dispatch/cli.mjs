@@ -25,7 +25,7 @@ import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentity } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
@@ -349,13 +349,14 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
 
   const stageSkill = executorId;
   const targetStage = opts.stage ?? work?.stage ?? 'executing';
-  const capability = resolveCapabilityIdentity({
+  const capabilityResolution = resolveCapabilityIdentityDetails({
     cfg,
     work,
     stage: targetStage,
     executorId,
     resolvedExecutor: executorForTier,
   });
+  const { capability, anchorCapability } = capabilityResolution;
 
   let confinementRequest;
   try {
@@ -363,8 +364,8 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       capability,
       stageSkill,
       executorId: resolvedExecutorId ?? executorId,
-      fallbackFrom: capability,
-      anchorCapability: capability,
+      fallbackFrom: anchorCapability,
+      anchorCapability,
       cfg,
       invocation: {
         command,
@@ -685,7 +686,7 @@ export async function executeExecutorCli(
   // for a direct executorId call — whichever capabilities that executor
   // itself declares serving (executor.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  const capabilityIdentity = resolveCapabilityIdentity({
+  const capabilityResolution = resolveCapabilityIdentityDetails({
     cfg,
     work,
     stage,
@@ -693,6 +694,7 @@ export async function executeExecutorCli(
     resolvedExecutor,
     purpose,
   });
+  const { capability: capabilityIdentity, anchorCapability } = capabilityResolution;
   const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
@@ -706,8 +708,8 @@ export async function executeExecutorCli(
         capability: capabilityIdentity,
         stageSkill,
         executorId,
-        fallbackFrom: capabilityIdentity,
-        anchorCapability: capabilityIdentity,
+        fallbackFrom: anchorCapability,
+        anchorCapability,
         cfg,
         authorityScope: 'external-harness',
         invocation: {
@@ -902,8 +904,8 @@ export async function executeExecutorCli(
         capability: capabilityIdentity,
         stageSkill: executorIdArg,
         executorId,
-        fallbackFrom: capabilityIdentity,
-        anchorCapability: capabilityIdentity,
+        fallbackFrom: anchorCapability,
+        anchorCapability,
         cfg,
         invocation: {
           command,
