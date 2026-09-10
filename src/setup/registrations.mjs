@@ -3919,7 +3919,11 @@ export function checkConfinementHerdrMaturity(cwd) {
   }
   const executors = runner?.executors || {};
   const herdrExecutors = Object.entries(executors)
-    .filter(([_, exec]) => exec && typeof exec === 'object' && exec.adapter === 'herdr-spawn');
+    .filter(([_, exec]) => {
+      if (!exec || typeof exec !== 'object') return false;
+      const invocation = (exec.invocations ?? []).find((i) => i.via === 'cli') ?? exec;
+      return invocation.adapter === 'herdr-spawn';
+    });
 
   if (herdrExecutors.length === 0) {
     return {

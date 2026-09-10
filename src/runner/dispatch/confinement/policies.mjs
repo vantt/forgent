@@ -580,6 +580,7 @@ export function normalizeLegacyConfinement(confinement, label = 'confinement') {
             : []
         ),
         ...(confinement.backend ? { backend: confinement.backend } : {}),
+        ...(confinement.networkFilter !== undefined ? { networkFilter: confinement.networkFilter } : {}),
       };
     }
     return null;
