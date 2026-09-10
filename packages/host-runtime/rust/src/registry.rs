@@ -7,11 +7,13 @@
 //! root (Phase 08) by calling [`build_snapshot`] with the real provider list —
 //! `fgos-host-runtime` never depends downward on a provider crate.
 
+use crate::contracts::{OperationCatalog, ProviderDescriptor, RegistrySnapshot};
+
+#[cfg(test)]
 use crate::catalog::CATALOG;
-use crate::contracts::{
-    ContractRef, OperationCatalog, OperationId, ProviderDescriptor, ProviderLifecycle,
-    RegistrySnapshot,
-};
+#[cfg(test)]
+use crate::contracts::{ContractRef, OperationId, ProviderLifecycle};
+#[cfg(test)]
 use std::borrow::Cow;
 
 /// Builds an immutable [`RegistrySnapshot`].
@@ -22,6 +24,20 @@ use std::borrow::Cow;
 /// Note: The production snapshot is assembled once at the `apps/fgos` composition root
 /// (Phase 08) by calling this same constructor with the real provider list —
 /// `fgos-host-runtime` never depends downward on a provider crate.
+///
+/// **Known, deliberate R1 gap (not a bug):** a `replacement`-declaring pair
+/// passes THIS function's linking check, but `select` (`operation_provider_router.rs`)
+/// does not yet consult `replacement` when it finds more than one binding for
+/// an operation -- it returns `AmbiguousBinding` regardless, so a declared
+/// replacement is accepted at link time but not actually honored at
+/// selection time yet. Kernel §6 names an "authorizing policy" as part of
+/// replacement resolution, and this phase's own `RouterPolicy` is
+/// deliberately an empty, unreferenced placeholder (`operation_provider_router.rs`
+/// R4: "never referenced by selection logic yet") -- replacement resolution
+/// needs that policy machinery, which is out of R1 scope per this phase's
+/// own R6 test list (only "duplicate binding fails linking" is required;
+/// no "replacement resolution succeeds" case is named). Phase 06 or later
+/// owns making `select` actually resolve a declared replacement.
 pub fn build_snapshot(
     catalog: OperationCatalog,
     providers: &'static [ProviderDescriptor],
@@ -53,7 +69,7 @@ pub fn build_snapshot(
 }
 
 /// Fixture provider descriptor for `test.fixture.echo`.
-#[allow(dead_code)]
+#[cfg(test)]
 pub(crate) const FIXTURE_ECHO_PROVIDER: ProviderDescriptor = ProviderDescriptor {
     provider_id: Cow::Borrowed("test.fixture.echo.builtin"),
     operation_id: OperationId::from_static("test.fixture.echo"),
@@ -71,12 +87,12 @@ pub(crate) const FIXTURE_ECHO_PROVIDER: ProviderDescriptor = ProviderDescriptor 
 };
 
 /// Test providers table containing only in-crate fixture providers.
-#[allow(dead_code)]
+#[cfg(test)]
 pub(crate) const TEST_PROVIDERS: &[ProviderDescriptor] = &[FIXTURE_ECHO_PROVIDER];
 
 /// Crate-private snapshot built only from in-crate fixture providers, for this
 /// phase's own tests. It never references `fgos-distribution`.
-#[allow(dead_code)]
+#[cfg(test)]
 pub(crate) const SNAPSHOT_FOR_TESTS: RegistrySnapshot = RegistrySnapshot {
     catalog: CATALOG,
     providers: TEST_PROVIDERS,

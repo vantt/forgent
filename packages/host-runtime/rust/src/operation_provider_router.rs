@@ -6,6 +6,18 @@
 //! The Router reads the `RegistrySnapshot`, matches operation, invocation mode,
 //! host kind, and exact contract versions. It performs exact binding only —
 //! no priority, no registration order, no last-writer-wins.
+//!
+//! **Deliberately not checked here: `RegistrySnapshot.catalog` membership,
+//! or `OperationDescriptor.allowed_host_kinds`.** The canonical Router
+//! signature (`host-invocation-provider-routing.md` §6) is "matches
+//! operation/mode/host/compatible contract versions" against the PROVIDER
+//! table only; this phase's own R4 (`SelectionInput`'s field list) and R6
+//! (the seven named test cases) never mention catalog membership either.
+//! Catalog-authored constraints belong to a different, not-yet-built stage
+//! (most likely Phase 06's admission gate, which reads `OperationDescriptor`
+//! to decide whether a caller may even reach `select` at all) — adding a
+//! second, independent enforcement point here would risk the two drifting
+//! out of sync rather than adding real safety.
 
 use crate::contracts::{OperationId, ProviderDescriptor, RegistrySnapshot};
 
@@ -218,6 +230,76 @@ mod tests {
                 },
             ];
             let _ = build_snapshot(CATALOG, DUPS, "test-dup");
+        }
+    }
+
+    mod ambiguous_binding {
+        use super::*;
+
+        /// `duplicate_binding` proves `build_snapshot` fails closed at linking
+        /// time. This test proves the OTHER half of R4's non-panic contract:
+        /// `select` itself, given a snapshot that already carries two
+        /// providers bound to the same operation (constructed directly via
+        /// struct literal, bypassing `build_snapshot`'s own linking check --
+        /// the same pattern `shuffle_order_stability` uses below), returns
+        /// `Err(SelectionRefused::AmbiguousBinding)` rather than panicking or
+        /// picking one arbitrarily.
+        static AMBIGUOUS: &[ProviderDescriptor] = &[
+            ProviderDescriptor {
+                provider_id: Cow::Borrowed("amb1"),
+                operation_id: OperationId::from_static("test.fixture.echo"),
+                component_class: Cow::Borrowed("test"),
+                mechanism: Cow::Borrowed("builtin"),
+                lifecycle: ProviderLifecycle::Singleton,
+                request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                outcome_contract: ContractRef::from_static("test.fixture.echo.outcome", "1.0.0"),
+                allowed_hosts: &["cli"],
+                allowed_modes: &["sync"],
+                capabilities: &[],
+                replacement: None,
+                concurrency: None,
+                health: None,
+            },
+            ProviderDescriptor {
+                provider_id: Cow::Borrowed("amb2"),
+                operation_id: OperationId::from_static("test.fixture.echo"),
+                component_class: Cow::Borrowed("test"),
+                mechanism: Cow::Borrowed("builtin"),
+                lifecycle: ProviderLifecycle::Singleton,
+                request_contract: ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                outcome_contract: ContractRef::from_static("test.fixture.echo.outcome", "1.0.0"),
+                allowed_hosts: &["cli"],
+                allowed_modes: &["sync"],
+                capabilities: &[],
+                replacement: None,
+                concurrency: None,
+                health: None,
+            },
+        ];
+
+        #[test]
+        fn ambiguous_binding() {
+            let snapshot = RegistrySnapshot {
+                catalog: CATALOG,
+                providers: AMBIGUOUS,
+                fingerprint: "ambiguous-test",
+            };
+            let input = SelectionInput {
+                operation: OperationId::parse("test.fixture.echo").expect("valid id"),
+                request_contract_version: "1.0.0",
+                outcome_contract_version: "1.0.0",
+                host_kind: "cli",
+                invocation_mode: "sync",
+                policy: RouterPolicy,
+            };
+            let result = select(input, &snapshot);
+            assert!(matches!(
+                result,
+                Err(SelectionRefused::AmbiguousBinding {
+                    candidate_count: 2,
+                    ..
+                })
+            ));
         }
     }
 

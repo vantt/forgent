@@ -50,4 +50,20 @@ mod tests {
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"test.fixture.echo"));
     }
+
+    /// `OperationId::from_static` (used by every `CATALOG` entry, for
+    /// const-context construction with no runtime allocation) skips
+    /// `OperationId::parse`'s validation by design -- it is a trusted
+    /// constructor for literals the codebase author already controls, not a
+    /// public input boundary. This test is the safety net that catches a
+    /// future typo in a `from_static` literal: every id `CATALOG` ships must
+    /// still independently re-parse cleanly through the validating path.
+    #[test]
+    fn every_catalog_operation_id_reparses_through_the_validating_parser() {
+        for op in CATALOG {
+            let raw = op.operation_id.as_str();
+            crate::contracts::OperationId::parse(raw)
+                .unwrap_or_else(|e| panic!("CATALOG entry '{raw}' fails validation: {e}"));
+        }
+    }
 }
