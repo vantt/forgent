@@ -1683,14 +1683,17 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   advise: {
     description:
       'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+    confinement: { mode: 'required', policy: 'host-write-denied' },
   },
   execute: {
     description:
       'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+    confinement: { mode: 'unconfined' },
   },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
+    confinement: { mode: 'unconfined' },
   },
   // P2-runtime (docs/history/agent-coordination-foundation/plan.md):
   // extended by observed frequency, in this priority order. Deliberately
@@ -1699,18 +1702,22 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   'code:review': {
     description:
       'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'required', policy: 'host-write-denied' },
   },
   'code:test': {
     description:
       'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'unconfined' },
   },
   'code:debug': {
     description:
       'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'required', policy: 'host-write-denied' },
   },
   'code:refactor': {
     description:
       'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'unconfined' },
   },
 });
 

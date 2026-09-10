@@ -482,6 +482,10 @@ export function validateOverrideConfinementShape(
             `runner config (${grantLabel}) override cannot widen access for "${grant.resource}" from "${baseGrant.access}" to "${grant.access}".`,
           );
         }
+      } else {
+        throw new ConfinementPolicyError(
+          `runner config (${grantLabel}) override cannot add grant for "${grant.resource}" without a base policy.`,
+        );
       }
     }
   }

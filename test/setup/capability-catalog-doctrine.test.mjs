@@ -36,7 +36,7 @@ test('P2-runtime capability slots are registered with no provider/model/executor
   for (const name of ['code:review', 'code:test', 'code:debug', 'code:refactor']) {
     const entry = DEFAULT_CAPABILITY_SLOTS[name];
     assert.ok(entry, `DEFAULT_CAPABILITY_SLOTS is missing "${name}"`);
-    assert.deepEqual(Object.keys(entry), ['description'], `"${name}" must carry only a description, never prefer/overrides`);
+    assert.ok(!entry.prefer && !entry.overrides, `"${name}" must never carry prefer/overrides`);
     assert.equal(typeof entry.description, 'string');
     assert.ok(entry.description.trim().length > 0);
   }

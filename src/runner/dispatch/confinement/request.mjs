@@ -7,6 +7,7 @@ import {
   resolveConfinementPolicy,
   normalizeLegacyConfinement,
   validateConfinementPolicyShape,
+  validateOverrideConfinementShape,
   ConfinementPolicyError,
 } from "./policies.mjs";
 
@@ -73,6 +74,14 @@ export function validateConfinementRequest(request) {
   if (request.requirement.policy !== null && request.requirement.policy !== undefined) {
     validateConfinementPolicyShape(request.requirement.policy, "ConfinementRequest requirement.policy");
   }
+  if (request.override !== null && request.override !== undefined) {
+    validateOverrideConfinementShape(
+      request.override,
+      request.requirement?.policy ?? null,
+      "ConfinementRequest override",
+      request.requirement?.mode ?? "preferred",
+    );
+  }
   return request;
 }
 
@@ -84,6 +93,8 @@ export function buildConfinementRequest({
   capability,
   stageSkill = null,
   executorId,
+  fallbackFrom = null,
+  anchorCapability = null,
   invocation = {},
   context = {},
   cfg = null,
@@ -103,6 +114,7 @@ export function buildConfinementRequest({
 
   let resolvedRequirement = requirement;
   if (!resolvedRequirement) {
+    const effectiveFallback = fallbackFrom || anchorCapability || null;
     const capConfinement = cfg?.capabilities?.[cap]?.confinement;
     const skillConfinement = stageSkill && stageSkill !== cap ? cfg?.capabilities?.[stageSkill]?.confinement : undefined;
 
@@ -120,15 +132,28 @@ export function buildConfinementRequest({
       }
     }
 
-    const activeConfinement = capConfinement || skillConfinement;
+    let activeConfinement = capConfinement || skillConfinement;
+    let effectiveAnchor = capConfinement ? cap : (skillConfinement ? stageSkill : null);
+
+    // F-c: capability fallback must carry the same confinement policy that the anchor it fell back from declared
+    if (!activeConfinement && effectiveFallback && cfg?.capabilities?.[effectiveFallback]?.confinement) {
+      activeConfinement = cfg.capabilities[effectiveFallback].confinement;
+      effectiveAnchor = effectiveFallback;
+    }
+    if (!activeConfinement && cfg?.capabilities?.[cap]?.fallback && cfg?.capabilities?.[cfg.capabilities[cap].fallback]?.confinement) {
+      activeConfinement = cfg.capabilities[cfg.capabilities[cap].fallback].confinement;
+      effectiveAnchor = cfg.capabilities[cap].fallback;
+    }
+
     if (activeConfinement) {
-      validateCapabilityConfinementShape(activeConfinement, `capabilities.${capConfinement ? cap : stageSkill}.confinement`);
+      validateCapabilityConfinementShape(activeConfinement, `capabilities.${effectiveAnchor}.confinement`);
       const mode = activeConfinement.mode;
       if (mode === "unconfined") {
         resolvedRequirement = {
           mode: "unconfined",
           policyId: null,
           policy: null,
+          anchor: effectiveAnchor,
         };
       } else {
         const policyObj = resolveConfinementPolicy(activeConfinement.policy, cfg?.confinementPolicies);
@@ -141,6 +166,7 @@ export function buildConfinementRequest({
           mode,
           policyId: activeConfinement.policy,
           policy: policyObj,
+          anchor: effectiveAnchor,
         };
       }
     } else {
@@ -153,6 +179,7 @@ export function buildConfinementRequest({
         policyId: null,
         policy: null,
         omitted: true,
+        anchor: effectiveAnchor,
         ...(legacy ? { legacy } : {}),
       };
     }
@@ -204,11 +231,12 @@ export function buildConfinementRequest({
       closeAlways: context.closeAlways,
     },
     requirement: resolvedRequirement,
-    override: override || undefined,
+    override: override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? undefined,
     resourceNeeds: Array.isArray(resourceNeeds) ? resourceNeeds : [],
-    backendId: backendId ?? null,
+    backendId: backendId ?? invocation?.confinement?.backend ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
   };
 
   return validateConfinementRequest(req);
 }
+

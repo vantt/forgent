@@ -206,7 +206,7 @@ function prepareRunDir({ runDir, roundNumber, workId, tier, model }) {
  * downgrade: running anyway would put a worker on the operator's cockpit
  * socket while the profile claims it is confined.
  */
-async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
+export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
   // Checked first, because it is the one flag that is already true or already
   // false before anything is provisioned: a worker confined to its own
   // worktree cannot be running in the checkout it was told to stay out of.
@@ -245,9 +245,12 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
         herdrBin,
       });
       round.note({ workerSession: session.sessionName });
-      return { workerHomePath, sessionEnv: session.env };
+      return { workerHomePath, sessionEnv: session.env, confined: true, status: 'confined' };
     }
-    return { workerHomePath, sessionEnv: fullEnv };
+    if (hasPrivateHome || hasOwnWorktree) {
+      return { workerHomePath, sessionEnv: fullEnv, confined: true, status: 'confined' };
+    }
+    return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'unconfined' };
   } catch (err) {
     if (workerHomePath) { try { removeWorkerHome(workerHomePath); } catch { /* nothing left to do */ } }
     throw round.fail('invalid-config', err.code ?? 'confinement-unavailable',
