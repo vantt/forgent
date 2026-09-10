@@ -2,11 +2,14 @@
 
 **Status:** Selected migration direction, not an implementation plan.
 **Date:** 2026-09-01.
-**Selected direction (2026-09-03; revised 2026-09-04):** ship the distributable
-Rust `fgos` CLI host in R1, with every unmigrated selector routed to the
-CLI-only legacy Node compatibility provider; prove external process providers
-in R2 and the production remote peer in R3; then replace semantic operations
-one component at a time with native Rust providers.
+**Revised:** 2026-09-10 (see
+plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md).
+**Selected direction (2026-09-03; revised 2026-09-04, 2026-09-10):** ship the
+distributable Rust `fgos` CLI host in R1, with every unmigrated selector
+resolved by the CLI adapter to the legacy-cli lane and exec'd straight to the
+Node payload, never entering the kernel; prove external process providers in
+R2 and the production remote peer in R3; then replace semantic operations one
+component at a time with native Rust providers.
 **Source:** Product-owner planning and follow-up component-boundary discussion.
 
 This document discusses only migration options, ordering, transition stages,
@@ -39,14 +42,14 @@ The migration must preserve current commands, `fgos.v1`, errors, state
 authority, install behavior, and rollback until each replacement is proven.
 
 It must also preserve a visible repair path: an unmigrated selector remains
-owned by the named Node payload at
-`packages/legacy-node/node/fgos.mjs` (installed as
-`libexec/fgos/legacy-node/fgos.mjs`), not by an ambiguous historical
-`bin/fgos.mjs` path. The generated command-route descriptor tells a
-contributor whether a selector is `legacy-cli` or `native`, its owner path,
-and its required compatibility tests. A selector cannot be made native merely
-by changing a Rust parser; its descriptor and complete provider binding change
-together.
+owned by the Node payload — identity `legacy-node`, the npm package as
+`package.json` `files` defines it, unmoved in the source tree and staged whole
+under the release manifest's `components.legacyNode.root` — so `bin/fgos.mjs`
+is a file inside that payload, no longer a public name. The generated command-route
+descriptor tells a contributor whether a selector is `legacy-cli` or `native`,
+its owner path, and its required compatibility tests. A selector cannot be
+made native merely by changing a Rust parser; its descriptor and complete
+provider binding change together.
 
 ## 2. Options Considered
 
@@ -67,15 +70,17 @@ until after substantial Node restructuring.
 
 ```txt
 thin Rust host/router
-  -> default every unmigrated CLI selector to Node compatibility
+  -> CLI adapter execs every unmigrated selector straight to the Node payload
   -> move one complete operation/component to native Rust
   -> remove its Node path after proof
 ```
 
 This establishes the permanent composition root first. It keeps the initial
-Rust change narrow without making a disposable wrapper. R1 already has the
-router and compatibility shape that can survive a long migration;
-boundary extraction still happens only when a component is actually migrated.
+Rust change narrow without making a disposable wrapper. R1 already has the CLI
+adapter's legacy-cli exec lane and the kernel's native-selector shape that can
+survive a long migration; boundary extraction still happens only when a
+component is actually migrated. See
+[Legacy CLI Transition](./legacy-cli-transition.md) for the exec mechanics.
 
 ### Option C: Big-Bang Rust Rewrite
 
@@ -91,8 +96,9 @@ is rejected.
 ### Selected Option
 
 Option B is selected. The first Rust release is an intentionally small,
-distributable host/router with CLI-only Node compatibility as the default for
-unmigrated selectors, not an immediate rewrite of all Node semantics.
+distributable host/router; the CLI adapter execs every unmigrated selector
+straight to the Node payload by default, not an immediate rewrite of all Node
+semantics.
 
 ## 3. Why The Sequence Is Selected
 
@@ -101,7 +107,8 @@ The sequence provides a monotonic migration:
 - the final host exists before component replacement begins;
 - each completed slice removes one Node dependency;
 - untouched operations continue on their current execution path;
-- rollback changes one provider selection instead of reverting the host;
+- rollback is a release rollback through `fgctl`, not a rebuild of the outer
+  host;
 - external extension work can target the permanent host boundary;
 - Node cleanup follows demonstrated removal rather than forecasted ownership.
 
@@ -137,7 +144,7 @@ their order.
   and classification patching.
 - `plan` still owns validation branching, stage checks, verdict parsing, and
   child parsing.
-- `setup` and `doctor` still compose rc wiring, hooks, defaults, fixes, checks,
+- `init` and `doctor` still compose rc wiring, hooks, defaults, fixes, checks,
   and presentation.
 - `check`, `rollup`, and `evolve` still compose their read models and output.
 
@@ -168,20 +175,27 @@ compatibility, `fgos-runner` remains a separately proven Node public entry, and
 
 The migration order is:
 
-1. decide the supported target matrix, archive/install mechanism, upgrade and
-   rollback channels;
-2. relocate the Node CLI to its named legacy payload and retain only a thin,
-   temporary source-tree compatibility shim at `bin/fgos.mjs`;
+1. adopt the packaging stream's settled install/activation/rollback contract
+   (`fgctl` + release store + workspace activation binding; see
+   [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md)
+   §11–§13); confirm the supported target matrix;
+2. name the Node payload `legacy-node` in the release manifest
+   (`components.legacyNode.root`/`entry`) without moving or renaming any file;
+   add the ownership header to `bin/fgos.mjs` and the root `AGENTS.md` note;
 3. freeze executable Node compatibility evidence and the checked command-route
    descriptor, including the owner and test suite for every selector;
 4. land the Rust invocation kernel with immutable static bindings and the
    two-stage authority path;
-5. route every current CLI selector through the CLI-only legacy passthrough
-   provider unless it has an explicit native binding;
+5. wire the CLI adapter to read the checked `CommandRouteDescriptor` for every
+   current selector: a `legacy-cli` selector execs straight to the Node
+   payload with argv preserved, never entering `InvocationService`; only a
+   `native` selector builds an `OperationRequest`. See
+   [Legacy CLI Transition](./legacy-cli-transition.md);
 6. migrate `version` to native `distribution.build.show`;
-7. prove build, install, setup/doctor, upgrade, rollback, and uninstall from an
-   external temp project on every supported target, using a staged artifact
-   rather than a source checkout;
+7. prove the install/activation/rollback contract through `fgctl init` on an
+   external temp project from a staged release, followed by the active
+   runtime's `fgos init` → `doctor --fix` → `doctor`, on every supported
+   target;
 8. flip the installed default only after the compatibility and distribution
    gates pass.
 
@@ -189,18 +203,24 @@ External-process discovery, WASM, chat, and production gateway adoption do not
 block R1. They prove later parts of the permanent architecture without delaying
 the first usable release.
 
-Exit condition: every existing CLI invocation still reaches Node unchanged or
-an explicitly native provider, `version` creates no Node process, the Rust host
-is reproducibly installed as the default, and the previous Node entry remains a
-named rollback channel. For every legacy selector, `explain-command-route`
-identifies the canonical Node owner and required parity suite; no contributor
-must infer ownership from a stale `bin/fgos.mjs` reference. The activated Rust
-host, legacy payload, and Node runner always come from one versioned artifact
-manifest; no release mixes them across versions.
+Exit condition: every existing CLI invocation still reaches Node unchanged (via
+the CLI adapter's legacy-cli exec lane) or an explicitly native provider,
+`version` creates no Node process, and the proof runs through `fgctl init` on
+an external temp project from a staged release, followed by the active
+runtime's `fgos init` → `doctor --fix` → `doctor`, with the previous release
+remaining a named rollback channel through `fgctl`. For every legacy selector,
+`explain-command-route` identifies the canonical Node owner and required
+parity suite; no contributor must infer ownership from a stale `bin/fgos.mjs`
+reference. The activated Rust host, legacy payload, and Node runner always
+come from one versioned release artifact; no release mixes them across
+versions.
 
 ## 6. Release R2: External Process Provider Preview
 
-R2 proves runtime extension after R1 has established the host:
+R2 proves runtime extension after R1 has established the host. The framed
+protocol, discovery manifest shape, and process adapter contract live in
+[External Provider Protocol](./external-provider-protocol.md); this section
+only orders the migration proof.
 
 1. freeze the framed component protocol and conformance fixtures;
 2. implement bounded process supervision, handshake, cancellation, crash and
@@ -232,6 +252,14 @@ Adopt the common invocation service route by route:
 Captured/supervised legacy CLI output is not a semantic provider outcome and
 cannot serve this stage. This stage gets a separate blast-radius review because
 the current Herdr crate combines gateway, TUI, Axum, MCP, auth, and web concerns.
+
+The production remote host in R3 is the project-local gateway (the current
+Herdr crate, released alongside the runtime) composing the host-runtime crate
+in-process. A future shared multi-project gateway is a different component: it
+reaches a selected project runtime only through the out-of-process Project
+Runtime Adapter
+([Future Constraints](../packaging-distribution/future-constraints.md) §2),
+never by loading a project runtime in-process itself.
 
 Chat becomes a peer host only when a real chat adapter and its own contracts
 exist. Host extensibility is preserved meanwhile; a speculative chat proof is
@@ -282,6 +310,11 @@ For each subsequent component:
 Near-thin read-only operations come before complex write owners. File size alone
 does not choose order.
 
+A native provider never blocks waiting for a person. An operation that needs
+human input returns a `parked` outcome and is re-invoked by the work
+lifecycle, not by a provider-side wait. This must hold before any
+`ask`/`answer`-shaped operation migrates.
+
 ## 10. Migrate Read Models Before Writers
 
 The next meaningful proof after the small operations should be a Work Lifecycle
@@ -323,7 +356,7 @@ Remove the Node runtime/payload only when:
 - no built-in operation routes to the legacy provider;
 - all events written by the final Node version replay correctly in Rust;
 - all public commands and supported hosts pass contract tests;
-- setup/doctor reports no remaining legacy dependency;
+- `init`/`doctor` reports no remaining legacy dependency;
 - release rollback no longer depends on shipping Node;
 - obsolete Node facades, manifests, test adapters, and distribution entries are
   removed in the same cleanup series.
@@ -332,31 +365,37 @@ Node removal is a consequence of zero remaining routes, not a calendar target.
 
 ## 13. Rollback Rules
 
+Config can never replace a built-in provider (host doc open question 2 closed
+as "prohibit"). A provider binding is not a runtime-selectable switch, so
+rollback of a native operation in R1–R2 is a release rollback through `fgctl`:
+`ActivationRecord.previousArtifactDigest` + the preserved release directory +
+a state-schema compatibility check (see
+[Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md)
+§11). The previous release still contains both the native provider and the
+Node payload during the operation's observation window, so a release rollback
+restores the legacy path without restoring the old outer executable by hand.
+
 - Keep legacy and native implementations side by side only for the observation
   window of their operation.
-- Roll back by changing provider selection, not by restoring the old outer
-  executable.
 - Never delete a Node writer before proving it can read/recover state last
   written by the Rust implementation, or explicitly declaring the cutover
   irreversible with migration evidence.
 - Remove rollback code per component after its window; do not accumulate a
   permanent second implementation tree.
-- The Rust host itself rolls back through the distribution mechanism, while the
-  legacy Node entry remains directly invocable during early releases.
 
 ## 14. Verification Gates
 
 Every stage must leave a reproducible gate:
 
-| Stage | Minimum proof |
-|---|---|
-| R1 Rust CLI | Node baseline; invocation kernel; transparent CLI fallback parity across argv/stdin/stdout/stderr/cwd/env/exit/signal; native `version`; external install/upgrade/rollback/uninstall; setup/doctor on every supported target |
-| R2 process preview | framed-protocol conformance, manifest-without-execution discovery, bounded cancel/backpressure, crash/completion-unknown mapping, vendor fixture through the common router |
-| R3 remote peer | at least one native semantic route through the production gateway, transport-specific contract suite, and no internal `fgos.v1` parsing on migrated routes |
-| Next read proof | `gate-bypass` or another authority-confirmed read runs natively with no Node process and no writes |
-| Work read model | Rust event decode/replay/frontier determinism against Node fixtures |
-| First writer | atomicity, recovery, concurrency, mutual exclusion, idempotency, and cross-version replay |
-| Node removal | zero compatibility bindings and zero setup/doctor/runtime dependency on Node |
+| Stage | Minimum proof | Performance gate |
+|---|---|---|
+| R1 Rust CLI | Node baseline; invocation kernel; transparent CLI fallback parity across argv/stdin/stdout/stderr/cwd/env/exit/signal; native `version`; `fgctl` install/upgrade/rollback/uninstall from a staged release; `fgos init` / `doctor --fix` / `doctor` on every supported target | legacy passthrough overhead vs direct `node` entry and native `version` latency measured against the thresholds fixed in the plan's P1 harness |
+| R2 process preview | framed-protocol conformance, manifest-without-execution discovery, bounded cancel/backpressure, crash/completion-unknown mapping, vendor fixture through the common router | — |
+| R3 remote peer | at least one native semantic route through the production gateway, transport-specific contract suite, and no internal `fgos.v1` parsing on migrated routes | — |
+| Next read proof | `gate-bypass` or another authority-confirmed read runs natively with no Node process and no writes | — |
+| Work read model | Rust event decode/replay/frontier determinism against Node fixtures | — |
+| First writer | atomicity, recovery, concurrency, mutual exclusion, idempotency, and cross-version replay | — |
+| Node removal | zero compatibility bindings and zero init/doctor/runtime dependency on Node | — |
 
 Repository-wide proof remains `npm test` plus the new Rust workspace's
 `cargo test --workspace` until Node tests are retired deliberately.
@@ -364,9 +403,13 @@ Repository-wide proof remains `npm test` plus the new Rust workspace's
 ## 15. Remaining Migration Decisions
 
 1. Which supported target matrix gates the first distributed Rust host?
-2. Which post-npm release/install mechanism owns native artifacts?
-3. How long is the provider rollback observation window?
-4. Does `gate-bypass` remain the next proof after its component ownership is
+2. How long is the provider rollback observation window?
+3. Does `gate-bypass` remain the next proof after its component ownership is
    confirmed, or should an already-settled component read replace it?
-5. Which state-writing component is the first eligible writer after Rust replay
+4. Which state-writing component is the first eligible writer after Rust replay
    parity exists?
+
+The former "which post-npm release/install mechanism owns native artifacts"
+decision is settled: the packaging stream owns it (`fgctl` + release store +
+workspace activation binding), see
+[Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md).

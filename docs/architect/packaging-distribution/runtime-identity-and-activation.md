@@ -309,7 +309,8 @@ Minimum fields:
   },
   "components": {
     "legacyNode": {
-      "path": "libexec/legacy-node/fgos.mjs",
+      "root": "libexec/legacy-node",
+      "entry": "bin/fgos.mjs",
       "digest": "sha256:..."
     },
     "runner": {
@@ -339,6 +340,8 @@ Minimum fields:
   "files": []
 }
 ```
+
+`components.legacyNode` names a payload **root** plus an **entry** inside it, not a single file (proposed 2026-09-10 by the host-invocation stream, see [Legacy CLI Transition](../host-invocation-routing/legacy-cli-transition.md) §2): the legacy payload is the whole Node package as `package.json` `files` defines it, staged with its source-relative layout intact so `bin/fgos.mjs` needs no import changes, and `bin/fgos-runner.mjs` lives in the same root. The Rust host resolves `join(activeReleasePath, root, entry)` and nothing else. A `dev:<rev>` source activation declares `root: "."`, `entry: "bin/fgos.mjs"`, `entries.fgos: "target/release/fgos"` — the same fields serve dogfood and a staged release.
 
 ### Release Tree Canonicalization
 
@@ -1033,7 +1036,11 @@ identity. The first release tree may use the existing Node `fgos` host; Rust
    `TopologyContext` supplies the workspace roots.
 2. Exact release directory name: digest-only, version-plus-digest, or both.
 3. Exact stable shim implementation: Rust binary, shell/PowerShell script, or
-   platform-specific launcher.
+   platform-specific launcher. Host-invocation stream recommendation
+   (2026-09-10): a POSIX `sh` script (plus `.cmd` on Windows) for V1 — it must
+   exist before any Rust binary runs, `fgctl` can write it, and a person can
+   read it; a Rust shim only if a target lacks `sh` or the script's cost is
+   measured to matter.
 4. Exact `fgctl` acquisition UX for local path, tarball, and GitHub release
    asset.
 5. Which candidate preflight checks are required before publishing activation.

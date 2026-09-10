@@ -1,10 +1,14 @@
 # Rust Host And Proof Providers Implementation Plan
 
-**Status:** Proposed execution plan; blocked only by the named decisions in §3.
+**Status:** Proposed execution plan; blocked only by the remaining §3 decisions
+(target matrix, preview-vs-stable, compatibility-window duration) and the
+packaging stream's `fgctl` walking skeleton (§4, node `PK`).
 **Date:** 2026-09-04.
+**Revised:** 2026-09-10 (see plans/reports/architecture-review-260910-1537-host-invocation-provider-routing-design-review.md).
 **Architecture:** [Host Invocation And Provider Routing](./host-invocation-provider-routing.md).
 **Migration strategy:** [Node To Rust Component Migration](./node-to-rust-component-migration.md).
 **Component placement:** [fgOS Component Boundary Advisory](../component-boundary/component-boundary-advisory.md).
+**Distribution/activation authority:** [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md); this plan consumes that stream's walking skeleton, it does not redefine install/activation.
 
 This document contains execution order, deliverables, gates, verification, and
 rollback. Semantic contracts, provider lifecycle, authority, framing, registry
@@ -17,7 +21,9 @@ Execution is complete in three independently shippable releases:
 
 1. **R1 — distributable Rust CLI host:** installed `fgos` is Rust; every
    unmigrated CLI invocation transparently reaches Node; `version` is native;
-   install, setup/doctor, upgrade, rollback, and uninstall are reproducible.
+   install, init/doctor, upgrade, rollback, and uninstall are reproducible
+   (install/upgrade/rollback/uninstall via `fgctl`; init/doctor local, under
+   the active identity — `runtime-identity-and-activation.md` §12).
 2. **R2 — external process preview:** one vendor fixture proves the framed
    process protocol and fail-closed provider path without expanding into a full
    plugin marketplace.
@@ -45,17 +51,33 @@ is stable, but neither delays the R1 installed-entry flip.
 These are product/release inputs, not implementation details to guess:
 
 1. supported R1 target matrix;
-2. native archive publication and installation mechanism;
-3. upgrade and rollback channel plus compatibility-window duration;
-4. release artifact naming and integrity/checksum policy;
-5. whether the first public R1 is preview or immediate stable default.
-6. whether setup/doctor may ever select or download an upgrade; R1 defaults to
-   read-only doctor and named local `--fix` repairs unless this policy is
-   explicitly changed.
+2. ~~native archive publication and installation mechanism~~ — settled, see
+   `runtime-identity-and-activation.md` §13 (`fgctl` Rust bootstrap; local
+   path/tarball/GitHub release asset acquisition sources) and §5
+   (content-addressed release store, release tree manifest);
+3. ~~upgrade and rollback channel~~ — settled, see
+   `runtime-identity-and-activation.md` §11 (`fgctl upgrade`/`fgctl repair`
+   pipeline; rollback via `ActivationRecord.previousArtifactDigest` plus the
+   preserved release directory). Compatibility-window duration remains open
+   (carried forward as decision 6 below);
+4. ~~release artifact naming and integrity/checksum policy~~ — settled, see
+   `runtime-identity-and-activation.md` §5 (release tree manifest digest
+   identity, not archive digest) and §11 (quarantine on digest mismatch);
+5. whether the first public R1 is preview or immediate stable default;
+6. compatibility-window duration for R1's Node fallback (§16).
 
-Record them in `docs/distribution-vision.md` and
-`docs/specs/distribution.md` before Work Package 6 changes installation. Local
-P1–P5 work may proceed; the public entry flip may not infer these decisions.
+Decision "whether setup/doctor may ever select or download an upgrade" is
+closed: **never**. `fgctl` owns acquisition/upgrade/rollback; local `fgos
+init` and `fgos doctor --fix` never select or download a release
+(`runtime-identity-and-activation.md` §12, Command Authority Matrix). There is
+no `setup` verb — see the P0 deliverable on inventorying `fgos setup` callers
+(§5).
+
+Record decisions 1, 5, and 6 in the packaging stream
+(`docs/architect/packaging-distribution/`), which owns install/activation;
+`docs/specs/distribution.md` is regenerated from it later. Local P1–P5 work
+may proceed; the public entry flip (P6) may not infer these decisions and also
+depends on the packaging stream's `fgctl` walking skeleton (§4, node `PK`).
 
 ## 4. Delivery Graph
 
@@ -65,10 +87,11 @@ flowchart LR
     P0 --> P2[P2 workspace + artifacts]
     P1 --> P3[P3 invocation kernel]
     P2 --> P3
-    P3 --> P4[P4 Node passthrough]
+    P3 --> P4[P4 CLI adapter legacy exec]
     P3 --> P5[P5 native version]
     P4 --> P6[P6 distribution + flip]
     P5 --> P6
+    PK["PK: fgctl walking skeleton (packaging stream)"] --> P6
     P3 --> P7[P7 external process preview]
     P5 --> P8[P8 remote native route]
     P6 --> P9[P9 next native read]
@@ -77,20 +100,47 @@ flowchart LR
 P7 does not block P8 when the first production remote route is native
 `distribution.build.show`.
 
+`PK` is delivered by the packaging stream's own plan
+(`docs/architect/packaging-distribution/`), not this plan; this plan only
+consumes its interface (see the P0 deliverable in §5 below). `PK` is an
+external dependency node, not a new P-package — P-numbering stays P0–P9.
+
 ## 5. P0 — Lock Release Inputs And Baseline Inventory
 
 ### Deliverables
 
-- Distribution decision update covering §3.
+- Distribution decision update covering the remaining §3 items (target
+  matrix, preview-vs-stable, compatibility-window duration), recorded in the
+  packaging stream.
+- Confirm the packaging walking skeleton's interface this plan needs: release
+  tree layout for `bin/fgos` (Rust) + legacy payload + `fgos-runner`,
+  activation binding fields the runtime locator reads, and `fgctl init`'s tail
+  (`fgos init` → `fgos doctor --fix` → `fgos doctor`) — per
+  `runtime-identity-and-activation.md` §11 and §14.
+- Inventory every caller of `fgos setup` (README, CHANGELOG, AGENTS.md, specs,
+  `src/setup/*` messages, tests) and record the migration to `init`/`doctor
+  --fix`; the verb's removal is a CHANGELOG-visible CLI contract change
+  scheduled in its own change, not inside this plan's P-packages.
 - Machine-readable inventory of every public command selector/subcommand mode.
 - Each selector classified as compatibility-only or projected to an existing
   semantic operation.
 - Checked command-route descriptor for every selector, with route kind,
   canonical owner path, required compatibility suites, and no ambiguous
   native/legacy binding.
-- Approved relocation from `bin/fgos.mjs` to the architecture's canonical Node
-  legacy payload source path; source-tree shim and installed payload policy are
-  recorded before any public-entry cutover.
+- Confirm the legacy payload contract (no source relocation, no file rename):
+  payload = the npm package as `package.json` `files` defines it, staged whole
+  under the manifest's `components.legacyNode.root`; identity `legacy-node`;
+  the Rust host resolves `join(activeReleasePath, root, entry)` from the
+  activation binding, never a hardcoded path
+  ([Legacy CLI Transition](./legacy-cli-transition.md) §2).
+- Caller inventory for the old path: the nine real call sites (shell function
+  tier-1, Herdr `fgos.rs`/`gateway.rs`/`main.rs`, `src/runner/dispatch/cli.mjs`,
+  `src/evolve/iron-law.mjs`, `src/setup/registrations.mjs` reachability check,
+  `core/skills/_shared/fgos-cli-fallback.md`, `package.json` `bin`), each
+  classified; the ~75 Node tests spawning `bin/fgos.mjs` are fixtures and stay;
+  `.agents`/`plugins` copies are render targets of the one `core/skills` source.
+  The cutover (P4/P6) adds tier 0 = workspace shim to each runtime's single
+  resolver rather than editing nine sites independently.
 - Confirmed component owner for `distribution.build.show`.
 - Confirmed ownership of `gate-bypass`, or a different next read proof.
 - R1 runtime inventory includes the separately public Node `fgos-runner`, its
@@ -110,7 +160,8 @@ P7 does not block P8 when the first production remote route is native
 ### Exit gate
 
 No selector is absent; every future binary, payload, cache, config, or runtime
-dependency has a planned setup/doctor owner; unresolved distribution choices
+dependency has a planned init/doctor registration owner; unresolved
+distribution choices (§3 decisions 1, 5, 6) and the packaging walking skeleton
 are named as the only P6 blockers. Every selector has one repair owner and
 proof suite; no caller treats the private legacy payload as a public entry.
 
@@ -137,7 +188,7 @@ scripts/explain-command-route.mjs
 1. Build one harness that invokes Node or a candidate Rust binary with identical
    argv bytes, stdin, cwd, selected environment, and timeout.
 2. Capture stdout/stderr bytes, normal exit, signal termination, filesystem
-   diff, and spawned-process evidence.
+   diff, spawned-process evidence, and wall-clock timing per case.
 3. Generate a checked command-route descriptor from the current command
    registry plus explicit migration annotations; do not hand-maintain a second
    command list. Require one `legacy-cli` or `native` route kind, one canonical
@@ -164,6 +215,15 @@ scripts/explain-command-route.mjs
 - `--dir`, caller cwd distinct from product root, stdin consumer if present.
 - Target-specific signal/process-tree behavior.
 
+### Performance gates
+
+- Legacy exec overhead: wall time of `fgos <legacy selector>` through the Rust
+  CLI minus direct `node <payload> <selector>` on the same machine, both warm.
+  Threshold placeholder `≤ 25 ms p50 on the reference target` — initial
+  budget, confirm in P0.
+- Native `version` latency budget placeholder `≤ 10 ms p50`.
+- Both become regression gates in P6 (§11 exit gate).
+
 ### Exit gate and verify
 
 The harness fails on every injected difference and passes Node-against-Node.
@@ -178,19 +238,21 @@ node scripts/export-command-selectors.mjs --check
 ### Target areas
 
 ```txt
-Cargo.toml
+Cargo.toml                          # workspace root
 Cargo.lock
-apps/fgos/
-packages/component-protocol/rust/
-packages/host-runtime/rust/
-packages/legacy-node/rust/
-packages/distribution-health/rust/
+apps/fgos/                          # crate `fgos`, binary `fgos`; legacy_exec.rs is a module here
+packages/host-runtime/rust/         # crate `fgos-host-runtime`
+packages/distribution/rust/         # crate `fgos-distribution` (owner of distribution.build.show)
 scripts/build-rust-distribution.mjs
 scripts/run-rust-dev-host.mjs
 ```
 
-Start adapters as modules unless dependency/lifecycle pressure justifies a
-crate. Do not add a `gate-policy` component for migration convenience.
+R1 is exactly these three crates. `packages/component-protocol/rust/` is
+created in P7 (only the external-process adapter needs `EncodedMessage`); there
+is no `packages/legacy-node/` crate or directory — the legacy exec lane is a
+module in `apps/fgos` and the Node payload stays where it is. Start adapters as
+modules unless dependency/lifecycle pressure justifies a crate. Do not add a
+`gate-policy` component for migration convenience.
 
 ### Steps
 
@@ -221,23 +283,38 @@ cargo test --manifest-path herdr-plugin/Cargo.toml
 
 ## 8. P3 — Invocation Kernel Vertical Slice
 
+The kernel exposes exactly one contract: `OperationRequest` → `ProviderOutcome`.
+`legacy-cli` selectors never enter it — see P4 and
+[Legacy CLI Transition](./legacy-cli-transition.md).
+
 ### Deliverables
 
-- IDs and encoded-message types.
-- Minimum operation catalog with `distribution.build.show` and one fixture.
+- `OperationId` and typed in-process `OperationRequest`/`ProviderOutcome`
+  types. `EncodedMessage` bytes are deferred entirely to the external-process
+  adapter (P7); built-in providers, including `version`, never decode bytes.
+- Minimum operation catalog: a compile-time `const` array holding the single
+  native operation `distribution.build.show` and one fixture — no linker, no
+  cache, no manifest scan until P7.
 - Immutable registry snapshot and exact selector.
 - Caller-admission and selected-provider-grant ports, deny by default.
 - Async invocation, cancellation, event sink, outcome, and closed errors.
-- Shared invocation service.
+- A pure Router (selection function: `OperationId` + versions + hostKind +
+  mode + policy + `RegistrySnapshot` → `ProviderDescriptor` |
+  `SelectionRefused`; no I/O, no async) kept separate from the
+  `InvocationService` pipeline (admit → select → grant → invoke → normalize →
+  record), which owns invocation, failure normalization, and the lifecycle
+  record.
 - CLI projector/presenter and in-memory remote projector/presenter proof.
 
 ### Steps
 
 1. Write failing tests for duplicate/missing bindings, incompatible contracts,
    disallowed host, and denied provider capability.
-2. Implement catalog validation and immutable snapshot construction.
+2. Implement catalog validation and immutable snapshot construction via a pure
+   `build_snapshot(catalog, providers, fingerprint)` called once at the `apps/fgos` composition root (no linker/cache/manifest scan in R1).
 3. Implement exact binding without priority or scan-order fallback.
-4. Implement admission → selection → grant → invoke.
+4. Implement the `InvocationService` pipeline: admit → `Router.select` (pure,
+   no I/O) → grant → invoke → normalize → record.
 5. Propagate cancellation/deadline through an in-memory provider.
 6. Project one semantic outcome independently for CLI and remote tests.
 7. Assert no host adapter imports or invokes another.
@@ -246,51 +323,75 @@ cargo test --manifest-path herdr-plugin/Cargo.toml
 
 ### Exit gate and verify
 
-Both host projectors reach the same provider and all negative cases fail closed.
-No Node/process/filesystem/production-gateway dependency is involved.
+Both host projectors reach the same provider and all negative cases fail
+closed. The Router is unit-testable with no I/O and no async runtime. No
+Node/process/filesystem/production-gateway dependency is involved.
 
 ```sh
 cargo test --workspace host_runtime
 cargo test --workspace invocation_service
 ```
 
-## 9. P4 — Transparent Node CLI Compatibility
+## 9. P4 — CLI Adapter Legacy Exec
+
+This lane lives in the CLI adapter, not the kernel: for `legacy-cli`
+selectors the CLI adapter looks up `CommandRouteDescriptor`, then execs the
+Node payload directly — argv bytes preserved, inherited stdin, cwd/env, and
+signal forwarding, plus one invocation record through the shared recorder. It
+never builds an `OperationRequest` and never calls `InvocationService`. See
+[Legacy CLI Transition](./legacy-cli-transition.md) for the exec/recorder
+mechanics.
 
 ### Deliverables
 
 - Candidate Rust `fgos` executable.
-- CLI-only compatibility binding for every unmigrated selector.
+- CLI adapter descriptor lookup and direct-exec path for every `legacy-cli`
+  selector via `CommandRouteDescriptor`, bypassing `InvocationService`
+  entirely.
 - Executable-relative Node payload resolution, recursion protection, and
   process evidence.
-- Relocated, named Node payload at `packages/legacy-node/node/fgos.mjs` in the
-  source tree and `libexec/fgos/legacy-node/fgos.mjs` in an installed artifact;
-  a colocated ownership note and payload header guide legacy bug fixes.
+- One invocation record per legacy exec, written through the same shared
+  recorder `InvocationService` uses for native operations.
+- Node payload left in place (`bin/fgos.mjs` + the rest of `package.json`
+  `files`), identified as `legacy-node`; a header in `bin/fgos.mjs` and a root
+  `AGENTS.md` note guide legacy bug fixes. Its installed location is
+  `components.legacyNode.root` in the release tree manifest owned by the
+  packaging stream (`runtime-identity-and-activation.md` §5), not a path
+  hardcoded here.
 
 ### Steps
 
-1. Relocate the current Node entry to the canonical legacy payload path before
-   changing public entry wiring. Keep `bin/fgos.mjs` only as a source-tree
-   compatibility shim until checkout tooling uses the Rust development entry;
-   prove the shim is implementation-free.
+1. Add the ownership header to `bin/fgos.mjs` and the `AGENTS.md` note; no
+   file move, no rename.
 2. Scan only host-global options and a checked selector using `args_os`; keep
-   all provider-owned arguments as `OsString`.
-3. Resolve installation root independently from caller cwd.
-4. Resolve the legacy entry by explicit test override, installed relative
-   payload, then validated checkout path.
+   all legacy-owned arguments as `OsString`.
+3. Resolve the active release path from the workspace activation binding,
+   independently from caller cwd.
+4. Resolve the legacy entry as `join(activeReleasePath, components.legacyNode.root,
+   components.legacyNode.entry)` from the manifest — `root: "."` for a
+   `dev:<rev>` source activation, `libexec/legacy-node` for a staged release —
+   with an explicit test override only in the P1 harness.
 5. Invoke `node` and the named legacy payload directly, never `fgos`.
 6. Preserve stdin/stdout/stderr, cwd, environment, exit, and signal behavior;
    add only a private recursion marker.
 7. Run every P1 case through both entry points.
-8. Test an unrelated caller, source-tree shim, installed payload, and PATH
-   recursion trap. Reject a production direct spawn of the private payload
-   outside the compatibility provider.
+8. Test an unrelated caller, `dev:<rev>` source activation, staged-release
+   payload, and PATH recursion trap. Reject a production direct spawn of the
+   private payload outside the CLI adapter's legacy exec path (Node test
+   fixtures excepted).
+9. Add tier 0 (workspace shim `.fgos/installation/bin/fgos`) to each runtime's
+   single resolver — `src/setup/bin-discovery.mjs`, the shell function in
+   `scripts/fgos-shell-integration.sh`, one `resolve_fgos` in Herdr — and route
+   the nine inventoried call sites (P0) through it; keep `node bin/fgos.mjs`
+   only as the fallback for a workspace without an activation binding.
 
 ### Exit gate and verify
 
-Stable bytes, status, and filesystem effects match P1. Provider identity is
-visible in captured diagnostics without changing public output. Node remains
-directly runnable at its named payload path. `explain-command-route` identifies
-the legacy owner and proof suite for every unmigrated selector.
+Stable bytes, status, and filesystem effects match P1. The route kind
+(`legacy-cli`) is visible in captured diagnostics without changing public
+output. Node remains directly runnable at its named payload path.
+`explain-command-route` identifies the legacy owner and proof suite for every
+unmigrated selector.
 
 ```sh
 node --test test/rust-host/legacy-compatibility.test.mjs
@@ -326,42 +427,60 @@ cargo test --workspace distribution_build_show
 
 ## 11. P6 — Distribution And Installed-Entry Cutover
 
-P6 is part of R1, not late cleanup.
+P6 is part of R1, not late cleanup. Install, activation, upgrade, rollback,
+and uninstall are owned by the packaging stream
+(`runtime-identity-and-activation.md`), not by a home-grown installer in this
+package. This package builds the release tree `fgctl` consumes and proves the
+walking skeleton (node `PK`, §4) against it; the `<install-root>/libexec/...`
+layout is superseded by the release tree manifest contract.
 
 ### Steps
 
-1. Update distribution vision/spec and architecture manifest before adding a
-   new installation module.
-2. Implement the release builder before installer work: stage the Rust `fgos`,
-   Node `fgos-runner`, legacy CLI payload, their declared dependency closure,
-   generated artifacts, and a content-addressed release manifest. Prove the
-   staged bundle uses no checkout-relative path.
-3. Build one reproducible target artifact, then the approved matrix; publish
-   the manifest and integrity metadata according to §3.
-4. Implement an atomic Distribution Manager transition: verify target and
-   manifest before switching the active release pointer; preserve the prior
-   complete release for rollback; never mix Rust/Node files between releases.
-5. Install into an external temp project with no Rust toolchain or source tree.
-6. Register checks for Rust binary/version/target, public `fgos-runner`, Node
-   runtime/payload while
-   compatibility bindings remain, catalog/selector drift, registry load, and
-   release integrity.
-7. Register safe fixes/defaults through existing registries, preserving
-   project-over-global and customized settings; doctor validates the active
-   manifest without regenerating build inputs or changing releases by default.
-8. Prove clean install, repeated setup, read-only doctor, `doctor --fix` only
-   repairs named local conditions, upgrade, rollback,
-   uninstall, and global/project configurations.
-9. Update README/end-user install docs and `CHANGELOG.md`.
+1. Confirm the remaining §3 decisions (target matrix, preview-vs-stable) are
+   recorded in the packaging stream before adding a new build-script module.
+2. Extend `scripts/build-rust-distribution.mjs` to build the release tree:
+   stage the Rust `fgos`, Node `fgos-runner`, legacy CLI payload, their
+   declared dependency closure, and generated artifacts into a release tree +
+   manifest consumable by `fgctl`, per the release tree manifest contract
+   (`runtime-identity-and-activation.md` §5) — not a home-grown installer.
+   Prove the staged bundle uses no checkout-relative path.
+3. Build one reproducible target artifact, then the approved matrix; the
+   manifest and integrity metadata follow the release tree manifest contract
+   (digest of the canonical release tree manifest, not an archive digest).
+4. Prove `fgctl init` — clean and repeated (idempotent) — against an external
+   temp project with no Rust toolchain or source tree, staged from this
+   release tree: it acquires/stages/verifies the release, publishes the
+   workspace activation binding, then invokes active local `fgos init` →
+   `fgos doctor --fix` → `fgos doctor` (`runtime-identity-and-activation.md`
+   §11, §14). Also prove standalone read-only `fgos doctor`, and that `doctor
+   --fix` repairs only named local conditions.
+5. Prove `fgctl upgrade` and `fgctl repair` (rollback) against the same
+   external project, per the §11 drift/repair/rollback pipeline; rollback
+   restores the previous release via `ActivationRecord.previousArtifactDigest`
+   plus the preserved release directory, without work-state mutation.
+6. Prove uninstall via `fgctl`; this plan does not implement a separate
+   uninstaller.
+7. Register `doctor` checks for Rust binary/version/target, public
+   `fgos-runner`, Node runtime/payload while compatibility bindings remain,
+   catalog/selector drift, registry load, and release integrity, through the
+   existing check registry (`src/setup/checks.mjs`).
+8. Register safe fixes/defaults through the existing registries, preserving
+   project-over-global and customized settings; `doctor` validates the active
+   manifest without regenerating build inputs or changing releases — that
+   authority stays with `fgctl`.
+9. Update README/end-user install docs and `CHANGELOG.md`, including the
+   `fgos setup` → `init`/`doctor --fix` migration (§5 P0 deliverable).
 10. Flip the installed entry in a separately revertible change.
-11. Observe the named compatibility window.
+11. Observe the named compatibility window (§3 decision 6).
 
 ### Exit gate and verify
 
-All targets pass P1/P5 from outside the repo; missing Node payload is diagnosed
-before legacy invocation; a broken runner payload is diagnosed separately; no
-lifecycle script builds/downloads implicitly; rollback restores one complete
-prior release without work-state mutation.
+All targets pass P1/P5 through `fgctl init` from outside the repo; missing
+Node payload is diagnosed before legacy invocation; a broken runner payload is
+diagnosed separately; no lifecycle script builds/downloads implicitly outside
+`fgctl`; rollback restores one complete prior release without work-state
+mutation; legacy exec overhead and native `version` p50 latency stay within
+the P1 performance-gate thresholds (§6) — a regression fails this gate.
 
 ```sh
 npm test
@@ -369,9 +488,15 @@ cargo test --workspace
 node --test test/install-packaging.test.mjs
 ```
 
-Add explicit matrix commands after §3 is decided.
+Add explicit matrix commands after §3's remaining target-matrix and
+preview-vs-stable decisions land.
 
 ## 12. P7 — External Process Provider Preview
+
+See [External Provider Protocol](./external-provider-protocol.md) for the
+wire-format/handshake contract this section proves against. This is also
+where `EncodedMessage` bytes are introduced — built-in providers (P3, P5)
+never carry them.
 
 ### Steps
 
@@ -387,8 +512,9 @@ Add explicit matrix commands after §3 is decided.
 
 ### Exit gate and verify
 
-Built-in, compatibility, and process providers are distinguishable through one
-router; all negative cases fail closed; no production component moved.
+Built-in and process providers are distinguishable through one router; all
+negative cases fail closed; no production component moved. `legacy-cli`
+selectors never reach the router (P4 exec path is outside the kernel).
 
 ```sh
 cargo test --workspace external_process
@@ -431,6 +557,11 @@ only the read; consume resolved project context; prove zero writes and zero Node
 spawn; flip binding separately from Node deletion. If ownership stays unclear,
 choose another settled read instead of inventing a component boundary.
 
+The provider never blocks on human input; a `parked` outcome is the only
+allowed response when human input is needed (matches `ask`/awaiting-human;
+"Release con người" law). This applies to P9 and to any later native
+migration slice.
+
 ```sh
 node --test test/rust-host/gate-bypass-parity.test.mjs
 cargo test --workspace
@@ -442,13 +573,16 @@ cargo test --workspace
 |---|---|
 | Per commit | focused tests; Rust format and lint |
 | R1 integration | compatibility inventory, native no-Node proof, `npm test`, workspace tests |
-| R1 release | external install/upgrade/rollback/uninstall and setup/doctor on every target |
+| R1 release | external install/upgrade/rollback/uninstall via `fgctl`, init/doctor on every target, legacy-exec/`version` p50 latency within the P1 budget |
 | R2 | protocol conformance and fail-closed negative cases |
 | R3 | gateway suite, CLI/remote semantic equality, no CLI/envelope on migrated routes |
 | Future writer | replay, lock, atomicity, recovery, idempotency, mutual exclusion, rollback compatibility |
 
-Use process-spy evidence, not timing. Use filesystem snapshots for zero-write
-claims. Use explicit timestamp predicates; never normalize arbitrary differences.
+Use process-spy evidence, not timing, for no-spawn/no-Node claims — the §6/§11
+performance gates are the one place timing is the proof, and they measure
+wall-clock explicitly rather than inferring it from spawn evidence. Use
+filesystem snapshots for zero-write claims. Use explicit timestamp
+predicates; never normalize arbitrary differences.
 
 ## 16. Commit And Rollback Slices
 
@@ -460,17 +594,22 @@ Independently revertible slices:
 4. Node compatibility;
 5. native `version` binding;
 6. artifact production;
-7. setup/doctor and external install tests;
+7. init/doctor and external install tests;
 8. installed-entry flip;
 9. process protocol fixture/adapter;
 10. first remote route;
 11. each later native binding;
 12. each Node deletion after its observation window.
 
-Before P6, discard the candidate binary. After P6, use the distribution
-rollback channel. Roll back a read by changing one binding. Never shadow-run or
-auto-retry a writer. Never delete a Node writer before cross-version recovery is
-proven or the cutover is explicitly irreversible.
+Before P6, discard the candidate binary. After P6, roll back via `fgctl`
+release rollback (restores the previous complete release via
+`ActivationRecord.previousArtifactDigest` plus the preserved release
+directory; R1–R2 use no other rollback channel — config never selects or
+replaces a built-in provider). Roll back a single native read by changing its
+binding in code and shipping a new release, never by a runtime
+provider-selection toggle: R1–R2 bindings are immutable and static. Never
+shadow-run or auto-retry a writer. Never delete a Node writer before
+cross-version recovery is proven or the cutover is explicitly irreversible.
 
 ## 17. Risks And Controls
 
@@ -497,10 +636,10 @@ proven or the cutover is explicitly irreversible.
 1. R1 installs Rust on every approved target while every unmigrated selector
    preserves Node behavior.
 2. `version` is typed, native, compatible, and proven not to spawn Node.
-3. Setup/doctor diagnoses every new binary, payload, config, registry, and
+3. Init/doctor diagnoses every new binary, payload, config, registry, and
    integrity dependency.
-4. External install, upgrade, rollback, and uninstall reproduce without Rust
-   toolchain or lifecycle build.
+4. External install, upgrade, rollback, and uninstall reproduce via `fgctl`
+   without Rust toolchain or lifecycle build.
 5. R2 process conformance passes positive and fail-closed cases.
 6. R3 has a production gateway route using the semantic path with no CLI API.
 7. `npm test`, workspace tests, and independent Herdr tests are green at their
