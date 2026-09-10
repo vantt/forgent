@@ -203,7 +203,7 @@ export function buildConfinementRequest({
       interactiveMode: invocation.interactiveMode,
       promptDelivery: invocation.promptDelivery,
       permissionMode: invocation.permissionMode,
-      confinement: invocation.confinement,
+      confinement: invocation.confinement ? (normalizeLegacyConfinement(invocation.confinement, `executor.${execId}.confinement`) ?? invocation.confinement) : invocation.confinement,
       adapter: invocation.adapter || "cli-spawn",
       resourceBindings: invocation.resourceBindings || [],
       ...(invocation.method || invocation.url ? {

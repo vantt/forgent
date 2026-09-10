@@ -851,7 +851,7 @@ test("R6 / F-d: establishConfinement returns confined: false, status: unconfined
     repoRoot,
   });
   assert.equal(resultOwnWorktreeOnly.confined, false);
-  assert.equal(resultOwnWorktreeOnly.status, "unconfined");
+  assert.equal(resultOwnWorktreeOnly.status, "partial");
   assert.equal(resultOwnWorktreeOnly.workerHomePath, null);
 
   fs.rmSync(tmpHome, { recursive: true, force: true });

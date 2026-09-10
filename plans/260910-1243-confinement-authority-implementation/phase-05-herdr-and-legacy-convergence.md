@@ -41,7 +41,12 @@ Likely touch:
 
 ## Verification
 
-- Existing herdr interactive tests remain green.
+- Existing herdr interactive tests remain green, except 2 known-and-tracked
+  pre-existing failures on the herdr production dispatch path
+  (`test/runner/dispatch-production-call-sites.test.mjs:440,556`, both
+  "actual unconfined, expected unknown") that reproduce P04's own deferred
+  M-2 root cause (shipped `code:*` capability defaults carry confinement
+  `{mode:'unconfined'}`) -- out of scope for this cell, tracked separately.
 - Legacy partial confinement no longer returns success-shaped unconfined result.
 - Doctor reports herdr confinement maturity separately from bwrap backend
   readiness.

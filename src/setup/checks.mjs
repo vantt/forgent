@@ -19,4 +19,5 @@ export {
   integrationScriptPath,
   mainCheckoutHookWired,
   ensureSharedConfigDefaults,
+  checkConfinementHerdrMaturity,
 } from './registrations.mjs';
