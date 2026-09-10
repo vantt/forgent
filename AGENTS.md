@@ -57,6 +57,10 @@ A stranger agent with no chat history should be able to answer, for any change:
    `docs/decisions/`; a settled spec fact goes into the relevant
    `docs/specs/<area>.md`.
 
+## Legacy-Node CLI Ownership Boundary
+
+`bin/fgos.mjs` is the `legacy-node` payload entry, staged whole under a release's `components.legacyNode.root` and exec'd by the Rust host at `components.legacyNode.entry` — never relocated, never renamed in the source tree. The Rust host resolves this file only through the release manifest's `components.legacyNode` fields, never PATH, never cwd, never hardcoded outside the manifest. Global npm `bin.fgos` and fallback `node bin/fgos.mjs` remain compatibility channels that call this file directly.
+
 ## Install/setup/doctor gate
 
 `docs/distribution-vision.md` sets the direction for this repo's own

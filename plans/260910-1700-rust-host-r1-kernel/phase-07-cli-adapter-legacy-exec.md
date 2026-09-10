@@ -101,15 +101,43 @@ cargo test --workspace
 cargo test --manifest-path herdr-plugin/Cargo.toml
 ```
 
-- `FGOS_HARNESS_ENTRY=bin:apps/fgos/target/debug/fgos node --test
-  test/rust-host/*.test.mjs` — every `legacy-cli` selector passes on the
-  coverage floor.
-- `./target/debug/fgos not-a-real-selector`; `echo $?` prints `4`.
-- `./target/debug/fgos version`; `echo $?` is non-zero and stderr names a
+- `cargo build -p fgos` first (workspace builds share one `/target/` at
+  repo root, not a per-crate `apps/fgos/target/`), then
+  `FGOS_HARNESS_ENTRY_A=node:bin/fgos.mjs
+  FGOS_HARNESS_ENTRY_B=bin:target/debug/fgos node --test
+  test/rust-host/*.test.mjs` — a true Node-vs-Rust differential (setting
+  only `FGOS_HARNESS_ENTRY` compares the Rust binary against itself, not
+  against Node -- round-3 review MEDIUM-1). Every `legacy-cli` selector's
+  coverage-floor case passes. Two categories of case are an accepted,
+  documented divergence rather than a regression: the six `version`-arg
+  cases (`coverage-help-version`, `coverage-exit-category-stdout-zero`,
+  `coverage-read-version`, `coverage-stdin-consuming-case`,
+  `coverage-distinct-caller-cwd`, `coverage-signal-process-tree-case`)
+  fail by R6's own design (native `version` must fail closed pre-Phase-08,
+  which the leased coverage-floor fixture does not know about); and
+  `coverage-unknown-verb`/`coverage-exit-category-stderr-status` agree on
+  exit code 4 but diverge in stderr TEXT (Node prints the full verb list
+  plus an `invocation-faults.jsonl` record; the Rust host prints a short
+  usage line and writes no fault record) -- R3 only specifies the exit
+  code, and reproducing Node's exact fault-logging side effect is out of
+  this phase's scope (round-3 review MEDIUM-2; recorded in
+  `CHANGELOG.md`).
+  Precondition: this command depends on `target/dev-manifest.json`
+  existing (gitignored; written by `scripts/run-rust-dev-host.mjs`, or as
+  a side effect of `cargo test -p fgos --test cli_tests`) so
+  `resolve_payload_path`'s `current_exe`-relative fallback can find it
+  when neither `FGOS_ACTIVE_RELEASE_PATH` nor `FGOS_ACTIVE_MANIFEST_PATH`
+  is set -- run one of those first on a truly clean tree (round-3 review
+  MEDIUM-3).
+- `target/debug/fgos not-a-real-selector`; `echo $?` prints `4`.
+- `target/debug/fgos version`; `echo $?` is non-zero and stderr names a
   `no binding` / selection-refused failure (pre-Phase-08 expected state).
 - The recursion trap test and the one-`node`-child process-spy test both
   pass and are named explicitly in `cargo test --workspace -- --list`.
 - The alias-ban grep from `plan.md`'s Constraints, run over `apps/fgos`,
   returns nothing.
+- R7's invocation-record sink is exercised by `apps/fgos/tests/cli_tests.rs`
+  directly (setting `FGOS_INVOCATION_RECORD_PATH` itself) -- the P02
+  harness does not set this variable itself (round-3 review LOW-5).
 
 Capability annotation for this cell: `code:implement`.
