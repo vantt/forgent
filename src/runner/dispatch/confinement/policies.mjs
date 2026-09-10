@@ -399,6 +399,10 @@ export function validateOverrideConfinementShape(
     }
   }
 
+  if (!basePolicy && (override.controls !== undefined || override.networkFilter !== undefined)) {
+    throw new ConfinementPolicyError(`runner config (${label}) cannot override controls or networkFilter without a base policy.`);
+  }
+
   if (override.mode !== undefined) {
     if (override.mode !== 'required' && override.mode !== 'preferred') {
       throw new ConfinementPolicyError(`runner config (${label}) "mode" override must be "required" or "preferred", got: ${JSON.stringify(override.mode)}.`);

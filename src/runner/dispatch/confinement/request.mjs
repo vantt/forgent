@@ -68,6 +68,10 @@ export function validateConfinementRequest(request) {
   if (!request.requirement || typeof request.requirement !== "object" || Array.isArray(request.requirement)) {
     throw new Error("ConfinementRequest requirement must be an object.");
   }
+  if (request.requirement.mode === "unconfined" &&
+      (request.requirement.policyId !== null || request.requirement.policy !== null)) {
+    throw new Error("ConfinementRequest unconfined requirement must set policyId and policy to null.");
+  }
   // Requests can reach Authority without the config loader.  Keep that door
   // closed too: an invalid control is a malformed request, not "unknown"
   // coverage that could accidentally be executed.
@@ -139,10 +143,6 @@ export function buildConfinementRequest({
     if (!activeConfinement && effectiveFallback && cfg?.capabilities?.[effectiveFallback]?.confinement) {
       activeConfinement = cfg.capabilities[effectiveFallback].confinement;
       effectiveAnchor = effectiveFallback;
-    }
-    if (!activeConfinement && cfg?.capabilities?.[cap]?.fallback && cfg?.capabilities?.[cfg.capabilities[cap].fallback]?.confinement) {
-      activeConfinement = cfg.capabilities[cfg.capabilities[cap].fallback].confinement;
-      effectiveAnchor = cfg.capabilities[cap].fallback;
     }
 
     if (activeConfinement) {
@@ -233,10 +233,11 @@ export function buildConfinementRequest({
     requirement: resolvedRequirement,
     override: override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? undefined,
     resourceNeeds: Array.isArray(resourceNeeds) ? resourceNeeds : [],
-    backendId: backendId ?? invocation?.confinement?.backend ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
+    // Invocation data is untrusted at this boundary. Backend selection belongs
+    // to the trusted executor registration (or an explicit caller argument).
+    backendId: backendId ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
   };
 
   return validateConfinementRequest(req);
 }
-

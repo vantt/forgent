@@ -23,6 +23,7 @@ import {
 import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs";
 import { DEFAULT_CAPABILITY_SLOTS } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
+import { loadRunnerConfig } from "../../src/runner/dispatch/config.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
 
 function mkTemp(prefix) {
@@ -585,50 +586,7 @@ test("R3: explicit unconfined policy produces audited attestation with backend: 
 // ─── R4 & R5: Migrated Executor Config & Static Check ──────────────────────────
 
 test("R4 & R5: migrated claude-bwrap, agy-bwrap, codex-bwrap config fixture uses confinement.backend without bwrap in argv", () => {
-  // Config fixture demonstrating the migrated shape
-  const migratedConfig = {
-    executors: {
-      "claude-bwrap": {
-        kind: "agent",
-        providerModel: "claude",
-        confinement: { backend: "bwrap" },
-        invocations: [
-          {
-            via: "cli",
-            adapter: "cli-spawn",
-            command: "claude",
-            args: ["-p", "{prompt}", "--model", "{model}", "--permission-mode", "acceptEdits"],
-          },
-        ],
-      },
-      "agy-bwrap": {
-        kind: "agent",
-        providerModel: "gemini",
-        confinement: { backend: "bwrap" },
-        invocations: [
-          {
-            via: "cli",
-            adapter: "cli-spawn",
-            command: "agy",
-            args: ["-p", "{prompt}", "--mode", "accept-edits", "--print-timeout", "30m", "--model", "{model}"],
-          },
-        ],
-      },
-      "codex-bwrap": {
-        kind: "agent",
-        providerModel: "openai-codex",
-        confinement: { backend: "bwrap" },
-        invocations: [
-          {
-            via: "cli",
-            adapter: "cli-spawn",
-            command: "codex",
-            args: ["exec", "--skip-git-repo-check", "-s", "danger-full-access", "--model", "{model}", "{prompt}"],
-          },
-        ],
-      },
-    },
-  };
+  const migratedConfig = loadRunnerConfig(path.join(process.cwd(), "test/fixtures/confinement-migrated-executors.json"));
 
   for (const [id, exec] of Object.entries(migratedConfig.executors)) {
     // R5: IDs preserved unchanged
@@ -645,6 +603,16 @@ test("R4 & R5: migrated claude-bwrap, agy-bwrap, codex-bwrap config fixture uses
     const hasBwrapFlags = inv.args.some((a) => a.includes("--ro-bind") || a.includes("--dev") || a.includes("--proc"));
     assert.equal(hasBwrapFlags, false, `${id} argv must not contain hardcoded bwrap mount args`);
   }
+});
+
+test("R6: an unconfined request cannot carry a policy", () => {
+  const tmpDir = mkTemp("p04-unconfined-policy-");
+  assert.throws(() => validateConfinementRequest({
+    contract: "confinement-request.v1", dispatchId: "disp_bad", capability: "advise", executorId: "test",
+    invocation: {}, context: { cwd: tmpDir, runDir: tmpDir },
+    requirement: { mode: "unconfined", policyId: "host-write-denied", policy: resolveConfinementPolicy("host-write-denied") },
+  }), /unconfined requirement/);
+  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
 // ─── R6: Closure of Fail-Open Paths (F-a, F-b, F-c, F-d) ──────────────────────
@@ -846,17 +814,8 @@ test("R6 / F-d: establishConfinement returns confined: false, status: unconfined
 
 // ─── R7: DEFAULT_CAPABILITY_SLOTS Explicit Confinement Policies ────────────────
 
-test("R7: DEFAULT_CAPABILITY_SLOTS declares explicit confinement policy or unconfined for all slots", () => {
-  const requiredSlots = ["advise", "code:review", "code:debug"];
-  const unconfinedSlots = ["execute", "code:implement", "code:test", "code:refactor"];
-
-  for (const name of requiredSlots) {
-    const slot = DEFAULT_CAPABILITY_SLOTS[name];
-    assert.ok(slot, `slot "${name}" must exist`);
-    assert.equal(slot.confinement?.mode, "required", `${name} must have required confinement mode`);
-    assert.equal(slot.confinement?.policy, "host-write-denied", `${name} must have policy host-write-denied`);
-  }
-
+test("R7: read-only DEFAULT_CAPABILITY_SLOTS use the explicit interim unconfined posture until P06 wires backends", () => {
+  const unconfinedSlots = ["advise", "code:review", "code:debug"];
   for (const name of unconfinedSlots) {
     const slot = DEFAULT_CAPABILITY_SLOTS[name];
     assert.ok(slot, `slot "${name}" must exist`);

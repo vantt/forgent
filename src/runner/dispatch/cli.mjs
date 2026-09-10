@@ -363,6 +363,8 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       capability,
       stageSkill,
       executorId: resolvedExecutorId ?? executorId,
+      fallbackFrom: capability,
+      anchorCapability: capability,
       cfg,
       invocation: {
         command,
@@ -704,6 +706,8 @@ export async function executeExecutorCli(
         capability: capabilityIdentity,
         stageSkill,
         executorId,
+        fallbackFrom: capabilityIdentity,
+        anchorCapability: capabilityIdentity,
         cfg,
         authorityScope: 'external-harness',
         invocation: {
@@ -898,6 +902,8 @@ export async function executeExecutorCli(
         capability: capabilityIdentity,
         stageSkill: executorIdArg,
         executorId,
+        fallbackFrom: capabilityIdentity,
+        anchorCapability: capabilityIdentity,
         cfg,
         invocation: {
           command,

@@ -130,6 +130,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Confinement Authority now rejects contradictory unconfined requests that
+  retain a policy, ignores invocation-supplied backend selection, and rejects
+  no-base control/network overrides. Capability defaults that lack a wired
+  backend use an explicitly documented interim unconfined posture; preferred
+  confinement continues to refuse before spawn until a supported backend path
+  is available.
+
 - Confinement Authority now fails closed for every adapter except the proven
   `cli-spawn` prepared-sandbox consumer, preventing HTTP and future adapters
   from receiving bwrap enforcement credit without executing its argv. Required

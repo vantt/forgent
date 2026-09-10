@@ -621,9 +621,10 @@ export async function runHerdrRound(ctx) {
   fs.writeFileSync(paths.briefPath, briefText);
   round.note({ status: 'requested', agentName, round: roundNumber });
 
-  const { workerHomePath, sessionEnv } = await establishConfinement({
+  const { workerHomePath, sessionEnv, confined, status } = await establishConfinement({
     confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin,
   });
+  round.note({ confinement: { status, confined } });
 
   // From here on the home exists, so every way out of this function that is
   // not a settled round has to take the credential back out of it. The home
