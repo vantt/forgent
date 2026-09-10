@@ -408,6 +408,23 @@ impl OperationDescriptor {
 pub type OperationCatalog = &'static [OperationDescriptor];
 
 /// Immutable linked provider registry snapshot for an invocation.
+///
+/// `providers` holds `ProviderDescriptor` metadata, not `&'static dyn
+/// OperationProvider` trait objects -- deliberately, for this phase (Phase
+/// 05, kernel contracts + pure Router). The Router's canonical signature
+/// (`host-invocation-provider-routing.md` §6) is `(OperationId, ...,
+/// RegistrySnapshot) -> Result<ProviderDescriptor, SelectionRefused>`: pure
+/// selection only ever needs provider METADATA to match
+/// operation/mode/host/contract-version, never an actual invocable object.
+/// `OperationProvider` (the trait carrying `descriptor()` + async
+/// `invoke()`) is defined later, in Phase 06's `invocation_service.rs` (per
+/// that phase's own R3: "defined here, not in contracts.rs"), which
+/// consumes this crate's `select()` read-only and maintains its own mapping
+/// from a selected `ProviderDescriptor` to the real provider object it
+/// dispatches to -- `fgos-host-runtime` itself never depends on a concrete
+/// provider crate (R1/R3 of this phase), so it cannot hold real `dyn
+/// OperationProvider` objects even in principle before Phase 08 assembles
+/// the production snapshot.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegistrySnapshot {
     pub catalog: OperationCatalog,
