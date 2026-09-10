@@ -10,7 +10,7 @@
 # automatically for you -- adding it to ~/.bashrc (or similar) is your call
 # to make (D3).
 #
-# 4-tier resolution (Phase 10 tier 0, tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
+# 4-tier resolution (tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
 # external-project-reliability/CONTEXT.md): workspace installation
 # (tier 0, the `$root/.fgos/installation/bin/fgos` executable check below) >
 # dev-checkout self-hosting (tier 1, the `$root/bin/fgos.mjs` file-check below) >

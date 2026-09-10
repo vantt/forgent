@@ -39,8 +39,15 @@ import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
 
-// Resolved against this repo's root via resolveFgosBin (R4), preferring a tier-0
-// resolution when present with the same fallback as resolveFgosBin.
+// Resolved once at import against THIS MODULE's own location, preferring a
+// tier-0 resolution when present with the same fallback resolveFgosBin
+// itself uses. Known limitation: under this track's linked-worktree
+// topology, a dispatch CLI running from a worktree still resolves tier 0
+// against the module's own checkout root, not the caller's dispatch root
+// -- unreachable from a worktree even when the main checkout has a real
+// workspace installation. Accepted for this phase (falls back to today's
+// exact behavior, R4's own literal text is satisfied); the cutover track
+// can make this resolve per-call against the dispatch root instead.
 const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {

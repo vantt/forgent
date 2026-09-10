@@ -36,7 +36,7 @@ const MODULE_RULES = [
   // widen a domain's legal transitions (e.g. skip a stage) with
   // required:false.
   { kind: 'equals', value: 'src/state/workflow-stage-graphs.mjs' },
-  // Phase 10 (R5): bin-discovery.mjs houses the multi-tier resolver including tier-0
+  // bin-discovery.mjs houses the multi-tier resolver including tier-0
   // workspace shim resolution; diffs touching it are flagged like bin/fgos.mjs.
   { kind: 'equals', value: 'src/setup/bin-discovery.mjs' },
 ];

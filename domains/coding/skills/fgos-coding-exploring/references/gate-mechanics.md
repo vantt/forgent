@@ -4,9 +4,9 @@ The full detail behind SKILL.md's Gate section.
 
 Run these as two SEPARATE tool calls, never pasted together as one script
 — a worktree-isolated session's own isolation guard refuses a single call
-combining a `git`-rooted command with a following `node .../fgos.mjs`
-invocation. Resolve `root` first, read its printed value, then substitute
-that literal path into the second call.
+combining a `git`-rooted command with a following `fgos` invocation.
+Resolve `root` first, read its printed value, then substitute that
+literal path into the second call.
 
 ```bash
 fgos gate-check "<item-id>" --gate contextApprove --artifact "docs/history/<feature>/CONTEXT.md"

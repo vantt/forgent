@@ -235,7 +235,7 @@ test('plugin-skill-cli-reachable passes when a workspace installation exists, re
   const dir = mkTempDir();
   const installDir = path.join(dir, '.fgos', 'installation');
   fs.mkdirSync(path.join(installDir, 'bin'), { recursive: true });
-  fs.writeFileSync(path.join(installDir, 'bin', 'fgos'), '#!/bin/sh\n');
+  fs.writeFileSync(path.join(installDir, 'bin', 'fgos'), '#!/bin/sh\n', { mode: 0o755 });
   fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify({
     schemaVersion: 1,
     entries: { fgos: 'bin/fgos' },

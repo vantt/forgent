@@ -57,10 +57,39 @@ export function resolveWorkspaceInstallationBin(cwd) {
       return null;
     }
 
-    if (fs.existsSync(candidateBin) && fs.statSync(candidateBin).isFile()) {
-      return candidateBin;
+    if (!fs.existsSync(candidateBin) || !fs.statSync(candidateBin).isFile()) {
+      return null;
     }
-    return null;
+
+    // A lexically-confined path can still be a symlink whose real target
+    // escapes the release root (e.g. entries.fgos pointing at an in-root
+    // symlink to /bin/sh) -- resolve the real path and re-confirm
+    // containment against the release root's own real path too, matching
+    // the same discipline shell/Herdr's tier-0 checks apply implicitly by
+    // executing the resolved path directly.
+    let realBin;
+    let realBase;
+    try {
+      realBin = fs.realpathSync(candidateBin);
+      realBase = fs.realpathSync(resolvedBase);
+    } catch {
+      return null;
+    }
+    if (realBin !== realBase && !realBin.startsWith(realBase + path.sep)) {
+      return null;
+    }
+
+    // R2/R3's shell (`-x`) and Herdr (`mode & 0o111`) tier-0 checks both
+    // require the resolved entry be executable, not merely present --
+    // fall through to tier 1 here too rather than handing a mode-644 file
+    // to a caller that will exec it directly and fail with EACCES.
+    try {
+      fs.accessSync(candidateBin, fs.constants.X_OK);
+    } catch {
+      return null;
+    }
+
+    return candidateBin;
   } catch {
     return null;
   }
