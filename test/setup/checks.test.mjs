@@ -115,6 +115,11 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'trust-store-readable',
       'executor-confinement',
       'herdr-executor-kinds',
+      'confinement-policies-declared',
+      'confinement-backend-registry-readable',
+      'confinement-bwrap-platform',
+      'confinement-probe-freshness',
+      'confinement-strict-readiness',
     ].sort(),
   );
 });

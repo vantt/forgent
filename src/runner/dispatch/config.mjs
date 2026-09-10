@@ -33,6 +33,36 @@ import { findExecutableOnPath } from '../../state/tool-registry.mjs';
 // EXECUTOR_ADAPTERS here happens inside a function body invoked well after
 // both modules finish evaluating, never at module-eval time.
 import { EXECUTOR_ADAPTERS } from './transport.mjs';
+import {
+  BUILTIN_POLICIES,
+  BUILTIN_POLICY_IDS,
+  validateConfinementPolicyShape,
+  validateCapabilityConfinementShape,
+  validateOverrideConfinementShape,
+  normalizeLegacyConfinement,
+} from './confinement/policies.mjs';
+import {
+  rejectProjectBackendOverride,
+  validateBackendRegistryShape,
+  loadMachineBackendRegistry,
+  createBackendRegistrySnapshot,
+} from './confinement/backend-registry.mjs';
+
+export {
+  BUILTIN_POLICIES,
+  BUILTIN_POLICY_IDS,
+  validateConfinementPolicyShape,
+  validateCapabilityConfinementShape,
+  validateOverrideConfinementShape,
+  normalizeLegacyConfinement,
+} from './confinement/policies.mjs';
+export {
+  rejectProjectBackendOverride,
+  validateBackendRegistryShape,
+  loadMachineBackendRegistry,
+  createBackendRegistrySnapshot,
+} from './confinement/backend-registry.mjs';
+
 
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
@@ -140,6 +170,9 @@ export const DEFAULT_RUNNER_CONFIG = {
     },
   },
   timeoutMs: 900000,
+  confinement: {
+    strict: false,
+  },
   parallel: {
     maxRoots: 4,
     maxLeavesPerRoot: 4,
@@ -754,6 +787,9 @@ function validateExecutionProfileShape(executor, label) {
         throw new RunnerConfigError(`runner config (${label}) "confinement.${flag}" must be a boolean when present.`);
       }
     }
+    if (c.backend !== undefined && (typeof c.backend !== 'string' || !c.backend.trim())) {
+      throw new RunnerConfigError(`runner config (${label}) "confinement.backend" must be a non-empty string when present.`);
+    }
     // Unknown keys are refused rather than ignored. `sessionName` used to be
     // accepted here and used to pick the herdr session a worker landed in --
     // which meant a config could name the operator's own cockpit, if the
@@ -762,9 +798,9 @@ function validateExecutionProfileShape(executor, label) {
     // it is not configurable. A config still carrying the key must be told,
     // not quietly obeyed in a way it no longer means.
     for (const key of Object.keys(c)) {
-      if (!CONFINEMENT_FLAGS.includes(key)) {
+      if (!CONFINEMENT_FLAGS.includes(key) && key !== 'backend') {
         throw new RunnerConfigError(
-          `runner config (${label}) "confinement.${key}" is not a confinement flag. Legal flags: ${CONFINEMENT_FLAGS.join(', ')}.` +
+          `runner config (${label}) "confinement.${key}" is not a confinement flag. Legal flags: ${CONFINEMENT_FLAGS.join(', ')}, backend.` +
           (key === 'sessionName'
             ? ' "sessionName" was removed: a worker always goes to the one fgOS worker session, so that this field can never name the operator\'s own.'
             : ''),
@@ -961,6 +997,23 @@ function validateCapabilitiesShape(capabilities, label) {
         validateRigorOverridesShape(entry.overrides.rigorOverrides, `${entryLabel}.overrides.rigorOverrides`);
       }
     }
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement', 'unconfined'];
+    for (const key of Object.keys(entry)) {
+      if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
+        throw new RunnerConfigError(
+          `runner config (${entryLabel}) contains unknown key "${key}". Allowed keys: ${ALLOWED_CAPABILITY_ENTRY_KEYS.join(', ')}.`,
+        );
+      }
+    }
+    if (entry.unconfined !== undefined && typeof entry.unconfined !== 'boolean') {
+      throw new RunnerConfigError(`runner config (${entryLabel}) "unconfined" must be a boolean when present.`);
+    }
+    if (entry.unconfined === true && entry.confinement !== undefined) {
+      throw new RunnerConfigError(`runner config (${entryLabel}) cannot declare both "unconfined: true" and "confinement".`);
+    }
+    if (entry.confinement !== undefined) {
+      validateCapabilityConfinementShape(entry.confinement, `${entryLabel}.confinement`);
+    }
   }
 }
 
@@ -1105,6 +1158,78 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       const value = cfg.parallel[key];
       if (value !== undefined && (!Number.isInteger(value) || value <= 0)) {
         throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel.${key}" must be a positive integer when present.`);
+      }
+    }
+  }
+
+  // Phase 01 R1/R5: Project config cannot define or override machine backend instances.
+  rejectProjectBackendOverride(cfg, sourceLabel);
+
+  // Phase 01 R1: Capability-level and runner-level confinement validation.
+  if (cfg.confinement !== undefined) {
+    if (!cfg.confinement || typeof cfg.confinement !== 'object' || Array.isArray(cfg.confinement)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "confinement" must be an object when present.`);
+    }
+    const ALLOWED_CONFINEMENT_KEYS = ['strict'];
+    for (const k of Object.keys(cfg.confinement)) {
+      if (!ALLOWED_CONFINEMENT_KEYS.includes(k)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel}.confinement) contains unknown key "${k}". Allowed keys: ${ALLOWED_CONFINEMENT_KEYS.join(', ')}.`,
+        );
+      }
+    }
+    if (cfg.confinement.strict !== undefined && typeof cfg.confinement.strict !== 'boolean') {
+      throw new RunnerConfigError(`runner config (${sourceLabel}.confinement) "strict" must be a boolean when present.`);
+    }
+  }
+
+  // Phase 01 R3: Custom confinementPolicies validation.
+  if (cfg.confinementPolicies !== undefined) {
+    if (!cfg.confinementPolicies || typeof cfg.confinementPolicies !== 'object' || Array.isArray(cfg.confinementPolicies)) {
+      throw new RunnerConfigError(`runner config (${sourceLabel}) "confinementPolicies" must be an object when present.`);
+    }
+    for (const [policyId, policyDoc] of Object.entries(cfg.confinementPolicies)) {
+      if (typeof policyId !== 'string' || !policyId.trim()) {
+        throw new RunnerConfigError(`runner config (${sourceLabel}.confinementPolicies) policy id must be a non-empty string.`);
+      }
+      if (BUILTIN_POLICY_IDS.includes(policyId)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel}.confinementPolicies) cannot redefine built-in policy "${policyId}".`,
+        );
+      }
+      validateConfinementPolicyShape(policyDoc, `${sourceLabel} confinementPolicies.${policyId}`);
+    }
+  }
+
+  // Phase 01 R1: Strict mode requires every declared capability to have an explicit confinement policy.
+  if (cfg.confinement?.strict === true) {
+    if (!cfg.capabilities || typeof cfg.capabilities !== 'object' || Object.keys(cfg.capabilities).length === 0) {
+      throw new RunnerConfigError(
+        `runner config (${sourceLabel}) strict mode requires explicit capabilities declared (confinement-policy-missing).`,
+      );
+    }
+    for (const [name, entry] of Object.entries(cfg.capabilities)) {
+      if (!entry || typeof entry !== 'object' || (!entry.confinement && entry.unconfined !== true)) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel} capabilities.${name}) missing required explicit confinement in strict mode (confinement-policy-missing).`,
+        );
+      }
+      if (entry.unconfined === true) {
+        continue;
+      }
+      if (!entry.confinement.mode) {
+        throw new RunnerConfigError(
+          `runner config (${sourceLabel} capabilities.${name}) missing required explicit confinement in strict mode (confinement-policy-missing).`,
+        );
+      }
+      if (entry.confinement.mode === 'required' || entry.confinement.mode === 'preferred') {
+        const policyId = entry.confinement.policy;
+        const exists = BUILTIN_POLICY_IDS.includes(policyId) || (cfg.confinementPolicies && policyId in cfg.confinementPolicies);
+        if (!exists) {
+          throw new RunnerConfigError(
+            `runner config (${sourceLabel} capabilities.${name}) references unknown policy "${policyId}" in strict mode (confinement-policy-missing).`,
+          );
+        }
       }
     }
   }

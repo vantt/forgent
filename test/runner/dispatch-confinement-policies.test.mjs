@@ -1,0 +1,473 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import {
+  loadRunnerConfig,
+  loadRunnerConfigFromDir,
+  RunnerConfigError,
+} from '../../src/runner/dispatch/config.mjs';
+import {
+  BUILTIN_POLICIES,
+  BUILTIN_POLICY_IDS,
+  validateConfinementPolicyShape,
+  validateNetworkFilterShape,
+  validateCapabilityConfinementShape,
+  validateOverrideConfinementShape,
+  normalizeLegacyConfinement,
+  resolveConfinementPolicy,
+  ConfinementPolicyError,
+} from '../../src/runner/dispatch/confinement/policies.mjs';
+import {
+  validateBackendInstanceConfigShape,
+  validateBackendRegistryShape,
+  rejectProjectBackendOverride,
+  resolveMachineBackendRegistryPath,
+  loadMachineBackendRegistry,
+  createBackendRegistrySnapshot,
+  ensureMachineBackendRegistryDefaults,
+  ConfinementBackendRegistryError,
+} from '../../src/runner/dispatch/confinement/backend-registry.mjs';
+
+function mkTempConfig(runnerObj) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-test-'));
+  const file = path.join(dir, 'config.json');
+  fs.writeFileSync(file, JSON.stringify({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    ...runnerObj,
+  }, null, 2));
+  return { dir, file };
+}
+
+// ─── R2: Built-in Policies ──────────────────────────────────────────────────
+
+test('R2: BUILTIN_POLICIES defines host-write-denied and workspace-write as immutable v1 schemas', () => {
+  assert.ok(BUILTIN_POLICIES['host-write-denied'], 'host-write-denied must be defined');
+  assert.ok(BUILTIN_POLICIES['workspace-write'], 'workspace-write must be defined');
+  assert.deepEqual(BUILTIN_POLICY_IDS.slice().sort(), ['host-write-denied', 'workspace-write'].sort());
+
+  // Both pass validateConfinementPolicyShape
+  validateConfinementPolicyShape(BUILTIN_POLICIES['host-write-denied']);
+  validateConfinementPolicyShape(BUILTIN_POLICIES['workspace-write']);
+
+  // Immutability: frozen
+  assert.ok(Object.isFrozen(BUILTIN_POLICIES));
+  assert.ok(Object.isFrozen(BUILTIN_POLICIES['host-write-denied']));
+  assert.ok(Object.isFrozen(BUILTIN_POLICIES['workspace-write']));
+});
+
+// ─── R3: Custom Confinement Policies Validation ─────────────────────────────
+
+test('R3: validateConfinementPolicyShape accepts valid custom v1 policy', () => {
+  const customPolicy = {
+    contract: 'confinement-policy.v1',
+    controls: {
+      hostWrite: 'deny',
+      hostRead: 'allow',
+      networkEgress: 'filtered',
+      process: 'isolated',
+      home: 'private',
+      session: 'isolated',
+      workspace: 'own',
+    },
+    grants: [
+      { resource: 'run-output', access: 'write', scope: 'dispatch' },
+      { resource: 'workspace', access: 'read-write', scope: 'dispatch' },
+    ],
+    networkFilter: {
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'dns', value: 'registry.npmjs.org' },
+          ports: [443],
+        },
+      ],
+    },
+  };
+
+  const validated = validateConfinementPolicyShape(customPolicy);
+  assert.equal(validated.contract, 'confinement-policy.v1');
+  assert.equal(validated.controls.hostWrite, 'deny');
+});
+
+test('R3: validateConfinementPolicyShape rejects unknown root keys', () => {
+  assert.throws(
+    () => validateConfinementPolicyShape({
+      contract: 'confinement-policy.v1',
+      controls: {
+        hostWrite: 'deny',
+        hostRead: 'allow',
+        networkEgress: 'deny',
+        process: 'isolated',
+        home: 'private',
+        session: 'isolated',
+        workspace: 'own',
+      },
+      grants: [],
+      extraUnknownKey: true,
+    }),
+    /contains unknown key "extraUnknownKey"/,
+  );
+});
+
+test('R3: validateConfinementPolicyShape rejects wrong contract', () => {
+  assert.throws(
+    () => validateConfinementPolicyShape({
+      contract: 'confinement-policy.v2',
+      controls: {},
+      grants: [],
+    }),
+    /"contract" must be "confinement-policy.v1"/,
+  );
+});
+
+test('R3: validateConfinementPolicyShape rejects invalid control values', () => {
+  assert.throws(
+    () => validateConfinementPolicyShape({
+      contract: 'confinement-policy.v1',
+      controls: {
+        hostWrite: 'unrestricted',
+        hostRead: 'allow',
+        networkEgress: 'deny',
+        process: 'isolated',
+        home: 'private',
+        session: 'isolated',
+        workspace: 'own',
+      },
+      grants: [],
+    }),
+    /controls\.hostWrite\) must be one of/,
+  );
+
+  assert.throws(
+    () => validateConfinementPolicyShape({
+      contract: 'confinement-policy.v1',
+      controls: {
+        hostWrite: 'deny',
+        hostRead: 'allow',
+        networkEgress: 'wide-open',
+        process: 'isolated',
+        home: 'private',
+        session: 'isolated',
+        workspace: 'own',
+      },
+      grants: [],
+    }),
+    /controls\.networkEgress\) must be one of/,
+  );
+});
+
+test('R3: validateNetworkFilterShape rejects invalid rules and ports', () => {
+  assert.throws(
+    () => validateNetworkFilterShape({
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'dns', value: 'example.com' },
+          ports: [99999],
+        },
+      ],
+    }),
+    /port 99999 must be an integer between 1 and 65535/,
+  );
+
+  assert.throws(
+    () => validateNetworkFilterShape({
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'dns', value: '*.example.com' },
+          ports: [443],
+        },
+      ],
+    }),
+    /must not contain wildcard "\*"/,
+  );
+});
+
+// ─── R4: Legacy Normalization ───────────────────────────────────────────────
+
+test('R4: normalizeLegacyConfinement converts {privateHome, isolatedSession, ownWorktree} to v1 controls', () => {
+  const legacy = { privateHome: true, isolatedSession: true, ownWorktree: true };
+  const normalized = normalizeLegacyConfinement(legacy);
+
+  assert.equal(normalized.contract, 'confinement-policy.v1');
+  assert.equal(normalized.controls.home, 'private');
+  assert.equal(normalized.controls.workspace, 'own');
+  assert.equal(normalized.controls.session, 'isolated');
+  assert.equal(normalized.controls.process, 'host');
+  assert.equal(normalized.controls.hostWrite, 'deny');
+  assert.equal(normalized.controls.networkEgress, 'allow');
+});
+
+test('R4: normalizeLegacyConfinement handles empty or partial legacy objects', () => {
+  assert.equal(normalizeLegacyConfinement({}), null);
+  assert.equal(normalizeLegacyConfinement(null), null);
+
+  const partial = normalizeLegacyConfinement({ privateHome: true });
+  assert.equal(partial.controls.home, 'private');
+  assert.equal(partial.controls.workspace, 'shared');
+  assert.equal(partial.controls.session, 'shared');
+});
+
+// ─── R1 & R3: Capability Confinement Validation ─────────────────────────────
+
+test('R1: validateCapabilityConfinementShape validates mode, policy, allowInvocationOverride', () => {
+  const valid = validateCapabilityConfinementShape({
+    mode: 'required',
+    policy: 'workspace-write',
+    allowInvocationOverride: true,
+  });
+  assert.equal(valid.mode, 'required');
+  assert.equal(valid.policy, 'workspace-write');
+  assert.equal(valid.allowInvocationOverride, true);
+});
+
+test('R1: validateCapabilityConfinementShape rejects invalid mode', () => {
+  assert.throws(
+    () => validateCapabilityConfinementShape({ mode: 'unrestricted' }),
+    /mode/,
+  );
+});
+
+test('R1: validateCapabilityConfinementShape rejects unknown keys', () => {
+  assert.throws(
+    () => validateCapabilityConfinementShape({
+      mode: 'required',
+      policy: 'workspace-write',
+      disallowedKey: 123,
+    }),
+    /contains unknown key "disallowedKey"/,
+  );
+});
+
+// ─── Override Downgrade Prevention ──────────────────────────────────────────
+
+test('validateOverrideConfinementShape prevents widening write scope or relaxing posture', () => {
+  const strictBasePolicy = {
+    contract: 'confinement-policy.v1',
+    controls: {
+      hostWrite: 'deny',
+      hostRead: 'deny',
+      networkEgress: 'deny',
+      process: 'isolated',
+      home: 'private',
+      session: 'isolated',
+      workspace: 'own',
+    },
+    grants: [],
+  };
+
+  // Downgrade attempt: enabling network when base denied
+  assert.throws(
+    () => validateOverrideConfinementShape(
+      { controls: { networkEgress: 'allow' } },
+      strictBasePolicy,
+    ),
+    /override downgrade/,
+  );
+
+  // Downgrade attempt: allowing hostWrite when base denied
+  assert.throws(
+    () => validateOverrideConfinementShape(
+      { controls: { hostWrite: 'allow' } },
+      strictBasePolicy,
+    ),
+    /override downgrade/,
+  );
+
+  // Downgrade attempt: changing home from private to host
+  assert.throws(
+    () => validateOverrideConfinementShape(
+      { controls: { home: 'host' } },
+      strictBasePolicy,
+    ),
+    /override downgrade/,
+  );
+
+  // Hardening is allowed: keeping same or stricter
+  const valid = validateOverrideConfinementShape(
+    { controls: { hostWrite: 'deny', networkEgress: 'deny' } },
+    strictBasePolicy,
+  );
+  assert.ok(valid);
+});
+
+// ─── R5: Machine Backend Registry ───────────────────────────────────────────
+
+test('R5: rejectProjectBackendOverride rejects confinementBackends in project config', () => {
+  assert.throws(
+    () => rejectProjectBackendOverride(
+      { confinementBackends: { bwrap: { type: 'bwrap' } } },
+      'project .fgos/config.json',
+    ),
+    /confinement-backend-registry-forbidden/,
+  );
+});
+
+test('R5: validateBackendRegistryShape validates confinement-backend-registry.v1 schema', () => {
+  const validRegistry = {
+    contract: 'confinement-backend-registry.v1',
+    confinementBackends: {
+      bwrap: {
+        type: 'bwrap',
+        enabled: true,
+        executable: '/usr/bin/bwrap',
+      },
+      docker: {
+        type: 'container',
+        enabled: false,
+        runtime: 'docker',
+        image: 'fgos-worker:latest',
+      },
+      cluster: {
+        type: 'remote',
+        enabled: false,
+        endpoint: 'https://cluster.internal:8443',
+        credentialRef: 'env:CLUSTER_TOKEN',
+      },
+    },
+  };
+
+  const validated = validateBackendRegistryShape(validRegistry);
+  assert.equal(validated.contract, 'confinement-backend-registry.v1');
+  assert.equal(validated.confinementBackends.bwrap.type, 'bwrap');
+});
+
+test('R5: validateBackendRegistryShape rejects invalid driver type', () => {
+  assert.throws(
+    () => validateBackendRegistryShape({
+      contract: 'confinement-backend-registry.v1',
+      confinementBackends: {
+        wasm: { type: 'wasm-sandbox' },
+      },
+    }),
+    /type.*must be one of/,
+  );
+});
+
+test('R5: ensureMachineBackendRegistryDefaults creates default registry file if missing', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-backend-reg-test-'));
+  const customPath = path.join(dir, 'backends.json');
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = customPath;
+
+  try {
+    const res1 = ensureMachineBackendRegistryDefaults();
+    assert.equal(res1.created, true);
+    assert.equal(res1.path, customPath);
+    assert.ok(fs.existsSync(customPath));
+
+    const content = JSON.parse(fs.readFileSync(customPath, 'utf8'));
+    assert.equal(content.contract, 'confinement-backend-registry.v1');
+    assert.ok(content.confinementBackends.bwrap);
+
+    // Calling a second time is idempotent and does not overwrite
+    const res2 = ensureMachineBackendRegistryDefaults();
+    assert.equal(res2.created, false);
+  } finally {
+    delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ─── Config Integration: Strict Mode & Capabilities ─────────────────────────
+
+test('Strict mode: throws confinement-policy-missing when strict: true and capability has no policy', () => {
+  const { dir, file } = mkTempConfig({
+    executor: { command: 'node', args: ['{prompt}'] },
+    confinement: { strict: true },
+    capabilities: {
+      'code:implement': {
+        description: 'implementing code',
+        // missing confinement policy
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfig(file),
+      /confinement-policy-missing/,
+    );
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Strict mode: passes when capability declares valid built-in policy or unconfined: true', () => {
+  const { dir, file } = mkTempConfig({
+    executor: { command: 'node', args: ['{prompt}'] },
+    confinement: { strict: true },
+    capabilities: {
+      'code:implement': {
+        description: 'implementing code',
+        confinement: {
+          mode: 'required',
+          policy: 'workspace-write',
+        },
+      },
+      advise: {
+        description: 'advising',
+        unconfined: true,
+      },
+    },
+  });
+
+  try {
+    const cfg = loadRunnerConfig(file);
+    assert.equal(cfg.confinement.strict, true);
+    assert.equal(cfg.capabilities['code:implement'].confinement.policy, 'workspace-write');
+    assert.equal(cfg.capabilities.advise.unconfined, true);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Strict mode: rejects capability referencing unknown policy', () => {
+  const { dir, file } = mkTempConfig({
+    executor: { command: 'node', args: ['{prompt}'] },
+    confinement: { strict: true },
+    capabilities: {
+      'code:implement': {
+        description: 'implementing code',
+        confinement: {
+          mode: 'required',
+          policy: 'non-existent-policy',
+        },
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfig(file),
+      /references unknown policy "non-existent-policy" in strict mode \(confinement-policy-missing\)/,
+    );
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('Runner config rejects project-local confinementBackends definition', () => {
+  const { dir, file } = mkTempConfig({
+    executor: { command: 'node', args: ['{prompt}'] },
+    confinementBackends: {
+      hackedBackend: { type: 'bwrap' },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadRunnerConfig(file),
+      /confinement-backend-registry-forbidden/,
+    );
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
