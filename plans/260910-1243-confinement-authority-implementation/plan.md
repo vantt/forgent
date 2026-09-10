@@ -214,3 +214,31 @@ SMOKE_DECIDE: node src/runner/dispatch.mjs decide --for code:implement --has-liv
 Each phase may narrow the focused command. P04/P06/P07 must run the full suite
 unless the Lead records a concrete, reproducible environment blocker.
 
+
+## Roster (every request repeats this `actors[]` verbatim)
+
+Proven live through the coordination door on 2026-09-10 (session
+`herdr-smoke--cell-01`, see
+`plans/reports/group-thinking-readiness-260910-1235-confinement-authority-code-track.md`):
+
+```json
+"actors": [
+  { "id": "doer",     "executor": "agy-herdr",             "tier": "standard",   "persona": "focused-code-implementer" },
+  { "id": "reviewer", "executor": "claude-reviewer-herdr", "tier": "analytical", "persona": "code-quality-reviewer" },
+  { "id": "red-team", "executor": "codex-herdr",           "tier": "analytical", "persona": "edge-case-and-security-attacker" },
+  { "id": "fixer",    "executor": "agy-herdr",             "tier": "standard",   "persona": "surgical-fixer" }
+]
+```
+
+Resolved models: doer/fixer gemini-3.8-flash-medium, reviewer opus,
+red-team gpt-5.6-terra. Every codex executor runs on `CODEX_HOME=~/.codex-fgovn`.
+
+Unattended run policy: `fgos-plan-loop` SKILL.md section 5. Full-suite
+gates: P04, P06, P07. Known pre-existing red tests (not regressions):
+`cohort-planner` "buildCandidateInventory against the real committed",
+`check-decision-citation-drift`.
+
+## Cell status (appended by the Lead as cells merge)
+
+| Cell | Merge commit | Review / red-team | Deferred findings |
+|---|---|---|---|

@@ -535,3 +535,51 @@ entirely behaves byte-identically to every request that predates this
 rule — read-only, `isReadOnlyMode: true` — and a reviewer/red-team/recheck
 dispatch that mutates a file regardless still fails closed at the
 pre-existing read-only-violation gate, unaffected by any of the above.
+
+## 5. Unattended track mode: run every cell to the end
+
+Sections 0-4 drive ONE cell. When a person hands a whole track over and
+walks away ("run the track to the end"), the Lead loops them under the
+policy below, reading state only from `chain` and the track's own
+`plan.md` — never from chat history — so re-running the same instruction
+resumes wherever the previous session stopped.
+
+Loop, until the last phase in `plan.md`'s Product Gates carries a
+`merged` row in its cell-status table:
+
+1. `fgos coordination chain <track> --json`. An `activeCell` that is not
+   closed is resumed through sections 2-4, never bypassed by opening a new
+   one. Otherwise the next cell is the lowest phase with no `merged` row.
+2. Commit anything pending on the track branch, create the cell worktree,
+   compose `open.json` from the phase file (section 1). A phase whose
+   capability is review-only (`code:review`) has no `produce-candidate`:
+   the Lead writes the artifact into the plan's `reports/` directory and
+   dispatches review + red-team against it.
+3. After every produce/revise step, verify the commit and run the phase's
+   focused test in the worktree yourself before reading `show`.
+4. Disposition every finding: `accepted` when its evidence holds, `rejected`
+   when the Lead can prove it wrong, `deferred` only when it is outside the
+   cell's scope and the rationale says so. Any `accepted` finding opens a
+   fix round (section 3). Cap: three fix rounds per cell; past that, close
+   the cell with the remaining findings `deferred` and named in the trace.
+5. Close (section 4), write the cell trace under
+   `docs/architect/agent-coordination/verification/<track>/<cell>.md`,
+   merge `git merge --no-ff <track>--<cell-id>` into the track branch, drop
+   the worktree, and append one row to `plan.md`'s cell-status table:
+   cell, merge commit, review/red-team verdicts, deferred findings. Phases
+   the plan marks as full-suite gates run the full suite before the merge.
+6. Back to step 1. When the loop ends, write
+   `<plan dir>/reports/track-closeout.md`: every cell's merge commit, every
+   deferred finding, and the exact commands that reproduce the evidence.
+
+Stop and ask a person only for: a product decision the spec leaves open
+where two readings produce different code; the same failure twice after
+the approach was changed; a merge conflict the Lead cannot resolve. Batch
+every open question into one message and keep working on whatever does
+not depend on the answer (product priority #2, `AGENTS.md`).
+
+The roster (`actors[]`) is track state, not skill prose: `plan.md`'s
+Execution Inputs names the executors and tiers, and every request in the
+track repeats it verbatim. Model resolution stays tier x executor
+`rigorOverrides` — `actors[].model` has no channel for declared-protocol
+requests.
