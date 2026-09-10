@@ -191,12 +191,21 @@ export function loadMachineBackendRegistry(registryPath = resolveMachineBackendR
   return parsed;
 }
 
+function deepFreeze(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  Object.freeze(obj);
+  for (const key of Object.keys(obj)) {
+    deepFreeze(obj[key]);
+  }
+  return obj;
+}
+
 /**
  * Creates an immutable snapshot for a dispatch with a `.resolve(instanceId)` method (spec §6.5).
  */
 export function createBackendRegistrySnapshot(doc) {
   validateBackendRegistryShape(doc);
-  const frozenDoc = Object.freeze(JSON.parse(JSON.stringify(doc)));
+  const frozenDoc = deepFreeze(JSON.parse(JSON.stringify(doc)));
 
   return Object.freeze({
     contract: frozenDoc.contract,
@@ -219,6 +228,7 @@ export function createBackendRegistrySnapshot(doc) {
  */
 export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachineBackendRegistryPath()) {
   if (!fs.existsSync(registryPath)) {
+    validateBackendRegistryShape(DEFAULT_MACHINE_BACKEND_REGISTRY, registryPath);
     fs.mkdirSync(path.dirname(registryPath), { recursive: true });
     fs.writeFileSync(registryPath, `${JSON.stringify(DEFAULT_MACHINE_BACKEND_REGISTRY, null, 2)}\n`);
     return {
@@ -250,12 +260,25 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
     }
   }
 
+  if (existing.contract !== 'confinement-backend-registry.v1') {
+    changed = true;
+  }
+  const knownKeys = ['contract', 'confinementBackends'];
+  for (const k of Object.keys(existing)) {
+    if (!knownKeys.includes(k)) {
+      changed = true;
+      break;
+    }
+  }
+
+  const updated = {
+    contract: 'confinement-backend-registry.v1',
+    confinementBackends: mergedBackends,
+  };
+
+  validateBackendRegistryShape(updated, registryPath);
+
   if (changed) {
-    const updated = {
-      contract: 'confinement-backend-registry.v1',
-      ...existing,
-      confinementBackends: mergedBackends,
-    };
     fs.writeFileSync(registryPath, `${JSON.stringify(updated, null, 2)}\n`);
     return {
       created: false,

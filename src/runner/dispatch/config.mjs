@@ -82,6 +82,33 @@ export class RunnerConfigError extends Error {
  * `executor.command` (string), `executor.args` (array of strings),
  * `models` (object), `timeoutMs` (positive number).
  */
+function normalizeConfigConfinement(cfg) {
+  if (!cfg || typeof cfg !== 'object') return cfg;
+  if (cfg.executor?.confinement) {
+    const normalized = normalizeLegacyConfinement(cfg.executor.confinement);
+    if (normalized) {
+      if (cfg.executor.confinement.backend) {
+        normalized.backend = cfg.executor.confinement.backend;
+      }
+      cfg.executor.confinement = normalized;
+    }
+  }
+  if (cfg.executors && typeof cfg.executors === 'object') {
+    for (const executor of Object.values(cfg.executors)) {
+      if (executor?.confinement) {
+        const normalized = normalizeLegacyConfinement(executor.confinement);
+        if (normalized) {
+          if (executor.confinement.backend) {
+            normalized.backend = executor.confinement.backend;
+          }
+          executor.confinement = normalized;
+        }
+      }
+    }
+  }
+  return cfg;
+}
+
 export function loadRunnerConfig(configPath) {
   let raw;
   try {
@@ -98,6 +125,7 @@ export function loadRunnerConfig(configPath) {
   }
 
   validateRunnerConfigShape(cfg, configPath);
+  normalizeConfigConfinement(cfg);
   return cfg;
 }
 
@@ -239,6 +267,7 @@ export function loadRunnerConfigFromDir(dir) {
   const withGlobal = mergeWithGlobalConfig(parsed);
   const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+  normalizeConfigConfinement(runnerCfg);
   return runnerCfg;
 }
 
@@ -305,6 +334,7 @@ export function ensureRunnerConfigForDir(dir) {
     const withGlobal = mergeWithGlobalConfig(projectShared);
     const runnerCfg = dropModelPoliciesInjectedOverModels(projectShared.runner, withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
+    normalizeConfigConfinement(runnerCfg);
     return runnerCfg;
   }
 
@@ -317,6 +347,7 @@ export function ensureRunnerConfigForDir(dir) {
       detected ? `detected "${detected}" on PATH` : 'no known assistant CLI found on PATH'
     }; wrote a default (executor: ${executor.command}) at ${sharedPath}#runner; edit .fgos/config.json by hand to change.\n`,
   );
+  normalizeConfigConfinement(runnerConfig);
   return runnerConfig;
 }
 
@@ -997,19 +1028,18 @@ function validateCapabilitiesShape(capabilities, label) {
         validateRigorOverridesShape(entry.overrides.rigorOverrides, `${entryLabel}.overrides.rigorOverrides`);
       }
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement', 'unconfined'];
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
+        if (key === 'unconfined') {
+          throw new RunnerConfigError(
+            `runner config (${entryLabel}) boolean "unconfined" is deprecated/disallowed; use "confinement: { mode: 'unconfined' }" instead.`,
+          );
+        }
         throw new RunnerConfigError(
           `runner config (${entryLabel}) contains unknown key "${key}". Allowed keys: ${ALLOWED_CAPABILITY_ENTRY_KEYS.join(', ')}.`,
         );
       }
-    }
-    if (entry.unconfined !== undefined && typeof entry.unconfined !== 'boolean') {
-      throw new RunnerConfigError(`runner config (${entryLabel}) "unconfined" must be a boolean when present.`);
-    }
-    if (entry.unconfined === true && entry.confinement !== undefined) {
-      throw new RunnerConfigError(`runner config (${entryLabel}) cannot declare both "unconfined: true" and "confinement".`);
     }
     if (entry.confinement !== undefined) {
       validateCapabilityConfinementShape(entry.confinement, `${entryLabel}.confinement`);
@@ -1201,6 +1231,30 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     }
   }
 
+  // L6 / R1: Validate capability confinement policies exist
+  if (cfg.capabilities && typeof cfg.capabilities === 'object') {
+    for (const [name, entry] of Object.entries(cfg.capabilities)) {
+      if (!entry || typeof entry !== 'object') continue;
+      const isRequired = entry.confinement?.mode === 'required';
+      const isPreferred = entry.confinement?.mode === 'preferred';
+      if (isRequired || (cfg.confinement?.strict === true && isPreferred)) {
+        const policyId = entry.confinement?.policy;
+        const exists = BUILTIN_POLICY_IDS.includes(policyId) || (cfg.confinementPolicies && policyId in cfg.confinementPolicies);
+        if (!exists) {
+          if (cfg.confinement?.strict === true) {
+            throw new RunnerConfigError(
+              `runner config (${sourceLabel} capabilities.${name}) references unknown policy "${policyId}" in strict mode (confinement-policy-missing).`,
+            );
+          } else {
+            throw new RunnerConfigError(
+              `runner config (${sourceLabel} capabilities.${name}) mode "required" references unknown policy "${policyId}".`,
+            );
+          }
+        }
+      }
+    }
+  }
+
   // Phase 01 R1: Strict mode requires every declared capability to have an explicit confinement policy.
   if (cfg.confinement?.strict === true) {
     if (!cfg.capabilities || typeof cfg.capabilities !== 'object' || Object.keys(cfg.capabilities).length === 0) {
@@ -1209,27 +1263,15 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       );
     }
     for (const [name, entry] of Object.entries(cfg.capabilities)) {
-      if (!entry || typeof entry !== 'object' || (!entry.confinement && entry.unconfined !== true)) {
+      if (!entry || typeof entry !== 'object' || !entry.confinement) {
         throw new RunnerConfigError(
           `runner config (${sourceLabel} capabilities.${name}) missing required explicit confinement in strict mode (confinement-policy-missing).`,
         );
-      }
-      if (entry.unconfined === true) {
-        continue;
       }
       if (!entry.confinement.mode) {
         throw new RunnerConfigError(
           `runner config (${sourceLabel} capabilities.${name}) missing required explicit confinement in strict mode (confinement-policy-missing).`,
         );
-      }
-      if (entry.confinement.mode === 'required' || entry.confinement.mode === 'preferred') {
-        const policyId = entry.confinement.policy;
-        const exists = BUILTIN_POLICY_IDS.includes(policyId) || (cfg.confinementPolicies && policyId in cfg.confinementPolicies);
-        if (!exists) {
-          throw new RunnerConfigError(
-            `runner config (${sourceLabel} capabilities.${name}) references unknown policy "${policyId}" in strict mode (confinement-policy-missing).`,
-          );
-        }
       }
     }
   }

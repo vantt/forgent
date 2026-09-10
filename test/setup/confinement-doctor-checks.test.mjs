@@ -354,6 +354,7 @@ test('confinement-strict-readiness passes when all capabilities have valid polic
 
     writeProjectConfig(dir, {
       runner: {
+        confinement: { strict: true },
         capabilities: {
           'code:implement': {
             confinement: {
@@ -362,7 +363,9 @@ test('confinement-strict-readiness passes when all capabilities have valid polic
             },
           },
           'advise': {
-            unconfined: true,
+            confinement: {
+              mode: 'unconfined',
+            },
           },
         },
       },
@@ -383,11 +386,34 @@ test('confinement-strict-readiness passes when all capabilities have valid polic
   }
 });
 
-test('confinement-strict-readiness fails when capability lacks confinement policy', () => {
+test('H4: confinement-strict-readiness reports warning when strict: false and capability lacks policy', () => {
   const dir = mkTempProject();
   try {
     writeProjectConfig(dir, {
       runner: {
+        confinement: { strict: false },
+        capabilities: {
+          'code:implement': {
+            description: 'unconfined capability without flag',
+          },
+        },
+      },
+    });
+
+    const res = checkConfinementStrictReadiness(dir);
+    assert.equal(res.passed, true);
+    assert.match(res.message, /warning.*strict confinement disabled/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('H4: confinement-strict-readiness fails when strict: true and capability lacks policy', () => {
+  const dir = mkTempProject();
+  try {
+    writeProjectConfig(dir, {
+      runner: {
+        confinement: { strict: true },
         capabilities: {
           'code:implement': {
             description: 'unconfined capability without flag',
@@ -399,6 +425,23 @@ test('confinement-strict-readiness fails when capability lacks confinement polic
     const res = checkConfinementStrictReadiness(dir);
     assert.equal(res.passed, false);
     assert.match(res.message, /missing confinement policy/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('L2: doctor checks fail when runner config is not readable', () => {
+  const dir = mkTempProject();
+  try {
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), '{ not valid json');
+
+    const res1 = checkConfinementPoliciesDeclared(dir);
+    assert.equal(res1.passed, false);
+    assert.match(res1.message, /runner config not readable/);
+
+    const res2 = checkConfinementStrictReadiness(dir);
+    assert.equal(res2.passed, false);
+    assert.match(res2.message, /runner config not readable/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

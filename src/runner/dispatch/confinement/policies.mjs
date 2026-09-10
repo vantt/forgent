@@ -320,13 +320,10 @@ export function validateCapabilityConfinementShape(confinement, label = 'capabil
  */
 export function validateOverrideConfinementShape(
   override,
-  labelOrBasePolicy = 'invocation confinement override',
-  basePolicyArg = null,
+  basePolicy = null,
+  label = 'invocation confinement override',
   baseMode = 'preferred',
 ) {
-  let label = typeof labelOrBasePolicy === 'string' ? labelOrBasePolicy : 'invocation confinement override';
-  let basePolicy = typeof labelOrBasePolicy === 'object' && labelOrBasePolicy !== null ? labelOrBasePolicy : basePolicyArg;
-
   if (!override || typeof override !== 'object' || Array.isArray(override)) {
     throw new ConfinementPolicyError(`runner config (${label}) must be an object.`);
   }
@@ -378,14 +375,39 @@ export function validateOverrideConfinementShape(
       (basePolicy?.grants || []).map((g) => [g.resource, g]),
     );
 
+    const LEGAL_ACCESS = Object.keys(GRANT_ACCESS_LEVELS);
+    const seenResources = new Set();
+
     for (const [idx, grant] of override.grants.entries()) {
       const grantLabel = `${label}.grants[${idx}]`;
       if (!grant || typeof grant !== 'object' || Array.isArray(grant)) {
         throw new ConfinementPolicyError(`runner config (${grantLabel}) must be an object.`);
       }
+
+      const ALLOWED_GRANT_KEYS = ['resource', 'access', 'scope'];
+      for (const k of Object.keys(grant)) {
+        if (!ALLOWED_GRANT_KEYS.includes(k)) {
+          throw new ConfinementPolicyError(`runner config (${grantLabel}) contains unknown key "${k}". Allowed keys: ${ALLOWED_GRANT_KEYS.join(', ')}.`);
+        }
+      }
+
       if (typeof grant.resource !== 'string' || !grant.resource.trim()) {
         throw new ConfinementPolicyError(`runner config (${grantLabel}) "resource" must be a non-empty string.`);
       }
+
+      if (seenResources.has(grant.resource)) {
+        throw new ConfinementPolicyError(`runner config (${grantLabel}) duplicate resource grant for "${grant.resource}".`);
+      }
+      seenResources.add(grant.resource);
+
+      if (!LEGAL_ACCESS.includes(grant.access)) {
+        throw new ConfinementPolicyError(`runner config (${grantLabel}) "access" must be one of ${LEGAL_ACCESS.join('/')}, got: ${JSON.stringify(grant.access)}.`);
+      }
+
+      if (grant.scope !== 'dispatch') {
+        throw new ConfinementPolicyError(`runner config (${grantLabel}) "scope" must be "dispatch", got: ${JSON.stringify(grant.scope)}.`);
+      }
+
       if (basePolicy) {
         const baseGrant = baseGrantsByResource.get(grant.resource);
         if (!baseGrant) {
@@ -400,7 +422,16 @@ export function validateOverrideConfinementShape(
     }
   }
 
-  if (override.networkFilter !== undefined) {
+  const effectiveNetworkEgress = override.controls?.networkEgress ?? basePolicy?.controls?.networkEgress;
+  if (override.controls?.networkEgress === 'filtered') {
+    if (!override.networkFilter) {
+      throw new ConfinementPolicyError(`runner config (${label}) "networkFilter" is required when networkEgress is "filtered".`);
+    }
+    validateNetworkFilterShape(override.networkFilter, `${label}.networkFilter`);
+  } else if (override.networkFilter !== undefined) {
+    if (effectiveNetworkEgress !== 'filtered') {
+      throw new ConfinementPolicyError(`runner config (${label}) "networkFilter" is only permitted when networkEgress is "filtered".`);
+    }
     validateNetworkFilterShape(override.networkFilter, `${label}.networkFilter`);
   }
   return override;
@@ -431,7 +462,7 @@ export function normalizeLegacyConfinement(confinement, label = 'confinement') {
   return {
     contract: 'confinement-policy.v1',
     controls: {
-      hostWrite: 'deny',
+      hostWrite: 'allow',
       hostRead: 'allow',
       networkEgress: 'allow',
       process: 'host',
@@ -440,9 +471,7 @@ export function normalizeLegacyConfinement(confinement, label = 'confinement') {
       workspace: ownWorktree ? 'own' : 'shared',
     },
     grants: [
-      { resource: 'run-output', access: 'write', scope: 'dispatch' },
       ...(privateHome ? [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }] : []),
-      { resource: 'executor-credentials', access: 'read', scope: 'dispatch' },
     ],
   };
 }
