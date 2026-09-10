@@ -39,12 +39,33 @@ function assertNoDuplicateTopLevelKeys(rawText) {
   let inKeyPosition = true;
   const topLevelKeys = new Set();
 
+  // Standard JSON single-character escapes (RFC 8259 §7) -- \uXXXX is handled
+  // separately below since it needs four extra input characters decoded.
+  const SIMPLE_ESCAPES = { '"': '"', '\\': '\\', '/': '/', b: '\b', f: '\f', n: '\n', r: '\r', t: '\t' };
+
   for (let i = 0; i < rawText.length; i++) {
     const ch = rawText[i];
 
     if (inString) {
       if (escaped) {
         escaped = false;
+        if (ch === 'u') {
+          // \uXXXX -> the real code unit it represents, so a key written with
+          // an escape decodes identically to the same key written literally
+          // (JSON.parse's own behavior) -- collapsing version to
+          // "version" instead of missing the duplicate, and never
+          // mis-decoding an escaped-quote key like a\"b as containing a
+          // literal backslash-quote pair.
+          const hex = rawText.slice(i + 1, i + 5);
+          if (collectingKey && /^[0-9a-fA-F]{4}$/.test(hex)) {
+            keyBuf += String.fromCharCode(parseInt(hex, 16));
+          }
+          i += 4;
+        } else if (collectingKey && Object.hasOwn(SIMPLE_ESCAPES, ch)) {
+          keyBuf += SIMPLE_ESCAPES[ch];
+        } else if (collectingKey) {
+          keyBuf += ch; // not standard JSON, but never silently drop input
+        }
       } else if (ch === '\\') {
         escaped = true;
       } else if (ch === '"') {
@@ -178,7 +199,10 @@ function checkRouteKind(sel, item) {
  */
 export function assertAllSelectorsListed(routes, registry = COMMAND_REGISTRY) {
   for (const cmd of registry) {
-    if (!routes[cmd.name]) {
+    // Object.hasOwn, not index truthiness: a selector literally named
+    // "__proto__" would otherwise resolve through the prototype chain to a
+    // real (truthy, but meaningless) object and silently pass this guard.
+    if (!Object.hasOwn(routes, cmd.name)) {
       throw new Error(`Unlisted selector: selector "${cmd.name}" has no route in generated output`);
     }
   }

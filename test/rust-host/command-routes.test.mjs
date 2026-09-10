@@ -172,6 +172,69 @@ test('double-annotated selector fails the build (array duplicate entries)', () =
   );
 });
 
+test('a second annotated selector does not false-fail the duplicate-top-level-key scan', () => {
+  // Regression for the HIGH finding: the old regex-on-flat-text scan mistook
+  // a nested field name shared by two DIFFERENT selectors (operation_id) for
+  // a duplicate top-level key and threw on this exact shape.
+  const twoSelectors = JSON.stringify({
+    version: { route_kind: 'native', operation_id: 'distribution.build.show', owner_path: 'packages/distribution/rust' },
+    init: { route_kind: 'native', operation_id: 'some.other.op', owner_path: 'packages/distribution/rust' },
+  });
+
+  const map = loadAnnotations(twoSelectors);
+  assert.equal(map.size, 2);
+});
+
+test('a genuine top-level duplicate selector key is still caught as raw text', () => {
+  const dup = '{ "version": {"route_kind":"native","operation_id":"a"}, "version": {"route_kind":"legacy-cli"} }';
+
+  assert.throws(
+    () => {
+      loadAnnotations(dup);
+    },
+    /Double-bound selector: selector "version" declared more than once in annotations/
+  );
+});
+
+test('unicode-escaped duplicate selector key is caught (decode, not skip, \\uXXXX)', () => {
+  // Regression for red-team's HIGH finding: JSON.parse collapses
+  // "version" and "version" to the identical key "version" (last one
+  // wins, silently); the raw-text scan must decode the escape to see the
+  // same collision, not just skip past it.
+  const dup = '{ "version": {"route_kind":"native","operation_id":"a"}, "\\u0076ersion": {"route_kind":"legacy-cli"} }';
+
+  assert.throws(
+    () => {
+      loadAnnotations(dup);
+    },
+    /Double-bound selector: selector "version" declared more than once in annotations/
+  );
+});
+
+test('an escaped quote inside one key is not confused with a different key', () => {
+  // Regression for red-team's MEDIUM finding: two distinct keys `ab` and
+  // `a\"b` must decode to two DIFFERENT strings, not both collapse to "ab".
+  const distinctKeys = '{ "ab": {"route_kind":"legacy-cli"}, "a\\"b": {"route_kind":"legacy-cli"} }';
+
+  const map = loadAnnotations(distinctKeys);
+  assert.equal(map.size, 2);
+  assert.ok(map.has('ab'));
+  assert.ok(map.has('a"b'));
+});
+
+test('native route without an explicit owner_path fails the build', () => {
+  const badAnnotations = {
+    version: { route_kind: 'native', operation_id: 'distribution.build.show' },
+  };
+
+  assert.throws(
+    () => {
+      generateCommandRoutes({ annotations: badAnnotations });
+    },
+    /Native route for selector "version" requires an explicit owner_path/
+  );
+});
+
 test('double-annotated selector fails the build (multiple route_kinds in single entry)', () => {
   const badAnnotations = {
     version: {
