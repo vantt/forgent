@@ -3576,6 +3576,26 @@ function resolveConfinedManifestPath(releasePath, ...segments) {
   if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {
     return null;
   }
+  // Round-3 red-team HIGH: the lexical check above only catches a manifest
+  // NAMING an escaping path directly (an absolute path, or enough `../`
+  // segments) -- it says nothing about a symlink physically staged INSIDE
+  // the confined lexical path that points outside it (e.g. entries.fgos:
+  // "bin/fgos" where release/bin/fgos is itself a symlink to /bin/sh).
+  // Resolve the real path (following symlinks) when the target exists and
+  // re-confirm containment against the release root's own real path too.
+  if (fs.existsSync(resolved)) {
+    let realResolved;
+    let realBase;
+    try {
+      realResolved = fs.realpathSync(resolved);
+      realBase = fs.realpathSync(resolvedBase);
+    } catch (_) {
+      return null;
+    }
+    if (realResolved !== realBase && !realResolved.startsWith(realBase + path.sep)) {
+      return null;
+    }
+  }
   return resolved;
 }
 

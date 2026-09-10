@@ -90,7 +90,13 @@ function collectSourceFiles(baseDir, relativePath, results) {
   // applies via the disposable-outDir check.
   const resolvedFull = path.resolve(fullPath);
   const resolvedBase = path.resolve(baseDir);
-  if (resolvedFull !== resolvedBase && !resolvedFull.startsWith(resolvedBase + path.sep)) {
+  // Round-3 red-team MEDIUM: a declared entry must resolve to something
+  // STRICTLY inside baseDir, never baseDir itself -- an in-root
+  // dot-segment like "bin/.." lexically resolves to exactly baseDir
+  // without ever leaving it, which the round-2 fix's `!==` exception let
+  // through, staging (and packaging) the entire checkout root including
+  // unlisted workspace state.
+  if (!resolvedFull.startsWith(resolvedBase + path.sep)) {
     throw new Error(`Declared release payload entry escapes the source checkout: ${relativePath}`);
   }
   if (!fs.existsSync(fullPath)) {
