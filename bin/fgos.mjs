@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+// bin/fgos.mjs — legacy-node payload entry for fgOS.
+//
+// Ownership boundary: This file is the `legacy-node` payload entry, staged whole
+// under a release's `components.legacyNode.root` and exec'd by the Rust host at
+// `components.legacyNode.entry` — never relocated, never renamed in the source tree.
+// The Rust host resolves this file only through the release manifest's
+// `components.legacyNode` fields, never PATH, never cwd, never hardcoded outside
+// the manifest. Global npm `bin.fgos` and fallback `node bin/fgos.mjs` remain
+// compatibility channels that call this file directly.
+//
 // bin/fgos.mjs — the fgos CLI: the single door onto `.fgos/` (per D3/D5).
 //
 // Audience (per CONTEXT.md Terms, single-door): a consumer that cannot be

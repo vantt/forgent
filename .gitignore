@@ -26,6 +26,7 @@
 .fgos/dispatch-runs/
 cache/
 node_modules/
+node_modules
 
 # test-leak artifacts — belt against auto-commit clobber (backlog STR74/STR65)
 output.txt
@@ -80,6 +81,7 @@ packages/host-runtime/contracts/*.tmp.*
 
 # Rust build output
 /target/
+/apps/fgos/target/
 /herdr-plugin/target/
 # tsk-48w: herdr-plugin/web's bundled output, embedded into the binary at
 # compile time (RustEmbed) -- never committed, herdr-plugin/build.rs

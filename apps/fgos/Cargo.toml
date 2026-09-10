@@ -6,3 +6,7 @@ edition.workspace = true
 [dependencies]
 fgos-host-runtime = { path = "../../packages/host-runtime/rust" }
 fgos-distribution = { path = "../../packages/distribution/rust" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
