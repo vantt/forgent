@@ -747,7 +747,7 @@ export function isReadOnlyAssignment(assignment) {
 }
 
 // Allowed status values for agent-result.json (Step 04 §5.2).
-const ALLOWED_AGENT_CLAIM_STATUSES = new Set(['done', 'blocked', 'failed', 'no-evidence']);
+export const ALLOWED_AGENT_CLAIM_STATUSES = new Set(['done', 'blocked', 'failed', 'no-evidence']);
 
 /**
  * Validate the parsed content of agent-result.json (Step 04 §5.2).

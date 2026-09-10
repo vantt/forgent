@@ -78,10 +78,14 @@ Write these two files, in this order, each one \`.tmp\`-then-rename:
    understand or check your work belongs here.
 2. \`${p.resultPath}\` -- a JSON object:
 
-       {"status": "settled" | "failed" | "blocked",
+       {"status": "done" | "blocked" | "failed" | "no-evidence",
         "summary": "<one or two sentences>",
         "findings": [],
         "evidenceRefs": []}
+
+   "settled" is not a valid status here -- that word names the run reaching
+   its end, not whether the work succeeded; a worker that writes "settled"
+   in this file fails schema validation and the round is scored failed.
 
 The second file is what ends this round, so write it last and only once the
 first one is on disk. Nothing you write is treated as proof on its own; it is
