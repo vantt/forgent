@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "apps/fgos",
+    "packages/host-runtime/rust",
+    "packages/distribution/rust",
+]
+exclude = [
+    "herdr-plugin",
+    "upstreams",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+
+[workspace.dependencies]
+tokio = { version = "1.53.1", default-features = false, features = ["rt", "macros", "time"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+thiserror = "2.0.20"

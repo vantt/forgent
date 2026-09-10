@@ -74,6 +74,7 @@ output.txt
 /upstreams/
 
 # Rust build output
+/target/
 /herdr-plugin/target/
 # tsk-48w: herdr-plugin/web's bundled output, embedded into the binary at
 # compile time (RustEmbed) -- never committed, herdr-plugin/build.rs
