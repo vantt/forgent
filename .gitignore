@@ -73,6 +73,11 @@ output.txt
 /.codex/
 /upstreams/
 
+# scripts/export-command-selectors.mjs's own crash-safe write-then-rename
+# scratch file, written beside command-routes.json (never os.tmpdir() --
+# rename must stay within one filesystem)
+packages/host-runtime/contracts/*.tmp.*
+
 # Rust build output
 /target/
 /herdr-plugin/target/

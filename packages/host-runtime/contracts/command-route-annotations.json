@@ -1,0 +1,7 @@
+{
+  "version": {
+    "route_kind": "native",
+    "operation_id": "distribution.build.show",
+    "owner_path": "packages/distribution/rust"
+  }
+}
