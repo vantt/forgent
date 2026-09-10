@@ -47,8 +47,11 @@ pub fn command_routes() -> &'static HashMap<String, CommandRouteDescriptor> {
     })
 }
 
-/// Static provider table for the Phase 07 composition root: only in-crate echo fixture.
-static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[ECHO_PROVIDER_DESCRIPTOR];
+/// Static provider table for the composition root: echo fixture and fgos-distribution provider.
+static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
+    ECHO_PROVIDER_DESCRIPTOR,
+    fgos_distribution::DISTRIBUTION_BUILD_SHOW_DESCRIPTOR,
+];
 
 fn main() {
     // Check recursion guard immediately. Fails closed if already set.
@@ -96,6 +99,7 @@ fn main() {
     let snapshot = build_snapshot(CATALOG, COMPOSITION_PROVIDERS, "fgos-composition-root-v1");
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(EchoProvider::new()));
+    service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     let tracker = service.tracker();
 
     match route.route_kind.as_str() {

@@ -1,0 +1,28 @@
+{
+  "machine": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpuModel": "12th Gen Intel(R) Core(TM) i7-12650H",
+    "cpuCount": 16,
+    "referenceTarget": "x86_64-unknown-linux-gnu"
+  },
+  "measuredAt": "2026-09-10T18:04:48.776Z",
+  "sampleCount": 51,
+  "warmupCount": 5,
+  "legacyExecOverhead": {
+    "definition": "wall time of `fgos <legacy selector>` through the Rust CLI minus direct `node <payload> <selector>`, both warm",
+    "selector": "ready",
+    "rustCliP50Ms": 372.088,
+    "directNodeP50Ms": 371.231,
+    "overheadP50Ms": 0.857,
+    "thresholdMs": 25,
+    "withinThreshold": true
+  },
+  "nativeVersion": {
+    "definition": "wall time of `fgos version` through the native route",
+    "p50Ms": 3.999,
+    "thresholdMs": 10,
+    "withinThreshold": true
+  },
+  "findings": []
+}

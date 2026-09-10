@@ -175,24 +175,99 @@ fn test_one_node_child_process_spy() {
 }
 
 #[test]
-fn test_native_version_fails_closed_with_selection_refused() {
+fn test_native_version_succeeds_with_envelope() {
     let output = Command::new(fgos_bin())
         .arg("version")
         .output()
         .expect("failed to execute fgos");
 
-    assert_ne!(
+    assert_eq!(
         output.status.code(),
         Some(0),
-        "native version must fail closed pre-Phase-08 with non-zero exit code"
+        "native version must exit 0, got: {:?}",
+        output.status.code()
     );
 
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(
-        stderr.contains("selection refused") && stderr.contains("no binding"),
-        "stderr must report selection refused (no binding), got: {}",
-        stderr
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let parsed: serde_json::Value =
+        serde_json::from_str(&stdout).expect("output must be valid JSON envelope");
+
+    assert_eq!(parsed["contract"], "fgos.v1");
+    let gen_at = parsed["generated_at"]
+        .as_str()
+        .expect("generated_at must be string");
+    assert!(gen_at.ends_with('Z'));
+    assert_eq!(parsed["data_hash"].as_str().map(|h| h.len()), Some(64));
+    assert_eq!(parsed["data"]["packageVersion"], "0.1.0");
+    assert_eq!(
+        parsed["data"]["verbs"].as_array().map(|v| v.len()),
+        Some(73)
     );
+}
+
+#[test]
+fn test_native_version_zero_node_child_process_spy() {
+    let root = repo_root();
+
+    // Create a temporary directory containing a spy `node` wrapper script.
+    let temp_dir = std::env::temp_dir().join(format!("fgos_test_spy_zero_{}", std::process::id()));
+    fs::create_dir_all(&temp_dir).unwrap();
+
+    let spy_log = temp_dir.join("spy_log.txt");
+    let real_node = {
+        let which_out = Command::new("which")
+            .arg("node")
+            .output()
+            .expect("which node must succeed");
+        let path_str = String::from_utf8_lossy(&which_out.stdout)
+            .trim()
+            .to_string();
+        PathBuf::from(path_str)
+    };
+
+    let spy_script = temp_dir.join("node");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let script_content = format!(
+            "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
+            spy_log.display(),
+            real_node.display()
+        );
+        fs::write(&spy_script, script_content).unwrap();
+        let mut perms = fs::metadata(&spy_script).unwrap().permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&spy_script, perms).unwrap();
+    }
+
+    let original_path = std::env::var("PATH").unwrap_or_default();
+    let modified_path = format!("{}:{}", temp_dir.display(), original_path);
+
+    let output = Command::new(fgos_bin())
+        .arg("version")
+        .env("PATH", modified_path)
+        .env("FGOS_ACTIVE_RELEASE_PATH", &root)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(output.status.code(), Some(0));
+
+    // Read spy log: must contain zero invocations of the `node` wrapper.
+    let log_content = fs::read_to_string(&spy_log).unwrap_or_default();
+    let invocations: Vec<&str> = log_content
+        .lines()
+        .filter(|l| l.starts_with("SPY_PID:"))
+        .collect();
+
+    assert_eq!(
+        invocations.len(),
+        0,
+        "expected zero node child processes for native version, got: {:?}",
+        invocations
+    );
+
+    // Clean up temporary directory.
+    let _ = fs::remove_dir_all(&temp_dir);
 }
 
 #[test]
