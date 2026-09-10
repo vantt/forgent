@@ -275,6 +275,8 @@ interface ResourceGrantV1 {
   resource: string;
   access: 'read' | 'write' | 'read-write';
   scope: 'dispatch';
+  // Defaults to true: an unavailable optional resource is unverified, not a refusal.
+  optional?: boolean;
 }
 ```
 
@@ -408,6 +410,12 @@ Hai built-in cho phép private-home nhưng không bắt dùng: provider normaliz
 khai need/binding khi CLI cần home ghi được. home host không có nghĩa cấp quyền
 ghi host home. Credential/plugin/config đọc từ host qua hostRead allow; provider
 phải chứng minh cách load khi dùng private home, không tự copy toàn bộ home.
+
+Grant mặc định là optional khi runtime không resolve được resource đó: coverage
+của grant là `unverified`, không biến cả required dispatch thành refusal. Caller
+có thể đặt `optional: false` trên grant của policy riêng để biến absence thành
+mismatch/refusal. Hai built-in giữ credentials optional để required mode usable
+trên máy chưa có credential source.
 
 Machine registry tương ứng:
 
@@ -670,7 +678,8 @@ public, nhưng run record cục bộ phải đủ thông tin để audit grant.
 resources; identity/location nằm ở resources, không suy từ string path.
 
 `required` cộng bất kỳ control nào `unsatisfied|unknown` dẫn tới
-`refuse`. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
+`refuse`; grant optional không resolve là ngoại lệ hẹp: nó là `unverified`
+nhưng không mismatch. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
 attestation. `coverage` phải có entry cho toàn bộ control và grant trong
 `requested.policy`; thiếu entry là `unknown` và bị từ chối trong `required`.
 Không có degrade âm thầm.
@@ -858,8 +867,11 @@ Channels luôn có đủ năm entry trên; out-of-scope không được dùng đ
 filesystem hay inherited-fd khi hostWrite deny. Violation đã xác nhận ghi
 phase failed, outcome degraded và mismatch; unknown dành cho thiếu bằng chứng.
 
-Authority lưu plan, prepared record và terminal attestation vào store do host
-quản lý ngoài mọi write grant của agent. Run-output chỉ chứa artifact của agent
+Authority lưu plan, prepared record và terminal attestation vào machine state
+store do host quản lý, mặc định ngoài project `.fgos/` và ngoài mọi write grant
+của agent. Trước mỗi persist Authority kiểm tra containment hai chiều giữa store
+và mọi resolved writable resource; bất kỳ overlap nào phải refuse, không được
+ghi record vào vùng grant. Run-output chỉ chứa artifact của agent
 và có thể chứa bản sao attestation, không phải durable truth. Event committed
 chỉ chứa dispatch id, outcome, mismatch code và reference/digest tới record đã
 redact; không chứa credential, raw env hay absolute sensitive path. Recovery

@@ -41,6 +41,7 @@ import {
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
+import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
@@ -3778,9 +3779,43 @@ registerCheck({
 });
 
 export function checkConfinementProbeFreshness() {
+  let registry;
+  try {
+    registry = loadMachineBackendRegistry();
+  } catch (err) {
+    return {
+      passed: false,
+      message: `confinement probe freshness: machine registry not readable (${err.message})`,
+    };
+  }
+
+  const bwrapBackend = registry.confinementBackends?.bwrap;
+  if (!bwrapBackend || bwrapBackend.enabled === false) {
+    return {
+      passed: true,
+      message: 'confinement probe freshness: bwrap backend is disabled or not configured in machine registry',
+    };
+  }
+
+  if (os.platform() !== 'linux') {
+    return {
+      passed: true,
+      message: `confinement probe freshness: platform "${os.platform()}" is not Linux (bwrap probes skipped)`,
+    };
+  }
+
+  const binaryPath = bwrapBackend.executable || 'bwrap';
+  const probeResult = runAllConfinementProbes({ bwrapBin: binaryPath });
+  if (!probeResult.passed) {
+    return {
+      passed: false,
+      message: `confinement probe freshness: failing or stale probe detected: ${probeResult.message}`,
+    };
+  }
+
   return {
     passed: true,
-    message: 'confinement probe freshness check (placeholder -- no active probe required in phase 01)',
+    message: 'confinement probe freshness: all 8 local-bwrap-v1 probes passed (fresh)',
   };
 }
 

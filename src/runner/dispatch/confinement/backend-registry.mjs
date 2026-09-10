@@ -8,6 +8,8 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { bwrapDriver } from './drivers/bwrap.mjs';
+
 export class ConfinementBackendRegistryError extends Error {
   constructor(message) {
     super(message);
@@ -16,6 +18,30 @@ export class ConfinementBackendRegistryError extends Error {
 }
 
 export const ALLOWED_DRIVER_TYPES = Object.freeze(['bwrap', 'container', 'remote']);
+
+const DRIVER_REGISTRY = new Map();
+DRIVER_REGISTRY.set('bwrap', bwrapDriver);
+
+export function getBackendDriver(type) {
+  if (typeof type !== 'string' || !ALLOWED_DRIVER_TYPES.includes(type) || !DRIVER_REGISTRY.has(type)) {
+    throw new ConfinementBackendRegistryError(
+      `unknown confinement backend driver type "${type}" (confinement-backend-unknown). Known types: ${Array.from(DRIVER_REGISTRY.keys()).join(', ')}.`,
+    );
+  }
+  return DRIVER_REGISTRY.get(type);
+}
+
+export function registerBackendDriver(driver) {
+  if (!driver || typeof driver !== 'object') {
+    throw new ConfinementBackendRegistryError('driver must be an object.');
+  }
+  if (!ALLOWED_DRIVER_TYPES.includes(driver.type)) {
+    throw new ConfinementBackendRegistryError(
+      `cannot register driver for disallowed type "${driver.type}". Allowed types: ${ALLOWED_DRIVER_TYPES.join(', ')}.`,
+    );
+  }
+  DRIVER_REGISTRY.set(driver.type, driver);
+}
 
 /**
  * Default machine backend registry template (spec §6.2).

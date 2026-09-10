@@ -87,46 +87,60 @@ test("fake adapter receives only prepared invocation through Authority (R1-R3)",
   assert.equal(receivedOpts.timeoutMs, 5000);
 });
 
-test("throw in policy resolve / required mode creates zero spawn (Verification)", async () => {
+test("malformed required policy is rejected at the request door before any spawn", async () => {
   let spawnCount = 0;
   const fakeAdapter = async () => {
     spawnCount++;
     return { status: 0 };
   };
 
-  const req = buildConfinementRequest({
-    capability: "secured-task",
-    executorId: "test-exec",
-    requirement: {
-      mode: "required",
-      policyId: "host-write-denied",
-      policy: { contract: "confinement-policy.v1", controls: {}, grants: [] },
-    },
-    invocation: {
-      command: "echo",
-      args: [],
-      adapter: "cli-spawn",
-    },
-    context: {
-      cwd: "/cwd",
-      runDir: "/runDir",
-    },
-  });
-
-  await assert.rejects(
-    () => executeThroughConfinement(req, fakeAdapter),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-unsupported");
-      assert.match(err.message, /required confinement refused/);
-      assert.ok(err.attestation);
-      assert.equal(err.attestation.phase, "refused");
-      assert.equal(err.attestation.outcome, "refused");
-      return true;
-    },
+  assert.throws(
+    () => buildConfinementRequest({
+      capability: "secured-task", executorId: "test-exec",
+      requirement: { mode: "required", policyId: "host-write-denied", policy: { contract: "confinement-policy.v1", controls: {}, grants: [] } },
+      invocation: { command: "echo", args: [], adapter: "cli-spawn" },
+      context: { cwd: "/cwd", runDir: "/runDir" },
+    }),
+    /missing required control "hostWrite"/,
   );
+  assert.equal(spawnCount, 0, "malformed policy cannot reach an adapter");
+});
 
-  assert.equal(spawnCount, 0, "zero spawn when required policy cannot be enforced in observe mode");
+test("H3/M7: adapters outside the prepared-sandbox allowlist refuse required dispatch", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-herdr-confinement-'));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(tmp, 'backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap' } } }));
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+    const runDir = path.join(tmp, '.fgos', 'runs', 'one');
+    fs.mkdirSync(runDir, { recursive: true });
+    for (const adapter of ['herdr-spawn', 'http']) {
+      const req = buildConfinementRequest({
+        dispatchId: `disp_${adapter}_unverified`, capability: 'code:review', executorId: adapter, backendId: 'bwrap',
+        invocation: { command: 'agy', args: [], adapter, interactiveMode: { kind: 'agy' } },
+        context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, '.fgos') },
+        requirement: { mode: 'required', policyId: 'host-write-denied', policy: {
+          contract: 'confinement-policy.v1',
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
+        } },
+      });
+      await assert.rejects(() => executeThroughConfinement(req, async () => ({ status: 0 })), (err) => {
+        assert.equal(err.errorClass, 'confinement-unsupported');
+        assert.ok(err.attestation.mismatches.some((m) => m.detail.includes('does not apply the prepared sandbox')));
+        assert.equal(err.attestation.coverage['control:hostWrite'], 'unverified');
+        assert.equal(err.attestation.backend.id, 'bwrap');
+        assert.ok(Array.isArray(err.attestation.grants));
+        assert.deepEqual(err.attestation.readiness, {});
+        return true;
+      });
+    }
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 test("in-process dispatch gets authorityScope: external-harness with null attestation (R6)", async () => {
@@ -306,9 +320,9 @@ test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap obse
   assert.equal(att.effectiveControls.home, "private");
   assert.equal(att.coverage["control:hostWrite"], "satisfied");
   assert.equal(att.coverage["control:process"], "satisfied");
-  assert.equal(att.coverage["control:session"], "satisfied");
-  assert.equal(att.coverage["control:workspace"], "satisfied");
-  assert.equal(att.coverage["control:home"], "satisfied");
+  assert.equal(att.coverage["control:session"], "unverified");
+  assert.equal(att.coverage["control:workspace"], "unverified");
+  assert.equal(att.coverage["control:home"], "unverified");
   assert.ok(att.grants.some((g) => g.resource === "run-output"));
   assert.ok(att.grants.some((g) => g.resource === "private-home"));
   assert.ok(att.channels.some((c) => c.name === "filesystem" && c.coverage === "covered"));
@@ -930,4 +944,3 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
   assert.notEqual(pidOnlyAtt.effectiveControls.hostWrite, "deny");
   assert.equal(pidOnlyAtt.coverage["control:hostWrite"], "unverified");
 });
-

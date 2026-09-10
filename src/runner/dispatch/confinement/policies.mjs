@@ -291,7 +291,7 @@ export function validateConfinementPolicyShape(policy, label = 'confinement poli
       throw new ConfinementPolicyError(`runner config (${grantLabel}) must be an object.`);
     }
 
-    const ALLOWED_GRANT_KEYS = ['resource', 'access', 'scope'];
+    const ALLOWED_GRANT_KEYS = ['resource', 'access', 'scope', 'optional'];
     for (const k of Object.keys(grant)) {
       if (!ALLOWED_GRANT_KEYS.includes(k)) {
         throw new ConfinementPolicyError(`runner config (${grantLabel}) contains unknown key "${k}". Allowed keys: ${ALLOWED_GRANT_KEYS.join(', ')}.`);
@@ -314,6 +314,10 @@ export function validateConfinementPolicyShape(policy, label = 'confinement poli
 
     if (grant.scope !== 'dispatch') {
       throw new ConfinementPolicyError(`runner config (${grantLabel}) "scope" must be "dispatch", got: ${JSON.stringify(grant.scope)}.`);
+    }
+
+    if (grant.optional !== undefined && typeof grant.optional !== 'boolean') {
+      throw new ConfinementPolicyError(`runner config (${grantLabel}) "optional" must be a boolean when present.`);
     }
   });
 
