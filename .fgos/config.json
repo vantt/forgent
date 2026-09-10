@@ -53,7 +53,7 @@
       },
       "code:implement": {
         "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
-        "prefer": "claude"
+        "prefer": "agy-cli"
       },
       "code:review": {
         "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
@@ -108,7 +108,9 @@
               "--model",
               "{model}",
               "--permission-mode",
-              "acceptEdits"
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
             ]
           }
         ]
@@ -138,8 +140,8 @@
         "providerModel": "gemini",
         "rigorOverrides": {
           "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "standard": "standard",
+          "heavy": "creative"
         }
       },
       "agy-herdr": {
@@ -168,8 +170,8 @@
         "providerModel": "gemini",
         "rigorOverrides": {
           "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "standard": "standard",
+          "heavy": "creative"
         }
       },
       "claude-bwrap": {
@@ -262,7 +264,10 @@
               "--model",
               "{model}",
               "{prompt}"
-            ]
+            ],
+            "env": {
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            }
           }
         ]
       },
@@ -280,7 +285,10 @@
               "exec",
               "--dangerously-bypass-approvals-and-sandbox",
               "{prompt}"
-            ]
+            ],
+            "env": {
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            }
           }
         ]
       },
@@ -426,7 +434,7 @@
       },
       "codex-herdr": {
         "kind": "agent",
-        "description": "DORMANT (tsk-5jl): same Codex CLI invocation as executors.codex, dispatched via adapter:\"herdr-spawn\" -- NO liveOutput declared: whether `codex exec` streams live text by default or buffers is UNVERIFIED (deliberately deferred, not guessed -- docs/history/herdr-spawn-generalize-live-visibility/plan.md). A follow-up item should verify codex's real streaming behavior before adding a liveOutput renderer here. Not wired to any capability yet -- to activate, point a capability's \"prefer\" at \"codex-herdr\" (or dispatch to it by name explicitly).",
+        "description": "Red-team/review seat via herdr-spawn: codex interactive in a visible pane. herdr types the bare `codex` word from --kind, so the pane shell's `codex` function (~/.zshrc account switcher) runs; that function honours the CODEX_HOME this env exports and skips its own bypass flag when the args already carry one, so this entry -- not the shell -- decides account and approval posture. All codex executors share one account (CODEX_HOME=~/.codex-fgovn). Unconfined by decision until the confinement track lands.",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -434,10 +442,13 @@
             "adapter": "herdr-spawn",
             "command": "codex",
             "args": [
+              "--dangerously-bypass-approvals-and-sandbox",
+              "--model",
+              "{model}",
               "{prompt}"
             ],
             "env": {
-              "CODEX_HOME": "${HOME}/.codex-tetnu"
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
             },
             "interactiveMode": {
               "exitCommand": "/quit",
@@ -447,7 +458,8 @@
               }
             }
           }
-        ]
+        ],
+        "providerModel": "openai-codex"
       },
       "gitnexus": {
         "kind": "tool",
@@ -534,7 +546,7 @@
               "--tmpfs",
               "/tmp",
               "--ro-bind",
-              "/home/vantt/.codex/auth.json",
+              "/home/vantt/.codex-fgovn/auth.json",
               "/tmp/cdxhome/auth.json",
               "--setenv",
               "CODEX_HOME",
@@ -554,6 +566,42 @@
             ]
           }
         ]
+      },
+      "claude-reviewer-herdr": {
+        "kind": "agent",
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+            ],
+            "liveOutput": {
+              "streamFlags": [
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--include-partial-messages"
+              ],
+              "renderer": "src/runner/dispatch/live-renderers/claude-stream-json.mjs"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            }
+          }
+        ],
+        "description": "Reviewer/red-team seat via herdr-spawn: claude in a visible pane with read-only Bash (git diff/log/show/status, node --test, npm test; rtk-rewritten forms listed because the RTK hook rewrites argv). Mirrors claude-reviewer for the herdr transport."
       }
     },
     "timeoutMs": 2100000,
