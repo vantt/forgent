@@ -1,2 +1,4 @@
 # rustfmt.toml - Smallest config satisfying formatting gates
+# edition = "2021": rustfmt defaults to 2015 formatting rules when unset,
+# which would drift from this workspace's actual [workspace.package] edition.
 edition = "2021"
