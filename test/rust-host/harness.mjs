@@ -554,7 +554,15 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
     const deltaB = diffDirectorySnapshots(beforeSnapB, afterSnapB);
 
     function normalizeCreatedFiles(list) {
-      return list.map(p => p.replace(/\.fgos\/events\/[0-9]+-[0-9TZ]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
+      // Any file directly under .fgos/events/ is inherently non-deterministic
+      // per run (its name embeds a fresh session id and a real timestamp, not
+      // just a timestamp) -- matched by directory, not by trying to mirror the
+      // exact naming scheme, since the naming scheme is an implementation
+      // detail this harness must not assume it can predict. A prior version
+      // of this regex assumed a "<digits>-<timestamp>.jsonl" shape and missed
+      // the real "<uuid-with-dashes>-<timestamp>.jsonl" shape entirely,
+      // leaving Node-against-Node failing on every isolated-write case.
+      return list.map(p => p.replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
     }
 
     const normCreatedA = normalizeCreatedFiles(deltaA.created);
