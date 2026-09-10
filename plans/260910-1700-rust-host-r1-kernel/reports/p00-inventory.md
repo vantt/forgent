@@ -198,12 +198,14 @@ re-confirmed against this wider list before that cell closes:
    calls `resolveFgosBin`) — `src/setup/registrations.mjs:2336` (`const
    resolved = resolveFgosBin(cwd)`, inside `checkPluginSkillCliReachable`
    defined at `:2335`). Resolver: `resolveFgosBin` from
-   `./bin-discovery.mjs` (imported `:52`) — this is the one Node resolver
-   P10 adds tier 0 to. (A second, unrelated `resolveFgosBin` call exists at
-   `:303` inside a different check, not part of the nine-site inventory but
-   confirms the resolver is already centralized for Node call sites.) Other
-   hits in this file (`:19,960,1094,1532,2213,2338,2343,2349,2423,3084`) are
-   comments/strings referencing `bin/fgos.mjs` by name, not calls.
+   `./bin-discovery.mjs` (imported `:52`) — this is the one Node resolver P10
+   adds tier 0 to; the concrete tier-1 site it must precede is
+   `src/setup/bin-discovery.mjs:24` (`path.join(cwd, 'bin', 'fgos.mjs')`
+   inside `resolveDevCheckoutBin`). (A second, unrelated `resolveFgosBin`
+   call exists at `:303` inside a different check, not part of the nine-site
+   inventory but confirms the resolver is already centralized for Node call
+   sites.) Other hits in this file (`:19,960,1094,1532,2213,2338,2343,2349,2423,3084`)
+   are comments/strings referencing `bin/fgos.mjs` by name, not calls.
 8. `core/skills/_shared/fgos-cli-fallback.md` (documented shell snippet,
    source for ~20 `.agents`/`plugins` mirror copies) —
    `core/skills/_shared/fgos-cli-fallback.md:16` (`FGOS_BIN="...
@@ -224,16 +226,23 @@ re-confirmed against this wider list before that cell closes:
     `:64-66`) and its Product Gate exit (`plan.md:160`) must account for this
     caller or it is left on the hardcoded path after cutover.**
 11. `scripts/knowledge-canary.mjs:23` — `path.resolve(...,'bin',
-    'fgos.mjs')`, `execSync`'d four times (`:27,:31,:42` and one more).
-    Outside `test/`, so the "~75 Node tests are fixtures" carve-out below
-    does not cover it by name; classified here as fixture-class (a canary
-    script exercising the Node payload's own behavior, same rationale as the
-    test fixtures) but flagged since it was not previously named explicitly.
-12. `plugins/fgOS/skills/terminal/rename.sh:51-52` — `[ -f
-    "$project_root/bin/fgos.mjs" ] || exit 0` then `node
-    "$project_root/bin/fgos.mjs" tool query --capability pane-labeling ...`.
-    Fail-closed capability probe, not under `test/`. Resolver: none (inline
-    file-existence check). Same P10 accounting note as #10 applies.
+    'fgos.mjs')`, `execSync`'d six times (`:26,:30,:43,:61,:64,:67`; an
+    earlier revision of this item miscited this as four calls at
+    `:27,:31,:42` — those three lines hold no `execSync`, `:27`/`:31` are
+    blank and `:42` is a comment). Outside `test/`, so the "~75 Node tests
+    are fixtures" carve-out below does not cover it by name; classified here
+    as fixture-class (a canary script exercising the Node payload's own
+    behavior, same rationale as the test fixtures) but flagged since it was
+    not previously named explicitly.
+12. `plugins/fgOS/skills/terminal/rename.sh:50-51` — `[ -n "$project_root" ]
+    && [ -f "$project_root/bin/fgos.mjs" ] || exit 0` (`:50`) then `node
+    "$project_root/bin/fgos.mjs" tool query --capability pane-labeling ...`
+    (`:51`; an earlier revision of this item cited `:51-52`, which starts one
+    line late and swallows `:52`'s `| grep -q ...` pipe continuation of `:51`
+    instead of the `:50` guard it was meant to include). Fail-closed
+    capability probe, not under `test/`; exists only under `plugins/`, no
+    `core/skills/` source. Resolver: none (inline file-existence check). Same
+    P10 accounting note as #10 applies.
 
 **~75 Node tests spawning `bin/fgos.mjs` directly confirmed as fixtures, not
 callers to migrate** — per `legacy-cli-transition.md` §2's own statement
@@ -299,6 +308,18 @@ applies this header text (word-for-word or Lead-adjusted at that time) to
 `bin/fgos.mjs` and adds the matching ownership note to the root `AGENTS.md`;
 **not applied in this phase** (R8).
 
+**Residual nuance flagged by the recheck pass, not fixed here (deferred to
+P07, non-blocking):** the "both call this same file directly" sentence above
+still over-commits — `legacy-cli-transition.md:37` allows `package.json`
+`bin.fgos` to eventually be "pointed at the workspace shim" instead of
+removed; in that branch the npm channel would route through the Rust host
+and the sentence would stop holding. This is a pre-existing tension between
+`plan.md:21-22` (keeps npm `bin.fgos` as compatibility channel, unspecified
+whether shimmed) and `legacy-cli-transition.md:37` (allows either removal or
+shimming), not something this phase's own scope resolves. P07 should write
+whichever of the two npm-channel end-states actually landed by then into the
+header, rather than this report's placeholder wording.
+
 ## R6 — Wave-2 lease overlap check
 
 `plan.md` "Shared-File Lease Rule":
@@ -329,14 +350,46 @@ Execution Map states.
 
 **Lease map (full, beyond the wave-2 overlap check above):** `plan.md:150`
 lists a "lease map" among P00's exit artifacts; the wave-2 overlap check
-above is the only lease cross-reference this phase originally produced. Two
-paths this track touches carry no lease entry in `plan.md`'s Shared-File
-Lease Rule table (`:187-245`) at all: `src/cli/command-registry.mjs` (read by
-P01's `scripts/export-command-selectors.mjs` generator but not itself listed
-in any lease block — P01 should either add it to `node-harness` or note it as
-read-only input) and `scripts/herdr-cockpit-notify.mjs` (item #10 above,
-uninventoried by any lease — falls under no existing lease block; the Lead
-should assign it a lease, most likely `resolver`, when P10 touches it).
+above is the only lease cross-reference this phase originally produced. Paths
+this track touches that carry no lease entry in `plan.md`'s Shared-File Lease
+Rule table (`:187-245`) at all: `src/cli/command-registry.mjs` (read by P01's
+`scripts/export-command-selectors.mjs` generator but not itself listed in any
+lease block — P01 should either add it to `node-harness` or note it as
+read-only input) and, matching items #10-12 above and the deferred-to-P10
+class noted just below, `scripts/herdr-cockpit-notify.mjs`,
+`scripts/knowledge-canary.mjs`, and `plugins/fgOS/skills/terminal/rename.sh`
+— none covered by any existing lease block; the Lead should assign each a
+lease, most likely `resolver`, when P10 touches it.
+
+**Deferred, not resolved in this phase — a broader caller class outside
+P00's named scope, for P10 to scope and close:** phase-00's own R3 names a
+closed, nine-site list (`legacy-cli-transition.md` §2's own enumeration); this
+report widened that to items #10-12 (three additional real, non-test
+source-code/script callers). A recheck review + red-team pass against that
+widened report (2026-09-10) found a further, categorically different class:
+active skill-doc *prose* instructing an agent to run `node
+"$root/bin/fgos.mjs" ...` directly, outside any of items #1-12, spanning at
+least `domains/coding/skills/fgos-coding-planning/references/approach-and-shape.md:29`,
+`domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md:78,82,95,130`,
+`domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md:47,56`,
+`domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md:96`,
+`domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md:71,80,90,94`,
+`domains/coding/skills/fgos-coding-validating/references/gate-tier-a-b-triggers.md:18`,
+`plugins/fgOS/skills/retro-next/SKILL.md:55`, and (`path.resolve`-composed,
+outside repo-root `test/`) `dogfood-fixture/test/goal-directed-mvp.test.mjs:14`.
+**Lead's disposition: accepted as real, deferred to P10, not fixed in this
+phase.** Rationale: phase-00's R3 requirement is explicitly the nine named
+sites, not an exhaustive repo-wide sweep of every doc/prose invocation
+snippet; the doc-prose class is large (at minimum the 13+ sites above,
+plausibly more across `domains/*/skills/` and `plugins/*/skills/`), is
+categorically different from source-code call sites (an agent literally
+executes shell prose rather than the repo's own code calling out), and its
+correct remediation — deciding whether tier-0 shim awareness belongs in the
+prose itself or in a resolver these snippets should call instead — is
+product/design work for P10 (`plan.md` Goal 6, `:64-66`; Product Gate exit
+`plan.md:160`), not a fact this report can freeze. P10 must not scope its own
+"nine inventoried call sites" claim from this report's #1-12 list alone;
+it must run its own sweep for this doc-prose class before closing.
 
 ## Verification (per phase-00 Verification section)
 
@@ -351,10 +404,27 @@ should assign it a lease, most likely `resolver`, when P10 touches it).
 
 ## Revision note (post-review)
 
-This report was revised after its own review + red-team pass
-(`rust-host-r1-kernel--cell-01`, superseded by session
-`rust-host-r1-kernel--p00` — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md`
-for the full disposition). All 9 findings (1 HIGH, 4 MEDIUM, 4 LOW) from the
-reviewer pass and both non-LOW findings from the red-team pass are accepted
-and fixed in this revision; the 3 LOW/"not found" red-team findings needed no
-change. No open, unaddressed finding remains.
+This report went through two review + red-team passes; see
+`docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md`
+for the full disposition of both.
+
+**Round 1** (session `rust-host-r1-kernel--cell-01`, abandoned unclosed after
+review — see the coordination-session bug filed as `tsk-40j`; findings still
+valid, re-hosted under session `rust-host-r1-kernel--p00-review`). All 9
+findings (1 HIGH, 4 MEDIUM, 4 LOW) from the reviewer pass and the 2
+non-LOW findings from the red-team pass accepted and fixed.
+
+**Round 2** (session `rust-host-r1-kernel--p00-review`, closed
+`partially-complete` with `partialPolicy.allowedOmissions: [doer, fixer]`
+declared at open — this cell has no produce-candidate). 3 MEDIUM + 3 LOW from
+the reviewer recheck: M1/M2 (wrong file:line citations in items #11/#12) and
+L3 (missing file:line for item #7's resolver site) fixed directly; L1 (R5
+header nuance) and L2 (R6 lease-map inconsistency) fixed directly; M3
+(broader doc-prose caller class) and the red-team's 1 HIGH finding (same
+underlying gap, more strongly rated) are **accepted and deferred to P10**
+with rationale, per the "Deferred, not resolved in this phase" note under R6
+— outside phase-00 R3's own named scope, and P10 owns closing it for real.
+
+No open, unaddressed **fixable** finding remains; one class is knowingly
+deferred with rationale, per policy (cap reached: 2 fix rounds on this cell,
+one at cap for a different accepted class).
