@@ -3560,6 +3560,25 @@ registerCheck({
 
 // ─── Rust Host Release and Packaging Checks (Phase 09) ───────────────────────
 
+/**
+ * Resolves `releasePath` joined with `segments`, refusing a result that
+ * escapes `releasePath` (round-2 red-team HIGH: a manifest naming an
+ * absolute or `..`-escaping entry, e.g. `entries.fgos: "/bin/sh"`, must
+ * not make a doctor check pass against an arbitrary system binary just
+ * because that path happens to exist and be executable). Returns `null`
+ * on escape instead of throwing -- a doctor check reports a clear failed
+ * result, it doesn't crash the whole `fgos doctor` run over one bad
+ * manifest field.
+ */
+function resolveConfinedManifestPath(releasePath, ...segments) {
+  const resolvedBase = path.resolve(releasePath);
+  const resolved = path.resolve(resolvedBase, ...segments);
+  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {
+    return null;
+  }
+  return resolved;
+}
+
 function resolveActiveReleaseForDoctor(dir) {
   const root = resolveMainCheckout(dir) ?? dir;
   const candidateDirs = [dir, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
@@ -3643,7 +3662,13 @@ function checkRustHostBinaryPresent(cwd) {
     if (!fgosEntry) {
       return { passed: false, message: 'active release manifest missing entries.fgos' };
     }
-    binaryPath = path.resolve(releaseInfo.releasePath, fgosEntry);
+    binaryPath = resolveConfinedManifestPath(releaseInfo.releasePath, fgosEntry);
+    if (binaryPath === null) {
+      return {
+        passed: false,
+        message: `active release manifest's entries.fgos ("${fgosEntry}") escapes the active release path`,
+      };
+    }
   } else if (releaseInfo.isDevCheckout) {
     for (const candidate of candidateDirs) {
       const releaseTarget = path.join(candidate, 'target', 'release', 'fgos');
@@ -3707,7 +3732,13 @@ function checkLegacyNodePayloadPresent(cwd) {
   if (releaseInfo.manifest) {
     const rootDir = releaseInfo.manifest.components?.legacyNode?.root ?? releaseInfo.manifest.root ?? '.';
     const entry = releaseInfo.manifest.components?.legacyNode?.entry ?? releaseInfo.manifest.entry ?? 'bin/fgos.mjs';
-    payloadPath = path.resolve(releaseInfo.releasePath, rootDir, entry);
+    payloadPath = resolveConfinedManifestPath(releaseInfo.releasePath, rootDir, entry);
+    if (payloadPath === null) {
+      return {
+        passed: false,
+        message: `active release manifest's legacyNode root/entry ("${rootDir}"/"${entry}") escapes the active release path`,
+      };
+    }
   } else if (releaseInfo.isDevCheckout) {
     for (const candidate of candidateDirs) {
       const candidatePayload = path.join(candidate, 'bin', 'fgos.mjs');

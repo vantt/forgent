@@ -83,6 +83,16 @@ function collectSourceFiles(baseDir, relativePath, results) {
     throw new Error(`Absolute path refused in declared release payload entry: ${relativePath}`);
   }
   const fullPath = path.join(baseDir, relativePath);
+  // Round-2 red-team HIGH: `../outside-payload` is not absolute, so the
+  // isAbsolute guard above doesn't catch it, but path.join still resolves
+  // it outside baseDir. Refuse anything that escapes the source checkout,
+  // matching the same containment discipline the staged-tree side already
+  // applies via the disposable-outDir check.
+  const resolvedFull = path.resolve(fullPath);
+  const resolvedBase = path.resolve(baseDir);
+  if (resolvedFull !== resolvedBase && !resolvedFull.startsWith(resolvedBase + path.sep)) {
+    throw new Error(`Declared release payload entry escapes the source checkout: ${relativePath}`);
+  }
   if (!fs.existsSync(fullPath)) {
     throw new Error(`Declared release payload entry does not exist: ${relativePath}`);
   }
