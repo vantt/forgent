@@ -1,0 +1,1129 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-10T22:38:39.158Z",
+  "data_hash": "2c66f0558cca89b847cc7cde234b16f2f8f9b4471857a1702c73f675d6a6c57a",
+  "data": {
+    "track": "confinement-authority-implementation",
+    "cells": [
+      {
+        "cellId": "p00",
+        "sessionId": "confinement-authority-implementation--p00",
+        "createdAt": "2026-09-10T06:46:52.311Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_001",
+          "asgn_lead_confinement_authority_implementation_op_002",
+          "asgn_lead_confinement_authority_implementation_op_003",
+          "asgn_lead_confinement_authority_implementation_op_004"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_003",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_003_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_004",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_004_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p00b",
+        "sessionId": "confinement-authority-implementation--p00b",
+        "createdAt": "2026-09-10T07:17:21.138Z",
+        "status": "partial",
+        "phase": "partially-complete",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_005",
+          "asgn_lead_confinement_authority_implementation_op_006"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_005",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_005_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_006",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_006_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p00c",
+        "sessionId": "confinement-authority-implementation--p00c",
+        "createdAt": "2026-09-10T07:30:18.578Z",
+        "status": "partial",
+        "phase": "partially-complete",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_007",
+          "asgn_lead_confinement_authority_implementation_op_008"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_007",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_007_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_008",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_008_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01",
+        "sessionId": "confinement-authority-implementation--p01",
+        "createdAt": "2026-09-10T07:41:19.510Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": {
+          "targetRef": "asgn_lead_confinement_authority_implementation_op_018",
+          "disposition": "accepted",
+          "rationale": "Red-team's HIGH accepted: normalizeLegacyConfinement has no production caller, so R4's normalization-boundary requirement is unmet in practice even though the function itself exists and (once H2 is fixed) will be correct.",
+          "evidenceRefs": [],
+          "ts": "2026-09-10T08:22:16.909Z",
+          "postTerminal": false,
+          "targetRefOwnedBySession": true,
+          "evidenceRefsOwnedBySession": []
+        },
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_009",
+          "asgn_lead_confinement_authority_implementation_op_010",
+          "asgn_lead_confinement_authority_implementation_op_011",
+          "asgn_lead_confinement_authority_implementation_op_012",
+          "asgn_lead_confinement_authority_implementation_op_013",
+          "asgn_lead_confinement_authority_implementation_op_014",
+          "asgn_lead_confinement_authority_implementation_op_015",
+          "asgn_lead_confinement_authority_implementation_op_016",
+          "asgn_lead_confinement_authority_implementation_op_017",
+          "asgn_lead_confinement_authority_implementation_op_018"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_016",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_016_01"
+            },
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_017",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_017_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_018",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_018_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01b",
+        "sessionId": "confinement-authority-implementation--p01b",
+        "createdAt": "2026-09-10T08:23:08.204Z",
+        "status": "active",
+        "phase": "planned",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01c",
+        "sessionId": "confinement-authority-implementation--p01c",
+        "createdAt": "2026-09-10T08:23:58.964Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_019",
+          "asgn_lead_confinement_authority_implementation_op_020"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_019",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_019_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01d",
+        "sessionId": "confinement-authority-implementation--p01d",
+        "createdAt": "2026-09-10T08:39:19.898Z",
+        "status": "active",
+        "phase": "planned",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01e",
+        "sessionId": "confinement-authority-implementation--p01e",
+        "createdAt": "2026-09-10T08:53:17.308Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_021",
+          "asgn_lead_confinement_authority_implementation_op_022",
+          "asgn_lead_confinement_authority_implementation_op_023"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_021",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_021_01"
+            }
+          ],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p01f",
+        "sessionId": "confinement-authority-implementation--p01f",
+        "createdAt": "2026-09-10T09:32:08.687Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_024"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p02",
+        "sessionId": "confinement-authority-implementation--p02",
+        "createdAt": "2026-09-10T09:46:31.679Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_025",
+          "asgn_lead_confinement_authority_implementation_op_026",
+          "asgn_lead_confinement_authority_implementation_op_027",
+          "asgn_lead_confinement_authority_implementation_op_028",
+          "asgn_lead_confinement_authority_implementation_op_029"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_026",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_026_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_027",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_027_01"
+            }
+          ],
+          "failed": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_025",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_025_01"
+            },
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_028",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_028_01"
+            }
+          ],
+          "late": [],
+          "missing": [],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p02b",
+        "sessionId": "confinement-authority-implementation--p02b",
+        "createdAt": "2026-09-10T10:52:30.751Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_030",
+          "asgn_lead_confinement_authority_implementation_op_031",
+          "asgn_lead_confinement_authority_implementation_op_032"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_030",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_030_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p02c",
+        "sessionId": "confinement-authority-implementation--p02c",
+        "createdAt": "2026-09-10T11:28:35.850Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_033",
+          "asgn_lead_confinement_authority_implementation_op_034"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_033",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_033_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p03",
+        "sessionId": "confinement-authority-implementation--p03",
+        "createdAt": "2026-09-10T13:04:24.981Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_035",
+          "asgn_lead_confinement_authority_implementation_op_036",
+          "asgn_lead_confinement_authority_implementation_op_037",
+          "asgn_lead_confinement_authority_implementation_op_038",
+          "asgn_lead_confinement_authority_implementation_op_039",
+          "asgn_lead_confinement_authority_implementation_op_040",
+          "asgn_lead_confinement_authority_implementation_op_041",
+          "asgn_lead_confinement_authority_implementation_op_042",
+          "asgn_lead_confinement_authority_implementation_op_043",
+          "asgn_lead_confinement_authority_implementation_op_044"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_035",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_035_01"
+            },
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_036",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_036_01"
+            }
+          ],
+          "failed": [
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_037",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_037_01"
+            },
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_038",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_038_01"
+            }
+          ],
+          "late": [],
+          "missing": [],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p03b",
+        "sessionId": "confinement-authority-implementation--p03b",
+        "createdAt": "2026-09-10T14:22:35.819Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_045",
+          "asgn_lead_confinement_authority_implementation_op_046",
+          "asgn_lead_confinement_authority_implementation_op_047",
+          "asgn_lead_confinement_authority_implementation_op_048"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_046",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_046_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p03c",
+        "sessionId": "confinement-authority-implementation--p03c",
+        "createdAt": "2026-09-10T15:01:11.606Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_049",
+          "asgn_lead_confinement_authority_implementation_op_050"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_049",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_049_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p04",
+        "sessionId": "confinement-authority-implementation--p04",
+        "createdAt": "2026-09-10T15:23:07.483Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_051",
+          "asgn_lead_confinement_authority_implementation_op_052",
+          "asgn_lead_confinement_authority_implementation_op_053",
+          "asgn_lead_confinement_authority_implementation_op_054",
+          "asgn_lead_confinement_authority_implementation_op_055",
+          "asgn_lead_confinement_authority_implementation_op_056",
+          "asgn_lead_confinement_authority_implementation_op_057",
+          "asgn_lead_confinement_authority_implementation_op_058",
+          "asgn_lead_confinement_authority_implementation_op_059",
+          "asgn_lead_confinement_authority_implementation_op_060"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_051",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_051_01"
+            },
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_052",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_052_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_053",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_053_01"
+            },
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_054",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_054_01"
+            }
+          ],
+          "late": [],
+          "missing": [],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p04-fix3b",
+        "sessionId": "confinement-authority-implementation--p04-fix3b",
+        "createdAt": "2026-09-10T18:01:54.504Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_061",
+          "asgn_lead_confinement_authority_implementation_op_062"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_061",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_061_01"
+            }
+          ],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p04-fix3c",
+        "sessionId": "confinement-authority-implementation--p04-fix3c",
+        "createdAt": "2026-09-10T18:43:00.154Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_063",
+          "asgn_lead_confinement_authority_implementation_op_064"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [],
+          "failed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_063",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_063_01"
+            }
+          ],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "reviewer"
+            },
+            {
+              "actorId": "red-team"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p05",
+        "sessionId": "confinement-authority-implementation--p05",
+        "createdAt": "2026-09-10T19:29:44.301Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_065",
+          "asgn_lead_confinement_authority_implementation_op_066",
+          "asgn_lead_confinement_authority_implementation_op_067",
+          "asgn_lead_confinement_authority_implementation_op_068",
+          "asgn_lead_confinement_authority_implementation_op_069",
+          "asgn_lead_confinement_authority_implementation_op_070",
+          "asgn_lead_confinement_authority_implementation_op_071",
+          "asgn_lead_confinement_authority_implementation_op_072",
+          "asgn_lead_confinement_authority_implementation_op_073",
+          "asgn_lead_confinement_authority_implementation_op_074"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_066",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_066_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_067",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_067_01"
+            }
+          ],
+          "failed": [
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_068",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_068_01"
+            }
+          ],
+          "late": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_065"
+            }
+          ],
+          "missing": [],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p05-fix3-recheck",
+        "sessionId": "confinement-authority-implementation--p05-fix3-recheck",
+        "createdAt": "2026-09-10T21:31:59.637Z",
+        "status": "partial",
+        "phase": "partially-complete",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-revision",
+            "operationId": "revise-candidate",
+            "actorId": "fixer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_075",
+          "asgn_lead_confinement_authority_implementation_op_076"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_075",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_075_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_076",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_076_01"
+            }
+          ],
+          "failed": [],
+          "late": [],
+          "missing": [
+            {
+              "actorId": "doer"
+            },
+            {
+              "actorId": "fixer"
+            }
+          ],
+          "replaced": []
+        }
+      },
+      {
+        "cellId": "p06",
+        "sessionId": "confinement-authority-implementation--p06",
+        "createdAt": "2026-09-10T21:49:16.634Z",
+        "status": "active",
+        "phase": "running",
+        "lastDisposition": null,
+        "pendingDriverAuthorizations": [
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "reviewer-recheck",
+            "actorId": "reviewer"
+          },
+          {
+            "nodeId": "phase-recheck",
+            "operationId": "red-team-recheck",
+            "actorId": "red-team"
+          }
+        ],
+        "assignmentRefs": [
+          "asgn_lead_confinement_authority_implementation_op_077",
+          "asgn_lead_confinement_authority_implementation_op_078",
+          "asgn_lead_confinement_authority_implementation_op_079",
+          "asgn_lead_confinement_authority_implementation_op_080"
+        ],
+        "quorum": {
+          "requiredActorIds": [
+            "doer",
+            "reviewer",
+            "red-team",
+            "fixer"
+          ],
+          "completed": [
+            {
+              "actorId": "doer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_077",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_077_01"
+            },
+            {
+              "actorId": "red-team",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_079",
+              "runId": "run_asgn_lead_confinement_authority_implementation_op_079_01"
+            }
+          ],
+          "failed": [],
+          "late": [
+            {
+              "actorId": "reviewer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_078"
+            },
+            {
+              "actorId": "fixer",
+              "assignmentId": "asgn_lead_confinement_authority_implementation_op_080"
+            }
+          ],
+          "missing": [],
+          "replaced": []
+        }
+      }
+    ],
+    "activeCell": "p06",
+    "nextAction": "Cell \"p06\" (session \"confinement-authority-implementation--p06\") has 2 declared operation(s) still awaiting driver authorization: phase-recheck/reviewer-recheck, phase-recheck/red-team-recheck. Run `fgos coordination show confinement-authority-implementation--p06` for detail."
+  }
+}

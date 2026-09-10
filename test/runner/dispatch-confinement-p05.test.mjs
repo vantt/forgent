@@ -20,6 +20,7 @@ import {
   normalizeLegacyConfinement,
 } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { establishConfinement } from "../../src/runner/dispatch/herdr-round.mjs";
+import { evaluateBypassPairing } from "../../src/runner/dispatch/confinement/bypass-pairing.mjs";
 import { checkConfinementHerdrMaturity } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 
@@ -366,6 +367,195 @@ test("R5: permissionMode: 'bypass' with full v1 controls passes pre-adapter gate
   assert.equal(res.status, "completed");
 
   fs.rmSync(runDir, { recursive: true, force: true });
+});
+
+test("R5: direct establishConfinement with permissionMode: 'bypass' and only ownWorktree hard-refuses via evaluateBypassPairing", async () => {
+  const tmpBase = mkTemp("p05-direct-bypass-");
+  const repoRoot = path.join(tmpBase, "repo");
+  const cwd = path.join(repoRoot, "worktree");
+  fs.mkdirSync(cwd, { recursive: true });
+
+  const mockRound = {
+    workId: "w-direct-bypass-incomplete",
+    agentName: "worker-direct-bypass",
+    note: () => {},
+    fail: (errorClass, reason, message) => {
+      const err = new Error(message);
+      err.errorClass = errorClass;
+      err.reason = reason;
+      return err;
+    },
+  };
+
+  await assert.rejects(
+    () =>
+      establishConfinement({
+        confinement: { ownWorktree: true },
+        round: mockRound,
+        fullEnv: { HOME: os.homedir() },
+        cwd,
+        repoRoot,
+        permissionMode: "bypass",
+      }),
+    (err) => {
+      assert.equal(err.errorClass, "invalid-config");
+      assert.equal(err.reason, "bypass-confinement-incomplete");
+      assert.match(err.message, /permissionMode "bypass" requires full confinement/);
+      assert.match(err.message, /home: private \(privateHome\)/);
+      assert.match(err.message, /session: isolated \(isolatedSession\)/);
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpBase, { recursive: true, force: true });
+});
+
+test("R5: direct establishConfinement with permissionMode: 'bypass' and only v1 controls.workspace='own' hard-refuses via evaluateBypassPairing", async () => {
+  // Same incomplete-pairing scenario as the legacy-flag test above, but
+  // expressed as confinement-policy.v1-shaped input (controls.workspace)
+  // instead of the legacy ownWorktree flag, to prove both input shapes are
+  // refused identically at this entry point.
+  const tmpBase = mkTemp("p05-direct-bypass-v1-");
+  const repoRoot = path.join(tmpBase, "repo");
+  const cwd = path.join(repoRoot, "worktree");
+  fs.mkdirSync(cwd, { recursive: true });
+
+  const mockRound = {
+    workId: "w-direct-bypass-v1-incomplete",
+    agentName: "worker-direct-bypass-v1",
+    note: () => {},
+    fail: (errorClass, reason, message) => {
+      const err = new Error(message);
+      err.errorClass = errorClass;
+      err.reason = reason;
+      return err;
+    },
+  };
+
+  await assert.rejects(
+    () =>
+      establishConfinement({
+        confinement: {
+          contract: "confinement-policy.v1",
+          controls: { workspace: "own" }, // incomplete: no home/session controls
+        },
+        round: mockRound,
+        fullEnv: { HOME: os.homedir() },
+        cwd,
+        repoRoot,
+        permissionMode: "bypass",
+      }),
+    (err) => {
+      assert.equal(err.errorClass, "invalid-config");
+      assert.equal(err.reason, "bypass-confinement-incomplete");
+      assert.match(err.message, /permissionMode "bypass" requires full confinement/);
+      assert.match(err.message, /home: private \(privateHome\)/);
+      assert.match(err.message, /session: isolated \(isolatedSession\)/);
+      // controls.workspace: "own" must be recognized as satisfying ownWorktree,
+      // so "workspace: own (ownWorktree)" must NOT be listed as missing.
+      assert.doesNotMatch(err.message, /workspace: own \(ownWorktree\)/);
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpBase, { recursive: true, force: true });
+});
+
+test("R5: evaluateBypassPairing table test covers valid and invalid pairings", () => {
+  // 1. Non-bypass cases always pass regardless of controls
+  assert.deepEqual(
+    evaluateBypassPairing({
+      isBypass: false,
+      hasOwnWorktree: false,
+      hasPrivateHome: false,
+      hasIsolatedSession: false,
+    }),
+    { satisfied: true, missing: [] },
+  );
+  assert.deepEqual(
+    evaluateBypassPairing({
+      isBypass: false,
+      hasOwnWorktree: true,
+      hasPrivateHome: false,
+      hasIsolatedSession: true,
+    }),
+    { satisfied: true, missing: [] },
+  );
+
+  // 2. Complete valid pairing passes under bypass
+  assert.deepEqual(
+    evaluateBypassPairing({
+      isBypass: true,
+      hasOwnWorktree: true,
+      hasPrivateHome: true,
+      hasIsolatedSession: true,
+    }),
+    { satisfied: true, missing: [] },
+  );
+
+  // 3. Each incomplete/invalid pairing shape under bypass
+  const invalidCases = [
+    {
+      name: "missing all controls",
+      input: { isBypass: true, hasOwnWorktree: false, hasPrivateHome: false, hasIsolatedSession: false },
+      expectedMissing: [
+        "home: private (privateHome)",
+        "session: isolated (isolatedSession)",
+        "workspace: own (ownWorktree)",
+      ],
+    },
+    {
+      name: "only ownWorktree (missing home and session)",
+      input: { isBypass: true, hasOwnWorktree: true, hasPrivateHome: false, hasIsolatedSession: false },
+      expectedMissing: [
+        "home: private (privateHome)",
+        "session: isolated (isolatedSession)",
+      ],
+    },
+    {
+      name: "only privateHome (missing session and workspace)",
+      input: { isBypass: true, hasOwnWorktree: false, hasPrivateHome: true, hasIsolatedSession: false },
+      expectedMissing: [
+        "session: isolated (isolatedSession)",
+        "workspace: own (ownWorktree)",
+      ],
+    },
+    {
+      name: "only isolatedSession (missing home and workspace)",
+      input: { isBypass: true, hasOwnWorktree: false, hasPrivateHome: false, hasIsolatedSession: true },
+      expectedMissing: [
+        "home: private (privateHome)",
+        "workspace: own (ownWorktree)",
+      ],
+    },
+    {
+      name: "missing session only",
+      input: { isBypass: true, hasOwnWorktree: true, hasPrivateHome: true, hasIsolatedSession: false },
+      expectedMissing: [
+        "session: isolated (isolatedSession)",
+      ],
+    },
+    {
+      name: "missing home only",
+      input: { isBypass: true, hasOwnWorktree: true, hasPrivateHome: false, hasIsolatedSession: true },
+      expectedMissing: [
+        "home: private (privateHome)",
+      ],
+    },
+    {
+      name: "missing workspace only",
+      input: { isBypass: true, hasOwnWorktree: false, hasPrivateHome: true, hasIsolatedSession: true },
+      expectedMissing: [
+        "workspace: own (ownWorktree)",
+      ],
+    },
+  ];
+
+  for (const c of invalidCases) {
+    const result = evaluateBypassPairing(c.input);
+    assert.equal(result.satisfied, false, `case "${c.name}" must not be satisfied`);
+    assert.deepEqual(result.missing, c.expectedMissing, `case "${c.name}" missing mismatch`);
+  }
 });
 
 // ─── R6: No OS Confinement Overclaim for herdr Routes ──────────────────────────

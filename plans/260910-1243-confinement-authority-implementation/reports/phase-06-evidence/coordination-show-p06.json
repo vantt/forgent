@@ -1,0 +1,116 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-10T22:38:39.341Z",
+  "data_hash": "c5cf0a281271af0916ba90b9be23a3d385fc9afc78dc7284e32d72f19c5bcb4b",
+  "data": {
+    "coordinationId": "confinement-authority-implementation--p06",
+    "status": "active",
+    "phase": "running",
+    "objective": "Implement cell P06 of the confinement-authority-implementation track: Group-thinking coding dogfood proof (Requirements R1-R7). Source plan/artifact: plans/260910-1243-confinement-authority-implementation/phase-06-group-thinking-coding-dogfood-proof.md (read it in full first) and docs/specs/confinement-authority.md. This cell's goal is DIFFERENT from P00-P05: it is not primarily a code-change cell, it is a PROOF that this track's own coordination mechanism genuinely works end-to-end with real cross-provider dispatch, real confinement enforcement (not just observation), a real fix round, and no Work-lifecycle coupling -- using a small, real, low-risk piece of actual coding work as the vehicle. This proof directly answers the operator's own standing requirement: verify that the group-thinking/panel executor configuration (agy-herdr, claude-reviewer-herdr, codex-herdr) is confinement-compliant via REAL live dispatch tests, not mocked/unit tests -- your final report must explicitly address this.",
+    "definitionRef": {
+      "id": "core.coordination-protocol.standalone-master-coordination-loop",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "createdAt": "2026-09-10T21:49:16.634Z",
+    "completedAt": null,
+    "provenanceRoot": {
+      "writerId": "lead-confinement-authority-implementation"
+    },
+    "actors": [
+      {
+        "id": "doer",
+        "role": "doer"
+      },
+      {
+        "id": "reviewer",
+        "role": "reviewer"
+      },
+      {
+        "id": "red-team",
+        "role": "red-team"
+      },
+      {
+        "id": "fixer",
+        "role": "fixer"
+      }
+    ],
+    "assignmentRefs": [
+      "asgn_lead_confinement_authority_implementation_op_077",
+      "asgn_lead_confinement_authority_implementation_op_078",
+      "asgn_lead_confinement_authority_implementation_op_079",
+      "asgn_lead_confinement_authority_implementation_op_080"
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 7200000,
+      "maxAssignments": 20,
+      "maxConcurrency": 4,
+      "maxRounds": 20,
+      "maxTaskDepth": 3
+    },
+    "partialPolicy": null,
+    "quorum": {
+      "requiredActorIds": [
+        "doer",
+        "reviewer",
+        "red-team",
+        "fixer"
+      ],
+      "completed": [
+        {
+          "actorId": "doer",
+          "assignmentId": "asgn_lead_confinement_authority_implementation_op_077",
+          "runId": "run_asgn_lead_confinement_authority_implementation_op_077_01"
+        },
+        {
+          "actorId": "red-team",
+          "assignmentId": "asgn_lead_confinement_authority_implementation_op_079",
+          "runId": "run_asgn_lead_confinement_authority_implementation_op_079_01"
+        }
+      ],
+      "failed": [],
+      "late": [
+        {
+          "actorId": "reviewer",
+          "assignmentId": "asgn_lead_confinement_authority_implementation_op_078"
+        },
+        {
+          "actorId": "fixer",
+          "assignmentId": "asgn_lead_confinement_authority_implementation_op_080"
+        }
+      ],
+      "missing": [],
+      "replaced": []
+    },
+    "eventCount": 12,
+    "authorizations": [
+      {
+        "authorizationId": "auth_p06_fix1_revise",
+        "operationId": "revise-candidate",
+        "nodeId": "phase-revision",
+        "targetActorId": "fixer",
+        "consumed": true
+      }
+    ],
+    "ignoredAuthorizations": [],
+    "dispositions": [],
+    "pendingDriverAuthorizations": [
+      {
+        "nodeId": "phase-recheck",
+        "operationId": "reviewer-recheck",
+        "actorId": "reviewer"
+      },
+      {
+        "nodeId": "phase-recheck",
+        "operationId": "red-team-recheck",
+        "actorId": "red-team"
+      }
+    ],
+    "aggregations": [],
+    "ignoredAggregations": [],
+    "specialistAuthorizations": [],
+    "ignoredSpecialistAuthorizations": [],
+    "humanTurns": [],
+    "ignoredHumanTurns": []
+  }
+}
