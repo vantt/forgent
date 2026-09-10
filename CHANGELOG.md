@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Confinement Authority Phase 04: Required Enforcement, Executor Migration, and Fail-Open Closures (docs/specs/confinement-authority.md):
+  - R1 Refusal Gates: required policy dispatches refuse cleanly before spawn with zero adapter calls for 7 canonical failure conditions: missing backend (`confinement-backend-missing`), disabled backend (`confinement-backend-disabled`), unsupported control/backend (`confinement-unsupported`), stale probe failure (`confinement-probe-failed`), invalid grant (`confinement-grant-invalid`), unsatisfied resource need (`confinement-need-unsatisfied`), and prepared claims mismatching the assessed plan (`confinement-plan-mismatch`).
+  - R2 Preferred Mode Guard: preferred confinement mode is cleanly refused before spawn with `confinement-mode-unsupported` to prevent silent unconfined execution.
+  - R3 Explicit Unconfined Attestation: explicit `unconfined` policy produces audited attestation with `backend: null`, `outcome: 'unconfined'`, and `explicit-opt-out` evidence.
+  - R4/R5 Executor Migration: added a migration fixture for `claude-bwrap`, `agy-bwrap`, and `codex-bwrap` showing declarative `confinement.backend: 'bwrap'` and capability policy without hardcoded sandbox argv, while preserving executor IDs.
+  - R6 Fail-Open Closures: closed F-a (structural enforcement guarantees cli-spawn cannot dispatch unconfined under required policy), F-b (invocation confinement override validation strictly forbids adding grants, lowering controls, changing policy, or flipping mode), F-c (capability fallback preserves a distinct resolved anchor and its confinement policy), and F-d (only actual private-home or isolated-session provisioning is reported as `confined`).
+  - R7 Default Capability Slots: declared explicit interim `unconfined` confinement policies for `advise`, `code:review`, `code:debug`, `execute`, `code:implement`, `code:test`, and `code:refactor` until a supported backend path is configured.
+
 - Required Confinement Authority dispatches now refuse unless every non-optional control and grant has `satisfied` coverage, reject malformed policy controls at the request door, and attach a current local-bwrap falsification-probe fingerprint before reporting `enforced`. The built-in optional executor-credentials grant remains honestly `unverified` without degrading an otherwise verified dispatch.
 
 - One-Door Confinement Authority runtime and observe mode (Phase 02, docs/specs/confinement-authority.md): introduced `src/runner/dispatch/confinement/authority.mjs` with `executeThroughConfinement()` as the single runtime execution door to executor adapters (`cli-spawn`, `herdr-spawn`, `http`), closing the `EXECUTOR_ADAPTERS` export leak from `src/runner/dispatch.mjs`. Added canonical `confinement-request.v1` construction (`src/runner/dispatch/confinement/request.mjs`) at the dispatch seam after executor resolution and `runDir` allocation. Routed both `spawnWorker` and `executeExecutorCli` through the Authority facade. Confinement execution attaches a structured attestation to `ExecutorResult`, tagging legacy omitted policies as `unknown`/`unconfined` in observe mode. In-process Agent/Task dispatches receive `authorityScope: 'external-harness'` with null attestation and fail-closed if required confinement is configured without a trusted harness attestation contract. Added static AST/import analysis (`test/architecture.test.mjs`) ensuring `EXECUTOR_ADAPTERS` call sites remain confined to `authority.mjs`.
@@ -121,6 +129,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when one exists.
 
 ### Fixed
+
+- Confinement Authority now rejects contradictory unconfined requests that
+  retain a policy, ignores invocation-supplied backend selection, and rejects
+  no-base control/network overrides. Capability defaults that lack a wired
+  backend use an explicitly documented interim unconfined posture; preferred
+  confinement continues to refuse before spawn until a supported backend path
+  is available.
 
 - Confinement Authority now fails closed for every adapter except the proven
   `cli-spawn` prepared-sandbox consumer, preventing HTTP and future adapters

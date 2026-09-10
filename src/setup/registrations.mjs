@@ -1683,6 +1683,9 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   advise: {
     description:
       'Async product-decision consult -- value comes from disagreement, never changes state, one question/one answer (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+    // Interim posture: P06 must first wire a production backend binding.
+    // Required here would otherwise universally refuse group-thinking.
+    confinement: { mode: 'unconfined' },
   },
   execute: {
     description:
@@ -1699,6 +1702,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   'code:review': {
     description:
       'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'unconfined' },
   },
   'code:test': {
     description:
@@ -1707,6 +1711,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   'code:debug': {
     description:
       'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    confinement: { mode: 'unconfined' },
   },
   'code:refactor': {
     description:
@@ -3904,5 +3909,3 @@ registerCheck({
   description: 'strict confinement readiness (all capabilities declared with known policies, bwrap ready)',
   check: (cwd) => checkConfinementStrictReadiness(cwd),
 });
-
-

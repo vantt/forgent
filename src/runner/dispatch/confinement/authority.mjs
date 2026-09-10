@@ -332,6 +332,14 @@ export function buildConfinementAttestation({
       freshness: "current",
     });
   }
+  if (isExplicitUnconfined) {
+    evidence.push({
+      kind: "explicit-opt-out",
+      ref: "policy:unconfined",
+      detail: "explicit unconfined policy declared; running unconfined with audited opt-out",
+      freshness: "current",
+    });
+  }
 
   const attestation = {
     contract: "confinement-attestation.v1",
@@ -399,7 +407,30 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     };
   }
 
-  // R7 / Phase 02 Observe Mode / Phase 03 Backend Resolution:
+  // R2: Preferred mode stays disabled / explicitly bounded; never silently runs unconfined;
+  // cleanly refuses before spawn with named reason (confinement-mode-unsupported).
+  if (request.requirement?.mode === "preferred") {
+    const refusedAttestation = buildConfinementAttestation({
+      request,
+      phase: "refused",
+      outcome: "refused",
+    });
+    saveAttestationRecord(refusedAttestation, request.context);
+    throw new DispatchError(
+      "confinement-mode-unsupported",
+      `preferred confinement mode is disabled / unsupported in this phase; refusing dispatch cleanly before spawn.`,
+      {
+        contract: "confinement-execution.v1",
+        status: "refused",
+        dispatchId: request.dispatchId,
+        capability: request.capability,
+        requirement: request.requirement,
+        attestation: refusedAttestation,
+      },
+    );
+  }
+
+  // Phase 04 Required Enforcement & Backend Resolution:
   let backendInstance = null;
   let driver = null;
   let backendPlan = null;
@@ -408,6 +439,27 @@ export async function executeThroughConfinement(request, adapterPort = null) {
 
   if (request.backendId) {
     const registryDoc = loadMachineBackendRegistry();
+    const rawInstance = registryDoc?.confinementBackends?.[request.backendId];
+    if (rawInstance && rawInstance.enabled === false) {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-backend-disabled",
+        `confinement backend instance "${request.backendId}" is disabled in machine registry.`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
     const snapshot = createBackendRegistrySnapshot(registryDoc);
     backendInstance = snapshot.resolve(request.backendId);
     if (!backendInstance) {
@@ -418,8 +470,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       });
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
-        "confinement-backend-unknown",
-        `confinement backend instance "${request.backendId}" not found or disabled in machine registry.`,
+        "confinement-backend-missing",
+        `confinement backend instance "${request.backendId}" not found in machine registry.`,
         {
           contract: "confinement-execution.v1",
           status: "refused",
@@ -434,6 +486,27 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   }
 
   if (request.requirement?.mode === "required") {
+    if (!request.backendId) {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-backend-missing",
+        `required confinement refused for capability "${request.capability}": no confinement backend specified.`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+
     if (!backendInstance || !driver) {
       const refusedAttestation = buildConfinementAttestation({
         request,
@@ -442,8 +515,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       });
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
-        "confinement-unsupported",
-        `required confinement refused for capability "${request.capability}": no confinement backend available in observe mode.`,
+        "confinement-backend-missing",
+        `required confinement refused for capability "${request.capability}": backend "${request.backendId}" unavailable.`,
         {
           contract: "confinement-execution.v1",
           status: "refused",
@@ -507,8 +580,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       });
       applyBackendPlanToAttestation(refusedAttestation, backendPlan);
       saveAttestationRecord(refusedAttestation, request.context);
+      const primaryMismatch = assessment.mismatches[0] || {};
+      const errorCode = primaryMismatch.code || "confinement-unsupported";
       throw new DispatchError(
-        "confinement-unsupported",
+        errorCode,
         `required confinement refused for capability "${request.capability}": ${assessment.mismatches.map((m) => m.detail).join("; ")}`,
         {
           contract: "confinement-execution.v1",
@@ -538,6 +613,53 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     backendPlan.probe = probe;
 
     preparedConfinement = await driver.prepare(backendPlan, request, backendInstance);
+
+    // Verify prepared claims match plan coverage (R1: prepared claims mismatch the plan)
+    let claimsMismatch = false;
+    if (!preparedConfinement?.claims) {
+      claimsMismatch = true;
+    } else {
+      for (const [key, expected] of Object.entries(backendPlan.coverage || {})) {
+        if (preparedConfinement.claims[key] !== expected) {
+          claimsMismatch = true;
+          break;
+        }
+      }
+      if (!claimsMismatch) {
+        for (const key of Object.keys(preparedConfinement.claims)) {
+          if (!(key in (backendPlan.coverage || {}))) {
+            claimsMismatch = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (claimsMismatch) {
+      if (preparedConfinement?.cleanup) {
+        try { await preparedConfinement.cleanup(); } catch {}
+      }
+      const refusedAttestation = buildConfinementAttestation({ request, phase: "refused", outcome: "refused" });
+      applyBackendPlanToAttestation(refusedAttestation, backendPlan);
+      refusedAttestation.mismatches.push({
+        code: "confinement-plan-mismatch",
+        detail: "prepared confinement claims mismatch the assessed plan coverage.",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "confinement-plan-mismatch",
+        `prepared confinement claims mismatch the assessed plan coverage for capability "${request.capability}".`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+
     const prepAttestation = buildConfinementAttestation({
       request,
       phase: "prepared",

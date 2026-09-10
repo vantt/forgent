@@ -895,6 +895,10 @@ prepared invocation. Detector:
 | `confinement-policy-missing` | capability không có quyết định tường minh | refuse trong strict mode |
 | `confinement-backend-registry-forbidden` | project config cố định nghĩa/override machine backend | config error |
 | `confinement-backend-unknown` | backend instance không có trong machine registry hoặc driver type không ở allowlist | config error |
+| `confinement-backend-missing` | required dispatch không có backend instance được executor chọn, hoặc instance không resolve được | refuse trước spawn |
+| `confinement-backend-disabled` | backend instance được chọn nhưng bị machine registry vô hiệu hóa | refuse trước spawn |
+| `confinement-mode-unsupported` | mode `preferred` chưa có backend path được hỗ trợ trong phase hiện tại | refuse trước spawn |
+| `confinement-need-unsatisfied` | resource need bắt buộc không được plan/backend đáp ứng | refuse trước spawn |
 | `confinement-unsupported` | host/backend không đáp ứng required control | refuse trước spawn |
 | `confinement-grant-invalid` | resource không tồn tại, path thoát boundary, access sai | refuse trước spawn |
 | `confinement-plan-mismatch` | prepared claims khác plan | refuse trước spawn |

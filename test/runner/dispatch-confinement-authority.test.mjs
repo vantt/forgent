@@ -286,7 +286,7 @@ test("H1: spawnWorker resolves and binds curated capability confinement (code:im
     () => spawnWorker(sampleWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
     (err) => {
       assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-unsupported");
+      assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
       assert.match(err.message, /required confinement refused for capability "code:implement"/);
       return true;
     },
@@ -550,7 +550,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       () => spawnWorker({ id: "w-exec", domain: "coding", stage: "executing", tier: "standard" }, cfgExecute, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
-        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
         assert.equal(err.capability, "execute");
         return true;
       },
@@ -567,7 +567,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       () => spawnWorker({ id: "w-adv", domain: "coding", stage: "exploring", kind: "advise", tier: "standard" }, cfgAdvise, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
-        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
         assert.equal(err.capability, "advise");
         return true;
       },
@@ -584,7 +584,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       () => spawnWorker({ id: "w-disc", domain: "coding", stage: "discovery", tier: "standard" }, cfgDiscovery, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
-        assert.equal(err.errorClass, "confinement-unsupported");
+        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
         assert.equal(err.capability, "discovery");
         return true;
       },

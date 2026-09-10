@@ -267,7 +267,7 @@ export function assessBwrap(request, backend) {
     if (!res) {
       readiness[need.resource] = 'unsatisfied';
       mismatches.push({
-        code: 'confinement-grant-invalid',
+        code: 'confinement-need-unsatisfied',
         detail: `required resource need "${need.resource}" could not be resolved.`,
       });
     } else {

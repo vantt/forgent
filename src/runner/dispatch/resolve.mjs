@@ -480,7 +480,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
  *    Never depends on array ordering in `executor.for`.
  * 5. No speculative reads of `work?.capability` or `opts.capability` (LOW-1).
  */
-export function resolveCapabilityIdentity({
+export function resolveCapabilityIdentityDetails({
   cfg,
   work,
   stage,
@@ -501,9 +501,9 @@ export function resolveCapabilityIdentity({
     return name;
   }
 
-  if (purpose && typeof purpose === 'string' && purpose.trim()) {
-    return resolveAlias(purpose.trim());
-  }
+  const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()
+    ? resolveAlias(purpose.trim())
+    : null;
 
   const domain = resolveDomainName(work?.domain);
   const domainObj = DOMAINS[domain];
@@ -571,8 +571,12 @@ export function resolveCapabilityIdentity({
     .map((c) => resolveAlias(c))
     .filter(Boolean);
 
-  if (normalizedCandidates.length === 0) {
-    return stageSkill ?? executorId ?? '(unknown-capability)';
+  // An explicitly requested purpose remains the dispatched capability.  The
+  // other candidates still matter: if that generic purpose has no policy,
+  // they retain the concrete capability from which confinement can inherit.
+  let capability = explicitPurpose;
+  if (!capability && normalizedCandidates.length === 0) {
+    capability = stageSkill ?? executorId ?? '(unknown-capability)';
   }
 
   // Order-independent resolution rule:
@@ -580,34 +584,51 @@ export function resolveCapabilityIdentity({
   const requiredCandidates = normalizedCandidates.filter(
     (c) => capabilities[c]?.confinement?.mode === 'required',
   );
-  if (requiredCandidates.length > 0) {
+  if (!capability && requiredCandidates.length > 0) {
     requiredCandidates.sort();
-    return requiredCandidates[0];
+    capability = requiredCandidates[0];
   }
 
   // 2. Any candidate with configured confinement wins next
   const configuredConfinementCandidates = normalizedCandidates.filter(
     (c) => Boolean(capabilities[c]?.confinement),
   );
-  if (configuredConfinementCandidates.length > 0) {
+  if (!capability && configuredConfinementCandidates.length > 0) {
     configuredConfinementCandidates.sort();
-    return configuredConfinementCandidates[0];
+    capability = configuredConfinementCandidates[0];
   }
 
   // 3. Prefer curated 'code:implement' if coding executing
-  if (domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement') && normalizedCandidates.includes('code:implement')) {
-    return 'code:implement';
+  if (!capability && domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement') && normalizedCandidates.includes('code:implement')) {
+    capability = 'code:implement';
   }
 
   // 4. Prefer registered capabilities in cfg.capabilities
   const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
-  if (registeredCandidates.length > 0) {
+  if (!capability && registeredCandidates.length > 0) {
     registeredCandidates.sort();
-    return registeredCandidates[0];
+    capability = registeredCandidates[0];
   }
 
-  // 5. Fallback: sorted candidates first
-  normalizedCandidates.sort();
-  return normalizedCandidates[0];
+  // 5. Fallback: sorted candidates first.
+  if (!capability) {
+    normalizedCandidates.sort();
+    capability = normalizedCandidates[0];
+  }
+
+  // Preserve the actual configured capability that a generic selected
+  // identity came from.  `buildConfinementRequest` only uses this when the
+  // selected capability and stage skill have no policy of their own.
+  const policyAnchors = normalizedCandidates
+    .filter((candidate) => candidate !== capability && capabilities[candidate]?.confinement);
+  const requiredAnchors = policyAnchors.filter(
+    (candidate) => capabilities[candidate]?.confinement?.mode === 'required',
+  ).sort();
+  const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
+
+  return { capability, anchorCapability };
 }
 
+export function resolveCapabilityIdentity(args = {}) {
+  return resolveCapabilityIdentityDetails(args).capability;
+}
