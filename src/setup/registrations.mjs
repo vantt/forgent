@@ -1065,19 +1065,29 @@ registerFix({
   fix: () => fixAgyPermissionsConfigured(),
 });
 
-export function checkBwrapAvailable() {
+let cachedBwrapResult = null;
+
+export function checkBwrapAvailable(binary = 'bwrap') {
+  if (binary === 'bwrap' && cachedBwrapResult) {
+    return cachedBwrapResult;
+  }
+  let res;
   try {
-    execFileSync('bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
-    return {
+    execFileSync(binary, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+    res = {
       passed: true,
-      message: 'bwrap is available on PATH and smoke test (bwrap --ro-bind / / -- true) passed',
+      message: `${binary} is available on PATH and smoke test (bwrap --ro-bind / / -- true) passed`,
     };
   } catch (err) {
-    return {
+    res = {
       passed: false,
-      message: `bwrap is unavailable or failed smoke test: ${err.message}`,
+      message: `${binary} is unavailable or failed smoke test: ${err.message}`,
     };
   }
+  if (binary === 'bwrap') {
+    cachedBwrapResult = res;
+  }
+  return res;
 }
 
 registerCheck({
@@ -3408,12 +3418,14 @@ export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.cl
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
 export function checkExecutorConfinement(runnerCfg = {}) {
-  const flags = ['privateHome', 'isolatedSession', 'ownWorktree'];
   const offenders = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     if (executor?.permissionMode !== 'bypass') continue;
     const c = executor.confinement ?? {};
-    const missing = flags.filter((f) => c[f] !== true);
+    const missing = [];
+    if (!(c.privateHome === true || c.controls?.home === 'private')) missing.push('privateHome');
+    if (!(c.isolatedSession === true || c.controls?.session === 'isolated')) missing.push('isolatedSession');
+    if (!(c.ownWorktree === true || c.controls?.workspace === 'own')) missing.push('ownWorktree');
     if (missing.length > 0) offenders.push(`${id} (missing ${missing.join(', ')})`);
   }
   if (offenders.length === 0) {
@@ -3596,9 +3608,9 @@ export function checkConfinementPoliciesDeclared(cwd) {
   const missingAnchors = [];
   for (const [name, cap] of Object.entries(runner.capabilities)) {
     if (!cap || typeof cap !== 'object') continue;
-    if (!cap.confinement && cap.unconfined !== true) {
+    if (!cap.confinement) {
       missingAnchors.push(name);
-    } else if (cap.confinement?.mode === 'unconfined' || cap.unconfined === true) {
+    } else if (cap.confinement?.mode === 'unconfined') {
       continue;
     } else if (cap.confinement?.policy) {
       const policyId = cap.confinement.policy;
@@ -3682,15 +3694,22 @@ export function fixConfinementBackendRegistryReadable() {
       // Re-create default registry if malformed
     }
   }
-  const res = ensureMachineBackendRegistryDefaults(regPath);
-  return {
-    changed: res.created || res.changed,
-    message: res.created
-      ? `created default machine backend registry at ${res.path}`
-      : res.changed
-        ? `repaired machine backend registry at ${res.path}`
-        : `machine backend registry already valid at ${res.path}`,
-  };
+  try {
+    const res = ensureMachineBackendRegistryDefaults(regPath);
+    return {
+      changed: Boolean(res.created || res.changed),
+      message: res.message ?? (res.created
+        ? `created default machine backend registry at ${res.path}`
+        : res.changed
+          ? `repaired machine backend registry at ${res.path}`
+          : `machine backend registry already valid at ${res.path}`),
+    };
+  } catch (err) {
+    return {
+      changed: false,
+      message: `skipped -- ${err.message}`,
+    };
+  }
 }
 
 registerCheck({
@@ -3711,7 +3730,7 @@ export function checkConfinementBwrapPlatform() {
   } catch (err) {
     return {
       passed: false,
-      message: `bwrap backend status: not configured (machine registry not readable: ${err.message})`,
+      message: `bwrap backend status: machine registry not readable or malformed (${err.message})`,
     };
   }
 
@@ -3738,12 +3757,11 @@ export function checkConfinementBwrapPlatform() {
   }
 
   const binaryPath = bwrapBackend.executable || 'bwrap';
-  try {
-    execFileSync(binaryPath, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
-  } catch (err) {
+  const probe = checkBwrapAvailable(binaryPath);
+  if (!probe.passed) {
     return {
       passed: false,
-      message: `bwrap backend status: unavailable (binary "${binaryPath}" failed smoke test: ${err.message})`,
+      message: `bwrap backend status: unavailable (binary "${binaryPath}" failed smoke test: ${probe.message})`,
     };
   }
 
@@ -3794,7 +3812,7 @@ export function checkConfinementStrictReadiness(cwd) {
         invalid.push(`capability "${name}" is malformed`);
         continue;
       }
-      if (cap.confinement?.mode === 'unconfined' || cap.unconfined === true) continue;
+      if (cap.confinement?.mode === 'unconfined') continue;
       const policyId = cap.confinement?.policy;
       if (!policyId) {
         missing.push(`capability "${name}" missing confinement policy`);

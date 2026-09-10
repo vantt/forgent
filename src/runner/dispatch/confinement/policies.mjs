@@ -8,6 +8,8 @@
 //   - validateOverrideConfinementShape: checks that invocation overrides only narrow/harden posture
 //   - normalizeLegacyConfinement: converts legacy {privateHome, isolatedSession, ownWorktree} to v1 controls
 
+import net from 'node:net';
+
 export class ConfinementPolicyError extends Error {
   constructor(message) {
     super(message);
@@ -98,6 +100,45 @@ export const GRANT_ACCESS_LEVELS = Object.freeze({
   read: 1,
 });
 
+function canonicalizeCidr(value, label) {
+  if (typeof value !== 'string' || !value.includes('/')) {
+    throw new ConfinementPolicyError(`runner config (${label}) invalid CIDR "${value}".`);
+  }
+  const parts = value.split('/');
+  if (parts.length !== 2) {
+    throw new ConfinementPolicyError(`runner config (${label}) invalid CIDR "${value}".`);
+  }
+  const [ipStr, prefixStr] = parts;
+  if (!/^\d+$/.test(prefixStr)) {
+    throw new ConfinementPolicyError(`runner config (${label}) invalid CIDR prefix "${prefixStr}".`);
+  }
+  const prefix = parseInt(prefixStr, 10);
+
+  const octets = ipStr.split('.');
+  if (octets.length === 4 && octets.every((o) => /^\d+$/.test(o))) {
+    if (prefix < 0 || prefix > 32) {
+      throw new ConfinementPolicyError(`runner config (${label}) IPv4 CIDR prefix must be between 0 and 32, got ${prefix}.`);
+    }
+    const nums = octets.map(Number);
+    if (nums.some((n) => n < 0 || n > 255)) {
+      throw new ConfinementPolicyError(`runner config (${label}) invalid IPv4 octet in "${value}".`);
+    }
+    const ip = ((nums[0] << 24) | (nums[1] << 16) | (nums[2] << 8) | nums[3]) >>> 0;
+    const mask = prefix === 0 ? 0 : (~0 << (32 - prefix)) >>> 0;
+    const canonIp = (ip & mask) >>> 0;
+    return `${(canonIp >>> 24) & 255}.${(canonIp >>> 16) & 255}.${(canonIp >>> 8) & 255}.${canonIp & 255}/${prefix}`;
+  }
+
+  if (net.isIPv6(ipStr)) {
+    if (prefix < 0 || prefix > 128) {
+      throw new ConfinementPolicyError(`runner config (${label}) IPv6 CIDR prefix must be between 0 and 128, got ${prefix}.`);
+    }
+    return `${ipStr.toLowerCase()}/${prefix}`;
+  }
+
+  throw new ConfinementPolicyError(`runner config (${label}) invalid CIDR "${value}".`);
+}
+
 /**
  * Closed schema validation for `NetworkFilterV1` (spec §6.1).
  */
@@ -121,6 +162,7 @@ export function validateNetworkFilterShape(filter, label = 'networkFilter') {
     throw new ConfinementPolicyError(`runner config (${label}) "allow" must be an array of allowlist rules.`);
   }
 
+  const seenRules = new Set();
   filter.allow.forEach((rule, idx) => {
     const ruleLabel = `${label}.allow[${idx}]`;
     if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
@@ -162,6 +204,17 @@ export function validateNetworkFilterShape(filter, label = 'networkFilter') {
       throw new ConfinementPolicyError(`runner config (${ruleLabel}.destination) DNS destination "${rule.destination.value}" must not contain wildcard "*".`);
     }
 
+    if (rule.destination.kind === 'cidr') {
+      const canonicalVal = canonicalizeCidr(rule.destination.value, `${ruleLabel}.destination`);
+      if (Object.isFrozen(rule.destination)) {
+        if (rule.destination.value !== canonicalVal) {
+          throw new ConfinementPolicyError(`runner config (${ruleLabel}.destination) CIDR must be canonical: got "${rule.destination.value}", expected "${canonicalVal}".`);
+        }
+      } else {
+        rule.destination.value = canonicalVal;
+      }
+    }
+
     if (!Array.isArray(rule.ports) || rule.ports.length === 0) {
       throw new ConfinementPolicyError(`runner config (${ruleLabel}) "ports" must be a non-empty array of port numbers.`);
     }
@@ -176,6 +229,13 @@ export function validateNetworkFilterShape(filter, label = 'networkFilter') {
       }
       seenPorts.add(p);
     }
+
+    const sortedPorts = [...rule.ports].sort((a, b) => a - b);
+    const ruleFingerprint = `${rule.protocol}:${rule.destination.kind}:${rule.destination.value}:${sortedPorts.join(',')}`;
+    if (seenRules.has(ruleFingerprint)) {
+      throw new ConfinementPolicyError(`runner config (${ruleLabel}) duplicate allow rule entry.`);
+    }
+    seenRules.add(ruleFingerprint);
   });
 }
 
@@ -434,6 +494,38 @@ export function validateOverrideConfinementShape(
     }
     validateNetworkFilterShape(override.networkFilter, `${label}.networkFilter`);
   }
+
+  if (override.networkFilter && basePolicy?.networkFilter) {
+    const baseRules = (basePolicy.networkFilter.allow || []).map((r) => ({
+      protocol: r.protocol,
+      kind: r.destination?.kind,
+      value: r.destination?.value,
+      ports: new Set(r.ports || []),
+    }));
+
+    for (const [idx, rule] of override.networkFilter.allow.entries()) {
+      const ruleLabel = `${label}.networkFilter.allow[${idx}]`;
+      const matchingBase = baseRules.find(
+        (b) =>
+          b.protocol === rule.protocol &&
+          b.kind === rule.destination.kind &&
+          b.value === rule.destination.value,
+      );
+      if (!matchingBase) {
+        throw new ConfinementPolicyError(
+          `runner config (${ruleLabel}) override cannot add rule with destination "${rule.destination.value}" (${rule.protocol}) not in base policy.`,
+        );
+      }
+      for (const p of rule.ports) {
+        if (!matchingBase.ports.has(p)) {
+          throw new ConfinementPolicyError(
+            `runner config (${ruleLabel}) override cannot add port ${p} not permitted by base policy.`,
+          );
+        }
+      }
+    }
+  }
+
   return override;
 }
 

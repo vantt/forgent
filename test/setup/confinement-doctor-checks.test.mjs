@@ -446,3 +446,35 @@ test('L2: doctor checks fail when runner config is not readable', () => {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('L-c: confinement-bwrap-platform distinguishes malformed registry from not configured', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-bwrap-malformed-'));
+  const regPath = path.join(dir, 'confinement-backends.json');
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
+
+  try {
+    fs.writeFileSync(regPath, '{ invalid json');
+    const res = checkConfinementBwrapPlatform();
+    assert.equal(res.passed, false);
+    assert.match(res.message, /machine registry not readable or malformed/);
+  } finally {
+    delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('N2: fixConfinementBackendRegistryReadable returns skipped contract on corrupt registry', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-doctor-bwrap-corrupt-'));
+  const regPath = path.join(dir, 'confinement-backends.json');
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
+
+  try {
+    fs.writeFileSync(regPath, 'not json', 'utf8');
+    const res = fixConfinementBackendRegistryReadable();
+    assert.equal(res.changed, false);
+    assert.match(res.message, /skipped -- cannot parse machine backend registry/);
+  } finally {
+    delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

@@ -243,7 +243,12 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
   try {
     existing = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
   } catch (err) {
-    throw new ConfinementBackendRegistryError(`cannot parse machine backend registry at "${registryPath}": ${err.message}`);
+    return {
+      created: false,
+      changed: false,
+      path: registryPath,
+      message: `skipped -- cannot parse machine backend registry at "${registryPath}": ${err.message}`,
+    };
   }
 
   const existingBackends = existing.confinementBackends && typeof existing.confinementBackends === 'object' && !Array.isArray(existing.confinementBackends)
@@ -253,10 +258,13 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
   let changed = false;
   const mergedBackends = { ...existingBackends };
 
-  for (const [key, defaultCfg] of Object.entries(DEFAULT_MACHINE_BACKEND_REGISTRY.confinementBackends)) {
-    if (mergedBackends[key] === undefined) {
-      mergedBackends[key] = defaultCfg;
-      changed = true;
+  // L-b: do not inject a default bwrap instance into a machine registry whose operator declared only custom instances
+  if (Object.keys(existingBackends).length === 0) {
+    for (const [key, defaultCfg] of Object.entries(DEFAULT_MACHINE_BACKEND_REGISTRY.confinementBackends)) {
+      if (mergedBackends[key] === undefined) {
+        mergedBackends[key] = defaultCfg;
+        changed = true;
+      }
     }
   }
 
@@ -276,7 +284,16 @@ export function ensureMachineBackendRegistryDefaults(registryPath = resolveMachi
     confinementBackends: mergedBackends,
   };
 
-  validateBackendRegistryShape(updated, registryPath);
+  try {
+    validateBackendRegistryShape(updated, registryPath);
+  } catch (err) {
+    return {
+      created: false,
+      changed: false,
+      path: registryPath,
+      message: `skipped -- cannot repair machine backend registry at "${registryPath}": ${err.message}`,
+    };
+  }
 
   if (changed) {
     fs.writeFileSync(registryPath, `${JSON.stringify(updated, null, 2)}\n`);

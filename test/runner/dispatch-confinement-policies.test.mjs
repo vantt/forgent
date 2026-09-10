@@ -492,7 +492,7 @@ test('M5: ensureMachineBackendRegistryDefaults strips unknown keys and stale con
     assert.equal(written.contract, 'confinement-backend-registry.v1');
     assert.equal(written.junkKey, undefined);
     assert.ok(written.confinementBackends.custom);
-    assert.ok(written.confinementBackends.bwrap);
+    assert.equal(written.confinementBackends.bwrap, undefined);
     assert.doesNotThrow(() => validateBackendRegistryShape(written));
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
@@ -640,3 +640,140 @@ test('Runner config rejects project-local confinementBackends definition', () =>
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// ─── Tests for L4, N3, N2, N1 ────────────────────────────────────────────────
+
+test('L4: validateNetworkFilterShape canonicalizes IPv4 CIDR values', () => {
+  const filter = {
+    defaultAction: 'deny',
+    allow: [
+      {
+        protocol: 'tcp',
+        destination: { kind: 'cidr', value: '10.0.0.1/8' },
+        ports: [443],
+      },
+    ],
+  };
+  validateNetworkFilterShape(filter);
+  assert.equal(filter.allow[0].destination.value, '10.0.0.0/8');
+});
+
+test('L4: validateNetworkFilterShape rejects syntactically invalid CIDRs', () => {
+  const invalidFilter = {
+    defaultAction: 'deny',
+    allow: [
+      {
+        protocol: 'tcp',
+        destination: { kind: 'cidr', value: 'not-a-cidr' },
+        ports: [443],
+      },
+    ],
+  };
+  assert.throws(
+    () => validateNetworkFilterShape(invalidFilter),
+    /invalid CIDR "not-a-cidr"/,
+  );
+});
+
+test('L4: validateNetworkFilterShape rejects duplicate allow-rule entries', () => {
+  const dupFilter = {
+    defaultAction: 'deny',
+    allow: [
+      {
+        protocol: 'tcp',
+        destination: { kind: 'cidr', value: '10.0.0.0/8' },
+        ports: [80, 443],
+      },
+      {
+        protocol: 'tcp',
+        destination: { kind: 'cidr', value: '10.0.0.0/8' },
+        ports: [443, 80],
+      },
+    ],
+  };
+  assert.throws(
+    () => validateNetworkFilterShape(dupFilter),
+    /duplicate allow rule entry/,
+  );
+});
+
+test('N3: validateOverrideConfinementShape rejects override adding broader CIDR or port set than base', () => {
+  const basePolicy = {
+    contract: 'confinement-policy.v1',
+    controls: {
+      hostWrite: 'deny',
+      hostRead: 'allow',
+      networkEgress: 'filtered',
+      process: 'host',
+      home: 'host',
+      session: 'shared',
+      workspace: 'shared',
+    },
+    grants: [],
+    networkFilter: {
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'cidr', value: '10.0.0.1/32' },
+          ports: [443],
+        },
+      ],
+    },
+  };
+
+  // Override supplying 0.0.0.0/0
+  const broadCidrOverride = {
+    controls: { networkEgress: 'filtered' },
+    networkFilter: {
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'cidr', value: '0.0.0.0/0' },
+          ports: [443],
+        },
+      ],
+    },
+  };
+
+  assert.throws(
+    () => validateOverrideConfinementShape(broadCidrOverride, basePolicy),
+    /override cannot add rule with destination "0.0.0.0\/0"/,
+  );
+
+  // Override supplying broader ports (e.g. 80 when base only allows 443)
+  const broadPortOverride = {
+    controls: { networkEgress: 'filtered' },
+    networkFilter: {
+      defaultAction: 'deny',
+      allow: [
+        {
+          protocol: 'tcp',
+          destination: { kind: 'cidr', value: '10.0.0.1/32' },
+          ports: [443, 80],
+        },
+      ],
+    },
+  };
+
+  assert.throws(
+    () => validateOverrideConfinementShape(broadPortOverride, basePolicy),
+    /override cannot add port 80 not permitted by base policy/,
+  );
+});
+
+test('N2: ensureMachineBackendRegistryDefaults returns skipped contract on unparseable JSON without throwing', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-n2-reg-test-'));
+  const customPath = path.join(dir, 'backends.json');
+  try {
+    fs.writeFileSync(customPath, 'not json', 'utf8');
+    const res = ensureMachineBackendRegistryDefaults(customPath);
+    assert.equal(res.changed, false);
+    assert.equal(res.created, false);
+    assert.match(res.message, /skipped -- cannot parse machine backend registry/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
