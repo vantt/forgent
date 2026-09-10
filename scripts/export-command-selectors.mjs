@@ -18,6 +18,92 @@ export const DEFAULT_ROUTES_PATH = path.join(
 );
 
 /**
+ * Scan raw JSON object text for a duplicate KEY AT DEPTH 1 (i.e. a duplicate
+ * selector in the top-level annotations object) -- the one thing `JSON.parse`
+ * itself silently allows (last write wins). Tracks object/array nesting depth
+ * and string/escape state character by character so a nested field name that
+ * happens to repeat across sibling entries (e.g. two different selectors both
+ * declaring "operation_id") is never mistaken for a duplicate top-level key.
+ * A real tokenizer, not a flat split -- the prior regex-based scan split on
+ * `,\s*(?=")` with no depth awareness and false-failed on exactly that case.
+ */
+function assertNoDuplicateTopLevelKeys(rawText) {
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  let collectingKey = false;
+  let keyBuf = '';
+  // At each depth, are we currently in "key position" (expecting a property
+  // name next) or "value position" (expecting a value, which may itself be a
+  // string)? Object literals alternate key -> `:` -> value -> `,` -> key ...
+  let inKeyPosition = true;
+  const topLevelKeys = new Set();
+
+  for (let i = 0; i < rawText.length; i++) {
+    const ch = rawText[i];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (ch === '\\') {
+        escaped = true;
+      } else if (ch === '"') {
+        inString = false;
+        if (collectingKey) {
+          collectingKey = false;
+          if (depth === 1) {
+            if (topLevelKeys.has(keyBuf)) {
+              throw new Error(`Double-bound selector: selector "${keyBuf}" declared more than once in annotations`);
+            }
+            topLevelKeys.add(keyBuf);
+          }
+        }
+      } else if (collectingKey) {
+        keyBuf += ch;
+      }
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = true;
+      if (depth === 1 && inKeyPosition) {
+        collectingKey = true;
+        keyBuf = '';
+      }
+      continue;
+    }
+
+    if (ch === '{') {
+      depth++;
+      inKeyPosition = true;
+      continue;
+    }
+    if (ch === '[') {
+      depth++;
+      inKeyPosition = false; // array elements are values, never object keys
+      continue;
+    }
+    if (ch === '}' || ch === ']') {
+      depth--;
+      continue;
+    }
+    if (ch === ':') {
+      inKeyPosition = false;
+      continue;
+    }
+    if (ch === ',') {
+      // Re-entering key position only makes sense directly inside an object;
+      // depth tracking alone can't distinguish "back in an object" from
+      // "still inside an array" at the same nesting depth, but the outer
+      // annotations shape is always object-at-depth-1, so this is safe for
+      // the one position (depth === 1) this scan actually acts on.
+      if (depth === 1) inKeyPosition = true;
+      continue;
+    }
+  }
+}
+
+/**
  * Load and validate annotations from file or object/string.
  * Handles both object and array formats, checking for duplicates and multi-bound route kinds.
  */
@@ -39,23 +125,12 @@ export function loadAnnotations(input) {
     throw new Error('Invalid annotations input');
   }
 
-  // Detect duplicate keys in raw JSON text if available
+  // Detect duplicate top-level (selector) keys in raw JSON text, if available.
+  // A depth-aware scan (not a flat split) so a nested field name shared by two
+  // different selector entries -- e.g. two annotated selectors both carrying
+  // "operation_id" -- is never mistaken for a duplicate top-level key.
   if (rawText && !Array.isArray(parsed)) {
-    const objMatch = rawText.match(/^\s*\{([\s\S]*)\}\s*$/);
-    if (objMatch) {
-      const topLevelKeys = new Set();
-      const entries = objMatch[1].split(/,\s*(?=")/);
-      for (const entry of entries) {
-        const keyMatch = entry.match(/^\s*"([^"\\]+)"\s*:/);
-        if (keyMatch) {
-          const k = keyMatch[1];
-          if (topLevelKeys.has(k)) {
-            throw new Error(`Double-bound selector: selector "${k}" declared more than once in annotations`);
-          }
-          topLevelKeys.add(k);
-        }
-      }
-    }
+    assertNoDuplicateTopLevelKeys(rawText);
   }
 
   const annotationsMap = new Map();
@@ -132,8 +207,12 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
 
   const routes = {};
 
-  // Sort selectors lexicographically for deterministic output
-  const sortedCommands = [...registry].sort((a, b) => a.name.localeCompare(b.name));
+  // Sort selectors lexicographically for deterministic output. Iteration
+  // order here is discarded anyway -- formatCommandRoutesJson re-sorts
+  // output keys with the same default .sort() before serializing -- so this
+  // uses the identical comparator rather than a second, locale-sensitive one
+  // that would only diverge from it silently.
+  const sortedCommands = [...registry].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 
   for (const cmd of sortedCommands) {
     const selector = cmd.name;
@@ -155,7 +234,10 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
         if (!operation_id) {
           throw new Error(`Native route for selector "${selector}" requires operation_id`);
         }
-        owner_path = ann.owner_path ?? (selector === 'version' ? 'packages/distribution/rust' : 'packages/distribution/rust');
+        owner_path = ann.owner_path;
+        if (!owner_path) {
+          throw new Error(`Native route for selector "${selector}" requires an explicit owner_path`);
+        }
       } else if (route_kind === 'legacy-cli') {
         legacy_payload = ann.legacy_payload ?? 'legacy-node';
         owner_path = ann.owner_path ?? 'src/cli/command-registry.mjs';
@@ -211,7 +293,12 @@ export function exportCommandRoutes({
   const content = formatCommandRoutesJson(routes);
 
   fs.mkdirSync(path.dirname(routesPath), { recursive: true });
-  const tmpPath = `${routesPath}.tmp.${Date.now()}`;
+  // Same directory as routesPath (never os.tmpdir()): fs.renameSync is only
+  // atomic within one filesystem, and /tmp is commonly a separate mount from
+  // the checkout. A crash mid-write can still leave this file behind, so
+  // .gitignore covers its exact naming pattern (see the ignore entry added
+  // alongside this generator).
+  const tmpPath = `${routesPath}.tmp.${process.pid}.${Date.now()}`;
   fs.writeFileSync(tmpPath, content, 'utf8');
   fs.renameSync(tmpPath, routesPath);
   return { routes, content };

@@ -15,7 +15,12 @@ export function explainCommandRoute(selector, routesPath = DEFAULT_ROUTES_PATH) 
   }
 
   const routes = JSON.parse(fs.readFileSync(routesPath, 'utf8'));
-  const route = routes[selector];
+  // Object.hasOwn, not `routes[selector]` truthiness: a selector literally
+  // named "__proto__" or "constructor" would otherwise resolve through the
+  // prototype chain to a real (truthy, but meaningless) object and fall
+  // through to a confusing TypeError instead of the clear unknown-selector
+  // message below.
+  const route = Object.hasOwn(routes, selector) ? routes[selector] : undefined;
 
   if (!route) {
     throw new Error(`Unknown command selector: "${selector}"`);

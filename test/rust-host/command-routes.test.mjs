@@ -135,6 +135,29 @@ test('unlisted selector fails the build', () => {
   );
 });
 
+test('unlisted selector fails the build through generateCommandRoutes itself (not just the standalone guard)', () => {
+  // The above test proves assertAllSelectorsListed itself rejects a gap; this
+  // test proves generateCommandRoutes actually WIRES that guard in on every
+  // call, so a regression that silently drops the guard call from
+  // generateCommandRoutes (a real edit generateCommandRoutes could survive
+  // without failing this file at all otherwise) is caught. A registry with a
+  // duplicate `name` entry makes the routes map collapse to fewer keys than
+  // registry.length purely as a side effect of generateCommandRoutes's own
+  // loop (`routes[selector] = descriptor` overwrites on the duplicate) --
+  // this drives the real gap into the real function, never a hand-edited map.
+  const registryWithDuplicateName = [
+    ...COMMAND_REGISTRY,
+    { ...COMMAND_REGISTRY.find((c) => c.name === 'version') },
+  ];
+
+  assert.throws(
+    () => {
+      generateCommandRoutes({ registry: registryWithDuplicateName });
+    },
+    /Route count mismatch/
+  );
+});
+
 test('double-annotated selector fails the build (array duplicate entries)', () => {
   const badAnnotations = [
     { selector: 'version', route_kind: 'native', operation_id: 'distribution.build.show' },
