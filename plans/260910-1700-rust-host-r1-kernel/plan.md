@@ -368,3 +368,4 @@ the approach changed; an unresolvable merge conflict.
 
 | Cell | Merge commit | Review / red-team | Deferred findings |
 |---|---|---|---|
+| P00 | `b3ea08d9` | Clean after 2 fix rounds (reviewer: 9+3 findings fixed; red-team: 2+1 findings fixed) | 1 class deferred to P10: active skill-doc prose (`domains/coding/skills/**` etc.) invoking `bin/fgos.mjs` directly, outside R3's named 9-site scope — see `docs/architect/agent-coordination/verification/rust-host-r1-kernel/p00.md` |
