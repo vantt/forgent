@@ -828,8 +828,9 @@ function validateExecutionProfileShape(executor, label) {
     // `HERDR_SESSION` to compare against. There is one worker session now and
     // it is not configurable. A config still carrying the key must be told,
     // not quietly obeyed in a way it no longer means.
+    const LEGAL_CONFINEMENT_KEYS = [...CONFINEMENT_FLAGS, 'backend', 'contract', 'controls', 'grants', 'networkFilter'];
     for (const key of Object.keys(c)) {
-      if (!CONFINEMENT_FLAGS.includes(key) && key !== 'backend') {
+      if (!LEGAL_CONFINEMENT_KEYS.includes(key)) {
         throw new RunnerConfigError(
           `runner config (${label}) "confinement.${key}" is not a confinement flag. Legal flags: ${CONFINEMENT_FLAGS.join(', ')}, backend.` +
           (key === 'sessionName'
@@ -844,8 +845,14 @@ function validateExecutionProfileShape(executor, label) {
   // the values it reads.
   if (executor.permissionMode === 'bypass') {
     const c = executor.confinement ?? {};
-    const missing = CONFINEMENT_FLAGS.filter((flag) => c[flag] !== true);
-    if (missing.length > 0) {
+    const hasPrivateHome = c.privateHome === true || c.controls?.home === 'private';
+    const hasIsolatedSession = c.isolatedSession === true || c.controls?.session === 'isolated';
+    const hasOwnWorktree = c.ownWorktree === true || c.controls?.workspace === 'own';
+    if (!hasPrivateHome || !hasIsolatedSession || !hasOwnWorktree) {
+      const missing = [];
+      if (!hasPrivateHome) missing.push('privateHome');
+      if (!hasIsolatedSession) missing.push('isolatedSession');
+      if (!hasOwnWorktree) missing.push('ownWorktree');
       throw new RunnerConfigError(
         `runner config (${label}) declares "permissionMode": "bypass" without full confinement -- missing ${missing.join(', ')}. ` +
         'A worker that never asks before acting is only defensible when it is confined, so bypass requires ' +

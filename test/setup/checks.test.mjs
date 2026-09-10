@@ -118,6 +118,7 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'confinement-policies-declared',
       'confinement-backend-registry-readable',
       'confinement-bwrap-platform',
+      'confinement-herdr-maturity',
       'confinement-probe-freshness',
       'confinement-strict-readiness',
     ].sort(),

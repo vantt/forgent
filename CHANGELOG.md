@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Confinement Authority Phase 05: Herdr and Legacy Confinement Convergence (docs/specs/confinement-authority.md):
+  - R1 Policy Normalization: normalized legacy herdr confinement flags (`privateHome: true` -> `home: "private"`, `isolatedSession: true` -> `session: "isolated"`, `ownWorktree: true` -> `workspace: "own"`) into canonical v1 policy controls before runtime dispatch, preserving existing v1 policy controls and grants.
+  - R2 Unified Authority Door: converged `herdr-spawn` execution through Confinement Authority (`executeThroughConfinement`) without secondary runtime dispatch seams, returning canonical `confinement-execution.v1` and structured `confinement-attestation.v1`.
+  - R3 Pre-Adapter Preparation: hoisted pre-adapter checks (`workspace: own` worktree cwd validation and bypass pairing) to Authority prepare; bounded session and private home lifecycle isolation to adapter with named attestation mismatch `herdr-partial-maturity` and `herdr-partial-maturity:herdr-round` structural observation evidence.
+  - R4 Interactive Invariant Preservation: preserved all existing Herdr interactive execution behaviors (round keywords, prompt delivery via file or inline, status polling, pane visibility, exit sequences, timeout classification, error reporting) through Authority.
+  - R5 Bypass Pairing Enforcement: enforced that `permissionMode: "bypass"` dispatches strictly refuse unless full confinement protection (`home: private`, `session: isolated`, `workspace: own`) is declared and satisfied across both legacy and v1 policy shapes.
+  - R6 Anti-Overclaim Attestation: ensured Authority attestations for `herdr-spawn` dispatches never overclaim local lifecycle hygiene or external harness as OS confinement (`host-ipc` channel marked `out-of-scope`, non-bwrap controls marked `unverified`, outcome never claimed `enforced` without backend proof).
+  - Doctor Check: added `confinement-herdr-maturity` doctor check evaluating herdr executor convergence maturity status, reporting `partial` when herdr executors are configured and failing when bypass pairing invariants are violated.
+
 - Confinement Authority Phase 04: Required Enforcement, Executor Migration, and Fail-Open Closures (docs/specs/confinement-authority.md):
   - R1 Refusal Gates: required policy dispatches refuse cleanly before spawn with zero adapter calls for 7 canonical failure conditions: missing backend (`confinement-backend-missing`), disabled backend (`confinement-backend-disabled`), unsupported control/backend (`confinement-unsupported`), stale probe failure (`confinement-probe-failed`), invalid grant (`confinement-grant-invalid`), unsatisfied resource need (`confinement-need-unsatisfied`), and prepared claims mismatching the assessed plan (`confinement-plan-mismatch`).
   - R2 Preferred Mode Guard: preferred confinement mode is cleanly refused before spawn with `confinement-mode-unsupported` to prevent silent unconfined execution.

@@ -14,6 +14,8 @@ import {
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 
+import { normalizeLegacyConfinement } from "./policies.mjs";
+
 export { DispatchError };
 
 function applyBackendPlanToAttestation(attestation, backendPlan) {
@@ -24,7 +26,11 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
   attestation.grants = backendPlan.grants;
   attestation.backend = backendPlan.backend;
   if (Array.isArray(backendPlan.mismatches)) {
-    attestation.mismatches = backendPlan.mismatches;
+    const existingCodes = new Set((attestation.mismatches || []).map((m) => m.code));
+    attestation.mismatches = [
+      ...(attestation.mismatches || []),
+      ...backendPlan.mismatches.filter((m) => !existingCodes.has(m.code)),
+    ];
   }
   return attestation;
 }
@@ -96,7 +102,11 @@ export function buildConfinementAttestation({
     }
   }
 
-  const legacy = request.requirement?.legacy;
+  const legacy =
+    request.requirement?.legacy ||
+    (request.invocation?.confinement
+      ? normalizeLegacyConfinement(request.invocation.confinement)
+      : null);
   const hasBwrapCmd = request.invocation?.command === "bwrap";
 
   let hasHostWriteDeny = false;
@@ -293,10 +303,21 @@ export function buildConfinementAttestation({
         },
         {
           name: "host-ipc",
-          coverage: legacy?.controls?.session === "isolated" ? "covered" : "out-of-scope",
-          detail: legacy?.controls?.session === "isolated"
-            ? "observed legacy isolated session"
-            : "observe-mode: host IPC unmanaged",
+          coverage:
+            request.invocation?.adapter !== "herdr-spawn" &&
+            isVerifiedBwrap &&
+            legacy?.controls?.session === "isolated"
+              ? "covered"
+              : "out-of-scope",
+          detail:
+            request.invocation?.adapter !== "herdr-spawn" &&
+            isVerifiedBwrap &&
+            legacy?.controls?.session === "isolated"
+              ? "observed legacy isolated session with verified bwrap"
+              : request.invocation?.adapter === "herdr-spawn" &&
+                  legacy?.controls?.session === "isolated"
+                ? "observe-mode: herdr session isolation is lifecycle hygiene, not OS IPC confinement"
+                : "observe-mode: host IPC unmanaged",
         },
         {
           name: "network",
@@ -305,6 +326,16 @@ export function buildConfinementAttestation({
         },
       ];
 
+  const isHerdrSpawn = request.invocation?.adapter === "herdr-spawn";
+  const mismatches = [];
+  if (isHerdrSpawn) {
+    mismatches.push({
+      code: "herdr-partial-maturity",
+      detail:
+        "herdr-spawn session/home lifecycle remains in adapter; pre-adapter preparation partially mature.",
+    });
+  }
+
   const evidence = [
     {
       kind: "structural-observation",
@@ -312,6 +343,13 @@ export function buildConfinementAttestation({
       freshness: "current",
     },
   ];
+  if (isHerdrSpawn) {
+    evidence.push({
+      kind: "structural-observation",
+      ref: "herdr-partial-maturity:herdr-round",
+      freshness: "current",
+    });
+  }
   if (isVerifiedBwrap) {
     evidence.push({
       kind: "structural-observation",
@@ -359,7 +397,7 @@ export function buildConfinementAttestation({
     receipt: null,
     backend: null,
     grants,
-    mismatches: [],
+    mismatches,
     evidence,
     cleanup: { status: "not-needed" },
   };
@@ -425,6 +463,85 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         dispatchId: request.dispatchId,
         capability: request.capability,
         requirement: request.requirement,
+        attestation: refusedAttestation,
+      },
+    );
+  }
+
+  // Safe pre-adapter preparation checks (R3, R5: ownWorktree & bypass pairing)
+  const invocationConfinement = request.invocation?.confinement;
+  const legacyNormalized = invocationConfinement
+    ? normalizeLegacyConfinement(invocationConfinement)
+    : null;
+  const isBypass = request.invocation?.permissionMode === "bypass";
+
+  const hasOwnWorktree = Boolean(
+    legacyNormalized?.controls?.workspace === "own" ||
+      invocationConfinement?.ownWorktree ||
+      invocationConfinement?.controls?.workspace === "own",
+  );
+  const hasPrivateHome = Boolean(
+    legacyNormalized?.controls?.home === "private" ||
+      invocationConfinement?.privateHome ||
+      invocationConfinement?.controls?.home === "private",
+  );
+  const hasIsolatedSession = Boolean(
+    legacyNormalized?.controls?.session === "isolated" ||
+      invocationConfinement?.isolatedSession ||
+      invocationConfinement?.controls?.session === "isolated",
+  );
+
+  if (isBypass) {
+    if (!hasOwnWorktree || !hasPrivateHome || !hasIsolatedSession) {
+      const missing = [];
+      if (!hasPrivateHome) missing.push("home: private (privateHome)");
+      if (!hasIsolatedSession) missing.push("session: isolated (isolatedSession)");
+      if (!hasOwnWorktree) missing.push("workspace: own (ownWorktree)");
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError(
+        "invalid-config",
+        `executor for work "${request.context?.workId ?? request.executorId}" refused: permissionMode "bypass" requires full confinement (missing: ${missing.join(", ")}).`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          reason: "bypass-confinement-incomplete",
+          dispatchId: request.dispatchId,
+          executorId: request.executorId,
+          confinement: invocationConfinement,
+          attestation: refusedAttestation,
+        },
+      );
+    }
+  }
+
+  if (
+    hasOwnWorktree &&
+    request.context?.repoRoot &&
+    path.resolve(request.context.cwd) === path.resolve(request.context.repoRoot)
+  ) {
+    const refusedAttestation = buildConfinementAttestation({
+      request,
+      phase: "refused",
+      outcome: "refused",
+    });
+    saveAttestationRecord(refusedAttestation, request.context);
+    throw new DispatchError(
+      "invalid-config",
+      `executor for work "${request.context?.workId ?? request.executorId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(request.context.cwd)}) rather than a worktree of its own.`,
+      {
+        contract: "confinement-execution.v1",
+        status: "refused",
+        reason: "own-worktree-unavailable",
+        dispatchId: request.dispatchId,
+        executorId: request.executorId,
+        cwd: request.context.cwd,
+        repoRoot: request.context.repoRoot,
+        confinement: invocationConfinement,
         attestation: refusedAttestation,
       },
     );

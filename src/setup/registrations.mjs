@@ -34,7 +34,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
-import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape } from '../runner/dispatch/confinement/policies.mjs';
+import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
   resolveMachineBackendRegistryPath,
   validateBackendRegistryShape,
@@ -3909,3 +3909,59 @@ registerCheck({
   description: 'strict confinement readiness (all capabilities declared with known policies, bwrap ready)',
   check: (cwd) => checkConfinementStrictReadiness(cwd),
 });
+
+export function checkConfinementHerdrMaturity(cwd) {
+  let runner;
+  try {
+    runner = readSharedConfig(cwd)?.runner;
+  } catch (err) {
+    return { passed: true, message: `runner config not readable, herdr maturity check skipped: ${err.message}` };
+  }
+  const executors = runner?.executors || {};
+  const herdrExecutors = Object.entries(executors)
+    .filter(([_, exec]) => exec && typeof exec === 'object' && exec.adapter === 'herdr-spawn');
+
+  if (herdrExecutors.length === 0) {
+    return {
+      passed: true,
+      maturity: 'not-applicable',
+      message: 'herdr confinement maturity: not applicable (no herdr-spawn executors configured)',
+    };
+  }
+
+  // Validate bypass pairing on herdr executors
+  const invalidBypass = [];
+  for (const [id, exec] of herdrExecutors) {
+    if (exec.permissionMode === 'bypass') {
+      const conf = exec.confinement;
+      const normalized = conf ? normalizeLegacyConfinement(conf) : null;
+      const hasWorkspace = Boolean(normalized?.controls?.workspace === 'own' || conf?.ownWorktree);
+      const hasHome = Boolean(normalized?.controls?.home === 'private' || conf?.privateHome);
+      const hasSession = Boolean(normalized?.controls?.session === 'isolated' || conf?.isolatedSession);
+      if (!hasWorkspace || !hasHome || !hasSession) {
+        invalidBypass.push(id);
+      }
+    }
+  }
+
+  if (invalidBypass.length > 0) {
+    return {
+      passed: false,
+      maturity: 'invalid',
+      message: `herdr confinement maturity check failed: executors declare bypass without full confinement (${invalidBypass.join(', ')})`,
+    };
+  }
+
+  return {
+    passed: true,
+    maturity: 'partial',
+    message: `herdr confinement maturity: partial (${herdrExecutors.length} herdr-spawn executor(s); pre-adapter validation under Authority, session/home lifecycle in adapter)`,
+  };
+}
+
+registerCheck({
+  id: 'confinement-herdr-maturity',
+  description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
+  check: (cwd) => checkConfinementHerdrMaturity(cwd),
+});
+

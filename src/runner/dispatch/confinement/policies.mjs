@@ -553,15 +553,53 @@ export function normalizeLegacyConfinement(confinement, label = 'confinement') {
   const isLegacy =
     confinement.privateHome !== undefined ||
     confinement.isolatedSession !== undefined ||
-    confinement.ownWorktree !== undefined;
+    confinement.ownWorktree !== undefined ||
+    confinement.home !== undefined ||
+    confinement.session !== undefined ||
+    confinement.workspace !== undefined;
 
   if (!isLegacy) {
+    if (confinement.contract === 'confinement-policy.v1' && confinement.controls) {
+      return confinement;
+    }
+    if (confinement.controls && typeof confinement.controls === 'object') {
+      return {
+        contract: 'confinement-policy.v1',
+        controls: {
+          hostWrite: confinement.controls.hostWrite ?? 'allow',
+          hostRead: confinement.controls.hostRead ?? 'allow',
+          networkEgress: confinement.controls.networkEgress ?? 'allow',
+          process: confinement.controls.process ?? 'host',
+          home: confinement.controls.home ?? 'host',
+          session: confinement.controls.session ?? 'shared',
+          workspace: confinement.controls.workspace ?? 'shared',
+        },
+        grants: Array.isArray(confinement.grants) ? confinement.grants : (
+          confinement.controls.home === 'private'
+            ? [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }]
+            : []
+        ),
+        ...(confinement.backend ? { backend: confinement.backend } : {}),
+      };
+    }
     return null;
   }
 
-  const privateHome = Boolean(confinement.privateHome);
-  const isolatedSession = Boolean(confinement.isolatedSession);
-  const ownWorktree = Boolean(confinement.ownWorktree);
+  const privateHome = Boolean(
+    confinement.privateHome ||
+    confinement.home === 'private' ||
+    confinement.controls?.home === 'private'
+  );
+  const isolatedSession = Boolean(
+    confinement.isolatedSession ||
+    confinement.session === 'isolated' ||
+    confinement.controls?.session === 'isolated'
+  );
+  const ownWorktree = Boolean(
+    confinement.ownWorktree ||
+    confinement.workspace === 'own' ||
+    confinement.controls?.workspace === 'own'
+  );
 
   return {
     contract: 'confinement-policy.v1',
@@ -577,6 +615,7 @@ export function normalizeLegacyConfinement(confinement, label = 'confinement') {
     grants: [
       ...(privateHome ? [{ resource: 'private-home', access: 'read-write', scope: 'dispatch' }] : []),
     ],
+    ...(confinement.backend ? { backend: confinement.backend } : {}),
   };
 }
 
