@@ -1,0 +1,50 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-synth",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_run2_v1",
+      "invocationKey": "ik_synth_run2_v1",
+      "reason": "Both Phase-6 bindings (critique-proposals op_061, assess-constraints op_062) have linked results, so post-critique-open is open. Authorizing whole-ledger synthesis.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_058",
+        "asgn_coordinator_driver_op_059",
+        "asgn_coordinator_driver_op_060",
+        "asgn_coordinator_driver_op_061",
+        "asgn_coordinator_driver_op_062"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "synthesize",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_058",
+        "asgn_coordinator_driver_op_059",
+        "asgn_coordinator_driver_op_060",
+        "asgn_coordinator_driver_op_061",
+        "asgn_coordinator_driver_op_062"
+      ],
+      "objective": "You are the SYNTHESIZER on an architecture advisory panel designing a 'Confinement Authority' for fgOS dispatch. You see the whole ledger; no one else has. Produce the Decision Packet. Use ONLY absolute paths. READ ALL FIVE, in this order: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_058/runs/01/agent-report.md (system shaper proposal), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_059/runs/01/agent-report.md (alternative shaper proposal), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_060/runs/01/agent-report.md (constraint advocate proposal), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_061/runs/01/agent-report.md (architecture critic -- verified two decisive falsifications), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_062/runs/01/agent-report.md (constraint advocate's Phase-6 cross-assessment, in which it downgraded its OWN proposal). Background evidence: op_057 (scout) and op_056 (framing) at the same path pattern. RE-VERIFY the decisive claims yourself against real source under /home/vantt/projects/forgentX/src/runner/dispatch/ -- do not take the critic's falsifications on trust; they decide the outcome. Specifically re-check: (i) that resolveExecutorConfig is genuinely the sole chokepoint both dispatch paths traverse; (ii) that spawnWorker (cli.mjs) really does bypass resolveAssignmentDispatchPolicy, which is what falsified the alternative shaper's PLACEMENT; (iii) that codex-bwrap's bwrap recipe really is bespoke in KIND (tmpfs, auth.json re-bind, --setenv CODEX_HOME) versus claude-bwrap/agy-bwrap, which is what falsified a generic constructive argv builder; (iv) FO-1, the capability-without-prefer fallback to an unconfined write-capable cfg.executor. YOUR JOB: (1) Produce ONE recommendation answering all six sub-asks -- component boundary, component parent, canonical contracts (literal shapes), backend abstraction, default implementation, expansion roadmap with reversibility per step. It may be a composite; if so, name exactly which piece comes from which proposal and why that combination is better than any single one. (2) Note that the alternative shaper's PLACEMENT was falsified but its EVIDENCE MODEL (probe-based attestation with a mandatory negative control, configHash, host fingerprint) was independently endorsed by the constraint advocate as the strongest part of the whole panel -- decide whether to adopt the evidence model at the chokepoint the critic verified, and say plainly if you are doing so. (3) The constraint advocate identified a risk ALL THREE missed: integrity of the policy/evidence store -- a writable attestation ledger turns 'attested' into self-issued permission, and a configHash detects change but not an attacker changing config and ledger together. Address it or explicitly defer it with a trigger. (4) CRITICAL -- DO NOT LAUNDER DISSENT. Where the panel genuinely did not settle something, carry it to the person as visible dissent in the packet BODY, not a footnote, and label it unresolved. The critic explicitly marked two disagreements as VALUE disagreements evidence cannot settle (attestation vs declaration; fail-open vs deny-by-default) -- do not manufacture a technical resolution for either. Converting a real unresolved into a tidy 'consideration' is the single worst thing you can do here. (5) Name what you are NOT recommending and why, especially any proposal element you are dropping. (6) State the largest remaining uncertainty and which decision it would change. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

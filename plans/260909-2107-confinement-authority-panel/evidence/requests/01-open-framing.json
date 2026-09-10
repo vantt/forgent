@@ -1,0 +1,36 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-fgos-confinement-authority",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30, "wallTimeMs": 14400000 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "codex-readonly", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "codex-readonly", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret this person's raw request, verbatim: \"Cho toi mot architecture panel de thiet ke Confinement Authority cho fgOS dispatch. Hay xac dinh component boundary, component parent, canonical contracts, backend abstraction, default implementation don gian va lo trinh mo rong. Ghi toan bo discussion va quyet dinh cuoi vao mot file.\" (Vietnamese; English gloss: 'Give me an architecture panel to design a Confinement Authority for fgOS dispatch. Determine component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap. Write the whole discussion and final decision into one file.'). The target system is real: /home/vantt/projects/forgentX/src/runner/dispatch.mjs and the out-of-process executor path it drives (dispatch/resolve.mjs, dispatch/assignment-runner.mjs). Real prior art already exists and is directly relevant: /home/vantt/projects/forgentX/.fgos/config.json already defines three executors (claude-bwrap, agy-bwrap, codex-readonly) whose confinement scheme today is an OS-level bwrap mount plus prose in a JSON 'description' field -- not a named, reusable component with its own contract. Read that config.json (search for \"claude-bwrap\", \"agy-bwrap\", \"codex-readonly\") yourself using an absolute path to ground your interpretation. Name: what altitude is this request at (one module's internal shape vs. a new cross-cutting platform capability vs. a rewrite of dispatch itself); what decision burden it carries (reversibility -- is this additive or does it require moving existing bwrap logic); and the single largest ambiguity in the six sub-asks (boundary/parent/contracts/backend-abstraction/default-impl/roadmap) that you are holding open for the context investigator to resolve with evidence, not deciding yourself. Use absolute paths for anything you read. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the REAL repository at /home/vantt/projects/forgentX for everything relevant to a proposed 'Confinement Authority' component for fgOS dispatch. Use ONLY absolute paths for everything you read. Specifically investigate: (1) /home/vantt/projects/forgentX/.fgos/config.json -- the full executor definitions for claude-bwrap, agy-bwrap, codex-readonly (grep those three names): what confinement mechanism each actually declares (bwrap mount args, writable exceptions, sandbox flags), and whether that logic is described only in prose/config or is actually enforced by real code. (2) /home/vantt/projects/forgentX/src/runner/dispatch/assignment-policy.mjs -- where 'bwrap' is referenced in real code (grep it), what it actually does with that string today (is it building a real bwrap invocation, or just reading a config field). (3) /home/vantt/projects/forgentX/src/runner/dispatch/mechanism.mjs and /home/vantt/projects/forgentX/src/runner/dispatch/resolve.mjs -- how dispatch.mjs's 'decide'/'execute' verbs currently decide in-process vs out-of-process and resolve an executor's config; is there ANY existing seam that could be called a confinement boundary today, or is confinement purely encoded as bwrap CLI args assembled ad hoc. (4) /home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs and /home/vantt/projects/forgentX/src/runner/worktree.mjs -- the EXISTING worktree isolation guard and main-checkout lock: what do THEY confine (git-write access, main checkout access) and by what mechanism (lock file? path check? something else)? This matters because the panel must not accidentally re-propose something that already exists under a different name -- report plainly whether worktree isolation guard / main-checkout lock already IS a form of confinement authority, or is a genuinely different concern (e.g. write-serialization vs. process/filesystem sandboxing). (5) /home/vantt/projects/forgentX/src/runner/dispatch.mjs itself (only 82 lines -- read it whole) -- what it currently does, and where in the call chain a Confinement Authority component would plug in if one existed. Report counted, path-cited findings only -- no adjectives like 'tightly coupled', use real evidence (line numbers, function names, exact config keys). Explicitly report anything you looked for and did NOT find (absence is a finding). If your starting hypothesis (that no real Confinement Authority component exists yet, only ad hoc bwrap args) turns out to be false, say so plainly -- do not just confirm what you were asked to check. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

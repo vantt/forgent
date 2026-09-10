@@ -1,0 +1,52 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_run2_v1",
+      "invocationKey": "ik_redteam_run2_v1",
+      "reason": "synthesize-recommendation (op_063) has a linked result, so post-synthesis-open is open. Authorizing the independent red-team to attack the panel's process and authority, not only its architecture.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_058",
+        "asgn_coordinator_driver_op_059",
+        "asgn_coordinator_driver_op_060",
+        "asgn_coordinator_driver_op_061",
+        "asgn_coordinator_driver_op_062",
+        "asgn_coordinator_driver_op_063"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_058",
+        "asgn_coordinator_driver_op_059",
+        "asgn_coordinator_driver_op_060",
+        "asgn_coordinator_driver_op_061",
+        "asgn_coordinator_driver_op_062",
+        "asgn_coordinator_driver_op_063"
+      ],
+      "objective": "You are the INDEPENDENT RED-TEAM on an architecture advisory panel. Your target is NOT primarily the architecture -- it is HOW THIS PANEL REACHED ITS ANSWER, and whether the process earned the confidence the packet projects. Use ONLY absolute paths. READ THE LEDGER: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_058/runs/01/agent-report.md (system shaper), op_059 (alternative shaper), op_060 (constraint advocate proposal), op_061 (architecture critic), op_062 (advocate's cross-assessment), and op_063 (the SYNTHESIS / Decision Packet) -- same path pattern, substituting the assignment id. THE COORDINATOR DISCLOSES A REAL PROCESS DEFECT, AND YOU MUST ASSESS IT RATHER THAN EXCUSE IT: the per-actor executor roster is carried in the request body's actors[] array. The coordinator OMITTED actors[] from the Phase-5 shaping request. As a result all three shapers (op_058, op_059, op_060) silently fell back to the global default executor -- a single provider family, and specifically a git-write-enabled 'claude-reviewer' invocation that this panel's own doctrine excludes from advisory work -- instead of the intended three distinct provider families. The failure was silent: nothing refused it. Phases 1, 6, 7 and this red-team ran on the intended roster. Assess honestly: (a) Does the single-provider shaping phase invalidate the panel's result, materially weaken it, or not much -- and on what evidence? The three proposals WERE materially different in solution class; does that fact actually rescue the diversity claim, or is that post-hoc rationalization by the coordinator? (b) Is there evidence of correlated blind spots across the three shapers that a genuinely different provider family would plausibly have caught? Look for things all three assumed without checking. (c) The coordinator chose NOT to re-run shaping, judging that a re-run would produce a different sample rather than a correction. Is that judgment defensible, or is it the coordinator protecting its own sunk work? THEN ATTACK THE PANEL'S CONDUCT GENERALLY: (d) Did the critic (op_061) do real verification, or did it perform verification -- check whether its file:line citations actually support its two decisive falsifications, by reading the cited source yourself. (e) The constraint advocate downgraded its OWN proposal in op_062. Is that genuine self-correction, or is it a cheap credibility move that costs nothing because its ideas survived inside the composite anyway? (f) Did the synthesizer (op_063) launder any dissent -- did anything that was genuinely unsettled in the ledger get converted into a tidy 'consideration'? It claims two UNRESOLVED items; check whether anything ELSE should have been a third. (g) Is any proposal in the ledger a DESIGNATED LOSER -- present only to be defeated, not genuinely defended by its author? (h) Does the Decision Packet's confidence exceed its evidence anywhere -- particularly given that every role in this session reported Bash/Grep/Glob unavailable and worked from Read on absolute paths alone. Give a VERDICT: APPROVE, APPROVE-WITH-CONCERNS, or REJECT, with the concerns named specifically. A ceremonial APPROVE with nothing actually checked is the worst possible output from this role and is itself a finding against you. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

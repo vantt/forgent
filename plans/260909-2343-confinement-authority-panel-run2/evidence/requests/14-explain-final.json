@@ -1,0 +1,83 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "lead-advisor-actor",
+      "executor": "claude-bwrap"
+    },
+    {
+      "id": "context-investigator-actor",
+      "executor": "claude-bwrap",
+      "tier": "standard"
+    },
+    {
+      "id": "system-shaper-actor",
+      "executor": "claude-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "alternative-shaper-actor",
+      "executor": "agy-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "constraint-advocate-actor",
+      "executor": "codex-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "architecture-critic-actor",
+      "executor": "agy-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "synthesizer-actor",
+      "executor": "claude-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "red-team-actor",
+      "executor": "codex-bwrap",
+      "tier": "critical"
+    }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_explain_final_v1",
+      "invocationKey": "ik_explain_final_v1",
+      "reason": "The uncontaminated synthesis (op_074) has been independently critiqued (op_075) as the red-team (op_072) required. Authorizing the final person-facing explanation over the corrected packet.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_074",
+        "asgn_coordinator_driver_op_075",
+        "asgn_coordinator_driver_op_072"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_074",
+        "asgn_coordinator_driver_op_075",
+        "asgn_coordinator_driver_op_072"
+      ],
+      "objective": "You are the LEAD ADVISOR closing this panel. You framed the case at the start (op_056). The recommendation is NOT yours -- it belongs to the synthesizer (op_074) and has been attacked by an independent critic (op_075). Your job is to make it usable by the person and to carry its weaknesses over unsanded. Write in VIETNAMESE (the person wrote in Vietnamese). Address the person as 'anh' and yourself as 'em'. Use ONLY absolute paths when reading. READ: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_074/runs/01/agent-report.md (the Decision Packet), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_075/runs/01/agent-report.md (the independent critique of that packet), and /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_072/runs/01/agent-report.md (an earlier red-team on the panel's own process). THE PERSON ASKED SIX THINGS: component boundary, component parent, canonical contracts, backend abstraction, default implementation don gian, lo trinh mo rong. Answer all six in their vocabulary. EXPLANATION STANDARD: lead with the CONSEQUENCE, not the architecture. The test is not whether it is clear -- it is whether anh can DEFEND this decision to colleagues who will live in that codebase. MANDATORY, DO NOT SOFTEN ANY OF THESE: (1) The critic found a DECISIVE problem: the P00.1 bwrap probe script (scratch/run_probes.mjs) is NOT in the repository, so the proof the enforcing roadmap depends on cannot be re-run. The coordinator independently confirmed the file is absent. Per the packet's own logic the roadmap must collapse to steps S1+S2 (observe/derive/attest) and enforcement steps S3-S5 must wait until someone authors and commits a new confinement proof. Say this plainly as the headline constraint on the roadmap. (2) The critic REJECTED one of the synthesizer's own inventions (I2, widening the write-watcher to check the declared writable set) as smuggling a fourth proposal with a circular dependency -- a detective control must not depend on the declarative control it exists to check. Report it as rejected. (3) The critic accepted I1 and I3 as legitimate integration. (4) The claim that nothing outside src/runner/dispatch/ reads executor.confinement is FALSE -- src/setup/registrations.mjs line 3407 reads it for a doctor check. Coordinator confirmed. (5) Carry ALL the packet's unresolved dissents as live decisions belonging to anh, in the body, never as a closing disclaimer: observability-first vs enforce-first; whether an unsupported host refuses or degrades-and-reports; whether the threat model is host-write only (bwrap's --ro-bind / / protects host mutation, NOT confidentiality or network egress -- an attestation saying 'read-only' could mislead); and whether writableExceptions is rooted at the target project or at fgOS's own assignment store. (6) There are ZERO tests covering confinement or bwrap in test/runner/dispatch.test.mjs -- coordinator confirmed by grep. Say what that means for anh's first step. FLATTENING FOR COMFORT IS THE WORST THING YOU CAN DO. Name explicitly which parts stay anh's judgment, as decisions he must make. Name the single largest uncertainty and which decision it changes. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "taskKey": "explain_final_v1"
+    }
+  ]
+}

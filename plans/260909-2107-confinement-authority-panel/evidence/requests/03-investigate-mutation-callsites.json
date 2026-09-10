@@ -1,0 +1,21 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Follow-up investigate-context pass: answer the lead-advisor's single held-open ambiguity from interpret-request with call-site evidence, before Phase 5 shaping.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-fgos-confinement-authority",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "investigate-mutation",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "taskKey": "investigate-context-mutation-callsites-01",
+      "objective": "Answer ONE specific, decision-relevant question with call-site evidence, for the fgOS dispatch codebase at /home/vantt/projects/forgentX. The lead-advisor's interpretation (a real, prior artifact in this same session) found that fgOS has two half-authorities over confinement: (a) a per-Assignment `mutation`/read-only-role posture stamped by /home/vantt/projects/forgentX/src/runner/dispatch/assignment-normalizer.mjs (search for READ_ONLY_ROLES, isReadOnlyAssignment), and (b) an OS-level bwrap mount hardcoded into executor argv in /home/vantt/projects/forgentX/.fgos/config.json, joined today only by a human typing an executor name into a capability's `prefer` field. The held-open question: is the Assignment's stamped `mutation` posture RELIABLY IN SCOPE at every point that /home/vantt/projects/forgentX/src/runner/dispatch/transport.mjs's `resolveExecutorCommand` (argv assembly) actually runs, or are there real, live dispatch paths that reach argv assembly WITHOUT an Assignment at all (and therefore with no `mutation` value)? Concretely, trace and report, with file+line citations, for EACH of these real call paths: (1) /home/vantt/projects/forgentX/src/runner/dispatch/assignment-runner.mjs's `executeAssignment` path (does it reliably have a `mutation` value; note its own `fallbackMutationForAssignment` if you find one, and what triggers that fallback). (2) `spawnWorker` (search for its definition and callers) -- does IT always originate from an Assignment, or can it be invoked directly with no Assignment context. (3) `executeExecutorCli` in /home/vantt/projects/forgentX/src/runner/dispatch/cli.mjs -- same question. (4) `node src/runner/dispatch.mjs execute` for a plain work item with no coordination Assignment (per AGENTS.md's own dispatch doctrine, `decide --for <label> --needs-soul` is a path that fires an Agent/Task tool directly, with no executor or work item to name) -- does THIS path, or any CLI entry point like it, ever reach `resolveExecutorCommand` with no `mutation` in scope? Use ONLY absolute paths for everything you read. Report a definitive answer: either 'every real path carries a reliable mutation value' (name them all and why), or 'these specific paths reach argv assembly with no mutation value' (name them, file+line). If you cannot fully settle it from reading (e.g. a code path only reachable at a runtime you cannot execute), say exactly what remains unverified and why -- do not guess. This finding directly decides where a Confinement Authority's parent and canonical input contract sit, so precision matters more than speed. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

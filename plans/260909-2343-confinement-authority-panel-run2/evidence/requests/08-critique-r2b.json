@@ -1,0 +1,114 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "lead-advisor-actor",
+      "executor": "claude-bwrap"
+    },
+    {
+      "id": "context-investigator-actor",
+      "executor": "claude-bwrap",
+      "tier": "standard"
+    },
+    {
+      "id": "system-shaper-actor",
+      "executor": "claude-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "alternative-shaper-actor",
+      "executor": "agy-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "constraint-advocate-actor",
+      "executor": "codex-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "architecture-critic-actor",
+      "executor": "agy-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "synthesizer-actor",
+      "executor": "claude-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "red-team-actor",
+      "executor": "codex-bwrap",
+      "tier": "critical"
+    }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "reason": "All three Phase-5 shaping bindings have linked results (asgn_coordinator_driver_op_066, op_067, op_068), so post-shaping-open is legitimately open. Authorizing the independent architecture critic to attack all three proposals on their merits. Phase-5 was re-run on the intended three-provider roster (claude/gemini/codex); these are the new proposals.",
+      "authorizationId": "auth_critique_r2b_v1",
+      "invocationKey": "ik_critique_r2b_v1",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "You are the ARCHITECTURE CRITIC on an advisory panel. Three shapers independently proposed a 'Confinement Authority' design for fgOS dispatch. Attack all three on their merits. Use ONLY absolute paths for everything you read (relative paths will fail for you). READ ALL THREE PROPOSALS: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_066/runs/01/agent-report.md (system shaper), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_067/runs/01/agent-report.md (alternative shaper), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_068/runs/01/agent-report.md (constraint advocate). Shared evidence base: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_057/runs/01/agent-report.md (scout) and /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_056/runs/01/agent-report.md (framing). VERIFY the load-bearing factual claims yourself against real source under /home/vantt/projects/forgentX/src/runner/dispatch/ and /home/vantt/projects/forgentX/.fgos/config.json -- several proposals cite specific file:line facts (resolve.mjs:282-307 fail-open on a capability with no prefer; resolve.mjs:398 preferring an unvalidated invocations[].confinement; config.mjs:503-577 not validating it; transport.mjs:294-295 cliSpawnAdapter dropping confinement; herdr-round.mjs:209-253 establishConfinement being wholly optional-chained; 0 of 17 executors declaring confinement). Check the ones that decide the ranking. A claim that is wrong changes everything downstream, and you are the only role positioned to catch it. YOUR POSTURE: attack the ARGUMENT, never the author. For each proposal name (a) its strongest point, honestly stated -- if you cannot state a proposal's strongest form, you have not understood it well enough to attack it; (b) the load-bearing claim that, if false, collapses it; (c) whether that claim is actually true, per your own verification, with file:line. Say plainly which attacks are decisive versus which are merely concerns. Where two proposals disagree on a FACT (not a preference), settle it with evidence and say which one is wrong. Where they disagree on a VALUE or risk appetite, say so and do NOT pretend evidence settles it. Do not rank the proposals into a winner -- the synthesizer does that; your job is to make its ranking honest. AVOID: the convenient dismissal (rejecting a proposal for a flaw its author already named and bounded); false balance (manufacturing an equal-sized objection to each proposal when the real objections are not equal-sized); attacking a strawman version of a proposal that is easier to hit than what was actually written. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones. ADDITIONAL, IMPORTANT: these three proposals were produced by three DIFFERENT provider families (system shaper=claude, alternative shaper=gemini, constraint advocate=openai-codex). The alternative shaper this time proposes EXTERNALIZING confinement out of fgOS entirely into OS-level wrapper scripts, leaving dispatch ignorant of confinement. Take that seriously as a real candidate rather than dismissing it because it removes the component the request asked for -- but test it hard against the evidence, especially: whether fgOS could still RECORD or verify a confinement posture it does not model, whether a wrapper script is discoverable/validatable by fgos doctor, and whether it solves or merely relocates the hardcoded-absolute-path portability problem.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "contextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068"
+      ],
+      "taskKey": "critique_r2b"
+    },
+    {
+      "type": "authorize",
+      "as": "auth-assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "reason": "All three Phase-5 shaping bindings have linked results, so post-shaping-open is open. Authorizing the constraint advocate's Phase-6 findings pass, which now reads all three proposals including the two it could not see while shaping. Phase-5 was re-run on the intended three-provider roster (claude/gemini/codex); these are the new proposals.",
+      "authorizationId": "auth_assess_r2b_v1",
+      "invocationKey": "ik_assess_r2b_v1",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "You are the CONSTRAINT ADVOCATE, now in your Phase-6 findings pass. In Phase 5 you authored one of three proposals in isolation; you can now see the other two. Use ONLY absolute paths. READ: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_066/runs/01/agent-report.md (system shaper), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_067/runs/01/agent-report.md (alternative shaper), and your own /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_068/runs/01/agent-report.md. YOUR JOB NOW is production-reality assessment across all three, NOT re-advocating your own. Specifically: (1) Rank the three on MIGRATION RISK and BLAST RADIUS -- which can be shipped and reversed cheaply, which contains a one-way door, and where exactly is each one-way door. (2) The alternative shaper proposes DELETING CONFINEMENT_FLAGS and confinement.ownWorktree as dead/duplicated code, and replacing the C5 invariant with an attested-posture form. Assess that honestly against the real code: is C5 genuinely guarding an empty set today, and is replacing it strictly stronger or is something lost? Verify against /home/vantt/projects/forgentX/src/runner/dispatch/config.mjs and herdr-round.mjs with absolute paths. (3) The system shaper's default implementation ships ATTEST-ONLY and stops zero attacks by design; your own shipped DENY-BY-DEFAULT. State plainly which is the right first step for THIS repository given that 0 of 17 executors declare confinement today, and say what would change your answer. (4) Name any risk that ALL THREE proposals miss. (5) Operability: who owns this after it ships, and does that person or process actually exist here? CRITICAL: you must be willing to rank another shaper's proposal above your own if the evidence supports it -- self-preference here is the failure mode that makes this whole role worthless. If you do downgrade your own proposal, say exactly which evidence moved you. Do not treat every risk as blocking; rank them, and mark which are genuinely blocking versus merely worth knowing. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "contextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068"
+      ],
+      "taskKey": "assess_r2b"
+    }
+  ]
+}

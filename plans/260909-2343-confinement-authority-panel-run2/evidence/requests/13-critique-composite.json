@@ -1,0 +1,79 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "lead-advisor-actor",
+      "executor": "claude-bwrap"
+    },
+    {
+      "id": "context-investigator-actor",
+      "executor": "claude-bwrap",
+      "tier": "standard"
+    },
+    {
+      "id": "system-shaper-actor",
+      "executor": "claude-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "alternative-shaper-actor",
+      "executor": "agy-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "constraint-advocate-actor",
+      "executor": "codex-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "architecture-critic-actor",
+      "executor": "agy-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "synthesizer-actor",
+      "executor": "claude-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "red-team-actor",
+      "executor": "codex-bwrap",
+      "tier": "critical"
+    }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "reason": "An independent red-team (op_072) required that the synthesizer-invented composite be submitted to an independent critic before adoption. Authorizing that critique against the uncontaminated synthesis op_074.",
+      "authorizationId": "auth_critique_composite_v1",
+      "invocationKey": "ik_critique_composite_v1",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_074"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "You are the ARCHITECTURE CRITIC. Your target is NOT three shaper proposals this time -- it is ONE synthesized composite Decision Packet that a synthesizer produced, which contains design elements NO shaper proposed and NO critic has ever attacked. An independent red-team required this critique before the packet may be adopted. Use ONLY absolute paths. READ: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_074/runs/01/agent-report.md -- the packet under attack. Pay special attention to its section 5, 'MY OWN INVENTIONS', where the synthesizer itself flags what it invented and admits it is unattacked. For context on what the panel actually proposed, the originals are at the same path pattern: asgn_coordinator_driver_op_066 (system shaper), op_067 (alternative shaper), op_068 (constraint advocate), op_069 (the earlier critic), op_070 (cross-assessment). YOUR JOB: (1) Attack every element the synthesizer marked as its own invention. For each: is it a legitimate integration that follows necessarily from verified evidence, or is it the synthesizer smuggling in a fourth proposal under cover of synthesis? Name which. (2) VERIFY AT SOURCE the packet's decisive new claims -- it says it opened a primary source document no other role opened (a permission-posture proof document referenced from config.mjs around lines 710-711) and used it to refute a shaper's founding premise; it claims the confinement schema is unadopted because its consumer adapter path is nearly dormant rather than because the abstraction failed; and it lists several corrections to earlier roles' claims. Read the real files and say which of those hold and which do not. Do not accept them because they are well written. (3) Attack its correction (c): it claims a proposed mitigation does not cover its stated risk because the write-watcher only diffs git-dirty paths inside repoRoot and only when cwd differs from repoRoot. Verify that at source in /home/vantt/projects/forgentX/src/runner/dispatch/cli.mjs and say whether the criticism is right, overstated, or wrong. (4) Does the packet's confidence exceed its evidence anywhere? Every role in this panel worked without Bash/Grep/Glob, from direct reads only. (5) Is anything the packet presents as settled actually still open? State clearly which of your attacks are DECISIVE (they would change the recommendation) and which are merely concerns. Attack the argument, never the author. Do NOT manufacture false balance -- if the packet is largely sound, say so and concentrate on the few real weaknesses; if it is not, say that plainly. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "contextRefs": [
+        "asgn_coordinator_driver_op_074"
+      ],
+      "taskKey": "critique_composite_v1"
+    }
+  ]
+}

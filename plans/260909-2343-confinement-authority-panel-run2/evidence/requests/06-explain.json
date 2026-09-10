@@ -1,0 +1,44 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_explain_run2_v1",
+      "invocationKey": "ik_explain_run2_v1",
+      "reason": "red-team-packet (op_064) has a linked result, so post-redteam-open is open. Authorizing the lead advisor's person-facing explanation, which must carry the red-team's APPROVE-WITH-CONCERNS verdict and its three required corrections.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_063",
+        "asgn_coordinator_driver_op_064"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_063",
+        "asgn_coordinator_driver_op_064"
+      ],
+      "objective": "You are the LEAD ADVISOR, closing the panel with the person-facing explanation. You framed this case at the start (op_056); you have not seen any shaper's private notes and you must not become the panel by writing your own architecture opinion. Use ONLY absolute paths. READ: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_063/runs/01/agent-report.md (the synthesizer's Decision Packet -- the recommendation is ITS work, not yours to alter) and /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_064/runs/01/agent-report.md (the independent red-team, verdict APPROVE-WITH-CONCERNS). THE PERSON asked six things in Vietnamese: component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap. Answer all six, in their vocabulary. You may write in Vietnamese or English; the person wrote in Vietnamese and either is acceptable, but be consistent. THE EXPLANATION STANDARD: lead with the CONSEQUENCE, not the architecture. 'You will be able to X without Y' lands; 'we introduce an abstraction with a plugin seam' does not. The test is not whether this is clear -- it is whether the person can DEFEND this decision to colleagues who will live in that codebase. MANDATORY, non-negotiable: (1) Carry the red-team's verdict and ALL of its required concerns, especially that the Phase-5 shaping roster failed -- all three shapers ran on ONE provider family, through a git-write-enabled executor the doctrine excludes, because the coordinator omitted actors[] from the request. Do NOT soften this and do NOT bury it; the red-team specifically requires that no three-provider-diversity claim be made. (2) Apply the red-team's correction that the 'constructive backend is falsified' conclusion is TOO BROAD -- only the specific proposed contract (writableRoots[]-driven byte-identical derivation) was falsified, not the whole abstraction class. (3) Apply the red-team's correction that there is a THIRD unresolved decision the packet under-weighted: whether writableExceptions is rooted at the TARGET project or at fgOS's own installation/assignment store -- this decides roadmap step 2 and bears directly on fgOS's stated mission of serving other projects. Present it at the same body-level status as the other two. (4) Carry BOTH original unresolved items as live dissent in the body: attestation-vs-declaration, and fail-open-vs-deny-by-default. Name the part that stays the PERSON'S judgment explicitly, as a decision they must make -- never as a closing 'of course it's your call' disclaimer. (5) FLATTENING FOR COMFORT IS THE WORST THING YOU CAN DO HERE: do not soften or omit a live dissent because the person might prefer a tidy answer. This is the only surface where dissent actually reaches them. Name the single largest uncertainty and say plainly which decision it would change. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

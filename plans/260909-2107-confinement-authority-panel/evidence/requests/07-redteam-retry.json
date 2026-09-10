@@ -1,0 +1,31 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Retry red-team-packet: prior attempt on agy-bwrap timed out (agy's own 5-minute print-mode budget, unrelated to fgOS) on a long objective requiring 5 file opens. Retry with a tighter, faster objective.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-fgos-confinement-authority",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authRedteamRetry",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_v1_retry",
+      "invocationKey": "ik_redteam_v1_retry",
+      "reason": "First red-team attempt (op_053) timed out on agy's own 5-minute print-mode budget before producing any result; re-authorizing a fresh, tighter-scoped attempt.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_047", "asgn_coordinator_driver_op_048", "asgn_coordinator_driver_op_049", "asgn_coordinator_driver_op_050", "asgn_coordinator_driver_op_051"]
+    },
+    {
+      "type": "operation",
+      "as": "redteam-retry",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "taskKey": "redteam-confinement-authority-retry-01",
+      "objective": "BE FAST. Independently attack this architecture-advisory-panel's own CONDUCT (not the architecture) on a Confinement Authority design for fgOS dispatch. Trust the quotes below as real and verbatim -- do NOT re-open the underlying files unless something looks actually fabricated or self-contradictory; answer from these excerpts first, and only spot-check ONE thing at most if truly needed. Real ledger: THREE PROPOSALS -- A (system-shaper): runtime interception at transport.mjs, opt-in `executor.confinementProfile` field on the executor config, herdr-round.mjs kept separate. B (alternative-shaper): compile-time synthesis at config load, claimed zero runtime changes. C (constraint-advocate): a runtime value object deriving posture from capability+cwd (never an optional field), folds herdr-round.mjs in. CRITIQUE verdicts (architecture-critic): B is FATALLY falsified (needs a per-item worktree path that only exists at dispatch time, after config load). A recreates a fail-open risk at the executor-config layer (new executor can forget to set confinementProfile). C's herdr-round.mjs folding leaks silently through the cli-spawn adapter (which ignores the folded fields). CONSTRAINT RANKING (constraint-advocate, ranking its OWN proposal too): B=HIGH risk (same gap, independently found), C=MEDIUM-HIGH (new params + caller change, applies to all 15 executors every call), A=LOW-MEDIUM (zero caller/signature change; argued the critic's residual attack on A is smaller-magnitude -- a config-authoring-time-reviewed risk -- than a per-dispatch-call gap). SYNTHESIS then recommended a direction built on this ledger (you have NOT seen the synthesis text itself -- that is deliberate isolation; do not assume what it concluded, judge only the ledger above). Answer FAST, in order of importance: (1) Was the critic's attack on A (the proposal the ranking ends up favoring) given real weight, or does 'A's risk is smaller-magnitude' look like a convenient dismissal rather than an argued distinction -- pick one and say why in 2-3 sentences. (2) The constraint-advocate ranked its OWN Phase-5 proposal (C) as riskier than A -- genuine self-correction, or does this smell of understating C's own case? 2-3 sentences. (3) Was Proposal B a serious candidate that got fatally falsified on the merits, or a straw man dressed up to make A/C look better? 2-3 sentences. Give ONE overall verdict: APPROVE, REVISE, or INSUFFICIENT-EVIDENCE, with a one-sentence reason. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string, \"verdict\": one of \"APPROVE\"|\"REVISE\"|\"INSUFFICIENT-EVIDENCE\"}. Write agent-result.json FIRST, before writing the longer agent-report.md, so a partial run still leaves a usable structured result.",
+      "expectedOutputs": ["agent-result.json (status, summary, verdict)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

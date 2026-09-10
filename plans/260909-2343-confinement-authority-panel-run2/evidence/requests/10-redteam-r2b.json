@@ -1,0 +1,89 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "lead-advisor-actor",
+      "executor": "claude-bwrap"
+    },
+    {
+      "id": "context-investigator-actor",
+      "executor": "claude-bwrap",
+      "tier": "standard"
+    },
+    {
+      "id": "system-shaper-actor",
+      "executor": "claude-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "alternative-shaper-actor",
+      "executor": "agy-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "constraint-advocate-actor",
+      "executor": "codex-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "architecture-critic-actor",
+      "executor": "agy-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "synthesizer-actor",
+      "executor": "claude-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "red-team-actor",
+      "executor": "codex-bwrap",
+      "tier": "critical"
+    }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_r2b_v1",
+      "invocationKey": "ik_redteam_r2b_v1",
+      "reason": "synthesize-recommendation (op_071) has a linked result over the RE-RUN three-provider Phase 5. Authorizing an independent red-team over the corrected panel.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068",
+        "asgn_coordinator_driver_op_069",
+        "asgn_coordinator_driver_op_070",
+        "asgn_coordinator_driver_op_071"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068",
+        "asgn_coordinator_driver_op_069",
+        "asgn_coordinator_driver_op_070",
+        "asgn_coordinator_driver_op_071"
+      ],
+      "objective": "You are the INDEPENDENT RED-TEAM on an architecture advisory panel designing a 'Confinement Authority' for fgOS dispatch. Attack HOW THIS PANEL REACHED ITS ANSWER, not only the architecture. Use ONLY absolute paths. READ THE LEDGER (all at /home/vantt/projects/forgentX/.fgos/assignments/<id>/runs/01/agent-report.md): asgn_coordinator_driver_op_066 (system shaper, claude), op_067 (alternative shaper, gemini), op_068 (constraint advocate, codex), op_069 (architecture critic, gemini), op_070 (constraint advocate cross-assessment, codex), op_071 (THE SYNTHESIS / Decision Packet, claude). FULL PROCESS HISTORY, DISCLOSED HONESTLY BY THE COORDINATOR -- assess it, do not excuse it: Phase 5 was run TWICE. On the first attempt the coordinator omitted the per-actor actors[] roster from the request body, so all three shapers silently fell back to a single provider family, via a git-write-enabled 'claude-reviewer' invocation this panel's doctrine excludes from advisory work. Nothing refused it. An earlier red-team (on codex) called the coordinator's initial decision NOT to re-run 'at least partly protection of sunk work'. The coordinator escalated that finding to the person, who directed a full re-run. Phase 5 was then re-run on the intended roster (claude/gemini/codex) with BYTE-IDENTICAL briefs, and critique+synthesis were re-run over the new proposals. The ledger you are reading is entirely from that corrected run. ASSESS: (a) Did the re-run actually cure the defect, or does residual contamination remain -- e.g. did the coordinator's prompts to the second-round critic/synthesizer smuggle in conclusions from the discarded first round? Check the packet for claims that could only have come from the earlier discarded proposals. (b) The coordinator claims the re-run PROVED provider diversity has value, because the gemini shaper proposed externalizing confinement out of fgOS -- a solution class no claude instance produced. Is that a sound inference, or is the coordinator over-claiming from n=1 per family? (c) op_069 falsified op_067 using op_067's OWN stated falsification criterion. Verify that reasoning at source -- read the hardcoded assignments paths in /home/vantt/projects/forgentX/.fgos/config.json and judge whether a static wrapper script genuinely cannot narrow a per-dispatch writable bind. If the critic is wrong, the packet loses a decisive attack. (d) op_071 claims a two-station split (derive at resolve.mjs, compile/enforce at the cli.mjs adapter seam) that NEITHER shaper proposed, justified by runDir postdating resolveExecutorConfig. Verify that timing claim at source. A synthesizer inventing architecture is normally a role violation -- is this legitimate integration or the synthesizer becoming a fourth shaper? (e) Did op_071 launder any dissent? It carries UNRESOLVED-1, UNRESOLVED-2, an ordering dissent it decided against, and an enforcement-location item. Is anything else genuinely unsettled but presented as settled? (f) Is any proposal a DESIGNATED LOSER? (g) Does the packet's confidence exceed its evidence, given every role reported Bash/Grep/Glob unavailable and worked from Read alone? Give a VERDICT: APPROVE, APPROVE-WITH-CONCERNS, or REJECT, concerns named specifically. A ceremonial APPROVE with nothing checked is the worst possible output and is itself a finding against you. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "taskKey": "redteam_r2b"
+    }
+  ]
+}

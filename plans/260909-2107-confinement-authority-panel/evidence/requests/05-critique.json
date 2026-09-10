@@ -1,0 +1,51 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-260909-fgos-confinement-authority: Phase 6 (critique the three real Phase 5 proposals; rank their operational risk).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-fgos-confinement-authority",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_v1",
+      "invocationKey": "ik_critique_v1",
+      "reason": "Phase 6: all three Phase 5 proposals are in (system-shaper op_047, alternative-shaper op_048, constraint-advocate op_049) -- attack the strongest one.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_047", "asgn_coordinator_driver_op_048", "asgn_coordinator_driver_op_049"]
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "contextRefs": ["asgn_coordinator_driver_op_047", "asgn_coordinator_driver_op_048", "asgn_coordinator_driver_op_049"],
+      "objective": "Attack the strongest of these three real Phase 5 proposals for a Confinement Authority component in fgOS dispatch at /home/vantt/projects/forgentX -- not the weakest. Two of the three independently converged on nearly the same shape; that convergence is itself something you must test, not accept as corroboration. PROPOSAL A (system-shaper, op_047): new src/runner/dispatch/confinement.mjs, a pure `render(executor, ctx)->{command,args}` function called from transport.mjs#resolveExecutorCommand right after resolveExecutorConfig and before argv substitution, driven by an opt-in `executor.confinementProfile = {backend: 'bwrap-ro'|'provider-native', writableExceptions?: string[]}` field. Two backends (bwrap-ro, provider-native) reproduce today's byte-identical argv. herdr-round.mjs's confinement stays separate (different contract: mutates env/session, not a pure argv render). PROPOSAL B (alternative-shaper, op_048): 'Declarative Capability Posture with Compile-Time Dialect Translation' -- NO runtime component at all. Confinement folds into config.mjs's config-LOAD phase: executors declare `confinementDialects`, capabilities declare a required posture, and a `compileConfinementDialects(cfg)` pass synthesizes fully-formed executor blocks (e.g. `claude__readonly`) in-memory at load time, before resolve.mjs/transport.mjs ever run. Zero changes to resolve.mjs or transport.mjs. Falsifiable if confinement ever needs a per-invocation dynamic value that only exists at spawn time (its own stated falsification criterion). PROPOSAL C (constraint-advocate, op_049): a backend-agnostic `confinementProfile` VALUE OBJECT `{mechanism: 'os-mount-readonly'|'os-mount-full'|'provider-native'|'none', writableExceptions: string[], requiresOwnWorktree, requiresPrivateHome, requiresIsolatedSession}` resolved by a new pure function `resolveConfinementProfile(executorEntry, {capabilityName, cwd, repoRoot})` called from inside resolveExecutorCommand (same seam as A) -- and explicitly FOLDS herdr-round.mjs's three booleans in as profile fields (disagreeing with A on whether herdr-round.mjs merges in). C's top risk finding: any design keying confinement on an Assignment/mutation field fails OPEN (not closed) on /home/vantt/projects/forgentX/src/runner/loop.mjs:1005, the always-running production per-item dispatch loop, which has no Assignment at all -- C's mitigation is to derive posture only from data every call site already has (capability name, cwd), never an optional field. Specific attacks to test, decision-relevant, not style: (1) Does Proposal A actually survive C's fail-open risk, or does A's `confinementProfile` opt-in field on the EXECUTOR entry (not derived from capability/cwd) recreate exactly the failure C warns against -- i.e. is A's own mechanism itself an 'optional field a caller can forget to populate', just moved from Assignment to executor config? Attack this directly with evidence from transport.mjs/resolve.mjs. (2) Proposal A and Proposal C disagree on whether herdr-round.mjs's three booleans fold into the same value object (C: yes) or stay a separate, uninherited mechanism (A: pure-function purity argument). Which claim survives scrutiny -- does merging them actually risk anything real, or is A's purity argument aesthetic? (3) Proposal B claims zero runtime changes and cites this as a strength ('sidesteps the high-stakes runtime spawnWorker flow entirely') -- but does B's compile-time synthesis actually solve C's fail-open-on-loop.mjs:1005 risk, or does it just move the failure mode earlier (a capability with no declared posture in config.mjs still silently gets no confinement, exactly as today, just decided at a different time)? Attack B's claimed advantage directly. (4) Attack each proposal's own stated falsification criteria: are they real, occur-able conditions, or falsification theatre? Name any criterion that could never actually be observed. Report attacks that fail alongside attacks that land, at the same weight -- if an attack holds under scrutiny, concede it. Rank your attacks by whether they'd flip the panel's eventual recommendation; lead with that one. Use absolute paths for anything you verify yourself in /home/vantt/projects/forgentX. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_v1",
+      "invocationKey": "ik_assess_v1",
+      "reason": "Phase 6: rank operational risk across all three Phase 5 proposals, including your own.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_047", "asgn_coordinator_driver_op_048", "asgn_coordinator_driver_op_049"]
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "contextRefs": ["asgn_coordinator_driver_op_047", "asgn_coordinator_driver_op_048", "asgn_coordinator_driver_op_049"],
+      "objective": "Rank the real operational risk of these three real Phase 5 proposals for a Confinement Authority component in fgOS dispatch at /home/vantt/projects/forgentX -- including your own (Proposal C), evaluated with the same rigor as the others. PROPOSAL A (system-shaper, op_047): runtime interception at transport.mjs#resolveExecutorCommand via a new confinement.mjs, opt-in `executor.confinementProfile` field on the executor config entry, two backends (bwrap-ro, provider-native), herdr-round.mjs kept fully separate. PROPOSAL B (alternative-shaper, op_048): compile-time synthesis -- executors declare `confinementDialects`, capabilities declare a required posture, config.mjs's load phase synthesizes fully-formed executor blocks; zero runtime changes to resolve.mjs/transport.mjs. PROPOSAL C (your own, op_049): a `confinementProfile` value object resolved by `resolveConfinementProfile(executorEntry, {capabilityName, cwd, repoRoot})` inside resolveExecutorCommand, deriving posture from capability name + cwd (never an optional per-call field) specifically to avoid failing open on /home/vantt/projects/forgentX/src/runner/loop.mjs:1005's always-running production dispatch loop; folds herdr-round.mjs's three booleans in as profile fields. For EACH proposal, rank: does it actually apply on loop.mjs:1005's real call path with no code change to loop.mjs itself, or does it require loop.mjs (or some other mandatory caller) to be modified to pass a new value through -- and if so, is that migration risk real or trivial? Does each proposal preserve today's byte-identical argv for claude-bwrap/agy-bwrap/codex-readonly, provably (a mechanical test), or does it merely claim to? Attach every concern to a specific proposal and a magnitude -- never a generic 'has operational risk' with no named consequence. Propose the cheapest engineering mitigation that survives for the single highest-risk concern you find (not a process promise). Use absolute paths for anything you verify yourself. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

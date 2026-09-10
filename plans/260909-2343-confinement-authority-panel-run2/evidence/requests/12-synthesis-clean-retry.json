@@ -1,0 +1,87 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "lead-advisor-actor",
+      "executor": "claude-bwrap"
+    },
+    {
+      "id": "context-investigator-actor",
+      "executor": "claude-bwrap",
+      "tier": "standard"
+    },
+    {
+      "id": "system-shaper-actor",
+      "executor": "claude-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "alternative-shaper-actor",
+      "executor": "agy-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "constraint-advocate-actor",
+      "executor": "codex-bwrap",
+      "tier": "analytical"
+    },
+    {
+      "id": "architecture-critic-actor",
+      "executor": "agy-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "synthesizer-actor",
+      "executor": "claude-bwrap",
+      "tier": "critical"
+    },
+    {
+      "id": "red-team-actor",
+      "executor": "codex-bwrap",
+      "tier": "critical"
+    }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "auth-synth-clean",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_clean_v2",
+      "invocationKey": "ik_synth_clean_v2",
+      "reason": "An independent red-team (op_072) returned REJECT, demonstrating that the previous synthesis brief injected adjudications from a discarded earlier round. Re-authorizing synthesis on an uncontaminated brief containing only the corrected round's own artifacts. Retry: the first attempt (op_073) failed on a provider account session limit, not on substance.",
+      "grantedContextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068",
+        "asgn_coordinator_driver_op_069",
+        "asgn_coordinator_driver_op_070"
+      ]
+    },
+    {
+      "type": "operation",
+      "as": "synthesize-clean",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "taskKey": "synthesize_clean_v2",
+      "contextRefs": [
+        "asgn_coordinator_driver_op_066",
+        "asgn_coordinator_driver_op_067",
+        "asgn_coordinator_driver_op_068",
+        "asgn_coordinator_driver_op_069",
+        "asgn_coordinator_driver_op_070"
+      ],
+      "objective": "You are the SYNTHESIZER on an architecture advisory panel designing a 'Confinement Authority' for fgOS dispatch. You see the whole ledger; no one else has. Produce the Decision Packet answering all six sub-asks: component boundary, component parent, canonical contracts (literal shapes), backend abstraction, default implementation, expansion roadmap with reversibility marked per step. Use ONLY absolute paths. READ THESE FIVE, which are the ENTIRE ledger (all at /home/vantt/projects/forgentX/.fgos/assignments/<id>/runs/01/agent-report.md): asgn_coordinator_driver_op_066 (system shaper proposal), asgn_coordinator_driver_op_067 (alternative shaper proposal), asgn_coordinator_driver_op_068 (constraint advocate proposal), asgn_coordinator_driver_op_069 (architecture critic), asgn_coordinator_driver_op_070 (constraint advocate's cross-assessment of all three). Background: asgn_coordinator_driver_op_056 (lead advisor framing) and asgn_coordinator_driver_op_057 (context investigator scout) at the same path pattern. PROCESS NOTE YOU MUST HONOUR: a previous attempt at this synthesis was rejected by an independent red-team because its brief had conclusions pre-adjudicated inside it by the coordinator, which the synthesizer then partly reported as its own findings. This brief deliberately contains NO adjudications. Do not ask the coordinator what was concluded before, do not look for a previous synthesis, and derive every conclusion yourself from the five reports plus your own reading of real source under /home/vantt/projects/forgentX/src/runner/dispatch/ and /home/vantt/projects/forgentX/.fgos/config.json. If you assert that some claim is settled, falsified, or new, YOU must show where in the ledger or the source that comes from. RE-VERIFY at source, do not take any role on trust, anything that decides your recommendation. YOUR JOB: (1) One recommendation, answering all six sub-asks. It may be a composite; if so name exactly which piece comes from which proposal and why the combination beats any single one. (2) IMPORTANT -- if your integration produces any design element that NO shaper actually proposed, you must label it explicitly as your own invention, flag that it has not been attacked by any critic, and say plainly that it needs independent critique before adoption. Do not present invented architecture as if it were integration of existing proposals. (3) Carry genuine disagreement to the person as visible dissent in the packet BODY, labelled unresolved -- never convert an unsettled matter into a tidy 'consideration'. Distinguish what the ledger settled BY EVIDENCE from what remains a VALUE choice about risk appetite that evidence cannot settle. (4) Where a roadmap step depends on an unresolved value choice, do not silently assume one branch -- give the decision-contingent alternatives. (5) Name what you are NOT recommending and why, especially anything you drop. (6) Name the largest remaining uncertainty and which decision it would change. (7) Be explicit about evidence limits: state which of your claims rest on exhaustive verification and which rest on targeted reads, particularly for any negative/absence claim. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ]
+    }
+  ]
+}

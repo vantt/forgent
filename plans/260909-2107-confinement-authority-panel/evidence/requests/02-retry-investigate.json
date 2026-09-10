@@ -1,0 +1,30 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Retry investigate-context on agy-bwrap: codex-readonly produced a real, evidence-cited scout but could not write agent-result.json (read-only sandbox, no writable exception -- the documented gap). Re-run the same investigation on a bwrap executor that has the writable .fgos/assignments exception.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-fgos-confinement-authority",
+  "protocolRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1"
+  },
+  "actors": [
+    {
+      "id": "context-investigator-actor",
+      "executor": "agy-bwrap",
+      "tier": "standard"
+    }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "investigate-retry",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the REAL repository at /home/vantt/projects/forgentX for everything relevant to a proposed 'Confinement Authority' component for fgOS dispatch. Use ONLY absolute paths for everything you read (do not rely on your own current directory). Specifically investigate and report path+line-cited findings for: (1) /home/vantt/projects/forgentX/.fgos/config.json -- the full executor definitions for claude-bwrap, agy-bwrap, codex-readonly (grep those three names): what confinement mechanism each declares (bwrap mount args, writable exceptions, sandbox flags). (2) /home/vantt/projects/forgentX/src/runner/dispatch/config.mjs -- search for a declared 'confinement' schema (flags such as privateHome, isolatedSession, ownWorktree) and any validation rule tying it to permissionMode. Report its exact shape and where it is validated. (3) /home/vantt/projects/forgentX/src/runner/dispatch/herdr-round.mjs -- search for where those confinement flags (privateHome/isolatedSession/ownWorktree) are actually enforced (own-worktree path check, private HOME creation, isolated worker session). Report exactly what real code does for each flag, with line numbers. (4) Whether the bwrap-executor confinement (claude-bwrap/agy-bwrap's OS-level bwrap mount) and the herdr-round.mjs confinement schema are the SAME mechanism, related, or two independent, disconnected confinement schemes today -- this is the single most decision-relevant fact for the panel, so verify it directly by reading both, do not assume. (5) /home/vantt/projects/forgentX/src/runner/dispatch/mechanism.mjs and /home/vantt/projects/forgentX/src/runner/dispatch/resolve.mjs -- how dispatch.mjs's decide/execute verbs choose in-process vs out-of-process and resolve an executor's config; is there any existing seam that could be called a confinement boundary today. (6) /home/vantt/projects/forgentX/src/runner/main-checkout-lock.mjs and /home/vantt/projects/forgentX/src/runner/worktree.mjs -- the EXISTING worktree isolation guard and main-checkout lock: what do they confine and by what mechanism, and whether that already IS a form of confinement authority or a genuinely different concern (write-serialization vs. process/filesystem sandboxing). (7) /home/vantt/projects/forgentX/src/runner/dispatch.mjs itself (82 lines -- read it whole) -- what it currently does, and where in the call chain a Confinement Authority component would plug in if one existed. Report counted, path-cited findings only, no adjectives. Explicitly report anything you looked for and did NOT find (absence is a finding). If a starting hypothesis (no real Confinement Authority component exists yet, only ad hoc bwrap args plus a separate, disconnected herdr-spawn confinement schema) turns out to be false or only partly true, say so plainly. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": [
+        "agent-result.json (status, summary)",
+        "agent-report.md (human-readable)"
+      ],
+      "taskKey": "investigate-context-retry-01"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Design a Confinement Authority component for fgOS dispatch (src/runner/dispatch.mjs and the out-of-process executor path): component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-260909-2343-fgos-confinement-run2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30, "wallTimeMs": 14400000 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret this person's raw request, verbatim: \"Cho toi mot architecture panel de thiet ke Confinement Authority cho fgOS dispatch. Hay xac dinh component boundary, component parent, canonical contracts, backend abstraction, default implementation don gian va lo trinh mo rong. Ghi toan bo discussion va quyet dinh cuoi vao mot file.\" (Vietnamese; English gloss: 'Give me an architecture panel to design a Confinement Authority for fgOS dispatch. Determine component boundary, component parent, canonical contracts, backend abstraction, a simple default implementation, and an expansion roadmap. Write the whole discussion and final decision into one file.'). The system under design is real and is the repository you are running inside: /home/vantt/projects/forgentX. The dispatch surface is /home/vantt/projects/forgentX/src/runner/dispatch.mjs plus the modules under /home/vantt/projects/forgentX/src/runner/dispatch/. Executor definitions live in /home/vantt/projects/forgentX/.fgos/config.json. Ground your interpretation by reading real files with absolute paths. Do NOT accept the phrase 'Confinement Authority' as implying no such thing exists yet -- whether it does, partly does, or does not is exactly what the context investigator will establish with evidence, and you must NOT decide it here. Name: what altitude this request sits at (one module's internal shape vs. a new cross-cutting platform capability vs. a rewrite of dispatch itself); what decision burden it carries (reversibility -- additive vs. moving existing logic); and the single largest ambiguity across the six sub-asks (boundary/parent/contracts/backend-abstraction/default-impl/roadmap) that you are deliberately holding OPEN for evidence rather than resolving yourself. Mark uncertainty per inference, not per document. Use absolute paths for anything you read. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the REAL repository at /home/vantt/projects/forgentX for everything bearing on a proposed 'Confinement Authority' for fgOS dispatch. Use ONLY absolute paths. Your job is evidence, never a recommendation. Start from the dispatch surface itself -- /home/vantt/projects/forgentX/src/runner/dispatch.mjs and every module under /home/vantt/projects/forgentX/src/runner/dispatch/ -- and from the executor definitions in /home/vantt/projects/forgentX/.fgos/config.json. Establish, with file:line citations and counts: (a) By what concrete mechanism is an executor actually confined today, if at all? Trace it from the config declaration all the way to the process that gets spawned -- name every file and function the confinement information passes through, and say exactly where it stops being data and becomes hardcoded strings, if it does. (b) Is confinement today DECLARED (a validated config field with a schema) or IMPLIED (argv assembled ad hoc)? Check whether any config validator knows about it, and whether an unknown or misspelled key would be refused or silently ignored -- verify that against the real validator code, do not assume. (c) Does every executor that is confined actually declare it, and does every executor that declares it actually get it enforced? Report any asymmetry between declaration and enforcement, in BOTH directions, naming the exact executors. (d) Are there OTHER isolation or confinement-like mechanisms elsewhere under /home/vantt/projects/forgentX/src/runner/ that a new component might duplicate or wrongly absorb? Find them yourself by reading; for each, state what it actually confines, by what mechanism, and whether it is the same concern or a genuinely different axis. Do not assume the answer either way. (e) What test coverage, if any, currently pins the spawned command and argv for the confined executors? Cite the test file and what it actually asserts. CRITICAL METHOD REQUIREMENT: write down your starting hypothesis first, then hunt specifically for what would FALSIFY it. A repository is large enough to confirm anything, so unanimous support for your own starting hypothesis is a method failure, not a good result. If what you find contradicts the framing you were handed -- including contradicting the premise that a Confinement Authority does not already exist -- report that contradiction plainly and prominently; that is the most valuable thing you can produce. Separate 'I looked and it is not there' from 'I did not look'. Report counted, path-cited findings only, never adjectives like 'tightly coupled'. Do NOT recommend an architecture: three independent shapers will read your report and a recommendation from you would contaminate all three. Also write a short human-readable agent-report.md alongside your structured result. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}
