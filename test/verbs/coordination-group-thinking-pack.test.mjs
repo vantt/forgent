@@ -654,3 +654,92 @@ test('a request naming a DIFFERENT executor per actor reaches run.mjs\'s real pe
   assert.equal(result.steps[1].provider, 'family-b');
   assert.equal(result.closed, true);
 });
+
+// Regression guard for a real, observed fail-open in the dispatch layer.
+//
+// The per-actor roster lives in the REQUEST BODY (`actors[]`), never in the
+// session. So a request that names `targetActorId` but omits `actors[]` --
+// which is exactly what a RESUMED session looks like when its driver forgets
+// to repeat the roster -- resolves every actor to the global default
+// executor. Observed live: an architecture-advisory panel resumed without
+// `actors[]` ran three roles that were deliberately bound to three different
+// confined executors on the single default one instead. Nothing refused it
+// and nothing warned; it was found only by reading result metadata after the
+// fact, by which point three advisory dispatches had already run on the
+// wrong provider.
+//
+// This is the negative twin of the multi-executor test directly above: same
+// protocol, same steps, same explicit `targetActorId` -- `actors[]` removed.
+// The silent-downgrade behaviour itself is legal and is preserved (omitting
+// `actors[]` is a legitimate "I want defaults" request); what must never
+// happen again is that it passes in SILENCE.
+test('a request that names targetActorId but omits actors[] says so out loud -- the roster is per-request, and a silent fallback to the default executor is how a confined roster got downgraded unnoticed', async () => {
+  const tempDir = mkTempDir();
+  writeMultiExecutorConfig(tempDir);
+  const packPath = writePack(tempDir, { members: [{ id: DECLARED_CONSULT_ID, version: '1.0.0' }] });
+
+  const request = {
+    kind: 'declared-protocol',
+    objective: 'Prove an omitted actors[] roster is reported rather than silently defaulted.',
+    writerId: 'group-thinking-pack-missing-roster-test',
+    coordinationId: 'coord_group_thinking_missing_roster_test',
+    protocolRef: { id: DECLARED_CONSULT_ID },
+    // actors[] deliberately ABSENT -- the whole point of this test.
+    steps: [
+      { type: 'operation', as: 'req', operationId: 'request-consult', targetActorId: 'requester-actor', objective: 'Ask.', expectedOutputs: OUTPUTS },
+      {
+        type: 'operation',
+        as: 'resp',
+        operationId: 'provide-consult',
+        targetActorId: 'consultant-actor',
+        objective: 'Answer.',
+        expectedOutputs: OUTPUTS,
+        contextRefs: ['$ref:req'],
+        fromAssignmentId: '$ref:req',
+      },
+    ],
+  };
+
+  const originalWrite = process.stderr.write.bind(process.stderr);
+  const captured = [];
+  process.stderr.write = (chunk, ...rest) => {
+    captured.push(String(chunk));
+    return originalWrite(chunk, ...rest);
+  };
+  let result;
+  try {
+    result = await runGroupThinkingRequest(
+      { cwd: tempDir, repoRoot: tempDir },
+      { packPath, protocolId: DECLARED_CONSULT_ID, requestObject: request },
+    );
+  } finally {
+    process.stderr.write = originalWrite;
+  }
+
+  const stderr = captured.join('');
+
+  // The behaviour that was already true and must stay true: both actors
+  // collapse onto the one global default executor. This is the downgrade.
+  assert.equal(result.steps[0].executor, result.steps[1].executor, 'without a roster both actors are expected to fall back to the same global default -- that is the downgrade this warning exists to announce');
+  assert.notEqual(result.steps[0].executor, 'exec-actor-a', 'the per-actor binding must genuinely NOT have applied, otherwise this test is not exercising the fallback at all');
+
+  // The new behaviour: it is announced, per actor, naming where it landed.
+  for (const actorId of ['requester-actor', 'consultant-actor']) {
+    assert.ok(
+      stderr.includes(actorId) && stderr.includes('declares no actors[] entry'),
+      `the omitted roster must be reported for "${actorId}" -- a silent per-actor fallback to the default executor is the exact fail-open this guard exists for. stderr was: ${stderr}`,
+    );
+  }
+  // Asserted against the WARNING LINE specifically, not against all of
+  // stderr: the surrounding dispatch log already prints `executor=<path>`,
+  // so a whole-stderr substring check would pass even if the warning itself
+  // never named where the dispatch landed.
+  const warningLines = stderr.split('\n').filter((line) => line.includes('declares no actors[] entry'));
+  assert.equal(warningLines.length, 2, 'exactly one warning per un-bound actor');
+  for (const line of warningLines) {
+    assert.ok(
+      line.includes(result.steps[0].executor),
+      `the warning itself must name the executor the dispatch actually landed on, so a reader can tell WHICH posture they got instead of the one they intended. Line was: ${line}`,
+    );
+  }
+});

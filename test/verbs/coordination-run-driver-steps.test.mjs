@@ -272,9 +272,18 @@ test('validateCoordinationRequest: an unknown field on an "authorize" step is re
 });
 
 test('validateCoordinationRequest: an "authorize" step missing authorizationId/invocationKey/reason is rejected, one message each', () => {
+  // `authorizationId`/`invocationKey` now also state WHY they are required
+  // and what a retry needs: because `authorizationId` seeds the dispatch's
+  // default taskKey, re-sending a previous attempt's ids re-presents the same
+  // task instead of running a new one. A driver hitting the old bare
+  // "must be a non-empty string" read it as malformed input rather than as
+  // retry semantics. The patterns below still pin one dedicated,
+  // field-naming refusal per missing field -- this test's actual subject --
+  // and additionally pin that the retry guidance is present, so the wording
+  // cannot silently regress to the bare form.
   for (const [field, pattern] of [
-    ['authorizationId', /steps\[1\]\.authorizationId must be a non-empty string/],
-    ['invocationKey', /steps\[1\]\.invocationKey is required/],
+    ['authorizationId', /steps\[1\]\.authorizationId is required for an "authorize" step\..*FRESH authorizationId/s],
+    ['invocationKey', /steps\[1\]\.invocationKey is required.*fresh one alongside a fresh authorizationId/s],
     ['reason', /steps\[1\]\.reason is required/],
   ]) {
     const step = authorizeStep();

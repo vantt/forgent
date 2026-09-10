@@ -459,6 +459,29 @@ export async function runCoordinationUseCase(ctx, options = {}) {
           engineOpts,
         );
         labels[step.as] = dispatch.assignment.assignmentId;
+        // The per-actor roster lives in the REQUEST BODY (`actors[]`), not in
+        // the session. A resume request that omits it therefore resolves every
+        // actor to the global default executor -- silently, because an absent
+        // entry is indistinguishable here from "no override wanted". Observed
+        // live: an advisory panel resumed without `actors[]` ran three roles
+        // that were bound to three different confined executors on the single
+        // default one instead, and nothing said so; it was found only by
+        // reading result metadata afterwards. Say it out loud instead. This
+        // warns rather than refuses because omitting `actors[]` is legal and
+        // is sometimes exactly what a caller means.
+        if (step.targetActorId && actorEntry === undefined) {
+          // Same provenance field summarizeDispatch reports as `executor`
+          // (below) -- the executor actually resolved for this dispatch, not
+          // the one a caller asked for. Naming it is the point: it tells the
+          // reader WHICH posture they got instead of the one they intended.
+          const landedOn = dispatch?.runResult?.policy?.provenance?.executor?.value;
+          process.stderr.write(
+            `fgos: coordination step "${step.as}" targets actor "${step.targetActorId}" but this request declares no ` +
+              `actors[] entry for it — no per-actor executor/tier/persona was applied` +
+              `${landedOn ? `, so it dispatched on "${landedOn}"` : ''}. ` +
+              `The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.\n`,
+          );
+        }
         // `targetActorId` is reported as given; when the caller omits it
         // (a single-actor-per-operation template), the engine's own
         // resolveDeclaredOperationActor resolves it internally and does not

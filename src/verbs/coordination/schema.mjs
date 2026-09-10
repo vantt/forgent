@@ -326,9 +326,26 @@ function validateAuthorizeStep(step, i) {
   // `authorizationId` is concatenated verbatim into a driver-authorized
   // dispatch's default `taskKey` (session-engine.mjs), the same string this
   // module already charset-checks when a caller supplies `taskKey` directly.
+  //
+  // Both identity fields below are also what makes a RETRY legal: because
+  // `authorizationId` feeds the default `taskKey`, re-sending an authorize
+  // step with the ids a previous attempt already used re-presents the same
+  // task rather than a new one. The bare "required" message did not say so,
+  // and a driver retrying a failed operation reads it as a malformed-input
+  // error instead of a retry-semantics one. Say what the field is for.
+  if (step.authorizationId === undefined) {
+    fail(
+      `steps[${i}].authorizationId is required for an "authorize" step. It names this grant and seeds the ` +
+        `dispatch's default taskKey, so RETRYING a driver-authorized operation needs a FRESH authorizationId ` +
+        `and invocationKey — reusing the previous attempt's ids re-presents the same task instead of a new run.`,
+    );
+  }
   assertSafeId(step.authorizationId, `steps[${i}].authorizationId`);
   if (!isNonEmptyString(step.invocationKey) || step.invocationKey.length > INVOCATION_KEY_MAX_LENGTH) {
-    fail(`steps[${i}].invocationKey is required and must be a non-empty string of at most ${INVOCATION_KEY_MAX_LENGTH} characters`);
+    fail(
+      `steps[${i}].invocationKey is required and must be a non-empty string of at most ${INVOCATION_KEY_MAX_LENGTH} characters. ` +
+        `It distinguishes one invocation of a grant from another, so a retry needs a fresh one alongside a fresh authorizationId.`,
+    );
   }
   if (!isNonEmptyString(step.reason) || step.reason.length > REASON_MAX_LENGTH) {
     fail(`steps[${i}].reason is required and must be a non-empty string of at most ${REASON_MAX_LENGTH} characters`);

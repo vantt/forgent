@@ -655,6 +655,20 @@ function warnIfProviderFamilyUnreliable(executorId, executor) {
     ? executor.invocations.find((inv) => inv.via === 'cli')?.command
     : undefined;
   if (typeof cliInvocationCommand === 'string' && cliInvocationCommand.trim()) return;
+  // NOTE (unresolved, deliberately left as-is): warning on this shape is a
+  // tested decision -- `dispatch.test.mjs`'s "gitnexus shape: mcp-only" case
+  // asserts it fires exactly once and does not throw. It is also NOISY in
+  // practice: `loadRunnerConfig` runs several times per dispatching process,
+  // so a real advisory session prints it repeatedly for an entry that
+  // `dispatch.mjs decide gitnexus` resolves `{"mechanism":"in-process",
+  // "mcpTool":"mcp__gitnexus__impact"}` -- never a cli-spawn, so the
+  // cross-call-site provider disagreement it warns about cannot arise on
+  // that path. That observation does NOT by itself refute the reason named
+  // in the test's own title (assignment-policy.mjs has no command to extract
+  // for this shape and defaults the family), so the behaviour is not
+  // reversed here on one agent's judgment. Decide it deliberately: either
+  // declare a truthful provider on the entry, narrow the warning to shapes
+  // that can actually reach a CLI dispatch, or make it once-per-process.
   const command = executor.command;
   if (typeof command === 'string' && command.trim() && CLAUDE_CLI_COMMANDS.includes(command)) return;
   const commandDescription = typeof command === 'string' && command.trim() ? JSON.stringify(command) : 'none resolvable from its config';
