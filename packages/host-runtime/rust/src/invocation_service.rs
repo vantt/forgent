@@ -303,26 +303,64 @@ impl<F: Future> Future for CatchUnwind<F> {
     }
 }
 
-/// RAII guard removing one entry from `cancellation_txs` when dropped.
+/// One `cancellation_txs` registration: a monotonic per-registration
+/// generation number alongside the sender, so a guard drop can identify and
+/// remove exactly its own registration -- never a different, still-live
+/// invocation that happens to share the same invocation_id.
+struct CancellationEntry {
+    generation: u64,
+    tx: tokio::sync::watch::Sender<bool>,
+}
+
+/// RAII guard removing one registration from `cancellation_txs` when
+/// dropped -- but ONLY the exact generation this guard itself registered,
+/// never a sibling registration sharing the same invocation_id.
 ///
 /// MEDIUM-6: `cancellation_txs` had no removal path anywhere -- unbounded
-/// growth for a long-running host (kernel §6), and a reused invocation id
-/// silently overwrote an earlier still-registered sender. Binding this guard
-/// for the lifetime of `invoke_internal`'s call means the entry is pruned
+/// growth for a long-running host (kernel §6). Binding this guard for the
+/// lifetime of `invoke_internal`'s call means its registration is pruned
 /// the moment that invocation reaches ANY terminal return, regardless of
-/// which of the function's many early-return paths fires -- shrinking the
-/// collision window down to genuinely concurrent, overlapping same-id
-/// invocations (a caller bug `LifecycleTracker::write_terminal` already
-/// handles as a late-response diagnostic, per R7), not "any id reused
-/// across the service's whole lifetime".
+/// which of the function's many early-return paths fires.
+///
+/// `cancellation_txs` maps an invocation_id to a `Vec` of registrations,
+/// not a single slot (red-team MEDIUM, P06 round 2): two genuinely
+/// concurrent invocations sharing an id, however that happened, must not
+/// let whichever one registers SECOND silently drop the first one's
+/// `watch::Sender` by overwriting a single map slot -- `invoke_internal`
+/// treats its own sender being dropped (the watch channel closing) the
+/// same as an explicit cancellation, so a plain single-slot `insert` would
+/// spuriously cancel the earlier invocation the instant the later one
+/// registers, with no caller ever calling `cancel()` at all. Appending to a
+/// `Vec` keeps every concurrent registration's sender alive independently;
+/// `cancel()` then signals every live registration under that id, and each
+/// guard drop removes only its own entry (by generation) from the `Vec`,
+/// removing the `Vec` itself only once it is empty.
 struct CancellationTxGuard<'a> {
-    txs: &'a Mutex<HashMap<String, tokio::sync::watch::Sender<bool>>>,
+    txs: &'a Mutex<HashMap<String, Vec<CancellationEntry>>>,
     invocation_id: String,
+    generation: u64,
 }
 
 impl Drop for CancellationTxGuard<'_> {
     fn drop(&mut self) {
-        self.txs.lock().unwrap().remove(&self.invocation_id);
+        // .unwrap_or_else(PoisonError::into_inner), not .unwrap() (LOW-4):
+        // a Drop running during an unwind (e.g. a caller-supplied
+        // &dyn EventSink panicking outside CatchUnwind's reach) while this
+        // same mutex is already poisoned would otherwise be panic-during-
+        // unwind, which aborts the whole process. Best-effort cleanup of a
+        // poisoned map is strictly better than an abort here.
+        let mut map = self
+            .txs
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        if let std::collections::hash_map::Entry::Occupied(mut entry) =
+            map.entry(self.invocation_id.clone())
+        {
+            entry.get_mut().retain(|e| e.generation != self.generation);
+            if entry.get().is_empty() {
+                entry.remove();
+            }
+        }
     }
 }
 
@@ -333,7 +371,8 @@ pub struct InvocationService {
     admission: CallerAdmission,
     grant: ProviderGrant,
     tracker: Arc<LifecycleTracker>,
-    cancellation_txs: Mutex<HashMap<String, tokio::sync::watch::Sender<bool>>>,
+    cancellation_txs: Mutex<HashMap<String, Vec<CancellationEntry>>>,
+    cancellation_generation: std::sync::atomic::AtomicU64,
 }
 
 impl InvocationService {
@@ -354,6 +393,7 @@ impl InvocationService {
             grant: ProviderGrant::default(),
             tracker: Arc::new(LifecycleTracker::default()),
             cancellation_txs: Mutex::new(HashMap::new()),
+            cancellation_generation: std::sync::atomic::AtomicU64::new(0),
         }
     }
 
@@ -376,13 +416,24 @@ impl InvocationService {
     }
 
     /// Signals cancellation for an active invocation by ID.
+    ///
+    /// If multiple concurrent invocations somehow share an id, this signals
+    /// every one of them still live -- `cancellation_txs` holds a `Vec` of
+    /// registrations per id precisely so a shared id cancels all of them,
+    /// not an arbitrary pick (P06 round 2).
     pub fn cancel(&self, invocation_id: &str) -> bool {
-        let map = self.cancellation_txs.lock().unwrap();
-        if let Some(tx) = map.get(invocation_id) {
-            let _ = tx.send(true);
-            true
-        } else {
-            false
+        let map = self
+            .cancellation_txs
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        match map.get(invocation_id) {
+            Some(entries) if !entries.is_empty() => {
+                for entry in entries {
+                    let _ = entry.tx.send(true);
+                }
+                true
+            }
+            _ => false,
         }
     }
 
@@ -463,19 +514,32 @@ impl InvocationService {
         sink.record_event("invocation.received");
         sink.record_progress("stage: received");
 
-        // Prepare cancellation watch channel
+        // Prepare cancellation watch channel. The generation number this
+        // registration gets is what lets its own guard tell "my entry" apart
+        // from a different, later registration under the same id (P06
+        // round 2 fix for red-team's concurrent-duplicate-id finding).
         let (cancel_tx, cancel_rx) = tokio::sync::watch::channel(false);
+        let generation = self
+            .cancellation_generation
+            .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
         {
             self.cancellation_txs
                 .lock()
-                .unwrap()
-                .insert(invocation_id.clone(), cancel_tx);
+                .unwrap_or_else(|poisoned| poisoned.into_inner())
+                .entry(invocation_id.clone())
+                .or_default()
+                .push(CancellationEntry {
+                    generation,
+                    tx: cancel_tx,
+                });
         }
         // Held for the rest of this function's scope: pruned on every return
-        // path via Drop (MEDIUM-6).
+        // path via Drop (MEDIUM-6), but only if this generation is still the
+        // live one (round-2 fix above).
         let _cancellation_guard = CancellationTxGuard {
             txs: &self.cancellation_txs,
             invocation_id: invocation_id.clone(),
+            generation,
         };
 
         // Stage 2: admit (before routing)
@@ -1135,6 +1199,88 @@ mod tests {
                 !service.cancel(&record.invocation_id),
                 "cancellation_txs entry for a terminal invocation must already be pruned"
             );
+        }
+    }
+
+    mod concurrent_duplicate_invocation_id_cancellation {
+        use super::*;
+
+        /// Regression for red-team's P06 round-2 MEDIUM: two invocations
+        /// that (however it happened caller-side) share one invocation_id
+        /// must not let whichever one reaches a terminal record FIRST
+        /// silently orphan the other's still-live cancellation channel by
+        /// removing its entry out from underneath it.
+        #[tokio::test]
+        async fn concurrent_duplicate_invocation_id_cancellation() {
+            let service = Arc::new(build_test_service());
+            let shared_id = "inv_dup_test";
+
+            let mut invocation_a = HostInvocation::new("cli");
+            invocation_a.invocation_id = Some(shared_id.to_string());
+            let request_a = OperationRequest::new(
+                OperationId::from_static("test.fixture.echo"),
+                ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                Box::new(EchoAction::Delay {
+                    duration: Duration::from_millis(20),
+                    message: "a".to_string(),
+                }),
+            );
+            let service_a = Arc::clone(&service);
+            let handle_a = tokio::spawn(async move {
+                service_a
+                    .invoke_with_record(invocation_a, request_a, &NoopEventSink)
+                    .await
+            });
+
+            // Let A run up to its own first internal await point (inside
+            // its Delay future) before spawning B: A's cancellation_txs
+            // insert is entirely synchronous (Stage 1, before any await),
+            // so this guarantees A registers generation 0 before B
+            // registers a later generation under the same id.
+            tokio::task::yield_now().await;
+
+            let mut invocation_b = HostInvocation::new("cli");
+            invocation_b.invocation_id = Some(shared_id.to_string());
+            let request_b = OperationRequest::new(
+                OperationId::from_static("test.fixture.echo"),
+                ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                Box::new(EchoAction::Delay {
+                    duration: Duration::from_millis(200),
+                    message: "b".to_string(),
+                }),
+            );
+            let service_b = Arc::clone(&service);
+            let handle_b = tokio::spawn(async move {
+                service_b
+                    .invoke_with_record(invocation_b, request_b, &NoopEventSink)
+                    .await
+            });
+            tokio::task::yield_now().await;
+
+            // A's short delay elapses well before B's; A finishes and its
+            // guard drops first.
+            let (result_a, _record_a) = handle_a.await.unwrap();
+            // Before the Vec-per-id fix, B's registration would have
+            // overwritten A's single map slot and dropped A's sender,
+            // which invoke_internal's cancellation watch treats the same
+            // as an explicit cancel -- spuriously cancelling A even though
+            // nobody ever called `cancel()`.
+            assert!(result_a.is_ok(), "result_a: {:?}", result_a);
+
+            // Without generation tagging, A's drop would have removed the
+            // shared-id map entry outright, orphaning B's still-live
+            // cancellation channel. With it, B's later (higher-generation)
+            // registration survives A's drop.
+            assert!(
+                service.cancel(shared_id),
+                "B's cancellation entry must still be reachable after A's guard drops"
+            );
+
+            let (result_b, _record_b) = handle_b.await.unwrap();
+            assert!(matches!(result_b, Err(ProviderError::CallerCancelled(_))));
+
+            // Both are now terminal; the shared id must be fully pruned.
+            assert!(!service.cancel(shared_id));
         }
     }
 

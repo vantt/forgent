@@ -127,6 +127,23 @@ impl CallerAdmission {
     /// a real, externally-configured `CallerAdmission` once one exists).
     /// Grants no capabilities by default -- pair with
     /// `.with_admitted_capabilities(..)` for a provider that requests any.
+    ///
+    /// Known limitation, carried forward rather than solved here (review
+    /// round 2, MEDIUM-1-residual-on-HIGH-1): `admit()` looks up `op_desc`
+    /// from the SAME catalog this allow-list was built from, so the policy
+    /// check is tautological for any catalogued operation -- it can never
+    /// refuse one. `InvocationService::new` is the only composition this
+    /// crate offers today, so this call site's effective runtime
+    /// authorization posture is unchanged from before HIGH-1 was fixed; the
+    /// value added here is making the *default* deny-by-default in general
+    /// (any caller who builds a `CallerAdmission` some other way, or checks
+    /// a policy this catalog does not name, is correctly refused). Closing
+    /// this for real needs a policy source independent of "whatever
+    /// operations exist" -- an explicit externally-sourced allow-list, or
+    /// `InvocationService::new` dropping its default and requiring every
+    /// caller to supply a `CallerAdmission`. That is a Phase 08
+    /// composition-root obligation, not something this phase's scope (no
+    /// external policy distribution exists in R1) can resolve.
     pub fn allow_catalog_policies(catalog: OperationCatalog) -> Self {
         let allowed_policies: HashSet<String> = catalog
             .iter()
