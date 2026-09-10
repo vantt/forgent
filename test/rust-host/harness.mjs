@@ -43,7 +43,7 @@ export const SPY_PATH = path.join(__dirname, "fixtures/child-process-spy.cjs");
 export const ROUTES_PATH = path.join(REPO_ROOT, "packages/host-runtime/contracts/command-routes.json");
 
 /** Commands this harness has empirically observed a real `fgos` invocation spawn. */
-const PATH_SHIM_COMMANDS = ["git"];
+const PATH_SHIM_COMMANDS = ["git", "npm"];
 
 /**
  * Builds a PATH-shim directory: one wrapper script per name in `PATH_SHIM_COMMANDS`
@@ -449,10 +449,10 @@ export function compareResults(testCase, resultA, resultB) {
   // checked before anything else so two identically-broken entries can never
   // rubber-stamp as a pass just because every other field happens to match
   // (both null/undefined).
-  if (resultA.launchError || resultB.launchError) {
+  if (resultA.launchError != null || resultB.launchError != null) {
     differences.push(
-      `Launch failure: entry A ${resultA.launchError ? `failed to launch (${resultA.launchError.message})` : "launched fine"}, ` +
-      `entry B ${resultB.launchError ? `failed to launch (${resultB.launchError.message})` : "launched fine"}`
+      `Launch failure: entry A ${resultA.launchError != null ? `failed to launch (${resultA.launchError.message})` : "launched fine"}, ` +
+      `entry B ${resultB.launchError != null ? `failed to launch (${resultB.launchError.message})` : "launched fine"}`
     );
     return { caseId: testCase.id, modes, passed: false, differences, resultA, resultB };
   }
