@@ -18,6 +18,55 @@ import { execFileSync } from 'node:child_process';
 import { loadGlobalConfig, writeGlobalConfig } from '../config/global-config.mjs';
 
 /**
+ * Tier 0: workspace installation shim/binary.
+ * Checked when `<cwd>/.fgos/installation/activation.json` exists and its manifest's
+ * `entries.fgos` resolves to a real file.
+ */
+export function resolveWorkspaceInstallationBin(cwd) {
+  try {
+    const activationPath = path.join(cwd, '.fgos', 'installation', 'activation.json');
+    if (!fs.existsSync(activationPath)) return null;
+    const act = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+
+    let manifestPath = null;
+    let baseDir = null;
+
+    if (act && typeof act.releasePath === 'string' && act.releasePath) {
+      const candidate = path.join(act.releasePath, 'manifest.json');
+      if (fs.existsSync(candidate)) {
+        manifestPath = candidate;
+        baseDir = act.releasePath;
+      }
+    }
+    if (!manifestPath) {
+      const installManifest = path.join(cwd, '.fgos', 'installation', 'manifest.json');
+      if (fs.existsSync(installManifest)) {
+        manifestPath = installManifest;
+        baseDir = path.join(cwd, '.fgos', 'installation');
+      }
+    }
+    if (!manifestPath || !baseDir) return null;
+
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const fgosEntry = manifest?.entries?.fgos;
+    if (typeof fgosEntry !== 'string' || !fgosEntry) return null;
+
+    const resolvedBase = path.resolve(baseDir);
+    const candidateBin = path.resolve(resolvedBase, fgosEntry);
+    if (candidateBin !== resolvedBase && !candidateBin.startsWith(resolvedBase + path.sep)) {
+      return null;
+    }
+
+    if (fs.existsSync(candidateBin) && fs.statSync(candidateBin).isFile()) {
+      return candidateBin;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Tier 1: dev-checkout self-hosting -- `cwd` itself is a forgent checkout.
  */
 export function resolveDevCheckoutBin(cwd) {
@@ -98,12 +147,15 @@ export function refreshGlobalBinCache(globalConfigPath = undefined) {
 }
 
 /**
- * The full 3-tier resolution (D2), in priority order: dev-checkout (tier
- * 1) > project-local (tier 2) > global (tier 3, cache-first with a live
+ * The full 4-tier resolution (D2 + Phase 10 tier 0), in priority order:
+ * workspace installation (tier 0) > dev-checkout (tier 1) >
+ * project-local (tier 2) > global (tier 3, cache-first with a live
  * fallback so a cold cache never hard-fails). Returns `{ tier, path }` or
  * `null` when nothing resolves at any tier.
  */
 export function resolveFgosBin(cwd, { globalConfigPath = undefined } = {}) {
+  const workspaceBin = resolveWorkspaceInstallationBin(cwd);
+  if (workspaceBin) return { tier: 0, path: workspaceBin };
   const devBin = resolveDevCheckoutBin(cwd);
   if (devBin) return { tier: 1, path: devBin };
   const projectLocalBin = resolveProjectLocalBin(cwd);

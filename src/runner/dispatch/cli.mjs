@@ -37,14 +37,12 @@ import { executeAssignment } from './assignment-runner.mjs';
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
-// Resolved against THIS module's own file location, never a caller-supplied
-// `root` -- `bin/fgos.mjs` is a fixed sibling of this checkout's own
-// `src/runner/dispatch/cli.mjs`, same "resolve against your own file
-// location, never the caller's cwd or repo root" principle
-// `gate-check`'s CLI wrapper already establishes elsewhere in this repo, so
-// this keeps working from any install shape/test fixture regardless of
-// what `root` a given call happens to be resolving `.fgos/`/config against.
-const BIN_FGOS_PATH = fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
+import { resolveFgosBin } from '../../setup/bin-discovery.mjs';
+
+// Resolved against this repo's root via resolveFgosBin (R4), preferring a tier-0
+// resolution when present with the same fallback as resolveFgosBin.
+const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
+const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {
   acquireMainCheckoutLock,
   dispatchLockFile,
@@ -974,7 +972,13 @@ export async function fanoutBatchExecutorCli(
         // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
         // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
         // suffix into a nonexistent `<root>/.fgos/.fgos`.
-        const pickStdout = execFileSync(process.execPath, [BIN_FGOS_PATH, 'pick', candidateId, '--dir', root], {
+        const execFgos = (args, options) => {
+          if (BIN_FGOS_PATH.endsWith('.mjs')) {
+            return execFileSync(process.execPath, [BIN_FGOS_PATH, ...args], options);
+          }
+          return execFileSync(BIN_FGOS_PATH, args, options);
+        };
+        const pickStdout = execFgos(['pick', candidateId, '--dir', root], {
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'pipe'],
         });
@@ -1009,7 +1013,7 @@ export async function fanoutBatchExecutorCli(
         if (execRes && execRes.verifiedSha) {
           returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
         }
-        execFileSync(process.execPath, [BIN_FGOS_PATH, ...returnArgs], {
+        execFgos(returnArgs, {
           cwd: wtPath,
           encoding: 'utf8',
           stdio: ['ignore', 'pipe', 'pipe'],

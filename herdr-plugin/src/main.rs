@@ -210,17 +210,29 @@ struct SlotsEnvelope {
 /// treats as "no ceiling known" rather than "no room" — see
 /// `worker_slot_room`.
 fn fetch_worker_slots(root: &Path) -> Option<WorkerSlots> {
-    let fgos_mjs = root.join("bin/fgos.mjs");
-    let output = Command::new("node")
-        .args([
-            fgos_mjs.to_string_lossy().as_ref(),
-            "slots",
-            "--json",
-            "--dir",
-            root.to_string_lossy().as_ref(),
-        ])
-        .output()
-        .ok()?;
+    let fgos_bin = fgos::resolve_fgos(root).ok()?;
+    let output = if fgos::is_tier_zero(root, &fgos_bin) {
+        Command::new(&fgos_bin)
+            .args([
+                "slots",
+                "--json",
+                "--dir",
+                root.to_string_lossy().as_ref(),
+            ])
+            .output()
+            .ok()?
+    } else {
+        Command::new("node")
+            .args([
+                fgos_bin.to_string_lossy().as_ref(),
+                "slots",
+                "--json",
+                "--dir",
+                root.to_string_lossy().as_ref(),
+            ])
+            .output()
+            .ok()?
+    };
     if !output.status.success() {
         return None;
     }

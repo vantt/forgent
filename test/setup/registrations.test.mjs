@@ -231,6 +231,24 @@ function pluginSkillCliReachableCheck() {
   return entry.check;
 }
 
+test('plugin-skill-cli-reachable passes when a workspace installation exists, reporting tier 0', () => {
+  const dir = mkTempDir();
+  const installDir = path.join(dir, '.fgos', 'installation');
+  fs.mkdirSync(path.join(installDir, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(installDir, 'bin', 'fgos'), '#!/bin/sh\n');
+  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify({
+    schemaVersion: 1,
+    entries: { fgos: 'bin/fgos' },
+  }));
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({
+    schemaVersion: 1,
+    status: 'ready',
+  }));
+  const result = pluginSkillCliReachableCheck()(dir);
+  assert.equal(result.passed, true);
+  assert.match(result.message, /workspace installation found/);
+});
+
 test('plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH', () => {
   const dir = mkTempDir();
   fs.mkdirSync(path.join(dir, 'bin'));

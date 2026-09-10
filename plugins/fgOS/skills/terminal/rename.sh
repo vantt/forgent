@@ -44,12 +44,20 @@ project_root="${2:-}"
 # inside one of its panes.
 #
 # Any failure to answer the question at all -- no <project-root>, no
-# bin/fgos.mjs there, node missing, CLI error -- falls through to the same
-# no-op. Fail-closed is the right direction for decoration: a helper that
-# cannot confirm the capability must not guess that it is present.
-[ -n "$project_root" ] && [ -f "$project_root/bin/fgos.mjs" ] || exit 0
-node "$project_root/bin/fgos.mjs" tool query --capability pane-labeling --dir "$project_root" 2>/dev/null \
-  | grep -q '"capability" *: *"pane-labeling"' || exit 0
+# .fgos/installation/bin/fgos or bin/fgos.mjs there, node missing, CLI error --
+# falls through to the same no-op. Fail-closed is the right direction for
+# decoration: a helper that cannot confirm the capability must not guess
+# that it is present.
+[ -n "$project_root" ] || exit 0
+if [ -x "$project_root/.fgos/installation/bin/fgos" ]; then
+  "$project_root/.fgos/installation/bin/fgos" tool query --capability pane-labeling --dir "$project_root" 2>/dev/null \
+    | grep -q '"capability" *: *"pane-labeling"' || exit 0
+elif [ -f "$project_root/bin/fgos.mjs" ]; then
+  node "$project_root/bin/fgos.mjs" tool query --capability pane-labeling --dir "$project_root" 2>/dev/null \
+    | grep -q '"capability" *: *"pane-labeling"' || exit 0
+else
+  exit 0
+fi
 
 # herdr adapter -- today's only pane-labeling provider. Not in a
 # herdr-managed pane, or herdr unavailable: no-op.

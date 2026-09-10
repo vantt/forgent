@@ -52,7 +52,7 @@ and never re-implements that skill's synthesis
 
    ```bash
    root=$(git rev-parse --path-format=absolute --git-common-dir | xargs dirname)
-   node "$root/bin/fgos.mjs" retrospective --dir "$root"
+   fgos retrospective --dir "$root"
    ```
 
    Then pick:

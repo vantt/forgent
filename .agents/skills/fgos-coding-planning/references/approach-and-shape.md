@@ -26,7 +26,7 @@ direct read resolves, dispatch to `fgos-researching` — the rare
 `consult` interaction, not the default path:
 
 ```bash
-node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
+fgos handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
 ```
 
 ## Shape

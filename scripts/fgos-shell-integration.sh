@@ -10,10 +10,11 @@
 # automatically for you -- adding it to ~/.bashrc (or similar) is your call
 # to make (D3).
 #
-# 3-tier resolution (tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
-# external-project-reliability/CONTEXT.md): dev-checkout self-hosting
-# (tier 1, the `$root/bin/fgos.mjs` file-check below) > project-local
-# install (tier 2, `node_modules/.bin/fgos`, walking up from $PWD the same
+# 4-tier resolution (Phase 10 tier 0, tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
+# external-project-reliability/CONTEXT.md): workspace installation
+# (tier 0, the `$root/.fgos/installation/bin/fgos` executable check below) >
+# dev-checkout self-hosting (tier 1, the `$root/bin/fgos.mjs` file-check below) >
+# project-local install (tier 2, `node_modules/.bin/fgos`, walking up from $PWD the same
 # way Node's own module resolution does -- kept as a real mode for
 # cross-project version pinning) > global install (tier 3, the only tier
 # needing a PATH lookup). Tier 3 reads the config-cache
@@ -66,6 +67,14 @@ fgos() {
       --dir|--dir=*) has_dir=1; break ;;
     esac
   done
+  if [ -x "$root/.fgos/installation/bin/fgos" ]; then
+    if [ "$has_dir" -eq 0 ]; then
+      "$root/.fgos/installation/bin/fgos" "$@" --dir "$root"
+    else
+      "$root/.fgos/installation/bin/fgos" "$@"
+    fi
+    return $?
+  fi
   if [ -f "$root/bin/fgos.mjs" ]; then
     if [ "$has_dir" -eq 0 ]; then
       node "$root/bin/fgos.mjs" "$@" --dir "$root"

@@ -44,7 +44,7 @@ transition to a later blind `fgos discover` call or a fragile file-read
 trust signal:
 
 ```bash
-node "$root/bin/fgos.mjs" discover "<item-id>" --verdict clear --verify "<the same verify value just recorded via gate-approve>" --dir "$root"
+fgos discover "<item-id>" --verdict clear --verify "<the same verify value just recorded via gate-approve>" --dir "$root"
 ```
 
 ## `true` branch
@@ -53,7 +53,7 @@ Skip the question. Post the non-question line `auto-approved: CONTEXT.md
 (gate-bypass level <level>)`, log it:
 
 ```bash
-node "$root/bin/fgos.mjs" decision --id "<item-id>" --text "auto-approved CONTEXT.md gate for <item-id> at level <level>" --rationale "gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)" --relation none --dir "$root"
+fgos decision --id "<item-id>" --text "auto-approved CONTEXT.md gate for <item-id> at level <level>" --rationale "gate-bypass level <level> permits auto-approval per the gate-bypass feature's own locked decisions (see docs/history/gate-bypass/CONTEXT.md)" --relation none --dir "$root"
 ```
 
 record the approve (`fgos gate-approve <item-id> --gate contextApprove

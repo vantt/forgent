@@ -12,6 +12,7 @@
 
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { resolveFgosBin } from '../src/setup/bin-discovery.mjs';
 
 /**
  * Pure: given the set of ids currently believed to be `awaiting-human`
@@ -42,7 +43,13 @@ export function formatStatusLine(items) {
 }
 
 function pollOnce(repoRoot) {
-  const result = spawnSync(process.execPath, [path.join(repoRoot, 'bin', 'fgos.mjs'), 'list', '--all', '--json'], {
+  const resolved = resolveFgosBin(repoRoot);
+  const isTierZero = resolved?.tier === 0;
+  const cmd = isTierZero ? resolved.path : process.execPath;
+  const args = isTierZero
+    ? ['list', '--all', '--json']
+    : [resolved?.path ?? path.join(repoRoot, 'bin', 'fgos.mjs'), 'list', '--all', '--json'];
+  const result = spawnSync(cmd, args, {
     cwd: repoRoot,
     encoding: 'utf8',
   });

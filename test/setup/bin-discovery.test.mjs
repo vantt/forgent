@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
+  resolveWorkspaceInstallationBin,
   resolveDevCheckoutBin,
   resolveProjectLocalBin,
   cachedGlobalBin,
@@ -159,3 +160,96 @@ test('resolveFgosBin returns null when no tier resolves', () => {
     process.env.PATH = originalPath;
   }
 });
+
+test('resolveWorkspaceInstallationBin resolves when activation.json references a release with manifest.json', () => {
+  const dir = mkTempDir('bin-discovery-tier0-rel-');
+  const releaseDir = mkTempDir('bin-discovery-release-');
+  const binPath = path.join(releaseDir, 'bin', 'fgos');
+  writeStub(binPath);
+
+  const manifest = {
+    schemaVersion: 1,
+    entries: { fgos: 'bin/fgos' },
+  };
+  fs.writeFileSync(path.join(releaseDir, 'manifest.json'), JSON.stringify(manifest));
+
+  const installDir = path.join(dir, '.fgos', 'installation');
+  fs.mkdirSync(installDir, { recursive: true });
+  const activation = {
+    schemaVersion: 1,
+    status: 'ready',
+    releasePath: releaseDir,
+  };
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify(activation));
+
+  assert.equal(resolveWorkspaceInstallationBin(dir), binPath);
+});
+
+test('resolveWorkspaceInstallationBin resolves when manifest.json is directly inside .fgos/installation', () => {
+  const dir = mkTempDir('bin-discovery-tier0-direct-');
+  const installDir = path.join(dir, '.fgos', 'installation');
+  const binPath = path.join(installDir, 'bin', 'fgos');
+  writeStub(binPath);
+
+  const manifest = {
+    schemaVersion: 1,
+    entries: { fgos: 'bin/fgos' },
+  };
+  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
+
+  const activation = {
+    schemaVersion: 1,
+    status: 'ready',
+  };
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify(activation));
+
+  assert.equal(resolveWorkspaceInstallationBin(dir), binPath);
+});
+
+test('resolveWorkspaceInstallationBin returns null when activation.json is absent or manifest missing', () => {
+  const dir = mkTempDir('bin-discovery-tier0-absent-');
+  assert.equal(resolveWorkspaceInstallationBin(dir), null);
+
+  const installDir = path.join(dir, '.fgos', 'installation');
+  fs.mkdirSync(installDir, { recursive: true });
+  fs.writeFileSync(path.join(installDir, 'activation.json'), '{ "invalid" json');
+  assert.equal(resolveWorkspaceInstallationBin(dir), null);
+});
+
+test('resolveWorkspaceInstallationBin returns null when manifest entries.fgos escapes release root', () => {
+  const dir = mkTempDir('bin-discovery-tier0-escape-');
+  const installDir = path.join(dir, '.fgos', 'installation');
+  fs.mkdirSync(installDir, { recursive: true });
+
+  const manifest = {
+    schemaVersion: 1,
+    entries: { fgos: '../../etc/passwd' },
+  };
+  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
+
+  assert.equal(resolveWorkspaceInstallationBin(dir), null);
+});
+
+test('resolveFgosBin prefers tier 0 (workspace installation) over tier 1, tier 2, and tier 3', () => {
+  const dir = mkTempDir('bin-discovery-priority-0-');
+  const installDir = path.join(dir, '.fgos', 'installation');
+  const tier0Bin = path.join(installDir, 'bin', 'fgos');
+  writeStub(tier0Bin);
+
+  const manifest = {
+    schemaVersion: 1,
+    entries: { fgos: 'bin/fgos' },
+  };
+  fs.writeFileSync(path.join(installDir, 'manifest.json'), JSON.stringify(manifest));
+  fs.writeFileSync(path.join(installDir, 'activation.json'), JSON.stringify({ status: 'ready' }));
+
+  // Also stage tier 1 and tier 2
+  writeStub(path.join(dir, 'bin', 'fgos.mjs'));
+  writeStub(path.join(dir, 'node_modules', '.bin', 'fgos'));
+
+  const result = resolveFgosBin(dir);
+  assert.equal(result.tier, 0);
+  assert.equal(result.path, tier0Bin);
+});
+

@@ -13,8 +13,11 @@ value) this call needs — e.g. `list --json --dir
 resolved `$root` in an earlier step:
 
 ```bash
+FGOS_INSTALL_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/.fgos/installation/bin/fgos"
 FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-if [ -f "$FGOS_BIN" ]; then
+if [ -x "$FGOS_INSTALL_BIN" ]; then
+  "$FGOS_INSTALL_BIN" <verb-cmd>
+elif [ -f "$FGOS_BIN" ]; then
   node "$FGOS_BIN" <verb-cmd>
 elif command -v fgos >/dev/null 2>&1; then
   fgos <verb-cmd>
