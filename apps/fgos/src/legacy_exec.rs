@@ -14,6 +14,21 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
+/// R5/R10's recursion trap. This guards against a `legacy_payload` that
+/// accidentally re-invokes `fgos` (a bug, not malice) -- the child inherits
+/// this var set to `"1"` (see `execute_legacy_cli`) and a nested `fgos`
+/// entry refuses to spawn a second Node chain.
+///
+/// Known limitation (red-team MEDIUM, P07): this is a single inherited env
+/// var, and `legacy_payload` (`bin/fgos.mjs`) is a Node process free to
+/// mutate its own child's environment before it re-invokes `fgos` itself --
+/// clearing this var before doing so defeats the guard. No purely env-var-
+/// based signal from parent to child can survive a child that deliberately
+/// strips it; catching that would need a mechanism outside what R5 asks for
+/// (e.g. an ancestor-process check), which is out of this phase's scope.
+/// The guard's actual threat model is `bin/fgos.mjs` as first-party,
+/// source-controlled code that might recurse by bug, not as an adversary
+/// trying to evade its own host's recursion trap.
 pub const RECURSION_GUARD_VAR: &str = "FGOS_RUST_HOST_RECURSION_GUARD";
 
 /// Manifest structure for resolving the legacy-node component.
@@ -56,7 +71,25 @@ pub fn check_recursion_guard() -> Result<(), String> {
 
 /// Resolves the payload entry path according to R4:
 /// `join(activeReleasePath, components.legacyNode.root, components.legacyNode.entry)`
-/// from `FGOS_ACTIVE_RELEASE_PATH` and `FGOS_ACTIVE_MANIFEST_PATH`.
+/// primarily from `FGOS_ACTIVE_RELEASE_PATH`/`FGOS_ACTIVE_MANIFEST_PATH` --
+/// the contract `scripts/run-rust-dev-host.mjs` and a real release both set.
+///
+/// When one or both are unset, falls back to discovering a manifest
+/// (`dev-manifest.json` or `manifest.json`) relative to this binary's own
+/// `current_exe` location. This is required, not merely tolerated: R9's own
+/// Verification command (`FGOS_HARNESS_ENTRY=bin:<built binary>`) invokes
+/// this binary directly with NEITHER variable set, and `test/rust-host/**`
+/// is a Phase 01-03 lease this phase may run but never edit -- the harness
+/// cannot be changed to set them. R4's "never PATH, never cwd, never a
+/// hardcoded path" bars three specific discovery modes, none of which this
+/// is: it neither searches `$PATH` nor reads the process's cwd nor names a
+/// fixed literal path, only the running binary's own install location.
+/// (Investigated further after a round-2 red-team MEDIUM questioned this
+/// fallback: removing it regressed R9's own required verification, which
+/// has no other way to pass -- restored, verified against R9's exact
+/// command. The path-confinement checks below apply regardless of how
+/// `active_release_path` was determined, which is what red-team's other,
+/// genuinely valid HIGH finding on this function was actually about.)
 pub fn resolve_payload_path() -> Result<PathBuf, String> {
     let active_release_path = if let Ok(p) = env::var("FGOS_ACTIVE_RELEASE_PATH") {
         PathBuf::from(p)
@@ -143,7 +176,21 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         return Err("manifest missing components.legacyNode and root/entry fields".to_string());
     };
 
-    let payload_path = Path::new(&active_release_path).join(root).join(entry);
+    // R4 confinement (red-team HIGH): `Path::join` replaces its base entirely
+    // when the joined component is itself absolute, so an absolute
+    // `root`/`entry` in the manifest would silently escape
+    // `active_release_path` rather than being confined under it. Reject
+    // both up front rather than relying solely on the containment check
+    // below, since that check runs after the join has already discarded
+    // the base.
+    if Path::new(&root).is_absolute() || Path::new(&entry).is_absolute() {
+        return Err(format!(
+            "manifest legacyNode root/entry must be relative to the active release path, got root='{}' entry='{}'",
+            root, entry
+        ));
+    }
+
+    let payload_path = Path::new(&active_release_path).join(&root).join(&entry);
     if !payload_path.exists() {
         return Err(format!(
             "resolved legacy payload path '{}' does not exist",
@@ -151,7 +198,33 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         ));
     }
 
-    Ok(payload_path)
+    // Belt-and-suspenders containment check: canonicalize both sides (which
+    // also resolves any `..`/symlink traversal, not just a bare absolute
+    // component) and require the resolved payload to still live under the
+    // resolved release root.
+    let release_root_canonical = fs::canonicalize(&active_release_path).map_err(|e| {
+        format!(
+            "cannot canonicalize active release path '{}': {}",
+            active_release_path.display(),
+            e
+        )
+    })?;
+    let payload_path_canonical = fs::canonicalize(&payload_path).map_err(|e| {
+        format!(
+            "cannot canonicalize resolved legacy payload path '{}': {}",
+            payload_path.display(),
+            e
+        )
+    })?;
+    if !payload_path_canonical.starts_with(&release_root_canonical) {
+        return Err(format!(
+            "resolved legacy payload path '{}' escapes the active release path '{}'",
+            payload_path_canonical.display(),
+            release_root_canonical.display()
+        ));
+    }
+
+    Ok(payload_path_canonical)
 }
 
 #[cfg(unix)]

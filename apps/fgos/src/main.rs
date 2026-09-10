@@ -60,19 +60,13 @@ fn main() {
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
 
-    // R1: Scan for host-global options only. In R1, no host-global options are
-    // recognized. The first positional token is always the selector.
-    let mut selector: Option<&str> = None;
-    for arg in cli_args {
-        if let Some(s) = arg.to_str() {
-            if !s.starts_with('-') {
-                selector = Some(s);
-                break;
-            }
-        }
-    }
-
-    let selector = match selector {
+    // R1: No host-global options are recognized in R1 -- the first positional
+    // token is always the selector, dash-prefixed or not. Do NOT skip past a
+    // leading dash-prefixed token while searching for "the real" selector:
+    // that would let an unlisted option in front of a real selector (e.g.
+    // `fgos --made-up version`) slip past R3's unknown-verb rejection and
+    // fall through to whatever route the token after it happens to name.
+    let selector = match cli_args.first().and_then(|a| a.to_str()) {
         Some(s) if !s.is_empty() => s,
         _ => {
             // R3: Unlisted or missing selector fails closed with EXIT_CODES.validation = 4.
