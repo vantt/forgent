@@ -31,7 +31,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import { DispatchError } from './dispatch-error.mjs';
-import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
+import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
@@ -637,6 +637,32 @@ export async function runHerdrRound(ctx) {
   }
 }
 
+// One batch tab per `dispatchBatchKey`, for the lifetime of this process --
+// which is also the lifetime of one `fgos coordination run` invocation (R1:
+// its steps run sequentially in-process), so this is exactly "one tab per
+// batch" without any cross-process persistence. Labeled with a per-process
+// timestamp suffix so a coordinationId's separate invocations over time (a
+// panel's open/fix/close) show up as visibly distinct tabs, not identically-
+// named ones -- the label is only ever built here, at first creation, never
+// passed in by the caller.
+const batchTabsByKey = new Map();
+let batchTabExitHookRegistered = false;
+
+function batchTabFor(key, { cwd } = {}) {
+  let batchTab = batchTabsByKey.get(key);
+  if (!batchTab) {
+    batchTab = createBatchTab({ label: `fgos-lead-${key}-${Date.now().toString(36)}`, cwd });
+    batchTabsByKey.set(key, batchTab);
+    if (!batchTabExitHookRegistered) {
+      batchTabExitHookRegistered = true;
+      process.once('exit', () => {
+        for (const bt of batchTabsByKey.values()) bt.closeIfEmpty();
+      });
+    }
+  }
+  return batchTab;
+}
+
 /** The round proper, once its home and session exist. Split from
  * `runHerdrRound` only so the credential teardown above wraps every exit
  * from it -- not as a second seam. */
@@ -649,30 +675,55 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // beside it instead of wherever the operator happens to be focused. Absent
     // for a standalone dispatch, which keeps today's implicit-focus behaviour.
     anchorPaneId,
-    // A lazily-created batch tab shared by every round of one caller's batch
-    // (one coordination round's actors, one fanout wave): `ensure(client)`
-    // creates the tab on the first round that needs it and memoizes the
-    // result, so later rounds of the same batch reuse it without a second
-    // `tab create` call. Ignored when `anchorPaneId` is already explicit.
-    anchorTab,
+    // A caller-supplied string naming the batch this round belongs to (a
+    // coordination round's own coordinationId, a future fanout batch id) --
+    // never a live handle, so the caller (run.mjs) never has to import
+    // anything herdr-shaped to build it. The batch tab itself is process-
+    // local state owned entirely by this module (`batchTabFor`, above).
+    dispatchBatchKey,
   } = ctx;
 
   const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
   // ordinary variables, which is exactly what this relies on.
   const effectivePaneEnv = workerHomePath ? { ...paneEnv, HOME: workerHomePath } : paneEnv;
-  const anchor = anchorPaneId ?? anchorTab?.ensure(client);
+
+  // A confined round talks to a different herdr server (a different socket,
+  // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
+  // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
+  const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
+  const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
+
+  let anchor = anchorPaneId;
+  if (anchor === undefined && batchTab) {
+    try {
+      anchor = batchTab.ensure(client, sessionKey);
+    } catch {
+      // `tab create` itself failed (herdr unavailable, timed out, refused the
+      // label, ...). Grouping is a visibility nicety, never a dispatch
+      // requirement -- degrade to an ordinary unanchored round rather than
+      // letting a tab-creation failure take down a round that would
+      // otherwise succeed on its own.
+      anchor = undefined;
+    }
+  }
+
   try {
     round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
     round.note({ status: 'pane-created', paneId: round.paneId });
   } catch (err) {
-    if (!anchor) {
+    // Only an anchor known to be gone is worth a second attempt: any other
+    // failure (herdr unavailable, a call timeout, an unparseable envelope)
+    // would fail the retry identically, just after paying its own timeout
+    // again -- and an anchor-less first attempt has nothing to retry at all.
+    if (!anchor || err.code !== 'pane_not_found') {
       throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
         `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
     }
-    // Grouping is a visibility nicety, not a dispatch requirement: an anchor
-    // pane closed since it was created (operator action, a prior round's own
-    // cleanup) must never fail a round that would otherwise succeed on its own.
+    // The anchor pane is gone (operator action, a prior round's own
+    // cleanup). Forget it so the NEXT round of this batch opens a fresh tab
+    // instead of repeating a split against an id already known to be dead.
+    batchTab?.invalidate(sessionKey);
     try {
       round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
       round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });

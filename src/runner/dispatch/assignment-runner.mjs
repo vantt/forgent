@@ -933,8 +933,7 @@ export async function executeAssignment(assignment, opts = {}) {
       work: opts.work,
       stage: effectiveAssignment.stage,
       runDir: path.resolve(runDir),
-      anchorPaneId: opts.anchorPaneId,
-      anchorTab: opts.anchorTab,
+      dispatchBatchKey: opts.dispatchBatchKey,
     });
   } catch (err) {
     executionError = err;

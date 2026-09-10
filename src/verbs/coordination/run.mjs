@@ -65,7 +65,6 @@ import {
 import { recordDriverDisposition, recordHumanTurn, readSessionEvents } from '../../runner/coordination/store.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
 import { validateCoordinationRequest } from './schema.mjs';
-import { createBatchTab } from '../../runner/dispatch/herdr-agent.mjs';
 
 function readRequestFile(requestPath) {
   let raw;
@@ -330,10 +329,12 @@ export async function runCoordinationUseCase(ctx, options = {}) {
 
   const engineOpts = {
     cwd: ctx.cwd, repoRoot: ctx.repoRoot, packageRoot: ctx.packageRoot, runnerConfig: ctx.runnerConfig, timeoutMs: ctx.timeoutMs,
-    // Lazy: no herdr call happens until some step's dispatch actually reaches
-    // a herdr-family adapter. A request whose actors are all cli-spawn never
-    // touches herdr at all, and this handle costs nothing until then.
-    anchorTab: createBatchTab({ label: request.coordinationId, cwd: ctx.cwd }),
+    // Opaque here -- a plain string, never a herdr-shaped value. Only a
+    // herdr-family dispatch adapter (transport.mjs/herdr-round.mjs) ever
+    // looks this up to lazily open a batch tab; a request whose actors are
+    // all cli-spawn never touches herdr at all. This module has no reason to
+    // import anything herdr-specific to build it.
+    dispatchBatchKey: request.coordinationId,
   };
   const openParams = {
     coordinationId: request.coordinationId,

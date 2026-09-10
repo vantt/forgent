@@ -598,19 +598,25 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // wherever the operator happens to be focused. Absent for a standalone
     // dispatch -- today's implicit-focus behaviour is unchanged.
     //
-    // `dispatch.mjs execute`, the generic CLI door, has no flag for this --
-    // "pane" is herdr's own vocabulary, not something the adapter-agnostic
-    // dispatch surface should have to know about. A cross-process caller
-    // (fanout's independently-launched children) that wants to group its own
-    // batch sets FGOS_HERDR_ANCHOR_PANE in the dispatching process's own env
-    // instead, the same door FGOS_HERDR_BIN/FGOS_HERDR_MODEL already use for
-    // herdr-only knobs. An in-process caller (assignment-runner.mjs, from one
-    // coordination round's own driver) passes `opts.anchorPaneId` directly.
+    // Deliberately NOT threaded through `cli.mjs`/`assignment-runner.mjs`:
+    // "pane" is herdr's own vocabulary, and neither of those is herdr-aware
+    // (`executeExecutorCli` serves cli-spawn/http too). Read directly off
+    // this adapter's own `opts` instead -- a direct caller of this adapter
+    // (or a test) may still pass one explicitly, but the only real caller
+    // today is the env-var default: a cross-process caller (fanout's
+    // independently-launched children) sets FGOS_HERDR_ANCHOR_PANE in its
+    // own env, the same door FGOS_HERDR_BIN already uses for a herdr-only
+    // knob neither of those two files carries either. The in-process case
+    // (one coordination round's own actors) uses `dispatchBatchKey` below
+    // instead, which IS threaded through both -- a plain string is not
+    // herdr's vocabulary the way an explicit pane id is.
     anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE,
-    // A lazily-created batch tab handle (see `createBatchTab`), for a batch
-    // whose first round doesn't yet know an explicit anchor pane. In-process
-    // only -- there is no environment-variable equivalent for a live handle.
-    anchorTab,
+    // A caller-supplied batch key (see `batchTabFor` in herdr-round.mjs), for
+    // a batch whose first round doesn't yet know an explicit anchor pane.
+    // Plain data, in-process only -- the batch tab itself is created and
+    // looked up from inside the round that first needs it, never passed as
+    // a live value, so there is no environment-variable equivalent.
+    dispatchBatchKey,
   } = opts;
 
   const depth = currentDispatchDepth();
@@ -655,7 +661,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     trustStore,
     runDir: optsRunDir,
     anchorPaneId,
-    anchorTab,
+    dispatchBatchKey,
     paneEnv: resolvedEnv,
     cwd,
     repoRoot: opts.repoRoot,
