@@ -278,7 +278,7 @@ fn test_absolute_manifest_entry_is_rejected() {
     fs::write(
         &outside_script,
         format!(
-            "require('fs').writeFileSync({:?}, 'executed');\nprocess.exit(37);\n",
+            "import fs from 'node:fs';\nfs.writeFileSync({:?}, 'executed');\nprocess.exit(37);\n",
             marker.to_string_lossy()
         ),
     )
