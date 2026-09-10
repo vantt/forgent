@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Confinement Authority Phase 07: Strict Confinement Readiness, Documentation, and Track Closeout (docs/specs/confinement-authority.md):
+  - R1 Strict Mode Decision: decided and recorded that `runner.confinement.strict` remains `false` by default with `fgos doctor` readiness guidance, because 4/7 canonical capabilities omit confinement keys in shipping defaults, anchor-inheritance overclaims unconfined attestation (M-3), and enforced attestation bodies remain thin (NEW-1b/NEW-1c, P06 M2).
+  - R2 Spec & Architecture Updates: updated `docs/specs/confinement-authority.md` to `coverage: implemented` with settled implementation facts, updated `docs/specs/runner.md` with Confinement Authority dispatch and configuration rules, updated `docs/specs/reading-map.md`, `docs/architecture-map.md` (CTR010), and `docs/reference/dispatch-module-boundaries.md`.
+  - R3 Operational Documentation: authored `docs/how-to/configure-and-operate-agent-confinement.md` covering backend registry setup (`confinement-backend-registry.v1`), capability declarations, running `fgos doctor` for readiness, attestation interpretation, and strict-mode operational checklist.
+  - R4 Changelog Reconciled: corrected P04 M-1 capability overclaim and cataloged full user-visible changes across all phases P00-P07.
+  - R5-R7 Verification and Closeout: recorded capability gate posture, executed full test suite, and published final closeout report with complete deferral register and proof links.
+
+- Confinement Authority Phase 06: Group-Thinking Coding Dogfood Proof (docs/specs/confinement-authority.md):
+  - Proven Live Confinement: demonstrated live cross-provider multi-agent dispatch (`agy-herdr` Doer, `claude-reviewer-herdr` Reviewer/Fixer, `codex-herdr` Red-Team) under real `bwrap` backend confinement enforcement with `workspace-write` and `host-write-denied` producing verified `enforced` attestations.
+  - Regression Test Coverage: added direct `establishConfinement` bypass-pairing regression tests covering both v1 and legacy config shapes and preventing non-Authority bypass execution without full confinement.
+  - Durable Evidence: packaged and verified live attestation and transcript artifacts under `plans/260910-1243-confinement-authority-implementation/reports/phase-06-evidence/`.
+
 - Confinement Authority Phase 05: Herdr and Legacy Confinement Convergence (docs/specs/confinement-authority.md):
   - R1 Policy Normalization: normalized legacy herdr confinement flags (`privateHome: true` -> `home: "private"`, `isolatedSession: true` -> `session: "isolated"`, `ownWorktree: true` -> `workspace: "own"`) into canonical v1 policy controls before runtime dispatch, preserving existing v1 policy controls and grants.
   - R2 Unified Authority Door: on the single Authority door already installed for `herdr-spawn` execution (`executeThroughConfinement`, Phase 04 H-1), converged herdr's pre-adapter checks and attestation content onto that door, returning canonical `confinement-execution.v1` and structured `confinement-attestation.v1`.
@@ -24,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - R3 Explicit Unconfined Attestation: explicit `unconfined` policy produces audited attestation with `backend: null`, `outcome: 'unconfined'`, and `explicit-opt-out` evidence.
   - R4/R5 Executor Migration: added a migration fixture for `claude-bwrap`, `agy-bwrap`, and `codex-bwrap` showing declarative `confinement.backend: 'bwrap'` and capability policy without hardcoded sandbox argv, while preserving executor IDs.
   - R6 Fail-Open Closures: closed F-a (structural enforcement guarantees cli-spawn cannot dispatch unconfined under required policy), F-b (invocation confinement override validation strictly forbids adding grants, lowering controls, changing policy, or flipping mode), F-c (capability fallback preserves a distinct resolved anchor and its confinement policy), and F-d (only actual private-home or isolated-session provisioning is reported as `confined`).
-  - R7 Default Capability Slots: declared explicit interim `unconfined` confinement policies for `advise`, `code:review`, `code:debug`, `execute`, `code:implement`, `code:test`, and `code:refactor` until a supported backend path is configured.
+  - R7 Default Capability Slots: declared explicit interim `unconfined` confinement policies for `advise`, `code:review`, and `code:debug`, while leaving `execute`, `code:implement`, `code:test`, and `code:refactor` without a declared confinement key (omitted, attesting unknown) until supported backend bindings are configured.
 
 - Required Confinement Authority dispatches now refuse unless every non-optional control and grant has `satisfied` coverage, reject malformed policy controls at the request door, and attach a current local-bwrap falsification-probe fingerprint before reporting `enforced`. The built-in optional executor-credentials grant remains honestly `unverified` without degrading an otherwise verified dispatch.
 
