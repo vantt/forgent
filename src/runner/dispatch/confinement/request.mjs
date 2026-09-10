@@ -1,21 +1,40 @@
 // request.mjs — Confinement Authority request construction and validation
-// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4).
+// (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).
 
 import crypto from "node:crypto";
-import path from "node:path";
-import os from "node:os";
 import {
   validateCapabilityConfinementShape,
   resolveConfinementPolicy,
   normalizeLegacyConfinement,
+  ConfinementPolicyError,
 } from "./policies.mjs";
 
+const ALLOWED_REQUEST_KEYS = new Set([
+  "contract",
+  "dispatchId",
+  "capability",
+  "stageSkill",
+  "executorId",
+  "invocation",
+  "context",
+  "requirement",
+  "override",
+  "resourceNeeds",
+  "backendId",
+  "authorityScope",
+]);
+
 /**
- * Validate a ConfinementRequestV1 shape (spec §6.4).
+ * Validate a ConfinementRequestV1 shape (spec §6.4, §6.10 closed-shape).
  */
 export function validateConfinementRequest(request) {
   if (!request || typeof request !== "object" || Array.isArray(request)) {
     throw new Error("ConfinementRequest must be an object.");
+  }
+  for (const k of Object.keys(request)) {
+    if (!ALLOWED_REQUEST_KEYS.has(k)) {
+      throw new Error(`ConfinementRequest contains unknown key "${k}".`);
+    }
   }
   if (request.contract !== "confinement-request.v1") {
     throw new Error(`ConfinementRequest contract must be "confinement-request.v1", got "${request.contract}".`);
@@ -25,6 +44,9 @@ export function validateConfinementRequest(request) {
   }
   if (!request.capability || typeof request.capability !== "string") {
     throw new Error("ConfinementRequest capability must be a non-empty string.");
+  }
+  if (request.stageSkill !== undefined && (typeof request.stageSkill !== "string" || !request.stageSkill)) {
+    throw new Error("ConfinementRequest stageSkill must be a non-empty string when present.");
   }
   if (!request.executorId || typeof request.executorId !== "string") {
     throw new Error("ConfinementRequest executorId must be a non-empty string.");
@@ -38,7 +60,7 @@ export function validateConfinementRequest(request) {
   if (!request.context.cwd || typeof request.context.cwd !== "string") {
     throw new Error("ConfinementRequest context.cwd must be a non-empty string.");
   }
-  if (!request.context.runDir || typeof request.context.runDir !== "string") {
+  if (!request.context.runDir || typeof request.context.runDir !== "string" || !request.context.runDir.trim()) {
     throw new Error("ConfinementRequest context.runDir must be a non-empty string.");
   }
   if (!request.requirement || typeof request.requirement !== "object" || Array.isArray(request.requirement)) {
@@ -53,6 +75,7 @@ export function validateConfinementRequest(request) {
  */
 export function buildConfinementRequest({
   capability,
+  stageSkill = null,
   executorId,
   invocation = {},
   context = {},
@@ -67,12 +90,33 @@ export function buildConfinementRequest({
   const cap = capability || executorId || "(unknown-capability)";
   const execId = executorId || cap;
 
+  if (!context?.runDir || typeof context.runDir !== "string" || !context.runDir.trim()) {
+    throw new Error("ConfinementRequest context.runDir must be a non-empty string.");
+  }
+
   let resolvedRequirement = requirement;
   if (!resolvedRequirement) {
     const capConfinement = cfg?.capabilities?.[cap]?.confinement;
-    if (capConfinement) {
+    const skillConfinement = stageSkill && stageSkill !== cap ? cfg?.capabilities?.[stageSkill]?.confinement : undefined;
+
+    if (capConfinement && skillConfinement) {
       validateCapabilityConfinementShape(capConfinement, `capabilities.${cap}.confinement`);
-      const mode = capConfinement.mode;
+      validateCapabilityConfinementShape(skillConfinement, `capabilities.${stageSkill}.confinement`);
+      const capMode = capConfinement.mode;
+      const skillMode = skillConfinement.mode;
+      const capPolicy = capConfinement.policy;
+      const skillPolicy = skillConfinement.policy;
+      if (capMode !== skillMode || capPolicy !== skillPolicy) {
+        throw new ConfinementPolicyError(
+          `ambiguous confinement policies between capability "${cap}" (${capMode}:${capPolicy ?? "none"}) and stage skill "${stageSkill}" (${skillMode}:${skillPolicy ?? "none"}).`,
+        );
+      }
+    }
+
+    const activeConfinement = capConfinement || skillConfinement;
+    if (activeConfinement) {
+      validateCapabilityConfinementShape(activeConfinement, `capabilities.${capConfinement ? cap : stageSkill}.confinement`);
+      const mode = activeConfinement.mode;
       if (mode === "unconfined") {
         resolvedRequirement = {
           mode: "unconfined",
@@ -80,10 +124,16 @@ export function buildConfinementRequest({
           policy: null,
         };
       } else {
+        const policyObj = resolveConfinementPolicy(activeConfinement.policy, cfg?.confinementPolicies);
+        if (!policyObj) {
+          throw new ConfinementPolicyError(
+            `runner config policy "${activeConfinement.policy}" is unknown (neither built-in nor declared in confinementPolicies).`,
+          );
+        }
         resolvedRequirement = {
           mode,
-          policyId: capConfinement.policy,
-          policy: resolveConfinementPolicy(capConfinement.policy),
+          policyId: activeConfinement.policy,
+          policy: policyObj,
         };
       }
     } else {
@@ -107,6 +157,7 @@ export function buildConfinementRequest({
     contract: "confinement-request.v1",
     dispatchId: id,
     capability: cap,
+    ...(stageSkill ? { stageSkill } : {}),
     executorId: execId,
     invocation: {
       command: invocation.command,
@@ -132,11 +183,7 @@ export function buildConfinementRequest({
     context: {
       cwd: context.cwd || process.cwd(),
       repoRoot: context.repoRoot,
-      runDir:
-        context.runDir ||
-        (context.fgosDir
-          ? path.join(context.fgosDir, "dispatch-runs", String(execId), String(Date.now()))
-          : path.join(os.tmpdir(), "fgos-dispatch-runs", String(execId), String(Date.now()))),
+      runDir: context.runDir,
       fgosDir: context.fgosDir,
       timeoutMs: context.timeoutMs,
       idleTimeoutMs: context.idleTimeoutMs,

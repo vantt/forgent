@@ -13,10 +13,11 @@
 
 import path from 'node:path';
 import fs from 'node:fs';
+import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
@@ -249,9 +250,8 @@ function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
 }
 
 function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
-  if (!fgosDir) return { runDir: undefined, closeRun: () => {} };
-
-  const runDir = path.join(fgosDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
+  const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-dispatch-runs');
+  const runDir = path.join(baseDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({
     runId: `${path.basename(path.dirname(runDir))}-${path.basename(runDir)}`,
@@ -341,8 +341,18 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const repoRootForWatch = opts.fgosDir ? path.dirname(opts.fgosDir) : undefined;
   const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: repoRootForWatch, cwd });
 
+  const stageSkill = executorId;
+  const targetStage = opts.stage ?? work?.stage ?? 'executing';
+  const domain = resolveDomainName(work?.domain);
+  let curatedCapability = work?.capability ?? opts.capability;
+  if (!curatedCapability && domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement')) {
+    curatedCapability = 'code:implement';
+  }
+  const capability = curatedCapability ?? stageSkill ?? '(unknown-capability)';
+
   const confinementRequest = buildConfinementRequest({
-    capability: opts.stage ? executorIdForWork(work, opts.stage) : executorId,
+    capability,
+    stageSkill,
     executorId: resolvedExecutorId ?? executorId,
     cfg,
     invocation: {
@@ -515,7 +525,6 @@ export async function executeExecutorCli(
     model: modelOverride,
     tier: tierOverride,
     for: purposeArg,
-    purpose: optionsPurpose,
     carries,
     hasLiveTaskAccess = false,
     timeoutMs: timeoutOverride,
@@ -538,7 +547,7 @@ export async function executeExecutorCli(
     options,
   } = {},
 ) {
-  const purpose = purposeArg ?? optionsPurpose;
+  const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
       'usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
@@ -621,23 +630,48 @@ export async function executeExecutorCli(
   // for a direct executorId call — whichever capabilities that executor
   // itself declares serving (executor.for, D15), so the line still answers
   // "what is this FOR" even without a --for flag. Diagnostic-only.
-  const capabilityLabel = purpose ?? (cfg?.capabilities?.[executorIdArg] ? executorIdArg : (resolvedExecutor?.for?.join(',') || '(none declared)'));
+  let curatedCapability = work?.capability;
+  if (!curatedCapability && (executorIdArg === 'fgos-coding-implement' || (stage === 'executing' && (!work?.domain || work?.domain === DEFAULT_DOMAIN)))) {
+    curatedCapability = 'code:implement';
+  }
+  const capabilityIdentity = purpose ?? curatedCapability ?? (resolvedExecutor?.for?.[0]) ?? executorIdArg ?? '(unknown-capability)';
+  const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
   if (mechanism === 'in-process') {
-    const capConfinement = cfg?.capabilities?.[capabilityLabel]?.confinement ?? (purpose ? cfg?.capabilities?.[purpose]?.confinement : undefined) ?? (executorIdArg ? cfg?.capabilities?.[executorIdArg]?.confinement : undefined);
-    if (capConfinement?.mode === 'required') {
-      throw new DispatchError(
-        'confinement-unsupported',
-        `required confinement refused for "${capabilityLabel}": in-process dispatch has no trusted harness attestation contract.`,
-        { capability: capabilityLabel, executorId, requirement: capConfinement, authorityScope: 'external-harness' },
-      );
-    }
     const agentType = resolvedExecutor?.agentType;
+    const stageSkill = executorIdArg;
+    const inProcRunDir = runDir || path.join(os.tmpdir(), 'fgos-in-process', String(executorId), String(Date.now()));
+    const confinementRequest = buildConfinementRequest({
+      capability: capabilityIdentity,
+      stageSkill,
+      executorId,
+      cfg,
+      authorityScope: 'external-harness',
+      invocation: {
+        agentType,
+        prompt,
+      },
+      context: {
+        cwd,
+        repoRoot: root,
+        runDir: inProcRunDir,
+        fgosDir,
+      },
+    });
+
+    const doorResult = await executeThroughConfinement(confinementRequest);
+
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=in-process agentType=${agentType ?? '(none)'} provider=n/a model=n/a tier=n/a\n`,
     );
-    const base = { mechanism, agentType, prompt, authorityScope: 'external-harness', attestation: null };
+    const base = {
+      mechanism,
+      agentType,
+      prompt,
+      authorityScope: 'external-harness',
+      attestation: doorResult.attestation,
+    };
     return resolvedByPurpose ? { ...base, executorId } : base;
   }
 
@@ -768,7 +802,8 @@ export async function executeExecutorCli(
     const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
     const confinementRequest = buildConfinementRequest({
-      capability: capabilityLabel,
+      capability: capabilityIdentity,
+      stageSkill: executorIdArg,
       executorId,
       cfg,
       invocation: {

@@ -31,6 +31,43 @@ export function buildConfinementAttestation({
     }
   }
 
+  const legacy = request.requirement?.legacy;
+  const isBwrap =
+    request.invocation?.command === "bwrap" ||
+    request.executorId?.includes?.("bwrap") ||
+    (Array.isArray(request.invocation?.args) && request.invocation.args.includes("bwrap"));
+
+  const effectiveControls = {
+    ...(legacy?.controls ? { ...legacy.controls } : {}),
+    ...(isBwrap ? { hostWrite: "deny", process: "isolated" } : {}),
+  };
+
+  const coverage = {};
+  if (isBwrap) {
+    coverage["control:hostWrite"] = "satisfied";
+    coverage["control:process"] = "satisfied";
+  }
+  if (legacy?.controls?.session === "isolated") {
+    coverage["control:session"] = "satisfied";
+  }
+  if (legacy?.controls?.workspace === "own") {
+    coverage["control:workspace"] = "satisfied";
+  }
+  if (legacy?.controls?.home === "private") {
+    coverage["control:home"] = "satisfied";
+  }
+
+  const grants = [
+    ...(legacy?.grants ? legacy.grants.map((g) => ({ ...g, target: g.resource })) : []),
+  ];
+  if (isBwrap && !grants.some((g) => g.resource === "run-output")) {
+    grants.push({
+      resource: "run-output",
+      access: "write",
+      target: request.context?.runDir ?? "run-output",
+    });
+  }
+
   const channels = isExplicitUnconfined
     ? [
         { name: "filesystem", coverage: "out-of-scope", detail: "explicitly unconfined" },
@@ -40,12 +77,64 @@ export function buildConfinementAttestation({
         { name: "network", coverage: "out-of-scope", detail: "explicitly unconfined" },
       ]
     : [
-        { name: "filesystem", coverage: "unknown", detail: "observe-mode: no policy declared" },
-        { name: "inherited-fd", coverage: "unknown", detail: "observe-mode: no policy declared" },
-        { name: "stdio", coverage: "unknown", detail: "observe-mode: stdio unmanaged" },
-        { name: "host-ipc", coverage: "out-of-scope", detail: "observe-mode: host IPC unmanaged" },
-        { name: "network", coverage: "out-of-scope", detail: "observe-mode: network unmanaged" },
+        {
+          name: "filesystem",
+          coverage: isBwrap ? "covered" : "unknown",
+          detail: isBwrap
+            ? "observed hand-written bwrap sandbox"
+            : (request.requirement?.policyId
+                ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
+                : "observe-mode: no policy declared"),
+        },
+        {
+          name: "inherited-fd",
+          coverage: isBwrap ? "covered" : "unknown",
+          detail: isBwrap
+            ? "observed hand-written bwrap sandbox"
+            : (request.requirement?.policyId
+                ? `observe-mode: unverified execution for policy ${request.requirement.policyId}`
+                : "observe-mode: no policy declared"),
+        },
+        {
+          name: "stdio",
+          coverage: "unknown",
+          detail: "observe-mode: stdio unmanaged",
+        },
+        {
+          name: "host-ipc",
+          coverage: legacy?.controls?.session === "isolated" ? "covered" : "out-of-scope",
+          detail: legacy?.controls?.session === "isolated"
+            ? "observed legacy isolated session"
+            : "observe-mode: host IPC unmanaged",
+        },
+        {
+          name: "network",
+          coverage: "out-of-scope",
+          detail: "observe-mode: network unmanaged",
+        },
       ];
+
+  const evidence = [
+    {
+      kind: "structural-observation",
+      ref: `dispatch:${request.dispatchId}`,
+      freshness: "current",
+    },
+  ];
+  if (isBwrap) {
+    evidence.push({
+      kind: "structural-observation",
+      ref: `bwrap-argv:${request.executorId}`,
+      freshness: "current",
+    });
+  }
+  if (legacy) {
+    evidence.push({
+      kind: "structural-observation",
+      ref: `legacy-confinement:${request.executorId}`,
+      freshness: "current",
+    });
+  }
 
   const attestation = {
     contract: "confinement-attestation.v1",
@@ -57,22 +146,16 @@ export function buildConfinementAttestation({
       policyId: request.requirement?.policyId ?? null,
       policy: request.requirement?.policy ?? null,
     },
-    coverage: {},
-    effectiveControls: {},
+    coverage,
+    effectiveControls,
     resources: [],
     readiness: {},
     channels,
     receipt: null,
     backend: null,
-    grants: [],
+    grants,
     mismatches: [],
-    evidence: [
-      {
-        kind: "structural-observation",
-        ref: `dispatch:${request.dispatchId}`,
-        freshness: "current",
-      },
-    ],
+    evidence,
     cleanup: { status: "not-needed" },
   };
 
@@ -97,8 +180,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       });
       throw new DispatchError(
         "confinement-unsupported",
-        `required confinement refused: in-process dispatch with authorityScope "external-harness" has no trusted harness attestation contract.`,
+        `required confinement refused: in-process dispatch has no trusted harness attestation contract (authorityScope "external-harness").`,
         {
+          contract: "confinement-execution.v1",
+          status: "refused",
           dispatchId: request.dispatchId,
           capability: request.capability,
           requirement: request.requirement,
@@ -108,6 +193,9 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       );
     }
     return {
+      contract: "confinement-execution.v1",
+      status: "completed",
+      result: request.invocation,
       ...request.invocation,
       attestation: null,
       authorityScope: "external-harness",
@@ -126,6 +214,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       "confinement-unsupported",
       `required confinement refused for capability "${request.capability}": no confinement backend available in observe mode.`,
       {
+        contract: "confinement-execution.v1",
+        status: "refused",
         dispatchId: request.dispatchId,
         capability: request.capability,
         requirement: request.requirement,
@@ -203,16 +293,26 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       error: err,
     });
     if (err instanceof DispatchError) {
+      err.contract = "confinement-execution.v1";
+      err.status = "failed";
       err.attestation = failedAttestation;
       err.dispatchId = request.dispatchId;
+      err.cleanup = failedAttestation.cleanup;
+      if (err.result === undefined && adapterResult !== undefined) {
+        err.result = adapterResult;
+      }
       throw err;
     }
     throw new DispatchError(
       "confinement-execution-failed",
       `confinement execution failed for dispatch "${request.dispatchId}": ${err.message}`,
       {
+        contract: "confinement-execution.v1",
+        status: "failed",
         dispatchId: request.dispatchId,
         attestation: failedAttestation,
+        cleanup: failedAttestation.cleanup,
+        result: adapterResult,
         cause: err.message,
       },
     );
@@ -224,6 +324,9 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   });
 
   return {
+    contract: "confinement-execution.v1",
+    status: "completed",
+    result: adapterResult,
     ...adapterResult,
     attestation,
   };

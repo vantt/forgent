@@ -484,7 +484,7 @@ test('in-process dispatch with required confinement refuses without trusted harn
         repoRoot: root,
         cwd: root,
         hasLiveTaskAccess: true,
-        purpose: IMPLEMENT_CAPABILITY,
+        for: IMPLEMENT_CAPABILITY,
       }),
       (err) => {
         assert.equal(err.errorClass, 'confinement-unsupported');
