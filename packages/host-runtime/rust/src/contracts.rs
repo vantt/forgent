@@ -236,6 +236,11 @@ pub enum ProviderOutcome {
         output: Box<dyn Any + Send>,
         diagnostics: Vec<String>,
     },
+    Parked {
+        contract: ContractRef,
+        reason: String,
+        diagnostics: Vec<String>,
+    },
 }
 
 impl ProviderOutcome {
@@ -259,15 +264,37 @@ impl ProviderOutcome {
         }
     }
 
+    pub fn parked(contract: ContractRef, reason: impl Into<String>) -> Self {
+        Self::Parked {
+            contract,
+            reason: reason.into(),
+            diagnostics: Vec::new(),
+        }
+    }
+
+    pub fn parked_with_diagnostics(
+        contract: ContractRef,
+        reason: impl Into<String>,
+        diagnostics: Vec<String>,
+    ) -> Self {
+        Self::Parked {
+            contract,
+            reason: reason.into(),
+            diagnostics,
+        }
+    }
+
     pub fn contract(&self) -> &ContractRef {
         match self {
             Self::Completed { contract, .. } => contract,
+            Self::Parked { contract, .. } => contract,
         }
     }
 
     pub fn diagnostics(&self) -> &[String] {
         match self {
             Self::Completed { diagnostics, .. } => diagnostics,
+            Self::Parked { diagnostics, .. } => diagnostics,
         }
     }
 }
@@ -283,6 +310,16 @@ impl fmt::Debug for ProviderOutcome {
                 .debug_struct("ProviderOutcome::Completed")
                 .field("contract", contract)
                 .field("output", &"<Box<dyn Any + Send>>")
+                .field("diagnostics", diagnostics)
+                .finish(),
+            Self::Parked {
+                contract,
+                reason,
+                diagnostics,
+            } => f
+                .debug_struct("ProviderOutcome::Parked")
+                .field("contract", contract)
+                .field("reason", reason)
                 .field("diagnostics", diagnostics)
                 .finish(),
         }
@@ -319,6 +356,8 @@ pub enum ProviderError {
     ProtocolViolation(String),
     #[error("provider crash: {0}")]
     ProviderCrash(String),
+    #[error("provider failed: {0}")]
+    ProviderFailed(String),
     #[error("deadline exceeded: {0}")]
     DeadlineExceeded(String),
     #[error("caller cancelled: {0}")]
@@ -497,5 +536,27 @@ mod tests {
             OperationId::parse("foo.b@r.baz"),
             Err(OperationIdError::InvalidCharacter { char: '@', .. })
         ));
+    }
+
+    #[test]
+    fn provider_outcome_parked() {
+        let contract = ContractRef::from_static("test.op", "1.0.0");
+        let outcome = ProviderOutcome::parked(contract.clone(), "waiting for input");
+        assert_eq!(outcome.contract(), &contract);
+        assert_eq!(outcome.diagnostics(), &[] as &[String]);
+
+        let outcome_diag = ProviderOutcome::parked_with_diagnostics(
+            contract.clone(),
+            "reason",
+            vec!["diag1".to_string()],
+        );
+        assert_eq!(outcome_diag.diagnostics(), &["diag1".to_string()]);
+        assert!(format!("{:?}", outcome_diag).contains("ProviderOutcome::Parked"));
+    }
+
+    #[test]
+    fn provider_error_provider_failed() {
+        let err = ProviderError::ProviderFailed("crash detail".to_string());
+        assert_eq!(err.to_string(), "provider failed: crash detail");
     }
 }
