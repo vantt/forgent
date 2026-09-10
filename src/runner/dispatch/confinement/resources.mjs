@@ -164,7 +164,13 @@ export function resolveConfinementResources({
         'run-output resource requires context.runDir to be specified.',
       );
     }
-    const declaredRoot = context.fgosDir || path.dirname(context.runDir);
+    if (!context.fgosDir) {
+      throw new ConfinementResourceError(
+        'confinement-grant-invalid',
+        'run-output resource requires context.fgosDir so its containment boundary can be verified.',
+      );
+    }
+    const declaredRoot = context.fgosDir;
     const { hostTarget } = canonicalizeAndVerifySubpath(context.runDir, declaredRoot, 'run-output');
 
     resolved.push({
@@ -189,7 +195,13 @@ export function resolveConfinementResources({
         'workspace resource requires context.repoRoot or context.cwd.',
       );
     }
-    const { hostTarget } = canonicalizeAndVerifySubpath(declaredRoot, declaredRoot, 'workspace');
+    const { hostTarget } = canonicalizeAndVerifySubpath(declaredRoot, path.dirname(declaredRoot), 'workspace');
+    if (hostTarget !== path.resolve(declaredRoot)) {
+      throw new ConfinementResourceError(
+        'confinement-grant-invalid',
+        `workspace root "${declaredRoot}" resolves through a symlink to "${hostTarget}"; use its canonical path.`,
+      );
+    }
 
     resolved.push({
       resource: 'workspace',
@@ -237,10 +249,11 @@ export function resolveConfinementResources({
       path.join(os.tmpdir(), 'fgos-confinement');
 
     const allocatedHome = path.join(tempRoot, dispatchId, 'home');
-    fs.mkdirSync(allocatedHome, { recursive: true });
-
-    // Validate allocation stays inside tempRoot
+    // Validate before any mutation: a hostile dispatchId must never leave an
+    // escaped directory behind when validation refuses it.
     const { hostTarget } = canonicalizeAndVerifySubpath(allocatedHome, tempRoot, 'private-home');
+
+    fs.mkdirSync(hostTarget, { recursive: true });
 
     // Write ownership marker (R5)
     writeOwnershipMarker(hostTarget, { dispatchId, resource: 'private-home' });

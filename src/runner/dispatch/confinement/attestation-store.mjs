@@ -66,16 +66,98 @@ export function validateAttestationCompleteness(attestation) {
 }
 
 /**
+ * Verifies that the attestation store directory does not overlap ANY resource
+ * granted write access to the confined process (Phase 03 H1 fix, R6).
+ * Fails closed (throws AttestationStoreError) if storeDir is inside, contains,
+ * or equals any writable resource path.
+ */
+export function verifyAttestationStoreIsolation(storeDir, resources = []) {
+  if (!storeDir || typeof storeDir !== 'string') {
+    throw new AttestationStoreError('attestation storeDir must be a non-empty string.');
+  }
+
+  const absStore = path.resolve(storeDir);
+  let realStore = absStore;
+  try {
+    if (fs.existsSync(absStore)) {
+      realStore = fs.realpathSync(absStore);
+    } else {
+      let ancestor = path.dirname(absStore);
+      let tail = path.basename(absStore);
+      while (ancestor !== path.dirname(ancestor) && !fs.existsSync(ancestor)) {
+        tail = path.join(path.basename(ancestor), tail);
+        ancestor = path.dirname(ancestor);
+      }
+      if (fs.existsSync(ancestor)) {
+        realStore = path.join(fs.realpathSync(ancestor), tail);
+      }
+    }
+  } catch {
+    realStore = absStore;
+  }
+
+  for (const res of resources) {
+    const isWritable = res.access === 'write' || res.access === 'read-write';
+    if (!isWritable) continue;
+
+    const targetPath = res.hostTarget || res.executionTarget?.path;
+    if (!targetPath) continue;
+
+    const absTarget = path.resolve(targetPath);
+    let realTarget = absTarget;
+    try {
+      if (fs.existsSync(absTarget)) {
+        realTarget = fs.realpathSync(absTarget);
+      } else {
+        let ancestor = path.dirname(absTarget);
+        let tail = path.basename(absTarget);
+        while (ancestor !== path.dirname(ancestor) && !fs.existsSync(ancestor)) {
+          tail = path.join(path.basename(ancestor), tail);
+          ancestor = path.dirname(ancestor);
+        }
+        if (fs.existsSync(ancestor)) {
+          realTarget = path.join(fs.realpathSync(ancestor), tail);
+        }
+      }
+    } catch {
+      realTarget = absTarget;
+    }
+
+    const isSame = realStore === realTarget;
+    const storeInsideTarget = realStore.startsWith(realTarget.endsWith(path.sep) ? realTarget : realTarget + path.sep);
+    const targetInsideStore = realTarget.startsWith(realStore.endsWith(path.sep) ? realStore : realStore + path.sep);
+
+    if (isSame || storeInsideTarget || targetInsideStore) {
+      throw new AttestationStoreError(
+        `attestation store directory "${realStore}" overlaps with writable resource "${res.resource}" at "${realTarget}" (fail closed).`,
+      );
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Refuse to persist an attestation anywhere a confined process can write.
+ */
+export function assertAttestationStoreIsolated(context = {}, resources = []) {
+  const storeDir = resolveAttestationStoreDir(context);
+  verifyAttestationStoreIsolation(storeDir, resources);
+  return storeDir;
+}
+
+/**
  * Resolves the host attestation store directory outside agent write grants.
+ * Store default is user-machine state, never project-local .fgos state.
  */
 export function resolveAttestationStoreDir(context = {}) {
   if (process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH) {
     return path.resolve(process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH);
   }
-  if (context.fgosDir) {
-    return path.join(context.fgosDir, 'attestations');
+  if (context.attestationStoreDir) {
+    return path.resolve(context.attestationStoreDir);
   }
-  return path.join(os.homedir(), '.fgos', 'attestations');
+  return path.join(process.env.XDG_STATE_HOME || path.join(os.homedir(), '.local', 'state'), 'fgos', 'attestations');
 }
 
 /**
@@ -85,6 +167,10 @@ export function saveAttestationRecord(attestation, context = {}) {
   validateAttestationCompleteness(attestation);
 
   const storeDir = resolveAttestationStoreDir(context);
+  if (Array.isArray(attestation.resources) && attestation.resources.length > 0) {
+    verifyAttestationStoreIsolation(storeDir, attestation.resources);
+  }
+
   fs.mkdirSync(storeDir, { recursive: true });
 
   const fileName = `${attestation.dispatchId}.${attestation.phase}.json`;
@@ -109,6 +195,10 @@ export function savePlanRecord(plan, context = {}) {
     throw new AttestationStoreError('plan must have dispatchId.');
   }
   const storeDir = resolveAttestationStoreDir(context);
+  if (Array.isArray(plan.resources) && plan.resources.length > 0) {
+    verifyAttestationStoreIsolation(storeDir, plan.resources);
+  }
+
   fs.mkdirSync(storeDir, { recursive: true });
 
   const fileName = `${plan.dispatchId}.plan.json`;

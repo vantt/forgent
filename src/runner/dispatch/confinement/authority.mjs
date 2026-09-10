@@ -1,6 +1,7 @@
 // authority.mjs — Agent Confinement Authority runtime execution door
 // (Phase 02 R1-R7, docs/specs/confinement-authority.md §1, §5.2, §6.6, §6.9).
 
+import crypto from "node:crypto";
 import path from "node:path";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError } from "../transport.mjs";
 import { RunnerConfigError } from "../config.mjs";
@@ -13,6 +14,26 @@ import {
 } from "./backend-registry.mjs";
 
 export { DispatchError };
+
+function applyBackendPlanToAttestation(attestation, backendPlan) {
+  if (!backendPlan) return attestation;
+  attestation.coverage = backendPlan.coverage;
+  attestation.resources = backendPlan.resources;
+  attestation.readiness = backendPlan.readiness;
+  attestation.grants = backendPlan.grants;
+  attestation.backend = backendPlan.backend;
+  if (Array.isArray(backendPlan.mismatches)) {
+    attestation.mismatches = backendPlan.mismatches;
+  }
+  return attestation;
+}
+
+function adapterConsumesPreparedSandbox(adapterName) {
+  // herdr starts a provider by kind and forwards only provider argv; it does
+  // not execute Authority's prepared command/args. Treating its dispatch as
+  // bwrap-enforced would be a false attestation.
+  return adapterName !== 'herdr-spawn';
+}
 
 /**
  * Build a canonical ConfinementAttestationV1 (spec §6.6).
@@ -325,6 +346,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   let driver = null;
   let backendPlan = null;
   let preparedConfinement = null;
+  const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
 
   if (request.backendId) {
     const registryDoc = loadMachineBackendRegistry();
@@ -376,6 +398,13 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     }
 
     const assessment = driver.assess(request, backendInstance);
+    if (!adapterConsumesPreparedSandbox(adapterName)) {
+      const detail = `adapter ${adapterName} does not apply the prepared sandbox.`;
+      assessment.mismatches.push({ code: 'confinement-unsupported', detail });
+      for (const key of Object.keys(assessment.coverage)) {
+        if (assessment.coverage[key] === 'satisfied') assessment.coverage[key] = 'unverified';
+      }
+    }
     backendPlan = {
       contract: "confinement-plan.v1",
       dispatchId: request.dispatchId,
@@ -396,11 +425,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         id: backendInstance.id,
         type: backendInstance.type,
         version: driver.version,
-        configDigest: "",
+        configDigest: crypto
+          .createHash("sha256")
+          .update(JSON.stringify(backendInstance.config || {}))
+          .digest("hex"),
       },
       mismatches: assessment.mismatches,
     };
-    savePlanRecord(backendPlan, request.context);
+    savePlanRecord(backendPlan, request.context, backendPlan.resources);
 
     if (backendPlan.decision === "refuse") {
       const refusedAttestation = buildConfinementAttestation({
@@ -408,10 +440,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         phase: "refused",
         outcome: "refused",
       });
-      refusedAttestation.mismatches = assessment.mismatches;
-      refusedAttestation.coverage = assessment.coverage;
-      refusedAttestation.resources = assessment.resources;
-      saveAttestationRecord(refusedAttestation, request.context);
+      applyBackendPlanToAttestation(refusedAttestation, backendPlan);
+      saveAttestationRecord(refusedAttestation, request.context, backendPlan.resources);
       throw new DispatchError(
         "confinement-unsupported",
         `required confinement refused for capability "${request.capability}": ${assessment.mismatches.map((m) => m.detail).join("; ")}`,
@@ -432,15 +462,12 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       phase: "prepared",
       outcome: "unknown",
     });
-    prepAttestation.coverage = backendPlan.coverage;
-    prepAttestation.resources = backendPlan.resources;
-    saveAttestationRecord(prepAttestation, request.context);
+    applyBackendPlanToAttestation(prepAttestation, backendPlan);
+    saveAttestationRecord(prepAttestation, request.context, backendPlan.resources);
   }
 
   // R3: Resolve adapter function through Authority
   let adapterFn = null;
-  const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
-
   if (typeof adapterPort === "function") {
     adapterFn = adapterPort;
   } else if (typeof adapterPort === "object" && adapterPort !== null) {
@@ -506,7 +533,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       outcome: "unknown",
       error: err,
     });
-    saveAttestationRecord(failedAttestation, request.context);
+    applyBackendPlanToAttestation(failedAttestation, backendPlan);
+    saveAttestationRecord(failedAttestation, request.context, backendPlan?.resources);
     if (err instanceof DispatchError) {
       err.contract = "confinement-execution.v1";
       err.status = "failed";
@@ -545,11 +573,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     request,
     phase: "completed",
   });
-  if (backendPlan) {
-    attestation.coverage = backendPlan.coverage;
-    attestation.resources = backendPlan.resources;
-  }
-  saveAttestationRecord(attestation, request.context);
+  applyBackendPlanToAttestation(attestation, backendPlan);
+  saveAttestationRecord(attestation, request.context, backendPlan?.resources);
 
   return {
     ...adapterResult,

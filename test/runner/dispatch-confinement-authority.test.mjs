@@ -129,6 +129,41 @@ test("throw in policy resolve / required mode creates zero spawn (Verification)"
   assert.equal(spawnCount, 0, "zero spawn when required policy cannot be enforced in observe mode");
 });
 
+test("H3/M7: herdr-spawn required dispatch refuses rather than claiming prepared bwrap coverage", async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-herdr-confinement-'));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(tmp, 'backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({ contract: 'confinement-backend-registry.v1', confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: '/usr/bin/bwrap' } } }));
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+    const runDir = path.join(tmp, '.fgos', 'runs', 'one');
+    fs.mkdirSync(runDir, { recursive: true });
+    const req = buildConfinementRequest({
+      dispatchId: 'disp_herdr_unverified', capability: 'code:review', executorId: 'herdr', backendId: 'bwrap',
+      invocation: { command: 'agy', args: [], adapter: 'herdr-spawn', interactiveMode: { kind: 'agy' } },
+      context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, '.fgos') },
+      requirement: { mode: 'required', policyId: 'host-write-denied', policy: {
+        contract: 'confinement-policy.v1',
+        controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+        grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
+      } },
+    });
+    await assert.rejects(() => executeThroughConfinement(req, async () => ({ status: 0 })), (err) => {
+      assert.equal(err.errorClass, 'confinement-unsupported');
+      assert.ok(err.attestation.mismatches.some((m) => m.detail.includes('does not apply the prepared sandbox')));
+      assert.equal(err.attestation.coverage['control:hostWrite'], 'unverified');
+      assert.equal(err.attestation.backend.id, 'bwrap');
+      assert.ok(Array.isArray(err.attestation.grants));
+      assert.deepEqual(err.attestation.readiness, {});
+      return true;
+    });
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test("in-process dispatch gets authorityScope: external-harness with null attestation (R6)", async () => {
   const inProcessReq = buildConfinementRequest({
     capability: "in-proc-task",
@@ -930,4 +965,3 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
   assert.notEqual(pidOnlyAtt.effectiveControls.hostWrite, "deny");
   assert.equal(pidOnlyAtt.coverage["control:hostWrite"], "unverified");
 });
-

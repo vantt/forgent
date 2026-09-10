@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { cleanupConfinementResource } from '../cleanup.mjs';
 import { resolveConfinementResources } from '../resources.mjs';
+import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
@@ -94,6 +95,38 @@ export function assessBwrap(request, backend) {
 
   const policy = request.requirement?.policy;
   const controls = policy?.controls;
+
+  const supportedControls = new Set([
+    'hostWrite', 'hostRead', 'networkEgress', 'process', 'home', 'session', 'workspace',
+  ]);
+
+  if (!controls || typeof controls !== 'object' || Array.isArray(controls)) {
+    mismatches.push({
+      code: 'confinement-unsupported',
+      detail: 'required confinement policy must declare a controls object.',
+    });
+  } else {
+    for (const key of Object.keys(controls)) {
+      if (!supportedControls.has(key)) {
+        mismatches.push({
+          code: 'confinement-unsupported',
+          detail: `control "${key}" is not supported by local-bwrap-v1.`,
+        });
+        coverage[`control:${key}`] = 'unsatisfied';
+      }
+    }
+    if (reqMode === 'required') {
+      for (const key of supportedControls) {
+        if (controls[key] === undefined) {
+          mismatches.push({
+            code: 'confinement-unsupported',
+            detail: `required confinement policy is missing control "${key}".`,
+          });
+          coverage[`control:${key}`] = 'unsatisfied';
+        }
+      }
+    }
+  }
 
   if (controls) {
     // hostWrite: only deny is supported (or allow for unconfined)
@@ -209,6 +242,17 @@ export function assessBwrap(request, backend) {
     });
   }
 
+  // No provider credential source is currently resolved or mounted by this
+  // driver. Never turn that absence into a satisfied security claim.
+  if (policyGrants.some((grant) => grant.resource === 'executor-credentials') &&
+      !resolvedResources.some((resource) => resource.resource === 'executor-credentials')) {
+    coverage['grant:executor-credentials'] = 'unverified';
+    mismatches.push({
+      code: 'confinement-unsupported',
+      detail: 'executor credentials were requested but no provider credential source was resolved for mounting.',
+    });
+  }
+
   // Readiness: check if all resourceNeeds have matching resolved resources with sufficient access
   for (const need of request.resourceNeeds || []) {
     const res = resolvedResources.find((r) => r.resource === need.resource);
@@ -221,6 +265,17 @@ export function assessBwrap(request, backend) {
     } else {
       readiness[need.resource] = 'satisfied';
     }
+  }
+
+  // Verify attestation store isolation: fail closed if store overlaps any writable resource (H1)
+  try {
+    assertAttestationStoreIsolated(request.context, resolvedResources);
+  } catch (err) {
+    mismatches.push({
+      code: 'confinement-grant-invalid',
+      detail: err.message,
+    });
+    coverage['control:hostWrite'] = 'unsatisfied';
   }
 
   return {
@@ -236,6 +291,9 @@ export function assessBwrap(request, backend) {
  * Never branches on executorId, providerModel, or agent type!
  */
 export async function prepareBwrap(plan, request, backend) {
+  // Verify attestation store isolation before materializing mounts (H1)
+  assertAttestationStoreIsolated(request.context, plan.resources || []);
+
   const allocatedPaths = [];
 
   try {

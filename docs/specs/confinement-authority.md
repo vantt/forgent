@@ -858,8 +858,11 @@ Channels luôn có đủ năm entry trên; out-of-scope không được dùng đ
 filesystem hay inherited-fd khi hostWrite deny. Violation đã xác nhận ghi
 phase failed, outcome degraded và mismatch; unknown dành cho thiếu bằng chứng.
 
-Authority lưu plan, prepared record và terminal attestation vào store do host
-quản lý ngoài mọi write grant của agent. Run-output chỉ chứa artifact của agent
+Authority lưu plan, prepared record và terminal attestation vào machine state
+store do host quản lý, mặc định ngoài project `.fgos/` và ngoài mọi write grant
+của agent. Trước mỗi persist Authority kiểm tra containment hai chiều giữa store
+và mọi resolved writable resource; bất kỳ overlap nào phải refuse, không được
+ghi record vào vùng grant. Run-output chỉ chứa artifact của agent
 và có thể chứa bản sao attestation, không phải durable truth. Event committed
 chỉ chứa dispatch id, outcome, mismatch code và reference/digest tới record đã
 redact; không chứa credential, raw env hay absolute sensitive path. Recovery

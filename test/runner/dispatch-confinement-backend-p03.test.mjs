@@ -47,6 +47,7 @@ import {
   savePlanRecord,
   createRedactedAttestationReference,
   validateAttestationCompleteness,
+  verifyAttestationStoreIsolation,
   REQUIRED_CHANNELS,
   VALID_PHASES,
   AttestationStoreError,
@@ -194,6 +195,55 @@ test('R2: resolveConfinementResources resolves run-output, workspace, private-ho
     assert.equal(homeRes.allocation, 'temporary');
     assert.ok(fs.existsSync(homeRes.hostTarget));
   } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('H2/M2: bwrap refuses unknown or missing required controls and unresolved credentials', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-control-refusal-'));
+  try {
+    const base = {
+      dispatchId: 'disp_controls',
+      context: { cwd: tmp, repoRoot: tmp, runDir: path.join(tmp, '.fgos', 'runs', 'one'), fgosDir: path.join(tmp, '.fgos') },
+      requirement: {
+        mode: 'required', policyId: 'host-write-denied', policy: {
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
+        },
+      },
+    };
+    fs.mkdirSync(base.context.runDir, { recursive: true });
+    const unknown = assessBwrap({ ...base, requirement: { ...base.requirement, policy: { ...base.requirement.policy, controls: { ...base.requirement.policy.controls, gpu: 'deny' } } } }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.ok(unknown.mismatches.some((m) => m.detail.includes('control "gpu"')));
+    const missing = assessBwrap({ ...base, requirement: { ...base.requirement, policy: { ...base.requirement.policy, controls: { ...base.requirement.policy.controls, hostWrite: undefined } } } }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.ok(missing.mismatches.some((m) => m.detail.includes('missing control "hostWrite"')));
+    const credentials = assessBwrap({ ...base, requirement: { ...base.requirement, policy: { ...base.requirement.policy, grants: [{ resource: 'executor-credentials', access: 'read', scope: 'dispatch' }] } } }, { id: 'bwrap', config: { type: 'bwrap' } });
+    assert.equal(credentials.coverage['grant:executor-credentials'], 'unverified');
+    assert.ok(credentials.mismatches.some((m) => m.detail.includes('no provider credential source')));
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('H1/M5/M6: resolver refuses unsafe state boundaries before creating private home', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resource-refusal-'));
+  const oldStore = process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
+  try {
+    const fgosDir = path.join(tmp, '.fgos');
+    const runDir = path.join(fgosDir, 'runs', 'one');
+    fs.mkdirSync(runDir, { recursive: true });
+    assert.throws(() => resolveConfinementResources({ dispatchId: 'disp_run', context: { runDir }, grants: [{ resource: 'run-output', access: 'write' }] }), ConfinementResourceError);
+    const outside = path.join(tmp, 'outside');
+    fs.mkdirSync(outside);
+    const workspaceLink = path.join(tmp, 'workspace-link');
+    fs.symlinkSync(outside, workspaceLink);
+    assert.throws(() => resolveConfinementResources({ dispatchId: 'disp_workspace', context: { repoRoot: workspaceLink }, grants: [{ resource: 'workspace', access: 'read-write' }] }), ConfinementResourceError);
+    const escaped = path.join(tmp, 'escaped', 'home');
+    assert.throws(() => resolveConfinementResources({ dispatchId: '../../escaped', context: {}, grants: [{ resource: 'private-home', access: 'read-write' }], backendConfig: { tempRoot: path.join(tmp, 'safe') } }), ConfinementResourceError);
+    assert.equal(fs.existsSync(escaped), false);
+    process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = path.join(fgosDir, 'attestations');
+    assert.throws(() => verifyAttestationStoreIsolation(path.join(fgosDir, 'attestations'), [{ resource: 'workspace', hostTarget: path.dirname(fgosDir), access: 'read-write' }]), AttestationStoreError);
+  } finally {
+    if (oldStore === undefined) delete process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
+    else process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = oldStore;
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
@@ -521,7 +571,9 @@ test('R6: validateAttestationCompleteness enforces 4 phases and 5 required chann
 
 test('R6: saveAttestationRecord persists records outside write grants and createRedactedAttestationReference creates digest', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-attest-test-'));
+  const oldStore = process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
   try {
+    process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = path.join(tmp, 'machine-state', 'attestations');
     const context = { fgosDir: tmp };
 
     for (const phase of ['prepared', 'completed', 'failed', 'refused']) {
@@ -550,6 +602,8 @@ test('R6: saveAttestationRecord persists records outside write grants and create
       assert.equal(ref.ref, `attestation:${att.dispatchId}:${phase}`);
     }
   } finally {
+    if (oldStore === undefined) delete process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH;
+    else process.env.FGOS_CONFINEMENT_ATTESTATION_STORE_PATH = oldStore;
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
@@ -908,4 +962,3 @@ test('Cleanup: adapter failure and timeout/cancel clean up temporary resources i
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
-
