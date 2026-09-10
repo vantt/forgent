@@ -34,6 +34,14 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
+import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape } from '../runner/dispatch/confinement/policies.mjs';
+import {
+  resolveMachineBackendRegistryPath,
+  validateBackendRegistryShape,
+  ensureMachineBackendRegistryDefaults,
+  loadMachineBackendRegistry,
+} from '../runner/dispatch/confinement/backend-registry.mjs';
+
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -1057,19 +1065,29 @@ registerFix({
   fix: () => fixAgyPermissionsConfigured(),
 });
 
-export function checkBwrapAvailable() {
+let cachedBwrapResult = null;
+
+export function checkBwrapAvailable(binary = 'bwrap') {
+  if (binary === 'bwrap' && cachedBwrapResult) {
+    return cachedBwrapResult;
+  }
+  let res;
   try {
-    execFileSync('bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
-    return {
+    execFileSync(binary, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+    res = {
       passed: true,
-      message: 'bwrap is available on PATH and smoke test (bwrap --ro-bind / / -- true) passed',
+      message: `${binary} is available on PATH and smoke test (bwrap --ro-bind / / -- true) passed`,
     };
   } catch (err) {
-    return {
+    res = {
       passed: false,
-      message: `bwrap is unavailable or failed smoke test: ${err.message}`,
+      message: `${binary} is unavailable or failed smoke test: ${err.message}`,
     };
   }
+  if (binary === 'bwrap') {
+    cachedBwrapResult = res;
+  }
+  return res;
 }
 
 registerCheck({
@@ -3400,12 +3418,14 @@ export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.cl
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
 export function checkExecutorConfinement(runnerCfg = {}) {
-  const flags = ['privateHome', 'isolatedSession', 'ownWorktree'];
   const offenders = [];
   for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
     if (executor?.permissionMode !== 'bypass') continue;
     const c = executor.confinement ?? {};
-    const missing = flags.filter((f) => c[f] !== true);
+    const missing = [];
+    if (!(c.privateHome === true || c.controls?.home === 'private')) missing.push('privateHome');
+    if (!(c.isolatedSession === true || c.controls?.session === 'isolated')) missing.push('isolatedSession');
+    if (!(c.ownWorktree === true || c.controls?.workspace === 'own')) missing.push('ownWorktree');
     if (missing.length > 0) offenders.push(`${id} (missing ${missing.join(', ')})`);
   }
   if (offenders.length === 0) {
@@ -3557,4 +3577,297 @@ registerCheck({
     }
   },
 });
+
+// ─── Confinement Authority (Phase 01 R7, docs/specs/confinement-authority.md) ─
+
+export function checkConfinementPoliciesDeclared(cwd) {
+  let runner;
+  try {
+    runner = readSharedConfig(cwd)?.runner;
+  } catch (err) {
+    return { passed: false, message: `runner config not readable: ${err.message}` };
+  }
+  if (!runner?.capabilities || typeof runner.capabilities !== 'object') {
+    return { passed: true, message: 'no runner capabilities declared -- nothing to check' };
+  }
+
+  const customPolicies = runner.confinementPolicies || {};
+  if (typeof customPolicies !== 'object' || Array.isArray(customPolicies)) {
+    return { passed: false, message: 'runner.confinementPolicies must be an object' };
+  }
+
+  for (const [policyId, policyDoc] of Object.entries(customPolicies)) {
+    try {
+      validateConfinementPolicyShape(policyDoc);
+    } catch (err) {
+      return { passed: false, message: `custom confinement policy "${policyId}" is malformed: ${err.message}` };
+    }
+  }
+
+  const undeclared = [];
+  const missingAnchors = [];
+  for (const [name, cap] of Object.entries(runner.capabilities)) {
+    if (!cap || typeof cap !== 'object') continue;
+    if (!cap.confinement) {
+      missingAnchors.push(name);
+    } else if (cap.confinement?.mode === 'unconfined') {
+      continue;
+    } else if (cap.confinement?.policy) {
+      const policyId = cap.confinement.policy;
+      if (!BUILTIN_POLICY_IDS.includes(policyId) && !customPolicies[policyId]) {
+        undeclared.push(`capability "${name}" references unknown policy "${policyId}"`);
+      }
+    } else {
+      missingAnchors.push(name);
+    }
+  }
+
+  if (undeclared.length > 0) {
+    return { passed: false, message: `undeclared confinement policies: ${undeclared.join('; ')}` };
+  }
+
+  const isStrict = Boolean(runner?.confinement?.strict);
+  if (isStrict && missingAnchors.length > 0) {
+    return { passed: false, message: `missing confinement anchors in strict mode: ${missingAnchors.join(', ')}` };
+  }
+
+  if (missingAnchors.length > 0) {
+    return {
+      passed: true,
+      message: `all referenced capability confinement policies are declared; ${missingAnchors.length} capability/capabilities have no confinement anchor declared (${missingAnchors.join(', ')})`,
+    };
+  }
+
+  return { passed: true, message: 'all capability confinement policies are declared' };
+}
+
+registerCheck({
+  id: 'confinement-policies-declared',
+  description: 'confinement policies referenced by capabilities exist in built-ins or runner.confinementPolicies',
+  check: (cwd) => checkConfinementPoliciesDeclared(cwd),
+});
+
+export function checkConfinementBackendRegistryReadable() {
+  const regPath = resolveMachineBackendRegistryPath();
+  if (!fs.existsSync(regPath)) {
+    return {
+      passed: false,
+      message: `machine backend registry not found at ${regPath} -- run fgos doctor --fix`,
+    };
+  }
+  let parsed;
+  try {
+    const raw = fs.readFileSync(regPath, 'utf8');
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    return {
+      passed: false,
+      message: `machine backend registry at ${regPath} is not valid JSON: ${err.message}`,
+    };
+  }
+  try {
+    validateBackendRegistryShape(parsed);
+  } catch (err) {
+    return {
+      passed: false,
+      message: `machine backend registry at ${regPath} is malformed: ${err.message}`,
+    };
+  }
+  const count = Object.keys(parsed.confinementBackends || {}).length;
+  return {
+    passed: true,
+    message: `machine backend registry valid at ${regPath} (${count} backend(s) configured)`,
+  };
+}
+
+export function fixConfinementBackendRegistryReadable() {
+  const regPath = resolveMachineBackendRegistryPath();
+  if (fs.existsSync(regPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(regPath, 'utf8'));
+      validateBackendRegistryShape(parsed);
+      return {
+        changed: false,
+        message: `machine backend registry already valid at ${regPath}`,
+      };
+    } catch {
+      // Re-create default registry if malformed
+    }
+  }
+  try {
+    const res = ensureMachineBackendRegistryDefaults(regPath);
+    return {
+      changed: Boolean(res.created || res.changed),
+      message: res.message ?? (res.created
+        ? `created default machine backend registry at ${res.path}`
+        : res.changed
+          ? `repaired machine backend registry at ${res.path}`
+          : `machine backend registry already valid at ${res.path}`),
+    };
+  } catch (err) {
+    return {
+      changed: false,
+      message: `skipped -- ${err.message}`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'confinement-backend-registry-readable',
+  description: 'machine backend registry file exists and conforms to confinement-backend-registry.v1 schema',
+  check: () => checkConfinementBackendRegistryReadable(),
+});
+
+registerFix({
+  id: 'confinement-backend-registry-readable',
+  fix: () => fixConfinementBackendRegistryReadable(),
+});
+
+export function checkConfinementBwrapPlatform() {
+  let registry;
+  try {
+    registry = loadMachineBackendRegistry();
+  } catch (err) {
+    return {
+      passed: false,
+      message: `bwrap backend status: machine registry not readable or malformed (${err.message})`,
+    };
+  }
+
+  const bwrapBackend = registry.confinementBackends?.bwrap;
+  if (!bwrapBackend) {
+    return {
+      passed: false,
+      message: 'bwrap backend status: not configured in machine registry',
+    };
+  }
+
+  if (bwrapBackend.enabled === false) {
+    return {
+      passed: true,
+      message: 'bwrap backend status: disabled in machine registry',
+    };
+  }
+
+  if (os.platform() !== 'linux') {
+    return {
+      passed: false,
+      message: `bwrap backend status: unavailable (platform "${os.platform()}" is not Linux)`,
+    };
+  }
+
+  const binaryPath = bwrapBackend.executable || 'bwrap';
+  const probe = checkBwrapAvailable(binaryPath);
+  if (!probe.passed) {
+    return {
+      passed: false,
+      message: `bwrap backend status: unavailable (binary "${binaryPath}" failed smoke test: ${probe.message})`,
+    };
+  }
+
+  return {
+    passed: true,
+    message: `bwrap backend status: ready (Linux, binary "${binaryPath}" working, enabled)`,
+  };
+}
+
+registerCheck({
+  id: 'confinement-bwrap-platform',
+  description: 'bwrap backend instance configured in machine registry is enabled and its executable is verified on Linux',
+  check: () => checkConfinementBwrapPlatform(),
+});
+
+export function checkConfinementProbeFreshness() {
+  return {
+    passed: true,
+    message: 'confinement probe freshness check (placeholder -- no active probe required in phase 01)',
+  };
+}
+
+registerCheck({
+  id: 'confinement-probe-freshness',
+  description: 'confinement probe freshness status (placeholder in phase 01)',
+  check: () => checkConfinementProbeFreshness(),
+});
+
+export function checkConfinementStrictReadiness(cwd) {
+  let runner;
+  try {
+    runner = readSharedConfig(cwd)?.runner;
+  } catch (err) {
+    return { passed: false, message: `runner config not readable: ${err.message}` };
+  }
+
+  const isStrict = Boolean(runner?.confinement?.strict);
+  const missing = [];
+  const invalid = [];
+  const capabilities = runner?.capabilities;
+  const customPolicies = runner?.confinementPolicies || {};
+
+  if (!capabilities || typeof capabilities !== 'object' || Object.keys(capabilities).length === 0) {
+    missing.push('no capabilities declared');
+  } else {
+    for (const [name, cap] of Object.entries(capabilities)) {
+      if (!cap || typeof cap !== 'object') {
+        invalid.push(`capability "${name}" is malformed`);
+        continue;
+      }
+      if (cap.confinement?.mode === 'unconfined') continue;
+      const policyId = cap.confinement?.policy;
+      if (!policyId) {
+        missing.push(`capability "${name}" missing confinement policy`);
+      } else if (!BUILTIN_POLICY_IDS.includes(policyId) && !customPolicies[policyId]) {
+        invalid.push(`capability "${name}" references unknown policy "${policyId}"`);
+      }
+    }
+  }
+
+  const bwrapResult = checkConfinementBwrapPlatform();
+  const bwrapReady = bwrapResult.passed && bwrapResult.message.includes('ready');
+
+  if (invalid.length > 0) {
+    return {
+      passed: false,
+      message: `strict confinement not ready: ${[...missing, ...invalid].join('; ')}`,
+    };
+  }
+
+  if (missing.length > 0) {
+    if (isStrict) {
+      return {
+        passed: false,
+        message: `strict confinement not ready: ${missing.join('; ')}`,
+      };
+    }
+    return {
+      passed: true,
+      message: `warning: strict confinement disabled (${missing.join('; ')})`,
+    };
+  }
+
+  if (!bwrapReady) {
+    if (isStrict) {
+      return {
+        passed: false,
+        message: `strict confinement not ready: bwrap not ready (${bwrapResult.message})`,
+      };
+    }
+    return {
+      passed: true,
+      message: `warning: strict confinement disabled; bwrap not ready (${bwrapResult.message})`,
+    };
+  }
+
+  return {
+    passed: true,
+    message: 'strict confinement readiness satisfied (all capabilities declare valid policies and bwrap backend is ready)',
+  };
+}
+
+registerCheck({
+  id: 'confinement-strict-readiness',
+  description: 'strict confinement readiness (all capabilities declared with known policies, bwrap ready)',
+  check: (cwd) => checkConfinementStrictReadiness(cwd),
+});
+
 

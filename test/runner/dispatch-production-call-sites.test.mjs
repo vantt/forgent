@@ -14,7 +14,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
 
 const WORKER_SESSION = 'fgos-worker';
 
@@ -198,7 +198,7 @@ test('a confinement the config declares reaches herdr, from the config file down
   try {
     assert.deepEqual(
       loadRunnerConfigFromDir(root).executors['herdr-worker'].confinement,
-      { privateHome: false, isolatedSession: true },
+      normalizeLegacyConfinement({ privateHome: false, isolatedSession: true }),
       'the config door accepted the declaration',
     );
 

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
@@ -54,7 +54,7 @@ test('A1: the declared profile survives the load intact', () => {
   });
   const e = cfg.executors.sample;
   assert.equal(e.permissionMode, 'bypass');
-  assert.deepEqual(e.confinement, FULL_CONFINEMENT);
+  assert.deepEqual(e.confinement, normalizeLegacyConfinement(FULL_CONFINEMENT));
   assert.equal(e.promptDelivery, 'file-pointer');
 });
 
@@ -171,7 +171,7 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
     const cfg = loadRunnerConfig(file);
     const resolved = resolveExecutorConfig(cfg, 'standard', 'profiled');
     assert.equal(resolved.permissionMode, 'bypass');
-    assert.deepEqual(resolved.confinement, FULL_CONFINEMENT);
+    assert.deepEqual(resolved.confinement, normalizeLegacyConfinement(FULL_CONFINEMENT));
     assert.equal(resolved.promptDelivery, 'file-pointer');
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

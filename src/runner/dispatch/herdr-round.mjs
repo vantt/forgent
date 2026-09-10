@@ -212,14 +212,16 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
   // worktree cannot be running in the checkout it was told to stay out of.
   // The config door refuses `bypass` unless this is declared, so leaving it
   // unenforced made that refusal partly ceremonial.
-  if (confinement?.ownWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
+  const hasOwnWorktree = Boolean(confinement?.ownWorktree || confinement?.controls?.workspace === 'own');
+  if (hasOwnWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
     throw round.fail('invalid-config', 'own-worktree-unavailable',
       `executor for work "${round.workId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(cwd)}) rather than a worktree of its own.`);
   }
 
   let workerHomePath = null;
   try {
-    if (confinement?.privateHome) {
+    const hasPrivateHome = Boolean(confinement?.privateHome || confinement?.controls?.home === 'private');
+    if (hasPrivateHome) {
       const home = createWorkerHome(os.tmpdir(), {
         runId: round.agentName,
         sourceHome: fullEnv.HOME ?? os.homedir(),
@@ -230,7 +232,8 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
       workerHomePath = home.homePath;
       round.note({ workerHome: workerHomePath });
     }
-    if (confinement?.isolatedSession) {
+    const hasIsolatedSession = Boolean(confinement?.isolatedSession || confinement?.controls?.session === 'isolated');
+    if (hasIsolatedSession) {
       // One worker session, never named by config: a config-supplied name could
       // point at the operator's own cockpit whenever that cockpit has a name
       // and the dispatch runs outside herdr, where there is no HERDR_SESSION
