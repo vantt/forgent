@@ -891,10 +891,18 @@ never invent a new filename mid-session.
   caveats folded into the registration.
 - **`tsk-31d`** — `agy -p` ignores the invoking OS cwd for relative
   paths; pass absolute paths in prompts targeting `agy-bwrap`.
-- **`tsk-1ed`** — the auto-generated dispatch prompt
-  (`renderAssignmentPrompt`) never states the required
-  `agent-result.json` schema (`status` enum, required fields); state it
-  explicitly in the objective text until this lands.
+- **`tsk-1ed`** — **closed by `tsk-5zim`; do not hand-write the schema
+  into objectives any more.** `renderAssignmentPrompt`
+  (`src/runner/dispatch/assignment.mjs`) now states the
+  `agent-result.json` contract itself whenever a `runDir` is in scope: the
+  legal `status` values, rendered from `ALLOWED_AGENT_CLAIM_STATUSES` (the
+  same set `validateAgentResultClaim` enforces, so the prompt cannot drift
+  from the validator), the required non-empty `summary`, and — for a
+  read-only operation — that a `done` with no `agent-report.md` settles as
+  `no-evidence`. Verified live in a real dispatched prompt. Restating the
+  schema in the objective is redundant, not harmful; but a hand-written
+  copy CAN drift from the validator, which is the reason this entry
+  existed. Prefer the rendered contract.
 - **`tsk-oed`** — `aggregateBounds` carries an undocumented third bound
   (`wallTimeMs`, default 1 hour) that can permanently block a session
   regardless of unused round/assignment budget; declare it explicitly

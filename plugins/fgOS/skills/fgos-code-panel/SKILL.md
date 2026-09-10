@@ -68,22 +68,17 @@ here requires opening `fgos-plan-loop` to understand or use.
   discussion before implementation is a `fgos-plan-loop` track, not this
   skill.
 
-## Known gap (`tsk-371`, not fixed yet)
+## Verify the doer's real outcome yourself
 
-`src/verbs/coordination/run.mjs`'s operation-step dispatch does not
-forward a step's own declared `mutation: "mutating"` into
-`dispatchDeclaredOperation` (confirmed by `grep -n "mutation"
-src/verbs/coordination/run.mjs` returning zero matches, and live four
-separate times during this project's own R5 live proof). **Effect for
-this skill specifically:** a `produce-candidate`/`revise-candidate` step
-whose real commit lands correctly still comes back with RunResult
-`status: "failed"`. Work around it directly, every time: after a
-produce/revise step reports, check `git log`/`git diff` in the cell's own
-worktree for the expected commit, and run the target project's real test
-command there. If the real commit and real tests both check out, treat
-the step as genuinely successful in your own disposition, and record in
-the disposition `rationale` that the `"failed"` grading is this known
-gap, not a real defect.
+`src/verbs/coordination/run.mjs` forwards a step's own `mutation: "mutating"`
+into `dispatchDeclaredOperation` (landed in commit `da078125`, the
+`tsk-371` fix), so a `produce-candidate`/`revise-candidate` step whose
+commit lands is graded on its real result -- the old "correct commit still
+comes back `status: "failed"`" behaviour is gone. What stays true: the
+RunResult is the worker's own claim. After a produce/revise step reports,
+check `git log`/`git diff` in the cell's own worktree for the expected
+commit and run the target project's real test command there before you
+record any disposition.
 
 ## Default actor roster
 
@@ -108,6 +103,28 @@ Fix-round roster:
   { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-code-attacker" }
 ]
 ```
+
+Visible-pane variant (herdr-spawn), proven live 2026-09-10 through this
+exact door (session `herdr-smoke--cell-01`: doer commit + result, reviewer
+diff/test/sha256 report, red-team `xxd` check -- all three settled):
+
+```json
+"actors": [
+  { "id": "doer", "executor": "agy-herdr", "tier": "standard", "persona": "focused-code-implementer" },
+  { "id": "reviewer", "executor": "claude-reviewer-herdr", "tier": "analytical", "persona": "code-quality-reviewer" },
+  { "id": "red-team", "executor": "codex-herdr", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+]
+```
+
+Same protocol, same request shape, same `--cwd` rule; each role runs in its
+own herdr pane in the `fgos-worker` session, so a person can watch it and a
+failed round leaves its pane open with the reason on screen. Two things the
+herdr transport does that cli-spawn does not: herdr types the bare agent word
+from `--kind` (an executor's `command` path is not what gets typed), and the
+pane is the operator's own interactive shell, so shell aliases apply --
+`codex-herdr` relies on that (see its config description). Model resolution
+is unchanged: `actors[].model` has no channel for declared-protocol
+requests, so tier x the executor's `rigorOverrides` decides the model.
 
 `persona` is free-form prose the executor receives as framing, not a
 closed vocabulary (`schema.mjs:133` `ACTOR_ALLOWED_KEYS`) -- sharpen any
@@ -191,7 +208,7 @@ engine refuses `"mutating"` whenever `cwd` resolves to the main checkout
 fgos coordination show code-panel--<change-slug> --json
 ```
 
-Verify the doer's real outcome yourself first (known gap above), then
+Verify the doer's real outcome yourself first (section above), then
 record each accept/reject/deferred decision as a `disposition` step:
 
 ```json
