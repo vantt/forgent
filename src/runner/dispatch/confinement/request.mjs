@@ -6,6 +6,7 @@ import {
   validateCapabilityConfinementShape,
   resolveConfinementPolicy,
   normalizeLegacyConfinement,
+  validateConfinementPolicyShape,
   ConfinementPolicyError,
 } from "./policies.mjs";
 
@@ -65,6 +66,12 @@ export function validateConfinementRequest(request) {
   }
   if (!request.requirement || typeof request.requirement !== "object" || Array.isArray(request.requirement)) {
     throw new Error("ConfinementRequest requirement must be an object.");
+  }
+  // Requests can reach Authority without the config loader.  Keep that door
+  // closed too: an invalid control is a malformed request, not "unknown"
+  // coverage that could accidentally be executed.
+  if (request.requirement.policy !== null && request.requirement.policy !== undefined) {
+    validateConfinementPolicyShape(request.requirement.policy, "ConfinementRequest requirement.policy");
   }
   return request;
 }

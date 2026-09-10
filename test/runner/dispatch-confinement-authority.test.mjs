@@ -87,46 +87,23 @@ test("fake adapter receives only prepared invocation through Authority (R1-R3)",
   assert.equal(receivedOpts.timeoutMs, 5000);
 });
 
-test("throw in policy resolve / required mode creates zero spawn (Verification)", async () => {
+test("malformed required policy is rejected at the request door before any spawn", async () => {
   let spawnCount = 0;
   const fakeAdapter = async () => {
     spawnCount++;
     return { status: 0 };
   };
 
-  const req = buildConfinementRequest({
-    capability: "secured-task",
-    executorId: "test-exec",
-    requirement: {
-      mode: "required",
-      policyId: "host-write-denied",
-      policy: { contract: "confinement-policy.v1", controls: {}, grants: [] },
-    },
-    invocation: {
-      command: "echo",
-      args: [],
-      adapter: "cli-spawn",
-    },
-    context: {
-      cwd: "/cwd",
-      runDir: "/runDir",
-    },
-  });
-
-  await assert.rejects(
-    () => executeThroughConfinement(req, fakeAdapter),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.errorClass, "confinement-unsupported");
-      assert.match(err.message, /required confinement refused/);
-      assert.ok(err.attestation);
-      assert.equal(err.attestation.phase, "refused");
-      assert.equal(err.attestation.outcome, "refused");
-      return true;
-    },
+  assert.throws(
+    () => buildConfinementRequest({
+      capability: "secured-task", executorId: "test-exec",
+      requirement: { mode: "required", policyId: "host-write-denied", policy: { contract: "confinement-policy.v1", controls: {}, grants: [] } },
+      invocation: { command: "echo", args: [], adapter: "cli-spawn" },
+      context: { cwd: "/cwd", runDir: "/runDir" },
+    }),
+    /missing required control "hostWrite"/,
   );
-
-  assert.equal(spawnCount, 0, "zero spawn when required policy cannot be enforced in observe mode");
+  assert.equal(spawnCount, 0, "malformed policy cannot reach an adapter");
 });
 
 test("H3/M7: adapters outside the prepared-sandbox allowlist refuse required dispatch", async () => {

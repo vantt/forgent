@@ -315,8 +315,8 @@ test('R3: assessBwrap accepts default host-write-denied and workspace-write poli
   }
 });
 
-test('R3: assessBwrap returns named mismatches for unsupported controls (hostRead:deny, networkEgress:filtered, process:isolated)', () => {
-  const req = buildConfinementRequest({
+test('R3: malformed filtered policy is rejected before bwrap assessment', () => {
+  assert.throws(() => buildConfinementRequest({
     capability: 'secure-task',
     executorId: 'bwrap-exec',
     requirement: {
@@ -338,16 +338,7 @@ test('R3: assessBwrap returns named mismatches for unsupported controls (hostRea
     },
     context: { cwd: '/tmp', runDir: '/tmp' },
     backendId: 'bwrap',
-  });
-
-  const assessment = assessBwrap(req, { id: 'bwrap', type: 'bwrap', config: { type: 'bwrap' } });
-  assert.ok(assessment.mismatches.length >= 3);
-  assert.ok(assessment.mismatches.some((m) => m.detail.includes('hostRead: deny')));
-  assert.ok(assessment.mismatches.some((m) => m.detail.includes('networkEgress: filtered')));
-  assert.ok(assessment.mismatches.some((m) => m.detail.includes('process: isolated')));
-  assert.equal(assessment.coverage['control:hostRead'], 'unsatisfied');
-  assert.equal(assessment.coverage['control:networkEgress'], 'unsatisfied');
-  assert.equal(assessment.coverage['control:process'], 'unsatisfied');
+  }), /networkFilter.*required/);
 });
 
 test('R3: assessBwrap returns mismatch for preferred mode and invocation override', () => {
@@ -837,6 +828,7 @@ test('Authority Door: required mode with bwrap backend assesses, prepares, execu
     assert.equal(execResult.status, 'completed');
     assert.ok(execResult.attestation);
     assert.equal(execResult.attestation.phase, 'completed');
+    assert.ok(execResult.attestation.evidence.some((entry) => entry.kind === 'falsification-probe' && entry.freshness === 'current'));
 
     // Attestation records persisted outside write grants
     const storeContext = { attestationStoreDir: req.context.attestationStoreDir };

@@ -12,6 +12,7 @@ import {
   createBackendRegistrySnapshot,
   getBackendDriver,
 } from "./backend-registry.mjs";
+import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 
 export { DispatchError };
 
@@ -33,6 +34,42 @@ function adapterConsumesPreparedSandbox(adapterName) {
   // receive a bwrap enforcement attestation. New adapters intentionally
   // default to unverified until they prove that contract.
   return adapterName === 'cli-spawn';
+}
+
+function requiredCoverageFailures(policy, coverage) {
+  const failures = [];
+  for (const control of Object.keys(policy?.controls || {})) {
+    const key = `control:${control}`;
+    if (coverage[key] !== "satisfied") failures.push({ key, coverage: coverage[key] ?? "unknown" });
+  }
+  for (const grant of policy?.grants || []) {
+    // Spec §6.6/§6.9: a resource grant is optional by default.  In particular,
+    // built-in executor-credentials remains honestly unverified when absent,
+    // but is deliberately not allowed to make an otherwise verified dispatch
+    // refuse or degrade.
+    if (grant.optional === false) {
+      const key = `grant:${grant.resource}`;
+      if (coverage[key] !== "satisfied") failures.push({ key, coverage: coverage[key] ?? "unknown" });
+    }
+  }
+  return failures;
+}
+
+function verifyRequiredProbe(request, backendInstance, driver) {
+  if (backendInstance.type !== "bwrap") {
+    return { passed: false, message: `no falsification probe profile for backend type "${backendInstance.type}"` };
+  }
+  const executable = backendInstance.config?.executable || "bwrap";
+  const result = runAllConfinementProbes({ bwrapBin: executable });
+  return {
+    ...result,
+    fingerprint: computeProbeFingerprint({
+      policy: request.requirement.policy,
+      driverVersion: driver.version,
+      backendConfig: backendInstance.config || {},
+      bwrapExecutable: executable,
+    }),
+  };
 }
 
 /**
@@ -426,6 +463,13 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         if (assessment.coverage[key] === 'satisfied') assessment.coverage[key] = 'unverified';
       }
     }
+    const coverageFailures = requiredCoverageFailures(request.requirement.policy, assessment.coverage);
+    for (const failure of coverageFailures) {
+      assessment.mismatches.push({
+        code: "confinement-coverage-unverified",
+        detail: `${failure.key} has ${failure.coverage} coverage; required confinement needs satisfied coverage.`,
+      });
+    }
     backendPlan = {
       contract: "confinement-plan.v1",
       dispatchId: request.dispatchId,
@@ -476,6 +520,22 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         },
       );
     }
+
+    // The same real falsification harness used by doctor is Authority's
+    // pre-spawn proof gate. Structural inspection of argv cannot establish
+    // outcome: enforced (spec §6.6).
+    const probe = verifyRequiredProbe(request, backendInstance, driver);
+    if (!probe.passed) {
+      const refusedAttestation = buildConfinementAttestation({ request, phase: "refused", outcome: "refused" });
+      applyBackendPlanToAttestation(refusedAttestation, backendPlan);
+      refusedAttestation.evidence.push({ kind: "falsification-probe", ref: probe.message, freshness: "stale", fingerprint: probe.fingerprint });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError("confinement-probe-failed", `required confinement refused: ${probe.message}`, {
+        contract: "confinement-execution.v1", status: "refused", dispatchId: request.dispatchId,
+        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
+      });
+    }
+    backendPlan.probe = probe;
 
     preparedConfinement = await driver.prepare(backendPlan, request, backendInstance);
     const prepAttestation = buildConfinementAttestation({
@@ -596,6 +656,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     outcome: preparedConfinement ? "enforced" : undefined,
   });
   applyBackendPlanToAttestation(attestation, backendPlan);
+  if (backendPlan?.probe?.fingerprint) {
+    attestation.evidence.push({
+      kind: "falsification-probe",
+      ref: "local-bwrap-v1:pre-spawn",
+      freshness: "current",
+      fingerprint: backendPlan.probe.fingerprint,
+    });
+  }
   saveAttestationRecord(attestation, request.context);
 
   return {
