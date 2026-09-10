@@ -39,6 +39,7 @@ import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-h
 import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
+import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -207,12 +208,13 @@ function prepareRunDir({ runDir, roundNumber, workId, tier, model }) {
  *
  * Confinement that was asked for and cannot be delivered is a refusal, not a
  * downgrade: running anyway would put a worker on the operator's cockpit
- * socket while the profile claims it is confined. The `ownWorktree` check
- * below stays as a backstop for callers that invoke this adapter directly
- * (bypassing Authority, as some tests do) -- not a second policy
- * implementation, just the one condition Authority cannot pre-empt from
- * here (see authority.mjs for the canonical bypass-pairing/own-worktree
- * refusal logic).
+ * socket while the profile claims it is confined. The bypass-pairing and
+ * `ownWorktree` checks below are backstops for callers that invoke this
+ * adapter directly (bypassing Authority, as some tests do) -- not a second
+ * policy implementation: the bypass-pairing check calls the exact same
+ * `evaluateBypassPairing` function Authority itself calls
+ * (confinement/bypass-pairing.mjs), so both entry points refuse an
+ * incomplete pairing identically.
  */
 export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
   const normalized = confinement ? normalizeLegacyConfinement(confinement, `executor.${round.workId}.confinement`) : null;
@@ -231,7 +233,20 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
     effectiveConfinement?.controls?.session === 'isolated',
   );
 
-  // Checked first, because it is the one flag that is already true or already
+  // Checked before ownWorktree/repoRoot, because an incomplete bypass pairing
+  // is a refusal regardless of where the dispatch happens to be running.
+  const { satisfied: bypassPairingSatisfied, missing: missingBypassControls } = evaluateBypassPairing({
+    isBypass: permissionMode === 'bypass',
+    hasOwnWorktree,
+    hasPrivateHome,
+    hasIsolatedSession,
+  });
+  if (!bypassPairingSatisfied) {
+    throw round.fail('invalid-config', 'bypass-confinement-incomplete',
+      `executor for work "${round.workId}" refused: permissionMode "bypass" requires full confinement (missing: ${missingBypassControls.join(', ')}).`);
+  }
+
+  // Checked next, because it is the one flag that is already true or already
   // false before anything is provisioned: a worker confined to its own
   // worktree cannot be running in the checkout it was told to stay out of.
   if (hasOwnWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {

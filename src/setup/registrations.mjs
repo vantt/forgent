@@ -3493,6 +3493,13 @@ const HERDR_KIND_TO_INTEGRATION = Object.freeze({ agy: 'antigravity-cli' });
  * any more, a missing hook costs latency and precision rather than
  * correctness.
  */
+/** An executor's own declared invocation shape (legacy, no `invocations[]`)
+ * still needs an `adapter` to check, so this falls back to the executor
+ * itself when no `via: 'cli'` entry exists. */
+function resolveCliInvocation(executor) {
+  return (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor;
+}
+
 export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
   // Presence, not truthiness: a caller passing `kinds: null` is saying "herdr
   // could not be asked", which is a different statement from not passing it
@@ -3502,7 +3509,7 @@ export function checkHerdrExecutorKinds(runnerCfg = {}, injected = {}) {
   const executors = Object.entries(runnerCfg.executors ?? {});
   const herdrExecutors = [];
   for (const [id, executor] of executors) {
-    const invocation = (executor?.invocations ?? []).find((i) => i.via === 'cli') ?? executor ?? {};
+    const invocation = resolveCliInvocation(executor) ?? {};
     if (invocation.adapter !== 'herdr-spawn') continue;
     const declared = invocation.interactiveMode?.kind;
     const command = invocation.command;
@@ -3921,7 +3928,7 @@ export function checkConfinementHerdrMaturity(cwd) {
   const herdrExecutors = Object.entries(executors)
     .filter(([_, exec]) => {
       if (!exec || typeof exec !== 'object') return false;
-      const invocation = (exec.invocations ?? []).find((i) => i.via === 'cli') ?? exec;
+      const invocation = resolveCliInvocation(exec);
       return invocation.adapter === 'herdr-spawn';
     });
 

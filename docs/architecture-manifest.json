@@ -20,6 +20,7 @@
     "src/runner/dispatch.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
     "src/runner/dispatch/confinement/policies.mjs": "infra",
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
     "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
     "src/runner/dispatch/confinement/authority.mjs": "infra",
     "src/runner/dispatch/confinement/request.mjs": "infra",

@@ -15,6 +15,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 
 import { normalizeLegacyConfinement } from "./policies.mjs";
+import { evaluateBypassPairing } from "./bypass-pairing.mjs";
 
 export { DispatchError };
 
@@ -491,12 +492,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       invocationConfinement?.controls?.session === "isolated",
   );
 
-  if (isBypass) {
-    if (!hasOwnWorktree || !hasPrivateHome || !hasIsolatedSession) {
-      const missing = [];
-      if (!hasPrivateHome) missing.push("home: private (privateHome)");
-      if (!hasIsolatedSession) missing.push("session: isolated (isolatedSession)");
-      if (!hasOwnWorktree) missing.push("workspace: own (ownWorktree)");
+  {
+    const { satisfied, missing } = evaluateBypassPairing({
+      isBypass,
+      hasOwnWorktree,
+      hasPrivateHome,
+      hasIsolatedSession,
+    });
+    if (!satisfied) {
       const refusedAttestation = buildConfinementAttestation({
         request,
         phase: "refused",
