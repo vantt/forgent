@@ -7,15 +7,27 @@
  *    fork, exec, execSync) and appends { cmd, args } JSON lines to a per-case log file
  *    named by the FGOS_HARNESS_SPY_LOG environment variable.
  * 2. `bin:` entries (and `node:` entries too, as a second net): a PATH shim
- *    (`buildPathShim`) generates a small wrapper script per externally-observed
- *    command (currently just `git`, the only command this harness has seen a real
- *    fgos invocation spawn), placed in a scratch directory prepended to PATH. Each
+ *    (`buildPathShim`) generates a small wrapper script per name in
+ *    PATH_SHIM_COMMANDS (currently just `git` -- the only command this harness
+ *    has seen a real fgos invocation spawn; NOT a general child-process
+ *    interceptor), placed in a scratch directory prepended to PATH. Each
  *    wrapper appends the SAME { cmd, args } JSON line format to FGOS_HARNESS_SPY_LOG,
  *    then execs the real binary (resolved once via `command -v` before the shim
  *    directory is prepended to PATH, so it never resolves back to itself). This is
  *    the only mechanism that can observe a Rust binary's own subprocess spawns,
  *    since there is no in-process monkeypatch hook for a compiled binary the way
  *    there is for `node:child_process`.
+ *
+ *    KNOWN ASYMMETRY (MEDIUM-B, not yet closed): a `node:` entry still sees a
+ *    deeper process tree than a `bin:` entry can, for two reasons the
+ *    all-read-verb coverage floor happens not to exercise today. First, a
+ *    `node:` entry's own NODE_OPTIONS preload is inherited by any grandchild
+ *    Node process it spawns, giving `node:` visibility a `bin:` entry has no
+ *    equivalent for. Second, PATH_SHIM_COMMANDS covers only `git` -- any other
+ *    command a future selector spawns is invisible to a `bin:` entry until
+ *    added to that list. Extend PATH_SHIM_COMMANDS, and revisit the
+ *    NODE_OPTIONS-inheritance gap, before this harness is trusted for a
+ *    write-verb or subprocess-heavy Rust-vs-Node comparison (P07+).
  */
 
 import fs from "node:fs";
@@ -36,11 +48,13 @@ const PATH_SHIM_COMMANDS = ["git"];
 /**
  * Builds a PATH-shim directory: one wrapper script per name in `PATH_SHIM_COMMANDS`
  * that logs `{cmd, args}` to `spyLogPath` (same format `child-process-spy.cjs` uses)
- * then execs the real binary. Returns the shim directory path, or `null` if a
- * command in the list cannot be resolved on the current PATH (fails open -- a
- * missing shimmable command is not fatal to the case under test, just unshimmed).
- * The real binary is resolved via `command -v` BEFORE this directory is ever
- * prepended to PATH, so the shim never execs itself.
+ * then execs the real binary. Always returns the shim directory path (never
+ * `null`, LOW-2) -- if a command in the list cannot be resolved on the current
+ * PATH, that ONE command is silently left unshimmed (fails open: a missing
+ * shimmable command is not fatal to the case under test), the directory
+ * itself is still created and returned. The real binary is resolved via
+ * `command -v` BEFORE this directory is ever prepended to PATH, so the shim
+ * never execs itself.
  */
 function buildPathShim(shimDir, spyLogPath) {
   fs.mkdirSync(shimDir, { recursive: true });
@@ -54,7 +68,12 @@ function buildPathShim(shimDir, spyLogPath) {
     if (!realPath) continue;
     const shimScript = [
       "#!/bin/sh",
-      `node -e 'const fs=require("node:fs");try{fs.appendFileSync(process.env.FGOS_HARNESS_SPY_LOG, JSON.stringify({cmd:${JSON.stringify(name)},args:process.argv.slice(1)})+"\\n")}catch(e){}' "$@"`,
+      // "--" (MEDIUM-A) forces node to treat every "$@" element as a script
+      // arg, never as its OWN flag -- without it, a shimmed command invoked
+      // with a leading node-flag-shaped arg (e.g. `git --version`) would be
+      // consumed by `node` itself, the logger would never run, and `node`'s
+      // own stdout (its version string) would leak into the child's stdout.
+      `node -e 'const fs=require("node:fs");try{fs.appendFileSync(process.env.FGOS_HARNESS_SPY_LOG, JSON.stringify({cmd:${JSON.stringify(name)},args:process.argv.slice(1)})+"\\n")}catch(e){}' -- "$@"`,
       `exec ${JSON.stringify(realPath)} "$@"`,
       "",
     ].join("\n");

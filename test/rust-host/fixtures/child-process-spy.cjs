@@ -11,6 +11,15 @@
 // AND the PATH shim would double-count it for node: entries while a bin:
 // entry only ever gets the single PATH-shim count, producing a spurious
 // mismatch in exactly the node-vs-bin comparison this harness exists for.
+//
+// KNOWN GAP (LOW-1, latent): the skip check is `path.basename(cmd)`, which
+// only matches a shimmed name when it is the literal FIRST argument (spawn/
+// execFile-style). A cp.exec/execSync call with a shell command STRING (e.g.
+// "git rev-parse HEAD" as one argument) would never match and would be
+// recorded here too, alongside the shim's own record -- a real double-count
+// path this harness does not yet close. No current call site under src/ or
+// bin/ uses exec/execSync with a shimmed command, so this is latent, not
+// reachable today.
 
 const fs = require("node:fs");
 const path = require("node:path");

@@ -341,3 +341,54 @@ test("R2/R5: Signal comparison mode is exercised end to end (MEDIUM-2)", async (
   assert.equal(res.resultA.signal, "SIGKILL");
   assert.equal(res.resultB.signal, "SIGKILL");
 });
+
+test("HIGH-1 regression: a launch failure is an unconditional hard difference, never a match", () => {
+  // Unit-level (synthetic results, no real spawn) so this stays fast and
+  // exercises compareResults' own early-return directly, matching the
+  // reviewer's original reproduction shape: two ENOENT-style failures with
+  // every other field left at its default/empty value.
+  const testCase = { id: "launch-error-regression", modes: ["exact-bytes"] };
+  const baseResult = {
+    exitCode: null,
+    signal: null,
+    launchError: null,
+    stdout: Buffer.alloc(0),
+    stderr: Buffer.alloc(0),
+    stdoutText: "",
+    stderrText: "",
+    spawnedChildren: [],
+    fsDelta: null,
+  };
+
+  const bothFailed = compareResults(testCase, { ...baseResult, launchError: { message: "spawn ENOENT", code: "ENOENT" } }, { ...baseResult, launchError: { message: "spawn ENOENT", code: "ENOENT" } });
+  assert.equal(bothFailed.passed, false, "Two identically-broken launches must never compare equal");
+  assert.ok(bothFailed.differences.some((d) => d.includes("Launch failure")));
+
+  const oneFailed = compareResults(testCase, { ...baseResult, launchError: { message: "spawn ENOENT", code: "ENOENT" } }, { ...baseResult });
+  assert.equal(oneFailed.passed, false, "One launch failure alone must fail too");
+  assert.ok(oneFailed.differences.some((d) => d.includes("Launch failure")));
+});
+
+test("HIGH-2 regression: bin: entries get child-process evidence via the PATH shim, node: entries are not double-counted", async () => {
+  const binEntry = parseEntry(`bin:${path.join(FIXTURES_DIR, "bin-git-caller.sh")}`);
+  const binResult = await runCaseOnEntry(binEntry, { id: "bin-shim-regression", args: [] });
+  assert.equal(binResult.launchError, null, `bin: fixture must launch cleanly, got: ${JSON.stringify(binResult.launchError)}`);
+  assert.ok(
+    binResult.spawnedChildren.some((c) => path.basename(c.cmd) === "git"),
+    `Expected the PATH shim to record a git call for the bin: entry, got: ${JSON.stringify(binResult.spawnedChildren)}`
+  );
+
+  // node: entries must NOT double-count: the same real git invocation is
+  // reachable through both child-process-spy.cjs (in-process monkeypatch)
+  // and the PATH shim (OS-exec boundary) unless the spy's own
+  // FGOS_HARNESS_SHIMMED_COMMANDS skip is working. `bin/fgos.mjs version`
+  // is the real fgos invocation known to spawn exactly one `git` call.
+  const nodeEntry = parseEntry("node:bin/fgos.mjs");
+  const nodeResult = await runCaseOnEntry(nodeEntry, { id: "node-no-double-count-regression", args: ["version"] });
+  const gitCallsRecorded = nodeResult.spawnedChildren.filter((c) => path.basename(c.cmd) === "git").length;
+  assert.equal(
+    gitCallsRecorded,
+    1,
+    `Expected exactly one recorded git call for a node: entry (spy+shim must not double-count), got ${gitCallsRecorded}: ${JSON.stringify(nodeResult.spawnedChildren)}`
+  );
+});
