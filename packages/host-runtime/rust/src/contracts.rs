@@ -410,21 +410,25 @@ pub type OperationCatalog = &'static [OperationDescriptor];
 /// Immutable linked provider registry snapshot for an invocation.
 ///
 /// `providers` holds `ProviderDescriptor` metadata, not `&'static dyn
-/// OperationProvider` trait objects -- deliberately, for this phase (Phase
-/// 05, kernel contracts + pure Router). The Router's canonical signature
-/// (`host-invocation-provider-routing.md` §6) is `(OperationId, ...,
-/// RegistrySnapshot) -> Result<ProviderDescriptor, SelectionRefused>`: pure
-/// selection only ever needs provider METADATA to match
-/// operation/mode/host/contract-version, never an actual invocable object.
-/// `OperationProvider` (the trait carrying `descriptor()` + async
-/// `invoke()`) is defined later, in Phase 06's `invocation_service.rs` (per
-/// that phase's own R3: "defined here, not in contracts.rs"), which
-/// consumes this crate's `select()` read-only and maintains its own mapping
-/// from a selected `ProviderDescriptor` to the real provider object it
-/// dispatches to -- `fgos-host-runtime` itself never depends on a concrete
-/// provider crate (R1/R3 of this phase), so it cannot hold real `dyn
-/// OperationProvider` objects even in principle before Phase 08 assembles
-/// the production snapshot.
+/// OperationProvider` trait objects, even though phase-05.md's own R1/R3
+/// literally specify the latter. This is a genuine contradiction inside the
+/// phase spec, not a misreading on either side: R1/R3 ask for the
+/// trait-object field, while R7 says in the same breath that THIS phase
+/// "does not define... the trait body" at all -- and a `&'static dyn Trait`
+/// field cannot type-check with no trait definition in scope. (A `dyn
+/// Trait` field itself would need no dependency on any IMPLEMENTING crate --
+/// that is not the blocker; the blocker is that the trait declaration itself
+/// does not exist yet in this crate, by R7's own explicit instruction.)
+/// R7 is treated as controlling here: `OperationProvider` (the trait
+/// carrying `descriptor()` + async `invoke()`) is defined fresh in Phase
+/// 06's `invocation_service.rs` (per that phase's own R3: "defined here,
+/// not in contracts.rs"), which consumes this crate's `select()` read-only.
+/// Cost of this choice, for whoever picks up Phase 06/08: `select()` hands
+/// back a `&ProviderDescriptor`, so `InvocationService` needs its own
+/// separate mapping from a selected `ProviderDescriptor` to the real
+/// provider object it dispatches to, rather than the one shared table
+/// canonical §6 sketches -- two registration tables Phase 08 must keep in
+/// sync instead of one.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegistrySnapshot {
     pub catalog: OperationCatalog,
