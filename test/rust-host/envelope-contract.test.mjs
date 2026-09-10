@@ -239,11 +239,21 @@ test("R5 split: timestamp shape and range predicate (never exact string equality
       `Timestamp "${vector.envelope.generated_at}" must match predicate regex ${predicate.regex}`
     );
 
-    // 2. Timestamp parses as a valid date
+    // 2. Timestamp parses as a valid date, within [min_year, max_year]
     const parsedEpoch = Date.parse(vector.envelope.generated_at);
     assert.ok(!Number.isNaN(parsedEpoch), "Timestamp must parse as valid epoch milliseconds");
     const parsedYear = new Date(parsedEpoch).getUTCFullYear();
     assert.ok(parsedYear >= predicate.min_year, `Year ${parsedYear} must be >= ${predicate.min_year}`);
+    // max_year (red-team MEDIUM, P03 round 1): without an upper bound, an
+    // absurdly future timestamp (e.g. 9999-12-31) satisfies the regex,
+    // Date.parse, and min_year alike -- assert it does NOT satisfy max_year.
+    assert.ok(predicate.max_year, `timestamp_predicate.max_year missing in ${filename}`);
+    assert.ok(parsedYear <= predicate.max_year, `Year ${parsedYear} must be <= ${predicate.max_year}`);
+    assert.ok(
+      !regex.test("9999-12-31T23:59:59.999Z") ||
+        new Date(Date.parse("9999-12-31T23:59:59.999Z")).getUTCFullYear() > predicate.max_year,
+      "An absurdly future timestamp must fail min_year/max_year range checking even though it satisfies the regex"
+    );
 
     // 3. Live envelope check: fresh wrapEnvelope produces a different timestamp,
     //    proving why shape/range predicate is used rather than exact string equality!
@@ -252,10 +262,9 @@ test("R5 split: timestamp shape and range predicate (never exact string equality
       regex.test(liveEnvelope.generated_at),
       "Live wrapEnvelope timestamp satisfies predicate regex"
     );
-    assert.ok(
-      new Date(liveEnvelope.generated_at).getUTCFullYear() >= predicate.min_year,
-      "Live wrapEnvelope timestamp satisfies min_year"
-    );
+    const liveYear = new Date(liveEnvelope.generated_at).getUTCFullYear();
+    assert.ok(liveYear >= predicate.min_year, "Live wrapEnvelope timestamp satisfies min_year");
+    assert.ok(liveYear <= predicate.max_year, "Live wrapEnvelope timestamp satisfies max_year");
   }
 });
 
@@ -380,6 +389,15 @@ test("R6 serialization corpus category: negative zero", () => {
 
   // In ECMAScript, -0 serializes to 0
   assert.ok(!fixture.compact_bytes.includes("-0"), "-0 must serialize to 0 without negative sign");
+
+  // Red-team HIGH (P03 round 1): input_value alone loses the -0 distinction
+  // through the fixture file's own JSON round-trip. negative_zero_paths is
+  // the sign-preserving companion a Rust consumer must use instead.
+  assert.deepEqual(
+    fixture.negative_zero_paths,
+    ["neg_zero", "array_neg_zero[0]", "nested.value"],
+    "negative_zero_paths must name every -0-valued location in input_value"
+  );
 });
 
 test("R6 serialization corpus category: floating exponent formatting", () => {

@@ -58,7 +58,8 @@
   "timestamp_predicate": {
     "format": "iso-8601",
     "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
-    "min_year": 2026
+    "min_year": 2026,
+    "max_year": 2100
   },
   "has_trailing_newline": true,
   "exit_code": 0

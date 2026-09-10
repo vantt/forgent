@@ -1,6 +1,11 @@
 {
   "category": "negative zero",
   "description": "ECMAScript specification serializes -0 as 0 in both compact and pretty JSON",
+  "negative_zero_paths": [
+    "neg_zero",
+    "array_neg_zero[0]",
+    "nested.value"
+  ],
   "input_value": {
     "neg_zero": 0,
     "array_neg_zero": [

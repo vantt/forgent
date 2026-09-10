@@ -77,6 +77,11 @@ export function generateEnvelopeVectors() {
       format: "iso-8601",
       regex: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
       min_year: 2026,
+      // max_year (red-team MEDIUM, P03 round 1): without an upper bound,
+      // an absurdly future timestamp (e.g. 9999-12-31) satisfies the regex,
+      // Date.parse, and min_year alike -- a loose predicate that would
+      // accept a badly-broken serializer's output.
+      max_year: 2100,
     },
     has_trailing_newline: true,
     exit_code: 0,
@@ -117,6 +122,11 @@ export function generateEnvelopeVectors() {
       format: "iso-8601",
       regex: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
       min_year: 2026,
+      // max_year (red-team MEDIUM, P03 round 1): without an upper bound,
+      // an absurdly future timestamp (e.g. 9999-12-31) satisfies the regex,
+      // Date.parse, and min_year alike -- a loose predicate that would
+      // accept a badly-broken serializer's output.
+      max_year: 2100,
     },
     has_trailing_newline: true,
     exit_code: 0,
@@ -187,6 +197,17 @@ export function generateSerializationCorpus() {
   corpus.set("negative-zero.json", {
     category: "negative zero",
     description: "ECMAScript specification serializes -0 as 0 in both compact and pretty JSON",
+    // input_value alone cannot represent -0: JSON has no literal that
+    // round-trips as IEEE754 negative zero through this FIXTURE FILE's own
+    // JSON.stringify/JSON.parse (unlike the compact_bytes/pretty_bytes
+    // strings below, which capture the real one-time serialization of the
+    // real -0 held in memory here). A Rust fixture consumer must instead
+    // construct -0.0_f64 directly at each dot-path/bracket-index named
+    // here, assign it into the otherwise-parsed input_value, and confirm
+    // ITS OWN serializer reproduces compact_bytes/pretty_bytes exactly --
+    // never trust input_value's own (sign-lost) numeric fields for these
+    // paths (red-team HIGH finding, P03 round 1).
+    negative_zero_paths: ["neg_zero", "array_neg_zero[0]", "nested.value"],
     input_value: negZeroValue,
     compact_bytes: JSON.stringify(negZeroValue),
     pretty_bytes: JSON.stringify(negZeroValue, null, 2),
