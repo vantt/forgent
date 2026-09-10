@@ -274,8 +274,14 @@ For each cell:
 9. Status is read with `fgos coordination chain rust-host-r1-kernel --json` /
    `show`, never from worker narration.
 
-Rust cells (P04–P08) dispatch the Doer at tier `heavy`; every other cell at
-`standard`. Reviewer and Red-Team stay `analytical`.
+Rust cells (P04–P08) dispatch the Doer at tier `creative`; every other cell
+at `standard`. Reviewer and Red-Team stay `analytical`. (Corrected 2026-09-10
+during P04's own cell open: `heavy` is not a value the coordination schema's
+`MODEL_POLICY_TIERS` enum accepts — `config.mjs:393` lists only
+`lightweight|standard|creative|analytical|critical`. `creative` is the
+correct enum value for this line's own parenthetical target,
+`gemini-3.8-flash-high`, per `.fgos/config.json`'s `modelPolicies.gemini`
+mapping.)
 
 ## Plan-Level Acceptance
 
@@ -355,8 +361,9 @@ Proven live 2026-09-10 (`herdr-smoke--cell-01`,
 ]
 ```
 
-For the Rust cells P04–P08 and P11–P13 set `doer`/`fixer` `tier` to `heavy`
-(gemini flash-high). Resolved
+For the Rust cells P04–P08 and P11–P13 set `doer`/`fixer` `tier` to
+`creative` (gemini flash-high — corrected 2026-09-10, see the roster note
+above). Resolved
 models otherwise: doer/fixer gemini-3.8-flash-medium, reviewer opus, red-team
 gpt-5.6-terra; codex on `CODEX_HOME=~/.codex-fgovn`.
 
