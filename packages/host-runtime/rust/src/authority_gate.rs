@@ -5,7 +5,22 @@
 //! 2. Selected-provider grant (after routing): intersects the admitted action with the operation's capability policy
 //!    and the selected provider's requested capabilities.
 //!
-//! Both gates are deny-by-default and enforce least-privilege only.
+//! Both gates deny by default for every check backed by real, structural
+//! data: `CallerAdmission`'s policy check and `ProviderGrant`'s capability
+//! check both require an explicit allow-list before admitting/granting
+//! anything (HIGH-1/MEDIUM-1 fix, P06 round 1). The one exception is
+//! `CallerAdmission`'s PRINCIPAL check, which stays opt-in: `HostInvocation`
+//! carries no real caller-identity type yet (a gap rooted in Phase 05's
+//! kernel contracts, not something Phase 06 can close by inventing one), so
+//! enforcing "deny unless configured" against a caller-supplied,
+//! freely-choosable string would be security theater, not real protection.
+//! R2's own "operation's capability policy" half of the grant intersection
+//! is similarly unimplementable as literally written: `OperationDescriptor`
+//! carries an opaque `authority_policy_id` string, not a capability set, so
+//! there is no operation-side capability data to intersect against yet --
+//! the policy-id check inside `CallerAdmission::admit` is the real
+//! per-operation authorization signal this phase can enforce with the data
+//! that actually exists.
 
 use crate::contracts::{
     HostInvocation, OperationCatalog, OperationDescriptor, OperationId, ProviderDescriptor,
@@ -101,6 +116,30 @@ impl CallerAdmission {
         }
     }
 
+    /// Creates a caller admission gate that trusts exactly the policies this
+    /// binary's own compiled-in `OperationCatalog` declares (HIGH-1 fix).
+    ///
+    /// This is NOT "allow everything": it admits only operations whose
+    /// `authority_policy_id` is one this same process's own catalog already
+    /// names -- nothing external, no wildcard. It is the correct minimal-R1
+    /// default for a composition that has no external policy-distribution
+    /// mechanism yet (Phase 08's own composition root may replace this with
+    /// a real, externally-configured `CallerAdmission` once one exists).
+    /// Grants no capabilities by default -- pair with
+    /// `.with_admitted_capabilities(..)` for a provider that requests any.
+    pub fn allow_catalog_policies(catalog: OperationCatalog) -> Self {
+        let allowed_policies: HashSet<String> = catalog
+            .iter()
+            .map(|op| op.authority_policy_id.to_string())
+            .collect();
+        Self {
+            allowed_principals: None,
+            allowed_policies: Some(allowed_policies),
+            admitted_capabilities: None,
+            deny_all: false,
+        }
+    }
+
     /// Sets explicit allowed principals.
     pub fn with_allowed_principals(
         mut self,
@@ -159,7 +198,12 @@ impl CallerAdmission {
             });
         }
 
-        // 3. Principal check (if configured)
+        // 3. Principal check -- opt-in, NOT deny-by-default (a known,
+        // deliberate R1 gap, not a silent bypass; see this struct's own doc
+        // comment for why: `HostInvocation` has no real caller-identity type
+        // yet, so "deny unless configured" here would only be enforceable
+        // against a self-reported, freely-choosable string, which is
+        // security theater, not real protection).
         if let Some(allowed_principals) = &self.allowed_principals {
             let caller_principal = invocation.invocation_id.as_deref().unwrap_or("anonymous");
             if !allowed_principals.contains(caller_principal) {
@@ -169,14 +213,21 @@ impl CallerAdmission {
             }
         }
 
-        // 4. Policy check (if configured)
-        if let Some(allowed_policies) = &self.allowed_policies {
-            if !allowed_policies.contains(op_desc.authority_policy_id.as_ref()) {
-                return Err(AdmissionRefused::PolicyNotSatisfied {
-                    operation: operation.clone(),
-                    policy: op_desc.authority_policy_id.to_string(),
-                });
-            }
+        // 4. Policy check -- deny by default (R2, HIGH-1 fix): unlike the
+        // principal check above, `authority_policy_id` is real, catalog-
+        // backed data every operation declares, so "unconfigured" here means
+        // NO policy is trusted, not "skip the check". A gate must be given
+        // an explicit allow-list (`with_allowed_policies`, or the
+        // `allow_catalog_policies` constructor below) before it admits
+        // anything past the structural operation/host-kind checks above.
+        let allowed_policies = self.allowed_policies.as_ref();
+        let policy_satisfied =
+            allowed_policies.is_some_and(|set| set.contains(op_desc.authority_policy_id.as_ref()));
+        if !policy_satisfied {
+            return Err(AdmissionRefused::PolicyNotSatisfied {
+                operation: operation.clone(),
+                policy: op_desc.authority_policy_id.to_string(),
+            });
         }
 
         let admitted_caps = self.admitted_capabilities.clone().unwrap_or_default();
@@ -223,11 +274,11 @@ impl ProviderGrant {
 
         let mut granted = Vec::new();
 
-        // Check each requested capability
+        // Check each requested capability -- exact match only (MEDIUM-1
+        // fix): a "*" wildcard defeated the whole point of a per-capability
+        // grant and was unused by every real caller in this crate.
         for &cap in provider.capabilities {
-            if admitted.admitted_capabilities.contains(cap)
-                || admitted.admitted_capabilities.contains("*")
-            {
+            if admitted.admitted_capabilities.contains(cap) {
                 granted.push(cap.to_string());
             } else {
                 return Err(GrantRefused::CapabilityDenied {
@@ -284,7 +335,9 @@ mod tests {
 
     #[test]
     fn admission_succeeds_for_valid_call() {
-        let gate = CallerAdmission::default();
+        // allow_catalog_policies, not default() (HIGH-1 fix): a
+        // default-constructed gate now genuinely denies by policy.
+        let gate = CallerAdmission::allow_catalog_policies(CATALOG);
         let invocation = HostInvocation::new("cli");
         let op = OperationId::parse("distribution.build.show").unwrap();
         let res = gate.admit(&invocation, &op, CATALOG);
@@ -295,6 +348,52 @@ mod tests {
             "distribution.build.show"
         );
         assert_eq!(admitted.host_kind, "cli");
+    }
+
+    #[test]
+    fn default_gate_denies_by_policy_even_for_a_real_catalog_operation() {
+        // HIGH-1 regression: CallerAdmission::default() must deny by
+        // default, not silently skip the policy check.
+        let gate = CallerAdmission::default();
+        let invocation = HostInvocation::new("cli");
+        let op = OperationId::parse("distribution.build.show").unwrap();
+        let res = gate.admit(&invocation, &op, CATALOG);
+        assert!(matches!(
+            res,
+            Err(AdmissionRefused::PolicyNotSatisfied { .. })
+        ));
+    }
+
+    #[test]
+    fn wildcard_capability_no_longer_grants_everything() {
+        // MEDIUM-1 regression: "*" in admitted_capabilities must not act as
+        // a blanket grant.
+        let grant_gate = ProviderGrant::new();
+        let mut caps = HashSet::new();
+        caps.insert("*".to_string());
+        let admitted = AdmittedCall {
+            operation: CATALOG[1].clone(),
+            host_kind: "cli".to_string(),
+            principal: None,
+            admitted_capabilities: caps,
+        };
+        let provider = ProviderDescriptor {
+            provider_id: Cow::Borrowed("test.provider"),
+            operation_id: OperationId::from_static("test.fixture.echo"),
+            component_class: Cow::Borrowed("test"),
+            mechanism: Cow::Borrowed("builtin"),
+            lifecycle: ProviderLifecycle::Singleton,
+            request_contract: ContractRef::from_static("req", "1.0.0"),
+            outcome_contract: ContractRef::from_static("out", "1.0.0"),
+            allowed_hosts: &["cli"],
+            allowed_modes: &["sync"],
+            capabilities: &["network.connect"],
+            replacement: None,
+            concurrency: None,
+            health: None,
+        };
+        let res = grant_gate.grant(&admitted, &provider);
+        assert!(matches!(res, Err(GrantRefused::CapabilityDenied { .. })));
     }
 
     #[test]

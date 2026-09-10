@@ -9,17 +9,21 @@
 
 pub mod cli_projector {
     use fgos_host_runtime::{
-        ContractRef, HostInvocation, InvocationService, OperationId, OperationRequest,
-        ProviderOutcome,
+        ContractRef, HostInvocation, InvocationService, NoopEventSink, OperationId,
+        OperationRequest, ProviderOutcome,
     };
 
     pub struct CliProjectorShim;
 
     impl CliProjectorShim {
+        /// Returns the decoded output AND the provider id the record names
+        /// (LOW-2: R7 asks for the SAME fixture provider, not just matching
+        /// output strings, which two coincidentally-identical providers
+        /// could also produce).
         pub async fn project_and_invoke(
             service: &InvocationService,
             message: &str,
-        ) -> Result<String, String> {
+        ) -> Result<(String, Option<String>), String> {
             let invocation = HostInvocation::new("cli");
             let request = OperationRequest::new(
                 OperationId::from_static("test.fixture.echo"),
@@ -27,37 +31,37 @@ pub mod cli_projector {
                 Box::new(message.to_string()),
             );
 
-            let outcome = service
-                .invoke(invocation, request)
-                .await
-                .map_err(|e| e.to_string())?;
+            let (result, record) = service
+                .invoke_with_record(invocation, request, &NoopEventSink)
+                .await;
+            let outcome = result.map_err(|e| e.to_string())?;
 
-            match outcome {
-                ProviderOutcome::Completed { output, .. } => {
-                    let text = output
-                        .downcast::<String>()
-                        .map_err(|_| "failed to downcast output to String".to_string())?;
-                    Ok(*text)
-                }
-                ProviderOutcome::Parked { reason, .. } => Ok(format!("parked: {reason}")),
-            }
+            let text = match outcome {
+                ProviderOutcome::Completed { output, .. } => *output
+                    .downcast::<String>()
+                    .map_err(|_| "failed to downcast output to String".to_string())?,
+                ProviderOutcome::Parked { reason, .. } => format!("parked: {reason}"),
+            };
+            Ok((text, record.provider_id))
         }
     }
 }
 
 pub mod remote_projector {
     use fgos_host_runtime::{
-        ContractRef, HostInvocation, InvocationService, OperationId, OperationRequest,
-        ProviderOutcome,
+        ContractRef, HostInvocation, InvocationService, NoopEventSink, OperationId,
+        OperationRequest, ProviderOutcome,
     };
 
     pub struct RemoteProjectorShim;
 
     impl RemoteProjectorShim {
+        /// Returns the decoded output AND the provider id the record names
+        /// (LOW-2, see `CliProjectorShim`'s own doc comment).
         pub async fn project_and_invoke(
             service: &InvocationService,
             message: &str,
-        ) -> Result<String, String> {
+        ) -> Result<(String, Option<String>), String> {
             let invocation = HostInvocation::new("remote");
             let request = OperationRequest::new(
                 OperationId::from_static("test.fixture.echo"),
@@ -65,20 +69,18 @@ pub mod remote_projector {
                 Box::new(message.to_string()),
             );
 
-            let outcome = service
-                .invoke(invocation, request)
-                .await
-                .map_err(|e| e.to_string())?;
+            let (result, record) = service
+                .invoke_with_record(invocation, request, &NoopEventSink)
+                .await;
+            let outcome = result.map_err(|e| e.to_string())?;
 
-            match outcome {
-                ProviderOutcome::Completed { output, .. } => {
-                    let text = output
-                        .downcast::<String>()
-                        .map_err(|_| "failed to downcast output to String".to_string())?;
-                    Ok(*text)
-                }
-                ProviderOutcome::Parked { reason, .. } => Ok(format!("parked: {reason}")),
-            }
+            let text = match outcome {
+                ProviderOutcome::Completed { output, .. } => *output
+                    .downcast::<String>()
+                    .map_err(|_| "failed to downcast output to String".to_string())?,
+                ProviderOutcome::Parked { reason, .. } => format!("parked: {reason}"),
+            };
+            Ok((text, record.provider_id))
         }
     }
 }
@@ -105,11 +107,12 @@ async fn two_projectors_same_outcome() {
     let service = build_runtime_service();
     let message = "canonical-payload-test";
 
-    let cli_output = cli_projector::CliProjectorShim::project_and_invoke(&service, message)
-        .await
-        .expect("cli projector invocation must succeed");
+    let (cli_output, cli_provider_id) =
+        cli_projector::CliProjectorShim::project_and_invoke(&service, message)
+            .await
+            .expect("cli projector invocation must succeed");
 
-    let remote_output =
+    let (remote_output, remote_provider_id) =
         remote_projector::RemoteProjectorShim::project_and_invoke(&service, message)
             .await
             .expect("remote projector invocation must succeed");
@@ -117,4 +120,9 @@ async fn two_projectors_same_outcome() {
     assert_eq!(cli_output, message);
     assert_eq!(remote_output, message);
     assert_eq!(cli_output, remote_output);
+
+    // LOW-2: R7 asks for "the same fixture provider", not just matching
+    // output strings.
+    assert!(cli_provider_id.is_some());
+    assert_eq!(cli_provider_id, remote_provider_id);
 }

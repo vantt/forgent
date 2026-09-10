@@ -161,6 +161,10 @@ pub enum InvocationTerminalState {
     SelectionRefused,
     GrantRefused,
     Succeeded,
+    // Kernel §8: a parked outcome means the host re-invokes later -- it is
+    // NOT the same as Succeeded (MEDIUM-4). Recorded distinctly so a parked
+    // invocation is never indistinguishable from a completed one.
+    Parked,
     SemanticFailed,
     Cancelled,
     DeadlineExceeded,
@@ -175,6 +179,7 @@ impl InvocationTerminalState {
             Self::SelectionRefused => "selection-refused",
             Self::GrantRefused => "grant-refused",
             Self::Succeeded => "succeeded",
+            Self::Parked => "parked",
             Self::SemanticFailed => "semantic-failed",
             Self::Cancelled => "cancelled",
             Self::DeadlineExceeded => "deadline-exceeded",
@@ -187,6 +192,7 @@ impl InvocationTerminalState {
         matches!(
             self,
             Self::Succeeded
+                | Self::Parked
                 | Self::SemanticFailed
                 | Self::Cancelled
                 | Self::DeadlineExceeded
@@ -297,6 +303,29 @@ impl<F: Future> Future for CatchUnwind<F> {
     }
 }
 
+/// RAII guard removing one entry from `cancellation_txs` when dropped.
+///
+/// MEDIUM-6: `cancellation_txs` had no removal path anywhere -- unbounded
+/// growth for a long-running host (kernel §6), and a reused invocation id
+/// silently overwrote an earlier still-registered sender. Binding this guard
+/// for the lifetime of `invoke_internal`'s call means the entry is pruned
+/// the moment that invocation reaches ANY terminal return, regardless of
+/// which of the function's many early-return paths fires -- shrinking the
+/// collision window down to genuinely concurrent, overlapping same-id
+/// invocations (a caller bug `LifecycleTracker::write_terminal` already
+/// handles as a late-response diagnostic, per R7), not "any id reused
+/// across the service's whole lifetime".
+struct CancellationTxGuard<'a> {
+    txs: &'a Mutex<HashMap<String, tokio::sync::watch::Sender<bool>>>,
+    invocation_id: String,
+}
+
+impl Drop for CancellationTxGuard<'_> {
+    fn drop(&mut self) {
+        self.txs.lock().unwrap().remove(&self.invocation_id);
+    }
+}
+
 /// Invocation service managing the six-stage invocation pipeline.
 pub struct InvocationService {
     snapshot: RegistrySnapshot,
@@ -309,11 +338,19 @@ pub struct InvocationService {
 
 impl InvocationService {
     /// Creates a new [`InvocationService`] with the given snapshot.
+    ///
+    /// Default admission trusts exactly the policies `snapshot`'s own
+    /// catalog declares (`CallerAdmission::allow_catalog_policies`, HIGH-1
+    /// fix) -- never `CallerAdmission::default()`, which denies everything
+    /// past the structural checks and would make this constructor useless
+    /// out of the box. Override with `.with_admission(..)` for a real,
+    /// externally-configured policy once one exists (Phase 08+).
     pub fn new(snapshot: RegistrySnapshot) -> Self {
+        let admission = CallerAdmission::allow_catalog_policies(snapshot.catalog());
         Self {
             snapshot,
             providers: RwLock::new(HashMap::new()),
-            admission: CallerAdmission::default(),
+            admission,
             grant: ProviderGrant::default(),
             tracker: Arc::new(LifecycleTracker::default()),
             cancellation_txs: Mutex::new(HashMap::new()),
@@ -434,6 +471,12 @@ impl InvocationService {
                 .unwrap()
                 .insert(invocation_id.clone(), cancel_tx);
         }
+        // Held for the rest of this function's scope: pruned on every return
+        // path via Drop (MEDIUM-6).
+        let _cancellation_guard = CancellationTxGuard {
+            txs: &self.cancellation_txs,
+            invocation_id: invocation_id.clone(),
+        };
 
         // Stage 2: admit (before routing)
         sink.record_progress("stage: admit");
@@ -563,8 +606,13 @@ impl InvocationService {
 
         // Stage 5: invoke
         sink.record_progress("stage: invoke");
-        sink.record_event("invocation.dispatched");
-        let dispatched = true;
+        // `dispatched` (kernel §8: the point past which a transport loss may
+        // be recorded as completion-unknown rather than a clean failure)
+        // stays false until the provider's own invoke() future is actually
+        // constructed below -- NOT here, where provider-not-registered and
+        // the two pre-invoke fast-path checks (cancellation, deadline) can
+        // still return without ever reaching the provider (MEDIUM-3).
+        let mut dispatched = false;
 
         let provider_instance = {
             let map = self.providers.read().unwrap();
@@ -656,6 +704,11 @@ impl InvocationService {
             }
         }
 
+        // The real dispatch point (MEDIUM-3): everything before this line can
+        // still return without ever reaching the provider.
+        dispatched = true;
+        sink.record_event("invocation.dispatched");
+
         let caught_fut = CatchUnwind {
             inner: provider_instance.invoke(&invocation, request, control, sink),
         };
@@ -724,6 +777,20 @@ impl InvocationService {
         // Stage 6: normalize & record
         sink.record_progress("stage: normalize");
         let (terminal_state, terminal_error, outcome_result, diags) = match execution_result {
+            Ok(outcome @ ProviderOutcome::Parked { .. }) => {
+                // MEDIUM-4: a parked outcome means the host re-invokes later
+                // (kernel §8) -- recorded distinctly, never folded into
+                // Succeeded, which would make it indistinguishable from a
+                // completed invocation.
+                let diagnostics = outcome.diagnostics().to_vec();
+                sink.record_event("invocation.parked");
+                (
+                    InvocationTerminalState::Parked,
+                    None,
+                    Ok(outcome),
+                    diagnostics,
+                )
+            }
             Ok(outcome) => {
                 let diagnostics = outcome.diagnostics().to_vec();
                 sink.record_event("invocation.succeeded");
@@ -913,10 +980,18 @@ mod tests {
             );
             assert!(!record.dispatched);
 
-            // Assert that the Router was NOT called
+            // Assert that the Router was NOT called (LOW-3: check for the
+            // "stage: select" progress marker's absence too, not just the
+            // success event -- a Router call that itself REFUSED would emit
+            // "invocation.selection-refused", not "invocation.selected", and
+            // the original assertion alone would not have caught that).
             let events = sink.events();
             assert!(events.contains(&"invocation.admission-refused".to_string()));
             assert!(!events.contains(&"invocation.selected".to_string()));
+            assert!(!events.contains(&"invocation.selection-refused".to_string()));
+            assert!(!sink
+                .progress_entries()
+                .contains(&"stage: select".to_string()));
         }
     }
 
@@ -1004,6 +1079,62 @@ mod tests {
                 InvocationTerminalState::SemanticFailed
             );
             assert!(record.dispatched);
+        }
+    }
+
+    mod parked {
+        use super::*;
+
+        /// Regression for MEDIUM-4: a Parked outcome must record
+        /// InvocationTerminalState::Parked, never Succeeded -- driven
+        /// through the real InvocationService, not constructed by hand.
+        #[tokio::test]
+        async fn parked() {
+            let service = build_test_service();
+            let invocation = HostInvocation::new("cli");
+            let request = OperationRequest::new(
+                OperationId::from_static("test.fixture.echo"),
+                ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                Box::new(EchoAction::Park("awaiting external callback".to_string())),
+            );
+
+            let sink = InMemoryEventSink::new();
+            let (result, record) = service.invoke_with_record(invocation, request, &sink).await;
+
+            assert!(result.is_ok());
+            assert_eq!(record.terminal_state, InvocationTerminalState::Parked);
+            assert_ne!(record.terminal_state, InvocationTerminalState::Succeeded);
+            assert!(record.dispatched);
+            assert!(sink.events().iter().any(|e| e == "invocation.parked"));
+        }
+    }
+
+    mod cancellation_tx_pruned_after_terminal {
+        use super::*;
+
+        /// Regression for MEDIUM-6: cancellation_txs must not grow
+        /// unboundedly -- its entry for an invocation is pruned the moment
+        /// that invocation reaches a terminal record. `cancel()` on an
+        /// already-terminal invocation id must return false (nothing to
+        /// signal), not silently succeed against a stale sender.
+        #[tokio::test]
+        async fn cancellation_tx_pruned_after_terminal() {
+            let service = build_test_service();
+            let invocation = HostInvocation::new("cli");
+            let request = OperationRequest::new(
+                OperationId::from_static("test.fixture.echo"),
+                ContractRef::from_static("test.fixture.echo.request", "1.0.0"),
+                Box::new(EchoAction::Echo("hello".to_string())),
+            );
+
+            let sink = InMemoryEventSink::new();
+            let (result, record) = service.invoke_with_record(invocation, request, &sink).await;
+            assert!(result.is_ok());
+
+            assert!(
+                !service.cancel(&record.invocation_id),
+                "cancellation_txs entry for a terminal invocation must already be pruned"
+            );
         }
     }
 
