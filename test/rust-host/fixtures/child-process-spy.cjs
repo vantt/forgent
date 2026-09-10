@@ -2,17 +2,31 @@
 //
 // Monkeypatches node:child_process methods to record spawned child processes.
 // Appends { cmd, args } JSON lines to the file path in FGOS_HARNESS_SPY_LOG.
+//
+// Commands named in FGOS_HARNESS_SHIMMED_COMMANDS (comma-separated basenames)
+// are deliberately NOT recorded here -- the harness's PATH shim
+// (harness.mjs's buildPathShim) already intercepts those at the real OS-exec
+// boundary, which is the only mechanism a bin: (compiled) entry can ever get.
+// Recording the same real invocation from both this in-process monkeypatch
+// AND the PATH shim would double-count it for node: entries while a bin:
+// entry only ever gets the single PATH-shim count, producing a spurious
+// mismatch in exactly the node-vs-bin comparison this harness exists for.
 
 const fs = require("node:fs");
+const path = require("node:path");
 const cp = require("node:child_process");
 
 const logPath = process.env.FGOS_HARNESS_SPY_LOG;
+const shimmedCommands = new Set(
+  (process.env.FGOS_HARNESS_SHIMMED_COMMANDS || "").split(",").filter(Boolean)
+);
 
 if (logPath) {
   let insideSpy = false;
 
   function recordChild(cmd, args) {
     try {
+      if (shimmedCommands.has(path.basename(String(cmd)))) return;
       const line = JSON.stringify({
         cmd: String(cmd),
         args: Array.isArray(args) ? args.map(String) : [],

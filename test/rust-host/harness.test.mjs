@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -103,8 +104,21 @@ test("R3: Filesystem snapshot and delta capture", () => {
     const snap2 = snapshotDirectory(tmpDir);
     const delta = diffDirectorySnapshots(snap1, snap2);
 
-    assert.deepEqual(delta.created, ["file3.txt"]);
-    assert.deepEqual(delta.modified, ["file2.txt"]);
+    // created/modified carry {path, hash} (MEDIUM-3/red-team-HIGH fix), not a
+    // bare path -- content hash is what lets compareResults's fs-delta mode
+    // catch two entries writing the same filename with different bytes.
+    assert.equal(delta.created.length, 1);
+    assert.equal(delta.created[0].path, "file3.txt");
+    assert.equal(
+      delta.created[0].hash,
+      crypto.createHash("sha256").update("new-file").digest("hex")
+    );
+    assert.equal(delta.modified.length, 1);
+    assert.equal(delta.modified[0].path, "file2.txt");
+    assert.equal(
+      delta.modified[0].hash,
+      crypto.createHash("sha256").update("world-modified").digest("hex")
+    );
     assert.deepEqual(delta.deleted, ["file1.txt"]);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -298,4 +312,32 @@ test("R6: Injected divergence: unexpected child process fails comparison", async
     res.differences.some((d) => d.includes("Spawned children count mismatch")),
     `Expected child process mismatch error, got: ${res.differences.join("; ")}`
   );
+});
+
+test("R2/R5: Signal comparison mode is exercised end to end (MEDIUM-2)", async () => {
+  // signal-trapping.mjs was committed for R5's "target-specific signal ...
+  // case" but nothing ran it (MEDIUM-2). SIGKILL, not SIGTERM: SIGTERM is
+  // trapped by the fixture (self-exits 143, no OS-level signal termination,
+  // so `.signal` would just be null -- not a real signal-mode exercise).
+  // SIGKILL cannot be trapped, so both entries are genuinely terminated BY
+  // the OS with `.signal === "SIGKILL"`, which is what mode "signal" (and
+  // the unconditional signal-equality check every case already gets) exists
+  // to compare.
+  const entryA = parseEntry(`node:${path.join(FIXTURES_DIR, "signal-trapping.mjs")}`);
+  const entryB = parseEntry(`node:${path.join(FIXTURES_DIR, "signal-trapping.mjs")}`);
+
+  const res = await runDifferentialCase(entryA, entryB, {
+    id: "signal-mode-exercise",
+    args: [],
+    modes: ["signal"],
+    killSignal: "SIGKILL",
+    killSignalAfterMs: 200,
+    expectedSignal: "SIGKILL",
+    ignoreChildren: true,
+    timeoutMs: 5000,
+  });
+
+  assert.equal(res.passed, true, `Expected signal-mode case to pass, got: ${res.differences.join("; ")}`);
+  assert.equal(res.resultA.signal, "SIGKILL");
+  assert.equal(res.resultB.signal, "SIGKILL");
 });

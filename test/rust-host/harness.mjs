@@ -1,11 +1,21 @@
 /**
  * Parity Harness for fgOS (Rust vs Node differential verification).
  *
- * Child-process evidence mechanism:
- * Uses a NODE_OPTIONS="--require <path>/child-process-spy.cjs" preload that monkeypatches
- * node:child_process methods (spawn, spawnSync, execFile, execFileSync, fork, exec, execSync)
- * and appends { cmd, args } JSON lines to a per-case log file named by the FGOS_HARNESS_SPY_LOG
- * environment variable.
+ * Child-process evidence mechanism (two complementary layers, same log format):
+ * 1. `node:` entries: NODE_OPTIONS="--require <path>/child-process-spy.cjs" preload that
+ *    monkeypatches node:child_process methods (spawn, spawnSync, execFile, execFileSync,
+ *    fork, exec, execSync) and appends { cmd, args } JSON lines to a per-case log file
+ *    named by the FGOS_HARNESS_SPY_LOG environment variable.
+ * 2. `bin:` entries (and `node:` entries too, as a second net): a PATH shim
+ *    (`buildPathShim`) generates a small wrapper script per externally-observed
+ *    command (currently just `git`, the only command this harness has seen a real
+ *    fgos invocation spawn), placed in a scratch directory prepended to PATH. Each
+ *    wrapper appends the SAME { cmd, args } JSON line format to FGOS_HARNESS_SPY_LOG,
+ *    then execs the real binary (resolved once via `command -v` before the shim
+ *    directory is prepended to PATH, so it never resolves back to itself). This is
+ *    the only mechanism that can observe a Rust binary's own subprocess spawns,
+ *    since there is no in-process monkeypatch hook for a compiled binary the way
+ *    there is for `node:child_process`.
  */
 
 import fs from "node:fs";
@@ -19,6 +29,40 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, "../..");
 export const SPY_PATH = path.join(__dirname, "fixtures/child-process-spy.cjs");
 export const ROUTES_PATH = path.join(REPO_ROOT, "packages/host-runtime/contracts/command-routes.json");
+
+/** Commands this harness has empirically observed a real `fgos` invocation spawn. */
+const PATH_SHIM_COMMANDS = ["git"];
+
+/**
+ * Builds a PATH-shim directory: one wrapper script per name in `PATH_SHIM_COMMANDS`
+ * that logs `{cmd, args}` to `spyLogPath` (same format `child-process-spy.cjs` uses)
+ * then execs the real binary. Returns the shim directory path, or `null` if a
+ * command in the list cannot be resolved on the current PATH (fails open -- a
+ * missing shimmable command is not fatal to the case under test, just unshimmed).
+ * The real binary is resolved via `command -v` BEFORE this directory is ever
+ * prepended to PATH, so the shim never execs itself.
+ */
+function buildPathShim(shimDir, spyLogPath) {
+  fs.mkdirSync(shimDir, { recursive: true });
+  for (const name of PATH_SHIM_COMMANDS) {
+    let realPath;
+    try {
+      realPath = execFileSync("sh", ["-c", `command -v ${name}`], { encoding: "utf8" }).trim();
+    } catch (_) {
+      continue; // not resolvable on this machine -- skip shimming it, don't fail the case
+    }
+    if (!realPath) continue;
+    const shimScript = [
+      "#!/bin/sh",
+      `node -e 'const fs=require("node:fs");try{fs.appendFileSync(process.env.FGOS_HARNESS_SPY_LOG, JSON.stringify({cmd:${JSON.stringify(name)},args:process.argv.slice(1)})+"\\n")}catch(e){}' "$@"`,
+      `exec ${JSON.stringify(realPath)} "$@"`,
+      "",
+    ].join("\n");
+    const shimPath = path.join(shimDir, name);
+    fs.writeFileSync(shimPath, shimScript, { mode: 0o755 });
+  }
+  return shimDir;
+}
 
 /**
  * Parses an entry spec: "node:<path>" or "bin:<path>".
@@ -95,6 +139,13 @@ export function snapshotDirectory(dirPath, ignoreGit = true) {
 
 /**
  * Computes difference between before and after directory snapshots.
+ *
+ * `created`/`modified` carry `{path, hash}` (sha256 of the after-content), not
+ * just the path -- so a comparator can tell two entries wrote the SAME set of
+ * files with DIFFERENT bytes, not merely that they touched the same paths
+ * (see `compareResults`'s "fs-delta" mode, which compares these hashes across
+ * entries; MEDIUM-3/red-team-HIGH). `deleted` stays plain paths -- there is
+ * no "after" content to hash for a removed file.
  */
 export function diffDirectorySnapshots(before, after) {
   const created = [];
@@ -103,11 +154,11 @@ export function diffDirectorySnapshots(before, after) {
 
   for (const [relPath, afterInfo] of after.entries()) {
     if (!before.has(relPath)) {
-      created.push(relPath);
+      created.push({ path: relPath, hash: afterInfo.hash });
     } else {
       const beforeInfo = before.get(relPath);
       if (beforeInfo.hash !== afterInfo.hash || beforeInfo.size !== afterInfo.size) {
-        modified.push(relPath);
+        modified.push({ path: relPath, hash: afterInfo.hash });
       }
     }
   }
@@ -118,9 +169,10 @@ export function diffDirectorySnapshots(before, after) {
     }
   }
 
+  const byPath = (a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
   return {
-    created: created.sort(),
-    modified: modified.sort(),
+    created: created.sort(byPath),
+    modified: modified.sort(byPath),
     deleted: deleted.sort(),
   };
 }
@@ -161,8 +213,19 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
   const env = { ...process.env, ...(testCase.env ?? {}) };
   env.FGOS_HARNESS_SPY_LOG = spyLogPath;
   if (entry.type === "node") {
-    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require ${SPY_PATH}`;
+    // Quoted (LOW-3): an unquoted path breaks silently under NODE_OPTIONS
+    // parsing when the checkout lives under a path containing a space --
+    // the preload then never loads and child-process evidence becomes
+    // vacuously empty instead of erroring.
+    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${SPY_PATH}"`;
   }
+  // PATH shim: the only child-process evidence mechanism a bin: (compiled) entry
+  // can get, and a second net for node: entries too (see header comment).
+  // FGOS_HARNESS_SHIMMED_COMMANDS tells child-process-spy.cjs to skip recording
+  // these same commands itself, so a node: entry is never double-counted.
+  const shimDir = buildPathShim(path.join(scratchBase, "path-shim"), spyLogPath);
+  env.PATH = shimDir + path.delimiter + (env.PATH ?? "");
+  env.FGOS_HARNESS_SHIMMED_COMMANDS = PATH_SHIM_COMMANDS.join(",");
 
   const spawnCmd = entry.executable;
   const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(testCase.args ?? [])];
@@ -206,7 +269,9 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
 
     timer = setTimeout(() => {
       try { child.kill("SIGKILL"); } catch (_) {}
-      reject(new Error(`Execution timed out after ${timeoutMs}ms`));
+      const timeoutErr = new Error(`Execution timed out after ${timeoutMs}ms`);
+      timeoutErr.isTimeout = true;
+      reject(timeoutErr);
     }, timeoutMs);
 
     child.on("close", (code, signal) => {
@@ -224,12 +289,22 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
 
   let exitCode = null;
   let exitSignal = null;
+  let launchError = null;
   try {
     const outcome = await runPromise;
     exitCode = outcome.code;
     exitSignal = outcome.signal;
   } catch (err) {
-    exitSignal = "TIMEOUT";
+    if (err && err.isTimeout) {
+      exitSignal = "TIMEOUT";
+    } else {
+      // A real launch/spawn failure (e.g. ENOENT for a missing bin: target) is
+      // NOT a timeout and must never compare equal to one -- see HIGH-1: the
+      // comparator now treats any launchError as an unconditional hard
+      // difference (compareResults), rather than letting two differently
+      // (or identically) broken entries silently rubber-stamp as a pass.
+      launchError = { message: String(err && err.message), code: err && err.code };
+    }
   }
 
   const t1 = performance.now();
@@ -267,6 +342,7 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
     entrySpec: entry.spec,
     exitCode,
     signal: exitSignal,
+    launchError,
     stdout,
     stderr,
     stdoutText: stdout.toString("utf8"),
@@ -330,10 +406,9 @@ export function compareSemanticJson(a, b, timestampPredicate = isIsoTimestamp, c
     }
 
     for (const key of keysA) {
-      if (key === "generated_at" && timestampPredicate(a[key]) && timestampPredicate(b[key])) {
-        // Timestamp predicate satisfied for generated_at
-        continue;
-      }
+      // No generated_at special case here (LOW-1, dead code removed): the
+      // string branch above already applies timestampPredicate to every
+      // string pair, including this key's value, on the recursive call below.
       diffs.push(...compareSemanticJson(a[key], b[key], timestampPredicate, `${currentPath}.${key}`));
     }
     return diffs;
@@ -349,6 +424,19 @@ export function compareSemanticJson(a, b, timestampPredicate = isIsoTimestamp, c
 export function compareResults(testCase, resultA, resultB) {
   const differences = [];
   const modes = testCase.modes ?? ["exact-bytes"];
+
+  // 0. A launch/spawn failure (HIGH-1) is never comparable to a normal exit,
+  // a signal, or another launch failure -- unconditional hard difference,
+  // checked before anything else so two identically-broken entries can never
+  // rubber-stamp as a pass just because every other field happens to match
+  // (both null/undefined).
+  if (resultA.launchError || resultB.launchError) {
+    differences.push(
+      `Launch failure: entry A ${resultA.launchError ? `failed to launch (${resultA.launchError.message})` : "launched fine"}, ` +
+      `entry B ${resultB.launchError ? `failed to launch (${resultB.launchError.message})` : "launched fine"}`
+    );
+    return { caseId: testCase.id, modes, passed: false, differences, resultA, resultB };
+  }
 
   // 1. Check exit code
   if (resultA.exitCode !== resultB.exitCode) {
@@ -431,11 +519,23 @@ export function compareResults(testCase, resultA, resultB) {
       if (!resultA.fsDelta || !resultB.fsDelta) {
         differences.push("fs-delta mode declared but filesystem delta not captured for one or both entries");
       } else {
-        if (JSON.stringify(resultA.fsDelta.created) !== JSON.stringify(resultB.fsDelta.created)) {
-          differences.push(`fs-delta created mismatch: ${JSON.stringify(resultA.fsDelta.created)} !== ${JSON.stringify(resultB.fsDelta.created)}`);
-        }
-        if (JSON.stringify(resultA.fsDelta.modified) !== JSON.stringify(resultB.fsDelta.modified)) {
-          differences.push(`fs-delta modified mismatch: ${JSON.stringify(resultA.fsDelta.modified)} !== ${JSON.stringify(resultB.fsDelta.modified)}`);
+        // created/modified compare path AND content hash (MEDIUM-3/red-team-HIGH:
+        // the prior version compared only the path list, so two entries writing
+        // the same filenames with DIFFERENT bytes would silently pass).
+        for (const key of ["created", "modified"]) {
+          const listA = resultA.fsDelta[key];
+          const listB = resultB.fsDelta[key];
+          if (listA.length !== listB.length) {
+            differences.push(`fs-delta ${key} path-list length mismatch: ${JSON.stringify(listA.map((e) => e.path))} !== ${JSON.stringify(listB.map((e) => e.path))}`);
+            continue;
+          }
+          for (let i = 0; i < listA.length; i++) {
+            if (listA[i].path !== listB[i].path) {
+              differences.push(`fs-delta ${key} path mismatch at index ${i}: "${listA[i].path}" !== "${listB[i].path}"`);
+            } else if (listA[i].hash !== listB[i].hash) {
+              differences.push(`fs-delta ${key} content hash mismatch for "${listA[i].path}": ${listA[i].hash} !== ${listB[i].hash}`);
+            }
+          }
         }
         if (JSON.stringify(resultA.fsDelta.deleted) !== JSON.stringify(resultB.fsDelta.deleted)) {
           differences.push(`fs-delta deleted mismatch: ${JSON.stringify(resultA.fsDelta.deleted)} !== ${JSON.stringify(resultB.fsDelta.deleted)}`);
@@ -562,7 +662,19 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       // of this regex assumed a "<digits>-<timestamp>.jsonl" shape and missed
       // the real "<uuid-with-dashes>-<timestamp>.jsonl" shape entirely,
       // leaving Node-against-Node failing on every isolated-write case.
-      return list.map(p => p.replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
+      //
+      // Path-only comparison here (never content hash, unlike compareResults's
+      // general fs-delta mode): .fgos/cache/state.json's own JSON body embeds
+      // this same volatile event-log filename plus a real timestamp/hash pair
+      // in a nested field (confirmed empirically -- two independent `init`+`add`
+      // runs produce byte-different state.json, though identical `revision`),
+      // so hashing it would immediately reintroduce the exact flaky-content
+      // failure this function was written to eliminate. Left as a known,
+      // documented gap (MEDIUM-3) rather than a deeper JSON-normalization fix,
+      // which risks new flakiness under the same time pressure that produced
+      // the original regex bug -- content-identity proof for this specific
+      // case is deferred, not silently dropped.
+      return list.map(entry => entry.path.replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
     }
 
     const normCreatedA = normalizeCreatedFiles(deltaA.created);
