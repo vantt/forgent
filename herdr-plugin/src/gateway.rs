@@ -379,14 +379,23 @@ fn wait_with_timeout(
 /// too, or those two verbs silently act on wherever the gateway process
 /// happened to be launched from.
 fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
-    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
-    cmd_args.extend(args.iter().cloned());
-    cmd_args.push("--dir".to_string());
-    cmd_args.push(root.to_string_lossy().to_string());
+    let fgos_bin = crate::fgos::resolve_fgos(root).unwrap_or_else(|_| root.join("bin/fgos.mjs"));
+    if crate::fgos::is_tier_zero(root, &fgos_bin) {
+        let mut cmd = std::process::Command::new(&fgos_bin);
+        cmd.args(args);
+        cmd.arg("--dir").arg(root);
+        cmd.current_dir(root).stdin(Stdio::null());
+        cmd
+    } else {
+        let mut cmd_args: Vec<String> = vec![fgos_bin.to_string_lossy().to_string()];
+        cmd_args.extend(args.iter().cloned());
+        cmd_args.push("--dir".to_string());
+        cmd_args.push(root.to_string_lossy().to_string());
 
-    let mut cmd = std::process::Command::new("node");
-    cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
-    cmd
+        let mut cmd = std::process::Command::new("node");
+        cmd.args(&cmd_args).current_dir(root).stdin(Stdio::null());
+        cmd
+    }
 }
 
 /// D7: the sole function that ever spawns `fgos <verb>` on the gateway's

@@ -2335,7 +2335,13 @@ registerFix({
 function checkPluginSkillCliReachable(cwd) {
   const resolved = resolveFgosBin(cwd);
   if (resolved) {
-    const tierLabel = resolved.tier === 1 ? 'local bin/fgos.mjs found' : resolved.tier === 2 ? 'project-local install found' : 'fgos resolved from PATH';
+    const tierLabel = resolved.tier === 0
+      ? 'workspace installation found'
+      : resolved.tier === 1
+        ? 'local bin/fgos.mjs found'
+        : resolved.tier === 2
+          ? 'project-local install found'
+          : 'fgos resolved from PATH';
     return { passed: true, message: `${tierLabel} at ${resolved.path}` };
   }
   return {

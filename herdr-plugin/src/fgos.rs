@@ -359,13 +359,65 @@ pub fn repo_root() -> io::Result<PathBuf> {
     Ok(root.to_path_buf())
 }
 
-fn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {
-    let mut cmd_args: Vec<String> = vec![root.join("bin/fgos.mjs").to_string_lossy().to_string()];
-    cmd_args.extend(args.iter().map(|s| s.to_string()));
-    cmd_args.push("--dir".to_string());
-    cmd_args.push(root.to_string_lossy().to_string());
+#[cfg(unix)]
+fn is_executable(path: &Path) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    path.metadata()
+        .map(|meta| meta.is_file() && (meta.permissions().mode() & 0o111 != 0))
+        .unwrap_or(false)
+}
 
-    let output = Command::new("node").args(&cmd_args).output()?;
+#[cfg(not(unix))]
+fn is_executable(path: &Path) -> bool {
+    path.is_file()
+}
+
+/// True when `path` is confined under `root` after resolving symlinks --
+/// `is_executable`'s `metadata()` call follows a symlink chain
+/// transparently, so a tier-0 shim that is itself a symlink pointing
+/// outside the installation root would otherwise be accepted as valid.
+/// Matches the same realpath-confinement discipline the Node resolver
+/// (`resolveWorkspaceInstallationBin`) and the shell integration
+/// (`fgos()`) both apply.
+fn is_confined(path: &Path, root: &Path) -> bool {
+    let (real_path, real_root) = match (path.canonicalize(), root.canonicalize()) {
+        (Ok(p), Ok(r)) => (p, r),
+        _ => return false,
+    };
+    real_path == real_root || real_path.starts_with(&real_root)
+}
+
+/// Resolves fgos binary via tier 0 (workspace shim `<root>/.fgos/installation/bin/fgos` if present, executable,
+/// and confined under the installation root) with fallback to `<root>/bin/fgos.mjs` (run via node).
+pub fn resolve_fgos(root: &Path) -> Result<PathBuf, io::Error> {
+    let tier_zero = root.join(".fgos").join("installation").join("bin").join("fgos");
+    let install_root = root.join(".fgos").join("installation");
+    if is_executable(&tier_zero) && is_confined(&tier_zero, &install_root) {
+        return Ok(tier_zero);
+    }
+    Ok(root.join("bin/fgos.mjs"))
+}
+
+pub fn is_tier_zero(root: &Path, resolved: &Path) -> bool {
+    resolved == root.join(".fgos").join("installation").join("bin").join("fgos")
+}
+
+fn run_fgos(root: &Path, args: &[&str]) -> Result<String, FgosError> {
+    let fgos_bin = resolve_fgos(root)?;
+    let output = if is_tier_zero(root, &fgos_bin) {
+        let mut cmd_args: Vec<String> = args.iter().map(|s| s.to_string()).collect();
+        cmd_args.push("--dir".to_string());
+        cmd_args.push(root.to_string_lossy().to_string());
+
+        Command::new(&fgos_bin).args(&cmd_args).output()?
+    } else {
+        let mut cmd_args: Vec<String> = vec![fgos_bin.to_string_lossy().to_string()];
+        cmd_args.extend(args.iter().map(|s| s.to_string()));
+        cmd_args.push("--dir".to_string());
+        cmd_args.push(root.to_string_lossy().to_string());
+
+        Command::new("node").args(&cmd_args).output()?
+    };
     if !output.status.success() {
         return Err(FgosError::ExitStatus(
             String::from_utf8_lossy(&output.stderr).to_string(),
@@ -938,5 +990,102 @@ mod tests {
         }"#;
         let summary = parse_merge_list(json).expect("missing tree field should still parse");
         assert!(summary.tree.is_empty());
+    }
+
+    #[test]
+    fn resolve_fgos_resolves_tier_0_when_present_and_executable() {
+        let root = std::env::temp_dir().join(format!("fgos-resolve-test-t0-{}-{}", std::process::id(), line!()));
+        let _ = std::fs::remove_dir_all(&root);
+        let bin_dir = root.join(".fgos").join("installation").join("bin");
+        std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
+        let shim = bin_dir.join("fgos");
+        std::fs::write(&shim, "#!/bin/sh\nexit 0\n").expect("write shim");
+
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&shim).expect("metadata").permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&shim, perms).expect("set_permissions");
+        }
+
+        let resolved = resolve_fgos(&root).expect("resolve_fgos");
+        assert_eq!(resolved, shim);
+        assert!(is_tier_zero(&root, &resolved));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn resolve_fgos_falls_back_when_tier_0_is_absent() {
+        let root = std::env::temp_dir().join(format!("fgos-resolve-test-fallback-{}-{}", std::process::id(), line!()));
+        let _ = std::fs::remove_dir_all(&root);
+        let resolved = resolve_fgos(&root).expect("resolve_fgos");
+        assert_eq!(resolved, root.join("bin/fgos.mjs"));
+        assert!(!is_tier_zero(&root, &resolved));
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn resolve_fgos_falls_back_when_tier_0_is_not_executable() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = std::env::temp_dir().join(format!("fgos-resolve-test-noexec-{}-{}", std::process::id(), line!()));
+        let _ = std::fs::remove_dir_all(&root);
+        let bin_dir = root.join(".fgos").join("installation").join("bin");
+        std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
+        let shim = bin_dir.join("fgos");
+        std::fs::write(&shim, "#!/bin/sh\nexit 0\n").expect("write shim");
+
+        let mut perms = std::fs::metadata(&shim).expect("metadata").permissions();
+        perms.set_mode(0o644);
+        std::fs::set_permissions(&shim, perms).expect("set_permissions");
+
+        let resolved = resolve_fgos(&root).expect("resolve_fgos");
+        assert_eq!(resolved, root.join("bin/fgos.mjs"));
+        assert!(!is_tier_zero(&root, &resolved));
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    /// Regression: an executable tier-0 shim that is itself a symlink
+    /// whose real target escapes the installation root was accepted --
+    /// `is_executable`'s `metadata()` call follows the symlink chain
+    /// transparently, with no containment check on the real target.
+    #[test]
+    #[cfg(unix)]
+    fn resolve_fgos_falls_back_when_tier_0_is_a_symlink_escaping_the_install_root() {
+        let root = std::env::temp_dir().join(format!(
+            "fgos-resolve-test-symlink-escape-{}-{}",
+            std::process::id(),
+            line!()
+        ));
+        let _ = std::fs::remove_dir_all(&root);
+        let bin_dir = root.join(".fgos").join("installation").join("bin");
+        std::fs::create_dir_all(&bin_dir).expect("create_dir_all");
+
+        let outside_dir = std::env::temp_dir().join(format!(
+            "fgos-resolve-test-outside-{}-{}",
+            std::process::id(),
+            line!()
+        ));
+        let _ = std::fs::remove_dir_all(&outside_dir);
+        std::fs::create_dir_all(&outside_dir).expect("create_dir_all outside");
+        let outside_target = outside_dir.join("sh-stub");
+        std::fs::write(&outside_target, "#!/bin/sh\nexit 0\n").expect("write outside target");
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&outside_target)
+                .expect("metadata")
+                .permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&outside_target, perms).expect("set_permissions");
+        }
+
+        let shim = bin_dir.join("fgos");
+        std::os::unix::fs::symlink(&outside_target, &shim).expect("symlink");
+
+        let resolved = resolve_fgos(&root).expect("resolve_fgos");
+        assert_eq!(resolved, root.join("bin/fgos.mjs"));
+        assert!(!is_tier_zero(&root, &resolved));
+        let _ = std::fs::remove_dir_all(&root);
+        let _ = std::fs::remove_dir_all(&outside_dir);
     }
 }

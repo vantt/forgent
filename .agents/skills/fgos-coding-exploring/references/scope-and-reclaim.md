@@ -93,5 +93,5 @@ it right after the dispatch returns (whether it found something or came
 up empty):
 
 ```bash
-node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
+fgos handoff "<id>" --to researcher --reason consult --outcome "<finding, one line>" --dir "$root"
 ```

@@ -75,11 +75,11 @@ state.
 This is the real `advise` interaction — call `handoff` first, then `ask`:
 
 ```bash
-node "$root/bin/fgos.mjs" handoff "<id>" --to advisor --reason advise --dir "$root"
+fgos handoff "<id>" --to advisor --reason advise --dir "$root"
 ```
 
 ```bash
-node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
+fgos ask "<id>" --text "..." --dir "$root"
 ```
 
 **When the answer comes back immediately** (same session, `fgos answer`
@@ -92,7 +92,7 @@ round's own `consult`/`advise` attempt gets refused — `advisor` has
 zero outgoing edges at stage `exploring`:
 
 ```bash
-node "$root/bin/fgos.mjs" handoff-return "<id>" --note "reclaiming after an immediately-answered ask, same session" --dir "$root"
+fgos handoff-return "<id>" --note "reclaiming after an immediately-answered ask, same session" --dir "$root"
 ```
 
 When the answer does NOT come back immediately — the item genuinely parks
@@ -127,7 +127,7 @@ earlier render), then run, once, after the last decision for this pass
 has been logged:
 
 ```bash
-node "$root/bin/fgos.mjs" context-render "<item-id>" --dir "$root"
+fgos context-render "<item-id>" --dir "$root"
 ```
 
 This replaces whatever sits under the heading with a fresh render from

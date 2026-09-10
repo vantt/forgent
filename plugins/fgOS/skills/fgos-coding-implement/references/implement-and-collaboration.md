@@ -68,7 +68,7 @@ trigger actually matches; no trigger matching means no call:
   (`fgos-researching`, or your own direct read), log it:
 
   ```bash
-  node "$root/bin/fgos.mjs" handoff "<id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
+  fgos handoff "<id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
   ```
 
 - **assist (sync)** — an independent scoped subtask exists whose
@@ -77,7 +77,7 @@ trigger actually matches; no trigger matching means no call:
   log it:
 
   ```bash
-  node "$root/bin/fgos.mjs" handoff "<id>" --to helper --reason assist --outcome "<the work product, one line>" --dir "$root"
+  fgos handoff "<id>" --to helper --reason assist --outcome "<the work product, one line>" --dir "$root"
   ```
 
 - **advise (async)** — a product decision outside the locked decisions
@@ -87,11 +87,11 @@ trigger actually matches; no trigger matching means no call:
   `ask` (parks `status` to `awaiting-human`):
 
   ```bash
-  node "$root/bin/fgos.mjs" handoff "<id>" --to advisor --reason advise --dir "$root"
+  fgos handoff "<id>" --to advisor --reason advise --dir "$root"
   ```
 
   ```bash
-  node "$root/bin/fgos.mjs" ask "<id>" --text "..." --dir "$root"
+  fgos ask "<id>" --text "..." --dir "$root"
   ```
 
   The role-axis side of this call closes later, at a future session's

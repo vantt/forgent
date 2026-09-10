@@ -15,7 +15,7 @@ top.** Do not ask a person. When the action taken was invoking
 right after it returns — whether it found something or came up empty:
 
 ```bash
-node "$root/bin/fgos.mjs" handoff "<item-id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
+fgos handoff "<item-id>" --to researcher --reason consult --outcome "<the finding, one line>" --dir "$root"
 ```
 
 You leave tier A only when the action does not exist, was tried and

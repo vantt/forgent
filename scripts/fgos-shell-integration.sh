@@ -10,10 +10,11 @@
 # automatically for you -- adding it to ~/.bashrc (or similar) is your call
 # to make (D3).
 #
-# 3-tier resolution (tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
-# external-project-reliability/CONTEXT.md): dev-checkout self-hosting
-# (tier 1, the `$root/bin/fgos.mjs` file-check below) > project-local
-# install (tier 2, `node_modules/.bin/fgos`, walking up from $PWD the same
+# 4-tier resolution (tsk-2qc-1 D2/D3/D4, docs/history/install-setup-
+# external-project-reliability/CONTEXT.md): workspace installation
+# (tier 0, the `$root/.fgos/installation/bin/fgos` executable check below) >
+# dev-checkout self-hosting (tier 1, the `$root/bin/fgos.mjs` file-check below) >
+# project-local install (tier 2, `node_modules/.bin/fgos`, walking up from $PWD the same
 # way Node's own module resolution does -- kept as a real mode for
 # cross-project version pinning) > global install (tier 3, the only tier
 # needing a PATH lookup). Tier 3 reads the config-cache
@@ -55,7 +56,7 @@ _fgos_tier3_cached_bin() {
 }
 
 fgos() {
-  local root real_bin common_dir tier2 tier3 has_dir=0 arg
+  local root real_bin real_root common_dir tier2 tier3 has_dir=0 arg
   common_dir=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
     echo "fgos: not a git repository" >&2
     return 1
@@ -66,6 +67,25 @@ fgos() {
       --dir|--dir=*) has_dir=1; break ;;
     esac
   done
+  if [ -x "$root/.fgos/installation/bin/fgos" ]; then
+    # `-x` follows a symlink chain transparently -- confirm the REAL target
+    # (not just the lexical path) still lives under the installation root
+    # before executing it, the same discipline resolveFgosBin's Node tier-0
+    # check applies. `readlink -f` is a GNU coreutils extension, present on
+    # this track's only approved reference target (x86_64-unknown-linux-gnu).
+    real_bin=$(readlink -f "$root/.fgos/installation/bin/fgos" 2>/dev/null)
+    real_root=$(readlink -f "$root/.fgos/installation" 2>/dev/null)
+    case "$real_bin" in
+      "$real_root"/*)
+        if [ "$has_dir" -eq 0 ]; then
+          "$root/.fgos/installation/bin/fgos" "$@" --dir "$root"
+        else
+          "$root/.fgos/installation/bin/fgos" "$@"
+        fi
+        return $?
+        ;;
+    esac
+  fi
   if [ -f "$root/bin/fgos.mjs" ]; then
     if [ "$has_dir" -eq 0 ]; then
       node "$root/bin/fgos.mjs" "$@" --dir "$root"

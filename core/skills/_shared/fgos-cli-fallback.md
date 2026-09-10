@@ -1,10 +1,11 @@
 # fgos CLI fallback
 
 Standard fallback for invoking the `fgos` CLI from a skill that has no
-guaranteed project-relative path to `bin/fgos.mjs` — an installed plugin's
-files run from a copied cache location, not from a checkout, so this
-resolves the real binary or falls back to a global install before giving
-up. Every CLI-wrapper skill under `plugins/fgOS/skills/` points here
+guaranteed project-relative path to a workspace installation shim or
+`bin/fgos.mjs` — an installed plugin's files run from a copied cache
+location, not from a checkout, so this resolves the real binary (tier 0's
+workspace installation shim first, then a dev checkout's `bin/fgos.mjs`)
+or falls back to a global install before giving up. Every CLI-wrapper skill under `plugins/fgOS/skills/` points here
 instead of repeating this block; substitute `<verb-cmd>` with the exact
 `fgos` subcommand and its own flags (including that call's own `--dir`
 value) this call needs — e.g. `list --json --dir
@@ -13,13 +14,16 @@ value) this call needs — e.g. `list --json --dir
 resolved `$root` in an earlier step:
 
 ```bash
+FGOS_INSTALL_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/.fgos/installation/bin/fgos"
 FGOS_BIN="${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX}/bin/fgos.mjs"
-if [ -f "$FGOS_BIN" ]; then
+if [ -x "$FGOS_INSTALL_BIN" ]; then
+  "$FGOS_INSTALL_BIN" <verb-cmd>
+elif [ -f "$FGOS_BIN" ]; then
   node "$FGOS_BIN" <verb-cmd>
 elif command -v fgos >/dev/null 2>&1; then
   fgos <verb-cmd>
 else
-  echo "fgos: no bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
+  echo "fgos: no installation shim or bin/fgos.mjs at ${CLAUDE_PROJECT_DIR}${FGOS_NESTED_PREFIX:+/$FGOS_NESTED_PREFIX} (not a forgent checkout) and no global fgos install on PATH" >&2
   exit 1
 fi
 ```
