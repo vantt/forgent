@@ -313,6 +313,7 @@ máy bắt được lỗi đếm tay này.)
 | `src/state/dep-graph.mjs` — kiểm tra chu trình trên đồ thị hợp nhất blocks+parent-child (supersede record ADR0012; trước v0.3 chỉ xét `deps`) | Domain | — | governance | — (nội bộ) |
 | `src/state/events.mjs` — engine đọc/ghi log | Kernel | event | memory | CTR002 |
 | `src/state/work.mjs` — schema + DEFAULTS | Kernel | — (schema) | memory | CTR002 (schema v2) |
+| `src/runner/dispatch/confinement/` — Agent Confinement Authority | Infra | — | control + execution + tool | CTR010 (confinement-authority.v1), CTR009, CTR003 |
 | *(test/{state,runner,cli,e2e} — đi theo nhà module nó kiểm, không row riêng)* | | | | |
 
 ### Slice — live (tính năng xuyên tầng, trỏ về component)
@@ -322,6 +323,7 @@ máy bắt được lỗi đếm tay này.)
 | human-gate (`awaiting-human`) | verbs ask/answer (Entry) + FSM edge (Domain) + fold (Domain) | event | CTR004 | live (STR19) |
 | outcome hai-nửa + `fgos check` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | CTR002 | live |
 | worker-run trên nhánh `fgw/` | dispatch spawn (Infra) + worktree sandbox (Infra) + loop giám sát (Use-case) | run | CTR003, CTR009 | live |
+| confinement-enforcement (Authority) | dispatch/confinement (Infra) + dispatch cli/transport (Infra) + backend registry (Infra) | run | CTR010, CTR009 | live |
 
 ### Slice — sắp cắm (planned; mỗi cái PHẢI qua nghi thức §9 + trỏ PBI)
 
@@ -355,6 +357,7 @@ mũi tên nội bộ (frontier, recovery) không cần — đó không phải l�
 | **CTR007** | state ↔ reactor | signal: con trỏ tối thiểu, lossy/at-least-once, consumer bắt buộc idempotent | planned (STR8) | §4 bảng event≠signal |
 | **CTR008** | hệ ↔ hub chú ý | attention envelope (`gate-opened`/`question-raised`/`blocked`), versioned | idea | deep-dive quản-lý §9 |
 | **CTR009** | model gateway ↔ provider | `executor.v1`: runner config `{command, args[]}` thay `{prompt}`/`{model}` per-element — không nối chuỗi; validate RunnerConfigError tại nạp | **live** (v0.1 để vô danh — chính là ranh giới doc cũ tự hỏi "còn thiếu contract nào") | `dispatch.mjs` |
+| **CTR010** | dispatch ↔ executor adapter | `confinement-authority.v1`: một cửa runtime duy nhất `executeThroughConfinement(request, adapterPort)` trước khi adapter được spawn agent; chuẩn hóa `confinement-policy.v1`, compile `confinement-plan.v1`, đối chiếu năng lực backend driver (`bwrap` v1 với 8 falsification probes), fail-closed cho `required`, cấm bypass thiếu full confinement, và phát `confinement-attestation.v1` bền | **live** | `src/runner/dispatch/confinement/` · spec `docs/specs/confinement-authority.md` |
 
 ```mermaid
 flowchart LR

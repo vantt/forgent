@@ -17,6 +17,8 @@ export class DispatchError extends Error {
     super(message);
     this.name = 'DispatchError';
     this.errorClass = errorClass;
+    this.code = details.code ?? errorClass;
+    this.data = details;
     Object.assign(this, details);
   }
 }

@@ -39,7 +39,9 @@ export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './disp
 
 export { compileDispatchPlan } from './dispatch/plan.mjs';
 
-export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAPTER, EXECUTOR_ADAPTERS, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
+export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
+
+export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
 
 export { buildPrompt } from './dispatch/prepare.mjs';
 

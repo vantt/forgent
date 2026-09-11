@@ -206,6 +206,11 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // the D1/D2/D6 governance work. Additive only: every existing caller
     // that destructures a subset of this object is unaffected.
     governance: executor.governance,
+    method: executor.method,
+    url: executor.url,
+    headers: executor.headers,
+    body: executor.body,
+    resourceBindings: executor.resourceBindings,
   };
 }
 

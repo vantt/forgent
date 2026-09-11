@@ -38,6 +38,8 @@ import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
+import { normalizeLegacyConfinement } from './confinement/policies.mjs';
+import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -199,27 +201,62 @@ function prepareRunDir({ runDir, roundNumber, workId, tier, model }) {
  * socket it is handed controls only worker panes.
  *
  * Declared, never inferred. An executor that declares nothing keeps the old
- * behaviour exactly, and the config door has already refused any `bypass`
- * that did not declare all three confinement flags.
+ * behaviour exactly, and Confinement Authority (`executeThroughConfinement`,
+ * src/runner/dispatch/confinement/authority.mjs) has already refused any
+ * `bypass` that did not declare all three confinement flags before this
+ * function is ever reached on the real dispatch path.
  *
  * Confinement that was asked for and cannot be delivered is a refusal, not a
  * downgrade: running anyway would put a worker on the operator's cockpit
- * socket while the profile claims it is confined.
+ * socket while the profile claims it is confined. The bypass-pairing and
+ * `ownWorktree` checks below are backstops for callers that invoke this
+ * adapter directly (bypassing Authority, as some tests do) -- not a second
+ * policy implementation: the bypass-pairing check calls the exact same
+ * `evaluateBypassPairing` function Authority itself calls
+ * (confinement/bypass-pairing.mjs), so both entry points refuse an
+ * incomplete pairing identically.
  */
-async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
-  // Checked first, because it is the one flag that is already true or already
+export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
+  const normalized = confinement ? normalizeLegacyConfinement(confinement, `executor.${round.workId}.confinement`) : null;
+  const effectiveConfinement = normalized ?? confinement;
+
+  const hasOwnWorktree = Boolean(
+    effectiveConfinement?.ownWorktree ||
+    effectiveConfinement?.controls?.workspace === 'own',
+  );
+  const hasPrivateHome = Boolean(
+    effectiveConfinement?.privateHome ||
+    effectiveConfinement?.controls?.home === 'private',
+  );
+  const hasIsolatedSession = Boolean(
+    effectiveConfinement?.isolatedSession ||
+    effectiveConfinement?.controls?.session === 'isolated',
+  );
+
+  // Checked before ownWorktree/repoRoot, because an incomplete bypass pairing
+  // is a refusal regardless of where the dispatch happens to be running.
+  const { satisfied: bypassPairingSatisfied, missing: missingBypassControls } = evaluateBypassPairing({
+    isBypass: permissionMode === 'bypass',
+    hasOwnWorktree,
+    hasPrivateHome,
+    hasIsolatedSession,
+  });
+  if (!bypassPairingSatisfied) {
+    throw round.fail('invalid-config', 'bypass-confinement-incomplete',
+      `executor for work "${round.workId}" refused: permissionMode "bypass" requires full confinement (missing: ${missingBypassControls.join(', ')}).`);
+  }
+
+  // Checked next, because it is the one flag that is already true or already
   // false before anything is provisioned: a worker confined to its own
   // worktree cannot be running in the checkout it was told to stay out of.
-  // The config door refuses `bypass` unless this is declared, so leaving it
-  // unenforced made that refusal partly ceremonial.
-  if (confinement?.ownWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
+  if (hasOwnWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
     throw round.fail('invalid-config', 'own-worktree-unavailable',
       `executor for work "${round.workId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(cwd)}) rather than a worktree of its own.`);
   }
 
   let workerHomePath = null;
   try {
-    if (confinement?.privateHome) {
+    if (hasPrivateHome) {
       const home = createWorkerHome(os.tmpdir(), {
         runId: round.agentName,
         sourceHome: fullEnv.HOME ?? os.homedir(),
@@ -230,7 +267,7 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
       workerHomePath = home.homePath;
       round.note({ workerHome: workerHomePath });
     }
-    if (confinement?.isolatedSession) {
+    if (hasIsolatedSession) {
       // One worker session, never named by config: a config-supplied name could
       // point at the operator's own cockpit whenever that cockpit has a name
       // and the dispatch runs outside herdr, where there is no HERDR_SESSION
@@ -242,9 +279,15 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
         herdrBin,
       });
       round.note({ workerSession: session.sessionName });
-      return { workerHomePath, sessionEnv: session.env };
+      return { workerHomePath, sessionEnv: session.env, confined: true, status: 'confined' };
     }
-    return { workerHomePath, sessionEnv: fullEnv };
+    if (hasPrivateHome) {
+      return { workerHomePath, sessionEnv: fullEnv, confined: true, status: 'confined' };
+    }
+    if (hasOwnWorktree) {
+      return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'partial' };
+    }
+    return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'unconfined' };
   } catch (err) {
     if (workerHomePath) { try { removeWorkerHome(workerHomePath); } catch { /* nothing left to do */ } }
     throw round.fail('invalid-config', err.code ?? 'confinement-unavailable',
@@ -615,9 +658,10 @@ export async function runHerdrRound(ctx) {
   fs.writeFileSync(paths.briefPath, briefText);
   round.note({ status: 'requested', agentName, round: roundNumber });
 
-  const { workerHomePath, sessionEnv } = await establishConfinement({
+  const { workerHomePath, sessionEnv, confined, status } = await establishConfinement({
     confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin,
   });
+  round.note({ confinement: { status, confined } });
 
   // From here on the home exists, so every way out of this function that is
   // not a settled round has to take the credential back out of it. The home

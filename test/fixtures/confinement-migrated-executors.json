@@ -1,0 +1,19 @@
+{
+  "executor": { "command": "claude", "args": ["-p", "{prompt}", "--model", "{model}"] },
+  "models": { "light": "haiku", "standard": "sonnet", "heavy": "opus" },
+  "timeoutMs": 120000,
+  "executors": {
+    "claude-bwrap": {
+      "kind": "agent", "providerModel": "claude", "confinement": { "backend": "bwrap" },
+      "invocations": [{ "via": "cli", "adapter": "cli-spawn", "command": "claude", "args": ["-p", "{prompt}", "--model", "{model}"] }]
+    },
+    "agy-bwrap": {
+      "kind": "agent", "providerModel": "gemini", "allowCrossProvider": true, "confinement": { "backend": "bwrap" },
+      "invocations": [{ "via": "cli", "adapter": "cli-spawn", "command": "agy", "args": ["-p", "{prompt}", "--model", "{model}"] }]
+    },
+    "codex-bwrap": {
+      "kind": "agent", "providerModel": "openai-codex", "allowCrossProvider": true, "confinement": { "backend": "bwrap" },
+      "invocations": [{ "via": "cli", "adapter": "cli-spawn", "command": "codex", "args": ["exec", "--model", "{model}", "{prompt}"] }]
+    }
+  }
+}
