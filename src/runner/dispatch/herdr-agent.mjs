@@ -141,9 +141,17 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
     invoke,
 
     /** Always a FRESH pane. Reusing a finished worker's pane delivers the next
-     * dispatch as chat into an idle REPL -- the tsk-1nih incident. */
-    paneSplit({ direction = 'right', focus = false, cwd: paneCwd, env: paneEnv } = {}) {
-      const args = ['pane', 'split', '--direction', direction];
+     * dispatch as chat into an idle REPL -- the tsk-1nih incident.
+     *
+     * `pane`, when given, is an existing pane to split FROM -- the only way to
+     * land the fresh pane in a specific tab, since herdr splits are anchored to
+     * a pane, never addressed by tab id. Omitted, herdr falls back to whatever
+     * pane is currently focused, which is what scatters sibling dispatches
+     * across whichever tab a person happens to be looking at. */
+    paneSplit({ pane, direction = 'right', focus = false, cwd: paneCwd, env: paneEnv } = {}) {
+      const args = ['pane', 'split'];
+      if (pane) args.push('--pane', pane);
+      args.push('--direction', direction);
       if (!focus) args.push('--no-focus');
       if (paneCwd) args.push('--cwd', paneCwd);
       for (const [key, value] of Object.entries(paneEnv ?? {})) {
@@ -178,6 +186,46 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       for (const [key, value] of Object.entries(wsEnv ?? {})) args.push('--env', `${key}=${value}`);
       const result = invoke(args);
       return result?.root_pane?.pane_id ?? result?.pane?.pane_id ?? null;
+    },
+
+    /** A fresh tab, labeled atomically in the same call (no rename-after race
+     * to close -- `label` is a `tab create` param, not a separate step). The
+     * returned `paneId` is that tab's own root pane: pass it as `pane` to
+     * `paneSplit` to land every sibling dispatch of one batch in this same
+     * tab instead of wherever focus happens to be. */
+    tabCreate({ cwd: tabCwd, label, env: tabEnv, focus = false } = {}) {
+      const args = ['tab', 'create'];
+      if (tabCwd) args.push('--cwd', tabCwd);
+      if (label) args.push('--label', label);
+      if (!focus) args.push('--no-focus');
+      for (const [key, value] of Object.entries(tabEnv ?? {})) args.push('--env', `${key}=${value}`);
+      const result = invoke(args);
+      const tabId = result?.tab?.tab_id ?? null;
+      const paneId = result?.root_pane?.pane_id ?? null;
+      if (!tabId || !paneId) {
+        throw new HerdrError('herdr_unparseable', 'herdr tab create returned no tab_id/pane_id.', { args });
+      }
+      return { tabId, paneId };
+    },
+
+    /** Diagnostic only, used to decide whether a tab is safe to close: a tab
+     * still holding more than its own root pane has a live or forensically-
+     * kept leaf pane in it, and closing it would take that pane down too. */
+    tabGet(tabId) {
+      const tab = invoke(['tab', 'get', tabId])?.tab ?? {};
+      return { tabId: tab.tab_id ?? tabId, paneCount: tab.pane_count ?? null, label: tab.label ?? null };
+    },
+
+    /** Best-effort, like `paneClose` -- cleanup, never a dispatch result. A
+     * tab that refuses to close is left for a person to deal with, not a
+     * failure this call reports. */
+    tabClose(tabId) {
+      try {
+        invoke(['tab', 'close', tabId], { timeoutMs: 5000 });
+        return true;
+      } catch {
+        return false;
+      }
     },
 
     paneClose(paneId) {
@@ -259,6 +307,69 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       if (lines) args.push('--lines', String(lines));
       const result = invoke(args);
       return result?.read?.text ?? result?.text ?? '';
+    },
+  };
+}
+
+/**
+ * A lazily-created, memoized batch tab: the first `ensure(client, sessionKey)`
+ * call for a given session opens a tab via `tabCreate` and remembers the
+ * result; every later call for that SAME session returns the same pane id
+ * without a second `tab create`.
+ *
+ * Exists so one caller's batch (one coordination round's actors, one fanout
+ * wave) can share a single tab across sequential dispatch calls without
+ * creating one for a batch that turns out to have no herdr-backed round at
+ * all -- `ensure` is only ever invoked from inside a round that already
+ * needs a herdr client, never eagerly by whoever builds the batch.
+ *
+ * Keyed by `sessionKey`, not shared globally: a confined round talks to a
+ * different herdr server (a different socket, a different pane-id
+ * namespace) than an unconfined one, so a tab created on one is not a valid
+ * split target on the other. Two rounds of one batch that land in different
+ * herdr sessions get their own tab per session instead of colliding.
+ */
+export function createBatchTab({ label, cwd, env } = {}) {
+  const bySession = new Map();
+  return {
+    ensure(client, sessionKey = 'default') {
+      let handle = bySession.get(sessionKey);
+      if (!handle) {
+        const created = client.tabCreate({ label, cwd, env });
+        handle = { ...created, client };
+        bySession.set(sessionKey, handle);
+      }
+      return handle.paneId;
+    },
+
+    /** Forget a session's tab -- e.g. its anchor pane turned out to be gone.
+     * The next `ensure()` for that session opens a fresh tab instead of
+     * repeating a split against an id already known to be dead. */
+    invalidate(sessionKey = 'default') {
+      bySession.delete(sessionKey);
+    },
+
+    /** Best-effort end-of-batch cleanup: close a tab only when nothing but
+     * its own root pane is left in it. A tab still holding a leaf pane has
+     * either a round genuinely still running or a failed round's pane kept
+     * open on purpose (`herdr pane close` on a fixed reason on screen) --
+     * `tab close` takes down every pane in it unconditionally, so closing
+     * one that still holds a leaf pane would destroy exactly the evidence
+     * that policy exists to keep. Never throws: called from a process exit
+     * hook, where a herdr that is slow or gone must not block shutdown. */
+    closeIfEmpty() {
+      for (const handle of bySession.values()) {
+        try {
+          const info = handle.client.tabGet(handle.tabId);
+          if (typeof info.paneCount === 'number' && info.paneCount <= 1) {
+            handle.client.tabClose(handle.tabId);
+          }
+        } catch {
+          // Best-effort only -- a herdr that cannot answer at exit time is
+          // not this cleanup's problem to solve. An unreadable pane count is
+          // read as "not safe to close", never as "assume empty".
+        }
+      }
     },
   };
 }

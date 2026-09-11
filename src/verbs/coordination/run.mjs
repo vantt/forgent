@@ -327,7 +327,15 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   const request = validateCoordinationRequest(raw, { executor: cliExecutor, model: cliModel, tier: cliTier });
   assertModelSupportedForKind(request.kind, { globalModel: cliModel, actors: request.actors });
 
-  const engineOpts = { cwd: ctx.cwd, repoRoot: ctx.repoRoot, packageRoot: ctx.packageRoot, runnerConfig: ctx.runnerConfig, timeoutMs: ctx.timeoutMs };
+  const engineOpts = {
+    cwd: ctx.cwd, repoRoot: ctx.repoRoot, packageRoot: ctx.packageRoot, runnerConfig: ctx.runnerConfig, timeoutMs: ctx.timeoutMs,
+    // Opaque here -- a plain string, never a herdr-shaped value. Only a
+    // herdr-family dispatch adapter (transport.mjs/herdr-round.mjs) ever
+    // looks this up to lazily open a batch tab; a request whose actors are
+    // all cli-spawn never touches herdr at all. This module has no reason to
+    // import anything herdr-specific to build it.
+    dispatchBatchKey: request.coordinationId,
+  };
   const openParams = {
     coordinationId: request.coordinationId,
     objective: request.objective,

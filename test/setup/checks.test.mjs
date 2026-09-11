@@ -120,6 +120,12 @@ test('DOCTOR_CHECKS has exactly the three v1 checks from CONTEXT.md plus main-ch
       'rust-host-target-supported',
       'legacy-node-payload-present',
       'command-routes-drift',
+      'confinement-policies-declared',
+      'confinement-backend-registry-readable',
+      'confinement-bwrap-platform',
+      'confinement-herdr-maturity',
+      'confinement-probe-freshness',
+      'confinement-strict-readiness',
     ].sort(),
   );
 });

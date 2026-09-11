@@ -27,7 +27,6 @@ import {
   spawnWorker,
   RunnerConfigError,
   DispatchError,
-  EXECUTOR_ADAPTERS,
   DEFAULT_ADAPTER,
   DISPATCH_DEPTH_ENV,
   MAX_DISPATCH_DEPTH,
@@ -38,6 +37,7 @@ import {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
 } from '../../src/runner/dispatch.mjs';
+import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
@@ -3555,7 +3555,7 @@ test('executeExecutorCli hands back {mechanism:"in-process",agentType,prompt} fo
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
-  assert.deepEqual(result, { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do the thing' });
+  assert.deepEqual(result, { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do the thing', authorityScope: 'external-harness', attestation: null });
 });
 
 test('executeExecutorCli falls to out-of-process and self-executes (never hands back) for a kind:"task" executor with no live Task access — the safe default', async () => {
@@ -4137,7 +4137,7 @@ test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for 
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do it' });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'code-simplifier', prompt: 'do it', authorityScope: 'external-harness', attestation: null });
 });
 
 test('the "execute" CLI entry point exits non-zero with a usage message when executorId is omitted', () => {

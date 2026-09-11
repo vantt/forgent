@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   createHerdrClient,
+  createBatchTab,
   normalizeAgentName,
   isReadyState,
   READY_STATES,
@@ -71,6 +72,155 @@ test('a pane split that returns no pane_id fails loudly instead of returning nul
   const { run } = fakeBackend(() => ok({ nothing: true }));
   const client = createHerdrClient({ run });
   assert.throws(() => client.paneSplit({}), (err) => err.code === 'herdr_unparseable');
+});
+
+test('paneSplit given an explicit pane anchors the split there instead of leaving it implicit', () => {
+  const { run, calls } = fakeBackend(() => ok({ pane: { pane_id: 'w9:p4' } }));
+  const client = createHerdrClient({ run });
+  const paneId = client.paneSplit({ pane: 'w9:p1', direction: 'down' });
+  assert.equal(paneId, 'w9:p4');
+  assert.deepEqual(calls[0].args, ['pane', 'split', '--pane', 'w9:p1', '--direction', 'down', '--no-focus']);
+});
+
+test('tabCreate labels the tab in the same call and returns its tab_id and root pane_id', () => {
+  const { run, calls } = fakeBackend(() => ok({
+    tab: { tab_id: 'w9:t2' },
+    root_pane: { pane_id: 'w9:p1' },
+  }));
+  const client = createHerdrClient({ run });
+  const { tabId, paneId } = client.tabCreate({ label: 'fgos-lead-tsk-1', cwd: '/tmp/work' });
+  assert.deepEqual({ tabId, paneId }, { tabId: 'w9:t2', paneId: 'w9:p1' });
+  assert.deepEqual(calls[0].args, ['tab', 'create', '--cwd', '/tmp/work', '--label', 'fgos-lead-tsk-1', '--no-focus']);
+});
+
+test('tabCreate fails loudly when the response is missing either id, never guessing one', () => {
+  const { run } = fakeBackend(() => ok({ tab: { tab_id: 'w9:t2' } }));
+  const client = createHerdrClient({ run });
+  assert.throws(() => client.tabCreate({ label: 'x' }), (err) => err.code === 'herdr_unparseable');
+});
+
+test('createBatchTab creates its tab at most once, no matter how many rounds ensure() it', () => {
+  const { run, calls } = fakeBackend(() => ok({ tab: { tab_id: 'w9:t2' }, root_pane: { pane_id: 'w9:p1' } }));
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'fgos-lead-tsk-1', cwd: '/tmp/work' });
+
+  assert.equal(batch.ensure(client), 'w9:p1');
+  assert.equal(batch.ensure(client), 'w9:p1');
+  assert.equal(batch.ensure(client), 'w9:p1');
+
+  const tabCreateCalls = calls.filter((c) => c.args[0] === 'tab' && c.args[1] === 'create');
+  assert.equal(tabCreateCalls.length, 1, 'three rounds of one batch must open exactly one tab');
+});
+
+test('createBatchTab never calls tab create until the first ensure()', () => {
+  const { calls } = fakeBackend(() => ok({ tab: { tab_id: 'w9:t2' }, root_pane: { pane_id: 'w9:p1' } }));
+  createBatchTab({ label: 'unused' });
+  assert.equal(calls.length, 0, 'a request whose actors never reach a herdr round must never touch herdr');
+});
+
+test('createBatchTab opens a separate tab per session -- a confined round is a different herdr server', () => {
+  let tabNumber = 0;
+  const { run, calls } = fakeBackend(() => {
+    tabNumber += 1;
+    return ok({ tab: { tab_id: `w9:t${tabNumber}` }, root_pane: { pane_id: `w9:p${tabNumber}` } });
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'fgos-lead-tsk-1' });
+
+  assert.equal(batch.ensure(client, 'default'), 'w9:p1');
+  assert.equal(batch.ensure(client, 'default'), 'w9:p1', 'same session, same tab');
+  assert.equal(batch.ensure(client, 'fgos-worker'), 'w9:p2', 'a different session gets its own tab');
+  assert.equal(batch.ensure(client, 'fgos-worker'), 'w9:p2');
+
+  const tabCreateCalls = calls.filter((c) => c.args[0] === 'tab' && c.args[1] === 'create');
+  assert.equal(tabCreateCalls.length, 2, 'two sessions of one batch open exactly two tabs, one each');
+});
+
+test('createBatchTab.invalidate forgets a session so the next ensure() opens a fresh tab', () => {
+  let tabNumber = 0;
+  const { run, calls } = fakeBackend(() => {
+    tabNumber += 1;
+    return ok({ tab: { tab_id: `w9:t${tabNumber}` }, root_pane: { pane_id: `w9:p${tabNumber}` } });
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'fgos-lead-tsk-1' });
+
+  assert.equal(batch.ensure(client), 'w9:p1');
+  batch.invalidate();
+  assert.equal(batch.ensure(client), 'w9:p2', 'a forgotten session opens a fresh tab, not the dead one');
+
+  const tabCreateCalls = calls.filter((c) => c.args[0] === 'tab' && c.args[1] === 'create');
+  assert.equal(tabCreateCalls.length, 2);
+});
+
+test('createBatchTab.closeIfEmpty closes a tab holding only its own root pane', () => {
+  const { run, calls } = fakeBackend((args) => {
+    if (args[0] === 'tab' && args[1] === 'create') return ok({ tab: { tab_id: 'w9:t1' }, root_pane: { pane_id: 'w9:p1' } });
+    if (args[0] === 'tab' && args[1] === 'get') return ok({ tab: { tab_id: 'w9:t1', pane_count: 1 } });
+    if (args[0] === 'tab' && args[1] === 'close') return ok({});
+    throw new Error(`unexpected call: ${args.join(' ')}`);
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'x' });
+  batch.ensure(client);
+
+  batch.closeIfEmpty();
+
+  assert.ok(calls.some((c) => c.args[0] === 'tab' && c.args[1] === 'close' && c.args[2] === 'w9:t1'));
+});
+
+test('createBatchTab.closeIfEmpty never closes a tab still holding a leaf pane -- that pane may be a failed round kept open on purpose', () => {
+  const { run, calls } = fakeBackend((args) => {
+    if (args[0] === 'tab' && args[1] === 'create') return ok({ tab: { tab_id: 'w9:t1' }, root_pane: { pane_id: 'w9:p1' } });
+    if (args[0] === 'tab' && args[1] === 'get') return ok({ tab: { tab_id: 'w9:t1', pane_count: 2 } });
+    throw new Error(`unexpected call: ${args.join(' ')} -- tab close must never even be attempted here`);
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'x' });
+  batch.ensure(client);
+
+  batch.closeIfEmpty();
+
+  assert.ok(!calls.some((c) => c.args[0] === 'tab' && c.args[1] === 'close'));
+});
+
+test('createBatchTab.closeIfEmpty treats an unreadable pane count as not safe to close, never as empty', () => {
+  const { run, calls } = fakeBackend((args) => {
+    if (args[0] === 'tab' && args[1] === 'create') return ok({ tab: { tab_id: 'w9:t1' }, root_pane: { pane_id: 'w9:p1' } });
+    if (args[0] === 'tab' && args[1] === 'get') return ok({}); // shape drift / empty envelope
+    throw new Error(`unexpected call: ${args.join(' ')} -- tab close must never be attempted on an unreadable pane count`);
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'x' });
+  batch.ensure(client);
+
+  batch.closeIfEmpty();
+
+  assert.ok(!calls.some((c) => c.args[0] === 'tab' && c.args[1] === 'close'));
+});
+
+test("closeIfEmpty never throws -- it runs from a process exit hook where a dead herdr must not block shutdown", () => {
+  const { run } = fakeBackend((args) => {
+    if (args[0] === 'tab' && args[1] === 'create') return ok({ tab: { tab_id: 'w9:t1' }, root_pane: { pane_id: 'w9:p1' } });
+    throw new Error('herdr is gone');
+  });
+  const client = createHerdrClient({ run });
+  const batch = createBatchTab({ label: 'x' });
+  batch.ensure(client);
+
+  assert.doesNotThrow(() => batch.closeIfEmpty());
+});
+
+test('tabGet reads back the pane count used to decide whether a tab is safe to close', () => {
+  const { run } = fakeBackend(() => ok({ tab: { tab_id: 'w9:t1', pane_count: 3, label: 'fgos-lead-x' } }));
+  const client = createHerdrClient({ run });
+  assert.deepEqual(client.tabGet('w9:t1'), { tabId: 'w9:t1', paneCount: 3, label: 'fgos-lead-x' });
+});
+
+test('tabClose never throws -- a tab that refuses to close is left for a person, not a failure', () => {
+  const { run } = fakeBackend(() => herdrErr('tab_close_failed'));
+  const client = createHerdrClient({ run });
+  assert.equal(client.tabClose('w9:t1'), false);
 });
 
 test('agentStart passes kind, pane and timeout, and puts agent args after the separator', () => {

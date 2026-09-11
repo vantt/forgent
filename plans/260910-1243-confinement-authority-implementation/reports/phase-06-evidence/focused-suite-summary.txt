@@ -1,0 +1,13 @@
+✖ production dispatch attaches confinement attestation to ExecutorResult (R5, R7) (594.531095ms)
+✖ http adapter routes through executeThroughConfinement and returns result with attestation (152.972122ms)
+ℹ tests 1887
+ℹ suites 0
+ℹ pass 1884
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 35380.663629
+✖ failing tests:
+✖ production dispatch attaches confinement attestation to ExecutorResult (R5, R7) (594.531095ms)
+✖ http adapter routes through executeThroughConfinement and returns result with attestation (152.972122ms)

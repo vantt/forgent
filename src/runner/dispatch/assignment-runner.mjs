@@ -933,6 +933,7 @@ export async function executeAssignment(assignment, opts = {}) {
       work: opts.work,
       stage: effectiveAssignment.stage,
       runDir: path.resolve(runDir),
+      dispatchBatchKey: opts.dispatchBatchKey,
     });
   } catch (err) {
     executionError = err;

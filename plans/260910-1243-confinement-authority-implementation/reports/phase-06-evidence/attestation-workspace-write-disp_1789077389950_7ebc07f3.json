@@ -1,0 +1,204 @@
+{
+  "contract": "confinement-attestation.v1",
+  "dispatchId": "disp_1789077389950_7ebc07f3",
+  "phase": "completed",
+  "outcome": "enforced",
+  "requested": {
+    "mode": "required",
+    "policyId": "workspace-write",
+    "policy": {
+      "contract": "confinement-policy.v1",
+      "controls": {
+        "hostWrite": "deny",
+        "hostRead": "allow",
+        "networkEgress": "allow",
+        "process": "host",
+        "home": "host",
+        "session": "shared",
+        "workspace": "shared"
+      },
+      "grants": [
+        {
+          "resource": "run-output",
+          "access": "write",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "private-home",
+          "access": "read-write",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "executor-credentials",
+          "access": "read",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "workspace",
+          "access": "read-write",
+          "scope": "dispatch"
+        },
+        {
+          "resource": "workspace-git-metadata",
+          "access": "read-write",
+          "scope": "dispatch"
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "control:hostWrite": "satisfied",
+    "control:hostRead": "satisfied",
+    "control:networkEgress": "satisfied",
+    "control:process": "satisfied",
+    "control:home": "satisfied",
+    "control:session": "satisfied",
+    "control:workspace": "satisfied",
+    "grant:run-output": "satisfied",
+    "grant:private-home": "satisfied",
+    "grant:executor-credentials": "unverified",
+    "grant:workspace": "satisfied",
+    "grant:workspace-git-metadata": "satisfied"
+  },
+  "effectiveControls": {},
+  "resources": [
+    {
+      "resource": "run-output",
+      "identity": "run-output:disp_1789077389950_7ebc07f3",
+      "hostTarget": "/tmp/fgos-probe-8OU6bO/.fgos/runs/run1",
+      "executionTarget": {
+        "location": "host",
+        "path": "/tmp/fgos-probe-8OU6bO/.fgos/runs/run1"
+      },
+      "delivery": "mount",
+      "collect": "artifact",
+      "access": "write",
+      "allocation": "existing"
+    },
+    {
+      "resource": "workspace",
+      "identity": "workspace:forgentX",
+      "hostTarget": "/home/vantt/projects/forgentX",
+      "executionTarget": {
+        "location": "host",
+        "path": "/home/vantt/projects/forgentX"
+      },
+      "delivery": "mount",
+      "collect": "workspace-change",
+      "access": "read-write",
+      "allocation": "existing"
+    },
+    {
+      "resource": "workspace-git-metadata",
+      "identity": "workspace-git-metadata:.git",
+      "hostTarget": "/home/vantt/projects/forgentX/.git",
+      "executionTarget": {
+        "location": "host",
+        "path": "/home/vantt/projects/forgentX/.git"
+      },
+      "delivery": "mount",
+      "collect": "none",
+      "access": "read-write",
+      "allocation": "existing"
+    },
+    {
+      "resource": "private-home",
+      "identity": "private-home:disp_1789077389950_7ebc07f3",
+      "hostTarget": "/tmp/fgos-confinement/disp_1789077389950_7ebc07f3/home",
+      "executionTarget": {
+        "location": "host",
+        "path": "/tmp/fgos-confinement/disp_1789077389950_7ebc07f3/home"
+      },
+      "delivery": "mount",
+      "collect": "none",
+      "access": "read-write",
+      "allocation": "temporary"
+    }
+  ],
+  "readiness": {},
+  "channels": [
+    {
+      "name": "filesystem",
+      "coverage": "unknown",
+      "detail": "observe-mode: unverified execution for policy workspace-write"
+    },
+    {
+      "name": "inherited-fd",
+      "coverage": "unknown",
+      "detail": "observe-mode: unverified execution for policy workspace-write"
+    },
+    {
+      "name": "stdio",
+      "coverage": "unknown",
+      "detail": "observe-mode: stdio unmanaged"
+    },
+    {
+      "name": "host-ipc",
+      "coverage": "out-of-scope",
+      "detail": "observe-mode: host IPC unmanaged"
+    },
+    {
+      "name": "network",
+      "coverage": "out-of-scope",
+      "detail": "observe-mode: network unmanaged"
+    }
+  ],
+  "receipt": null,
+  "backend": {
+    "id": "bwrap",
+    "type": "bwrap",
+    "version": "local-bwrap-v1",
+    "configDigest": "f0795e2d438d241d899ff10ae3b1ed7d57651abf141d31bdb6762fb4e814ec1d"
+  },
+  "grants": [
+    {
+      "resource": "run-output",
+      "access": "write",
+      "resolvedTarget": "/tmp/fgos-probe-8OU6bO/.fgos/runs/run1"
+    },
+    {
+      "resource": "private-home",
+      "access": "read-write",
+      "resolvedTarget": "/tmp/fgos-confinement/disp_1789077389950_7ebc07f3/home"
+    },
+    {
+      "resource": "executor-credentials",
+      "access": "read",
+      "resolvedTarget": "executor-credentials"
+    },
+    {
+      "resource": "workspace",
+      "access": "read-write",
+      "resolvedTarget": "/home/vantt/projects/forgentX"
+    },
+    {
+      "resource": "workspace-git-metadata",
+      "access": "read-write",
+      "resolvedTarget": "/home/vantt/projects/forgentX/.git"
+    }
+  ],
+  "mismatches": [],
+  "evidence": [
+    {
+      "kind": "structural-observation",
+      "ref": "dispatch:disp_1789077389950_7ebc07f3",
+      "freshness": "current"
+    },
+    {
+      "kind": "falsification-probe",
+      "ref": "local-bwrap-v1:pre-spawn",
+      "freshness": "current",
+      "fingerprint": {
+        "contract": "confinement-probe-fingerprint.v1",
+        "policyDigest": "6a2204cf2321be9943ae35b915cd945e3d628daba42653addfeea37b5657873e",
+        "driverVersion": "local-bwrap-v1",
+        "backendConfigDigest": "f0795e2d438d241d899ff10ae3b1ed7d57651abf141d31bdb6762fb4e814ec1d",
+        "platformDigest": "e705aed3639153cc172d09041dd54432d554da45e8c2df687a851b6490a3ee50",
+        "proofProfile": "local-bwrap-v1"
+      }
+    }
+  ],
+  "cleanup": {
+    "status": "not-needed"
+  }
+}

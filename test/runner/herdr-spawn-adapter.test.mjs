@@ -84,7 +84,15 @@ const fail = (code, message) => { console.log(JSON.stringify({ error: { code, me
 
 const [group, action] = args;
 
-if (group === 'pane' && action === 'split') ok({ pane: { pane_id: 'mock-pane-1' } });
+if (group === 'pane' && action === 'split') {
+  const paneFlagIdx = args.indexOf('--pane');
+  const targetPane = paneFlagIdx >= 0 ? args[paneFlagIdx + 1] : null;
+  if (scenario.deadAnchorPane && targetPane === scenario.deadAnchorPane) {
+    fail('pane_not_found', 'no such pane');
+  }
+  ok({ pane: { pane_id: 'mock-pane-1' } });
+}
+if (group === 'tab' && action === 'create') ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-tab-root-pane' } });
 if (group === 'pane' && action === 'close') ok({ closed: true });
 if (group === 'pane' && action === 'process-info') {
   // A real pane always lists its own shell. "The agent is there" means a
@@ -158,7 +166,7 @@ ok({});
   };
 }
 
-function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate, transportDeadlines } = {}) {
+function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate, transportDeadlines, anchorPaneId, dispatchBatchKey } = {}) {
   const runDir = path.join(tmpDir, 'run');
   fs.mkdirSync(runDir, { recursive: true });
   return EXECUTOR_ADAPTERS['herdr-spawn'](
@@ -174,7 +182,7 @@ function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDeli
     // Transport deadlines are not executor config any more; this is the seam
     // that keeps a mock round short, and production never sets it.
     { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir,
-      transportDeadlines: { resendAfterMs: 200, ...transportDeadlines } },
+      transportDeadlines: { resendAfterMs: 200, ...transportDeadlines }, anchorPaneId, dispatchBatchKey },
   );
 }
 
@@ -240,6 +248,169 @@ test('the prompt travels as a file and only a one-line pointer is ever typed', a
   assert.match(typed, /^Read .*brief-1\.md and do what it says\.$/);
   assert.ok(!typed.includes('read the spec'), 'the work itself never goes through the terminal');
   assert.equal(res.status, 0);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('an anchor pane id lands the split in the caller batch tab instead of leaving it implicit', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-anchor-pane-'));
+  const mock = createMockHerdr(tmpDir);
+  await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:p1' });
+
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.deepEqual(split, ['pane', 'split', '--pane', 'w9:p1', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a standalone dispatch with no anchor pane keeps the old implicit-focus split', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-anchor-pane-'));
+  const mock = createMockHerdr(tmpDir);
+  const savedEnv = process.env.FGOS_HERDR_ANCHOR_PANE;
+  delete process.env.FGOS_HERDR_ANCHOR_PANE;
+  try {
+    await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  } finally {
+    if (savedEnv === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
+    else process.env.FGOS_HERDR_ANCHOR_PANE = savedEnv;
+  }
+
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.deepEqual(split, ['pane', 'split', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE, never a CLI flag', async () => {
+  // The generic dispatch CLI (`cli.mjs`'s `execute` subcommand) has no
+  // "--anchor-pane" flag on purpose -- "pane" is herdr's own vocabulary, and
+  // the adapter-agnostic surface must not have to know it. This is the door
+  // a caller that only has a real CLI invocation (fanout's independently
+  // launched children) actually uses, mirroring FGOS_HERDR_BIN/FGOS_HERDR_MODEL.
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-env-anchor-pane-'));
+  const mock = createMockHerdr(tmpDir);
+  const savedEnv = process.env.FGOS_HERDR_ANCHOR_PANE;
+  process.env.FGOS_HERDR_ANCHOR_PANE = 'w9:p5';
+  try {
+    await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  } finally {
+    if (savedEnv === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
+    else process.env.FGOS_HERDR_ANCHOR_PANE = savedEnv;
+  }
+
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.deepEqual(split, ['pane', 'split', '--pane', 'w9:p5', '--direction', 'right', '--no-focus', '--cwd', tmpDir]);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a dispatchBatchKey opens its tab once and every round of the batch splits into it', async () => {
+  // Two separate rounds of one batch -- each gets its own run directory (a
+  // real coordination round always does), sharing only the mock herdr
+  // backend and the batch key. The registry itself is module-level state in
+  // herdr-round.mjs, so the key must be unique to this test run.
+  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-batch-tab-'));
+  const round1Dir = fs.mkdtempSync(path.join(rootDir, 'r1-'));
+  const round2Dir = fs.mkdtempSync(path.join(rootDir, 'r2-'));
+  const mock = createMockHerdr(rootDir);
+  const dispatchBatchKey = `test-batch-${path.basename(rootDir)}`;
+
+  await dispatchThroughMock(round1Dir, mock, { prompt: 'round one', dispatchBatchKey });
+  await dispatchThroughMock(round2Dir, mock, { prompt: 'round two', dispatchBatchKey });
+
+  const tabCreates = mock.calls().filter((c) => c[0] === 'tab' && c[1] === 'create');
+  const splits = mock.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.equal(tabCreates.length, 1, 'two rounds of one batch must open exactly one tab');
+  assert.ok(tabCreates[0].includes('--label'), 'the tab is labeled at creation, never renamed after');
+  assert.equal(splits.length, 2);
+  for (const split of splits) {
+    assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'mock-tab-root-pane']);
+  }
+
+  fs.rmSync(rootDir, { recursive: true, force: true });
+});
+
+test('two different batch keys never share a tab, even from the same process', async () => {
+  const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-two-batches-'));
+  const dirA = fs.mkdtempSync(path.join(rootDir, 'a-'));
+  const dirB = fs.mkdtempSync(path.join(rootDir, 'b-'));
+  const mock = createMockHerdr(rootDir);
+  const suffix = path.basename(rootDir);
+
+  await dispatchThroughMock(dirA, mock, { prompt: 'batch a', dispatchBatchKey: `batch-a-${suffix}` });
+  await dispatchThroughMock(dirB, mock, { prompt: 'batch b', dispatchBatchKey: `batch-b-${suffix}` });
+
+  const tabCreates = mock.calls().filter((c) => c[0] === 'tab' && c[1] === 'create');
+  assert.equal(tabCreates.length, 2, 'two distinct batches must never share a tab');
+
+  fs.rmSync(rootDir, { recursive: true, force: true });
+});
+
+test('a dead anchor pane retries unanchored instead of failing the round', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-dead-anchor-'));
+  const mock = createMockHerdr(tmpDir, { deadAnchorPane: 'w9:gone' });
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:gone' });
+
+  const splits = mock.calls().filter((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.equal(splits.length, 2, 'the first (anchored) attempt fails, the retry (unanchored) succeeds');
+  assert.deepEqual(splits[0].slice(0, 4), ['pane', 'split', '--pane', 'w9:gone']);
+  assert.ok(!splits[1].includes('--pane'), 'the retry drops the dead anchor rather than repeating it');
+  // Grouping is a visibility nicety: a closed anchor pane must never fail a
+  // round that would otherwise succeed on its own.
+  assert.equal(res.status, 0);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('dispatchBatchKey survives the real executeExecutorCli door, not just a direct adapter call', async () => {
+  // The other batch-key tests call EXECUTOR_ADAPTERS['herdr-spawn'] directly,
+  // skipping cli.mjs's own object-literal hop and assignment-runner.mjs's --
+  // exactly the two places `dispatchBatchKey` is named in a literal and
+  // would silently be dropped if someone rewrote either one. This test goes
+  // through the real CLI-facing door instead. (anchorPaneId is deliberately
+  // NOT threaded through this door at all -- it's herdr's own vocabulary,
+  // see transport.mjs -- so it has no equivalent test at this layer; its
+  // adapter-level behavior is already covered by the direct-adapter tests
+  // above and its cross-process env-var door by the FGOS_HERDR_ANCHOR_PANE
+  // test above.)
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-execute-cli-batchkey-'));
+  const mock = createMockHerdr(tmpDir);
+  writeRunnerConfigFixture(tmpDir, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    executors: {
+      agyHerdr: {
+        kind: 'agent',
+        command: 'agy',
+        args: ['-i', '{prompt}', '--mode', 'accept-edits'],
+        adapter: 'herdr-spawn',
+        allowCrossProvider: true,
+        interactiveMode: { exitCommand: '/exit', kind: 'agy' },
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  const savedBin = process.env.FGOS_HERDR_BIN;
+  process.env.FGOS_HERDR_BIN = mock.herdrBin;
+  let result;
+  try {
+    result = await executeExecutorCli('agyHerdr', {
+      prompt: 'do the thing',
+      repoRoot: tmpDir,
+      tier: 'standard',
+      dispatchBatchKey: `test-batch-${path.basename(tmpDir)}`,
+    });
+  } finally {
+    if (savedBin === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = savedBin;
+  }
+
+  assert.equal(result.status, 0);
+  const tabCreate = mock.calls().find((c) => c[0] === 'tab' && c[1] === 'create');
+  assert.ok(tabCreate, 'a tab create call must have happened -- dispatchBatchKey must reach the round through the real executeExecutorCli door');
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.deepEqual(split.slice(0, 4), ['pane', 'split', '--pane', 'mock-tab-root-pane']);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

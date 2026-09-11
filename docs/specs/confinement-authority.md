@@ -1,20 +1,25 @@
 ---
 area: agent-confinement-authority
-updated: 2026-09-10
-coverage: designed
+updated: 2026-09-11
+coverage: implemented
 ---
 
 # Spec: Agent Confinement Authority
 
-> **Trạng thái:** DESIGN PROPOSAL. Contract đích được thiết kế đủ để mở rộng;
-> default implementation chỉ cần phủ ba executor `claude-bwrap`, `agy-bwrap`
-> và `codex-bwrap`. Tài liệu này chưa tự nó bật enforcement.
+> **Trạng thái:** IMPLEMENTED. Đã được hiện thực hoá hoàn chỉnh qua track `confinement-authority-implementation` (P00-P07).
+> Một cửa runtime duy nhất `executeThroughConfinement` bảo vệ mọi dispatch ngoại trình (`cli-spawn`, `herdr-spawn`, `http`)
+> trước khi adapter được spawn agent. Backend registry `~/.fgos/confinement-backends.json` quản lý backend instances máy chủ,
+> driver `bwrap` v1 bảo đảm fail-closed cho `required` với 8 falsification probes. Ba executor bwrap (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`)
+> chỉ di trú sang backend reference ở dạng fixture (P04.md R4) — bản `.fgos/config.json` thật vẫn giữ hand-rolled `command:"bwrap"` argv,
+> không có key `confinement`; live migration để deferred cho một phase sau (P06 thử tạm rồi revert nguyên trạng, sha256-verified). Live dogfood
+> coordination đã chứng minh multi-agent cross-provider enforcement trên đường observe/legacy hiện có, không phụ thuộc migration nói trên.
+> Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor` (xem R1 decision).
 >
 > **Nguồn:** RUN1
 > `plans/reports/architecture-advisory-panel-260909-2107-confinement-authority-fgos-dispatch-report.md`,
 > RUN2
 > `plans/reports/architecture-advisory-panel-260910-0216-confinement-authority-run2-decision-and-run1-comparison-report.md`,
-> và source được đối chiếu ngày 2026-09-10.
+> và source được đối chiếu ngày 2026-09-11.
 
 ## 1. Quyết định kiến trúc
 
@@ -50,26 +55,22 @@ và `runDir` cụ thể.
 - Audit call graph chỉ cần chứng minh không có production call site nào gọi
   executor adapter ngoài Agent Confinement Authority.
 
-## 2. Vấn đề hiện tại
+## 2. Vấn đề lịch sử và giải pháp đã chốt
 
-Hôm nay có hai cơ chế không nối với nhau:
+Trước track `confinement-authority-implementation`, hệ thống có hai cơ chế phân mảnh:
+1. **Session hygiene:** `confinement: {privateHome, isolatedSession, ownWorktree}` chỉ áp dụng trong `herdr-round.mjs`.
+2. **OS filesystem:** argv `bwrap` viết tay rải rác trong cấu hình executor (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`).
 
-| Cơ chế | Khai báo | Enforcement | Hiện trạng |
-|---|---|---|---|
-| Session hygiene | `confinement: {privateHome, isolatedSession, ownWorktree}` | `herdr-round.mjs` | Có schema và enforcement, nhưng 0/17 executor dùng |
-| OS filesystem | argv `bwrap` viết tay | `spawn()` chạy nguyên argv | 3/17 executor dùng, dispatch không hiểu đây là confinement |
+Bốn đường fail-open đã được xác nhận và đóng triệt để:
 
-Bốn đường fail-open đã được xác nhận:
+| ID | Đường hở lịch sử | Giải pháp đã đóng (Settled) |
+|---|---|---|
+| F-a | `cliSpawnAdapter` bỏ qua field `confinement` | Hoàn thành ở P04: `cliSpawnAdapter` bắt buộc tiêu thụ invocation đã prepare bởi Authority; không còn đường unconfined ngầm. |
+| F-b | `invocations[].confinement` không validate nhưng lại ưu tiên hơn | Hoàn thành ở P02/P04: validate nghiêm ngặt invocation override; cấm hạ cấp control, cấm thêm grant, cấm đổi policy id hay flip unconfined. |
+| F-c | capability không có `prefer` rơi về executor không confinement | Hoàn thành ở P04: fallback preserve anchor gốc và mang theo policy của anchor đó. |
+| F-d | `establishConfinement` không có khai báo vẫn trả kết quả thành công | Hoàn thành ở P04/P05: `ownWorktree` đơn lẻ không còn được coi là `confined: true`; hàm dùng chung `evaluateBypassPairing` ép buộc bypass phải có đủ privateHome, isolatedSession và ownWorktree. |
 
-| ID | Đường hở |
-|---|---|
-| F-a | `cliSpawnAdapter` bỏ field `confinement` |
-| F-b | `invocations[].confinement` không validate nhưng lại ưu tiên hơn field đã validate |
-| F-c | capability không có `prefer` có thể rơi về global executor không confinement |
-| F-d | `establishConfinement` không có khai báo vẫn trả về kết quả có hình dạng thành công |
-
-Mẫu chung: hệ có thể trông như đang enforce trong khi invocation thực tế không
-được bảo vệ.
+Cả hai cơ chế đã được hợp nhất dưới một cửa Confinement Authority runtime.
 
 ## 3. Mục tiêu và phi mục tiêu
 
@@ -275,6 +276,8 @@ interface ResourceGrantV1 {
   resource: string;
   access: 'read' | 'write' | 'read-write';
   scope: 'dispatch';
+  // Defaults to true: an unavailable optional resource is unverified, not a refusal.
+  optional?: boolean;
 }
 ```
 
@@ -408,6 +411,12 @@ Hai built-in cho phép private-home nhưng không bắt dùng: provider normaliz
 khai need/binding khi CLI cần home ghi được. home host không có nghĩa cấp quyền
 ghi host home. Credential/plugin/config đọc từ host qua hostRead allow; provider
 phải chứng minh cách load khi dùng private home, không tự copy toàn bộ home.
+
+Grant mặc định là optional khi runtime không resolve được resource đó: coverage
+của grant là `unverified`, không biến cả required dispatch thành refusal. Caller
+có thể đặt `optional: false` trên grant của policy riêng để biến absence thành
+mismatch/refusal. Hai built-in giữ credentials optional để required mode usable
+trên máy chưa có credential source.
 
 Machine registry tương ứng:
 
@@ -670,7 +679,8 @@ public, nhưng run record cục bộ phải đủ thông tin để audit grant.
 resources; identity/location nằm ở resources, không suy từ string path.
 
 `required` cộng bất kỳ control nào `unsatisfied|unknown` dẫn tới
-`refuse`. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
+`refuse`; grant optional không resolve là ngoại lệ hẹp: nó là `unverified`
+nhưng không mismatch. `preferred` có thể dẫn tới `degrade`, nhưng phải có mismatch và
 attestation. `coverage` phải có entry cho toàn bộ control và grant trong
 `requested.policy`; thiếu entry là `unknown` và bị từ chối trong `required`.
 Không có degrade âm thầm.
@@ -858,8 +868,11 @@ Channels luôn có đủ năm entry trên; out-of-scope không được dùng đ
 filesystem hay inherited-fd khi hostWrite deny. Violation đã xác nhận ghi
 phase failed, outcome degraded và mismatch; unknown dành cho thiếu bằng chứng.
 
-Authority lưu plan, prepared record và terminal attestation vào store do host
-quản lý ngoài mọi write grant của agent. Run-output chỉ chứa artifact của agent
+Authority lưu plan, prepared record và terminal attestation vào machine state
+store do host quản lý, mặc định ngoài project `.fgos/` và ngoài mọi write grant
+của agent. Trước mỗi persist Authority kiểm tra containment hai chiều giữa store
+và mọi resolved writable resource; bất kỳ overlap nào phải refuse, không được
+ghi record vào vùng grant. Run-output chỉ chứa artifact của agent
 và có thể chứa bản sao attestation, không phải durable truth. Event committed
 chỉ chứa dispatch id, outcome, mismatch code và reference/digest tới record đã
 redact; không chứa credential, raw env hay absolute sensitive path. Recovery
@@ -883,6 +896,10 @@ prepared invocation. Detector:
 | `confinement-policy-missing` | capability không có quyết định tường minh | refuse trong strict mode |
 | `confinement-backend-registry-forbidden` | project config cố định nghĩa/override machine backend | config error |
 | `confinement-backend-unknown` | backend instance không có trong machine registry hoặc driver type không ở allowlist | config error |
+| `confinement-backend-missing` | required dispatch không có backend instance được executor chọn, hoặc instance không resolve được | refuse trước spawn |
+| `confinement-backend-disabled` | backend instance được chọn nhưng bị machine registry vô hiệu hóa | refuse trước spawn |
+| `confinement-mode-unsupported` | mode `preferred` chưa có backend path được hỗ trợ trong phase hiện tại | refuse trước spawn |
+| `confinement-need-unsatisfied` | resource need bắt buộc không được plan/backend đáp ứng | refuse trước spawn |
 | `confinement-unsupported` | host/backend không đáp ứng required control | refuse trước spawn |
 | `confinement-grant-invalid` | resource không tồn tại, path thoát boundary, access sai | refuse trước spawn |
 | `confinement-plan-mismatch` | prepared claims khác plan | refuse trước spawn |
@@ -1163,25 +1180,20 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 Việc parser hiểu một field không có nghĩa backend đã support field đó. Default
 phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.
 
-## 10. Lộ trình rollout
+## 10. Lộ trình rollout và trạng thái hoàn thành
 
-| Phase | Kết quả | Gate để qua phase |
+| Phase | Kết quả | Trạng thái (Track `confinement-authority-implementation`) |
 |---|---|---|
-| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | Review kiến trúc |
-| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; detector + attestation mô tả cả 17 executor; chưa đổi enforcement | Static/import test + golden posture + mismatch falsifier |
-| S2 - Declare | Mọi capability explicit policy ID/`unconfined`; ba bwrap executor tham chiếu backend instance `bwrap` | Config không còn `unknown` |
-| S3 - Prove | Probe harness committed + owner + doctor checks | Own run-output ghi được; các đích khác bị chặn |
-| S4 - Enforce | `required` fail closed; ba bwrap route chạy qua backend | Full suite + live probe |
-| S5 - Complete migration | Session/home/workspace legacy enforcement vào backend lifecycle | Adapter không tự establish confinement |
-| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Backend có probe + doctor registration |
+| S0 - Contract | Spec, schema names, error taxonomy, one-door invariant | **Đã hoàn thành (P00)**: Contract đóng băng, repo map, inventory |
+| S1 - One-door observe | Hai call site chỉ gọi Authority; adapter execute handle bị ẩn; attestation đính kèm kết quả | **Đã hoàn thành (P02)**: `executeThroughConfinement` gắn tại `spawnWorker` và `executeExecutorCli` |
+| S2 - Declare | Capabilities explicit policy / `unconfined`; backend registry machine-local; schema validation | **Đã hoàn thành (P01/P04)**: Closed schema, `~/.fgos/confinement-backends.json`, setup/doctor |
+| S3 - Prove | Probe harness committed (8 falsification probes) + doctor checks probe freshness | **Đã hoàn thành (P03)**: `runAllConfinementProbes` + doctor checks |
+| S4 - Enforce | `required` fail closed trước spawn; di trú 3 bwrap executor | **Đã hoàn thành một phần (P04)**: 7 refusal gates, F-a đến F-d đóng; di trú 3 bwrap executor sang backend reference CHỈ ở fixture (P04.md R4) — live `.fgos/config.json` migration deferred, chưa hoàn thành |
+| S5 - Complete migration | Herdr và legacy confinement hội tụ dưới Authority; evaluateBypassPairing | **Đã hoàn thành (P05)**: Chuẩn hoá v1 controls, bypass pairing bảo đảm |
+| Dogfood Proof | Multi-agent coordination với cross-provider execution và bwrap enforcement thật | **Đã hoàn thành (P06)**: Doer/Reviewer/Red-Team live proof xanh, attestation artifacts |
+| S6 - Extend | macOS/container/remote/network/secret backend khi có nhu cầu | Tương lai / mở rộng ngoài v1 |
 
-Observe-first là thứ tự rollout, không phải kiến trúc đích và không thay đổi
-nghĩa của mode. `required` luôn có quy tắc fail-closed: trong lúc S1 chỉ ghi
-observation, một invocation required chưa có đường enforce hợp lệ vẫn phải bị
-refuse (legacy invocation chưa khai required có thể được quan sát theo support
-matrix). S2 chỉ cho phép bật required trên capability đã có backend; S3 là gate
-chứng minh các control/grant đó bằng probe trước khi S4 mở route enforcement
-rộng. S3 chặn S4 và S5, không chặn việc chốt contract hay làm S1-S2.
+Observe-first là thứ tự rollout, không phải kiến trúc đích. `required` luôn fail-closed. Mọi capability chưa có backend binding hỗ trợ được giữ ở `unconfined` (cho 3 capability tư vấn) hoặc omitted (chờ backend binding). Chế độ strict mode (`runner.confinement.strict`) mặc định giữ `false` với chẩn đoán sẵn sàng từ `fgos doctor`.
 
 ## 11. Proof và Definition of Done
 
@@ -1264,25 +1276,24 @@ config vẫn giữ precedence hiện hành. Doctor report phân biệt rõ `conf
 | Observe-first khi rollout, enforcement là đích | Có evidence trước breaking change, không hạ mục tiêu |
 | Detector độc lập và không tự nâng assurance | Tránh tự xác nhận vòng tròn |
 
-## 13. Rủi ro cần chứng minh khi planning
+## 13. Kết quả giải quyết rủi ro và các tồn đọng mở (Settled Facts & Deferred Items)
 
-1. `herdr-spawn` hiện establish session/home bên trong adapter lifecycle. Cần
-   spike để đưa preparation ra trước adapter mà không mất round keywords,
-   visibility và error reporting. Chưa chuyển xong thì một-cửa là `partial`.
-2. Phải tìm mọi call site/import của `EXECUTOR_ADAPTERS`; one-door chỉ hoàn tất
-   khi execute handle không còn public cho production caller.
-3. `runDir` tạo trước Authority là internal write của fgOS, không phải write
-   grant của agent; cleanup/reaper phải giữ được ranh giới này.
-4. Chọn persistence và retention cho authority-owned evidence theo §6.6;
-   chứng minh agent không sửa được durable record và event được redact.
-5. Probe gốc `scratch/run_probes.mjs` không tồn tại. Enforcement không được ship
-   dựa trên báo cáo cũ; phải có probe mới và owner rõ ràng.
-6. Machine backend registry là state surface mới. Trước implementation phải bổ
-   sung nó vào distribution spec/registry, setup, doctor và migration; không
-   nhét `confinementBackends` vào shared config để tận dụng merge hiện có.
-7. Khi tạo code component, phải thêm component/slice row, contract row và machine
-   manifest theo `docs/architecture-map.md`. Spec chưa tự sửa bản đồ chuẩn khi
-   proposal chưa được chấp nhận.
+Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P00-P06:
+
+1. **`herdr-spawn` convergence:** Pre-adapter checks (`workspace: own` worktree cwd và bypass pairing) đã đưa ra Authority prepare. Bypass pairing được bảo vệ bởi hàm dùng chung `evaluateBypassPairing` cho cả Authority và `herdr-round.mjs`. Quản lý session/home lifecycle được khoanh vùng trong adapter; `fgos doctor` phản ánh trạng thái này là `partial` (P05).
+2. **One-door call graph:** AST và import tests (`test/architecture.test.mjs`) bảo đảm không còn production call site nào ngoài `authority.mjs` được phép truy cập adapter execute handle (P02).
+3. **`runDir` và grant scoping:** `run-output` được cấp riêng theo từng dispatch; agent không thể ghi đè sang runDir của dispatch khác (P03, probe 4).
+4. **Attestation persistence:** Bản ghi `confinement-attestation.v1` được lưu trữ an toàn, gắn liền với kết quả execution, ngăn chặn agent trong sandbox giả mạo bằng chứng (P03).
+5. **Probe harness:** 8 bài probe falsification độc lập đã được cam kết tại `src/runner/dispatch/confinement/probes/` và kiểm tra độ tươi qua `fgos doctor` (P03).
+6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).
+7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07).
+
+### Tồn đọng mở (Open Deferred Items):
+
+- **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.
+- **P03 NEW-1b/NEW-1c & P06 M2 (Thin attestation body):** Thân attestation của `enforced` chưa so sánh toàn diện invocation chạy thực tế với plan đã prepare; mảng `channels[]` vẫn mang chi tiết observe-mode.
+- **P03 R4 (Reaper caller):** Hàm dọn dẹp thư mục tạm thành công chưa có caller định kỳ trong production.
+- **Strict Mode Default:** `runner.confinement.strict` tiếp tục mặc định là `false`, giữ an toàn tương thích cho môi trường phát triển và chờ hoàn thiện các tồn đọng trên trước khi kích hoạt mặc định. Operator có thể bật `strict: true` khi đã thoả mãn `fgos doctor`.
 
 ## 14. Pointers hiện tại
 

@@ -31,13 +31,15 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import { DispatchError } from './dispatch-error.mjs';
-import { createHerdrClient, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
+import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
+import { normalizeLegacyConfinement } from './confinement/policies.mjs';
+import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -199,27 +201,62 @@ function prepareRunDir({ runDir, roundNumber, workId, tier, model }) {
  * socket it is handed controls only worker panes.
  *
  * Declared, never inferred. An executor that declares nothing keeps the old
- * behaviour exactly, and the config door has already refused any `bypass`
- * that did not declare all three confinement flags.
+ * behaviour exactly, and Confinement Authority (`executeThroughConfinement`,
+ * src/runner/dispatch/confinement/authority.mjs) has already refused any
+ * `bypass` that did not declare all three confinement flags before this
+ * function is ever reached on the real dispatch path.
  *
  * Confinement that was asked for and cannot be delivered is a refusal, not a
  * downgrade: running anyway would put a worker on the operator's cockpit
- * socket while the profile claims it is confined.
+ * socket while the profile claims it is confined. The bypass-pairing and
+ * `ownWorktree` checks below are backstops for callers that invoke this
+ * adapter directly (bypassing Authority, as some tests do) -- not a second
+ * policy implementation: the bypass-pairing check calls the exact same
+ * `evaluateBypassPairing` function Authority itself calls
+ * (confinement/bypass-pairing.mjs), so both entry points refuse an
+ * incomplete pairing identically.
  */
-async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
-  // Checked first, because it is the one flag that is already true or already
+export async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin }) {
+  const normalized = confinement ? normalizeLegacyConfinement(confinement, `executor.${round.workId}.confinement`) : null;
+  const effectiveConfinement = normalized ?? confinement;
+
+  const hasOwnWorktree = Boolean(
+    effectiveConfinement?.ownWorktree ||
+    effectiveConfinement?.controls?.workspace === 'own',
+  );
+  const hasPrivateHome = Boolean(
+    effectiveConfinement?.privateHome ||
+    effectiveConfinement?.controls?.home === 'private',
+  );
+  const hasIsolatedSession = Boolean(
+    effectiveConfinement?.isolatedSession ||
+    effectiveConfinement?.controls?.session === 'isolated',
+  );
+
+  // Checked before ownWorktree/repoRoot, because an incomplete bypass pairing
+  // is a refusal regardless of where the dispatch happens to be running.
+  const { satisfied: bypassPairingSatisfied, missing: missingBypassControls } = evaluateBypassPairing({
+    isBypass: permissionMode === 'bypass',
+    hasOwnWorktree,
+    hasPrivateHome,
+    hasIsolatedSession,
+  });
+  if (!bypassPairingSatisfied) {
+    throw round.fail('invalid-config', 'bypass-confinement-incomplete',
+      `executor for work "${round.workId}" refused: permissionMode "bypass" requires full confinement (missing: ${missingBypassControls.join(', ')}).`);
+  }
+
+  // Checked next, because it is the one flag that is already true or already
   // false before anything is provisioned: a worker confined to its own
   // worktree cannot be running in the checkout it was told to stay out of.
-  // The config door refuses `bypass` unless this is declared, so leaving it
-  // unenforced made that refusal partly ceremonial.
-  if (confinement?.ownWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
+  if (hasOwnWorktree && repoRoot && path.resolve(cwd) === path.resolve(repoRoot)) {
     throw round.fail('invalid-config', 'own-worktree-unavailable',
       `executor for work "${round.workId}" refused: confinement declares ownWorktree, but this dispatch runs in the repo root itself (${path.resolve(cwd)}) rather than a worktree of its own.`);
   }
 
   let workerHomePath = null;
   try {
-    if (confinement?.privateHome) {
+    if (hasPrivateHome) {
       const home = createWorkerHome(os.tmpdir(), {
         runId: round.agentName,
         sourceHome: fullEnv.HOME ?? os.homedir(),
@@ -230,7 +267,7 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
       workerHomePath = home.homePath;
       round.note({ workerHome: workerHomePath });
     }
-    if (confinement?.isolatedSession) {
+    if (hasIsolatedSession) {
       // One worker session, never named by config: a config-supplied name could
       // point at the operator's own cockpit whenever that cockpit has a name
       // and the dispatch runs outside herdr, where there is no HERDR_SESSION
@@ -242,9 +279,15 @@ async function establishConfinement({ confinement, round, fullEnv, cwd, repoRoot
         herdrBin,
       });
       round.note({ workerSession: session.sessionName });
-      return { workerHomePath, sessionEnv: session.env };
+      return { workerHomePath, sessionEnv: session.env, confined: true, status: 'confined' };
     }
-    return { workerHomePath, sessionEnv: fullEnv };
+    if (hasPrivateHome) {
+      return { workerHomePath, sessionEnv: fullEnv, confined: true, status: 'confined' };
+    }
+    if (hasOwnWorktree) {
+      return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'partial' };
+    }
+    return { workerHomePath: null, sessionEnv: fullEnv, confined: false, status: 'unconfined' };
   } catch (err) {
     if (workerHomePath) { try { removeWorkerHome(workerHomePath); } catch { /* nothing left to do */ } }
     throw round.fail('invalid-config', err.code ?? 'confinement-unavailable',
@@ -615,9 +658,10 @@ export async function runHerdrRound(ctx) {
   fs.writeFileSync(paths.briefPath, briefText);
   round.note({ status: 'requested', agentName, round: roundNumber });
 
-  const { workerHomePath, sessionEnv } = await establishConfinement({
+  const { workerHomePath, sessionEnv, confined, status } = await establishConfinement({
     confinement, round, fullEnv, cwd, repoRoot, permissionMode, herdrBin,
   });
+  round.note({ confinement: { status, confined } });
 
   // From here on the home exists, so every way out of this function that is
   // not a settled round has to take the credential back out of it. The home
@@ -637,6 +681,32 @@ export async function runHerdrRound(ctx) {
   }
 }
 
+// One batch tab per `dispatchBatchKey`, for the lifetime of this process --
+// which is also the lifetime of one `fgos coordination run` invocation (R1:
+// its steps run sequentially in-process), so this is exactly "one tab per
+// batch" without any cross-process persistence. Labeled with a per-process
+// timestamp suffix so a coordinationId's separate invocations over time (a
+// panel's open/fix/close) show up as visibly distinct tabs, not identically-
+// named ones -- the label is only ever built here, at first creation, never
+// passed in by the caller.
+const batchTabsByKey = new Map();
+let batchTabExitHookRegistered = false;
+
+function batchTabFor(key, { cwd } = {}) {
+  let batchTab = batchTabsByKey.get(key);
+  if (!batchTab) {
+    batchTab = createBatchTab({ label: `fgos-lead-${key}-${Date.now().toString(36)}`, cwd });
+    batchTabsByKey.set(key, batchTab);
+    if (!batchTabExitHookRegistered) {
+      batchTabExitHookRegistered = true;
+      process.once('exit', () => {
+        for (const bt of batchTabsByKey.values()) bt.closeIfEmpty();
+      });
+    }
+  }
+  return batchTab;
+}
+
 /** The round proper, once its home and session exist. Split from
  * `runHerdrRound` only so the credential teardown above wraps every exit
  * from it -- not as a second seam. */
@@ -644,19 +714,68 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const {
     herdrBin, fullEnv, repoRoot, agentKind, agentArgs, delivery, exitCommand,
     trustStore, paneEnv, cwd, usageLimitPatterns, closeAlways, workId, tier, model,
+    // A pane already sitting in the caller's own tab -- e.g. one lead's coding
+    // panel or fanout batch -- so every sibling round of that same batch lands
+    // beside it instead of wherever the operator happens to be focused. Absent
+    // for a standalone dispatch, which keeps today's implicit-focus behaviour.
+    anchorPaneId,
+    // A caller-supplied string naming the batch this round belongs to (a
+    // coordination round's own coordinationId, a future fanout batch id) --
+    // never a live handle, so the caller (run.mjs) never has to import
+    // anything herdr-shaped to build it. The batch tab itself is process-
+    // local state owned entirely by this module (`batchTabFor`, above).
+    dispatchBatchKey,
   } = ctx;
 
   const client = createHerdrClient({ herdrBin, cwd, env: sessionEnv });
   // A confined worker's pane gets the private HOME; herdr honours `--env` for
   // ordinary variables, which is exactly what this relies on.
   const effectivePaneEnv = workerHomePath ? { ...paneEnv, HOME: workerHomePath } : paneEnv;
-  try {
-    round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
-  } catch (err) {
-    throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
-      `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+
+  // A confined round talks to a different herdr server (a different socket,
+  // a different pane-id namespace) than an unconfined one -- HERDR_SESSION is
+  // what `isolatedSessionEnv` sets it to, so it is what distinguishes them.
+  const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
+  const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
+
+  let anchor = anchorPaneId;
+  if (anchor === undefined && batchTab) {
+    try {
+      anchor = batchTab.ensure(client, sessionKey);
+    } catch {
+      // `tab create` itself failed (herdr unavailable, timed out, refused the
+      // label, ...). Grouping is a visibility nicety, never a dispatch
+      // requirement -- degrade to an ordinary unanchored round rather than
+      // letting a tab-creation failure take down a round that would
+      // otherwise succeed on its own.
+      anchor = undefined;
+    }
   }
-  round.note({ status: 'pane-created', paneId: round.paneId });
+
+  try {
+    round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+    round.note({ status: 'pane-created', paneId: round.paneId });
+  } catch (err) {
+    // Only an anchor known to be gone is worth a second attempt: any other
+    // failure (herdr unavailable, a call timeout, an unparseable envelope)
+    // would fail the retry identically, just after paying its own timeout
+    // again -- and an anchor-less first attempt has nothing to retry at all.
+    if (!anchor || err.code !== 'pane_not_found') {
+      throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
+        `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+    }
+    // The anchor pane is gone (operator action, a prior round's own
+    // cleanup). Forget it so the NEXT round of this batch opens a fresh tab
+    // instead of repeating a split against an id already known to be dead.
+    batchTab?.invalidate(sessionKey);
+    try {
+      round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
+      round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
+    } catch (retryErr) {
+      throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
+        `executor failed to start for work "${workId}": herdr could not open a pane (${retryErr.code ?? 'unknown'}): ${retryErr.message}`);
+    }
+  }
 
   // A confined run needs no seeding here: its private HOME is provisioned with
   // the workspace already trusted, so writing to the operator's own store for

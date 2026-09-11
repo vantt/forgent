@@ -206,6 +206,11 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     // the D1/D2/D6 governance work. Additive only: every existing caller
     // that destructures a subset of this object is unaffected.
     governance: executor.governance,
+    method: executor.method,
+    url: executor.url,
+    headers: executor.headers,
+    body: executor.body,
+    resourceBindings: executor.resourceBindings,
   };
 }
 
@@ -593,6 +598,30 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // closes one paused on a provider limit -- that screen is the only place
     // the reset time is written.
     closeAlways = false,
+    // A pane already sitting in the caller's own tab (one lead's coding panel
+    // or fanout batch), so this round's fresh pane lands beside it instead of
+    // wherever the operator happens to be focused. Absent for a standalone
+    // dispatch -- today's implicit-focus behaviour is unchanged.
+    //
+    // Deliberately NOT threaded through `cli.mjs`/`assignment-runner.mjs`:
+    // "pane" is herdr's own vocabulary, and neither of those is herdr-aware
+    // (`executeExecutorCli` serves cli-spawn/http too). Read directly off
+    // this adapter's own `opts` instead -- a direct caller of this adapter
+    // (or a test) may still pass one explicitly, but the only real caller
+    // today is the env-var default: a cross-process caller (fanout's
+    // independently-launched children) sets FGOS_HERDR_ANCHOR_PANE in its
+    // own env, the same door FGOS_HERDR_BIN already uses for a herdr-only
+    // knob neither of those two files carries either. The in-process case
+    // (one coordination round's own actors) uses `dispatchBatchKey` below
+    // instead, which IS threaded through both -- a plain string is not
+    // herdr's vocabulary the way an explicit pane id is.
+    anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE,
+    // A caller-supplied batch key (see `batchTabFor` in herdr-round.mjs), for
+    // a batch whose first round doesn't yet know an explicit anchor pane.
+    // Plain data, in-process only -- the batch tab itself is created and
+    // looked up from inside the round that first needs it, never passed as
+    // a live value, so there is no environment-variable equivalent.
+    dispatchBatchKey,
   } = opts;
 
   const depth = currentDispatchDepth();
@@ -636,6 +665,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     transportDeadlines: opts.transportDeadlines,
     trustStore,
     runDir: optsRunDir,
+    anchorPaneId,
+    dispatchBatchKey,
     paneEnv: resolvedEnv,
     cwd,
     repoRoot: opts.repoRoot,

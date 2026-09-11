@@ -59,6 +59,22 @@ test('checkExecutorConfinement passes for a fully confined bypass executor', () 
   assert.equal(r.passed, true);
 });
 
+test('checkExecutorConfinement passes for a bypass executor with normalized controls', () => {
+  const r = checkExecutorConfinement({
+    executors: {
+      a: {
+        kind: 'agent',
+        permissionMode: 'bypass',
+        confinement: {
+          contract: 'confinement-policy.v1',
+          controls: { home: 'private', session: 'isolated', workspace: 'own' },
+        },
+      },
+    },
+  });
+  assert.equal(r.passed, true);
+});
+
 test('checkExecutorConfinement fails and names the executor and the missing flags', () => {
   const r = checkExecutorConfinement({
     executors: {
