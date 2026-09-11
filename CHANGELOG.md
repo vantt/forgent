@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Proposed `RunHandle` runtime-layer design (`docs/architect/agent-coordination/architecture/run-handle.md`): a common handle for locating, observing, labeling, snapshotting, and guarding live Assignment Runs across herdr panes and future process/container/remote runtimes, while keeping pane/process identity out of core coordination truth.
+- Proposed CoordinationSession continuation/recovery and executor health/fallback designs (`docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md`, `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md`), separating session next-action planning from dispatch executor retry/fallback policy.
+
 - Confinement Authority Phase 07: Strict Confinement Readiness, Documentation, and Track Closeout (docs/specs/confinement-authority.md):
   - R1 Strict Mode Decision: decided and recorded that `runner.confinement.strict` remains `false` by default with `fgos doctor` readiness guidance, because 3 non-canonical capabilities (`impact-analysis`, `pane-labeling`, `fgos-coding-implement`) still lack explicit confinement and would break config load today, and enforced attestation bodies remain thin (NEW-1b/NEW-1c, P06 M2); the anchor-inheritance gap (M-3) is not itself a reason to keep strict disabled — it is an argument FOR eventually enabling strict, since flipping it would make that overclaim path unreachable.
   - R2 Spec & Architecture Updates: updated `docs/specs/confinement-authority.md` to `coverage: implemented` with settled implementation facts, updated `docs/specs/runner.md` with Confinement Authority dispatch and configuration rules, updated `docs/specs/reading-map.md`, `docs/architecture-map.md` (CTR010), and `docs/reference/dispatch-module-boundaries.md`.
