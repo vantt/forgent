@@ -643,6 +643,9 @@
       "light": "haiku",
       "standard": "sonnet",
       "heavy": "opus"
+    },
+    "confinement": {
+      "strict": false
     }
   },
   "gateBypass": {
