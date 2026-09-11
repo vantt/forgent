@@ -120,8 +120,10 @@ const s = http.createServer((req, res) => {
     return;
   }
   const f = path.join(dir, path.basename(u));
-  if (fs.existsSync(f) && fs.statSync(f).isFile()) {
-    res.writeHead(200, { "Content-Length": fs.statSync(f).size });
+  let st;
+  try { st = fs.lstatSync(f); } catch { st = null; }
+  if (st && st.isFile()) {
+    res.writeHead(200, { "Content-Length": st.size });
     fs.createReadStream(f).pipe(res);
     return;
   }
@@ -205,21 +207,36 @@ VERSION_OUTPUT="$(
 FGOS_BASENAME="$(basename "$FGOS_TARBALL")"
 SHA_RECORD="$(awk -v f="$FGOS_BASENAME" '{ n = $2; sub(/^\*/, "", n); sub(/^dist\//, "", n); if (n == f) { print $1; exit } }' "$ASSETS_DIR/SHA256SUMS")"
 if [ -z "$SHA_RECORD" ]; then
-  SHA_RECORD="$(awk '/fgos-.*\.tar\.gz/ { print $1; exit }' "$ASSETS_DIR/SHA256SUMS")"
+  echo "Step failed: SHA256SUMS has no entry for $FGOS_BASENAME" >&2
+  exit 1
 fi
 
+# Gate 1: the archive's own bytes must match the published SHA256SUMS
+# record -- this is the only check that can detect a tampered/corrupted
+# tarball in transit. It must pass BEFORE any content extracted from the
+# archive (below) is trusted.
+ARCHIVE_SHA="$(sha256sum "$FGOS_TARBALL" | awk '{ print $1 }')"
+if [ "$ARCHIVE_SHA" != "$SHA_RECORD" ]; then
+  echo "Step failed: $FGOS_BASENAME sha256 ($ARCHIVE_SHA) does not match SHA256SUMS ($SHA_RECORD)" >&2
+  exit 1
+fi
+
+# Gate 2: artifactDigest is a canonical hash of the release manifest/tree
+# content, not of the compressed archive bytes, so it is never expected to
+# equal the SHA256SUMS record above -- it is compared against the same
+# archive's own manifest.json instead. This is only trustworthy because
+# Gate 1 already proved these archive bytes are authentic.
 MANIFEST_DIGEST="$( (tar -xzf "$FGOS_TARBALL" ./manifest.json -O 2>/dev/null || tar -xzf "$FGOS_TARBALL" manifest.json -O 2>/dev/null) | node -e '
   let d = "";
   process.stdin.on("data", c => d += c);
   process.stdin.on("end", () => {
     try { console.log(JSON.parse(d).artifactDigest || ""); } catch { console.log(""); }
   });
-' 2>/dev/null || true)"
+')"
 
 node -e '
   const versionJson = JSON.parse(process.argv[1]);
-  const shaRecord = (process.argv[2] || "").trim();
-  const manifestDigest = (process.argv[3] || "").trim();
+  const manifestDigest = (process.argv[2] || "").trim();
 
   const host = versionJson.data?.host;
   if (host !== "rust") {
@@ -234,17 +251,13 @@ node -e '
   }
 
   const reportedHex = reportedDigest.replace(/^sha256:/, "");
-  const shaHex = shaRecord.replace(/^sha256:/, "");
   const manifestHex = manifestDigest.replace(/^sha256:/, "");
 
-  const matchesSha = shaHex && reportedHex === shaHex;
-  const matchesManifest = manifestHex && reportedHex === manifestHex;
-
-  if (!matchesSha && !matchesManifest) {
-    console.error(`Assertion failed: reported digest "${reportedDigest}" does not match SHA256SUMS ("${shaRecord}") or asset manifest ("${manifestDigest}")`);
+  if (!manifestHex || reportedHex !== manifestHex) {
+    console.error(`Assertion failed: reported digest "${reportedDigest}" does not match the verified archive manifest ("${manifestDigest}")`);
     process.exit(1);
   }
-' "$VERSION_OUTPUT" "$SHA_RECORD" "$MANIFEST_DIGEST" || {
+' "$VERSION_OUTPUT" "$MANIFEST_DIGEST" || {
   echo "Step failed: inline assertion for version --runtime-json (host == "rust" and digest match)" >&2
   exit 1
 }
