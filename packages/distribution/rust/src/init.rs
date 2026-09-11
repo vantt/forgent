@@ -593,6 +593,16 @@ fn mark_transaction_status(tx_path: &Path, status: &str) -> std::io::Result<()> 
     Ok(())
 }
 
+/// True only when `releases/<digest>/` genuinely exists on disk. A binding
+/// can claim `status: "ready"` for a digest whose release directory is
+/// already gone -- a process SIGKILLed by `fgctl verify` between moving the
+/// release to quarantine/ and publishing `status: "quarantined"` leaves
+/// exactly this "falsely ready" state behind, and status alone cannot tell
+/// the difference from a genuinely healthy binding.
+fn is_release_staged(store_root: &Path, digest: &str) -> bool {
+    store_root.join("releases").join(digest).exists()
+}
+
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
@@ -647,7 +657,10 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
             // requires -- fall through and let this --from door genuinely
             // re-stage/re-verify/re-publish the digest instead.
             if let Some(ref current) = current_activation {
-                if &current.artifact_digest == pin_digest && current.status != "quarantined" {
+                if &current.artifact_digest == pin_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -686,7 +699,10 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
             // R9: Idempotent re-run check (Reviewer M2). See the quarantine
             // note on the pin+--from arm above -- same exclusion applies.
             if let Some(ref current) = current_activation {
-                if &current.artifact_digest == pin_digest && current.status != "quarantined" {
+                if &current.artifact_digest == pin_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -722,7 +738,10 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
             // (quarantined excluded -- see the pin+--from arm's own note above):
             let from_digest = resolve_source_manifest_digest(from_src)?;
             if let Some(ref current) = current_activation {
-                if current.artifact_digest == from_digest && current.status != "quarantined" {
+                if current.artifact_digest == from_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -807,7 +826,10 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         };
 
     if let Some(ref current) = current_activation_under_lock {
-        if current.artifact_digest == target_digest && current.status != "quarantined" {
+        if current.artifact_digest == target_digest
+            && current.status != "quarantined"
+            && is_release_staged(&store_root, &current.artifact_digest)
+        {
             let shim_fgos = installation_dir.join("bin").join("fgos");
             run_tail(
                 &workspace_root,
@@ -819,9 +841,19 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         }
     }
 
-    // Previous activation digest if present
-    let previous_artifact_digest: Option<String> =
-        current_activation_under_lock.map(|a| a.artifact_digest);
+    // Previous activation digest if present. Mirrors upgrade_workspace's own
+    // rule (Reviewer M2): a quarantined current activation's own digest
+    // names a release directory `fgctl verify` has already moved away, so
+    // recording it as previousArtifactDigest would give a later `fgctl
+    // repair` a rollback target that no longer exists. Chain past it to
+    // whatever it itself pointed at instead.
+    let previous_artifact_digest: Option<String> = match current_activation_under_lock {
+        Some(ref current) if current.status == "quarantined" => {
+            current.previous_artifact_digest.clone()
+        }
+        Some(current) => Some(current.artifact_digest),
+        None => None,
+    };
 
     publish_and_tail(PublishArgs {
         workspace_root: &workspace_root,
@@ -1070,6 +1102,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
     let from_digest_peek = resolve_source_manifest_digest(from_source)?;
     if from_digest_peek == current_activation.artifact_digest
         && current_activation.status != "quarantined"
+        && is_release_staged(&store_root, &current_activation.artifact_digest)
     {
         check_main_checkout_lock(&workspace_root)?;
         let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
@@ -1136,6 +1169,26 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         } else {
             None
         };
+
+    // Reviewer L1: the pre-lock idempotent fast-path above is only a best-
+    // effort optimization; re-check authoritatively once the lock is held
+    // (mirrors init_workspace's own two-phase pattern) so two concurrent
+    // same-digest upgrades can't both mint a fresh activationId.
+    if let Some(ref current) = current_activation_under_lock {
+        if current.artifact_digest == staged_digest
+            && current.status != "quarantined"
+            && is_release_staged(&store_root, &current.artifact_digest)
+        {
+            let shim_fgos = installation_dir.join("bin").join("fgos");
+            run_tail(
+                &workspace_root,
+                &shim_fgos,
+                &store_root,
+                &current.activation_id,
+            )?;
+            return Ok(());
+        }
+    }
 
     // Reviewer M2: if the activation being upgraded away from is itself
     // quarantined, its own artifactDigest names a release directory that
@@ -1248,11 +1301,32 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
             if candidate_dir.exists() {
                 let _ = std::fs::rename(&candidate_dir, &quarantine_dir);
             }
+            // Mirror verify_workspace's own fix for the identical race: the
+            // `current_activation` snapshot above was read before this
+            // release was moved and before the lock was held, so a
+            // concurrent `fgctl upgrade` may have already published a
+            // DIFFERENT activation by now. Re-read fresh under the lock and
+            // only publish the quarantine status if it still names the
+            // digest being quarantined -- otherwise a newer, unrelated
+            // activation would be silently overwritten.
             let _lock = ActivationLockGuard::acquire(&installation_dir)?;
             cleanup_stale_activation_tmp_files(&installation_dir);
-            let mut quarantined_activation = current_activation;
-            quarantined_activation.status = "quarantined".to_string();
-            publish_activation_file(&activation_path, &quarantined_activation)?;
+            let activation_under_lock: Option<WorkspaceActivationBinding> =
+                std::fs::read_to_string(&activation_path)
+                    .ok()
+                    .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok());
+            match activation_under_lock {
+                Some(mut fresh) if fresh.artifact_digest == target_digest => {
+                    fresh.status = "quarantined".to_string();
+                    publish_activation_file(&activation_path, &fresh)?;
+                }
+                _ => {
+                    // The active binding moved on before this quarantine
+                    // could publish -- the offending release is still
+                    // safely quarantined above, but the now-current
+                    // activation must not be touched.
+                }
+            }
             return Err(InitError::Custom(format!(
                 "active release {} failed repair verification and was quarantined at {}: {}",
                 target_digest,

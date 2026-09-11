@@ -503,6 +503,47 @@ test('Red-team MEDIUM: repair of a tampered active release (no previousArtifactD
   }
 });
 
+test('Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-falseready-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-falseready-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+
+    // Simulate the exact crash window red-team found: `fgctl verify` moves
+    // the release directory to quarantine/ but is killed before it
+    // publishes status: "quarantined" -- activation.json still (falsely)
+    // reads "ready" for a digest whose release directory no longer exists.
+    const releaseDir = path.join(stateHome, 'releases', digestA);
+    const quarantineDir = path.join(stateHome, 'quarantine', `${digestA}-simulated-crash`);
+    fs.mkdirSync(path.dirname(quarantineDir), { recursive: true });
+    fs.renameSync(releaseDir, quarantineDir);
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const beforeActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(beforeActivation.status, 'ready', 'precondition: status must still read ready (simulating the crash window)');
+    assert.ok(!fs.existsSync(releaseDir), 'precondition: the release directory must genuinely be gone');
+
+    // Without the is_release_staged check, this would take the idempotent
+    // fast path (digest matches, status looks ready) and never re-stage --
+    // the tail would then fail against a missing binary with no recovery.
+    const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(recoverRes.status, 0, `init --from must self-heal a falsely-ready binding: ${recoverRes.stderr}`);
+    assert.ok(fs.existsSync(releaseDir), 'digestA must be genuinely re-staged under releases/');
+
+    const afterActivation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(afterActivation.status, 'ready');
+    assert.equal(afterActivation.artifactDigest, digestA);
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
 test('R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-proj-'));
