@@ -181,7 +181,7 @@ Every dispatch executed through the Confinement Authority produces a `confinemen
 {
   "contract": "confinement-attestation.v1",
   "dispatchId": "disp_01J8F...",
-  "phase": "enforced",
+  "phase": "completed",
   "outcome": "enforced",
   "requested": {
     "mode": "required",
@@ -190,6 +190,11 @@ Every dispatch executed through the Confinement Authority produces a `confinemen
   },
   "coverage": { "hostWrite": "satisfied", "workspace": "satisfied" },
   "effectiveControls": { "hostWrite": "deny", "workspace": "own" },
+  "resources": [
+    { "resource": "workspace", "identity": "workspace:disp_01J8F...", "hostTarget": "/path/to/worktree", "executionTarget": { "location": "host", "path": "/path/to/worktree" }, "delivery": "mount", "collect": "artifact", "access": "read-write", "allocation": "existing" },
+    { "resource": "run-output", "identity": "run-output:disp_01J8F...", "hostTarget": "/path/to/runDir", "executionTarget": { "location": "host", "path": "/path/to/runDir" }, "delivery": "mount", "collect": "artifact", "access": "write", "allocation": "existing" }
+  ],
+  "readiness": { "workspace": "satisfied", "run-output": "satisfied" },
   "channels": [
     { "name": "filesystem", "coverage": "covered", "detail": "observed hand-written bwrap sandbox" },
     { "name": "inherited-fd", "coverage": "covered", "detail": "observed hand-written bwrap sandbox" },
@@ -197,10 +202,11 @@ Every dispatch executed through the Confinement Authority produces a `confinemen
     { "name": "host-ipc", "coverage": "out-of-scope", "detail": "observe-mode: host IPC unmanaged" },
     { "name": "network", "coverage": "out-of-scope", "detail": "observe-mode: network unmanaged" }
   ],
+  "receipt": null,
   "backend": { "id": "bwrap", "type": "bwrap", "version": "local-bwrap-v1", "configDigest": "a3f8c9..." },
   "grants": [
-    { "resource": "workspace", "access": "read-write", "target": "/path/to/worktree" },
-    { "resource": "run-output", "access": "write", "target": "/path/to/runDir" }
+    { "resource": "workspace", "access": "read-write", "resolvedTarget": "/path/to/worktree" },
+    { "resource": "run-output", "access": "write", "resolvedTarget": "/path/to/runDir" }
   ],
   "mismatches": [],
   "evidence": [
@@ -214,7 +220,7 @@ Every dispatch executed through the Confinement Authority produces a `confinemen
 - `outcome`: The final verdict (`enforced`, `unconfined`, `degraded`, `refused`, `unknown`).
 - `requested`: The mode/policy the capability actually asked for (`requested.mode`, `requested.policyId`).
 - `channels`: A fixed array of 5 named security channels (`filesystem`, `inherited-fd`, `stdio`, `host-ipc`, `network`) — not the policy's own control axes. `covered` means the driver verified and applied the restriction for that channel; `unverified`/`unknown`/`out-of-scope` mean it was not (`src/runner/dispatch/confinement/authority.mjs`).
-- `grants`: Explicit paths permitted for filesystem write, keyed by `resource`/`access`/`target`. Any write outside these paths was blocked by the kernel namespace.
+- `grants`: Explicit paths permitted for filesystem write, keyed by `resource`/`access`/`resolvedTarget`. Any write outside these paths was blocked by the kernel namespace.
 - `backend`: Present only when a backend actually ran the plan (`null` for `unconfined`/omitted dispatches); carries the backend instance id/type/driver version and a config digest, not a raw probe fingerprint.
 
 ---
