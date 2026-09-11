@@ -309,18 +309,22 @@ function checkAncestry(repoRoot, sha, targetRef, fallbackNote) {
 }
 
 /**
- * Did retrospective actually produce real content for `id` — a real
- * end-user document (D8: `outcome.docType` + `outcome.docPath`, the file
- * itself confirmed present on disk under `repoRoot`) or at least one
- * decision record — rather than just a status flip, or a claim-lifecycle
- * artifact (`outcome.actual`/`outcome.predicted`, written at claim/return
- * time, unrelated to whether retrospective itself ever ran) (tsk-558,
- * restore-to-decision: D8 names `docType` specifically, and a recorded
- * `docPath` alone is not accepted as evidence — a prior incident
- * (retro-loop doc orphaning) proved a path can be recorded while the file
- * never lands in the working tree).
+ * Did retrospective actually produce real content for exactly `id` (never
+ * following the parent chain — that fallback lives one level up, in
+ * `checkRetrospectiveContent`) — a real end-user document (D8:
+ * `outcome.docType` + `outcome.docPath`, the file itself confirmed present
+ * on disk under `repoRoot`), a knowledge-registry re-attest of an EXISTING
+ * doc (tsk-555: `fgos knowledge attest`, the doc's `sourceCaptureIds`
+ * includes `id`, that doc's `currentPath` file confirmed present), or at
+ * least one decision record — rather than just a status flip, or a
+ * claim-lifecycle artifact (`outcome.actual`/`outcome.predicted`, written
+ * at claim/return time, unrelated to whether retrospective itself ever
+ * ran) (tsk-558, restore-to-decision: D8 names `docType` specifically, and
+ * a recorded `docPath` alone is not accepted as evidence — a prior
+ * incident (retro-loop doc orphaning) proved a path can be recorded while
+ * the file never lands in the working tree).
  */
-export function checkRetrospectiveContent(view, id, repoRoot) {
+function checkRetrospectiveContentForId(view, id, repoRoot) {
   const outcome = view?.outcomes?.[id];
   // `kind: 'engine'` records are the engine's own bookkeeping — a resolvePlan
   // verdict, a discovery outcome, a stale-claim reclaim note, a driver's
@@ -344,10 +348,65 @@ export function checkRetrospectiveContent(view, id, repoRoot) {
       detail: `outcome records docType "${outcome.docType}" at ${outcome.docPath}, but the file does not exist on disk — retrospective's own document is missing`,
     };
   }
+  // tsk-555: a genuine re-attest judgment — "no new doc needed, an
+  // existing doc already covers this" — is real reflection on the work,
+  // but it produces neither a decision nor an outcome.docType/docPath: the
+  // modern door for it is `fgos knowledge attest` (doc.attest), which
+  // appends `id` into the attested doc's `sourceCaptureIds`
+  // (knowledge-registry.mjs). The driver's only OTHER record of the same
+  // judgment is its generic closing report (`fgos report`, kind:'engine'),
+  // deliberately excluded above as bookkeeping — so before this check, a
+  // real re-attest and a plain drive-through-with-no-retrospective were
+  // indistinguishable, and the item parked at cleanup forever. Mirrors the
+  // docType/docPath check immediately above: found is not enough, the
+  // attested doc's file must still resolve on disk at repoRoot.
+  const attestedDoc = Object.values(view?.docs ?? {}).find(
+    (doc) => Array.isArray(doc?.sourceCaptureIds) && doc.sourceCaptureIds.includes(id),
+  );
+  if (attestedDoc?.currentPath) {
+    if (fs.existsSync(path.join(repoRoot, attestedDoc.currentPath))) {
+      return { ok: true, detail: `retrospective content found (re-attested doc "${attestedDoc.docId ?? attestedDoc.currentPath}" at ${attestedDoc.currentPath}, file confirmed present)` };
+    }
+    return {
+      ok: false,
+      detail: `attests existing doc "${attestedDoc.docId ?? attestedDoc.currentPath}" at ${attestedDoc.currentPath}, but the file does not exist on disk — attested document is missing`,
+    };
+  }
   return {
     ok: false,
-    detail: 'no outcome docType/docPath or decision record found for this item — retrospective may not have actually run',
+    detail: 'no outcome docType/docPath, decision record, or knowledge-registry attestation found for this item — retrospective may not have actually run',
   };
+}
+
+/**
+ * Did retrospective actually produce real content for `id` — checking `id`
+ * itself first, per `checkRetrospectiveContentForId` above.
+ *
+ * PARENT FALLBACK (tsk-5fv, person's call 2026-09-11: fall back to the
+ * parent, over per-leaf triage): a LEAF item's own retrospective judgment
+ * is routinely recorded against its ROOT's id instead — the knowledge skill
+ * runs once per split group, not once per leaf, and a driver closing a
+ * whole group naturally tags the group's own id. `checkRetrospectiveContentForId`
+ * taking only `id` made every leaf whose content lives on its root fail
+ * forever, regardless of TTL, even though the root plainly HAS real content.
+ * `resolveRoot(view, id)` (frontier.mjs, same helper `resolveTtlDaysForItem`
+ * above already uses for the leaf/root TTL split) is a no-op for a
+ * root/standalone item (returns `id` unchanged) — the fallback branch below
+ * never fires for those, so every existing root-only caller is unaffected.
+ * Only tried when `id`'s own check fails AND it genuinely has a different
+ * root; the root's own detail is relabelled "inherited from parent" so a
+ * reader can tell this was borrowed, not `id`'s own record.
+ */
+export function checkRetrospectiveContent(view, id, repoRoot) {
+  const own = checkRetrospectiveContentForId(view, id, repoRoot);
+  if (own.ok) return own;
+  const rootId = resolveRoot(view, id);
+  if (rootId === id) return own;
+  const fromRoot = checkRetrospectiveContentForId(view, rootId, repoRoot);
+  if (fromRoot.ok) {
+    return { ok: true, detail: `retrospective content inherited from parent "${rootId}" (${fromRoot.detail})` };
+  }
+  return own;
 }
 
 /**

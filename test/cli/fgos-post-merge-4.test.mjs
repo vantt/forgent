@@ -167,7 +167,7 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
   const data = envelopeData(result.stdout);
   assert.equal(data.to, 'blocked');
   assert.match(data.reason, /not ready yet/);
-  assert.match(data.reason, /no outcome docType\/docPath or decision record/);
+  assert.match(data.reason, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
 
   assert.equal(stateView(cwd).work['cleanup-not-ready'].status, 'blocked');
 });
@@ -407,7 +407,7 @@ test('catchup still rejects a cleanup-origin blocked item whose recorded commit 
   assert.equal(cleanupResult.status, 0, cleanupResult.stderr);
   const cleanupData = envelopeData(cleanupResult.stdout);
   assert.equal(cleanupData.to, 'blocked');
-  assert.match(cleanupData.reason, /no outcome docType\/docPath or decision record/);
+  assert.match(cleanupData.reason, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
   assert.doesNotMatch(cleanupData.reason, /no longer reachable/);
 
   const catchupResult = run(cwd, ['catchup', 'cleanup-origin-retro-only']);

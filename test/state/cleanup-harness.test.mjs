@@ -441,7 +441,7 @@ test('checkRetrospectiveContent: not ok when no outcome or decision record exist
   const repoRoot = initRepo();
   const result = checkRetrospectiveContent({}, 'no-content-item', repoRoot);
   assert.equal(result.ok, false);
-  assert.match(result.detail, /no outcome docType\/docPath or decision record/);
+  assert.match(result.detail, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
 });
 
 test('checkRetrospectiveContent: NOT ok when the item has a claim-lifecycle predicted/actual outcome but no real doc (tsk-558 false-pass regression)', () => {
@@ -513,6 +513,112 @@ test('checkRetrospectiveContent: not ok when decisionsById exists for the id but
   const view = { decisionsById: { 'empty-decisions': [] } };
   const result = checkRetrospectiveContent(view, 'empty-decisions', repoRoot);
   assert.equal(result.ok, false);
+});
+
+// tsk-555: a genuine re-attest ("no new doc needed, an existing doc
+// already covers this") produces neither a decision nor an
+// outcome.docType/docPath — only a knowledge-registry attestation
+// (doc.sourceCaptureIds includes the item id). Before this fix the only
+// OTHER record of the judgment was the driver's generic closing report
+// (kind:'engine'), indistinguishable from an item that was never
+// retrospected at all — permanently blocking cleanup regardless of TTL.
+test('checkRetrospectiveContent: ok when the item re-attested an existing doc via the knowledge registry, file confirmed present', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'explanation'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'explanation', 'existing-doc.md'), '# existing doc\n');
+  const view = {
+    docs: {
+      'topic:explanation': {
+        docId: 'topic:explanation',
+        currentPath: 'docs/explanation/existing-doc.md',
+        docLifecycle: 'active',
+        sourceCaptureIds: ['some-other-item', 're-attest-item'],
+      },
+    },
+  };
+  const result = checkRetrospectiveContent(view, 're-attest-item', repoRoot);
+  assert.equal(result.ok, true, 'a real knowledge-registry attestation must satisfy the gate even with no decision or outcome at all');
+});
+
+test('checkRetrospectiveContent: NOT ok when the attested doc sourceCaptureIds includes the id but the file does not exist on disk', () => {
+  const repoRoot = initRepo();
+  const view = {
+    docs: {
+      'topic:explanation': {
+        docId: 'topic:explanation',
+        currentPath: 'docs/explanation/never-written.md',
+        docLifecycle: 'active',
+        sourceCaptureIds: ['re-attest-orphan'],
+      },
+    },
+  };
+  const result = checkRetrospectiveContent(view, 're-attest-orphan', repoRoot);
+  assert.equal(result.ok, false, 'an attestation pointing at a nonexistent file must never pass, same orphaning risk as outcome.docPath');
+  assert.match(result.detail, /does not exist on disk/);
+});
+
+test('checkRetrospectiveContent: not ok when other docs are attested but none carry this id in sourceCaptureIds', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'explanation'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'explanation', 'unrelated.md'), '# unrelated\n');
+  const view = {
+    docs: {
+      'topic:explanation': {
+        docId: 'topic:explanation',
+        currentPath: 'docs/explanation/unrelated.md',
+        docLifecycle: 'active',
+        sourceCaptureIds: ['some-other-item'],
+      },
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'not-attested-item', repoRoot);
+  assert.equal(result.ok, false);
+});
+
+// tsk-5fv (person's call 2026-09-11: fall back to the parent, over per-leaf
+// triage): a leaf's retrospective content is routinely recorded against its
+// ROOT id instead of the leaf's own id — the knowledge skill runs once per
+// split group. Before this fix, a leaf whose content lived only on its root
+// failed forever, regardless of TTL, even though the root plainly had real
+// content.
+test('checkRetrospectiveContent: a leaf with no content of its own falls back to its root, which has real content', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'how-to'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'how-to', 'root-doc.md'), '# root doc\n');
+  const view = {
+    work: { 'root-1': {}, 'leaf-1': { parent: 'root-1' } },
+    outcomes: { 'root-1': { docType: 'how-to', docPath: 'docs/how-to/root-doc.md' } },
+  };
+  const result = checkRetrospectiveContent(view, 'leaf-1', repoRoot);
+  assert.equal(result.ok, true, "a leaf must inherit its root's real retrospective content");
+  assert.match(result.detail, /inherited from parent "root-1"/);
+});
+
+test('checkRetrospectiveContent: a leaf with its OWN content never falls back to the root, even when the root has none', () => {
+  const repoRoot = initRepo();
+  const view = {
+    work: { 'root-2': {}, 'leaf-2': { parent: 'root-2' } },
+    decisionsById: { 'leaf-2': [{ text: 'x', rationale: 'y', kind: 'design' }] },
+  };
+  const result = checkRetrospectiveContent(view, 'leaf-2', repoRoot);
+  assert.equal(result.ok, true);
+  assert.doesNotMatch(result.detail, /inherited from parent/, "a leaf's own real content must never be reported as inherited");
+});
+
+test('checkRetrospectiveContent: a leaf whose root ALSO has no content stays not ok, reporting its own (not the root\'s) failure detail', () => {
+  const repoRoot = initRepo();
+  const view = { work: { 'root-3': {}, 'leaf-3': { parent: 'root-3' } } };
+  const result = checkRetrospectiveContent(view, 'leaf-3', repoRoot);
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
+});
+
+test('checkRetrospectiveContent: a root/standalone item with no parent never falls back to itself (no-op, unaffected)', () => {
+  const repoRoot = initRepo();
+  const view = { work: { 'standalone-1': {} } };
+  const result = checkRetrospectiveContent(view, 'standalone-1', repoRoot);
+  assert.equal(result.ok, false);
+  assert.match(result.detail, /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
 });
 
 // --- checkCleanupTTLElapsed ---------------------------------------------
@@ -627,7 +733,7 @@ test('assessCleanupReadiness: TTL elapsed + D8 checks fail -> ready:false, failu
   assert.equal(result.ready, false);
   assert.deepEqual(result.notReadyYet, []);
   assert.equal(result.failed.length, 1);
-  assert.match(result.failed[0], /no outcome docType\/docPath or decision record/);
+  assert.match(result.failed[0], /no outcome docType\/docPath, decision record, or knowledge-registry attestation/);
 });
 
 test('assessCleanupReadiness: TTL not elapsed + D8 checks pass -> ready:false, but ONLY notReadyYet is non-empty', () => {
