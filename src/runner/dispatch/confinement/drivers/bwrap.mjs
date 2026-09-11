@@ -18,6 +18,42 @@ import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
 
+// Executors whose private-home resource is the Codex CLI's own CODEX_HOME
+// (config-declared via a `resourceBindings` entry pointing private-home at
+// the CODEX_HOME env var) and therefore need the host Codex credential
+// provisioned into it -- otherwise codex starts with no auth and cannot run.
+// This is a closed, explicit identity allowlist, not a resource-type branch:
+// it does not weaken any confinement guarantee (mount read/write-ness,
+// hostWrite posture, network egress, ...) for the named executor, it only
+// narrows which executor receives an opt-in credential grant that every
+// other executor gets by default (none). Keying this off `res.resource`
+// alone (as the migration first shipped it) leaked the Codex credential
+// into every private-home, including claude-bwrap/agy-bwrap, which have no
+// relationship to Codex.
+const CODEX_HOME_CREDENTIAL_EXECUTOR_IDS = Object.freeze(['codex-bwrap']);
+
+/**
+ * Copies the host's Codex credential file into a Codex executor's own
+ * per-dispatch private-home (which that executor's config binds to
+ * CODEX_HOME), never any other executor's. Non-fatal on read/copy failure.
+ */
+function provisionCodexCredential(privateHomeTarget) {
+  const authCandidates = [
+    path.join(process.env.HOME || '', '.codex', 'auth.json'),
+    path.join(process.env.HOME || '', '.codex-fgovn', 'auth.json'),
+  ];
+  for (const authCandidate of authCandidates) {
+    if (fs.existsSync(authCandidate)) {
+      try {
+        fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
+      } catch {
+        // non-fatal
+      }
+      break;
+    }
+  }
+}
+
 const ALLOWED_BWRAP_CONFIG_KEYS = Object.freeze([
   'type',
   'enabled',
@@ -296,7 +332,13 @@ export function assessBwrap(request, backend) {
 
 /**
  * Prepare sandbox invocation strictly from RESOLVED resources (spec §6.5, R4).
- * Never branches on executorId, providerModel, or agent type!
+ * Never branches on executorId, providerModel, or agent type to decide any
+ * confinement guarantee (which resources get mounted, read/write-ness,
+ * hostWrite/hostRead/networkEgress posture, ...) -- that stays purely
+ * resource-driven. The one narrow, explicitly-documented exception is
+ * provisioning a Codex-specific credential file (see
+ * CODEX_HOME_CREDENTIAL_EXECUTOR_IDS above), which grants nothing away from
+ * any other executor and is not a confinement control.
  */
 export async function prepareBwrap(plan, request, backend) {
   // Verify attestation store isolation before materializing mounts (H1)
@@ -320,21 +362,8 @@ export async function prepareBwrap(plan, request, backend) {
       if (res.allocation === 'temporary') {
         fs.mkdirSync(res.hostTarget, { recursive: true });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
-        if (res.resource === 'private-home') {
-          const authCandidates = [
-            path.join(process.env.HOME || '', '.codex', 'auth.json'),
-            path.join(process.env.HOME || '', '.codex-fgovn', 'auth.json'),
-          ];
-          for (const authCandidate of authCandidates) {
-            if (fs.existsSync(authCandidate)) {
-              try {
-                fs.copyFileSync(authCandidate, path.join(res.hostTarget, 'auth.json'));
-              } catch {
-                // non-fatal
-              }
-              break;
-            }
-          }
+        if (res.resource === 'private-home' && CODEX_HOME_CREDENTIAL_EXECUTOR_IDS.includes(request.executorId)) {
+          provisionCodexCredential(res.hostTarget);
         }
         allocatedPaths.push(res.hostTarget);
       }

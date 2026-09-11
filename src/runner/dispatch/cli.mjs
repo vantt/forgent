@@ -860,15 +860,13 @@ export async function executeExecutorCli(
 
   const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
   const lockFile = dispatchLockFile(cwd);
-  const lockRes = process.env.FGOS_DISPATCH_NO_LOCK === '1'
-    ? { status: ACQUIRED, release: () => {} }
-    : acquireMainCheckoutLock(fgosDir, {
-        identity,
-        ttlMs: timeoutMs,
-        now: Date.now(),
-        releaseOnExit: true,
-        lockFile,
-      });
+  const lockRes = acquireMainCheckoutLock(fgosDir, {
+    identity,
+    ttlMs: timeoutMs,
+    now: Date.now(),
+    releaseOnExit: true,
+    lockFile,
+  });
 
   if (lockRes.status === HELD) {
     const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
