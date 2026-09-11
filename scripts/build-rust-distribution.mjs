@@ -126,7 +126,12 @@ function collectSourceFiles(baseDir, relativePath, results) {
 /**
  * Stages the release tree into outDir.
  */
-export function buildRustDistribution({ outDir, repoRoot = REPO_ROOT } = {}) {
+export function buildRustDistribution({
+  outDir,
+  repoRoot = REPO_ROOT,
+  releaseVersion = null,
+  stateSchemas = { read: ['1'], write: ['1'], migrations: [] },
+} = {}) {
   if (!outDir) {
     throw new Error('outDir is required (--out)');
   }
@@ -294,18 +299,29 @@ export function buildRustDistribution({ outDir, repoRoot = REPO_ROOT } = {}) {
       arch: 'x64',
       libc: 'glibc',
     },
+    stateSchemas,
     files: fileEntries,
   };
+
+  if (releaseVersion) {
+    manifestWithoutDigest.releaseVersion = releaseVersion;
+  }
 
   const artifactDigest = computeArtifactDigest(manifestWithoutDigest);
 
   const manifest = {
     schemaVersion: manifestWithoutDigest.schemaVersion,
     artifactDigest,
+    ...(manifestWithoutDigest.releaseVersion
+      ? { releaseVersion: manifestWithoutDigest.releaseVersion }
+      : {}),
     entries: manifestWithoutDigest.entries,
     components: manifestWithoutDigest.components,
     requires: manifestWithoutDigest.requires,
     target: manifestWithoutDigest.target,
+    ...(manifestWithoutDigest.stateSchemas
+      ? { stateSchemas: manifestWithoutDigest.stateSchemas }
+      : {}),
     files: manifestWithoutDigest.files,
   };
 

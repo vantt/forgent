@@ -149,6 +149,11 @@ pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
                                     .unwrap_or(serde_json::Value::Null),
                             );
                             map.insert(
+                                "previousArtifactDigest".to_string(),
+                                serde_json::to_value(&runtime.previous_artifact_digest)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
                                 "releaseVersion".to_string(),
                                 serde_json::to_value(&runtime.release_version)
                                     .unwrap_or(serde_json::Value::Null),

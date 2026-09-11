@@ -7,7 +7,10 @@
 use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;
 use crate::manifest::{read_manifest_from_dir, ReleaseManifest};
-use crate::store::{now_millis, resolve_machine_release_store_root, stage_release, StageOutcome};
+use crate::store::{
+    list_releases, now_millis, resolve_machine_release_store_root, stage_release,
+    ReleaseStatusEntry, StageOutcome,
+};
 use crate::verify::{recompute_artifact_digest, verify_release_files};
 use crate::workspace::{
     compute_repository_id, compute_work_state_id, compute_workspace_id, resolve_workspace_root,
@@ -25,6 +28,8 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
 release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos"
@@ -39,6 +44,8 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+[ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
 release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos-runner"
@@ -586,6 +593,16 @@ fn mark_transaction_status(tx_path: &Path, status: &str) -> std::io::Result<()> 
     Ok(())
 }
 
+/// True only when `releases/<digest>/` genuinely exists on disk. A binding
+/// can claim `status: "ready"` for a digest whose release directory is
+/// already gone -- a process SIGKILLed by `fgctl verify` between moving the
+/// release to quarantine/ and publishing `status: "quarantined"` leaves
+/// exactly this "falsely ready" state behind, and status alone cannot tell
+/// the difference from a genuinely healthy binding.
+fn is_release_staged(store_root: &Path, digest: &str) -> bool {
+    store_root.join("releases").join(digest).exists()
+}
+
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
 pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<(), InitError> {
     // R1: Resolve workspace root via git-common-dir parent; refuse outside git repo.
@@ -593,8 +610,8 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
 
     // R2: Compute workspaceId and workStateId.
     let workspace_id = compute_workspace_id(&workspace_root);
-    let work_state_id = compute_work_state_id(&workspace_id);
-    let repository_id = compute_repository_id(&workspace_id);
+    let _work_state_id = compute_work_state_id(&workspace_id);
+    let _repository_id = compute_repository_id(&workspace_id);
 
     let store_root = resolve_machine_release_store_root();
     let installation_dir = workspace_root.join(".fgos").join("installation");
@@ -633,8 +650,17 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
             }
 
             // R9: Idempotent re-run check BEFORE stage_release (Reviewer M2).
+            // A quarantined activation must never idempotent-skip: the release
+            // directory it points at has already been moved away by `fgctl
+            // verify`, so the ready-looking digest match is the exact "every
+            // reader must treat quarantined as missing" case section 11
+            // requires -- fall through and let this --from door genuinely
+            // re-stage/re-verify/re-publish the digest instead.
             if let Some(ref current) = current_activation {
-                if &current.artifact_digest == pin_digest {
+                if &current.artifact_digest == pin_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -670,9 +696,13 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         (Some(pin), None) => {
             let pin_digest = &pin.project_runtime.artifact_digest;
 
-            // R9: Idempotent re-run check (Reviewer M2).
+            // R9: Idempotent re-run check (Reviewer M2). See the quarantine
+            // note on the pin+--from arm above -- same exclusion applies.
             if let Some(ref current) = current_activation {
-                if &current.artifact_digest == pin_digest {
+                if &current.artifact_digest == pin_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -690,19 +720,28 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
 
             let dir = store_root.join("releases").join(pin_digest);
             if !dir.exists() {
+                let quarantine_note = current_activation
+                    .as_ref()
+                    .filter(|c| c.status == "quarantined" && &c.artifact_digest == pin_digest)
+                    .map(|_| " (this workspace's active release was quarantined by `fgctl verify`; provide --from to reacquire it)")
+                    .unwrap_or("");
                 return Err(InitError::Custom(format!(
-                    "pinned release {} is not staged in release store and no --from source was provided",
-                    pin_digest
+                    "pinned release {} is not staged in release store and no --from source was provided{}",
+                    pin_digest, quarantine_note
                 )));
             }
 
             (pin_digest.clone(), dir)
         }
         (None, Some(from_src)) => {
-            // Check if from_src matches current activation for idempotent re-run:
+            // Check if from_src matches current activation for idempotent re-run
+            // (quarantined excluded -- see the pin+--from arm's own note above):
             let from_digest = resolve_source_manifest_digest(from_src)?;
             if let Some(ref current) = current_activation {
-                if current.artifact_digest == from_digest {
+                if current.artifact_digest == from_digest
+                    && current.status != "quarantined"
+                    && is_release_staged(&store_root, &current.artifact_digest)
+                {
                     check_main_checkout_lock(&workspace_root)?;
                     let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
                     cleanup_stale_activation_tmp_files(&installation_dir);
@@ -787,7 +826,10 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         };
 
     if let Some(ref current) = current_activation_under_lock {
-        if current.artifact_digest == target_digest {
+        if current.artifact_digest == target_digest
+            && current.status != "quarantined"
+            && is_release_staged(&store_root, &current.artifact_digest)
+        {
             let shim_fgos = installation_dir.join("bin").join("fgos");
             run_tail(
                 &workspace_root,
@@ -799,9 +841,53 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         }
     }
 
-    // Previous activation digest if present
-    let previous_artifact_digest: Option<String> =
-        current_activation_under_lock.map(|a| a.artifact_digest);
+    // Previous activation digest if present. Mirrors upgrade_workspace's own
+    // rule (Reviewer M2): a quarantined current activation's own digest
+    // names a release directory `fgctl verify` has already moved away, so
+    // recording it as previousArtifactDigest would give a later `fgctl
+    // repair` a rollback target that no longer exists. Chain past it to
+    // whatever it itself pointed at instead.
+    let previous_artifact_digest: Option<String> = match current_activation_under_lock {
+        Some(ref current) if current.status == "quarantined" => {
+            current.previous_artifact_digest.clone()
+        }
+        Some(current) => Some(current.artifact_digest),
+        None => None,
+    };
+
+    publish_and_tail(PublishArgs {
+        workspace_root: &workspace_root,
+        store_root: &store_root,
+        candidate_dir: &candidate_dir,
+        manifest: &manifest,
+        previous_artifact_digest,
+        tracked_pin: tracked_pin.as_ref(),
+        update_pin: false,
+        _lock: &_activation_lock,
+    })
+}
+
+/// Arguments for `publish_and_tail`.
+pub struct PublishArgs<'a> {
+    pub workspace_root: &'a Path,
+    pub store_root: &'a Path,
+    pub candidate_dir: &'a Path,
+    pub manifest: &'a ReleaseManifest,
+    pub previous_artifact_digest: Option<String>,
+    pub tracked_pin: Option<&'a TrackedDistributionPin>,
+    pub update_pin: bool,
+    pub _lock: &'a ActivationLockGuard,
+}
+
+/// Preflight, capsule creation, atomic activation publishing, and post-activation tail.
+pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
+    let workspace_id = compute_workspace_id(args.workspace_root);
+    let work_state_id = compute_work_state_id(&workspace_id);
+    let repository_id = compute_repository_id(&workspace_id);
+
+    let installation_dir = args.workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+    let distribution_path = args.workspace_root.join(".fgos").join("distribution.json");
 
     let activation_id = format!("act_{:016x}", now_millis());
     let now_str = format_iso8601_utc(SystemTime::now());
@@ -827,25 +913,25 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     // Write root.json
     let root_binding = WorkspaceRootBinding {
         schema_version: 1,
-        repository_root: workspace_root.to_string_lossy().to_string(),
+        repository_root: args.workspace_root.to_string_lossy().to_string(),
         workspace_id: workspace_id.clone(),
         work_state_id: work_state_id.clone(),
-        machine_release_store: store_root.to_string_lossy().to_string(),
+        machine_release_store: args.store_root.to_string_lossy().to_string(),
     };
     let root_json_bytes = serde_json::to_vec_pretty(&root_binding)?;
     std::fs::write(installation_dir.join("root.json"), root_json_bytes)?;
 
     // Publish activation.json
     let node_path = resolve_node_path();
-    let pin_snapshot = if let Some(ref pin) = tracked_pin {
+    let pin_snapshot = if let Some(pin) = args.tracked_pin {
         serde_json::to_value(pin).unwrap_or(serde_json::json!({}))
     } else {
         serde_json::json!({
             "schemaVersion": 1,
             "projectRuntime": {
                 "policy": "exact-digest",
-                "artifactDigest": target_digest,
-                "releaseVersion": manifest.release_version,
+                "artifactDigest": args.manifest.artifact_digest,
+                "releaseVersion": args.manifest.release_version,
                 "channel": null,
                 "allowPrerelease": false
             }
@@ -855,13 +941,13 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     let activation_binding = WorkspaceActivationBinding {
         schema_version: 1,
         repository_id,
-        workspace_id,
+        workspace_id: workspace_id.clone(),
         work_state_id,
         activation_id: activation_id.clone(),
         status: "ready".to_string(),
-        artifact_digest: target_digest.clone(),
-        release_path: candidate_dir.to_string_lossy().to_string(),
-        previous_artifact_digest,
+        artifact_digest: args.manifest.artifact_digest.clone(),
+        release_path: args.candidate_dir.to_string_lossy().to_string(),
+        previous_artifact_digest: args.previous_artifact_digest,
         shim_version: "1".to_string(),
         resolved_dependencies: serde_json::json!({ "node": node_path }),
         pin_snapshot,
@@ -874,31 +960,31 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
 
     publish_activation_file(&activation_path, &activation_binding)?;
 
-    // If tracked .fgos/distribution.json was absent, write it now (R3)
-    if !distribution_path.exists() {
+    // If tracked .fgos/distribution.json was absent or update requested, write it now
+    if args.update_pin || !distribution_path.exists() {
         let pin = TrackedDistributionPin {
             schema_version: 1,
             project_runtime: ProjectRuntimePin {
                 policy: "exact-digest".to_string(),
-                artifact_digest: target_digest.clone(),
-                release_version: manifest.release_version.clone(),
+                artifact_digest: args.manifest.artifact_digest.clone(),
+                release_version: args.manifest.release_version.clone(),
                 channel: None,
                 allow_prerelease: false,
             },
         };
         let pin_bytes = serde_json::to_vec_pretty(&pin)?;
-        std::fs::create_dir_all(workspace_root.join(".fgos"))?;
+        std::fs::create_dir_all(args.workspace_root.join(".fgos"))?;
         std::fs::write(&distribution_path, pin_bytes)?;
     }
 
     // Write <store>/installs/<activationId>.json
-    let installs_dir = store_root.join("installs");
+    let installs_dir = args.store_root.join("installs");
     std::fs::create_dir_all(&installs_dir)?;
     let tx_record = InstallTransactionRecord {
         schema_version: 1,
         activation_id: activation_id.clone(),
-        workspace_id: activation_binding.workspace_id.clone(),
-        artifact_digest: target_digest,
+        workspace_id,
+        artifact_digest: args.manifest.artifact_digest.clone(),
         status: "ready-published".to_string(),
         history: vec![
             TransactionHistoryEntry {
@@ -927,7 +1013,482 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     )?;
 
     // R8: Run the tail through the just-written shim
-    run_tail(&workspace_root, &shim_fgos, &store_root, &activation_id)?;
+    run_tail(
+        args.workspace_root,
+        &shim_fgos,
+        args.store_root,
+        &activation_id,
+    )?;
 
     Ok(())
+}
+
+/// Reads currentStateSchema from <workHistoryRoot>/schema.json (defaults to "1" if missing)
+/// and verifies candidate manifest compatibility:
+/// - manifest.state_schemas.read contains currentStateSchema (else `state-schema-incompatible`)
+/// - manifest.state_schemas.write contains currentStateSchema (else `state-schema-write-incompatible`)
+pub fn check_state_schema_compatibility(
+    work_history_root: &Path,
+    manifest: &ReleaseManifest,
+) -> Result<String, InitError> {
+    let schema_path = work_history_root.join("schema.json");
+    let current_schema = if schema_path.exists() {
+        let content = std::fs::read_to_string(&schema_path)?;
+        let val: serde_json::Value = serde_json::from_str(&content)?;
+        if let Some(s) = val.get("currentStateSchema").and_then(|v| v.as_str()) {
+            s.to_string()
+        } else if let Some(n) = val.get("currentStateSchema").and_then(|v| v.as_i64()) {
+            n.to_string()
+        } else if let Some(u) = val.get("currentStateSchema").and_then(|v| v.as_u64()) {
+            u.to_string()
+        } else {
+            "1".to_string()
+        }
+    } else {
+        "1".to_string()
+    };
+
+    let (read_schemas, write_schemas) = match &manifest.state_schemas {
+        Some(s) => (s.read.as_slice(), s.write.as_slice()),
+        None => {
+            let empty: &[String] = &[];
+            (empty, empty)
+        }
+    };
+
+    if !read_schemas.iter().any(|s| s == &current_schema) {
+        return Err(InitError::Custom(format!(
+            "state-schema-incompatible: candidate release cannot read workspace state schema '{}'",
+            current_schema
+        )));
+    }
+
+    if !write_schemas.iter().any(|s| s == &current_schema) {
+        return Err(InitError::Custom(format!(
+            "state-schema-write-incompatible: candidate release cannot write workspace state schema '{}'",
+            current_schema
+        )));
+    }
+
+    Ok(current_schema)
+}
+
+/// Upgrades workspace to a new release candidate (--from <source>).
+pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), InitError> {
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_id = compute_workspace_id(&workspace_root);
+    let work_state_id = compute_work_state_id(&workspace_id);
+
+    let store_root = resolve_machine_release_store_root();
+    let installation_dir = workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+
+    if !activation_path.exists() {
+        return Err(InitError::Custom(
+            "no active runtime found in workspace -- run 'fgctl init' first".to_string(),
+        ));
+    }
+
+    let current_activation: WorkspaceActivationBinding = {
+        let content = std::fs::read_to_string(&activation_path)?;
+        serde_json::from_str(&content)?
+    };
+
+    // Idempotent re-run (mirrors Phase 12's init_workspace): an upgrade to the
+    // digest that's already active is a no-op, not a fresh activationId with
+    // a self-referential previousArtifactDigest -- excluded when quarantined
+    // for the same reason init_workspace excludes it (the release directory
+    // has already been moved away, so the "already active" read is stale).
+    let from_digest_peek = resolve_source_manifest_digest(from_source)?;
+    if from_digest_peek == current_activation.artifact_digest
+        && current_activation.status != "quarantined"
+        && is_release_staged(&store_root, &current_activation.artifact_digest)
+    {
+        check_main_checkout_lock(&workspace_root)?;
+        let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
+        cleanup_stale_activation_tmp_files(&installation_dir);
+        let shim_fgos = installation_dir.join("bin").join("fgos");
+        run_tail(
+            &workspace_root,
+            &shim_fgos,
+            &store_root,
+            &current_activation.activation_id,
+        )?;
+        return Ok(());
+    }
+
+    // Stage candidate release from --from source
+    let stage_outcome = stage_release(&store_root, from_source)?;
+    let staged_digest = match stage_outcome {
+        StageOutcome::Staged { artifact_digest } => artifact_digest,
+        StageOutcome::NoOp { artifact_digest } => artifact_digest,
+    };
+
+    let candidate_dir = store_root.join("releases").join(&staged_digest);
+    let manifest = read_manifest_from_dir(&candidate_dir).map_err(|e| {
+        InitError::Custom(format!(
+            "failed to read manifest from {}: {}",
+            candidate_dir.display(),
+            e
+        ))
+    })?;
+
+    if manifest.artifact_digest != staged_digest {
+        return Err(InitError::Custom(format!(
+            "staged release manifest digest mismatch: {} declares {}, expected {}",
+            candidate_dir.display(),
+            manifest.artifact_digest,
+            staged_digest
+        )));
+    }
+
+    // Check main checkout lock before publish
+    check_main_checkout_lock(&workspace_root)?;
+
+    // R1: State-schema check before publish
+    let work_history_root = workspace_root
+        .join(".fgos")
+        .join("local")
+        .join("work-state")
+        .join(&work_state_id);
+    check_state_schema_compatibility(&work_history_root, &manifest)?;
+
+    // Preflight candidate before publish
+    preflight_candidate(&candidate_dir, &manifest)?;
+
+    // Acquire lock and clean stale tmps
+    let lock = ActivationLockGuard::acquire(&installation_dir)?;
+    cleanup_stale_activation_tmp_files(&installation_dir);
+
+    // Re-read current activation under lock to ensure previousArtifactDigest is fresh
+    let current_activation_under_lock: Option<WorkspaceActivationBinding> =
+        if activation_path.exists() {
+            std::fs::read_to_string(&activation_path)
+                .ok()
+                .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok())
+        } else {
+            None
+        };
+
+    // Reviewer L1: the pre-lock idempotent fast-path above is only a best-
+    // effort optimization; re-check authoritatively once the lock is held
+    // (mirrors init_workspace's own two-phase pattern) so two concurrent
+    // same-digest upgrades can't both mint a fresh activationId.
+    if let Some(ref current) = current_activation_under_lock {
+        if current.artifact_digest == staged_digest
+            && current.status != "quarantined"
+            && is_release_staged(&store_root, &current.artifact_digest)
+        {
+            let shim_fgos = installation_dir.join("bin").join("fgos");
+            run_tail(
+                &workspace_root,
+                &shim_fgos,
+                &store_root,
+                &current.activation_id,
+            )?;
+            return Ok(());
+        }
+    }
+
+    // Reviewer M2: if the activation being upgraded away from is itself
+    // quarantined, its own artifactDigest names a release directory that
+    // `fgctl verify` has already moved to quarantine/ -- recording it as the
+    // new previousArtifactDigest would make a later `fgctl repair` rollback
+    // target a release that no longer exists under releases/. Chain past it
+    // to whatever it itself pointed at (or null) instead.
+    let effective_current = current_activation_under_lock.unwrap_or(current_activation);
+    let previous_artifact_digest = if effective_current.status == "quarantined" {
+        effective_current.previous_artifact_digest
+    } else {
+        Some(effective_current.artifact_digest)
+    };
+
+    publish_and_tail(PublishArgs {
+        workspace_root: &workspace_root,
+        store_root: &store_root,
+        candidate_dir: &candidate_dir,
+        manifest: &manifest,
+        previous_artifact_digest,
+        tracked_pin: None,
+        update_pin: true,
+        _lock: &lock,
+    })
+}
+
+/// Repairs workspace activation: rolls back if previousArtifactDigest is set,
+/// or re-verifies and re-publishes the same digest if previousArtifactDigest is null.
+pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let workspace_id = compute_workspace_id(&workspace_root);
+    let work_state_id = compute_work_state_id(&workspace_id);
+
+    let store_root = resolve_machine_release_store_root();
+    let installation_dir = workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+
+    if !activation_path.exists() {
+        return Err(InitError::Custom(
+            "no active runtime found in workspace -- run 'fgctl init' first".to_string(),
+        ));
+    }
+
+    let current_activation: WorkspaceActivationBinding = {
+        let content = std::fs::read_to_string(&activation_path)?;
+        serde_json::from_str(&content)?
+    };
+
+    let is_self_verify = current_activation.previous_artifact_digest.is_none();
+    let (target_digest, candidate_dir) =
+        if let Some(ref prev_digest) = current_activation.previous_artifact_digest {
+            let dir = store_root.join("releases").join(prev_digest);
+            if !dir.exists() {
+                return Err(InitError::Custom(format!(
+                    "cannot repair: previous release {} not found in release store",
+                    prev_digest
+                )));
+            }
+            (prev_digest.clone(), dir)
+        } else {
+            let active_digest = &current_activation.artifact_digest;
+            let dir = store_root.join("releases").join(active_digest);
+            if !dir.exists() {
+                return Err(InitError::Custom(format!(
+                    "cannot repair: active release {} not found in release store",
+                    active_digest
+                )));
+            }
+            (active_digest.clone(), dir)
+        };
+
+    // Re-verifying the currently active release (no previousArtifactDigest to
+    // roll back to) is the same drift check `fgctl verify` performs -- a
+    // failure here means the active payload is corrupted/tampered, and per
+    // the drift-quarantine rule that must quarantine it too, not just refuse
+    // and leave a known-bad release sitting under releases/<digest>/.
+    let verify_result: Result<ReleaseManifest, String> = (|| {
+        recompute_artifact_digest(&candidate_dir.join("manifest.json"))
+            .map_err(|e| format!("artifact digest verification failed: {}", e))?;
+        let manifest = read_manifest_from_dir(&candidate_dir).map_err(|e| {
+            format!(
+                "failed to read manifest from {}: {}",
+                candidate_dir.display(),
+                e
+            )
+        })?;
+        canonicalize_manifest_files(&manifest)
+            .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
+        verify_release_files(&candidate_dir, &manifest)
+            .map_err(|e| format!("verify release files failed: {}", e))?;
+        if manifest.artifact_digest != target_digest {
+            return Err(format!(
+                "staged release manifest digest mismatch: {} declares {}, expected {}",
+                candidate_dir.display(),
+                manifest.artifact_digest,
+                target_digest
+            ));
+        }
+        Ok(manifest)
+    })();
+
+    let manifest = match verify_result {
+        Ok(m) => m,
+        Err(err_msg) if is_self_verify => {
+            let timestamp = now_millis();
+            let quarantine_dir = store_root
+                .join("quarantine")
+                .join(format!("{}-{}", target_digest, timestamp));
+            std::fs::create_dir_all(store_root.join("quarantine"))?;
+            if candidate_dir.exists() {
+                let _ = std::fs::rename(&candidate_dir, &quarantine_dir);
+            }
+            // Mirror verify_workspace's own fix for the identical race: the
+            // `current_activation` snapshot above was read before this
+            // release was moved and before the lock was held, so a
+            // concurrent `fgctl upgrade` may have already published a
+            // DIFFERENT activation by now. Re-read fresh under the lock and
+            // only publish the quarantine status if it still names the
+            // digest being quarantined -- otherwise a newer, unrelated
+            // activation would be silently overwritten.
+            let _lock = ActivationLockGuard::acquire(&installation_dir)?;
+            cleanup_stale_activation_tmp_files(&installation_dir);
+            let activation_under_lock: Option<WorkspaceActivationBinding> =
+                std::fs::read_to_string(&activation_path)
+                    .ok()
+                    .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok());
+            match activation_under_lock {
+                Some(mut fresh) if fresh.artifact_digest == target_digest => {
+                    fresh.status = "quarantined".to_string();
+                    publish_activation_file(&activation_path, &fresh)?;
+                }
+                _ => {
+                    // The active binding moved on before this quarantine
+                    // could publish -- the offending release is still
+                    // safely quarantined above, but the now-current
+                    // activation must not be touched.
+                }
+            }
+            return Err(InitError::Custom(format!(
+                "active release {} failed repair verification and was quarantined at {}: {}",
+                target_digest,
+                quarantine_dir.display(),
+                err_msg
+            )));
+        }
+        Err(err_msg) => return Err(InitError::Custom(err_msg)),
+    };
+
+    // Check main checkout lock before publish
+    check_main_checkout_lock(&workspace_root)?;
+
+    // R1 & R3: State-schema check before publish
+    let work_history_root = workspace_root
+        .join(".fgos")
+        .join("local")
+        .join("work-state")
+        .join(&work_state_id);
+    check_state_schema_compatibility(&work_history_root, &manifest)?;
+
+    // Preflight candidate before publish
+    preflight_candidate(&candidate_dir, &manifest)?;
+
+    // Acquire lock and clean stale tmps
+    let lock = ActivationLockGuard::acquire(&installation_dir)?;
+    cleanup_stale_activation_tmp_files(&installation_dir);
+
+    publish_and_tail(PublishArgs {
+        workspace_root: &workspace_root,
+        store_root: &store_root,
+        candidate_dir: &candidate_dir,
+        manifest: &manifest,
+        previous_artifact_digest: None,
+        tracked_pin: None,
+        update_pin: true,
+        _lock: &lock,
+    })
+}
+
+/// Verifies active release files against manifest and quarantines on any drift.
+pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
+    let workspace_root = resolve_workspace_root(start_dir)?;
+    let store_root = resolve_machine_release_store_root();
+    let installation_dir = workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+
+    if !activation_path.exists() {
+        return Err(InitError::Custom(
+            "no active runtime found in workspace -- run 'fgctl init' first".to_string(),
+        ));
+    }
+
+    let current_activation: WorkspaceActivationBinding = {
+        let content = std::fs::read_to_string(&activation_path)?;
+        serde_json::from_str(&content)?
+    };
+
+    let active_digest = current_activation.artifact_digest.clone();
+    let release_dir = store_root.join("releases").join(&active_digest);
+
+    let verify_result = (|| -> Result<(), String> {
+        if !release_dir.exists() {
+            return Err(format!(
+                "release directory does not exist: {}",
+                release_dir.display()
+            ));
+        }
+        let manifest_path = release_dir.join("manifest.json");
+        recompute_artifact_digest(&manifest_path)
+            .map_err(|e| format!("artifact digest mismatch: {}", e))?;
+        let manifest = read_manifest_from_dir(&release_dir)
+            .map_err(|e| format!("manifest read error: {}", e))?;
+        canonicalize_manifest_files(&manifest)
+            .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
+        verify_release_files(&release_dir, &manifest)
+            .map_err(|e| format!("file digest mismatch: {}", e))?;
+        Ok(())
+    })();
+
+    match verify_result {
+        Ok(()) => {
+            println!("verified active release {}", active_digest);
+            Ok(())
+        }
+        Err(err_msg) => {
+            // Mismatch: move release directory to quarantine/<digest>-<timestamp>/
+            let timestamp = now_millis();
+            let quarantine_dir = store_root
+                .join("quarantine")
+                .join(format!("{}-{}", active_digest, timestamp));
+            std::fs::create_dir_all(store_root.join("quarantine"))?;
+            if release_dir.exists() {
+                let _ = std::fs::rename(&release_dir, &quarantine_dir);
+            }
+
+            // Acquire the activation lock before touching activation.json, then
+            // re-read it fresh: the `current_activation` snapshot above was
+            // taken before this release was moved and before the lock was
+            // held, so a concurrent `fgctl upgrade` may have already
+            // published a DIFFERENT activation in the meantime. Publishing
+            // the stale in-memory record here would silently overwrite that
+            // newer, unrelated activation with a quarantine record for a
+            // digest it no longer even points at.
+            let _lock = ActivationLockGuard::acquire(&installation_dir)?;
+            cleanup_stale_activation_tmp_files(&installation_dir);
+            let activation_under_lock: Option<WorkspaceActivationBinding> =
+                std::fs::read_to_string(&activation_path)
+                    .ok()
+                    .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok());
+
+            match activation_under_lock {
+                Some(mut fresh) if fresh.artifact_digest == active_digest => {
+                    fresh.status = "quarantined".to_string();
+                    publish_activation_file(&activation_path, &fresh)?;
+                }
+                _ => {
+                    // The active binding moved on before this quarantine could
+                    // publish -- the offending release is still safely
+                    // quarantined above, but the now-current activation
+                    // (pointing at a different, presumably good, release)
+                    // must not be touched.
+                }
+            }
+
+            Err(InitError::Custom(format!(
+                "active release {} verification failed and was quarantined at {}: {}",
+                active_digest,
+                quarantine_dir.display(),
+                err_msg
+            )))
+        }
+    }
+}
+
+/// Workspace status representation for `fgctl status` (R5).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FgctlWorkspaceStatus {
+    pub active_artifact_digest: String,
+    pub previous_artifact_digest: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub quarantined: bool,
+    pub releases: Vec<ReleaseStatusEntry>,
+}
+
+/// Resolves active workspace status alongside the machine release store releases.
+pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<FgctlWorkspaceStatus> {
+    let workspace_root = resolve_workspace_root(start_dir).ok()?;
+    let installation_dir = workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+    if !activation_path.exists() {
+        return None;
+    }
+    let content = std::fs::read_to_string(&activation_path).ok()?;
+    let activation: WorkspaceActivationBinding = serde_json::from_str(&content).ok()?;
+    let releases = list_releases(store_root).unwrap_or_default();
+
+    Some(FgctlWorkspaceStatus {
+        active_artifact_digest: activation.artifact_digest,
+        previous_artifact_digest: activation.previous_artifact_digest,
+        quarantined: activation.status == "quarantined",
+        releases,
+    })
 }
