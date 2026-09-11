@@ -55,8 +55,9 @@ Every deferred finding recorded in the phase verification traces and cell status
 4. **P02 (Phase 02)**:
    - LOW nits only, all explicitly latent (no current call site triggers them) — exitCode-preservation edge case, process-spy environment filtering.
 5. **P05 (Phase 05)**:
-   - M2: Replacement declared-but-unresolved by `select()`. Deferred to Phase 06+.
-   - 3 LOW deferred: plan-corpus ownership, `from_static` validation reach, link-time catalog check.
+   - M1: The kernel cannot hold real `&'static dyn OperationProvider` values yet, because this phase is explicitly forbidden from declaring the trait body at all (R7) — a genuine contradiction inside the phase spec, resolved in R7's favor. Deferred to Phase 06+.
+   - M2: A `replacement`-declaring duplicate pair passes `build_snapshot`'s linking check but `select()` never resolves it, always refusing `AmbiguousBinding`. Deferred, but only as a source comment — no owner in the plan corpus.
+   - 4 LOW deferred: M2's plan-corpus ownership gap; `from_static` validation reach (public and unvalidated beyond the `CATALOG` test); a link-time catalog-membership check that could complement M3 without adding a second runtime enforcement point; `SNAPSHOT_FOR_TESTS`'s pub-field justification (same-crate, `pub(crate)` would serve it).
 6. **P03 (Phase 03)**:
    - 1 MEDIUM: 2 of 8 R5 assertions test a mock. Real coverage exists in P02's `harness.test.mjs`.
    - 5 LOW deferred: golden vector edge cases, strict key ordering assertions.
@@ -80,6 +81,7 @@ Every deferred finding recorded in the phase verification traces and cell status
 12. **P11 (Phase 11)**:
     - M1: Stale-lock ownership after a crash. Flagged for P12/P13 lock format.
     - L3–L8 and 2 new LOW (pax-global-header format; same-trust-domain archive-reopen TOCTOU) accepted as documented caveats.
+    - INFO: Phase 09's manifest builder does not yet emit `digestKind`, `releaseVersion`, `sourceRevision`, `createdAt`, `requires.git`, or `stateSchemas`; `fgos-distribution`'s `ReleaseManifest` accommodates these as optional fields so deserialization never hard-fails. Not a P11 defect — anticipated explicitly by this phase's own requirements.
 13. **P12 (Phase 12)**:
     - MEDIUM F2: A 2-syscall reclaim-path race, injection-only, never spontaneous, identical to the residual window in reference `main-checkout-lock.mjs`. Deferred to a structurally different mechanism (flock or tombstone-rename).
     - Several LOW accepted as documented caveats.
@@ -105,19 +107,27 @@ node scripts/run-rust-dev-host.mjs version && node scripts/measure-p08-performan
 
 ### Measured Numbers
 
-Sourced from [`plans/260910-1700-rust-host-r1-kernel/reports/p08-performance.json`](p08-performance.json):
+Sourced from the committed
+[`plans/260910-1700-rust-host-r1-kernel/reports/p08-performance.json`](p08-performance.json)
+artifact. The reproduction command above rewrites that same file in place —
+running it re-measures live rather than reading a static number, and every
+observed re-run this cell (0.263 ms, 2.638 ms, 3.131 ms across three separate
+runs on this shared host) landed well inside budget but never reproduced the
+committed figure to the decimal; the committed artifact was restored via
+`git checkout` after each verification run so this report cites only it,
+not a live re-measurement:
 
 1. **Legacy Exec Overhead (`ready` selector)**:
    - Definition: Wall time of `fgos <legacy selector>` through the Rust CLI minus direct `node <payload> <selector>`, both warm (51 samples, 5 warmup rounds).
-   - Rust CLI p50: `374.634 ms` (re-measurement: `384.424 ms`)
-   - Direct Node p50: `374.371 ms` (re-measurement: `381.293 ms`)
-   - **Overhead p50**: `0.263 ms` (re-measurement: `3.131 ms`)
+   - Rust CLI p50: `374.634 ms`
+   - Direct Node p50: `374.371 ms`
+   - **Overhead p50**: `0.263 ms`
    - **Budget / Threshold**: `≤ 25 ms`
    - **Status**: **PASS (within threshold)**
 
 2. **Native `version` Latency**:
    - Definition: Wall time of `fgos version` through the native Rust route (51 samples, 5 warmup rounds).
-   - **Native Version p50**: `6.183 ms` (re-measurement: `5.642 ms`)
+   - **Native Version p50**: `6.183 ms`
    - **Budget / Threshold**: `≤ 10 ms`
    - **Status**: **PASS (within threshold)**
 
@@ -135,14 +145,15 @@ FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs' \
 ```
 
 `plan.md` itself documents one pre-existing, non-regression red test in that
-Node suite (line 330-332: `cohort-planner` "buildCandidateInventory against
+Node suite (lines 336-338: `cohort-planner` "buildCandidateInventory against
 the real committed", `check-decision-citation-drift`), so the chained command
 above does not itself exit 0 — each piece was verified individually instead:
 
 | Command | Target / Scope | Result / Exit Code |
 |---|---|---|
 | `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'` | Whole-repo Node suite | Exit code 1 — 6030/6038 passed, 7 skipped, 1 failed (`cohort-planner`'s `buildCandidateInventory` test, the plan.md-documented pre-existing red, reproduced identically on unmodified `main`, not a regression) |
-| `cargo fmt --all -- --check` | Rust formatting across workspace and `herdr-plugin` | Passed (exit code 0) |
+| `cargo fmt --all -- --check` | Rust formatting across the workspace only — `herdr-plugin` is `[workspace].exclude`d, so this command does not cover it (see below) | Passed (exit code 0) |
+| `cargo fmt --manifest-path herdr-plugin/Cargo.toml -- --check` | Rust formatting for `herdr-plugin` specifically | **Fails** — pre-existing formatting drift in `herdr-plugin/src/app.rs`, unrelated to any cell this track shipped; not part of `plan.md`'s own `FULL_TEST` definition, which only names the two commands above it, but recorded here for completeness since "workspace and `herdr-plugin`" is otherwise a misleading claim |
 | `cargo clippy --workspace --all-targets -- -D warnings` | Rust linting across all workspace crates and targets | Passed (exit code 0) |
 | `cargo test --workspace` | Rust unit and integration tests across workspace crates | Passed (exit code 0) |
 | `cargo test --manifest-path herdr-plugin/Cargo.toml` | Rust integration and unit tests for `herdr-plugin` | Passed (exit code 0, 225 tests passed) |
@@ -150,5 +161,8 @@ above does not itself exit 0 — each piece was verified individually instead:
 | `source scripts/fgos-shell-integration.sh && fgos coordination chain rust-host-r1-kernel --json` | Coordination chain status read | Passed (exit code 0) |
 
 Every command above was run individually and its real exit code recorded;
-none were assumed. The only non-zero exit is the plan.md-documented
-pre-existing `cohort-planner` red, unrelated to any cell this track shipped.
+none were assumed. The two non-zero exits are the plan.md-documented
+pre-existing `cohort-planner` red and the pre-existing `herdr-plugin`
+formatting drift noted above — neither is part of `plan.md`'s own
+`FULL_TEST` definition, and neither is caused by any cell this track
+shipped.
