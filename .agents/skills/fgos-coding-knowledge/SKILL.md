@@ -23,6 +23,14 @@ Runs while a work item sits at status `retrospective`. This skill turns the item
 ## Flow
 
 1. **Resolve topic + role.** Ask registry for `(topicId, role, docId)` based on the capture's topic.
+   - **Re-attest branch (tsk-555):** if an ACTIVE doc for this `(topicId, role)` already
+     covers the capture and no new doc is needed, skip steps 2-3 entirely — go straight
+     to step 4, attesting the EXISTING `currentPath`. Never close a re-attest judgment
+     with only a closing report (`fgos report`/driver stop reason) and no `fgos knowledge
+     attest` call — a report alone is `kind:'engine'` bookkeeping, indistinguishable from
+     an item that was never retrospected at all, and the item parks at `cleanup ->
+     blocked` forever (`checkRetrospectiveContent`, src/state/cleanup-harness.mjs) even
+     though the judgment was real.
 2. **Reserve doc slot if new.** Run:
    ```bash
    fgos doc reserve <topicId> <role> <currentPath>
@@ -33,7 +41,8 @@ Runs while a work item sits at status `retrospective`. This skill turns the item
    git commit -m "docs(<id>): retrospective synthesis"
    ```
 4. **Attest document.** Links this item's own capture to the doc slot
-   (docs/architect/knowledge-registry-redesign.md §7.4). Run:
+   (docs/architect/knowledge-registry-redesign.md §7.4) — REQUIRED for both a
+   freshly-written doc and a re-attest of an existing one. Run:
    ```bash
    fgos knowledge attest --doc-path <currentPath> --capture-id <id>
    ```
