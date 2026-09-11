@@ -29,6 +29,15 @@ directory. Architecture refines that direction into accepted system boundaries.
    and false-success boundaries.
 8. [Visibility And Herdr](visibility-and-herdr.md) defines the observability
    boundary.
+9. [RunHandle](run-handle.md) proposes the runtime-layer handle boundary for
+   locating, observing, labeling, snapshotting, and guarding live Runs without
+   making pane/process identity part of core coordination truth.
+10. [Coordination Continuation And Recovery](coordination-continuation-recovery.md)
+    proposes the CoordinationSession planner boundary for resume, immutable
+    request-shape hazards, existing-result recovery, and continuation sessions.
+11. [Executor Health And Fallback](executor-health-and-fallback.md) proposes
+    the Dispatch Control Plane boundary for executor failure classification,
+    cooldown/quota parking, and governed fallback.
 
 CoordinationSession's identity/persistence boundary and the shared
 FlowDefinition graph/operation/policy IR are accepted per
