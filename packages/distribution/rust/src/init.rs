@@ -120,6 +120,8 @@ pub struct InstallTransactionRecord {
 
 #[derive(Debug, thiserror::Error)]
 pub enum InitError {
+    #[error("activation-lock-held: workspace activation is already in progress")]
+    ActivationLockHeld,
     #[error("{0}")]
     Workspace(#[from] crate::workspace::WorkspaceError),
     #[error("{0}")]
@@ -136,6 +138,124 @@ pub enum InitError {
     Json(#[from] serde_json::Error),
     #[error("{0}")]
     Custom(String),
+}
+
+/// RAII lock guard for `.fgos/installation/activation.lock` create-exclusive file.
+///
+/// Matches Phase 11's `install.lock` pattern in `store.rs`:
+/// - `OpenOptions::new().write(true).create_new(true)`
+/// - Immediate refusal on EEXIST (never a blocking retry)
+/// - RAII guard removes the file on drop
+pub struct ActivationLockGuard {
+    lock_path: std::path::PathBuf,
+}
+
+impl ActivationLockGuard {
+    pub fn acquire(installation_dir: &Path) -> Result<Self, InitError> {
+        let lock_path = installation_dir.join("activation.lock");
+        if let Some(parent) = lock_path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+
+        match std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .open(&lock_path)
+        {
+            Ok(file) => {
+                drop(file);
+                Ok(Self { lock_path })
+            }
+            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
+                Err(InitError::ActivationLockHeld)
+            }
+            Err(err) => Err(InitError::Io(err)),
+        }
+    }
+}
+
+impl Drop for ActivationLockGuard {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.lock_path);
+    }
+}
+
+/// Cleans up any stale `activation.json.tmp.*` files left from a previous killed run (Reviewer L8).
+///
+/// Must only be called after acquiring `activation.lock`.
+pub fn cleanup_stale_activation_tmp_files(installation_dir: &Path) {
+    if let Ok(entries) = std::fs::read_dir(installation_dir) {
+        for entry in entries.flatten() {
+            if entry
+                .file_name()
+                .to_string_lossy()
+                .starts_with("activation.json.tmp.")
+            {
+                let _ = std::fs::remove_file(entry.path());
+            }
+        }
+    }
+}
+
+#[derive(Deserialize)]
+struct DigestOnly {
+    #[serde(rename = "artifactDigest")]
+    artifact_digest: String,
+}
+
+/// Reads or peeks candidate release manifest `artifactDigest` from a source path (directory or .tar.gz).
+pub fn resolve_source_manifest_digest(from_path: &Path) -> Result<String, InitError> {
+    if !from_path.exists() {
+        return Err(InitError::Stage(crate::store::StageError::SourceNotFound(
+            from_path.to_path_buf(),
+        )));
+    }
+    if from_path.is_dir() {
+        let manifest_path = from_path.join("manifest.json");
+        if !manifest_path.is_file() {
+            return Err(InitError::Custom(format!(
+                "manifest.json not found in {}",
+                from_path.display()
+            )));
+        }
+        let content = std::fs::read_to_string(&manifest_path)?;
+        let parsed: DigestOnly = serde_json::from_str(&content).map_err(|e| {
+            InitError::Custom(format!(
+                "failed to parse manifest from {}: {}",
+                manifest_path.display(),
+                e
+            ))
+        })?;
+        Ok(parsed.artifact_digest)
+    } else {
+        let file = std::fs::File::open(from_path)?;
+        let decoder = flate2::read::GzDecoder::new(file);
+        let mut archive = tar::Archive::new(decoder);
+        let entries = archive
+            .entries()
+            .map_err(|e| InitError::Custom(format!("failed to read archive entries: {}", e)))?;
+        for entry_res in entries {
+            let mut entry =
+                entry_res.map_err(|e| InitError::Custom(format!("archive entry error: {}", e)))?;
+            let p = entry
+                .path()
+                .map_err(|e| InitError::Custom(format!("archive path error: {}", e)))?;
+            let p_str = p.to_string_lossy().replace('\\', "/");
+            let norm = p_str.strip_prefix("./").unwrap_or(&p_str);
+            if norm == "manifest.json"
+                || (norm.ends_with("/manifest.json") && norm.matches('/').count() == 1)
+            {
+                let parsed: DigestOnly = serde_json::from_reader(&mut entry).map_err(|e| {
+                    InitError::Custom(format!("failed to parse manifest from archive: {}", e))
+                })?;
+                return Ok(parsed.artifact_digest);
+            }
+        }
+        Err(InitError::Custom(format!(
+            "manifest.json not found in archive {}",
+            from_path.display()
+        )))
+    }
 }
 
 /// Formats a SystemTime into ISO 8601 UTC string (YYYY-MM-DDTHH:mm:ss.sssZ).
@@ -404,28 +524,139 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         None
     };
 
-    // Determine target release digest and source
-    let (target_digest, candidate_dir) = match (from_source, &tracked_pin) {
-        (Some(src), _) => {
-            // Stage from explicit source first (or no-op if already staged)
-            let stage_outcome = stage_release(&store_root, src)?;
-            let digest = match stage_outcome {
+    // Read current activation.json if present (R9 / Reviewer M2).
+    let current_activation: Option<WorkspaceActivationBinding> = if activation_path.exists() {
+        std::fs::read_to_string(&activation_path)
+            .ok()
+            .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok())
+    } else {
+        None
+    };
+
+    // Determine target release digest and candidate directory (Items 2, 3, 5).
+    let (target_digest, candidate_dir) = match (&tracked_pin, from_source) {
+        (Some(pin), Some(from_src)) => {
+            let pin_digest = &pin.project_runtime.artifact_digest;
+
+            // Reconcile --from with pin before staging (Item 2):
+            let from_digest = resolve_source_manifest_digest(from_src)?;
+            if &from_digest != pin_digest {
+                return Err(InitError::Custom(format!(
+                    "pin-mismatch: workspace is pinned to {}, --from resolved to {}",
+                    pin_digest, from_digest
+                )));
+            }
+
+            // R9: Idempotent re-run check BEFORE stage_release (Reviewer M2).
+            if let Some(ref current) = current_activation {
+                if &current.artifact_digest == pin_digest {
+                    check_main_checkout_lock(&workspace_root)?;
+                    let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
+                    cleanup_stale_activation_tmp_files(&installation_dir);
+
+                    let shim_fgos = installation_dir.join("bin").join("fgos");
+                    run_tail(
+                        &workspace_root,
+                        &shim_fgos,
+                        &store_root,
+                        &current.activation_id,
+                    )?;
+                    return Ok(());
+                }
+            }
+
+            // Stage candidate release from --from source
+            let stage_outcome = stage_release(&store_root, from_src)?;
+            let staged_digest = match stage_outcome {
                 StageOutcome::Staged { artifact_digest } => artifact_digest,
                 StageOutcome::NoOp { artifact_digest } => artifact_digest,
             };
-            let dir = store_root.join("releases").join(&digest);
-            (digest, dir)
+
+            if &staged_digest != pin_digest {
+                return Err(InitError::Custom(format!(
+                    "pin-mismatch: workspace is pinned to {}, --from resolved to {}",
+                    pin_digest, staged_digest
+                )));
+            }
+
+            let dir = store_root.join("releases").join(&staged_digest);
+            (staged_digest, dir)
         }
-        (None, Some(pin)) => {
-            let digest = pin.project_runtime.artifact_digest.clone();
-            let dir = store_root.join("releases").join(&digest);
+        (Some(pin), None) => {
+            let pin_digest = &pin.project_runtime.artifact_digest;
+
+            // R9: Idempotent re-run check (Reviewer M2).
+            if let Some(ref current) = current_activation {
+                if &current.artifact_digest == pin_digest {
+                    check_main_checkout_lock(&workspace_root)?;
+                    let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
+                    cleanup_stale_activation_tmp_files(&installation_dir);
+
+                    let shim_fgos = installation_dir.join("bin").join("fgos");
+                    run_tail(
+                        &workspace_root,
+                        &shim_fgos,
+                        &store_root,
+                        &current.activation_id,
+                    )?;
+                    return Ok(());
+                }
+            }
+
+            let dir = store_root.join("releases").join(pin_digest);
             if !dir.exists() {
                 return Err(InitError::Custom(format!(
                     "pinned release {} is not staged in release store and no --from source was provided",
-                    digest
+                    pin_digest
                 )));
             }
-            (digest, dir)
+
+            // Reviewer L7 (Item 5): assert staged release's own manifest.json artifactDigest equals pinned artifactDigest
+            let staged_manifest = read_manifest_from_dir(&dir).map_err(|e| {
+                InitError::Custom(format!(
+                    "failed to read manifest from staged release {}: {}",
+                    dir.display(),
+                    e
+                ))
+            })?;
+            if &staged_manifest.artifact_digest != pin_digest {
+                return Err(InitError::Custom(format!(
+                    "staged release manifest digest mismatch: {} declares {}, expected pinned {}",
+                    dir.display(),
+                    staged_manifest.artifact_digest,
+                    pin_digest
+                )));
+            }
+
+            (pin_digest.clone(), dir)
+        }
+        (None, Some(from_src)) => {
+            // Check if from_src matches current activation for idempotent re-run:
+            let from_digest = resolve_source_manifest_digest(from_src)?;
+            if let Some(ref current) = current_activation {
+                if current.artifact_digest == from_digest {
+                    check_main_checkout_lock(&workspace_root)?;
+                    let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
+                    cleanup_stale_activation_tmp_files(&installation_dir);
+
+                    let shim_fgos = installation_dir.join("bin").join("fgos");
+                    run_tail(
+                        &workspace_root,
+                        &shim_fgos,
+                        &store_root,
+                        &current.activation_id,
+                    )?;
+                    return Ok(());
+                }
+            }
+
+            let stage_outcome = stage_release(&store_root, from_src)?;
+            let staged_digest = match stage_outcome {
+                StageOutcome::Staged { artifact_digest } => artifact_digest,
+                StageOutcome::NoOp { artifact_digest } => artifact_digest,
+            };
+            let dir = store_root.join("releases").join(&staged_digest);
+            (staged_digest, dir)
         }
         (None, None) => {
             return Err(InitError::Custom(
@@ -433,30 +664,6 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
             ));
         }
     };
-
-    // R9: Idempotent re-run check:
-    // If activation.json exists and its artifactDigest == target_digest, skip re-staging/writing shims/activation.
-    if activation_path.exists() {
-        if let Ok(content) = std::fs::read_to_string(&activation_path) {
-            if let Ok(current_activation) =
-                serde_json::from_str::<WorkspaceActivationBinding>(&content)
-            {
-                if current_activation.artifact_digest == target_digest {
-                    // Check lock even on idempotent re-run
-                    check_main_checkout_lock(&workspace_root)?;
-
-                    let shim_fgos = installation_dir.join("bin").join("fgos");
-                    run_tail(
-                        &workspace_root,
-                        &shim_fgos,
-                        &store_root,
-                        &current_activation.activation_id,
-                    )?;
-                    return Ok(());
-                }
-            }
-        }
-    }
 
     // Read candidate manifest
     let manifest = read_manifest_from_dir(&candidate_dir).map_err(|e| {
@@ -473,15 +680,14 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     // R6: Preflight before publish (no host-visible writes)
     preflight_candidate(&candidate_dir, &manifest)?;
 
+    // Acquire workspace activation lock before ANY workspace-visible write (Item 1)
+    let _activation_lock = ActivationLockGuard::acquire(&installation_dir)?;
+
+    // Clean up stale activation.json.tmp.* files left from previous killed runs (Item 6)
+    cleanup_stale_activation_tmp_files(&installation_dir);
+
     // Previous activation digest if present
-    let previous_artifact_digest: Option<String> = if activation_path.exists() {
-        std::fs::read_to_string(&activation_path)
-            .ok()
-            .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok())
-            .map(|a| a.artifact_digest)
-    } else {
-        None
-    };
+    let previous_artifact_digest: Option<String> = current_activation.map(|a| a.artifact_digest);
 
     let activation_id = format!("act_{:016x}", now_millis());
     let now_str = format_iso8601_utc(SystemTime::now());

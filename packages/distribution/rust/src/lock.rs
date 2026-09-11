@@ -119,10 +119,14 @@ pub fn check_main_checkout_lock(workspace_root: &Path) -> Result<(), MainCheckou
 
     match record.identity {
         LockHolderIdentity::Numeric(pid) => {
-            if is_pid_alive(pid as i32) {
+            let lock_age = now.saturating_sub(record.ts);
+            let within_ttl = lock_age <= DEFAULT_TTL_MS;
+            let pid_i32 = i32::try_from(pid).ok();
+            let pid_live = pid_i32.map(is_pid_alive).unwrap_or(false);
+            if pid_live && within_ttl {
                 Err(MainCheckoutLockError::HeldNumeric(pid))
             } else {
-                // dead pid is stale -> free
+                // dead pid or ttl-expired is stale -> free
                 Ok(())
             }
         }
@@ -179,6 +183,27 @@ mod tests {
     fn test_check_missing_lock_is_free() {
         let temp = std::env::temp_dir().join(format!("test_lock_missing_{}", std::process::id()));
         let _ = std::fs::create_dir_all(&temp);
+        assert!(check_main_checkout_lock(&temp).is_ok());
+        let _ = std::fs::remove_dir_all(&temp);
+    }
+
+    #[test]
+    fn test_check_live_pid_expired_ttl_is_free() {
+        let temp =
+            std::env::temp_dir().join(format!("test_lock_live_expired_{}", std::process::id()));
+        let fgos_dir = temp.join(".fgos");
+        let _ = std::fs::create_dir_all(&fgos_dir);
+        let lock_path = fgos_dir.join("main-checkout.lock");
+
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64;
+        let expired_ts = now.saturating_sub(DEFAULT_TTL_MS + 5_000);
+
+        let raw = format!(r#"{{"pid": {}, "ts": {}}}"#, std::process::id(), expired_ts);
+        std::fs::write(&lock_path, raw).unwrap();
+
         assert!(check_main_checkout_lock(&temp).is_ok());
         let _ = std::fs::remove_dir_all(&temp);
     }

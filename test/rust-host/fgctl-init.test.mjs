@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -372,3 +372,317 @@ test('R10: version --runtime-json outside activated workspace reports host: "dev
     fs.rmSync(tempEmptyDir, { recursive: true, force: true });
   }
 });
+
+test('Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)', async () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-conc-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-conc-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-conc-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // Pre-stage fixture into release store
+    const stageRes = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome: tempState });
+    assert.equal(stageRes.status, 0, `Pre-staging fixture must succeed: ${stageRes.stderr}`);
+
+    // Pre-pin workspace to fixtureDigest
+    const fgosDir = path.join(tempProj, '.fgos');
+    fs.mkdirSync(fgosDir, { recursive: true });
+    const distPin = {
+      schemaVersion: 1,
+      projectRuntime: {
+        policy: 'exact-digest',
+        artifactDigest: fixtureDigest,
+        releaseVersion: '0.1.0',
+        channel: null,
+        allowPrerelease: false,
+      },
+    };
+    fs.writeFileSync(path.join(fgosDir, 'distribution.json'), JSON.stringify(distPin, null, 2));
+
+    // Fire several truly concurrent fgctl init processes
+    const procCount = 8;
+    const procs = Array.from({ length: procCount }, () =>
+      spawn(FGCTL_BIN, ['init'], {
+        cwd: tempProj,
+        env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
+        stdio: ['ignore', 'pipe', 'pipe'],
+      })
+    );
+
+    const results = await Promise.all(procs.map(waitForProcess));
+    const succeeded = results.filter((r) => r.code === 0);
+    const failed = results.filter((r) => r.code !== 0);
+
+    assert.equal(succeeded.length, 1, 'Exactly one concurrent init must succeed');
+    assert.equal(failed.length, procCount - 1, 'Every other concurrent init must fail');
+    for (const r of failed) {
+      assert.match(r.stderr, /activation-lock-held/, 'Failed invocation must report activation-lock-held');
+    }
+
+    // Exactly one completed install transaction record in store
+    const installsDir = path.join(tempState, 'installs');
+    assert.ok(fs.existsSync(installsDir), 'installs directory must exist');
+    const txFiles = fs.readdirSync(installsDir).filter((f) => f.endsWith('.json'));
+    assert.equal(txFiles.length, 1, 'Release store must contain exactly one completed install transaction');
+
+    // activation.json exists, activation.lock is removed
+    assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.lock')));
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-pin-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-pin-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-pin-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    const fgosDir = path.join(tempProj, '.fgos');
+    fs.mkdirSync(fgosDir, { recursive: true });
+
+    // Pinned to fixtureDigest
+    const distPin = {
+      schemaVersion: 1,
+      projectRuntime: {
+        policy: 'exact-digest',
+        artifactDigest: fixtureDigest,
+        releaseVersion: '0.1.0',
+        channel: null,
+        allowPrerelease: false,
+      },
+    };
+    const pinPath = path.join(fgosDir, 'distribution.json');
+    fs.writeFileSync(pinPath, JSON.stringify(distPin, null, 2));
+
+    // A: Pinned and unstaged, NO --from: refuses clearly naming pin is unstaged
+    const resNoFrom = runFgctl(['init'], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.notEqual(resNoFrom.status, 0);
+    assert.match(resNoFrom.stderr, /pinned release .* is not staged .* and no --from source was provided/);
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')));
+
+    // B: Pinned and unstaged, mismatching --from: refuses clearly with pin-mismatch and writes nothing
+    const mismatchDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-mismatch-'));
+    const dummyManifest = JSON.parse(fs.readFileSync(path.join(fixtureReleaseDir, 'manifest.json'), 'utf8'));
+    dummyManifest.artifactDigest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+    fs.writeFileSync(path.join(mismatchDir, 'manifest.json'), JSON.stringify(dummyManifest, null, 2));
+
+    const resMismatch = runFgctl(['init', '--from', mismatchDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.notEqual(resMismatch.status, 0);
+    assert.match(resMismatch.stderr, /pin-mismatch/);
+    assert.match(resMismatch.stderr, new RegExp(fixtureDigest));
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')), 'Must write nothing on pin mismatch');
+
+    // Pin file in workspace was NOT overridden
+    const pinAfter = JSON.parse(fs.readFileSync(pinPath, 'utf8'));
+    assert.equal(pinAfter.projectRuntime.artifactDigest, fixtureDigest, 'Tracked pin must not be modified');
+
+    // C: Pinned and unstaged, matching --from: reconciles, stages, and activates successfully
+    const resMatching = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(resMatching.status, 0, `Matching --from must succeed: ${resMatching.stderr}`);
+    assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
+
+    fs.rmSync(mismatchDir, { recursive: true, force: true });
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // 1. Initial init
+    const initRes = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(initRes.status, 0);
+
+    // 2. Intentionally block the release store's install.lock
+    const installLockPath = path.join(tempState, 'install.lock');
+    fs.writeFileSync(installLockPath, 'artificially locked store');
+
+    // 3. Re-run init at the same digest: must skip stage_release and succeed without failing on install.lock!
+    const rerunRes = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(rerunRes.status, 0, `Idempotent re-run must not touch install.lock: ${rerunRes.stderr}`);
+
+    // Cleanup artificial lock
+    fs.unlinkSync(installLockPath);
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l1-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    const fgosDir = path.join(tempProj, '.fgos');
+    fs.mkdirSync(fgosDir, { recursive: true });
+    const lockPath = path.join(fgosDir, 'main-checkout.lock');
+
+    // Write a lock held by current live PID, but with ts older than DEFAULT_TTL_MS (3 mins)
+    const expiredTs = Date.now() - DEFAULT_TTL_MS - 5000;
+    fs.writeFileSync(lockPath, JSON.stringify({ pid: process.pid, ts: expiredTs }));
+
+    // Must be treated as free and succeed!
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(res.status, 0, `Init must succeed when live PID lock is expired: ${res.stderr}`);
+    assert.ok(fs.existsSync(path.join(tempProj, '.fgos', 'installation', 'activation.json')));
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 5: Staged release whose manifest.json digest mismatches pin is refused', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // Pre-stage fixture into release store
+    const stageRes = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome: tempState });
+    assert.equal(stageRes.status, 0);
+
+    // Tamper with manifest in staged release dir
+    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
+    manifest.artifactDigest = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+    fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
+
+    // Pin workspace to fixtureDigest (no --from provided)
+    const fgosDir = path.join(tempProj, '.fgos');
+    fs.mkdirSync(fgosDir, { recursive: true });
+    const distPin = {
+      schemaVersion: 1,
+      projectRuntime: {
+        policy: 'exact-digest',
+        artifactDigest: fixtureDigest,
+        releaseVersion: '0.1.0',
+        channel: null,
+        allowPrerelease: false,
+      },
+    };
+    fs.writeFileSync(path.join(fgosDir, 'distribution.json'), JSON.stringify(distPin, null, 2));
+
+    // fgctl init without --from must detect the tampered manifest and refuse clearly
+    const res = runFgctl(['init'], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.notEqual(res.status, 0);
+    assert.match(res.stderr, /manifest digest mismatch/);
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')));
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l8-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l8-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l8-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // Simulate leftover tmp file from crashed previous run
+    const installDir = path.join(tempProj, '.fgos', 'installation');
+    fs.mkdirSync(installDir, { recursive: true });
+    const staleTmp1 = path.join(installDir, 'activation.json.tmp.act_deadbeef12345678');
+    const staleTmp2 = path.join(installDir, 'activation.json.tmp.act_0000111122223333');
+    fs.writeFileSync(staleTmp1, '{"partial": true}');
+    fs.writeFileSync(staleTmp2, '{"corrupt": true}');
+
+    // Run fgctl init
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(res.status, 0, `Init must succeed: ${res.stderr}`);
+
+    // Stale tmp files must be cleaned up
+    assert.ok(!fs.existsSync(staleTmp1), 'Stale tmp file 1 must be removed');
+    assert.ok(!fs.existsSync(staleTmp2), 'Stale tmp file 2 must be removed');
+
+    // Real activation.json must exist
+    assert.ok(fs.existsSync(path.join(installDir, 'activation.json')), 'activation.json must exist');
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+function waitForProcess(proc) {
+  return new Promise((resolve) => {
+    let stdout = '';
+    let stderr = '';
+    proc.stdout.on('data', (d) => (stdout += d));
+    proc.stderr.on('data', (d) => (stderr += d));
+    proc.on('close', (code) => {
+      resolve({ code, stdout, stderr });
+    });
+  });
+}
+
