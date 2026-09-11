@@ -78,6 +78,7 @@ Every deferred finding recorded in the phase verification traces and cell status
 11. **P10 (Phase 10)**:
     - MEDIUM: Worktree-topology limitation for `cli.mjs` tier-0 resolution. Ratified as Lead decision, deferred to cutover track.
     - Pre-existing `cohort-planner` flake and minor LOW accepted as documented caveats.
+    - LOW (found in P16 closeout verification): the cell's `herdr::resolve_fgos` addition to `fgos.rs`/`main.rs` was never run through `cargo fmt`, since `herdr-plugin` is `[workspace].exclude`d from the track's own `cargo fmt --all -- --check` gate and no reviewer/red-team round caught it. 6 new unformatted hunks against an already-unformatted pre-existing baseline (see §5). Deferred — fixing it now would touch code outside this closeout cell's own docs-only lease.
 12. **P11 (Phase 11)**:
     - M1: Stale-lock ownership after a crash. Flagged for P12/P13 lock format.
     - L3–L8 and 2 new LOW (pax-global-header format; same-trust-domain archive-reopen TOCTOU) accepted as documented caveats.
@@ -111,11 +112,11 @@ Sourced from the committed
 [`plans/260910-1700-rust-host-r1-kernel/reports/p08-performance.json`](p08-performance.json)
 artifact. The reproduction command above rewrites that same file in place —
 running it re-measures live rather than reading a static number, and every
-observed re-run this cell (0.263 ms, 2.638 ms, 3.131 ms across three separate
-runs on this shared host) landed well inside budget but never reproduced the
-committed figure to the decimal; the committed artifact was restored via
-`git checkout` after each verification run so this report cites only it,
-not a live re-measurement:
+live re-run observed this cell (2.638 ms, 3.131 ms, across two separate runs
+on this shared host) landed well inside budget but never reproduced the
+committed `0.263 ms` figure to the decimal; the committed artifact was
+restored via `git checkout` after each verification run so this report cites
+only it, not a live re-measurement:
 
 1. **Legacy Exec Overhead (`ready` selector)**:
    - Definition: Wall time of `fgos <legacy selector>` through the Rust CLI minus direct `node <payload> <selector>`, both warm (51 samples, 5 warmup rounds).
@@ -153,7 +154,7 @@ above does not itself exit 0 — each piece was verified individually instead:
 |---|---|---|
 | `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'` | Whole-repo Node suite | Exit code 1 — 6030/6038 passed, 7 skipped, 1 failed (`cohort-planner`'s `buildCandidateInventory` test, the plan.md-documented pre-existing red, reproduced identically on unmodified `main`, not a regression) |
 | `cargo fmt --all -- --check` | Rust formatting across the workspace only — `herdr-plugin` is `[workspace].exclude`d, so this command does not cover it (see below) | Passed (exit code 0) |
-| `cargo fmt --manifest-path herdr-plugin/Cargo.toml -- --check` | Rust formatting for `herdr-plugin` specifically | **Fails** — pre-existing formatting drift in `herdr-plugin/src/app.rs`, unrelated to any cell this track shipped; not part of `plan.md`'s own `FULL_TEST` definition, which only names the two commands above it, but recorded here for completeness since "workspace and `herdr-plugin`" is otherwise a misleading claim |
+| `cargo fmt --manifest-path herdr-plugin/Cargo.toml -- --check` | Rust formatting for `herdr-plugin` specifically | **Fails** — 276 diff hunks across 12 files. 270 of those hunks, in all 12 files, reproduce identically on unmodified `main` — pre-existing, unrelated to this track. The remaining 6 (`fgos.rs` 8→13, `main.rs` 52→53) are new, introduced by this track's own Phase 10 commits, since no tooling this track ran ever covers `herdr-plugin`'s formatting (it is `[workspace].exclude`d from every `cargo fmt --all` call, including this cell's own). Not part of `plan.md`'s own `FULL_TEST` definition, which only names the two commands above it, but recorded here for completeness since "workspace and `herdr-plugin`" is otherwise a misleading claim |
 | `cargo clippy --workspace --all-targets -- -D warnings` | Rust linting across all workspace crates and targets | Passed (exit code 0) |
 | `cargo test --workspace` | Rust unit and integration tests across workspace crates | Passed (exit code 0) |
 | `cargo test --manifest-path herdr-plugin/Cargo.toml` | Rust integration and unit tests for `herdr-plugin` | Passed (exit code 0, 225 tests passed) |
@@ -162,7 +163,9 @@ above does not itself exit 0 — each piece was verified individually instead:
 
 Every command above was run individually and its real exit code recorded;
 none were assumed. The two non-zero exits are the plan.md-documented
-pre-existing `cohort-planner` red and the pre-existing `herdr-plugin`
-formatting drift noted above — neither is part of `plan.md`'s own
-`FULL_TEST` definition, and neither is caused by any cell this track
-shipped.
+pre-existing `cohort-planner` red and the `herdr-plugin` formatting drift
+noted above — neither is part of `plan.md`'s own `FULL_TEST` definition.
+The `cohort-planner` red is entirely pre-existing; the `herdr-plugin`
+drift is overwhelmingly pre-existing (270 of 276 hunks) with a small
+addition (6 hunks, 2 files) this track's own Phase 10 introduced — see
+§3.
