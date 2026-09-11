@@ -2,6 +2,18 @@
 //!
 //! Distribution provider and manifest utilities.
 
+pub mod canonical;
+pub mod extract;
+pub mod manifest;
+pub mod store;
+pub mod verify;
+
+pub use canonical::*;
+pub use extract::*;
+pub use manifest::*;
+pub use store::*;
+pub use verify::*;
+
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
     ProviderLifecycle, ProviderOutcome,
