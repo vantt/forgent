@@ -34,13 +34,19 @@ case "$TARGET" in
     ;;
 esac
 
+# Bounds every network call below so a server that connects but never
+# finishes sending (or never responds at all) cannot hang this script
+# indefinitely -- connect and total-transfer ceilings, not just connect.
+CURL_TIMEOUT_ARGS="--connect-timeout 15 --max-time 120"
+WGET_TIMEOUT_ARGS="--timeout=120"
+
 download_file() {
   dl_url="$1"
   dl_dest="$2"
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL -o "$dl_dest" "$dl_url"
+    curl -fsSL $CURL_TIMEOUT_ARGS -o "$dl_dest" "$dl_url"
   elif command -v wget >/dev/null 2>&1; then
-    wget -q -O "$dl_dest" "$dl_url"
+    wget -q $WGET_TIMEOUT_ARGS -O "$dl_dest" "$dl_url"
   else
     echo "Error: curl or wget is required to download assets" >&2
     exit 1
@@ -58,9 +64,9 @@ else
   fi
 
   if command -v curl >/dev/null 2>&1; then
-    EFFECTIVE_URL="$(curl -fsSL -o /dev/null -w '%{url_effective}' "$LATEST_URL")"
+    EFFECTIVE_URL="$(curl -fsSL $CURL_TIMEOUT_ARGS -o /dev/null -w '%{url_effective}' "$LATEST_URL")"
   elif command -v wget >/dev/null 2>&1; then
-    EFFECTIVE_URL="$(wget --spider -S "$LATEST_URL" 2>&1 | grep -i '^[[:space:]]*Location:' | tail -n 1 | awk '{print $2}')"
+    EFFECTIVE_URL="$(wget $WGET_TIMEOUT_ARGS --spider -S "$LATEST_URL" 2>&1 | grep -i '^[[:space:]]*Location:' | tail -n 1 | awk '{print $2}')"
   else
     echo "Error: curl or wget is required to resolve the latest release" >&2
     exit 1
@@ -140,14 +146,19 @@ if ! tar -xzf "$TMP_DIR/$TARBALL" -C "$EXTRACT_DIR"; then
   exit 1
 fi
 
-if [ -f "$EXTRACT_DIR/fgctl" ]; then
+# `-f`/`cp` both follow a symlink transparently -- a tarball whose `fgctl`
+# entry is a symlink to some other extracted (or, worse, absolute) path
+# would otherwise have THAT target's bytes installed instead of the real
+# binary the checksum above only verified at the tarball level. Refuse a
+# symlink explicitly rather than letting `-f` silently accept its target.
+if [ -e "$EXTRACT_DIR/fgctl" ] && [ ! -L "$EXTRACT_DIR/fgctl" ] && [ -f "$EXTRACT_DIR/fgctl" ]; then
   FGCTL_BIN="$EXTRACT_DIR/fgctl"
 else
   FGCTL_BIN="$(find "$EXTRACT_DIR" -type f -name fgctl 2>/dev/null | head -n 1 || true)"
 fi
 
-if [ -z "$FGCTL_BIN" ] || [ ! -f "$FGCTL_BIN" ]; then
-  echo "Error: fgctl binary not found in $TARBALL" >&2
+if [ -z "$FGCTL_BIN" ] || [ ! -f "$FGCTL_BIN" ] || [ -L "$FGCTL_BIN" ]; then
+  echo "Error: fgctl binary not found (or is a symlink, which is refused) in $TARBALL" >&2
   exit 1
 fi
 

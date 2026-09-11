@@ -233,6 +233,94 @@ describe('install.sh e2e installer suite', () => {
     }
   });
 
+  test('Case 6: every network call is bounded by a connect/total timeout (no unbounded hang)', () => {
+    const source = fs.readFileSync(installScript, 'utf8');
+    assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--connect-timeout/, 'curl timeout args must set --connect-timeout');
+    assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--max-time/, 'curl timeout args must set --max-time');
+    assert.match(source, /WGET_TIMEOUT_ARGS="--timeout=/, 'wget timeout args must set --timeout=');
+    // Every actual curl/wget invocation must reference the shared timeout
+    // args, not just one of them -- a live server that never finishes
+    // responding would otherwise still hang the specific call that omitted
+    // them. Count exact invocation substrings rather than any line
+    // mentioning "curl"/"wget" (comments, error messages, `command -v`
+    // probes) to avoid false matches/misses on either side.
+    const curlInvocations = (source.match(/curl -fsSL \$CURL_TIMEOUT_ARGS/g) || []).length;
+    const wgetInvocations = (source.match(/wget[^\n]*\$WGET_TIMEOUT_ARGS/g) || []).length;
+    assert.equal(curlInvocations, 2, 'expected exactly two curl invocations carrying the shared timeout args (download + latest resolution)');
+    assert.equal(wgetInvocations, 2, 'expected exactly two wget invocations carrying the shared timeout args (download + latest resolution)');
+  });
+
+  test('Case 7: a tarball whose fgctl entry is a symlink to an external file is refused, nothing installed', async () => {
+    tamperActive = false;
+    const tempInstallDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case7-install-'));
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case7-home-'));
+    const secretDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case7-secret-'));
+    const symlinkFixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case7-fixture-'));
+    const symlinkTarballName = `fgctl-${version}-${target}.tar.gz`;
+
+    try {
+      // A file OUTSIDE the tarball whose content must never end up installed.
+      const secretPath = path.join(secretDir, 'external-secret');
+      const secretContent = 'this-must-never-be-installed-as-fgctl';
+      fs.writeFileSync(secretPath, secretContent);
+
+      fs.symlinkSync(secretPath, path.join(symlinkFixtureDir, 'fgctl'));
+      const symlinkTarPath = path.join(symlinkFixtureDir, symlinkTarballName);
+      // Build the archive WITHOUT dereferencing (-h), so `fgctl` is stored as
+      // an actual symlink entry, matching a real malicious tarball.
+      execFileSync('tar', ['-czf', symlinkTarPath, '-C', symlinkFixtureDir, 'fgctl']);
+      const symlinkTarball = fs.readFileSync(symlinkTarPath);
+      const symlinkHash = crypto.createHash('sha256').update(symlinkTarball).digest('hex');
+
+      // Serve this malicious tarball for the duration of this one test via a
+      // second, disposable server (keeps the shared `before()` fixtures
+      // untouched for every other case).
+      const evilServer = http.createServer((req, res) => {
+        const url = req.url || '';
+        if (url.endsWith(symlinkTarballName)) {
+          res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': symlinkTarball.length });
+          res.end(symlinkTarball);
+          return;
+        }
+        if (url.endsWith('/SHA256SUMS')) {
+          const content = `${symlinkHash}  ${symlinkTarballName}\n`;
+          res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Length': Buffer.byteLength(content) });
+          res.end(content);
+          return;
+        }
+        res.writeHead(404);
+        res.end('Not found');
+      });
+      const evilBaseUrl = await new Promise((resolve) => {
+        evilServer.listen(0, '127.0.0.1', () => resolve(`http://127.0.0.1:${evilServer.address().port}`));
+      });
+
+      try {
+        const res = await runInstallScript({
+          PATH: process.env.PATH,
+          HOME: tempHome,
+          FGCTL_INSTALL_DIR: tempInstallDir,
+          FGCTL_ASSET_BASE_URL: evilBaseUrl,
+          FGCTL_VERSION: version,
+          FGCTL_ALLOW_ROOT: '1',
+        });
+
+        assert.notEqual(res.status, 0, 'install.sh must refuse a symlinked fgctl entry');
+        assert.match(res.stderr, /symlink/i, 'refusal message should mention the symlink refusal');
+
+        const installedBin = path.join(tempInstallDir, 'fgctl');
+        assert.ok(!fs.existsSync(installedBin), 'nothing must be installed when fgctl is a symlink payload');
+      } finally {
+        await new Promise((resolve) => evilServer.close(resolve));
+      }
+    } finally {
+      fs.rmSync(tempInstallDir, { recursive: true, force: true });
+      fs.rmSync(tempHome, { recursive: true, force: true });
+      fs.rmSync(secretDir, { recursive: true, force: true });
+      fs.rmSync(symlinkFixtureDir, { recursive: true, force: true });
+    }
+  });
+
   test('Case 5: refuses to run as root without FGCTL_ALLOW_ROOT=1, and proceeds with it set', async () => {
     tamperActive = false;
     const tempInstallDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case5-install-'));
