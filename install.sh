@@ -89,7 +89,8 @@ TARBALL_URL="${ASSET_BASE}/${TARBALL}"
 CHECKSUMS_URL="${ASSET_BASE}/SHA256SUMS"
 
 TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'fgctl-install')"
-trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
+TEMP_BIN=""
+trap 'rm -rf "$TMP_DIR"; [ -n "$TEMP_BIN" ] && rm -f "$TEMP_BIN"; true' EXIT INT TERM
 
 if ! download_file "$TARBALL_URL" "$TMP_DIR/$TARBALL"; then
   echo "Error: failed to download $TARBALL from $TARBALL_URL" >&2
@@ -101,8 +102,11 @@ if ! download_file "$CHECKSUMS_URL" "$TMP_DIR/SHA256SUMS"; then
   exit 1
 fi
 
-# Checksum verification against the tarball's own line in SHA256SUMS
-TARBALL_LINE="$(grep -F "$TARBALL" "$TMP_DIR/SHA256SUMS" || true)"
+# Checksum verification against the tarball's own line in SHA256SUMS --
+# match the filename field exactly (stripping sha256sum's optional
+# binary-mode "*" prefix), never a substring, so a sibling entry whose name
+# merely contains this tarball's name as a substring cannot be selected.
+TARBALL_LINE="$(awk -v f="$TARBALL" '{ n = $2; sub(/^\*/, "", n); if (n == f) { print; exit } }' "$TMP_DIR/SHA256SUMS")"
 if [ -z "$TARBALL_LINE" ]; then
   echo "Error: no checksum entry found for $TARBALL in SHA256SUMS" >&2
   exit 1

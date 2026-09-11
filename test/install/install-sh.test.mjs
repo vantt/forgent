@@ -232,4 +232,48 @@ describe('install.sh e2e installer suite', () => {
       fs.rmSync(tempHome, { recursive: true, force: true });
     }
   });
+
+  test('Case 5: refuses to run as root without FGCTL_ALLOW_ROOT=1, and proceeds with it set', async () => {
+    tamperActive = false;
+    const tempInstallDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case5-install-'));
+    const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case5-home-'));
+    const fakeBinDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-case5-fakebin-'));
+
+    try {
+      // Shadow `id` with a fake root reply -- prepended onto PATH so
+      // install.sh's own `id -u` call resolves to this script instead of
+      // the real one, without actually running the test suite as root.
+      const fakeIdPath = path.join(fakeBinDir, 'id');
+      fs.writeFileSync(fakeIdPath, '#!/bin/sh\nif [ "$1" = "-u" ]; then echo 0; else echo "uid=0(root) gid=0(root)"; fi\n', {
+        mode: 0o755,
+      });
+      const rootPath = `${fakeBinDir}:${process.env.PATH}`;
+
+      const refused = await runInstallScript({
+        PATH: rootPath,
+        HOME: tempHome,
+        FGCTL_INSTALL_DIR: tempInstallDir,
+        FGCTL_ASSET_BASE_URL: baseUrl,
+        FGCTL_VERSION: version,
+      });
+      assert.notEqual(refused.status, 0, 'install.sh must refuse to run as root by default');
+      assert.match(refused.stderr, /root/i, 'refusal message should mention root');
+      assert.ok(!fs.existsSync(path.join(tempInstallDir, 'fgctl')), 'nothing installed on root refusal');
+
+      const allowed = await runInstallScript({
+        PATH: rootPath,
+        HOME: tempHome,
+        FGCTL_INSTALL_DIR: tempInstallDir,
+        FGCTL_ASSET_BASE_URL: baseUrl,
+        FGCTL_VERSION: version,
+        FGCTL_ALLOW_ROOT: '1',
+      });
+      assert.equal(allowed.status, 0, `install.sh with FGCTL_ALLOW_ROOT=1 must succeed: ${allowed.stderr}`);
+      assert.ok(fs.existsSync(path.join(tempInstallDir, 'fgctl')), 'fgctl installed once root is explicitly allowed');
+    } finally {
+      fs.rmSync(tempInstallDir, { recursive: true, force: true });
+      fs.rmSync(tempHome, { recursive: true, force: true });
+      fs.rmSync(fakeBinDir, { recursive: true, force: true });
+    }
+  });
 });
