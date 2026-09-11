@@ -1,0 +1,202 @@
+#!/bin/sh
+set -eu
+
+# R6: Refuse to run as root unless explicitly allowed
+if [ "$(id -u)" = "0" ] && [ "${FGCTL_ALLOW_ROOT:-0}" != "1" ]; then
+  echo "Error: running as root is not permitted by default. Set FGCTL_ALLOW_ROOT=1 to allow." >&2
+  exit 1
+fi
+
+# R2: Target detection and override
+SUPPORTED_TARGETS="x86_64-unknown-linux-gnu"
+
+if [ -n "${FGCTL_TARGET:-}" ]; then
+  TARGET="$FGCTL_TARGET"
+else
+  OS="$(uname -s)"
+  ARCH="$(uname -m)"
+  case "$OS-$ARCH" in
+    Linux-x86_64|Linux-amd64)
+      TARGET="x86_64-unknown-linux-gnu"
+      ;;
+    *)
+      TARGET="$OS-$ARCH"
+      ;;
+  esac
+fi
+
+case "$TARGET" in
+  x86_64-unknown-linux-gnu)
+    ;;
+  *)
+    echo "Error: target '$TARGET' is not supported. Supported targets: $SUPPORTED_TARGETS" >&2
+    exit 1
+    ;;
+esac
+
+# Bounds every network call below so a server that connects but never
+# finishes sending (or never responds at all) cannot hang this script
+# indefinitely. curl's --max-time is a true wall-clock total-transfer cap.
+# wget has no such option -- its --timeout resets on every byte received
+# (an idle timeout, not a total one) and it retries up to 20 times by
+# default, so a slow-drip server could keep it alive far past 120s even
+# with --tries capped. HARD_TIMEOUT_CMD wraps both with a real wall-clock
+# backstop via the external `timeout` command when available, so the wget
+# fallback path is genuinely bounded too, not just curl's own preferred path.
+CURL_TIMEOUT_ARGS="--connect-timeout 15 --max-time 120"
+WGET_TIMEOUT_ARGS="--timeout=120 --tries=1"
+HARD_TIMEOUT_CMD=""
+if command -v timeout >/dev/null 2>&1; then
+  HARD_TIMEOUT_CMD="timeout 130"
+fi
+
+download_file() {
+  dl_url="$1"
+  dl_dest="$2"
+  if command -v curl >/dev/null 2>&1; then
+    $HARD_TIMEOUT_CMD curl -fsSL $CURL_TIMEOUT_ARGS -o "$dl_dest" "$dl_url"
+  elif command -v wget >/dev/null 2>&1; then
+    $HARD_TIMEOUT_CMD wget -q $WGET_TIMEOUT_ARGS -O "$dl_dest" "$dl_url"
+  else
+    echo "Error: curl or wget is required to download assets" >&2
+    exit 1
+  fi
+}
+
+# R3: Version resolution
+if [ -n "${FGCTL_VERSION:-}" ]; then
+  VERSION="$FGCTL_VERSION"
+else
+  if [ -n "${FGCTL_ASSET_BASE_URL:-}" ]; then
+    LATEST_URL="${FGCTL_ASSET_BASE_URL%/}/releases/latest"
+  else
+    LATEST_URL="https://github.com/vantt/forgent/releases/latest"
+  fi
+
+  if command -v curl >/dev/null 2>&1; then
+    EFFECTIVE_URL="$($HARD_TIMEOUT_CMD curl -fsSL $CURL_TIMEOUT_ARGS -o /dev/null -w '%{url_effective}' "$LATEST_URL")"
+  elif command -v wget >/dev/null 2>&1; then
+    EFFECTIVE_URL="$($HARD_TIMEOUT_CMD wget $WGET_TIMEOUT_ARGS --spider -S "$LATEST_URL" 2>&1 | grep -i '^[[:space:]]*Location:' | tail -n 1 | awk '{print $2}')"
+  else
+    echo "Error: curl or wget is required to resolve the latest release" >&2
+    exit 1
+  fi
+
+  EFFECTIVE_URL="${EFFECTIVE_URL%%\?*}"
+  EFFECTIVE_URL="${EFFECTIVE_URL%%\#*}"
+  EFFECTIVE_URL="${EFFECTIVE_URL%/}"
+  VERSION="${EFFECTIVE_URL##*/}"
+
+  if [ -z "$VERSION" ]; then
+    echo "Error: failed to resolve latest version from $LATEST_URL" >&2
+    exit 1
+  fi
+fi
+
+# R4: Asset base URL and asset download
+TARBALL="fgctl-${VERSION}-${TARGET}.tar.gz"
+if [ -n "${FGCTL_ASSET_BASE_URL:-}" ]; then
+  ASSET_BASE="${FGCTL_ASSET_BASE_URL%/}"
+else
+  ASSET_BASE="https://github.com/vantt/forgent/releases/download/${VERSION}"
+fi
+
+TARBALL_URL="${ASSET_BASE}/${TARBALL}"
+CHECKSUMS_URL="${ASSET_BASE}/SHA256SUMS"
+
+TMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'fgctl-install')"
+TEMP_BIN=""
+trap 'rm -rf "$TMP_DIR"; [ -n "$TEMP_BIN" ] && rm -f "$TEMP_BIN"; true' EXIT INT TERM
+
+if ! download_file "$TARBALL_URL" "$TMP_DIR/$TARBALL"; then
+  echo "Error: failed to download $TARBALL from $TARBALL_URL" >&2
+  exit 1
+fi
+
+if ! download_file "$CHECKSUMS_URL" "$TMP_DIR/SHA256SUMS"; then
+  echo "Error: failed to download SHA256SUMS from $CHECKSUMS_URL" >&2
+  exit 1
+fi
+
+# Checksum verification against the tarball's own line in SHA256SUMS --
+# match the filename field exactly (stripping sha256sum's optional
+# binary-mode "*" prefix), never a substring, so a sibling entry whose name
+# merely contains this tarball's name as a substring cannot be selected.
+TARBALL_LINE="$(awk -v f="$TARBALL" '{ n = $2; sub(/^\*/, "", n); if (n == f) { print; exit } }' "$TMP_DIR/SHA256SUMS")"
+if [ -z "$TARBALL_LINE" ]; then
+  echo "Error: no checksum entry found for $TARBALL in SHA256SUMS" >&2
+  exit 1
+fi
+
+HASH="$(echo "$TARBALL_LINE" | awk '{print $1}')"
+if [ -z "$HASH" ]; then
+  echo "Error: invalid checksum entry for $TARBALL in SHA256SUMS" >&2
+  exit 1
+fi
+
+printf '%s  %s\n' "$HASH" "$TARBALL" > "$TMP_DIR/single_checksum.txt"
+
+CHECKSUM_OK=0
+if (cd "$TMP_DIR" && command -v sha256sum >/dev/null 2>&1 && sha256sum -c --ignore-missing single_checksum.txt >/dev/null 2>&1); then
+  CHECKSUM_OK=1
+elif (cd "$TMP_DIR" && command -v shasum >/dev/null 2>&1 && shasum -a 256 -c single_checksum.txt >/dev/null 2>&1); then
+  CHECKSUM_OK=1
+fi
+
+if [ "$CHECKSUM_OK" != "1" ]; then
+  echo "Error: checksum verification failed for $TARBALL" >&2
+  exit 1
+fi
+
+# R5: Extract to fresh temp dir and atomically install to FGCTL_INSTALL_DIR
+EXTRACT_DIR="$TMP_DIR/extracted"
+mkdir -p "$EXTRACT_DIR"
+if ! tar -xzf "$TMP_DIR/$TARBALL" -C "$EXTRACT_DIR"; then
+  echo "Error: failed to extract $TARBALL" >&2
+  exit 1
+fi
+
+# `-f`/`cp` both follow a symlink transparently -- a tarball whose `fgctl`
+# entry is a symlink to some other extracted (or, worse, absolute) path
+# would otherwise have THAT target's bytes installed instead of the real
+# binary the checksum above only verified at the tarball level. Refuse a
+# symlink explicitly rather than letting `-f` silently accept its target.
+if [ -e "$EXTRACT_DIR/fgctl" ] && [ ! -L "$EXTRACT_DIR/fgctl" ] && [ -f "$EXTRACT_DIR/fgctl" ]; then
+  FGCTL_BIN="$EXTRACT_DIR/fgctl"
+else
+  FGCTL_BIN="$(find "$EXTRACT_DIR" -type f -name fgctl 2>/dev/null | head -n 1 || true)"
+fi
+
+if [ -z "$FGCTL_BIN" ] || [ ! -f "$FGCTL_BIN" ] || [ -L "$FGCTL_BIN" ]; then
+  echo "Error: fgctl binary not found (or is a symlink, which is refused) in $TARBALL" >&2
+  exit 1
+fi
+
+INSTALL_DIR="${FGCTL_INSTALL_DIR:-$HOME/.local/bin}"
+mkdir -p "$INSTALL_DIR"
+
+TEMP_BIN="$INSTALL_DIR/.fgctl.$$.tmp"
+cp "$FGCTL_BIN" "$TEMP_BIN"
+chmod 755 "$TEMP_BIN"
+mv -f "$TEMP_BIN" "$INSTALL_DIR/fgctl"
+
+# R6: PATH advisory and next step
+INSTALL_DIR_CLEAN="${INSTALL_DIR%/}"
+PATH_FOUND=0
+case ":$PATH:" in
+  *":$INSTALL_DIR_CLEAN:"*)
+    PATH_FOUND=1
+    ;;
+esac
+
+if [ "$PATH_FOUND" = "0" ]; then
+  echo ""
+  echo "Notice: $INSTALL_DIR_CLEAN is not in your PATH."
+  echo "Add it to your shell configuration file by running:"
+  echo "  export PATH=\"$INSTALL_DIR_CLEAN:\$PATH\""
+fi
+
+echo ""
+echo "Installed fgctl successfully to $INSTALL_DIR/fgctl"
+echo "Next step:"
+echo "  fgctl init"

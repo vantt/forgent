@@ -10,12 +10,24 @@ Forgent (fgOS) is the platform layer for building and running agent applications
 
 ## Install
 
-Recommended — install a specific tagged release, so a broken commit on
-`main` never breaks your install:
+Recommended — installs the `fgctl` binary for your machine from the
+[latest GitHub release](https://github.com/vantt/forgent/releases), no
+clone, no npm, no Rust toolchain required:
 
 ```bash
-npm install -g github:vantt/forgent#v0.1.0
+curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
 ```
+
+Then initialize your project:
+
+```bash
+fgctl init
+```
+
+`npm install -g github:vantt/forgent#v0.1.0` is kept as a documented
+compatibility channel for the Node host this platform is migrating away
+from — use it only if you specifically need the Node-hosted `fgos` CLI
+instead of the native `fgctl`/`fgos` binaries above.
 
 Replace `v0.1.0` with the [latest release tag](https://github.com/vantt/forgent/tags).
 See `docs/how-to/cut-a-fgos-release-tag.md` for how tags get cut.
