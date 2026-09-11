@@ -210,6 +210,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     url: executor.url,
     headers: executor.headers,
     body: executor.body,
+    resourceBindings: executor.resourceBindings,
   };
 }
 

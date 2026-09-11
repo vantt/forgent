@@ -320,6 +320,22 @@ export async function prepareBwrap(plan, request, backend) {
       if (res.allocation === 'temporary') {
         fs.mkdirSync(res.hostTarget, { recursive: true });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
+        if (res.resource === 'private-home') {
+          const authCandidates = [
+            path.join(process.env.HOME || '', '.codex', 'auth.json'),
+            path.join(process.env.HOME || '', '.codex-fgovn', 'auth.json'),
+          ];
+          for (const authCandidate of authCandidates) {
+            if (fs.existsSync(authCandidate)) {
+              try {
+                fs.copyFileSync(authCandidate, path.join(res.hostTarget, 'auth.json'));
+              } catch {
+                // non-fatal
+              }
+              break;
+            }
+          }
+        }
         allocatedPaths.push(res.hostTarget);
       }
 
