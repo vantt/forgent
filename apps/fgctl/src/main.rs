@@ -4,11 +4,12 @@ use fgos_distribution::store::{
 use std::path::PathBuf;
 
 fn print_usage_and_exit() -> ! {
-    eprintln!("Usage: fgctl <stage|status> [options]");
+    eprintln!("Usage: fgctl <stage|status|init> [options]");
     eprintln!();
     eprintln!("Subcommands:");
     eprintln!("  stage   Stage a release tree into the machine release store");
     eprintln!("  status  Show staged releases in the machine release store");
+    eprintln!("  init    Initialize and activate fgOS in a workspace");
     std::process::exit(1);
 }
 
@@ -87,6 +88,35 @@ fn main() {
                 }
                 Err(err) => {
                     eprintln!("Error reading releases: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+        "init" => {
+            let mut from_path: Option<PathBuf> = None;
+            let mut i = 2;
+            while i < args.len() {
+                if args[i] == "--from" && i + 1 < args.len() {
+                    from_path = Some(PathBuf::from(&args[i + 1]));
+                    i += 2;
+                } else {
+                    eprintln!("Unknown option: {}", args[i]);
+                    print_usage_and_exit();
+                }
+            }
+
+            let cwd = match std::env::current_dir() {
+                Ok(d) => d,
+                Err(err) => {
+                    eprintln!("Error reading current directory: {}", err);
+                    std::process::exit(1);
+                }
+            };
+
+            match fgos_distribution::init_workspace(&cwd, from_path.as_deref()) {
+                Ok(()) => {}
+                Err(err) => {
+                    eprintln!("Error: {}", err);
                     std::process::exit(1);
                 }
             }

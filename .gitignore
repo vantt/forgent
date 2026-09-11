@@ -38,6 +38,7 @@ output.txt
 
 # main-checkout activity lock + sibling lock files (STR65) — process state, never committed
 .fgos/*.lock
+.fgos/installation/
 
 # untracked local secret environment variables (tsk-gb3)
 .fgos/secrets.local.env

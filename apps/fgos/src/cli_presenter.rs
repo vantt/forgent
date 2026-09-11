@@ -106,7 +106,89 @@ pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
         ProviderOutcome::Completed { output, .. } => {
             let formatted =
                 if let Some(show) = output.downcast_ref::<fgos_distribution::BuildShowOutcome>() {
-                    wrap_envelope(show, None)
+                    if let Some(runtime) = &show.runtime {
+                        let mut data_val = match serde_json::to_value(show) {
+                            Ok(v) => v,
+                            Err(e) => {
+                                return {
+                                    eprintln!("fgos: error: {}", e);
+                                    1
+                                }
+                            }
+                        };
+                        if let serde_json::Value::Object(ref mut map) = data_val {
+                            map.remove("runtime");
+                            map.insert(
+                                "projectRoot".to_string(),
+                                serde_json::to_value(&runtime.project_root)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "workspaceId".to_string(),
+                                serde_json::to_value(&runtime.workspace_id)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "workHistoryRoot".to_string(),
+                                serde_json::to_value(&runtime.work_history_root)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "workStateId".to_string(),
+                                serde_json::to_value(&runtime.work_state_id)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "machineReleaseStore".to_string(),
+                                serde_json::to_value(&runtime.machine_release_store)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "artifactDigest".to_string(),
+                                serde_json::to_value(&runtime.artifact_digest)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "releaseVersion".to_string(),
+                                serde_json::to_value(&runtime.release_version)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "schemaVersion".to_string(),
+                                serde_json::to_value(runtime.schema_version)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "manifestSchemaVersion".to_string(),
+                                serde_json::to_value(runtime.schema_version)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "stateSchemas".to_string(),
+                                serde_json::to_value(&runtime.state_schemas)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "components".to_string(),
+                                serde_json::to_value(&runtime.components)
+                                    .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "legacyNode".to_string(),
+                                serde_json::to_value(
+                                    runtime.components.as_ref().map(|c| &c.legacy_node),
+                                )
+                                .unwrap_or(serde_json::Value::Null),
+                            );
+                            map.insert(
+                                "host".to_string(),
+                                serde_json::Value::String(runtime.host.clone()),
+                            );
+                        }
+                        wrap_envelope(&data_val, None)
+                    } else {
+                        wrap_envelope(show, None)
+                    }
                 } else if let Some(val) = output.downcast_ref::<serde_json::Value>() {
                     wrap_envelope(val, None)
                 } else if let Some(s) = output.downcast_ref::<String>() {
