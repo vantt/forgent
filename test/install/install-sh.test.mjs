@@ -238,6 +238,12 @@ describe('install.sh e2e installer suite', () => {
     assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--connect-timeout/, 'curl timeout args must set --connect-timeout');
     assert.match(source, /CURL_TIMEOUT_ARGS="[^"]*--max-time/, 'curl timeout args must set --max-time');
     assert.match(source, /WGET_TIMEOUT_ARGS="--timeout=/, 'wget timeout args must set --timeout=');
+    // wget's --timeout is an IDLE timeout (resets on every byte received)
+    // and it retries up to 20 times by default -- --tries=1 stops the
+    // retry multiplication, and the external `timeout` command wrapper
+    // below is the only genuine wall-clock backstop for the wget path.
+    assert.match(source, /WGET_TIMEOUT_ARGS="[^"]*--tries=1/, 'wget timeout args must cap retries to 1');
+    assert.match(source, /HARD_TIMEOUT_CMD="timeout \d/, 'a real wall-clock backstop via the external timeout command must be defined');
     // Every actual curl/wget invocation must reference the shared timeout
     // args, not just one of them -- a live server that never finishes
     // responding would otherwise still hang the specific call that omitted
@@ -246,8 +252,10 @@ describe('install.sh e2e installer suite', () => {
     // probes) to avoid false matches/misses on either side.
     const curlInvocations = (source.match(/curl -fsSL \$CURL_TIMEOUT_ARGS/g) || []).length;
     const wgetInvocations = (source.match(/wget[^\n]*\$WGET_TIMEOUT_ARGS/g) || []).length;
+    const hardTimeoutUsages = (source.match(/\$HARD_TIMEOUT_CMD (curl|wget)/g) || []).length;
     assert.equal(curlInvocations, 2, 'expected exactly two curl invocations carrying the shared timeout args (download + latest resolution)');
     assert.equal(wgetInvocations, 2, 'expected exactly two wget invocations carrying the shared timeout args (download + latest resolution)');
+    assert.equal(hardTimeoutUsages, 4, 'expected all four curl/wget call sites to be wrapped by the hard timeout backstop');
   });
 
   test('Case 7: a tarball whose fgctl entry is a symlink to an external file is refused, nothing installed', async () => {

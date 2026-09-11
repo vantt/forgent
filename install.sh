@@ -36,17 +36,27 @@ esac
 
 # Bounds every network call below so a server that connects but never
 # finishes sending (or never responds at all) cannot hang this script
-# indefinitely -- connect and total-transfer ceilings, not just connect.
+# indefinitely. curl's --max-time is a true wall-clock total-transfer cap.
+# wget has no such option -- its --timeout resets on every byte received
+# (an idle timeout, not a total one) and it retries up to 20 times by
+# default, so a slow-drip server could keep it alive far past 120s even
+# with --tries capped. HARD_TIMEOUT_CMD wraps both with a real wall-clock
+# backstop via the external `timeout` command when available, so the wget
+# fallback path is genuinely bounded too, not just curl's own preferred path.
 CURL_TIMEOUT_ARGS="--connect-timeout 15 --max-time 120"
-WGET_TIMEOUT_ARGS="--timeout=120"
+WGET_TIMEOUT_ARGS="--timeout=120 --tries=1"
+HARD_TIMEOUT_CMD=""
+if command -v timeout >/dev/null 2>&1; then
+  HARD_TIMEOUT_CMD="timeout 130"
+fi
 
 download_file() {
   dl_url="$1"
   dl_dest="$2"
   if command -v curl >/dev/null 2>&1; then
-    curl -fsSL $CURL_TIMEOUT_ARGS -o "$dl_dest" "$dl_url"
+    $HARD_TIMEOUT_CMD curl -fsSL $CURL_TIMEOUT_ARGS -o "$dl_dest" "$dl_url"
   elif command -v wget >/dev/null 2>&1; then
-    wget -q $WGET_TIMEOUT_ARGS -O "$dl_dest" "$dl_url"
+    $HARD_TIMEOUT_CMD wget -q $WGET_TIMEOUT_ARGS -O "$dl_dest" "$dl_url"
   else
     echo "Error: curl or wget is required to download assets" >&2
     exit 1
@@ -64,9 +74,9 @@ else
   fi
 
   if command -v curl >/dev/null 2>&1; then
-    EFFECTIVE_URL="$(curl -fsSL $CURL_TIMEOUT_ARGS -o /dev/null -w '%{url_effective}' "$LATEST_URL")"
+    EFFECTIVE_URL="$($HARD_TIMEOUT_CMD curl -fsSL $CURL_TIMEOUT_ARGS -o /dev/null -w '%{url_effective}' "$LATEST_URL")"
   elif command -v wget >/dev/null 2>&1; then
-    EFFECTIVE_URL="$(wget $WGET_TIMEOUT_ARGS --spider -S "$LATEST_URL" 2>&1 | grep -i '^[[:space:]]*Location:' | tail -n 1 | awk '{print $2}')"
+    EFFECTIVE_URL="$($HARD_TIMEOUT_CMD wget $WGET_TIMEOUT_ARGS --spider -S "$LATEST_URL" 2>&1 | grep -i '^[[:space:]]*Location:' | tail -n 1 | awk '{print $2}')"
   else
     echo "Error: curl or wget is required to resolve the latest release" >&2
     exit 1
