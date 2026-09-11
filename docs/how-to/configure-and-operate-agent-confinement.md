@@ -49,26 +49,23 @@ To inspect or configure `~/.fgos/confinement-backends.json` manually:
 
 ```json
 {
-  "$schema": "https://forgent.dev/schemas/confinement-backend-registry.v1.json",
-  "version": 1,
+  "contract": "confinement-backend-registry.v1",
   "confinementBackends": {
     "bwrap": {
       "type": "bwrap",
       "executable": "/usr/bin/bwrap",
-      "enabled": true,
-      "config": {
-        "maxScratchBytes": 1073741824
-      }
+      "enabled": true
     }
   }
 }
 ```
 
 Fields:
-- `type`: Driver implementation (`bwrap` is the built-in local Linux driver).
+- `contract`: Must be the literal string `"confinement-backend-registry.v1"`. `confinementBackends` is the only other top-level key the schema accepts (`validateBackendRegistryShape`, `src/runner/dispatch/confinement/backend-registry.mjs`).
+- `type`: Driver implementation (`bwrap` is the built-in local Linux driver; other allowed values are `container` and `remote`, each with their own key set).
 - `executable`: Path to the Bubblewrap binary.
 - `enabled`: `true` to allow dispatch through this backend; `false` causes required dispatches to fail closed with `confinement-backend-disabled`.
-- `config`: Driver-specific options (e.g., maximum scratch disk space).
+- `tempRoot` / `privateHomeRoot`: optional bwrap-specific path overrides. A bwrap instance accepts only `type`, `enabled`, `executable`, `tempRoot`, `privateHomeRoot` — any other key (including a nested `config` object) is rejected as unknown.
 
 ---
 
@@ -127,19 +124,26 @@ You can define custom policies in `runner.confinementPolicies`:
   "runner": {
     "confinementPolicies": {
       "strict-read-only": {
+        "contract": "confinement-policy.v1",
         "controls": {
           "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "deny",
+          "process": "isolated",
           "home": "private",
-          "session": "isolated"
+          "session": "isolated",
+          "workspace": "own"
         },
-        "resources": {
-          "runOutput": { "mode": "writable" }
-        }
+        "grants": [
+          { "resource": "run-output", "access": "write", "scope": "dispatch" }
+        ]
       }
     }
   }
 }
 ```
+
+A custom policy's `controls` block must give an explicit value for all 7 axes (`hostWrite`, `hostRead`, `networkEgress`, `process`, `home`, `session`, `workspace`) — there is no default or partial form. `grants` is a required array (each entry: `resource`, `access` one of `read`/`write`/`read-write`, `scope: "dispatch"`, optional `optional: boolean`); `networkFilter` is required when — and only permitted when — `networkEgress` is `"filtered"`. The only top-level keys accepted are `contract`, `controls`, `grants`, `networkFilter` (`validateConfinementPolicyShape`, `src/runner/dispatch/confinement/policies.mjs`).
 
 ---
 
@@ -169,46 +173,49 @@ Output includes six dedicated confinement checks:
 
 Every dispatch executed through the Confinement Authority produces a `confinement-attestation.v1` record. This record is:
 - Attached to the in-memory `ExecutorResult.confinement`.
-- Saved in the dispatch run directory (`runs/<runId>/run.json` or companion files).
-- Retained in the machine-level attestation store.
+- Retained as a standalone JSON file in the machine-level attestation store (`~/.local/state/fgos/attestations/<dispatchId>.<phase>.json` by default, `$XDG_STATE_HOME` or `FGOS_CONFINEMENT_ATTESTATION_STORE_PATH` if set — never a project-local `runs/<runId>/run.json`; `resolveAttestationStoreDir`, `src/runner/dispatch/confinement/attestation-store.mjs`).
 
 ### Sample Attestation (`enforced`)
 
 ```json
 {
-  "schemaVersion": "confinement-attestation.v1",
+  "contract": "confinement-attestation.v1",
   "dispatchId": "disp_01J8F...",
-  "timestamp": "2026-09-11T05:30:00.000Z",
-  "policyId": "workspace-write",
-  "mode": "required",
+  "phase": "enforced",
   "outcome": "enforced",
-  "backend": {
-    "instance": "bwrap",
-    "driver": "local-bwrap-v1",
-    "executable": "/usr/bin/bwrap"
+  "requested": {
+    "mode": "required",
+    "policyId": "workspace-write",
+    "policy": null
   },
-  "fingerprint": "a3f8c9...",
-  "channels": {
-    "hostWrite": { "coverage": "satisfied", "control": "deny" },
-    "hostRead": { "coverage": "satisfied", "control": "allow" },
-    "networkEgress": { "coverage": "satisfied", "control": "allow" },
-    "process": { "coverage": "satisfied", "control": "host" },
-    "home": { "coverage": "satisfied", "control": "host" },
-    "session": { "coverage": "satisfied", "control": "shared" },
-    "workspace": { "coverage": "satisfied", "control": "own" }
-  },
+  "coverage": { "hostWrite": "satisfied", "workspace": "satisfied" },
+  "effectiveControls": { "hostWrite": "deny", "workspace": "own" },
+  "channels": [
+    { "name": "filesystem", "coverage": "covered", "detail": "observed hand-written bwrap sandbox" },
+    { "name": "inherited-fd", "coverage": "covered", "detail": "observed hand-written bwrap sandbox" },
+    { "name": "stdio", "coverage": "unknown", "detail": "observe-mode: stdio unmanaged" },
+    { "name": "host-ipc", "coverage": "out-of-scope", "detail": "observe-mode: host IPC unmanaged" },
+    { "name": "network", "coverage": "out-of-scope", "detail": "observe-mode: network unmanaged" }
+  ],
+  "backend": { "id": "bwrap", "type": "bwrap", "version": "local-bwrap-v1", "configDigest": "a3f8c9..." },
   "grants": [
-    { "type": "workspace", "path": "/path/to/worktree", "access": "read-write" },
-    { "type": "run-output", "path": "/path/to/runDir", "access": "read-write" }
-  ]
+    { "resource": "workspace", "access": "read-write", "target": "/path/to/worktree" },
+    { "resource": "run-output", "access": "write", "target": "/path/to/runDir" }
+  ],
+  "mismatches": [],
+  "evidence": [
+    { "kind": "structural-observation", "ref": "dispatch:disp_01J8F...", "freshness": "current" }
+  ],
+  "cleanup": { "status": "not-needed" }
 }
 ```
 
 ### Key Fields to Check:
 - `outcome`: The final verdict (`enforced`, `unconfined`, `degraded`, `refused`, `unknown`).
-- `channels`: Reports the exact enforcement status per security axis. `satisfied` means the driver verified and applied the restriction.
-- `grants`: Explicit paths permitted for filesystem write. Any write outside these paths was blocked by the kernel namespace.
-- `fingerprint`: Cryptographic hash of the probe run verifying driver correctness on the current host.
+- `requested`: The mode/policy the capability actually asked for (`requested.mode`, `requested.policyId`).
+- `channels`: A fixed array of 5 named security channels (`filesystem`, `inherited-fd`, `stdio`, `host-ipc`, `network`) — not the policy's own control axes. `covered` means the driver verified and applied the restriction for that channel; `unverified`/`unknown`/`out-of-scope` mean it was not (`src/runner/dispatch/confinement/authority.mjs`).
+- `grants`: Explicit paths permitted for filesystem write, keyed by `resource`/`access`/`target`. Any write outside these paths was blocked by the kernel namespace.
+- `backend`: Present only when a backend actually ran the plan (`null` for `unconfined`/omitted dispatches); carries the backend instance id/type/driver version and a config digest, not a raw probe fingerprint.
 
 ---
 
@@ -249,16 +256,24 @@ When a dispatch refuses, the Authority throws an actionable error code:
 
 By default, `runner.confinement.strict` is `false`. In default mode, unconfigured capabilities run in observe mode with `unknown` attestation.
 
-In **strict mode** (`runner.confinement.strict: true`), fgOS refuses execution unless:
+In **strict mode** (`runner.confinement.strict: true`), fgOS refuses to load the runner config at all unless (`config.mjs:1266-1283`):
 1. Every capability declared in `runner.capabilities` has an explicit `confinement` block with a valid `mode`.
-2. Every referenced policy exists in built-ins or `runner.confinementPolicies`.
-3. The `bwrap` backend is enabled and passes all platform readiness checks.
+2. Every referenced policy exists in built-ins or `runner.confinementPolicies` (checked for every mode, not only under strict).
+
+Strict mode's own check never inspects the `bwrap` backend or the host platform — it is a pure
+config-shape gate at load time. A `required`-mode capability still needs a working `bwrap` backend
+to actually dispatch once config loads (separately fail-closed with `confinement-backend-missing`/
+`confinement-backend-disabled`), but that is true with or without strict mode.
 
 ### Checklist Before Enabling Strict Mode
 
-1. Run `fgos doctor` and verify `confinement-strict-readiness` reports no missing policies.
+1. Run `fgos doctor` and verify `confinement-strict-readiness` reports no missing policies. Note: on
+   a repo where `doctor` is run without merging the operator's global `~/.fgos/config.json`, its count
+   of "missing" capabilities can be wider than what the strict validator itself will actually see at
+   dispatch time (the validator merges project + global config; `doctor`'s confinement checks
+   currently read the project file only) — cross-check against the merged config if the two disagree.
 2. In `.fgos/config.json`, verify all canonical capabilities (`advise`, `execute`, `code:implement`, `code:review`, `code:test`, `code:debug`, `code:refactor`) are explicitly declared with valid `mode` settings.
-3. Verify `bwrap` is ready (`fgos doctor` check `confinement-bwrap-platform` is passing).
+3. If any capability declares a `required`-mode policy, verify `bwrap` is ready (`fgos doctor` check `confinement-bwrap-platform` is passing) — strict mode itself won't check this, but a required dispatch will refuse without it.
 4. Set strict mode in `.fgos/config.json`:
    ```json
    {
