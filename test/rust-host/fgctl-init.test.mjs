@@ -635,6 +635,59 @@ test('Item 5: Staged release whose manifest.json digest mismatches pin is refuse
   }
 });
 
+test('Item 5 (widened): a tampered staged release is refused on the pin+matching --from NoOp arm too, not just the pin-only arm', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-noop-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-noop-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l7-noop-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // Pre-stage fixture, then tamper with the staged copy's manifest so
+    // releases/<fixtureDigest>/manifest.json declares a different digest --
+    // stage_release's own NoOp path (dir already exists) never re-verifies,
+    // so only init's own post-match digest assertion can catch this.
+    const stageRes = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome: tempState });
+    assert.equal(stageRes.status, 0);
+    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
+    manifest.artifactDigest = 'sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+    fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
+
+    const fgosDir = path.join(tempProj, '.fgos');
+    fs.mkdirSync(fgosDir, { recursive: true });
+    const distPin = {
+      schemaVersion: 1,
+      projectRuntime: {
+        policy: 'exact-digest',
+        artifactDigest: fixtureDigest,
+        releaseVersion: '0.1.0',
+        channel: null,
+        allowPrerelease: false,
+      },
+    };
+    fs.writeFileSync(path.join(fgosDir, 'distribution.json'), JSON.stringify(distPin, null, 2));
+
+    // Pin + matching --from source (resolves to fixtureDigest, matches the
+    // pin) -> stage_release takes the NoOp path since releases/<digest>/
+    // already exists -- the tampered on-disk manifest must still be caught.
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.notEqual(res.status, 0, 'Tampered staged release must be refused even via the --from NoOp arm');
+    assert.match(res.stderr, /manifest digest mismatch/);
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'installation')));
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
 test('Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init', () => {
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l8-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-l8-state-'));
@@ -667,6 +720,79 @@ test('Item 6: Stale activation.json.tmp.* files left from crash are cleaned up o
 
     // Real activation.json must exist
     assert.ok(fs.existsSync(path.join(installDir, 'activation.json')), 'activation.json must exist');
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockreclaim-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockreclaim-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockreclaim-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // Obtain a definitely-dead pid: spawn a short-lived child and wait for exit.
+    const deadPidRes = spawnSync(process.execPath, ['-e', 'process.exit(0)']);
+    const deadPid = deadPidRes.pid;
+    assert.ok(deadPid > 0, 'must have captured a real (now-dead) pid');
+
+    // Simulate an activation.lock + activation.json.tmp.* left behind by a
+    // process that was SIGKILLed between lock-acquire and rename -- Drop
+    // never runs on SIGKILL, so both files are real, not hypothetical
+    // (reproduces the reviewer's real strace-injected repro).
+    const installDir = path.join(tempProj, '.fgos', 'installation');
+    fs.mkdirSync(installDir, { recursive: true });
+    const lockPath = path.join(installDir, 'activation.lock');
+    fs.writeFileSync(lockPath, JSON.stringify({ pid: deadPid, ts: Date.now() }));
+    const staleTmp = path.join(installDir, 'activation.json.tmp.act_deadbeef12345678');
+    fs.writeFileSync(staleTmp, '{"partial": true}');
+
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.equal(res.status, 0, `Init must reclaim the orphaned lock and succeed: ${res.stderr}`);
+    assert.ok(!fs.existsSync(staleTmp), 'Orphaned tmp file must be cleaned up');
+    assert.ok(fs.existsSync(path.join(installDir, 'activation.json')), 'activation.json must be published');
+    assert.ok(!fs.existsSync(lockPath), 'activation.lock must be released after this init completes');
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+  }
+});
+
+test('Item 1: A live-pid, within-ttl activation.lock is genuinely held, not reclaimed', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockheld-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockheld-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-lockheld-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    const installDir = path.join(tempProj, '.fgos', 'installation');
+    fs.mkdirSync(installDir, { recursive: true });
+    const lockPath = path.join(installDir, 'activation.lock');
+    // This test process's own pid, fresh timestamp -- genuinely alive and within TTL.
+    fs.writeFileSync(lockPath, JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+    const res = runFgctl(['init', '--from', fixtureReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+    assert.notEqual(res.status, 0, 'Init must refuse while the lock is genuinely live');
+    assert.match(res.stderr, /activation-lock-held/);
+    assert.ok(fs.existsSync(lockPath), 'A genuinely held lock must not be removed by a refused init');
   } finally {
     fs.rmSync(tempHome, { recursive: true, force: true });
     fs.rmSync(tempState, { recursive: true, force: true });

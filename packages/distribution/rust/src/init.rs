@@ -157,19 +157,70 @@ impl ActivationLockGuard {
             std::fs::create_dir_all(parent)?;
         }
 
-        match std::fs::OpenOptions::new()
+        let content = format!(
+            r#"{{"pid": {}, "ts": {}}}"#,
+            std::process::id(),
+            now_millis() as u64
+        );
+
+        match Self::try_create(&lock_path, &content) {
+            Ok(()) => return Ok(Self { lock_path }),
+            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {}
+            Err(err) => return Err(InitError::Io(err)),
+        }
+
+        // A SIGKILL between acquire and Drop leaves this file behind forever
+        // otherwise -- reclaim it the same way lock.rs judges the main
+        // checkout lock stale (dead pid OR past DEFAULT_TTL_MS), one retry
+        // only, never a blocking loop.
+        if Self::is_stale(&lock_path) {
+            let _ = std::fs::remove_file(&lock_path);
+            match Self::try_create(&lock_path, &content) {
+                Ok(()) => return Ok(Self { lock_path }),
+                Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
+                    return Err(InitError::ActivationLockHeld);
+                }
+                Err(err) => return Err(InitError::Io(err)),
+            }
+        }
+
+        Err(InitError::ActivationLockHeld)
+    }
+
+    fn try_create(lock_path: &Path, content: &str) -> std::io::Result<()> {
+        let mut file = std::fs::OpenOptions::new()
             .write(true)
             .create_new(true)
-            .open(&lock_path)
-        {
-            Ok(file) => {
-                drop(file);
-                Ok(Self { lock_path })
+            .open(lock_path)?;
+        file.write_all(content.as_bytes())?;
+        Ok(())
+    }
+
+    /// A lock this crate itself owns and can safely reclaim once its holder
+    /// is provably gone -- unlike `check_main_checkout_lock`'s read-only
+    /// "ambiguous means refuse" rule for a lock file this crate never
+    /// writes, an unparseable `activation.lock` here can only be leftover
+    /// wreckage from a killed writer, so it is treated as stale too.
+    fn is_stale(lock_path: &Path) -> bool {
+        let raw = match std::fs::read_to_string(lock_path) {
+            Ok(r) => r,
+            Err(_) => return false, // vanished concurrently; the next create attempt resolves it
+        };
+        let record = match crate::lock::parse_lock_content(&raw) {
+            Some(r) => r,
+            None => return true,
+        };
+        match record.identity {
+            crate::lock::LockHolderIdentity::Numeric(pid) => {
+                let now = now_millis() as u64;
+                let within_ttl = now.saturating_sub(record.ts) <= crate::lock::DEFAULT_TTL_MS;
+                let pid_live = i32::try_from(pid)
+                    .ok()
+                    .map(crate::lock::is_pid_alive)
+                    .unwrap_or(false);
+                !(pid_live && within_ttl)
             }
-            Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
-                Err(InitError::ActivationLockHeld)
-            }
-            Err(err) => Err(InitError::Io(err)),
+            crate::lock::LockHolderIdentity::String(_) => false,
         }
     }
 }
@@ -611,23 +662,6 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 )));
             }
 
-            // Reviewer L7 (Item 5): assert staged release's own manifest.json artifactDigest equals pinned artifactDigest
-            let staged_manifest = read_manifest_from_dir(&dir).map_err(|e| {
-                InitError::Custom(format!(
-                    "failed to read manifest from staged release {}: {}",
-                    dir.display(),
-                    e
-                ))
-            })?;
-            if &staged_manifest.artifact_digest != pin_digest {
-                return Err(InitError::Custom(format!(
-                    "staged release manifest digest mismatch: {} declares {}, expected pinned {}",
-                    dir.display(),
-                    staged_manifest.artifact_digest,
-                    pin_digest
-                )));
-            }
-
             (pin_digest.clone(), dir)
         }
         (None, Some(from_src)) => {
@@ -674,6 +708,21 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
         ))
     })?;
 
+    // Reviewer L7 (Item 5): assert the candidate's own manifest.json
+    // artifactDigest equals the resolved target digest on every arm (pin-only,
+    // pin+matching --from's StageOutcome::NoOp, and no-pin --from's NoOp all
+    // trust releases/<digest> by directory name alone otherwise) -- a
+    // tampered or corrupted release-store entry must be refused here, not
+    // just on the pin-only path.
+    if manifest.artifact_digest != target_digest {
+        return Err(InitError::Custom(format!(
+            "staged release manifest digest mismatch: {} declares {}, expected {}",
+            candidate_dir.display(),
+            manifest.artifact_digest,
+            target_digest
+        )));
+    }
+
     // R5: Read-only .fgos/main-checkout.lock check before publish
     check_main_checkout_lock(&workspace_root)?;
 
@@ -686,8 +735,39 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
     // Clean up stale activation.json.tmp.* files left from previous killed runs (Item 6)
     cleanup_stale_activation_tmp_files(&installation_dir);
 
+    // Re-read activation.json now that the activation lock is held (Reviewer
+    // Item 1 TOCTOU): the `current_activation` captured before staging/lock
+    // acquisition can be stale by the time this process reaches publish -- a
+    // slower initializer that started before a faster concurrent one
+    // finished would otherwise republish with a wrong `previousArtifactDigest`
+    // and skip the idempotent short-circuit entirely. This second read is
+    // authoritative; the earlier one was only ever a fast-path optimization
+    // to avoid wasted staging work in the common uncontended case.
+    let current_activation_under_lock: Option<WorkspaceActivationBinding> =
+        if activation_path.exists() {
+            std::fs::read_to_string(&activation_path)
+                .ok()
+                .and_then(|s| serde_json::from_str::<WorkspaceActivationBinding>(&s).ok())
+        } else {
+            None
+        };
+
+    if let Some(ref current) = current_activation_under_lock {
+        if current.artifact_digest == target_digest {
+            let shim_fgos = installation_dir.join("bin").join("fgos");
+            run_tail(
+                &workspace_root,
+                &shim_fgos,
+                &store_root,
+                &current.activation_id,
+            )?;
+            return Ok(());
+        }
+    }
+
     // Previous activation digest if present
-    let previous_artifact_digest: Option<String> = current_activation.map(|a| a.artifact_digest);
+    let previous_artifact_digest: Option<String> =
+        current_activation_under_lock.map(|a| a.artifact_digest);
 
     let activation_id = format!("act_{:016x}", now_millis());
     let now_str = format_iso8601_utc(SystemTime::now());
