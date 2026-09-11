@@ -3,7 +3,7 @@
 Document type: Index
 Design status: Accepted
 Implementation: Partial
-Last reviewed: 2026-09-01
+Last reviewed: 2026-09-11
 Canonical for: navigation across accepted architecture
 
 ## Documents
@@ -29,15 +29,46 @@ directory. Architecture refines that direction into accepted system boundaries.
    and false-success boundaries.
 8. [Visibility And Herdr](visibility-and-herdr.md) defines the observability
    boundary.
-9. [RunHandle](run-handle.md) proposes the runtime-layer handle boundary for
-   locating, observing, labeling, snapshotting, and guarding live Runs without
-   making pane/process identity part of core coordination truth.
+9. [RunHandle](run-handle.md) proposes the runtime-layer handle for locating,
+   observing, and guarding live Runs: three ports (repository, runtime
+   control, guard), orthogonal execution/attachment/observation state, and
+   adapter-owned locator incarnation — never core coordination truth.
 10. [Coordination Continuation And Recovery](coordination-continuation-recovery.md)
-    proposes the CoordinationSession planner boundary for resume, immutable
-    request-shape hazards, existing-result recovery, and continuation sessions.
-11. [Executor Health And Fallback](executor-health-and-fallback.md) proposes
-    the Dispatch Control Plane boundary for executor failure classification,
-    cooldown/quota parking, and governed fallback.
+    proposes a pure planner that turns a session snapshot into one typed
+    continuation action; plan is advice, the engine re-validates at apply.
+11. [Executor Fallback Activation And Health](executor-health-and-fallback.md)
+    proposes activating the reserved `fallbackExecutors` on signal-ladder
+    outcomes through the existing compiler; health observation store is the
+    future of the same contract.
+
+Documents 9–11 share one admission authority: the Run contract's
+[Run Phases And Admission](../contracts/assignment-run-runresult.md#run-phases-and-admission).
+
+## Runtime Recovery Principles
+
+Shared by documents 9–11; each applies them without restating them.
+
+- An observed incident never creates execution authority. Every new attempt
+  needs a valid admission through the Run contract; a missing RunHandle,
+  an expired retry-after, or a timeout grants nothing.
+- Three guarantees stay distinct: control fencing (one controller per
+  un-settled Run), result fencing (a superseded Run cannot publish the
+  authoritative result), effect protection (owned by the operation adapter;
+  no exactly-once promise).
+- Facts before conclusions: worker result beats every runtime signal; a
+  failed liveness read is `unknown`, never `absent`; delivery without
+  acknowledgment is `unknown`, never "launch failed"; cancel requested is
+  not worker stopped.
+- Domain semantics and application ports first; wire/persistence schemas
+  only at boundaries that are stored or exchanged. Existing semantic
+  contracts (`liveness.mjs` ladder, `recovery.mjs` matrix, `run-retried`
+  supersession, exclusive-create lock) are ported, not re-derived.
+- Node/Rust coexistence: the runtime that spawned owns the state it wrote;
+  the other reads; a reader that does not understand a `contract` version
+  refuses explicitly.
+- Default implementations are minimal and reuse repository primitives;
+  contracts keep room (optional fields, ports) for distributed lease, generic
+  incarnation, health scoring, and effect ledgers without renaming.
 
 CoordinationSession's identity/persistence boundary and the shared
 FlowDefinition graph/operation/policy IR are accepted per
