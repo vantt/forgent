@@ -1,15 +1,21 @@
 use fgos_distribution::store::{
     list_releases, resolve_machine_release_store_root, stage_release, StageOutcome,
 };
+use fgos_distribution::{
+    get_workspace_status, repair_workspace, upgrade_workspace, verify_workspace,
+};
 use std::path::PathBuf;
 
 fn print_usage_and_exit() -> ! {
-    eprintln!("Usage: fgctl <stage|status|init> [options]");
+    eprintln!("Usage: fgctl <stage|status|init|upgrade|repair|verify> [options]");
     eprintln!();
     eprintln!("Subcommands:");
-    eprintln!("  stage   Stage a release tree into the machine release store");
-    eprintln!("  status  Show staged releases in the machine release store");
-    eprintln!("  init    Initialize and activate fgOS in a workspace");
+    eprintln!("  stage    Stage a release tree into the machine release store");
+    eprintln!("  status   Show staged releases in the machine release store");
+    eprintln!("  init     Initialize and activate fgOS in a workspace");
+    eprintln!("  upgrade  Upgrade workspace to a new release candidate");
+    eprintln!("  repair   Repair or rollback workspace activation");
+    eprintln!("  verify   Verify active release files against manifest");
     std::process::exit(1);
 }
 
@@ -69,26 +75,52 @@ fn main() {
             }
 
             let store_root = resolve_machine_release_store_root();
-            match list_releases(&store_root) {
-                Ok(releases) => {
-                    if json_output {
-                        let json = serde_json::to_string_pretty(&releases)
-                            .unwrap_or_else(|_| "[]".to_string());
-                        println!("{}", json);
-                    } else {
-                        for r in releases {
-                            println!(
-                                "{} (version: {}, created: {})",
-                                r.artifact_digest,
-                                r.release_version.as_deref().unwrap_or("none"),
-                                r.created_at.as_deref().unwrap_or("none")
-                            );
-                        }
+            let cwd = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+
+            if let Some(ws) = get_workspace_status(&cwd, &store_root) {
+                if json_output {
+                    let json =
+                        serde_json::to_string_pretty(&ws).unwrap_or_else(|_| "{}".to_string());
+                    println!("{}", json);
+                } else {
+                    println!("activeArtifactDigest: {}", ws.active_artifact_digest);
+                    if let Some(prev) = &ws.previous_artifact_digest {
+                        println!("previousArtifactDigest: {}", prev);
+                    }
+                    if ws.quarantined {
+                        println!("quarantined: true");
+                    }
+                    for r in &ws.releases {
+                        println!(
+                            "{} (version: {}, created: {})",
+                            r.artifact_digest,
+                            r.release_version.as_deref().unwrap_or("none"),
+                            r.created_at.as_deref().unwrap_or("none")
+                        );
                     }
                 }
-                Err(err) => {
-                    eprintln!("Error reading releases: {}", err);
-                    std::process::exit(1);
+            } else {
+                match list_releases(&store_root) {
+                    Ok(releases) => {
+                        if json_output {
+                            let json = serde_json::to_string_pretty(&releases)
+                                .unwrap_or_else(|_| "[]".to_string());
+                            println!("{}", json);
+                        } else {
+                            for r in releases {
+                                println!(
+                                    "{} (version: {}, created: {})",
+                                    r.artifact_digest,
+                                    r.release_version.as_deref().unwrap_or("none"),
+                                    r.created_at.as_deref().unwrap_or("none")
+                                );
+                            }
+                        }
+                    }
+                    Err(err) => {
+                        eprintln!("Error reading releases: {}", err);
+                        std::process::exit(1);
+                    }
                 }
             }
         }
@@ -114,6 +146,87 @@ fn main() {
             };
 
             match fgos_distribution::init_workspace(&cwd, from_path.as_deref()) {
+                Ok(()) => {}
+                Err(err) => {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+        "upgrade" => {
+            let mut from_path: Option<PathBuf> = None;
+            let mut i = 2;
+            while i < args.len() {
+                if args[i] == "--from" && i + 1 < args.len() {
+                    from_path = Some(PathBuf::from(&args[i + 1]));
+                    i += 2;
+                } else {
+                    eprintln!("Unknown option: {}", args[i]);
+                    print_usage_and_exit();
+                }
+            }
+
+            let from = match from_path {
+                Some(p) => p,
+                None => {
+                    eprintln!("Error: --from <path> is required for 'fgctl upgrade'");
+                    print_usage_and_exit();
+                }
+            };
+
+            let cwd = match std::env::current_dir() {
+                Ok(d) => d,
+                Err(err) => {
+                    eprintln!("Error reading current directory: {}", err);
+                    std::process::exit(1);
+                }
+            };
+
+            match upgrade_workspace(&cwd, &from) {
+                Ok(()) => {}
+                Err(err) => {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+        "repair" => {
+            if let Some(arg) = args[2..].first() {
+                eprintln!("Unknown option: {}", arg);
+                print_usage_and_exit();
+            }
+
+            let cwd = match std::env::current_dir() {
+                Ok(d) => d,
+                Err(err) => {
+                    eprintln!("Error reading current directory: {}", err);
+                    std::process::exit(1);
+                }
+            };
+
+            match repair_workspace(&cwd) {
+                Ok(()) => {}
+                Err(err) => {
+                    eprintln!("Error: {}", err);
+                    std::process::exit(1);
+                }
+            }
+        }
+        "verify" => {
+            if let Some(arg) = args[2..].first() {
+                eprintln!("Unknown option: {}", arg);
+                print_usage_and_exit();
+            }
+
+            let cwd = match std::env::current_dir() {
+                Ok(d) => d,
+                Err(err) => {
+                    eprintln!("Error reading current directory: {}", err);
+                    std::process::exit(1);
+                }
+            };
+
+            match verify_workspace(&cwd) {
                 Ok(()) => {}
                 Err(err) => {
                     eprintln!("Error: {}", err);

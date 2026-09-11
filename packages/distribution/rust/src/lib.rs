@@ -79,6 +79,7 @@ pub struct RuntimeIdentityInfo {
     pub work_state_id: Option<String>,
     pub machine_release_store: Option<String>,
     pub artifact_digest: Option<String>,
+    pub previous_artifact_digest: Option<String>,
     pub release_version: Option<String>,
     pub schema_version: Option<u32>,
     pub state_schemas: Option<StateSchemasInfoRuntime>,
@@ -95,6 +96,7 @@ impl RuntimeIdentityInfo {
             work_state_id: None,
             machine_release_store: None,
             artifact_digest: None,
+            previous_artifact_digest: None,
             release_version: None,
             schema_version: None,
             state_schemas: None,
@@ -243,6 +245,10 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
         Err(_) => return RuntimeIdentityInfo::dev_source(),
     };
 
+    if activation["status"].as_str() != Some("ready") {
+        return RuntimeIdentityInfo::dev_source();
+    }
+
     let root_json_path = installation_dir.join("root.json");
     let root_json: Option<serde_json::Value> = std::fs::read_to_string(&root_json_path)
         .ok()
@@ -267,6 +273,9 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
         .and_then(|r| r["machineReleaseStore"].as_str().map(|s| s.to_string()));
 
     let artifact_digest = activation["artifactDigest"].as_str().map(|s| s.to_string());
+    let previous_artifact_digest = activation["previousArtifactDigest"]
+        .as_str()
+        .map(|s| s.to_string());
     let release_path_str = activation["releasePath"].as_str();
 
     let manifest = release_path_str.and_then(|rp| {
@@ -297,6 +306,7 @@ pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
         work_state_id,
         machine_release_store,
         artifact_digest,
+        previous_artifact_digest,
         release_version,
         schema_version,
         state_schemas,
