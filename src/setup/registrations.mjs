@@ -3833,7 +3833,7 @@ export function checkConfinementProbeFreshness() {
 
 registerCheck({
   id: 'confinement-probe-freshness',
-  description: 'confinement probe freshness status (placeholder in phase 01)',
+  description: 'confinement probe freshness status (runs the 8-probe falsification harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
 });
 
