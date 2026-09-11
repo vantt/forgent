@@ -123,16 +123,32 @@ Sourced from [`plans/260910-1700-rust-host-r1-kernel/reports/p08-performance.jso
 
 ## 5. Full-Suite Verification Gates
 
-All full-suite commands named in `plan.md`'s `FULL_TEST` and the external consumer script were executed and verified green:
+`plan.md`'s own `FULL_TEST` definition (line 323) is the whole-repo Node suite,
+not just the rust-host subset:
+
+```sh
+FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs' \
+  && cargo fmt --all -- --check \
+  && cargo clippy --workspace --all-targets -- -D warnings \
+  && cargo test --workspace \
+  && cargo test --manifest-path herdr-plugin/Cargo.toml
+```
+
+`plan.md` itself documents one pre-existing, non-regression red test in that
+Node suite (line 330-332: `cohort-planner` "buildCandidateInventory against
+the real committed", `check-decision-citation-drift`), so the chained command
+above does not itself exit 0 — each piece was verified individually instead:
 
 | Command | Target / Scope | Result / Exit Code |
 |---|---|---|
+| `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'` | Whole-repo Node suite | Exit code 1 — 6030/6038 passed, 7 skipped, 1 failed (`cohort-planner`'s `buildCandidateInventory` test, the plan.md-documented pre-existing red, reproduced identically on unmodified `main`, not a regression) |
 | `cargo fmt --all -- --check` | Rust formatting across workspace and `herdr-plugin` | Passed (exit code 0) |
 | `cargo clippy --workspace --all-targets -- -D warnings` | Rust linting across all workspace crates and targets | Passed (exit code 0) |
 | `cargo test --workspace` | Rust unit and integration tests across workspace crates | Passed (exit code 0) |
 | `cargo test --manifest-path herdr-plugin/Cargo.toml` | Rust integration and unit tests for `herdr-plugin` | Passed (exit code 0, 225 tests passed) |
-| `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/rust-host/*.test.mjs'` | Parity harness, release tree, vectors, fgctl integration tests | Passed (exit code 0, 88 tests passed) |
-| `scripts/ci-external-consumer.sh --assets dist` | External consumer proof on clean environment | Passed (exit code 0) |
+| `scripts/ci-external-consumer.sh --assets dist` (a hand-built distribution directory, packaged per `.github/workflows/release.yml`'s own steps) | External consumer proof on clean environment | Passed (exit code 0) |
 | `source scripts/fgos-shell-integration.sh && fgos coordination chain rust-host-r1-kernel --json` | Coordination chain status read | Passed (exit code 0) |
 
-All tests and gates reproduce cleanly with exit code 0.
+Every command above was run individually and its real exit code recorded;
+none were assumed. The only non-zero exit is the plan.md-documented
+pre-existing `cohort-planner` red, unrelated to any cell this track shipped.
