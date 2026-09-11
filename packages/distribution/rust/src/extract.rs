@@ -2,7 +2,7 @@
 
 use flate2::read::GzDecoder;
 use std::fs::File;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use tar::{Archive, EntryType};
 
 #[derive(Debug, thiserror::Error)]
@@ -15,27 +15,50 @@ pub enum ExtractError {
     EntryRefused(String),
 }
 
-/// Rejects any entry whose normalized path is empty, absolute, or contains a
-/// `..` component, and any entry that is not a plain file or directory
-/// (symlink, hard link, device, fifo, etc.) -- matches the same confinement
-/// discipline the release manifest's own `files[]` list is held to.
+/// Rejects any entry whose normalized path is empty, absolute (Unix `/` or a
+/// Windows drive-letter prefix), or contains a `..` segment, and any entry
+/// that is not a plain file or directory (symlink, hard link, device, fifo,
+/// etc.) -- matches the same confinement discipline the release manifest's
+/// own `files[]` list is held to. Backslashes are normalized to `/` before
+/// this check the same way `canonical::normalize_release_path` normalizes
+/// manifest paths: `Path::components()` alone does not split on `\` on a
+/// Unix host, so a raw `..\..\outside` or `C:\outside\pwn` entry would
+/// otherwise pass through as one opaque, harmless-looking filename.
 fn validate_entry(path: &Path, entry_type: EntryType) -> Result<(), ExtractError> {
-    if path.as_os_str().is_empty() {
+    let raw = path.to_string_lossy();
+    if raw.is_empty() {
         return Err(ExtractError::EntryRefused(
             "empty path in archive entry".to_string(),
         ));
     }
-    for component in path.components() {
-        match component {
-            Component::Normal(_) | Component::CurDir => {}
-            Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
-                return Err(ExtractError::EntryRefused(format!(
-                    "unsafe path in archive entry: {}",
-                    path.display()
-                )));
-            }
+    let normalized = raw.replace('\\', "/");
+
+    let mut chars = normalized.chars();
+    if let (Some(letter), Some(':')) = (chars.next(), chars.next()) {
+        if letter.is_ascii_alphabetic() {
+            return Err(ExtractError::EntryRefused(format!(
+                "unsafe path in archive entry: {}",
+                path.display()
+            )));
         }
     }
+
+    if normalized.starts_with('/') {
+        return Err(ExtractError::EntryRefused(format!(
+            "unsafe path in archive entry: {}",
+            path.display()
+        )));
+    }
+
+    for seg in normalized.split('/') {
+        if seg == ".." {
+            return Err(ExtractError::EntryRefused(format!(
+                "unsafe path in archive entry: {}",
+                path.display()
+            )));
+        }
+    }
+
     if !(entry_type.is_file() || entry_type.is_dir()) {
         return Err(ExtractError::EntryRefused(format!(
             "disallowed archive entry type {:?} at {}",
@@ -171,6 +194,24 @@ mod tests {
     }
 
     #[test]
+    fn test_extract_refuses_backslash_traversal_entry() {
+        let archive_path = build_archive_with_extra_entry("..\\..\\outside", EntryType::Regular);
+        let dest = archive_path.parent().unwrap().join("dest");
+        let err = extract_tar_gz(&archive_path, &dest).unwrap_err();
+        assert!(matches!(err, ExtractError::EntryRefused(_)));
+        let _ = std::fs::remove_dir_all(archive_path.parent().unwrap());
+    }
+
+    #[test]
+    fn test_extract_refuses_windows_drive_letter_entry() {
+        let archive_path = build_archive_with_extra_entry("C:\\outside\\pwn", EntryType::Regular);
+        let dest = archive_path.parent().unwrap().join("dest");
+        let err = extract_tar_gz(&archive_path, &dest).unwrap_err();
+        assert!(matches!(err, ExtractError::EntryRefused(_)));
+        let _ = std::fs::remove_dir_all(archive_path.parent().unwrap());
+    }
+
+    #[test]
     fn test_extract_refuses_absolute_entry() {
         let archive_path = build_archive_with_extra_entry("/etc/passwd", EntryType::Regular);
         let dest = archive_path.parent().unwrap().join("dest");
@@ -197,6 +238,18 @@ mod tests {
     #[test]
     fn test_validate_entry_refuses_hardlink() {
         let err = validate_entry(Path::new("bin/link"), EntryType::Link).unwrap_err();
+        assert!(matches!(err, ExtractError::EntryRefused(_)));
+    }
+
+    #[test]
+    fn test_validate_entry_refuses_backslash_traversal() {
+        let err = validate_entry(Path::new("..\\..\\outside"), EntryType::Regular).unwrap_err();
+        assert!(matches!(err, ExtractError::EntryRefused(_)));
+    }
+
+    #[test]
+    fn test_validate_entry_refuses_windows_drive_letter() {
+        let err = validate_entry(Path::new("C:\\outside\\pwn"), EntryType::Regular).unwrap_err();
         assert!(matches!(err, ExtractError::EntryRefused(_)));
     }
 }
