@@ -173,27 +173,60 @@ impl ActivationLockGuard {
         // otherwise -- reclaim it the same way lock.rs judges the main
         // checkout lock stale (dead pid OR past DEFAULT_TTL_MS), one retry
         // only, never a blocking loop.
-        if Self::is_stale(&lock_path) {
-            let _ = std::fs::remove_file(&lock_path);
-            match Self::try_create(&lock_path, &content) {
-                Ok(()) => return Ok(Self { lock_path }),
-                Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
-                    return Err(InitError::ActivationLockHeld);
+        let raw = match std::fs::read_to_string(&lock_path) {
+            Ok(r) => r,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                // Vanished between our failed create and this read -- the
+                // holder that just released it may already have been
+                // replaced by a fresh one. Try once more rather than assume
+                // we now own an empty path.
+                return match Self::try_create(&lock_path, &content) {
+                    Ok(()) => Ok(Self { lock_path }),
+                    Err(_) => Err(InitError::ActivationLockHeld),
+                };
+            }
+            Err(err) => return Err(InitError::Io(err)),
+        };
+
+        if Self::is_stale_content(&raw) {
+            // Re-read right before unlinking (mirrors
+            // src/runner/main-checkout-lock.mjs's own reclaim guard,
+            // `tryAcquireOnce`'s stale branch): the liveness/TTL check above
+            // is the slow window. If the content changed since `raw` was
+            // read, a fresh holder took this path in between and must not
+            // be unlinked out from under itself.
+            let current = std::fs::read_to_string(&lock_path).unwrap_or_default();
+            if current == raw {
+                let _ = std::fs::remove_file(&lock_path);
+                match Self::try_create(&lock_path, &content) {
+                    Ok(()) => return Ok(Self { lock_path }),
+                    Err(err) if err.kind() == std::io::ErrorKind::AlreadyExists => {
+                        return Err(InitError::ActivationLockHeld);
+                    }
+                    Err(err) => return Err(InitError::Io(err)),
                 }
-                Err(err) => return Err(InitError::Io(err)),
             }
         }
 
         Err(InitError::ActivationLockHeld)
     }
 
+    /// Creates `lock_path` atomically with `content` already fully written --
+    /// never a window where the file exists but is empty or partial.
+    /// Mirrors `src/runner/main-checkout-lock.mjs`'s own `writeAtomicCreate`:
+    /// write the complete content to a uniquely-named temp file first, then
+    /// `hard_link` it onto `lock_path` (atomic, fails `AlreadyExists` on
+    /// collision exactly like `open(.., O_EXCL)` would), then remove the
+    /// temp file. A plain `create_new` + separate `write_all` would leave
+    /// exactly the empty-file window a concurrent reader's staleness check
+    /// could observe and wrongly reclaim a genuinely live lock.
     fn try_create(lock_path: &Path, content: &str) -> std::io::Result<()> {
-        let mut file = std::fs::OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(lock_path)?;
-        file.write_all(content.as_bytes())?;
-        Ok(())
+        let tmp_path =
+            lock_path.with_extension(format!("tmp-{}-{}", std::process::id(), now_millis()));
+        std::fs::write(&tmp_path, content)?;
+        let result = std::fs::hard_link(&tmp_path, lock_path);
+        let _ = std::fs::remove_file(&tmp_path);
+        result
     }
 
     /// A lock this crate itself owns and can safely reclaim once its holder
@@ -201,12 +234,8 @@ impl ActivationLockGuard {
     /// "ambiguous means refuse" rule for a lock file this crate never
     /// writes, an unparseable `activation.lock` here can only be leftover
     /// wreckage from a killed writer, so it is treated as stale too.
-    fn is_stale(lock_path: &Path) -> bool {
-        let raw = match std::fs::read_to_string(lock_path) {
-            Ok(r) => r,
-            Err(_) => return false, // vanished concurrently; the next create attempt resolves it
-        };
-        let record = match crate::lock::parse_lock_content(&raw) {
+    fn is_stale_content(raw: &str) -> bool {
+        let record = match crate::lock::parse_lock_content(raw) {
             Some(r) => r,
             None => return true,
         };
@@ -220,6 +249,11 @@ impl ActivationLockGuard {
                     .unwrap_or(false);
                 !(pid_live && within_ttl)
             }
+            // activation.lock's own writer (this function) only ever records
+            // a numeric pid; a string identity here would be foreign content
+            // this crate never wrote and is never reclaimed, deliberately
+            // more conservative than the reference module's TTL-only rule
+            // for a string holder since this path is unreachable in practice.
             crate::lock::LockHolderIdentity::String(_) => false,
         }
     }

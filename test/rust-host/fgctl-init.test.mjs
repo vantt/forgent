@@ -402,8 +402,12 @@ test('Item 1: Concurrent fgctl init invocations against pre-staged pinned worksp
     };
     fs.writeFileSync(path.join(fgosDir, 'distribution.json'), JSON.stringify(distPin, null, 2));
 
-    // Fire several truly concurrent fgctl init processes
-    const procCount = 8;
+    // Fire several truly concurrent fgctl init processes. A narrow window
+    // between activation.lock's create and its content becoming fully
+    // visible only shows up probabilistically under real concurrency, not
+    // via a fixed handful of processes -- push the count up to widen the
+    // odds of catching a regression of that class here.
+    const procCount = 24;
     const procs = Array.from({ length: procCount }, () =>
       spawn(FGCTL_BIN, ['init'], {
         cwd: tempProj,
