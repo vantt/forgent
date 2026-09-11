@@ -501,6 +501,32 @@ test('checkRetrospectiveContent: NOT ok when docPath is recorded but the file do
   assert.match(result.detail, /does not exist on disk/);
 });
 
+test('checkRetrospectiveContent: ok when outcome.docPath is stale (post docs-registry migration) but the registry resolves it via alias to a live doc whose CURRENT file exists', () => {
+  const repoRoot = initRepo();
+  fs.mkdirSync(path.join(repoRoot, 'docs', 'knowledge', 'why-migrated-topic'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'docs', 'knowledge', 'why-migrated-topic', 'migrated-doc.md'), '# migrated doc\n');
+  const view = {
+    outcomes: { 'migrated-item': { docType: 'explanation', docPath: 'docs/explanation/migrated-doc.md' } },
+    topics: {
+      'why-migrated-topic': { topicId: 'why-migrated-topic', status: 'active' },
+    },
+    docs: {
+      'why-migrated-topic:migrated-doc': {
+        docId: 'why-migrated-topic:migrated-doc',
+        topicId: 'why-migrated-topic',
+        role: 'migrated-doc',
+        currentPath: 'docs/knowledge/why-migrated-topic/migrated-doc.md',
+        docLifecycle: 'active',
+        aliases: ['docs/explanation/migrated-doc.md'],
+        sourceCaptureIds: [],
+      },
+    },
+  };
+  const result = checkRetrospectiveContent(view, 'migrated-item', repoRoot);
+  assert.equal(result.ok, true, 'a doc relocated by the docs-registry migration must still satisfy the gate via its alias, not just its stale outcome.docPath');
+  assert.match(result.detail, /resolved via registry/);
+});
+
 test('checkRetrospectiveContent: ok when at least one decision record exists, even with no outcome at all', () => {
   const repoRoot = initRepo();
   const view = { decisionsById: { 'has-decision': [{ text: 'x', rationale: 'y' }] } };

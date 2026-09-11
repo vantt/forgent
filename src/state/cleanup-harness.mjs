@@ -52,6 +52,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { getDomain } from './workflow-stage-graphs.mjs';
 import { isCanceledStatus, resolveRoot } from './frontier.mjs';
+import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 
 // Shared with blockedItemsNowResolvable below (tsk-597z): the one detail
 // string that means "this item never claimed a git-verifiable merge in the
@@ -354,6 +355,21 @@ function checkRetrospectiveContentForId(view, id, repoRoot) {
   if (outcome?.docType && outcome?.docPath) {
     if (fs.existsSync(path.join(repoRoot, outcome.docPath))) {
       return { ok: true, detail: `retrospective content found (docType "${outcome.docType}" at ${outcome.docPath}, file confirmed present)` };
+    }
+    // A docs-registry migration (tsk-5mh) can move a doc's real file to a
+    // new `currentPath` while `outcome.docPath` — historical, never rewritten
+    // per D-tsk28x-9 ("docPath cũ là sự thật lịch sử, không sửa") — still
+    // names the pre-migration path. Before declaring the content missing,
+    // resolve that path through the registry's own alias/currentPath table
+    // (`resolveDocPath`): an unambiguous live doc whose CURRENT file still
+    // exists means the content is genuinely present, just relocated.
+    const resolved = resolveDocPath(view, outcome.docPath);
+    const resolvedDoc = Array.isArray(resolved) ? null : resolved;
+    if (resolvedDoc?.currentPath && fs.existsSync(path.join(repoRoot, resolvedDoc.currentPath))) {
+      return {
+        ok: true,
+        detail: `retrospective content found (docType "${outcome.docType}", outcome path ${outcome.docPath} resolved via registry to ${resolvedDoc.currentPath}, file confirmed present)`,
+      };
     }
     return {
       ok: false,
