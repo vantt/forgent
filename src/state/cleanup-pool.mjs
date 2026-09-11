@@ -15,14 +15,15 @@ function isCandidate(item) {
   return item.status === 'cleanup';
 }
 
-// The specific latest `retrospective -> cleanup` transition event for
-// `id` — the exact same event `checkCleanupTTLElapsed` reads. Mirrors
-// that function's own filter rather than importing a timestamp it
-// doesn't export. Returns `undefined` when the item never actually
-// entered `cleanup`.
-function latestCleanupEntry(rawEvents, id) {
+// The specific latest `delivered` transition event for `id` — the exact
+// same event `checkCleanupTTLElapsed` reads (D7-revised, person's call
+// 2026-09-11: anchors to release, not to the later retrospective->cleanup
+// transition). Mirrors that function's own filter rather than importing a
+// timestamp it doesn't export. Returns `undefined` when the item never
+// actually shipped.
+function latestDeliveredEntry(rawEvents, id) {
   const entries = (rawEvents ?? []).filter(
-    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'cleanup',
+    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'delivered',
   );
   return entries.at(-1);
 }
@@ -31,8 +32,8 @@ function latestCleanupEntry(rawEvents, id) {
  * Pick the single next `status:cleanup` item whose TTL has already
  * elapsed, or `null` when none qualify. D1
  * (docs/history/fgos-cleanup-loop/CONTEXT.md): FIFO by the item's own
- * `retrospective -> cleanup` entry timestamp, oldest first — no priority/
- * tier weighting, cleanup is housekeeping, not merge-readiness.
+ * `delivered` entry timestamp, oldest first — no priority/tier weighting,
+ * cleanup is housekeeping, not merge-readiness.
  *
  * tsk-59x D2: `leafTtlDays`, when supplied alongside `ttlDays`, resolves
  * per-item the same way `assessCleanupReadiness` does — a leaf's own TTL
@@ -50,12 +51,12 @@ export function pickNextCleanupItem(view, rawEvents, { ttlDays, leafTtlDays, now
     const resolvedTtlDays = resolveTtlDaysForItem(view, id, { ttlDays, leafTtlDays });
     const ttl = checkCleanupTTLElapsed(rawEvents, id, { ttlDays: resolvedTtlDays, now });
     if (!ttl.ok) continue;
-    const entered = latestCleanupEntry(rawEvents, id);
-    candidates.push({ id, enteredAt: new Date(entered.ts).getTime() });
+    const shipped = latestDeliveredEntry(rawEvents, id);
+    candidates.push({ id, shippedAt: new Date(shipped.ts).getTime() });
   }
 
   if (candidates.length === 0) return null;
 
-  candidates.sort((a, b) => a.enteredAt - b.enteredAt);
+  candidates.sort((a, b) => a.shippedAt - b.shippedAt);
   return { id: candidates[0].id };
 }

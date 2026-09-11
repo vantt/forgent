@@ -9,8 +9,11 @@ function item(id, status, extra = {}) {
   return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
-function cleanupEntry(id, ts) {
-  return { type: 'work.move', payload: { id, to: 'cleanup' }, ts };
+// D7-revised (person's call, 2026-09-11): checkCleanupTTLElapsed anchors to
+// the item's `delivered` (release) transition, not the later
+// `retrospective -> cleanup` one — see cleanup-harness.mjs's own comment.
+function deliveredEntry(id, ts) {
+  return { type: 'work.move', payload: { id, to: 'delivered' }, ts };
 }
 
 const TTL_DAYS = 7;
@@ -24,30 +27,30 @@ test('pickNextCleanupItem on a view with no work key returns null', () => {
   assert.equal(pickNextCleanupItem({}, [], { ttlDays: TTL_DAYS, now: NOW }), null);
 });
 
-test('a status:cleanup item with no retrospective->cleanup event in rawEvents is excluded', () => {
+test('a status:cleanup item with no delivered event in rawEvents is excluded', () => {
   const view = { work: { a: item('a', 'cleanup') } };
   assert.equal(pickNextCleanupItem(view, [], { ttlDays: TTL_DAYS, now: NOW }), null);
 });
 
 test('a status:cleanup item whose TTL has not elapsed is excluded', () => {
   const view = { work: { a: item('a', 'cleanup') } };
-  const rawEvents = [cleanupEntry('a', '2026-01-14T00:00:00.000Z')]; // 1 day ago, TTL is 7
+  const rawEvents = [deliveredEntry('a', '2026-01-14T00:00:00.000Z')]; // 1 day ago, TTL is 7
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
 });
 
 test('a status:cleanup item whose TTL has elapsed is picked', () => {
   const view = { work: { a: item('a', 'cleanup') } };
-  const rawEvents = [cleanupEntry('a', '2026-01-01T00:00:00.000Z')]; // 14 days ago, TTL is 7
+  const rawEvents = [deliveredEntry('a', '2026-01-01T00:00:00.000Z')]; // 14 days ago, TTL is 7
   assert.deepEqual(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), { id: 'a' });
 });
 
 test('a non-cleanup-status item is never picked, even with a matching event in rawEvents', () => {
   const view = { work: { a: item('a', 'doing') } };
-  const rawEvents = [cleanupEntry('a', '2026-01-01T00:00:00.000Z')];
+  const rawEvents = [deliveredEntry('a', '2026-01-01T00:00:00.000Z')];
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
 });
 
-test('two TTL-elapsed candidates: the earlier retrospective->cleanup entry wins (D1 FIFO)', () => {
+test('two TTL-elapsed candidates: the earlier delivered entry wins (D1 FIFO)', () => {
   const view = {
     work: {
       a: item('a', 'cleanup'),
@@ -55,17 +58,17 @@ test('two TTL-elapsed candidates: the earlier retrospective->cleanup entry wins 
     },
   };
   const rawEvents = [
-    cleanupEntry('a', '2026-01-02T00:00:00.000Z'),
-    cleanupEntry('b', '2026-01-01T00:00:00.000Z'),
+    deliveredEntry('a', '2026-01-02T00:00:00.000Z'),
+    deliveredEntry('b', '2026-01-01T00:00:00.000Z'),
   ];
   assert.deepEqual(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), { id: 'b' });
 });
 
-test('only the specific latest retrospective->cleanup event for the id is read, per cleanup-harness.mjs\'s own contract', () => {
+test('only the specific latest delivered event for the id is read, per cleanup-harness.mjs\'s own contract', () => {
   const view = { work: { a: item('a', 'cleanup') } };
   const rawEvents = [
-    cleanupEntry('a', '2025-01-01T00:00:00.000Z'), // a much older, superseded entry
-    cleanupEntry('a', '2026-01-14T00:00:00.000Z'), // the real, latest entry: 1 day ago, TTL not elapsed
+    deliveredEntry('a', '2025-01-01T00:00:00.000Z'), // a much older, superseded entry
+    deliveredEntry('a', '2026-01-14T00:00:00.000Z'), // the real, latest entry: 1 day ago, TTL not elapsed
   ];
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
 });
@@ -76,7 +79,7 @@ test('only the specific latest retrospective->cleanup event for the id is read, 
 
 test('a leaf item (parent present in view) 1 day into cleanup is picked under leafTtlDays:0, even though root TTL is 7d', () => {
   const view = { work: { root: item('root', 'delivered'), leaf: item('leaf', 'cleanup', { parent: 'root' }) } };
-  const rawEvents = [cleanupEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  const rawEvents = [deliveredEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
   assert.deepEqual(
     pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, leafTtlDays: 0, now: NOW }),
     { id: 'leaf' },
@@ -85,12 +88,12 @@ test('a leaf item (parent present in view) 1 day into cleanup is picked under le
 
 test('a root item (no parent) 1 day into cleanup is still excluded under leafTtlDays:0 -- root keeps the full 7d TTL', () => {
   const view = { work: { root: item('root', 'cleanup') } };
-  const rawEvents = [cleanupEntry('root', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  const rawEvents = [deliveredEntry('root', '2026-01-14T00:00:00.000Z')]; // 1 day ago
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, leafTtlDays: 0, now: NOW }), null);
 });
 
 test('leafTtlDays omitted entirely: a leaf 1 day into cleanup is still excluded, byte-identical to before tsk-59x', () => {
   const view = { work: { root: item('root', 'delivered'), leaf: item('leaf', 'cleanup', { parent: 'root' }) } };
-  const rawEvents = [cleanupEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
+  const rawEvents = [deliveredEntry('leaf', '2026-01-14T00:00:00.000Z')]; // 1 day ago
   assert.equal(pickNextCleanupItem(view, rawEvents, { ttlDays: TTL_DAYS, now: NOW }), null);
 });

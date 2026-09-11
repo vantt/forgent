@@ -6,12 +6,24 @@
 // --is-ancestor`, no mutation).
 //
 // Three independent checks, combined by assessCleanupReadiness:
-//   (1) TTL elapsed since the item actually entered `cleanup` (D7) — the
-//       clock anchors to the specific retrospective->cleanup event
-//       timestamp, mirroring graph-metrics.mjs's classifyStaleDoing
-//       precedent (age = now - a specific transition's ts), never "latest
-//       event of any kind for this id" (an unrelated decision/friction
-//       logged while parked would otherwise silently reset the clock).
+//   (1) TTL elapsed since the item actually shipped (D7-revised, person's
+//       call 2026-09-11) — the clock anchors to the specific
+//       delivered->retrospective transition event's own timestamp (i.e.
+//       the merge/release moment), never a later one, mirroring
+//       graph-metrics.mjs's classifyStaleDoing precedent (age = now - a
+//       specific transition's ts, never "latest event of any kind for this
+//       id" — an unrelated decision/friction logged while parked would
+//       otherwise silently reset the clock). D7's ORIGINAL anchor was the
+//       later retrospective->cleanup transition, justified as protecting a
+//       reusable worktree during the delay; that rationale is stale in
+//       practice (measured: 0/55 live `cleanup` items still have a
+//       worktree, `cleanupMergedBranch` tears it down far earlier — see
+//       "Drift 2" in the knowledge doc below) — what the delay actually
+//       protects today is a real post-merge incident window on the
+//       SHIPPED ARTIFACT, which starts at `delivered`, not at whatever
+//       later moment retrospective happens to finish. Anchoring at
+//       `delivered` also means a slow retrospective no longer silently
+//       extends the protection window past what was intended.
 //   (2) retrospective actually produced real content (D4/D8) — a crashed
 //       or partial retrospective run could transition delivered->
 //       retrospective->cleanup without ever writing real output, so this
@@ -410,26 +422,41 @@ export function checkRetrospectiveContent(view, id, repoRoot) {
 }
 
 /**
- * Has enough time elapsed since `id` actually entered `cleanup`? Reads
- * `rawEvents` (readRawEvents(dir)'s own shape) for the SPECIFIC latest
- * `work.move` event with `payload.to === 'cleanup'` for this id — never
- * "latest event of any kind", per this module's own header comment.
+ * Has enough time elapsed since `id` actually shipped (D7-revised, person's
+ * call 2026-09-11: anchor to release, not to retrospective finishing)?
+ * Reads `rawEvents` (readRawEvents(dir)'s own shape) for the SPECIFIC
+ * latest `work.move` event with `payload.to === 'delivered'` for this id
+ * — never "latest event of any kind", per this module's own header
+ * comment. `.at(-1)` (latest, not first) matches the pre-existing
+ * convention this function already used for the old cleanup-anchor: an
+ * item recalled and re-delivered restarts its protection window from the
+ * NEW release, not a stale original one.
+ *
+ * This does NOT weaken the "must retrospective before cleanup" invariant:
+ * that is a structural property of the FSM chain itself
+ * (delivered -> retrospective -> cleanup, strictly sequential — an item
+ * cannot reach status `cleanup` without having passed through
+ * `retrospective` first, regardless of what this function returns). If
+ * retrospective happens to take longer than `ttlDays`, this check is
+ * already satisfied by the time the item reaches `cleanup` — correct
+ * behavior (the protection window was already spent while waiting on
+ * retrospective), not a bypass.
  */
 export function checkCleanupTTLElapsed(rawEvents, id, { ttlDays, now = Date.now() } = {}) {
   const entries = (rawEvents ?? []).filter(
-    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'cleanup',
+    (e) => e.type === 'work.move' && e.payload?.id === id && e.payload?.to === 'delivered',
   );
-  const entered = entries.at(-1);
-  if (!entered) {
-    return { ok: false, detail: 'item never actually entered cleanup — no retrospective->cleanup event found in the log' };
+  const shipped = entries.at(-1);
+  if (!shipped) {
+    return { ok: false, detail: 'item never actually shipped — no delivered event found in the log' };
   }
-  const ageMs = now - new Date(entered.ts).getTime();
+  const ageMs = now - new Date(shipped.ts).getTime();
   const ttlMs = ttlDays * 24 * 60 * 60 * 1000;
   const ageDays = Math.floor(ageMs / 86400000);
   if (ageMs >= ttlMs) {
-    return { ok: true, detail: `${ageDays}d elapsed since entering cleanup (TTL ${ttlDays}d)` };
+    return { ok: true, detail: `${ageDays}d elapsed since shipping (TTL ${ttlDays}d)` };
   }
-  return { ok: false, detail: `only ${ageDays}d elapsed since entering cleanup, TTL is ${ttlDays}d — not ready yet` };
+  return { ok: false, detail: `only ${ageDays}d elapsed since shipping, TTL is ${ttlDays}d — not ready yet` };
 }
 
 /**

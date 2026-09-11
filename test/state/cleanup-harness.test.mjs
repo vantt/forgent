@@ -622,17 +622,21 @@ test('checkRetrospectiveContent: a root/standalone item with no parent never fal
 });
 
 // --- checkCleanupTTLElapsed ---------------------------------------------
+// D7-revised (person's call 2026-09-11): anchors to `delivered` (the
+// release/merge moment), not to the later `retrospective -> cleanup`
+// transition — see the fix comment on checkCleanupTTLElapsed itself for
+// why. Fixture shape here otherwise unchanged from before the revision.
 
-test('checkCleanupTTLElapsed: not ok when the item never entered cleanup at all', () => {
-  const result = checkCleanupTTLElapsed([], 'never-entered', { ttlDays: 7 });
+test('checkCleanupTTLElapsed: not ok when the item never shipped at all', () => {
+  const result = checkCleanupTTLElapsed([], 'never-shipped', { ttlDays: 7 });
   assert.equal(result.ok, false);
-  assert.match(result.detail, /never actually entered cleanup/);
+  assert.match(result.detail, /never actually shipped/);
 });
 
 test('checkCleanupTTLElapsed: not ok when TTL has not yet elapsed', () => {
   const now = Date.now();
-  const enteredAt = new Date(now - 2 * 86400000).toISOString(); // 2 days ago
-  const rawEvents = [{ type: 'work.move', payload: { id: 'x', to: 'cleanup' }, ts: enteredAt }];
+  const shippedAt = new Date(now - 2 * 86400000).toISOString(); // 2 days ago
+  const rawEvents = [{ type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: shippedAt }];
   const result = checkCleanupTTLElapsed(rawEvents, 'x', { ttlDays: 7, now });
   assert.equal(result.ok, false);
   assert.match(result.detail, /not ready yet/);
@@ -640,36 +644,36 @@ test('checkCleanupTTLElapsed: not ok when TTL has not yet elapsed', () => {
 
 test('checkCleanupTTLElapsed: ok when TTL has fully elapsed', () => {
   const now = Date.now();
-  const enteredAt = new Date(now - 8 * 86400000).toISOString(); // 8 days ago
-  const rawEvents = [{ type: 'work.move', payload: { id: 'x', to: 'cleanup' }, ts: enteredAt }];
+  const shippedAt = new Date(now - 8 * 86400000).toISOString(); // 8 days ago
+  const rawEvents = [{ type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: shippedAt }];
   const result = checkCleanupTTLElapsed(rawEvents, 'x', { ttlDays: 7, now });
   assert.equal(result.ok, true);
 });
 
-test('checkCleanupTTLElapsed: anchors to the SPECIFIC retrospective->cleanup event, never a later unrelated event for the same id', () => {
+test('checkCleanupTTLElapsed: anchors to the SPECIFIC delivered event, never a later unrelated event for the same id', () => {
   const now = Date.now();
-  const enteredAt = new Date(now - 8 * 86400000).toISOString(); // 8 days ago -- TTL-elapsed
+  const shippedAt = new Date(now - 8 * 86400000).toISOString(); // 8 days ago -- TTL-elapsed
   const laterUnrelated = new Date(now - 1 * 86400000).toISOString(); // a decision logged 1 day ago
   const rawEvents = [
-    { type: 'work.move', payload: { id: 'x', to: 'cleanup' }, ts: enteredAt },
+    { type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: shippedAt },
     { type: 'decision', payload: { id: 'x', text: 'unrelated note' }, ts: laterUnrelated },
   ];
   const result = checkCleanupTTLElapsed(rawEvents, 'x', { ttlDays: 7, now });
   assert.equal(result.ok, true, 'an unrelated later event must never reset the TTL clock');
 });
 
-test('checkCleanupTTLElapsed: uses the LATEST cleanup entry if an item somehow re-entered cleanup more than once', () => {
+test('checkCleanupTTLElapsed: uses the LATEST delivered entry if an item was recalled and re-shipped more than once', () => {
   const now = Date.now();
-  const firstEntry = new Date(now - 20 * 86400000).toISOString();
-  const secondEntry = new Date(now - 1 * 86400000).toISOString(); // most recent, TTL not elapsed
+  const firstShip = new Date(now - 20 * 86400000).toISOString();
+  const secondShip = new Date(now - 1 * 86400000).toISOString(); // most recent, TTL not elapsed
   const rawEvents = [
-    { type: 'work.move', payload: { id: 'x', to: 'cleanup' }, ts: firstEntry },
+    { type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: firstShip },
     { type: 'work.move', payload: { id: 'x', to: 'blocked' }, ts: new Date(now - 15 * 86400000).toISOString() },
-    { type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: new Date(now - 10 * 86400000).toISOString() },
-    { type: 'work.move', payload: { id: 'x', to: 'cleanup' }, ts: secondEntry },
+    { type: 'work.move', payload: { id: 'x', to: 'doing' }, ts: new Date(now - 10 * 86400000).toISOString() },
+    { type: 'work.move', payload: { id: 'x', to: 'delivered' }, ts: secondShip },
   ];
   const result = checkCleanupTTLElapsed(rawEvents, 'x', { ttlDays: 7, now });
-  assert.equal(result.ok, false, 'must use the LATEST cleanup entry, not the first');
+  assert.equal(result.ok, false, 'must use the LATEST delivered entry, not the first — a recalled-and-re-shipped item restarts its protection window');
 });
 
 // --- resolveTtlDaysForItem (tsk-59x D1) ----------------------------------
@@ -709,7 +713,7 @@ test('assessCleanupReadiness: TTL elapsed + D8 checks pass -> ready:true, both a
   const repoRoot = initRepo();
   const sha = commitFile(repoRoot, 'ok.txt');
   const now = Date.now();
-  const rawEvents = [{ type: 'work.move', payload: { id: 'good-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
+  const rawEvents = [{ type: 'work.move', payload: { id: 'good-item', to: 'delivered' }, ts: new Date(now - 8 * 86400000).toISOString() }];
   const view = {
     work: { 'good-item': { branchHeadAtReturn: sha } },
     decisionsById: { 'good-item': [{ text: 'x', rationale: 'y' }] },
@@ -724,7 +728,7 @@ test('assessCleanupReadiness: TTL elapsed + D8 checks fail -> ready:false, failu
   const repoRoot = initRepo();
   const sha = commitFile(repoRoot, 'ok.txt');
   const now = Date.now();
-  const rawEvents = [{ type: 'work.move', payload: { id: 'no-content-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
+  const rawEvents = [{ type: 'work.move', payload: { id: 'no-content-item', to: 'delivered' }, ts: new Date(now - 8 * 86400000).toISOString() }];
   const view = {
     work: { 'no-content-item': { branchHeadAtReturn: sha } },
     outcomes: {}, // no retrospective content -> content check fails
@@ -740,7 +744,7 @@ test('assessCleanupReadiness: TTL not elapsed + D8 checks pass -> ready:false, b
   const repoRoot = initRepo();
   const sha = commitFile(repoRoot, 'ok.txt');
   const now = Date.now();
-  const rawEvents = [{ type: 'work.move', payload: { id: 'fresh-item', to: 'cleanup' }, ts: new Date(now - 2 * 86400000).toISOString() }];
+  const rawEvents = [{ type: 'work.move', payload: { id: 'fresh-item', to: 'delivered' }, ts: new Date(now - 2 * 86400000).toISOString() }];
   const view = {
     work: { 'fresh-item': { branchHeadAtReturn: sha } },
     decisionsById: { 'fresh-item': [{ text: 'x', rationale: 'y' }] },
@@ -768,7 +772,7 @@ test('assessCleanupReadiness: a leaf item at 1 day in cleanup is TTL-ready under
   const rootSha = commitFile(repoRoot, 'root.txt');
   const leafSha = commitFile(repoRoot, 'leaf.txt');
   const now = Date.now();
-  const enteredAt = new Date(now - 1 * 86400000).toISOString(); // 1 day ago -- under root's 7d TTL, over leaf's 0d TTL
+  const shippedAt = new Date(now - 1 * 86400000).toISOString(); // 1 day ago -- under root's 7d TTL, over leaf's 0d TTL
   const view = {
     work: {
       'root-item': { branchHeadAtReturn: rootSha },
@@ -779,7 +783,7 @@ test('assessCleanupReadiness: a leaf item at 1 day in cleanup is TTL-ready under
       'leaf-item': [{ text: 'x', rationale: 'y' }],
     },
   };
-  const rawEventsFor = (id) => [{ type: 'work.move', payload: { id, to: 'cleanup' }, ts: enteredAt }];
+  const rawEventsFor = (id) => [{ type: 'work.move', payload: { id, to: 'delivered' }, ts: shippedAt }];
 
   const rootResult = assessCleanupReadiness({
     view, rawEvents: rawEventsFor('root-item'), id: 'root-item', repoRoot, worktreeBacked: true, ttlDays: 7, leafTtlDays: 0, now,
@@ -796,7 +800,7 @@ test('assessCleanupReadiness: a leaf item at 1 day in cleanup is TTL-ready under
 
 test('assessCleanupReadiness: skips the merge-resolves check entirely when worktreeBacked is false (synthetic domain, D5)', () => {
   const now = Date.now();
-  const rawEvents = [{ type: 'work.move', payload: { id: 'synth-item', to: 'cleanup' }, ts: new Date(now - 8 * 86400000).toISOString() }];
+  const rawEvents = [{ type: 'work.move', payload: { id: 'synth-item', to: 'delivered' }, ts: new Date(now - 8 * 86400000).toISOString() }];
   const view = {
     work: { 'synth-item': { branchHeadAtReturn: 'not-a-real-sha-would-fail-if-checked' } },
     decisionsById: { 'synth-item': [{ text: 'x', rationale: 'y' }] },

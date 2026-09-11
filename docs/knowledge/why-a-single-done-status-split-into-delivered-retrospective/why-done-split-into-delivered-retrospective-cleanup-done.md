@@ -87,16 +87,31 @@ completeness) — they don't move together:
 
 ## Why `cleanup`'s TTL delay is deliberate, not laziness
 
-`cleanup` doesn't reclaim the worktree the moment retrospective synthesis
-finishes — it waits out a globally-configured TTL first. The reason: a
-worktree that's already been torn down can't be reused if a post-merge
-incident needs to inspect what actually shipped. The TTL clock itself
-anchors to the specific `retrospective -> cleanup` transition event's own
-timestamp — mirroring the same discipline `classifyStaleDoing` already
-uses elsewhere (`now - claimedAt`, the *specific* claiming event, never
-"whatever the latest event of any kind happens to be") — so an unrelated
-decision or friction logged against a parked item can never accidentally
-reset its cleanup clock.
+`cleanup` doesn't reclaim the worktree/branch the moment retrospective
+synthesis finishes — it waits out a globally-configured TTL first. The
+reason: a post-merge incident needs a window to inspect what actually
+shipped. The TTL clock anchors to a specific event's own timestamp —
+mirroring the same discipline `classifyStaleDoing` already uses elsewhere
+(`now - claimedAt`, the *specific* claiming event, never "whatever the
+latest event of any kind happens to be") — so an unrelated decision or
+friction logged against a parked item can never accidentally reset the
+clock.
+
+**Revision (D7-revised, person's own call, 2026-09-11):** the anchor moved
+from the `retrospective -> cleanup` transition to the earlier `delivered`
+transition (the actual merge/release moment). The original anchor's stated
+justification — protecting a *worktree* that's still reusable — was found
+stale by "Drift 2" below, measured against live data: `cleanupMergedBranch`
+already tears the worktree down far earlier in practice, so by the time an
+item reaches `cleanup` there is usually nothing left to protect at that
+anchor. What the delay actually protects, in practice, is a real
+post-merge incident window on the *shipped artifact* — and that window
+rightfully starts at `delivered`, not at whatever later moment
+retrospective happens to finish (a slow retrospective was silently
+extending the window past what was intended). This does not weaken "must
+retrospective before cleanup" — that stays a structural property of the
+`delivered -> retrospective -> cleanup` chain itself, independent of the
+TTL clock's anchor.
 
 ## The dependent-opens-early tradeoff, and why it isn't a new risk
 

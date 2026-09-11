@@ -725,6 +725,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a one-off migration, a text-based gate refusal, or are left as-is remains
   an open decision.
 
+- `checkRetrospectiveContent` (the `cleanup -> done` retrospective-content
+  gate) missed two legitimate forms of retrospective content, both
+  false-negatives that permanently parked an item at `cleanup` regardless
+  of TTL: a genuine re-attest judgment ("no new doc needed, an existing doc
+  already covers this"), recorded only through `fgos knowledge attest`
+  (never a decision or `outcome.docType`/`docPath`); and a leaf item whose
+  retrospective content was recorded against its ROOT id instead of its
+  own (the knowledge skill runs once per split group). The gate now
+  recognizes a knowledge-registry attestation naming the item's id, and
+  falls back to the item's root when the leaf itself has no evidence of
+  its own — a no-op for any root/standalone item.
+
 - Parallel fan-out no longer refuses to dispatch anything when the
   worker-slot ceiling is unarmed — which is how every project starts, since
   `fgos setup` writes `workerSlots.ceiling: null` on purpose. In that state
@@ -740,6 +752,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   entry stage (`discovery`) went uncounted. It now resolves each item's own
   domain entry stage, and the row is labelled `stage-entry` instead of
   `stage-clarify` to match what it actually counts.
+
+### Changed
+
+- **`cleanup`'s TTL delay now anchors to `delivered` (release), not to the
+  later `retrospective -> cleanup` transition.** The original anchor's
+  justification — protecting a still-reusable worktree during the delay —
+  is stale in practice: the worktree is normally torn down far earlier than
+  `cleanup`, so by the time an item reaches `cleanup` there is usually
+  nothing left at that anchor to protect. What the delay actually protects
+  is a real post-merge incident window on the shipped artifact, which
+  starts at release, not at whatever later moment retrospective happens to
+  finish (a slow retrospective was silently extending the window past what
+  was intended). Does not weaken "must retrospective before cleanup" —
+  that stays a structural property of the `delivered -> retrospective ->
+  cleanup` chain itself, independent of the TTL clock.
 
 ### Removed
 
