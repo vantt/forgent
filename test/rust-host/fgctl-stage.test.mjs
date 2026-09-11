@@ -45,19 +45,19 @@ after(() => {
   }
 });
 
-test('R1: CLI recognizes exactly stage and status; refuses other subcommands naming only those two', () => {
-  const disallowed = ['init', 'upgrade', 'repair', 'help', '--help', 'bogus'];
+test('R1: CLI recognizes exactly stage, status, and init; refuses other subcommands', () => {
+  const disallowed = ['upgrade', 'repair', 'help', '--help', 'bogus'];
   for (const sub of disallowed) {
     const res = runFgctl([sub]);
     assert.notEqual(res.status, 0, `fgctl ${sub} must exit non-zero`);
-    assert.match(res.stderr, /Usage: fgctl <stage\|status>/, `Must name only stage and status in usage`);
-    assert.doesNotMatch(res.stderr, /\binit\b.*\bupgrade\b/, `Must not declare placeholder subcommands`);
+    assert.match(res.stderr, /Usage: fgctl <stage\|status\|init>/, `Must name stage, status, and init in usage`);
+    assert.doesNotMatch(res.stderr, /\bupgrade\b.*\brepair\b/, `Must not declare placeholder subcommands`);
   }
 
   // No args
   const resNoArgs = runFgctl([]);
   assert.notEqual(resNoArgs.status, 0, 'fgctl with no args must exit non-zero');
-  assert.match(resNoArgs.stderr, /Usage: fgctl <stage\|status>/);
+  assert.match(resNoArgs.stderr, /Usage: fgctl <stage\|status\|init>/);
 });
 
 test('R8: status --json on empty store reports empty array, not an error', () => {

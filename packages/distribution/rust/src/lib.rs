@@ -4,15 +4,21 @@
 
 pub mod canonical;
 pub mod extract;
+pub mod init;
+pub mod lock;
 pub mod manifest;
 pub mod store;
 pub mod verify;
+pub mod workspace;
 
 pub use canonical::*;
 pub use extract::*;
+pub use init::*;
+pub use lock::*;
 pub use manifest::*;
 pub use store::*;
 pub use verify::*;
+pub use workspace::*;
 
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
@@ -34,7 +40,69 @@ const COMMAND_ROUTES_JSON: &str =
 
 /// Typed request for `distribution.build.show`.
 #[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq)]
-pub struct BuildShowRequest;
+#[serde(rename_all = "camelCase")]
+pub struct BuildShowRequest {
+    #[serde(default)]
+    pub include_runtime: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct StateSchemasInfoRuntime {
+    #[serde(default)]
+    pub read: Vec<String>,
+    #[serde(default)]
+    pub write: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct LegacyNodeComponentRuntime {
+    pub root: String,
+    pub entry: String,
+    pub digest: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct ComponentsInfoRuntime {
+    pub legacy_node: LegacyNodeComponentRuntime,
+}
+
+/// Section-14 identity fields reported when `include_runtime` is true (R10).
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct RuntimeIdentityInfo {
+    pub project_root: Option<String>,
+    pub workspace_id: Option<String>,
+    pub work_history_root: Option<String>,
+    pub work_state_id: Option<String>,
+    pub machine_release_store: Option<String>,
+    pub artifact_digest: Option<String>,
+    pub release_version: Option<String>,
+    pub schema_version: Option<u32>,
+    pub state_schemas: Option<StateSchemasInfoRuntime>,
+    pub components: Option<ComponentsInfoRuntime>,
+    pub host: String,
+}
+
+impl RuntimeIdentityInfo {
+    pub fn dev_source() -> Self {
+        Self {
+            project_root: None,
+            workspace_id: None,
+            work_history_root: None,
+            work_state_id: None,
+            machine_release_store: None,
+            artifact_digest: None,
+            release_version: None,
+            schema_version: None,
+            state_schemas: None,
+            components: None,
+            host: "dev-source".to_string(),
+        }
+    }
+}
 
 /// Typed outcome for `distribution.build.show`.
 ///
@@ -45,6 +113,8 @@ pub struct BuildShowOutcome {
     pub package_version: String,
     pub git_commit: Option<String>,
     pub verbs: Vec<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub runtime: Option<RuntimeIdentityInfo>,
 }
 
 /// Static provider descriptor for `distribution.build.show.builtin`.
@@ -141,6 +211,97 @@ pub fn resolve_cli_version_info() -> BuildShowOutcome {
         package_version: resolve_package_version(),
         git_commit: resolve_git_commit(),
         verbs: resolve_verbs(),
+        runtime: None,
+    }
+}
+
+/// Resolves the runtime identity info from .fgos/installation/activation.json (R10).
+pub fn resolve_runtime_identity_info() -> RuntimeIdentityInfo {
+    let cwd = match std::env::current_dir() {
+        Ok(d) => d,
+        Err(_) => return RuntimeIdentityInfo::dev_source(),
+    };
+
+    let workspace_root = match crate::workspace::resolve_workspace_root(&cwd) {
+        Ok(r) => r,
+        Err(_) => return RuntimeIdentityInfo::dev_source(),
+    };
+
+    let installation_dir = workspace_root.join(".fgos").join("installation");
+    let activation_path = installation_dir.join("activation.json");
+    if !activation_path.exists() {
+        return RuntimeIdentityInfo::dev_source();
+    }
+
+    let activation_str = match std::fs::read_to_string(&activation_path) {
+        Ok(s) => s,
+        Err(_) => return RuntimeIdentityInfo::dev_source(),
+    };
+
+    let activation: serde_json::Value = match serde_json::from_str(&activation_str) {
+        Ok(v) => v,
+        Err(_) => return RuntimeIdentityInfo::dev_source(),
+    };
+
+    let root_json_path = installation_dir.join("root.json");
+    let root_json: Option<serde_json::Value> = std::fs::read_to_string(&root_json_path)
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok());
+
+    let workspace_id = activation["workspaceId"].as_str().map(|s| s.to_string());
+    let work_state_id = activation["workStateId"]
+        .as_str()
+        .map(|s| s.to_string())
+        .or_else(|| workspace_id.clone());
+
+    let work_history_root = work_state_id.as_ref().map(|ws_id| {
+        format!(
+            "{}/.fgos/local/work-state/{}",
+            workspace_root.display(),
+            ws_id
+        )
+    });
+
+    let machine_release_store = root_json
+        .as_ref()
+        .and_then(|r| r["machineReleaseStore"].as_str().map(|s| s.to_string()));
+
+    let artifact_digest = activation["artifactDigest"].as_str().map(|s| s.to_string());
+    let release_path_str = activation["releasePath"].as_str();
+
+    let manifest = release_path_str.and_then(|rp| {
+        let p = Path::new(rp);
+        crate::manifest::read_manifest_from_dir(p).ok()
+    });
+
+    let release_version = manifest.as_ref().and_then(|m| m.release_version.clone());
+    let schema_version = manifest.as_ref().map(|m| m.schema_version);
+    let state_schemas = manifest.as_ref().and_then(|m| {
+        m.state_schemas.as_ref().map(|s| StateSchemasInfoRuntime {
+            read: s.read.clone(),
+            write: s.write.clone(),
+        })
+    });
+    let components = manifest.as_ref().map(|m| ComponentsInfoRuntime {
+        legacy_node: LegacyNodeComponentRuntime {
+            root: m.components.legacy_node.root.clone(),
+            entry: m.components.legacy_node.entry.clone(),
+            digest: m.components.legacy_node.digest.clone(),
+        },
+    });
+
+    RuntimeIdentityInfo {
+        project_root: Some(workspace_root.to_string_lossy().to_string()),
+        workspace_id,
+        work_history_root,
+        work_state_id,
+        machine_release_store,
+        artifact_digest,
+        release_version,
+        schema_version,
+        state_schemas,
+        components,
+        host: "rust".to_string(),
     }
 }
 
@@ -176,13 +337,22 @@ impl OperationProvider for BuildShowProvider {
     fn invoke<'a>(
         &'a self,
         _invocation: &'a HostInvocation,
-        _request: OperationRequest,
+        request: OperationRequest,
         _control: InvocationControl,
         events: &'a dyn EventSink,
     ) -> Pin<Box<dyn Future<Output = Result<ProviderOutcome, ProviderError>> + Send + 'a>> {
         Box::pin(async move {
             events.record_event("distribution.build.show.invoked");
-            let outcome = resolve_cli_version_info();
+            let include_runtime = request
+                .input
+                .downcast_ref::<BuildShowRequest>()
+                .map(|r| r.include_runtime)
+                .unwrap_or(false);
+
+            let mut outcome = resolve_cli_version_info();
+            if include_runtime {
+                outcome.runtime = Some(resolve_runtime_identity_info());
+            }
             Ok(ProviderOutcome::completed(
                 self.descriptor.outcome_contract.clone(),
                 Box::new(outcome),
@@ -245,7 +415,7 @@ mod tests {
         let request = OperationRequest::new(
             OperationId::from_static("distribution.build.show"),
             ContractRef::from_static("distribution.build.show.request", "1.0.0"),
-            Box::new(BuildShowRequest),
+            Box::new(BuildShowRequest::default()),
         );
         let control = InvocationControl::new(None, None, Vec::new());
         let outcome = provider
@@ -290,6 +460,7 @@ mod tests {
             package_version: expected_version.to_string(),
             git_commit: Some(vector_data["gitCommit"].as_str().unwrap().to_string()),
             verbs: expected_verbs,
+            runtime: None,
         };
         let compact = serde_json::to_string(&outcome).unwrap();
         assert_eq!(compact, vector["compact_hash_input"].as_str().unwrap());
