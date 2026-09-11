@@ -305,7 +305,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // door's "bypass requires full confinement" invariant is enforced at load
   // and void at dispatch -- the profile would claim a confined worker and
   // this call would run an unconfined one in the operator's own session.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -383,6 +383,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
         url,
         headers,
         body,
+        resourceBindings,
       },
       context: {
         cwd,
@@ -611,7 +612,17 @@ export async function executeExecutorCli(
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
   const fgosDir = fgosDirFromRoot(root);
-  const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(root);
+  let configRoot = root;
+  if (cwd) {
+    try {
+      const wtRoot = resolveRepoRoot(cwd);
+      const mainRoot = resolveMainCheckoutRoot(cwd);
+      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {
+        configRoot = wtRoot;
+      }
+    } catch {}
+  }
+  const rawCfg = runnerConfig ?? ensureRunnerConfigForDir(configRoot);
   const cfg = { ...rawCfg };
   if (rawCfg.executor) {
     cfg.executors = {
@@ -833,7 +844,7 @@ export async function executeExecutorCli(
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body } = resolveExecutorCommand(cfg, {
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
     prompt,
     model,
     tier,
@@ -923,6 +934,7 @@ export async function executeExecutorCli(
           url,
           headers,
           body,
+          resourceBindings,
         },
         context: {
           cwd,
@@ -1101,7 +1113,17 @@ export async function decideExecutorCli(
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  const cfg = ensureRunnerConfigForDir(root);
+  let configRoot = root;
+  if (cwd) {
+    try {
+      const wtRoot = resolveRepoRoot(cwd);
+      const mainRoot = resolveMainCheckoutRoot(cwd);
+      if (mainRoot === root && wtRoot !== root && fs.existsSync(path.join(wtRoot, '.fgos', 'config.json'))) {
+        configRoot = wtRoot;
+      }
+    } catch {}
+  }
+  const cfg = ensureRunnerConfigForDir(configRoot);
 
   let workItem;
   if (!executorIdArg && workIdArg) {

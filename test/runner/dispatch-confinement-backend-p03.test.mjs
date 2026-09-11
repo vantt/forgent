@@ -463,6 +463,72 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
   }
 });
 
+test('H-1 regression: prepareBwrap provisions the Codex credential only into codex-bwrap\'s private-home, never claude-bwrap/agy-bwrap\'s', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-cred-test-'));
+  const originalHome = process.env.HOME;
+  try {
+    // Fake host HOME carrying a Codex credential, isolated from the real one.
+    const fakeHome = path.join(tmp, 'fake-home');
+    fs.mkdirSync(path.join(fakeHome, '.codex'), { recursive: true });
+    const fakeAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'not-a-real-token' });
+    fs.writeFileSync(path.join(fakeHome, '.codex', 'auth.json'), fakeAuthContent);
+    process.env.HOME = fakeHome;
+
+    async function preparedPrivateHome(executorId) {
+      const privateHomeHost = path.join(tmp, `home-${executorId}`);
+      const plan = {
+        contract: 'confinement-plan.v1',
+        dispatchId: `disp_test_${executorId}`,
+        decision: 'execute',
+        coverage: {},
+        resources: [
+          {
+            resource: 'private-home',
+            hostTarget: privateHomeHost,
+            executionTarget: { location: 'host', path: '/home/sandbox' },
+            access: 'read-write',
+            delivery: 'mount',
+            allocation: 'temporary',
+          },
+        ],
+      };
+      const req = {
+        dispatchId: `disp_test_${executorId}`,
+        executorId,
+        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        context: { cwd: tmp, runDir: tmp },
+      };
+      const prepared = await prepareBwrap(plan, req, { id: 'bwrap', type: 'bwrap', config: {} });
+      // Inspect the materialized private-home BEFORE cleanup removes it.
+      return { hostTarget: privateHomeHost, cleanup: prepared.cleanup };
+    }
+
+    const codex = await preparedPrivateHome('codex-bwrap');
+    try {
+      assert.ok(fs.existsSync(path.join(codex.hostTarget, 'auth.json')), 'codex-bwrap must receive its own Codex credential');
+      assert.equal(fs.readFileSync(path.join(codex.hostTarget, 'auth.json'), 'utf8'), fakeAuthContent);
+    } finally {
+      await codex.cleanup();
+    }
+
+    for (const executorId of ['claude-bwrap', 'agy-bwrap']) {
+      const other = await preparedPrivateHome(executorId);
+      try {
+        assert.ok(fs.existsSync(other.hostTarget), `${executorId} private-home must still be allocated`);
+        assert.ok(
+          !fs.existsSync(path.join(other.hostTarget, 'auth.json')),
+          `${executorId} must NOT receive the Codex credential (H-1 regression)`,
+        );
+      } finally {
+        await other.cleanup();
+      }
+    }
+  } finally {
+    process.env.HOME = originalHome;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 // =========================================================================
 // R5: Ownership markers and idempotent reaper
 // =========================================================================
