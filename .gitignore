@@ -88,3 +88,6 @@ packages/host-runtime/contracts/*.tmp.*
 # compile time (RustEmbed) -- never committed, herdr-plugin/build.rs
 # guarantees this directory exists even when npm run bundle hasn't run.
 /herdr-plugin/static/
+
+# Distribution packaging output
+/dist/

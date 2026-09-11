@@ -80,3 +80,39 @@ jobs:
       - name: cargo test
         run: cargo test --workspace
 
+  external-consumer:
+    name: external consumer proof
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: rustup show && cargo --version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build workspace (release)
+        run: cargo build --release --workspace
+
+      - name: Build and package distribution assets
+        run: |
+          set -eu
+          TARGET="x86_64-unknown-linux-gnu"
+          VERSION="v$(node -pe "require('./package.json').version")"
+
+          mkdir -p dist
+          node scripts/build-rust-distribution.mjs --out dist/tree
+          tar -czf "dist/fgos-${VERSION}-${TARGET}.tar.gz" -C dist/tree .
+          tar -czf "dist/fgctl-${VERSION}-${TARGET}.tar.gz" -C target/release fgctl
+          cp install.sh dist/
+          (cd dist && sha256sum fgos-*.tar.gz fgctl-*.tar.gz > SHA256SUMS)
+
+      - name: Run external consumer proof
+        run: scripts/ci-external-consumer.sh --assets dist
+
