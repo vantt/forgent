@@ -716,8 +716,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   cleanup gate read a routine branch merge as someone's reflection on the
   work and passed the item through. Both records are now tagged as engine
   bookkeeping. They remain fully visible in `fgos show`; they simply no
-  longer stand in for a retrospective document. Items that were relying on
-  this to pass will now be held at `cleanup` until real synthesis happens.
+  longer stand in for a retrospective document. **Forward-only** (tsk-33w9):
+  the event log is append-only and replay folds each decision exactly as it
+  was written, so every `sync-root`/`promote-to-component` decision recorded
+  BEFORE this fix keeps `kind: design` forever — this change stops new
+  records from falsely satisfying the gate, it does not retag or re-flip
+  anything already on disk. Whether pre-existing falsely-tagged records get
+  a one-off migration, a text-based gate refusal, or are left as-is remains
+  an open decision.
 
 - Parallel fan-out no longer refuses to dispatch anything when the
   worker-slot ceiling is unarmed — which is how every project starts, since

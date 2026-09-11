@@ -141,10 +141,23 @@ FLIPPED ok->fail : 3
 ```
 
 Three of 658. None at `cleanup` or `done`, so nothing sitting at the gate
-is newly blocked mid-flight. All three flip correctly: they carry no
-`docType`/`docPath` and their only decision was a mechanical sync, so they
-genuinely never ran a retrospective. They will now be held until real
-synthesis happens, which is the intended effect and not a regression.
+is newly blocked mid-flight. This count is a COUNTERFACTUAL, not a
+prediction of real post-merge behavior (tsk-33w9, corrected here after
+verifying the merge result rather than trusting this document): it
+simulated the `kind: engine` tag over historical records to bound the
+change's risk, which is a sound way to measure blast radius, but the fix
+itself is forward-only — the event log is append-only and replay folds
+each decision exactly as it was written, so a `sync-root`/
+`promote-to-component` decision recorded BEFORE this fix keeps
+`kind: design` forever. Verified on the live view immediately after the
+merge landed at `bc25a194`: all three of `tsk-25b`, `tsk-2mt`, `tsk-tku`
+still return `checkRetrospectiveContent` `ok: true`, with folded decision
+kinds `design` among them — none of them actually flipped. Only NEW
+`sync-root`/`promote-to-component` records are affected going forward.
+Whether pre-existing falsely-tagged records get a one-off migration, a
+text-based gate refusal, or are left as-is is a real product decision
+about rewriting versus reinterpreting history, and was deliberately left
+open rather than chosen here.
 
 `impact-analysis: degraded` — `fgos tool query --capability
 impact-analysis --status present` reports gitnexus `present`, but its index
