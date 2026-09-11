@@ -431,6 +431,63 @@ test("checkMergeStillResolves: a decomposed ROOT still ok:false when a child fai
   assert.match(result.detail, /child-h/);
 });
 
+// tsk-2k4: a decomposed ROOT's own branch is pruned after a real merge (the
+// exact same "only ever force-deleted after its own merge already
+// resolved" guarantee the leaf-path MISSING-REF FALLBACK above already
+// relies on) -- before this fix, checkRootBranchResolves gave up the moment
+// refExists failed, never falling back to the root's own recorded sha the
+// way the leaf path already does, so a root whose branch was legitimately
+// pruned post-merge stayed permanently ok:false with no way to recover.
+test("checkMergeStillResolves: a decomposed ROOT whose own branch is pruned post-merge still resolves ok:true via its recorded sha (tsk-2k4)", () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-m'], { cwd: repoRoot });
+  commitFile(repoRoot, 'root.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-i', 'fgw/root-m'], { cwd: repoRoot });
+  const childISha = commitFile(repoRoot, 'child-i.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-m'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-i', 'fgw/child-i'], { cwd: repoRoot });
+  const rootSha = execFileSync('git', ['rev-parse', 'fgw/root-m'], { cwd: repoRoot }).toString().trim();
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge root-m into main', 'fgw/root-m'], { cwd: repoRoot });
+  // Prune the root's own branch AFTER it already merged -- the real-world
+  // shape this fallback exists for.
+  execFileSync('git', ['branch', '-D', 'fgw/root-m'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-m': { branchHeadAtReturn: rootSha },
+      'child-i': { parent: 'root-m', branchHeadAtReturn: childISha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['root-m'], { view, id: 'root-m' });
+  assert.equal(result.ok, true, "a root's own pruned-after-merge branch must still resolve via its recorded sha, mirroring the leaf path's own missing-ref fallback");
+  assert.match(result.detail, /child-i/);
+});
+
+test("checkMergeStillResolves: a decomposed ROOT whose branch is gone AND whose recorded sha is genuinely not an ancestor stays ok:false (tsk-2k4 regression guard)", () => {
+  const repoRoot = initRepo();
+  execFileSync('git', ['checkout', '-qb', 'fgw/root-n'], { cwd: repoRoot });
+  const rootSha = commitFile(repoRoot, 'root-work.txt');
+  execFileSync('git', ['checkout', '-qb', 'fgw/child-j', 'fgw/root-n'], { cwd: repoRoot });
+  const childJSha = commitFile(repoRoot, 'child-j.txt');
+  execFileSync('git', ['checkout', '-q', 'fgw/root-n'], { cwd: repoRoot });
+  execFileSync('git', ['merge', '--no-ff', '-q', '-m', 'merge child-j', 'fgw/child-j'], { cwd: repoRoot });
+  // root-n's own branch is deleted WITHOUT ever merging into main -- a
+  // genuine loss, must still be caught even though the branch is gone.
+  execFileSync('git', ['checkout', '-q', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['branch', '-D', 'fgw/root-n'], { cwd: repoRoot });
+
+  const view = {
+    work: {
+      'root-n': { branchHeadAtReturn: rootSha },
+      'child-j': { parent: 'root-n', branchHeadAtReturn: childJSha },
+    },
+  };
+  const result = checkMergeStillResolves(repoRoot, view.work['root-n'], { view, id: 'root-n' });
+  assert.equal(result.ok, false, 'a genuinely unmerged root branch must still fail even after the missing-ref fallback tries its recorded sha');
+  assert.match(result.detail, /not an ancestor of HEAD/);
+});
+
 // --- checkRetrospectiveContent -----------------------------------------
 // tsk-558: reads outcome.docType/docPath (D8's own named fields) instead
 // of outcome.actual/predicted (claim-lifecycle artifacts, unrelated to

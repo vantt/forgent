@@ -175,7 +175,7 @@ export function checkMergeStillResolves(repoRoot, work, { view, id } = {}) {
       // matters for the true root, since a non-root decomposed node's own
       // branch is never itself merged forward (tsk-psb).
       return resolveRoot(view, id) === id
-        ? checkRootBranchResolves(repoRoot, id, childrenResult)
+        ? checkRootBranchResolves(repoRoot, id, childrenResult, work)
         : childrenResult;
     }
   }
@@ -224,13 +224,40 @@ function checkChildrenResolve(repoRoot, view, children) {
  * resolve AND the root's own branch also reached `main`. Diagnostic-only,
  * same posture as every other check in this file -- never auto-recovers,
  * just stops silently reporting ok when it isn't.
+ *
+ * MISSING-REF FALLBACK: same reasoning `checkMergeStillResolves`'s own
+ * leaf-path fallback already documents above (tsk-577) -- `fgw/<id>` is
+ * only ever force-deleted in the two guarded places named there, both of
+ * which only run AFTER that branch's own merge already resolved. A missing
+ * root ref is therefore just as safe to re-check via the item's own
+ * recorded sha against HEAD as a missing leaf ref already is; before this
+ * fallback existed, a root whose branch was pruned post-merge (e.g. by the
+ * same zero-ahead prune that already spares leaves) reported `ok:false`
+ * with no way to ever recover, even though its own recorded sha was a
+ * genuine ancestor of HEAD the whole time.
  */
-function checkRootBranchResolves(repoRoot, id, childrenResult) {
+function checkRootBranchResolves(repoRoot, id, childrenResult, work) {
   const namedRef = `fgw/${id}`;
   if (!refExists(repoRoot, namedRef)) {
+    const sha = work?.branchHeadAtReturn ?? work?.headAtReturn ?? work?.branchHeadAtTake ?? work?.headAtTake
+      ?? work?.lastAttempt?.branchHeadAtReturn ?? work?.lastAttempt?.headAtReturn
+      ?? work?.lastAttempt?.branchHeadAtTake ?? work?.lastAttempt?.headAtTake;
+    if (!sha) {
+      return {
+        ok: false,
+        detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, so whether it ever reached HEAD cannot be confirmed`,
+      };
+    }
+    const rootAncestry = checkAncestry(repoRoot, sha, 'HEAD', `${namedRef} no longer exists (pruned)`);
+    if (!rootAncestry.ok) {
+      return {
+        ok: false,
+        detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, and its recorded sha ${sha} is not an ancestor of HEAD either — the merge may have been force-pushed away or history rewritten`,
+      };
+    }
     return {
-      ok: false,
-      detail: `${childrenResult.detail} — but this root's own branch ${namedRef} no longer exists, so whether it ever reached HEAD cannot be confirmed`,
+      ok: true,
+      detail: `${childrenResult.detail}; root's own branch ${namedRef} no longer exists, but its recorded sha is still an ancestor of HEAD`,
     };
   }
   const tipSha = git(repoRoot, ['rev-parse', namedRef]);
