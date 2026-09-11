@@ -351,6 +351,158 @@ test('R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current 
   }
 });
 
+test('Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m1-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m1-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+
+    // Tamper and quarantine via verify (same repro as the R4/R5/R6 test above).
+    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    fs.appendFileSync(stagedFile, 'TAMPER');
+    assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
+
+    // Before the fix, `fgctl init` (no --from) would idempotent-skip on
+    // digest match alone and never reach the tail; confirm it now refuses
+    // clearly instead, naming the quarantine.
+    const initNoFrom = runFgctl(['init'], { cwd: projDir, stateHome });
+    assert.notEqual(initNoFrom.status, 0, 'init with no --from must not silently no-op a quarantined workspace');
+    assert.match(initNoFrom.stderr, /quarantined/i);
+
+    // The documented recovery door: fgctl init --from <matching source>
+    // must genuinely re-stage/re-verify/re-publish, not idempotent-skip.
+    const recoverRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(recoverRes.status, 0, `init --from must recover a quarantined workspace: ${recoverRes.stderr}`);
+
+    const recovered = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(recovered.status, 'ready', 'status must return to ready after recovery');
+    assert.equal(recovered.artifactDigest, digestA);
+    assert.ok(fs.existsSync(path.join(stateHome, 'releases', digestA)), 'digestA must be staged again under releases/');
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-m2-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+
+    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    fs.appendFileSync(stagedFile, 'TAMPER');
+    assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    assert.equal(JSON.parse(fs.readFileSync(activationPath, 'utf8')).status, 'quarantined');
+
+    // Upgrade away from the quarantined A straight to B.
+    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+    assert.equal(upgradeRes.status, 0, `upgrade from a quarantined activation must succeed: ${upgradeRes.stderr}`);
+
+    const afterUpgrade = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(afterUpgrade.artifactDigest, digestB);
+    assert.equal(afterUpgrade.status, 'ready');
+    // digestA's release directory was moved to quarantine/ and no longer
+    // exists -- previousArtifactDigest must never point at it (a later
+    // `fgctl repair` would otherwise fail looking for a directory that's
+    // gone by design, per the M2 finding).
+    assert.notEqual(afterUpgrade.previousArtifactDigest, digestA);
+    if (afterUpgrade.previousArtifactDigest !== null) {
+      assert.ok(
+        fs.existsSync(path.join(stateHome, 'releases', afterUpgrade.previousArtifactDigest)),
+        'previousArtifactDigest, if set, must name a release directory that still genuinely exists'
+      );
+    }
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-idem-upgrade-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-idem-upgrade-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const before = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+
+    // Re-run upgrade against the SAME digest that's already active.
+    const upgradeRes = runFgctl(['upgrade', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(upgradeRes.status, 0, `same-digest upgrade must succeed: ${upgradeRes.stderr}`);
+
+    const after = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(after.activationId, before.activationId, 'same-digest upgrade must not mint a new activationId');
+    assert.equal(after.artifactDigest, digestA);
+    assert.notEqual(after.previousArtifactDigest, digestA, 'previousArtifactDigest must never self-reference the active digest');
+    assert.equal(after.previousArtifactDigest, before.previousArtifactDigest, 'previousArtifactDigest must be unchanged by a same-digest upgrade');
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-tamper-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-tamper-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
+
+    // Tamper the active release WITHOUT going through `fgctl verify` first --
+    // `fgctl repair` (previousArtifactDigest null) must independently detect
+    // and quarantine it, not merely refuse and leave a known-bad payload
+    // sitting under releases/<digest>/.
+    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    fs.appendFileSync(stagedFile, 'TAMPER');
+
+    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+    assert.notEqual(repairRes.status, 0, 'repair of a tampered active release must fail');
+
+    const releaseDir = path.join(stateHome, 'releases', digestA);
+    assert.ok(!fs.existsSync(releaseDir), 'tampered release must be moved out of releases/ by repair, not left in place');
+
+    const quarantineDir = path.join(stateHome, 'quarantine');
+    assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist after a failed repair');
+    const quarantinedEntries = fs.readdirSync(quarantineDir);
+    assert.ok(
+      quarantinedEntries.some((e) => e.startsWith(digestA)),
+      `quarantine must contain an entry for ${digestA} after repair fails`
+    );
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(activation.status, 'quarantined', 'activation.json must be marked quarantined after repair fails');
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
 test('R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule', () => {
   const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-state-'));
   const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-null-proj-'));
