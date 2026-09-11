@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Rust toolchain
+        run: rustup show && cargo --version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build workspace (release)
+        run: cargo build --release --workspace
+
+      - name: Build, package, and verify release assets
+        run: |
+          set -eu
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          BASE_VERSION="${TAG_VERSION%%-*}"
+          PKG_VERSION="$(node -pe "require('./package.json').version")"
+          if [ "$BASE_VERSION" != "$PKG_VERSION" ]; then
+            echo "Version mismatch: tag base $BASE_VERSION does not match package.json $PKG_VERSION" >&2
+            exit 1
+          fi
+
+          TARGET="x86_64-unknown-linux-gnu"
+          VERSION="$GITHUB_REF_NAME"
+
+          mkdir -p dist
+          node scripts/build-rust-distribution.mjs --out dist/tree
+          tar -czf "dist/fgos-${VERSION}-${TARGET}.tar.gz" -C dist/tree .
+          tar -czf "dist/fgctl-${VERSION}-${TARGET}.tar.gz" -C target/release fgctl
+          cp install.sh dist/
+          (cd dist && sha256sum fgos-*.tar.gz fgctl-*.tar.gz > SHA256SUMS)
+
+          scripts/ci-external-consumer.sh --assets dist
+
+      - name: Publish GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          PRERELEASE_FLAG=""
+          case "$GITHUB_REF_NAME" in
+            *-*) PRERELEASE_FLAG="--prerelease" ;;
+          esac
+
+          gh release create "$GITHUB_REF_NAME"             --generate-notes             $PRERELEASE_FLAG             dist/fgos-*.tar.gz             dist/fgctl-*.tar.gz             dist/SHA256SUMS             dist/install.sh

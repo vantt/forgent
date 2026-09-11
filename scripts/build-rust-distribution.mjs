@@ -139,8 +139,11 @@ export function buildRustDistribution({
   const resolvedOut = path.resolve(outDir);
   const resolvedRepo = path.resolve(repoRoot);
 
-  // Refuse if outDir is inside checkout
-  if (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep)) {
+  // Refuse if outDir is inside checkout (unless it is under dist/ disposable build output)
+  const isDist =
+    resolvedOut === path.join(resolvedRepo, 'dist') ||
+    resolvedOut.startsWith(path.join(resolvedRepo, 'dist') + path.sep);
+  if (!isDist && (resolvedOut === resolvedRepo || resolvedOut.startsWith(resolvedRepo + path.sep))) {
     throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);
   }
 
