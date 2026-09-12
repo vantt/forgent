@@ -337,9 +337,16 @@ mode. One row per closed cell; a cell only gets a row once its merge commit
 lands on `main` and its trace is written under
 `docs/architect/agent-coordination/verification/runtime-recovery/`.
 
+**Branch policy (corrected after P00):** P00 (docs-only, zero behavior risk) merged
+directly to `main`. Every cell from P01 onward merges into the `runtime-recovery`
+integration branch (created off `main` at `3b0dba42`, i.e. right after P00);
+`runtime-recovery` merges into `main` only once at P08 closeout. Each cell's own
+worktree/branch (`runtime-recovery--p01`, `--p04`, ...) is unaffected — only the
+merge TARGET changes from `main` to `runtime-recovery`.
+
 | Cell | Merge commit | Reviewer | Red-team | Deferred findings | Trace |
 |---|---|---|---|---|---|
-| P00 | `bb64e945` | PASS (2 fix rounds) | PASS on substantive finding (fix-1); final 2-line recheck not dispatched, `maxRounds` cap hit — reviewer's independent source-verified recheck accepted in its place | Citation-swap suggestion (cosmetic) | [p00.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p00.md) |
+| P00 | `bb64e945` (direct to `main`) | PASS (2 fix rounds) | PASS on substantive finding (fix-1); final 2-line recheck not dispatched, `maxRounds` cap hit — reviewer's independent source-verified recheck accepted in its place | Citation-swap suggestion (cosmetic) | [p00.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p00.md) |
 
 ## Design Gate Definition
 
