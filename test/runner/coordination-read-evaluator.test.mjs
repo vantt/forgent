@@ -36,6 +36,15 @@ function inlineContract(overrides = {}) {
 
 const READ_EVALUATORS_PATH = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/coordination/read-evaluators.mjs');
 
+// Strips `// line` and `/* block */` comments before the mutation-guard
+// regex runs over source text -- a comment merely MENTIONING a mutation-
+// sounding word (documenting what this module extracts FROM, e.g. "extracted
+// from store.mjs's assertDriverIdentity") is not a mutation call, and must
+// not false-positive the guard the way a whole-file scan does.
+function stripComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+}
+
 test('read-evaluators.mjs imports no fs/child_process/network/adapter module', () => {
   const source = fs.readFileSync(READ_EVALUATORS_PATH, 'utf8');
   const importLines = source.split('\n').filter((line) => /^\s*import\b/.test(line));
@@ -50,9 +59,22 @@ test('read-evaluators.mjs imports no fs/child_process/network/adapter module', (
 });
 
 test('read-evaluators.mjs source never mutates (no fs.write/appendEvent/dispatch calls anywhere in the file body)', () => {
-  const source = fs.readFileSync(READ_EVALUATORS_PATH, 'utf8');
+  const source = stripComments(fs.readFileSync(READ_EVALUATORS_PATH, 'utf8'));
   assert.ok(!/fs\.\w+Sync/.test(source), 'unexpected fs.*Sync call in a pure evaluator module');
   assert.ok(!/appendEvent|writeManifest|executeAssignment|child_process/.test(source), 'unexpected mutation/execution call in a pure evaluator module');
+});
+
+test('stripComments: a comment mentioning a mutation-sounding word does not false-positive the mutation guard', () => {
+  const fixtureSource = [
+    '// Extracted from store.mjs: appendEvent/writeManifest/executeAssignment',
+    '// and child_process are what the write door does, this module never does.',
+    '/* fs.writeFileSync / child_process.execSync also mentioned here */',
+    'export function pureFn(x) { return x; }',
+  ].join('\n');
+  const stripped = stripComments(fixtureSource);
+  assert.ok(!/fs\.\w+Sync/.test(stripped), 'fs.*Sync mention inside a comment must be stripped');
+  assert.ok(!/appendEvent|writeManifest|executeAssignment|child_process/.test(stripped), 'mutation-sounding words inside comments must be stripped');
+  assert.match(stripped, /export function pureFn/, 'real code outside comments must survive stripping');
 });
 
 // ─── Determinism ─────────────────────────────────────────────────────────────
@@ -85,6 +107,64 @@ test('visibility is a pure deterministic function of its arguments', () => {
   assert.deepEqual(a, b);
   assert.deepEqual(a.visibleRefs, ['asgn_own']);
   assert.equal(a.deniedRefs.length, 2);
+});
+
+// ─── Regression: fail-closed guards ─────────────────────────────────────────
+
+test('visibility denies a blank/whitespace-only ref', () => {
+  const snapshot = Object.freeze({ manifest: Object.freeze({ coordinationId: 'coord_blank_ref' }), assignmentRefs: Object.freeze([]) });
+  const projection = visibility(snapshot, { requestedRefs: ['   '] });
+  assert.equal(projection.visibleRefs.length, 0);
+  assert.equal(projection.deniedRefs.length, 1);
+  assert.match(projection.deniedRefs[0].reason, /must be a non-empty string/);
+});
+
+test('visibility fails closed (denies, does not iterate characters) when requestedRefs is not an array', () => {
+  const snapshot = Object.freeze({ manifest: Object.freeze({ coordinationId: 'coord_non_array_refs' }), assignmentRefs: Object.freeze([]) });
+  const projection = visibility(snapshot, { requestedRefs: 'asgn_own' });
+  assert.deepEqual(projection.visibleRefs, []);
+  assert.equal(projection.deniedRefs.length, 1);
+  assert.match(projection.deniedRefs[0].reason, /must be an array/);
+});
+
+test('authorize rejects an authorizedBy missing the required "type" field', () => {
+  const facts = {
+    manifest: { coordinationId: 'coord_shape', provenanceRoot: { writerId: 'writer-1' } },
+    authorizedBy: { id: 'writer-1' },
+  };
+  const verdict = authorize({ label: 'authorize' }, facts);
+  assert.equal(verdict.kind, 'needs-input');
+  assert.match(verdict.reason, /type must be "driver"/);
+});
+
+test('authorize rejects an authorizedBy with a non-"driver" type', () => {
+  const facts = {
+    manifest: { coordinationId: 'coord_shape', provenanceRoot: { writerId: 'writer-1' } },
+    authorizedBy: { type: 'worker', id: 'writer-1' },
+  };
+  const verdict = authorize({ label: 'authorize' }, facts);
+  assert.equal(verdict.kind, 'needs-input');
+  assert.match(verdict.reason, /type must be "driver"/);
+});
+
+test('authorize rejects an authorizedBy carrying an unknown extra field', () => {
+  const facts = {
+    manifest: { coordinationId: 'coord_shape', provenanceRoot: { writerId: 'writer-1' } },
+    authorizedBy: { type: 'driver', id: 'writer-1', extra: 'unexpected' },
+  };
+  const verdict = authorize({ label: 'authorize' }, facts);
+  assert.equal(verdict.kind, 'needs-input');
+  assert.match(verdict.reason, /unknown field "extra"/);
+});
+
+test('authorize rejects an undefined authorizedBy', () => {
+  const facts = {
+    manifest: { coordinationId: 'coord_shape', provenanceRoot: { writerId: 'writer-1' } },
+    authorizedBy: undefined,
+  };
+  const verdict = authorize({ label: 'authorize' }, facts);
+  assert.equal(verdict.kind, 'needs-input');
+  assert.match(verdict.reason, /must be a non-null object/);
 });
 
 test('completion is a pure deterministic function of its arguments', () => {

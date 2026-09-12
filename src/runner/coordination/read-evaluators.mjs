@@ -24,6 +24,32 @@ import { STATUS_VALUES, CONTRIBUTION_REF_PREFIX } from './schema.mjs';
 // schema-owned enum rather than a second, hand-duplicated list.
 const TERMINAL_STATUSES = new Set([...STATUS_VALUES].filter((status) => status !== 'active'));
 
+// Mirrors schema.mjs's own private `isPlainObject`/`isNonEmptyString`/
+// `AUTHORIZED_BY_FIELDS` (unexported, so not importable under AD-11's "no
+// write-door/adapter dependency" boundary) exactly: `authorizedBy` must be
+// a plain object carrying only `type`/`id`, `type` must be the literal
+// string "driver", and `id` must be a non-empty string -- the same shape
+// `validateAuthorizedBy` enforces before `authorizeOperation`/
+// `recordDriverDisposition` ever reach the driver-identity match.
+const AUTHORIZED_BY_FIELDS = new Set(['type', 'id']);
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function authorizedByShapeError(authorizedBy, fieldName) {
+  if (!isPlainObject(authorizedBy)) return `${fieldName} must be a non-null object`;
+  const unknownField = Object.keys(authorizedBy).find((key) => !AUTHORIZED_BY_FIELDS.has(key));
+  if (unknownField) return `${fieldName} has unknown field "${unknownField}"`;
+  if (authorizedBy.type !== 'driver') return `${fieldName}.type must be "driver"`;
+  if (!isNonEmptyString(authorizedBy.id)) return `${fieldName}.id must be a non-empty string`;
+  return null;
+}
+
 // The only two caller-declared action shapes this cell recognizes: "proceed"
 // (facts.requestedAction's own default, below) and "transition" (a requested
 // status change). Every real write door fails closed on an operation/event
@@ -86,21 +112,31 @@ export function legalNext(snapshot, facts = {}) {
  * `recordHumanTurn` all apply before appending anything under a caller-
  * supplied identity) -- AD-09's "current profile requires trusted-config
  * operator authorization ... under the session's own driver/provenance-root
- * identity".
+ * identity" -- plus schema.mjs's own `validateAuthorizedBy` shape gate
+ * (non-null object, only `type`/`id` fields, `type === 'driver'`, `id`
+ * non-empty), which every real door runs before the identity match ever
+ * happens. A malformed `authorizedBy` is refused here the same way, before
+ * comparing `.id` at all.
  *
  * @param {{label?: string, subject?: string, fieldName?: string}} [action]
- * @param {{manifest: {coordinationId: string, provenanceRoot: {writerId: string}}, authorizedBy: {id?: string}}} facts
+ * @param {{manifest: {coordinationId: string, provenanceRoot: {writerId: string}}, authorizedBy: {type?: string, id?: string}}} facts
  * @returns {{kind: 'allowed'} | {kind: 'needs-input', reason: string}}
  */
 export function authorize(action, facts) {
   const { manifest, authorizedBy } = facts;
-  if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
-    const label = action?.label ?? 'authorize';
-    const subject = action?.subject ?? 'this action';
-    const fieldName = action?.fieldName ?? 'authorizedBy';
+  const label = action?.label ?? 'authorize';
+  const subject = action?.subject ?? 'this action';
+  const fieldName = action?.fieldName ?? 'authorizedBy';
+
+  const shapeError = authorizedByShapeError(authorizedBy, fieldName);
+  if (shapeError) {
+    return { kind: 'needs-input', reason: `${label}: ${shapeError}` };
+  }
+
+  if (authorizedBy.id !== manifest.provenanceRoot.writerId) {
     return {
       kind: 'needs-input',
-      reason: `${label}: ${fieldName}.id "${authorizedBy?.id}" is not the driver identity of session "${manifest.coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- ${subject} may only be written under the session's own driver/provenance-root identity`,
+      reason: `${label}: ${fieldName}.id "${authorizedBy.id}" is not the driver identity of session "${manifest.coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- ${subject} may only be written under the session's own driver/provenance-root identity`,
     };
   }
   return { kind: 'allowed' };
@@ -134,6 +170,12 @@ function refSegments(ref) {
  * session id / Assignment id an adapter has already confirmed exists on
  * disk); this function only applies the ownership rule to that evidence.
  *
+ * A `requestedRefs` that is not itself an array (e.g. a bare string) is
+ * refused outright rather than iterated character-by-character -- the same
+ * "must be an array" gate `validateConsultProposal`'s `contextRefs` check
+ * and `authorizeOperation`'s `grantedContextRefs` check both apply before
+ * treating a refs parameter as a list at all (fail closed, not fail open).
+ *
  * @param {{manifest: {coordinationId: string}, assignmentRefs: string[]}} snapshot
  * @param {{requestedRefs?: string[], knownSessionIds?: string[], knownAssignmentIds?: string[]}} [caller]
  * @returns {Readonly<{visibleRefs: string[], deniedRefs: Readonly<{ref: string, reason: string}>[]}>}
@@ -142,6 +184,18 @@ export function visibility(snapshot, caller = {}) {
   const { manifest, assignmentRefs = [] } = snapshot;
   const coordinationId = manifest.coordinationId;
   const { requestedRefs = [], knownSessionIds = [], knownAssignmentIds = [] } = caller;
+
+  if (!Array.isArray(requestedRefs)) {
+    return Object.freeze({
+      visibleRefs: Object.freeze([]),
+      deniedRefs: Object.freeze([
+        Object.freeze({
+          ref: requestedRefs,
+          reason: `requestedRefs must be an array of strings, got ${typeof requestedRefs} -- matching validateConsultProposal's/authorizeOperation's own "must be an array" gate, a non-array is refused rather than iterated`,
+        }),
+      ]),
+    });
+  }
 
   const visibleRefs = [];
   const deniedRefs = [];
