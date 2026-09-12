@@ -36,6 +36,22 @@ import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+import {
+  publishNextGeneration,
+  acquireRunControl,
+  releaseRunControl,
+  isRunControlCurrent,
+  isProcessAlive,
+  readMarker,
+  publishMarkerOnce,
+  fsyncFileBestEffort,
+  fsyncDirBestEffort,
+} from './run-lock.mjs';
+
+function normalizeDigest(digest) {
+  if (!digest || typeof digest !== 'string') return null;
+  return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -665,6 +681,264 @@ function validateAssignmentLegality(asgn, opts = {}) {
 }
 
 /**
+ * Atomically admit one Run attempt for `assignmentId` under `runsDir`,
+ * replacing the prior readdirSync + max-attempt scan. Fences three
+ * outcomes, per the admission door's own commit algorithm:
+ *
+ * - The SAME `(retryId, destination, payloadDigest)` tuple as an
+ *   already-committed generation returns that SAME attempt/runId, never a
+ *   new one (idempotent retry).
+ * - A DIFFERENT tuple reusing an already-used `retryId` is refused
+ *   (`duplicate-retry`) -- a caller's retry identity may not silently
+ *   change what it means partway through.
+ * - A caller naming `predecessorRunId` (or contending while a Run is
+ *   already admitted at all) must supersede the EXACT current committed
+ *   Run; any other value is refused (`invalid-predecessor`).
+ *
+ * The admission-generation ledger (`assignmentDir/admission/generations/`,
+ * run-lock.mjs's shared append-only primitive) is the sole source of truth
+ * for attempt numbers: concurrent callers race on one hard-linked path,
+ * exactly one wins, every loser rereads and re-evaluates against the new
+ * current generation. Once an attempt/runId is committed there, it is
+ * never reused or leapfrogged, independent of whether the run directory
+ * materialization below has completed.
+ *
+ * The run directory itself (`runs/<NN>/run.json` + `dispatch-plan.json`)
+ * is built in a same-filesystem staging directory, fsynced, then published
+ * with one atomic rename -- a reader never observes a partially-written
+ * attempt directory, and a crash between generation commit and rename
+ * leaves the generation record as the sole durable fact (no `runs/<NN>/`
+ * at all) until a later call for the same tuple resumes and completes it.
+ * Final attempt directories are never created empty.
+ */
+function admitRunAttempt(
+  assignmentDir,
+  runsDir,
+  assignmentId,
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan },
+) {
+  const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
+  const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
+
+  if (retryId !== undefined) {
+    if (readMarker(path.join(admissionMarkersDir, `${retryId}.aborted.json`)) !== null) {
+      throw new RunnerConfigError(
+        `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was aborted -- refuse identity reuse`,
+      );
+    }
+  }
+
+  const admission = publishNextGeneration(admissionGenerationsDir, ({ current, nextEpoch, generations }) => {
+    // Strict tuple/predecessor fencing is opt-in, gated on the caller
+    // supplying a `retryId` at all -- every pre-existing caller of
+    // `executeAssignment` (and every legacy retry path that just calls it
+    // again with no new admission opts) never passes one, and must keep
+    // getting "next available attempt" exactly as the replaced
+    // readdirSync scan did. A caller that DOES pass `retryId` opts into
+    // the full admission contract: same tuple resumes idempotently, a
+    // changed tuple under the same retryId is refused, and the caller must
+    // name the exact current Run it supersedes.
+    if (retryId !== undefined) {
+      const priorForRetryId = generations.find((g) => g.record.retryId === retryId);
+      if (priorForRetryId) {
+        if (priorForRetryId.record.destination === destination && priorForRetryId.record.admissionPayloadDigest === payloadDigest) {
+          return { stop: true, status: 'duplicate', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
+        }
+        return { stop: true, status: 'duplicate-retry', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
+      }
+
+      const isGenerationValid = (g) => {
+        if (!g.record?.retryId) return true;
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+
+      const validGenerations = generations.filter(isGenerationValid);
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      const currentRunId = currentValid?.record?.runId ?? null;
+      if (predecessorRunId !== currentRunId) {
+        return { stop: true, status: 'invalid-predecessor', currentRunId };
+      }
+    }
+
+    let maxDir = 0;
+    if (fs.existsSync(runsDir)) {
+      try {
+        const entries = fs.readdirSync(runsDir);
+        for (const name of entries) {
+          if (/^\d+$/.test(name)) {
+            const n = parseInt(name, 10);
+            if (!Number.isNaN(n) && n > maxDir) maxDir = n;
+          }
+        }
+      } catch {}
+    }
+    for (const g of generations) {
+      if (g.record?.attempt && g.record.attempt > maxDir) {
+        maxDir = g.record.attempt;
+      }
+    }
+    let attempt = Math.max(nextEpoch, maxDir + 1);
+    while (fs.existsSync(path.join(runsDir, String(attempt).padStart(2, '0')))) {
+      attempt += 1;
+    }
+
+    if (expectedRunId !== undefined) {
+      const match = /^run_.+_(\d+)$/.exec(expectedRunId);
+      if (match) {
+        const declaredAttempt = parseInt(match[1], 10);
+        if (!Number.isNaN(declaredAttempt) && declaredAttempt > attempt) {
+          attempt = declaredAttempt;
+        }
+      }
+    }
+
+    const attemptStr = String(attempt).padStart(2, '0');
+    const runId = `run_${assignmentId}_${attemptStr}`;
+    if (expectedRunId !== undefined && runId !== expectedRunId) {
+      // A caller (e.g. a schema-2 session retry declaration) that named an
+      // exact expected identity gets exactly that identity or a refusal --
+      // never a silently different runId drifting out of two independent
+      // ledgers (the session's own retry-declaration generations and this
+      // Assignment's admission generations) that were supposed to stay in
+      // lockstep.
+      const isGenerationValid = (g) => {
+        if (!g.record?.retryId) return true;
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+      const validGenerations = generations.filter(isGenerationValid);
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
+    }
+    return {
+      record: {
+        attempt,
+        attemptStr,
+        runId,
+        retryId: retryId ?? null,
+        predecessorRunId,
+        destination,
+        admissionPayloadDigest: payloadDigest,
+        admittedAt: new Date().toISOString(),
+      },
+    };
+  });
+
+  if (admission.status === 'duplicate-retry') {
+    throw new RunnerConfigError(
+      `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,
+    );
+  }
+  if (admission.status === 'invalid-predecessor') {
+    throw new RunnerConfigError(
+      `executeAssignment: predecessorRunId "${predecessorRunId}" for assignment "${assignmentId}" does not match the current committed Run "${admission.currentRunId}" -- refusing (invalid-predecessor)`,
+    );
+  }
+
+  const record = admission.record;
+  const runDir = path.join(runsDir, record.attemptStr);
+
+  if (fs.existsSync(runDir)) {
+    if (retryId !== undefined && admission.status === 'duplicate') {
+      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
+    }
+  }
+
+  // Remove matching abandoned staging directory only after validating its identity:
+  // "abandoned staging is not admission and is removed only after matching its retry id and digest"
+  try {
+    if (fs.existsSync(runsDir)) {
+      const entries = fs.readdirSync(runsDir);
+      for (const name of entries) {
+        if (name.startsWith(`.staging-${record.attemptStr}`)) {
+          const abandonedPath = path.join(runsDir, name);
+          try {
+            // Live sibling protection: never delete a staging directory belonging to a live process
+            const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
+            if (pidMatch) {
+              const stagedPid = parseInt(pidMatch[1], 10);
+              if (isProcessAlive(stagedPid)) {
+                continue;
+              }
+            }
+
+            // Legacy staging without PID/UUID (.staging-NN)
+            if (name === `.staging-${record.attemptStr}`) {
+              fs.rmSync(abandonedPath, { recursive: true, force: true });
+              continue;
+            }
+
+            const stagedMetaPath = path.join(abandonedPath, 'run.json');
+            if (fs.existsSync(stagedMetaPath)) {
+              const stagedMeta = JSON.parse(fs.readFileSync(stagedMetaPath, 'utf8'));
+              const normStaged = normalizeDigest(stagedMeta.payloadDigest);
+              const normAdmission = normalizeDigest(record.admissionPayloadDigest);
+              if (
+                stagedMeta.retryId === (record.retryId ?? null) &&
+                normStaged === normAdmission
+              ) {
+                fs.rmSync(abandonedPath, { recursive: true, force: true });
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch {}
+
+  const stagingDir = path.join(runsDir, `.staging-${record.attemptStr}-${process.pid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(stagingDir, { recursive: true });
+
+  const runMeta = buildRunMeta(record);
+  const runMetaPath = path.join(stagingDir, 'run.json');
+  fs.writeFileSync(runMetaPath, `${JSON.stringify(runMeta, null, 2)}\n`);
+  fsyncFileBestEffort(runMetaPath);
+
+  if (buildDispatchPlan) {
+    const dispatchPlan = buildDispatchPlan(record);
+    if (dispatchPlan) {
+      const dispatchPlanPath = path.join(stagingDir, 'dispatch-plan.json');
+      fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(dispatchPlan, null, 2)}\n`);
+      fsyncFileBestEffort(dispatchPlanPath);
+    }
+  }
+  fsyncDirBestEffort(stagingDir);
+
+  try {
+    fs.renameSync(stagingDir, runDir);
+  } catch (err) {
+    if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST') {
+      fs.rmSync(stagingDir, { recursive: true, force: true });
+      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
+    } else {
+      throw err;
+    }
+  }
+  fsyncDirBestEffort(runsDir);
+
+  return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: false };
+}
+
+/**
  * Execute an assignment by dispatching a worker and recording the Run & RunResult (Step 03 §5).
  *
  * @param {object} assignment Assignment object
@@ -807,24 +1081,75 @@ export async function executeAssignment(assignment, opts = {}) {
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
 
-  // Determine run attempt number monotonically without reusing existing dirs
-  const existingAttempts = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
-  let maxAttempt = 0;
-  for (const att of existingAttempts) {
-    const num = parseInt(att, 10);
-    if (!Number.isNaN(num) && num > maxAttempt) {
-      maxAttempt = num;
+  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
+  const startedAt = new Date().toISOString();
+
+  // Plan content identity, recorded runner-side BEFORE the worker runs: the
+  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
+  // recomputes this hash so a verdict computed against an older plan
+  // revision is never consumed, even when the worker hides the edit by
+  // rewinding file mtimes (the worker controls mtimes; it never controls
+  // this runner-recorded hash).
+  let planContentHash = null;
+  if (effectiveAssignment.workId && opts.work?.docsRef) {
+    try {
+      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
+      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
+      if (fs.existsSync(planInputPath)) {
+        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
+      }
+    } catch {
+      planContentHash = null;
     }
   }
-  let attemptNum = maxAttempt + 1;
-  let attemptStr = String(attemptNum).padStart(2, '0');
-  let runDir = path.join(runsDir, attemptStr);
-  while (fs.existsSync(runDir)) {
-    attemptNum += 1;
-    attemptStr = String(attemptNum).padStart(2, '0');
-    runDir = path.join(runsDir, attemptStr);
+
+  // Atomic admission (replaces the prior readdirSync + max-attempt scan --
+  // see admitRunAttempt's own doc comment for the full commit algorithm).
+  // `retryId` is opt-in: every pre-existing caller omits it and gets "next
+  // available attempt" exactly as before; a caller that supplies one opts
+  // into the full idempotent-tuple/predecessor-fencing contract.
+  const defaultAdmissionPayloadDigest = crypto
+    .createHash('sha256')
+    .update(JSON.stringify({ assignment: effectiveAssignment, compiledPlan }))
+    .digest('hex');
+  const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
+    retryId: opts.retryId,
+    predecessorRunId: opts.predecessorRunId ?? null,
+    destination: opts.destination ?? effectiveCwd,
+    payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
+    expectedRunId: opts.expectedRunId,
+    buildRunMeta: (record) => ({
+      contract: 'assignment-run.v2',
+      runId: record.runId,
+      assignmentId: effectiveAssignment.assignmentId,
+      attempt: record.attempt,
+      supersedesRunId: record.predecessorRunId ?? null,
+      retryId: record.retryId ?? null,
+      payloadDigest: record.admissionPayloadDigest ? (record.admissionPayloadDigest.startsWith('sha256:') ? record.admissionPayloadDigest : `sha256:${record.admissionPayloadDigest}`) : null,
+      dispatchPlanDigest: compiledPlan ? `sha256:${crypto.createHash('sha256').update(JSON.stringify(compiledPlan)).digest('hex')}` : null,
+      phase: 'admitted',
+      delivery: 'not-sent',
+      executorId: resolvedExecutorId,
+      ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
+      ...(planContentHash ? { planContentHash } : {}),
+      cwd,
+      startedAt,
+      timeoutMs,
+      status: 'running',
+    }),
+    buildDispatchPlan: () => compiledPlan,
+  });
+  const { attemptStr, runId, runDir } = admitted;
+  const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
+
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (admitted.resumed && fs.existsSync(resultJsonPath)) {
+    try {
+      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      return Object.freeze(settledResult);
+    } catch {}
   }
-  fs.mkdirSync(runDir, { recursive: true });
 
   // Dispatched-run membership: record every run attempt THIS runner actually
   // dispatched, appended to assignment.json right after the run dir exists.
@@ -849,49 +1174,6 @@ export async function executeAssignment(assignment, opts = {}) {
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
   const prompt = renderAssignmentPrompt(effectiveAssignment, { cwd, runDir: path.resolve(runDir) });
 
-  const runId = `run_${effectiveAssignment.assignmentId}_${attemptStr}`;
-  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
-  const startedAt = new Date().toISOString();
-
-  const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
-  fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(compiledPlan, null, 2)}\n`);
-
-  // Plan content identity, recorded runner-side BEFORE the worker runs: the
-  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
-  // recomputes this hash so a verdict computed against an older plan
-  // revision is never consumed, even when the worker hides the edit by
-  // rewinding file mtimes (the worker controls mtimes; it never controls
-  // this runner-recorded hash).
-  let planContentHash = null;
-  if (effectiveAssignment.workId && opts.work?.docsRef) {
-    try {
-      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
-      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
-      if (fs.existsSync(planInputPath)) {
-        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
-      }
-    } catch {
-      planContentHash = null;
-    }
-  }
-
-  const runMeta = {
-    runId,
-    assignmentId: effectiveAssignment.assignmentId,
-    attempt: attemptNum,
-    executorId: resolvedExecutorId,
-    ...(compiledPlan ? { dispatchPlanPath: path.relative(root, dispatchPlanPath) } : {}),
-    ...(planContentHash ? { planContentHash } : {}),
-    cwd,
-    startedAt,
-    timeoutMs,
-    status: 'running',
-  };
-
-  fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify(runMeta, null, 2)}\n`);
-
-  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
-
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
   const dirtyBefore = safeGitStatusFiles(effectiveCwd);
@@ -915,36 +1197,66 @@ export async function executeAssignment(assignment, opts = {}) {
   // silently inheriting this call's provenance.
   const gitBeforeSource = 'pre-launch';
 
+  // Per-Run control fencing (AD-02/AD-10): a monotonic controlEpoch plus a
+  // unique controlToken, acquired synchronously (no adapter I/O runs inside
+  // the acquisition itself) and re-checked before this attempt is allowed
+  // to append a settlement. Two acquisitions of the same Run always
+  // receive distinct epochs/tokens; a live holder is never reclaimed on
+  // heartbeat/TTL alone (see run-lock.mjs). Failure to acquire here means a
+  // different controller already holds this exact Run -- refuse outright
+  // rather than race it for the same subprocess/files.
+  const controlHolder = { id: `${runId}:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+  const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
+  if (control.status !== 'acquired') {
+    throw new RunnerConfigError(
+      `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
+    );
+  }
+  const { controlEpoch, controlToken } = control;
+
   const startTime = Date.now();
   let rawResult;
   let executionError = null;
 
   const executorId = resolvedExecutorId;
   try {
-    rawResult = await executeExecutorCli(executorId, {
-      prompt,
-      cwd,
-      repoRoot: root,
-      runnerConfig: cfg,
-      model: effectivePolicy.model,
-      tier: effectivePolicy.tier,
-      timeoutMs,
-      onChunk: opts.onChunk,
-      work: opts.work,
-      stage: effectiveAssignment.stage,
-      runDir: path.resolve(runDir),
-      dispatchBatchKey: opts.dispatchBatchKey,
-    });
-  } catch (err) {
-    executionError = err;
-    const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
-    rawResult = {
-      status: isTimeoutErr ? 'timeout' : 'failed',
-      signal: isTimeoutErr ? 'SIGTERM' : null,
-      stdout: err.stdout || '',
-      stderr: err.stderr || err.message || String(err),
-    };
-  }
+    try {
+      rawResult = await executeExecutorCli(executorId, {
+        prompt,
+        cwd,
+        repoRoot: root,
+        runnerConfig: cfg,
+        model: effectivePolicy.model,
+        tier: effectivePolicy.tier,
+        timeoutMs,
+        onChunk: opts.onChunk,
+        work: opts.work,
+        stage: effectiveAssignment.stage,
+        runDir: path.resolve(runDir),
+        dispatchBatchKey: opts.dispatchBatchKey,
+      });
+    } catch (err) {
+      executionError = err;
+      const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
+      rawResult = {
+        status: isTimeoutErr ? 'timeout' : 'failed',
+        signal: isTimeoutErr ? 'SIGTERM' : null,
+        stdout: err.stdout || '',
+        stderr: err.stderr || err.message || String(err),
+      };
+    }
+
+    // The adapter call above is the ONE async gap this control token has to
+    // outlive. Before appending anything a reader would treat as this Run's
+    // settlement, confirm nothing superseded this token while it ran --
+    // otherwise a controller that lost control mid-flight could still write
+    // a result a fresher controller never authorized (crash matrix: "result
+    // with stale control token -- refuse and append no settlement").
+    if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+      throw new RunnerConfigError(
+        `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+      );
+    }
 
   const durationMs = Date.now() - startTime;
   const settledAt = new Date().toISOString();
@@ -1135,6 +1447,8 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
+    controlEpoch,
+    controlToken,
     // executorId: the executor that ACTUALLY ran this attempt (post-redirect).
     // policy.executorPreference[0]: the DECLARED preference (pre-redirect).
     // executorRedirected: true when the two above disagree, so the redirect
@@ -1175,6 +1489,12 @@ export async function executeAssignment(assignment, opts = {}) {
     },
   };
 
+  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+    throw new RunnerConfigError(
+      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+    );
+  }
+
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
 
   // Close the sentence run.json started. It was written `running` before the
@@ -1187,5 +1507,8 @@ export async function executeAssignment(assignment, opts = {}) {
   // `status`/`confidence` pair inside result.json, one line above.
   markRunSettled(runDir);
 
-  return Object.freeze(runResult);
+    return Object.freeze(runResult);
+  } finally {
+    releaseRunControl(runDir, { controlEpoch, controlToken });
+  }
 }

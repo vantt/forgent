@@ -20,6 +20,17 @@ import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
 
 export const SCHEMA_VERSION = '1';
 
+// Run admission and fencing (runtime-recovery track, cell P01): a session
+// opts into the stricter schema-2 retry-declaration contract (exact
+// nextRunId/nextAttempt fencing, no leapfrogging, no fulfilled-by-link-count
+// inference) by being OPENED with `schemaVersion: SCHEMA_VERSION_2`. Every
+// schema-1 session keeps its existing engine path byte-identically --
+// `SCHEMA_VERSION` above stays the DEFAULT `openSession` writes when a
+// caller specifies none, so no pre-existing caller changes behavior merely
+// because this constant now has a sibling.
+export const SCHEMA_VERSION_2 = '2';
+export const SUPPORTED_SCHEMA_VERSIONS = new Set([SCHEMA_VERSION, SCHEMA_VERSION_2]);
+
 export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed', 'cancelled']);
 
 // Contract's manifest field table, verbatim. Any OTHER top-level key
@@ -324,7 +335,16 @@ const EVENT_SPECS = {
   // the "record intent before mutating/spawning" discipline every other
   // store.mjs door already uses) so a crash between declaration and dispatch
   // always leaves a durable, resumable trace -- never a silently lost retry.
-  'run-retried': { required: ['assignmentId', 'reason'], accepted: ['assignmentId', 'reason', 'previousRunId'] },
+  // Schema-2 sessions (SCHEMA_VERSION_2) additionally require the "exact-
+  // destination" fields below (enforced in store.mjs's recordRunRetry,
+  // which knows the session's own schemaVersion -- this pure, session-blind
+  // validator only fixes their SHAPE when present, never their presence).
+  // A schema-1 payload that never carries them validates exactly as it
+  // always has: `run-retried` shape is unchanged for schema-1 replay.
+  'run-retried': {
+    required: ['assignmentId', 'reason'],
+    accepted: ['assignmentId', 'reason', 'previousRunId', 'retryId', 'nextRunId', 'nextAttempt', 'admissionPayloadDigest', 'authorityRef'],
+  },
   // Phase 06 R2: actor replacement, recorded ONLY through declared retry
   // policy (session-engine.mjs's replaceSessionActor). `allocationProvenance`
   // is an opaque, caller-supplied pass-through record (e.g. a cohort-planner
@@ -517,7 +537,25 @@ const OPTIONAL_STRING_ARRAY_FIELDS = new Set(['failedActors', 'lateActors', 'rep
 // Optional non-empty-string fields shared by more than one event kind, in
 // the same "checked regardless of kind, only ever ACCEPTED where the kind's
 // own `accepted` list allows it" shape as OPTIONAL_STRING_ARRAY_FIELDS above.
-const OPTIONAL_STRING_FIELDS = new Set(['actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'targetArtifactRef']);
+const OPTIONAL_STRING_FIELDS = new Set([
+  'actorId',
+  'operationId',
+  'nodeId',
+  'authorizationId',
+  'invocationKey',
+  'targetArtifactRef',
+  'retryId',
+  'nextRunId',
+  'admissionPayloadDigest',
+  'authorityRef',
+]);
+
+// Schema-2 run-retried's own optional positive-integer field. A separate,
+// small bucket rather than folding into the REQUIRED-field
+// `maxAssignments`/`expiresAfterRound`/`turnOrdinal` check above: this one
+// is OPTIONAL (schema-1 payloads never carry it at all), so it needs its
+// own "checked only when present" pass.
+const OPTIONAL_POSITIVE_INTEGER_FIELDS = new Set(['nextAttempt']);
 
 // The `assignment-created` driver-authorization provenance fields OTHER than
 // `authorizationId` itself -- none of them is meaningful, or checkable, on an
@@ -624,7 +662,7 @@ function validateAttributedTo(attributedTo, label) {
  * a missing required field, an unlisted field, or a forbidden field found
  * anywhere in the payload.
  */
-export function validateEventPayload(type, payload) {
+export function validateEventPayload(type, payload, opts = {}) {
   const spec = EVENT_SPECS[type];
   if (!spec) fail('validation', `unknown event kind "${type}" (expected one of ${EVENT_KINDS.join(', ')})`);
 
@@ -729,6 +767,12 @@ export function validateEventPayload(type, payload) {
       fail('validation', `event "${type}" payload.${field} must be a non-empty string when provided`);
     }
   }
+  for (const field of OPTIONAL_POSITIVE_INTEGER_FIELDS) {
+    if (body[field] === undefined) continue;
+    if (!isPositiveInteger(body[field])) {
+      fail('validation', `event "${type}" payload.${field} must be a positive integer when provided`);
+    }
+  }
   if (body.contextGrant !== undefined) {
     const label = `event "${type}" payload.contextGrant`;
     if (!isPlainObject(body.contextGrant)) fail('validation', `${label} must be an object when provided`);
@@ -750,6 +794,20 @@ export function validateEventPayload(type, payload) {
         'validation',
         `event "assignment-created" payload carries driver-authorization provenance (${orphaned.join(', ')}) without "authorizationId" -- these fields travel together or not at all`,
       );
+    }
+  }
+  if (type === 'run-retried') {
+    const s2Fields = ['retryId', 'nextRunId', 'nextAttempt', 'admissionPayloadDigest', 'authorityRef'];
+    const presentS2 = s2Fields.filter((field) => body[field] !== undefined);
+    const isS2 = opts.schemaVersion === SCHEMA_VERSION_2 || opts.schemaVersion === 2 || presentS2.length > 0;
+    if (isS2) {
+      const missing = s2Fields.filter((field) => body[field] === undefined);
+      if (missing.length > 0) {
+        fail(
+          'validation',
+          `event "run-retried" schema-2 payload requires exact-destination fields -- missing: ${missing.join(', ')}`,
+        );
+      }
     }
   }
   if (type === 'aggregation-validated') {
@@ -855,10 +913,10 @@ export function validateEventPayload(type, payload) {
  * @param {string} manifestPath Path it was read from, for the error message.
  */
 export function assertSchemaVersionCurrent(manifest, manifestPath) {
-  if (manifest.schemaVersion !== SCHEMA_VERSION) {
+  if (!SUPPORTED_SCHEMA_VERSIONS.has(manifest.schemaVersion)) {
     throw new CoordinationError(
       'schema-version-mismatch',
-      `session.json at ${manifestPath} has schemaVersion "${manifest.schemaVersion}", running contract is "${SCHEMA_VERSION}" -- recovery refuses to reinterpret an old shape`,
+      `session.json at ${manifestPath} has schemaVersion "${manifest.schemaVersion}", running contract supports ${[...SUPPORTED_SCHEMA_VERSIONS].join(' | ')} -- recovery refuses to reinterpret an unknown shape`,
     );
   }
 }

@@ -40,13 +40,16 @@ import {
   createSessionAssignment,
   linkResult,
   recordRunRetry,
+  markRunRetryFulfilled,
+  abortRunRetryDeclaration,
   transitionSessionStatus,
   readManifest,
   readSessionEvents,
   appendEvent,
 } from '../../src/runner/coordination/store.mjs';
-import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
+import { CoordinationError, SCHEMA_VERSION_2 } from '../../src/runner/coordination/schema.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
+import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-recovery-test-'));
@@ -1096,4 +1099,363 @@ test('deriveSessionPhase reports planned -> running -> the terminal status, matc
   openSession({ coordinationId: 'coord_phase_partial', objective: 'x', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir2 });
   transitionSessionStatus('coord_phase_partial', 'partial', { missingActors: ['a'] }, { cwd: tempDir2 });
   assert.equal(deriveSessionPhase('coord_phase_partial', { cwd: tempDir2 }), 'partially-complete');
+});
+
+// =============================================================================
+// Run admission and fencing (runtime-recovery P01): schema-2 session retry
+// declarations. A schema-2 session (`schemaVersion: SCHEMA_VERSION_2`) opts
+// `recordRunRetry` into a stricter, append-only declaration ledger
+// (run-lock.mjs's shared generation primitive, under
+// `sessionDir/retries/<assignmentId>/`) instead of the schema-1 behavior's
+// `result-linked`-count inference. Schema-1 sessions (every test above this
+// section) are entirely unaffected -- same code path, byte-identical.
+// =============================================================================
+
+function schema2Payload(overrides = {}) {
+  return {
+    retryId: 'retry-1',
+    admissionPayloadDigest: 'fixed-digest-1',
+    authorityRef: 'coordination:test-session',
+    ...overrides,
+  };
+}
+
+test('schema-2 recordRunRetry rejects a declaration missing any exact-destination field, while an equivalent schema-1 call (no such fields) keeps working unchanged', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_required_fields', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_required_fields', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+
+  // Missing retryId
+  assert.throws(
+    () => recordRunRetry('coord_s2_required_fields', { assignmentId: assignment.assignmentId, reason: 'x', admissionPayloadDigest: 'd', authorityRef: 'a' }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /requires a non-empty retryId/.test(err.message),
+  );
+  // Missing admissionPayloadDigest
+  assert.throws(
+    () => recordRunRetry('coord_s2_required_fields', { assignmentId: assignment.assignmentId, reason: 'x', retryId: 'r1', authorityRef: 'a' }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /requires admissionPayloadDigest/.test(err.message),
+  );
+  // Missing authorityRef
+  assert.throws(
+    () => recordRunRetry('coord_s2_required_fields', { assignmentId: assignment.assignmentId, reason: 'x', retryId: 'r1', admissionPayloadDigest: 'd' }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /requires authorityRef/.test(err.message),
+  );
+  // No declaration ever got through -- the ledger stays empty.
+  const events = readSessionEvents('coord_s2_required_fields', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'run-retried').length, 0);
+
+  // A schema-1 session's own recordRunRetry call needs none of these fields
+  // and keeps working exactly as it always has -- unaffected by schema-2's
+  // stricter contract existing at all.
+  const tempDir2 = mkTempDir();
+  openSession({ coordinationId: 'coord_s1_unaffected', objective: 'x', provenanceRoot: { writerId: 'writer-1' } }, { cwd: tempDir2 });
+  const assignment2 = createSessionAssignment({ coordinationId: 'coord_s1_unaffected', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir2 });
+  const declared = recordRunRetry('coord_s1_unaffected', { assignmentId: assignment2.assignmentId, reason: 'transient failure' }, { cwd: tempDir2 });
+  assert.equal(declared.attempt, 1);
+  assert.equal(declared.resumedDeclaration, false);
+  assert.equal(declared.nextRunId, undefined, 'schema-1 declarations never carry the schema-2 exact-destination fields');
+});
+
+test('schema-2 recordRunRetry declares an exact nextRunId/nextAttempt, and a repeated call before fulfillment resumes the SAME declaration (never leapfrogs it)', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_resume', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_resume', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const first = recordRunRetry('coord_s2_resume', { assignmentId, reason: 'transient failure', ...schema2Payload() }, { cwd: tempDir });
+  assert.equal(first.resumedDeclaration, false);
+  assert.equal(first.attempt, 2);
+  assert.equal(first.nextRunId, `run_${assignmentId}_02`);
+  assert.equal(first.retryId, 'retry-1');
+
+  // A SECOND call, with a DIFFERENT retryId/tuple, while the first is still
+  // pending (unfulfilled, unaborted) must resume the EXACT SAME declaration
+  // -- never leapfrog it with a second one.
+  const second = recordRunRetry('coord_s2_resume', { assignmentId, reason: 'transient failure', ...schema2Payload({ retryId: 'retry-2', admissionPayloadDigest: 'different-digest' }) }, { cwd: tempDir });
+  assert.equal(second.resumedDeclaration, true);
+  assert.equal(second.retryId, 'retry-1', 'the resumed declaration keeps its ORIGINAL identity, ignoring the new caller-supplied retryId');
+  assert.equal(second.nextRunId, first.nextRunId);
+  assert.equal(second.attempt, first.attempt);
+
+  const events = readSessionEvents('coord_s2_resume', { cwd: tempDir });
+  const retriedEvents = events.filter((e) => e.type === 'run-retried' && e.payload.assignmentId === assignmentId);
+  assert.equal(retriedEvents.length, 1, 'only ONE run-retried event was ever appended, despite two recordRunRetry calls');
+  assert.equal(retriedEvents[0].payload.retryId, 'retry-1');
+});
+
+test('schema-2 recordRunRetry: fulfilling a declaration (never inferred from result-linked count) permits declaring a genuinely NEW retry generation', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_fulfilled', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_fulfilled', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const first = recordRunRetry('coord_s2_fulfilled', { assignmentId, reason: 'r1', ...schema2Payload({ retryId: 'retry-1' }) }, { cwd: tempDir });
+
+  // Before fulfillment, even a fresh call resumes the pending declaration --
+  // never treated as fulfilled merely because no result has linked (no
+  // link-count inference at all).
+  const stillPending = recordRunRetry('coord_s2_fulfilled', { assignmentId, reason: 'r1', ...schema2Payload({ retryId: 'retry-x' }) }, { cwd: tempDir });
+  assert.equal(stillPending.resumedDeclaration, true);
+  assert.equal(stillPending.nextRunId, first.nextRunId);
+
+  markRunRetryFulfilled('coord_s2_fulfilled', { assignmentId, retryId: first.retryId }, { cwd: tempDir });
+
+  const second = recordRunRetry('coord_s2_fulfilled', { assignmentId, reason: 'r2', ...schema2Payload({ retryId: 'retry-2', admissionPayloadDigest: 'digest-2' }) }, { cwd: tempDir });
+  assert.equal(second.resumedDeclaration, false, 'a NEW declaration is legal once the pending one is explicitly fulfilled');
+  assert.notEqual(second.nextRunId, first.nextRunId);
+  assert.equal(second.nextRunId, `run_${assignmentId}_03`, 'attempt 1 = initial, attempt 2 = first retry, attempt 3 = second retry');
+
+  const events = readSessionEvents('coord_s2_fulfilled', { cwd: tempDir });
+  assert.equal(events.filter((e) => e.type === 'run-retried' && e.payload.assignmentId === assignmentId).length, 2);
+});
+
+test('schema-2 recordRunRetry: aborting a pending declaration (never silently superseded) permits a new one, and the aborted generation is never deleted', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_aborted', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_aborted', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const first = recordRunRetry('coord_s2_aborted', { assignmentId, reason: 'r1', ...schema2Payload({ retryId: 'retry-1' }) }, { cwd: tempDir });
+
+  const abortOutcome = abortRunRetryDeclaration('coord_s2_aborted', { assignmentId, retryId: first.retryId, reason: 'operator cancelled the retry' }, { cwd: tempDir });
+  assert.equal(abortOutcome.status, 'aborted');
+  // Idempotent.
+  assert.equal(abortRunRetryDeclaration('coord_s2_aborted', { assignmentId, retryId: first.retryId, reason: 'again' }, { cwd: tempDir }).status, 'already-aborted');
+
+  const second = recordRunRetry('coord_s2_aborted', { assignmentId, reason: 'r2', ...schema2Payload({ retryId: 'retry-2', admissionPayloadDigest: 'digest-2' }) }, { cwd: tempDir });
+  assert.equal(second.resumedDeclaration, false, 'an aborted declaration is settled -- a fresh one may be declared');
+  assert.notEqual(second.nextRunId, first.nextRunId);
+
+  // The aborted generation record itself is never deleted -- it stays on
+  // disk as an immutable, append-only ledger entry.
+  const generationsDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', 'coord_s2_aborted', 'retries', assignmentId, 'generations');
+  const generationFiles = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
+  assert.equal(generationFiles.length, 2, 'both the aborted generation and the new one remain, never overwritten or removed');
+});
+
+test('schema-2 recordRunRetry: once the session leaves active (e.g. cancelled), no further declaration is admitted -- cancellation-first forbids a later retry', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_cancel_first', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_cancel_first', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  transitionSessionStatus('coord_s2_cancel_first', 'cancelled', { reason: 'operator abort' }, { cwd: tempDir });
+
+  assert.throws(
+    () => recordRunRetry('coord_s2_cancel_first', { assignmentId, reason: 'too late', ...schema2Payload() }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /is not active/.test(err.message),
+    'a retry declared AFTER cancellation must never be admitted',
+  );
+});
+
+test('schema-2 recordRunRetry: a declaration made BEFORE cancellation survives it -- the session becomes cancelled, but the already-declared Run identity is untouched and still resumable', () => {
+  const tempDir = mkTempDir();
+  openSession({ coordinationId: 'coord_s2_retry_first', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_retry_first', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const declared = recordRunRetry('coord_s2_retry_first', { assignmentId, reason: 'transient failure', ...schema2Payload() }, { cwd: tempDir });
+
+  transitionSessionStatus('coord_s2_retry_first', 'cancelled', { reason: 'operator abort, after the retry was already declared' }, { cwd: tempDir });
+
+  // The declaration itself -- an explicit, pending Run identity -- is
+  // untouched by the session's own terminal transition: it is neither
+  // deleted nor silently reinterpreted as fulfilled/aborted.
+  const generationsDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', 'coord_s2_retry_first', 'retries', assignmentId, 'generations');
+  assert.equal(fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json')).length, 1);
+  const markersDir = path.join(tempDir, '.fgos', 'coordination', 'sessions', 'coord_s2_retry_first', 'retries', assignmentId, 'markers');
+  assert.equal(fs.existsSync(markersDir) ? fs.readdirSync(markersDir).length : 0, 0, 'no fulfilled/aborted marker was ever written -- the declaration stays explicitly pending');
+  assert.equal(declared.nextRunId, `run_${assignmentId}_02`);
+});
+
+test('schema-2 session retry: a declaration made directly (simulating a crash before dispatch) is resumed by retrySessionTask with the exact same nextRunId', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir, { summary: 'first attempt' });
+  openSession({ coordinationId: 'coord_s2_e2e_resume', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_e2e_resume', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  // First dispatch (attempt 1) -- the same shape dispatchPrimaryTask's own
+  // internals would produce.
+  const firstResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, isReadOnlyMode: true });
+  linkResult('coord_s2_e2e_resume', { assignmentId, runId: firstResult.runId }, { cwd: tempDir });
+
+  // Simulate "a crash right after the retry was DECLARED, before dispatch
+  // ever happened": call the store door directly -- the exact declaration
+  // retrySessionTask itself would make -- but never follow through with the
+  // actual Run admission/dispatch.
+  const declared = recordRunRetry(
+    'coord_s2_e2e_resume',
+    {
+      assignmentId,
+      reason: 'transient failure',
+      previousRunId: firstResult.runId,
+      maxRetries: 3,
+      retryId: 'retry-pre-crash-1',
+      admissionPayloadDigest: 'fixed-digest-pre-crash',
+      authorityRef: 'coordination:coord_s2_e2e_resume',
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(declared.resumedDeclaration, false);
+  const preCrashNextRunId = declared.nextRunId;
+  assert.equal(preCrashNextRunId, `run_${assignmentId}_02`);
+  assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments', assignmentId, 'runs', '02')), false, 'the declaration is durable, but nothing was ever admitted for it yet');
+
+  // retrySessionTask's OWN normal call (unaware of the pre-declared
+  // retryId) must resume this exact pending declaration, never declare a
+  // second, leapfrogging one.
+  const retryRunnerConfig = fakeExecutor(tempDir, { summary: 'retry attempt' });
+  const retried = await retrySessionTask(
+    'coord_s2_e2e_resume',
+    { assignmentId, reason: 'transient failure', maxRetries: 3 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig: retryRunnerConfig },
+  );
+
+  assert.equal(retried.nextRunId, preCrashNextRunId, 'retrySessionTask must resume the EXACT nextRunId the pre-crash declaration committed');
+  assert.equal(retried.runResult.runId, preCrashNextRunId);
+  assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments', assignmentId, 'runs', '02', 'result.json')), true);
+
+  const events = readSessionEvents('coord_s2_e2e_resume', { cwd: tempDir });
+  const retriedEvents = events.filter((e) => e.type === 'run-retried' && e.payload.assignmentId === assignmentId);
+  assert.equal(retriedEvents.length, 1, 'only ONE run-retried event -- never a second leapfrogging declaration');
+  assert.equal(retriedEvents[0].payload.retryId, 'retry-pre-crash-1', 'the event reflects the ORIGINAL pre-crash declaration identity');
+});
+
+test('schema-2 session retry: aborting an admitted-but-unsettled retry declaration permits subsequent retrySessionTask attempts', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir, { summary: 'attempt result' });
+  openSession({ coordinationId: 'coord_s2_abort_flow', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_abort_flow', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const firstResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, isReadOnlyMode: true });
+  linkResult('coord_s2_abort_flow', { assignmentId, runId: firstResult.runId }, { cwd: tempDir });
+
+  // Simulate an admitted retry (attempt 2) that crashed mid-run without settling
+  const declared = recordRunRetry(
+    'coord_s2_abort_flow',
+    {
+      assignmentId,
+      reason: 'retry 1',
+      previousRunId: firstResult.runId,
+      maxRetries: 5,
+      retryId: 'retry-crashed-1',
+      admissionPayloadDigest: 'digest-crash-1',
+      authorityRef: 'coordination:coord_s2_abort_flow',
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(declared.nextRunId, `run_${assignmentId}_02`);
+
+  // Plant the admission generation for attempt 2 in assignment's admission ledger
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignmentId);
+  const admissionGenDir = path.join(asgnDir, 'admission', 'generations');
+  fs.mkdirSync(admissionGenDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(admissionGenDir, '0000000002.json'),
+    JSON.stringify({
+      attempt: 2,
+      attemptStr: '02',
+      runId: `run_${assignmentId}_02`,
+      retryId: 'retry-crashed-1',
+      predecessorRunId: firstResult.runId,
+      destination: tempDir,
+      admissionPayloadDigest: 'digest-crash-1',
+      admittedAt: new Date().toISOString(),
+    }),
+  );
+  fs.mkdirSync(path.join(asgnDir, 'runs', '02'), { recursive: true });
+
+  // Operator recovery: abort the pending declaration
+  const abortOutcome = abortRunRetryDeclaration('coord_s2_abort_flow', { assignmentId, retryId: 'retry-crashed-1', reason: 'crashed mid-dispatch' }, { cwd: tempDir });
+  assert.equal(abortOutcome.status, 'aborted');
+
+  // Next retrySessionTask call must succeed, allocating attempt 03 without invalid-predecessor error
+  const retried = await retrySessionTask(
+    'coord_s2_abort_flow',
+    { assignmentId, reason: 'retry after abort', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried.runResult.runId, `run_${assignmentId}_03`);
+  assert.equal(retried.nextRunId, `run_${assignmentId}_03`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '03', 'result.json')), true);
+
+  // Subsequent retrySessionTask call allocates attempt 04
+  const retried2 = await retrySessionTask(
+    'coord_s2_abort_flow',
+    { assignmentId, reason: 'third retry', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried2.runResult.runId, `run_${assignmentId}_04`);
+  assert.equal(retried2.nextRunId, `run_${assignmentId}_04`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '04', 'result.json')), true);
+});
+
+test('schema-2 session retry: aborting a retry declaration whose Run already materialized refuses already-admitted, and subsequent retry allocates next attempt', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir, { summary: 'attempt result' });
+  const cid = 'coord_s2_abort_admitted';
+  openSession({ coordinationId: cid, objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: cid, taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const firstResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, isReadOnlyMode: true });
+  linkResult(cid, { assignmentId, runId: firstResult.runId }, { cwd: tempDir });
+
+  // Declare a retry for attempt 2
+  const declared = recordRunRetry(
+    cid,
+    {
+      assignmentId,
+      reason: 'retry 1',
+      previousRunId: firstResult.runId,
+      maxRetries: 5,
+      retryId: 'retry-admitted-1',
+      admissionPayloadDigest: 'digest-admitted-1',
+      authorityRef: `coordination:${cid}`,
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(declared.nextRunId, `run_${assignmentId}_02`);
+
+  // Admit / execute it (real Run materializes with run.json)
+  const asgnJson = JSON.parse(fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', assignmentId, 'assignment.json'), 'utf8'));
+  const executed = await executeAssignment(asgnJson, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId: 'retry-admitted-1',
+    predecessorRunId: firstResult.runId,
+    payloadDigest: 'digest-admitted-1',
+    expectedRunId: declared.nextRunId,
+    isReadOnlyMode: true,
+  });
+  assert.equal(executed.runId, `run_${assignmentId}_02`);
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignmentId);
+  const runJsonPath = path.join(asgnDir, 'runs', '02', 'run.json');
+  assert.equal(fs.existsSync(runJsonPath), true, 'real Run materialized on disk');
+
+  // Attempt to abort it AFTER admission/materialization (before fulfilled marker)
+  const abortOutcome = abortRunRetryDeclaration(cid, { assignmentId, retryId: 'retry-admitted-1', reason: 'late abort attempt' }, { cwd: tempDir });
+  assert.equal(abortOutcome.status, 'already-admitted', 'must refuse already-admitted, not silently succeed');
+
+  // Next retrySessionTask call self-heals/links attempt 02 and fulfills it
+  const retried = await retrySessionTask(
+    cid,
+    { assignmentId, reason: 'retry after refused abort', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried.runResult.runId, `run_${assignmentId}_02`);
+  assert.equal(retried.resumed, true);
+
+  // Subsequent retrySessionTask call allocates the next attempt number (attempt 03) without error
+  const retried2 = await retrySessionTask(
+    cid,
+    { assignmentId, reason: 'next retry attempt', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried2.runResult.runId, `run_${assignmentId}_03`);
+  assert.equal(retried2.nextRunId, `run_${assignmentId}_03`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '03', 'result.json')), true);
 });
