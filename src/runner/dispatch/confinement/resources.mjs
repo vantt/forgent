@@ -170,7 +170,14 @@ export function resolveConfinementResources({
       );
     }
     const declaredRoot = context.fgosDir;
-    const { hostTarget } = canonicalizeAndVerifySubpath(context.runDir, declaredRoot, 'run-output');
+    let targetDir = context.runDir;
+    if (context.assignmentLaunchContext || grant.subpath === 'worker-output') {
+      targetDir = path.join(context.runDir, 'worker-output');
+      try {
+        fs.mkdirSync(path.join(targetDir, 'outbox'), { recursive: true });
+      } catch {}
+    }
+    const { hostTarget } = canonicalizeAndVerifySubpath(targetDir, declaredRoot, 'run-output');
 
     resolved.push({
       resource: 'run-output',

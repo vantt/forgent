@@ -620,6 +620,10 @@ export async function executeExecutorCli(
     // the herdr adapter in transport.mjs, the same door FGOS_HERDR_BIN
     // already uses for a herdr-only knob this function doesn't carry either).
     dispatchBatchKey,
+    assignmentLaunchContext,
+    launchCommandId,
+    controlEpoch,
+    controlToken,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -936,6 +940,7 @@ export async function executeExecutorCli(
         fallbackFrom: anchorCapability,
         anchorCapability,
         cfg,
+        assignmentLaunchContext,
         invocation: {
           command,
           args,
@@ -967,6 +972,9 @@ export async function executeExecutorCli(
           tier,
           model,
           dispatchBatchKey,
+          launchCommandId,
+          controlEpoch,
+          controlToken,
         },
       });
     } catch (err) {

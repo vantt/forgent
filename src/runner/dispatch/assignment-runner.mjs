@@ -21,6 +21,30 @@ import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 // about which file is the worker's claim. Re-exported because callers and
 // tests have always taken it from here.
 export { resolveWorkerArtifactPath };
+
+export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
+  const candidateDirs = [
+    path.join(runDir, 'worker-output', 'outbox'),
+    path.join(runDir, 'worker-output'),
+    path.join(runDir, 'outbox'),
+  ];
+  for (const dir of candidateDirs) {
+    if (fs.existsSync(dir)) {
+      let entries = [];
+      try { entries = fs.readdirSync(dir); } catch {}
+      const latest = entries
+        .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
+        .filter((e) => Number.isFinite(e.round))
+        .sort((a, b) => a.round - b.round)
+        .pop();
+      if (latest) return path.join(dir, latest.name);
+      if (legacyName && entries.includes(legacyName)) {
+        return path.join(dir, legacyName);
+      }
+    }
+  }
+  return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
+}
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -47,6 +71,22 @@ import {
   fsyncFileBestEffort,
   fsyncDirBestEffort,
 } from './run-lock.mjs';
+import { resolveExecutorCommand } from './transport.mjs';
+import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
+import { buildConfinementRequest } from './confinement/request.mjs';
+import {
+  startSupervisorProcess,
+  readSupervisorBinding,
+  readWorkerBinding,
+  readAdapterReceipt,
+  getBootId,
+  getProcessStartTime,
+  getProcessPgid,
+  publishImmutableProof,
+  publishMutableProjection,
+  computeSha256Digest,
+  canonicalJson,
+} from './cli-spawn-supervisor.mjs';
 
 function normalizeDigest(digest) {
   if (!digest || typeof digest !== 'string') return null;
@@ -1219,43 +1259,291 @@ export async function executeAssignment(assignment, opts = {}) {
   let executionError = null;
 
   const executorId = resolvedExecutorId;
-  try {
-    try {
-      rawResult = await executeExecutorCli(executorId, {
-        prompt,
-        cwd,
-        repoRoot: root,
-        runnerConfig: cfg,
-        model: effectivePolicy.model,
-        tier: effectivePolicy.tier,
-        timeoutMs,
-        onChunk: opts.onChunk,
-        work: opts.work,
-        stage: effectiveAssignment.stage,
-        runDir: path.resolve(runDir),
-        dispatchBatchKey: opts.dispatchBatchKey,
-      });
-    } catch (err) {
-      executionError = err;
-      const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
-      rawResult = {
-        status: isTimeoutErr ? 'timeout' : 'failed',
-        signal: isTimeoutErr ? 'SIGTERM' : null,
-        stdout: err.stdout || '',
-        stderr: err.stderr || err.message || String(err),
-      };
-    }
+  const resolvedAdapter = compiledPlan?.policy?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
 
-    // The adapter call above is the ONE async gap this control token has to
-    // outlive. Before appending anything a reader would treat as this Run's
-    // settlement, confirm nothing superseded this token while it ran --
-    // otherwise a controller that lost control mid-flight could still write
-    // a result a fresher controller never authorized (crash matrix: "result
-    // with stale control token -- refuse and append no settlement").
-    if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-      throw new RunnerConfigError(
-        `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-      );
+  let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+  let commandState = null;
+  let supervisorReceipt = null;
+
+  try {
+    if (useSupervisorRecovery) {
+      // 1. Snapshot and write Evaluator Baseline V1 before launch
+      const snapshotsObj = {};
+      for (const [p, snap] of dirtyBeforeSnapshots.entries()) {
+        snapshotsObj[p] = { exists: snap.exists, sha256: snap.hash };
+      }
+      const baselineBody = {
+        contract: 'evaluator-baseline.v1',
+        runId,
+        assignmentId: effectiveAssignment.assignmentId,
+        cwd: effectiveCwd,
+        gitBefore,
+        gitBeforeSource,
+        dirtyBefore,
+        dirtyBeforeSnapshots: snapshotsObj,
+        capturedAt: new Date().toISOString(),
+      };
+      const baselineDigest = computeSha256Digest(baselineBody);
+      const baselineRecord = { ...baselineBody, digest: baselineDigest };
+      const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+      publishImmutableProof(baselinePath, baselineRecord);
+
+      // 2. Commit Command State V1 not-requested -> pending
+      const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+      commandState = {
+        contract: 'assignment-command-state.v1',
+        runId,
+        launchCommandId,
+        controlEpoch,
+        controlTokenDigest: computeSha256Digest(controlToken),
+        state: 'pending',
+        envelopeDigest: null,
+        bindingDigest: null,
+        receiptDigest: null,
+        outcome: null,
+      };
+      publishMutableProjection(commandPath, commandState);
+
+      // 3. Build Assignment Launch Context
+      const assignmentLaunchContext = {
+        contract: 'assignment-cli-spawn-launch-context.v1',
+        run: {
+          runId,
+          assignmentId: effectiveAssignment.assignmentId,
+          attempt: admitted.attemptNum,
+          dispatchPlanDigest: compiledPlan ? `sha256:${crypto.createHash('sha256').update(JSON.stringify(compiledPlan)).digest('hex')}` : null,
+          evaluatorBaselineDigest: baselineDigest,
+        },
+        command: {
+          launchCommandId,
+          controlEpoch,
+          controlTokenDigest: computeSha256Digest(controlToken),
+        },
+      };
+
+      // 4. Resolve executor command params
+      let resolvedCmd;
+      try {
+        resolvedCmd = resolveExecutorCommand(cfg, {
+          prompt,
+          model: effectivePolicy.model,
+          tier: effectivePolicy.tier,
+          executorId: resolvedExecutorId,
+          fgosDir,
+          attestRoot: effectiveCwd,
+        });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: 'launch-envelope-invalid',
+          failureDetail: { message: err.message, code: 'config-invalid', source: 'controller' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 5. Prepare Confinement For Launch via Confinement Authority
+      let prepResult;
+      try {
+        const confReq = buildConfinementRequest({
+          capability: compiledPlan.capability || 'code:implement',
+          stageSkill: resolvedExecutorId,
+          executorId: resolvedExecutorId,
+          cfg,
+          assignmentLaunchContext,
+          invocation: {
+            command: resolvedCmd.command,
+            args: resolvedCmd.args,
+            argsTemplate: resolvedCmd.argsTemplate,
+            prompt,
+            env: resolvedCmd.env,
+            liveOutput: resolvedCmd.liveOutput,
+            interactiveMode: resolvedCmd.interactiveMode,
+            promptDelivery: resolvedCmd.promptDelivery,
+            permissionMode: resolvedCmd.permissionMode,
+            confinement: resolvedCmd.confinement,
+            adapter: resolvedCmd.adapter || 'cli-spawn',
+            method: resolvedCmd.method,
+            url: resolvedCmd.url,
+            headers: resolvedCmd.headers,
+            body: resolvedCmd.body,
+            resourceBindings: resolvedCmd.resourceBindings,
+          },
+          context: {
+            cwd: effectiveCwd,
+            repoRoot: root,
+            runDir: path.resolve(runDir),
+            fgosDir,
+            timeoutMs,
+            idleTimeoutMs: cfg.idleTimeoutMs,
+            maxBuffer: cfg.maxBuffer,
+            onChunk: opts.onChunk,
+            workId: resolvedExecutorId,
+            tier: effectivePolicy.tier,
+            model: effectivePolicy.model,
+            dispatchBatchKey: opts.dispatchBatchKey,
+          },
+          requirement: compiledPlan.policy?.confinement
+            ? (compiledPlan.policy.confinement.mode === 'unconfined'
+                ? { mode: 'unconfined', policyId: null, policy: null }
+                : compiledPlan.policy.confinement)
+            : { mode: 'unconfined', policyId: null, policy: null },
+        });
+        prepResult = await prepareConfinementForLaunch(confReq, { adapterPort: opts.adapterPort });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: err.code || 'confinement-refused',
+          failureDetail: { message: err.message, code: err.code || null, source: 'confinement-authority' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 6. Guarded update of pending command with envelopeDigest
+      commandState.envelopeDigest = prepResult.envelope.digest;
+      publishMutableProjection(commandPath, commandState);
+
+      // 7. Submit supervisor
+      let supervisorProc;
+      try {
+        supervisorProc = startSupervisorProcess({
+          envelopePath: prepResult.envelopePath,
+          detached: true,
+          onChunk: opts.onChunk,
+        });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: 'supervisor-spawn-refused',
+          failureDetail: { message: err.message, code: 'supervisor-spawn-fail', source: 'supervisor-launch' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 8. Wait for receipt in live execution
+      const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
+      const pollDeadline = Date.now() + timeoutMs + 10000;
+      while (Date.now() < pollDeadline) {
+        if (fs.existsSync(receiptPath)) {
+          try {
+            supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+            break;
+          } catch {}
+        }
+        if (supervisorProc.exitCode !== null) {
+          if (fs.existsSync(receiptPath)) {
+            try { supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8')); } catch {}
+          }
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 20));
+      }
+
+      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+        );
+      }
+
+      // 9. Guarded update: command reconciled with receipt-backed outcome
+      if (supervisorReceipt) {
+        commandState.state = 'reconciled';
+        commandState.receiptDigest = supervisorReceipt.digest;
+        commandState.bindingDigest = supervisorReceipt.bindingDigest;
+        commandState.outcome = {
+          kind: 'receipt-backed',
+          receiptDigest: supervisorReceipt.digest,
+          adapterCompletion: supervisorReceipt.completion,
+        };
+        publishMutableProjection(commandPath, commandState);
+      }
+
+      const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
+      const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
+      let stdoutText = '';
+      let stderrText = '';
+      try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
+      try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
+
+      const isTimeout = supervisorReceipt?.completion?.kind === 'timeout' || supervisorReceipt?.completion?.kind === 'idle-timeout';
+      const exitCode = supervisorReceipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
+      const signal = supervisorReceipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
+
+      rawResult = {
+        status: isTimeout ? 'timeout' : (exitCode === 0 ? 0 : 'failed'),
+        exitCode,
+        signal,
+        stdout: stdoutText,
+        stderr: stderrText,
+      };
+    } else {
+      try {
+        rawResult = await executeExecutorCli(executorId, {
+          prompt,
+          cwd,
+          repoRoot: root,
+          runnerConfig: cfg,
+          model: effectivePolicy.model,
+          tier: effectivePolicy.tier,
+          timeoutMs,
+          onChunk: opts.onChunk,
+          work: opts.work,
+          stage: effectiveAssignment.stage,
+          runDir: path.resolve(runDir),
+          dispatchBatchKey: opts.dispatchBatchKey,
+        });
+      } catch (err) {
+        executionError = err;
+        const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
+        rawResult = {
+          status: isTimeoutErr ? 'timeout' : 'failed',
+          signal: isTimeoutErr ? 'SIGTERM' : null,
+          stdout: err.stdout || '',
+          stderr: err.stderr || err.message || String(err),
+        };
+      }
+
+      // The adapter call above is the ONE async gap this control token has to
+      // outlive. Before appending anything a reader would treat as this Run's
+      // settlement, confirm nothing superseded this token while it ran --
+      // otherwise a controller that lost control mid-flight could still write
+      // a result a fresher controller never authorized (crash matrix: "result
+      // with stale control token -- refuse and append no settlement").
+      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+        );
+      }
     }
 
   const durationMs = Date.now() - startTime;
@@ -1287,8 +1575,8 @@ export async function executeAssignment(assignment, opts = {}) {
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
   // Detect worker-produced artifacts in runDir (Step 04 §5.5)
-  const agentReportPath = resolveWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  const agentResultPath = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
+  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
 
   // Step 04 §5.2: validate agent-result.json; invalid schema must produce failed/failed.
   let agentClaim = null;
@@ -1504,11 +1792,568 @@ export async function executeAssignment(assignment, opts = {}) {
   //
   // `settled` here means the run reached its end and produced a RunResult. It
   // says nothing about whether the work succeeded; that verdict is the
-  // `status`/`confidence` pair inside result.json, one line above.
   markRunSettled(runDir);
-
-    return Object.freeze(runResult);
+  Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
+  return Object.freeze(runResult);
   } finally {
+    if (useSupervisorRecovery && launchCommandId) {
+      try {
+        await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
+      } catch {}
+    }
     releaseRunControl(runDir, { controlEpoch, controlToken });
+  }
+}
+
+async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken) {
+  const settledAt = new Date().toISOString();
+  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
+
+  const stdoutText = '';
+  const stderrText = command.outcome?.failureDetail?.message || 'submission-refused';
+
+  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
+  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+
+  const exitInfoData = {
+    exitCode: 1,
+    signal: null,
+    timedOut: false,
+    settledAt,
+    durationMs: 0,
+  };
+  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
+
+  const evidenceData = {
+    operationMutability: 'mutates-repo',
+    gitBefore: null,
+    gitAfter: null,
+    gitBeforeSource: 'pre-launch',
+    dirtyBefore: [],
+    dirtyAfter: [],
+    mutatedDirtyBeforeFiles: [],
+    changedFiles: [],
+    changedFileReasons: {},
+    artifacts: [],
+    tests: [],
+  };
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+
+  const runResult = {
+    runId: runMeta.runId,
+    assignmentId: runMeta.assignmentId,
+    controlEpoch,
+    controlToken,
+    status: 'failed',
+    confidence: 'failed',
+    runtime: {
+      exitCode: 1,
+      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+    },
+    agentClaim: {
+      status: 'failed',
+      summary: stderrText,
+    },
+    evidence: {
+      gitBefore: null,
+      gitAfter: null,
+      gitBeforeSource: 'pre-launch',
+      changedFiles: [],
+      mutatedDirtyBeforeFiles: [],
+      artifacts: [],
+      tests: [],
+    },
+  };
+
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  const runJsonPath = path.join(runDir, 'run.json');
+  let runJsonMeta = runMeta || {};
+  if (fs.existsSync(runJsonPath)) {
+    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+  }
+  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'failed', settledAt }, null, 2)}\n`);
+  await finalizeConfinementResources({ runDir, launchCommandId: command.launchCommandId });
+
+  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+}
+
+async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receiptOpt = null) {
+  const launchCommandId = command.launchCommandId;
+  const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
+  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
+
+  const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
+  const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
+  let stdoutText = '';
+  let stderrText = '';
+  try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
+  try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
+
+  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
+  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+
+  const isTimeout = receipt?.completion?.kind === 'timeout' || receipt?.completion?.kind === 'idle-timeout';
+  const exitCode = receipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
+  const signal = receipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
+  const durationMs = receipt?.completion?.durationMs ?? 0;
+  const settledAt = receipt?.completion?.settledAt ?? new Date().toISOString();
+
+  const exitInfoData = {
+    exitCode,
+    signal,
+    timedOut: isTimeout,
+    settledAt,
+    durationMs,
+  };
+  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
+
+  // Detect worker artifacts
+  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
+  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+
+  let agentClaim = null;
+  let claimInvalid = false;
+  let claimSha256 = null;
+
+  if (fs.existsSync(agentResultPath)) {
+    try {
+      const claimBytes = fs.readFileSync(agentResultPath);
+      const parsed = JSON.parse(claimBytes.toString('utf8'));
+      const validation = validateAgentResultClaim(parsed);
+      if (validation.valid) {
+        agentClaim = parsed;
+        claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
+      } else {
+        claimInvalid = true;
+      }
+    } catch {
+      claimInvalid = true;
+    }
+  }
+
+  const workerArtifacts = [];
+  const settleReports = [];
+  if (fs.existsSync(agentReportPath)) {
+    let reportValid = false;
+    let reportSha256 = null;
+    try {
+      const reportBytes = fs.readFileSync(agentReportPath);
+      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
+      if (reportValid) {
+        reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
+      }
+    } catch {}
+    const reportRel = path.relative(root, agentReportPath);
+    workerArtifacts.push({ path: reportRel, kind: 'agent-report', valid: reportValid });
+    if (reportValid && reportSha256) {
+      settleReports.push({ path: reportRel, sha256: reportSha256 });
+    }
+  }
+
+  if (fs.existsSync(agentResultPath)) {
+    workerArtifacts.push({
+      path: path.relative(root, agentResultPath),
+      kind: 'agent-result',
+      valid: !claimInvalid,
+    });
+  }
+
+  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
+
+  // Read assignment to check read-only
+  const candidateAssignmentPaths = [
+    path.join(path.dirname(runDir), '..', 'assignment.json'),
+    path.join(runDir, 'assignment.json'),
+  ];
+  let asgn = null;
+  for (const p of candidateAssignmentPaths) {
+    if (fs.existsSync(p)) {
+      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
+    }
+  }
+  const isReadOnly = isReadOnlyAssignment(asgn);
+
+  const effectiveCwd = baseline?.cwd || root;
+  const gitBefore = baseline?.gitBefore ?? null;
+  const gitBeforeSource = baseline?.gitBeforeSource ?? 'pre-launch';
+  const dirtyBefore = baseline?.dirtyBefore || [];
+  const gitAfter = safeGitHead(effectiveCwd);
+  const dirtyAfter = safeGitStatusFiles(effectiveCwd);
+
+  const { changedFiles, changedFileReasons } = computeChangedFiles(effectiveCwd, gitBefore, gitAfter, dirtyBefore, dirtyAfter);
+
+  const mutatedDirtyBeforeFiles = [];
+  if (isReadOnly && baseline?.dirtyBeforeSnapshots) {
+    for (const [relPath, snap] of Object.entries(baseline.dirtyBeforeSnapshots)) {
+      const fullPath = path.join(effectiveCwd, relPath);
+      let currentExists = false;
+      let currentHash = null;
+      try {
+        if (fs.existsSync(fullPath)) {
+          const content = fs.readFileSync(fullPath);
+          currentHash = crypto.createHash('sha256').update(content).digest('hex');
+          currentExists = true;
+        }
+      } catch {}
+      if (currentExists !== snap.exists || currentHash !== snap.sha256) {
+        mutatedDirtyBeforeFiles.push(relPath);
+      }
+    }
+  }
+
+  const { status, confidence } = classifyRunEvidence({
+    exitCode,
+    signal,
+    isTimeout,
+    agentClaim,
+    claimInvalid,
+    workerArtifacts: workerArtifactPaths,
+    changedFiles,
+    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
+    isReadOnlyOperation: isReadOnly,
+    cwd: effectiveCwd,
+    repoRoot: root,
+    assignment: asgn,
+  });
+
+  const evidenceData = {
+    operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
+    gitBefore,
+    gitAfter,
+    gitBeforeSource,
+    dirtyBefore,
+    dirtyAfter,
+    mutatedDirtyBeforeFiles,
+    changedFiles,
+    changedFileReasons,
+    artifacts: workerArtifacts,
+    tests: [],
+  };
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+
+  const runResult = {
+    runId: runMeta.runId,
+    assignmentId: runMeta.assignmentId,
+    workId: runMeta.workId || asgn?.workId,
+    controlEpoch,
+    controlToken,
+    executorId: runMeta.executorId || 'cli-spawn',
+    ...(claimSha256 ? { claimSha256 } : {}),
+    settleReports,
+    status,
+    confidence,
+    runtime: {
+      exitCode,
+      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+    },
+    agentClaim: agentClaim ?? {
+      status,
+      summary: claimInvalid ? 'agent-result.json was present but failed schema validation' : (isTimeout ? 'Execution timed out' : 'Settled'),
+    },
+    evidence: {
+      gitBefore,
+      gitAfter,
+      gitBeforeSource,
+      changedFiles,
+      mutatedDirtyBeforeFiles,
+      artifacts: workerArtifactPaths,
+      tests: [],
+    },
+  };
+
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  const runJsonPath = path.join(runDir, 'run.json');
+  let runJsonMeta = runMeta || {};
+  if (fs.existsSync(runJsonPath)) {
+    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+  }
+  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'settled', settledAt }, null, 2)}\n`);
+  await finalizeConfinementResources({ runDir, launchCommandId, receipt });
+
+  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+}
+
+/**
+ * Reconcile an Assignment-owned cli-spawn Run against durable evidence.
+ *
+ * @param {string} runDir Path to Run directory (assignments/<asgn>/runs/<attempt>)
+ * @param {object} [opts] Options
+ * @returns {Promise<object>} Outcome object
+ */
+export async function reconcileCliSpawnRun(runDir, opts = {}) {
+  // Check action: unsupported operations
+  if (opts.action === 'cancel' || opts.operation === 'cancel') {
+    return { status: 'parked', reason: 'cancel-unsupported' };
+  }
+  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {
+    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };
+  }
+
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+  const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+  if (commandFiles.length === 0) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+
+  commandFiles.sort();
+  const commandFile = commandFiles[commandFiles.length - 1];
+  const launchCommandId = path.basename(commandFile, '.json');
+  const commandPath = path.join(commandsDir, commandFile);
+  const command = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+
+  // Stale controller verification
+  if (opts.controlEpoch !== undefined && opts.controlEpoch < command.controlEpoch) {
+    throw new Error(`stale control epoch: provided ${opts.controlEpoch}, required ${command.controlEpoch}`);
+  }
+  if (opts.controlToken !== undefined && command.controlTokenDigest) {
+    const providedDigest = computeSha256Digest(opts.controlToken);
+    if (providedDigest !== command.controlTokenDigest) {
+      throw new Error(`control token mismatch: provided token does not match recorded digest`);
+    }
+  }
+
+  let controlEpoch = opts.controlEpoch ?? command.controlEpoch ?? 1;
+  let controlToken = opts.controlToken ?? 'tok-reconcile-default';
+
+  let acquiredControl = null;
+  const holder = opts.holder || { id: `reconciler:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+  try {
+    const control = acquireRunControl(runDir, { holder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
+    if (control.status === 'held') {
+      return { status: 'held', holder: control.holder, controlEpoch: control.controlEpoch };
+    }
+    if (control.status === 'stale') {
+      return { status: 'stale', controlEpoch: control.controlEpoch };
+    }
+    acquiredControl = control;
+    if (opts.controlEpoch === undefined && control.controlEpoch !== undefined) {
+      controlEpoch = control.controlEpoch;
+    }
+    if (opts.controlToken === undefined && control.controlToken !== undefined) {
+      controlToken = control.controlToken;
+    }
+  } catch {}
+
+  try {
+    let runMeta = null;
+    const runJsonPath = path.join(runDir, 'run.json');
+    if (fs.existsSync(runJsonPath)) {
+      try { runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+    }
+    if (!runMeta) {
+      const asgnJsonPath = path.join(runDir, 'assignment.json');
+      if (fs.existsSync(asgnJsonPath)) {
+        try { runMeta = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8')); } catch {}
+      }
+    }
+    if (!runMeta) {
+      return { status: 'parked', reason: 'run-meta-missing' };
+    }
+
+    // Window 3a / 13: submission refusal recorded, Run unsettled
+    if (command.state === 'reconciled' && command.outcome?.kind === 'submission-refused') {
+      if (opts.tokenCurrent === false) {
+        return { status: 'observed', outcome: command.outcome, settled: false };
+      }
+      return await settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken);
+    }
+
+    // Check receipt tamper if receipt already exists
+    const receipt = readAdapterReceipt(runDir, launchCommandId);
+    if (receipt) {
+      if (receipt.digest) {
+        const { digest: rDig, ...rBody } = receipt;
+        if (rDig !== computeSha256Digest(rBody)) {
+          return { status: 'refused', reason: 'protected-artifact-corrupt' };
+        }
+      }
+      const actualRecDigest = receipt.digest || computeSha256Digest(receipt);
+      if (command.outcome?.receiptDigest && command.outcome.receiptDigest !== actualRecDigest) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+      if (command.receiptDigest && command.receiptDigest !== actualRecDigest) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    }
+
+    // Window 11 / 12: command outcome recorded, Run unsettled
+    if (command.state === 'reconciled' && command.outcome?.kind === 'receipt-backed') {
+      const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+      let baseline = null;
+      if (fs.existsSync(baselinePath)) {
+        try {
+          baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+          const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
+          if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
+            return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
+          }
+        } catch {
+          return { status: 'parked', reason: 'evaluator-baseline-missing' };
+        }
+      } else {
+        return { status: 'parked', reason: 'evaluator-baseline-missing' };
+      }
+      if (opts.tokenCurrent === false) {
+        return { status: 'observed', outcome: command.outcome, settled: false };
+      }
+      return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken);
+    }
+
+    // Window 2: Command pending without envelope
+    if (!command.envelopeDigest) {
+      return { status: 'parked', reason: 'launch-envelope-missing' };
+    }
+
+    let envelopePath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
+    if (!fs.existsSync(envelopePath)) {
+      envelopePath = path.join(runDir, 'protected', 'launch-envelope.json');
+    }
+    if (!fs.existsSync(envelopePath)) {
+      return { status: 'parked', reason: 'launch-envelope-missing' };
+    }
+
+    let envelope;
+    try {
+      envelope = JSON.parse(fs.readFileSync(envelopePath, 'utf8'));
+      const { digest: envDigest, ...envelopeWithoutDigest } = envelope;
+      if (envDigest && (envDigest !== computeSha256Digest(envelopeWithoutDigest) || (command.envelopeDigest && envDigest !== command.envelopeDigest))) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    } catch {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+
+    // Window 3 / 4: Envelope exists, no supervisor binding
+    const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
+    if (!supervisorBinding) {
+      return { status: 'parked', reason: 'supervisor-binding-unknown' };
+    }
+
+    if (supervisorBinding.digest) {
+      const { digest: supDig, ...supBody } = supervisorBinding;
+      if (supDig !== computeSha256Digest(supBody)) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    }
+
+    if (supervisorBinding.envelopeDigest && envelope.digest && supervisorBinding.envelopeDigest !== envelope.digest) {
+      return { status: 'refused', reason: 'incarnation-mismatch' };
+    }
+
+    // Window 15: Host boot changed
+    const currentBootId = getBootId();
+    const bindingBootId = supervisorBinding.bootId || supervisorBinding.supervisor?.bootId;
+    if (bindingBootId && currentBootId && currentBootId !== 'unknown-boot' && bindingBootId !== currentBootId && !receipt) {
+      return { status: 'parked', reason: 'host-reboot-unknown' };
+    }
+
+    // Check supervisor liveness and starttime
+    const supervisorAlive = isProcessAlive(supervisorBinding.supervisor?.pid);
+    const supervisorStartTime = getProcessStartTime(supervisorBinding.supervisor?.pid);
+    if (supervisorAlive && supervisorStartTime && supervisorBinding.supervisor?.processStartTime) {
+      if (supervisorStartTime !== supervisorBinding.supervisor.processStartTime) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+    }
+
+    // Window 5 / 6: Check worker binding
+    const workerBinding = readWorkerBinding(runDir, launchCommandId);
+    if (!workerBinding) {
+      if (supervisorAlive) {
+        return { status: 'waiting', state: 'supervisor-running' };
+      }
+      if (!receipt) {
+        return { status: 'parked', reason: 'worker-binding-unknown' };
+      }
+    } else {
+      if (workerBinding.envelopeDigest && envelope.digest && workerBinding.envelopeDigest !== envelope.digest) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+      if (workerBinding.worker?.pgid && supervisorBinding.supervisor?.pgid && workerBinding.worker.pgid === supervisorBinding.supervisor.pgid) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+      const workerAlive = isProcessAlive(workerBinding.worker?.pid);
+      const workerStartTime = getProcessStartTime(workerBinding.worker?.pid);
+      if (workerAlive && workerStartTime && workerBinding.worker?.processStartTime) {
+        if (workerStartTime !== workerBinding.worker.processStartTime) {
+          return { status: 'refused', reason: 'incarnation-mismatch' };
+        }
+      }
+    }
+
+    // Window 7 / 9 / 14: Check receipt
+    if (!receipt) {
+      const workerAlive = workerBinding ? isProcessAlive(workerBinding.worker?.pid) : false;
+      if (supervisorAlive || workerAlive) {
+        return { status: 'waiting', state: 'running' };
+      }
+      return { status: 'parked', reason: 'worker-state-unknown' };
+    }
+
+    // Verify receipt digests
+    const { digest: recDigest, ...receiptWithoutDigest } = receipt;
+    if (recDigest && recDigest !== computeSha256Digest(receiptWithoutDigest)) {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+    if (receipt.envelopeDigest && envelope.digest && receipt.envelopeDigest !== envelope.digest) {
+      return { status: 'refused', reason: 'confinement-plan-mismatch' };
+    }
+
+    const supervisorBindingDigest = supervisorBinding.digest || computeSha256Digest(supervisorBinding);
+    let expectedBindingDigest = supervisorBindingDigest;
+    if (workerBinding) {
+      expectedBindingDigest = computeSha256Digest([supervisorBindingDigest, workerBinding.digest || computeSha256Digest(workerBinding)]);
+    }
+    if (receipt.bindingDigest && receipt.bindingDigest !== expectedBindingDigest && receipt.bindingDigest !== supervisorBindingDigest) {
+      return { status: 'refused', reason: 'incarnation-mismatch' };
+    }
+
+    // Stale controller check (Acceptance Test 11)
+    if (opts.tokenCurrent === false || !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+      return { status: 'observed', receipt, settled: false };
+    }
+
+    const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+    let baseline = null;
+    if (fs.existsSync(baselinePath)) {
+      try {
+        baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
+        if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
+          return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
+        }
+      } catch {
+        return { status: 'parked', reason: 'evaluator-baseline-missing' };
+      }
+    } else {
+      return { status: 'parked', reason: 'evaluator-baseline-missing' };
+    }
+
+    // Publish receipt-backed command outcome
+    const outcome = {
+      kind: 'receipt-backed',
+      receiptDigest: receipt.digest || computeSha256Digest(receipt),
+      adapterCompletion: receipt.completion || receipt.outcome,
+    };
+    command.state = 'reconciled';
+    command.receiptDigest = outcome.receiptDigest;
+    command.outcome = outcome;
+    publishMutableProjection(commandPath, command);
+
+    return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receipt);
+  } finally {
+    if (acquiredControl?.controlToken) {
+      try {
+        releaseRunControl(runDir, {
+          controlEpoch: acquiredControl.controlEpoch,
+          controlToken: acquiredControl.controlToken,
+        });
+      } catch {}
+    }
   }
 }

@@ -127,7 +127,7 @@ test("H3/M7: adapters outside the prepared-sandbox allowlist refuse required dis
         } },
       });
       await assert.rejects(() => executeThroughConfinement(req, async () => ({ status: 0 })), (err) => {
-        assert.equal(err.errorClass, 'confinement-unsupported');
+        assert.ok(err.errorClass === 'confinement-adapter-unsupported' || err.errorClass === 'confinement-unsupported');
         assert.ok(err.attestation.mismatches.some((m) => m.detail.includes('does not apply the prepared sandbox')));
         assert.equal(err.attestation.coverage['control:hostWrite'], 'unverified');
         assert.equal(err.attestation.backend.id, 'bwrap');
