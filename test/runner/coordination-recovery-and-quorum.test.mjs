@@ -1391,3 +1391,71 @@ test('schema-2 session retry: aborting an admitted-but-unsettled retry declarati
   assert.equal(retried2.nextRunId, `run_${assignmentId}_04`);
   assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '04', 'result.json')), true);
 });
+
+test('schema-2 session retry: aborting a retry declaration whose Run already materialized refuses already-admitted, and subsequent retry allocates next attempt', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir, { summary: 'attempt result' });
+  const cid = 'coord_s2_abort_admitted';
+  openSession({ coordinationId: cid, objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: cid, taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const firstResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, isReadOnlyMode: true });
+  linkResult(cid, { assignmentId, runId: firstResult.runId }, { cwd: tempDir });
+
+  // Declare a retry for attempt 2
+  const declared = recordRunRetry(
+    cid,
+    {
+      assignmentId,
+      reason: 'retry 1',
+      previousRunId: firstResult.runId,
+      maxRetries: 5,
+      retryId: 'retry-admitted-1',
+      admissionPayloadDigest: 'digest-admitted-1',
+      authorityRef: `coordination:${cid}`,
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(declared.nextRunId, `run_${assignmentId}_02`);
+
+  // Admit / execute it (real Run materializes with run.json)
+  const asgnJson = JSON.parse(fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', assignmentId, 'assignment.json'), 'utf8'));
+  const executed = await executeAssignment(asgnJson, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId: 'retry-admitted-1',
+    predecessorRunId: firstResult.runId,
+    payloadDigest: 'digest-admitted-1',
+    expectedRunId: declared.nextRunId,
+    isReadOnlyMode: true,
+  });
+  assert.equal(executed.runId, `run_${assignmentId}_02`);
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignmentId);
+  const runJsonPath = path.join(asgnDir, 'runs', '02', 'run.json');
+  assert.equal(fs.existsSync(runJsonPath), true, 'real Run materialized on disk');
+
+  // Attempt to abort it AFTER admission/materialization (before fulfilled marker)
+  const abortOutcome = abortRunRetryDeclaration(cid, { assignmentId, retryId: 'retry-admitted-1', reason: 'late abort attempt' }, { cwd: tempDir });
+  assert.equal(abortOutcome.status, 'already-admitted', 'must refuse already-admitted, not silently succeed');
+
+  // Next retrySessionTask call self-heals/links attempt 02 and fulfills it
+  const retried = await retrySessionTask(
+    cid,
+    { assignmentId, reason: 'retry after refused abort', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried.runResult.runId, `run_${assignmentId}_02`);
+  assert.equal(retried.resumed, true);
+
+  // Subsequent retrySessionTask call allocates the next attempt number (attempt 03) without error
+  const retried2 = await retrySessionTask(
+    cid,
+    { assignmentId, reason: 'next retry attempt', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried2.runResult.runId, `run_${assignmentId}_03`);
+  assert.equal(retried2.nextRunId, `run_${assignmentId}_03`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '03', 'result.json')), true);
+});

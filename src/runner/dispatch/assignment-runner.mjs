@@ -747,10 +747,22 @@ function admitRunAttempt(
         return { stop: true, status: 'duplicate-retry', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
       }
 
-      const validGenerations = generations.filter((g) => {
+      const isGenerationValid = (g) => {
         if (!g.record?.retryId) return true;
-        return readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) === null;
-      });
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+
+      const validGenerations = generations.filter(isGenerationValid);
       const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
       const currentRunId = currentValid?.record?.runId ?? null;
       if (predecessorRunId !== currentRunId) {
@@ -799,10 +811,21 @@ function admitRunAttempt(
       // ledgers (the session's own retry-declaration generations and this
       // Assignment's admission generations) that were supposed to stay in
       // lockstep.
-      const validGenerations = generations.filter((g) => {
+      const isGenerationValid = (g) => {
         if (!g.record?.retryId) return true;
-        return readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) === null;
-      });
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+      const validGenerations = generations.filter(isGenerationValid);
       const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
       return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
     }

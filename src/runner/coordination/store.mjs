@@ -35,7 +35,7 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
-import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration } from '../dispatch/run-lock.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
@@ -2305,28 +2305,110 @@ export function markRunRetryFulfilled(coordinationId, { assignmentId, retryId },
   return { status: outcome.published ? 'fulfilled' : 'already-fulfilled' };
 }
 
+function normalizeDigest(digest) {
+  if (!digest || typeof digest !== 'string') return null;
+  return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
+
+function hasMatchingAdmittedRun(asgnDir, retryId, expectedDigest) {
+  const runsDir = path.join(asgnDir, 'runs');
+  if (!fs.existsSync(runsDir)) return false;
+
+  const admissionGenDir = path.join(asgnDir, 'admission', 'generations');
+  if (fs.existsSync(admissionGenDir)) {
+    try {
+      const gens = listGenerations(admissionGenDir);
+      for (const g of gens) {
+        if (g.record?.retryId === retryId) {
+          const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+          const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+          if (fs.existsSync(runJsonPath)) {
+            try {
+              const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+              if (runMeta?.retryId === retryId) {
+                if (expectedDigest) {
+                  const normExpected = normalizeDigest(expectedDigest);
+                  const normActual = normalizeDigest(runMeta.payloadDigest);
+                  if (normExpected && normActual && normExpected !== normActual) {
+                    continue;
+                  }
+                }
+                return true;
+              }
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+  }
+
+  try {
+    const entries = fs.readdirSync(runsDir);
+    for (const name of entries) {
+      if (!/^\d+$/.test(name)) continue;
+      const runJsonPath = path.join(runsDir, name, 'run.json');
+      if (!fs.existsSync(runJsonPath)) continue;
+      try {
+        const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+        if (runMeta?.retryId === retryId) {
+          if (expectedDigest) {
+            const normExpected = normalizeDigest(expectedDigest);
+            const normActual = normalizeDigest(runMeta.payloadDigest);
+            if (normExpected && normActual && normExpected !== normActual) {
+              continue;
+            }
+          }
+          return true;
+        }
+      } catch {}
+    }
+  } catch {}
+
+  return false;
+}
+
 /**
  * Explicitly abort a pending schema-2 retry declaration -- the ONLY other
  * way a pending declaration may resolve besides fulfillment (never
- * silently superseded, never inferred). Idempotent, append-only, and safe
- * to call even after the declaration has already been fulfilled (a
- * fulfilled declaration's own marker already makes it non-pending, so a
- * late abort attempt is a harmless no-op reported as `already-settled`,
- * never a race that could un-fulfill a completed admission).
+ * silently superseded, never inferred). Idempotent, append-only, safe
+ * to call even after the declaration has already been fulfilled (reported
+ * as `already-settled`), and refuses with `already-admitted` when a matching
+ * admitted Run already materialized on disk (a real runs/NN/run.json exists
+ * whose retryId/digest matches this declaration).
  */
 export function abortRunRetryDeclaration(coordinationId, { assignmentId, retryId, reason }, opts = {}) {
   const { sessionDir, fgosDir } = resolveSessionPaths(coordinationId, opts);
-  const { markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
+  const { generationsDir, markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
   if (readMarker(path.join(markersDir, `${retryId}.fulfilled.json`)) !== null) {
     return { status: 'already-settled' };
   }
-  const outcome = publishMarkerOnce(path.join(markersDir, `${retryId}.aborted.json`), {
-    retryId,
-    reason,
-    abortedAt: new Date().toISOString(),
-  });
   const asgnDir = path.join(fgosDir, 'assignments', assignmentId);
+  if (readMarker(path.join(markersDir, `${retryId}.aborted.json`)) !== null) {
+    if (fs.existsSync(asgnDir)) {
+      const admissionMarkersDir = path.join(asgnDir, 'admission', 'markers');
+      publishMarkerOnce(path.join(admissionMarkersDir, `${retryId}.aborted.json`), {
+        retryId,
+        reason,
+        abortedAt: new Date().toISOString(),
+      });
+    }
+    return { status: 'already-aborted' };
+  }
+
   if (fs.existsSync(asgnDir)) {
+    let expectedDigest = null;
+    try {
+      const declGens = listGenerations(generationsDir);
+      const decl = declGens.find((g) => g.record?.retryId === retryId)?.record;
+      if (decl?.admissionPayloadDigest) {
+        expectedDigest = decl.admissionPayloadDigest;
+      }
+    } catch {}
+
+    if (hasMatchingAdmittedRun(asgnDir, retryId, expectedDigest)) {
+      return { status: 'already-admitted' };
+    }
+
     const admissionMarkersDir = path.join(asgnDir, 'admission', 'markers');
     publishMarkerOnce(path.join(admissionMarkersDir, `${retryId}.aborted.json`), {
       retryId,
@@ -2334,6 +2416,12 @@ export function abortRunRetryDeclaration(coordinationId, { assignmentId, retryId
       abortedAt: new Date().toISOString(),
     });
   }
+
+  const outcome = publishMarkerOnce(path.join(markersDir, `${retryId}.aborted.json`), {
+    retryId,
+    reason,
+    abortedAt: new Date().toISOString(),
+  });
   return { status: outcome.published ? 'aborted' : 'already-aborted' };
 }
 
