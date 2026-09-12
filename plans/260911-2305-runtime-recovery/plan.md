@@ -348,6 +348,7 @@ merge TARGET changes from `main` to `runtime-recovery`.
 |---|---|---|---|---|---|
 | P00 | `bb64e945` (direct to `main`) | PASS (2 fix rounds) | PASS on substantive finding (fix-1); final 2-line recheck not dispatched, `maxRounds` cap hit — reviewer's independent source-verified recheck accepted in its place | Citation-swap suggestion (cosmetic) | [p00.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p00.md) |
 | P04 | `6bb50205` (into `runtime-recovery`) | PASS (2 fix rounds) | PASS (2 fix rounds, adversarial re-probe with new literals) | 3 cosmetic/edge-case notes | [p04.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p04.md) |
+| P01 | `05ef76db` (into `runtime-recovery`) | PASS (4 fix rounds, 2 sessions) | PASS (4 fix rounds, 2 sessions) | 2 LOW double-fault race residuals, fix shapes recorded | [p01.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p01.md) |
 
 ## Design Gate Definition
 
