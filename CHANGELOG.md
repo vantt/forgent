@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
+  arbitrary worker takeover without mandatory checkpoints, Run admission/result
+  fencing refinements, effect-aware fallback, and protocol-declared session
+  continuation with lineage, scoped imports and crash recovery. The design entry
+  is `docs/architect/agent-coordination/architecture/runtime-recovery-design.md`;
+  it includes versioned rollout and a shared proof matrix.
+
 - `apps/fgos` (rust-host-r1-kernel track, Phase 07): the Rust CLI host is now
   a real binary. Every `legacy-cli` selector routes unchanged through the
   existing Node payload (`bin/fgos.mjs`); the one currently-listed `native`

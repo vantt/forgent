@@ -615,6 +615,17 @@ references.
 | Any `FlowDefinition` | a `missionId` field anywhere | ADR-008 Decision 5; Mission stays deferred-preserved. |
 | A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`minTier`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel instead (proven protocol-agnostic, `P10.1.md`/`P10.3.md`, Step 09 Phase 10). Named as a contract-text gap by P10.2's own Reviewer (found investigating RFC-Review-Lite's own objector-actor `policy.minTier` elevation), closed here by P10.10. |
 
+## Proposed Continuation Profile
+
+Status: PROPOSED, not accepted or implemented by the current validator.
+[The continuation design](../architecture/coordination-continuation-recovery.md#5-protocol-transfer-declaration)
+specifies an optional CoordinationProtocol continuation profile with declared
+source prerequisites, bounded input mappings and a version-pinned destination
+whose real graph entry is used. It is not an arbitrary node-resume mechanism
+and does not introduce another predicate/graph language. Protocols without this
+extension retain their current semantics. A supporting format/version must be
+introduced explicitly before any writer consumes the field.
+
 ## Required Negative Tests
 
 - A node declaring its own `kind` field is rejected regardless of value.

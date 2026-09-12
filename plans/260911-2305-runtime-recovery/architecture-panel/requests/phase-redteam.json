@@ -1,0 +1,37 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Red-team: attack the panel process and packet integrity, not the architecture.",
+  "writerId": "runtime-recovery-panel-coordinator",
+  "coordinationId": "architecture-advisory-panel--runtime-recovery",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeRedteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "nodeId": "phase-redteam",
+      "authorizationId": "auth-redteam-1",
+      "invocationKey": "invoke-redteam-1",
+      "reason": "Driver authorizes red-team now that synthesis is linked (post-synthesis-open)."
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/red-team.md and follow it exactly: attack packet/process integrity with real artifact verification, give a real verdict.",
+      "expectedOutputs": ["agent-report.md: findings with real evidence, verdict (APPROVE/REVISE/INSUFFICIENT-EVIDENCE), verified vs unverifiable"]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Phase 5 (Diverge Honestly): three independent proposals for the runtime-recovery design — baseline conservative (system-shaper), gateway-change (alternative-shaper), and constraint findings against the current package (constraint-advocate).",
+  "writerId": "runtime-recovery-panel-coordinator",
+  "coordinationId": "architecture-advisory-panel--runtime-recovery",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "shapeSystem",
+      "operationId": "shape-system-proposal",
+      "targetActorId": "system-shaper-actor",
+      "taskKey": "shape-system-proposal-1",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/system-shaper.md and follow it exactly: produce the 'baseline conservative' architecture alternative, sized to the scout's real evidence, explicit about the standalone Team-Dispatch-V1 fencing gap.",
+      "expectedOutputs": ["agent-report.md: priors, proposal, load-bearing constraint, what it makes harder, half-adopted state, first reversible step, evidence-vs-assumption, falsification criteria"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeAlt",
+      "operationId": "shape-alternative-proposal",
+      "targetActorId": "alternative-shaper-actor",
+      "taskKey": "shape-alternative-proposal-1",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/alternative-shaper.md and follow it exactly: produce a genuine 'gateway-change' alternative, independent of the system shaper.",
+      "expectedOutputs": ["agent-report.md: priors, proposal, load-bearing constraint, what it makes harder, no-build path, first reversible step, evidence-vs-assumption, falsification criteria"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeConstraint",
+      "operationId": "shape-constraint-proposal",
+      "targetActorId": "constraint-advocate-actor",
+      "taskKey": "shape-constraint-proposal-1",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/constraint-advocate-phase5.md and follow it exactly: rank real operational/migration risks in the current package against the scout's confirmed evidence, with magnitude and reversibility.",
+      "expectedOutputs": ["agent-report.md: ranked findings with magnitude and reversibility, concerns considered and not raised"]
+    }
+  ]
+}

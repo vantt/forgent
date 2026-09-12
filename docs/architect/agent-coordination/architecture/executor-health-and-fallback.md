@@ -4,227 +4,221 @@ updated: 2026-09-11
 coverage: proposed
 ---
 
-# Design: Executor Fallback Activation And Health
+# Executor Fallback And Effect Eligibility
 
-> **Trạng thái:** PROPOSED — contract v1 chốt hình; default implementation chưa
-> có. Hướng kiến trúc đã được người dùng chấp thuận 2026-09-11
-> (`plans/reports/design-review-260911-1617-run-handle-continuation-health.md`).
->
-> **Một câu:** lớp này quyết định **retry, park, hay fallback sang executor
-> nào** — bằng cách *kích hoạt* `fallbackExecutors` đã reserved trong
-> DispatchRequest, dựa trên signal ladder và recovery matrix đã có. Health
-> observation store là phần tương lai của cùng contract, không phải điều kiện
-> để ship.
+Design status: PROPOSED detailed contract. Implementation: not implemented.
+Read [Runtime Recovery Design](runtime-recovery-design.md) first.
+This activates existing fallbackExecutors through the existing recovery matrix,
+compiler and runtime admission. No second health classifier or policy store.
 
-Nguyên tắc chung nằm ở [README](README.md#runtime-recovery-principles).
+## 1. Responsibility And Inputs
 
-## 1. Bất biến
+| Stage | Owner | Output |
+|---|---|---|
+| Worker result interpretation | Existing normalizer/evaluator | Per-Run result; not an executor-health judgment. |
+| Liveness classification | Existing signal ladder | Nonterminal or settled/blocked/died/ceiling/paused-limit/idle outcome. |
+| Effect and workspace retry eligibility | Operation recovery adapter plus runtime facts | Eligible/reconcile/forbidden verdict. |
+| Retry/park/halt and bounds | Existing recovery matrix, extended with an explicit runtime projection | Coarse decision and cap reasons. |
+| Candidate ordering | Pure fallback resolver | Ordered selection/rejections. |
+| Governance | Existing compileDispatchPlan and Confinement Authority | Governed plan, then runtime enforcement before launch. |
+| Admission | Run repository | One durable current attempt under authority. |
 
-```text
-Capability là semantic target; executor là implementation.
-Fallback không bao giờ hạ capability, tier, provider, confinement, mutation.
-Mọi candidate đi qua cùng compileDispatchPlan với constraints/provenance ban đầu.
-Recommendation không phải permission: admission đi qua Run contract.
-```
+The application service composes these stages. Fallback receives values, never
+calls herdr, traverses session graphs, moves Work or normalizes evidence.
 
-Một executor unhealthy không làm operation thất bại về semantic; nó chỉ là tín
-hiệu để retry/fallback/park. Semantic result thuộc RunResult normalizer.
+FailureObservationV1:
+`{contract: executor-failure-observation.v1, observationId,
+assignmentId, runId, attempt, executorId, capability,
+resourceScope, outcome, evidenceRefs, observedAt}`.
+ResourceScope is optional provider/account/model identifiers without credentials.
+Outcome is a discriminated union:
+- infra-ok;
+- ladder with `outcome` nullable while nonterminal, delivery, outputBytes,
+  rawLimitLineRef?, retryAfter?;
+- launch-failed with phase and creation/delivery certainty;
+- config-invalid with typed code;
+- confinement-refused with attestation/refusal ref.
+Success/config/launch outcomes do not require fabricated ladder values.
 
-## 2. Bug gốc → proof
+## 2. Production Ladder Semantics
 
-| ID | Lỗi lịch sử | Giải pháp | Proof |
-|---|---|---|---|
-| E-a | `codex-herdr` timeout 35', zero output, no commit, `gitBefore == gitAfter`. | Ladder `timed-out-idle` + delivery/effect facts → eligibility → candidate tiếp theo qua compiler. | Fake zero-output → decision `fallback` với candidate từ `fallbackExecutors`, không hardcode trong skill. |
-| E-b | `agy-herdr` handshake/re-brief timeout. | Ladder `timed-out-idle` với `delivery: unknown` → bounded retry cùng executor trước, fallback khi lặp. | Attempt 1 `retry-same`, attempt 2 `fallback`. |
-| E-c | Codex quota "try again at…" bị retry ngay. | Ladder `paused-limit` → `park` với `retryAfter`; cùng Run tiếp tục, không Run mới. | Quota signal → `park`, không admit Run; sau retryAfter chỉ inspect. |
-| E-d | Load cao → dispatch timeout giả, pane vẫn chạy. | RunHandle `present` → không ghi failure, decision `wait`. | Timeout + handle present → không duplicate spawn, không cooldown. |
-| E-e | Fallback ổn định nằm trong trí nhớ người. | `fallbackExecutors` theo capability/operation trong config, resolver kiểm governance. | Candidate ngoài config hoặc sai capability → `rejectedCandidates` có reason. |
-| E-f | Launch/config/semantic bị trộn thành timeout chung. | Ladder outcome + Run phase + RunResult classification tách ba lớp. | Semantic failure (RunResult reject) → không fallback, không cooldown. |
+The order and behavior in `src/runner/dispatch/liveness.mjs` are ported:
+1. Worker result file beats all runtime readings; it still requires normalization.
+2. Blocked beats timeout: answer the existing question, do not retry.
+3. Death requires consecutive absent readings (default 3); unknown/present reset.
+4. Absolute ceiling follows truth/blocked/death and is not reduced by blind time.
+5. Only stale evaluation reads screen; working itself is progress even with zero
+   stdout, and blind intervals are subtracted from idle duration.
 
-Thêm proof từ guarantee: restart không reset attempt; concurrent retry bị Run
-admission chặn; cancellation đến giữa plan và admission → không spawn.
+A screen request is a second stage of the same sample, not another death reading.
+Keep all failure panes by default. Paused-limit survives automated closeAlways;
+operator destructive intent is separate and guarded. Never infer Run completion
+from agent_status or pane idleness.
 
-## 3. Ranh giới (SRP): bốn trách nhiệm, không trộn
+Zero output is a fact orthogonal to outcome. A 35-minute zero-output incident can
+be timed-out-ceiling, as dogfood P08 records; it is not renamed timed-out-idle.
+Handshake timeout with unknown delivery is not proof of launch failure.
+The ladder supplies the matching screen line, not a parsed retryAfter timestamp.
+An adapter may parse a known provider reset format, preserving the original line;
+otherwise retryAfter is absent. RetryAfter only schedules inspection.
 
-| Trách nhiệm | Chủ | Input | Output |
-|---|---|---|---|
-| **Classification** — worker còn làm không, dừng kiểu gì | Signal ladder (`src/runner/dispatch/liveness.mjs`, semantic contract §4) | observation (result file, liveness reading, agent_status, output, screen) | `settled / blocked / died / timed-out-ceiling / paused-limit / timed-out-idle` |
-| **Retry eligibility** — có được phép thử lại không | Operation contract + adapter guarantees + Run admission | ladder outcome, Run phase (`delivery`), effect facts, operation retry conditions | eligible / reconcile-first / park |
-| **Candidate selection** — thử ai | Fallback policy (doc này) | eligibility, `fallbackExecutors`, attempt budget, trigger | ordered candidates |
-| **Compile** — candidate có hợp governance không | `compileDispatchPlan` + Confinement Authority | candidate + effective constraints ban đầu | DispatchPlan hoặc refuse |
+## 3. Coarse Matrix Mapping
 
-Lớp này sở hữu: candidate ordering, failure triggers, backoff, attempt budget,
-reason code, và (tương lai) observation store. Không sở hữu: ladder rule,
-governance merge, session graph, RunHandle lifecycle, result normalization,
-Work lifecycle, confinement backend.
+Extend the existing recovery module's runtime-facing pure entry rather than
+creating a parallel matrix. Preserve `resolveAction(errorClass, claimAttempt)`
+for its current Work-runner callers and `resolveStaleDoing` semantics.
 
-Dependency: dispatch resolver import fallback; coordination planner không
-import fallback internals (nhận `dispatchAvailability` qua snapshot); fallback
-đọc RunHandle summary do caller đưa, không gọi herdr; không import
-session-engine; Confinement Authority là gate cuối trước spawn.
+| Observation | Existing class / composed action |
+|---|---|
+| Creation failure proven before delivery | worker-spawn-fail; retry eligibility and bounds still required. |
+| timed-out-idle or timed-out-ceiling | worker-timeout; never proof the worker is dead. |
+| died without result | worker-spawn-fail for coarse retry class, with original died outcome retained; effect/quiescence gate remains mandatory. |
+| paused-limit / blocked | **Proposed behavior change:** park current Run, before retry matrix. Existing callers currently classify these through the retry matrix; S0 must freeze that behavior and this mapping cannot ship as a silent port. |
+| Nonterminal/present worker | wait; no failure classification or candidate selection. |
+| Unknown delivery or effects | reconcile then park if unresolved. |
+| Config-invalid / confinement-refused | refuse current dispatch; do not try another candidate to bypass policy. |
+| Semantic RunResult rejection | No infrastructure fallback; caller decides a new semantic operation/recheck if authorized. |
+| Unmapped internal error class | Preserve recovery matrix halt, scope reported to caller. |
+| dispatch-in-flight | Admission contention, not health; wait/re-read without consuming a Run attempt. |
 
-## 4. Classification: semantic contract phải được giữ khi port
+`verify-miss`, `verify-timeout`, `worktree-fail`, `reject-returned`,
+`stale-doing` and `state-conflict` keep their Work-runner meaning. Do not route
+them into executor fallback simply because some coarse entries say retry.
+For timed-out-ceiling, original session/Run bounds remain binding; an expired
+session cannot dispatch a fallback. An eligible retry under still-valid session
+authority gets its own bounded Run; it does not extend the old Run ceiling.
 
-Ladder là rule học từ production; bất kỳ implementation nào (Node hay Rust)
-phải giữ nguyên:
+## 4. One Attempt History, Explicit Caps
 
-1. Truth: result file của worker thắng mọi signal, kể cả "agent đã biến mất".
-2. Blocked: agent chờ người → không timeout, không retry; answer it.
-3. Died: chỉ sau `N` reading `absent` liên tiếp; một `unknown` reset đếm.
-4. Ceiling: quá absolute bound bất kể bận thế nào.
-5. Stale: chỉ ở đây mới đọc screen; blind interval (không đọc được
-   `agent_status`) không tính vào idle. `paused-limit` tách khỏi idle thật.
+Canonical count A = number of committed admissions for the Assignment, including
+admitted attempts that failed before launch. It never resets on restart, changed
+executor, changed error class or a new observer. Repeating an admissionKey does
+not increment A. Pure refusal before admission consumes no attempt.
 
-Liveness read FAIL là `unknown`, không phải `absent`. Gate được phép refuse
-trên thông tin xấu; quyết định kill thì không. `agent_status` chỉ là progress
-hint, không bao giờ kết luận done.
+For executor e, E(e) counts those same admissions selecting e.
+Retry count R = max(0, A - 1). Session retry declarations may reserve the next
+attempt before it is admitted; a pending declaration is resumed, not counted as
+a completed extra Run. Reservation checks include any outstanding declaration.
 
-Doc này không định nghĩa taxonomy thứ hai. Các nhãn cũ map như sau:
-`zero-output-timeout` = `timed-out-idle` + `outputBytes == 0`;
-`handshake-timeout` = `timed-out-idle` + `delivery: unknown`;
-`provider-quota` = `paused-limit`; `timeout-unknown` = ladder chưa kết luận +
-handle `present`; `launch-failed` = Run settled ở phase `admitted`/`launched`;
-`dispatch-in-flight` KHÔNG phải health — là admission refusal của Run contract.
+Default policy is a derived view of effective DispatchRequest/PolicyPatch:
+- candidates = unique `[selected primary, ...fallbackExecutors]`, preserving order;
+- maxAttemptsPerExecutor = 1;
+- maxAttemptsPerAssignment = 2 (the existing recovery default's total-attempt
+  threshold for a retryable runtime failure);
+- no automatic retry-same; no fallback if explicitly pinned no-fallback;
+- no observation store, cooldown or scoring;
+- retry backoff remains the caller's existing bounded scheduling policy; no new
+  configurable exponential-backoff subsystem in the default.
 
-## 5. Contract v1
+A candidate can be admitted only if A < maxAttemptsPerAssignment and
+E(candidate) < maxAttemptsPerExecutor. With maxAttempts=2, initial Run 1 fails,
+Run 2 may use the next candidate; no third admission. The Session's existing
+maxRetries counts retry declarations after the initial attempt: its allowance is
+`1 + maxRetries` total attempts, not a number directly passed to the old
+per-class claim resolver. The stricter effective cap always wins. Other session
+assignment/concurrency/wall-time bounds remain independent predicates.
 
-### 5.1 FailureObservation
+The runtime projection consumes the SAME recovery table's action/default limit,
+using Assignment admission history as its counter input; it does not reset on
+class changes. Existing claim-scoped callers of resolveAction keep their current
+counter semantics. Name both scopes in APIs/tests so one integer is not silently
+reinterpreted. Future policy can permit retry-same with the same history and caps,
+but that is not today's default E-b proof.
 
-```ts
-interface FailureObservationV1 {
-  contract: 'executor-failure-observation.v1';
-  observationId: string;               // dedup
-  assignmentId: string; runId: string; attempt: number;
-  executorId: string;
-  scope: { capability: string; provider?: string; account?: string; model?: string }; // resource thật bị giới hạn; không ghi credential
-  outcome:
-    | { kind: 'infra-ok' }             // executor chạy được; semantic thuộc RunResult
-    | { kind: 'ladder'; result: LadderOutcome; delivery: 'not-sent' | 'sent' | 'unknown'; outputBytes: number; gitBefore?: string; gitAfter?: string; retryAfter?: string }
-    | { kind: 'launch-failed'; phase: 'admitted' | 'launched'; error: string }
-    | { kind: 'confinement-refused' }
-    | { kind: 'config-invalid'; error: string };
-  evidenceRefs: string[];
-  observedAt: string;
-}
-```
+## 5. EffectGuaranteePort
 
-Success không mang failure class. Hai executor dùng chung quota có cùng
-`scope.provider/account` → cùng nguồn.
+`assess({operationContractRef, assignmentRef, sourceRunId,
+recoveryMaterialRef, destinationExecutorFacts, now})` returns a typed verdict:
+- eligible with guarantee;
+- reconcile with required fact refs/reason;
+- forbidden with reason.
 
-### 5.2 FallbackPolicy — chỉ candidates, triggers, budget
+The operation contract declares repeat mode explicitly: before-delivery-only,
+read-only, idempotent, dedup-keyed or never. The first protocol profile declares
+`repeatMode: read-only` in its review/red-team YAML operation contracts. The
+read-only effect boundary is derived from the selected executor's DispatchPlan
+(`providerModel` and executor facts): provider endpoints may be allowed, while
+unlisted external sinks are denied. Operations declare only sinks whose repeated
+write is part of their contract; a sink that can change outcome needs its own
+dedup identity. The runtime never infers this from `Assignment.mutation`.
+Missing/unknown mode cannot authorize automatic
+retry after possible delivery. The adapter verifies facts appropriate to that
+mode, rather than demanding every idempotent operation have a dedup service.
 
-```ts
-interface FallbackPolicyV1 {
-  contract: 'executor-fallback-policy.v1';
-  capability: string;
-  candidates: string[];                // = DispatchRequest.fallbackExecutors, thứ tự ưu tiên
-  fallbackOn: LadderOutcome[];         // default: ['died', 'timed-out-idle']
-  parkOn: LadderOutcome[];             // default: ['paused-limit', 'blocked']
-  retrySameFirst: { on: LadderOutcome[]; max: number };  // default: timed-out-idle với delivery unknown, max 1
-  attemptBudget: { perExecutor: number; perAssignment: number; deadline?: string };
-  backoff?: { initialMs: number; factor: number; maxMs: number };
-  precedence: 'park-wins';             // fallbackOn ∩ parkOn → park
-}
-```
+| Guarantee | Required evidence |
+|---|---|
+| no-delivery | Proof original launch/input was never delivered and no pending command can later deliver it. |
+| read-only | Actual permitted effect scope; writable output artifacts isolated per Run and no unaccounted external mutation. |
+| idempotent | Operation contract version, same logical input/effect identity, and evidence that repetition satisfies its operation-specific invariant. |
+| deduplicated | Stable effect key, input digest, effect-boundary namespace, verified dedup capability, validity window and destination compatibility. |
 
-Không có `minTier`, `allowCrossProvider`, `requireConfinementAtLeast`: governance
-sống trong DispatchRequest/PolicyPatch/compiler, không nhân bản ở đây. Policy
-khai trong `runner.capabilities.<capability>` hoặc `runner.executors.<id>`
-(additive); default nội bộ không hardcode executor cụ thể cho một role.
-Unknown outcome không tự retry chỉ vì còn budget.
+All eligible outcomes carry source Run, operation contract digest, input/effect
+identity, evidence refs and assessedAt; window end is explicit when relevant.
+The effect identity stays stable across attempts, unlike runId. Destination
+selection revalidates that the same guarantee holds for that candidate.
+`Assignment.mutation` remains descriptive and is not an effect guarantee.
+`effectsObserved: false` is not proof of no effects; boolean labels cannot replace
+typed unknown/reconcile outcomes. A generic effect ledger is not required.
 
-### 5.3 FallbackDecision — typed variants
+For writable takeover, eligibility additionally requires proof all old writers
+are stopped or deprived of access, and a held exclusive workspace grant. A dead
+main PID or a closed pane is insufficient for surviving descendants. New isolated
+workspaces can retain read-only snapshots of prior work, but cannot bypass
+unknown external effects. Material and grants are passed through the existing
+confinement/runtime boundary, not written into immutable Assignment semantics.
 
-```ts
-interface FallbackDecisionV1 {
-  contract: 'executor-fallback-decision.v1';
-  assignmentId; runId; attempt;
-  originalExecutorId: string;
-  decision:
-    | { kind: 'retry-same'; attemptNext: number; backoffMs: number }
-    | { kind: 'fallback'; selectedExecutorId: string; compiledPlanRef: string }   // đã qua compileDispatchPlan
-    | { kind: 'wait'; handleId: string; recheckAfter: string }                    // run còn sống
-    | { kind: 'park'; reasonCode: FallbackReasonCode; retryAfter?: string; nextAction: string }
-    | { kind: 'refuse'; reasonCode: FallbackReasonCode };
-  eligibility: { ladder: LadderOutcome; delivery; effectGuarantee: 'not-needed' | 'declared-and-verified' | 'unverified' };
-  rejectedCandidates: Array<{ executorId: string; reasonCode: FallbackReasonCode }>;
-  policyProvenance: { scope: 'cliOverride' | 'opPolicy' | 'capability' | 'default'; id?: string };
-}
-type FallbackReasonCode =
-  | 'candidate-not-registered' | 'candidate-capability-mismatch' | 'candidate-compile-refused'
-  | 'candidate-in-cooldown' | 'attempt-budget-exhausted' | 'deadline-exceeded'
-  | 'effect-guarantee-unverified' | 'run-still-live' | 'paused-provider-limit'
-  | 'blocked-awaiting-human' | 'cancelled' | 'unknown-outcome' | 'no-fallback-pinned';
-```
+## 6. Resolver Output And Apply
 
-Không có boolean governance summary: `fallback` chỉ hợp lệ khi có
-`compiledPlanRef`, tức compiler đã giữ mọi constraint. Operator pin executor
-với "no fallback" → chỉ `retry-same`/`park`/`refuse`, code `no-fallback-pinned`.
+FallbackDecisionV1:
+`{contract: executor-fallback-decision.v1, assignmentId, sourceRunId,
+historyRevision, policyProvenance, observationRef, decision,
+rejectedCandidates[]}`.
 
-### 5.4 EffectGuarantee port — operation khai, adapter chứng minh
+Decision variants:
+- collect-result with resultRef;
+- wait with runId and optional nextCheckAt;
+- reconcile with requiredFacts[];
+- fallback with executorId and compiledPlanRef;
+- park/refuse/halt with typed reasonCode and remedy;
+- retry-same exists only when a non-default policy explicitly permits it.
 
-```ts
-interface EffectGuaranteePort {
-  // Operation contract khai điều kiện thực thi lại; adapter cung cấp facts.
-  declare(operationId): { retryable: 'before-delivery-only' | 'idempotent' | 'dedup-keyed' | 'never'; dedupWindowMs?: number };
-  verify(operationId, runId): Promise<{ effectsObserved: boolean; dedupKey?: string; withinWindow: boolean }>;
-}
-```
+Remedy is a typed union: inspect-run, reconcile-effect, repair-config,
+request-budget, await-driver-input, none. Human display text is supplementary.
+Reasons include run-live, delivery-unknown, effect-unknown, writer-not-quiescent,
+candidate-unregistered, capability-mismatch, compile-refused, confinement-refused,
+assignment-budget-exhausted, executor-budget-exhausted, candidates-exhausted,
+deadline-exceeded, no-fallback-pinned, cancelled, unknown-error-class.
 
-Nhãn `idempotent` tự khai không thay bằng chứng: `verify` phải xác nhận
-boundary thực hiện effect hỗ trợ dedup. Effect identity giữ nguyên khi thử lại
-cùng effect, đổi khi có effect mới; `runId` không phải dedup key. Retry ngoài
-window không còn guarantee. Default không cần effect ledger; contract có đường.
+Candidate resolution rejects duplicates/previously exhausted executors, preserves
+original capability, tier, provider/egress constraints, persona and provenance,
+then calls the existing compiler. A fallback candidate is passed as an explicit
+`cliOverride.preferExecutor` with
+`policyProvenance.executor: {scope: fallback, id}`; the policy resolver must
+recognize that scoped candidate as valid. If the current compiler still hard-
+errors on this mismatch, fallback remains parked until that compiler contract is
+amended. Its output is advice, not a permission token.
+Apply re-reads admission history, budget, late results, cancellation and effect
+window before Run admission. Compiling does not replace final confinement checks.
 
-## 6. Retry và effect semantics
+No fallback candidate does not imply a failed semantic task. Return parked/refused
+with the precise reason; the caller can continue independent work. A quota pause
+does not consume another attempt. Admission contention is neither a quota event
+nor evidence an executor is unhealthy.
 
-- Reconnect/observe tìm lại attempt hiện tại; resume tiếp tục execution hiện
-  tại; retry tạo Run mới cùng Assignment; continuation tạo ledger mới. Không
-  trộn.
-- Lỗi xác nhận **trước delivery** (`delivery: not-sent`, hoặc Run settled ở
-  `admitted`/`launched`) → retry theo budget/governance.
-- **Sau delivery** → chỉ retry khi `EffectGuaranteePort` đáp ứng; `delivery:
-  unknown` → reconnect/reconcile trước; chưa giải quyết → `park` với reason và
-  `nextAction` cụ thể. Dừng process không xóa effect đã xảy ra.
-- Cooldown/quota reset không vượt cancellation hay authority đã thu hồi.
-- Chỉ hỏi người khi thiếu quyết định máy không tự đưa ra được (`blocked`).
+## 7. Proof, Rollout And Future Work
 
-## 7. Default implementation
+E-a..E-f and X01..X06 in
+[the common proof matrix](runtime-recovery-design.md#10-proof-matrix)
+are the acceptance scenarios. In particular E-b is reconcile then eligible
+fallback, not unknown-delivery retry-same followed by an impossible third attempt.
+Pair pure resolver tests with real admission/confinement integration.
 
-Không có observation store. Ba mảnh, đều là kích hoạt thứ đã có:
+Node changes extend recovery/assignment-policy/assignment-runner and runtime
+interfaces; do not rename/rebuild dispatch core. Doctor validates referenced
+executors, supported recovery guarantees and any introduced policy defaults.
+Configuration still merges project over global through existing setup.
 
-1. **Activate `fallbackExecutors`** (`assignment-policy.mjs` executorList, hiện
-   reserved-not-executed): khi `recovery.mjs` `resolveAction` trả `retry` và
-   ladder trả `died`/`timed-out-idle` với eligibility đạt, chọn phần tử kế
-   tiếp trong `executorList` chưa dùng cho Assignment này, qua
-   `compileDispatchPlan`. Hết list → `park` `attempt-budget-exhausted`.
-2. **`paused-limit` → park** với `retryAfter` từ ladder; cùng Run, không admit
-   Run mới.
-3. **Một attempt per executor per Assignment** (chặn re-pick executor vừa hỏng
-   mà không cần cooldown window). `attempt` đếm trên Assignment, không reset.
-
-Slices: R1 policy resolver thuần + decision (tests theo §2); R2 dispatch
-integration (assignment-runner hỏi resolver trước retry, log structured
-decision qua `logExecutorDispatch` với `fallbackReason` đã có); R3 CLI show.
-
-Doctor: nếu thêm config policy → đăng ký defaults + doctor check "executors
-referenced by fallbackExecutors exist". R1 không thêm runtime dir.
-
-## 8. Tương lai (contract đã chừa chỗ, không ship ở default)
-
-- Observation store `.fgos/runtime/executor-health/observations.jsonl` +
-  derived `ExecutorHealthState` (window, attempts, successes, status
-  healthy/degraded/cooldown/quota-paused) — scope theo resource.
-- Cooldown window theo scope, adaptive ranking, cross-project sharing, UI.
-- Effect ledger tổng quát.
-
-Correctness của default không phụ thuộc scoring.
-
-## 9. Con trỏ
-
-- [Dispatch Control Plane](dispatch-control-plane.md) — DispatchRequest (`fallbackExecutors`, `minTier`, provenance), compiler.
-- [Run contract](../contracts/assignment-run-runresult.md) — admission, phases, ba guarantee.
-- [RunHandle](run-handle.md) — runtime facts.
-- [Continuation Planner](coordination-continuation-recovery.md) — session next action.
-- [Agent Confinement Authority](../../../specs/confinement-authority.md) — gate cuối trước spawn.
-- `src/runner/dispatch/liveness.mjs`, `src/runner/recovery.mjs` — semantic contract hiện hành phải giữ khi port.
+Future observation history is scoped by actual provider/account/model resource;
+cooldown/scoring is not needed for correctness. Distributed effect ledgers,
+cross-project health and additional repeat strategies remain explicitly unsupported
+until their adapters and proof exist.

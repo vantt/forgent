@@ -4,308 +4,260 @@ updated: 2026-09-11
 coverage: proposed
 ---
 
-# Design: RunHandle
+# RunHandle And Recovery Material
 
-> **Trạng thái:** PROPOSED — contract v1 chốt hình; default implementation chưa
-> có. Hướng kiến trúc đã được người dùng chấp thuận 2026-09-11 sau các vòng
-> review (`plans/reports/design-review-260911-1617-run-handle-continuation-health.md`).
->
-> **Một câu:** `RunHandle` là tay nắm runtime để *tìm, quan sát, và điều khiển
-> có guard* một `Run`. Nó ghi facts về runtime; nó không cấp quyền, không phải
-> identity, không phải evidence, không nằm trong core coordination ledger.
+Design status: PROPOSED detailed contract. Implementation: not implemented.
+Read [Runtime Recovery Design](runtime-recovery-design.md) first for ownership,
+local locking, version rollout, proof IDs and the long-horizon scope. This file
+owns runtime observation/control and recoverable-state capture, not Run admission
+or session policy. Two ports (repository/runtime) and one guard application service.
 
-Nguyên tắc chung cho cả ba thiết kế runtime recovery (RunHandle, Continuation
-Planner, Executor Fallback) nằm ở [README](README.md#runtime-recovery-principles);
-doc này không lặp lại, chỉ áp dụng.
+## 1. Identity And Facts
 
-## 1. Vị trí và bất biến
+RunHandle identifies a runtime resource for one admitted Run. Losing it does not
+authorize another Run. Assignment identity and acceptance remain immutable;
+runtime locator is opaque outside its adapter.
 
-```text
-Assignment -> Run -> RunHandle(s)
-                  -> RunResult
-```
+| RunHandleV1 field | Type / semantics |
+|---|---|
+| contract, id, revision | `run-handle.v1`, opaque stable id, nonnegative integer CAS revision. |
+| subject | `{assignmentId, runId, attempt}`; validated against committed Run admission. |
+| ownerRuntime | `{kind: node or rust, releaseRef}`; immutable spawning implementation, not PID. |
+| controller | Optional current lock-token reference; diagnostic projection of lock store, never lock authority. |
+| runtime | `{adapter, locator}`; adapter name versioned/namespaced; locator adapter-validated. |
+| role | driver / observer / replacement. |
+| capabilities | Supported operations: inspect, snapshot, send-input, rename, terminate, reconcile-command. |
+| execution | launching / running / paused / unknown / terminated. No success/done state. |
+| attachment | attached / detached; observer connection, independent of execution. |
+| observation | ObservationV1 below, nullable until first observation. |
+| delivery | not-sent / sent / unknown; mirrors Run fact via the runtime writer, not a second authority. |
+| pause | Optional `{reason, retryAfter?, rawMessageRef?}`; reasons provider-limit, awaiting-operator, transport-backpressure, unknown. |
+| diagnosticRefs | DiagnosticRefV1 array; empty allowed. |
+| createdAt, updatedAt | UTC timestamps; not identity inputs. |
+| displayName, labels | Optional presentation metadata; never lookup/permission keys. |
 
-```text
-runId là execution identity và launch identity (Run contract §Run Phases).
-RunHandle là operational locator + capability handle.
-Pane id / pid chỉ là một field locator bên trong RunHandle.
-```
+ObservationV1: `{sequence, observedAt, source, liveness, agentState,
+lastProgressAt, outputBytes, lastOutputAt, freshness}`.
+Liveness is present/absent/unknown; agentState is working/idle/blocked/unknown.
+Nullable progress/output timestamps mean unavailable. Freshness is fresh/stale.
+Sequence belongs to this observer and allows its classifier to avoid counting
+one probe twice when a subsequent screen read completes that same observation.
 
-RunHandle thuộc **runtime/dispatch infra** dưới Agent Coordination, cạnh
-Run/RunResult, ngoài protocol graph. Core coordination chỉ tham chiếu
-`Assignment`, `Run`, `RunResult`, evidence, protocol/operation state — không
-biết tmux pane, terminal title, pid tree, hay runtime chrome nào.
+The signal ladder owns classification. Caller threads absentStreak, lastProgressAt
+and blindMs, not the session graph or Guard. Restart resets absence streak and
+treats unobserved elapsed time as blind for idle; absolute ceiling still uses
+the original Run start time. Worker result is normalized before any runtime
+reading is used to admit replacement. Receipt is delivery evidence, not result.
 
-Run là đơn vị admission ([Run contract](../contracts/assignment-run-runresult.md)
-§Run Phases And Admission). RunHandle được tạo ở phase `bound`, sau `launched`,
-trước `delivered`. Mất handle không bao giờ là lý do admit Run mới.
+## 2. State Transitions
 
-## 2. Bug gốc → proof
-
-Mỗi lỗi dogfood code-panel P01–P14 gắn đúng một proof; đây là DoD của doc.
-
-| ID | Lỗi lịch sử | Giải pháp | Proof |
-|---|---|---|---|
-| F-a | Lead đóng nhầm pane vì dựa vào title/vị trí. | Mọi control đi qua guard; guard đọc Run state + handle theo exact `handleId`. | Close pane có handle `active` không kèm exact id → refused với `run-handle-active-close-refused`. |
-| F-b | CLI cha bị kill vì RAM, pane vẫn sống, session driver mất state. | Binding ghi durable trước khi gửi prompt; resume đọc result → handle → mới dispatch. | Fixture: coordinator giả chết + handle inspect được → không redispatch, trả `attach`. |
-| F-c | Dispatch timeout giả dưới tải cao, pane vẫn làm. | Timeout caller là fact về observer; execution state chỉ đổi khi adapter chứng minh. | Timeout + adapter `present` → `observation.freshness = stale`, execution state không đổi, không ghi failure. |
-| F-d | Provider quota cần giữ pane để tiếp tục sau reset. | `execution: paused` + `pause.retryAfter`; guard refuse close paused. | Paused-limit pane không bị close; retry-after hết chỉ cho phép inspect lại. |
-| F-e | Zero-output timeout không có output/commit. | Snapshot + delivery state phân biệt no-output launch hang với worker có tiến triển không ghi stdout. | Fixture zero output + `delivery: unknown` → classify `unknown`, snapshot được ghi trước classify. |
-| F-f | Hai cơ chế background gây duplicate process. | Một Run chưa-settled per Assignment (Run contract) + controller lock per Run. | Hai controller cùng bind một Run → cái thứ hai `run-handle-lease-conflict`. |
-| F-g | Lock "dispatch in flight" khó quan sát. | `list` trả handle đang chiếm cwd/Assignment. | `dispatch-in-flight` error in ra `handleId`/`runId` đang chiếm. |
-
-Thêm hai proof không từ bug nhưng từ guarantee đã chốt: locator tái dùng (pane
-id sau tmux restart / pid wrap) không bị control nhầm; `show` read-only không
-ghi state.
-
-## 3. Ranh giới (SRP)
-
-Ba port + một application service. Đây là ranh giới logic; Rust có thể biểu
-đạt bằng trait, không bắt buộc ba crate.
-
-| Thành phần | Sở hữu | Không sở hữu |
+| From | To | Required fact |
 |---|---|---|
-| `RunHandleRepository` (port, persistence) | lưu/đọc handle với expected revision (CAS), controller lock acquire/release | inspect runtime, policy |
-| `RuntimeControlPort` (port, adapter) | inspect / send-input / snapshot / rename / terminate trên một locator; validate locator shape; báo capability | quyết định có được phép làm không, ghi handle |
-| `RunHandleGuard` (application service) | authority + precondition trước mọi control: đọc Run state, exact id, lock, revision, incarnation; ghi diagnostic refs; chuyển execution/attachment state | chọn executor, admit Run, normalize RunResult, recovery policy |
-| Recovery planner (doc riêng) | chọn next action | — |
+| launching | running | Worker receipt/progress identified by adapter; transport ack alone need not mean execution started. |
+| launching/running | paused | Explicit pause/provider-limit observation. |
+| launching/running/paused | unknown | Runtime cannot currently establish execution; preserve last pause metadata. |
+| unknown | paused | Inspection confirms pause; do not convert a limit screen into running. |
+| unknown | running | Positive progress and matching incarnation; not merely a successful gateway request. |
+| paused | running | Positive progress/resume confirmation; expiry of retryAfter is only an inspect trigger. |
+| any nonterminal | terminated | Confirmed worker stop under declared coverage, or ladder death under matching identity. |
+| terminated | terminated | Terminal resource fact; reattach cannot revive this incarnation. |
 
-Guard không có recovery policy thứ hai. Guard không tạo Run.
+A paused worker proven dead can become terminated without a user kill request.
+This differs from initiating termination of a paused worker, which is guarded.
+The Run may be settled while its pane remains open. Observation freshness can
+be stale while execution remains running. A transient caller timeout changes
+freshness, not automatically execution.
 
-**Writer hợp lệ:** dispatch adapter (lúc bind), supervisor/recovery (lúc inspect
-đổi state), operator CLI (control có guard). Worker agent không được ghi handle
-— worker chỉ ghi receipt/result theo contract Run.
+DiagnosticRefV1: `{kind, ref, sha256?, capturedAt}`. Kinds: stdout-log,
+stderr-log, pane-snapshot, process-info, worker-result, confinement-attestation.
+Worker-result refs still pass the normalizer. A diagnostic is not quorum evidence.
 
-**Node/Rust coexistence:** ai spawn thì sở hữu handle (`owner`); runtime kia
-chỉ đọc. Reader không hiểu `contract` version phải từ chối rõ, không tự diễn
-giải.
+## 3. Ports And Control Outcomes
 
-## 4. Contract v1
+RunHandleRepository supplies:
+- `get(handleId)`, `list({runId?, assignmentId?, adapter?})`;
+- `put(handle, expectedRevision)` with atomic CAS;
+- `acquireControl(runId, holderIdentity, purpose)` returning a unique lock token;
+- `releaseControl(token)`, idempotent for that token only;
+- `readPending(runId)`, `recordPending(command, token)`,
+  `recordOutcome(commandId, result, token)`.
 
-Chữ ký TypeScript là minh họa ngôn ngữ-độc-lập; wire/persistence schema chỉ
-chuẩn hóa ở boundary lưu lâu dài (file handle) và trao đổi (CLI JSON).
+Lock semantics and physical publication are defined once in
+[Local Concurrency And Durability](runtime-recovery-design.md#6-local-concurrency-and-durability).
+Purpose is bind/drive/terminate/recover. Observers doing pure reads take no lock;
+an explicit refresh that writes observations takes the writer guard. Every handle
+of a Run resolves to the same control lock. Owner runtime and holder process
+are different identities. Cross-runtime control routes to the owner or refuses.
 
-### 4.1 RunHandle
+RuntimeAdapterPort supplies:
+- `launch(runId, preparedInvocation, commandContext)`;
+- `reconcileLaunch(runId, launchCommandId, commandContext)`;
+- `inspect(locator, commandContext)`;
+- `sendInput(locator, input, commandContext)`;
+- `snapshot(locator, commandContext)`;
+- `rename(locator, displayName, commandContext)`;
+- `terminate(locator, {graceMs, force}, commandContext)`;
+- `reconcileCommand(commandId, locator?, commandContext)`.
 
-```ts
-interface RunHandleV1 {
-  contract: 'run-handle.v1';
-  id: string;                      // rh_<ulid>
-  revision: number;                // CAS; mọi write mang expected revision
-  subject: RunHandleSubjectV1;
-  runtime: RuntimeLocatorV1;
-  owner: RunHandleOwnerV1;         // ai spawn / ai đang giữ binding
-  role: 'driver' | 'observer' | 'replacement';
-  capabilities: RunHandleCapability[];   // adapter khai; không phải permission
-  execution: ExecutionStateV1;     // worker đang làm gì (theo adapter)
-  attachment: AttachmentStateV1;   // observer/gateway còn nối không
-  observation: ObservationV1;      // dữ kiện mới tới đâu, từ đâu
-  delivery: 'not-sent' | 'sent' | 'unknown';
-  pause?: RunHandlePauseV1;
-  lock?: ControllerLockV1;
-  diagnosticRefs?: DiagnosticRefV1[];
-  displayName: string;
-  labels?: Record<string, string>;
-  createdAt: string;
-  updatedAt: string;
-}
-```
+All are asynchronous typed results; none writes a Run/handle or chooses policy.
+CommandContext is `{commandId, payloadHash, cancellation, deadlineAt}`.
+Mutating commandId is stable per logical command, not per CLI invocation.
+Same commandId/different payloadHash refuses. Read IDs are diagnostic, not dedup
+claims. An unsupported operation fails by code before attempting its effect.
 
-Ba trạng thái trực giao, có thể đồng thời đúng (`paused` + `detached` + stale):
+| Operation | Typed result variants |
+|---|---|
+| launch/reconcileLaunch | found(locator, incarnation) / absent-proven / pending / unknown. Launch failure also carries not-created proof or unknown. |
+| inspect | observed(ObservationV1, incarnation match/mismatch/unknown). |
+| sendInput | delivered(receiptRef) / not-delivered(proofRef) / unknown(commandId). Sent-without-ack is unknown. |
+| snapshot | captured(refs, coverage complete/partial, omissions[]) / unavailable(reason). |
+| rename | applied / already-applied / unknown(commandId). |
+| terminate | stopped(coverage, proofRef) / still-live / unknown(commandId). |
+| reconcileCommand | applied(originalResult) / not-applied(proofRef) / pending / unknown. |
 
-```ts
-type ExecutionStateV1 =
-  | 'launching' | 'running' | 'paused' | 'unknown' | 'terminated';
-type AttachmentStateV1 = 'attached' | 'detached';
-interface ObservationV1 {
-  observedAt: string;
-  source: RunHandleOwnerV1;
-  adapterStatus: 'working' | 'idle' | 'blocked' | 'absent' | 'unknown';
-  freshness: 'fresh' | 'stale';    // theo policy max-age; stale ≠ dead
-  outputBytes?: number;
-  lastOutputAt?: string;
-}
-```
+Errors: `{code, message, handleId?, runId?, retry: never | reconcile | later}`.
+Codes: handle-not-found, subject-mismatch, revision-conflict, control-held,
+incarnation-mismatch, incarnation-unknown, capability-unsupported, active-close-refused,
+locator-invalid, adapter-failed, version-unsupported, owner-runtime-unavailable,
+command-payload-conflict, pending-command-unknown, run-handle-missing.
+CLI prefixes these with `run-handle-` in its public error namespace. Cancellation
+before submission returns not-applied; after possible submission it returns
+unknown unless an outcome is reconciled. No promise that aborting a Promise stops
+a remote command.
 
-`adapterStatus: idle` không bao giờ nghĩa là Run done. `absent` một lần không
-nghĩa là dead — rule "unknown ≠ absent, died cần absent liên tiếp, blind
-interval không tính stale" là của signal ladder
-(`src/runner/dispatch/liveness.mjs`, xem [Executor Fallback](executor-health-and-fallback.md) §4);
-RunHandle chỉ ghi reading, không tự kết luận.
+## 4. Guard Sequence
 
-### 4.2 Subject
+Bind checks committed Run identity and owner, reconciles launch, validates locator
+incarnation and persists the handle before work input. Missing binding after a
+crash invokes reconcileLaunch; it never reruns launch merely because a handle
+file is absent. The Run contract defines crash admission behavior.
 
-```ts
-interface RunHandleSubjectV1 {
-  type: 'assignment-run';
-  assignmentId: string;
-  runId: string;                   // launch identity
-  attempt: number;
-  coordinationId?: string; actorId?: string; operationId?: string; nodeId?: string;
-  executorId: string;
-  cwd: string; runDir: string;     // canonical, do dispatch resolver cấp; không nhận từ worker
-}
-```
+Deliver/rename/terminate:
+1. Acquire per-Run control; re-read Run and handle revision.
+2. Reconcile pending command before a new mutation. Unknown leaves the Run parked.
+3. Verify caller authority, current admission where required, exact target and
+   adapter incarnation. Capability is not permission.
+4. Persist pending command with stable key/hash before submission.
+5. Submit once; persist typed result and corresponding facts. Crash before step 5
+   leaves a command that the next controller must reconcile.
 
-`assignmentId`/`runId` là identity; các field còn lại là context hiển thị,
-không phải điều kiện quorum.
+Every control critical section releases its token in `finally` and appends a
+release marker, including cancellation and adapter-error paths. This invariant
+is required for Node/R1-R2. An operator force-release door for a live process is
+deferred to R3; if introduced, it must carry explicit attestation and audit
+evidence and is never a TTL-only steal.
 
-### 4.3 RuntimeLocator và incarnation
+The pending record is stored even when delivery was never acknowledged. Adapter
+launch/control must supply either idempotent command execution or authoritative
+reconciliation before safe repetition. An adapter with neither cannot advertise
+automatic takeover for this scenario. This protects correctness without pretending
+local filesystem locks fence remotely queued input.
 
-```ts
-interface RuntimeLocatorV1 {
-  adapter: string;                 // namespaced, versioned: 'fgos.herdr-pane@1', 'fgos.process@1'
-  locator: Record<string, unknown>; // opaque theo adapter; adapter validate
-}
-```
+Termination requires exact handle identity for an active/unknown Run, separate
+operator authority and diagnostic snapshot where obtainable. Automated cleanup
+cannot force-close paused-limit. A user's explicit force intent may do so, but
+stopped must name coverage: resource-only / worker-tree / write-access-revoked.
+Closing a pane proves only resource-only; setsid descendants may remain. Only
+worker-tree or proven write-access-revoked satisfies writable takeover. Snapshot
+failure is recorded; it must not prevent urgent explicitly authorized cancellation.
 
-Danh sách adapter không nằm trong common contract; thêm plugin không sửa
-contract này. Unknown adapter: đọc metadata được, control bị refuse
-`run-handle-control-unsupported`.
+Herdr launch identity is a durable run-scoped key. The gateway-side adapter must
+be able to look up a resource by that key before locator persistence completes.
+For the current Herdr client, a deterministic agent/resource name derived from
+`runId` is one possible strategy (and the only currently exposed `agentGet`
+strategy); a gateway registry or idempotent launch record is preferable when
+available. Gateway identity + agentSessionId + pane coordinates are then checked
+against the gateway at each control. Process locator: host/boot + pid/startTime,
+and process-tree or confinement ownership when required. `agent_session` is
+correlation, not proof an old gateway command cannot affect a new resource.
+Mismatch/unknown refuses destructive control. If a crash occurs before the
+locator is persisted, reconciliation is possible only through this deterministic
+run-scoped identity; adapters without that primitive remain observe/park only.
+Unknown adapter permits metadata reads but no control.
 
-**Rule incarnation:** locator phải unique trong đời máy/server, và adapter
-kiểm lại trước mọi control destructive. Không cần field generic:
+## 5. RecoveryMaterialV1
 
-| Adapter | Locator | Incarnation |
-|---|---|---|
-| `fgos.herdr-pane@1` | `gateway, session, window, paneId, agentSessionId` | `agentSessionId` (herdr cấp, không tái dùng) |
-| `fgos.process@1` | `pid, pgid, startTime` | `pid + startTime` (từ `/proc`) |
-| `remote-job` (tương lai) | `provider, jobId, url` | `jobId` |
+Recovery material is optional to task correctness but necessary to claim partial
+work was preserved. It is not a required worker-written checkpoint.
 
-### 4.4 Owner và controller lock
+| Field | Meaning |
+|---|---|
+| contract, materialId | `run-recovery-material.v1`, digest of canonical manifest. |
+| assignmentId, sourceRunIds | Immutable task and admitted contributing attempts. |
+| level | baseline / recoverable-state / declared-checkpoint. |
+| base | Original input/baseline refs with digests. |
+| workspace | Resource identity and captured manifest ref; never an arbitrary worker-supplied path. |
+| artifacts | `{ref, sha256, originRunId?, attribution: observed or verified}` array. |
+| verification | `{resultRef, testedSnapshotDigest}` array; stale results remain labeled stale. |
+| notes | Optional untrusted note refs, timestamped; absence allowed. |
+| effects | Operation-specific reconciliation refs; no generic false=no-effect assumption. |
+| writerQuiescence | `{status: confirmed or unknown, coverage, proofRef?}`. |
+| capture | `{coverage: complete or partial, omissions[], capturedAt}`. |
+| checkpoint | Only for declared-checkpoint: `{adapter, version, payloadRef, inputDigest}`. |
 
-```ts
-interface RunHandleOwnerV1 { kind: 'dispatch-adapter' | 'supervisor' | 'operator-cli' | 'gateway'; id: string; runtime: 'node' | 'rust'; }
-interface ControllerLockV1 { holder: RunHandleOwnerV1; acquiredAt: string; expiresAt: string; purpose: 'drive' | 'terminate' | 'recover'; }
-```
+The operation recovery adapter implements `capture(inputs)` and
+`validateMaterial(material, currentInputs)`. The coding adapter captures tracked,
+staged and untracked permitted artifacts, file deletions/modes and baseline
+identity; a git diff alone is not a complete workspace manifest. Capture occurs
+after writer quiescence and under workspace ownership coordination. Unknown
+external writers or concurrent changes make the capture partial/invalid, never
+a consistent checkpoint. Private/ungranted paths and credentials are excluded;
+omissions are explicit. Large artifacts can remain content-addressed refs with
+retention pins rather than copied bytes.
 
-Lock chỉ cho control cần một chủ (drive, terminate, recover). Observer không
-cần lock. Default = lock file per Run theo pattern exclusive-create đã có trong
-repo (holder + expiry + stale-by-pid). Lock nội bộ chỉ bảo vệ control; effect
-protection thuộc operation adapter (Run contract §Three guarantees).
+Takeover passes an envelope `{assignmentRef, sourceRunIds, materialRef,
+workspaceGrantRef}` into the replacement invocation; it does not mutate Assignment.
+The replacement gets original objective/constraints, current verified facts and
+explicit uncertainty. It must inspect partial edits before continuing. The runtime
+holds the exclusive writable-resource grant across replacement; concurrency checks
+use workspace identity, not just Assignment identity. Different Assignments sharing
+a workspace are not currently serialized by a workspace owner. `workspaceGrantRef`
+is valid only when issued by a named workspace-grant repository, or by the
+Work-runner's existing worktree claim in that profile. Until that issuer and lock
+scope exist, shared writable takeover returns `workspace-authority-unavailable`
+and parks; read-only or isolated snapshots may proceed.
 
-### 4.5 Pause, diagnostic refs, lỗi
+Material is evidence input, not acceptance. Current-run output and inherited work
+are labeled separately. Missing capture permits baseline restart only when operation
+effect policy and workspace handling authorize it; never silently discard user
+edits. General external-effect protection is defined in the fallback contract.
 
-```ts
-interface RunHandlePauseV1 { reason: 'provider-limit' | 'awaiting-operator' | 'transport-backpressure' | 'unknown'; retryAfter?: string; message?: string; }
-interface DiagnosticRefV1 { kind: 'stdout-log' | 'stderr-log' | 'pane-snapshot' | 'process-info' | 'worker-result' | 'confinement-attestation'; path?: string; ref?: string; sha256?: string; capturedAt: string; }
-```
+## 6. Persistence And Supported Profile
 
-`diagnosticRefs` là artifact chẩn đoán, không thỏa evidence policy của
-RunResult; `worker-result` ref vẫn phải qua normalizer.
+Default: `runDir/run-handle.json` stores
+`{contract: run-handle-store.v1, revision, currentHandleId, handles[], commands[]}`.
+Retired handles stay in this small per-Run envelope, detached and not selectable
+as current; exact-ID reads still resolve them. New binding changes currentHandleId
+under CAS. Commands are append-preserved records with reconciled outcome; no
+independent control ledger/database. Run owns admission/delivery truth; the envelope
+is an operational projection repaired from Run and adapter facts.
 
-```ts
-type RunHandleErrorCode =
-  | 'run-handle-not-found' | 'run-handle-subject-mismatch' | 'run-handle-revision-conflict'
-  | 'run-handle-lease-conflict' | 'run-handle-incarnation-mismatch'
-  | 'run-handle-inspect-unsupported' | 'run-handle-control-unsupported'
-  | 'run-handle-active-close-refused' | 'run-handle-locator-invalid'
-  | 'run-handle-adapter-failed' | 'run-handle-version-unsupported';
-```
+Recovery manifests live under `runDir/recovery/<materialId>.json`, immutable
+with referenced snapshots pinned while any active attempt/transfer needs them.
+Retention compaction cannot delete active dependencies. These are local runtime
+artifacts, not committed Work truth. Corrupt authoritative state fails closed;
+missing diagnostic projection is repairable.
 
-Error có `code`, `message`, `handleId?`, `runId?`, `assignmentId?`,
-`recoverable: boolean`. Consumer rẽ theo `code`.
+RunHandle replaces `visibility.json` as binding authority for the new writer
+profile. During transition, legacy visibility is a one-way projection; no dual
+writer and no silent adoption of an unknown legacy live binding. Old schema-1 Runs
+remain on their legacy path. Existing `show` reads do not refresh or write files.
 
-## 5. Ports
+First adapter: herdr with explicit capability proof for launch discovery,
+incarnation and command reconciliation. Process/remote adapters implement the same
+ports later. Until supported, they return a named unsupported recovery outcome
+and remain on their declared legacy execution profile, not universal RunHandle
+guarantees. S2 cannot ship automatic writable takeover solely on pane-close proof.
 
-```ts
-interface RunHandleRepository {
-  put(handle: RunHandleV1, expectedRevision: number | null): RunHandleV1;   // CAS
-  get(handleId: string): RunHandleV1 | null;
-  list(filter: { runId?; assignmentId?; cwd?; execution?; adapter? }): RunHandleV1[];
-  acquireLock(handleId, holder, purpose, ttlMs): ControllerLockV1;       // atomic
-  releaseLock(handleId, holder): void;
-}
+Setup/doctor: local atomic publication/fsync support, handle/material directory
+writability, adapter capabilities, quiescence coverage and retained pending-command
+diagnostics. No new config precedence. All runtime paths are resolver-owned.
 
-interface RuntimeControlPort {
-  adapter: string;
-  validateLocator(locator): void;
-  inspect(locator): Promise<{ status: ObservationV1['adapterStatus']; incarnationOk: boolean; raw? }>;
-  sendInput(locator, input, opts: { idempotencyKey; signal }): Promise<{ delivery: 'sent' | 'unknown' }>;
-  snapshot(locator): Promise<DiagnosticRefV1[]>;
-  rename(locator, displayName): Promise<void>;
-  terminate(locator, policy: { graceMs; force }): Promise<{ outcome: 'stopped' | 'unknown' }>;
-}
-```
+## 7. Proof And Deferred Scope
 
-Control là typed request/result/error, async, có cancellation và idempotency
-key. Adapter khai `capabilities`; khai được không đồng nghĩa caller được phép —
-Guard quyết.
-
-**Guard (application service):**
-
-- `bind(run, locator, owner)` — ghi handle trước khi gửi prompt; fail → dispatch
-  refuse/degrade rõ, không spawn interactive run không có handle.
-- `inspect(handleId, { refresh })` — `refresh: false` là pure read (`show`),
-  không ghi. `refresh: true` gọi adapter, kiểm incarnation, ghi observation.
-- `deliver(handleId, input)` — cần lock `drive`; ghi `delivery` theo kết quả.
-- `terminate(handleId, { exactId, force })` — thứ tự: đọc RunResult/receipt →
-  nếu Run settled cho phép → nếu active/unknown yêu cầu exact id → paused
-  provider-limit refuse trừ force → kiểm revision + incarnation → snapshot →
-  terminate → ghi `execution: terminated` chỉ khi adapter xác nhận `stopped`.
-- `detach/reattach(handleId)` — đổi `attachment`, không đổi `execution`.
-
-## 6. Lifecycle
-
-Execution × attachment tách nhau; bảng dưới là transition execution:
-
-| From | To | Trigger |
-|---|---|---|
-| launching | running | adapter inspect thấy worker nhận việc |
-| running | paused | provider limit / operator pause |
-| paused | running | inspect sau retryAfter thấy tiến triển (retry-after hết chỉ cho phép inspect) |
-| running/paused | unknown | inspect fail hoặc absent chưa đủ ngưỡng ladder |
-| unknown | running | inspect thành công + incarnation khớp |
-| any | terminated | guarded terminate xác nhận `stopped`, hoặc ladder kết luận `died` |
-
-Cấm: handle → `settled`/`failed` (thuộc Run/RunResult); `paused → terminated`
-không có explicit intent; `unknown → terminated` chỉ vì hết retry-after.
-
-## 7. Thứ tự recovery
-
-Theo Run contract: (1) worker result/receipt trong runDir/outbox → normalize;
-(2) chưa có result → đọc handle, `inspect({refresh: true})`; (3) worker sống →
-attach/observe, không dispatch; (4) ladder kết luận died/lost và không có result
-→ classify, để Continuation Planner/Fallback quyết; (5) không có handle → ghi
-`run-handle-missing`, vẫn KHÔNG tự admit Run mới.
-
-## 8. Default implementation
-
-- **Adapter:** `fgos.herdr-pane@1` (herdr-spawn trong code-panel). `fgos.process@1`
-  cho `cli-spawn` là slice sau, cùng contract.
-- **Persistence:** một file `run-handle.json` trong `runDir` của Run. Index
-  by-run = runDir, by-assignment = assignment dir, by-locator = scan. Không
-  có lớp index riêng. Ghi atomic temp+rename theo chuẩn repo; không tạo file
-  rỗng rồi ghi sau (race P12).
-- **Lock:** lock file per Run, pattern exclusive-create đã có.
-- **Multiplicity:** contract cho nhiều handle per Run (`role`); default một
-  handle, replacement sau gateway restart = handle mới `role: replacement`,
-  handle cũ `attachment: detached`.
-- **Display name:** `<roleShort> <opShort> <coordShort> <asgnShort> <runShort>`,
-  ví dụ `RT op_107 c_8fa asgn_01wf run_02`. Canonical assignment/run path không
-  đổi; alias chỉ là convenience.
-
-Slices: R1 bind + label + read-only list/inspect; R2 close guard; R3 recovery
-integration (resume đọc handle, in-flight error in handle, timeout snapshot);
-R4 process adapter.
-
-Doctor/setup: R1 không thêm config key; doctor thêm read-only check: handle
-store writable, herdr adapter available khi có herdr executor, stale-handle
-summary. Thêm config/env/dir mới thì phải đăng ký `fgos setup`/`fgos doctor`.
-
-## 9. Deferred (contract đã chừa chỗ)
-
-- Distributed lease nhiều máy, renew bởi supervisor sống qua cái chết CLI.
-- Field `incarnation` generic cho container/remote-job.
-- Archive/retention của handle cũ; audit log mirror.
-- Web dashboard cho handle list và guarded close.
-- Security model cho remote locator.
-
-## 10. Con trỏ
-
-- [Run contract](../contracts/assignment-run-runresult.md) — phases, admission, ba guarantee.
-- [Runtime Model](runtime-model.md) — Assignment → Run → RunResult.
-- [Visibility And Herdr](visibility-and-herdr.md) — herdr là observability, không phải truth.
-- [Executor Fallback](executor-health-and-fallback.md) — ladder classification và fallback.
-- [Continuation Planner](coordination-continuation-recovery.md) — next action sau recovery.
-- [Agent Confinement Authority](../../../specs/confinement-authority.md) — enforcement quanh spawn; handle tham chiếu attestation, không thay thế.
+Primary proofs F-a..F-g and X01..X05/X10 are specified once in
+[the proof matrix](runtime-recovery-design.md#10-proof-matrix).
+Also exercise every state transition and cancellation before/after submission.
+Default needs no distributed lease, generic checkpoint framework, full worker
+memory snapshot, health store or dashboard. Future adapters must explicitly
+advertise checkpoint/remote-control support rather than accepting arbitrary blobs.

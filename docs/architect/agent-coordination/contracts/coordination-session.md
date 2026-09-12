@@ -929,6 +929,30 @@ disposition `targetRef`/`evidenceRefs` (the request boundary's charset was
 already stricter than the engine's own ref-shape acceptance before this
 door existed); this door does not widen or fix that pre-existing gap.
 
+## Proposed Runtime Recovery Extension
+
+Status: PROPOSED, not part of the implemented schema-1 contract above.
+The detailed schema-2 design is owned by
+[Coordination Recovery Planning And Session Continuation](../architecture/coordination-continuation-recovery.md).
+It proposes explicit retry destination identity for strict result fencing,
+parent-owned continuation prepared/committed/aborted events, child originTransfer
+execution gating, scoped import grants and optional external work-unit correlation.
+The [Run amendment](assignment-run-runresult.md#proposed-runtime-recovery-amendment)
+defines exact admission/result identity and lock ordering.
+
+Existing terminal-status, authorization, taskKey, recheck and quorum semantics
+remain the baseline. Transfer bookkeeping never makes a parent completed or
+reopens a terminal status; imported artifacts never count as child quorum.
+No worker/CLI boolean grants cross-session context authority. New state requires
+an explicitly supported schema version; old ledgers/readers are not silently
+reinterpreted. Current event-order supersession checks do not yet prove the exact
+Run fencing required by this proposal. Shared proof and rollout are in
+[Runtime Recovery Design](../architecture/runtime-recovery-design.md).
+
+A fresh driver identity is not inferred from a supplied `writerId`; it must be
+established through a future `driver-replaced` door, which records the
+replacement identity while preserving the original driver's provenance.
+
 ## Recovery Rule
 
 A resumed session must not duplicate a completed Assignment. This requires

@@ -1,0 +1,84 @@
+{
+  "coordinationId": "architecture-advisory-panel--runtime-recovery",
+  "kind": "declared-protocol",
+  "definitionRef": {
+    "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+    "version": "1.0.0"
+  },
+  "objective": "Independent architecture-advisory review of fgOS's runtime-recovery detailed design package (S0-P08), per plans/260911-2305-runtime-recovery/design-panel-prompt.md: simplicity, hexagonal/SRP shape, phase readiness, and a red-team, without reopening the 15 locked baseline decisions absent direct contradicting evidence.",
+  "status": "running",
+  "closed": false,
+  "closeAttempted": true,
+  "closeRefusalReason": "closeSessionByQuorum: session \"architecture-advisory-panel--runtime-recovery\" is missing required actor(s) [lead-advisor-actor, context-investigator-actor, system-shaper-actor, alternative-shaper-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+  "quorum": {
+    "requiredActorIds": [
+      "lead-advisor-actor",
+      "context-investigator-actor",
+      "system-shaper-actor",
+      "alternative-shaper-actor",
+      "constraint-advocate-actor",
+      "architecture-critic-actor",
+      "synthesizer-actor",
+      "red-team-actor"
+    ],
+    "completed": [],
+    "failed": [
+      {
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_runtime_recovery_panel_coordinator_op_001",
+        "runId": "run_asgn_runtime_recovery_panel_coordinator_op_001_01"
+      },
+      {
+        "actorId": "context-investigator-actor",
+        "assignmentId": "asgn_runtime_recovery_panel_coordinator_op_002",
+        "runId": "run_asgn_runtime_recovery_panel_coordinator_op_002_01"
+      }
+    ],
+    "late": [],
+    "missing": [
+      {
+        "actorId": "system-shaper-actor"
+      },
+      {
+        "actorId": "alternative-shaper-actor"
+      },
+      {
+        "actorId": "constraint-advocate-actor"
+      },
+      {
+        "actorId": "architecture-critic-actor"
+      },
+      {
+        "actorId": "synthesizer-actor"
+      },
+      {
+        "actorId": "red-team-actor"
+      }
+    ],
+    "replaced": []
+  },
+  "steps": [
+    {
+      "as": "interpret",
+      "type": "operation",
+      "actorId": "lead-advisor-actor",
+      "assignmentId": "asgn_runtime_recovery_panel_coordinator_op_001",
+      "status": "failed",
+      "confidence": "failed",
+      "executor": "claude-bwrap",
+      "provider": "claude",
+      "tier": "critical"
+    },
+    {
+      "as": "investigate",
+      "type": "operation",
+      "actorId": "context-investigator-actor",
+      "assignmentId": "asgn_runtime_recovery_panel_coordinator_op_002",
+      "status": "failed",
+      "confidence": "failed",
+      "executor": "claude-bwrap",
+      "provider": "claude",
+      "tier": "standard"
+    }
+  ]
+}

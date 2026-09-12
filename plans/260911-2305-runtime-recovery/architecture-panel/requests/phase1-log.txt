@@ -1,0 +1,19 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=advise executor=claude-bwrap via=cli-spawn provider=claude model=opus tier=critical
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=advise executor=claude-bwrap via=cli-spawn provider=claude model=sonnet tier=standard
+PHASE1_DONE
+{
+  "coordinationId": "architecture-advisory-panel--runtime-recovery",
+  "status": "running",
+  "steps": [
+    {
+      "as": "interpret",
+      "status": "failed"
+    },
+    {
+      "as": "investigate",
+      "status": "failed"
+    }
+  ]
+}

@@ -29,17 +29,22 @@ directory. Architecture refines that direction into accepted system boundaries.
    and false-success boundaries.
 8. [Visibility And Herdr](visibility-and-herdr.md) defines the observability
    boundary.
-9. [RunHandle](run-handle.md) proposes the runtime-layer handle for locating,
-   observing, and guarding live Runs: three ports (repository, runtime
-   control, guard), orthogonal execution/attachment/observation state, and
-   adapter-owned locator incarnation — never core coordination truth.
+9. [RunHandle](run-handle.md) proposes the runtime-layer handle and recoverable
+   work material: repository/runtime ports, a guard service, independent
+   execution/attachment/observation facts, pending-command reconciliation and
+   adapter-owned incarnation. In-cell takeover needs no worker checkpoint.
 10. [Coordination Continuation And Recovery](coordination-continuation-recovery.md)
-    proposes a pure planner that turns a session snapshot into one typed
-    continuation action; plan is advice, the engine re-validates at apply.
+    proposes evaluator-backed snapshots, a pure typed planner, idempotent apply
+    and protocol-declared parent/child transfer through existing engine doors.
 11. [Executor Fallback Activation And Health](executor-health-and-fallback.md)
     proposes activating the reserved `fallbackExecutors` on signal-ladder
     outcomes through the existing compiler; health observation store is the
     future of the same contract.
+12. [Runtime Recovery And Work Continuity](runtime-recovery-design.md) is the
+    proposed detailed-design entry point for documents 9-11: current identity
+    mapping, ownership, local concurrency, long-horizon scope, rollout and the
+    shared bug/proof matrix. It is not a fourth runtime component. Read it first
+    when implementing or reviewing these proposals.
 
 Documents 9–11 share one admission authority: the Run contract's
 [Run Phases And Admission](../contracts/assignment-run-runresult.md#run-phases-and-admission).
@@ -67,8 +72,12 @@ Shared by documents 9–11; each applies them without restating them.
   the other reads; a reader that does not understand a `contract` version
   refuses explicitly.
 - Default implementations are minimal and reuse repository primitives;
-  contracts keep room (optional fields, ports) for distributed lease, generic
-  incarnation, health scoring, and effect ledgers without renaming.
+  unsupported future capabilities refuse explicitly; optional fields alone do
+  not provide distributed leases, generic checkpoints or effect guarantees.
+- Recoverable work does not require a worker-authored checkpoint. Deliberate
+  protocol handoff and arbitrary crash takeover have different preconditions.
+- Cell/session correlation belongs to the consuming track; neither replacing a
+  worker nor opening a child session constitutes cell acceptance.
 
 CoordinationSession's identity/persistence boundary and the shared
 FlowDefinition graph/operation/policy IR are accepted per

@@ -1,0 +1,55 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Phase 6 (Debate Claims): critique the three shaped candidates together, and the constraint advocate's second pass against the finished candidates.",
+  "writerId": "runtime-recovery-panel-coordinator",
+  "coordinationId": "architecture-advisory-panel--runtime-recovery",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap" },
+    { "id": "context-investigator-actor", "executor": "claude-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "critical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "nodeId": "phase-critique",
+      "authorizationId": "auth-critique-1",
+      "invocationKey": "invoke-critique-1",
+      "reason": "Driver authorizes Phase 6 critique now that all three Phase 5 shaped candidates are linked and post-shaping-open is real."
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/architecture-critic.md and follow it exactly: attack the three candidates together, check the specific contested claims listed, and evaluate falsification criteria for real occurability.",
+      "expectedOutputs": ["agent-report.md: numbered attacks with target/claim/decision-impact, attacks that failed, the shared unexamined assumption finding"]
+    },
+    {
+      "type": "authorize",
+      "as": "authorizeAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "nodeId": "phase-critique",
+      "authorizationId": "auth-assess-1",
+      "invocationKey": "invoke-assess-1",
+      "reason": "Driver authorizes the constraint advocate's second pass against the finished shaped candidates."
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Read /home/vantt/projects/forgentX/plans/260911-2305-runtime-recovery/architecture-panel/prompts/constraint-advocate-phase6.md and follow it exactly: rank migration/operational risk per candidate, plus any shared cross-candidate risk.",
+      "expectedOutputs": ["agent-report.md: ranked findings organized by candidate, plus a cross-candidate shared-risk finding if warranted"]
+    }
+  ]
+}

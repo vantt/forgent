@@ -87,6 +87,15 @@ cancelled.
 
 ## Stability Direction
 
+Proposed successor: [RunHandle And Recovery Material](run-handle.md), under
+[Runtime Recovery Design](runtime-recovery-design.md), replaces the binding
+authority with a versioned handle store for new Runs. The existing visibility
+file remains the legacy profile or a one-way compatibility projection; the two
+must not become independent writers. The proposal requires explicit proof of
+worker-tree termination or revoked write access before writable takeover:
+closing a pane alone still does not prove that its descendants stopped.
+This successor is not implemented by the current visibility module.
+
 Visibility adapters should consume canonical Run/RunResult state where possible.
 Interactive transport remains useful, but correctness must survive detached,
 headless, retried, or partially failed executions.

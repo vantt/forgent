@@ -1,0 +1,366 @@
+{
+  "contract": "runtime-recovery-code-panel-cells.v1",
+  "plan": "plans/260911-2305-runtime-recovery/plan.md",
+  "policy": {
+    "executor": "fgos-code-panel",
+    "oneCellPerPanel": true,
+    "dispatchStatus": "design-ready-human-hold-cli-and-herdr",
+    "requires": [
+      "architecture-decision-lock",
+      "phase-detailed-design",
+      "phase-design-review-and-red-team"
+    ],
+    "parallelRequiresDisjointLeases": true,
+    "mergeAuthority": "lead-outside-session",
+    "proofRequired": [
+      "focused-tests",
+      "reviewer",
+      "red-team"
+    ]
+  },
+  "cells": [
+    {
+      "id": "P00",
+      "wave": 0,
+      "dependsOn": [],
+      "lease": [
+        "plans/260911-2305-runtime-recovery/phase-00-freeze-existing-behavior.md"
+      ],
+      "testLease": [
+        "test/runner/**"
+      ],
+      "mode": "read-only-baseline",
+      "objective": "Freeze current retry, Herdr, lock, replay and BL1 behavior without source changes.",
+      "exit": [
+        "baseline-report",
+        "focused-tests-green",
+        "known-changes-labeled"
+      ]
+    },
+    {
+      "id": "P01",
+      "wave": 1,
+      "dependsOn": [
+        "P00"
+      ],
+      "status": "design-approved",
+      "lease": [
+        "src/runner/dispatch/assignment-runner.mjs",
+        "src/runner/dispatch/run-lock.mjs",
+        "src/runner/coordination/store.mjs",
+        "src/runner/coordination/schema.mjs",
+        "src/runner/coordination/replay.mjs",
+        "src/runner/coordination/session-engine.mjs"
+      ],
+      "testLease": [
+        "test/runner/assignment-dispatch.test.mjs",
+        "test/runner/main-checkout-lock.test.mjs",
+        "test/runner/coordination-recovery-and-quorum.test.mjs"
+      ],
+      "objective": "Implement Assignment-owned Run admission, schema-2 exact retry declaration and separate per-Run control epoch/token fencing while preserving schema-1 callers.",
+      "exit": [
+        "single concurrent admission winner",
+        "declared retry resumes exact nextRunId",
+        "stale control token refused",
+        "two acquisitions of one Run get distinct epochs",
+        "live/dead lock distinction"
+      ]
+    },
+    {
+      "id": "P04",
+      "wave": 1,
+      "dependsOn": [
+        "P00"
+      ],
+      "status": "design-approved",
+      "lease": [
+        "src/runner/coordination/read-evaluators.mjs"
+      ],
+      "testLease": [
+        "test/runner/coordination-read-evaluator.test.mjs"
+      ],
+      "objective": "Define and test pure legal-next, authorization, visibility and completion evaluators without editing write doors; P05 owns integration after P01.",
+      "exit": [
+        "pure deterministic evaluator",
+        "no state mutation or adapter import",
+        "schema-1 fixture parity"
+      ]
+    },
+    {
+      "id": "P02L",
+      "wave": 2,
+      "dependsOn": [
+        "P01"
+      ],
+      "status": "design-ready-human-hold",
+      "contract": "plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-local-contract.md",
+      "lease": [
+        "src/runner/dispatch/assignment-runner.mjs",
+        "src/runner/dispatch/cli.mjs",
+        "src/runner/dispatch/transport.mjs",
+        "src/runner/dispatch/visibility-session.mjs",
+        "src/runner/dispatch/confinement/request.mjs",
+        "src/runner/dispatch/confinement/authority.mjs",
+        "src/runner/dispatch/confinement/attestation-store.mjs",
+        "src/runner/dispatch/confinement/resources.mjs",
+        "src/runner/dispatch/confinement/drivers/bwrap.mjs",
+        "src/runner/dispatch/cli-spawn-supervisor.mjs"
+      ],
+      "testLease": [
+        "test/runner/dispatch.test.mjs",
+        "test/runner/dispatch-production-call-sites.test.mjs",
+        "test/runner/dispatch-confinement-authority.test.mjs",
+        "test/runner/dispatch-confinement-backend-p03.test.mjs",
+        "test/runner/assignment-runresult.test.mjs",
+        "test/runner/cli-spawn-reconciliation.test.mjs"
+      ],
+      "objective": "Make Assignment-owned default cli-spawn crash-observable: one fresh supervisor launch, assignmentLaunchContext-preserved confinement envelope, protected confinement envelope/receipt, durable protected stdout/stderr capture, evaluator baseline, recoverable confinement finalization, and pending resume that reconciles or parks without duplicate spawn.",
+      "exit": [
+        "legacy ad-hoc cli-spawn parity",
+        "fresh supervisor submits once",
+        "protected capture and receipt outside worker write grant",
+        "pre-launch evaluator baseline drives recovered collection",
+        "parent crash preserves binding and protected capture",
+        "pre-binding ambiguity parks",
+        "stale PID/start-time/boot refuses control",
+        "distinct worker-PGID timeout parity",
+        "typed timeout/idle/maxBuffer receipt parity",
+        "confinement cleanup/finalization is recoverable from dispatch/resource/attestation identity",
+        "supervisor receipt cannot settle without current control token",
+        "recovered destructive cancel and shared-cwd takeover remain typed unsupported",
+        "crash after command outcome before Run settlement resumes idempotently",
+        "live onChunk failure/disconnect cannot block durable receipt",
+        "assignmentLaunchContext is validated and preserved through confinement request",
+        "submission-refused resumes failed settlement without binding or receipt",
+        "finalization recovery handles already-absent-after-owned-delete safely"
+      ],
+      "sharedContract": "plans/260911-2305-runtime-recovery/phase-designs/confinement-adapter-contract.md"
+    },
+    {
+      "id": "P02H",
+      "wave": 3,
+      "dependsOn": [
+        "P01",
+        "P02L"
+      ],
+      "status": "architecture-ready-worker-command-seam-required-human-hold",
+      "lease": [
+        "src/runner/dispatch/herdr-round.mjs",
+        "src/runner/dispatch/transport.mjs",
+        "src/runner/dispatch/herdr-agent.mjs",
+        "src/runner/dispatch/visibility-session.mjs",
+        "src/runner/dispatch/confinement/authority.mjs",
+        "src/runner/dispatch/confinement/request.mjs"
+      ],
+      "testLease": [
+        "test/runner/herdr-spawn-adapter.test.mjs",
+        "test/runner/herdr-reconciliation.test.mjs",
+        "test/runner/dispatch-confinement-authority.test.mjs",
+        "test/runner/dispatch-confinement-p05.test.mjs",
+        "test/runner/dispatch-confinement-backend-p03.test.mjs"
+      ],
+      "objective": "Make Assignment-owned herdr-spawn use the Confinement Authority-prepared worker command inside Herdr by adding/proving the arbitrary worker-command seam, then observe/reconcile/park by durable Run identity and adapter-proven resource incarnation without treating Herdr status as Run truth.",
+      "exit": [
+        "fresh Herdr launch submits once",
+        "Herdr worker-command seam starts exact Authority-prepared command including bwrap argv when required",
+        "worker-command suffix/env digest binds to prepared invocation and adapter receipt",
+        "Confinement Authority attestation can be enforced for herdr-spawn under local-bwrap-v1 support matrix",
+        "completion uses outbox result plus receipt, never Herdr status alone",
+        "same conversation new process parks",
+        "crash before binding never duplicates",
+        "deterministic-name absence parks without absent-proven",
+        "no resurrection",
+        "F-b observe",
+        "F-f one submit",
+        "Authority no longer hard-refuses required herdr-spawn when worker-command seam is present",
+        "legacy provider-kind-only Herdr path cannot claim enforced bwrap"
+      ],
+      "contract": "plans/260911-2305-runtime-recovery/phase-designs/launch-reconciliation.md",
+      "sharedContract": "plans/260911-2305-runtime-recovery/phase-designs/confinement-adapter-contract.md"
+    },
+    {
+      "id": "P03",
+      "wave": 4,
+      "dependsOn": [
+        "P01",
+        "P02L"
+      ],
+      "status": "ready-pre-delivery-only",
+      "lease": [
+        "src/runner/dispatch/recovery.mjs",
+        "src/runner/dispatch/liveness.mjs",
+        "src/runner/dispatch/assignment-policy.mjs",
+        "src/runner/dispatch/resolve.mjs",
+        "src/runner/definitions/schema.mjs",
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml"
+      ],
+      "testLease": [
+        "test/runner/dispatch-recovery.test.mjs",
+        "test/runner/dispatch-effect-guarantee.test.mjs"
+      ],
+      "objective": "Implement governed pre-delivery fallback and explicit repeatMode claims; post-delivery repeat remains parked until an adapter proves filtered provider-only confinement.",
+      "exit": [
+        "pre-delivery fallback",
+        "network allow parks post-delivery",
+        "undeclared sink parks",
+        "filtered unsupported parks",
+        "compiler provenance preserved"
+      ]
+    },
+    {
+      "id": "P05",
+      "wave": 4,
+      "dependsOn": [
+        "P01",
+        "P02L",
+        "P04"
+      ],
+      "status": "design-approved",
+      "lease": [
+        "bin/fgos.mjs",
+        "src/verbs/dispatch/show-run.mjs",
+        "src/verbs/dispatch/recover.mjs",
+        "src/runner/dispatch/recovery-planner.mjs",
+        "src/cli/command-registry.mjs"
+      ],
+      "testLease": [
+        "test/verbs/dispatch-observe.test.mjs",
+        "test/verbs/dispatch-recovery.test.mjs"
+      ],
+      "objective": "Add a deterministic standalone-Run recovery planner and the public dispatch recover door; recover executes one selected action and never becomes coordination-session authority.",
+      "exit": [
+        "pure planner",
+        "expected snapshot and control epoch required",
+        "single-use action key",
+        "stale-plan refusal",
+        "no session event from dispatch door"
+      ]
+    },
+    {
+      "id": "P05S",
+      "wave": 5,
+      "dependsOn": [
+        "P01",
+        "P04",
+        "P05"
+      ],
+      "status": "design-approved",
+      "lease": [
+        "bin/fgos.mjs",
+        "src/verbs/coordination/recover.mjs",
+        "src/runner/coordination/store.mjs",
+        "src/runner/coordination/schema.mjs",
+        "src/runner/coordination/replay.mjs",
+        "src/runner/coordination/session-engine.mjs",
+        "src/runner/coordination/recovery-planner.mjs",
+        "src/cli/command-registry.mjs"
+      ],
+      "testLease": [
+        "test/verbs/coordination-recovery.test.mjs",
+        "test/runner/coordination-recovery-and-quorum.test.mjs"
+      ],
+      "objective": "Add the session-owned recovery read/apply door through existing CoordinationSession authority using the shared evaluators and explicit stale-plan expectations.",
+      "exit": [
+        "write doors reuse evaluator",
+        "C-f exact result collection",
+        "current driver enforced",
+        "single-use action key",
+        "no implicit close",
+        "X11 hazard remains visible"
+      ]
+    },
+    {
+      "id": "P06",
+      "wave": 6,
+      "dependsOn": [
+        "P02L",
+        "P02H",
+        "P05"
+      ],
+      "status": "capability-blocked-b02-b03",
+      "lease": [
+        "src/runner/dispatch/confinement/authority.mjs",
+        "src/runner/dispatch/recovery-material.mjs",
+        "src/runner/dispatch/workspace-grant.mjs",
+        "src/runner/dispatch/run-result-evaluator.mjs"
+      ],
+      "testLease": [
+        "test/runner/recovery-material.test.mjs",
+        "test/runner/workspace-grant.test.mjs"
+      ],
+      "objective": "Implement optional same-workspace writable profile with explicit grant, quiescence and inherited-lineage evaluator; default remains park.",
+      "exit": [
+        "workspace collision refusal",
+        "X04",
+        "X05",
+        "unknown writer parks",
+        "no discarded edits"
+      ]
+    },
+    {
+      "id": "P07",
+      "wave": 6,
+      "dependsOn": [
+        "P01",
+        "P03",
+        "P05S"
+      ],
+      "status": "capability-blocked-engine-backlog",
+      "externalDependsOn": [
+        "tsk-5qj",
+        "tsk-40j",
+        "tsk-296",
+        "tsk-1zu"
+      ],
+      "lease": [
+        "src/runner/coordination/schema.mjs",
+        "src/runner/coordination/store.mjs",
+        "src/runner/coordination/replay.mjs",
+        "src/runner/coordination/session-engine.mjs",
+        "src/runner/definitions/schema.mjs"
+      ],
+      "testLease": [
+        "test/runner/coordination-continuation.test.mjs",
+        "test/runner/coordination-replay.test.mjs"
+      ],
+      "objective": "Implement one protocol-declared prepared/gated-child/committed transfer with terminal-parent refusal and driver-replaced anti-replay door.",
+      "exit": [
+        "B01",
+        "X08",
+        "C-f",
+        "C-g",
+        "fresh authority",
+        "single-use grant",
+        "replay parity"
+      ]
+    },
+    {
+      "id": "P08",
+      "wave": 7,
+      "dependsOn": [
+        "P00",
+        "P01",
+        "P02L",
+        "P03",
+        "P04",
+        "P05",
+        "P05S"
+      ],
+      "status": "core-closeout",
+      "lease": [
+        "docs/specs/runner.md",
+        "src/setup/checks.mjs",
+        "test/runner/**",
+        "test/verbs/**"
+      ],
+      "objective": "Close the conservative Node core profile; P06/P07 remain disabled unless their own proof and closeout pass later.",
+      "exit": [
+        "npm test green",
+        "capability matrix matches proofs",
+        "unsupported paths typed",
+        "docs rendered",
+        "no legacy regression"
+      ]
+    }
+  ]
+}
