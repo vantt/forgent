@@ -25,6 +25,8 @@ import { buildAssignment, claimAssignmentId } from '../dispatch/assignment.mjs';
 import {
   CoordinationError,
   SCHEMA_VERSION,
+  SCHEMA_VERSION_2,
+  SUPPORTED_SCHEMA_VERSIONS,
   STATUS_VALUES,
   validateManifest,
   validateEventPayload,
@@ -33,7 +35,22 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
+
+function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
+  if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
+    const sessionGenerationsDir = path.join(sessionDir, 'generations');
+    publishNextGeneration(sessionGenerationsDir, ({ nextEpoch }) => ({
+      record: {
+        epoch: nextEpoch,
+        type: event.type,
+        at: new Date().toISOString(),
+      },
+    }));
+  }
+  return appendEventLocked(eventsPath, event, sessionDir);
+}
 
 // Same retry ceiling as mission-lite.mjs's own MAX_ASSIGNMENT_CLAIM_ATTEMPTS
 // / assignment.mjs's MAX_ASSIGNMENT_ID_CLAIM_ATTEMPTS -- a local constant,
@@ -190,13 +207,23 @@ function writeManifestRaw(manifestPath, manifest) {
  *   execution"); immutable once the session opens. `null` (default) means no
  *   partial close is ever legal -- default completion requires every
  *   required SessionActor.
+ * @param {string} [params.schemaVersion] Defaults to `SCHEMA_VERSION` ('1').
+ *   Pass `SCHEMA_VERSION_2` to opt into the stricter run-admission-and-
+ *   fencing retry contract (`recordRunRetry`'s schema-2 branch). Any other
+ *   value is refused -- never silently coerced to the default.
  * @param {object} [opts] Workspace options ({ cwd, repoRoot })
  * @returns {Readonly<object>} The stored manifest
  */
 export function openSession(
-  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null },
+  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null, schemaVersion = SCHEMA_VERSION },
   opts = {},
 ) {
+  if (!SUPPORTED_SCHEMA_VERSIONS.has(schemaVersion)) {
+    throw new CoordinationError(
+      'validation',
+      `openSession: schemaVersion "${schemaVersion}" is not one of the supported versions (${[...SUPPORTED_SCHEMA_VERSIONS].join(' | ')})`,
+    );
+  }
   const { sessionsDir } = resolveCoordinationPaths(opts);
   fs.mkdirSync(sessionsDir, { recursive: true });
 
@@ -247,7 +274,7 @@ export function openSession(
     : undefined;
 
   const manifest = {
-    schemaVersion: SCHEMA_VERSION,
+    schemaVersion,
     coordinationId: id,
     objective,
     status: 'active',
@@ -270,7 +297,7 @@ export function openSession(
   const openedPayload = { coordinationId: id, provenanceRoot };
   validateEventPayload('session-opened', openedPayload);
   withEventsLock(eventsPath, () => {
-    appendEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, sessionDir, manifest);
     if (resolvedActors) {
       for (const actor of resolvedActors) {
         const payload = {
@@ -280,7 +307,7 @@ export function openSession(
           ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
         };
         validateEventPayload('actor-bound', payload);
-        appendEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir);
+        appendSessionEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir, manifest);
       }
     }
   });
@@ -336,7 +363,7 @@ export function bindActor(coordinationId, actor, opts = {}) {
         );
       }
     }
-    appendEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir, manifest);
     manifest.actors = [...existingActors, { id: actor.id, role: actor.role, ...(actor.persona !== undefined ? { persona: actor.persona } : {}), ...(actor.policy !== undefined ? { policy: actor.policy } : {}) }];
     validateManifest(manifest);
     writeManifestRaw(manifestPath, manifest);
@@ -393,7 +420,7 @@ function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, se
   if (!alreadyAppended) {
     const eventPayload = { assignmentId, ...(actorId ? { actorId } : {}), ...(authorizationProvenance ?? {}) };
     validateEventPayload('assignment-created', eventPayload);
-    appendEventLocked(eventsPath, { type: 'assignment-created', payload: eventPayload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'assignment-created', payload: eventPayload }, sessionDir, manifest);
   }
 
   manifest.assignmentRefs = [...manifest.assignmentRefs, assignmentId];
@@ -1034,7 +1061,7 @@ export function authorizeOperation(
       }
     }
 
-    appendEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1149,7 +1176,7 @@ export function recordSpecialistAuthorization(
       }
     }
 
-    appendEventLocked(eventsPath, { type: 'specialist-authorized', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'specialist-authorized', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1327,7 +1354,7 @@ export function recordDriverDisposition(coordinationId, { targetRef, disposition
     );
     if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
 
-    appendEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1519,7 +1546,7 @@ export function recordHumanTurn(
       );
     }
 
-    appendEventLocked(eventsPath, { type: 'human-turn-recorded', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'human-turn-recorded', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1716,7 +1743,7 @@ export function recordContributionLink(
       asCoordinationError(err, `recordContributionLink: session "${coordinationId}" contribution "${contributionId}"`);
     }
 
-    appendEventLocked(eventsPath, { type: 'deliberation-contribution-linked', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'deliberation-contribution-linked', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1850,7 +1877,7 @@ export function recordAggregationValidation(
       );
     }
 
-    appendEventLocked(eventsPath, { type: 'aggregation-validated', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'aggregation-validated', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
   });
 }
@@ -1985,7 +2012,7 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
             `linkResult: supersede requested for assignment "${assignmentId}" but no "run-retried" event authorizes replacing runId "${existingLink.payload.runId}" with "${runId}" -- retries must be declared via recordRunRetry before their result can supersede the prior link`,
           );
         }
-        appendEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir);
+        appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
         return;
       }
       throw new CoordinationError(
@@ -1993,7 +2020,7 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
         `assignment "${assignmentId}" in session "${coordinationId}" already has a result linked (runId "${existingLink.payload.runId}") -- refusing to link a second, DIFFERENT run ("${runId}")`,
       );
     }
-    appendEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
   });
 }
 
@@ -2019,14 +2046,28 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
  * `readEvents()` it reasons from -- the same cross-process TOCTOU closure
  * `createSessionAssignment`'s own opt-in caps use.
  *
+ * Schema-2 sessions (`manifest.schemaVersion === SCHEMA_VERSION_2`) take a
+ * STRICTER path instead (`recordSchema2RunRetry`, below): the caller must
+ * supply `retryId`/`previousRunId`/`admissionPayloadDigest`/`authorityRef`,
+ * pending-ness is tracked by an explicit append-only declaration ledger
+ * (run-lock.mjs's shared generation primitive under
+ * `sessionDir/retries/<assignmentId>/`) rather than inferred from
+ * `result-linked` count, and the returned `nextRunId`/`nextAttempt` are
+ * exact -- a crash-resumed call always gets back the SAME identity, never a
+ * recomputed guess. Schema-1 sessions keep the EXACT behavior below,
+ * unchanged.
+ *
  * @param {object} params
  * @param {string} params.assignmentId
  * @param {string} params.reason Non-empty; retry must record why.
- * @param {string} [params.previousRunId] The runId being superseded, if any.
+ * @param {string} [params.previousRunId] The runId being superseded, if any (required for schema-2).
  * @param {number} [params.maxRetries] Declared retry policy ceiling; omitted = unbounded (caller's own responsibility -- `session-engine.mjs`'s `retrySessionTask` always passes one).
- * @returns {{attempt: number, resumedDeclaration: boolean}}
+ * @param {string} [params.retryId] Schema-2 only: caller idempotency key for this declaration.
+ * @param {string} [params.admissionPayloadDigest] Schema-2 only: required.
+ * @param {string} [params.authorityRef] Schema-2 only: required.
+ * @returns {{attempt: number, resumedDeclaration: boolean, nextRunId?: string, retryId?: string}}
  */
-export function recordRunRetry(coordinationId, { assignmentId, reason, previousRunId, maxRetries }, opts = {}) {
+export function recordRunRetry(coordinationId, { assignmentId, reason, previousRunId, maxRetries, retryId, admissionPayloadDigest, authorityRef }, opts = {}) {
   const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
 
   return withEventsLock(eventsPath, () => {
@@ -2037,6 +2078,21 @@ export function recordRunRetry(coordinationId, { assignmentId, reason, previousR
     }
     if (!manifest.assignmentRefs.includes(assignmentId)) {
       throw new CoordinationError('validation', `recordRunRetry: assignment "${assignmentId}" is not a member of session "${coordinationId}"`);
+    }
+
+    if (manifest.schemaVersion === SCHEMA_VERSION_2) {
+      return recordSchema2RunRetry({
+        coordinationId,
+        sessionDir,
+        eventsPath,
+        assignmentId,
+        reason,
+        previousRunId,
+        maxRetries,
+        retryId,
+        admissionPayloadDigest,
+        authorityRef,
+      });
     }
 
     const freshEvents = readEvents(eventsPath);
@@ -2064,9 +2120,212 @@ export function recordRunRetry(coordinationId, { assignmentId, reason, previousR
 
     const payload = { assignmentId, reason, ...(previousRunId !== undefined ? { previousRunId } : {}) };
     validateEventPayload('run-retried', payload);
-    appendEventLocked(eventsPath, { type: 'run-retried', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'run-retried', payload }, sessionDir, manifest);
     return { attempt: priorRetries + 1, resumedDeclaration: false };
   });
+}
+
+// Directory holding one schema-2 assignment's retry declaration ledger:
+// `generations/` (run-lock.mjs's shared append-only primitive -- one
+// immutable record per declared retry, never leapfrogged, never deleted)
+// plus `markers/` (one-shot fulfilled/aborted markers, keyed by retryId --
+// never inferred from `result-linked` count).
+function schema2RetryDeclarationDirs(sessionDir, assignmentId) {
+  const base = path.join(sessionDir, 'retries', assignmentId);
+  return { generationsDir: path.join(base, 'generations'), markersDir: path.join(base, 'markers') };
+}
+
+function isRetryDeclarationSettled(markersDir, retryIdForGeneration) {
+  return (
+    readMarker(path.join(markersDir, `${retryIdForGeneration}.fulfilled.json`)) !== null ||
+    readMarker(path.join(markersDir, `${retryIdForGeneration}.aborted.json`)) !== null
+  );
+}
+
+/**
+ * Schema-2 retry declaration (called only from `recordRunRetry`, under its
+ * already-held events lock and already-verified active/membership checks).
+ * The declaration ledger is the durable fact; the `run-retried` event is
+ * its session-log projection, self-healingly appended (or re-appended on a
+ * resumed call) with the exact same identity every time -- never a second,
+ * independently-decided identity for the same `retryId`.
+ */
+function recordSchema2RunRetry({ coordinationId, sessionDir, eventsPath, assignmentId, reason, previousRunId, maxRetries, retryId, admissionPayloadDigest, authorityRef }) {
+  if (!isNonEmptyString(retryId)) {
+    throw new CoordinationError('validation', `recordRunRetry: schema-2 session "${coordinationId}" requires a non-empty retryId for assignment "${assignmentId}"`);
+  }
+  // previousRunId is OPTIONAL, same as schema-1: undefined means no prior
+  // Run has ever been admitted for this assignment yet (a `retrySessionTask`
+  // call that lands before any dispatch at all), which fences correctly as
+  // an initial admission (admitRunAttempt's own predecessor check treats a
+  // null predecessor against a null current Run as a match). A DEFINED
+  // value, when present, must still be a real non-empty string.
+  if (previousRunId !== undefined && !isNonEmptyString(previousRunId)) {
+    throw new CoordinationError('validation', `recordRunRetry: schema-2 session "${coordinationId}" previousRunId must be a non-empty string when provided, for assignment "${assignmentId}"`);
+  }
+  if (!isNonEmptyString(admissionPayloadDigest)) {
+    throw new CoordinationError('validation', `recordRunRetry: schema-2 session "${coordinationId}" requires admissionPayloadDigest for assignment "${assignmentId}"`);
+  }
+  if (!isNonEmptyString(authorityRef)) {
+    throw new CoordinationError('validation', `recordRunRetry: schema-2 session "${coordinationId}" requires authorityRef for assignment "${assignmentId}"`);
+  }
+
+  const { generationsDir, markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
+
+  const generation = publishNextGeneration(generationsDir, ({ current, nextEpoch, generations }) => {
+    // Idempotency: the SAME retryId reused returns the SAME declared
+    // identity, settled or not -- never a second allocation.
+    const priorForRetryId = generations.find((g) => g.record.retryId === retryId);
+    if (priorForRetryId) {
+      if (readMarker(path.join(markersDir, `${retryId}.aborted.json`)) !== null) {
+        return { stop: true, status: 'aborted-retry', retryId };
+      }
+      return { stop: true, status: 'duplicate', record: priorForRetryId.record };
+    }
+
+    // A pending (unsettled) declaration can never be leapfrogged. Settled-
+    // ness is read from an EXPLICIT marker, never inferred from
+    // `result-linked` count.
+    if (current && !isRetryDeclarationSettled(markersDir, current.record.retryId)) {
+      return { stop: true, status: 'pending', record: current.record };
+    }
+
+    if (maxRetries !== undefined && generations.length >= maxRetries) {
+      return { stop: true, status: 'max-retries', declaredCount: generations.length };
+    }
+
+    // Attempt 1 is always the initial admission, never a retry -- the Nth
+    // declared retry generation is attempt N+1.
+    const nextAttempt = nextEpoch + 1;
+    const attemptStr = String(nextAttempt).padStart(2, '0');
+    return {
+      record: {
+        retryId,
+        reason,
+        previousRunId,
+        nextRunId: `run_${assignmentId}_${attemptStr}`,
+        nextAttempt,
+        admissionPayloadDigest,
+        authorityRef,
+        declaredAt: new Date().toISOString(),
+      },
+    };
+  });
+
+  if (generation.status === 'aborted-retry') {
+    throw new CoordinationError(
+      'validation',
+      `recordRunRetry: retry declaration "${retryId}" for assignment "${assignmentId}" in session "${coordinationId}" was aborted -- refuse identity reuse`,
+    );
+  }
+
+  if (generation.status === 'max-retries') {
+    throw new CoordinationError(
+      'validation',
+      `recordRunRetry: assignment "${assignmentId}" in session "${coordinationId}" has already declared ${generation.declaredCount} retry generation(s), at or above the declared maxRetries cap of ${maxRetries} -- refusing a further retry`,
+    );
+  }
+
+  const record = generation.record;
+  const resumedDeclaration = generation.status === 'pending' || generation.status === 'duplicate';
+
+  // Self-heal the session-log projection regardless of which call actually
+  // published the declaration: a crash between the declaration's own
+  // publish and this append leaves a resumer that never won the race
+  // itself, but must still complete the still-missing event.
+  const payload = {
+    assignmentId,
+    reason: record.reason,
+    retryId: record.retryId,
+    previousRunId: record.previousRunId,
+    nextRunId: record.nextRunId,
+    nextAttempt: record.nextAttempt,
+    admissionPayloadDigest: record.admissionPayloadDigest,
+    authorityRef: record.authorityRef,
+  };
+  validateEventPayload('run-retried', payload, { schemaVersion: SCHEMA_VERSION_2 });
+  const alreadyAppended = readEvents(eventsPath).some(
+    (event) => event.type === 'run-retried' && event.payload?.retryId === record.retryId,
+  );
+  if (!alreadyAppended) {
+    appendSessionEventLocked(eventsPath, { type: 'run-retried', payload }, sessionDir, { schemaVersion: SCHEMA_VERSION_2 });
+  }
+
+  return {
+    attempt: record.nextAttempt,
+    nextRunId: record.nextRunId,
+    retryId: record.retryId,
+    admissionPayloadDigest: record.admissionPayloadDigest,
+    authorityRef: record.authorityRef,
+    resumedDeclaration,
+  };
+}
+
+/**
+ * Explicitly mark a schema-2 retry declaration FULFILLED: the declared
+ * `nextRunId` was successfully admitted (materialized on disk), so this
+ * declaration is spent and a further retry may declare a new generation.
+ * Never inferred from `result-linked` count -- always this one explicit,
+ * idempotent, append-only marker. Not lock-held against the session's
+ * events lock: Run admission itself happens under the Assignment lock
+ * only, strictly after the session lock has already been released (the
+ * commit algorithm's own "no session lock spans adapter I/O" rule), so
+ * this marker publish is deliberately a separate, independent write.
+ */
+export function markRunRetryFulfilled(coordinationId, { assignmentId, retryId }, opts = {}) {
+  const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+  const { markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
+  const outcome = publishMarkerOnce(path.join(markersDir, `${retryId}.fulfilled.json`), {
+    retryId,
+    fulfilledAt: new Date().toISOString(),
+  });
+  return { status: outcome.published ? 'fulfilled' : 'already-fulfilled' };
+}
+
+/**
+ * Explicitly abort a pending schema-2 retry declaration -- the ONLY other
+ * way a pending declaration may resolve besides fulfillment (never
+ * silently superseded, never inferred). Idempotent, append-only, and safe
+ * to call even after the declaration has already been fulfilled (a
+ * fulfilled declaration's own marker already makes it non-pending, so a
+ * late abort attempt is a harmless no-op reported as `already-settled`,
+ * never a race that could un-fulfill a completed admission).
+ */
+export function abortRunRetryDeclaration(coordinationId, { assignmentId, retryId, reason }, opts = {}) {
+  const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+  const { markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
+  if (readMarker(path.join(markersDir, `${retryId}.fulfilled.json`)) !== null) {
+    return { status: 'already-settled' };
+  }
+  const outcome = publishMarkerOnce(path.join(markersDir, `${retryId}.aborted.json`), {
+    retryId,
+    reason,
+    abortedAt: new Date().toISOString(),
+  });
+  const asgnDir = path.join(sessionDir, '..', '..', 'assignments', assignmentId);
+  if (fs.existsSync(asgnDir)) {
+    const admissionMarkersDir = path.join(asgnDir, 'admission', 'markers');
+    publishMarkerOnce(path.join(admissionMarkersDir, `${retryId}.aborted.json`), {
+      retryId,
+      reason,
+      abortedAt: new Date().toISOString(),
+    });
+  }
+  return { status: outcome.published ? 'aborted' : 'already-aborted' };
+}
+
+/**
+ * Return the pending (unfulfilled, unaborted) schema-2 retry declaration for
+ * `assignmentId` in `coordinationId`, or null when none is pending.
+ */
+export function getPendingRetryDeclaration(coordinationId, assignmentId, opts = {}) {
+  const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+  const { generationsDir, markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
+  const current = currentGeneration(generationsDir);
+  if (current && !isRetryDeclarationSettled(markersDir, current.record.retryId)) {
+    return current.record;
+  }
+  return null;
 }
 
 /**
@@ -2091,7 +2350,7 @@ export function recordActorReplacement(coordinationId, { oldActorId, replacement
       (event) => event.type === 'actor-replaced' && event.payload.oldActorId === oldActorId && event.payload.replacementActorId === replacementActorId,
     );
     if (alreadyRecorded) return;
-    appendEventLocked(eventsPath, { type: 'actor-replaced', payload }, sessionDir);
+    appendSessionEventLocked(eventsPath, { type: 'actor-replaced', payload }, sessionDir, manifest);
   });
 }
 
@@ -2143,7 +2402,24 @@ export function transitionSessionStatusLocked(coordinationId, status, extra, { s
   if (manifest.status !== 'active') {
     throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot transition to "${status}"`);
   }
-  appendEventLocked(eventsPath, { type: eventType, payload }, sessionDir);
+
+  if (manifest.schemaVersion === SCHEMA_VERSION_2 && (status === 'completed' || status === 'partial')) {
+    const retriesBase = path.join(sessionDir, 'retries');
+    if (fs.existsSync(retriesBase)) {
+      for (const asgnId of fs.readdirSync(retriesBase)) {
+        const { generationsDir, markersDir } = schema2RetryDeclarationDirs(sessionDir, asgnId);
+        const current = currentGeneration(generationsDir);
+        if (current && !isRetryDeclarationSettled(markersDir, current.record.retryId)) {
+          throw new CoordinationError(
+            'validation',
+            `session "${coordinationId}" cannot transition to "${status}" while schema-2 retry declaration for assignment "${asgnId}" is still pending (retryId: "${current.record.retryId}") -- refuse to close over pending declaration`,
+          );
+        }
+      }
+    }
+  }
+
+  appendSessionEventLocked(eventsPath, { type: eventType, payload }, sessionDir, manifest);
   manifest.status = status;
   manifest.completedAt = new Date().toISOString();
   validateManifest(manifest);
