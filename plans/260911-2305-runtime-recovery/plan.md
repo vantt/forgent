@@ -329,6 +329,18 @@ their named adapter/backlog proofs pass.
 
 ## Handoff Validation
 
+## Product Gates — Cell Status
+
+Implementation handoff hold lifted 2026-09-12 (explicit user authorization to
+implement through completion). Driven via `fgos-plan-loop`'s unattended track
+mode. One row per closed cell; a cell only gets a row once its merge commit
+lands on `main` and its trace is written under
+`docs/architect/agent-coordination/verification/runtime-recovery/`.
+
+| Cell | Merge commit | Reviewer | Red-team | Deferred findings | Trace |
+|---|---|---|---|---|---|
+| P00 | `bb64e945` | PASS (2 fix rounds) | PASS on substantive finding (fix-1); final 2-line recheck not dispatched, `maxRounds` cap hit — reviewer's independent source-verified recheck accepted in its place | Citation-swap suggestion (cosmetic) | [p00.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p00.md) |
+
 ## Design Gate Definition
 
 Before implementation authorization, every phase brief must identify its
