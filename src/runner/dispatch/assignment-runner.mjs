@@ -41,11 +41,17 @@ import {
   acquireRunControl,
   releaseRunControl,
   isRunControlCurrent,
+  isProcessAlive,
   readMarker,
   publishMarkerOnce,
   fsyncFileBestEffort,
   fsyncDirBestEffort,
 } from './run-lock.mjs';
+
+function normalizeDigest(digest) {
+  if (!digest || typeof digest !== 'string') return null;
+  return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -741,41 +747,44 @@ function admitRunAttempt(
         return { stop: true, status: 'duplicate-retry', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
       }
 
-      const currentRunId = current?.record?.runId ?? null;
+      const validGenerations = generations.filter((g) => {
+        if (!g.record?.retryId) return true;
+        return readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) === null;
+      });
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      const currentRunId = currentValid?.record?.runId ?? null;
       if (predecessorRunId !== currentRunId) {
         return { stop: true, status: 'invalid-predecessor', currentRunId };
       }
     }
 
-    let attempt = nextEpoch;
-    if (retryId === undefined) {
-      // Unfenced / legacy caller: scan existing runs/* directories
-      let maxDir = 0;
-      if (fs.existsSync(runsDir)) {
-        try {
-          const entries = fs.readdirSync(runsDir);
-          for (const name of entries) {
-            if (/^\d+$/.test(name)) {
-              const n = parseInt(name, 10);
-              if (!Number.isNaN(n) && n > maxDir) maxDir = n;
-            }
+    let maxDir = 0;
+    if (fs.existsSync(runsDir)) {
+      try {
+        const entries = fs.readdirSync(runsDir);
+        for (const name of entries) {
+          if (/^\d+$/.test(name)) {
+            const n = parseInt(name, 10);
+            if (!Number.isNaN(n) && n > maxDir) maxDir = n;
           }
-        } catch {}
-      }
-      for (const g of generations) {
-        if (g.record?.attempt && g.record.attempt > maxDir) {
-          maxDir = g.record.attempt;
         }
+      } catch {}
+    }
+    for (const g of generations) {
+      if (g.record?.attempt && g.record.attempt > maxDir) {
+        maxDir = g.record.attempt;
       }
-      attempt = Math.max(attempt, maxDir + 1);
-      while (fs.existsSync(path.join(runsDir, String(attempt).padStart(2, '0')))) {
-        attempt += 1;
-      }
-    } else if (expectedRunId !== undefined) {
+    }
+    let attempt = Math.max(nextEpoch, maxDir + 1);
+    while (fs.existsSync(path.join(runsDir, String(attempt).padStart(2, '0')))) {
+      attempt += 1;
+    }
+
+    if (expectedRunId !== undefined) {
       const match = /^run_.+_(\d+)$/.exec(expectedRunId);
       if (match) {
         const declaredAttempt = parseInt(match[1], 10);
-        if (!Number.isNaN(declaredAttempt) && declaredAttempt > (current?.record?.attempt ?? 0)) {
+        if (!Number.isNaN(declaredAttempt) && declaredAttempt > attempt) {
           attempt = declaredAttempt;
         }
       }
@@ -790,7 +799,12 @@ function admitRunAttempt(
       // ledgers (the session's own retry-declaration generations and this
       // Assignment's admission generations) that were supposed to stay in
       // lockstep.
-      return { stop: true, status: 'invalid-predecessor', currentRunId: current?.record?.runId ?? null, expectedRunId, computedRunId: runId };
+      const validGenerations = generations.filter((g) => {
+        if (!g.record?.retryId) return true;
+        return readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) === null;
+      });
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
     }
     return {
       record: {
@@ -835,12 +849,29 @@ function admitRunAttempt(
         if (name.startsWith(`.staging-${record.attemptStr}`)) {
           const abandonedPath = path.join(runsDir, name);
           try {
+            // Live sibling protection: never delete a staging directory belonging to a live process
+            const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
+            if (pidMatch) {
+              const stagedPid = parseInt(pidMatch[1], 10);
+              if (isProcessAlive(stagedPid)) {
+                continue;
+              }
+            }
+
+            // Legacy staging without PID/UUID (.staging-NN)
+            if (name === `.staging-${record.attemptStr}`) {
+              fs.rmSync(abandonedPath, { recursive: true, force: true });
+              continue;
+            }
+
             const stagedMetaPath = path.join(abandonedPath, 'run.json');
             if (fs.existsSync(stagedMetaPath)) {
               const stagedMeta = JSON.parse(fs.readFileSync(stagedMetaPath, 'utf8'));
+              const normStaged = normalizeDigest(stagedMeta.payloadDigest);
+              const normAdmission = normalizeDigest(record.admissionPayloadDigest);
               if (
-                stagedMeta.retryId === record.retryId &&
-                stagedMeta.payloadDigest === record.admissionPayloadDigest
+                stagedMeta.retryId === (record.retryId ?? null) &&
+                normStaged === normAdmission
               ) {
                 fs.rmSync(abandonedPath, { recursive: true, force: true });
               }
@@ -1453,7 +1484,8 @@ export async function executeAssignment(assignment, opts = {}) {
   // `status`/`confidence` pair inside result.json, one line above.
   markRunSettled(runDir);
 
-  return Object.freeze(runResult);
-} finally {
-  releaseRunControl(runDir, { controlEpoch, controlToken });
+    return Object.freeze(runResult);
+  } finally {
+    releaseRunControl(runDir, { controlEpoch, controlToken });
+  }
 }

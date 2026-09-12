@@ -2075,6 +2075,83 @@ test('executeAssignment: an abandoned staging directory from a prior crashed att
   assert.equal(fs.existsSync(path.join(runDir, 'garbage.txt')), false, 'stale staging content must never leak into the real committed attempt directory');
 });
 
+test('executeAssignment: a live sibling staging directory is never removed during admission cleanup', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-live-staging', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  fs.mkdirSync(runsDir, { recursive: true });
+
+  const retryId = 'retry-sibling-test';
+  const payloadDigest = 'digest-test-sibling';
+  // Plant a live sibling staging directory whose PID is this live process
+  const liveStagingDir = path.join(runsDir, `.staging-01-${process.pid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(liveStagingDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(liveStagingDir, 'run.json'),
+    JSON.stringify({ retryId, payloadDigest: `sha256:${payloadDigest}` }),
+  );
+
+  // Also plant an abandoned staging directory from a dead PID
+  const deadPid = 99999999;
+  const deadStagingDir = path.join(runsDir, `.staging-01-${deadPid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(deadStagingDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(deadStagingDir, 'run.json'),
+    JSON.stringify({ retryId, payloadDigest: `sha256:${payloadDigest}` }),
+  );
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId,
+    predecessorRunId: null,
+    destination: tempDir,
+    payloadDigest,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(fs.existsSync(deadStagingDir), false, 'dead pid staging directory must be cleaned up');
+  assert.equal(fs.existsSync(liveStagingDir), true, 'live sibling staging directory must NEVER be removed');
+
+  // Clean up planted live directory
+  fs.rmSync(liveStagingDir, { recursive: true, force: true });
+});
+
+test('executeAssignment: fenced caller on pre-ledger runs/NN directory allocates next attempt, never adopting legacy settlement', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-fenced-legacy', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const legacyDir = path.join(runsDir, '01');
+  fs.mkdirSync(legacyDir, { recursive: true });
+  const legacyRunId = `run_${assignment.assignmentId}_01`;
+  fs.writeFileSync(path.join(legacyDir, 'run.json'), JSON.stringify({ runId: legacyRunId, attempt: 1, status: 'settled' }, null, 2));
+  fs.writeFileSync(path.join(legacyDir, 'result.json'), JSON.stringify({ runId: legacyRunId, status: 'failed', agentClaim: { status: 'failed', summary: 'LEGACY-SETTLED-EVIDENCE' } }, null, 2));
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId: 'retry-fenced-1',
+    predecessorRunId: null,
+    destination: tempDir,
+    payloadDigest: 'digest-fenced-1',
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.runId, `run_${assignment.assignmentId}_02`, 'fenced caller must allocate attempt 02, never adopt legacy attempt 01');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d)).sort();
+  assert.deepEqual(attemptDirs, ['01', '02']);
+  const legacyResult = JSON.parse(fs.readFileSync(path.join(legacyDir, 'result.json'), 'utf8'));
+  assert.equal(legacyResult.agentClaim?.summary, 'LEGACY-SETTLED-EVIDENCE', 'legacy result must not be overwritten');
+});
+
 test('executeAssignment: a control token that is superseded mid-flight (a fresher controller cleanly took over while the adapter call was still in flight) refuses to append a settlement', async () => {
   const tempDir = mkTempDir();
   const executorScript = path.join(tempDir, 'slow-executor.mjs');

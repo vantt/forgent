@@ -2068,7 +2068,7 @@ export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
  * @returns {{attempt: number, resumedDeclaration: boolean, nextRunId?: string, retryId?: string}}
  */
 export function recordRunRetry(coordinationId, { assignmentId, reason, previousRunId, maxRetries, retryId, admissionPayloadDigest, authorityRef }, opts = {}) {
-  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { sessionDir, eventsPath, manifestPath, fgosDir } = resolveSessionPaths(coordinationId, opts);
 
   return withEventsLock(eventsPath, () => {
     const manifest = readManifestRaw(manifestPath);
@@ -2084,6 +2084,7 @@ export function recordRunRetry(coordinationId, { assignmentId, reason, previousR
       return recordSchema2RunRetry({
         coordinationId,
         sessionDir,
+        fgosDir,
         eventsPath,
         assignmentId,
         reason,
@@ -2150,7 +2151,7 @@ function isRetryDeclarationSettled(markersDir, retryIdForGeneration) {
  * resumed call) with the exact same identity every time -- never a second,
  * independently-decided identity for the same `retryId`.
  */
-function recordSchema2RunRetry({ coordinationId, sessionDir, eventsPath, assignmentId, reason, previousRunId, maxRetries, retryId, admissionPayloadDigest, authorityRef }) {
+function recordSchema2RunRetry({ coordinationId, sessionDir, fgosDir, eventsPath, assignmentId, reason, previousRunId, maxRetries, retryId, admissionPayloadDigest, authorityRef }) {
   if (!isNonEmptyString(retryId)) {
     throw new CoordinationError('validation', `recordRunRetry: schema-2 session "${coordinationId}" requires a non-empty retryId for assignment "${assignmentId}"`);
   }
@@ -2196,7 +2197,29 @@ function recordSchema2RunRetry({ coordinationId, sessionDir, eventsPath, assignm
 
     // Attempt 1 is always the initial admission, never a retry -- the Nth
     // declared retry generation is attempt N+1.
-    const nextAttempt = nextEpoch + 1;
+    let maxAttempt = nextEpoch;
+    const asgnDir = path.join(fgosDir, 'assignments', assignmentId);
+    const runsDir = path.join(asgnDir, 'runs');
+    if (fs.existsSync(runsDir)) {
+      try {
+        for (const name of fs.readdirSync(runsDir)) {
+          if (/^\d+$/.test(name)) {
+            const n = parseInt(name, 10);
+            if (!Number.isNaN(n) && n > maxAttempt) maxAttempt = n;
+          }
+        }
+      } catch {}
+    }
+    const admissionGenDir = path.join(asgnDir, 'admission', 'generations');
+    if (fs.existsSync(admissionGenDir)) {
+      try {
+        const curAdmit = currentGeneration(admissionGenDir);
+        if (curAdmit?.record?.attempt && curAdmit.record.attempt > maxAttempt) {
+          maxAttempt = curAdmit.record.attempt;
+        }
+      } catch {}
+    }
+    const nextAttempt = maxAttempt + 1;
     const attemptStr = String(nextAttempt).padStart(2, '0');
     return {
       record: {
@@ -2292,7 +2315,7 @@ export function markRunRetryFulfilled(coordinationId, { assignmentId, retryId },
  * never a race that could un-fulfill a completed admission).
  */
 export function abortRunRetryDeclaration(coordinationId, { assignmentId, retryId, reason }, opts = {}) {
-  const { sessionDir } = resolveSessionPaths(coordinationId, opts);
+  const { sessionDir, fgosDir } = resolveSessionPaths(coordinationId, opts);
   const { markersDir } = schema2RetryDeclarationDirs(sessionDir, assignmentId);
   if (readMarker(path.join(markersDir, `${retryId}.fulfilled.json`)) !== null) {
     return { status: 'already-settled' };
@@ -2302,7 +2325,7 @@ export function abortRunRetryDeclaration(coordinationId, { assignmentId, retryId
     reason,
     abortedAt: new Date().toISOString(),
   });
-  const asgnDir = path.join(sessionDir, '..', '..', 'assignments', assignmentId);
+  const asgnDir = path.join(fgosDir, 'assignments', assignmentId);
   if (fs.existsSync(asgnDir)) {
     const admissionMarkersDir = path.join(asgnDir, 'admission', 'markers');
     publishMarkerOnce(path.join(admissionMarkersDir, `${retryId}.aborted.json`), {

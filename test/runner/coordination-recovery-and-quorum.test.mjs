@@ -1321,3 +1321,73 @@ test('schema-2 session retry: a declaration made directly (simulating a crash be
   assert.equal(retriedEvents.length, 1, 'only ONE run-retried event -- never a second leapfrogging declaration');
   assert.equal(retriedEvents[0].payload.retryId, 'retry-pre-crash-1', 'the event reflects the ORIGINAL pre-crash declaration identity');
 });
+
+test('schema-2 session retry: aborting an admitted-but-unsettled retry declaration permits subsequent retrySessionTask attempts', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir, { summary: 'attempt result' });
+  openSession({ coordinationId: 'coord_s2_abort_flow', objective: 'x', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_2 }, { cwd: tempDir });
+  const assignment = createSessionAssignment({ coordinationId: 'coord_s2_abort_flow', taskKey: 'a-task', contract: inlineContract(), caller: { writerId: 'writer-1' } }, { cwd: tempDir });
+  const assignmentId = assignment.assignmentId;
+
+  const firstResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, isReadOnlyMode: true });
+  linkResult('coord_s2_abort_flow', { assignmentId, runId: firstResult.runId }, { cwd: tempDir });
+
+  // Simulate an admitted retry (attempt 2) that crashed mid-run without settling
+  const declared = recordRunRetry(
+    'coord_s2_abort_flow',
+    {
+      assignmentId,
+      reason: 'retry 1',
+      previousRunId: firstResult.runId,
+      maxRetries: 5,
+      retryId: 'retry-crashed-1',
+      admissionPayloadDigest: 'digest-crash-1',
+      authorityRef: 'coordination:coord_s2_abort_flow',
+    },
+    { cwd: tempDir },
+  );
+  assert.equal(declared.nextRunId, `run_${assignmentId}_02`);
+
+  // Plant the admission generation for attempt 2 in assignment's admission ledger
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', assignmentId);
+  const admissionGenDir = path.join(asgnDir, 'admission', 'generations');
+  fs.mkdirSync(admissionGenDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(admissionGenDir, '0000000002.json'),
+    JSON.stringify({
+      attempt: 2,
+      attemptStr: '02',
+      runId: `run_${assignmentId}_02`,
+      retryId: 'retry-crashed-1',
+      predecessorRunId: firstResult.runId,
+      destination: tempDir,
+      admissionPayloadDigest: 'digest-crash-1',
+      admittedAt: new Date().toISOString(),
+    }),
+  );
+  fs.mkdirSync(path.join(asgnDir, 'runs', '02'), { recursive: true });
+
+  // Operator recovery: abort the pending declaration
+  const abortOutcome = abortRunRetryDeclaration('coord_s2_abort_flow', { assignmentId, retryId: 'retry-crashed-1', reason: 'crashed mid-dispatch' }, { cwd: tempDir });
+  assert.equal(abortOutcome.status, 'aborted');
+
+  // Next retrySessionTask call must succeed, allocating attempt 03 without invalid-predecessor error
+  const retried = await retrySessionTask(
+    'coord_s2_abort_flow',
+    { assignmentId, reason: 'retry after abort', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried.runResult.runId, `run_${assignmentId}_03`);
+  assert.equal(retried.nextRunId, `run_${assignmentId}_03`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '03', 'result.json')), true);
+
+  // Subsequent retrySessionTask call allocates attempt 04
+  const retried2 = await retrySessionTask(
+    'coord_s2_abort_flow',
+    { assignmentId, reason: 'third retry', maxRetries: 5 },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+  );
+  assert.equal(retried2.runResult.runId, `run_${assignmentId}_04`);
+  assert.equal(retried2.nextRunId, `run_${assignmentId}_04`);
+  assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '04', 'result.json')), true);
+});
