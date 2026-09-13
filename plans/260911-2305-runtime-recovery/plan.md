@@ -350,6 +350,7 @@ merge TARGET changes from `main` to `runtime-recovery`.
 | P04 | `6bb50205` (into `runtime-recovery`) | PASS (2 fix rounds) | PASS (2 fix rounds, adversarial re-probe with new literals) | 3 cosmetic/edge-case notes | [p04.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p04.md) |
 | P01 | `05ef76db` (into `runtime-recovery`) | PASS (4 fix rounds, 2 sessions) | PASS (4 fix rounds, 2 sessions) | 2 LOW double-fault race residuals, fix shapes recorded | [p01.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p01.md) |
 | P02L | `469f4544` (into `runtime-recovery`) | PASS (2 fix rounds, 3 sessions) | PASS (2 fix rounds, 3 sessions) | 1 unreproduced transient test flake; 2 cosmetic notes | [p02l.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02l.md) |
+| P02H | `171a6510` (into `runtime-recovery`) | PASS (3 fix rounds, 1 session) | PASS (3 fix rounds, 1 session) | 1 MEDIUM crash-window edge case; 1 MEDIUM unrelated trust-store race; 1 LOW-MEDIUM self-healing digest gap; cosmetic notes | [p02h.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02h.md) |
 
 ## Design Gate Definition
 
