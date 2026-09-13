@@ -362,7 +362,20 @@ function startAgent({ client, round, agentKind, agentArgs, readyMs }) {
     // (receipts, command projections) -- it was never assigned on `round`
     // itself, only logged via `note`, so a mismatch signal (a new
     // agent_session on the same pane) had no real data to compare against.
-    round.agentSession = { value: info.agentSession };
+    //
+    // herdr's own `agent_session` is ALREADY an object shaped
+    // `{agent, kind, source, value}`, not a plain string -- `.value` is the
+    // flat session-id string every downstream reader expects (receipts,
+    // command projections, and reconcileHerdrSpawnRun's own incarnation
+    // probe, which compares against a plain string it reads straight off a
+    // live herdr call). Wrapping the whole object one level deeper here
+    // doubly-nested it, so every consumer stored/compared an object instead
+    // of a string and the reconcile probe's `!==` check never matched even
+    // for a live, healthy worker.
+    const flatAgentSession = (info.agentSession && typeof info.agentSession === 'object')
+      ? info.agentSession.value
+      : info.agentSession;
+    round.agentSession = { value: flatAgentSession };
     round.note({ status: 'agent-ready', agentSession: info.agentSession, stateChangeSeq: info.stateChangeSeq });
   } catch {
     round.note({ status: 'agent-ready' });
@@ -677,11 +690,23 @@ export async function runHerdrRound(ctx) {
 
   const roundNumber = 1;
   const deadlines = groupDeadlines(ctx);
-  const { runDir, paths } = prepareRunDir({ runDir: ctx.runDir, roundNumber, workId, tier, model });
 
+  // F4: this resume/existing-state check must run BEFORE `prepareRunDir`
+  // below -- `prepareRunDir` refuses outright (stale-result-in-run-dir) the
+  // instant `outbox/result-1.json` already exists, which is exactly the
+  // state a SETTLED prior round leaves behind. Checking resume state first
+  // means a real settled/live launch command is found and reconciled
+  // through the door below; checking it after means that door is dead code
+  // for every run that actually reached settlement, and a resume attempt on
+  // a completed round throws instead of reconciling. Uses a lightweight
+  // resolve of the same `ctx.runDir` `prepareRunDir` would derive -- never
+  // its mkdtemp fallback, since an ad-hoc dispatch with no `ctx.runDir` is
+  // never `isAssignmentRun` (no `ctx.runId`/`ctx.launchCommandId`) and never
+  // takes this branch.
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
-  if (isAssignmentRun) {
-    const commandsDir = path.join(runDir, 'controller', 'commands');
+  const preResumeRunDir = ctx.runDir ? path.resolve(ctx.runDir) : null;
+  if (isAssignmentRun && preResumeRunDir) {
+    const commandsDir = path.join(preResumeRunDir, 'controller', 'commands');
     if (fs.existsSync(commandsDir)) {
       const existingFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
       for (const f of existingFiles) {
@@ -702,7 +727,7 @@ export async function runHerdrRound(ctx) {
       }
     }
 
-    const existingCmd = readHerdrLaunchCommand(runDir, ctx.launchCommandId);
+    const existingCmd = readHerdrLaunchCommand(preResumeRunDir, ctx.launchCommandId);
     if (existingCmd) {
       if (existingCmd.state === 'reconciled' || (existingCmd.state === 'pending' && existingCmd.paneId)) {
         // Production `ctx` carries no `herdrClient`/`probe` -- only test
@@ -710,10 +735,12 @@ export async function runHerdrRound(ctx) {
         // live-but-not-yet-observed worker fell through reconcile's probe
         // branch to `unknown-launch` instead of actually asking herdr.
         const reconcileClient = ctx.herdrClient ?? createHerdrClient({ herdrBin, cwd, env: fullEnv });
-        return await reconcileHerdrSpawnRun(runDir, { ...ctx, herdrClient: reconcileClient });
+        return await reconcileHerdrSpawnRun(preResumeRunDir, { ...ctx, herdrClient: reconcileClient });
       }
     }
   }
+
+  const { runDir, paths } = prepareRunDir({ runDir: ctx.runDir, roundNumber, workId, tier, model });
 
   const agentName = isAssignmentRun
     ? normalizeAgentName(`fgos-${ctx.runId}-${ctx.launchCommandId}`)
@@ -849,6 +876,17 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const agentKindToUse = agentKind ?? (ctx.command ? path.basename(ctx.command) : 'claude');
   const effectiveAgentArgs = (agentArgs && agentArgs.length) ? agentArgs : (ctx.args || []);
   const herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
+  // Canonical worker-command digest, defined identically to Authority's own
+  // `workerInvocation.workerCommandDigest` (confinement/authority.mjs:
+  // `computeSha256Digest({ command: workerCommand, args: workerArgs })`,
+  // computed from the SAME resolved `ctx.command`/`ctx.args` this adapter was
+  // handed). `herdrStartArgv` has its own separate digest (`startArgvDigest`,
+  // below) because it also carries transport fields (agent name, pane,
+  // timeout) that are never part of "what worker command ran" -- conflating
+  // the two meant a genuine, untampered receipt could never match what
+  // Authority recorded, and reconcile's cross-check (confinement-mismatch,
+  // below) could never pass for a real dispatch.
+  const workerCommandDigest = computeSha256Digest({ command: ctx.command, args: ctx.args || [] });
 
   if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
     startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
@@ -928,7 +966,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
           agentSession: round.agentSession?.value || null,
           resourceIncarnation,
           startArgvDigest: computeSha256Digest(herdrStartArgv),
-          workerCommandDigest: computeSha256Digest(herdrStartArgv),
+          workerCommandDigest,
           completion: {
             kind: decision.outcome,
             reason: decision.detail || decision.outcome,
@@ -1022,7 +1060,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       agentSession: round.agentSession?.value || null,
       resourceIncarnation,
       startArgvDigest: computeSha256Digest(herdrStartArgv),
-      workerCommandDigest: computeSha256Digest(herdrStartArgv),
+      workerCommandDigest,
       completion: {
         kind: 'settled',
         reason: 'worker-outbox-settled',
@@ -1353,6 +1391,16 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
   if (!fs.existsSync(prepPath)) {
     return { status: 'parked', reason: 'prepared-invocation-missing' };
   }
+  // Authority's own canonical `workerInvocation.workerCommandDigest`
+  // (sha256 of just {command, args}), hoisted out of the try block below so
+  // a synthesized receipt (built further down when settlement is inferred
+  // from a real outbox result with no receipt yet on disk) can reuse the
+  // SAME value instead of falling back to `command.preparedInvocationDigest`
+  // -- a different digest entirely (of the whole prepared-invocation
+  // record, not the worker command), which conflated two distinct notions
+  // of "workerCommandDigest" and could never agree with a receipt a live
+  // round actually published.
+  let authorityWorkerCommandDigest = null;
   try {
     const prepRec = JSON.parse(fs.readFileSync(prepPath, 'utf8'));
     const { digest: pDig, ...pBody } = prepRec;
@@ -1376,6 +1424,7 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
     if (receipt && prepRec.workerInvocation?.envDigest && receipt.envDigest && receipt.envDigest !== prepRec.workerInvocation.envDigest) {
       return { status: 'refused', reason: 'confinement-mismatch' };
     }
+    authorityWorkerCommandDigest = prepRec.workerInvocation?.workerCommandDigest ?? null;
   } catch {
     return { status: 'refused', reason: 'protected-artifact-corrupt' };
   }
@@ -1411,7 +1460,13 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
         agentSession: command.agentSession,
         resourceIncarnation: command.resourceIncarnation,
         startArgvDigest: command.startArgvDigest || computeSha256Digest({ herdrName: command.herdrName }),
-        workerCommandDigest: command.workerCommandDigest || command.preparedInvocationDigest,
+        // Never fall back to `preparedInvocationDigest` here -- it digests
+        // the whole prepared-invocation record, not {command, args}, and is
+        // a different notion of "workerCommandDigest" entirely (see the
+        // canonical definition this mirrors: confinement/authority.mjs's
+        // `workerInvocation.workerCommandDigest`, read back here from the
+        // same already-validated prepared-invocation record above).
+        workerCommandDigest: command.workerCommandDigest ?? authorityWorkerCommandDigest,
         completion: {
           kind: 'settled',
           reason: 'worker-outbox-settled',

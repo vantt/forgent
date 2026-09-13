@@ -1437,11 +1437,38 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     publishedAt: new Date().toISOString(),
   };
 
-  const preparedInvocationDigest = computeSha256Digest(preparedInvocationRecord);
+  const preparedInvocationPath = path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`);
+
+  // F1 (resume corrupts prepared digest): `preparedInvocationRecord.publishedAt`
+  // above is always "now", so a resume that re-enters this function for the
+  // SAME launchCommandId always recomputes a byte-different record and thus a
+  // DIFFERENT digest than the one the first attempt actually published.
+  // `publishImmutableProof` below is itself resume-safe (its EEXIST branch
+  // never overwrites the file), but every caller downstream (the
+  // herdr-launch-command.v1 write and the cli-spawn-launch-envelope.v1 write,
+  // both further down, plus confinement-finalization.v1's own
+  // `preparedInvocationDigest` field) reads the digest from THIS variable,
+  // not from disk -- so on resume they must reuse the ORIGINAL record's
+  // digest, never a freshly recomputed one, or `reconcileHerdrSpawnRun`
+  // refuses a live, healthy worker as `confinement-mismatch` purely because
+  // this function ran twice.
+  let preparedInvocationDigest = computeSha256Digest(preparedInvocationRecord);
   preparedInvocationRecord.digest = preparedInvocationDigest;
 
-  const preparedInvocationPath = path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`);
-  publishImmutableProof(preparedInvocationPath, preparedInvocationRecord);
+  if (fs.existsSync(preparedInvocationPath)) {
+    try {
+      const existingPreparedInvocation = JSON.parse(fs.readFileSync(preparedInvocationPath, 'utf8'));
+      if (existingPreparedInvocation?.digest) {
+        preparedInvocationDigest = existingPreparedInvocation.digest;
+      }
+    } catch {
+      // Corrupt on-disk record: fall through and attempt the normal
+      // (no-op-on-EEXIST) publish below, which will surface the mismatch
+      // through publishImmutableProof's own collision handling elsewhere.
+    }
+  } else {
+    publishImmutableProof(preparedInvocationPath, preparedInvocationRecord);
+  }
 
   // 2. Publish confinement-finalization.v1
   const finalizationDescBody = {

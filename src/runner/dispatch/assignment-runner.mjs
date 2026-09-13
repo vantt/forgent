@@ -72,6 +72,7 @@ import {
   fsyncDirBestEffort,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
+import { reconcileHerdrSpawnRun } from './herdr-round.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import {
@@ -1193,7 +1194,27 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     const commandsDir = path.join(runDir, 'controller', 'commands');
     if (fs.existsSync(commandsDir)) {
-      const rec = await reconcileCliSpawnRun(runDir);
+      // The commands/<launchCommandId>.json record's own `contract` field
+      // says which reconcile shape actually applies -- cli-spawn's
+      // 'assignment-command-state.v1' (envelopeDigest/bindingDigest) and
+      // herdr-spawn's 'herdr-launch-command.v1' (herdrName/paneId/
+      // agentSession) are different contracts sharing this one path, and
+      // reconcileCliSpawnRun's own window checks (e.g. `command.envelopeDigest`)
+      // never match a herdr record, so a herdr-spawn resume always fell
+      // through to a duplicate fresh dispatch attempt instead of finding
+      // its live/settled worker.
+      let reconcileFn = reconcileCliSpawnRun;
+      try {
+        const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
+        const latestCommandFile = commandFiles[commandFiles.length - 1];
+        if (latestCommandFile) {
+          const latestCommand = JSON.parse(fs.readFileSync(path.join(commandsDir, latestCommandFile), 'utf8'));
+          if (latestCommand?.contract === 'herdr-launch-command.v1') {
+            reconcileFn = reconcileHerdrSpawnRun;
+          }
+        }
+      } catch {}
+      const rec = await reconcileFn(runDir);
       if (rec.settled && rec.runResult) {
         return rec.runResult;
       }
@@ -1268,15 +1289,37 @@ export async function executeAssignment(assignment, opts = {}) {
   let executionError = null;
 
   const executorId = resolvedExecutorId;
-  const resolvedAdapter = compiledPlan?.policy?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  // ADR-006 R7 sibling bug (RT059-F1): `compiledPlan.policy` (the object
+  // `resolveAssignmentDispatchPolicy()` returns -- tier/model/providerModel/
+  // confinement/executorPreference) has never carried an `adapter` field.
+  // The real resolved adapter lives at `compiledPlan.invocation.adapter`
+  // (plan.mjs: `invocation = { via: 'cli', adapter: resolvedForDispatch.adapter
+  // ?? executor?.adapter ?? 'cli-spawn', ... }`). Reading the wrong (always
+  // undefined) field silently defaulted every executor to 'cli-spawn',
+  // including a real herdr-spawn `invocations[]` executor -- misrouting it
+  // into the cli-spawn supervisor, which then spawns against a herdr
+  // launch-command file it cannot parse.
+  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
   const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
+  // Both cli-spawn (via the local supervisor process, below) and herdr-spawn
+  // (via `executeExecutorCli`'s own confinement-authority door) are
+  // Assignment-owned recoverable dispatches: a resume must find the same
+  // launchCommandId/controlEpoch/controlToken identity a first attempt
+  // admitted, and a receipt must land under the same runDir. This is the
+  // ONE decision that determines that identity is built and threaded --
+  // never left to each adapter branch to remember independently (RT059-F2:
+  // the herdr-spawn branch used to skip this entirely and fall back to
+  // legacy behavior with no controller/protected tree and no receipt).
+  const needsAssignmentLaunchContext = (resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn') && !opts.legacySpawn;
 
   let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
   let commandState = null;
+  let commandPath = null;
   let supervisorReceipt = null;
+  let assignmentLaunchContext = null;
 
   try {
-    if (useSupervisorRecovery) {
+    if (needsAssignmentLaunchContext) {
       const depth = currentDispatchDepth();
       if (depth >= MAX_DISPATCH_DEPTH) {
         throw new DispatchError(
@@ -1306,8 +1349,14 @@ export async function executeAssignment(assignment, opts = {}) {
       const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
       publishImmutableProof(baselinePath, baselineRecord);
 
-      // 2. Commit Command State V1 not-requested -> pending
-      const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+      // 2. Commit Command State V1 not-requested -> pending. For herdr-spawn
+      // this initial record is immediately superseded by the
+      // herdr-launch-command.v1 shape `prepareConfinementForLaunch` publishes
+      // to the same path (confinement/authority.mjs) -- harmless, since that
+      // publish already preserves any prior pending/reconciled state for
+      // this exact launchCommandId, and this write's only real job is
+      // admitting the identity before anything downstream can race it.
+      commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
       commandState = {
         contract: 'assignment-command-state.v1',
         runId,
@@ -1323,7 +1372,7 @@ export async function executeAssignment(assignment, opts = {}) {
       publishMutableProjection(commandPath, commandState);
 
       // 3. Build Assignment Launch Context
-      const assignmentLaunchContext = {
+      assignmentLaunchContext = {
         contract: 'assignment-cli-spawn-launch-context.v1',
         run: {
           runId,
@@ -1338,7 +1387,9 @@ export async function executeAssignment(assignment, opts = {}) {
           controlTokenDigest: computeSha256Digest(controlToken),
         },
       };
+    }
 
+    if (useSupervisorRecovery) {
       // 4. Resolve executor command params
       let resolvedCmd;
       try {
@@ -1568,6 +1619,19 @@ export async function executeAssignment(assignment, opts = {}) {
           stage: effectiveAssignment.stage,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
+          // needsAssignmentLaunchContext (herdr-spawn, and any other
+          // out-of-process adapter besides cli-spawn) reuses the SAME
+          // assignmentLaunchContext identity built above -- executeExecutorCli
+          // already accepts and threads these through buildConfinementRequest
+          // -> executeThroughConfinement -> confinement/authority.mjs, which
+          // resolves 'herdr-spawn' onto `herdrSpawnInteractiveAdapter`
+          // (transport.mjs) -> `runHerdrRound` (herdr-round.mjs), the real
+          // worker-command seam that publishes a receipt to
+          // runDir/protected/adapter-receipts/<launchCommandId>.json. A plain
+          // `opts.legacySpawn`/unrecognized-adapter caller never sets
+          // `needsAssignmentLaunchContext`, so `assignmentLaunchContext` stays
+          // null here and this call is byte-identical to before this fix.
+          ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
         });
       } catch (err) {
         executionError = err;
