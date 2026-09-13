@@ -22,6 +22,14 @@ import {
   DEFAULT_TTL_MS,
   HOOK_TTL_MS,
 } from '../../src/runner/main-checkout-lock.mjs';
+import {
+  isProcessAlive,
+  publishNextGeneration,
+  listGenerations,
+  acquireRunControl,
+  releaseRunControl,
+  isRunControlCurrent,
+} from '../../src/runner/dispatch/run-lock.mjs';
 
 // Main-checkout activity lock (str65-worktree-isolation-enforcement, D4/D5/D6).
 // Every test builds its own disposable git repo (git init in mkdtemp) with
@@ -997,4 +1005,306 @@ test('releaseMainCheckoutLockIfOwn/renewMainCheckoutLockIfOwn/inspectMainCheckou
   fs.writeFileSync(path.join(dir, slot), 'not json');
   const reclaimed = forceReclaimAmbiguousLock(dir, { lockFile: slot });
   assert.equal(reclaimed.status, 'reclaimed');
+});
+
+// =============================================================================
+// run-lock.mjs (runtime-recovery P01): the append-only generation/release-
+// marker primitive and per-Run control-epoch/token fencing. Lives in this
+// file (not a dedicated one) because it shares this file's exact real-child-
+// process/deadPid()/spawnAcquire-style infrastructure for genuine PID-
+// liveness proofs -- the one thing a synchronous, single-process test can
+// never fake honestly. main-checkout-lock.mjs itself is untouched by this
+// track's own P01 cell (a SEPARATE per-Run layer); these tests only prove
+// run-lock.mjs does NOT copy that file's own heartbeat-mitigated TTL
+// takeover of a live holder (the P00-corrected fact this cell is bound by).
+// =============================================================================
+
+function mkRunLockTempDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-lock-test-'));
+}
+
+/** Spawns a real child process that imports run-lock.mjs, calls
+ * `acquireRunControl(runDir, { holder: { id: 'child', pid: process.pid }, purpose: 'test', ttlMs })`,
+ * prints the JSON result as its first stdout line the instant it resolves,
+ * then blocks forever (until killed) so the test can signal it externally.
+ * Resolves with `{ pid, result }` once the first stdout line is observed --
+ * the child is still alive and holding control at that point. */
+function spawnControlHolder(runDir, { ttlMs } = {}) {
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/run-lock.mjs')).href;
+  const script = [
+    `import('${moduleUrl}').then(({ acquireRunControl }) => {`,
+    `  const result = acquireRunControl(${JSON.stringify(runDir)}, { holder: { id: 'child', pid: process.pid }, purpose: 'test'${ttlMs !== undefined ? `, ttlMs: ${ttlMs}` : ''} });`,
+    `  process.stdout.write(JSON.stringify(result) + '\\n');`,
+    `  setInterval(() => {}, 1_000_000);`, // block forever until killed
+    `});`,
+  ].join('\n');
+  const child = spawn(process.execPath, ['-e', script]);
+  return new Promise((resolve, reject) => {
+    let buffered = '';
+    const onData = (chunk) => {
+      buffered += chunk;
+      const newlineIndex = buffered.indexOf('\n');
+      if (newlineIndex === -1) return;
+      child.stdout.off('data', onData);
+      try {
+        const result = JSON.parse(buffered.slice(0, newlineIndex));
+        resolve({ pid: child.pid, result, child });
+      } catch (err) {
+        reject(err);
+      }
+    };
+    child.stdout.on('data', onData);
+    child.on('error', reject);
+  });
+}
+
+// --- isProcessAlive -----------------------------------------------------
+
+test('run-lock: isProcessAlive is true for this test\'s own live pid and false for a guaranteed-dead pid', () => {
+  assert.equal(isProcessAlive(process.pid), true);
+  assert.equal(isProcessAlive(deadPid()), false);
+});
+
+// --- publishNextGeneration: the shared append-only primitive ------------
+
+test('run-lock: publishNextGeneration never unlinks/overwrites -- repeated publishes accumulate distinct, immutable generation files', () => {
+  const dir = mkRunLockTempDir();
+  const generationsDir = path.join(dir, 'generations');
+
+  const first = publishNextGeneration(generationsDir, ({ nextEpoch }) => ({ record: { label: `gen-${nextEpoch}` } }));
+  const second = publishNextGeneration(generationsDir, ({ nextEpoch }) => ({ record: { label: `gen-${nextEpoch}` } }));
+  const third = publishNextGeneration(generationsDir, ({ nextEpoch }) => ({ record: { label: `gen-${nextEpoch}` } }));
+
+  assert.deepEqual([first.epoch, second.epoch, third.epoch], [1, 2, 3]);
+  const generations = listGenerations(generationsDir);
+  assert.equal(generations.length, 3);
+  assert.deepEqual(generations.map((g) => g.record.label), ['gen-1', 'gen-2', 'gen-3']);
+  // The first generation's file is untouched -- reading it again yields the
+  // exact original content, never rewritten by a later publish.
+  assert.equal(generations[0].record.label, 'gen-1');
+});
+
+test('run-lock: publishNextGeneration lets `decide` stop without publishing anything (idempotent recognition)', () => {
+  const dir = mkRunLockTempDir();
+  const generationsDir = path.join(dir, 'generations');
+
+  publishNextGeneration(generationsDir, () => ({ record: { label: 'only-one' } }));
+  const stopped = publishNextGeneration(generationsDir, ({ current }) => ({ stop: true, status: 'duplicate', epoch: current.epoch, record: current.record }));
+
+  assert.equal(stopped.published, false);
+  assert.equal(stopped.status, 'duplicate');
+  assert.equal(listGenerations(generationsDir).length, 1, 'a stopped decide() must never write a new generation file');
+});
+
+test('run-lock: two racing processes publishing into the SAME generations dir always produce two distinct, non-colliding epochs, never a torn/duplicate generation 1', async () => {
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/run-lock.mjs')).href;
+  const dir = mkRunLockTempDir();
+  const generationsDir = path.join(dir, 'generations');
+
+  function spawnPublish(label) {
+    const script = [
+      `import('${moduleUrl}').then(({ publishNextGeneration }) => {`,
+      `  const res = publishNextGeneration(${JSON.stringify(generationsDir)}, ({ nextEpoch }) => ({ record: { label: ${JSON.stringify(label)}, epoch: nextEpoch } }));`,
+      `  process.stdout.write(JSON.stringify(res));`,
+      `  process.exit(0);`,
+      `});`,
+    ].join('\n');
+    return new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, ['-e', script]);
+      let stdout = '';
+      child.stdout.on('data', (c) => { stdout += c; });
+      child.on('close', (code) => (code === 0 ? resolve(JSON.parse(stdout)) : reject(new Error(`exit ${code}`))));
+      child.on('error', reject);
+    });
+  }
+
+  const [a, b] = await Promise.all([spawnPublish('racer-a'), spawnPublish('racer-b')]);
+
+  assert.notEqual(a.epoch, b.epoch, `racing publishes must land on distinct epochs, got ${JSON.stringify([a, b])}`);
+  assert.deepEqual([a.epoch, b.epoch].sort((x, y) => x - y), [1, 2]);
+  const generations = listGenerations(generationsDir);
+  assert.equal(generations.length, 2);
+});
+
+// --- acquireRunControl / releaseRunControl -------------------------------
+
+test('run-lock: acquireRunControl on a free Run succeeds with epoch 1 and a fresh token', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+  const res = acquireRunControl(runDir, { holder: { id: 'me', pid: process.pid }, purpose: 'test' });
+  assert.equal(res.status, 'acquired');
+  assert.equal(res.controlEpoch, 1);
+  assert.equal(typeof res.controlToken, 'string');
+  assert.ok(res.controlToken.length > 0);
+});
+
+test('run-lock: two controller acquisitions of the same Run receive different epochs and different tokens', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const first = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'test' });
+  assert.equal(first.status, 'acquired');
+  releaseRunControl(runDir, { controlEpoch: first.controlEpoch, controlToken: first.controlToken });
+
+  const second = acquireRunControl(runDir, { holder: { id: 'controller-b', pid: process.pid }, purpose: 'test' });
+  assert.equal(second.status, 'acquired');
+
+  assert.notEqual(first.controlEpoch, second.controlEpoch);
+  assert.notEqual(first.controlToken, second.controlToken);
+});
+
+test('run-lock: acquireRunControl refuses a second acquisition while the first controller is still live and never released (held, not reclaimed)', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const first = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'test' });
+  assert.equal(first.status, 'acquired');
+
+  const second = acquireRunControl(runDir, { holder: { id: 'controller-b', pid: process.pid }, purpose: 'test' });
+  assert.equal(second.status, 'held');
+  assert.equal(second.controlEpoch, first.controlEpoch);
+  assert.equal(second.holder.id, 'controller-a');
+});
+
+test('run-lock: acquireRunControl with expectedControlEpoch refuses "stale" when the ambient epoch has moved on', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const first = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'test' });
+  releaseRunControl(runDir, { controlEpoch: first.controlEpoch, controlToken: first.controlToken });
+  const second = acquireRunControl(runDir, { holder: { id: 'controller-b', pid: process.pid }, purpose: 'test' });
+  assert.equal(second.controlEpoch, 2);
+
+  const stale = acquireRunControl(runDir, {
+    holder: { id: 'controller-c', pid: process.pid },
+    purpose: 'test',
+    expectedControlEpoch: 1, // no longer current -- epoch 2 is
+  });
+  assert.equal(stale.status, 'stale');
+  assert.equal(stale.controlEpoch, 2);
+});
+
+test('run-lock: SIGKILL without a release marker can be reclaimed only after PID-dead proof', async () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const { pid: childPid, result: acquired, child } = await spawnControlHolder(runDir);
+  assert.equal(acquired.status, 'acquired');
+  assert.equal(acquired.controlEpoch, 1);
+  assert.equal(isProcessAlive(childPid), true);
+
+  // While genuinely alive, a contender is refused -- never reclaimed merely
+  // because no release marker exists yet (a finally marker is evidence of a
+  // CLEAN release, never death proof; its absence proves nothing).
+  const whileAlive = acquireRunControl(runDir, { holder: { id: 'contender', pid: process.pid }, purpose: 'test' });
+  assert.equal(whileAlive.status, 'held');
+  assert.equal(whileAlive.holder.pid, childPid);
+
+  child.kill('SIGKILL');
+  // Wait for the OS to actually reap the pid before probing -- isPidAlive
+  // can otherwise observe a not-yet-reaped zombie as still "alive".
+  for (let i = 0; i < 100 && isProcessAlive(childPid); i += 1) {
+    await new Promise((r) => setTimeout(r, 20));
+  }
+  assert.equal(isProcessAlive(childPid), false, 'the killed child must be genuinely dead before this test proceeds');
+
+  const reclaimed = acquireRunControl(runDir, { holder: { id: 'contender', pid: process.pid }, purpose: 'test' });
+  assert.equal(reclaimed.status, 'acquired', 'a genuinely dead holder (SIGKILL, no release marker) must be reclaimable on PID-dead proof alone');
+  assert.equal(reclaimed.controlEpoch, 2);
+});
+
+test('run-lock: SIGSTOP with an expired heartbeat/ttl remains HELD -- a live-but-stopped PID is never mistaken for dead', async () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+  const shortTtl = 200;
+
+  const { pid: childPid, result: acquired, child } = await spawnControlHolder(runDir, { ttlMs: shortTtl });
+  assert.equal(acquired.status, 'acquired');
+
+  try {
+    child.kill('SIGSTOP');
+    // Let the recorded generation's heartbeat/ttl genuinely expire.
+    await new Promise((r) => setTimeout(r, shortTtl + 200));
+
+    const contender = acquireRunControl(runDir, {
+      holder: { id: 'contender', pid: process.pid },
+      purpose: 'test',
+      ttlMs: shortTtl,
+    });
+
+    assert.equal(
+      contender.status,
+      'held',
+      'a SIGSTOPped process still answers signal 0 (alive) -- an expired heartbeat only permits an ATTEMPT to reclaim, never a reclaim on elapsed time alone',
+    );
+    assert.equal(contender.controlEpoch, acquired.controlEpoch);
+  } finally {
+    child.kill('SIGCONT');
+    child.kill('SIGKILL');
+  }
+});
+
+test('run-lock: a successor generation is never deleted or shadowed by a stale release of an old, already-superseded epoch', async () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const { pid: childPid, result: firstGen, child } = await spawnControlHolder(runDir);
+  assert.equal(firstGen.status, 'acquired');
+
+  child.kill('SIGKILL');
+  for (let i = 0; i < 100 && isProcessAlive(childPid); i += 1) {
+    await new Promise((r) => setTimeout(r, 20));
+  }
+  assert.equal(isProcessAlive(childPid), false);
+
+  const secondGen = acquireRunControl(runDir, { holder: { id: 'successor', pid: process.pid }, purpose: 'test' });
+  assert.equal(secondGen.status, 'acquired');
+  assert.equal(secondGen.controlEpoch, firstGen.controlEpoch + 1);
+
+  // A late/stale release for the FIRST (dead, superseded) generation arrives
+  // after the successor has already taken over.
+  const staleRelease = releaseRunControl(runDir, { controlEpoch: firstGen.controlEpoch, controlToken: firstGen.controlToken });
+  assert.equal(staleRelease.status, 'released'); // the old generation's own marker publishes fine...
+
+  // ...but the successor generation is completely unaffected: it is still
+  // current, still holds control, and a fresh contender is still refused.
+  assert.equal(isRunControlCurrent(runDir, { controlEpoch: secondGen.controlEpoch, controlToken: secondGen.controlToken }), true);
+  const thirdContender = acquireRunControl(runDir, { holder: { id: 'third', pid: process.pid }, purpose: 'test' });
+  assert.equal(thirdContender.status, 'held');
+  assert.equal(thirdContender.controlEpoch, secondGen.controlEpoch);
+});
+
+test('run-lock: isRunControlCurrent detects a token that has outlived its own control generation, so an in-flight adapter call can notice it was superseded', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const first = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'test' });
+  assert.equal(isRunControlCurrent(runDir, { controlEpoch: first.controlEpoch, controlToken: first.controlToken }), true);
+
+  releaseRunControl(runDir, { controlEpoch: first.controlEpoch, controlToken: first.controlToken });
+  const second = acquireRunControl(runDir, { holder: { id: 'controller-b', pid: process.pid }, purpose: 'test' });
+  assert.equal(second.status, 'acquired');
+
+  // The FIRST controller's token is now stale -- it must never be able to
+  // observe itself as still current after a successor has taken over.
+  assert.equal(
+    isRunControlCurrent(runDir, { controlEpoch: first.controlEpoch, controlToken: first.controlToken }),
+    false,
+    'a token that has outlived its control generation must be detectable as no longer current',
+  );
+  assert.equal(isRunControlCurrent(runDir, { controlEpoch: second.controlEpoch, controlToken: second.controlToken }), true);
+});
+
+test('run-lock: releaseRunControl is idempotent and never throws for an unknown generation or a mismatched token', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  assert.equal(releaseRunControl(runDir, { controlEpoch: 1, controlToken: 'nope' }).status, 'unknown-generation');
+
+  const acquired = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'test' });
+  assert.equal(releaseRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: 'wrong-token' }).status, 'token-mismatch');
+
+  assert.equal(releaseRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken }).status, 'released');
+  // Releasing the same, already-released epoch/token again is a no-op, not an error.
+  assert.equal(releaseRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken }).status, 'already-released');
 });

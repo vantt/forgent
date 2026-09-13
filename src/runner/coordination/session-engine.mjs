@@ -52,6 +52,7 @@ import {
   authorizeOperation,
   linkResult,
   recordRunRetry,
+  markRunRetryFulfilled,
   recordActorReplacement,
   transitionSessionStatus,
   transitionSessionStatusLocked,
@@ -66,10 +67,11 @@ import {
   recordSpecialistAuthorization,
   knownContributionsFromEvents,
   asCoordinationError,
+  getPendingRetryDeclaration,
 } from './store.mjs';
 import { validateContributionLineage } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
-import { CoordinationError, CONTRIBUTION_REF_PREFIX } from './schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX, SCHEMA_VERSION_2 } from './schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
@@ -4399,6 +4401,12 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   const latestOnDisk = findLatestRunResult(fgosDir, assignmentId);
   const latestLinked = lastEventFor(reconciled.events, 'result-linked', assignmentId);
   if (latestOnDisk && (!latestLinked || latestLinked.payload.runId !== latestOnDisk.runId)) {
+    if (reconciled.manifest.schemaVersion === SCHEMA_VERSION_2) {
+      const pending = getPendingRetryDeclaration(coordinationId, assignmentId, opts);
+      if (pending && pending.nextRunId === latestOnDisk.runId) {
+        markRunRetryFulfilled(coordinationId, { assignmentId, retryId: pending.retryId }, opts);
+      }
+    }
     linkResult(coordinationId, { assignmentId, runId: latestOnDisk.runId }, { ...opts, allowSupersede: true });
     return { assignmentId, actorId, runResult: latestOnDisk, retried: false, resumed: true };
   }
@@ -4415,10 +4423,6 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   // dispatch.
   assertWithinWallTimeBudget(reconciled.manifest, 'retrySessionTask');
 
-  // recordRunRetry itself resumes a pending-but-undispatched declaration
-  // (never double-declares) and enforces maxRetries atomically, lock-held.
-  const { attempt } = recordRunRetry(coordinationId, { assignmentId, reason, previousRunId: latestLinked?.payload?.runId, maxRetries }, opts);
-
   const assignmentPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
   let assignment;
   try {
@@ -4426,6 +4430,34 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   } catch (err) {
     throw new CoordinationError('corrupt-log', `retrySessionTask: assignment.json for "${assignmentId}" could not be read: ${err.message}`);
   }
+
+  // Schema-2 sessions opt into the strict run-admission contract: an exact
+  // (retryId, previousRunId, admissionPayloadDigest, authorityRef) tuple,
+  // fenced through to the actual Run admission below so the declared
+  // `nextRunId` is exactly what gets published -- never independently
+  // recomputed.
+  const isSchema2 = reconciled.manifest.schemaVersion === SCHEMA_VERSION_2;
+  const previousRunId = latestLinked?.payload?.runId;
+  const pending = isSchema2 ? getPendingRetryDeclaration(coordinationId, assignmentId, opts) : null;
+  const retryId = opts.retryId ?? pending?.retryId ?? (isSchema2 ? crypto.randomUUID() : undefined);
+  const admissionPayloadDigest = isSchema2
+    ? (pending?.admissionPayloadDigest ?? crypto.createHash('sha256').update(JSON.stringify({ assignmentId, assignment })).digest('hex'))
+    : undefined;
+  const authorityRef = isSchema2 ? `coordination:${coordinationId}` : undefined;
+
+  // recordRunRetry itself resumes a pending-but-undispatched declaration
+  // (never double-declares) and enforces maxRetries atomically, lock-held.
+  const { attempt, nextRunId, retryId: declaredRetryId, admissionPayloadDigest: declaredPayloadDigest } = recordRunRetry(
+    coordinationId,
+    {
+      assignmentId,
+      reason,
+      previousRunId,
+      maxRetries,
+      ...(isSchema2 ? { retryId, admissionPayloadDigest, authorityRef } : {}),
+    },
+    opts,
+  );
 
   // Per-attempt exclusive claim -- same crash-safety shape as
   // createAndExecuteSessionTask's own `dispatch.claim`, numbered per retry
@@ -4445,9 +4477,17 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
     throw err;
   }
 
+  // Schema-2: fence the actual Run admission to the EXACT declared identity
+  // -- assignment-runner.mjs's own admission ledger refuses anything that
+  // does not supersede `previousRunId` under this `retryId`/payload tuple,
+  // so the published Run can never drift from what was just declared.
+  const executionOpts = isSchema2
+    ? { ...opts, retryId: declaredRetryId, predecessorRunId: previousRunId ?? null, payloadDigest: declaredPayloadDigest ?? admissionPayloadDigest, expectedRunId: nextRunId }
+    : opts;
+
   let runResult;
   try {
-    runResult = await runExecutorAttempt(assignment, opts);
+    runResult = await runExecutorAttempt(assignment, executionOpts);
   } catch (err) {
     if (err instanceof RunnerConfigError) {
       try {
@@ -4458,8 +4498,14 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
     }
     throw err;
   }
+  if (isSchema2) {
+    // The declared identity was successfully published as a real, admitted
+    // Run -- explicitly spend this declaration so a FURTHER retry may
+    // declare a new one. Never inferred from `result-linked` below.
+    markRunRetryFulfilled(coordinationId, { assignmentId, retryId: declaredRetryId }, opts);
+  }
   linkResult(coordinationId, { assignmentId, runId: runResult.runId }, { ...opts, allowSupersede: true });
-  return { assignmentId, actorId, runResult, retried: true, resumed: false };
+  return { assignmentId, actorId, runResult, retried: true, resumed: false, ...(isSchema2 ? { nextRunId } : {}) };
 }
 
 /**

@@ -21,6 +21,30 @@ import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 // about which file is the worker's claim. Re-exported because callers and
 // tests have always taken it from here.
 export { resolveWorkerArtifactPath };
+
+export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
+  const candidateDirs = [
+    path.join(runDir, 'worker-output', 'outbox'),
+    path.join(runDir, 'worker-output'),
+    path.join(runDir, 'outbox'),
+  ];
+  for (const dir of candidateDirs) {
+    if (fs.existsSync(dir)) {
+      let entries = [];
+      try { entries = fs.readdirSync(dir); } catch {}
+      const latest = entries
+        .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
+        .filter((e) => Number.isFinite(e.round))
+        .sort((a, b) => a.round - b.round)
+        .pop();
+      if (latest) return path.join(dir, latest.name);
+      if (legacyName && entries.includes(legacyName)) {
+        return path.join(dir, legacyName);
+      }
+    }
+  }
+  return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
+}
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -36,6 +60,38 @@ import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+import {
+  publishNextGeneration,
+  acquireRunControl,
+  releaseRunControl,
+  isRunControlCurrent,
+  isProcessAlive,
+  readMarker,
+  publishMarkerOnce,
+  fsyncFileBestEffort,
+  fsyncDirBestEffort,
+} from './run-lock.mjs';
+import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
+import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
+import { buildConfinementRequest } from './confinement/request.mjs';
+import {
+  startSupervisorProcess,
+  readSupervisorBinding,
+  readWorkerBinding,
+  readAdapterReceipt,
+  getBootId,
+  getProcessStartTime,
+  getProcessPgid,
+  publishImmutableProof,
+  publishMutableProjection,
+  computeSha256Digest,
+  canonicalJson,
+} from './cli-spawn-supervisor.mjs';
+
+function normalizeDigest(digest) {
+  if (!digest || typeof digest !== 'string') return null;
+  return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
 // `effectiveAssignment` derivation reads a stored assignment.json back from
@@ -665,6 +721,264 @@ function validateAssignmentLegality(asgn, opts = {}) {
 }
 
 /**
+ * Atomically admit one Run attempt for `assignmentId` under `runsDir`,
+ * replacing the prior readdirSync + max-attempt scan. Fences three
+ * outcomes, per the admission door's own commit algorithm:
+ *
+ * - The SAME `(retryId, destination, payloadDigest)` tuple as an
+ *   already-committed generation returns that SAME attempt/runId, never a
+ *   new one (idempotent retry).
+ * - A DIFFERENT tuple reusing an already-used `retryId` is refused
+ *   (`duplicate-retry`) -- a caller's retry identity may not silently
+ *   change what it means partway through.
+ * - A caller naming `predecessorRunId` (or contending while a Run is
+ *   already admitted at all) must supersede the EXACT current committed
+ *   Run; any other value is refused (`invalid-predecessor`).
+ *
+ * The admission-generation ledger (`assignmentDir/admission/generations/`,
+ * run-lock.mjs's shared append-only primitive) is the sole source of truth
+ * for attempt numbers: concurrent callers race on one hard-linked path,
+ * exactly one wins, every loser rereads and re-evaluates against the new
+ * current generation. Once an attempt/runId is committed there, it is
+ * never reused or leapfrogged, independent of whether the run directory
+ * materialization below has completed.
+ *
+ * The run directory itself (`runs/<NN>/run.json` + `dispatch-plan.json`)
+ * is built in a same-filesystem staging directory, fsynced, then published
+ * with one atomic rename -- a reader never observes a partially-written
+ * attempt directory, and a crash between generation commit and rename
+ * leaves the generation record as the sole durable fact (no `runs/<NN>/`
+ * at all) until a later call for the same tuple resumes and completes it.
+ * Final attempt directories are never created empty.
+ */
+function admitRunAttempt(
+  assignmentDir,
+  runsDir,
+  assignmentId,
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan },
+) {
+  const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
+  const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
+
+  if (retryId !== undefined) {
+    if (readMarker(path.join(admissionMarkersDir, `${retryId}.aborted.json`)) !== null) {
+      throw new RunnerConfigError(
+        `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was aborted -- refuse identity reuse`,
+      );
+    }
+  }
+
+  const admission = publishNextGeneration(admissionGenerationsDir, ({ current, nextEpoch, generations }) => {
+    // Strict tuple/predecessor fencing is opt-in, gated on the caller
+    // supplying a `retryId` at all -- every pre-existing caller of
+    // `executeAssignment` (and every legacy retry path that just calls it
+    // again with no new admission opts) never passes one, and must keep
+    // getting "next available attempt" exactly as the replaced
+    // readdirSync scan did. A caller that DOES pass `retryId` opts into
+    // the full admission contract: same tuple resumes idempotently, a
+    // changed tuple under the same retryId is refused, and the caller must
+    // name the exact current Run it supersedes.
+    if (retryId !== undefined) {
+      const priorForRetryId = generations.find((g) => g.record.retryId === retryId);
+      if (priorForRetryId) {
+        if (priorForRetryId.record.destination === destination && priorForRetryId.record.admissionPayloadDigest === payloadDigest) {
+          return { stop: true, status: 'duplicate', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
+        }
+        return { stop: true, status: 'duplicate-retry', epoch: priorForRetryId.epoch, record: priorForRetryId.record };
+      }
+
+      const isGenerationValid = (g) => {
+        if (!g.record?.retryId) return true;
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+
+      const validGenerations = generations.filter(isGenerationValid);
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      const currentRunId = currentValid?.record?.runId ?? null;
+      if (predecessorRunId !== currentRunId) {
+        return { stop: true, status: 'invalid-predecessor', currentRunId };
+      }
+    }
+
+    let maxDir = 0;
+    if (fs.existsSync(runsDir)) {
+      try {
+        const entries = fs.readdirSync(runsDir);
+        for (const name of entries) {
+          if (/^\d+$/.test(name)) {
+            const n = parseInt(name, 10);
+            if (!Number.isNaN(n) && n > maxDir) maxDir = n;
+          }
+        }
+      } catch {}
+    }
+    for (const g of generations) {
+      if (g.record?.attempt && g.record.attempt > maxDir) {
+        maxDir = g.record.attempt;
+      }
+    }
+    let attempt = Math.max(nextEpoch, maxDir + 1);
+    while (fs.existsSync(path.join(runsDir, String(attempt).padStart(2, '0')))) {
+      attempt += 1;
+    }
+
+    if (expectedRunId !== undefined) {
+      const match = /^run_.+_(\d+)$/.exec(expectedRunId);
+      if (match) {
+        const declaredAttempt = parseInt(match[1], 10);
+        if (!Number.isNaN(declaredAttempt) && declaredAttempt > attempt) {
+          attempt = declaredAttempt;
+        }
+      }
+    }
+
+    const attemptStr = String(attempt).padStart(2, '0');
+    const runId = `run_${assignmentId}_${attemptStr}`;
+    if (expectedRunId !== undefined && runId !== expectedRunId) {
+      // A caller (e.g. a schema-2 session retry declaration) that named an
+      // exact expected identity gets exactly that identity or a refusal --
+      // never a silently different runId drifting out of two independent
+      // ledgers (the session's own retry-declaration generations and this
+      // Assignment's admission generations) that were supposed to stay in
+      // lockstep.
+      const isGenerationValid = (g) => {
+        if (!g.record?.retryId) return true;
+        const isAborted = readMarker(path.join(admissionMarkersDir, `${g.record.retryId}.aborted.json`)) !== null;
+        if (!isAborted) return true;
+        const attemptStr = g.record.attemptStr || String(g.record.attempt).padStart(2, '0');
+        const runJsonPath = path.join(runsDir, attemptStr, 'run.json');
+        if (!fs.existsSync(runJsonPath)) return false;
+        try {
+          const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          return runMeta?.retryId === g.record.retryId;
+        } catch {
+          return false;
+        }
+      };
+      const validGenerations = generations.filter(isGenerationValid);
+      const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
+      return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
+    }
+    return {
+      record: {
+        attempt,
+        attemptStr,
+        runId,
+        retryId: retryId ?? null,
+        predecessorRunId,
+        destination,
+        admissionPayloadDigest: payloadDigest,
+        admittedAt: new Date().toISOString(),
+      },
+    };
+  });
+
+  if (admission.status === 'duplicate-retry') {
+    throw new RunnerConfigError(
+      `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,
+    );
+  }
+  if (admission.status === 'invalid-predecessor') {
+    throw new RunnerConfigError(
+      `executeAssignment: predecessorRunId "${predecessorRunId}" for assignment "${assignmentId}" does not match the current committed Run "${admission.currentRunId}" -- refusing (invalid-predecessor)`,
+    );
+  }
+
+  const record = admission.record;
+  const runDir = path.join(runsDir, record.attemptStr);
+
+  if (fs.existsSync(runDir)) {
+    if (retryId !== undefined && admission.status === 'duplicate') {
+      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
+    }
+  }
+
+  // Remove matching abandoned staging directory only after validating its identity:
+  // "abandoned staging is not admission and is removed only after matching its retry id and digest"
+  try {
+    if (fs.existsSync(runsDir)) {
+      const entries = fs.readdirSync(runsDir);
+      for (const name of entries) {
+        if (name.startsWith(`.staging-${record.attemptStr}`)) {
+          const abandonedPath = path.join(runsDir, name);
+          try {
+            // Live sibling protection: never delete a staging directory belonging to a live process
+            const pidMatch = /^\.staging-[^-]+-(\d+)-/.exec(name);
+            if (pidMatch) {
+              const stagedPid = parseInt(pidMatch[1], 10);
+              if (isProcessAlive(stagedPid)) {
+                continue;
+              }
+            }
+
+            // Legacy staging without PID/UUID (.staging-NN)
+            if (name === `.staging-${record.attemptStr}`) {
+              fs.rmSync(abandonedPath, { recursive: true, force: true });
+              continue;
+            }
+
+            const stagedMetaPath = path.join(abandonedPath, 'run.json');
+            if (fs.existsSync(stagedMetaPath)) {
+              const stagedMeta = JSON.parse(fs.readFileSync(stagedMetaPath, 'utf8'));
+              const normStaged = normalizeDigest(stagedMeta.payloadDigest);
+              const normAdmission = normalizeDigest(record.admissionPayloadDigest);
+              if (
+                stagedMeta.retryId === (record.retryId ?? null) &&
+                normStaged === normAdmission
+              ) {
+                fs.rmSync(abandonedPath, { recursive: true, force: true });
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch {}
+
+  const stagingDir = path.join(runsDir, `.staging-${record.attemptStr}-${process.pid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(stagingDir, { recursive: true });
+
+  const runMeta = buildRunMeta(record);
+  const runMetaPath = path.join(stagingDir, 'run.json');
+  fs.writeFileSync(runMetaPath, `${JSON.stringify(runMeta, null, 2)}\n`);
+  fsyncFileBestEffort(runMetaPath);
+
+  if (buildDispatchPlan) {
+    const dispatchPlan = buildDispatchPlan(record);
+    if (dispatchPlan) {
+      const dispatchPlanPath = path.join(stagingDir, 'dispatch-plan.json');
+      fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(dispatchPlan, null, 2)}\n`);
+      fsyncFileBestEffort(dispatchPlanPath);
+    }
+  }
+  fsyncDirBestEffort(stagingDir);
+
+  try {
+    fs.renameSync(stagingDir, runDir);
+  } catch (err) {
+    if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST') {
+      fs.rmSync(stagingDir, { recursive: true, force: true });
+      return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
+    } else {
+      throw err;
+    }
+  }
+  fsyncDirBestEffort(runsDir);
+
+  return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: false };
+}
+
+/**
  * Execute an assignment by dispatching a worker and recording the Run & RunResult (Step 03 §5).
  *
  * @param {object} assignment Assignment object
@@ -807,24 +1121,84 @@ export async function executeAssignment(assignment, opts = {}) {
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
 
-  // Determine run attempt number monotonically without reusing existing dirs
-  const existingAttempts = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
-  let maxAttempt = 0;
-  for (const att of existingAttempts) {
-    const num = parseInt(att, 10);
-    if (!Number.isNaN(num) && num > maxAttempt) {
-      maxAttempt = num;
+  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
+  const startedAt = new Date().toISOString();
+
+  // Plan content identity, recorded runner-side BEFORE the worker runs: the
+  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
+  // recomputes this hash so a verdict computed against an older plan
+  // revision is never consumed, even when the worker hides the edit by
+  // rewinding file mtimes (the worker controls mtimes; it never controls
+  // this runner-recorded hash).
+  let planContentHash = null;
+  if (effectiveAssignment.workId && opts.work?.docsRef) {
+    try {
+      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
+      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
+      if (fs.existsSync(planInputPath)) {
+        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
+      }
+    } catch {
+      planContentHash = null;
     }
   }
-  let attemptNum = maxAttempt + 1;
-  let attemptStr = String(attemptNum).padStart(2, '0');
-  let runDir = path.join(runsDir, attemptStr);
-  while (fs.existsSync(runDir)) {
-    attemptNum += 1;
-    attemptStr = String(attemptNum).padStart(2, '0');
-    runDir = path.join(runsDir, attemptStr);
+
+  // Atomic admission (replaces the prior readdirSync + max-attempt scan --
+  // see admitRunAttempt's own doc comment for the full commit algorithm).
+  // `retryId` is opt-in: every pre-existing caller omits it and gets "next
+  // available attempt" exactly as before; a caller that supplies one opts
+  // into the full idempotent-tuple/predecessor-fencing contract.
+  const defaultAdmissionPayloadDigest = crypto
+    .createHash('sha256')
+    .update(JSON.stringify({ assignment: effectiveAssignment, compiledPlan }))
+    .digest('hex');
+  const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
+    retryId: opts.retryId,
+    predecessorRunId: opts.predecessorRunId ?? null,
+    destination: opts.destination ?? effectiveCwd,
+    payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
+    expectedRunId: opts.expectedRunId,
+    buildRunMeta: (record) => ({
+      contract: 'assignment-run.v2',
+      runId: record.runId,
+      assignmentId: effectiveAssignment.assignmentId,
+      attempt: record.attempt,
+      supersedesRunId: record.predecessorRunId ?? null,
+      retryId: record.retryId ?? null,
+      payloadDigest: record.admissionPayloadDigest ? (record.admissionPayloadDigest.startsWith('sha256:') ? record.admissionPayloadDigest : `sha256:${record.admissionPayloadDigest}`) : null,
+      dispatchPlanDigest: compiledPlan ? `sha256:${crypto.createHash('sha256').update(JSON.stringify(compiledPlan)).digest('hex')}` : null,
+      phase: 'admitted',
+      delivery: 'not-sent',
+      executorId: resolvedExecutorId,
+      ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
+      ...(planContentHash ? { planContentHash } : {}),
+      cwd,
+      startedAt,
+      timeoutMs,
+      status: 'running',
+    }),
+    buildDispatchPlan: () => compiledPlan,
+  });
+  const { attemptStr, runId, runDir } = admitted;
+  const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
+
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (admitted.resumed) {
+    if (fs.existsSync(resultJsonPath)) {
+      try {
+        const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+        return Object.freeze(settledResult);
+      } catch {}
+    }
+    const commandsDir = path.join(runDir, 'controller', 'commands');
+    if (fs.existsSync(commandsDir)) {
+      const rec = await reconcileCliSpawnRun(runDir);
+      if (rec.settled && rec.runResult) {
+        return rec.runResult;
+      }
+    }
   }
-  fs.mkdirSync(runDir, { recursive: true });
 
   // Dispatched-run membership: record every run attempt THIS runner actually
   // dispatched, appended to assignment.json right after the run dir exists.
@@ -849,49 +1223,6 @@ export async function executeAssignment(assignment, opts = {}) {
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
   const prompt = renderAssignmentPrompt(effectiveAssignment, { cwd, runDir: path.resolve(runDir) });
 
-  const runId = `run_${effectiveAssignment.assignmentId}_${attemptStr}`;
-  const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
-  const startedAt = new Date().toISOString();
-
-  const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
-  fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(compiledPlan, null, 2)}\n`);
-
-  // Plan content identity, recorded runner-side BEFORE the worker runs: the
-  // sha256 of the Work's plan.md at dispatch time. Cross-pass consumption
-  // recomputes this hash so a verdict computed against an older plan
-  // revision is never consumed, even when the worker hides the edit by
-  // rewinding file mtimes (the worker controls mtimes; it never controls
-  // this runner-recorded hash).
-  let planContentHash = null;
-  if (effectiveAssignment.workId && opts.work?.docsRef) {
-    try {
-      const planContentRoot = resolveContentRoot(root, effectiveAssignment.workId, opts.work.docsRef);
-      const planInputPath = path.join(planContentRoot, opts.work.docsRef, 'plan.md');
-      if (fs.existsSync(planInputPath)) {
-        planContentHash = crypto.createHash('sha256').update(fs.readFileSync(planInputPath)).digest('hex');
-      }
-    } catch {
-      planContentHash = null;
-    }
-  }
-
-  const runMeta = {
-    runId,
-    assignmentId: effectiveAssignment.assignmentId,
-    attempt: attemptNum,
-    executorId: resolvedExecutorId,
-    ...(compiledPlan ? { dispatchPlanPath: path.relative(root, dispatchPlanPath) } : {}),
-    ...(planContentHash ? { planContentHash } : {}),
-    cwd,
-    startedAt,
-    timeoutMs,
-    status: 'running',
-  };
-
-  fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify(runMeta, null, 2)}\n`);
-
-  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
-
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
   const dirtyBefore = safeGitStatusFiles(effectiveCwd);
@@ -915,36 +1246,352 @@ export async function executeAssignment(assignment, opts = {}) {
   // silently inheriting this call's provenance.
   const gitBeforeSource = 'pre-launch';
 
+  // Per-Run control fencing (AD-02/AD-10): a monotonic controlEpoch plus a
+  // unique controlToken, acquired synchronously (no adapter I/O runs inside
+  // the acquisition itself) and re-checked before this attempt is allowed
+  // to append a settlement. Two acquisitions of the same Run always
+  // receive distinct epochs/tokens; a live holder is never reclaimed on
+  // heartbeat/TTL alone (see run-lock.mjs). Failure to acquire here means a
+  // different controller already holds this exact Run -- refuse outright
+  // rather than race it for the same subprocess/files.
+  const controlHolder = { id: `${runId}:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+  const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
+  if (control.status !== 'acquired') {
+    throw new RunnerConfigError(
+      `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
+    );
+  }
+  const { controlEpoch, controlToken } = control;
+
   const startTime = Date.now();
   let rawResult;
   let executionError = null;
 
   const executorId = resolvedExecutorId;
+  const resolvedAdapter = compiledPlan?.policy?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
+
+  let launchCommandId = opts.launchCommandId || `cmd_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+  let commandState = null;
+  let supervisorReceipt = null;
+
   try {
-    rawResult = await executeExecutorCli(executorId, {
-      prompt,
-      cwd,
-      repoRoot: root,
-      runnerConfig: cfg,
-      model: effectivePolicy.model,
-      tier: effectivePolicy.tier,
-      timeoutMs,
-      onChunk: opts.onChunk,
-      work: opts.work,
-      stage: effectiveAssignment.stage,
-      runDir: path.resolve(runDir),
-      dispatchBatchKey: opts.dispatchBatchKey,
-    });
-  } catch (err) {
-    executionError = err;
-    const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
-    rawResult = {
-      status: isTimeoutErr ? 'timeout' : 'failed',
-      signal: isTimeoutErr ? 'SIGTERM' : null,
-      stdout: err.stdout || '',
-      stderr: err.stderr || err.message || String(err),
-    };
-  }
+    if (useSupervisorRecovery) {
+      const depth = currentDispatchDepth();
+      if (depth >= MAX_DISPATCH_DEPTH) {
+        throw new DispatchError(
+          'dispatch-depth-exceeded',
+          `executor dispatch refused: current dispatch depth (${depth}) has reached MAX_DISPATCH_DEPTH (${MAX_DISPATCH_DEPTH}) -- prevent runaway nested dispatch.`,
+          { depth, maxDepth: MAX_DISPATCH_DEPTH, workId: effectiveAssignment?.workId },
+        );
+      }
+      // 1. Snapshot and write Evaluator Baseline V1 before launch
+      const snapshotsObj = {};
+      for (const [p, snap] of dirtyBeforeSnapshots.entries()) {
+        snapshotsObj[p] = { exists: snap.exists, sha256: snap.hash };
+      }
+      const baselineBody = {
+        contract: 'evaluator-baseline.v1',
+        runId,
+        assignmentId: effectiveAssignment.assignmentId,
+        cwd: effectiveCwd,
+        gitBefore,
+        gitBeforeSource,
+        dirtyBefore,
+        dirtyBeforeSnapshots: snapshotsObj,
+        capturedAt: new Date().toISOString(),
+      };
+      const baselineDigest = computeSha256Digest(baselineBody);
+      const baselineRecord = { ...baselineBody, digest: baselineDigest };
+      const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+      publishImmutableProof(baselinePath, baselineRecord);
+
+      // 2. Commit Command State V1 not-requested -> pending
+      const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+      commandState = {
+        contract: 'assignment-command-state.v1',
+        runId,
+        launchCommandId,
+        controlEpoch,
+        controlTokenDigest: computeSha256Digest(controlToken),
+        state: 'pending',
+        envelopeDigest: null,
+        bindingDigest: null,
+        receiptDigest: null,
+        outcome: null,
+      };
+      publishMutableProjection(commandPath, commandState);
+
+      // 3. Build Assignment Launch Context
+      const assignmentLaunchContext = {
+        contract: 'assignment-cli-spawn-launch-context.v1',
+        run: {
+          runId,
+          assignmentId: effectiveAssignment.assignmentId,
+          attempt: admitted.attemptNum,
+          dispatchPlanDigest: compiledPlan ? `sha256:${crypto.createHash('sha256').update(JSON.stringify(compiledPlan)).digest('hex')}` : null,
+          evaluatorBaselineDigest: baselineDigest,
+        },
+        command: {
+          launchCommandId,
+          controlEpoch,
+          controlTokenDigest: computeSha256Digest(controlToken),
+        },
+      };
+
+      // 4. Resolve executor command params
+      let resolvedCmd;
+      try {
+        resolvedCmd = resolveExecutorCommand(cfg, {
+          prompt,
+          model: effectivePolicy.model,
+          tier: effectivePolicy.tier,
+          executorId: resolvedExecutorId,
+          fgosDir,
+          attestRoot: effectiveCwd,
+        });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: 'launch-envelope-invalid',
+          failureDetail: { message: err.message, code: 'config-invalid', source: 'controller' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 5. Prepare Confinement For Launch via Confinement Authority
+      let prepResult;
+      try {
+        const confReq = buildConfinementRequest({
+          capability: compiledPlan.capability || 'code:implement',
+          stageSkill: resolvedExecutorId,
+          executorId: resolvedExecutorId,
+          cfg,
+          assignmentLaunchContext,
+          invocation: {
+            command: resolvedCmd.command,
+            args: resolvedCmd.args,
+            argsTemplate: resolvedCmd.argsTemplate,
+            prompt,
+            env: resolvedCmd.env,
+            liveOutput: resolvedCmd.liveOutput,
+            interactiveMode: resolvedCmd.interactiveMode,
+            promptDelivery: resolvedCmd.promptDelivery,
+            permissionMode: resolvedCmd.permissionMode,
+            confinement: resolvedCmd.confinement,
+            adapter: resolvedCmd.adapter || 'cli-spawn',
+            method: resolvedCmd.method,
+            url: resolvedCmd.url,
+            headers: resolvedCmd.headers,
+            body: resolvedCmd.body,
+            resourceBindings: resolvedCmd.resourceBindings,
+          },
+          context: {
+            cwd: effectiveCwd,
+            repoRoot: root,
+            runDir: path.resolve(runDir),
+            fgosDir,
+            timeoutMs,
+            idleTimeoutMs: cfg.idleTimeoutMs,
+            maxBuffer: cfg.maxBuffer,
+            onChunk: opts.onChunk,
+            workId: resolvedExecutorId,
+            tier: effectivePolicy.tier,
+            model: effectivePolicy.model,
+            dispatchBatchKey: opts.dispatchBatchKey,
+            controlToken,
+            controlEpoch,
+            launchCommandId,
+          },
+          requirement: compiledPlan.policy?.confinement
+            ? (compiledPlan.policy.confinement.mode === 'unconfined'
+                ? { mode: 'unconfined', policyId: null, policy: null }
+                : compiledPlan.policy.confinement)
+            : { mode: 'unconfined', policyId: null, policy: null },
+        });
+        prepResult = await prepareConfinementForLaunch(confReq, { adapterPort: opts.adapterPort });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: err.code || 'confinement-refused',
+          failureDetail: { message: err.message, code: err.code || null, source: 'confinement-authority' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 6. Guarded update of pending command with envelopeDigest
+      commandState.envelopeDigest = prepResult.envelope.digest;
+      publishMutableProjection(commandPath, commandState);
+
+      // 7. Submit supervisor
+      let supervisorProc;
+      try {
+        supervisorProc = startSupervisorProcess({
+          envelopePath: prepResult.envelopePath,
+          detached: true,
+          onChunk: opts.onChunk,
+        });
+      } catch (err) {
+        const commandOutcome = {
+          kind: 'submission-refused',
+          reason: 'supervisor-spawn-refused',
+          failureDetail: { message: err.message, code: 'supervisor-spawn-fail', source: 'supervisor-launch' },
+          failedAt: new Date().toISOString(),
+        };
+        commandOutcome.failureDigest = computeSha256Digest({
+          kind: commandOutcome.kind,
+          reason: commandOutcome.reason,
+          failureDetail: commandOutcome.failureDetail,
+          failedAt: commandOutcome.failedAt,
+        });
+        commandState.state = 'reconciled';
+        commandState.outcome = commandOutcome;
+        publishMutableProjection(commandPath, commandState);
+        throw err;
+      }
+
+      // 8. Wait for receipt in live execution
+      const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
+      const pollDeadline = Date.now() + timeoutMs + 10000;
+      while (Date.now() < pollDeadline) {
+        if (fs.existsSync(receiptPath)) {
+          try {
+            supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+            break;
+          } catch {}
+        }
+        if (supervisorProc.exitCode !== null) {
+          if (fs.existsSync(receiptPath)) {
+            try { supervisorReceipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8')); } catch {}
+          }
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 20));
+      }
+
+      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+        );
+      }
+
+      // 9. Guarded update: command reconciled with receipt-backed outcome
+      if (supervisorReceipt) {
+        commandState.state = 'reconciled';
+        commandState.receiptDigest = supervisorReceipt.digest;
+        commandState.bindingDigest = supervisorReceipt.bindingDigest;
+        commandState.outcome = {
+          kind: 'receipt-backed',
+          receiptDigest: supervisorReceipt.digest,
+          adapterCompletion: supervisorReceipt.completion,
+        };
+        publishMutableProjection(commandPath, commandState);
+      } else {
+        commandState.state = 'reconciled';
+        commandState.outcome = {
+          kind: 'submission-refused',
+          reason: 'worker-state-unknown',
+          failureDetail: {
+            message: 'supervisor exited before adapter receipt was published',
+          },
+        };
+        publishMutableProjection(commandPath, commandState);
+        let runMeta = null;
+        const runJsonPath = path.join(runDir, 'run.json');
+        if (fs.existsSync(runJsonPath)) {
+          try { runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+        }
+        if (!runMeta) {
+          runMeta = {
+            contract: 'run-meta.v1',
+            runId,
+            assignmentId: effectiveAssignment.assignmentId,
+            workId: effectiveAssignment.workId,
+            attempt: admitted.attemptNum,
+            executorId,
+          };
+        }
+        const settledFailed = await settleFailedRunFromOutcome(runDir, runMeta, commandState, controlEpoch, controlToken);
+        return settledFailed.runResult;
+      }
+
+      const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
+      const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
+      let stdoutText = '';
+      let stderrText = '';
+      try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
+      try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
+
+      const isTimeout = supervisorReceipt?.completion?.kind === 'timeout' || supervisorReceipt?.completion?.kind === 'idle-timeout';
+      const exitCode = supervisorReceipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
+      const signal = supervisorReceipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
+
+      rawResult = {
+        status: isTimeout ? 'timeout' : (exitCode === 0 ? 0 : 'failed'),
+        exitCode,
+        signal,
+        stdout: stdoutText,
+        stderr: stderrText,
+      };
+    } else {
+      try {
+        rawResult = await executeExecutorCli(executorId, {
+          prompt,
+          cwd,
+          repoRoot: root,
+          runnerConfig: cfg,
+          model: effectivePolicy.model,
+          tier: effectivePolicy.tier,
+          timeoutMs,
+          onChunk: opts.onChunk,
+          work: opts.work,
+          stage: effectiveAssignment.stage,
+          runDir: path.resolve(runDir),
+          dispatchBatchKey: opts.dispatchBatchKey,
+        });
+      } catch (err) {
+        executionError = err;
+        const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
+        rawResult = {
+          status: isTimeoutErr ? 'timeout' : 'failed',
+          signal: isTimeoutErr ? 'SIGTERM' : null,
+          stdout: err.stdout || '',
+          stderr: err.stderr || err.message || String(err),
+        };
+      }
+
+      // The adapter call above is the ONE async gap this control token has to
+      // outlive. Before appending anything a reader would treat as this Run's
+      // settlement, confirm nothing superseded this token while it ran --
+      // otherwise a controller that lost control mid-flight could still write
+      // a result a fresher controller never authorized (crash matrix: "result
+      // with stale control token -- refuse and append no settlement").
+      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+        );
+      }
+    }
 
   const durationMs = Date.now() - startTime;
   const settledAt = new Date().toISOString();
@@ -975,8 +1622,8 @@ export async function executeAssignment(assignment, opts = {}) {
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
   // Detect worker-produced artifacts in runDir (Step 04 §5.5)
-  const agentReportPath = resolveWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  const agentResultPath = resolveWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
+  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
 
   // Step 04 §5.2: validate agent-result.json; invalid schema must produce failed/failed.
   let agentClaim = null;
@@ -1135,6 +1782,8 @@ export async function executeAssignment(assignment, opts = {}) {
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
+    controlEpoch,
+    controlToken,
     // executorId: the executor that ACTUALLY ran this attempt (post-redirect).
     // policy.executorPreference[0]: the DECLARED preference (pre-redirect).
     // executorRedirected: true when the two above disagree, so the redirect
@@ -1175,6 +1824,12 @@ export async function executeAssignment(assignment, opts = {}) {
     },
   };
 
+  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+    throw new RunnerConfigError(
+      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+    );
+  }
+
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
 
   // Close the sentence run.json started. It was written `running` before the
@@ -1184,8 +1839,632 @@ export async function executeAssignment(assignment, opts = {}) {
   //
   // `settled` here means the run reached its end and produced a RunResult. It
   // says nothing about whether the work succeeded; that verdict is the
-  // `status`/`confidence` pair inside result.json, one line above.
   markRunSettled(runDir);
-
+  Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
   return Object.freeze(runResult);
+  } finally {
+    if (useSupervisorRecovery && launchCommandId) {
+      try {
+        await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
+      } catch {}
+    }
+    releaseRunControl(runDir, { controlEpoch, controlToken });
+  }
+}
+
+async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken) {
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (fs.existsSync(resultJsonPath)) {
+    try {
+      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+    } catch {}
+  }
+  const generationsDir = path.join(runDir, 'control', 'generations');
+  if (fs.existsSync(generationsDir)) {
+    try {
+      const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
+      if (files.length > 0 && !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `settleFailedRunFromOutcome: control token for Run "${runMeta?.runId || ''}" (epoch ${controlEpoch}) is no longer current -- refusing to append a settlement from a superseded controller`,
+        );
+      }
+    } catch (err) {
+      if (err instanceof RunnerConfigError) throw err;
+    }
+  }
+  const settledAt = new Date().toISOString();
+  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
+
+  const stdoutText = '';
+  const stderrText = command.outcome?.failureDetail?.message || 'submission-refused';
+
+  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
+  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+
+  const exitInfoData = {
+    exitCode: 1,
+    signal: null,
+    timedOut: false,
+    settledAt,
+    durationMs: 0,
+  };
+  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
+
+  const evidenceData = {
+    operationMutability: 'mutates-repo',
+    gitBefore: null,
+    gitAfter: null,
+    gitBeforeSource: 'pre-launch',
+    dirtyBefore: [],
+    dirtyAfter: [],
+    mutatedDirtyBeforeFiles: [],
+    changedFiles: [],
+    changedFileReasons: {},
+    artifacts: [],
+    tests: [],
+  };
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+
+  const runResult = {
+    runId: runMeta.runId,
+    assignmentId: runMeta.assignmentId,
+    controlEpoch,
+    controlToken,
+    status: 'failed',
+    confidence: 'failed',
+    runtime: {
+      exitCode: 1,
+      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+    },
+    agentClaim: {
+      status: 'failed',
+      summary: stderrText,
+    },
+    evidence: {
+      gitBefore: null,
+      gitAfter: null,
+      gitBeforeSource: 'pre-launch',
+      changedFiles: [],
+      mutatedDirtyBeforeFiles: [],
+      artifacts: [],
+      tests: [],
+    },
+  };
+
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  const runJsonPath = path.join(runDir, 'run.json');
+  let runJsonMeta = runMeta || {};
+  if (fs.existsSync(runJsonPath)) {
+    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+  }
+  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'failed', settledAt }, null, 2)}\n`);
+  await finalizeConfinementResources({ runDir, launchCommandId: command.launchCommandId });
+
+  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+}
+
+async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receiptOpt = null) {
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (fs.existsSync(resultJsonPath)) {
+    try {
+      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+    } catch {}
+  }
+  const generationsDir = path.join(runDir, 'control', 'generations');
+  if (fs.existsSync(generationsDir)) {
+    try {
+      const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
+      if (files.length > 0 && !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+        throw new RunnerConfigError(
+          `settleReceiptRunFromOutcome: control token for Run "${runMeta?.runId || ''}" (epoch ${controlEpoch}) is no longer current -- refusing to append a settlement from a superseded controller`,
+        );
+      }
+    } catch (err) {
+      if (err instanceof RunnerConfigError) throw err;
+    }
+  }
+  const launchCommandId = command.launchCommandId;
+  const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
+  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
+
+  const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
+  const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
+  let stdoutText = '';
+  let stderrText = '';
+  try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
+  try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
+
+  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
+  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+
+  const isTimeout = receipt?.completion?.kind === 'timeout' || receipt?.completion?.kind === 'idle-timeout';
+  const exitCode = receipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
+  const signal = receipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
+  const durationMs = receipt?.completion?.durationMs ?? 0;
+  const settledAt = receipt?.completion?.settledAt ?? new Date().toISOString();
+
+  const exitInfoData = {
+    exitCode,
+    signal,
+    timedOut: isTimeout,
+    settledAt,
+    durationMs,
+  };
+  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
+
+  // Detect worker artifacts
+  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
+  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
+
+  let agentClaim = null;
+  let claimInvalid = false;
+  let claimSha256 = null;
+
+  if (fs.existsSync(agentResultPath)) {
+    try {
+      const claimBytes = fs.readFileSync(agentResultPath);
+      const parsed = JSON.parse(claimBytes.toString('utf8'));
+      const validation = validateAgentResultClaim(parsed);
+      if (validation.valid) {
+        agentClaim = parsed;
+        claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
+      } else {
+        claimInvalid = true;
+      }
+    } catch {
+      claimInvalid = true;
+    }
+  }
+
+  const workerArtifacts = [];
+  const settleReports = [];
+  if (fs.existsSync(agentReportPath)) {
+    let reportValid = false;
+    let reportSha256 = null;
+    try {
+      const reportBytes = fs.readFileSync(agentReportPath);
+      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
+      if (reportValid) {
+        reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
+      }
+    } catch {}
+    const reportRel = path.relative(root, agentReportPath);
+    workerArtifacts.push({ path: reportRel, kind: 'agent-report', valid: reportValid });
+    if (reportValid && reportSha256) {
+      settleReports.push({ path: reportRel, sha256: reportSha256 });
+    }
+  }
+
+  if (fs.existsSync(agentResultPath)) {
+    workerArtifacts.push({
+      path: path.relative(root, agentResultPath),
+      kind: 'agent-result',
+      valid: !claimInvalid,
+    });
+  }
+
+  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
+
+  // Read assignment to check read-only
+  const candidateAssignmentPaths = [
+    path.join(path.dirname(runDir), '..', 'assignment.json'),
+    path.join(runDir, 'assignment.json'),
+  ];
+  let asgn = null;
+  for (const p of candidateAssignmentPaths) {
+    if (fs.existsSync(p)) {
+      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
+    }
+  }
+  const isReadOnly = isReadOnlyAssignment(asgn);
+
+  const effectiveCwd = baseline?.cwd || root;
+  const gitBefore = baseline?.gitBefore ?? null;
+  const gitBeforeSource = baseline?.gitBeforeSource ?? 'pre-launch';
+  const dirtyBefore = baseline?.dirtyBefore || [];
+  const gitAfter = safeGitHead(effectiveCwd);
+  const dirtyAfter = safeGitStatusFiles(effectiveCwd);
+
+  const { changedFiles, changedFileReasons } = computeChangedFiles(effectiveCwd, gitBefore, gitAfter, dirtyBefore, dirtyAfter);
+
+  const mutatedDirtyBeforeFiles = [];
+  if (isReadOnly && baseline?.dirtyBeforeSnapshots) {
+    for (const [relPath, snap] of Object.entries(baseline.dirtyBeforeSnapshots)) {
+      const fullPath = path.join(effectiveCwd, relPath);
+      let currentExists = false;
+      let currentHash = null;
+      try {
+        if (fs.existsSync(fullPath)) {
+          const content = fs.readFileSync(fullPath);
+          currentHash = crypto.createHash('sha256').update(content).digest('hex');
+          currentExists = true;
+        }
+      } catch {}
+      if (currentExists !== snap.exists || currentHash !== snap.sha256) {
+        mutatedDirtyBeforeFiles.push(relPath);
+      }
+    }
+  }
+
+  const { status, confidence } = classifyRunEvidence({
+    exitCode,
+    signal,
+    isTimeout,
+    agentClaim,
+    claimInvalid,
+    workerArtifacts: workerArtifactPaths,
+    changedFiles,
+    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
+    isReadOnlyOperation: isReadOnly,
+    cwd: effectiveCwd,
+    repoRoot: root,
+    assignment: asgn,
+  });
+
+  const evidenceData = {
+    operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
+    gitBefore,
+    gitAfter,
+    gitBeforeSource,
+    dirtyBefore,
+    dirtyAfter,
+    mutatedDirtyBeforeFiles,
+    changedFiles,
+    changedFileReasons,
+    artifacts: workerArtifacts,
+    tests: [],
+  };
+  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+
+  const runResult = {
+    runId: runMeta.runId,
+    assignmentId: runMeta.assignmentId,
+    workId: runMeta.workId || asgn?.workId,
+    controlEpoch,
+    controlToken,
+    executorId: runMeta.executorId || 'cli-spawn',
+    ...(claimSha256 ? { claimSha256 } : {}),
+    settleReports,
+    status,
+    confidence,
+    runtime: {
+      exitCode,
+      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+    },
+    agentClaim: agentClaim ?? {
+      status,
+      summary: claimInvalid ? 'agent-result.json was present but failed schema validation' : (isTimeout ? 'Execution timed out' : 'Settled'),
+    },
+    evidence: {
+      gitBefore,
+      gitAfter,
+      gitBeforeSource,
+      changedFiles,
+      mutatedDirtyBeforeFiles,
+      artifacts: workerArtifactPaths,
+      tests: [],
+    },
+  };
+
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  const runJsonPath = path.join(runDir, 'run.json');
+  let runJsonMeta = runMeta || {};
+  if (fs.existsSync(runJsonPath)) {
+    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+  }
+  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'settled', settledAt }, null, 2)}\n`);
+  await finalizeConfinementResources({ runDir, launchCommandId, receipt });
+
+  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+}
+
+/**
+ * Reconcile an Assignment-owned cli-spawn Run against durable evidence.
+ *
+ * @param {string} runDir Path to Run directory (assignments/<asgn>/runs/<attempt>)
+ * @param {object} [opts] Options
+ * @returns {Promise<object>} Outcome object
+ */
+export async function reconcileCliSpawnRun(runDir, opts = {}) {
+  // Check action: unsupported operations
+  if (opts.action === 'cancel' || opts.operation === 'cancel') {
+    return { status: 'parked', reason: 'cancel-unsupported' };
+  }
+  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {
+    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };
+  }
+
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (fs.existsSync(resultJsonPath)) {
+    try {
+      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+    } catch {}
+  }
+
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+  const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+  if (commandFiles.length === 0) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+
+  commandFiles.sort();
+  const commandFile = commandFiles[commandFiles.length - 1];
+  const launchCommandId = path.basename(commandFile, '.json');
+  const commandPath = path.join(commandsDir, commandFile);
+  const command = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+
+  // Stale controller verification
+  const isStale = (opts.controlEpoch !== undefined && opts.controlEpoch < command.controlEpoch) ||
+    (opts.controlToken !== undefined && command.controlTokenDigest && computeSha256Digest(opts.controlToken) !== command.controlTokenDigest);
+  if (isStale) {
+    return { status: 'observed', outcome: command.outcome, receipt: readAdapterReceipt(runDir, launchCommandId), settled: false };
+  }
+
+  let controlEpoch = opts.controlEpoch ?? command.controlEpoch ?? 1;
+  let controlToken = opts.controlToken ?? 'tok-reconcile-default';
+
+  let acquiredControl = null;
+  if (opts.controlToken === undefined) {
+    const holder = opts.holder || { id: `reconciler:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+    try {
+      const control = acquireRunControl(runDir, { holder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
+      if (control.status === 'held') {
+        return { status: 'held', holder: control.holder, controlEpoch: control.controlEpoch };
+      }
+      if (control.status === 'stale') {
+        return { status: 'stale', controlEpoch: control.controlEpoch };
+      }
+      acquiredControl = control;
+      if (opts.controlEpoch === undefined && control.controlEpoch !== undefined) {
+        controlEpoch = control.controlEpoch;
+      }
+      if (control.controlToken !== undefined) {
+        controlToken = control.controlToken;
+      }
+    } catch {}
+  }
+
+  function checkRunControlCurrent() {
+    if (opts.tokenCurrent === false) return false;
+    const generationsDir = path.join(runDir, 'control', 'generations');
+    if (fs.existsSync(generationsDir)) {
+      try {
+        const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
+        if (files.length > 0) {
+          return isRunControlCurrent(runDir, { controlEpoch, controlToken });
+        }
+      } catch {}
+    }
+    return true;
+  }
+
+  try {
+    let runMeta = null;
+    const runJsonPath = path.join(runDir, 'run.json');
+    if (fs.existsSync(runJsonPath)) {
+      try { runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+    }
+    if (!runMeta) {
+      const asgnJsonPath = path.join(runDir, 'assignment.json');
+      if (fs.existsSync(asgnJsonPath)) {
+        try { runMeta = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8')); } catch {}
+      }
+    }
+    if (!runMeta) {
+      return { status: 'parked', reason: 'run-meta-missing' };
+    }
+
+    // Window 3a / 13: submission refusal recorded, Run unsettled
+    if (command.state === 'reconciled' && command.outcome?.kind === 'submission-refused') {
+      if (!checkRunControlCurrent()) {
+        return { status: 'observed', outcome: command.outcome, settled: false };
+      }
+      return await settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken);
+    }
+
+    // Check receipt tamper if receipt already exists
+    const receipt = readAdapterReceipt(runDir, launchCommandId);
+    if (receipt) {
+      if (receipt.digest) {
+        const { digest: rDig, ...rBody } = receipt;
+        if (rDig !== computeSha256Digest(rBody)) {
+          return { status: 'refused', reason: 'protected-artifact-corrupt' };
+        }
+      }
+      const actualRecDigest = receipt.digest || computeSha256Digest(receipt);
+      if (command.outcome?.receiptDigest && command.outcome.receiptDigest !== actualRecDigest) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+      if (command.receiptDigest && command.receiptDigest !== actualRecDigest) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    }
+
+    // Window 11 / 12: command outcome recorded, Run unsettled
+    if (command.state === 'reconciled' && command.outcome?.kind === 'receipt-backed') {
+      const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+      let baseline = null;
+      if (fs.existsSync(baselinePath)) {
+        try {
+          baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+          const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
+          if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
+            return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
+          }
+        } catch {
+          return { status: 'parked', reason: 'evaluator-baseline-missing' };
+        }
+      } else {
+        return { status: 'parked', reason: 'evaluator-baseline-missing' };
+      }
+      if (!checkRunControlCurrent()) {
+        return { status: 'observed', outcome: command.outcome, settled: false };
+      }
+      return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken);
+    }
+
+    // Window 2: Command pending without envelope
+    if (!command.envelopeDigest) {
+      return { status: 'parked', reason: 'launch-envelope-missing' };
+    }
+
+    let envelopePath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
+    if (!fs.existsSync(envelopePath)) {
+      envelopePath = path.join(runDir, 'protected', 'launch-envelope.json');
+    }
+    if (!fs.existsSync(envelopePath)) {
+      return { status: 'parked', reason: 'launch-envelope-missing' };
+    }
+
+    let envelope;
+    try {
+      envelope = JSON.parse(fs.readFileSync(envelopePath, 'utf8'));
+      const { digest: envDigest, ...envelopeWithoutDigest } = envelope;
+      if (envDigest && (envDigest !== computeSha256Digest(envelopeWithoutDigest) || (command.envelopeDigest && envDigest !== command.envelopeDigest))) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    } catch {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+
+    const { digest: envDigest, ...envelopeWithoutDigest } = envelope;
+    const computedEnvDigest = computeSha256Digest(envelopeWithoutDigest);
+    const actualEnvDigest = envDigest || computedEnvDigest;
+
+    // Window 3 / 4: Envelope exists, no supervisor binding
+    const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
+    if (!supervisorBinding) {
+      return { status: 'parked', reason: 'supervisor-binding-unknown' };
+    }
+
+    if (supervisorBinding.digest) {
+      const { digest: supDig, ...supBody } = supervisorBinding;
+      if (supDig !== computeSha256Digest(supBody)) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    }
+
+    if (!supervisorBinding.envelopeDigest || (actualEnvDigest && supervisorBinding.envelopeDigest !== actualEnvDigest)) {
+      return { status: 'refused', reason: 'incarnation-mismatch' };
+    }
+
+    // Window 15: Host boot changed
+    const currentBootId = getBootId();
+    const bindingBootId = supervisorBinding.bootId || supervisorBinding.supervisor?.bootId;
+    if (bindingBootId && currentBootId && currentBootId !== 'unknown-boot' && bindingBootId !== currentBootId && !receipt) {
+      return { status: 'parked', reason: 'host-reboot-unknown' };
+    }
+
+    // Check supervisor liveness and starttime
+    const supervisorAlive = isProcessAlive(supervisorBinding.supervisor?.pid);
+    const supervisorStartTime = getProcessStartTime(supervisorBinding.supervisor?.pid);
+    if (supervisorAlive && supervisorStartTime && supervisorBinding.supervisor?.processStartTime) {
+      if (supervisorStartTime !== supervisorBinding.supervisor.processStartTime) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+    }
+
+    // Window 5 / 6: Check worker binding
+    const workerBinding = readWorkerBinding(runDir, launchCommandId);
+    if (!workerBinding) {
+      if (supervisorAlive) {
+        return { status: 'waiting', state: 'supervisor-running' };
+      }
+      if (!receipt) {
+        return { status: 'parked', reason: 'worker-binding-unknown' };
+      }
+    } else {
+      if (!workerBinding.envelopeDigest || (actualEnvDigest && workerBinding.envelopeDigest !== actualEnvDigest)) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+      if (workerBinding.worker?.pgid && supervisorBinding.supervisor?.pgid && workerBinding.worker.pgid === supervisorBinding.supervisor.pgid) {
+        return { status: 'refused', reason: 'incarnation-mismatch' };
+      }
+      const workerAlive = isProcessAlive(workerBinding.worker?.pid);
+      const workerStartTime = getProcessStartTime(workerBinding.worker?.pid);
+      if (workerAlive && workerStartTime && workerBinding.worker?.processStartTime) {
+        if (workerStartTime !== workerBinding.worker.processStartTime) {
+          return { status: 'refused', reason: 'incarnation-mismatch' };
+        }
+      }
+    }
+
+    // Window 7 / 9 / 14: Check receipt
+    if (!receipt) {
+      const workerAlive = workerBinding ? isProcessAlive(workerBinding.worker?.pid) : false;
+      if (supervisorAlive || workerAlive) {
+        return { status: 'waiting', state: 'running' };
+      }
+      return { status: 'parked', reason: 'worker-state-unknown' };
+    }
+
+    // Verify receipt digests
+    const { digest: recDigest, ...receiptWithoutDigest } = receipt;
+    if (recDigest && recDigest !== computeSha256Digest(receiptWithoutDigest)) {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+    if (receipt.envelopeDigest && actualEnvDigest && receipt.envelopeDigest !== actualEnvDigest) {
+      return { status: 'refused', reason: 'confinement-plan-mismatch' };
+    }
+
+    const supervisorBindingDigest = supervisorBinding.digest || computeSha256Digest(supervisorBinding);
+    let expectedBindingDigest = supervisorBindingDigest;
+    if (workerBinding) {
+      expectedBindingDigest = computeSha256Digest([supervisorBindingDigest, workerBinding.digest || computeSha256Digest(workerBinding)]);
+    }
+    if (receipt.bindingDigest && receipt.bindingDigest !== expectedBindingDigest && receipt.bindingDigest !== supervisorBindingDigest) {
+      return { status: 'refused', reason: 'incarnation-mismatch' };
+    }
+
+    // Stale controller check (Acceptance Test 11)
+    if (!checkRunControlCurrent()) {
+      return { status: 'observed', receipt, settled: false };
+    }
+
+    const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+    let baseline = null;
+    if (fs.existsSync(baselinePath)) {
+      try {
+        baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+        const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
+        if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
+          return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
+        }
+      } catch {
+        return { status: 'parked', reason: 'evaluator-baseline-missing' };
+      }
+    } else {
+      return { status: 'parked', reason: 'evaluator-baseline-missing' };
+    }
+
+    // Publish receipt-backed command outcome
+    const outcome = {
+      kind: 'receipt-backed',
+      receiptDigest: receipt.digest || computeSha256Digest(receipt),
+      adapterCompletion: receipt.completion || receipt.outcome,
+    };
+    command.state = 'reconciled';
+    command.receiptDigest = outcome.receiptDigest;
+    command.outcome = outcome;
+    publishMutableProjection(commandPath, command);
+
+    return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receipt);
+  } finally {
+    if (acquiredControl?.controlToken) {
+      try {
+        releaseRunControl(runDir, {
+          controlEpoch: acquiredControl.controlEpoch,
+          controlToken: acquiredControl.controlToken,
+        });
+      } catch {}
+    }
+  }
 }

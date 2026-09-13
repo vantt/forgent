@@ -37,7 +37,8 @@ import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
 import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
-import { executeAssignment } from './assignment-runner.mjs';
+import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
+export { reconcileCliSpawnRun };
 import { buildAssignment, claimAssignmentId } from './assignment.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
@@ -620,6 +621,10 @@ export async function executeExecutorCli(
     // the herdr adapter in transport.mjs, the same door FGOS_HERDR_BIN
     // already uses for a herdr-only knob this function doesn't carry either).
     dispatchBatchKey,
+    assignmentLaunchContext,
+    launchCommandId,
+    controlEpoch,
+    controlToken,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -936,6 +941,7 @@ export async function executeExecutorCli(
         fallbackFrom: anchorCapability,
         anchorCapability,
         cfg,
+        assignmentLaunchContext,
         invocation: {
           command,
           args,
@@ -967,6 +973,9 @@ export async function executeExecutorCli(
           tier,
           model,
           dispatchBatchKey,
+          launchCommandId,
+          controlEpoch,
+          controlToken,
         },
       });
     } catch (err) {
@@ -1791,6 +1800,27 @@ export async function runDispatchCli() {
       fanoutBatchExecutorCli(candidateIds, {
         cwd: flagValue('--cwd') ?? flagValue('--dir'),
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+      }).then(
+        (result) => {
+          process.stdout.write(`${JSON.stringify(result)}\n`);
+        },
+        (err) => {
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        },
+      );
+      break;
+    }
+    case 'reconcile': {
+      const runDir = executorId ?? flagValue('--run-dir') ?? positional[1];
+      if (!runDir) {
+        process.stderr.write('dispatch reconcile requires a run directory: node src/runner/dispatch.mjs reconcile <runDir>\n');
+        process.exitCode = 1;
+        break;
+      }
+      reconcileCliSpawnRun(runDir, {
+        controlEpoch: flagValue('--control-epoch') ? Number(flagValue('--control-epoch')) : undefined,
+        controlToken: flagValue('--control-token'),
       }).then(
         (result) => {
           process.stdout.write(`${JSON.stringify(result)}\n`);
