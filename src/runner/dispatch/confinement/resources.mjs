@@ -171,10 +171,10 @@ export function resolveConfinementResources({
     }
     const declaredRoot = context.fgosDir;
     let targetDir = context.runDir;
-    if (context.assignmentLaunchContext || grant.subpath === 'worker-output') {
-      targetDir = path.join(context.runDir, 'worker-output');
+    if (context.assignmentLaunchContext || grant.subpath === 'worker-output' || grant.subpath === 'worker-output/outbox') {
+      targetDir = path.join(context.runDir, 'worker-output', 'outbox');
       try {
-        fs.mkdirSync(path.join(targetDir, 'outbox'), { recursive: true });
+        fs.mkdirSync(targetDir, { recursive: true });
       } catch {}
     }
     const { hostTarget } = canonicalizeAndVerifySubpath(targetDir, declaredRoot, 'run-output');

@@ -259,7 +259,10 @@ export async function runSupervisor(envelopePath, opts = {}) {
     publishedAt: new Date().toISOString(),
   };
 
-  publishImmutableProof(supervisorBindingPath, supervisorBinding);
+  const publishedBinding = publishImmutableProof(supervisorBindingPath, supervisorBinding);
+  if (!publishedBinding) {
+    throw new Error(`supervisor: duplicate supervisor binding rejected for ${launchCommandId} at ${supervisorBindingPath}`);
+  }
   if (envelope.paths?.bindingsDir) {
     try {
       publishImmutableProof(path.join(envelope.paths.bindingsDir, 'supervisor.json'), supervisorBinding);

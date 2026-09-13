@@ -1,6 +1,8 @@
 // request.mjs — Confinement Authority request construction and validation
 // (Phase 02 R1-R2, docs/specs/confinement-authority.md §6.4, §6.10).
 
+import fs from "node:fs";
+import path from "node:path";
 import crypto from "node:crypto";
 import {
   validateCapabilityConfinementShape,
@@ -27,7 +29,85 @@ const ALLOWED_REQUEST_KEYS = new Set([
   "assignmentLaunchContext",
 ]);
 
-export function validateAssignmentLaunchContext(launchContext) {
+export function crossCheckAssignmentLaunchContext(launchContext, context = null) {
+  if (!launchContext || !context?.runDir) return;
+  const runDir = context.runDir;
+
+  // 1. Cross-check run.json if present
+  const runJsonPath = path.join(runDir, 'run.json');
+  if (fs.existsSync(runJsonPath)) {
+    try {
+      const runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+      if (runMeta.runId && launchContext.run?.runId && runMeta.runId !== launchContext.run.runId) {
+        const err = new Error(`assignmentLaunchContext runId "${launchContext.run.runId}" mismatches run.json runId "${runMeta.runId}".`);
+        err.code = 'confinement-launch-context-invalid';
+        throw err;
+      }
+      if (runMeta.assignmentId && launchContext.run?.assignmentId && runMeta.assignmentId !== launchContext.run.assignmentId) {
+        const err = new Error(`assignmentLaunchContext assignmentId "${launchContext.run.assignmentId}" mismatches run.json assignmentId "${runMeta.assignmentId}".`);
+        err.code = 'confinement-launch-context-invalid';
+        throw err;
+      }
+      if (runMeta.attempt !== undefined && launchContext.run?.attempt !== undefined && runMeta.attempt !== launchContext.run.attempt) {
+        const err = new Error(`assignmentLaunchContext attempt "${launchContext.run.attempt}" mismatches run.json attempt "${runMeta.attempt}".`);
+        err.code = 'confinement-launch-context-invalid';
+        throw err;
+      }
+      if (runMeta.dispatchPlanDigest && launchContext.run?.dispatchPlanDigest && runMeta.dispatchPlanDigest !== launchContext.run.dispatchPlanDigest) {
+        const err = new Error(`assignmentLaunchContext dispatchPlanDigest "${launchContext.run.dispatchPlanDigest}" mismatches run.json dispatchPlanDigest "${runMeta.dispatchPlanDigest}".`);
+        err.code = 'confinement-launch-context-invalid';
+        throw err;
+      }
+    } catch (err) {
+      if (err.code === 'confinement-launch-context-invalid') throw err;
+    }
+  }
+
+  // 2. Cross-check evaluator-baseline.json if present
+  const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+  if (fs.existsSync(baselinePath)) {
+    try {
+      const baselineRecord = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+      if (baselineRecord.digest && launchContext.run?.evaluatorBaselineDigest && baselineRecord.digest !== launchContext.run.evaluatorBaselineDigest) {
+        const err = new Error(`assignmentLaunchContext evaluatorBaselineDigest "${launchContext.run.evaluatorBaselineDigest}" mismatches evaluator-baseline digest "${baselineRecord.digest}".`);
+        err.code = 'confinement-launch-context-invalid';
+        throw err;
+      }
+    } catch (err) {
+      if (err.code === 'confinement-launch-context-invalid') throw err;
+    }
+  }
+
+  // 3. Cross-check command file if present
+  const launchCommandId = launchContext.command?.launchCommandId;
+  if (launchCommandId) {
+    const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+    if (fs.existsSync(commandPath)) {
+      try {
+        const cmdRecord = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+        if (cmdRecord.runId && launchContext.run?.runId && cmdRecord.runId !== launchContext.run.runId) {
+          const err = new Error(`assignmentLaunchContext runId "${launchContext.run.runId}" mismatches command file runId "${cmdRecord.runId}".`);
+          err.code = 'confinement-launch-context-invalid';
+          throw err;
+        }
+        if (cmdRecord.controlEpoch !== undefined && launchContext.command?.controlEpoch !== undefined && cmdRecord.controlEpoch !== launchContext.command.controlEpoch) {
+          const err = new Error(`assignmentLaunchContext controlEpoch "${launchContext.command.controlEpoch}" mismatches command file controlEpoch "${cmdRecord.controlEpoch}".`);
+          err.code = 'confinement-launch-context-invalid';
+          throw err;
+        }
+        if (cmdRecord.controlTokenDigest && launchContext.command?.controlTokenDigest && cmdRecord.controlTokenDigest !== launchContext.command.controlTokenDigest) {
+          const err = new Error(`assignmentLaunchContext controlTokenDigest mismatches command file controlTokenDigest.`);
+          err.code = 'confinement-launch-context-invalid';
+          throw err;
+        }
+      } catch (err) {
+        if (err.code === 'confinement-launch-context-invalid') throw err;
+      }
+    }
+  }
+}
+
+export function validateAssignmentLaunchContext(launchContext, context = null) {
   if (!launchContext || typeof launchContext !== "object" || Array.isArray(launchContext)) {
     const err = new Error("assignmentLaunchContext must be an object.");
     err.code = "confinement-launch-context-invalid";
@@ -88,6 +168,9 @@ export function validateAssignmentLaunchContext(launchContext) {
     const err = new Error("assignmentLaunchContext.command.controlTokenDigest must be a non-empty sha256 string.");
     err.code = "confinement-launch-context-invalid";
     throw err;
+  }
+  if (context) {
+    crossCheckAssignmentLaunchContext(launchContext, context);
   }
   return launchContext;
 }
@@ -153,7 +236,7 @@ export function validateConfinementRequest(request) {
     );
   }
   if (request.assignmentLaunchContext !== undefined && request.assignmentLaunchContext !== null) {
-    validateAssignmentLaunchContext(request.assignmentLaunchContext);
+    validateAssignmentLaunchContext(request.assignmentLaunchContext, request.context);
   }
   return request;
 }

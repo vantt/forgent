@@ -66,7 +66,7 @@ export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
  * observed grandchild-dispatch incident yet, capped anticipatorily). */
 export const MAX_DISPATCH_DEPTH = 3;
 
-function currentDispatchDepth() {
+export function currentDispatchDepth() {
   const raw = process.env[DISPATCH_DEPTH_ENV];
   const n = raw ? Number(raw) : 0;
   return Number.isFinite(n) && n >= 0 ? n : 0;
@@ -622,7 +622,9 @@ export function cliSpawnAdapter(invocation, opts) {
     // always a no-op via `finish`'s `settled` guard.
     child.on('close', (code, signal) => {
       finish(() => {
-        resolve({ status: code, exitCode: code, signal, stdout, stderr, tier, model });
+        const res = { status: code, signal, stdout, stderr, tier, model };
+        Object.defineProperty(res, 'exitCode', { value: code, enumerable: false, writable: true, configurable: true });
+        resolve(res);
       });
     });
   });
@@ -861,18 +863,6 @@ export const ADAPTER_REGISTRY = {
 export function getAdapterMetadata(adapterName) {
   if (ADAPTER_REGISTRY[adapterName]) {
     return ADAPTER_REGISTRY[adapterName];
-  }
-  const adapter = EXECUTOR_ADAPTERS[adapterName];
-  if (adapter && typeof adapter === 'object') {
-    return adapter;
-  }
-  if (typeof adapter === 'function') {
-    return {
-      execute: adapter,
-      locus: adapter.locus,
-      preparedInvocationContract: adapter.preparedInvocationContract,
-      receiptContract: adapter.receiptContract,
-    };
   }
   return null;
 }

@@ -4,7 +4,7 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
-import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError, getAdapterMetadata } from "../transport.mjs";
+import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../transport.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
 import { saveAttestationRecord, savePlanRecord, assertAttestationStoreIsolated, verifyAttestationStoreIsolation } from "./attestation-store.mjs";
@@ -576,7 +576,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   let preparedConfinement = null;
   const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
 
-  if (request.backendId) {
+  if (!request.assignmentLaunchContext) {
+    if (request.backendId) {
     const registryDoc = loadMachineBackendRegistry();
     const rawInstance = registryDoc?.confinementBackends?.[request.backendId];
     if (rawInstance && rawInstance.enabled === false) {
@@ -807,6 +808,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     applyBackendPlanToAttestation(prepAttestation, backendPlan);
     saveAttestationRecord(prepAttestation, request.context);
   }
+}
 
   // R3: Resolve adapter function through Authority
   let adapterFn = null;
@@ -830,42 +832,6 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     throw new RunnerConfigError(`no executor adapter registered for "${adapterName}".`);
   }
 
-  // Prepare invocation
-  const sourceInvocation = preparedConfinement?.invocation || request.invocation;
-  const preparedInvocation = {
-    command: sourceInvocation.command,
-    args: sourceInvocation.args,
-    argsTemplate: sourceInvocation.argsTemplate,
-    prompt: sourceInvocation.prompt,
-    env: sourceInvocation.env,
-    liveOutput: sourceInvocation.liveOutput,
-    interactiveMode: sourceInvocation.interactiveMode,
-    promptDelivery: sourceInvocation.promptDelivery,
-    permissionMode: sourceInvocation.permissionMode,
-    confinement: sourceInvocation.confinement,
-    method: sourceInvocation.transport?.method ?? sourceInvocation.method,
-    url: sourceInvocation.transport?.url ?? sourceInvocation.url,
-    headers: sourceInvocation.transport?.headers ?? sourceInvocation.headers,
-    body: sourceInvocation.transport?.body ?? sourceInvocation.body,
-  };
-
-  const adapterOpts = {
-    cwd: request.context.cwd,
-    repoRoot: request.context.repoRoot,
-    runDir: request.context.runDir,
-    timeoutMs: request.context.timeoutMs,
-    idleTimeoutMs: request.context.idleTimeoutMs,
-    maxBuffer: request.context.maxBuffer,
-    onChunk: request.context.onChunk,
-    workId: request.context.workId ?? request.executorId,
-    tier: request.context.tier,
-    model: request.context.model,
-    herdrBin: request.context.herdrBin,
-    transportDeadlines: request.context.transportDeadlines,
-    closeAlways: request.context.closeAlways,
-    dispatchBatchKey: request.context.dispatchBatchKey,
-  };
-
   let preparedLaunch = null;
   if (request.assignmentLaunchContext) {
     try {
@@ -873,7 +839,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
       const controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
-      const controlToken = request.context?.controlToken;
+      const controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
       if (runDir && launchCommandId && controlToken) {
         updateCommandEnvelope({
           runDir,
@@ -887,7 +853,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
       const controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
-      const controlToken = request.context?.controlToken;
+      const controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
       if (runDir && launchCommandId && controlToken) {
         try {
           const failedAt = new Date().toISOString();
@@ -922,13 +888,49 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     }
   }
 
+  // Prepare invocation
+  const sourceInvocation = preparedLaunch?.envelope?.invocation || preparedConfinement?.invocation || request.invocation;
+  const preparedInvocation = {
+    command: sourceInvocation.command,
+    args: sourceInvocation.args,
+    argsTemplate: sourceInvocation.argsTemplate,
+    prompt: sourceInvocation.prompt,
+    env: sourceInvocation.env,
+    liveOutput: sourceInvocation.liveOutput,
+    interactiveMode: sourceInvocation.interactiveMode,
+    promptDelivery: sourceInvocation.promptDelivery,
+    permissionMode: sourceInvocation.permissionMode,
+    confinement: sourceInvocation.confinement,
+    method: sourceInvocation.transport?.method ?? sourceInvocation.method,
+    url: sourceInvocation.transport?.url ?? sourceInvocation.url,
+    headers: sourceInvocation.transport?.headers ?? sourceInvocation.headers,
+    body: sourceInvocation.transport?.body ?? sourceInvocation.body,
+  };
+
+  const adapterOpts = {
+    cwd: request.context.cwd,
+    repoRoot: request.context.repoRoot,
+    runDir: request.context.runDir,
+    timeoutMs: request.context.timeoutMs,
+    idleTimeoutMs: request.context.idleTimeoutMs,
+    maxBuffer: request.context.maxBuffer,
+    onChunk: request.context.onChunk,
+    workId: request.context.workId ?? request.executorId,
+    tier: request.context.tier,
+    model: request.context.model,
+    herdrBin: request.context.herdrBin,
+    transportDeadlines: request.context.transportDeadlines,
+    closeAlways: request.context.closeAlways,
+    dispatchBatchKey: request.context.dispatchBatchKey,
+  };
+
   if (preparedLaunch) {
     adapterOpts.envelopePath = preparedLaunch.envelopePath;
     adapterOpts.envelope = preparedLaunch.envelope;
     adapterOpts.assignmentLaunchContext = request.assignmentLaunchContext;
     adapterOpts.launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
     adapterOpts.controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
-    adapterOpts.controlToken = request.context?.controlToken;
+    adapterOpts.controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
   }
 
   let adapterResult;
@@ -938,7 +940,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
       const controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
-      const controlToken = request.context?.controlToken;
+      const controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
       if (runDir && launchCommandId && controlToken) {
         const outcome = {
           kind: 'receipt-backed',
@@ -964,7 +966,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
       const controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
-      const controlToken = request.context?.controlToken;
+      const controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
       const receipt = err.receipt || err.context?.receipt;
       if (receipt && runDir && launchCommandId && controlToken) {
         const outcome = {
@@ -1100,7 +1102,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   }
 
   const launchContext = request.assignmentLaunchContext;
-  validateAssignmentLaunchContext(launchContext);
+  validateAssignmentLaunchContext(launchContext, request.context);
 
   const runDir = request.context?.runDir;
   if (!runDir) {
@@ -1131,13 +1133,28 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   if (reqMode !== 'unconfined') {
     const backendRegistry = loadMachineBackendRegistry();
     const backendId = request.backendId || backendRegistry.defaultBackend || 'bwrap';
-    backendInstance = backendRegistry.backends?.[backendId];
+    const rawInstance = backendRegistry.confinementBackends?.[backendId];
 
-    if (!backendInstance || backendInstance.enabled === false) {
+    if (!rawInstance || rawInstance.enabled === false) {
       const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
       refusedAttestation.mismatches.push({
         code: 'confinement-backend-missing',
         detail: `confinement backend "${backendId}" is not configured or disabled.`,
+      });
+      saveAttestationRecord(refusedAttestation, request.context);
+      throw new DispatchError('confinement-backend-missing', `confinement backend "${backendId}" is not available.`, {
+        contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
+        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
+      });
+    }
+
+    const snapshot = createBackendRegistrySnapshot(backendRegistry);
+    backendInstance = snapshot.resolve(backendId);
+    if (!backendInstance) {
+      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
+      refusedAttestation.mismatches.push({
+        code: 'confinement-backend-missing',
+        detail: `confinement backend "${backendId}" could not be resolved from snapshot.`,
       });
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError('confinement-backend-missing', `confinement backend "${backendId}" is not available.`, {
@@ -1295,7 +1312,14 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const workerCommand = sourceInvocation.command;
   const workerArgs = sourceInvocation.args || [];
   const workerCwd = request.context.cwd;
-  const workerEnv = sourceInvocation.env || {};
+  const depth = currentDispatchDepth();
+  const rawEnv = sourceInvocation.env || {};
+  const resolvedExecutorEnv = resolveExecutorEnv(rawEnv);
+  const workerEnv = {
+    ...process.env,
+    ...resolvedExecutorEnv,
+    [DISPATCH_DEPTH_ENV]: String(depth + 1),
+  };
 
   const workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
   const envDigest = computeSha256Digest(workerEnv);
@@ -1312,7 +1336,12 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       const markerPath = path.join(res.hostTarget, OWNERSHIP_MARKER_FILE);
       if (fs.existsSync(markerPath)) {
         try {
-          ownershipMarkerDigest = computeSha256Digest(fs.readFileSync(markerPath, 'utf8'));
+          const raw = fs.readFileSync(markerPath, 'utf8');
+          try {
+            ownershipMarkerDigest = computeSha256Digest(JSON.parse(raw));
+          } catch {
+            ownershipMarkerDigest = computeSha256Digest(raw);
+          }
         } catch {}
       }
       finalizationResources.push({
@@ -1458,7 +1487,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       env: workerEnv,
       stdin: 'ignore',
       encoding: 'utf8',
-      dispatchDepth: Number(process.env.FGOS_DISPATCH_DEPTH || 1),
+      dispatchDepth: depth + 1,
       timeoutMs: request.context.timeoutMs || 900000,
       idleTimeoutMs: request.context.idleTimeoutMs || null,
       maxBuffer: request.context.maxBuffer || 10485760,
