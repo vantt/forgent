@@ -651,6 +651,21 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
  * a worker; open a step to see why it happens that way.
  */
 export async function runHerdrRound(ctx) {
+  const confinementReq = ctx.confinementRequirement ?? ctx.confinement ?? ctx.requirement;
+  const reqMode = confinementReq?.mode;
+  if (reqMode === 'required' || reqMode === 'preferred') {
+    throw new DispatchError(
+      'confinement-adapter-unsupported',
+      `required or preferred confinement refused: herdr-spawn does not support exact-v1 execution`,
+      {
+        code: 'confinement-adapter-unsupported',
+        reason: 'confinement-adapter-unsupported',
+        workId: ctx.workId,
+        runDir: ctx.runDir,
+      },
+    );
+  }
+
   // Only what setting a round up needs; everything the round itself reads is
   // unpacked in `driveRound`.
   const { herdrBin, fullEnv, confinement, permissionMode, repoRoot, prompt, cwd, workId, tier, model } = ctx;
@@ -660,6 +675,36 @@ export async function runHerdrRound(ctx) {
   const { runDir, paths } = prepareRunDir({ runDir: ctx.runDir, roundNumber, workId, tier, model });
 
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
+  if (isAssignmentRun) {
+    const commandsDir = path.join(runDir, 'controller', 'commands');
+    if (fs.existsSync(commandsDir)) {
+      const existingFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+      for (const f of existingFiles) {
+        try {
+          const existing = JSON.parse(fs.readFileSync(path.join(commandsDir, f), 'utf8'));
+          if (existing.runId === ctx.runId && (existing.state === 'pending' || existing.state === 'reconciled')) {
+            if (existing.launchCommandId !== ctx.launchCommandId || f !== `${ctx.launchCommandId}.json`) {
+              throw new HerdrLaunchCollisionError(`launch command for run ${ctx.runId} already exists as ${existing.launchCommandId}`, {
+                runId: ctx.runId,
+                existingCommandId: existing.launchCommandId,
+                existingCommand: existing,
+              });
+            }
+          }
+        } catch (err) {
+          if (err instanceof HerdrLaunchCollisionError) throw err;
+        }
+      }
+    }
+
+    const existingCmd = readHerdrLaunchCommand(runDir, ctx.launchCommandId);
+    if (existingCmd) {
+      if (existingCmd.state === 'reconciled' || (existingCmd.state === 'pending' && existingCmd.paneId)) {
+        return await reconcileHerdrSpawnRun(runDir, ctx);
+      }
+    }
+  }
+
   const agentName = isAssignmentRun
     ? normalizeAgentName(`fgos-${ctx.runId}-${ctx.launchCommandId}`)
     : normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
@@ -749,42 +794,38 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const sessionKey = sessionEnv?.HERDR_SESSION ?? 'default';
   const batchTab = dispatchBatchKey ? batchTabFor(dispatchBatchKey, { cwd }) : null;
 
-  let anchor = anchorPaneId;
-  if (anchor === undefined && batchTab) {
-    try {
-      anchor = batchTab.ensure(client, sessionKey);
-    } catch {
-      // `tab create` itself failed (herdr unavailable, timed out, refused the
-      // label, ...). Grouping is a visibility nicety, never a dispatch
-      // requirement -- degrade to an ordinary unanchored round rather than
-      // letting a tab-creation failure take down a round that would
-      // otherwise succeed on its own.
-      anchor = undefined;
-    }
-  }
+  const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
+  const existingCmd = isAssignmentRun ? readHerdrLaunchCommand(runDir, ctx.launchCommandId) : null;
 
-  try {
-    round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
-    round.note({ status: 'pane-created', paneId: round.paneId });
-  } catch (err) {
-    // Only an anchor known to be gone is worth a second attempt: any other
-    // failure (herdr unavailable, a call timeout, an unparseable envelope)
-    // would fail the retry identically, just after paying its own timeout
-    // again -- and an anchor-less first attempt has nothing to retry at all.
-    if (!anchor || err.code !== 'pane_not_found') {
-      throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
-        `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+  if (existingCmd?.paneId) {
+    round.paneId = existingCmd.paneId;
+    round.note({ status: 'pane-reused', paneId: round.paneId });
+  } else {
+    let anchor = anchorPaneId;
+    if (anchor === undefined && batchTab) {
+      try {
+        anchor = batchTab.ensure(client, sessionKey);
+      } catch {
+        anchor = undefined;
+      }
     }
-    // The anchor pane is gone (operator action, a prior round's own
-    // cleanup). Forget it so the NEXT round of this batch opens a fresh tab
-    // instead of repeating a split against an id already known to be dead.
-    batchTab?.invalidate(sessionKey);
+
     try {
-      round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
-      round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
-    } catch (retryErr) {
-      throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
-        `executor failed to start for work "${workId}": herdr could not open a pane (${retryErr.code ?? 'unknown'}): ${retryErr.message}`);
+      round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+      round.note({ status: 'pane-created', paneId: round.paneId });
+    } catch (err) {
+      if (!anchor || err.code !== 'pane_not_found') {
+        throw round.fail('worker-spawn-fail', err.code ?? 'pane_split_failed',
+          `executor failed to start for work "${workId}": herdr could not open a pane (${err.code ?? 'unknown'}): ${err.message}`);
+      }
+      batchTab?.invalidate(sessionKey);
+      try {
+        round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
+        round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
+      } catch (retryErr) {
+        throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
+          `executor failed to start for work "${workId}": herdr could not open a pane (${retryErr.code ?? 'unknown'}): ${retryErr.message}`);
+      }
     }
   }
 
@@ -795,67 +836,41 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
   }
 
-  const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
-  const workerCommand = ctx.workerInvocation?.command || ((ctx.workerCommandSeam || isAssignmentRun) ? ctx.command : null);
-  const workerArgs = ctx.workerInvocation?.args || ((ctx.workerCommandSeam || isAssignmentRun) ? (ctx.args || []) : []);
-  const useWorkerCommandSeam = Boolean(
-    (ctx.workerCommandSeam === true || ctx.workerInvocation || isAssignmentRun) &&
-    workerCommand
-  );
-  let executionSeam = 'interactive-agent';
-  let herdrStartArgv = null;
-  let workerCommandDigest = null;
+  const agentKindToUse = agentKind ?? (ctx.command ? path.basename(ctx.command) : 'claude');
+  const effectiveAgentArgs = (agentArgs && agentArgs.length) ? agentArgs : (ctx.args || []);
+  const herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
+
+  if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
+    startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
+  }
+
   let resourceIncarnation = null;
-
-  if (useWorkerCommandSeam) {
-    executionSeam = 'worker-command';
-    herdrStartArgv = ['pane', 'run', round.paneId, workerCommand, ...workerArgs];
-    workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
-
-    try {
-      client.paneRun(round.paneId, workerCommand, workerArgs);
-    } catch (err) {
-      if (ctx.confinementRequirement?.mode === 'required' || ctx.confinement?.mode === 'required') {
-        throw round.fail('worker-spawn-fail', 'confinement-unsupported',
-          `required confinement refused: Herdr could not execute prepared command in pane ${round.paneId}: ${err.message}`);
-      }
-      throw round.fail('worker-spawn-fail', err.code ?? 'worker_run_failed',
-        `executor failed to start prepared command in pane ${round.paneId}: ${err.message}`);
-    }
-
-    const agentSessionId = `sess-${round.agentName}`;
-    try {
-      client.reportAgent(round.paneId, { source: 'fgos', agent: round.agentName, state: 'working', agentSessionId });
-      client.reportAgentSession(round.paneId, { source: 'fgos', agent: round.agentName, agentSessionId });
-    } catch {}
-
-    try {
-      const pInfo = client.paneProcessInfo(round.paneId);
-      const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid) || pInfo?.foregroundProcesses?.[0];
-      resourceIncarnation = computeHerdrResourceIncarnation({
-        paneId: round.paneId,
-        shellPid: pInfo?.shellPid || null,
-        workerPid: workerProc?.pid || null,
-        foregroundPgid: pInfo?.foregroundPgid || null,
-        processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
-      });
-    } catch {
-      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
-    }
-
-    round.note({
-      status: 'agent-ready',
-      agentSession: { value: agentSessionId },
-      resourceIncarnation,
+  try {
+    const pInfo = client.paneProcessInfo(round.paneId);
+    const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
+    resourceIncarnation = computeHerdrResourceIncarnation({
+      paneId: round.paneId,
+      shellPid: pInfo?.shellPid || null,
+      workerPid: workerProc?.pid || null,
+      foregroundPgid: pInfo?.foregroundPgid || null,
+      processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
     });
-  } else {
-    herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKind, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((agentArgs && agentArgs.length) ? ['--', ...agentArgs] : [])];
-    startAgent({ client, round, agentKind, agentArgs, readyMs: deadlines.startup.readyMs });
-    try {
-      const pInfo = client.paneProcessInfo(round.paneId);
-      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId, shellPid: pInfo?.shellPid || null });
-    } catch {
-      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+  } catch {
+    resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+  }
+
+  if (isAssignmentRun) {
+    const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
+    if (fs.existsSync(commandPath)) {
+      try {
+        const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+        publishMutableProjection(commandPath, {
+          ...cmd,
+          paneId: round.paneId,
+          agentSession: round.agentSession?.value || cmd.agentSession || null,
+          resourceIncarnation: resourceIncarnation || cmd.resourceIncarnation,
+        });
+      } catch {}
     }
   }
 
@@ -864,12 +879,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // only -- nothing reads it back.
   process.stderr.write(`fgos: herdr-spawn work=${workId} pane=${round.paneId} agent=${round.agentName} runDir=${runDir}\n`);
 
-  if (executionSeam === 'interactive-agent') {
-    const message = briefMessage({ delivery, briefText, runDir, roundNumber });
-    deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
-  } else {
-    round.note({ status: 'briefed' });
-  }
+  const message = briefMessage({ delivery, briefText, runDir, roundNumber });
+  deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
 
   const readLiveness = livenessProbe(client, round.paneId);
   const decision = await pollForOutcome({
@@ -879,17 +890,35 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   if (decision.outcome !== 'settled') {
     if (isAssignmentRun) {
       try {
+        // Verify digests if preparedInvocation was expected (HIGH-4)
+        let prepRec = null;
+        const prepPath = path.join(runDir, 'protected', 'prepared-invocation', `${ctx.launchCommandId}.json`);
+        if (fs.existsSync(prepPath)) {
+          try { prepRec = JSON.parse(fs.readFileSync(prepPath, 'utf8')); } catch {}
+        }
+        const cmdOnDisk = readHerdrLaunchCommand(runDir, ctx.launchCommandId);
+        let preparedInvocationDigest = ctx.preparedInvocationDigest || cmdOnDisk?.preparedInvocationDigest || null;
+        if (cmdOnDisk?.preparedInvocationDigest && preparedInvocationDigest && preparedInvocationDigest !== cmdOnDisk.preparedInvocationDigest) {
+          throw new DispatchError('confinement-mismatch', `preparedInvocationDigest mismatch: caller gave ${preparedInvocationDigest} but launch command has ${cmdOnDisk.preparedInvocationDigest}`);
+        }
+        if (prepRec) {
+          const actualPDig = prepRec.digest || computeSha256Digest(prepRec);
+          if (preparedInvocationDigest && preparedInvocationDigest !== actualPDig) {
+            throw new DispatchError('confinement-mismatch', `preparedInvocationDigest mismatch: record is ${actualPDig} but got ${preparedInvocationDigest}`);
+          }
+        }
+
         const receiptData = {
           contract: 'herdr-adapter-receipt.v1',
           runId: ctx.runId,
           launchCommandId: ctx.launchCommandId,
-          preparedInvocationDigest: ctx.preparedInvocationDigest || null,
+          preparedInvocationDigest,
           herdrName: round.agentName,
           paneId: round.paneId || null,
           agentSession: round.agentSession?.value || null,
           resourceIncarnation,
           startArgvDigest: computeSha256Digest(herdrStartArgv),
-          workerCommandDigest: workerCommandDigest || computeSha256Digest(herdrStartArgv),
+          workerCommandDigest: computeSha256Digest(herdrStartArgv),
           completion: {
             kind: decision.outcome,
             reason: decision.detail || decision.outcome,
@@ -933,17 +962,36 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         outboxRelPath = path.relative(runDir, paths.resultPath);
       } catch {}
     }
+
+    // Verify digests (HIGH-4)
+    let prepRec = null;
+    const prepPath = path.join(runDir, 'protected', 'prepared-invocation', `${ctx.launchCommandId}.json`);
+    if (fs.existsSync(prepPath)) {
+      try { prepRec = JSON.parse(fs.readFileSync(prepPath, 'utf8')); } catch {}
+    }
+    const cmdOnDisk = readHerdrLaunchCommand(runDir, ctx.launchCommandId);
+    let preparedInvocationDigest = ctx.preparedInvocationDigest || cmdOnDisk?.preparedInvocationDigest || null;
+    if (cmdOnDisk?.preparedInvocationDigest && preparedInvocationDigest && preparedInvocationDigest !== cmdOnDisk.preparedInvocationDigest) {
+      throw new DispatchError('confinement-mismatch', `preparedInvocationDigest mismatch: caller gave ${preparedInvocationDigest} but launch command has ${cmdOnDisk.preparedInvocationDigest}`);
+    }
+    if (prepRec) {
+      const actualPDig = prepRec.digest || computeSha256Digest(prepRec);
+      if (preparedInvocationDigest && preparedInvocationDigest !== actualPDig) {
+        throw new DispatchError('confinement-mismatch', `preparedInvocationDigest mismatch: record is ${actualPDig} but got ${preparedInvocationDigest}`);
+      }
+    }
+
     const receiptData = {
       contract: 'herdr-adapter-receipt.v1',
       runId: ctx.runId,
       launchCommandId: ctx.launchCommandId,
-      preparedInvocationDigest: ctx.preparedInvocationDigest || null,
+      preparedInvocationDigest,
       herdrName: round.agentName,
       paneId: round.paneId || null,
       agentSession: round.agentSession?.value || null,
       resourceIncarnation,
       startArgvDigest: computeSha256Digest(herdrStartArgv),
-      workerCommandDigest: workerCommandDigest || computeSha256Digest(herdrStartArgv),
+      workerCommandDigest: computeSha256Digest(herdrStartArgv),
       completion: {
         kind: 'settled',
         reason: 'worker-outbox-settled',
@@ -1020,11 +1068,19 @@ export function computeHerdrResourceIncarnation({
 
 function matchIncarnations(a, b) {
   if (!a || !b) return false;
-  if (a.workerPid && b.workerPid && a.workerPid !== b.workerPid) return false;
-  if (a.processStartTime && b.processStartTime && a.processStartTime !== b.processStartTime) return false;
-  if (a.gatewaySessionId && b.gatewaySessionId && a.gatewaySessionId !== b.gatewaySessionId) return false;
-  if (a.shellPid && b.shellPid && a.shellPid !== b.shellPid) return false;
   if (a.paneId && b.paneId && a.paneId !== b.paneId) return false;
+  if (a.workerPid && b.workerPid) {
+    if (a.workerPid !== b.workerPid) return false;
+  } else if ((a.workerPid && !b.workerPid) || (!a.workerPid && b.workerPid)) {
+    return false;
+  }
+  if (a.processStartTime && b.processStartTime) {
+    if (a.processStartTime !== b.processStartTime) return false;
+  } else if ((a.processStartTime && !b.processStartTime) || (!a.processStartTime && b.processStartTime)) {
+    return false;
+  }
+  if (a.shellPid && b.shellPid && a.shellPid !== b.shellPid) return false;
+  if (a.gatewaySessionId && b.gatewaySessionId && a.gatewaySessionId !== b.gatewaySessionId) return false;
   return true;
 }
 
@@ -1205,6 +1261,13 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
     if (command.receiptDigest && command.receiptDigest !== actualRecDigest) {
       return { status: 'refused', reason: 'protected-artifact-corrupt' };
     }
+
+    // HIGH-4: Cross-check receipt digests against pending command
+    if (receipt.preparedInvocationDigest || command.preparedInvocationDigest) {
+      if (receipt.preparedInvocationDigest !== command.preparedInvocationDigest) {
+        return { status: 'refused', reason: 'confinement-mismatch' };
+      }
+    }
   }
 
   // Window: command already reconciled
@@ -1213,7 +1276,29 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
       return { status: 'refused', outcome: command.outcome, reason: 'submission-refused' };
     }
     if (command.outcome?.kind === 'receipt-backed') {
-      return { status: 'settled', outcome: command.outcome, receipt, settled: true };
+      // F2: Settlement MUST require the real worker outbox result file to exist and be readable
+      if (receipt && receipt.completion?.kind === 'settled' && receipt.result?.outboxPath) {
+        const outboxFullPath = path.join(runDir, receipt.result.outboxPath);
+        if (fs.existsSync(outboxFullPath)) {
+          try {
+            const outboxContent = fs.readFileSync(outboxFullPath, 'utf8');
+            const outboxDigest = computeSha256Digest(outboxContent);
+            if (receipt.result.outboxDigest && receipt.result.outboxDigest !== outboxDigest) {
+              return { status: 'refused', reason: 'protected-artifact-corrupt', settled: false };
+            }
+            return { status: 'settled', outcome: command.outcome, receipt, settled: true };
+          } catch {
+            return { status: 'refused', reason: 'protected-artifact-corrupt', settled: false };
+          }
+        }
+      }
+      return {
+        status: 'failed',
+        outcome: command.outcome,
+        receipt,
+        settled: false,
+        reason: receipt?.completion?.kind || 'unsettled-outcome',
+      };
     }
   }
 
@@ -1245,6 +1330,15 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
     }
     const actualPDig = pDig || computeSha256Digest(prepRec);
     if (command.preparedInvocationDigest && command.preparedInvocationDigest !== actualPDig) {
+      return { status: 'refused', reason: 'confinement-mismatch' };
+    }
+    if (receipt && receipt.preparedInvocationDigest && receipt.preparedInvocationDigest !== actualPDig) {
+      return { status: 'refused', reason: 'confinement-mismatch' };
+    }
+    if (receipt && prepRec.workerCommandDigest && receipt.workerCommandDigest && receipt.workerCommandDigest !== prepRec.workerCommandDigest) {
+      return { status: 'refused', reason: 'confinement-mismatch' };
+    }
+    if (receipt && prepRec.envDigest && receipt.envDigest && receipt.envDigest !== prepRec.envDigest) {
       return { status: 'refused', reason: 'confinement-mismatch' };
     }
   } catch {
@@ -1319,8 +1413,43 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
   const probe = opts.probe || (opts.herdrClient ? async (herdrName, paneId) => {
     try {
       const info = opts.herdrClient.agentGet(herdrName);
-      return { status: info?.agent_status || 'present', info };
+      let pInfo = null;
+      if (paneId) {
+        try { pInfo = opts.herdrClient.paneProcessInfo(paneId); } catch {}
+      }
+      const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+      const resourceIncarnation = pInfo ? computeHerdrResourceIncarnation({
+        paneId,
+        shellPid: pInfo.shellPid || null,
+        workerPid: workerProc?.pid || null,
+        foregroundPgid: pInfo.foregroundPgid || null,
+        processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+      }) : null;
+      return {
+        status: info?.agent_status || info?.agentStatus || 'present',
+        agentSession: info?.agent_session?.value || info?.agentSession || null,
+        resourceIncarnation,
+        info,
+      };
     } catch {
+      if (paneId) {
+        try {
+          const pInfo = opts.herdrClient.paneProcessInfo(paneId);
+          const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+          return {
+            status: workerProc ? 'present' : 'absent',
+            resourceIncarnation: computeHerdrResourceIncarnation({
+              paneId,
+              shellPid: pInfo.shellPid || null,
+              workerPid: workerProc?.pid || null,
+              foregroundPgid: pInfo.foregroundPgid || null,
+              processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+            }),
+          };
+        } catch {
+          return { status: 'absent' };
+        }
+      }
       return { status: 'absent' };
     }
   } : null);
@@ -1336,14 +1465,33 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
     }
 
     // Probed resource exists
-    if (!command.resourceIncarnation) {
+    // Require non-trivial recorded incarnation (must have workerPid or shellPid)
+    if (!command.resourceIncarnation || (!command.resourceIncarnation.workerPid && !command.resourceIncarnation.shellPid)) {
       return { status: 'parked', reason: 'incarnation-unknown' };
     }
 
-    if (probeResult.resourceIncarnation) {
-      if (!matchIncarnations(command.resourceIncarnation, probeResult.resourceIncarnation)) {
+    // Check agentSession from probe
+    const probeSession = probeResult.agentSession ||
+      probeResult.info?.agent_session?.value ||
+      probeResult.info?.agent?.agent_session?.value ||
+      probeResult.info?.agent_session ||
+      probeResult.info?.agent?.agent_session;
+
+    if (probeSession) {
+      if (command.agentSession && probeSession !== command.agentSession) {
         return { status: 'parked', reason: 'incarnation-mismatch' };
       }
+      if (!command.agentSession && probeResult.resourceIncarnation?.workerPid !== command.resourceIncarnation.workerPid) {
+        return { status: 'parked', reason: 'incarnation-mismatch' };
+      }
+    }
+
+    if (!probeResult.resourceIncarnation || (!probeResult.resourceIncarnation.workerPid && !probeResult.resourceIncarnation.shellPid)) {
+      return { status: 'parked', reason: 'incarnation-unknown' };
+    }
+
+    if (!matchIncarnations(command.resourceIncarnation, probeResult.resourceIncarnation)) {
+      return { status: 'parked', reason: 'incarnation-mismatch' };
     }
 
     // Alive and matches incarnation (F-b observation)

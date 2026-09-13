@@ -59,6 +59,9 @@ function adapterConsumesPreparedSandbox(adapterName, adapterPort, request = null
   if (invocation?.providerKindOnly === true || invocation?.workerCommandSeam === false) {
     return false;
   }
+  if (adapterName === 'herdr-spawn') {
+    return false;
+  }
   if (adapterPort && typeof adapterPort === 'object') {
     if (adapterPort.workerCommandSeam === false) return false;
     if (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true) return true;
@@ -66,11 +69,6 @@ function adapterConsumesPreparedSandbox(adapterName, adapterPort, request = null
   }
   if (adapterPort && typeof adapterPort === 'function' && (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true)) {
     return true;
-  }
-  if (adapterName === 'herdr-spawn') {
-    if (invocation?.interactiveMode?.kind && invocation?.workerCommandSeam !== true && !adapterPort?.workerCommandSeam) {
-      return false;
-    }
   }
   const meta = getAdapterMetadata(adapterName);
   return meta?.preparedInvocationContract === 'exact-v1';
@@ -1479,13 +1477,31 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   if (adapterName === 'herdr-spawn') {
     const herdrName = `fgos-${launchContext.run.runId}-${launchCommandId}`;
-    const launchCommandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+    const commandsDir = path.join(runDir, 'controller', 'commands');
+    fs.mkdirSync(commandsDir, { recursive: true });
+    const launchCommandPath = path.join(commandsDir, `${launchCommandId}.json`);
+
+    const existingFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
     let existingCmd = null;
-    if (fs.existsSync(launchCommandPath)) {
+    for (const f of existingFiles) {
       try {
-        existingCmd = JSON.parse(fs.readFileSync(launchCommandPath, 'utf8'));
-      } catch {}
+        const existing = JSON.parse(fs.readFileSync(path.join(commandsDir, f), 'utf8'));
+        if (existing.runId === launchContext.run.runId && (existing.state === 'pending' || existing.state === 'reconciled')) {
+          if (existing.launchCommandId !== launchCommandId || f !== `${launchCommandId}.json`) {
+            throw new DispatchError('launch-collision', `launch command for run ${launchContext.run.runId} already exists as ${existing.launchCommandId}`, {
+              code: 'launch-collision',
+              runId: launchContext.run.runId,
+              existingCommandId: existing.launchCommandId,
+              existingCommand: existing,
+            });
+          }
+          existingCmd = existing;
+        }
+      } catch (err) {
+        if (err.code === 'launch-collision') throw err;
+      }
     }
+
     const launchCommandBody = {
       contract: 'herdr-launch-command.v1',
       runId: launchContext.run.runId,

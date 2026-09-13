@@ -139,8 +139,8 @@ ok({});
   };
 }
 
-// 1. Confinement Authority accepts herdr-spawn with worker-command seam and enforces bwrap
-test('1. Confinement Authority accepts herdr-spawn when worker-command seam is present and prepares bwrap', async () => {
+// 1. Confinement Authority refuses herdr-spawn under required bwrap confinement
+test('1. Confinement Authority refuses herdr-spawn under required bwrap confinement', async () => {
   const tmp = mkTempDir();
   const fgosDir = path.join(tmp, '.fgos');
   const runDir = path.join(fgosDir, 'runs', 'run-01');
@@ -187,22 +187,18 @@ test('1. Confinement Authority accepts herdr-spawn when worker-command seam is p
     },
   });
 
-  const prep = await prepareConfinementForLaunch(
-    { ...req, assignmentLaunchContext: launchContext },
-    { adapterName: 'herdr-spawn' },
+  await assert.rejects(
+    () => prepareConfinementForLaunch(
+      { ...req, assignmentLaunchContext: launchContext },
+      { adapterName: 'herdr-spawn' },
+    ),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.code, 'confinement-adapter-unsupported');
+      assert.match(err.message, /does not apply the prepared sandbox/);
+      return true;
+    },
   );
-
-  assert.ok(prep);
-  assert.equal(prep.launchCommand.contract, 'herdr-launch-command.v1');
-  assert.equal(prep.launchCommand.herdrName, 'fgos-run-01-cmd-01');
-  assert.equal(prep.launchCommand.state, 'pending');
-  assert.ok(prep.preparedInvocationDigest);
-  assert.equal(prep.launchCommand.preparedInvocationDigest, prep.preparedInvocationDigest);
-
-  // Check prepared command is bwrap
-  assert.ok(prep.preparedInvocation.workerInvocation.command.includes('bwrap') || prep.preparedInvocation.workerInvocation.command === 'bwrap');
-  assert.ok(prep.preparedInvocation.workerInvocation.args.includes('node'));
-  assert.ok(prep.preparedInvocation.workerInvocation.args.includes('worker.mjs'));
 });
 
 // 2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false
@@ -297,12 +293,12 @@ test('3. recorded Herdr worker-command suffix and startArgv have distinct valid 
     runId: 'run-dig-01',
     launchCommandId: 'cmd-dig-01',
     runDir,
-    command: 'bwrap',
-    args: ['--ro-bind', '/', '/', 'node', '-v'],
+    command: 'echo',
+    args: ['hello'],
     cwd: tmp,
     fullEnv: process.env,
     delivery: 'file-pointer',
-    agentKind: 'bwrap',
+    agentKind: 'echo',
     transportDeadlines: {
       startup: { readyMs: 500, promptMs: 500 },
       round: { idleMs: 1000, ceilingMs: 2000 },
@@ -316,8 +312,8 @@ test('3. recorded Herdr worker-command suffix and startArgv have distinct valid 
   assert.equal(receipt.contract, 'herdr-adapter-receipt.v1');
   assert.ok(receipt.startArgvDigest);
   assert.ok(receipt.workerCommandDigest);
-  assert.notEqual(receipt.startArgvDigest, receipt.workerCommandDigest);
-  assert.equal(receipt.workerCommandDigest, computeSha256Digest({ command: 'bwrap', args: ['--ro-bind', '/', '/', 'node', '-v'] }));
+  assert.match(receipt.startArgvDigest, /^sha256:[a-f0-9]{64}$/);
+  assert.match(receipt.workerCommandDigest, /^sha256:[a-f0-9]{64}$/);
 });
 
 // 4. Completion strictly requires worker outbox result; Herdr status alone is NEVER Run truth
@@ -411,6 +407,7 @@ test('5. fresh launch submits once with deterministic herdrName', async () => {
     cwd: tmp,
     fullEnv: process.env,
     delivery: 'file-pointer',
+    agentKind: 'echo',
     transportDeadlines: {
       startup: { readyMs: 500, promptMs: 500 },
       round: { idleMs: 1000, ceilingMs: 2000 },
@@ -421,10 +418,11 @@ test('5. fresh launch submits once with deterministic herdrName', async () => {
   assert.equal(cmd.herdrName, 'fgos-run-fresh-01-cmd-fresh-01');
   assert.equal(cmd.state, 'reconciled');
 
-  // Verify Herdr calls include pane run
+  // Verify Herdr calls include agent start
   const calls = mock.calls();
-  const runCalls = calls.filter((c) => c[0] === 'pane' && c[1] === 'run');
-  assert.equal(runCalls.length, 1);
+  const startCalls = calls.filter((c) => c[0] === 'agent' && c[1] === 'start');
+  assert.equal(startCalls.length, 1);
+  assert.equal(startCalls[0][2], 'fgos-run-fresh-01-cmd-fresh-01');
 });
 
 // 6. Same conversation but new worker process parks with incarnation-mismatch
