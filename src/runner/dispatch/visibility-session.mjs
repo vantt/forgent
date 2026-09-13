@@ -270,6 +270,13 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
 
 export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
   const dir = path.resolve(runDir);
+  const commandsDir = path.join(dir, 'controller', 'commands');
+  let cliSpawnPromise = null;
+  if (fs.existsSync(commandsDir)) {
+    cliSpawnPromise = import('./assignment-runner.mjs')
+      .then(({ reconcileCliSpawnRun }) => reconcileCliSpawnRun(dir))
+      .catch(() => {});
+  }
   const runFile = path.join(dir, RUN_FILE);
   const { outcome, resultPath, runMeta, changed } = classifyRunOutcome(dir, { liveness });
   if (changed) {
@@ -287,7 +294,7 @@ export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
     // cli-spawn dispatch never had a pane). Reconciling run.json is the
     // point; the visibility stamp is a courtesy.
   }
-  return { outcome, changed, resultPath };
+  return { outcome, changed, resultPath, ...(cliSpawnPromise ? { cliSpawnPromise } : {}) };
 }
 
 /** Mark a run finished by the normal path: the dispatch returned and its

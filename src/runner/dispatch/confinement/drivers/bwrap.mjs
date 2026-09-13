@@ -270,7 +270,10 @@ export function assessBwrap(request, backend) {
   try {
     resolvedResources = resolveConfinementResources({
       dispatchId: request.dispatchId,
-      context: request.context,
+      context: {
+        ...request.context,
+        assignmentLaunchContext: request.assignmentLaunchContext,
+      },
       grants: policyGrants,
       resourceNeeds: request.resourceNeeds,
       backendConfig: backend?.config || {},

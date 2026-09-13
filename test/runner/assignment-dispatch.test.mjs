@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execSync, execFileSync, execFile } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { executeAssignment, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
@@ -11,6 +12,7 @@ import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
+import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 
@@ -1840,4 +1842,386 @@ test('resolveWorkerArtifactPath falls back to the flat legacy name when the outb
     resolveWorkerArtifactPath(noOutbox, /^result-(\d+)\.json$/, 'agent-result.json'),
     path.join(noOutbox, 'agent-result.json'),
   );
+});
+
+// =============================================================================
+// Run admission and fencing (runtime-recovery P01): executeAssignment's
+// atomic admission ledger (run-lock.mjs's shared generation primitive),
+// replacing the prior readdirSync + max-attempt scan. See
+// admitRunAttempt's own doc comment in assignment-runner.mjs for the full
+// commit algorithm this proves.
+// =============================================================================
+
+function writeAssignmentJsonFor(tempDir, assignment) {
+  const dir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'assignment.json'), `${JSON.stringify(assignment, null, 2)}\n`);
+  return dir;
+}
+
+/** Runs `executeAssignment(assignment, { cwd, repoRoot, runnerConfig, ...extraOpts })`
+ * in a genuinely separate child process (never a JS-level stub), reporting
+ * back `{ ok: true, result }` on success or `{ ok: false, message }` on a
+ * thrown error -- always exiting 0 so a Promise.all over an expected
+ * winner+loser pair never rejects on the loser. */
+function spawnExecuteAssignment(tempDir, assignment, runnerConfig, extraOpts = {}) {
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const script = [
+    `import('${moduleUrl}').then(async ({ executeAssignment }) => {`,
+    `  try {`,
+    `    const result = await executeAssignment(${JSON.stringify(assignment)}, {`,
+    `      cwd: ${JSON.stringify(tempDir)},`,
+    `      repoRoot: ${JSON.stringify(tempDir)},`,
+    `      runnerConfig: ${JSON.stringify(runnerConfig)},`,
+    `      ...${JSON.stringify(extraOpts)},`,
+    `    });`,
+    `    process.stdout.write(JSON.stringify({ ok: true, result }));`,
+    `  } catch (err) {`,
+    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message }));`,
+    `  }`,
+    `  process.exit(0);`,
+    `});`,
+  ].join('\n');
+  return execFileAsync(process.execPath, ['-e', script], { encoding: 'utf8' }).then((r) => JSON.parse(r.stdout));
+}
+
+function admissionRunnerConfig(executorScript) {
+  return {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+}
+
+test('executeAssignment: the same (retryId, destination, payloadDigest) tuple returns the identical committed Run without dispatching a second executor', async () => {
+  const tempDir = mkTempDir();
+  const counterPath = path.join(tempDir, 'invocation-count.txt');
+  const executorScript = path.join(tempDir, 'counting-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prior = fs.existsSync(${JSON.stringify(counterPath)}) ? Number(fs.readFileSync(${JSON.stringify(counterPath)}, 'utf8')) : 0;
+    fs.writeFileSync(${JSON.stringify(counterPath)}, String(prior + 1));
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+    }
+    process.exit(0);
+    `,
+  );
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-dup', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const tuple = { retryId: 'retry-dup-1', destination: 'fixed-destination', payloadDigest: 'fixed-payload-digest' };
+  const first = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple });
+  const second = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple });
+
+  assert.equal(second.runId, first.runId, 'the same idempotency tuple must resolve to the SAME committed Run');
+  assert.equal(fs.readFileSync(counterPath, 'utf8'), '1', 'the executor must only ever be dispatched once for a duplicate admission tuple');
+});
+
+test('executeAssignment: reusing a retryId with a CHANGED destination/payload is refused as duplicate-retry', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-dup-retry', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId: 'retry-a', destination: 'dest-1', payloadDigest: 'digest-1' });
+
+  await assert.rejects(
+    () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId: 'retry-a', destination: 'dest-1', payloadDigest: 'digest-2' }),
+    (err) => err instanceof RunnerConfigError && /duplicate-retry/.test(err.message),
+  );
+});
+
+test('executeAssignment: a predecessorRunId that does not name the current committed Run is refused as invalid-predecessor', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-bad-pred', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const initial = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId: 'retry-initial', destination: 'dest', payloadDigest: 'digest-1' });
+  assert.equal(initial.runtime.exitCode, 0);
+
+  await assert.rejects(
+    () =>
+      executeAssignment(assignment, {
+        cwd: tempDir,
+        repoRoot: tempDir,
+        runnerConfig,
+        retryId: 'retry-wrong-predecessor',
+        predecessorRunId: 'run_does_not_exist_99',
+        destination: 'dest',
+        payloadDigest: 'digest-2',
+      }),
+    (err) => err instanceof RunnerConfigError && /invalid-predecessor/.test(err.message),
+  );
+});
+
+test('executeAssignment: concurrent identical admission (same retryId/tuple, two genuinely separate processes) produces exactly one Run identity, never two', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-concurrent-dup', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  writeAssignmentJsonFor(tempDir, assignment);
+
+  const tuple = { retryId: 'retry-concurrent-dup', destination: 'fixed-destination', payloadDigest: 'fixed-payload-digest' };
+  const [a, b] = await Promise.all([
+    spawnExecuteAssignment(tempDir, assignment, runnerConfig, tuple),
+    spawnExecuteAssignment(tempDir, assignment, runnerConfig, tuple),
+  ]);
+
+  // Both calls resolve to the SAME admission identity. Execution-level
+  // deduplication is NOT this cell's contract (P01 owns admission, not
+  // adapter idempotency): the second call may either observe the same
+  // already-committed runId, or be refused by per-Run control fencing if
+  // it genuinely raced the first call's still-in-flight execution -- a
+  // correct, desired refusal ("second controller on an un-settled Run
+  // refused"), never a second, DIFFERENT Run.
+  const outcomes = [a, b];
+  const succeeded = outcomes.filter((o) => o.ok);
+  assert.ok(succeeded.length >= 1, `at least one call must succeed: ${JSON.stringify(outcomes)}`);
+  const runIds = new Set(succeeded.map((o) => o.result.runId));
+  assert.equal(runIds.size, 1, `every successful call must report the SAME Run identity, got ${JSON.stringify(outcomes)}`);
+  for (const o of outcomes) {
+    if (!o.ok) assert.match(o.message, /could not acquire control|invalid-predecessor|duplicate-retry/, `an unsuccessful call must fail for an expected admission/control reason, got: ${o.message}`);
+  }
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
+  assert.deepEqual(attemptDirs, ['01'], 'exactly one attempt directory must exist -- one Run, never two');
+});
+
+test('executeAssignment: concurrent DIFFERENT retry tuples racing for the same (empty) predecessor produce exactly one winner and one typed invalid-predecessor loser', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-concurrent-race', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  writeAssignmentJsonFor(tempDir, assignment);
+
+  const [a, b] = await Promise.all([
+    spawnExecuteAssignment(tempDir, assignment, runnerConfig, { retryId: 'retry-race-a', predecessorRunId: null, destination: 'dest', payloadDigest: 'digest-a' }),
+    spawnExecuteAssignment(tempDir, assignment, runnerConfig, { retryId: 'retry-race-b', predecessorRunId: null, destination: 'dest', payloadDigest: 'digest-b' }),
+  ]);
+
+  const outcomes = [a, b];
+  const winners = outcomes.filter((o) => o.ok);
+  const losers = outcomes.filter((o) => !o.ok);
+  assert.equal(winners.length, 1, `expected exactly one winner, got ${JSON.stringify(outcomes)}`);
+  assert.equal(losers.length, 1, `expected exactly one loser, got ${JSON.stringify(outcomes)}`);
+  assert.match(losers[0].message, /invalid-predecessor/);
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
+  assert.deepEqual(attemptDirs, ['01'], 'the loser must never materialize its own competing attempt directory');
+});
+
+test('executeAssignment: crash after admission-ledger commit but before the run directory ever materializes leaves NO admitted (visible) Run -- a repeat call with the same tuple self-heals it', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-crash-before-rename', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const tuple = { retryId: 'retry-crash-1', destination: 'dest', payloadDigest: 'digest-1' };
+  const first = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  assert.equal(fs.existsSync(runDir), true);
+
+  // Simulate "crash after the admission ledger committed attempt 1, before
+  // (or during) the run directory's own staging+rename ever completed" --
+  // the observable state left behind is: the ledger record exists, but
+  // runs/01/ does not. Directly constructing this on-disk fixture (rather
+  // than a literal process kill) matches this repo's own established crash-
+  // point test convention.
+  fs.rmSync(runDir, { recursive: true, force: true });
+  assert.equal(fs.existsSync(runDir), false, 'no committed Run is visible at this crash point');
+
+  const resumed = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple });
+
+  assert.equal(resumed.runId, first.runId, 'a repeat call for the SAME declared tuple must resume the exact same identity, never allocate a new attempt');
+  assert.equal(fs.existsSync(path.join(runDir, 'run.json')), true, 'the run directory must be fully re-materialized');
+  assert.equal(fs.existsSync(path.join(runDir, 'dispatch-plan.json')), true);
+  assert.equal(resumed.status, 'done');
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
+  assert.deepEqual(attemptDirs, ['01'], 'self-heal must never allocate attempt 02 for a resumed identical tuple');
+});
+
+test('executeAssignment: an abandoned staging directory from a prior crashed attempt is never trusted -- it is removed and rebuilt fresh, never left as a phantom empty attempt', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-abandoned-staging', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  fs.mkdirSync(runsDir, { recursive: true });
+  const stagingDir = path.join(runsDir, '.staging-01');
+  fs.mkdirSync(stagingDir, { recursive: true });
+  fs.writeFileSync(path.join(stagingDir, 'garbage.txt'), 'leftover from a crashed attempt');
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.status, 'done');
+  assert.equal(fs.existsSync(stagingDir), false, 'the abandoned staging directory must be gone -- consumed by the rebuild, not left dangling');
+  const runDir = path.join(runsDir, '01');
+  assert.equal(fs.existsSync(path.join(runDir, 'run.json')), true);
+  assert.equal(fs.existsSync(path.join(runDir, 'garbage.txt')), false, 'stale staging content must never leak into the real committed attempt directory');
+});
+
+test('executeAssignment: a live sibling staging directory is never removed during admission cleanup', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-live-staging', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  fs.mkdirSync(runsDir, { recursive: true });
+
+  const retryId = 'retry-sibling-test';
+  const payloadDigest = 'digest-test-sibling';
+  // Plant a live sibling staging directory whose PID is this live process
+  const liveStagingDir = path.join(runsDir, `.staging-01-${process.pid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(liveStagingDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(liveStagingDir, 'run.json'),
+    JSON.stringify({ retryId, payloadDigest: `sha256:${payloadDigest}` }),
+  );
+
+  // Also plant an abandoned staging directory from a dead PID
+  const deadPid = 99999999;
+  const deadStagingDir = path.join(runsDir, `.staging-01-${deadPid}-${crypto.randomUUID()}`);
+  fs.mkdirSync(deadStagingDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(deadStagingDir, 'run.json'),
+    JSON.stringify({ retryId, payloadDigest: `sha256:${payloadDigest}` }),
+  );
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId,
+    predecessorRunId: null,
+    destination: tempDir,
+    payloadDigest,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(fs.existsSync(deadStagingDir), false, 'dead pid staging directory must be cleaned up');
+  assert.equal(fs.existsSync(liveStagingDir), true, 'live sibling staging directory must NEVER be removed');
+
+  // Clean up planted live directory
+  fs.rmSync(liveStagingDir, { recursive: true, force: true });
+});
+
+test('executeAssignment: fenced caller on pre-ledger runs/NN directory allocates next attempt, never adopting legacy settlement', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-fenced-legacy', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const legacyDir = path.join(runsDir, '01');
+  fs.mkdirSync(legacyDir, { recursive: true });
+  const legacyRunId = `run_${assignment.assignmentId}_01`;
+  fs.writeFileSync(path.join(legacyDir, 'run.json'), JSON.stringify({ runId: legacyRunId, attempt: 1, status: 'settled' }, null, 2));
+  fs.writeFileSync(path.join(legacyDir, 'result.json'), JSON.stringify({ runId: legacyRunId, status: 'failed', agentClaim: { status: 'failed', summary: 'LEGACY-SETTLED-EVIDENCE' } }, null, 2));
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    retryId: 'retry-fenced-1',
+    predecessorRunId: null,
+    destination: tempDir,
+    payloadDigest: 'digest-fenced-1',
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.runId, `run_${assignment.assignmentId}_02`, 'fenced caller must allocate attempt 02, never adopt legacy attempt 01');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d)).sort();
+  assert.deepEqual(attemptDirs, ['01', '02']);
+  const legacyResult = JSON.parse(fs.readFileSync(path.join(legacyDir, 'result.json'), 'utf8'));
+  assert.equal(legacyResult.agentClaim?.summary, 'LEGACY-SETTLED-EVIDENCE', 'legacy result must not be overwritten');
+});
+
+test('executeAssignment: a control token that is superseded mid-flight (a fresher controller cleanly took over while the adapter call was still in flight) refuses to append a settlement', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'slow-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    setTimeout(() => {
+      const prompt = process.argv.slice(2).join(' ');
+      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      if (match) {
+        const runDir = path.dirname(match[1]);
+        fs.mkdirSync(runDir, { recursive: true });
+        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      }
+      process.exit(0);
+    }, 300);
+    `,
+  );
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-stale-token', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const controlGenerationsDir = path.join(runDir, 'control', 'generations');
+
+  // Interject once this attempt's control generation has actually been
+  // published (the executor is still "running" behind its own 300ms
+  // setTimeout) -- read the real epoch/token off disk (run-lock.mjs's own
+  // on-disk shape: one JSON record per epoch under control/generations/),
+  // cleanly release it, and let a fresh interloper take over, simulating a
+  // controller that legitimately superseded the original mid-flight.
+  const interject = async () => {
+    for (let i = 0; i < 100; i += 1) {
+      if (fs.existsSync(controlGenerationsDir) && fs.readdirSync(controlGenerationsDir).some((f) => f.endsWith('.json'))) break;
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    const [genFile] = fs.readdirSync(controlGenerationsDir).filter((f) => f.endsWith('.json')).sort();
+    const record = JSON.parse(fs.readFileSync(path.join(controlGenerationsDir, genFile), 'utf8'));
+    const controlEpoch = Number(genFile.replace('.json', ''));
+
+    releaseRunControl(runDir, { controlEpoch, controlToken: record.controlToken });
+    const interloper = acquireRunControl(runDir, { holder: { id: 'interloper', pid: process.pid }, purpose: 'test' });
+    assert.equal(interloper.status, 'acquired');
+    assert.equal(interloper.controlEpoch, controlEpoch + 1);
+  };
+
+  const [outcome] = await Promise.all([
+    executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }).then(
+      (result) => ({ ok: true, result }),
+      (err) => ({ ok: false, message: err.message }),
+    ),
+    interject(),
+  ]);
+
+  assert.equal(outcome.ok, false, 'a superseded controller must never successfully append a settlement');
+  assert.match(outcome.message, /no longer current/);
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false, 'no settlement (result.json) may be appended by a controller that lost its token mid-flight');
+});
+
+test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-unfenced', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const first = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  const second = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  const third = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.deepEqual([first.runId, second.runId, third.runId].map((id) => id.split('_').pop()), ['01', '02', '03']);
 });
