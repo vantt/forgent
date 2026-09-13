@@ -54,9 +54,23 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
   return attestation;
 }
 
-function adapterConsumesPreparedSandbox(adapterName, adapterPort) {
-  if (adapterPort && typeof adapterPort === 'object' && adapterPort.preparedInvocationContract === 'exact-v1') {
+function adapterConsumesPreparedSandbox(adapterName, adapterPort, request = null) {
+  const invocation = request?.invocation;
+  if (invocation?.providerKindOnly === true || invocation?.workerCommandSeam === false) {
+    return false;
+  }
+  if (adapterPort && typeof adapterPort === 'object') {
+    if (adapterPort.workerCommandSeam === false) return false;
+    if (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true) return true;
+    if (adapterPort.preparedInvocationContract !== undefined) return false;
+  }
+  if (adapterPort && typeof adapterPort === 'function' && (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true)) {
     return true;
+  }
+  if (adapterName === 'herdr-spawn') {
+    if (invocation?.interactiveMode?.kind && invocation?.workerCommandSeam !== true && !adapterPort?.workerCommandSeam) {
+      return false;
+    }
   }
   const meta = getAdapterMetadata(adapterName);
   return meta?.preparedInvocationContract === 'exact-v1';
@@ -669,7 +683,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     }
 
     const assessment = driver.assess(request, backendInstance);
-    if (!adapterConsumesPreparedSandbox(adapterName, adapterPort)) {
+    if (!adapterConsumesPreparedSandbox(adapterName, adapterPort, request)) {
       const detail = `adapter ${adapterName} does not apply the prepared sandbox.`;
       assessment.mismatches.push({ code: 'confinement-adapter-unsupported', detail });
       for (const key of Object.keys(assessment.coverage)) {
@@ -1176,7 +1190,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     }
 
     const assessment = driver.assess(request, backendInstance);
-    if (!adapterConsumesPreparedSandbox(adapterName, opts.adapterPort)) {
+    if (!adapterConsumesPreparedSandbox(adapterName, opts.adapterPort, request)) {
       const detail = `adapter ${adapterName} does not apply the prepared sandbox.`;
       assessment.mismatches.push({ code: 'confinement-adapter-unsupported', detail });
       for (const key of Object.keys(assessment.coverage)) {
@@ -1462,6 +1476,44 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   const finalizationPath = path.join(runDir, 'protected', 'confinement-finalization', `${launchCommandId}.json`);
   publishMutableProjection(finalizationPath, finalizationDescBody);
+
+  if (adapterName === 'herdr-spawn') {
+    const herdrName = `fgos-${launchContext.run.runId}-${launchCommandId}`;
+    const launchCommandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+    let existingCmd = null;
+    if (fs.existsSync(launchCommandPath)) {
+      try {
+        existingCmd = JSON.parse(fs.readFileSync(launchCommandPath, 'utf8'));
+      } catch {}
+    }
+    const launchCommandBody = {
+      contract: 'herdr-launch-command.v1',
+      runId: launchContext.run.runId,
+      launchCommandId,
+      controlEpoch: launchContext.command.controlEpoch,
+      controlTokenDigest: launchContext.command.controlTokenDigest,
+      state: existingCmd?.state || 'pending',
+      requestDigest: launchContextDigest,
+      preparedInvocationDigest,
+      herdrName,
+      agentSession: existingCmd?.agentSession || null,
+      paneId: existingCmd?.paneId || null,
+      resourceIncarnation: existingCmd?.resourceIncarnation || null,
+      outcome: existingCmd?.outcome || null,
+    };
+    publishMutableProjection(launchCommandPath, launchCommandBody);
+
+    return {
+      launchCommand: launchCommandBody,
+      launchCommandPath,
+      envelope: launchCommandBody,
+      envelopePath: launchCommandPath,
+      preparedInvocation: preparedInvocationRecord,
+      preparedInvocationDigest,
+      finalizationPath,
+      finalizationDescriptor: finalizationDescBody,
+    };
+  }
 
   // 3. Publish cli-spawn-launch-envelope.v1
   const envelopeBody = {

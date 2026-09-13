@@ -755,7 +755,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
   // herdr launches the canonical executable for a kind; `command` only tells
   // us which kind that is. An unrecognized kind is herdr's own refusal, and
   // it is reported as one -- never silently downgraded to typing at a shell.
-  const agentKind = kind ?? (command ? path.basename(command) : null);
+  const isBwrap = command === 'bwrap' || (Array.isArray(args) && args.includes('bwrap'));
+  const agentKind = kind ?? (command && !isBwrap ? path.basename(command) : (isBwrap ? 'bwrap' : null));
   if (!agentKind) {
     return Promise.reject(new DispatchError(
       'invalid-config',
@@ -774,6 +775,16 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     fullEnv,
     confinement,
     permissionMode,
+    command,
+    args,
+    workerInvocation: invocation.workerInvocation,
+    confinementRequirement: invocation.requirement ?? opts.requirement,
+    launchCommandId: opts.launchCommandId ?? invocation.launchCommandId,
+    runId: opts.runId ?? invocation.runId,
+    assignmentId: opts.assignmentId ?? invocation.assignmentId,
+    controlEpoch: opts.controlEpoch ?? invocation.controlEpoch,
+    controlToken: opts.controlToken ?? invocation.controlToken,
+    preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',
@@ -826,7 +837,7 @@ function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
   return effective.filter((arg) => !String(arg).includes(prompt));
 }
 
-function herdrSpawnAdapter(invocation, opts) {
+export function herdrSpawnAdapter(invocation, opts) {
   if (invocation.interactiveMode) {
     return herdrSpawnInteractiveAdapter(invocation, opts);
   }
@@ -841,6 +852,11 @@ cliSpawnAdapter.execute = cliSpawnAdapter;
 cliSpawnAdapter.locus = 'local-process';
 cliSpawnAdapter.preparedInvocationContract = 'exact-v1';
 cliSpawnAdapter.receiptContract = 'confinement-adapter-receipt.v1';
+
+herdrSpawnAdapter.execute = herdrSpawnAdapter;
+herdrSpawnAdapter.locus = 'herdr-pane';
+herdrSpawnAdapter.preparedInvocationContract = 'exact-v1';
+herdrSpawnAdapter.receiptContract = 'herdr-adapter-receipt.v1';
 
 /** Adapter metadata registry for Assignment-owned recovery profiles. */
 export const ADAPTER_REGISTRY = {
@@ -857,6 +873,8 @@ export const ADAPTER_REGISTRY = {
   'herdr-spawn': {
     execute: herdrSpawnAdapter,
     locus: 'herdr-pane',
+    preparedInvocationContract: 'exact-v1',
+    receiptContract: 'herdr-adapter-receipt.v1',
   },
 };
 

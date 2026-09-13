@@ -30,6 +30,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { DispatchError } from './dispatch-error.mjs';
 import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
@@ -40,6 +41,13 @@ import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
+import {
+  publishImmutableProof,
+  publishMutableProjection,
+  computeSha256Digest,
+  canonicalJson,
+  getProcessStartTime,
+} from './cli-spawn-supervisor.mjs';
 
 /**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
@@ -596,7 +604,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand, promptMs, readLiveness, workerHomePath }) {
+async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath }) {
   let stdout = '';
   try {
     stdout = fs.existsSync(paths.reportPath)
@@ -651,7 +659,10 @@ export async function runHerdrRound(ctx) {
   const deadlines = groupDeadlines(ctx);
   const { runDir, paths } = prepareRunDir({ runDir: ctx.runDir, roundNumber, workId, tier, model });
 
-  const agentName = normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
+  const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
+  const agentName = isAssignmentRun
+    ? normalizeAgentName(`fgos-${ctx.runId}-${ctx.launchCommandId}`)
+    : normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
   const round = openRound({ runDir, workId, tier, model, agentName });
 
   const briefText = renderBrief({ prompt, round: roundNumber, runDir, agentName });
@@ -784,22 +795,126 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
   }
 
-  startAgent({ client, round, agentKind, agentArgs, readyMs: deadlines.startup.readyMs });
+  const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
+  const workerCommand = ctx.workerInvocation?.command || ((ctx.workerCommandSeam || isAssignmentRun) ? ctx.command : null);
+  const workerArgs = ctx.workerInvocation?.args || ((ctx.workerCommandSeam || isAssignmentRun) ? (ctx.args || []) : []);
+  const useWorkerCommandSeam = Boolean(
+    (ctx.workerCommandSeam === true || ctx.workerInvocation || isAssignmentRun) &&
+    workerCommand
+  );
+  let executionSeam = 'interactive-agent';
+  let herdrStartArgv = null;
+  let workerCommandDigest = null;
+  let resourceIncarnation = null;
+
+  if (useWorkerCommandSeam) {
+    executionSeam = 'worker-command';
+    herdrStartArgv = ['pane', 'run', round.paneId, workerCommand, ...workerArgs];
+    workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });
+
+    try {
+      client.paneRun(round.paneId, workerCommand, workerArgs);
+    } catch (err) {
+      if (ctx.confinementRequirement?.mode === 'required' || ctx.confinement?.mode === 'required') {
+        throw round.fail('worker-spawn-fail', 'confinement-unsupported',
+          `required confinement refused: Herdr could not execute prepared command in pane ${round.paneId}: ${err.message}`);
+      }
+      throw round.fail('worker-spawn-fail', err.code ?? 'worker_run_failed',
+        `executor failed to start prepared command in pane ${round.paneId}: ${err.message}`);
+    }
+
+    const agentSessionId = `sess-${round.agentName}`;
+    try {
+      client.reportAgent(round.paneId, { source: 'fgos', agent: round.agentName, state: 'working', agentSessionId });
+      client.reportAgentSession(round.paneId, { source: 'fgos', agent: round.agentName, agentSessionId });
+    } catch {}
+
+    try {
+      const pInfo = client.paneProcessInfo(round.paneId);
+      const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid) || pInfo?.foregroundProcesses?.[0];
+      resourceIncarnation = computeHerdrResourceIncarnation({
+        paneId: round.paneId,
+        shellPid: pInfo?.shellPid || null,
+        workerPid: workerProc?.pid || null,
+        foregroundPgid: pInfo?.foregroundPgid || null,
+        processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+      });
+    } catch {
+      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+    }
+
+    round.note({
+      status: 'agent-ready',
+      agentSession: { value: agentSessionId },
+      resourceIncarnation,
+    });
+  } else {
+    herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKind, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((agentArgs && agentArgs.length) ? ['--', ...agentArgs] : [])];
+    startAgent({ client, round, agentKind, agentArgs, readyMs: deadlines.startup.readyMs });
+    try {
+      const pInfo = client.paneProcessInfo(round.paneId);
+      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId, shellPid: pInfo?.shellPid || null });
+    } catch {
+      resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+    }
+  }
 
   // One line so a person watching the runner's own stderr can find the pane to
   // watch and the directory this round's files will appear in. Diagnostic
   // only -- nothing reads it back.
   process.stderr.write(`fgos: herdr-spawn work=${workId} pane=${round.paneId} agent=${round.agentName} runDir=${runDir}\n`);
 
-  const message = briefMessage({ delivery, briefText, runDir, roundNumber });
-  deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+  if (executionSeam === 'interactive-agent') {
+    const message = briefMessage({ delivery, briefText, runDir, roundNumber });
+    deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+  } else {
+    round.note({ status: 'briefed' });
+  }
 
   const readLiveness = livenessProbe(client, round.paneId);
   const decision = await pollForOutcome({
-    client, round, paths, message, deadlines, usageLimitPatterns, readLiveness,
+    client, round, paths, message: briefMessage({ delivery, briefText, runDir, roundNumber }), deadlines, usageLimitPatterns, readLiveness,
   });
 
   if (decision.outcome !== 'settled') {
+    if (isAssignmentRun) {
+      try {
+        const receiptData = {
+          contract: 'herdr-adapter-receipt.v1',
+          runId: ctx.runId,
+          launchCommandId: ctx.launchCommandId,
+          preparedInvocationDigest: ctx.preparedInvocationDigest || null,
+          herdrName: round.agentName,
+          paneId: round.paneId || null,
+          agentSession: round.agentSession?.value || null,
+          resourceIncarnation,
+          startArgvDigest: computeSha256Digest(herdrStartArgv),
+          workerCommandDigest: workerCommandDigest || computeSha256Digest(herdrStartArgv),
+          completion: {
+            kind: decision.outcome,
+            reason: decision.detail || decision.outcome,
+            settledAt: new Date().toISOString(),
+          },
+          result: null,
+        };
+        const receipt = publishHerdrAdapterReceipt(runDir, ctx.launchCommandId, receiptData);
+        const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
+        if (fs.existsSync(commandPath)) {
+          const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+          publishMutableProjection(commandPath, {
+            ...cmd,
+            state: 'reconciled',
+            paneId: round.paneId,
+            agentSession: round.agentSession?.value || null,
+            resourceIncarnation,
+            outcome: {
+              kind: 'receipt-backed',
+              receiptDigest: receipt.digest,
+            },
+          });
+        }
+      } catch {}
+    }
     throw concludeFailure({ client, round, decision, closeAlways });
   }
 
@@ -807,6 +922,59 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     client, round, paths, exitCommand,
     promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath,
   });
+
+  if (isAssignmentRun) {
+    let resultDigest = null;
+    let outboxRelPath = null;
+    if (paths.resultPath && fs.existsSync(paths.resultPath)) {
+      try {
+        const resContent = fs.readFileSync(paths.resultPath, 'utf8');
+        resultDigest = computeSha256Digest(resContent);
+        outboxRelPath = path.relative(runDir, paths.resultPath);
+      } catch {}
+    }
+    const receiptData = {
+      contract: 'herdr-adapter-receipt.v1',
+      runId: ctx.runId,
+      launchCommandId: ctx.launchCommandId,
+      preparedInvocationDigest: ctx.preparedInvocationDigest || null,
+      herdrName: round.agentName,
+      paneId: round.paneId || null,
+      agentSession: round.agentSession?.value || null,
+      resourceIncarnation,
+      startArgvDigest: computeSha256Digest(herdrStartArgv),
+      workerCommandDigest: workerCommandDigest || computeSha256Digest(herdrStartArgv),
+      completion: {
+        kind: 'settled',
+        reason: 'worker-outbox-settled',
+        settledAt: new Date().toISOString(),
+      },
+      result: {
+        outboxPath: outboxRelPath || 'outbox/result-1.json',
+        outboxDigest: resultDigest,
+      },
+    };
+    const receipt = publishHerdrAdapterReceipt(runDir, ctx.launchCommandId, receiptData);
+
+    const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
+    if (fs.existsSync(commandPath)) {
+      try {
+        const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+        const updatedCmd = {
+          ...cmd,
+          state: 'reconciled',
+          paneId: round.paneId,
+          agentSession: round.agentSession?.value || null,
+          resourceIncarnation,
+          outcome: {
+            kind: 'receipt-backed',
+            receiptDigest: receipt.digest,
+          },
+        };
+        publishMutableProjection(commandPath, updatedCmd);
+      } catch {}
+    }
+  }
 
   return {
     status: 0,
@@ -820,4 +988,378 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     resultPath: paths.resultPath,
     outcome: 'settled',
   };
+}
+
+export class HerdrLaunchCollisionError extends Error {
+  constructor(message, details = {}) {
+    super(message);
+    this.name = 'HerdrLaunchCollisionError';
+    this.code = 'launch-collision';
+    Object.assign(this, details);
+  }
+}
+
+export function computeHerdrResourceIncarnation({
+  paneId = null,
+  shellPid = null,
+  workerPid = null,
+  foregroundPgid = null,
+  gatewaySessionId = null,
+  processStartTime = null,
+} = {}) {
+  return {
+    contract: 'herdr-resource-incarnation.v1',
+    paneId: paneId || null,
+    shellPid: shellPid || null,
+    workerPid: workerPid || null,
+    foregroundPgid: foregroundPgid || null,
+    gatewaySessionId: gatewaySessionId || null,
+    processStartTime: processStartTime || null,
+  };
+}
+
+function matchIncarnations(a, b) {
+  if (!a || !b) return false;
+  if (a.workerPid && b.workerPid && a.workerPid !== b.workerPid) return false;
+  if (a.processStartTime && b.processStartTime && a.processStartTime !== b.processStartTime) return false;
+  if (a.gatewaySessionId && b.gatewaySessionId && a.gatewaySessionId !== b.gatewaySessionId) return false;
+  if (a.shellPid && b.shellPid && a.shellPid !== b.shellPid) return false;
+  if (a.paneId && b.paneId && a.paneId !== b.paneId) return false;
+  return true;
+}
+
+export function createHerdrLaunchCommand(runDir, launchContext, {
+  state = 'pending',
+  herdrName = null,
+  preparedInvocationDigest = null,
+  agentSession = null,
+  paneId = null,
+  resourceIncarnation = null,
+  outcome = null,
+  checkDuplicate = true,
+} = {}) {
+  const runId = launchContext.run?.runId || launchContext.runId;
+  const launchCommandId = launchContext.command?.launchCommandId || launchContext.launchCommandId;
+  const controlEpoch = launchContext.command?.controlEpoch ?? launchContext.controlEpoch ?? 1;
+  const controlTokenDigest = launchContext.command?.controlTokenDigest || (launchContext.controlToken ? computeSha256Digest(launchContext.controlToken) : null);
+  const requestDigest = computeSha256Digest(launchContext);
+  const effectiveHerdrName = herdrName || `fgos-${runId}-${launchCommandId}`;
+
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  fs.mkdirSync(commandsDir, { recursive: true });
+  const cmdPath = path.join(commandsDir, `${launchCommandId}.json`);
+
+  if (checkDuplicate) {
+    const existingFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+    for (const f of existingFiles) {
+      try {
+        const existing = JSON.parse(fs.readFileSync(path.join(commandsDir, f), 'utf8'));
+        if (existing.runId === runId && (existing.state === 'pending' || existing.state === 'reconciled')) {
+          if (existing.launchCommandId !== launchCommandId || f !== `${launchCommandId}.json`) {
+            throw new HerdrLaunchCollisionError(`launch command for run ${runId} already exists as ${existing.launchCommandId}`, {
+              runId,
+              existingCommandId: existing.launchCommandId,
+              existingCommand: existing,
+            });
+          }
+        }
+      } catch (err) {
+        if (err instanceof HerdrLaunchCollisionError) throw err;
+      }
+    }
+  }
+
+  const cmd = {
+    contract: 'herdr-launch-command.v1',
+    runId,
+    launchCommandId,
+    controlEpoch,
+    controlTokenDigest,
+    state,
+    requestDigest,
+    preparedInvocationDigest,
+    herdrName: effectiveHerdrName,
+    agentSession,
+    paneId,
+    resourceIncarnation,
+    outcome,
+  };
+
+  publishMutableProjection(cmdPath, cmd);
+  return cmd;
+}
+
+export function readHerdrLaunchCommand(runDir, launchCommandId) {
+  const cmdPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+  if (!fs.existsSync(cmdPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(cmdPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+export function publishHerdrAdapterReceipt(runDir, launchCommandId, receiptData) {
+  const { digest: _existingDigest, ...receiptWithoutDigest } = receiptData;
+  const digest = computeSha256Digest(receiptWithoutDigest);
+  const fullReceipt = {
+    ...receiptWithoutDigest,
+    digest,
+  };
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipts');
+  fs.mkdirSync(receiptsDir, { recursive: true });
+  const receiptPath = path.join(receiptsDir, `${launchCommandId}.json`);
+  publishImmutableProof(receiptPath, fullReceipt);
+  return fullReceipt;
+}
+
+export function readHerdrAdapterReceipt(runDir, launchCommandId) {
+  const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
+  if (!fs.existsSync(receiptPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
+  // 1. Check action: unsupported operations
+  if (opts.action === 'cancel' || opts.operation === 'cancel') {
+    return { status: 'parked', reason: 'cancel-unsupported' };
+  }
+  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {
+    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };
+  }
+  if (opts.resourceClosed === true) {
+    return { status: 'parked', reason: 'closed-resource' };
+  }
+
+  // 2. Check result.json
+  const resultJsonPath = path.join(runDir, 'result.json');
+  if (fs.existsSync(resultJsonPath)) {
+    try {
+      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+    } catch {}
+  }
+
+  // 3. Check controller/commands
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+  const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+  if (commandFiles.length === 0) {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+
+  commandFiles.sort();
+  const commandFile = commandFiles[commandFiles.length - 1];
+  const launchCommandId = path.basename(commandFile, '.json');
+  const commandPath = path.join(commandsDir, commandFile);
+  let command;
+  try {
+    command = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+  } catch {
+    return { status: 'parked', reason: 'command-missing' };
+  }
+
+  // Stale controller verification
+  const isStale = (opts.controlEpoch !== undefined && opts.controlEpoch < command.controlEpoch) ||
+    (opts.controlToken !== undefined && command.controlTokenDigest && computeSha256Digest(opts.controlToken) !== command.controlTokenDigest);
+  if (isStale) {
+    return { status: 'observed', outcome: command.outcome, receipt: readHerdrAdapterReceipt(runDir, launchCommandId), settled: false };
+  }
+  if (opts.tokenCurrent === false) {
+    return { status: 'observed', outcome: command.outcome, receipt: readHerdrAdapterReceipt(runDir, launchCommandId), settled: false };
+  }
+
+  // Check evaluator baseline if exists
+  const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
+  if (fs.existsSync(baselinePath)) {
+    try {
+      const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+      const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
+      if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
+        return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
+      }
+    } catch {
+      return { status: 'parked', reason: 'evaluator-baseline-missing' };
+    }
+  }
+
+  // Check receipt tamper if receipt already exists
+  const receipt = readHerdrAdapterReceipt(runDir, launchCommandId);
+  if (receipt) {
+    if (receipt.digest) {
+      const { digest: rDig, ...rBody } = receipt;
+      if (rDig !== computeSha256Digest(rBody)) {
+        return { status: 'refused', reason: 'protected-artifact-corrupt' };
+      }
+    }
+    const actualRecDigest = receipt.digest || computeSha256Digest(receipt);
+    if (command.outcome?.receiptDigest && command.outcome.receiptDigest !== actualRecDigest) {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+    if (command.receiptDigest && command.receiptDigest !== actualRecDigest) {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+  }
+
+  // Window: command already reconciled
+  if (command.state === 'reconciled') {
+    if (command.outcome?.kind === 'submission-refused') {
+      return { status: 'refused', outcome: command.outcome, reason: 'submission-refused' };
+    }
+    if (command.outcome?.kind === 'receipt-backed') {
+      return { status: 'settled', outcome: command.outcome, receipt, settled: true };
+    }
+  }
+
+  // Window: command pending, no prepared invocation
+  if (!command.preparedInvocationDigest) {
+    if (opts.canPrepare && typeof opts.prepareConfinement === 'function') {
+      try {
+        const prep = await opts.prepareConfinement();
+        command.preparedInvocationDigest = prep.preparedInvocationDigest;
+        publishMutableProjection(commandPath, command);
+      } catch (err) {
+        return { status: 'parked', reason: 'prepared-invocation-missing', error: err.message };
+      }
+    } else {
+      return { status: 'parked', reason: 'prepared-invocation-missing' };
+    }
+  }
+
+  // Check prepared invocation on disk
+  const prepPath = path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`);
+  if (!fs.existsSync(prepPath)) {
+    return { status: 'parked', reason: 'prepared-invocation-missing' };
+  }
+  try {
+    const prepRec = JSON.parse(fs.readFileSync(prepPath, 'utf8'));
+    const { digest: pDig, ...pBody } = prepRec;
+    if (pDig && pDig !== computeSha256Digest(pBody)) {
+      return { status: 'refused', reason: 'protected-artifact-corrupt' };
+    }
+    const actualPDig = pDig || computeSha256Digest(prepRec);
+    if (command.preparedInvocationDigest && command.preparedInvocationDigest !== actualPDig) {
+      return { status: 'refused', reason: 'confinement-mismatch' };
+    }
+  } catch {
+    return { status: 'refused', reason: 'protected-artifact-corrupt' };
+  }
+
+  // Check worker outbox result
+  const outboxDirs = [
+    path.join(runDir, 'outbox'),
+    path.join(runDir, 'worker-output', 'outbox'),
+  ];
+  let outboxResultPath = null;
+  for (const od of outboxDirs) {
+    if (fs.existsSync(od)) {
+      const files = fs.readdirSync(od).filter((f) => (f.startsWith('result-') || f === 'result.json') && f.endsWith('.json'));
+      if (files.length > 0) {
+        outboxResultPath = path.join(od, files[0]);
+        break;
+      }
+    }
+  }
+
+  if (outboxResultPath && fs.existsSync(outboxResultPath)) {
+    const outboxContent = fs.readFileSync(outboxResultPath, 'utf8');
+    const outboxDigest = computeSha256Digest(outboxContent);
+    let effectiveReceipt = receipt;
+    if (!effectiveReceipt) {
+      effectiveReceipt = publishHerdrAdapterReceipt(runDir, launchCommandId, {
+        contract: 'herdr-adapter-receipt.v1',
+        runId: command.runId,
+        launchCommandId,
+        preparedInvocationDigest: command.preparedInvocationDigest,
+        herdrName: command.herdrName,
+        paneId: command.paneId,
+        agentSession: command.agentSession,
+        resourceIncarnation: command.resourceIncarnation,
+        startArgvDigest: command.startArgvDigest || computeSha256Digest({ herdrName: command.herdrName }),
+        workerCommandDigest: command.workerCommandDigest || command.preparedInvocationDigest,
+        completion: {
+          kind: 'settled',
+          reason: 'worker-outbox-settled',
+          settledAt: new Date().toISOString(),
+        },
+        result: {
+          outboxPath: path.relative(runDir, outboxResultPath),
+          outboxDigest,
+        },
+      });
+    }
+
+    command.state = 'reconciled';
+    command.outcome = {
+      kind: 'receipt-backed',
+      receiptDigest: effectiveReceipt.digest,
+    };
+    publishMutableProjection(commandPath, command);
+
+    return {
+      status: 'settled',
+      settled: true,
+      receipt: effectiveReceipt,
+      outcome: command.outcome,
+    };
+  }
+
+  // If no outbox result, check closed resource
+  if (opts.resourceClosed === true) {
+    return { status: 'parked', reason: 'closed-resource' };
+  }
+
+  // Check Herdr probe
+  const probe = opts.probe || (opts.herdrClient ? async (herdrName, paneId) => {
+    try {
+      const info = opts.herdrClient.agentGet(herdrName);
+      return { status: info?.agent_status || 'present', info };
+    } catch {
+      return { status: 'absent' };
+    }
+  } : null);
+
+  if (probe) {
+    const probeResult = await probe(command.herdrName, command.paneId);
+    if (probeResult.closed === true || probeResult.status === 'closed') {
+      return { status: 'parked', reason: 'closed-resource' };
+    }
+
+    if (probeResult.status === 'absent' || probeResult.notFound || probeResult.absentProven === true) {
+      return { status: 'parked', reason: 'unknown-launch' };
+    }
+
+    // Probed resource exists
+    if (!command.resourceIncarnation) {
+      return { status: 'parked', reason: 'incarnation-unknown' };
+    }
+
+    if (probeResult.resourceIncarnation) {
+      if (!matchIncarnations(command.resourceIncarnation, probeResult.resourceIncarnation)) {
+        return { status: 'parked', reason: 'incarnation-mismatch' };
+      }
+    }
+
+    // Alive and matches incarnation (F-b observation)
+    return {
+      status: 'waiting',
+      state: 'worker-running',
+      herdrName: command.herdrName,
+      paneId: command.paneId,
+      resourceIncarnation: command.resourceIncarnation,
+    };
+  }
+
+  // Without live probe or outbox
+  if (!command.resourceIncarnation) {
+    return { status: 'parked', reason: 'incarnation-unknown' };
+  }
+
+  return { status: 'parked', reason: 'unknown-launch' };
 }

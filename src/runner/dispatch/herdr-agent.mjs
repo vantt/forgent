@@ -118,6 +118,9 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       }
     }
     if (body === undefined) {
+      if (res.status === 0 && !res.stdout?.trim() && !res.stderr?.trim()) {
+        return {};
+      }
       // A herdr that answers JSON on neither stream is a broken transport, and
       // saying so beats guessing at the text.
       throw new HerdrError(
@@ -249,6 +252,38 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
         foregroundPgid: info.foreground_process_group_id ?? null,
         foregroundProcesses: Array.isArray(info.foreground_processes) ? info.foreground_processes : [],
       };
+    },
+
+    /**
+     * Run an arbitrary prepared command as the pane's foreground process.
+     */
+    paneRun(paneId, command, args = [], { timeoutMs } = {}) {
+      const runArgs = ['pane', 'run', paneId, command, ...(Array.isArray(args) ? args : [])];
+      return invoke(runArgs, { timeoutMs });
+    },
+
+    /**
+     * Report pane agent lifecycle state.
+     */
+    reportAgent(paneId, { source = 'fgos', agent, state = 'idle', message, seq, agentSessionId, agentSessionPath, timeoutMs } = {}) {
+      const args = ['pane', 'report-agent', paneId, '--source', source, '--agent', agent, '--state', state];
+      if (message) args.push('--message', message);
+      if (seq !== undefined && seq !== null) args.push('--seq', String(seq));
+      if (agentSessionId) args.push('--agent-session-id', agentSessionId);
+      if (agentSessionPath) args.push('--agent-session-path', agentSessionPath);
+      return invoke(args, { timeoutMs });
+    },
+
+    /**
+     * Report pane agent session identity.
+     */
+    reportAgentSession(paneId, { source = 'fgos', agent, seq, agentSessionId, agentSessionPath, sessionStartSource, timeoutMs } = {}) {
+      const args = ['pane', 'report-agent-session', paneId, '--source', source, '--agent', agent];
+      if (seq !== undefined && seq !== null) args.push('--seq', String(seq));
+      if (agentSessionId) args.push('--agent-session-id', agentSessionId);
+      if (agentSessionPath) args.push('--agent-session-path', agentSessionPath);
+      if (sessionStartSource) args.push('--session-start-source', sessionStartSource);
+      return invoke(args, { timeoutMs });
     },
 
     /** Starts the agent and returns only once herdr says the pane holds a

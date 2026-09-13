@@ -113,8 +113,13 @@ export function validateAssignmentLaunchContext(launchContext, context = null) {
     err.code = "confinement-launch-context-invalid";
     throw err;
   }
-  if (launchContext.contract !== "assignment-cli-spawn-launch-context.v1") {
-    const err = new Error(`assignmentLaunchContext contract must be "assignment-cli-spawn-launch-context.v1", got "${launchContext.contract}".`);
+  const validContracts = [
+    "assignment-cli-spawn-launch-context.v1",
+    "assignment-herdr-spawn-launch-context.v1",
+    "assignment-launch-context.v1",
+  ];
+  if (!validContracts.includes(launchContext.contract)) {
+    const err = new Error(`assignmentLaunchContext contract must be "assignment-cli-spawn-launch-context.v1" or "assignment-herdr-spawn-launch-context.v1", got "${launchContext.contract}".`);
     err.code = "confinement-launch-context-invalid";
     throw err;
   }
@@ -373,6 +378,8 @@ export function buildConfinementRequest({
         body: invocation.body,
       } : {}),
       ...(invocation.transport ? { transport: invocation.transport } : {}),
+      ...(invocation.providerKindOnly !== undefined ? { providerKindOnly: invocation.providerKindOnly } : {}),
+      ...(invocation.workerCommandSeam !== undefined ? { workerCommandSeam: invocation.workerCommandSeam } : {}),
     },
     context: {
       cwd: context.cwd || process.cwd(),

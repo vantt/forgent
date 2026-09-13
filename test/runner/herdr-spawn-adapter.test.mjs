@@ -94,6 +94,13 @@ if (group === 'pane' && action === 'split') {
 }
 if (group === 'tab' && action === 'create') ok({ tab: { tab_id: 'mock-tab-1' }, root_pane: { pane_id: 'mock-tab-root-pane' } });
 if (group === 'pane' && action === 'close') ok({ closed: true });
+if (group === 'pane' && action === 'run') {
+  if (scenario.runError) fail(scenario.runError, 'pane run failed');
+  ok({ type: 'ok' });
+}
+if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {
+  ok({ type: 'ok' });
+}
 if (group === 'pane' && action === 'process-info') {
   // A real pane always lists its own shell. "The agent is there" means a
   // foreground process that is NOT the shell -- so an agent that exited, or
