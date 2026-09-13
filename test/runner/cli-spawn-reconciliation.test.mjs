@@ -26,6 +26,8 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
+  publishAdapterReceipt,
+  ReceiptPathCollisionError,
 } from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
 import { spawnWorker } from '../../src/runner/dispatch/cli.mjs';
 import { cliSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
@@ -1014,3 +1016,125 @@ test('18. no .fgos runtime logs are committed to the project tree', () => {
   const trackedFgosLogs = lines.filter((line) => line.includes('.fgos') && line.includes('.log'));
   assert.equal(trackedFgosLogs.length, 0, 'No .fgos log files should be tracked or staged in git');
 });
+
+// 19. Pre-placed receipt with different content fails supervisor publication loudly
+test('19. pre-placed receipt with different content fails supervisor publication step loudly instead of silently succeeding', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  const launchCommandId = 'cmd_preplaced_receipt_19';
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipts');
+  fs.mkdirSync(receiptsDir, { recursive: true });
+
+  const receiptPath = path.join(receiptsDir, `${launchCommandId}.json`);
+  const prePlacedContent = {
+    contract: 'cli-spawn-adapter-receipt.v1',
+    launchCommandId,
+    prePlaced: true,
+    differentData: 'attacker-or-corrupt-payload',
+    exitCode: 42,
+  };
+  fs.writeFileSync(receiptPath, JSON.stringify(prePlacedContent, null, 2));
+
+  const realReceiptBody = {
+    contract: 'cli-spawn-adapter-receipt.v1',
+    runId: 'run_19',
+    launchCommandId,
+    envelopeDigest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+    bindingDigest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+    exitCode: 0,
+    signal: null,
+    outcome: { kind: 'exited', exitCode: 0 },
+    completion: { kind: 'exited', exitCode: 0 },
+    output: {
+      stdoutPath: 'protected/capture/cmd_preplaced_receipt_19/stdout.log',
+      stderrPath: 'protected/capture/cmd_preplaced_receipt_19/stderr.log',
+      stdoutDigest: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      stderrDigest: 'sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      stdoutBytesCaptured: 0,
+      stderrBytesCaptured: 0,
+      maxBufferBytes: 10485760,
+      overflowChunkDeliveredToLiveStream: false,
+    },
+    processTree: null,
+  };
+  const realReceiptDigest = computeSha256Digest(realReceiptBody);
+  const realReceipt = {
+    ...realReceiptBody,
+    digest: realReceiptDigest,
+  };
+
+  // Step A: Direct invocation of the supervisor's publish step must fail loudly with typed collision error
+  assert.throws(
+    () => {
+      publishAdapterReceipt(receiptPath, realReceipt, { launchCommandId });
+    },
+    (err) => {
+      assert.ok(err instanceof ReceiptPathCollisionError);
+      assert.equal(err.code, 'receipt-path-collision');
+      assert.equal(err.targetPath, receiptPath);
+      assert.equal(err.expectedDigest, realReceiptDigest);
+      assert.match(err.message, /adapter receipt path collision/);
+      return true;
+    },
+    'publishAdapterReceipt must throw ReceiptPathCollisionError when receipt path is pre-occupied with different content',
+  );
+
+  // Confirm pre-placed content was not overwritten and did not win
+  const onDiskAfterDirect = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  assert.equal(onDiskAfterDirect.prePlaced, true);
+  assert.equal(onDiskAfterDirect.exitCode, 42);
+  assert.notEqual(onDiskAfterDirect.digest, realReceiptDigest);
+
+  // Step B: Full supervisor execution with pre-placed receipt path must reject loudly
+  const workerScript = path.join(tmp, 'worker.mjs');
+  fs.writeFileSync(workerScript, 'process.exit(0);\n');
+
+  const envBody = {
+    contract: 'cli-spawn-launch-envelope.v1',
+    runId: 'run_19',
+    launchCommandId,
+    paths: {
+      runDir,
+    },
+    invocation: {
+      command: process.execPath,
+      args: [workerScript],
+      cwd: tmp,
+    },
+    limits: {
+      timeoutMs: 3000,
+    },
+  };
+  const envDigest = computeSha256Digest(envBody);
+  const envelope = { ...envBody, digest: envDigest };
+
+  const envDir = path.join(runDir, 'protected', 'launch-envelope');
+  fs.mkdirSync(envDir, { recursive: true });
+  const envPath = path.join(envDir, `${launchCommandId}.json`);
+  publishImmutableProof(envPath, envelope);
+
+  await assert.rejects(
+    async () => {
+      await runSupervisor(envPath);
+    },
+    (err) => {
+      assert.ok(err instanceof ReceiptPathCollisionError || err.code === 'receipt-path-collision');
+      assert.equal(err.code, 'receipt-path-collision');
+      assert.match(err.message, /adapter receipt path collision/);
+      return true;
+    },
+    'runSupervisor must reject loudly instead of silently succeeding when receipt path is pre-occupied with different content',
+  );
+
+  // Confirm pre-placed content is still intact on disk
+  const onDiskAfterRun = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+  assert.equal(onDiskAfterRun.prePlaced, true);
+  assert.equal(onDiskAfterRun.exitCode, 42);
+
+  // Step C: Identical content publication succeeds idempotently
+  const identicalPath = path.join(receiptsDir, 'identical_receipt.json');
+  publishAdapterReceipt(identicalPath, realReceipt);
+  const idempotentResult = publishAdapterReceipt(identicalPath, realReceipt);
+  assert.equal(idempotentResult.digest, realReceiptDigest);
+});
+

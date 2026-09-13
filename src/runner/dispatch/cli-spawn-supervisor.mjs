@@ -136,6 +136,149 @@ export function publishMutableProjection(targetPath, record) {
   fsyncDirBestEffort(dir);
 }
 
+// --- Immutable Proof Publication and Collision Errors ---------------------
+
+export class ReceiptPathCollisionError extends Error {
+  constructor(message, options = {}) {
+    super(message);
+    this.name = 'ReceiptPathCollisionError';
+    this.code = options.code || 'receipt-path-collision';
+    this.targetPath = options.targetPath;
+    this.expectedDigest = options.expectedDigest;
+    this.existingDigest = options.existingDigest;
+  }
+}
+
+export class SupervisorBindingPathCollisionError extends Error {
+  constructor(message, options = {}) {
+    super(message);
+    this.name = 'SupervisorBindingPathCollisionError';
+    this.code = options.code || 'binding-path-collision';
+    this.targetPath = options.targetPath;
+    this.expectedDigest = options.expectedDigest;
+    this.existingDigest = options.existingDigest;
+  }
+}
+
+export class WorkerBindingPathCollisionError extends Error {
+  constructor(message, options = {}) {
+    super(message);
+    this.name = 'WorkerBindingPathCollisionError';
+    this.code = options.code || 'worker-binding-path-collision';
+    this.targetPath = options.targetPath;
+    this.expectedDigest = options.expectedDigest;
+    this.existingDigest = options.existingDigest;
+  }
+}
+
+function computeFileSha256Digest(filePath) {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf8');
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        const { digest, ...body } = parsed;
+        if (digest && digest === computeSha256Digest(body)) {
+          return digest;
+        }
+        return computeSha256Digest(parsed);
+      }
+      return computeSha256Digest(raw);
+    } catch {
+      return computeSha256Digest(raw);
+    }
+  } catch {
+    return null;
+  }
+}
+
+export function publishAdapterReceipt(receiptPath, receipt, { launchCommandId = null, envelope = null } = {}) {
+  const publishedReceipt = publishImmutableProof(receiptPath, receipt);
+  if (!publishedReceipt) {
+    const existingDigest = computeFileSha256Digest(receiptPath);
+    const expectedDigest = receipt.digest || computeSha256Digest(receipt);
+    if (existingDigest !== expectedDigest) {
+      throw new ReceiptPathCollisionError(
+        `supervisor: adapter receipt path collision for ${launchCommandId || path.basename(receiptPath, '.json')} at ${receiptPath} (expected digest ${expectedDigest}, found ${existingDigest || 'unknown'})`,
+        {
+          code: 'receipt-path-collision',
+          targetPath: receiptPath,
+          expectedDigest,
+          existingDigest,
+        },
+      );
+    }
+  }
+
+  if (envelope?.paths?.receiptsDir) {
+    try {
+      publishImmutableProof(path.join(envelope.paths.receiptsDir, 'adapter-receipt.json'), receipt);
+      if (launchCommandId) {
+        publishImmutableProof(path.join(envelope.paths.receiptsDir, `${launchCommandId}.json`), receipt);
+      }
+    } catch {}
+  }
+  return receipt;
+}
+
+export function publishSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId = null, envelope = null } = {}) {
+  const published = publishImmutableProof(supervisorBindingPath, supervisorBinding);
+  if (!published) {
+    const existingDigest = computeFileSha256Digest(supervisorBindingPath);
+    const expectedDigest = supervisorBinding.digest || computeSha256Digest(supervisorBinding);
+    if (existingDigest !== expectedDigest) {
+      throw new SupervisorBindingPathCollisionError(
+        `supervisor: duplicate supervisor binding rejected for ${launchCommandId || path.basename(supervisorBindingPath, '.json')} at ${supervisorBindingPath}`,
+        {
+          code: 'binding-path-collision',
+          targetPath: supervisorBindingPath,
+          expectedDigest,
+          existingDigest,
+        },
+      );
+    }
+  }
+
+  if (envelope?.paths?.bindingsDir) {
+    try {
+      publishImmutableProof(path.join(envelope.paths.bindingsDir, 'supervisor.json'), supervisorBinding);
+      if (launchCommandId) {
+        publishImmutableProof(path.join(envelope.paths.bindingsDir, `${launchCommandId}.json`), supervisorBinding);
+      }
+    } catch {}
+  }
+  return supervisorBinding;
+}
+
+export function publishWorkerBinding(workerBindingPath, workerBinding, { launchCommandId = null, envelope = null } = {}) {
+  const publishedWorkerBinding = publishImmutableProof(workerBindingPath, workerBinding);
+  if (!publishedWorkerBinding) {
+    const existingDigest = computeFileSha256Digest(workerBindingPath);
+    const expectedDigest = workerBinding.digest || computeSha256Digest(workerBinding);
+    if (existingDigest !== expectedDigest) {
+      throw new WorkerBindingPathCollisionError(
+        `supervisor: worker binding path collision for ${launchCommandId || path.basename(workerBindingPath, '.worker.json')} at ${workerBindingPath} (expected digest ${expectedDigest}, found ${existingDigest || 'unknown'})`,
+        {
+          code: 'worker-binding-path-collision',
+          targetPath: workerBindingPath,
+          expectedDigest,
+          existingDigest,
+        },
+      );
+    }
+  }
+
+  if (envelope?.paths?.bindingsDir) {
+    try {
+      publishImmutableProof(path.join(envelope.paths.bindingsDir, 'worker.json'), workerBinding);
+      if (launchCommandId) {
+        publishImmutableProof(path.join(envelope.paths.bindingsDir, `${launchCommandId}.worker.json`), workerBinding);
+      }
+    } catch {}
+  }
+  return workerBinding;
+}
+
 // --- Readers --------------------------------------------------------------
 
 export function readSupervisorBinding(runDir, launchCommandId) {
@@ -259,16 +402,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
     publishedAt: new Date().toISOString(),
   };
 
-  const publishedBinding = publishImmutableProof(supervisorBindingPath, supervisorBinding);
-  if (!publishedBinding) {
-    throw new Error(`supervisor: duplicate supervisor binding rejected for ${launchCommandId} at ${supervisorBindingPath}`);
-  }
-  if (envelope.paths?.bindingsDir) {
-    try {
-      publishImmutableProof(path.join(envelope.paths.bindingsDir, 'supervisor.json'), supervisorBinding);
-      publishImmutableProof(path.join(envelope.paths.bindingsDir, `${launchCommandId}.json`), supervisorBinding);
-    } catch {}
-  }
+  publishSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId, envelope });
   const supervisorBindingDigest = computeSha256Digest(supervisorBinding);
 
   // Step 2: Open capture files
@@ -376,19 +510,21 @@ export async function runSupervisor(envelopePath, opts = {}) {
       digest: receiptDigest,
     };
 
-    publishImmutableProof(receiptPath, receipt);
-    if (envelope.paths?.receiptsDir) {
-      try {
-        publishImmutableProof(path.join(envelope.paths.receiptsDir, 'adapter-receipt.json'), receipt);
-        publishImmutableProof(path.join(envelope.paths.receiptsDir, `${launchCommandId}.json`), receipt);
-      } catch {}
-    }
-    return receipt;
+    return publishAdapterReceipt(receiptPath, receipt, { launchCommandId, envelope });
   }
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let timeoutTimer = null;
     let idleTimer = null;
+
+    function deliverReceipt(completion, processTree) {
+      try {
+        const receipt = publishReceiptOnce(completion, processTree);
+        resolve(receipt);
+      } catch (err) {
+        reject(err);
+      }
+    }
 
     function resetIdleTimer() {
       if (!idleTimeoutMs) return;
@@ -397,7 +533,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
         if (captureFrozen) return;
         const durationMs = Date.now() - startTime;
         killWorkerPgid('SIGTERM');
-        const receipt = publishReceiptOnce(
+        deliverReceipt(
           {
             kind: 'idle-timeout',
             exitCode: 124,
@@ -414,7 +550,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
             stoppedProof: 'not-claimed',
           },
         );
-        resolve(receipt);
       }, idleTimeoutMs);
     }
 
@@ -436,7 +571,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
         if (captureFrozen) return;
         const durationMs = Date.now() - startTime;
         killWorkerPgid('SIGTERM');
-        const receipt = publishReceiptOnce(
+        deliverReceipt(
           {
             kind: 'timeout',
             exitCode: 124,
@@ -453,7 +588,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
             stoppedProof: 'not-claimed',
           },
         );
-        resolve(receipt);
       }, timeoutMs);
     }
 
@@ -468,7 +602,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
       });
     } catch (err) {
       const durationMs = Date.now() - startTime;
-      const receipt = publishReceiptOnce(
+      deliverReceipt(
         {
           kind: 'spawn-failed',
           exitCode: 1,
@@ -485,14 +619,13 @@ export async function runSupervisor(envelopePath, opts = {}) {
           stoppedProof: 'not-claimed',
         },
       );
-      resolve(receipt);
       return;
     }
 
     workerChild.on('error', (err) => {
       if (captureFrozen) return;
       const durationMs = Date.now() - startTime;
-      const receipt = publishReceiptOnce(
+      deliverReceipt(
         {
           kind: 'spawn-failed',
           exitCode: 1,
@@ -509,12 +642,11 @@ export async function runSupervisor(envelopePath, opts = {}) {
           stoppedProof: 'not-claimed',
         },
       );
-      resolve(receipt);
     });
 
     if (!workerChild.pid) {
       const durationMs = Date.now() - startTime;
-      const receipt = publishReceiptOnce(
+      deliverReceipt(
         {
           kind: 'spawn-failed',
           exitCode: 1,
@@ -531,7 +663,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
           stoppedProof: 'not-claimed',
         },
       );
-      resolve(receipt);
       return;
     }
 
@@ -560,12 +691,14 @@ export async function runSupervisor(envelopePath, opts = {}) {
       digest: workerBindingDigest,
     };
 
-    publishImmutableProof(workerBindingPath, workerBinding);
-    if (envelope.paths?.bindingsDir) {
-      try {
-        publishImmutableProof(path.join(envelope.paths.bindingsDir, 'worker.json'), workerBinding);
-        publishImmutableProof(path.join(envelope.paths.bindingsDir, `${launchCommandId}.worker.json`), workerBinding);
-      } catch {}
+    try {
+      publishWorkerBinding(workerBindingPath, workerBinding, { launchCommandId, envelope });
+    } catch (err) {
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      if (idleTimer) clearTimeout(idleTimer);
+      killWorkerPgid('SIGKILL');
+      reject(err);
+      return;
     }
     bindingDigest = computeSha256Digest([supervisorBindingDigest, workerBindingDigest]);
 
@@ -575,7 +708,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
         if (captureFrozen) return;
         const durationMs = Date.now() - startTime;
         killWorkerPgid('SIGTERM');
-        const receipt = publishReceiptOnce(
+        deliverReceipt(
           {
             kind: 'timeout',
             exitCode: 124,
@@ -592,7 +725,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
             stoppedProof: 'not-claimed',
           },
         );
-        resolve(receipt);
       }, timeoutMs);
     }
 
@@ -607,7 +739,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
         overflowChunkDeliveredToLiveStream = true;
         killWorkerPgid('SIGTERM');
         const durationMs = Date.now() - startTime;
-        const receipt = publishReceiptOnce(
+        deliverReceipt(
           {
             kind: 'max-buffer',
             exitCode: 1,
@@ -624,7 +756,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
             stoppedProof: 'not-claimed',
           },
         );
-        resolve(receipt);
         return;
       }
 
@@ -644,7 +775,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
         overflowChunkDeliveredToLiveStream = true;
         killWorkerPgid('SIGTERM');
         const durationMs = Date.now() - startTime;
-        const receipt = publishReceiptOnce(
+        deliverReceipt(
           {
             kind: 'max-buffer',
             exitCode: 1,
@@ -661,7 +792,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
             stoppedProof: 'not-claimed',
           },
         );
-        resolve(receipt);
         return;
       }
 
@@ -682,7 +812,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
       const isSignaled = Boolean(signal);
       const exitCode = typeof code === 'number' ? code : (isSignaled ? 128 + 1 : 0);
 
-      const receipt = publishReceiptOnce(
+      deliverReceipt(
         {
           kind: isSignaled ? 'signaled' : 'exited',
           exitCode,
@@ -699,7 +829,6 @@ export async function runSupervisor(envelopePath, opts = {}) {
           stoppedProof: 'not-claimed',
         },
       );
-      resolve(receipt);
     });
   });
 }
