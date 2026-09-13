@@ -268,8 +268,37 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
   return found;
 }
 
+export { reconcileHerdrSpawnRun } from './herdr-round.mjs';
+
 export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
   const dir = path.resolve(runDir);
+  const commandsDir = path.join(dir, 'controller', 'commands');
+  let spawnPromise = null;
+  if (fs.existsSync(commandsDir)) {
+    let isHerdrSpawn = false;
+    try {
+      const files = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
+      for (const f of files) {
+        try {
+          const cmd = JSON.parse(fs.readFileSync(path.join(commandsDir, f), 'utf8'));
+          if (cmd.contract === 'herdr-launch-command.v1') {
+            isHerdrSpawn = true;
+            break;
+          }
+        } catch {}
+      }
+    } catch {}
+
+    if (isHerdrSpawn) {
+      spawnPromise = import('./herdr-round.mjs')
+        .then(({ reconcileHerdrSpawnRun }) => reconcileHerdrSpawnRun(dir))
+        .catch(() => {});
+    } else {
+      spawnPromise = import('./assignment-runner.mjs')
+        .then(({ reconcileCliSpawnRun }) => reconcileCliSpawnRun(dir))
+        .catch(() => {});
+    }
+  }
   const runFile = path.join(dir, RUN_FILE);
   const { outcome, resultPath, runMeta, changed } = classifyRunOutcome(dir, { liveness });
   if (changed) {
@@ -287,7 +316,7 @@ export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
     // cli-spawn dispatch never had a pane). Reconciling run.json is the
     // point; the visibility stamp is a courtesy.
   }
-  return { outcome, changed, resultPath };
+  return { outcome, changed, resultPath, ...(spawnPromise ? { cliSpawnPromise: spawnPromise, spawnPromise } : {}) };
 }
 
 /** Mark a run finished by the normal path: the dispatch returned and its
