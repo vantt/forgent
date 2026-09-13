@@ -358,6 +358,11 @@ function startAgent({ client, round, agentKind, agentArgs, readyMs }) {
   // reattach after a gateway restart matches on this.
   try {
     const info = client.agentGet(round.agentName);
+    // This is the binding read elsewhere as `round.agentSession?.value`
+    // (receipts, command projections) -- it was never assigned on `round`
+    // itself, only logged via `note`, so a mismatch signal (a new
+    // agent_session on the same pane) had no real data to compare against.
+    round.agentSession = { value: info.agentSession };
     round.note({ status: 'agent-ready', agentSession: info.agentSession, stateChangeSeq: info.stateChangeSeq });
   } catch {
     round.note({ status: 'agent-ready' });
@@ -700,7 +705,12 @@ export async function runHerdrRound(ctx) {
     const existingCmd = readHerdrLaunchCommand(runDir, ctx.launchCommandId);
     if (existingCmd) {
       if (existingCmd.state === 'reconciled' || (existingCmd.state === 'pending' && existingCmd.paneId)) {
-        return await reconcileHerdrSpawnRun(runDir, ctx);
+        // Production `ctx` carries no `herdrClient`/`probe` -- only test
+        // callers pass one explicitly -- so a resumed round for a
+        // live-but-not-yet-observed worker fell through reconcile's probe
+        // branch to `unknown-launch` instead of actually asking herdr.
+        const reconcileClient = ctx.herdrClient ?? createHerdrClient({ herdrBin, cwd, env: fullEnv });
+        return await reconcileHerdrSpawnRun(runDir, { ...ctx, herdrClient: reconcileClient });
       }
     }
   }
@@ -942,7 +952,16 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
             },
           });
         }
-      } catch {}
+      } catch (err) {
+        // A genuine digest tamper (`confinement-mismatch`, thrown just above)
+        // is a typed refusal that must reach the caller -- swallowing it here
+        // silently downgraded a detected mismatch into the generic
+        // `concludeFailure` below, losing the reason. Best-effort receipt
+        // bookkeeping (file I/O around it) still swallows everything else.
+        if (err instanceof DispatchError && err.errorClass === 'confinement-mismatch') {
+          throw err;
+        }
+      }
     }
     throw concludeFailure({ client, round, decision, closeAlways });
   }
@@ -961,6 +980,18 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         resultDigest = computeSha256Digest(resContent);
         outboxRelPath = path.relative(runDir, paths.resultPath);
       } catch {}
+    }
+
+    // `settled` means the ladder saw a result file at some earlier tick --
+    // it is not proof this digest is real. A missing/unreadable outbox
+    // result must refuse settlement, never publish a receipt claiming
+    // `settled` against a null digest.
+    if (!resultDigest) {
+      throw new DispatchError(
+        'protected-artifact-corrupt',
+        `executor for work "${workId}" settled but its outbox result could not be read or digested at ${paths.resultPath}.`,
+        { workId, tier, model, runDir, resultPath: paths.resultPath },
+      );
     }
 
     // Verify digests (HIGH-4)
@@ -1335,10 +1366,14 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
     if (receipt && receipt.preparedInvocationDigest && receipt.preparedInvocationDigest !== actualPDig) {
       return { status: 'refused', reason: 'confinement-mismatch' };
     }
-    if (receipt && prepRec.workerCommandDigest && receipt.workerCommandDigest && receipt.workerCommandDigest !== prepRec.workerCommandDigest) {
+    // Authority's real prepared-invocation record nests these under
+    // `workerInvocation` (confinement-adapter-contract.md's Authority Prepared
+    // Invocation V1 shape) -- reading them off `prepRec` directly compared
+    // against `undefined` and this check silently never fired.
+    if (receipt && prepRec.workerInvocation?.workerCommandDigest && receipt.workerCommandDigest && receipt.workerCommandDigest !== prepRec.workerInvocation.workerCommandDigest) {
       return { status: 'refused', reason: 'confinement-mismatch' };
     }
-    if (receipt && prepRec.envDigest && receipt.envDigest && receipt.envDigest !== prepRec.envDigest) {
+    if (receipt && prepRec.workerInvocation?.envDigest && receipt.envDigest && receipt.envDigest !== prepRec.workerInvocation.envDigest) {
       return { status: 'refused', reason: 'confinement-mismatch' };
     }
   } catch {

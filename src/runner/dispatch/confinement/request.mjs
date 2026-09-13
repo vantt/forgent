@@ -13,6 +13,8 @@ import {
   ConfinementPolicyError,
 } from "./policies.mjs";
 
+const VALID_REQUIREMENT_MODES = new Set(["unconfined", "preferred", "required"]);
+
 const ALLOWED_REQUEST_KEYS = new Set([
   "contract",
   "dispatchId",
@@ -221,6 +223,9 @@ export function validateConfinementRequest(request) {
   }
   if (!request.requirement || typeof request.requirement !== "object" || Array.isArray(request.requirement)) {
     throw new Error("ConfinementRequest requirement must be an object.");
+  }
+  if (!VALID_REQUIREMENT_MODES.has(request.requirement.mode)) {
+    throw new Error(`ConfinementRequest requirement.mode must be one of "unconfined", "preferred", "required", got "${request.requirement.mode}".`);
   }
   if (request.requirement.mode === "unconfined" &&
       (request.requirement.policyId !== null || request.requirement.policy !== null)) {

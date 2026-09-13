@@ -14,6 +14,7 @@ import {
   getBackendDriver,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
+import { normalizeAgentName } from "../herdr-agent.mjs";
 
 import { normalizeLegacyConfinement } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
@@ -943,6 +944,15 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     adapterOpts.launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
     adapterOpts.controlEpoch = request.assignmentLaunchContext.command?.controlEpoch;
     adapterOpts.controlToken = request.context?.controlToken || request.assignmentLaunchContext.command?.controlToken;
+    // herdr-spawn's adapter (unlike cli-spawn) has no envelope file to read
+    // runId/assignmentId/preparedInvocationDigest back out of -- it reads
+    // them straight off `opts` (herdrSpawnInteractiveAdapter, transport.mjs).
+    // Without these, `isAssignmentRun` evaluates false for every real
+    // Assignment-owned herdr-spawn dispatch and the whole receipt/binding/
+    // reconcile path built for it is silently bypassed.
+    adapterOpts.runId = request.assignmentLaunchContext.run?.runId;
+    adapterOpts.assignmentId = request.assignmentLaunchContext.run?.assignmentId;
+    adapterOpts.preparedInvocationDigest = preparedLaunch.preparedInvocationDigest;
   }
 
   let adapterResult;
@@ -1476,7 +1486,12 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   publishMutableProjection(finalizationPath, finalizationDescBody);
 
   if (adapterName === 'herdr-spawn') {
-    const herdrName = `fgos-${launchContext.run.runId}-${launchCommandId}`;
+    // Must be the exact same normalization the launch call itself applies
+    // (herdr-round.mjs's `agentName`) -- otherwise a long runId/
+    // launchCommandId records an un-truncated herdrName here while herdr
+    // actually starts the truncated one, and `agentGet(command.herdrName)`
+    // misses even a live, healthy worker.
+    const herdrName = normalizeAgentName(`fgos-${launchContext.run.runId}-${launchCommandId}`);
     const commandsDir = path.join(runDir, 'controller', 'commands');
     fs.mkdirSync(commandsDir, { recursive: true });
     const launchCommandPath = path.join(commandsDir, `${launchCommandId}.json`);
