@@ -18,6 +18,14 @@ import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/r
 
 const WORKER_SESSION = 'fgos-worker';
 
+const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
+const originalHome = process.env.HOME;
+fs.mkdirSync(path.join(testHome, '.fgos'), { recursive: true });
+if (originalHome && fs.existsSync(path.join(originalHome, '.fgos', 'confinement-backends.json'))) {
+  fs.copyFileSync(path.join(originalHome, '.fgos', 'confinement-backends.json'), path.join(testHome, '.fgos', 'confinement-backends.json'));
+}
+process.env.HOME = testHome;
+
 /** What `executorIdForWork` resolves for a coding item at the executing stage
  * -- the capability a real implement dispatch goes through. */
 const IMPLEMENT_CAPABILITY = 'fgos-coding-implement';

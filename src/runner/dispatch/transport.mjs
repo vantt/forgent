@@ -49,6 +49,7 @@ import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
+import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
 // the two never have to import each other. Re-exported so callers that have
@@ -65,7 +66,7 @@ export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
  * observed grandchild-dispatch incident yet, capped anticipatorily). */
 export const MAX_DISPATCH_DEPTH = 3;
 
-function currentDispatchDepth() {
+export function currentDispatchDepth() {
   const raw = process.env[DISPATCH_DEPTH_ENV];
   const n = raw ? Number(raw) : 0;
   return Number.isFinite(n) && n >= 0 ? n : 0;
@@ -296,9 +297,125 @@ function killChildTree(child, signal) {
   }
 }
 
-function cliSpawnAdapter(invocation, opts) {
+export function cliSpawnAdapter(invocation, opts) {
   const { command, args, env: rawEnv } = invocation;
   const { cwd, timeoutMs, idleTimeoutMs, maxBuffer, onChunk, workId, tier, model } = opts;
+
+  if (opts.envelopePath) {
+    const launchCommandId = opts.launchCommandId || path.basename(opts.envelopePath, '.json');
+    const runDir = opts.runDir || path.dirname(path.dirname(path.dirname(opts.envelopePath)));
+    const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
+
+    return new Promise((resolve, reject) => {
+      let supervisorProc = null;
+      try {
+        supervisorProc = startSupervisorProcess({
+          envelopePath: opts.envelopePath,
+          detached: true,
+          onChunk: opts.onChunk,
+        });
+      } catch (err) {
+        return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": ${err.message}`, {
+          workId,
+          tier,
+          model,
+          cause: err.message,
+        }));
+      }
+
+      let settled = false;
+      let pollInterval = null;
+
+      function finishWithReceipt() {
+        if (settled) return;
+        if (!fs.existsSync(receiptPath)) return;
+        settled = true;
+        if (pollInterval) clearInterval(pollInterval);
+
+        let receipt;
+        try {
+          receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
+        } catch (err) {
+          return reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": failed to parse receipt: ${err.message}`, {
+            workId,
+            tier,
+            model,
+          }));
+        }
+
+        const stdoutPath = path.join(runDir, receipt.output.stdoutPath);
+        const stderrPath = path.join(runDir, receipt.output.stderrPath);
+        let stdout = '';
+        let stderr = '';
+        try { stdout = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
+        try { stderr = fs.readFileSync(stderrPath, 'utf8'); } catch {}
+
+        const kind = receipt.completion?.kind;
+        if (kind === 'timeout' || kind === 'idle-timeout') {
+          return reject(new DispatchError(
+            'worker-timeout',
+            kind === 'idle-timeout'
+              ? `executor for work "${workId}" was killed after ${idleTimeoutMs}ms with no output (idle timeout).`
+              : `executor timed out after ${timeoutMs}ms for work "${workId}".`,
+            { workId, tier, model, stdout, stderr, receipt },
+          ));
+        }
+
+        if (kind === 'max-buffer') {
+          return reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor for work "${workId}" exceeded maxBuffer (${maxBuffer} bytes) and was killed.`,
+            { workId, tier, model, cause: 'maxBuffer exceeded', stdout, stderr, receipt },
+          ));
+        }
+
+        if (kind === 'spawn-failed') {
+          return reject(new DispatchError(
+            'worker-spawn-fail',
+            `executor failed to start for work "${workId}": ${receipt.completion?.cause || 'spawn failed'}`,
+            { workId, tier, model, cause: receipt.completion?.cause, stdout, stderr, receipt },
+          ));
+        }
+
+        return resolve({
+          status: receipt.completion?.exitCode ?? 0,
+          exitCode: receipt.completion?.exitCode ?? 0,
+          signal: receipt.completion?.signal ?? null,
+          stdout,
+          stderr,
+          tier,
+          model,
+          receipt,
+        });
+      }
+
+      pollInterval = setInterval(() => {
+        if (fs.existsSync(receiptPath)) {
+          finishWithReceipt();
+        }
+      }, 50);
+
+      if (supervisorProc) {
+        supervisorProc.on('close', () => {
+          setTimeout(() => {
+            if (!settled) {
+              if (fs.existsSync(receiptPath)) {
+                finishWithReceipt();
+              } else {
+                settled = true;
+                if (pollInterval) clearInterval(pollInterval);
+                reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": supervisor exited without receipt`, {
+                  workId,
+                  tier,
+                  model,
+                }));
+              }
+            }
+          }, 50);
+        });
+      }
+    });
+  }
 
   const depth = currentDispatchDepth();
   if (depth >= MAX_DISPATCH_DEPTH) {
@@ -505,7 +622,9 @@ function cliSpawnAdapter(invocation, opts) {
     // always a no-op via `finish`'s `settled` guard.
     child.on('close', (code, signal) => {
       finish(() => {
-        resolve({ status: code, signal, stdout, stderr, tier, model });
+        const res = { status: code, signal, stdout, stderr, tier, model };
+        Object.defineProperty(res, 'exitCode', { value: code, enumerable: false, writable: true, configurable: true });
+        resolve(res);
       });
     });
   });
@@ -636,7 +755,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
   // herdr launches the canonical executable for a kind; `command` only tells
   // us which kind that is. An unrecognized kind is herdr's own refusal, and
   // it is reported as one -- never silently downgraded to typing at a shell.
-  const agentKind = kind ?? (command ? path.basename(command) : null);
+  const isBwrap = command === 'bwrap' || (Array.isArray(args) && args.includes('bwrap'));
+  const agentKind = kind ?? (command && !isBwrap ? path.basename(command) : (isBwrap ? 'bwrap' : null));
   if (!agentKind) {
     return Promise.reject(new DispatchError(
       'invalid-config',
@@ -655,6 +775,16 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     fullEnv,
     confinement,
     permissionMode,
+    command,
+    args,
+    workerInvocation: invocation.workerInvocation,
+    confinementRequirement: invocation.requirement ?? opts.requirement,
+    launchCommandId: opts.launchCommandId ?? invocation.launchCommandId,
+    runId: opts.runId ?? invocation.runId,
+    assignmentId: opts.assignmentId ?? invocation.assignmentId,
+    controlEpoch: opts.controlEpoch ?? invocation.controlEpoch,
+    controlToken: opts.controlToken ?? invocation.controlToken,
+    preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',
@@ -707,7 +837,7 @@ function agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }) {
   return effective.filter((arg) => !String(arg).includes(prompt));
 }
 
-function herdrSpawnAdapter(invocation, opts) {
+export function herdrSpawnAdapter(invocation, opts) {
   if (invocation.interactiveMode) {
     return herdrSpawnInteractiveAdapter(invocation, opts);
   }
@@ -716,6 +846,41 @@ function herdrSpawnAdapter(invocation, opts) {
     `executor for work "${opts?.workId}" refused: herdr-spawn adapter requires interactiveMode to be configured -- it no longer supports a non-interactive dispatch path.`,
     { workId: opts?.workId, tier: opts?.tier, model: opts?.model },
   ));
+}
+
+cliSpawnAdapter.execute = cliSpawnAdapter;
+cliSpawnAdapter.locus = 'local-process';
+cliSpawnAdapter.preparedInvocationContract = 'exact-v1';
+cliSpawnAdapter.receiptContract = 'confinement-adapter-receipt.v1';
+
+herdrSpawnAdapter.execute = herdrSpawnAdapter;
+herdrSpawnAdapter.locus = 'herdr-pane';
+herdrSpawnAdapter.receiptContract = 'herdr-adapter-receipt.v1';
+
+/** Adapter metadata registry for Assignment-owned recovery profiles. */
+export const ADAPTER_REGISTRY = {
+  [DEFAULT_ADAPTER]: {
+    execute: cliSpawnAdapter,
+    locus: 'local-process',
+    preparedInvocationContract: 'exact-v1',
+    receiptContract: 'confinement-adapter-receipt.v1',
+  },
+  http: {
+    execute: httpAdapter,
+    locus: 'remote-http',
+  },
+  'herdr-spawn': {
+    execute: herdrSpawnAdapter,
+    locus: 'herdr-pane',
+    receiptContract: 'herdr-adapter-receipt.v1',
+  },
+};
+
+export function getAdapterMetadata(adapterName) {
+  if (ADAPTER_REGISTRY[adapterName]) {
+    return ADAPTER_REGISTRY[adapterName];
+  }
+  return null;
 }
 
 /** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
