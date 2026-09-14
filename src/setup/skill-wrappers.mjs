@@ -703,12 +703,36 @@ function toPosixRelativePath(fromDir, toPath) {
   return rel;
 }
 
+function toPosixPath(value) {
+  return value.split(path.sep).join('/');
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) {
   return toPosixRelativePath(path.dirname(filePath), path.join(skillsDir, '_shared', fragmentPath));
 }
 
-function rewritePackagedSkillReferences(content, filePath, skillsDir) {
-  return content
+function canonicalSharedRoots(projectRoot) {
+  if (!projectRoot) return [];
+  const roots = [
+    path.join(projectRoot, 'core', 'skills', '_shared'),
+    path.join(projectRoot, '.agents', 'skills', '_shared'),
+  ];
+  const domainsRoot = path.join(projectRoot, 'domains');
+  if (fs.existsSync(domainsRoot)) {
+    for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
+      if (isOwnTmpFile(domainEntry.name) || domainEntry.name.startsWith('.') || !domainEntry.isDirectory()) continue;
+      roots.push(path.join(domainsRoot, domainEntry.name, 'skills', '_shared'));
+    }
+  }
+  return roots.map((root) => toPosixPath(path.resolve(root)));
+}
+
+function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = []) {
+  let rewritten = content
     .replace(
       /(?:\.\.\/)+core\/skills\/_shared\/([^`\s)"']+)/g,
       (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
@@ -721,10 +745,16 @@ function rewritePackagedSkillReferences(content, filePath, skillsDir) {
       /(?:\.\.\/)+\.agents\/skills\/_shared\/([^`\s)"']+)/g,
       (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
     );
+  for (const root of sharedRoots) {
+    const rootPattern = new RegExp(`${escapeRegExp(root)}/([^\\\`\\s)"']+)`, 'g');
+    rewritten = rewritten.replace(rootPattern, (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath));
+  }
+  return rewritten;
 }
 
-function rewritePackagedTextReferences(root) {
+function rewritePackagedTextReferences(root, { projectRoot } = {}) {
   if (!fs.existsSync(root)) return;
+  const sharedRoots = canonicalSharedRoots(projectRoot);
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const fullPath = path.join(dir, entry.name);
@@ -740,7 +770,7 @@ function rewritePackagedTextReferences(root) {
         continue;
       }
       if (content.includes('\0')) continue;
-      const rewritten = rewritePackagedSkillReferences(content, fullPath, root);
+      const rewritten = rewritePackagedSkillReferences(content, fullPath, root, sharedRoots);
       if (rewritten !== content) fs.writeFileSync(fullPath, rewritten, 'utf8');
     }
   };
@@ -782,24 +812,15 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
 
   // 1. Package _shared fragments into skills/_shared if present
   if (projectRoot) {
-    const coreShared = path.join(projectRoot, 'core', 'skills', '_shared');
-    if (fs.existsSync(coreShared)) {
+    const sharedFragments = discoverSharedFragments(projectRoot);
+    if (sharedFragments.length > 0) {
       const targetShared = path.join(skillsDir, '_shared');
-      copyDirRecursive(coreShared, targetShared);
-      written.push(targetShared);
-    }
-    const domainsRoot = path.join(projectRoot, 'domains');
-    if (fs.existsSync(domainsRoot)) {
-      for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
-        if (domainEntry.isDirectory()) {
-          const domainShared = path.join(domainsRoot, domainEntry.name, 'skills', '_shared');
-          if (fs.existsSync(domainShared)) {
-            const targetShared = path.join(skillsDir, '_shared');
-            copyDirRecursive(domainShared, targetShared);
-            written.push(targetShared);
-          }
-        }
+      for (const fragment of sharedFragments) {
+        const targetPath = path.join(targetShared, fragment.relativeFragmentPath);
+        fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+        atomicCopyFileSync(path.join(projectRoot, fragment.sourcePath), targetPath);
       }
+      written.push(targetShared);
     }
   }
 
@@ -825,7 +846,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
       written.push(packagedSkillFile);
     }
   }
-  rewritePackagedTextReferences(skillsDir);
+  rewritePackagedTextReferences(skillsDir, { projectRoot });
 
   const manifest = {
     name: 'fgos',

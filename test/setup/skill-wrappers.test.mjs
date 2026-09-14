@@ -988,6 +988,50 @@ test('generateGeminiSkillPackage produces a completely self-contained extension 
   assert.doesNotMatch(geminiMd, unbundledSourcePattern, 'GEMINI.md must not route the host to an unbundled canonical source');
 });
 
+test('generateGeminiSkillPackage rejects nested shared fragment collisions before copying', () => {
+  const root = mkTempDir('gemini-nested-shared-collision-src-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+
+  const coreShared = path.join(root, 'core', 'skills', '_shared', 'nested');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared', 'nested');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'same.md'), '# Core Shared\n');
+  fs.writeFileSync(path.join(domainShared, 'same.md'), '# Domain Shared\n');
+
+  const outDir = mkTempDir('gemini-nested-shared-collision-pkg-');
+
+  assert.throws(
+    () => generateGeminiSkillPackage(root, outDir),
+    /duplicate shared fragment "nested\/same\.md" found in multiple sources:/,
+  );
+  assert.equal(fs.existsSync(path.join(outDir, 'skills', '_shared', 'nested', 'same.md')), false);
+});
+
+test('generateGeminiSkillPackage rewrites absolute canonical shared references into package-local references', () => {
+  const root = mkTempDir('gemini-absolute-shared-src-');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'a.md'), '# A\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-absolute',
+    '---\nname: fgos-absolute\ndescription: Absolute ref\n---\n',
+    `# Absolute\nRead \`${path.join(sharedDir, 'a.md').split(path.sep).join('/')}\`.\n`,
+  );
+
+  const outDir = mkTempDir('gemini-absolute-shared-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-absolute', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, new RegExp(root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  const ref = skillContent.match(/`(\.\.\/_shared\/a\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
 test('generateGeminiSkillPackage rewrites domain shared references with spaces in domain names', () => {
   const root = mkTempDir('gemini-space-domain-src-');
   writeSkill(
