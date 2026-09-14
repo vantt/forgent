@@ -14,7 +14,9 @@ use fgos_distribution::init::{
     ACTIVATION_BINDING_SCHEMA_VERSION_V1, DISTRIBUTION_PIN_SCHEMA_VERSION_V1,
     INSTALL_TRANSACTION_SCHEMA_VERSION_V1, WORKSPACE_ROOT_BINDING_SCHEMA_VERSION_V1,
 };
-use fgos_distribution::manifest::{ReleaseManifest, RELEASE_MANIFEST_SCHEMA_VERSION_V1};
+use fgos_distribution::manifest::{
+    read_manifest_from_path, ReleaseManifest, RELEASE_MANIFEST_SCHEMA_VERSION_V1,
+};
 use fgos_distribution::store::ReleaseStatusEntry;
 
 const GOLDEN_RELEASE_MANIFEST_FULL: &str = include_str!("goldens/release-manifest-full.json");
@@ -54,16 +56,13 @@ fn test_release_manifest_full_golden_roundtrip() {
     assert_eq!(manifest.target.libc.as_deref(), Some("gnu"));
 
     assert_eq!(manifest.entries.fgos, "bin/fgos");
-    assert_eq!(manifest.entries.fgos_runner.as_deref(), Some("bin/fgos-runner"));
+    assert_eq!(
+        manifest.entries.fgos_runner.as_deref(),
+        Some("bin/fgos-runner")
+    );
 
-    assert_eq!(
-        manifest.components.legacy_node.root,
-        "libexec/legacy-node"
-    );
-    assert_eq!(
-        manifest.components.legacy_node.entry,
-        "libexec/legacy-node/bin/fgos.mjs"
-    );
+    assert_eq!(manifest.components.legacy_node.root, "libexec/legacy-node");
+    assert_eq!(manifest.components.legacy_node.entry, "bin/fgos.mjs");
     assert_eq!(
         manifest.components.legacy_node.digest,
         "sha256:2222222222222222222222222222222222222222222222222222222222222222"
@@ -136,14 +135,8 @@ fn test_release_manifest_minimal_backward_compatible() {
     assert_eq!(manifest.state_schemas, None);
     assert!(manifest.files.is_empty());
 
-    assert_eq!(
-        manifest.components.legacy_node.root,
-        "libexec/legacy-node"
-    );
-    assert_eq!(
-        manifest.components.legacy_node.entry,
-        "libexec/legacy-node/bin/fgos.mjs"
-    );
+    assert_eq!(manifest.components.legacy_node.root, "libexec/legacy-node");
+    assert_eq!(manifest.components.legacy_node.entry, "bin/fgos.mjs");
     assert!(manifest.validate_legacy_node_invariant().is_ok());
 }
 
@@ -169,7 +162,10 @@ fn test_release_manifest_forward_compatibility_ignores_unknown_fields() {
     }"#;
 
     let manifest: Result<ReleaseManifest, _> = serde_json::from_str(raw);
-    assert!(manifest.is_ok(), "Manifest with extra future fields must deserialize cleanly");
+    assert!(
+        manifest.is_ok(),
+        "Manifest with extra future fields must deserialize cleanly"
+    );
 }
 
 #[test]
@@ -185,7 +181,10 @@ fn test_release_manifest_legacy_node_invariant_enforcement() {
         "files": []
     }"#;
     let res: Result<ReleaseManifest, _> = serde_json::from_str(without_legacy_node);
-    assert!(res.is_err(), "Manifest lacking components.legacyNode must fail deserialization");
+    assert!(
+        res.is_err(),
+        "Manifest lacking components.legacyNode must fail deserialization"
+    );
 
     // Empty root or entry must fail invariant check
     let mut manifest: ReleaseManifest =
@@ -196,6 +195,40 @@ fn test_release_manifest_legacy_node_invariant_enforcement() {
     manifest.components.legacy_node.root = "libexec/legacy-node".to_string();
     manifest.components.legacy_node.entry = "".to_string();
     assert!(manifest.validate_legacy_node_invariant().is_err());
+
+    manifest.components.legacy_node.entry = "/bin/fgos.mjs".to_string();
+    assert!(manifest.validate_legacy_node_invariant().is_err());
+
+    manifest.components.legacy_node.entry = "../bin/fgos.mjs".to_string();
+    assert!(manifest.validate_legacy_node_invariant().is_err());
+
+    manifest.components.legacy_node.entry = "libexec/legacy-node/bin/fgos.mjs".to_string();
+    assert!(manifest.validate_legacy_node_invariant().is_err());
+}
+
+#[test]
+fn test_release_manifest_read_boundary_rejects_unsupported_v1_semantics() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_schema_read_boundary_{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&temp_dir);
+    std::fs::create_dir_all(&temp_dir).unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+
+    std::fs::write(
+        &manifest_path,
+        GOLDEN_RELEASE_MANIFEST_MINIMAL.replace("\"schemaVersion\": 1", "\"schemaVersion\": 2"),
+    )
+    .unwrap();
+    assert!(read_manifest_from_path(&manifest_path).is_err());
+
+    std::fs::write(
+        &manifest_path,
+        GOLDEN_RELEASE_MANIFEST_FULL.replace("\"migrations\": []", "\"migrations\": [\"2-to-1\"]"),
+    )
+    .unwrap();
+    assert!(read_manifest_from_path(&manifest_path).is_err());
+
+    let _ = std::fs::remove_dir_all(&temp_dir);
 }
 
 // =========================================================================
@@ -227,7 +260,10 @@ fn test_activation_binding_full_golden_roundtrip() {
     );
     assert_eq!(binding.shim_version, "1");
     assert_eq!(
-        binding.resolved_dependencies.get("node").and_then(|v| v.as_str()),
+        binding
+            .resolved_dependencies
+            .get("node")
+            .and_then(|v| v.as_str()),
         Some("/usr/bin/node")
     );
     assert_eq!(
@@ -248,7 +284,8 @@ fn test_activation_binding_full_golden_roundtrip() {
 #[test]
 fn test_activation_binding_minimal_backward_compatible() {
     let binding: WorkspaceActivationBinding =
-        serde_json::from_str(GOLDEN_ACTIVATION_BINDING_MINIMAL).expect("must parse minimal activation");
+        serde_json::from_str(GOLDEN_ACTIVATION_BINDING_MINIMAL)
+            .expect("must parse minimal activation");
 
     assert_eq!(binding.schema_version, 1);
     assert_eq!(binding.previous_artifact_digest, None);
@@ -278,7 +315,10 @@ fn test_activation_binding_forward_compatibility_ignores_unknown_fields() {
     }"#;
 
     let parsed: Result<ActivationBinding, _> = serde_json::from_str(raw);
-    assert!(parsed.is_ok(), "ActivationBinding with extra future fields must parse cleanly");
+    assert!(
+        parsed.is_ok(),
+        "ActivationBinding with extra future fields must parse cleanly"
+    );
     assert_eq!(parsed.unwrap().status, "quarantined");
 }
 
@@ -297,7 +337,10 @@ fn test_distribution_pin_full_golden_roundtrip() {
         pin.project_runtime.artifact_digest,
         "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4"
     );
-    assert_eq!(pin.project_runtime.release_version.as_deref(), Some("0.1.0"));
+    assert_eq!(
+        pin.project_runtime.release_version.as_deref(),
+        Some("0.1.0")
+    );
     assert_eq!(pin.project_runtime.channel.as_deref(), Some("stable"));
     assert_eq!(pin.project_runtime.allow_prerelease, false);
 
@@ -339,7 +382,10 @@ fn test_distribution_pin_forward_compatibility_ignores_unknown_fields() {
     }"#;
 
     let pin: Result<DistributionPin, _> = serde_json::from_str(raw);
-    assert!(pin.is_ok(), "DistributionPin with extra future fields must parse cleanly");
+    assert!(
+        pin.is_ok(),
+        "DistributionPin with extra future fields must parse cleanly"
+    );
 }
 
 // =========================================================================
@@ -348,10 +394,13 @@ fn test_distribution_pin_forward_compatibility_ignores_unknown_fields() {
 
 #[test]
 fn test_workspace_root_binding_golden_roundtrip() {
-    let root: TopologyRootBinding =
-        serde_json::from_str(GOLDEN_WORKSPACE_ROOT_BINDING).expect("must parse workspace root binding");
+    let root: TopologyRootBinding = serde_json::from_str(GOLDEN_WORKSPACE_ROOT_BINDING)
+        .expect("must parse workspace root binding");
 
-    assert_eq!(root.schema_version, WORKSPACE_ROOT_BINDING_SCHEMA_VERSION_V1);
+    assert_eq!(
+        root.schema_version,
+        WORKSPACE_ROOT_BINDING_SCHEMA_VERSION_V1
+    );
     assert_eq!(root.repository_root, "/home/user/project");
     assert_eq!(root.workspace_id, "8d3322d88fba3bd8");
     assert_eq!(root.work_state_id, "8d3322d88fba3bd8");
@@ -377,7 +426,10 @@ fn test_workspace_root_binding_forward_compatibility() {
     }"#;
 
     let root: Result<WorkspaceRootBinding, _> = serde_json::from_str(raw);
-    assert!(root.is_ok(), "WorkspaceRootBinding with extra fields must parse cleanly");
+    assert!(
+        root.is_ok(),
+        "WorkspaceRootBinding with extra fields must parse cleanly"
+    );
 }
 
 // =========================================================================

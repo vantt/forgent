@@ -45,7 +45,7 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `pack
   "components": {
     "legacyNode": {
       "root": "libexec/legacy-node",
-      "entry": "libexec/legacy-node/bin/fgos.mjs",
+      "entry": "bin/fgos.mjs",
       "digest": "sha256:<64-hex>"
     },
     "runner": {
@@ -93,7 +93,7 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `pack
 | `entries` | object | Yes | Native executable entry points (`fgos`, optional `fgosRunner`). |
 | `components` | object | Yes | Payload component locators (see section 4). |
 | `requires` | object | Yes | System prerequisites (optional `node`, `git` semver range strings). |
-| `stateSchemas` | object | Optional | Work-state schema compatibility (`read`, `write`, `migrations`). |
+| `stateSchemas` | object | Optional | Work-state schema compatibility (`read`, `write`, `migrations`). In V1, `migrations` is reserved and must be empty. |
 | `files` | array | Yes | Array of manifest file entries (`path`, `kind`, `digest`, `mode`, `class`). |
 
 ## 4. Legacy Node Ownership Boundary Invariant
@@ -102,7 +102,8 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definitions live in `pack
 
 - The Rust host resolves the Node CLI entrypoint exclusively through `manifest.components.legacyNode`, never `PATH`, never `cwd`, and never hardcoded outside the manifest.
 - Omission of `components.legacyNode` is a schema validation error.
-- Empty `root`, `entry`, or `digest` fails `ReleaseManifest::validate_legacy_node_invariant`.
+- Empty, absolute, or parent-traversing `root`, `entry`, or `digest` fails `ReleaseManifest::validate_legacy_node_invariant`.
+- `entry` is relative to `root`; it must not repeat the `root` prefix.
 
 ## 5. Digest Rule
 

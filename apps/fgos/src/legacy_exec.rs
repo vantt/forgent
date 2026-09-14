@@ -10,7 +10,7 @@ use serde::Deserialize;
 use std::env;
 use std::ffi::OsString;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
@@ -36,17 +36,17 @@ pub const RECURSION_GUARD_VAR: &str = "FGOS_RUST_HOST_RECURSION_GUARD";
 #[serde(rename_all = "camelCase")]
 #[allow(dead_code)]
 pub struct ReleaseManifest {
-    pub schema_version: Option<u32>,
-    pub root: Option<String>,
-    pub entry: Option<String>,
-    pub components: Option<ManifestComponents>,
+    pub schema_version: u32,
+    pub components: ManifestComponents,
+    #[serde(default)]
+    pub state_schemas: Option<StateSchemas>,
 }
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[allow(dead_code)]
 pub struct ManifestComponents {
-    pub legacy_node: Option<LegacyNodeComponent>,
+    pub legacy_node: LegacyNodeComponent,
 }
 
 #[derive(Debug, Deserialize)]
@@ -55,7 +55,15 @@ pub struct ManifestComponents {
 pub struct LegacyNodeComponent {
     pub root: String,
     pub entry: String,
-    pub digest: Option<String>,
+    pub digest: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[allow(dead_code)]
+pub struct StateSchemas {
+    #[serde(default)]
+    pub migrations: Vec<String>,
 }
 
 /// Checks the recursion guard variable. Fails closed if already set.
@@ -162,19 +170,10 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         )
     })?;
 
-    let (root, entry) = if let Some(components) = manifest.components {
-        if let Some(legacy_node) = components.legacy_node {
-            (legacy_node.root, legacy_node.entry)
-        } else if let (Some(r), Some(e)) = (manifest.root, manifest.entry) {
-            (r, e)
-        } else {
-            return Err("manifest missing components.legacyNode and root/entry fields".to_string());
-        }
-    } else if let (Some(r), Some(e)) = (manifest.root, manifest.entry) {
-        (r, e)
-    } else {
-        return Err("manifest missing components.legacyNode and root/entry fields".to_string());
-    };
+    validate_manifest_v1_invariants(&manifest)?;
+
+    let legacy_node = manifest.components.legacy_node;
+    let (root, entry) = (legacy_node.root, legacy_node.entry);
 
     // R4 confinement (red-team HIGH): `Path::join` replaces its base entirely
     // when the joined component is itself absolute, so an absolute
@@ -225,6 +224,71 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
     }
 
     Ok(payload_path_canonical)
+}
+
+fn validate_manifest_v1_invariants(manifest: &ReleaseManifest) -> Result<(), String> {
+    if manifest.schema_version != 1 {
+        return Err(format!(
+            "manifest schemaVersion {} is unsupported; expected 1",
+            manifest.schema_version
+        ));
+    }
+
+    let legacy_node = &manifest.components.legacy_node;
+    if legacy_node.root.trim().is_empty() {
+        return Err("manifest components.legacyNode.root must not be empty".to_string());
+    }
+    if legacy_node.entry.trim().is_empty() {
+        return Err("manifest components.legacyNode.entry must not be empty".to_string());
+    }
+    if legacy_node.digest.trim().is_empty() {
+        return Err("manifest components.legacyNode.digest must not be empty".to_string());
+    }
+    validate_manifest_component_path("root", &legacy_node.root)?;
+    validate_manifest_component_path("entry", &legacy_node.entry)?;
+
+    let root_prefix = format!("{}/", legacy_node.root.trim_end_matches('/'));
+    if legacy_node.entry == legacy_node.root || legacy_node.entry.starts_with(&root_prefix) {
+        return Err(
+            "manifest components.legacyNode.entry must be relative to components.legacyNode.root"
+                .to_string(),
+        );
+    }
+
+    if manifest
+        .state_schemas
+        .as_ref()
+        .map(|schemas| !schemas.migrations.is_empty())
+        .unwrap_or(false)
+    {
+        return Err(
+            "manifest stateSchemas.migrations is reserved in V1 and must be empty".to_string(),
+        );
+    }
+
+    Ok(())
+}
+
+fn validate_manifest_component_path(field: &str, value: &str) -> Result<(), String> {
+    let path = Path::new(value);
+    if path.is_absolute() {
+        return Err(format!(
+            "manifest components.legacyNode.{} must be relative",
+            field
+        ));
+    }
+    if path.components().any(|component| {
+        matches!(
+            component,
+            Component::ParentDir | Component::RootDir | Component::Prefix(_)
+        )
+    }) {
+        return Err(format!(
+            "manifest components.legacyNode.{} must not traverse outside its base",
+            field
+        ));
+    }
+    Ok(())
 }
 
 #[cfg(unix)]

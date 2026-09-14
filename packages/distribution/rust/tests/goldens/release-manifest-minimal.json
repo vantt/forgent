@@ -11,7 +11,7 @@
   "components": {
     "legacyNode": {
       "root": "libexec/legacy-node",
-      "entry": "libexec/legacy-node/bin/fgos.mjs",
+      "entry": "bin/fgos.mjs",
       "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
     }
   },

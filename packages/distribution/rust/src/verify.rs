@@ -160,6 +160,9 @@ pub fn verify_release_tree(release_root: &Path) -> Result<String, VerificationEr
         },
         crate::manifest::ManifestReadError::Io(io_err) => VerificationError::Io(io_err),
         crate::manifest::ManifestReadError::Json(json_err) => VerificationError::Json(json_err),
+        crate::manifest::ManifestReadError::InvalidInvariant(_) => {
+            VerificationError::InvalidManifestStructure
+        }
     })?;
 
     canonicalize_manifest_files(&manifest)?;

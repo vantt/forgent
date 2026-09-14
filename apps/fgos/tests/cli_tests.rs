@@ -39,28 +39,25 @@ fn ensure_dev_manifest() -> PathBuf {
     let root = repo_root();
     let target = root.join("target");
     let manifest_path = target.join("dev-manifest.json");
-    if !manifest_path.exists() {
-        let manifest = serde_json::json!({
-            "schemaVersion": 1,
-            "root": ".",
-            "entry": "bin/fgos.mjs",
-            "entries": {
-                "fgos": "target/debug/fgos",
+    let manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "entries": {
+            "fgos": "target/debug/fgos",
+        },
+        "components": {
+            "legacyNode": {
+                "root": ".",
+                "entry": "bin/fgos.mjs",
+                "digest": "sha256:dev",
             },
-            "components": {
-                "legacyNode": {
-                    "root": ".",
-                    "entry": "bin/fgos.mjs",
-                },
-            },
-        });
-        fs::create_dir_all(&target).unwrap();
-        fs::write(
-            &manifest_path,
-            serde_json::to_string_pretty(&manifest).unwrap(),
-        )
-        .unwrap();
-    }
+        },
+    });
+    fs::create_dir_all(&target).unwrap();
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
     manifest_path
 }
 
@@ -366,6 +363,7 @@ fn test_absolute_manifest_entry_is_rejected() {
             "legacyNode": {
                 "root": "payload",
                 "entry": outside_script.to_string_lossy(),
+                "digest": "sha256:test",
             },
         },
     });
@@ -400,4 +398,113 @@ fn test_absolute_manifest_entry_is_rejected() {
     );
 
     let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_manifest_without_components_legacy_node_is_rejected() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_missing_legacy_node_{}",
+        std::process::id()
+    ));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+
+    let manifest_path = temp_dir.join("manifest.json");
+    let manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "root": ".",
+        "entry": "bin/fgos.mjs",
+    });
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("add")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("failed to parse manifest"),
+        "stderr must report manifest rejection, got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn test_host_manifest_v1_invariants_are_rejected() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_v1_invariants_{}",
+        std::process::id()
+    ));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+
+    let invalid_cases = [
+        serde_json::json!({
+            "schemaVersion": 2,
+            "components": {
+                "legacyNode": {
+                    "root": "payload",
+                    "entry": "bin/fgos.mjs",
+                    "digest": "sha256:test",
+                },
+            },
+        }),
+        serde_json::json!({
+            "schemaVersion": 1,
+            "components": {
+                "legacyNode": {
+                    "root": "payload",
+                    "entry": "payload/bin/fgos.mjs",
+                    "digest": "sha256:test",
+                },
+            },
+        }),
+        serde_json::json!({
+            "schemaVersion": 1,
+            "components": {
+                "legacyNode": {
+                    "root": "payload",
+                    "entry": "bin/fgos.mjs",
+                    "digest": "sha256:test",
+                },
+            },
+            "stateSchemas": {
+                "read": ["1"],
+                "write": ["1"],
+                "migrations": ["2-to-1"],
+            },
+        }),
+    ];
+
+    for manifest in invalid_cases {
+        fs::write(
+            &manifest_path,
+            serde_json::to_string_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+
+        let output = Command::new(fgos_bin())
+            .arg("add")
+            .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+            .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+            .output()
+            .expect("failed to execute fgos");
+
+        assert_ne!(output.status.code(), Some(0));
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains("manifest"),
+            "stderr must report manifest rejection, got: {}",
+            stderr
+        );
+    }
 }

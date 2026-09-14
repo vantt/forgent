@@ -11,7 +11,7 @@
 //!   never PATH, never cwd, never hardcoded outside the release manifest.
 
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::path::{Component, Path};
 
 /// Current frozen schema version for release manifests.
 pub const RELEASE_MANIFEST_SCHEMA_VERSION_V1: u32 = 1;
@@ -43,7 +43,7 @@ pub struct ReleaseManifest {
 
 impl ReleaseManifest {
     /// Validates the locked platform invariant that `components.legacyNode.root`
-    /// and `components.legacyNode.entry` exist non-emptily as the sole legacy Node locator.
+    /// and `components.legacyNode.entry` exist as confined relative locators.
     pub fn validate_legacy_node_invariant(&self) -> Result<(), &'static str> {
         if self.components.legacy_node.root.trim().is_empty() {
             return Err("components.legacyNode.root must not be empty");
@@ -54,8 +54,66 @@ impl ReleaseManifest {
         if self.components.legacy_node.digest.trim().is_empty() {
             return Err("components.legacyNode.digest must not be empty");
         }
+        validate_relative_component_path(
+            "components.legacyNode.root",
+            &self.components.legacy_node.root,
+        )?;
+        validate_relative_component_path(
+            "components.legacyNode.entry",
+            &self.components.legacy_node.entry,
+        )?;
+        let root_prefix = format!(
+            "{}/",
+            self.components.legacy_node.root.trim_end_matches('/')
+        );
+        if self.components.legacy_node.entry == self.components.legacy_node.root
+            || self.components.legacy_node.entry.starts_with(&root_prefix)
+        {
+            return Err("components.legacyNode.entry must be relative to components.legacyNode.root, not repeat it");
+        }
         Ok(())
     }
+
+    /// Validates V1 semantics enforced at every trusted manifest read boundary.
+    pub fn validate_v1_invariants(&self) -> Result<(), &'static str> {
+        if self.schema_version != RELEASE_MANIFEST_SCHEMA_VERSION_V1 {
+            return Err("schemaVersion is unsupported; expected 1");
+        }
+        self.validate_legacy_node_invariant()?;
+        if self
+            .state_schemas
+            .as_ref()
+            .map(|schemas| !schemas.migrations.is_empty())
+            .unwrap_or(false)
+        {
+            return Err("stateSchemas.migrations is reserved in V1 and must be empty");
+        }
+        Ok(())
+    }
+}
+
+fn validate_relative_component_path(field: &'static str, value: &str) -> Result<(), &'static str> {
+    let path = Path::new(value);
+    if path.is_absolute() {
+        return match field {
+            "components.legacyNode.root" => Err("components.legacyNode.root must be relative"),
+            _ => Err("components.legacyNode.entry must be relative"),
+        };
+    }
+    if path.components().any(|component| {
+        matches!(
+            component,
+            Component::ParentDir | Component::RootDir | Component::Prefix(_)
+        )
+    }) {
+        return match field {
+            "components.legacyNode.root" => {
+                Err("components.legacyNode.root must not traverse outside the release")
+            }
+            _ => Err("components.legacyNode.entry must not traverse outside the legacy root"),
+        };
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -152,6 +210,8 @@ pub enum ManifestReadError {
     Io(#[from] std::io::Error),
     #[error("json deserialization error: {0}")]
     Json(#[from] serde_json::Error),
+    #[error("invalid manifest invariant: {0}")]
+    InvalidInvariant(&'static str),
 }
 
 pub fn parse_manifest_str(json_str: &str) -> Result<ReleaseManifest, serde_json::Error> {
@@ -164,6 +224,9 @@ pub fn read_manifest_from_path(manifest_path: &Path) -> Result<ReleaseManifest, 
     }
     let content = std::fs::read_to_string(manifest_path)?;
     let manifest = parse_manifest_str(&content)?;
+    manifest
+        .validate_v1_invariants()
+        .map_err(ManifestReadError::InvalidInvariant)?;
     Ok(manifest)
 }
 
