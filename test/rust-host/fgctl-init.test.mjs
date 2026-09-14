@@ -858,6 +858,101 @@ test('P7: Candidate preflight failure refuses init before publishing activation 
   }
 });
 
+test('P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree', () => {
+  const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-home-'));
+  const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-state-'));
+  const tempProj = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-proj-'));
+  const hostileReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-rel-'));
+  const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-hostile-outside-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: tempProj });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempProj });
+
+    // A "successful" hostile candidate: every digest in its manifest is
+    // consistent, so stage/verify/preflight all accept it, and its bin/fgos
+    // exits 0 while printing a plausible `version --runtime-json` envelope
+    // -- exactly what a runtime smoke would have called a pass. It also
+    // writes a sentinel OUTSIDE the release tree and a host-visible file
+    // into whatever cwd it is run from.
+    fs.cpSync(fixtureReleaseDir, hostileReleaseDir, { recursive: true });
+    const sentinel = path.join(outsideDir, 'pwned');
+    const hostileBin = path.join(hostileReleaseDir, 'bin', 'fgos');
+    fs.writeFileSync(
+      hostileBin,
+      [
+        '#!/bin/sh',
+        `printf executed > "${sentinel}"`,
+        'printf executed > "$PWD/AGENTS.md"',
+        `printf '{"contract":"fgos.v1","data":{"host":"rust","artifactDigest":"%s"}}\\n' "\${FGOS_CANDIDATE_ARTIFACT_DIGEST:-none}"`,
+        'exit 0',
+        '',
+      ].join('\n'),
+      { mode: 0o755 }
+    );
+    fs.chmodSync(hostileBin, 0o755);
+
+    const manifestPath = path.join(hostileReleaseDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    for (const f of manifest.files) {
+      if (f.path === 'bin/fgos') {
+        f.digest = hashFile(hostileBin);
+      }
+    }
+    delete manifest.artifactDigest;
+    manifest.artifactDigest = computeArtifactDigest(manifest);
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+    // Control: the hostile entry really does write its sentinel when run,
+    // so a missing sentinel below proves fgctl never ran it -- not that the
+    // script is broken.
+    const control = spawnSync(hostileBin, ['version', '--runtime-json'], {
+      cwd: hostileReleaseDir,
+      encoding: 'utf8',
+    });
+    assert.equal(control.status, 0, `hostile control run must exit 0: ${control.stderr}`);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'executed');
+    fs.unlinkSync(sentinel);
+    fs.unlinkSync(path.join(hostileReleaseDir, 'AGENTS.md'));
+
+    // Hold the activation lock live so init stops AFTER preflight has
+    // accepted the candidate and BEFORE publish -- the exact window where
+    // preflight used to run <candidate>/bin/fgos. Nothing else in that
+    // window may execute candidate code.
+    const installDir = path.join(tempProj, '.fgos', 'installation');
+    fs.mkdirSync(installDir, { recursive: true });
+    fs.writeFileSync(path.join(installDir, 'activation.lock'), JSON.stringify({ pid: process.pid, ts: Date.now() }));
+
+    const res = runFgctl(['init', '--from', hostileReleaseDir], {
+      cwd: tempProj,
+      stateHome: tempState,
+      env: { HOME: tempHome },
+    });
+
+    assert.notEqual(res.status, 0, 'init must stop at the held activation lock');
+    assert.match(res.stderr, /activation-lock-held/, 'control must have reached lock acquisition, i.e. past preflight');
+    assert.doesNotMatch(res.stderr, /preflight failed/i, 'the hostile candidate is statically well-formed and must pass preflight');
+
+    // The candidate was staged (its tree is a valid release) ...
+    assert.ok(fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'manifest.json')));
+    // ... but never executed: no sentinel outside the release tree, no
+    // host-visible file in the candidate dir, the staged copy, or the project.
+    assert.ok(!fs.existsSync(sentinel), 'preflight executed candidate bin/fgos (sentinel written outside release tree)');
+    assert.ok(!fs.existsSync(path.join(hostileReleaseDir, 'AGENTS.md')), 'candidate wrote into its own source tree');
+    assert.ok(!fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'AGENTS.md')), 'candidate wrote into the staged release');
+    assert.ok(!fs.existsSync(path.join(tempProj, 'AGENTS.md')), 'candidate wrote into the project');
+    assert.ok(!fs.existsSync(path.join(installDir, 'activation.json')), 'no activation may be published');
+    assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'no pin may be written');
+  } finally {
+    fs.rmSync(tempHome, { recursive: true, force: true });
+    fs.rmSync(tempState, { recursive: true, force: true });
+    fs.rmSync(tempProj, { recursive: true, force: true });
+    fs.rmSync(hostileReleaseDir, { recursive: true, force: true });
+    fs.rmSync(outsideDir, { recursive: true, force: true });
+  }
+});
+
 test('P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts', () => {
   const tempHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-atomic-home-'));
   const tempState = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-atomic-state-'));

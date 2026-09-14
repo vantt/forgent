@@ -48,6 +48,7 @@ Read it in layers:
 | Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |
 | Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Settled for V1. |
 | `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |
+| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |
 | Shared gateway/web are architecture constraints only, not current delivery scope. | Settled for current delivery. |
 
 ## 1. Core Position
