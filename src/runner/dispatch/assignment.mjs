@@ -57,6 +57,11 @@ import {
   stampInlineAssignment,
 } from './assignment-normalizer.mjs';
 import { CONTRACT_POLICY_VERSION, validateExecutionContract } from './execution-contract.mjs';
+import {
+  ALLOWED_AGENT_CLAIM_STATUSES as CONTRACT_AGENT_CLAIM_STATUSES,
+  renderAgentResultClaimInstructions,
+  validateAgentResultClaimContract,
+} from './agent-result-claim-contract.mjs';
 // Step 08 P04.2b: `resolveStrongerTier` is the SAME tier-strength
 // comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
 // more-specific scope can only RAISE a tier requirement, never lower one
@@ -705,8 +710,9 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
     lines.push(`- Write structured JSON to ${agentResultPath}`);
-    lines.push(`  - "status" must be exactly one of: ${[...ALLOWED_AGENT_CLAIM_STATUSES].join(' | ')}`);
-    lines.push(`  - "summary" is a required non-empty string`);
+    for (const instruction of renderAgentResultClaimInstructions(assignment).split('\n')) {
+      lines.push(`  ${instruction.slice(2)}`);
+    }
     lines.push(
       readOnly
         ? `- Also write a human-readable report to ${agentReportPath} -- REQUIRED for this read-only operation: a "done" status with no report artifact is treated as unevidenced (no-evidence), not accepted as done.`
@@ -747,7 +753,7 @@ export function isReadOnlyAssignment(assignment) {
 }
 
 // Allowed status values for agent-result.json (Step 04 §5.2).
-export const ALLOWED_AGENT_CLAIM_STATUSES = new Set(['done', 'blocked', 'failed', 'no-evidence']);
+export const ALLOWED_AGENT_CLAIM_STATUSES = new Set(CONTRACT_AGENT_CLAIM_STATUSES);
 
 /**
  * Validate the parsed content of agent-result.json (Step 04 §5.2).
@@ -769,48 +775,6 @@ export const ALLOWED_AGENT_CLAIM_STATUSES = new Set(['done', 'blocked', 'failed'
  * @param {unknown} value Parsed agent-result.json content
  * @returns {{ valid: boolean, reason?: string }}
  */
-export function validateAgentResultClaim(value) {
-  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
-    return { valid: false, reason: 'agent-result.json must be a JSON object' };
-  }
-
-  const { status, summary } = value;
-
-  if (!status || typeof status !== 'string' || !ALLOWED_AGENT_CLAIM_STATUSES.has(status)) {
-    return {
-      valid: false,
-      reason: `agent-result.json status must be one of [${[...ALLOWED_AGENT_CLAIM_STATUSES].join(', ')}]; got: ${JSON.stringify(status)}`,
-    };
-  }
-
-  if (!summary || typeof summary !== 'string' || summary.trim() === '') {
-    return { valid: false, reason: 'agent-result.json requires a non-empty summary string' };
-  }
-
-  if (status === 'blocked') {
-    const { blocker } = value;
-    if (!blocker || typeof blocker !== 'string' || blocker.trim() === '') {
-      return { valid: false, reason: 'agent-result.json with status "blocked" requires a non-empty blocker string' };
-    }
-  }
-
-  if (status === 'failed') {
-    const { error } = value;
-    if (!error || typeof error !== 'string' || error.trim() === '') {
-      return { valid: false, reason: 'agent-result.json with status "failed" requires a non-empty error string' };
-    }
-  }
-
-  if (value.evidenceRefs !== undefined) {
-    if (!Array.isArray(value.evidenceRefs)) {
-      return { valid: false, reason: 'agent-result.json evidenceRefs must be an array if provided' };
-    }
-    for (const ref of value.evidenceRefs) {
-      if (typeof ref !== 'string' || ref.trim() === '') {
-        return { valid: false, reason: 'agent-result.json evidenceRefs items must be non-empty strings' };
-      }
-    }
-  }
-
-  return { valid: true };
+export function validateAgentResultClaim(value, context = {}) {
+  return validateAgentResultClaimContract(value, context);
 }

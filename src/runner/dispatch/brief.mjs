@@ -28,6 +28,7 @@
 // only works for workers that happen to live in this repo.
 
 import path from 'node:path';
+import { renderAgentResultClaimInstructions } from './agent-result-claim-contract.mjs';
 
 /** Where one round's artifacts live, all absolute -- a worker's cwd is its
  * own worktree and has no relationship to the run directory. */
@@ -78,10 +79,12 @@ Write these two files, in this order, each one \`.tmp\`-then-rename:
    understand or check your work belongs here.
 2. \`${p.resultPath}\` -- a JSON object:
 
-       {"status": "done" | "blocked" | "failed" | "no-evidence",
-        "summary": "<one or two sentences>",
-        "findings": [],
-        "evidenceRefs": []}
+       {"contract":{"id":"agent-result-claim","version":2},
+        "status": "done" | "blocked" | "failed" | "no-evidence",
+        "summary": "<one or two sentences>", "evidenceRefs": []}
+
+   Claim requirements:
+${renderAgentResultClaimInstructions()}
 
    "settled" is not a valid status here -- that word names the run reaching
    its end, not whether the work succeeded; a worker that writes "settled"
