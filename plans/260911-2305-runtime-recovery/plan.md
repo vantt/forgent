@@ -1,9 +1,11 @@
 # Runtime Recovery Implementation Plan
 
-**Status:** CLI/HERDR/CONFINEMENT DESIGN READY — A01-A08 are closed; P02L
-`cli-spawn` is technically ready after Astra re-review; P02H `herdr-spawn` is
-architecture-ready with the explicit Herdr worker-command seam required.
-Implementation handoff remains on human hold; do not call code panel yet.
+**Status:** CLOSED (2026-09-14) — all cells in scope (P00, P01, P02L, P02H
+including its reopen, P03, P04, P05, P05S, P08) are implemented, independently
+reviewed/red-teamed, and merged to `main`. P06 (writable takeover) and P07
+(terminal transfer) remain disabled/refused exactly as originally scoped — no
+contract, no proof, not implemented. See "Track status: CLOSED" below and the
+Product Gates table for the full closeout evidence.
 
 **Architecture lock:** [architecture-decision-lock.md](architecture-decision-lock.md)
 
