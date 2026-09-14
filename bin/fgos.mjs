@@ -3221,7 +3221,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'coordination': {
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop|chain> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop|chain|recover> ...');
       // Same repoRoot resolution `catchup`/`merge next` already use:
       // `--dir` names the main checkout's `.fgos/`, so its parent is the
       // repo root; omitted, the caller's own cwd is the repo root.
