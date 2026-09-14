@@ -1,4 +1,9 @@
 {
+  "gate-bypass": {
+    "route_kind": "native",
+    "operation_id": "work.gate-bypass.show",
+    "owner_path": "packages/work-state/rust"
+  },
   "version": {
     "route_kind": "native",
     "operation_id": "distribution.build.show",

@@ -271,6 +271,105 @@ fn test_native_version_zero_node_child_process_spy() {
 }
 
 #[test]
+fn test_native_gate_bypass_succeeds_with_envelope() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_gate_bypass_{}", std::process::id()));
+    let _ = fs::remove_dir_all(&temp_dir);
+    fs::create_dir_all(temp_dir.join(".fgos")).unwrap();
+    fs::write(
+        temp_dir.join(".fgos").join("config.json"),
+        r#"{"gateBypass":{"level":"standard"}}"#,
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("gate-bypass")
+        .current_dir(&temp_dir)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(
+        output.status.code(),
+        Some(0),
+        "native gate-bypass must exit 0, got: {:?}, stderr={}",
+        output.status.code(),
+        String::from_utf8_lossy(&output.stderr)
+    );
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let parsed: serde_json::Value =
+        serde_json::from_str(&stdout).expect("output must be valid JSON envelope");
+
+    assert_eq!(parsed["contract"], "fgos.v1");
+    assert_eq!(parsed["data"]["level"], "standard");
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_native_gate_bypass_zero_node_child_process_spy() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_gate_bypass_spy_{}", std::process::id()));
+    fs::create_dir_all(temp_dir.join(".fgos")).unwrap();
+
+    let spy_dir = temp_dir.join("spy");
+    fs::create_dir_all(&spy_dir).unwrap();
+    let spy_log = spy_dir.join("spy_log.txt");
+    let real_node = {
+        let which_out = Command::new("which")
+            .arg("node")
+            .output()
+            .expect("which node must succeed");
+        let path_str = String::from_utf8_lossy(&which_out.stdout)
+            .trim()
+            .to_string();
+        PathBuf::from(path_str)
+    };
+
+    let spy_script = spy_dir.join("node");
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let script_content = format!(
+            "#!/bin/sh\necho \"SPY_PID:$$\" >> \"{}\"\nexec \"{}\" \"$@\"\n",
+            spy_log.display(),
+            real_node.display()
+        );
+        fs::write(&spy_script, script_content).unwrap();
+        let mut perms = fs::metadata(&spy_script).unwrap().permissions();
+        perms.set_mode(0o755);
+        fs::set_permissions(&spy_script, perms).unwrap();
+    }
+
+    let original_path = std::env::var("PATH").unwrap_or_default();
+    let modified_path = format!("{}:{}", spy_dir.display(), original_path);
+
+    let output = Command::new(fgos_bin())
+        .arg("gate-bypass")
+        .current_dir(&temp_dir)
+        .env("PATH", modified_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_eq!(output.status.code(), Some(0));
+
+    let log_content = fs::read_to_string(&spy_log).unwrap_or_default();
+    let invocations: Vec<&str> = log_content
+        .lines()
+        .filter(|l| l.starts_with("SPY_PID:"))
+        .collect();
+
+    assert_eq!(
+        invocations.len(),
+        0,
+        "expected zero node child processes for native gate-bypass, got: {:?}",
+        invocations
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
 fn test_legacy_exec_invocation_record_sink() {
     let manifest_path = ensure_dev_manifest();
     let root = repo_root();

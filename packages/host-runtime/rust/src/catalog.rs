@@ -3,8 +3,8 @@
 //! Kernel §5: The catalog is an authority-bearing inventory of `OperationDescriptor`s,
 //! authored by owning components.
 //!
-//! In R1, the catalog is a `const` array holding exactly `distribution.build.show`
-//! and one fixture operation `test.fixture.echo`.
+//! In R1, the catalog is a `const` array holding native production reads
+//! plus one fixture operation `test.fixture.echo`.
 
 use crate::contracts::{
     ContractRef, OperationDescriptor, OperationEffect, OperationId, OperationIdempotency,
@@ -12,7 +12,7 @@ use crate::contracts::{
 };
 use std::borrow::Cow;
 
-/// Canonical operation catalog holding exactly `distribution.build.show`
+/// Canonical operation catalog holding native production reads
 /// and fixture `test.fixture.echo`.
 pub const CATALOG: &[OperationDescriptor] = &[
     OperationDescriptor {
@@ -23,6 +23,17 @@ pub const CATALOG: &[OperationDescriptor] = &[
         effect: OperationEffect::Read,
         idempotency: OperationIdempotency::Safe,
         authority_policy_id: Cow::Borrowed("distribution.read"),
+        allowed_host_kinds: &["cli", "remote"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("work.gate-bypass.show"),
+        owning_component_id: Cow::Borrowed("work"),
+        request_contract: ContractRef::from_static("work.gate-bypass.show.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("work.gate-bypass.show.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("work.read"),
         allowed_host_kinds: &["cli", "remote"],
         streaming_mode: StreamingMode::None,
     },
@@ -45,9 +56,10 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 2);
+        assert_eq!(CATALOG.len(), 3);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
+        assert!(ids.contains(&"work.gate-bypass.show"));
         assert!(ids.contains(&"test.fixture.echo"));
     }
 

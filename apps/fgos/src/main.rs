@@ -51,6 +51,7 @@ pub fn command_routes() -> &'static HashMap<String, CommandRouteDescriptor> {
 static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     ECHO_PROVIDER_DESCRIPTOR,
     fgos_distribution::DISTRIBUTION_BUILD_SHOW_DESCRIPTOR,
+    fgos_work_state::WORK_GATE_BYPASS_SHOW_DESCRIPTOR,
 ];
 
 fn main() {
@@ -100,6 +101,7 @@ fn main() {
     let service = InvocationService::new(snapshot);
     service.register_provider(Arc::new(EchoProvider::new()));
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
+    service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
     let tracker = service.tracker();
 
     match route.route_kind.as_str() {

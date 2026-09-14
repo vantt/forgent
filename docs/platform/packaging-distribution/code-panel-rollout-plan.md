@@ -54,6 +54,9 @@ Before opening any packet:
 
 No packet may silently delete a legacy/history detail. If a detail moves, update `source-preservation-audit.md`.
 
+Coordinator note, 2026-09-14:
+Recent host-invocation R1 handoff proof edits in this plan and the packaging-distribution verification docs are accepted for the active track. Apply them by packet boundary: P6 owns the Rust manifest/release handoff fields and manifest-based Rust host fallback proof; P7 owns the workspace activation end-to-end proof where `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`. Keep implementation-alignment status partial until release assets and public/default posture are decided.
+
 ## 3. Packet Queue
 
 | Packet | Branch/worktree suggestion | Goal | Primary contract | Depends on |
@@ -107,6 +110,18 @@ When a packet finishes:
 4. Merge the packet branch into `panel/packaging-distribution-rollout`.
 5. Run a panel-branch smoke proof for the touched area.
 6. Rebase or recreate still-open dependent packet branches from the updated panel branch.
+
+Packet owners, reviewers, red-team, and the packet coordinator should complete packet-scope proof, doc/status updates, pass/fail reporting, packet-to-panel merge, and panel-branch smoke proof through the code-panel track. Do not route ordinary packet implementation back to the human/coordinator as hand work when the packet can still progress.
+
+For P6/P7 closeout, report:
+
+1. Which proof commands passed.
+2. Whether `.fgos/installation/bin/fgos version --runtime-json` entered the Rust host and matched the activated digest.
+3. Which docs/status rows were updated.
+4. Whether any claim remains partial and why.
+5. Which release decisions still need human/coordinator approval.
+
+The following decisions remain coordinator/release-owner decisions even when packet tests pass: preview versus stable/default public release, Node fallback compatibility window, whether installed/default runtime claims may flip, whether the panel branch may merge to `main`, and whether host-invocation R1 may move from current partial to implemented.
 
 The panel track merges to `main` only after P9 closes and whole-track verification has passed.
 
@@ -236,17 +251,20 @@ Expected changes:
 - Freeze or document serde structs for `ReleaseManifest`, `ActivationBinding`, `DistributionPin`, and topology/root records.
 - Add schema/golden tests for backward-compatible reading.
 - Ensure `components.legacyNode.root` and `components.legacyNode.entry` remain the only legacy Node locator.
+- Preserve the host-invocation release handoff fields needed by the Rust host: native `bin/fgos`, `entries.fgos`, `components.legacyNode`, and `artifactDigest`.
 
 Proof:
 
 - Rust unit tests.
 - Existing `test/rust-host/*` release/stage/init tests pass.
+- Route/manifest proof shows the released Rust host can report its runtime identity and locate the legacy Node payload only through manifest fields.
 - Platform contracts updated with exact schema shape.
 
 Reviewer focus:
 
 - Does Rust own runtime identity without absorbing workflow semantics?
 - Are schema migrations explicit?
+- Do the frozen records give host-invocation enough information to prove native `version` and manifest-based legacy fallback in a release tree?
 
 ### P7: Prove `fgctl` Init/Repair/Upgrade Tail
 
@@ -258,18 +276,21 @@ Expected changes:
 - `fgctl init`, `fgctl repair`, and `fgctl upgrade` acquire/stage/verify as needed.
 - Publish ready activation binding atomically.
 - Invoke active local runtime tail: `fgos init`, then `fgos doctor --fix`, then `fgos doctor`.
+- Prove the stable workspace command `.fgos/installation/bin/fgos version --runtime-json` enters the Rust host and reports the activated release digest.
 - Keep candidate preflight from writing host-visible projections before activation.
 
 Proof:
 
 - Integration tests for init, repair, and upgrade.
 - Failure tests for candidate preflight, activation publish, and local tail failure.
+- External-consumer proof that installed `fgctl init --from <asset>` activates a workspace whose local `fgos version --runtime-json` reports `host: "rust"` and an `artifactDigest` matching the verified release manifest.
 - Implementation alignment updated from partial/planned to implemented where proven.
 
 Reviewer focus:
 
 - Does `fgctl` orchestrate rather than reimplement local runtime behavior?
 - Can a failed tail leave the workspace in a diagnosable state?
+- Does this packet close the packaging side of host-invocation R1 without claiming preview/stable public posture by itself?
 
 ### P8: Deprecate Or Retire Legacy `fgos setup`
 
@@ -346,6 +367,7 @@ The rollout is complete when:
 - every legacy source row in `source-preservation-audit.md` is preserved, superseded, or historized;
 - code-panel has proven at least one real domain-owned skill move;
 - Rust `fgctl` owns the packaging runtime boundary without owning unrelated workflow semantics;
+- the host-invocation R1 handoff is explicit: a workspace activation enters the Rust host for native `version`, and the release manifest remains the only legacy Node payload locator for unmigrated routes;
 - generated host surfaces are reproducible from one canonical source of truth.
 
 Final merge to `main` requires:

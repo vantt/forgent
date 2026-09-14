@@ -4,6 +4,7 @@ members = [
     "apps/fgctl",
     "packages/host-runtime/rust",
     "packages/distribution/rust",
+    "packages/work-state/rust",
 ]
 exclude = [
     "herdr-plugin",

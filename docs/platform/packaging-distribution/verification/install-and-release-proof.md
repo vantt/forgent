@@ -27,6 +27,7 @@ This document points to evidence. It is not the design authority.
 | Repository/runtime layout boundaries | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`, `packages/distribution/rust/src/init.rs`, `src/setup/bin-discovery.mjs`, worker/worktree tests before promotion |
 | `fgctl stage` and release store verification | `test/rust-host/fgctl-stage.test.mjs`, `packages/distribution/rust/src/store.rs`, `packages/distribution/rust/src/verify.rs` |
 | `fgctl init` and activation | `test/rust-host/fgctl-init.test.mjs`, `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/src/workspace.rs` |
+| Workspace local `fgos` enters Rust host | `test/rust-host/fgctl-init.test.mjs` asserts `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`; `scripts/ci-external-consumer.sh` repeats the same assertion against installed release assets |
 | `fgctl upgrade` and repair path | `test/rust-host/fgctl-upgrade.test.mjs`, `apps/fgctl/src/main.rs` |
 | External consumer flow | `scripts/ci-external-consumer.sh`, `.github/workflows/ci.yml`, `.github/workflows/release.yml` |
 | Install script behavior | `install.sh`, `test/install/install-sh.test.mjs` |

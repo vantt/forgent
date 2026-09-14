@@ -97,6 +97,7 @@ version = "0.1.0"
 dependencies = [
  "fgos-distribution",
  "fgos-host-runtime",
+ "fgos-work-state",
  "serde",
  "serde_json",
  "sha2",
@@ -126,6 +127,16 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "fgos-work-state"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 

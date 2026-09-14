@@ -67,6 +67,13 @@ test('all 73 COMMAND_REGISTRY selectors appear exactly once in generated output'
   assert.equal(routes.version.owner_path, 'packages/distribution/rust');
   assert.equal(routes.version.legacy_payload, undefined);
   assert.deepEqual(routes.version.compatibility_tests, ['test/rust-host/command-routes.test.mjs']);
+
+  // Specific check for native gate-bypass
+  assert.equal(routes['gate-bypass'].route_kind, 'native');
+  assert.equal(routes['gate-bypass'].operation_id, 'work.gate-bypass.show');
+  assert.equal(routes['gate-bypass'].owner_path, 'packages/work-state/rust');
+  assert.equal(routes['gate-bypass'].legacy_payload, undefined);
+  assert.deepEqual(routes['gate-bypass'].compatibility_tests, ['test/rust-host/command-routes.test.mjs']);
 });
 
 test('drift detection: clean committed file passes --check silently', () => {
@@ -278,6 +285,13 @@ test('explain-command-route explains native and legacy selectors and rejects unk
   assert.equal(versionInfo.owner_path, 'packages/distribution/rust');
   assert.deepEqual(versionInfo.compatibility_tests, ['test/rust-host/command-routes.test.mjs']);
 
+  const gateBypassInfo = explainCommandRoute('gate-bypass');
+  assert.equal(gateBypassInfo.selector, 'gate-bypass');
+  assert.equal(gateBypassInfo.route_kind, 'native');
+  assert.equal(gateBypassInfo.operation_id, 'work.gate-bypass.show');
+  assert.equal(gateBypassInfo.owner_path, 'packages/work-state/rust');
+  assert.deepEqual(gateBypassInfo.compatibility_tests, ['test/rust-host/command-routes.test.mjs']);
+
   const addInfo = explainCommandRoute('add');
   assert.equal(addInfo.selector, 'add');
   assert.equal(addInfo.route_kind, 'legacy-cli');
@@ -300,6 +314,14 @@ test('explain-command-route explains native and legacy selectors and rejects unk
   assert.match(versionOutput, /route_kind: native/);
   assert.match(versionOutput, /operation_id: distribution\.build\.show/);
   assert.match(versionOutput, /owner_path: packages\/distribution\/rust/);
+
+  const gateBypassOutput = execFileSync('node', [EXPLAIN_SCRIPT, 'gate-bypass'], {
+    cwd: REPO_ROOT,
+    encoding: 'utf8',
+  });
+  assert.match(gateBypassOutput, /route_kind: native/);
+  assert.match(gateBypassOutput, /operation_id: work\.gate-bypass\.show/);
+  assert.match(gateBypassOutput, /owner_path: packages\/work-state\/rust/);
 
   assert.throws(
     () => {
