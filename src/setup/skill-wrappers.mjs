@@ -440,17 +440,13 @@ export function deriveSkillIntentId(skillName, frontmatterContent = '') {
 
 function normalizeGeminiCommandVerb(intentId) {
   const rawVerb = intentId.startsWith('fgos:') ? intentId.slice(5) : intentId;
-  const normalized = path.posix.normalize(rawVerb);
   if (
     !rawVerb ||
-    rawVerb !== normalized ||
     rawVerb !== rawVerb.toLowerCase() ||
-    rawVerb.startsWith('/') ||
-    rawVerb.includes('\\') ||
-    rawVerb.split('/').some((part) => !part || part === '.' || part === '..')
+    !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(rawVerb)
   ) {
     throw new Error(
-      `invalid Gemini command intent "${intentId}": command verb must be a normalized relative path without dot segments`,
+      `invalid Gemini command intent "${intentId}": command verb must use lowercase ASCII letters, digits, and single hyphens only`,
     );
   }
   return rawVerb;
@@ -649,6 +645,11 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   const fragments = [];
   const pathToSources = new Map();
 
+  const sharedFragmentCollisionKey = (relPath) => relPath
+    .split('/')
+    .map((part) => part.normalize('NFC').toLowerCase().replace(/[. ]+$/g, ''))
+    .join('/');
+
   const scanShared = (sharedRoot, sourceLabel) => {
     if (!fs.existsSync(sharedRoot)) return;
     const walk = (currentDir, relBase = '') => {
@@ -660,10 +661,11 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
           walk(fullPath, entryRel);
         } else {
           const projectRelPath = path.relative(projectRoot, fullPath);
-          if (!pathToSources.has(entryRel)) {
-            pathToSources.set(entryRel, []);
+          const collisionKey = sharedFragmentCollisionKey(entryRel);
+          if (!pathToSources.has(collisionKey)) {
+            pathToSources.set(collisionKey, { relPath: entryRel, sources: [] });
           }
-          pathToSources.get(entryRel).push(projectRelPath);
+          pathToSources.get(collisionKey).sources.push(projectRelPath);
           fragments.push({
             relativeFragmentPath: entryRel,
             sourcePath: projectRelPath,
@@ -685,7 +687,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   }
 
   if (checkCollisions) {
-    for (const [relPath, sources] of pathToSources.entries()) {
+    for (const { relPath, sources } of pathToSources.values()) {
       if (sources.length > 1) {
         throw new Error(
           `duplicate shared fragment "${relPath}" found in multiple sources: ${sources.join(', ')}`,
@@ -728,10 +730,35 @@ function canonicalSharedRoots(projectRoot) {
       roots.push(path.join(domainsRoot, domainEntry.name, 'skills', '_shared'));
     }
   }
-  return roots.map((root) => toPosixPath(path.resolve(root)));
+  return roots.map((root) => path.resolve(root));
 }
 
-function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = []) {
+function isPathInside(parent, candidate) {
+  const rel = path.relative(parent, candidate);
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
+  const resolved = path.resolve(candidatePath);
+  for (const root of sharedRoots) {
+    if (!isPathInside(root, resolved)) continue;
+    const fragmentPath = path.relative(root, resolved).split(path.sep).join('/');
+    if (fragmentPath) return fragmentPath;
+  }
+  return null;
+}
+
+function rewriteAbsoluteSharedReferences(content, filePath, skillsDir, projectRoot, sharedRoots) {
+  if (!projectRoot || sharedRoots.length === 0) return content;
+  const projectRootPattern = escapeRegExp(toPosixPath(path.resolve(projectRoot)));
+  const absoluteProjectPathPattern = new RegExp(`${projectRootPattern}/([^\\\`\\n)"']+)`, 'g');
+  return content.replace(absoluteProjectPathPattern, (rawRef) => {
+    const fragmentPath = fragmentPathForCanonicalReference(rawRef, sharedRoots);
+    return fragmentPath ? packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) : rawRef;
+  });
+}
+
+function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = [], projectRoot) {
   let rewritten = content
     .replace(
       /(?:\.\.\/)+core\/skills\/_shared\/([^`\s)"']+)/g,
@@ -745,11 +772,7 @@ function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoot
       /(?:\.\.\/)+\.agents\/skills\/_shared\/([^`\s)"']+)/g,
       (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
     );
-  for (const root of sharedRoots) {
-    const rootPattern = new RegExp(`${escapeRegExp(root)}/([^\\\`\\s)"']+)`, 'g');
-    rewritten = rewritten.replace(rootPattern, (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath));
-  }
-  return rewritten;
+  return rewriteAbsoluteSharedReferences(rewritten, filePath, skillsDir, projectRoot, sharedRoots);
 }
 
 function rewritePackagedTextReferences(root, { projectRoot } = {}) {
@@ -770,7 +793,7 @@ function rewritePackagedTextReferences(root, { projectRoot } = {}) {
         continue;
       }
       if (content.includes('\0')) continue;
-      const rewritten = rewritePackagedSkillReferences(content, fullPath, root, sharedRoots);
+      const rewritten = rewritePackagedSkillReferences(content, fullPath, root, sharedRoots, projectRoot);
       if (rewritten !== content) fs.writeFileSync(fullPath, rewritten, 'utf8');
     }
   };

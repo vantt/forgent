@@ -844,6 +844,24 @@ test('discoverCanonicalSkills rejects case-only Gemini command path collisions',
   );
 });
 
+test('discoverCanonicalSkills rejects non-portable Gemini command verbs', () => {
+  for (const [name, intent] of [
+    ['skill-colon', 'fgos:foo:bar'],
+    ['skill-trailing-dot', 'fgos:foo.'],
+    ['skill-unicode', 'fgos:café'],
+  ]) {
+    const root = mkTempDir('gemini-nonportable-intent-');
+    const skillDir = path.join(root, 'core', 'skills', name);
+    fs.mkdirSync(skillDir, { recursive: true });
+    fs.writeFileSync(path.join(skillDir, 'SKILL.md'), `---\nname: ${name}\nintent: ${intent}\ndescription: Invalid portable filename\n---\n# Body\n`);
+
+    assert.throws(
+      () => discoverCanonicalSkills(root),
+      new RegExp(`invalid Gemini command intent "${intent}"`),
+    );
+  }
+});
+
 test('mapSkillIntentToHostTriggers maps canonical skill intent to host-native triggers across Codex, Claude, and Gemini', () => {
   const codePanel = mapSkillIntentToHostTriggers('fgos:code-panel', 'fgos-code-panel');
   assert.equal(codePanel.codex, '$fgos-code-panel');
@@ -1008,6 +1026,35 @@ test('generateGeminiSkillPackage rejects nested shared fragment collisions befor
   assert.equal(fs.existsSync(path.join(outDir, 'skills', '_shared', 'nested', 'same.md')), false);
 });
 
+test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized shared fragment collisions', () => {
+  const root = mkTempDir('shared-normalized-collision-src-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'café.md'), '# NFC\n');
+  fs.writeFileSync(path.join(domainShared, 'café.md'), '# NFD\n');
+
+  assert.throws(
+    () => discoverSharedFragments(root),
+    /duplicate shared fragment "café\.md" found in multiple sources:/,
+  );
+
+  fs.rmSync(root, { recursive: true, force: true });
+  const windowsRoot = mkTempDir('shared-windows-collision-src-');
+  const windowsCoreShared = path.join(windowsRoot, 'core', 'skills', '_shared');
+  const windowsDomainShared = path.join(windowsRoot, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(windowsCoreShared, { recursive: true });
+  fs.mkdirSync(windowsDomainShared, { recursive: true });
+  fs.writeFileSync(path.join(windowsCoreShared, 'same.md'), '# ordinary\n');
+  fs.writeFileSync(path.join(windowsDomainShared, 'same.md.'), '# trailing dot\n');
+
+  assert.throws(
+    () => discoverSharedFragments(windowsRoot),
+    /duplicate shared fragment "same\.md" found in multiple sources:/,
+  );
+});
+
 test('generateGeminiSkillPackage rewrites absolute canonical shared references into package-local references', () => {
   const root = mkTempDir('gemini-absolute-shared-src-');
   const sharedDir = path.join(root, 'core', 'skills', '_shared');
@@ -1028,6 +1075,30 @@ test('generateGeminiSkillPackage rewrites absolute canonical shared references i
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   assert.doesNotMatch(skillContent, new RegExp(root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   const ref = skillContent.match(/`(\.\.\/_shared\/a\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
+test('generateGeminiSkillPackage rewrites lexically non-canonical absolute shared references', () => {
+  const root = mkTempDir('gemini-noncanonical-absolute-src-');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'x.md'), '# X\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-noncanonical-absolute',
+    '---\nname: fgos-noncanonical-absolute\ndescription: Noncanonical absolute ref\n---\n',
+    `# Noncanonical Absolute\nRead \`${path.join(root, 'core', 'skills', 'a', '..', '_shared', 'x.md').split(path.sep).join('/')}\`.\n`,
+  );
+
+  const outDir = mkTempDir('gemini-noncanonical-absolute-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-noncanonical-absolute', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, /core\/skills\/a\/\.\.\/_shared\/x\.md/);
+  const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
   assert.ok(ref);
   assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
 });
