@@ -7,6 +7,7 @@
 //! - R6: Native `version` selector fails closed with SelectionRefused pre-Phase-08.
 //! - R7: Invocation record sink writes exactly one record when configured.
 
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -35,32 +36,64 @@ fn repo_root() -> PathBuf {
         .to_path_buf()
 }
 
+fn sha256_file(path: PathBuf) -> String {
+    let bytes = fs::read(path).unwrap();
+    format!("sha256:{:x}", Sha256::digest(&bytes))
+}
+
+fn valid_dev_manifest() -> serde_json::Value {
+    let legacy_node_digest = sha256_file(repo_root().join("bin").join("fgos.mjs"));
+    let mut manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "entries": {
+            "fgos": "target/debug/fgos",
+        },
+        "components": {
+            "legacyNode": {
+                "root": ".",
+                "entry": "bin/fgos.mjs",
+                "digest": legacy_node_digest,
+            },
+        },
+        "requires": {
+            "node": ">=18",
+        },
+        "target": {
+            "os": "linux",
+            "arch": "x64",
+        },
+        "stateSchemas": {
+            "read": ["2"],
+            "write": ["2"],
+            "migrations": [],
+        },
+        "files": [
+            {
+                "path": "bin/fgos.mjs",
+                "kind": "file",
+                "digest": legacy_node_digest,
+                "mode": "755",
+                "class": "legacy-node",
+            },
+        ],
+    });
+    let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+    manifest
+}
+
 fn ensure_dev_manifest() -> PathBuf {
     let root = repo_root();
     let target = root.join("target");
     let manifest_path = target.join("dev-manifest.json");
-    if !manifest_path.exists() {
-        let manifest = serde_json::json!({
-            "schemaVersion": 1,
-            "root": ".",
-            "entry": "bin/fgos.mjs",
-            "entries": {
-                "fgos": "target/debug/fgos",
-            },
-            "components": {
-                "legacyNode": {
-                    "root": ".",
-                    "entry": "bin/fgos.mjs",
-                },
-            },
-        });
-        fs::create_dir_all(&target).unwrap();
-        fs::write(
-            &manifest_path,
-            serde_json::to_string_pretty(&manifest).unwrap(),
-        )
-        .unwrap();
-    }
+    let manifest = valid_dev_manifest();
+    fs::create_dir_all(&target).unwrap();
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
     manifest_path
 }
 
@@ -360,15 +393,11 @@ fn test_absolute_manifest_entry_is_rejected() {
     .unwrap();
 
     let manifest_path = temp_dir.join("manifest.json");
-    let manifest = serde_json::json!({
-        "schemaVersion": 1,
-        "components": {
-            "legacyNode": {
-                "root": "payload",
-                "entry": outside_script.to_string_lossy(),
-            },
-        },
-    });
+    let mut manifest = valid_dev_manifest();
+    manifest["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    manifest["components"]["legacyNode"]["entry"] =
+        serde_json::json!(outside_script.to_string_lossy());
+    manifest["components"]["legacyNode"]["digest"] = serde_json::json!("sha256:test");
     fs::write(
         &manifest_path,
         serde_json::to_string_pretty(&manifest).unwrap(),
@@ -397,6 +426,553 @@ fn test_absolute_manifest_entry_is_rejected() {
         stderr.contains("must be relative") || stderr.contains("escapes"),
         "stderr must report the confinement rejection, got: {}",
         stderr
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_manifest_without_components_legacy_node_is_rejected() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_missing_legacy_node_{}",
+        std::process::id()
+    ));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+
+    let manifest_path = temp_dir.join("manifest.json");
+    let manifest = serde_json::json!({
+        "schemaVersion": 1,
+        "root": ".",
+        "entry": "bin/fgos.mjs",
+    });
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("add")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("failed to parse manifest"),
+        "stderr must report manifest rejection, got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn test_host_manifest_v1_invariants_are_rejected() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_v1_invariants_{}",
+        std::process::id()
+    ));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+
+    let mut schema_version_2 = valid_dev_manifest();
+    schema_version_2["schemaVersion"] = serde_json::json!(2);
+    let mut entry_repeats_root = valid_dev_manifest();
+    entry_repeats_root["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    entry_repeats_root["components"]["legacyNode"]["entry"] =
+        serde_json::json!("payload/bin/fgos.mjs");
+    let mut migrations = valid_dev_manifest();
+    migrations["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    migrations["stateSchemas"]["migrations"] = serde_json::json!(["2-to-1"]);
+
+    let invalid_cases = [
+        (
+            schema_version_2,
+            "manifest schemaVersion is unsupported; expected 1",
+        ),
+        (
+            entry_repeats_root,
+            "manifest components.legacyNode.entry must be relative to components.legacyNode.root, not repeat it",
+        ),
+        (
+            migrations,
+            "manifest stateSchemas.migrations is reserved in V1 and must be empty",
+        ),
+    ];
+
+    for (manifest, expected_stderr) in invalid_cases {
+        fs::write(
+            &manifest_path,
+            serde_json::to_string_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+
+        let output = Command::new(fgos_bin())
+            .arg("add")
+            .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+            .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+            .output()
+            .expect("failed to execute fgos");
+
+        assert_ne!(output.status.code(), Some(0));
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            stderr.contains(expected_stderr),
+            "stderr must report {expected_stderr:?}, got: {}",
+            stderr
+        );
+    }
+}
+
+#[test]
+fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_partial_manifest_{}", std::process::id()));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest.as_object_mut().unwrap().remove("artifactDigest");
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("add")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("missing field `artifactDigest`"),
+        "stderr must report the missing required V1 field, got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn test_host_rejects_full_manifest_with_mismatched_file_digest() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_file_digest_mismatch_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest["files"] = serde_json::json!([
+        {
+            "path": "bin/fgos.mjs",
+            "kind": "file",
+            "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "mode": "755",
+            "class": "legacy-node"
+        }
+    ]);
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("file digest mismatch for bin/fgos.mjs"),
+        "stderr must report file digest refusal, got: {}",
+        stderr
+    );
+    assert!(
+        !stderr.contains("manifest components.legacyNode.digest mismatch"),
+        "failure must not conflate with legacyNode.digest mismatch"
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_host_rejects_full_manifest_with_legacy_node_digest_only_mismatch() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_legacy_node_digest_mismatch_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    // files[0].digest is correct and matches the file on disk.
+    // Only components.legacyNode.digest is mismatched.
+    manifest["components"]["legacyNode"]["digest"] = serde_json::json!(
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    );
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("manifest components.legacyNode.digest mismatch"),
+        "stderr must report legacyNode.digest refusal, got: {}",
+        stderr
+    );
+    assert!(
+        !stderr.contains("file digest mismatch"),
+        "failure must not conflate with file digest mismatch"
+    );
+    assert!(
+        !stderr.contains("manifest verification failed"),
+        "failure must not conflate with artifactDigest mismatch"
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_host_rejects_full_manifest_with_mismatched_artifact_digest() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_artifact_digest_mismatch_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    // files[] and components.legacyNode are valid, but artifactDigest is corrupted.
+    manifest["artifactDigest"] = serde_json::json!(
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    );
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("manifest verification failed: manifest digest mismatch"),
+        "stderr must report artifactDigest refusal, got: {}",
+        stderr
+    );
+    assert!(
+        !stderr.contains("file digest mismatch"),
+        "failure must not conflate with file digest mismatch"
+    );
+    assert!(
+        !stderr.contains("manifest components.legacyNode.digest mismatch"),
+        "failure must not conflate with legacyNode.digest mismatch"
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_host_rejects_full_manifest_with_path_traversal_before_launch() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_path_traversal_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+
+    let outside_file = temp_dir.join("outside.txt");
+    fs::write(&outside_file, b"outside content").unwrap();
+    let outside_digest = format!("sha256:{:x}", Sha256::digest(b"outside content"));
+
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest["files"] = serde_json::json!([
+        {
+            "path": "../outside.txt",
+            "kind": "file",
+            "digest": outside_digest,
+            "mode": "644",
+            "class": "immutable-runtime"
+        },
+        {
+            "path": "bin/fgos.mjs",
+            "kind": "file",
+            "digest": sha256_file(repo_root().join("bin").join("fgos.mjs")),
+            "mode": "755",
+            "class": "legacy-node"
+        }
+    ]);
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let invocation_record_path = temp_dir.join("invocations.jsonl");
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_INVOCATION_RECORD_PATH", &invocation_record_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("path traversal refused in release manifest: ../outside.txt"),
+        "stderr must report path traversal refusal, got: {}",
+        stderr
+    );
+
+    // Confirm rejected before legacy Node launch
+    let records_content = fs::read_to_string(&invocation_record_path).unwrap();
+    assert!(
+        records_content.contains("\"dispatched\":false"),
+        "invocation must not have been dispatched to Node"
+    );
+    assert!(
+        records_content.contains("\"terminal_state\":\"admission-refused\""),
+        "invocation record must record admission-refused"
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_host_rejects_manifest_with_in_root_directory_symlink() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_in_root_dir_symlink_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    let fgos_mjs_path = release_root.join("bin").join("fgos.mjs");
+    fs::copy(repo_root().join("bin").join("fgos.mjs"), &fgos_mjs_path).unwrap();
+
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(release_root.join("bin"), release_root.join("link")).unwrap();
+
+    let digest = sha256_file(fgos_mjs_path);
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest["files"] = serde_json::json!([
+        {
+            "path": "link/fgos.mjs",
+            "kind": "file",
+            "digest": digest,
+            "mode": "755",
+            "class": "legacy-node"
+        }
+    ]);
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let invocation_record_path = temp_dir.join("invocations.jsonl");
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_INVOCATION_RECORD_PATH", &invocation_record_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("symlink refused in release files on disk: link/fgos.mjs"),
+        "stderr must report symlink refusal for directory symlink component, got: {}",
+        stderr
+    );
+
+    let records_content = fs::read_to_string(&invocation_record_path).unwrap();
+    assert!(
+        records_content.contains("\"dispatched\":false"),
+        "invocation must not have been dispatched to Node"
+    );
+    assert!(
+        records_content.contains("\"terminal_state\":\"admission-refused\""),
+        "invocation record must record admission-refused"
+    );
+
+    let _ = fs::remove_dir_all(&temp_dir);
+}
+
+#[test]
+fn test_host_rejects_manifest_with_unlisted_payload_symlink() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_unlisted_payload_symlink_{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&temp_dir);
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    let real_mjs = release_root.join("bin").join("real_fgos.mjs");
+    fs::copy(repo_root().join("bin").join("fgos.mjs"), &real_mjs).unwrap();
+
+    let sym_mjs = release_root.join("bin").join("sym_fgos.mjs");
+    #[cfg(unix)]
+    std::os::unix::fs::symlink(&real_mjs, &sym_mjs).unwrap();
+
+    let digest = sha256_file(real_mjs.clone());
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest["components"]["legacyNode"] = serde_json::json!({
+        "root": ".",
+        "entry": "bin/sym_fgos.mjs",
+        "digest": digest,
+    });
+    manifest["files"] = serde_json::json!([
+        {
+            "path": "bin/real_fgos.mjs",
+            "kind": "file",
+            "digest": digest,
+            "mode": "755",
+            "class": "legacy-node"
+        }
+    ]);
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let invocation_record_path = temp_dir.join("invocations.jsonl");
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .env("FGOS_INVOCATION_RECORD_PATH", &invocation_record_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("symlink refused in release files on disk"),
+        "stderr must report symlink refusal for unlisted payload symlink, got: {}",
+        stderr
+    );
+
+    let records_content = fs::read_to_string(&invocation_record_path).unwrap();
+    assert!(
+        records_content.contains("\"dispatched\":false"),
+        "invocation must not have been dispatched to Node"
+    );
+    assert!(
+        records_content.contains("\"terminal_state\":\"admission-refused\""),
+        "invocation record must record admission-refused"
     );
 
     let _ = fs::remove_dir_all(&temp_dir);

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "activationId": "act_000001a08fe31d00",
+  "workspaceId": "8d3322d88fba3bd8",
+  "artifactDigest": "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+  "status": "ready-published",
+  "history": [
+    {
+      "status": "staging",
+      "timestamp": "2026-09-14T00:00:00.000Z"
+    },
+    {
+      "status": "verified",
+      "timestamp": "2026-09-14T00:00:01.000Z"
+    },
+    {
+      "status": "preparing",
+      "timestamp": "2026-09-14T00:00:02.000Z"
+    },
+    {
+      "status": "ready-published",
+      "timestamp": "2026-09-14T00:00:03.000Z"
+    }
+  ],
+  "updatedAt": "2026-09-14T00:00:03.000Z"
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "artifactDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "target": {
+    "os": "linux",
+    "arch": "x86_64"
+  },
+  "entries": {
+    "fgos": "bin/fgos"
+  },
+  "components": {
+    "legacyNode": {
+      "root": "libexec/legacy-node",
+      "entry": "bin/fgos.mjs",
+      "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  },
+  "requires": {},
+  "files": []
+}

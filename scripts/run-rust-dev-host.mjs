@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { computeArtifactDigest, hashFile } from './build-rust-distribution.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,10 +32,10 @@ if (!fs.existsSync(targetDir)) {
 }
 
 const manifestPath = path.join(targetDir, 'dev-manifest.json');
-const devManifest = {
+const legacyNodeDigest = hashFile(path.join(checkoutRoot, 'bin', 'fgos.mjs'));
+const fgosDigest = hashFile(path.join(checkoutRoot, 'target', 'debug', 'fgos'));
+const devManifestWithoutDigest = {
   schemaVersion: 1,
-  root: '.',
-  entry: 'bin/fgos.mjs',
   entries: {
     fgos: 'target/debug/fgos',
   },
@@ -42,8 +43,47 @@ const devManifest = {
     legacyNode: {
       root: '.',
       entry: 'bin/fgos.mjs',
+      digest: legacyNodeDigest,
     },
   },
+  requires: {
+    node: '>=18',
+  },
+  target: {
+    os: process.platform,
+    arch: process.arch,
+  },
+  stateSchemas: {
+    read: ['2'],
+    write: ['2'],
+    migrations: [],
+  },
+  files: [
+    {
+      path: 'bin/fgos.mjs',
+      kind: 'file',
+      digest: legacyNodeDigest,
+      mode: '755',
+      class: 'legacy-node',
+    },
+    {
+      path: 'target/debug/fgos',
+      kind: 'file',
+      digest: fgosDigest,
+      mode: '755',
+      class: 'native-host',
+    },
+  ],
+};
+const devManifest = {
+  schemaVersion: devManifestWithoutDigest.schemaVersion,
+  artifactDigest: computeArtifactDigest(devManifestWithoutDigest),
+  entries: devManifestWithoutDigest.entries,
+  components: devManifestWithoutDigest.components,
+  requires: devManifestWithoutDigest.requires,
+  target: devManifestWithoutDigest.target,
+  stateSchemas: devManifestWithoutDigest.stateSchemas,
+  files: devManifestWithoutDigest.files,
 };
 
 fs.writeFileSync(manifestPath, JSON.stringify(devManifest, null, 2) + '\n');

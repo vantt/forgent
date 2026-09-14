@@ -5,7 +5,9 @@
 use crate::canonical::canonicalize_manifest_files;
 use crate::extract::{extract_tar_gz, resolve_extracted_release_root, ExtractError};
 use crate::manifest::{read_manifest_from_path, ManifestReadError};
-use crate::verify::{recompute_artifact_digest, verify_release_files, VerificationError};
+use crate::verify::{
+    recompute_artifact_digest, verify_legacy_node, verify_release_files, VerificationError,
+};
 use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::path::{Path, PathBuf};
@@ -215,6 +217,7 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
         recompute_artifact_digest(&manifest_path)?;
         canonicalize_manifest_files(&manifest)?;
         verify_release_files(&temp_sibling, &manifest)?;
+        verify_legacy_node(&temp_sibling, &manifest)?;
         Ok(())
     })();
 
