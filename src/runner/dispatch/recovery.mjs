@@ -141,6 +141,19 @@ export function resolveFallback(originalPlan, candidateId, { compilePlan } = {})
     });
   }
 
+  // A compiler that silently returns the ORIGINAL plan's executor (or any
+  // executor other than the one actually requested) for a given
+  // `candidateId` never attempted the substitution at all -- that is not a
+  // scoped variant of anything, and must be caught here rather than
+  // silently accepted as 'scoped'.
+  if (scopedPlan.executorId !== candidateId) {
+    return Object.freeze({
+      status: 'compiler-mismatch',
+      candidateId,
+      reason: `scoped plan executorId "${scopedPlan.executorId}" does not match requested candidateId "${candidateId}"`,
+    });
+  }
+
   return Object.freeze({ status: 'scoped', candidateId, plan: scopedPlan });
 }
 
@@ -210,11 +223,33 @@ export function assess(plan, repeatMode, confinement, attestation) {
   }
 
   // repeatMode === 'post-delivery' from here on -- the Acceptance Matrix.
-  if (!isPlainObject(attestation) || attestation.outcome === 'unknown' || attestation.outcome === 'refused' || attestation.outcome === 'failed') {
+  // Allowlist, not denylist: eligibility requires the
+  // attestation to itself claim real enforcement. `unconfined` (the
+  // contract's own local-bwrap-v1 support matrix) makes NO
+  // enforced-confinement claim at all, so it must never fall through here
+  // just because it is not one of the explicitly-named bad outcomes --
+  // and neither may any other outcome this function has never seen.
+  // `enforced` is the only outcome `buildConfinementAttestation`
+  // (confinement/authority.mjs) sets when a confinement backend genuinely
+  // ran.
+  if (!isPlainObject(attestation) || attestation.outcome !== 'enforced') {
     return 'effect-unknown';
   }
 
-  const networkEgress = confinement?.policy?.controls?.networkEgress;
+  // Effect Rule 2/3: the ACTUALLY-GRANTED networkEgress control is read
+  // from the attestation's own record of what was submitted to the
+  // confinement backend for THIS attested dispatch
+  // (`attestation.requested.policy.controls.networkEgress`,
+  // confinement/authority.mjs's `buildConfinementAttestation`, always
+  // populated for a real attestation) -- never from `confinement.policy`
+  // alone (the caller's own separately-threaded requested policy object),
+  // which the red-team showed can disagree with what the backend actually
+  // enforced (e.g. a caller believing "filtered" was requested while the
+  // attested dispatch actually ran with "allow"). `confinement.policy` is
+  // read only as a fallback for a caller/test double that hands in a
+  // minimal attestation carrying no `requested` block of its own.
+  const networkEgress = attestation.requested?.policy?.controls?.networkEgress
+    ?? confinement?.policy?.controls?.networkEgress;
   if (!NETWORK_EGRESS_VALUES.includes(networkEgress)) {
     return 'effect-unknown';
   }

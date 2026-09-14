@@ -39,6 +39,12 @@ const MIN_TIER_RANK = new Map(MIN_TIER_VALUES.map((tier, index) => [tier, index]
 // `post-delivery` names one that happens after -- the harder case
 // dispatch/recovery.mjs's own Acceptance Matrix governs.
 export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
+// Rank for the SAME non-weakening discipline MIN_TIER_RANK already applies
+// to `minTier` -- `post-delivery` is the stronger, harder-to-satisfy
+// requirement (it is gated by dispatch/recovery.mjs's own Acceptance
+// Matrix), so a more specific scope may only raise it, never silently
+// downgrade it back to `pre-delivery`.
+const REPEAT_MODE_RANK = new Map(REPEAT_MODE_VALUES.map((mode, index) => [mode, index]));
 
 export const VISIBILITY_VALUES = Object.freeze(['headless', 'visible']);
 export const RESULT_KIND_VALUES = Object.freeze(['advisory', 'gate-verdict', 'work-product']);
@@ -298,6 +304,7 @@ export function mergePolicyStack(scopedPatches) {
 
   const resolved = {};
   let resolvedMinTierLabel = null;
+  let resolvedRepeatModeLabel = null;
 
   for (const entry of scopedPatches) {
     if (!isPlainObject(entry)) fail('mergePolicyStack entries must be objects');
@@ -312,7 +319,18 @@ export function mergePolicyStack(scopedPatches) {
       resolved.minTier = validated.minTier;
       resolvedMinTierLabel = label;
     }
-    for (const key of ['preferPersona', 'preferExecutor', 'visibility', 'repeatMode']) {
+    // Same non-weakening discipline as minTier above -- a weaker scope
+    // (e.g. CLI/assignment) may not silently downgrade a stronger repeatMode
+    // (e.g. `post-delivery`) already set by a less specific scope (e.g. the
+    // operation itself).
+    if (validated.repeatMode !== undefined) {
+      if (resolved.repeatMode !== undefined && REPEAT_MODE_RANK.get(validated.repeatMode) < REPEAT_MODE_RANK.get(resolved.repeatMode)) {
+        fail(`${label} sets repeatMode "${validated.repeatMode}", weaker than "${resolved.repeatMode}" already set by ${resolvedRepeatModeLabel} -- PolicyPatch repeatMode is monotonic (a weaker scope may not downgrade a stronger one)`);
+      }
+      resolved.repeatMode = validated.repeatMode;
+      resolvedRepeatModeLabel = label;
+    }
+    for (const key of ['preferPersona', 'preferExecutor', 'visibility']) {
       if (validated[key] !== undefined) resolved[key] = validated[key];
     }
     if (validated.fallbackExecutors !== undefined) resolved.fallbackExecutors = validated.fallbackExecutors;
