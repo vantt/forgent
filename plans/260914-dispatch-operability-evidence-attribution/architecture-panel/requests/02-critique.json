@@ -1,0 +1,57 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Supplemental D06 panel Phase 6: critique the three shaped candidates and run the constraint advocate's second pass.",
+  "writerId": "codex-lead",
+  "coordinationId": "dispatch-operability-design-d06-panel-r2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "codex-bwrap", "persona": "person-facing-advisory-lead-codex-only" },
+    { "id": "context-investigator-actor", "executor": "codex-bwrap", "persona": "disconfirmation-seeking-scout-codex-only" },
+    { "id": "system-shaper-actor", "executor": "codex-bwrap", "persona": "baseline-design-architect-codex-only" },
+    { "id": "alternative-shaper-actor", "executor": "codex-bwrap", "persona": "different-priors-designer-codex-only" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "persona": "production-reality-advocate-codex-only" },
+    { "id": "architecture-critic-actor", "executor": "codex-bwrap", "persona": "cross-proposal-attacker-codex-only" },
+    { "id": "synthesizer-actor", "executor": "codex-bwrap", "persona": "whole-ledger-integrator-codex-only" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "persona": "process-and-authority-attacker-codex-only" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeCritique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "nodeId": "phase-critique",
+      "authorizationId": "auth-critique-r2-1",
+      "invocationKey": "invoke-critique-r2-1",
+      "reason": "All three Phase 5 shaping assignments have linked results; authorize Phase 6 critique over the shaped candidates and scout evidence."
+    },
+    {
+      "type": "operation",
+      "as": "critique",
+      "operationId": "critique-proposals",
+      "targetActorId": "architecture-critic-actor",
+      "taskKey": "d06-panel-r2-critique-1",
+      "objective": "As architecture critic, attack the Phase 5 candidate claims for D06 dispatch-operability readiness. Check whether READY overstates proof, whether Codex-only panel reduces independent confidence enough to change verdict, whether any source incidents lack traceability, whether planned docs imply shipped behavior, whether recovery can kill/retry/resume through an unnamed path, and whether locked laws/product decisions were changed silently. Report attacks that land and attacks that fail.",
+      "expectedOutputs": ["agent-report.md: ranked critique attacks with decision impact, attacks that failed, unsettled evidence, verdict pressure"]
+    },
+    {
+      "type": "authorize",
+      "as": "authorizeAssess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "nodeId": "phase-critique",
+      "authorizationId": "auth-assess-r2-1",
+      "invocationKey": "invoke-assess-r2-1",
+      "reason": "All Phase 5 candidate outputs exist; authorize constraint advocate second pass against the finished candidate set."
+    },
+    {
+      "type": "operation",
+      "as": "assess",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "taskKey": "d06-panel-r2-assess-1",
+      "objective": "As constraint advocate second pass, assess operational/migration constraints against the finished Phase 5 candidates. Decide whether any constraint forces NOT READY before implementation handoff. Pay special attention to write authority, CAS/concurrency, corrupt/legacy state, RunResult compatibility, inspection portability, production-door proof, and docs/spec promotion wording.",
+      "expectedOutputs": ["agent-report.md: candidate-by-candidate constraints, sink-the-decision risks if any, mitigations/residual risks"]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Supplemental D06 panel Phase 7: synthesize a readiness recommendation from the whole advisory ledger.",
+  "writerId": "codex-lead",
+  "coordinationId": "dispatch-operability-design-d06-panel-r2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "codex-bwrap", "persona": "person-facing-advisory-lead-codex-only" },
+    { "id": "context-investigator-actor", "executor": "codex-bwrap", "persona": "disconfirmation-seeking-scout-codex-only" },
+    { "id": "system-shaper-actor", "executor": "codex-bwrap", "persona": "baseline-design-architect-codex-only" },
+    { "id": "alternative-shaper-actor", "executor": "codex-bwrap", "persona": "different-priors-designer-codex-only" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "persona": "production-reality-advocate-codex-only" },
+    { "id": "architecture-critic-actor", "executor": "codex-bwrap", "persona": "cross-proposal-attacker-codex-only" },
+    { "id": "synthesizer-actor", "executor": "codex-bwrap", "persona": "whole-ledger-integrator-codex-only" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "persona": "process-and-authority-attacker-codex-only" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeSynth",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "nodeId": "phase-synthesis",
+      "authorizationId": "auth-synth-r2-1",
+      "invocationKey": "invoke-synth-r2-1",
+      "reason": "Critique and assess-constraints are linked; authorize synthesis over the whole supplemental D06 ledger."
+    },
+    {
+      "type": "operation",
+      "as": "synth",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "taskKey": "d06-panel-r2-synthesis-1",
+      "objective": "As synthesizer, recommend exactly one verdict for the D06 design package: keep READY, change to NOT READY, or READY with named supplemental edits before merge. Preserve genuine dissent and per-claim confidence. Explicitly account for the Codex-only roster limitation, source/design-only boundary, planned-vs-shipped wording, deferred external operability drills, and any HIGH/MEDIUM findings from critique or constraints.",
+      "expectedOutputs": ["agent-report.md: recommendation, why over alternatives, required edits if any, unresolved dissent, per-claim confidence"]
+    }
+  ]
+}

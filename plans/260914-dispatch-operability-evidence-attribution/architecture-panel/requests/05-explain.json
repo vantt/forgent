@@ -1,0 +1,38 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Supplemental D06 panel Phase 8: explain the recommendation and final readiness consequence.",
+  "writerId": "codex-lead",
+  "coordinationId": "dispatch-operability-design-d06-panel-r2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "codex-bwrap", "persona": "person-facing-advisory-lead-codex-only" },
+    { "id": "context-investigator-actor", "executor": "codex-bwrap", "persona": "disconfirmation-seeking-scout-codex-only" },
+    { "id": "system-shaper-actor", "executor": "codex-bwrap", "persona": "baseline-design-architect-codex-only" },
+    { "id": "alternative-shaper-actor", "executor": "codex-bwrap", "persona": "different-priors-designer-codex-only" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "persona": "production-reality-advocate-codex-only" },
+    { "id": "architecture-critic-actor", "executor": "codex-bwrap", "persona": "cross-proposal-attacker-codex-only" },
+    { "id": "synthesizer-actor", "executor": "codex-bwrap", "persona": "whole-ledger-integrator-codex-only" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "persona": "process-and-authority-attacker-codex-only" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeExplain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "nodeId": "phase-explanation",
+      "authorizationId": "auth-explain-r2-1",
+      "invocationKey": "invoke-explain-r2-1",
+      "reason": "Red-team has a linked result; authorize lead-advisor explanation of the final supplemental D06 panel recommendation."
+    },
+    {
+      "type": "operation",
+      "as": "explain",
+      "operationId": "explain-recommendation",
+      "targetActorId": "lead-advisor-actor",
+      "taskKey": "d06-panel-r2-explain-1",
+      "objective": "As lead advisor, explain the supplemental D06 panel recommendation for the person. Lead with consequence: whether the current design docs should stay READY, become NOT READY, or receive specific doc-only edits first. Name the Codex-only limitation plainly, preserve unresolved dissent, and state what remains for implementation rather than design.",
+      "expectedOutputs": ["agent-report.md: human-facing recommendation consequence, required edits if any, unresolved dissent, implementation-only follow-up"]
+    }
+  ]
+}

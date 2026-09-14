@@ -1,8 +1,9 @@
 # D06 Review Packet
 
-**Status:** complete
-**Reviewer mode:** inline Codex review per user override on 2026-09-14; no
-external agent dispatch or Work item was created.
+**Status:** superseded by supplemental panel verdict
+**Reviewer mode:** inline Codex review was completed first; supplemental
+registered architecture panel `dispatch-operability-design-d06-panel-r2` later
+ran on 2026-09-14 with Codex-only actor bindings.
 
 ## Claims Under Review
 
@@ -16,13 +17,16 @@ external agent dispatch or Work item was created.
 | C6: Worker claim and effective execution contract are specified before implementation. | `phase-designs/executor-contract-and-production-proof.md` Worker Claim and Effective Execution Contract |
 | C7: Every source incident is dispositioned without double counting. | `incident-evidence-matrix.md` Coverage Summary |
 
-## Panel Waiver
+## Panel Waiver History
 
 D06 originally asked for a registered architecture advisory panel. The user
 overrode the executor policy mid-run: "codex gpt-5.5:medium het di khoi
 dispatch qua cac agent khac". This packet therefore records the panel
 requirement as waived-by-user for this design-only run. No fake session id is
-invented. The replacement review evidence is:
+invented in the original closure. That waiver is no longer the final D06 state:
+the gap was reopened and a supplemental registered session was run.
+
+Replacement review evidence before the supplemental panel was:
 
 - this packet;
 - `reviews/d06-standalone-review.md`;
@@ -41,7 +45,7 @@ invented. The replacement review evidence is:
 
 ## Verdict
 
-READY, with one explicit process caveat: the external architecture-panel session
-was not run because the user replaced external dispatch with inline Codex-only
-review. The design artifacts are precise enough to create a separate
-implementation track, and READY does not authorize implementation here.
+Superseded. The supplemental panel's final advisory explanation recommends
+`NOT READY — documentation/evidence repair required`. The old READY conclusion
+must not be used to authorize canonical promotion or a separate implementation
+track.

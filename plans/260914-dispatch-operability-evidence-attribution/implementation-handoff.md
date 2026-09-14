@@ -1,10 +1,11 @@
 # Implementation Handoff
 
-**Status:** ready for a separate implementation track
+**Status:** blocked until D06 returns to READY
 
 This design track authorizes no source changes. A future implementation track
-may implement the planned Dispatch operability design by preserving the
-following order:
+must not start from this package until D06 supplemental findings are repaired
+and rechecked. Once D06 returns to `READY`, implementation should preserve this
+order:
 
 1. Define `agent-result-claim.v2` and generate prompt/validator text from one
    source.
@@ -35,3 +36,15 @@ following order:
 - Same-`taskKey` replay semantics change.
 - BL1 coordination auto-close defect.
 - Arbitrary Git history protection.
+
+## Blocking Before Implementation Track Creation
+
+- Record and recheck the supplemental panel findings from
+  `dispatch-operability-design-d06-panel-r2`.
+- Add explicit negative production-route proof requirements for every forbidden
+  reconciliation/recovery verb and operation-catalog indirection path.
+- Repair promotion/traceability/closure metadata so plan, ledger, lock,
+  manifest, handoff, and closeout agree on the same verdict.
+- Decide whether Codex-only role separation is an acceptable waiver of the
+  phase's independent/cross-provider panel expectation, or obtain genuinely
+  independent review.

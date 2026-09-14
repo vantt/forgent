@@ -1,0 +1,201 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-14T15:47:15.153Z",
+  "data_hash": "62104ad7d00321e706758f6a599441eb270e3591463000081a9f8c700996aefb",
+  "data": {
+    "coordinationId": "dispatch-operability-design-d06-panel-r2",
+    "status": "active",
+    "phase": "running",
+    "objective": "Supplemental D06 architecture advisory panel for the dispatch-operability evidence-attribution design track. Review D00-D05 accepted design and D06 promotion for readiness, contradictions, missing product decisions, locked-law contact, evidence attribution soundness, recovery/inspection authority boundaries, production proof sufficiency, and whether the package should remain READY or become NOT READY. User override for this supplemental run: bind every static actor to the Codex executor; record the resulting provider-diversity limitation honestly.",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "createdAt": "2026-09-14T15:22:07.750Z",
+    "completedAt": null,
+    "provenanceRoot": {
+      "writerId": "codex-lead"
+    },
+    "actors": [
+      {
+        "id": "lead-advisor-actor",
+        "role": "lead-advisor"
+      },
+      {
+        "id": "context-investigator-actor",
+        "role": "context-investigator"
+      },
+      {
+        "id": "system-shaper-actor",
+        "role": "system-shaper"
+      },
+      {
+        "id": "alternative-shaper-actor",
+        "role": "alternative-shaper"
+      },
+      {
+        "id": "constraint-advocate-actor",
+        "role": "constraint-advocate"
+      },
+      {
+        "id": "architecture-critic-actor",
+        "role": "architecture-critic"
+      },
+      {
+        "id": "synthesizer-actor",
+        "role": "synthesizer"
+      },
+      {
+        "id": "red-team-actor",
+        "role": "red-team"
+      }
+    ],
+    "assignmentRefs": [
+      "asgn_codex_lead_op_001",
+      "asgn_codex_lead_op_002",
+      "asgn_codex_lead_op_003",
+      "asgn_codex_lead_op_004",
+      "asgn_codex_lead_op_005",
+      "asgn_codex_lead_op_006",
+      "asgn_codex_lead_op_007",
+      "asgn_codex_lead_op_008",
+      "asgn_codex_lead_op_009",
+      "asgn_codex_lead_op_010"
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 3600000,
+      "maxAssignments": 20,
+      "maxConcurrency": 4,
+      "maxRounds": 10,
+      "maxTaskDepth": 3
+    },
+    "partialPolicy": null,
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_codex_lead_op_002",
+          "runId": "run_asgn_codex_lead_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_codex_lead_op_003",
+          "runId": "run_asgn_codex_lead_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_codex_lead_op_004",
+          "runId": "run_asgn_codex_lead_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_codex_lead_op_007",
+          "runId": "run_asgn_codex_lead_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_codex_lead_op_006",
+          "runId": "run_asgn_codex_lead_op_006_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_codex_lead_op_008",
+          "runId": "run_asgn_codex_lead_op_008_01"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_codex_lead_op_009",
+          "runId": "run_asgn_codex_lead_op_009_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "eventCount": 35,
+    "authorizations": [
+      {
+        "authorizationId": "auth-critique-r2-1",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "targetActorId": "architecture-critic-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth-assess-r2-1",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "targetActorId": "constraint-advocate-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth-synth-r2-1",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "targetActorId": "synthesizer-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth-redteam-r2-1",
+        "operationId": "red-team-packet",
+        "nodeId": "phase-redteam",
+        "targetActorId": "red-team-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth-explain-r2-1",
+        "operationId": "explain-recommendation",
+        "nodeId": "phase-explanation",
+        "targetActorId": "lead-advisor-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth-close-r2-1",
+        "operationId": "close-dialogue",
+        "nodeId": "phase-dialogue-reopen",
+        "targetActorId": "lead-advisor-actor",
+        "consumed": false
+      }
+    ],
+    "ignoredAuthorizations": [],
+    "dispositions": [],
+    "pendingDriverAuthorizations": [
+      {
+        "nodeId": "phase-critique",
+        "operationId": "answer-specialist-question"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "revise-synthesis",
+        "actorId": "synthesizer-actor"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "revise-explanation",
+        "actorId": "lead-advisor-actor"
+      }
+    ],
+    "aggregations": [],
+    "ignoredAggregations": [],
+    "specialistAuthorizations": [],
+    "ignoredSpecialistAuthorizations": [],
+    "humanTurns": [],
+    "ignoredHumanTurns": []
+  }
+}

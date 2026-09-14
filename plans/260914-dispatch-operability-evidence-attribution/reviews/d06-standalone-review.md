@@ -1,13 +1,18 @@
 # D06 Standalone Review
 
-**Status:** pass with no HIGH findings
+**Status:** superseded by supplemental panel
+
+This inline standalone review was produced before the registered supplemental
+architecture panel `dispatch-operability-design-d06-panel-r2`. Its original
+finding SR-2 treated the panel waiver as a LOW accepted process caveat. The
+supplemental panel later rejected that closure and changed D06 to `NOT READY`.
 
 ## Review Findings
 
 | ID | Severity | Finding | Disposition |
 |---|---|---|---|
 | SR-1 | LOW | `dispatch.runtime.reconcile` is named in design before implementation exists. Canonical docs must label it planned. | accepted; promotion manifest requires planned labels. |
-| SR-2 | LOW | D06 panel evidence is weaker than the original phase brief because external dispatch was waived. | accepted; review packet records waived-by-user and no fake session. |
+| SR-2 | LOW | D06 panel evidence is weaker than the original phase brief because external dispatch was waived. | superseded; supplemental registered panel ran later and changed D06 to NOT READY. |
 
 ## Checks
 
@@ -20,6 +25,5 @@
 
 ## Conclusion
 
-The design is READY for a future implementation track after canonical
-promotion. The implementation track must not claim shipped behavior until tests
-traverse the production door named in D05.
+Superseded. Do not use this inline report as the final D06 verdict. Current
+status is `NOT READY — documentation/evidence repair required`.

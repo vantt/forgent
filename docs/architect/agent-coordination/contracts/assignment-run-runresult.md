@@ -237,33 +237,6 @@ RunResult is the normalized outcome for one Run. It should identify:
 - failure classification;
 - timestamps and normalizer provenance.
 
-### Planned Dispatch Operability Addendum
-
-The dispatch-operability design track
-(`plans/260914-dispatch-operability-evidence-attribution/`) is READY for a
-future implementation track, but not shipped. Its planned RunResult contract
-adds a versioned v2 classification while preserving `result.json` as the one
-terminal RunResult location:
-
-- `RunResult` remains the only immutable terminal truth for a Run.
-- `RunObservation` is a mutable read projection for in-flight, ambiguous, or
-  incomplete facts; it cannot settle, retry, cancel, authorize, or clear a
-  guard.
-- `ProviderOutcome` is a host-invocation wrapper, not Run truth.
-- `agent-result.json` becomes `agent-result-claim.v2`, a worker claim consumed
-  by the normalizer, never independent proof.
-- New v2 results classify execution, assessment, confidence, failure, policy,
-  delivery, and provenance separately.
-- Historical v1 results are interpreted deterministically as `legacy-derived`
-  and are not rewritten on read.
-- A v2 result whose compatibility `status`/`confidence` disagrees with its
-  classification is `contract-corrupt` and fails closed.
-
-The accepted design authority is
-`plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`.
-Implementation must add production-door proof before any behavior is described
-as shipped.
-
 ## Confidence
 
 The exact vocabulary may evolve, but these boundaries are mandatory:
