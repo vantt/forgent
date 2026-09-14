@@ -278,6 +278,8 @@
             "args": [
               "exec",
               "--dangerously-bypass-approvals-and-sandbox",
+              "--model",
+              "{model}",
               "{prompt}"
             ],
             "env": {

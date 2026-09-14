@@ -41,7 +41,8 @@ import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
-import { resolveMainCheckoutRoot } from '../../src/runner/paths.mjs';
+import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { classifyDispatchConfidence, classifyDispatchResult } from '../../src/report/dispatch-confidence.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
@@ -1852,6 +1853,49 @@ test('resolveExecutorCommand substitutes {prompt} and {model} per array element'
   const { command, args } = resolveExecutorCommand(cfg, { prompt: 'do the thing', model: 'sonnet' });
   assert.equal(command, process.execPath);
   assert.deepEqual(args, ['-p', 'do the thing', '--model', 'sonnet']);
+});
+
+test('codex-cli consumes model placeholder in invocation args: analytical assignment resolves model from policy into argv', () => {
+  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: {
+      preferExecutor: 'codex-cli',
+      minTier: 'analytical',
+    },
+  });
+
+  const effectivePolicy = resolveAssignmentDispatchPolicy({
+    assignment,
+    runnerConfig: cfg,
+  });
+
+  assert.equal(effectivePolicy.providerModel, 'openai-codex');
+  assert.equal(effectivePolicy.tier, 'analytical');
+  assert.equal(effectivePolicy.model, 'gpt-5.6-terra');
+
+  const prompt = 'Analyze system architecture for potential failure modes';
+  const resolved = resolveExecutorCommand(cfg, {
+    prompt,
+    model: effectivePolicy.model,
+    executorId: 'codex-cli',
+  });
+
+  assert.equal(resolved.command, 'codex');
+  assert.ok(resolved.args.includes('--model'), 'resolved args must include --model flag');
+  assert.ok(resolved.args.includes('gpt-5.6-terra'), 'resolved args must include resolved model gpt-5.6-terra');
+  const modelFlagIndex = resolved.args.indexOf('--model');
+  assert.equal(resolved.args[modelFlagIndex + 1], 'gpt-5.6-terra', '--model flag must be immediately followed by gpt-5.6-terra');
+  assert.ok(resolved.args.includes(prompt), 'resolved args must include prompt as a separate argv element');
+  assert.equal(resolved.args[resolved.args.length - 1], prompt, '{prompt} must remain a separate argv element, not shell-concatenated');
+  assert.deepEqual(resolved.args, [
+    'exec',
+    '--dangerously-bypass-approvals-and-sandbox',
+    '--model',
+    'gpt-5.6-terra',
+    prompt,
+  ]);
 });
 
 test('resolveExecutorCommand keeps shell metacharacters and newlines in the prompt literal (argv, never a shell string)', () => {
