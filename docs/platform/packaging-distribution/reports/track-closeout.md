@@ -27,6 +27,8 @@ Panel verification HEAD before this closeout report:
 The closeout report itself is recorded by the containing panel-branch commit.
 Main-merge preview branch: `pd-main-integration-packaging-rollout`
 Main-merge preview commit: `b909476c merge(packaging): land code-panel rollout`
+Main merge commit: `f6849be3 merge(packaging): land code-panel rollout on main`
+Final verification hygiene commit: `0b528b6e test: stabilize final main verification`
 
 All packet branches P1-P9 have been merged into the panel branch. The final two
 panel-only hygiene merges stabilized verification expectations exposed by the
@@ -115,6 +117,42 @@ Main-merge preview GitNexus change detection reported low risk after indexing
 the preview worktree. The analyzer's AGENTS/CLAUDE metadata count side effect
 was not included in the merge result.
 
+These commands passed on `main` after the final merge and final verification
+hygiene:
+
+```bash
+cargo build --release --workspace
+node --test test/rust-host/harness.test.mjs test/rust-host/release-tree.test.mjs
+node --test test/report/enduser-index.test.mjs test/state/fgos-logs-bucket.test.mjs test/runner/codex-cli-glm-cli-live-executors.test.mjs
+node --test test/architecture.test.mjs test/cli/fgos-manifest.test.mjs test/setup/checks-setup-rc-line.test.mjs test/setup/*.test.mjs test/skills/*.test.mjs test/install-packaging.test.mjs test/install/*.test.mjs test/rust-host/*.test.mjs
+npm test
+git diff --cached --check
+```
+
+Final main focused proof:
+
+```txt
+tests 700
+suites 1
+pass 700
+fail 0
+cancelled 0
+skipped 0
+todo 0
+```
+
+Final main `npm test` result:
+
+```txt
+tests 6523
+suites 1
+pass 6514
+fail 0
+cancelled 0
+skipped 9
+todo 0
+```
+
 Additional P9 proof:
 
 ```bash
@@ -180,39 +218,33 @@ The code-panel track does not decide these product/release questions:
 - preview versus stable/default public release;
 - Node fallback compatibility window;
 - whether installed/default runtime claims may flip;
-- whether `panel/packaging-distribution-rollout` may merge to `main`;
 - whether host-invocation R1 may move from the current partial posture to implemented.
+
+The coordinator/user approved and completed the merge to `main` after the
+panel-branch proof and main-merge preview proof passed.
 
 ## 8. Main Merge Gate
 
-The panel branch satisfies the technical preconditions for a final merge:
+The panel branch satisfied the technical preconditions for the final merge:
 
 - all closed packet branches are merged into `panel/packaging-distribution-rollout`;
 - no unresolved packet-to-packet conflicts remain on the panel branch;
 - whole-track proof commands are recorded in this closeout;
 - `source-preservation-audit.md` is updated for legacy/source details touched by the track.
 
-The current main checkout is not merge-ready because it contains unrelated dirty
-and untracked files, including files that overlap packaging-distribution docs.
-The merge was therefore prepared and proven on
-`pd-main-integration-packaging-rollout` instead of being applied directly to the
-dirty main checkout. A final merge to `main` should happen only after the release
-owner/coordinator approves the merge and the main checkout is made safe for
-integration.
+The current main checkout's dirty state was preserved first in
+`23fb220e chore: preserve main worktree before packaging merge`, then the proven
+integration branch was merged into `main` at `f6849be3`.
 
-Tracked dirty files in the current main checkout that overlap the proven
-integration branch diff:
+The merge had content conflicts in the legacy packaging-distribution docs listed
+below. Resolution kept the promoted-source metadata block from the preserved main
+snapshot and the historical redirect language from the code-panel track:
 
 ```txt
-.agents/skills/fgos-code-panel/SKILL.md
-docs/architect/host-invocation-routing/legacy-cli-transition.md
 docs/architect/packaging-distribution/README.md
 docs/architect/packaging-distribution/future-constraints.md
 docs/architect/packaging-distribution/history/distribution-baseline.md
 docs/architect/packaging-distribution/runtime-identity-and-activation.md
 docs/architect/packaging-distribution/scope-map.md
 docs/architect/packaging-distribution/workspace-runtime-model.md
-docs/architecture-map.md
-docs/enduser-docs-index.json
-docs/specs/distribution.md
 ```
