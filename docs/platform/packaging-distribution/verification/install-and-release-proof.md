@@ -63,3 +63,31 @@ Run broader suites when implementation changes, release paths change, or a doc c
 - Treat a passing local unit test as local proof, not release proof.
 - Treat external consumer CI as the strongest install/release proof.
 - Re-scan code before changing claim status in `implementation-alignment.md`.
+
+## 5. Settled Node Fallback Policy
+
+Public/default release posture means the officially supported release stance
+for users outside the source checkout: which release channel is published or
+recommended, which installed `fgos` entrypoint is documented as the default,
+and what compatibility/rollback promise the release owner makes for that
+channel. It is broader than local proof that a workspace-installed path can
+enter the Rust host.
+
+The compatibility posture is now settled as:
+
+- Rust host is the default runtime path for activated workspace installs.
+- Legacy Node fallback is deprecated immediately as a public/default runtime
+  posture.
+- Legacy Node fallback may remain only as an explicit escape hatch during a
+  short compatibility window. It must require an intentional selector such as
+  an environment variable, flag, or equivalent supported mechanism; it must not
+  silently catch Rust-host failures.
+- Any escape-hatch invocation must emit a warning, log entry, or proof marker
+  that distinguishes deliberate legacy fallback use from default Rust-host use.
+- The exact removal date or release milestone still requires release-owner
+  approval before the fallback is removed.
+
+This policy does not mean every component has moved to Rust. It means the
+user-facing default entrypoint is Rust-host-owned; the Rust host may still
+execute the legacy Node payload through the release manifest while that payload
+remains a component behind the host boundary.

@@ -213,12 +213,25 @@ promoted by packet proof:
 
 ## 7. Release Decisions Still Required
 
-The code-panel track does not decide these product/release questions:
+The coordinator/user has settled the Node fallback posture: Rust host is the
+default runtime path for activated workspace installs; legacy Node fallback is
+deprecated immediately and may remain only as an explicit escape hatch with a
+warning/log/proof marker during a short compatibility window. The escape hatch
+must not silently catch Rust-host failures. Its exact removal date or release
+milestone still needs release-owner approval.
+
+Public/default release posture means the official stance for users outside the
+source checkout: which release channel is published or recommended, which
+installed `fgos` entrypoint is documented as the default, and what
+compatibility/rollback promise applies to that channel. It is broader than the
+P6/P7 local proof that an activated workspace path enters the Rust host.
+
+The code-panel track still does not decide these product/release questions:
 
 - preview versus stable/default public release;
-- Node fallback compatibility window;
 - whether installed/default runtime claims may flip;
 - whether host-invocation R1 may move from the current partial posture to implemented.
+- the exact legacy Node fallback removal date or release milestone.
 
 The coordinator/user approved and completed the merge to `main` after the
 panel-branch proof and main-merge preview proof passed.
