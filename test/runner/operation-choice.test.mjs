@@ -4699,6 +4699,26 @@ test('tampered stored validate-plan result with a schema-broken agentClaim is ne
   assert.equal(choice.reason, 'plan-written-needs-reality-check');
 });
 
+test('cross-pass does not consume a byte-bound reviewer v2 claim missing assessment.verdict', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+  const docsRef = 'docs/history/reviewer-missing-assessment';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-reviewer-missing-assessment', docsRef, withHash: true,
+    claimOverride: { contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Review completed', assessment: {} },
+  });
+  const assignmentPath = path.join(asgnDir, 'assignment.json');
+  const assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  assignment.role = 'reviewer';
+  fs.writeFileSync(assignmentPath, JSON.stringify(assignment));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-reviewer-missing-assessment', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
 test('tampered stored validate-plan result whose recorded evidence refs point at missing files is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);

@@ -188,7 +188,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // classification time; re-run the same gate here.
           if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
             try {
-              if (!validateAgentResultClaim(runResult.agentClaim).valid) continue;
+              if (!validateAgentResultClaim(runResult.agentClaim, { role: asgn?.role, operation: asgn?.operation }).valid) continue;
             } catch {
               continue;
             }
