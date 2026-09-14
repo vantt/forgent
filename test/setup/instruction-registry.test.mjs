@@ -688,6 +688,48 @@ test('InstructionRegistry: post-construction index assignment throws on frozen i
   }
 });
 
+test('InstructionRegistry: lookup index cannot be corrupted or mutated externally (regression)', () => {
+  const tmp = mkTempDir('fgos-inst-reg-immutability-');
+  try {
+    writeInstructionFile(path.join(tmp, 'core', 'instructions'), 'rule.md', 'id: rule-1\nkind: law');
+    const registry = discoverInstructionSources(tmp);
+
+    // 1. _byId is private / unexposed on the instance
+    assert.equal(registry._byId, undefined);
+    assert.throws(() => {
+      registry._byId = new Map();
+    }, TypeError);
+
+    // 2. Mutating the map returned by byId does not corrupt lookup index
+    const exportedMap = registry.byId;
+    assert.ok(exportedMap instanceof Map);
+    assert.equal(exportedMap.size, 1);
+
+    exportedMap.clear();
+    assert.equal(exportedMap.size, 0);
+    assert.equal(registry.has('rule-1'), true);
+    assert.equal(registry.get('rule-1')?.id, 'rule-1');
+
+    exportedMap.set('rule-1', { id: 'corrupted' });
+    assert.equal(registry.get('rule-1')?.id, 'rule-1');
+
+    exportedMap.set('injected', { id: 'injected' });
+    assert.equal(registry.has('injected'), false);
+    assert.equal(registry.get('injected'), undefined);
+
+    // 3. Own property keys do not leak internal index
+    const keys = Reflect.ownKeys(registry);
+    assert.ok(!keys.includes('_byId'));
+    assert.ok(!keys.includes('#byId'));
+
+    // 4. Lookup semantics remain completely intact
+    assert.equal(registry.has('rule-1'), true);
+    assert.equal(registry.get('rule-1')?.id, 'rule-1');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 // ---------------------------------------------------------------------------
 // 8. Containment, symlink, case policy, and custom roots (Requirement 5)
 // ---------------------------------------------------------------------------

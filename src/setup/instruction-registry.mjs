@@ -432,23 +432,25 @@ export class InstructionRegistry extends Array {
     return Array;
   }
 
+  #byId;
+
   constructor(...items) {
     super(...items);
-    this._byId = new Map();
+    this.#byId = new Map();
     for (const unit of this) {
       if (unit && unit.id) {
-        this._byId.set(unit.id, unit);
+        this.#byId.set(unit.id, unit);
       }
     }
     Object.freeze(this);
   }
 
   get(id) {
-    return this._byId.get(id);
+    return this.#byId.get(id);
   }
 
   has(id) {
-    return this._byId.has(id);
+    return this.#byId.has(id);
   }
 
   list() {
@@ -460,7 +462,7 @@ export class InstructionRegistry extends Array {
   }
 
   get byId() {
-    return new Map(this._byId);
+    return new Map(this.#byId);
   }
 
   filter(callback, thisArg) {
