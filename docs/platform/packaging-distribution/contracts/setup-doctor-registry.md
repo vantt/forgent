@@ -21,9 +21,9 @@ Related:
 
 The doctor/fix registry is the extension point for environment readiness. Modules register checks, fixes, and config defaults instead of adding one-off repair logic.
 
-Target architecture has no separate `fgos setup` verb. `fgctl init` is the one-command onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor`.
+Target architecture has no separate `fgos setup` verb for workspace onboarding. `fgctl init` is the one-command workspace onboarding orchestrator; after activation it invokes active local `fgos init`, `fgos doctor --fix`, and `fgos doctor`. Legacy shell/global integration remains compatibility behavior until a compatibility-window decision retires it or replaces it explicitly.
 
-Current Node `fgos setup` remains implemented as legacy compatibility and consumes the same registry while it exists.
+Current Node `fgos setup` remains implemented as deprecated legacy compatibility and consumes the same registry while it exists.
 
 ## 2. Registry Types
 
@@ -52,7 +52,7 @@ The registries are independent. A module may register only a check, only a fix, 
 
 ## 4. Legacy Setup Compatibility
 
-Current legacy `fgos setup`:
+Current legacy `fgos setup` is deprecated but still reachable:
 
 - wires known local support such as shell integration and hooks where applicable;
 - ensures shared config defaults are present;
@@ -60,7 +60,7 @@ Current legacy `fgos setup`:
 - reports changes;
 - preserves idempotency when run repeatedly.
 
-This is implemented behavior, not the target architecture. New distribution design should route onboarding through `fgctl init` plus local `fgos init`/`doctor --fix`/`doctor`, not add new semantic obligations to `fgos setup`.
+The command registry and setup result payload expose the deprecation and workspace-onboarding path. This is implemented behavior, not the target architecture. New distribution design should route workspace onboarding through `fgctl init` plus local `fgos init`/`doctor --fix`/`doctor`, while preserving `fgos setup` as the legacy shell/global integration path until a compatibility-window decision retires or replaces that behavior. Removing the command entirely remains a compatibility-window decision, not an implementation-side inference.
 
 ## 5. Config Merge Contract
 
@@ -83,7 +83,7 @@ Doctor/fix paths may repair environment readiness. They must not silently select
 | Checks/fixes/defaults are registered through open registries | `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `test/setup/registrations.test.mjs` |
 | Doctor default path is read-only | `bin/fgos.mjs`, `test/setup/*.test.mjs` |
 | Doctor fix runs registered fixes | `src/setup/registrations.mjs`, `bin/fgos.mjs`, `test/setup/*.test.mjs` |
-| Legacy setup runs registered fixes | `bin/fgos.mjs`, `docs/history/setup-runs-registered-fixes/CONTEXT.md` |
+| Legacy setup runs registered fixes and declares its deprecation path | `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `docs/history/setup-runs-registered-fixes/CONTEXT.md`, `test/cli/fgos-manifest.test.mjs`, `test/setup/checks-setup-rc-line.test.mjs` |
 | Project config overrides global config | `src/config/global-config.mjs`, `test/config/global-config.test.mjs` |
 
 ## 8. Open Follow-Up
