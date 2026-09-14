@@ -210,7 +210,21 @@ a quick `ps aux | grep`, verify with the full untruncated output (or `pgrep
 -af`) before concluding it has exited — a long wrapper line can hide the real
 process in a truncated grep view.
 
-## 16. Long real-time gaps between dispatch completion and the Lead noticing (this session)
+## 16. Re-dispatching a failed step with the SAME `taskKey` replays the cached failure instead of retrying (P03)
+
+`createAndExecuteSessionTask` checks for an already-`result-linked` outcome for
+the assignment before doing any real work, and returns it as-is — this applies
+even when that prior outcome is itself `failed`. Re-submitting an identical
+request (same `taskKey`) after fixing the actual blocker (in this case, the
+real cwd-lock holder) just replayed the stale `"already in flight"` failure
+from the first attempt, byte-for-byte including its original elapsed-time
+figure, rather than re-executing. Fix: a genuine retry of a failed step needs a
+NEW `taskKey` (and, since it is a different position invocation, this is
+distinct from the `authorize`+driver-authorized-operation retry pattern used
+for revise/recheck rounds — a first-pass `operation` step has no `authorize`
+step of its own, so the only way to force re-execution is a fresh `taskKey`).
+
+## 17. Long real-time gaps between dispatch completion and the Lead noticing (this session)
 
 At least one dispatch (P03's original produce attempt) sat completed-but-unread
 for roughly 12 hours of real elapsed time before being checked, during which an
