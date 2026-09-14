@@ -1718,7 +1718,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // Malformed JSON: treat as invalid claim (not absent)
       claimInvalid = true;
     } else {
-      const validation = validateAgentResultClaim(parsedClaim);
+      const validation = validateAgentResultClaim(parsedClaim, { role: assignment.role, operation: assignment.operation });
       if (validation.valid) {
         agentClaim = parsedClaim;
         try {
@@ -2063,6 +2063,19 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
   const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
 
+  // Read assignment before validating its worker claim so role/operation
+  // requirements are enforced at this recovery settlement gate too.
+  const candidateAssignmentPaths = [
+    path.join(path.dirname(runDir), '..', 'assignment.json'),
+    path.join(runDir, 'assignment.json'),
+  ];
+  let asgn = null;
+  for (const p of candidateAssignmentPaths) {
+    if (fs.existsSync(p)) {
+      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
+    }
+  }
+
   let agentClaim = null;
   let claimInvalid = false;
   let claimSha256 = null;
@@ -2071,7 +2084,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     try {
       const claimBytes = fs.readFileSync(agentResultPath);
       const parsed = JSON.parse(claimBytes.toString('utf8'));
-      const validation = validateAgentResultClaim(parsed);
+      const validation = validateAgentResultClaim(parsed, { role: asgn?.role, operation: asgn?.operation });
       if (validation.valid) {
         agentClaim = parsed;
         claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
@@ -2112,17 +2125,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
 
   const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
 
-  // Read assignment to check read-only
-  const candidateAssignmentPaths = [
-    path.join(path.dirname(runDir), '..', 'assignment.json'),
-    path.join(runDir, 'assignment.json'),
-  ];
-  let asgn = null;
-  for (const p of candidateAssignmentPaths) {
-    if (fs.existsSync(p)) {
-      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
-    }
-  }
+  // Assignment was read before claim validation so both gates share its context.
   const isReadOnly = isReadOnlyAssignment(asgn);
 
   const effectiveCwd = baseline?.cwd || root;

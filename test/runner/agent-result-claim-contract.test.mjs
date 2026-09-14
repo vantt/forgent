@@ -14,6 +14,7 @@ test('v2 contract validates status-dependent fields while preserving missing-con
   assert.deepEqual(AGENT_RESULT_CLAIM_CONTRACT, { id: 'agent-result-claim', version: 2 });
   assert.deepEqual(validateAgentResultClaimContract({ status: 'done', summary: 'legacy input' }), { valid: true });
   assert.deepEqual(validateAgentResultClaimContract({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'failed', summary: 'failed', error: { code: 'EFAIL' } }), { valid: true });
+  assert.equal(validateAgentResultClaimContract({ status: 'failed', summary: 'legacy failed', error: { code: 'ELEGACY' } }).valid, false);
   assert.equal(validateAgentResultClaimContract({ contract: { id: 'agent-result-claim', version: 1 }, status: 'done', summary: 'old contract' }).valid, false);
   assert.equal(validateAgentResultClaimContract({ status: 'blocked', summary: 'stuck' }).valid, false);
   assert.equal(validateAgentResultClaimContract({ status: 'failed', summary: 'bad' }).valid, false);
@@ -22,8 +23,8 @@ test('v2 contract validates status-dependent fields while preserving missing-con
 test('assessment requirements cover reviewer, red-team, and recheck contexts', () => {
   for (const context of [{ role: 'reviewer' }, { role: 'red-team' }, { operation: 'reviewer-recheck' }]) {
     assert.equal(isAssessmentRequired(context), true);
-    assert.equal(validateAgentResultClaimContract({ status: 'done', summary: 'finished' }, context).valid, false);
-    assert.deepEqual(validateAgentResultClaimContract({ status: 'done', summary: 'finished', assessment: { verdict: 'pass' } }, context), { valid: true });
+    assert.equal(validateAgentResultClaimContract({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished' }, context).valid, false);
+    assert.deepEqual(validateAgentResultClaimContract({ contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'finished', assessment: { verdict: 'pass' } }, context), { valid: true });
   }
 });
 

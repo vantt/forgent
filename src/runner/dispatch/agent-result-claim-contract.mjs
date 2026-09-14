@@ -68,13 +68,16 @@ export function validateAgentResultClaimContract(value, context = {}) {
   }
   if (!nonEmptyString(value.summary)) return { valid: false, reason: `agent-result.json requires non-empty summary (${summaryRule.description})` };
   if (value.status === blockerRule.requiredWhen && !nonEmptyString(value.blocker)) return { valid: false, reason: `agent-result.json with status "blocked" requires blocker: ${blockerRule.description}` };
-  if (value.status === errorRule.requiredWhen && !(nonEmptyString(value.error) || (value.error !== null && typeof value.error === 'object' && !Array.isArray(value.error)))) {
+  const validError = legacy
+    ? nonEmptyString(value.error)
+    : (nonEmptyString(value.error) || (value.error !== null && typeof value.error === 'object' && !Array.isArray(value.error)));
+  if (value.status === errorRule.requiredWhen && !validError) {
     return { valid: false, reason: `agent-result.json with status "failed" requires error: ${errorRule.description}` };
   }
   if (value.evidenceRefs !== undefined && (!Array.isArray(value.evidenceRefs) || value.evidenceRefs.some((ref) => !nonEmptyString(ref)))) {
     return { valid: false, reason: `agent-result.json evidenceRefs must be ${evidenceRefsRule.description}` };
   }
-  if (isAssessmentRequired(context)) {
+  if (!legacy && isAssessmentRequired(context)) {
     if (value.assessment === null || typeof value.assessment !== 'object' || Array.isArray(value.assessment)
       || !ASSESSMENT_VERDICTS.includes(value.assessment.verdict)) {
       return { valid: false, reason: `agent-result.json for this assessment role requires assessment.verdict one of [${ASSESSMENT_VERDICTS.join(', ')}]` };
