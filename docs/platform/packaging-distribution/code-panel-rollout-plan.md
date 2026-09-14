@@ -54,6 +54,9 @@ Before opening any packet:
 
 No packet may silently delete a legacy/history detail. If a detail moves, update `source-preservation-audit.md`.
 
+Coordinator note, 2026-09-14:
+Recent host-invocation R1 handoff proof edits in this plan and the packaging-distribution verification docs are accepted for the active track. Apply them by packet boundary: P6 owns the Rust manifest/release handoff fields and manifest-based Rust host fallback proof; P7 owns the workspace activation end-to-end proof where `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`. Keep implementation-alignment status partial until release assets and public/default posture are decided.
+
 ## 3. Packet Queue
 
 | Packet | Branch/worktree suggestion | Goal | Primary contract | Depends on |
@@ -107,6 +110,18 @@ When a packet finishes:
 4. Merge the packet branch into `panel/packaging-distribution-rollout`.
 5. Run a panel-branch smoke proof for the touched area.
 6. Rebase or recreate still-open dependent packet branches from the updated panel branch.
+
+Packet owners, reviewers, red-team, and the packet coordinator should complete packet-scope proof, doc/status updates, pass/fail reporting, packet-to-panel merge, and panel-branch smoke proof through the code-panel track. Do not route ordinary packet implementation back to the human/coordinator as hand work when the packet can still progress.
+
+For P6/P7 closeout, report:
+
+1. Which proof commands passed.
+2. Whether `.fgos/installation/bin/fgos version --runtime-json` entered the Rust host and matched the activated digest.
+3. Which docs/status rows were updated.
+4. Whether any claim remains partial and why.
+5. Which release decisions still need human/coordinator approval.
+
+The following decisions remain coordinator/release-owner decisions even when packet tests pass: preview versus stable/default public release, Node fallback compatibility window, whether installed/default runtime claims may flip, whether the panel branch may merge to `main`, and whether host-invocation R1 may move from current partial to implemented.
 
 The panel track merges to `main` only after P9 closes and whole-track verification has passed.
 
