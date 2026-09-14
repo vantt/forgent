@@ -47,7 +47,7 @@ No component-boundary change. This migration creates canonical platform document
 | `deferred` | R2/R3 protocol work, future chat host, marketplace/signature/WASM expansion, and open release-policy decisions stay deferred or planned. |
 | `superseded` | Rejected migration routes and old location authority are superseded by the promoted area structure and selected Rust-host-first sequence. |
 | `rejected` | Node-thinning-first, big-bang rewrite, semantic write dual-run, fake gate-policy component, and config-based replacement of built-ins are preserved as rejected choices in the ledger and migration docs. |
-| `unknown` | Target matrix, stable versus preview split, compatibility window, first external provider set, and chat admission/interruption details remain unknown where the old sources left them open. |
+| `unknown` | Stable/default graduation, first external provider set, and chat admission/interruption details remain unknown where the old sources left them open. Preview public posture and the 30-day legacy fallback escape-hatch window are now settled by packaging-distribution/release-owner decision. |
 
 ## 4. Alignment Rule Check
 

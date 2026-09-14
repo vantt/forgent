@@ -1,0 +1,841 @@
+test (ubuntu-latest)	UNKNOWN STEP	﻿2026-09-12T14:45:16.5186273Z Current runner version: '2.337.0'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5214625Z ##[group]Runner Image Provisioner
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5215686Z Hosted Compute Agent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5216401Z Version: 20260828.587
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5217247Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5218141Z Build Date: 2026-08-28T16:44:25Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5219164Z Worker ID: {30aaabb0-5a16-475b-9fbf-c66c2a7aec1a}
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5220158Z Azure Region: westus3
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5220853Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5222623Z ##[group]Operating System
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5223450Z Ubuntu
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5224080Z 24.04.5
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5224888Z LTS
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5225511Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5226233Z ##[group]Runner Image
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5226961Z Image: ubuntu-24.04
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5227680Z Version: 20260907.300.1
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5229485Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5231507Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5232742Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5234312Z ##[group]GITHUB_TOKEN Permissions
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5236404Z Contents: read
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5237104Z Metadata: read
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5237867Z Packages: read
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5238806Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5241373Z Secret source: Actions
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5242481Z Cache mode: write
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5243285Z Prepare workflow directory
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5625629Z Prepare all required actions
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.5682004Z Getting action download info
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.8631121Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:16.9621392Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.1721378Z Complete job name: test (ubuntu-latest)
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2309100Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2316008Z ##[group]Run actions/checkout@v4
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2316569Z with:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2316917Z   repository: vantt/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2320369Z   token: ***
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2320722Z   ssh-strict: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2321080Z   ssh-user: git
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2321456Z   persist-credentials: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2321842Z   clean: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2322192Z   sparse-checkout-cone-mode: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2322593Z   fetch-depth: 1
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2322934Z   fetch-tags: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2323277Z   show-progress: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2323624Z   lfs: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2323989Z   submodules: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2324346Z   set-safe-directory: true
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2324749Z   allow-unsafe-pr-checkout: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2325328Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3116178Z Syncing repository: vantt/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3117686Z ##[group]Getting Git version info
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3118256Z Working directory is '/home/runner/work/forgent/forgent'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3119536Z [command]/usr/bin/git version
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3188862Z git version 2.55.0
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3206021Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3219206Z Temporarily overriding HOME='/home/runner/work/_temp/80765d43-7895-4961-b4d6-b6cb4c737988' before making global git config changes
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3220926Z Adding repository directory to the temporary git global config as a safe directory
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3225002Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forgent/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3274643Z Deleting the contents of '/home/runner/work/forgent/forgent'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3279462Z ##[group]Initializing the repository
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3282705Z [command]/usr/bin/git init /home/runner/work/forgent/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3383862Z hint: Using 'master' as the name for the initial branch. This default branch name
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3386812Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3387986Z hint: to use in all of your new repositories, which will suppress this warning,
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3389053Z hint: call:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3389536Z hint:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3390133Z hint: 	git config --global init.defaultBranch <name>
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3390884Z hint:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3391574Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3392737Z hint: 'development'. The just-created branch can be renamed via this command:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3393652Z hint:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3394179Z hint: 	git branch -m <name>
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3394753Z hint:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3395557Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3396830Z Initialized empty Git repository in /home/runner/work/forgent/forgent/.git/
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3398995Z [command]/usr/bin/git remote add origin https://github.com/vantt/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3441946Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3442952Z ##[group]Disabling automatic garbage collection
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3445071Z [command]/usr/bin/git config --local gc.auto 0
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3484768Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3485701Z ##[group]Setting up auth
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3486583Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3506952Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3837133Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.3861185Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4058821Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4088915Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4276516Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4308212Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4309117Z ##[group]Fetching the repository
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:17.4315521Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +adb5b93bbd425ec502350439c694805b12a43dc0:refs/remotes/origin/main
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9577884Z From https://github.com/vantt/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9579655Z  * [new ref]         adb5b93bbd425ec502350439c694805b12a43dc0 -> origin/main
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9587732Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9589517Z ##[group]Determining the checkout info
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9596023Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:19.9596926Z [command]/usr/bin/git sparse-checkout disable
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.0174731Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.0778263Z ##[group]Checking out the ref
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.0781479Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6235043Z Switched to a new branch 'main'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6244404Z branch 'main' set up to track 'origin/main'.
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6251975Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6297310Z [command]/usr/bin/git log -1 --format=%H
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6321874Z adb5b93bbd425ec502350439c694805b12a43dc0
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6559609Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6561173Z ##[group]Run actions/setup-node@v4
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6561414Z with:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6561611Z   node-version: 20
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6561812Z   cache: npm
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6562005Z   always-auth: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6562221Z   check-latest: false
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6564448Z   token: ***
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.6564647Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.7678259Z Attempting to download 20...
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.7760555Z (node:2029) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:20.7761391Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:21.7430121Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-linux-x64.tar.gz
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2527098Z Extracting ...
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2620423Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/4a5dedde-e3d9-4607-88c2-86286eb1ee99 -f /home/runner/work/_temp/3da9e404-9edf-4a6b-8b77-c6f9e98e6804
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:23.1161694Z Adding to the cache ...
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5322448Z ##[group]Environment details
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7603753Z node: v20.20.2
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7604104Z npm: 10.8.2
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7604336Z yarn: 1.22.22
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7604918Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7621120Z [command]/opt/hostedtoolcache/node/20.20.2/x64/bin/npm config get cache
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8418765Z /home/runner/.npm
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0591433Z Cache hit for: node-cache-Linux-x64-npm-273aeb17e34b5c798c1576b834c8cabf2946ee2c3326e63565caaa53201cf358
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0720584Z (node:2029) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4130359Z Received 114669 of 114669 (100.0%), 0.8 MBs/sec
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4130844Z Cache Size: ~0 MB (114669 B)
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4151518Z [command]/usr/bin/tar -xf /home/runner/work/_temp/64b2ca53-c2aa-45ec-ba66-591201fd2e72/cache.tzst -P -C /home/runner/work/forgent/forgent --use-compress-program unzstd
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4224134Z Cache restored successfully
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4227720Z Cache restored from key: node-cache-Linux-x64-npm-273aeb17e34b5c798c1576b834c8cabf2946ee2c3326e63565caaa53201cf358
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4379458Z ##[group]Run npm install
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4379742Z ^[[36;1mnpm install^[[0m
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4416306Z shell: /usr/bin/bash -e {0}
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4416547Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8326135Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8332919Z added 1 package, and audited 2 packages in 337ms
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8333199Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8333380Z 1 package is looking for funding
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8333657Z   run `npm fund` for details
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8333800Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8333909Z found 0 vulnerabilities
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8404142Z ##[group]Run npm test
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8404364Z ^[[36;1mnpm test^[[0m
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8438392Z shell: /usr/bin/bash -e {0}
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.8438763Z ##[endgroup]
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9321991Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9322459Z > forgent@0.1.0 test
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9323099Z > FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9323486Z
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9564827Z Could not find '/home/runner/work/forgent/forgent/test/**/*.test.mjs'
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9633934Z ##[error]Process completed with exit code 1.
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9747934Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9750939Z Post job cleanup.
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0416478Z [command]/usr/bin/git version
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0450040Z git version 2.55.0
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0478860Z Temporarily overriding HOME='/home/runner/work/_temp/5da39965-f183-4919-b1e3-1df94dc455b4' before making global git config changes
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0479989Z Adding repository directory to the temporary git global config as a safe directory
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0483731Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forgent/forgent
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0515910Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0545521Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0764732Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0789058Z http.https://github.com/.extraheader
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0799155Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.0828009Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.1058216Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.1093372Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.1422145Z Cleaning up orphan processes
+test (ubuntu-latest)	UNKNOWN STEP	2026-09-12T14:45:27.1647709Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (macos-latest)	UNKNOWN STEP	﻿2026-09-12T14:45:20.5088070Z Current runner version: '2.337.0'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5105950Z ##[group]Runner Image Provisioner
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5106570Z Hosted Compute Agent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5106960Z Version: 20260828.587
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5107380Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5107870Z Build Date: 2026-08-28T16:44:25Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5108310Z Worker ID: {47142b16-dcd4-4b94-b1c0-34fa74152b5b}
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5108780Z Azure Region: westus
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5109150Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5110340Z ##[group]Operating System
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5110850Z macOS
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5111250Z 26.6.2
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5111600Z 25G83
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5111940Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5112300Z ##[group]Runner Image
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5112710Z Image: macos-26-arm64
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5113170Z Version: 20260907.0351.1
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5114130Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20260907.0351/images/macos/macos-26-arm64-Readme.md
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5115310Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20260907.0351
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5115970Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5116900Z ##[group]GITHUB_TOKEN Permissions
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5119370Z Contents: read
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5119800Z Metadata: read
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5120170Z Packages: read
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5120570Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5122320Z Secret source: Actions
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5122930Z Cache mode: write
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5123680Z Prepare workflow directory
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5357450Z Prepare all required actions
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5393180Z Getting action download info
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:20.8157320Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.2730870Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5149870Z Complete job name: test (macos-latest)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5744200Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5751400Z ##[group]Run actions/checkout@v4
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5751960Z with:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5752350Z   repository: vantt/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5755520Z   token: ***
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5755890Z   ssh-strict: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5756280Z   ssh-user: git
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5756660Z   persist-credentials: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5757080Z   clean: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5757590Z   sparse-checkout-cone-mode: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5758080Z   fetch-depth: 1
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5758480Z   fetch-tags: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5758870Z   show-progress: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5759270Z   lfs: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5759710Z   submodules: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5760150Z   set-safe-directory: true
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5760590Z   allow-unsafe-pr-checkout: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:21.5761480Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.1380030Z Syncing repository: vantt/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.1382000Z ##[group]Getting Git version info
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.1382810Z Working directory is '/Users/runner/work/forgent/forgent'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.1383990Z [command]/opt/homebrew/bin/git version
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2028990Z git version 2.55.0
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2137900Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2197320Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/6d63e8e3-dd72-4ae6-84d5-57dd1e3005fb/.gitconfig'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2200010Z Temporarily overriding HOME='/Users/runner/work/_temp/6d63e8e3-dd72-4ae6-84d5-57dd1e3005fb' before making global git config changes
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2202540Z Adding repository directory to the temporary git global config as a safe directory
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2204870Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/forgent/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2289950Z Deleting the contents of '/Users/runner/work/forgent/forgent'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2309660Z ##[group]Initializing the repository
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2316350Z [command]/opt/homebrew/bin/git init /Users/runner/work/forgent/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2683730Z hint: Using 'master' as the name for the initial branch. This default branch name
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2688360Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2690430Z hint: to use in all of your new repositories, which will suppress this warning,
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2693250Z hint: call:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2694190Z hint:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2695260Z hint: 	git config --global init.defaultBranch <name>
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2696840Z hint:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2697970Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2699880Z hint: 'development'. The just-created branch can be renamed via this command:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2703540Z hint:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2705860Z hint: 	git branch -m <name>
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2707820Z hint:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2710640Z hint: Disable this message with "git config set advice.defaultBranchName false"
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2714680Z Initialized empty Git repository in /Users/runner/work/forgent/forgent/.git/
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2721820Z [command]/opt/homebrew/bin/git remote add origin https://github.com/vantt/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2932520Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2962380Z ##[group]Disabling automatic garbage collection
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2967300Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2976540Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.2999240Z ##[group]Setting up auth
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.3016750Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.3072430Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.4549620Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.4616450Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.5591200Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.5753030Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.7384100Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.7530550Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.7533260Z ##[group]Fetching the repository
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:22.7535860Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +adb5b93bbd425ec502350439c694805b12a43dc0:refs/remotes/origin/main
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0007490Z From https://github.com/vantt/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0024170Z  * [new ref]         adb5b93bbd425ec502350439c694805b12a43dc0 -> origin/main
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0034920Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0038970Z ##[group]Determining the checkout info
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0040630Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0042010Z [command]/opt/homebrew/bin/git sparse-checkout disable
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.0989020Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.1167790Z ##[group]Checking out the ref
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:24.1171090Z [command]/opt/homebrew/bin/git checkout --progress --force -B main refs/remotes/origin/main
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.2223380Z Updating files:  83% (3997/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.2659090Z Updating files:  84% (4026/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.2757980Z Updating files:  85% (4074/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.2878020Z Updating files:  86% (4122/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3007880Z Updating files:  87% (4170/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3140310Z Updating files:  88% (4217/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3210750Z Updating files:  89% (4265/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3406110Z Updating files:  90% (4313/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3444370Z Updating files:  91% (4361/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3551550Z Updating files:  92% (4409/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3641110Z Updating files:  93% (4457/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3773600Z Updating files:  94% (4505/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.3877340Z Updating files:  95% (4553/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4094050Z Updating files:  96% (4601/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4187330Z Updating files:  97% (4649/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4320790Z Updating files:  98% (4697/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4408400Z Updating files:  99% (4745/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4409690Z Updating files: 100% (4792/4792)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4410700Z Updating files: 100% (4792/4792), done.
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4529740Z Switched to a new branch 'main'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4539130Z branch 'main' set up to track 'origin/main'.
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4550780Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4800680Z [command]/opt/homebrew/bin/git log -1 --format=%H
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.4958390Z adb5b93bbd425ec502350439c694805b12a43dc0
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5298500Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5300200Z ##[group]Run actions/setup-node@v4
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5300430Z with:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5300590Z   node-version: 20
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5300770Z   cache: npm
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5301010Z   always-auth: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5301290Z   check-latest: false
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5303890Z   token: ***
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.5304140Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7246320Z Attempting to download 20...
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7396760Z (node:1874) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7399110Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4403240Z Acquiring 20.20.2 - arm64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-darwin-arm64.tar.gz
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:27.2029280Z Extracting ...
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:27.2281890Z [command]/usr/bin/tar xz --strip 1 -C /Users/runner/work/_temp/e4a4704b-08c4-4ac3-a040-f0d9876f085f -f /Users/runner/work/_temp/0176a879-2d59-48e8-bae0-746e860de5e6
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:28.4028820Z Adding to the cache ...
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:30.7399990Z ##[group]Environment details
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.1168390Z node: v20.20.2
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.1169050Z npm: 10.8.2
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.1169750Z yarn: 1.22.22
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.1171150Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.1194410Z [command]/Users/runner/hostedtoolcache/node/20.20.2/arm64/bin/npm config get cache
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.2727130Z /Users/runner/.npm
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.4485860Z npm cache is not found
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.4663560Z ##[group]Run npm install
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.4663920Z ^[[36;1mnpm install^[[0m
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.4715870Z shell: /bin/bash -e {0}
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:31.4716200Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1394300Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1430010Z added 1 package, and audited 2 packages in 499ms
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1475990Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1477360Z 1 package is looking for funding
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1477720Z   run `npm fund` for details
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1478030Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1478210Z found 0 vulnerabilities
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1565840Z ##[group]Run npm test
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1566150Z ^[[36;1mnpm test^[[0m
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1598180Z shell: /bin/bash -e {0}
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.1598390Z ##[endgroup]
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.3468850Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.3490800Z > forgent@0.1.0 test
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.3491410Z > FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.3491670Z
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.3975400Z Could not find '/Users/runner/work/forgent/forgent/test/**/*.test.mjs'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.4046340Z ##[error]Process completed with exit code 1.
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.4283910Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.4284990Z Post job cleanup.
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.5820220Z [command]/opt/homebrew/bin/git version
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.5922300Z git version 2.55.0
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6368340Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/13ce3dc4-05e4-433d-8596-63f416bc88f6/.gitconfig'
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6466660Z Temporarily overriding HOME='/Users/runner/work/_temp/13ce3dc4-05e4-433d-8596-63f416bc88f6' before making global git config changes
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6471390Z Adding repository directory to the temporary git global config as a safe directory
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6472190Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/forgent/forgent
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6481900Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.6529170Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.7664170Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.7707820Z http.https://github.com/.extraheader
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.7732750Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.7821230Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.9025190Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:32.9095300Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:33.0502770Z Cleaning up orphan processes
+test (macos-latest)	UNKNOWN STEP	2026-09-12T14:45:33.0622560Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (windows-latest)	UNKNOWN STEP	﻿2026-09-12T14:45:17.2383438Z Current runner version: '2.337.0'
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2409612Z ##[group]Runner Image Provisioner
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2410428Z Hosted Compute Agent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2411056Z Version: 20260828.587
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2411647Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2412331Z Build Date: 2026-08-28T16:44:25Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2412993Z Worker ID: {9d24239e-6109-4f92-b8e6-9c150bed51ef}
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2413658Z Azure Region: westus
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2414216Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2415615Z ##[group]Operating System
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2416229Z Microsoft Windows Server 2025
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2416840Z 10.0.26100
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2417462Z Datacenter
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2418002Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2418537Z ##[group]Runner Image
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2419097Z Image: windows-2025-vs2026
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2419721Z Version: 20260907.229.1
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2421686Z Included Software: https://github.com/actions/runner-images/blob/win25-vs2026/20260907.229/images/windows/Windows2025-VS2026-Readme.md
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2423482Z Image Release: https://github.com/actions/runner-images/releases/tag/win25-vs2026%2F20260907.229
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2424471Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2425621Z ##[group]GITHUB_TOKEN Permissions
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2427701Z Contents: read
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2428343Z Metadata: read
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2428858Z Packages: read
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2429360Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2431490Z Secret source: Actions
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2432333Z Cache mode: write
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2433071Z Prepare workflow directory
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2867086Z Prepare all required actions
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.2934635Z Getting action download info
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.6336419Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:17.7665890Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.0721437Z Complete job name: test (windows-latest)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2080569Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2091721Z ##[group]Run actions/checkout@v4
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2092461Z with:
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2092899Z   repository: vantt/forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2097046Z   token: ***
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2097471Z   ssh-strict: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2097902Z   ssh-user: git
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2098726Z   persist-credentials: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2099303Z   clean: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2099742Z   sparse-checkout-cone-mode: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2100256Z   fetch-depth: 1
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2100683Z   fetch-tags: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2101112Z   show-progress: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2101566Z   lfs: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2102009Z   submodules: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2102444Z   set-safe-directory: true
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2102934Z   allow-unsafe-pr-checkout: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.2103832Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.3654923Z Syncing repository: vantt/forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.3658095Z ##[group]Getting Git version info
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.3659881Z Working directory is 'D:\a\forgent\forgent'
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.4747763Z [command]"C:\Program Files\Git\bin\git.exe" version
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8256830Z git version 2.55.0.windows.5
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8306265Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8326733Z Temporarily overriding HOME='D:\a\_temp\cea422d7-e17d-46cb-8aa2-8ce29971dc1d' before making global git config changes
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8328140Z Adding repository directory to the temporary git global config as a safe directory
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8337437Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\forgent\forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8989868Z Deleting the contents of 'D:\a\forgent\forgent'
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.8996653Z ##[group]Initializing the repository
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.9004870Z [command]"C:\Program Files\Git\bin\git.exe" init D:\a\forgent\forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.9783351Z Initialized empty Git repository in D:/a/forgent/forgent/.git/
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:18.9830062Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/vantt/forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0508954Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0511125Z ##[group]Disabling automatic garbage collection
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0518496Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0826716Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0827795Z ##[group]Setting up auth
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.0839477Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:19.1148816Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:20.4732720Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:20.5031475Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.0461876Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.0757977Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.6458729Z [command]"C:\Program Files\Git\bin\git.exe" config --local http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.6767328Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.6768295Z ##[group]Fetching the repository
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:21.6783101Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +adb5b93bbd425ec502350439c694805b12a43dc0:refs/remotes/origin/main
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5160115Z From https://github.com/vantt/forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5160904Z  * [new ref]         adb5b93bbd425ec502350439c694805b12a43dc0 -> origin/main
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5205655Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5206331Z ##[group]Determining the checkout info
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5208513Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5218775Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.5716993Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.6017918Z ##[group]Checking out the ref
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:24.6027389Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B main refs/remotes/origin/main
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.6657692Z Updating files:  55% (2644/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.6810424Z Updating files:  56% (2684/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.6971293Z Updating files:  57% (2732/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7111593Z Updating files:  58% (2780/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7266058Z Updating files:  59% (2828/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7415863Z Updating files:  60% (2876/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7564786Z Updating files:  61% (2924/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7710869Z Updating files:  62% (2972/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.7865551Z Updating files:  63% (3019/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8017036Z Updating files:  64% (3067/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8164158Z Updating files:  65% (3115/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8322531Z Updating files:  66% (3163/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8510263Z Updating files:  67% (3211/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8707580Z Updating files:  68% (3259/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.8890124Z Updating files:  69% (3307/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.9070953Z Updating files:  70% (3355/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.9502824Z Updating files:  71% (3403/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.9680144Z Updating files:  72% (3451/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:25.9875030Z Updating files:  73% (3499/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0035632Z Updating files:  74% (3547/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0192922Z Updating files:  75% (3594/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0352671Z Updating files:  76% (3642/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0499919Z Updating files:  77% (3690/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0639344Z Updating files:  78% (3738/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.0774347Z Updating files:  79% (3786/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.2031567Z Updating files:  80% (3834/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.2680194Z Updating files:  81% (3882/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.2806178Z Updating files:  82% (3930/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.2946777Z Updating files:  83% (3978/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3127597Z Updating files:  84% (4026/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3296810Z Updating files:  85% (4074/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3479781Z Updating files:  86% (4122/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3626054Z Updating files:  87% (4170/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3777098Z Updating files:  88% (4217/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.3919723Z Updating files:  89% (4265/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4133552Z Updating files:  90% (4313/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4286957Z Updating files:  91% (4361/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4442161Z Updating files:  92% (4409/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4588227Z Updating files:  93% (4457/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4788432Z Updating files:  94% (4505/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.4959019Z Updating files:  95% (4553/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5137518Z Updating files:  96% (4601/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5288551Z Updating files:  97% (4649/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5423067Z Updating files:  98% (4697/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5580127Z Updating files:  99% (4745/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5580588Z Updating files: 100% (4792/4792)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5581044Z Updating files: 100% (4792/4792), done.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5803759Z Switched to a new branch 'main'
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5869520Z branch 'main' set up to track 'origin/main'.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.5950907Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.6341889Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.6653662Z adb5b93bbd425ec502350439c694805b12a43dc0
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7133997Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7136066Z ##[group]Run actions/setup-node@v4
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7136315Z with:
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7136504Z   node-version: 20
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7136694Z   cache: npm
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7136875Z   always-auth: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7137081Z   check-latest: false
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7139823Z   token: ***
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.7140030Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9039279Z Attempting to download 20...
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9225583Z (node:6332) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:26.9226404Z (Use `node --trace-deprecation ...` to show where the warning was created)
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:27.5779492Z Acquiring 20.20.2 - x64 from https://github.com/actions/node-versions/releases/download/20.20.2-23521894959/node-20.20.2-win32-x64.7z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:27.9129649Z Extracting ...
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:30.1944303Z Adding to the cache ...
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:33.5278841Z ##[group]Environment details
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:34.7310517Z node: v20.20.2
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:34.7310860Z npm: 10.8.2
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:34.7311041Z yarn: 1.22.22
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:34.7311460Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:34.8044217Z [command]C:\Windows\system32\cmd.exe /D /S /C "C:\hostedtoolcache\windows\node\20.20.2\x64\npm.cmd config get cache"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.1344357Z C:\npm\cache
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.5032187Z npm cache is not found
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.5339619Z ##[group]Run npm install
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.5340016Z ^[[36;1mnpm install^[[0m
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.6050319Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:35.6050899Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0416654Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0422936Z added 1 package, and audited 2 packages in 846ms
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0423244Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0423432Z 1 package is looking for funding
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0423727Z   run `npm fund` for details
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0427282Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.0427681Z found 0 vulnerabilities
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.1988854Z ##[group]Run npm test
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.1989153Z ^[[36;1mnpm test^[[0m
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.2058460Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.2058818Z ##[endgroup]
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8216393Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8217044Z > forgent@0.1.0 test
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8218185Z > FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8218787Z
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8925353Z 'FGOS_DISABLE_OPPORTUNISTIC_CHECKS' is not recognized as an internal or external command,
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:37.8926286Z operable program or batch file.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.0103270Z ##[error]Process completed with exit code 1.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.0374263Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.0375602Z Post job cleanup.
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.2491511Z [command]"C:\Program Files\Git\bin\git.exe" version
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.2793859Z git version 2.55.0.windows.5
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.2871340Z Temporarily overriding HOME='D:\a\_temp\a6b9399d-368a-41c1-b812-0a301e5f9b72' before making global git config changes
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.2873497Z Adding repository directory to the temporary git global config as a safe directory
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.2887187Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\forgent\forgent
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.3229945Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.3560397Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.9253821Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.9507738Z http.https://github.com/.extraheader
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.9551593Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:38.9842315Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:39.5341795Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:39.5647317Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:40.1344094Z Cleaning up orphan processes
+test (windows-latest)	UNKNOWN STEP	2026-09-12T14:45:40.1399013Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+cargo (workspace)	UNKNOWN STEP	﻿2026-09-12T14:45:16.3276474Z Current runner version: '2.337.0'
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3293368Z ##[group]Runner Image Provisioner
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3294026Z Hosted Compute Agent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3294467Z Version: 20260828.587
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3294921Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3295694Z Build Date: 2026-08-28T16:44:25Z
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3296214Z Worker ID: {2784d3a3-cde3-4faa-b2e2-60a88bdda21b}
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3296723Z Azure Region: centralus
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3297140Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3298089Z ##[group]Operating System
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3298536Z Ubuntu
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3298890Z 24.04.5
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3299281Z LTS
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3299619Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3300011Z ##[group]Runner Image
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3300432Z Image: ubuntu-24.04
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3300826Z Version: 20260907.300.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3301774Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260907.300/images/ubuntu/Ubuntu2404-Readme.md
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3302948Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260907.300
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3303664Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3304537Z ##[group]GITHUB_TOKEN Permissions
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3306283Z Contents: read
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3306694Z Metadata: read
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3307114Z Packages: read
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3307487Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3308946Z Secret source: Actions
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3309600Z Cache mode: write
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3310107Z Prepare workflow directory
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3544951Z Prepare all required actions
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.3580027Z Getting action download info
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.5733263Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.7524210Z Complete job name: cargo (workspace)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8007079Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8013343Z ##[group]Run actions/checkout@v4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8013889Z with:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8014249Z   repository: vantt/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8017463Z   token: ***
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8017835Z   ssh-strict: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8018240Z   ssh-user: git
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8018624Z   persist-credentials: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8019027Z   clean: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8019431Z   sparse-checkout-cone-mode: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8019866Z   fetch-depth: 1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8020230Z   fetch-tags: false
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8020629Z   show-progress: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8021002Z   lfs: false
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8021468Z   submodules: false
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8021846Z   set-safe-directory: true
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8022262Z   allow-unsafe-pr-checkout: false
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8022816Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8783331Z Syncing repository: vantt/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8784682Z ##[group]Getting Git version info
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8785232Z Working directory is '/home/runner/work/forgent/forgent'
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8786340Z [command]/usr/bin/git version
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8895305Z git version 2.55.0
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8910880Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8921380Z Temporarily overriding HOME='/home/runner/work/_temp/079c1ca6-f573-4737-b30e-172fb23ddcf9' before making global git config changes
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8922639Z Adding repository directory to the temporary git global config as a safe directory
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8925682Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forgent/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8964364Z Deleting the contents of '/home/runner/work/forgent/forgent'
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8968139Z ##[group]Initializing the repository
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.8971612Z [command]/usr/bin/git init /home/runner/work/forgent/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9137508Z hint: Using 'master' as the name for the initial branch. This default branch name
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9139560Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9140830Z hint: to use in all of your new repositories, which will suppress this warning,
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9141692Z hint: call:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9142199Z hint:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9142818Z hint: 	git config --global init.defaultBranch <name>
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9143557Z hint:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9144247Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9145278Z hint: 'development'. The just-created branch can be renamed via this command:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9146384Z hint:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9146950Z hint: 	git branch -m <name>
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9147539Z hint:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9148338Z hint: Disable this message with "git config set advice.defaultBranchName false"
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9149462Z Initialized empty Git repository in /home/runner/work/forgent/forgent/.git/
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9162960Z [command]/usr/bin/git remote add origin https://github.com/vantt/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9202228Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9203034Z ##[group]Disabling automatic garbage collection
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9205047Z [command]/usr/bin/git config --local gc.auto 0
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9231753Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9232383Z ##[group]Setting up auth
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9238935Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9284885Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9543618Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9564260Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9704206Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9726153Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9863895Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9886401Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9887065Z ##[group]Fetching the repository
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:16.9894660Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +adb5b93bbd425ec502350439c694805b12a43dc0:refs/remotes/origin/main
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3959157Z From https://github.com/vantt/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3960911Z  * [new ref]         adb5b93bbd425ec502350439c694805b12a43dc0 -> origin/main
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3964883Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3966809Z ##[group]Determining the checkout info
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3968553Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.3969560Z [command]/usr/bin/git sparse-checkout disable
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.4013603Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.4046548Z ##[group]Checking out the ref
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.4047980Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7703935Z Switched to a new branch 'main'
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7706368Z branch 'main' set up to track 'origin/main'.
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7713971Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7747627Z [command]/usr/bin/git log -1 --format=%H
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7764717Z adb5b93bbd425ec502350439c694805b12a43dc0
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7930378Z ##[group]Run rustup show && cargo --version
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7930852Z ^[[36;1mrustup show && cargo --version^[[0m
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7955683Z shell: /usr/bin/bash -e {0}
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.7956098Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9639489Z Default host: x86_64-unknown-linux-gnu
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9640057Z rustup home:  /home/runner/.rustup
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9640251Z
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9654407Z installed toolchains
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9654819Z --------------------
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9655235Z stable-x86_64-unknown-linux-gnu (active, default)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9655604Z
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9655712Z active toolchain
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9655978Z ----------------
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9656238Z name: stable-x86_64-unknown-linux-gnu
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9656600Z active because: it's the default toolchain
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9656944Z installed targets:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:19.9819153Z   x86_64-unknown-linux-gnu
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:20.0271925Z cargo 1.98.1 (797e8a9bc 2026-08-05)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:20.0348139Z ##[group]Run cargo fmt --all -- --check
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:20.0348534Z ^[[36;1mcargo fmt --all -- --check^[[0m
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:20.0366775Z shell: /usr/bin/bash -e {0}
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:20.0367158Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.1019312Z ##[group]Run cargo clippy --workspace --all-targets -- -D warnings
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.1019746Z ^[[36;1mcargo clippy --workspace --all-targets -- -D warnings^[[0m
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.1040793Z shell: /usr/bin/bash -e {0}
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.1041084Z ##[endgroup]
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.5785275Z     Updating crates.io index
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:21.9493528Z  Downloading crates ...
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.0148858Z   Downloaded cpufeatures v0.2.17
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1929619Z   Downloaded adler2 v2.0.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1937711Z   Downloaded block-buffer v0.10.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1944041Z   Downloaded cfg-if v1.0.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1951379Z   Downloaded bitflags v2.13.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1976043Z   Downloaded equivalent v1.0.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1981618Z   Downloaded filetime v0.2.29
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.1991070Z   Downloaded pin-project-lite v0.2.17
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2069732Z   Downloaded crc32fast v1.5.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2080705Z   Downloaded tinyvec_macros v0.1.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2083451Z   Downloaded crypto-common v0.1.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2087172Z   Downloaded flate2 v1.1.10
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2107807Z   Downloaded version_check v0.9.5
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2112997Z   Downloaded errno v0.3.14
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2119014Z   Downloaded itoa v1.0.18
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2125009Z   Downloaded generic-array v0.14.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2130905Z   Downloaded xattr v1.6.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2138204Z   Downloaded quote v1.0.47
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2148846Z   Downloaded sha2 v0.10.9
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2158782Z   Downloaded zmij v1.0.23
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2167141Z   Downloaded tokio-macros v2.7.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2171967Z   Downloaded thiserror-impl v2.0.20
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2178095Z   Downloaded digest v0.10.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2185135Z   Downloaded simd-adler32 v0.3.10
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2196062Z   Downloaded miniz_oxide v0.9.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2208013Z   Downloaded thiserror v2.0.20
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2229906Z   Downloaded serde_core v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2242289Z   Downloaded proc-macro2 v1.0.107
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2255009Z   Downloaded unicode-ident v1.0.24
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2267503Z   Downloaded tar v0.4.46
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2280555Z   Downloaded tinyvec v1.13.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2298280Z   Downloaded serde_derive v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2311771Z   Downloaded memchr v2.8.3
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2334525Z   Downloaded serde v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2351736Z   Downloaded indexmap v2.14.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2371101Z   Downloaded typenum v1.20.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2388882Z   Downloaded unicode-normalization v0.1.25
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2406826Z   Downloaded hashbrown v0.17.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2432472Z   Downloaded serde_json v1.0.151
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2463734Z   Downloaded zlib-rs v0.6.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2490018Z   Downloaded syn v3.0.5
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2541175Z   Downloaded rustix v1.1.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2647910Z   Downloaded libc v0.2.189
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.2821963Z   Downloaded tokio v1.53.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.3009371Z   Downloaded linux-raw-sys v0.12.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.4840393Z    Compiling proc-macro2 v1.0.107
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.4840930Z    Compiling quote v1.0.47
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.4841183Z    Compiling unicode-ident v1.0.24
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.4841479Z    Compiling serde_core v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:22.9877867Z    Compiling version_check v0.9.5
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.2089178Z    Compiling zmij v1.0.23
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.5387108Z    Compiling generic-array v0.14.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.5457106Z    Compiling thiserror v2.0.20
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.5991156Z     Checking hashbrown v0.17.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.6778650Z     Checking equivalent v1.0.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.6927399Z    Compiling serde_json v1.0.151
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:23.7506347Z    Compiling serde v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.2111142Z    Compiling syn v3.0.5
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.2148622Z     Checking indexmap v2.14.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.2469515Z     Checking typenum v1.20.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.6077524Z     Checking memchr v2.8.3
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.7377971Z     Checking itoa v1.0.18
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.7860037Z     Checking cfg-if v1.0.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.7989478Z     Checking pin-project-lite v0.2.17
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:24.8656790Z    Compiling rustix v1.1.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.0217366Z    Compiling libc v0.2.189
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.2107004Z     Checking bitflags v2.13.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.2337789Z     Checking linux-raw-sys v0.12.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.2832575Z    Compiling crc32fast v1.5.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.5288453Z     Checking crypto-common v0.1.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.5697052Z     Checking block-buffer v0.10.4
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.6237681Z     Checking tinyvec_macros v0.1.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.6416289Z     Checking simd-adler32 v0.3.10
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.7177028Z     Checking adler2 v2.0.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.7556461Z     Checking miniz_oxide v0.9.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:25.9866734Z     Checking tinyvec v1.13.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.1056718Z     Checking filetime v0.2.29
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.1636237Z     Checking digest v0.10.7
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.2514820Z     Checking cpufeatures v0.2.17
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.2666633Z     Checking sha2 v0.10.9
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.3880236Z     Checking unicode-normalization v0.1.25
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.4332606Z     Checking xattr v1.6.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.4965074Z     Checking flate2 v1.1.10
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.5046297Z     Checking tar v0.4.46
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.7080028Z    Compiling serde_derive v1.0.229
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.7080746Z    Compiling tokio-macros v2.7.2
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:26.7081413Z    Compiling thiserror-impl v2.0.20
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:27.1216738Z     Checking tokio v1.53.1
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:28.9684708Z     Checking fgos-host-runtime v0.1.0 (/home/runner/work/forgent/forgent/packages/host-runtime/rust)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:31.8940856Z     Checking fgos-distribution v0.1.0 (/home/runner/work/forgent/forgent/packages/distribution/rust)
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5315090Z error: this block may be rewritten with the `?` operator
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5316025Z   --> packages/distribution/rust/src/lock.rs:83:12
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5316904Z    |
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5317775Z 83 |       } else if let Some(s) = pid_val.as_str() {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5318335Z    |  ____________^
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5318617Z 84 | |         if !s.is_empty() {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5323786Z 85 | |             LockHolderIdentity::String(s.to_string())
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5324298Z 86 | |         } else {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5324613Z ...  |
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5324941Z 90 | |         return None;
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5325234Z 91 | |     };
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5325724Z    | |_____^
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5326025Z    |
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5326704Z    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.98.0/index.html#question_mark
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5327546Z    = note: `-D clippy::question-mark` implied by `-D warnings`
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5328061Z    = help: to override `-D warnings` add `#[allow(clippy::question_mark)]`
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5328515Z help: replace it with
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5329386Z    |
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5329667Z 83 ~     } else {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5329974Z 84 +         let s = pid_val.as_str()?;
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5330518Z 85 +         if !s.is_empty() {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5330899Z 86 +             LockHolderIdentity::String(s.to_string())
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5331295Z 87 +         } else {
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5331558Z 88 +             return None;
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5331824Z 89 +         }
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5332099Z 90 ~     };
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5332336Z    |
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5332479Z
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5898984Z error: could not compile `fgos-distribution` (lib) due to 1 previous error
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.5899565Z warning: build failed, waiting for other jobs to finish...
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.6184824Z error: could not compile `fgos-distribution` (lib test) due to 1 previous error
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.6402630Z ##[error]Process completed with exit code 101.
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.6512538Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.6513753Z Post job cleanup.
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7115303Z [command]/usr/bin/git version
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7145042Z git version 2.55.0
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7170371Z Temporarily overriding HOME='/home/runner/work/_temp/96721143-dc8b-457a-987f-6f76a2179597' before making global git config changes
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7171349Z Adding repository directory to the temporary git global config as a safe directory
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7173361Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/forgent/forgent
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7241225Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7268880Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7440001Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7453627Z http.https://github.com/.extraheader
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7462637Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7545183Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7719281Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.7749519Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.8001458Z Cleaning up orphan processes
+cargo (workspace)	UNKNOWN STEP	2026-09-12T14:45:32.8184551Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

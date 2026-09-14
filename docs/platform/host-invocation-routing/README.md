@@ -49,6 +49,7 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Check preserved legacy intent and dispositions | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
 | Plan remaining work after R1 preview installed/default proof | [roadmap.md](roadmap.md) |
+| Plan R2 external process provider preview implementation | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |
@@ -65,7 +66,7 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | --- | --- | --- |
 | Existing Node CLI payload | `legacy-current` | `bin/fgos.mjs` and the current Node package still carry existing CLI behavior. The file remains unmoved and is the legacy payload during Rust host migration. |
 | Native invocation kernel | `current partial` | `OperationRequest` to `ProviderOutcome`, `InvocationService`, pure router, registry snapshot, and two-stage authority have implementation proof in the Rust host-runtime slice. Future provider mechanisms and replacement policy still need their own proof. |
-| R1 Rust CLI host | `implemented preview` | `apps/fgos` exists as a Rust CLI host, embeds the command route matrix, routes `version` natively to `distribution.build.show`, and sends unmigrated selectors through the `legacy-cli` lane. Packaging-Distribution preview proof shows external/default installed `fgos` enters the Rust host; stable/default graduation and fallback removal timing remain release-owner decisions. |
+| R1 Rust CLI host | `implemented preview` | `apps/fgos` exists as a Rust CLI host, embeds the command route matrix, routes `version` natively to `distribution.build.show`, and sends unmigrated selectors through the `legacy-cli` lane. Packaging-Distribution preview proof shows external/default installed `fgos` enters the Rust host; stable/default graduation remains a release-owner decision, and legacy fallback uses the settled 30-day preview window. |
 | R2 external process preview | `planned` | Static manifest discovery, framed component protocol, and fail-closed process provider path are planned proof work. |
 | R3 production remote peer | `planned` | The project-local gateway should become a peer host for at least one native semantic route, without shelling through CLI or parsing `fgos.v1`. |
 | Chat host | `planned` | Chat is a future peer only after a real adapter and admission/interruption/presentation contracts exist. |

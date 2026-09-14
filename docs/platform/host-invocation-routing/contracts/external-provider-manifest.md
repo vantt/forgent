@@ -33,7 +33,7 @@ Discovery scans static manifests and does not execute provider code. The derived
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Static discovery does not execute code. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | P7 manifest fixture. |
+| Static discovery does not execute code. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | R2 manifest fixture. |
 | Registry is derived rebuildable state. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | R2 linker/cache proof. |
 
 ## 4. Related Files
@@ -43,4 +43,3 @@ Discovery scans static manifests and does not execute provider code. The derived
 | external provider architecture | [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
-

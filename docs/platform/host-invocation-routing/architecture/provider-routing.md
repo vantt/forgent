@@ -5,7 +5,7 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define provider selection, registry snapshot, replacement, and authority gates
 Design status: Draft
-Implementation status: Accepted-not-implemented
+Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and external-provider-protocol.md
@@ -41,9 +41,9 @@ The selected provider receives only the least-privilege grant through `Invocatio
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Router is pure and fail-closed. | `accepted-not-implemented` | [old architecture §6](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline) | P3 unit tests for duplicates, incompatible contracts, denied hosts, denied capabilities. |
-| Provider manifest never grants authority. | `accepted-not-implemented` | [external provider protocol §5](../../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules) | P7 negative tests. |
-| Config cannot replace built-in provider. | `accepted-not-implemented` | [old architecture §7](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage) | Binding/replacement implementation proof. |
+| Router is pure and fail-closed. | `current partial` | [old architecture §6](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#6-router-pure-and-invocationservice-pipeline), [../../../../packages/host-runtime/rust/src/operation_provider_router.rs](../../../../packages/host-runtime/rust/src/operation_provider_router.rs), [../../../../packages/host-runtime/rust/tests/module_graph.rs](../../../../packages/host-runtime/rust/tests/module_graph.rs) | R2 still needs duplicate, incompatible-contract, denied-host, and denied-capability tests for external providers. |
+| Provider manifest never grants authority. | `planned` | [external provider protocol §5](../../../architect/host-invocation-routing/external-provider-protocol.md#5-namespace-rules) | R2 negative tests. |
+| Config cannot replace built-in provider. | `current partial` | [old architecture §7](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#7-authority-two-stage), [../../../../packages/host-runtime/rust/src/authority_gate.rs](../../../../packages/host-runtime/rust/src/authority_gate.rs) | Replacement policy proof belongs to R2 external provider binding/linking. |
 
 ## 5. Related Files
 
@@ -53,4 +53,3 @@ The selected provider receives only the least-privilege grant through `Invocatio
 | provider contract | [../contracts/operation-provider.md](../contracts/operation-provider.md) |
 | manifest contract | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
-

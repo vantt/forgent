@@ -35,8 +35,8 @@ The semantic component protocol is versioned independently from CLI `fgos.v1` an
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Component protocol is distinct from public host protocols. | `planned` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) | P7 conformance proof. |
-| `EncodedMessage` never enters built-in kernel. | `planned` | [invocation kernel](../architecture/invocation-kernel.md) | P3/P7 boundary tests. |
+| Component protocol is distinct from public host protocols. | `planned` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) | R2 conformance proof. |
+| `EncodedMessage` never enters built-in kernel. | `planned` | [invocation kernel](../architecture/invocation-kernel.md) | R2 boundary tests. |
 
 ## 4. Related Files
 
@@ -45,4 +45,3 @@ The semantic component protocol is versioned independently from CLI `fgos.v1` an
 | external provider architecture | [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md) |
 | request/outcome contract | [operation-request-outcome.md](operation-request-outcome.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
-

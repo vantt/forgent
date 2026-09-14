@@ -117,8 +117,10 @@ The compatibility posture is now settled as:
   silently catch Rust-host failures.
 - Any escape-hatch invocation must emit a warning, log entry, or proof marker
   that distinguishes deliberate legacy fallback use from default Rust-host use.
-- The exact removal date or release milestone still requires release-owner
-  approval before the fallback is removed.
+- The escape hatch remains supported for 30 calendar days after the preview
+  release publication date. For the 2026-09-15 preview proof/public-posture
+  decision, the earliest removal date is 2026-10-15; if the public preview tag
+  is published later, use that publication date plus 30 calendar days.
 
 This policy does not mean every component has moved to Rust. It means the
 user-facing default entrypoint is Rust-host-owned; the Rust host may still

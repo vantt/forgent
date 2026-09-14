@@ -30,14 +30,14 @@ Related:
 | --- | --- | --- |
 | Current R1 route matrix | `current partial` | Code snapshot: 73 selectors, 71 `legacy-cli`, two native routes: `version -> distribution.build.show` and `gate-bypass -> work.gate-bypass.show`. |
 | First public R1 preview vs stable default | `preview approved; stable undecided` | Packaging-distribution stream. |
-| Compatibility-window duration for R1 Node fallback | `explicit escape hatch approved; removal date or release milestone undecided` | Packaging-distribution stream plus host invocation. |
+| Compatibility-window duration for R1 Node fallback | `explicit escape hatch approved; 30 calendar days after preview release publication` | Packaging-distribution stream plus host invocation. |
 
 ## 3. Implementation Alignment
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | R1 Rust host code path exists. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/lib.rs](../../../../packages/host-runtime/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Route migration remains partial: 71 selectors still use the manifest-owned legacy CLI lane. |
-| R1 is a shipped host only with reproducible install/activation/rollback proof. | `implemented preview` | [source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../../packaging-distribution/verification/install-and-release-proof.md](../../packaging-distribution/verification/install-and-release-proof.md) | Stable/default release graduation and exact legacy fallback removal timing remain release-owner decisions. |
+| R1 is a shipped host only with reproducible install/activation/rollback proof. | `implemented preview` | [source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../../packaging-distribution/verification/install-and-release-proof.md](../../packaging-distribution/verification/install-and-release-proof.md) | Stable/default release graduation remains a release-owner decision. |
 | R2 and R3 do not delay R1 installed-entry flip. | `planned` | [source plan §1](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome) | Keep phase gates separate. |
 | `fgctl` owns rollback; runtime provider selection does not. | `accepted-not-implemented` | [packaging runtime activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) | Packaging proof required. |
 

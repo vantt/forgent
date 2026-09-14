@@ -37,11 +37,11 @@ The spec is written for current behavior and near-term accepted target behavior.
 | local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |
 | `fgos doctor` | Implemented | Reports environment checks without writing by default. |
 | `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |
-| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior until a compatibility-window decision retires it. |
+| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |
 
 ## 3. Install Channels
 
-**Release posture (coordinator decision, 2026-09-15):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for a compatibility window; its exact support-until release or date is still undecided and needs release-owner approval.
+**Release posture (coordinator decision, 2026-09-15):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for 30 calendar days after the preview release publication date; for the 2026-09-15 preview proof/public-posture decision, the earliest removal date is 2026-10-15, unless the public preview tag is published later.
 
 ## 3.1 Recommended Native Channel
 

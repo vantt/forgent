@@ -81,8 +81,8 @@ The area has two live layers:
 
 | Layer | Status | Meaning |
 | --- | --- | --- |
-| Legacy Node/npm compatibility | Implemented legacy deprecated | Legacy Node fallback still exists as an explicit escape hatch during a short compatibility window; it is not the public/default runtime posture. |
-| Native `fgctl` + project-local runtime | Implemented preview | Release tree, install script, fgctl stage/init/upgrade/repair, and `.fgos/installation` activation have real implementation and tests. The preview public posture says external installs default `fgos` through the Rust host, and public docs may state Rust host is the default installed runtime. Stable/default graduation and exact legacy fallback removal timing remain release-owner decisions. |
+| Legacy Node/npm compatibility | Implemented legacy deprecated | Legacy Node fallback still exists as an explicit escape hatch for 30 calendar days after preview release publication; it is not the public/default runtime posture. |
+| Native `fgctl` + project-local runtime | Implemented preview | Release tree, install script, fgctl stage/init/upgrade/repair, and `.fgos/installation` activation have real implementation and tests. The preview public posture says external installs default `fgos` through the Rust host, and public docs may state Rust host is the default installed runtime. Stable/default graduation remains a release-owner decision. |
 
 The old `docs/specs/distribution.md` remains a useful source for implemented legacy setup, doctor, and npm compatibility details. It is not the final human navigation shape.
 

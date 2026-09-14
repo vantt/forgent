@@ -22,7 +22,8 @@ Rust-host-owned, every unmigrated selector transparently reaches Node through
 the release manifest, `version` is native and creates no Node process, and
 install/init/doctor/upgrade/rollback/uninstall are reproducible through
 packaging-distribution's `fgctl` contracts. Stable/default release graduation
-and the exact legacy Node fallback removal date remain release-owner decisions.
+remains a release-owner decision. The legacy Node fallback escape hatch remains
+supported for 30 calendar days after preview release publication.
 
 ## 2. Code-Verified Snapshot
 
@@ -40,7 +41,7 @@ and the exact legacy Node fallback removal date remain release-owner decisions.
 | Decision | Status | Why code scan cannot close it |
 | --- | --- | --- |
 | Preview vs stable default | `preview approved; stable undecided` | Stable/default graduation is release posture, not implementation presence. |
-| Compatibility-window duration | `removal date or release milestone undecided` | This is support policy, not implementation presence. |
+| Compatibility-window duration | `30 calendar days after preview release publication` | The concrete calendar date derives from the public preview publication date; for the 2026-09-15 preview proof/public-posture decision, earliest removal is 2026-10-15 unless the public preview tag is published later. |
 
 ## 4. Proof Commands From Source Plan
 

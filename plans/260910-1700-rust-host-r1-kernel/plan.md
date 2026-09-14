@@ -1,6 +1,6 @@
 # Rust Host R1 Track
 
-Status: READY FOR PLAN-LOOP EXECUTION (after the three prerequisites below) | Created: 2026-09-10 | Widened 2026-09-10 (fgctl + install.sh + CI release) | Owner: Lead session
+Status: DONE FOR R1 PREVIEW INSTALLED/DEFAULT PROOF; PUBLIC TAG/STABLE GRADUATION FOLLOW-UP OPEN | Created: 2026-09-10 | Widened 2026-09-10 (fgctl + install.sh + CI release) | Owner: Lead session | Last reviewed: 2026-09-15
 
 Execution track: `rust-host-r1-kernel` (id kept from the original kernel-only scope; `fgos coordination chain` groups on it)
 
@@ -19,8 +19,10 @@ that publishes those assets. This track therefore delivers the whole of the
 plan's R1 for one target: a person on a clean machine runs one `curl | sh`,
 then `fgctl init` in a project, and `fgos` in that project is the Rust host.
 The per-project flip happens through `fgctl init`; the global npm `bin.fgos`
-stays as the compatibility channel. P7–P9 (external process, gateway route,
-next native read) remain a later track.
+stays as the deprecated explicit compatibility escape hatch for 30 calendar
+days after preview release publication. P7-P9 from the original source plan
+(external process, gateway route, next native read beyond the local
+`gate-bypass` proof) remain later tracks.
 
 ## Authority Entering The Plan
 
@@ -128,8 +130,8 @@ A Rust `fgos` binary that:
 | Decision | Default for this track | Source |
 |---|---|---|
 | Target matrix | `x86_64-unknown-linux-gnu` only (this machine + `ubuntu-latest` CI). macOS/Windows join in the cutover track. | plan §3.1 |
-| Preview vs stable | Preview. Nothing this track ships is the installed default. | plan §3.5 |
-| Node compatibility window | Two releases after a selector goes native before its Node path may be deleted. | plan §3.6 |
+| Preview vs stable | Preview. The R1 preview installed/default proof is closed; stable/default graduation remains a release-owner follow-up. | coordinator decision 2026-09-15 |
+| Node compatibility window | Legacy Node fallback remains a deprecated explicit escape hatch for 30 calendar days after preview release publication; for the 2026-09-15 preview proof/public-posture decision, earliest removal is 2026-10-15 unless the public preview tag is published later. | coordinator decision 2026-09-15 |
 | Performance budgets | legacy exec overhead ≤ 25 ms p50; native `version` ≤ 10 ms p50; measured warm, same machine, by the P02 harness. | plan §6 |
 | Selector classification | All 73 selectors `legacy-cli` except `version` (`native`, `distribution.build.show`). | plan §5 |
 | `distribution.build.show` owner | `fgos-distribution` crate (`packages/distribution/rust`); the same crate owns manifest parsing, release-tree canonicalization, and digest verification, shared by `fgos` and `fgctl`. | kernel §9 |
@@ -163,7 +165,7 @@ A Rust `fgos` binary that:
 | 13 | [fgctl upgrade, repair, rollback](phase-13-fgctl-upgrade-repair-rollback.md) | `code:implement` | `fgctl upgrade --from` stages a second release and re-activates; `fgctl repair` rolls back to `previousArtifactDigest` with the preserved directory; state-schema read/write range checked before publish; `ready-degraded` when the post-publish tail fails; quarantine path exercised by a corrupted-file test. **Full-suite gate.** |
 | 14 | [install.sh from GitHub release](phase-14-install-script.md) | `code:implement` | `install.sh` detects target, downloads `fgctl-<version>-<target>.tar.gz` + `SHA256SUMS` from `FGCTL_ASSET_BASE_URL` (default GitHub release), verifies, installs to `~/.local/bin`, prints PATH hint and `fgctl init` next step; `test/install/install-sh.test.mjs` serves fixture assets from a local HTTP server and proves success, checksum-mismatch refusal, and pinned-version; README install section rewritten. |
 | 15 | [CI release and external-consumer proof](phase-15-ci-release-and-external-consumer.md) | `code:implement` | `.github/workflows/release.yml` on `v*`: build, stage, tar, `SHA256SUMS`, `gh release upload`; `scripts/ci-external-consumer.sh` (also runnable locally): serve built assets → `install.sh` into a temp HOME → `fgctl init` in a temp project → `fgos version --runtime-json` + one legacy verb; `ci.yml` runs it on every push. Lead cuts a prerelease tag after merge as the real proof. **Full-suite gate.** |
-| 16 | [Docs, changelog, closeout](phase-16-docs-changelog-closeout.md) | `code:review` | `CHANGELOG.md` Unreleased rows; `docs/specs/distribution.md` doctor rows; `docs/specs/reading-map.md` entry for `host-invocation-routing/`; `reports/track-closeout.md` with every merge commit, deferred finding, the prerelease tag, and reproduction commands. **Full-suite gate.** |
+| 16 | [Docs, changelog, closeout](phase-16-docs-changelog-closeout.md) | `code:review` | DONE for R1 preview installed/default proof: `CHANGELOG.md` Unreleased rows, distribution/host-invocation proof docs, closeout, merge commits, deferred findings, and reproduction commands recorded. Public GitHub prerelease tag proof remains a release-publication follow-up. **Full-suite gate verified by recorded proof; latest preview external-consumer proof passed 2026-09-15.** |
 
 ## Parallel Execution Map
 
@@ -306,9 +308,10 @@ mapping.)
   schema range, legacy payload identity, and `host: rust`; one legacy verb
   runs byte-identically through the shim; `fgctl upgrade` then `fgctl repair`
   round-trips to the previous digest with no work-state mutation.
-- One prerelease tag (`v0.2.0-rc.1` or the Lead's choice) published by
-  `release.yml` carries `fgos-*.tar.gz`, `fgctl-*.tar.gz`, `SHA256SUMS`,
-  `install.sh`, and the same proof passes against the real GitHub assets.
+- Preview installed/default proof is recorded with release-shaped local assets.
+  Publishing a GitHub prerelease tag (`v0.2.0-rc.1` or the Lead's choice) and
+  re-running the same proof against real GitHub assets remains a
+  release-publication follow-up, not an unclosed implementation cell.
 - User-visible behavior recorded in `CHANGELOG.md`.
 
 ## Execution Inputs
@@ -333,9 +336,11 @@ REFERENCE_TARGET: x86_64-unknown-linux-gnu (cargo 1.96, node 24)
 GITHUB_REPO: vantt/forgent
 ```
 
-Full-suite gates: P07, P09, P13, P15, P16. Known pre-existing red tests (not
-regressions): `cohort-planner` "buildCandidateInventory against the real
-committed", `check-decision-citation-drift`.
+Full-suite gates: P07, P09, P13, P15, P16. The R1 preview installed/default
+proof is closed by the recorded main/full-suite and external-consumer proof.
+Known pre-existing red tests from the original track closeout (not regressions):
+`cohort-planner` "buildCandidateInventory against the real committed",
+`check-decision-citation-drift`.
 
 ## Prerequisites Before Opening P00 (Lead, outside any cell)
 
