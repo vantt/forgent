@@ -697,11 +697,30 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   return fragments.sort((a, b) => a.relativeFragmentPath.localeCompare(b.relativeFragmentPath));
 }
 
-function rewritePackagedSkillReferences(content) {
+function toPosixRelativePath(fromDir, toPath) {
+  let rel = path.relative(fromDir, toPath).split(path.sep).join('/');
+  if (!rel.startsWith('.')) rel = `./${rel}`;
+  return rel;
+}
+
+function packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) {
+  return toPosixRelativePath(path.dirname(filePath), path.join(skillsDir, '_shared', fragmentPath));
+}
+
+function rewritePackagedSkillReferences(content, filePath, skillsDir) {
   return content
-    .replace(/(?:\.\.\/)+core\/skills\/_shared\//g, '../_shared/')
-    .replace(/(?:\.\.\/)+domains\/.+?\/skills\/_shared\//g, '../_shared/')
-    .replace(/(?:\.\.\/)+\.agents\/skills\/_shared\//g, '../_shared/');
+    .replace(
+      /(?:\.\.\/)+core\/skills\/_shared\/([^`\s)"']+)/g,
+      (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
+    )
+    .replace(
+      /(?:\.\.\/)+domains\/.+?\/skills\/_shared\/([^`\n)"']+)/g,
+      (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
+    )
+    .replace(
+      /(?:\.\.\/)+\.agents\/skills\/_shared\/([^`\s)"']+)/g,
+      (_, fragmentPath) => packagedSharedReferenceFor(filePath, skillsDir, fragmentPath),
+    );
 }
 
 function rewritePackagedTextReferences(root) {
@@ -721,7 +740,7 @@ function rewritePackagedTextReferences(root) {
         continue;
       }
       if (content.includes('\0')) continue;
-      const rewritten = rewritePackagedSkillReferences(content);
+      const rewritten = rewritePackagedSkillReferences(content, fullPath, root);
       if (rewritten !== content) fs.writeFileSync(fullPath, rewritten, 'utf8');
     }
   };

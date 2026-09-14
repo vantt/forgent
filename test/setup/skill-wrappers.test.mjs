@@ -914,6 +914,11 @@ test('generateGeminiSkillPackage produces a completely self-contained extension 
     path.join(sharedDir, 'entry.md'),
     'Read `../../../core/skills/_shared/standalone-fragment.md` from shared.\n',
   );
+  fs.mkdirSync(path.join(sharedDir, 'nested'), { recursive: true });
+  fs.writeFileSync(
+    path.join(sharedDir, 'nested', 'entry.md'),
+    'Read `../../../../core/skills/_shared/standalone-fragment.md` from nested shared.\n',
+  );
 
   const outDir = mkTempDir('gemini-standalone-pkg-');
   generateGeminiSkillPackage(root, outDir);
@@ -933,10 +938,17 @@ test('generateGeminiSkillPackage produces a completely self-contained extension 
   assert.match(sharedContent, /# Standalone Shared Fragment/);
   const sharedEntry = fs.readFileSync(path.join(outDir, 'skills', '_shared', 'entry.md'), 'utf8');
   assert.doesNotMatch(sharedEntry, /(?:\.\.\/)+core\/skills\/_shared\//);
-  for (const ref of sharedEntry.matchAll(/`(\.\.\/_shared\/[^`]+)`/g)) {
+  assert.match(sharedEntry, /`\.\/standalone-fragment\.md`/);
+  for (const ref of sharedEntry.matchAll(/`((?:\.\/|\.\.\/)[^`]+)`/g)) {
     const resolved = path.resolve(path.join(outDir, 'skills', '_shared'), ref[1]);
     assert.ok(fs.existsSync(resolved), `shared packaged reference ${ref[1]} must resolve inside package`);
   }
+  const nestedSharedEntryPath = path.join(outDir, 'skills', '_shared', 'nested', 'entry.md');
+  const nestedSharedEntry = fs.readFileSync(nestedSharedEntryPath, 'utf8');
+  assert.doesNotMatch(nestedSharedEntry, /(?:\.\.\/)+core\/skills\/_shared\//);
+  const nestedRef = nestedSharedEntry.match(/`(\.\.\/standalone-fragment\.md)`/);
+  assert.ok(nestedRef);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(nestedSharedEntryPath), nestedRef[1])));
 
   // Every command TOML points to packaged source that exists inside outDir,
   // and its runnable prompt never names an unbundled canonical repo path --
