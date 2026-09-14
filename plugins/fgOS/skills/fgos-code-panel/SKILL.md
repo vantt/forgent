@@ -82,14 +82,17 @@ record any disposition.
 
 ## Default actor roster
 
-Executor/tier mapping already decided for this product line (doer/fixer
--> `agy-cli`, reviewer -> `claude`, red-team -> `codex-cli`), personas
-tuned for reading/writing/attacking real code:
+Executor/tier/effort mapping already decided for this product line
+(doer/fixer -> `agy-cli`, reviewer -> `claude-reviewer`, red-team ->
+`codex-cli`), personas tuned for reading/writing/attacking real code.
+`claude-reviewer` resolves to Claude Opus at `analytical` tier and passes
+`--effort high`: high is the quality-first default for code review; reserve
+`xhigh`/`max` for a deliberately exceptional, long-running audit:
 
 ```json
 "actors": [
   { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-  { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "code-quality-reviewer" },
+  { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
   { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
 ]
 ```
@@ -99,7 +102,7 @@ Fix-round roster:
 ```json
 "actors": [
   { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "surgical-fixer" },
-  { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "code-quality-rechecker" },
+  { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-rechecker" },
   { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-code-attacker" }
 ]
 ```
@@ -115,6 +118,9 @@ diff/test/sha256 report, red-team `xxd` check -- all three settled):
   { "id": "red-team", "executor": "codex-herdr", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
 ]
 ```
+
+`claude-reviewer-herdr` uses the same Claude Opus analytical tier and
+`--effort high` setting as `claude-reviewer`.
 
 Same protocol, same request shape, same `--cwd` rule; each role runs in its
 own herdr pane in the `fgos-worker` session, so a person can watch it and a
@@ -176,7 +182,7 @@ the worker's summary.
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "code-quality-reviewer" },
+    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
     { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
   ],
   "steps": [
@@ -266,7 +272,7 @@ step per position, all resuming the same `coordinationId`:
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "surgical-fixer" },
-    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "code-quality-rechecker" },
+    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-rechecker" },
     { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-code-attacker" }
   ],
   "steps": [
@@ -308,7 +314,7 @@ test command passes:
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "code-quality-reviewer" },
+    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
     { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
   ],
   "steps": [

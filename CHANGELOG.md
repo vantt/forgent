@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Code-panel reviewers now use the scoped `claude-reviewer` profile with
+  Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
+  variant.
+
 ### Added
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
