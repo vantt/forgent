@@ -372,4 +372,19 @@ test('mirrorDevSkillsIntoPlugin is a safe no-op returning [] when agentsSkillsRo
   assert.deepEqual(mirrored, []);
 });
 
+test('fgos-code-panel is canonically located in domains/coding/skills and absent from core/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const domainSource = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const coreSource = path.join(repoRoot, 'core', 'skills', 'fgos-code-panel');
+
+  assert.ok(fs.existsSync(domainSource), 'domains/coding/skills/fgos-code-panel/SKILL.md must exist as canonical source');
+  assert.equal(fs.existsSync(coreSource), false, 'core/skills/fgos-code-panel must not exist to prevent duplicate canonical skill ids');
+
+  // Verify assembleSkills completes cleanly on the real repo without duplicate-skill collision
+  assert.doesNotThrow(() => {
+    assembleSkills(repoRoot, mkTempDir('skill-wrappers-verify-unique-'));
+  });
+});
+
+
 
