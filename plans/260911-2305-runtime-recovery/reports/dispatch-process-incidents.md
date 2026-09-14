@@ -368,3 +368,29 @@ and if the stderr reason is "wrote outside its workspace", independently
 verify (`git status`/`git log -1 -- <path>`) whether the flagged dirty paths
 are plausibly this round's own leak versus unrelated concurrent activity on
 a shared machine, before either accepting or discarding the round's content.
+
+## 21. `agy-cli`'s own account quota exhausted mid-fix, cascading into a wasted reviewer timeout (P02H reopen)
+
+Switching the fixer role to `agy-cli` (per explicit user direction, to reduce
+memory footprint versus `agy-herdr`'s persistent pane) worked cleanly for the
+P02H reopen's initial produce/review/red-team round, but the very next fix
+round's fixer step failed immediately with `agy`'s own distinct limit:
+"Individual quota reached. Please upgrade your subscription to increase your
+limits. Resets in 2h58m5s" -- a different quota mechanism from the Claude CLI
+session limit seen earlier in this track (incident is per-provider, not a
+generic "any CLI can hit a usage ceiling" note). Zero files were changed
+(`gitBefore === gitAfter`, `changedFiles: []`) since the failure happened
+before any real work. The coordination protocol still dispatched the
+downstream reviewer-recheck regardless of the fixer's failure, which then
+burned the full 35-minute wall-time ceiling with nothing new to review and
+left an orphaned pane (closed). The red-team-recheck, dispatched after,
+correctly self-diagnosed from `git log`/`git status` that no new commit
+existed and the fixer had failed on a provider quota, re-confirmed the prior
+findings stood unchanged with a much shorter, efficient response instead of
+re-running its full harness for no reason -- worth noting as the RIGHT way to
+handle this situation, in contrast to the reviewer-recheck's wasted full
+timeout. Lesson: when switching an executor for resource reasons, its own
+distinct quota/limit surface should be treated as a real, separate failure
+mode to watch for (not just OOM/session-limit), and a recheck step ideally
+short-circuits on "no new commit since last check" before running its full
+live-test harness.
