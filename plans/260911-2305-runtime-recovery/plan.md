@@ -337,12 +337,28 @@ mode. One row per closed cell; a cell only gets a row once its merge commit
 lands on `main` and its trace is written under
 `docs/architect/agent-coordination/verification/runtime-recovery/`.
 
-**Branch policy (corrected after P00):** P00 (docs-only, zero behavior risk) merged
-directly to `main`. Every cell from P01 onward merges into the `runtime-recovery`
-integration branch (created off `main` at `3b0dba42`, i.e. right after P00);
-`runtime-recovery` merges into `main` only once at P08 closeout. Each cell's own
-worktree/branch (`runtime-recovery--p01`, `--p04`, ...) is unaffected — only the
-merge TARGET changes from `main` to `runtime-recovery`.
+**Branch policy — corrected twice:**
+
+1. After P00: P00 (docs-only) merged directly to `main`; P01 onward was meant to
+   merge into a separate `runtime-recovery` integration branch, itself merging
+   into `main` only once at P08.
+2. **Incident (found before P03 opened):** the Lead's own `git branch -f
+   runtime-recovery main` calls, run after every cell's docs commit to keep the
+   two branches in sync, silently discarded `runtime-recovery`'s own merge
+   history each time (`main` never itself carried the merged cell code — only
+   `runtime-recovery` did, via `--no-ff` merges the reset then threw away).
+   Each cell's own now-deleted branch had forked from a correct point before
+   the reset hit, so P01/P02L/P02H's code was recovered intact via those
+   branches' own surviving commit objects (`git branch -f` moves a pointer, it
+   does not delete the underlying commits) merged forward into `main`
+   (`4fe997ff`). P04's code required a second explicit recovery merge from its
+   own preserved merge commit (`6bb50205`) since P01's own merge had been built
+   on an already-reset, P04-less tip. All recovered code re-verified: parses,
+   and 140+19+55+79+72 focused-suite tests pass, 0 fail, across all 4 cells
+   combined. **Decision (user-confirmed):** keep the recovered code on `main`
+   rather than revert-and-re-separate — `runtime-recovery` is retired as a
+   distinct branch; every cell from here on (P03 onward) merges directly into
+   `main`.
 
 | Cell | Merge commit | Reviewer | Red-team | Deferred findings | Trace |
 |---|---|---|---|---|---|
