@@ -18,7 +18,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot } from '../paths.mjs';
 import { appendEvent, appendEventLocked, withEventsLock, readEvents } from '../../state/events.mjs';
 import { buildAssignment, claimAssignmentId } from '../dispatch/assignment.mjs';
@@ -37,6 +37,8 @@ import {
 } from './schema.mjs';
 import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
+import { computeActionKey } from './recovery-planner.mjs';
+import { authorize } from './read-evaluators.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
   if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
@@ -2462,6 +2464,192 @@ export function recordActorReplacement(coordinationId, { oldActorId, replacement
     );
     if (alreadyRecorded) return;
     appendSessionEventLocked(eventsPath, { type: 'actor-replaced', payload }, sessionDir, manifest);
+  });
+}
+
+/**
+ * Append one `recovery-command-recorded` event: a driver-authorized
+ * recovery command declared against a SPECIFIC session-owned Run. Schema-2
+ * sessions only -- refused outright on a schema-1 session, so schema-1
+ * behavior stays completely unchanged.
+ *
+ * Same door shape as `authorizeOperation`/`recordDriverDisposition` above:
+ * manifest read + schema/active-status checks + driver-identity pin +
+ * append, all inside ONE `withEventsLock` critical section. `actionKey`
+ * doubles as the event's own `invocationKey` -- single-use, checked
+ * lock-held against a fresh `readEvents()` BEFORE anything else: a repeat
+ * call for an already-consumed key returns the EXISTING recorded event's
+ * own payload unchanged (idempotent replay -- "coordinator dies after
+ * command record -> replay/reconcile the command, no duplicate effect"),
+ * never a second append and never a newly-minted `commandId`.
+ *
+ * `expectedEventSeq` is re-verified against `events.length` on the SAME
+ * fresh, lock-held read this door already needs for the invocationKey
+ * check above -- a real, authoritative, zero-extra-cost close of that one
+ * staleness dimension's TOCTOU window. `actionKey` itself is re-derived
+ * from the caller's other four CAS fields (`recovery-planner.mjs`'s own
+ * `computeActionKey`, the SAME function the read path used to mint it) and
+ * compared, so a caller cannot apply a DIFFERENT action/snapshot/epoch/
+ * expiry than the one the key was actually issued for.
+ *
+ * `expectedSnapshot`/`expectedRunControlEpoch`/`expectedExpiresAt`
+ * themselves are trusted from the caller's own IMMEDIATELY-PRIOR
+ * `recovery-planner.mjs` `checkApply()` call against a freshly-rebuilt
+ * snapshot (src/verbs/coordination/recover.mjs) -- this door does not
+ * independently re-read the target Run's own filesystem facts a second
+ * time (it has no notion of "the exact eligible Run" of its own; that
+ * selection lives in recovery-planner.mjs). The residual race this leaves
+ * (state changing between the caller's own fresh check and this lock being
+ * acquired) is the same narrow, documented class
+ * `dispatch/recover.mjs` accepts for the identical reason: the window is
+ * synchronous, fs-only work, never spanning an await.
+ *
+ * This door never performs a recovery command's own real-world Run effect
+ * -- it only records the driver's decision, the same "declare before
+ * acting" shape `recordRunRetry` already establishes for a Run retry.
+ * Linking a settled-but-unlinked result (the crash table's "collect")
+ * happens through the EXISTING, separately-callable `linkResult` door, on
+ * a driver's own follow-up call -- never nested inside this door's own
+ * lock (which would deadlock against `linkResult`'s own `withEventsLock`).
+ */
+export function recordRecoveryCommand(
+  coordinationId,
+  { runId, action, expectedSnapshot, expectedEventSeq, expectedRunControlEpoch, expectedExpiresAt, actionKey, authorizedBy },
+  opts = {},
+) {
+  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+
+  return withEventsLock(eventsPath, () => {
+    const manifest = readManifestRaw(manifestPath);
+    assertSchemaVersionCurrent(manifest, manifestPath);
+    if (manifest.schemaVersion !== SCHEMA_VERSION_2) {
+      throw new CoordinationError(
+        'validation',
+        `recordRecoveryCommand: session "${coordinationId}" is schema "${manifest.schemaVersion}" -- session recovery commands are schema-2 only (schema-1 sessions are unaffected by this cell)`,
+      );
+    }
+
+    const events = readEvents(eventsPath);
+    const already = events.find(
+      (event) => event.type === 'recovery-command-recorded' && event.payload?.invocationKey === actionKey,
+    );
+    if (already) return { outcome: 'already-applied', ...already.payload, appended: false };
+
+    if (manifest.status !== 'active') {
+      return {
+        outcome: 'refuse',
+        reason: `session "${coordinationId}" is not active (status: "${manifest.status}") -- terminal-parent continuation stays refused, never bypassed by this door`,
+      };
+    }
+    // Current-driver enforcement as a returned outcome, never a throw:
+    // unlike every OTHER driver-authored door in this module (which throws
+    // on identity mismatch), this door's whole contract is outcome-based
+    // (applied | already-applied | plan-stale | needs-input | refuse) --
+    // the caller's own earlier `recovery-planner.mjs` `checkApply()` call
+    // already runs this identical check via the shared `authorize()`
+    // evaluator before ever reaching this door; this is the lock-held
+    // backstop for the race where identity changed in between.
+    const authResult = authorize(
+      { label: 'recordRecoveryCommand', subject: 'a recovery command' },
+      { manifest, authorizedBy },
+    );
+    if (authResult.kind === 'needs-input') {
+      return {
+        outcome: 'needs-input',
+        reason: authResult.reason,
+      };
+    }
+
+    const currentEventSeq = events.length;
+    if (currentEventSeq !== expectedEventSeq) {
+      return {
+        outcome: 'plan-stale',
+        reason: `session "${coordinationId}"'s event sequence has advanced since this recommendation was issued (expected ${expectedEventSeq}, now ${currentEventSeq})`,
+      };
+    }
+
+    const expectedActionKey = computeActionKey({
+      snapshotDigest: expectedSnapshot,
+      expectedEventSeq,
+      expectedRunControlEpoch,
+      action,
+      expiresAt: expectedExpiresAt,
+    });
+    if (actionKey !== expectedActionKey) {
+      return {
+        outcome: 'plan-stale',
+        reason: 'actionKey does not match the action/snapshot/eventSeq/epoch/expiresAt it was issued for -- refusing a mismatched replay',
+      };
+    }
+
+    const nowMs = Date.now();
+    const expiresAtMs = Date.parse(expectedExpiresAt);
+    if (!Number.isFinite(expiresAtMs) || nowMs > expiresAtMs) {
+      return { outcome: 'plan-stale', reason: `this recommendation expired at ${expectedExpiresAt}` };
+    }
+
+    // X11: a real, authoritative, lock-held re-check that "close" stays
+    // refused whenever something is still genuinely in flight -- computed
+    // from the SAME fresh `events` this door already read above (the exact
+    // "created but not yet linked" definition `createSessionAssignment`'s
+    // own `maxConcurrencyForSession` check uses), at zero extra fs cost.
+    // This is what keeps a premature close a visible `refuse` even under a
+    // race the caller's own earlier, unlocked `checkApply()` pre-check
+    // cannot by itself close (a sibling Assignment created or linked
+    // between that pre-check and this lock being acquired).
+    if (action === 'close') {
+      const createdIds = new Set();
+      const linkedIds = new Set();
+      for (const event of events) {
+        if (event.type === 'assignment-created' && event.payload?.assignmentId) createdIds.add(event.payload.assignmentId);
+        if (event.type === 'result-linked' && event.payload?.assignmentId) linkedIds.add(event.payload.assignmentId);
+      }
+      const stillInFlight = [...createdIds].filter((id) => !linkedIds.has(id));
+      if (stillInFlight.length > 0) {
+        return {
+          outcome: 'refuse',
+          reason: `"close" refused: assignment(s) "${stillInFlight.join(', ')}" still have no linked result -- closing now would be a premature-close hazard (X11), never silently converted into success`,
+        };
+      }
+      const existingClose = events.find(
+        (event) => event.type === 'recovery-command-recorded' && event.payload?.action === 'close',
+      );
+      if (existingClose) {
+        return {
+          outcome: 'refuse',
+          reason: `"close" refused: recovery command "${existingClose.payload.commandId}" (close) is already recorded for session "${coordinationId}" and has not yet been reconciled`,
+        };
+      }
+    }
+
+    if (runId && (action === 'settle' || action === 'collect')) {
+      const existingCmd = events.find(
+        (event) => event.type === 'recovery-command-recorded' && event.payload?.runId === runId && (event.payload?.action === action || action === 'settle'),
+      );
+      if (existingCmd) {
+        return {
+          outcome: 'refuse',
+          reason: `action "${action}" refused: recovery command "${existingCmd.payload.commandId}" (${existingCmd.payload.action}) is already recorded for Run "${runId}" and has not yet been reconciled`,
+        };
+      }
+    }
+
+    const commandId = `rc_${randomUUID()}`;
+    const payload = {
+      invocationKey: actionKey,
+      coordinationId,
+      runId,
+      action,
+      snapshotDigest: expectedSnapshot,
+      expectedEventSeq,
+      expectedRunControlEpoch,
+      expiresAt: expectedExpiresAt,
+      commandId,
+    };
+    validateEventPayload('recovery-command-recorded', payload);
+
+    appendSessionEventLocked(eventsPath, { type: 'recovery-command-recorded', payload }, sessionDir, manifest);
+    return { outcome: 'applied', ...payload, appended: true };
   });
 }
 
