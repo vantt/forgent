@@ -391,14 +391,28 @@ test('fgos-code-panel canonical source has no broken markdown file links after d
   const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   const linkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
+  const expected = new Set([
+    '/core/skills/fgos-panel/SKILL.md',
+    '/src/runner/coordination/session-engine.mjs',
+    '/src/verbs/coordination/schema.mjs',
+    '/core/coordination-protocols/standalone-master-coordination-loop.yaml',
+    '/core/skills/_shared/private-cell-worktree.md',
+    '/docs/architect/agent-coordination/contracts/coordination-session.md',
+  ]);
+  const seen = new Set();
   const missing = [];
 
   for (const match of skillContent.matchAll(linkPattern)) {
     const target = match[1];
     if (/^[a-z][a-z0-9+.-]*:/.test(target) || target.startsWith('#')) continue;
-    const targetPath = path.resolve(path.dirname(skillPath), target.split('#')[0]);
+    const targetWithoutAnchor = target.split('#')[0];
+    seen.add(targetWithoutAnchor);
+    const targetPath = targetWithoutAnchor.startsWith('/')
+      ? path.join(repoRoot, targetWithoutAnchor.slice(1))
+      : path.resolve(path.dirname(skillPath), targetWithoutAnchor);
     if (!fs.existsSync(targetPath)) missing.push(target);
   }
 
+  assert.deepEqual(seen, expected);
   assert.deepEqual(missing, []);
 });
