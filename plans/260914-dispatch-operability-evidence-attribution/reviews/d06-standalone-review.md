@@ -5,14 +5,16 @@
 This inline standalone review was produced before the registered supplemental
 architecture panel `dispatch-operability-design-d06-panel-r2`. Its original
 finding SR-2 treated the panel waiver as a LOW accepted process caveat. The
-supplemental panel later rejected that closure and changed D06 to `NOT READY`.
+supplemental panel later rejected that closure and temporarily changed D06 to
+`NOT READY`; the D06 supplemental repair pass subsequently restored `READY`
+design authority with the Codex-only limitation recorded.
 
 ## Review Findings
 
 | ID | Severity | Finding | Disposition |
 |---|---|---|---|
 | SR-1 | LOW | `dispatch.runtime.reconcile` is named in design before implementation exists. Canonical docs must label it planned. | accepted; promotion manifest requires planned labels. |
-| SR-2 | LOW | D06 panel evidence is weaker than the original phase brief because external dispatch was waived. | superseded; supplemental registered panel ran later and changed D06 to NOT READY. |
+| SR-2 | LOW | D06 panel evidence is weaker than the original phase brief because external dispatch was waived. | superseded; supplemental registered panel ran later and the D06 repair pass bound its evidence. |
 
 ## Checks
 
@@ -26,4 +28,4 @@ supplemental panel later rejected that closure and changed D06 to `NOT READY`.
 ## Conclusion
 
 Superseded. Do not use this inline report as the final D06 verdict. Current
-status is `NOT READY — documentation/evidence repair required`.
+status is `READY` design authority only after supplemental repair.

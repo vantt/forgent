@@ -6,7 +6,7 @@
 
 **Worktree:** `/home/vantt/projects/dispatch-operability-design`
 
-**Status:** D00-D05 complete; D06 NOT READY after supplemental panel
+**Status:** READY after D06 supplemental repair
 
 **Date:** 2026-09-14
 
@@ -40,8 +40,8 @@ production-door proof requirements.
 - Cross-session authority or cross-session `contextRefs`.
 - Changes to same-`taskKey` replay, Coordination quorum, authorization ordering, or the separately tracked BL1 defect.
 - Writable workspace takeover, generic process management, and arbitrary Git history protection.
-- Implementation planning and source changes. Those require a new track only
-  after D06 returns to `READY`.
+- Implementation planning and source changes. Those require a new track after
+  D06 closes `READY`.
 
 ## Locked Architecture Direction
 
@@ -155,18 +155,15 @@ The design track closes only when:
 3. Positive and negative capabilities are specified symmetrically.
 4. Historical compatibility, ambiguity, corruption, and concurrency behavior are explicit and testable.
 5. D06 records independent review and red-team evidence, resolves every accepted finding, and returns `READY` or `NOT READY` without ambiguity.
-6. `READY` includes a canonical-doc promotion manifest and an implementation handoff; `NOT READY` pauses canonical promotion and does not authorize implementation in this track.
+6. `READY` includes a canonical-doc promotion manifest and an implementation handoff; it does not authorize implementation in this track.
 7. `git diff --check` passes and the design-only path fence is clean.
 
 ## Completion Meaning
 
-`READY` would mean the design is sufficiently precise to create a separate
+`READY` means the design is sufficiently precise to create a separate
 implementation plan. It does not mean any advertised runtime capability ships,
 and user-facing documentation must continue to label the capability as planned
 until production-door evidence exists.
-
-Current D06 verdict is `NOT READY`; no implementation track is authorized from
-this package until the supplemental D06 findings are repaired and rechecked.
 
 ## Cell Status
 
@@ -178,4 +175,4 @@ this package until the supplemental D06 findings are repaired and rechecked.
 | D03 | `9b54c221` | PASS | none |
 | D04 | `77a3d294` | PASS | none |
 | D05 | `23ec44cf` | PASS | none |
-| D06 | pending final merge | NOT READY | supplemental registered panel `dispatch-operability-design-d06-panel-r2` returned REVISE/NOT READY; doc/evidence repair required |
+| D06 | pending final merge | READY | supplemental registered panel `dispatch-operability-design-d06-panel-r2`; Codex-only/non-cross-provider limitation recorded; documentation/evidence blockers repaired |

@@ -128,6 +128,32 @@ path.
 | Historical RunResult | Inspect legacy result | `legacy-derived`; bytes unchanged |
 | Effective permissions | Real launched run | worker brief and inspect expose same effective contract |
 
+## Required Negative Production-Route Scenarios
+
+These scenarios close the D06 supplemental panel finding that a static
+no-import/no-call assertion cannot prove semantic recovery is unreachable
+through host, CLI, operation-catalog, callback, subprocess, or dynamic routing
+paths. Each forbidden verb must be tested through the same production-facing
+door a real operator or host would use, not only by direct evaluator calls.
+
+| Forbidden route | Starting door | Required observation |
+|---|---|---|
+| `dispatch.runtime.reconcile` attempts to kill a worker/pane/process | Host operation catalog and CLI projection | typed refusal before adapter/process-control invocation; no liveness resource mutation |
+| `dispatch.runtime.reconcile` attempts to retry or relaunch a Run | Host operation catalog and CLI projection | typed refusal before Assignment admission; no new Run directory, dispatch plan, or worker process |
+| `dispatch.runtime.reconcile` attempts to resume/reattach execution | Host operation catalog and CLI projection | typed refusal or read-only authority hint only; no prompt delivery, terminal attach, or control epoch mutation |
+| `dispatch.runtime.reconcile` attempts to reassign or takeover work | Host operation catalog and CLI projection | typed refusal; no assignment owner/write-scope/grant mutation |
+| `dispatch.runtime.reconcile` attempts to admit a new Run | Host operation catalog and CLI projection | typed refusal before Run admission writer; no CAS winner can create a new execution |
+| `dispatch.runtime.reconcile` attempts to cancel semantic execution | Host operation catalog and CLI projection | typed refusal; no provider, process, terminal, or controller cancellation side effect |
+| alternate operation id aliases a forbidden recovery verb | operation registry load plus dispatch decision | registry refuses alias or routes to the existing owner-specific recovery door, never to reconcile |
+| dynamic/callback/subprocess path reaches forbidden recovery from reconcile | selected adapter path with instrumentation | test fails if reconcile imports/calls/spawns any semantic-recovery operation or adapter control method |
+
+Passing proof requires both:
+
+1. positive inspection/reconciliation scenarios proving supported local repair
+   still works; and
+2. negative production-route scenarios proving every unsupported semantic
+   recovery route is absent or typed-refused at the public boundary.
+
 ## Negative Capabilities
 
 - No universal executor tool surface.
@@ -137,6 +163,9 @@ path.
 - No conflation of executor timeout with session wall-time.
 - No implementation cell closes on a direct-unit-only proof.
 - No worker claim upgrades to terminal truth without normalizer evaluation.
+- No reconciliation proof closes without production-route refusals for kill,
+  retry, resume, reassign, admit, cancel, takeover, and operation-catalog
+  indirection.
 
 ## Handoff To Implementation
 

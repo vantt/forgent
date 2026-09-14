@@ -1,11 +1,15 @@
 # Incident Evidence Matrix
 
-**Status:** D00 drafted
+**Status:** D00 complete; D06 supplemental repair pass added source-anchor rule
 **Source:** [dispatch-process-incidents.md](../260911-2305-runtime-recovery/reports/dispatch-process-incidents.md)
 
 This matrix preserves all twenty source observations. Each incident has exactly
 one primary disposition for summary counting. A row may also name secondary
 implications, but secondary implications do not increment the primary summary.
+The stable IDs `INC-01` through `INC-20` are positional anchors into the source
+report's ordered incident list as read on 2026-09-14; a future source-report
+rewrite must either preserve those incident labels or add a crosswalk before
+this matrix is used as implementation evidence.
 
 Disposition vocabulary:
 

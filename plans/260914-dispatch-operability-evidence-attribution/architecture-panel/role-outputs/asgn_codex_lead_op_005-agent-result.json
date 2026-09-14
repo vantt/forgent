@@ -1,0 +1,15 @@
+{
+  "status": "done",
+  "summary": "Ranked operational and migration risks for the READY dispatch-operability design. The principal residual risk is implementation discipline: prevent second terminal/recovery authorities and require production-door proof before shipping.",
+  "artifact": "agent-report.md",
+  "verdict": "design-only; separate implementation track required",
+  "topRisks": [
+    "second terminal authority during RunResult v2 migration",
+    "recovery authority leakage from inspection/reconcile",
+    "CAS fencing mismatch with partial lifecycle implementation",
+    "ambiguity/corruption normalized into action",
+    "production-door proof replaced by helper tests"
+  ],
+  "sinkTheDecisionConcern": "material: DOEA track-local decisions need explicit canonical contract/catalog/operator documentation sinks and formal decision handling for any locked-law or cross-area authority change."
+}
+

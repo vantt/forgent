@@ -1,6 +1,6 @@
 # Requirements Traceability
 
-**Status:** D00-D05 design trace complete; D06 NOT READY pending supplemental evidence repair; runtime proof remains future implementation work
+**Status:** D00-D06 design trace complete after supplemental evidence repair; runtime proof remains future implementation work
 
 | Requirement | Decisions | Incident drivers | Design authority | Planned proof |
 |---|---|---|---|---|
@@ -19,14 +19,14 @@
 | Adapter-positive proof is coverage-bound | DOEA-09, DOEA-12 | INC-08, INC-09 | same | adapter/confinement attestation fixture |
 | Guard cleanup requires dead/absent proof | DOEA-10 | INC-10, INC-15 | `phase-designs/guard-reconciliation.md` | live/dead/ambiguous holder matrix |
 | Reconciliation is CAS/idempotent | DOEA-10 | INC-10, INC-15, INC-17 | same | stale/concurrent/replayed action tests |
-| Reconciliation never performs semantic recovery | DOEA-07, DOEA-08, DOEA-10 | INC-03, INC-04, INC-10 | same | negative import/call and behavior tests |
+| Reconciliation never performs semantic recovery | DOEA-07, DOEA-08, DOEA-10 | INC-03, INC-04, INC-10 | same | production-route refusals for kill/retry/resume/reassign/admit/cancel/takeover through host/CLI/operation catalog, plus supporting negative import/call tests |
 | Effective limits and tool permissions are visible | DOEA-06, DOEA-11 | INC-06, INC-12 | `phase-designs/executor-contract-and-production-proof.md` | persisted snapshot and inspect output fixture |
-| Every capability is wired through a production door | DOEA-12 | INC-08, INC-09 | same | Future end-to-end implementation matrix |
+| Every capability is wired through a production door | DOEA-12 | INC-08, INC-09 | same | Future end-to-end implementation matrix, including field-forwarding and negative-route refusals |
 | Unsupported capabilities remain typed-disabled | DOEA-02, DOEA-08, DOEA-10 | INC-03, INC-04, INC-10, INC-11, INC-14 | `plan.md`, D06 packet | D06 supplemental panel requires additional negative production-route proof for forbidden recovery verbs before READY |
 
 ## Documentation Obligations
 
-- `docs/specs/runner.md`: settled behavior only after D06 returns to READY and again
+- `docs/specs/runner.md`: settled behavior only after D06 approval and again
   after implementation evidence exists.
 - Assignment/Run/RunResult canonical contract: version and migration rules.
 - Host invocation operation catalog: `dispatch.runtime.inspect` and

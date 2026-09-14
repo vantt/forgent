@@ -1,0 +1,30 @@
+{
+  "status": "done",
+  "summary": "Recommend changing the current D06 record to NOT READY pending bounded documentation and advisory-evidence repairs; preserve the core architecture, disclose the Codex-only/non-cross-provider limitation and unresolved dissent, then restore READY only after durable rechecks, leaving runtime proof to a separate implementation track.",
+  "findings": [
+    {
+      "severity": "high",
+      "claim": "The current READY label outruns the supplemental panel evidence state and should be suspended until the review chain and named document gaps are repaired."
+    },
+    {
+      "severity": "high",
+      "claim": "The session is durable but its downstream context grants and relied-on reports are not immutable, digest-bound protocol evidence, so it cannot yet substantiate staged isolation or complete replay."
+    },
+    {
+      "severity": "medium",
+      "claim": "The all-Codex roster provides role separation but no provider-family diversity or independent cross-provider corroboration."
+    },
+    {
+      "severity": "medium",
+      "claim": "The planned production-proof matrix must add negative route tests for every forbidden semantic-recovery action before D06 readiness is restored."
+    }
+  ],
+  "evidenceRefs": [
+    "/home/vantt/projects/forgentX/.fgos/assignments/asgn_codex_lead_op_008/runs/01/agent-report.md",
+    "/home/vantt/projects/forgentX/.fgos/assignments/asgn_codex_lead_op_009/runs/01/agent-report.md",
+    "/home/vantt/projects/forgentX/.fgos/coordination/sessions/dispatch-operability-design-d06-panel-r2/events.jsonl",
+    "/home/vantt/projects/dispatch-operability-design-d06-panel/plans/260914-dispatch-operability-evidence-attribution/phase-06-cross-design-review-promotion.md",
+    "/home/vantt/projects/dispatch-operability-design-d06-panel/plans/260914-dispatch-operability-evidence-attribution/reviews/d06-finding-ledger.md"
+  ],
+  "report_path": "/home/vantt/projects/forgentX/.fgos/assignments/asgn_codex_lead_op_010/runs/01/agent-report.md"
+}
