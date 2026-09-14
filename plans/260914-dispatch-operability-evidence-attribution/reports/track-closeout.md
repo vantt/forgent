@@ -16,7 +16,7 @@ architecture panel using Codex-only actor bindings.
 | D03 | `9c1083cf` | `9b54c221` | PASS | none |
 | D04 | `83de1168` | `77a3d294` | PASS | none |
 | D05 | `5e92ae5f` | `23ec44cf` | PASS | none |
-| D06 | pending until final commit | pending until merge | READY | Codex-only/non-cross-provider limitation recorded |
+| D06 | `b6ffeb83` | `1cb448a6` | READY | Codex-only/non-cross-provider limitation recorded |
 
 ## Evidence
 

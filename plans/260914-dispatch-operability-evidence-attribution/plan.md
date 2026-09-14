@@ -175,4 +175,4 @@ until production-door evidence exists.
 | D03 | `9b54c221` | PASS | none |
 | D04 | `77a3d294` | PASS | none |
 | D05 | `23ec44cf` | PASS | none |
-| D06 | pending final merge | READY | supplemental registered panel `dispatch-operability-design-d06-panel-r2`; Codex-only/non-cross-provider limitation recorded; documentation/evidence blockers repaired |
+| D06 | `b6ffeb83`; merge `1cb448a6` | READY | supplemental registered panel `dispatch-operability-design-d06-panel-r2`; Codex-only/non-cross-provider limitation recorded; documentation/evidence blockers repaired |
