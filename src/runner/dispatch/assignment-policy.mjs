@@ -25,6 +25,7 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
+import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 
 export const TIER_STRENGTH = Object.freeze({
   lightweight: 1,
@@ -299,6 +300,26 @@ export function resolveAssignmentDispatchPolicy({
       ? { scope: 'opPolicy', id: opId }
       : { scope: 'default' };
 
+  // 5b. RepeatMode Resolution (Step 09/P03 fallback-and-effect-boundary
+  // contract): declared explicitly on the operation/protocol YAML
+  // (`opPolicy.repeatMode`) or a caller's own `cliOverride.repeatMode` --
+  // NEVER derived from `assignment.mutation`, which this resolver does not
+  // read anywhere in this function. `mutation` and `repeatMode` are
+  // independent axes (mutation: does this dispatch write state; repeatMode:
+  // may ITS OWN declared operation be repeated once an effect has already
+  // reached an external sink) and must stay that way -- undeclared on both
+  // sides simply resolves to `null`, which `dispatch/recovery.mjs`'s
+  // `assess` treats as a config error, never as an inferred value.
+  const resolvedRepeatMode = cliOverride.repeatMode ?? opPolicy.repeatMode;
+  if (resolvedRepeatMode !== undefined && !REPEAT_MODE_VALUES.includes(resolvedRepeatMode)) {
+    throw new RunnerConfigError(`invalid repeatMode "${resolvedRepeatMode}". Valid repeatModes: [${REPEAT_MODE_VALUES.join(', ')}]`);
+  }
+  const repeatModeSource = cliOverride.repeatMode
+    ? { scope: 'cliOverride' }
+    : opPolicy.repeatMode
+      ? { scope: 'opPolicy', id: opId }
+      : { scope: 'default' };
+
   // 6. Constraints Accumulation
   const skills = Array.isArray(assignment.skills) ? assignment.skills : [];
   const constraints = {
@@ -331,6 +352,7 @@ export function resolveAssignmentDispatchPolicy({
     tier: effectiveTier,
     model: resolvedModel,
     visibility: resolvedVisibility,
+    repeatMode: resolvedRepeatMode ?? null,
     constraints: Object.freeze(constraints),
     // Phase 00 R7: field-level provenance, additive alongside the flat
     // fields above (which stay unchanged in shape/values for backward
@@ -343,6 +365,7 @@ export function resolveAssignmentDispatchPolicy({
       tier: Object.freeze({ value: effectiveTier, source: Object.freeze(tierSource) }),
       persona: Object.freeze({ value: resolvedPersona, source: personaSource ? Object.freeze(personaSource) : undefined }),
       visibility: Object.freeze({ value: resolvedVisibility, source: Object.freeze(visibilitySource) }),
+      repeatMode: Object.freeze({ value: resolvedRepeatMode ?? null, source: Object.freeze(repeatModeSource) }),
       constraints: Object.freeze({ value: constraints, source: Object.freeze(constraintsSource) }),
       governance: Object.freeze({ value: 'allowed', source: Object.freeze(governanceSource) }),
     }),

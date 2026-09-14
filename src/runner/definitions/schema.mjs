@@ -29,6 +29,23 @@ export const PROFILE_KINDS = Object.freeze(['Workflow', 'CoordinationProtocol'])
 export const MIN_TIER_VALUES = Object.freeze(['lightweight', 'standard', 'creative', 'analytical', 'critical']);
 const MIN_TIER_RANK = new Map(MIN_TIER_VALUES.map((tier, index) => [tier, index]));
 
+// repeatMode (Step 09/P03 fallback-and-effect-boundary contract): declared
+// explicitly per operation/protocol YAML, never inferred from a
+// materialized Assignment's own `mutation` field -- two independent axes
+// (mutation: does THIS dispatch write state; repeatMode: may ITS OWN
+// declared operation be safely repeated once an effect has already reached
+// an external sink). `pre-delivery` names a repeat that happens before any
+// effect reaches an external sink (always safe by construction);
+// `post-delivery` names one that happens after -- the harder case
+// dispatch/recovery.mjs's own Acceptance Matrix governs.
+export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
+// Rank for the SAME non-weakening discipline MIN_TIER_RANK already applies
+// to `minTier` -- `post-delivery` is the stronger, harder-to-satisfy
+// requirement (it is gated by dispatch/recovery.mjs's own Acceptance
+// Matrix), so a more specific scope may only raise it, never silently
+// downgrade it back to `pre-delivery`.
+const REPEAT_MODE_RANK = new Map(REPEAT_MODE_VALUES.map((mode, index) => [mode, index]));
+
 export const VISIBILITY_VALUES = Object.freeze(['headless', 'visible']);
 export const RESULT_KIND_VALUES = Object.freeze(['advisory', 'gate-verdict', 'work-product']);
 export const EVIDENCE_REQUIRED_VALUES = Object.freeze(['reported', 'verified']);
@@ -100,7 +117,7 @@ const CONTRIBUTION_TYPE_VALUES = Object.freeze(['proposal', 'objection', 'respon
 // optional PolicyPatch.
 const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 
-const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility']);
+const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility', 'repeatMode']);
 
 const WORKFLOW_PROFILE_FIELDS = new Set(['kind', 'work']);
 const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
@@ -259,6 +276,10 @@ function validatePolicyPatch(policy, label) {
     if (!VISIBILITY_VALUES.includes(policy.visibility)) fail(`${label}.visibility must be one of ${VISIBILITY_VALUES.join(' | ')}`);
     result.visibility = policy.visibility;
   }
+  if (policy.repeatMode !== undefined) {
+    if (!REPEAT_MODE_VALUES.includes(policy.repeatMode)) fail(`${label}.repeatMode must be one of ${REPEAT_MODE_VALUES.join(' | ')}`);
+    result.repeatMode = policy.repeatMode;
+  }
 
   return Object.freeze(result);
 }
@@ -283,6 +304,7 @@ export function mergePolicyStack(scopedPatches) {
 
   const resolved = {};
   let resolvedMinTierLabel = null;
+  let resolvedRepeatModeLabel = null;
 
   for (const entry of scopedPatches) {
     if (!isPlainObject(entry)) fail('mergePolicyStack entries must be objects');
@@ -296,6 +318,17 @@ export function mergePolicyStack(scopedPatches) {
       }
       resolved.minTier = validated.minTier;
       resolvedMinTierLabel = label;
+    }
+    // Same non-weakening discipline as minTier above -- a weaker scope
+    // (e.g. CLI/assignment) may not silently downgrade a stronger repeatMode
+    // (e.g. `post-delivery`) already set by a less specific scope (e.g. the
+    // operation itself).
+    if (validated.repeatMode !== undefined) {
+      if (resolved.repeatMode !== undefined && REPEAT_MODE_RANK.get(validated.repeatMode) < REPEAT_MODE_RANK.get(resolved.repeatMode)) {
+        fail(`${label} sets repeatMode "${validated.repeatMode}", weaker than "${resolved.repeatMode}" already set by ${resolvedRepeatModeLabel} -- PolicyPatch repeatMode is monotonic (a weaker scope may not downgrade a stronger one)`);
+      }
+      resolved.repeatMode = validated.repeatMode;
+      resolvedRepeatModeLabel = label;
     }
     for (const key of ['preferPersona', 'preferExecutor', 'visibility']) {
       if (validated[key] !== undefined) resolved[key] = validated[key];

@@ -366,6 +366,23 @@ test('R3: the full precedence chain composes, and the resolved tier/persona/exec
   assert.equal(provenance.governance.source.scope, 'governance');
 });
 
+test('R3: a declared-operation repeatMode is forwarded through the merged policy stack into the compiled RunResult, same channel as minTier', async () => {
+  const tempDir = mkTempDir();
+  openSessionWithConfig('coord_declared_r3_repeatmode', tempDir);
+  const runnerConfig = fakeExecutor(tempDir);
+  const request = await dispatchRequest('coord_declared_r3_repeatmode', tempDir, runnerConfig);
+
+  // provide-consult's own declared operation policy carries no repeatMode --
+  // sourcing it here from the operation scope of the SAME merged policy
+  // stack `minTier` already proves goes through, so this is exercising the
+  // identical `cliOverride` forwarding path, not a different one.
+  const provide = await dispatchProvide('coord_declared_r3_repeatmode', tempDir, runnerConfig, request.assignment.assignmentId, {
+    cliPolicy: { repeatMode: 'pre-delivery' },
+  });
+
+  assert.equal(provide.runResult.policy.repeatMode, 'pre-delivery');
+});
+
 test('R3: role-scope preferPersona wins over an absent runner/definition/operation/actor persona default, sourced to "role"', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_declared_r3_role_persona', tempDir);

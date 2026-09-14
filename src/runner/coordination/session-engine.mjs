@@ -2674,6 +2674,7 @@ export async function dispatchDeclaredOperation(
     ...(merged.preferExecutor !== undefined ? { preferExecutor: merged.preferExecutor } : {}),
     ...(merged.fallbackExecutors !== undefined ? { fallbackExecutors: merged.fallbackExecutors } : {}),
     ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
+    ...(merged.repeatMode !== undefined ? { repeatMode: merged.repeatMode } : {}),
     policyProvenance,
   };
 
