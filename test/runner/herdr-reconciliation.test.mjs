@@ -966,12 +966,19 @@ test('19. confined execution under required bwrap executes via launcher script a
 
   createHerdrLaunchCommand(runDir, launchContext);
 
+  // The fixture must declare the REAL binary genuinely running in the
+  // foreground process below (fgProcess, spawned from process.execPath) --
+  // verifyProcessExeIdentity resolves /proc/<pid>/exe against this same
+  // `command` field and fails closed on any mismatch, so a placeholder like
+  // /usr/bin/bwrap (a real binary on this machine, just not the one that is
+  // actually running) fails the exe-identity check before the cwd check
+  // ever runs.
   const workerInvocation = {
-    command: '/usr/bin/bwrap',
+    command: process.execPath,
     args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'],
     cwd: tmp,
     env: { TEST_CONF_ENV: 'active' },
-    workerCommandDigest: computeSha256Digest({ command: '/usr/bin/bwrap', args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'] }),
+    workerCommandDigest: computeSha256Digest({ command: process.execPath, args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'] }),
   };
 
   const prepDir = path.join(runDir, 'protected', 'prepared-invocation');
