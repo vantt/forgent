@@ -1,6 +1,11 @@
 # D06 Red-Team
 
-**Status:** pass with no HIGH findings
+**Status:** superseded by supplemental panel
+
+This inline red-team pass was produced before the registered supplemental
+architecture panel `dispatch-operability-design-d06-panel-r2`. It remains
+useful as a design attack checklist, but its `READY` conclusion is superseded by
+the supplemental panel red-team verdict `REVISE`.
 
 ## Attacks
 
@@ -21,4 +26,6 @@ shrinking it into pure evaluator tests.
 
 ## Conclusion
 
-No HIGH or MEDIUM design flaw remains after review. READY is appropriate.
+Superseded. Current D06 status is `NOT READY — documentation/evidence repair
+required`; see `architecture-panel/supplemental-panel-report.md` and
+`reviews/d06-finding-ledger.md`.

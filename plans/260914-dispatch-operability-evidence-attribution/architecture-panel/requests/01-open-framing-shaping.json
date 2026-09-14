@@ -1,0 +1,64 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Supplemental D06 architecture advisory panel for the dispatch-operability evidence-attribution design track. Review D00-D05 accepted design and D06 promotion for readiness, contradictions, missing product decisions, locked-law contact, evidence attribution soundness, recovery/inspection authority boundaries, production proof sufficiency, and whether the package should remain READY or become NOT READY. User override for this supplemental run: bind every static actor to the Codex executor; record the resulting provider-diversity limitation honestly.",
+  "writerId": "codex-lead",
+  "coordinationId": "dispatch-operability-design-d06-panel-r2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "codex-bwrap", "persona": "person-facing-advisory-lead-codex-only" },
+    { "id": "context-investigator-actor", "executor": "codex-bwrap", "persona": "disconfirmation-seeking-scout-codex-only" },
+    { "id": "system-shaper-actor", "executor": "codex-bwrap", "persona": "baseline-design-architect-codex-only" },
+    { "id": "alternative-shaper-actor", "executor": "codex-bwrap", "persona": "different-priors-designer-codex-only" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "persona": "production-reality-advocate-codex-only" },
+    { "id": "architecture-critic-actor", "executor": "codex-bwrap", "persona": "cross-proposal-attacker-codex-only" },
+    { "id": "synthesizer-actor", "executor": "codex-bwrap", "persona": "whole-ledger-integrator-codex-only" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "persona": "process-and-authority-attacker-codex-only" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "taskKey": "d06-panel-r2-interpret-1",
+      "objective": "Interpret the D06 review/promotion request for /home/vantt/projects/dispatch-operability-design-d06-panel. Read plans/260914-dispatch-operability-evidence-attribution/phase-06-cross-design-review-promotion.md, architecture-decision-lock.md, plan.md, reviews/d06-review-packet.md, reviews/d06-standalone-review.md, reviews/d06-red-team.md, reviews/d06-finding-ledger.md, promotion-manifest.md, implementation-handoff.md, reports/track-closeout.md. Identify the decision burden, what READY/NOT READY must mean here, the user override that all actors are Codex-only, and any product-decision or locked-law ambiguity. Do not recommend a design.",
+      "expectedOutputs": ["agent-report.md: interpretation, decision burden, material ambiguities, Codex-only limitation, what would force NOT READY"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "taskKey": "d06-panel-r2-investigate-1",
+      "objective": "Scout the D00-D06 design evidence in /home/vantt/projects/dispatch-operability-design-d06-panel. Read all phase briefs, D00-D05 accepted artifacts, requirements-traceability.md, incident-evidence-matrix.md, docs/specs/runner.md, docs/specs/reading-map.md, docs/architect/agent-coordination/contracts/assignment-run-runresult.md, docs/platform-foundations.md, docs/routing-handoff-contract.md. Hunt for contradictions, missing traceability, claims promoted as shipped instead of planned, authority-boundary violations, hidden source/config/test edits, and unowned deferrals. Report file/section evidence; do not recommend an architecture.",
+      "expectedOutputs": ["agent-report.md: evidence for/against readiness, contradictions, absences, could-not-determine, file/section citations"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeSystem",
+      "operationId": "shape-system-proposal",
+      "targetActorId": "system-shaper-actor",
+      "taskKey": "d06-panel-r2-shape-system-1",
+      "objective": "As system shaper, produce the strongest candidate for accepting the current D00-D06 design package as READY. Base it only on the track artifacts and canonical docs in /home/vantt/projects/dispatch-operability-design-d06-panel. Name the load-bearing constraint, what this design makes harder, first reversible implementation step, evidence-vs-assumption, and falsification criteria. Do not claim implementation exists.",
+      "expectedOutputs": ["agent-report.md: READY candidate, evidence, costs, first reversible step, falsification criteria"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeAlt",
+      "operationId": "shape-alternative-proposal",
+      "targetActorId": "alternative-shaper-actor",
+      "taskKey": "d06-panel-r2-shape-alt-1",
+      "objective": "As alternative shaper, produce a genuinely different candidate if current READY is too broad or mis-scoped: for example READY-with-deferred-proof, NOT READY pending product decision, or narrower promotion. Ground it in D00-D06 artifacts and canonical docs in /home/vantt/projects/dispatch-operability-design-d06-panel. Name the priors, no-build consequence, first reversible step, and falsification criteria.",
+      "expectedOutputs": ["agent-report.md: alternative candidate, why it differs materially, evidence, costs, falsification criteria"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeConstraint",
+      "operationId": "shape-constraint-proposal",
+      "targetActorId": "constraint-advocate-actor",
+      "taskKey": "d06-panel-r2-shape-constraint-1",
+      "objective": "As constraint advocate, rank operational/migration risks in the current design package. Focus on Dispatch ownership, recovery authority, inspection read-only shape, RunResult/RunObservation authority, evidence attribution, executor proof path, compatibility, concurrency/CAS, corruption ambiguity, locked laws, and downstream-project mission fit. Use actual track/canonical docs in /home/vantt/projects/dispatch-operability-design-d06-panel.",
+      "expectedOutputs": ["agent-report.md: ranked risks with magnitude, reversibility, owner, mitigation, and any sink-the-decision concern"]
+    }
+  ]
+}
