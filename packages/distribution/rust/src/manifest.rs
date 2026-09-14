@@ -1,10 +1,24 @@
 //! Manifest types for fgOS release distributions.
 //!
-//! Matches `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.
+//! Matches `docs/platform/packaging-distribution/contracts/release-manifest.md`
+//! and `docs/architect/packaging-distribution/runtime-identity-and-activation.md` §5.
+//!
+//! # Frozen Schema V1 Invariants
+//! - `schemaVersion` is frozen at 1.
+//! - `components.legacyNode.root` and `components.legacyNode.entry` are the ONLY
+//!   legacy Node locator across the platform (per repo `AGENTS.md` and contract).
+//!   The Rust host resolves the legacy Node payload exclusively through these fields;
+//!   never PATH, never cwd, never hardcoded outside the release manifest.
 
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::path::{Component, Path};
 
+/// Current frozen schema version for release manifests.
+pub const RELEASE_MANIFEST_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen V1 release manifest representation.
+///
+/// Serialized with `camelCase` naming matching `contracts/release-manifest.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ReleaseManifest {
@@ -25,6 +39,81 @@ pub struct ReleaseManifest {
     #[serde(default)]
     pub state_schemas: Option<StateSchemasInfo>,
     pub files: Vec<ManifestFileEntry>,
+}
+
+impl ReleaseManifest {
+    /// Validates the locked platform invariant that `components.legacyNode.root`
+    /// and `components.legacyNode.entry` exist as confined relative locators.
+    pub fn validate_legacy_node_invariant(&self) -> Result<(), &'static str> {
+        if self.components.legacy_node.root.trim().is_empty() {
+            return Err("components.legacyNode.root must not be empty");
+        }
+        if self.components.legacy_node.entry.trim().is_empty() {
+            return Err("components.legacyNode.entry must not be empty");
+        }
+        if self.components.legacy_node.digest.trim().is_empty() {
+            return Err("components.legacyNode.digest must not be empty");
+        }
+        validate_relative_component_path(
+            "components.legacyNode.root",
+            &self.components.legacy_node.root,
+        )?;
+        validate_relative_component_path(
+            "components.legacyNode.entry",
+            &self.components.legacy_node.entry,
+        )?;
+        let root_prefix = format!(
+            "{}/",
+            self.components.legacy_node.root.trim_end_matches('/')
+        );
+        if self.components.legacy_node.entry == self.components.legacy_node.root
+            || self.components.legacy_node.entry.starts_with(&root_prefix)
+        {
+            return Err("components.legacyNode.entry must be relative to components.legacyNode.root, not repeat it");
+        }
+        Ok(())
+    }
+
+    /// Validates V1 semantics enforced at every trusted manifest read boundary.
+    pub fn validate_v1_invariants(&self) -> Result<(), &'static str> {
+        if self.schema_version != RELEASE_MANIFEST_SCHEMA_VERSION_V1 {
+            return Err("schemaVersion is unsupported; expected 1");
+        }
+        self.validate_legacy_node_invariant()?;
+        if self
+            .state_schemas
+            .as_ref()
+            .map(|schemas| !schemas.migrations.is_empty())
+            .unwrap_or(false)
+        {
+            return Err("stateSchemas.migrations is reserved in V1 and must be empty");
+        }
+        Ok(())
+    }
+}
+
+fn validate_relative_component_path(field: &'static str, value: &str) -> Result<(), &'static str> {
+    let path = Path::new(value);
+    if path.is_absolute() {
+        return match field {
+            "components.legacyNode.root" => Err("components.legacyNode.root must be relative"),
+            _ => Err("components.legacyNode.entry must be relative"),
+        };
+    }
+    if path.components().any(|component| {
+        matches!(
+            component,
+            Component::ParentDir | Component::RootDir | Component::Prefix(_)
+        )
+    }) {
+        return match field {
+            "components.legacyNode.root" => {
+                Err("components.legacyNode.root must not traverse outside the release")
+            }
+            _ => Err("components.legacyNode.entry must not traverse outside the legacy root"),
+        };
+    }
+    Ok(())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -54,6 +143,9 @@ pub struct ComponentsInfo {
     pub workshop: Option<WorkshopComponent>,
 }
 
+/// Legacy Node payload component locator.
+///
+/// Invariant: `root` and `entry` are the only legacy Node locator in the release tree.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct LegacyNodeComponent {
@@ -118,6 +210,8 @@ pub enum ManifestReadError {
     Io(#[from] std::io::Error),
     #[error("json deserialization error: {0}")]
     Json(#[from] serde_json::Error),
+    #[error("invalid manifest invariant: {0}")]
+    InvalidInvariant(&'static str),
 }
 
 pub fn parse_manifest_str(json_str: &str) -> Result<ReleaseManifest, serde_json::Error> {
@@ -130,6 +224,9 @@ pub fn read_manifest_from_path(manifest_path: &Path) -> Result<ReleaseManifest, 
     }
     let content = std::fs::read_to_string(manifest_path)?;
     let manifest = parse_manifest_str(&content)?;
+    manifest
+        .validate_v1_invariants()
+        .map_err(ManifestReadError::InvalidInvariant)?;
     Ok(manifest)
 }
 

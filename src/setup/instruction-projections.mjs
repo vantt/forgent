@@ -1,0 +1,358 @@
+// instruction-projections.mjs — Render composed instruction sets into
+// host-visible managed projections (P5).
+
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { discoverInstructionSources } from './instruction-registry.mjs';
+import {
+  composeInstructionSet,
+  EFFECTIVE_INSTRUCTIONS_DIR,
+  effectiveSetRelativePath,
+  serializeEffectiveInstructionSet,
+  PORTABLE_HOST,
+} from './instruction-composition.mjs';
+
+export const INSTRUCTION_PROJECTION_SCHEMA_VERSION = 1;
+export const PROJECTION_LEDGER_RELATIVE_PATH = '.fgos/installation/projections/ledger.json';
+export const PORTABLE_AGENTS_DESTINATION = 'AGENTS.md';
+export const PORTABLE_AGENTS_ADAPTER = 'portable-agents-md';
+export const MANAGED_BLOCK_START = '<!-- fgos:instruction-projection:start -->';
+export const MANAGED_BLOCK_END = '<!-- fgos:instruction-projection:end -->';
+const EFFECTIVE_SET_KEY_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
+export class InstructionProjectionError extends Error {
+  constructor(message, { code = 'INSTRUCTION_PROJECTION_ERROR', filePath, cause } = {}) {
+    super(filePath ? `${message} (in ${filePath})` : message);
+    this.name = 'InstructionProjectionError';
+    this.code = code;
+    this.filePath = filePath;
+    if (cause) this.cause = cause;
+  }
+}
+
+function toPosixPath(filePath) {
+  return filePath.split(path.sep).join('/');
+}
+
+function safeRelativePath(filePath, label) {
+  if (path.isAbsolute(filePath)) {
+    throw new InstructionProjectionError(`${label} must be relative`, {
+      code: 'UNSAFE_PROJECTION_PATH',
+      filePath,
+    });
+  }
+  const normalized = path.normalize(filePath);
+  if (normalized === '.' || normalized === '..' || normalized.startsWith(`..${path.sep}`)) {
+    throw new InstructionProjectionError(`${label} must stay inside the project root`, {
+      code: 'UNSAFE_PROJECTION_PATH',
+      filePath,
+    });
+  }
+  return toPosixPath(normalized);
+}
+
+function assertNoSymlinkPath(projectRoot, relativePath, label) {
+  const parts = relativePath.split('/').filter(Boolean);
+  let cursor = projectRoot;
+  for (const part of parts) {
+    cursor = path.join(cursor, part);
+    let stat;
+    try {
+      stat = fs.lstatSync(cursor);
+    } catch (err) {
+      if (err && err.code === 'ENOENT') continue;
+      throw err;
+    }
+    if (stat.isSymbolicLink()) {
+      throw new InstructionProjectionError(`${label} must not cross a symlink`, {
+        code: 'UNSAFE_PROJECTION_PATH',
+        filePath: cursor,
+      });
+    }
+  }
+}
+
+function sha256(text) {
+  return `sha256:${crypto.createHash('sha256').update(text).digest('hex')}`;
+}
+
+function projectionId(targetKey, host, destinationPath) {
+  return `instruction:${targetKey}:${host}:${destinationPath}`;
+}
+
+function safeEffectiveSetRelativePath(effectiveSet) {
+  const unsafePath = effectiveSetRelativePath(effectiveSet.target);
+  if (!EFFECTIVE_SET_KEY_PATTERN.test(effectiveSet.key)) {
+    throw new InstructionProjectionError('Effective instruction set key must be a portable file stem', {
+      code: 'UNSAFE_PROJECTION_PATH',
+      filePath: unsafePath,
+    });
+  }
+  const relativePath = safeRelativePath(unsafePath, 'Effective instruction set path');
+  const prefix = `${EFFECTIVE_INSTRUCTIONS_DIR}/`;
+  if (!relativePath.startsWith(prefix) || relativePath.slice(prefix.length).includes('/')) {
+    throw new InstructionProjectionError('Effective instruction set path must stay inside the effective instructions directory', {
+      code: 'UNSAFE_PROJECTION_PATH',
+      filePath: unsafePath,
+    });
+  }
+  return relativePath;
+}
+
+function assertNoManagedMarkerLiterals(projectionContent, filePath) {
+  const start = projectionContent.indexOf(MANAGED_BLOCK_START);
+  const end = projectionContent.lastIndexOf(MANAGED_BLOCK_END);
+  const body = projectionContent.slice(start + MANAGED_BLOCK_START.length, end);
+  if (body.includes(MANAGED_BLOCK_START) || body.includes(MANAGED_BLOCK_END)) {
+    throw new InstructionProjectionError('Rendered instruction projection must not contain managed marker literals', {
+      code: 'UNSAFE_RENDERED_CONTENT',
+      filePath,
+    });
+  }
+}
+
+function groupRulesByKind(rules) {
+  const grouped = new Map();
+  for (const rule of rules) {
+    if (!grouped.has(rule.kind)) grouped.set(rule.kind, []);
+    grouped.get(rule.kind).push(rule);
+  }
+  return grouped;
+}
+
+function renderRule(rule) {
+  const lines = [
+    `#### ${rule.title || rule.id}`,
+    '',
+    `- id: \`${rule.id}\``,
+    `- source: \`${rule.sources.join('`, `')}\``,
+  ];
+  if (rule.description) lines.push(`- description: ${rule.description}`);
+  const body = String(rule.effectiveText ?? '').trim();
+  if (body) lines.push('', body, '');
+  else lines.push('');
+  return lines.join('\n');
+}
+
+export function renderPortableAgentsProjection(effectiveSet) {
+  const grouped = groupRulesByKind(effectiveSet.rules);
+  const lines = [
+    MANAGED_BLOCK_START,
+    '<!-- generated by fgos instruction projection; edit canonical instruction sources, not this block -->',
+    `<!-- effective-set: ${effectiveSetRelativePath(effectiveSet.target)}; key=${effectiveSet.key}; host=${effectiveSet.host} -->`,
+    '',
+    '## fgOS Effective Instructions',
+    '',
+  ];
+  for (const kind of ['law', 'boundary', 'procedure', 'preference', 'host-adapter']) {
+    const rules = grouped.get(kind) ?? [];
+    if (rules.length === 0) continue;
+    lines.push(`### ${kind}`, '');
+    for (const rule of rules) lines.push(renderRule(rule));
+  }
+  lines.push(MANAGED_BLOCK_END, '');
+  return lines.join('\n');
+}
+
+export function spliceManagedProjection(existingContent, blockContent, filePath = PORTABLE_AGENTS_DESTINATION) {
+  const existing = existingContent ?? '';
+  const starts = markerPositions(existing, MANAGED_BLOCK_START);
+  const ends = markerPositions(existing, MANAGED_BLOCK_END);
+  if (
+    starts.length !== ends.length ||
+    starts.length > 1 ||
+    (starts.length === 1 && ends[0] < starts[0])
+  ) {
+    throw new InstructionProjectionError('Instruction projection managed block markers are malformed', {
+      code: 'MALFORMED_MANAGED_BLOCK',
+      filePath,
+    });
+  }
+  if (starts.length === 0) {
+    const prefix = existing.length === 0
+      ? ''
+      : `${existing}${existing.endsWith('\n') ? '\n' : '\n\n'}`;
+    return `${prefix}${blockContent}`;
+  }
+  const start = starts[0];
+  const end = ends[0];
+  const afterEnd = end + MANAGED_BLOCK_END.length;
+  return `${existing.slice(0, start)}${blockContent.replace(/\n$/, '')}${existing.slice(afterEnd)}`;
+}
+
+function markerPositions(content, marker) {
+  const positions = [];
+  let index = content.indexOf(marker);
+  while (index !== -1) {
+    positions.push(index);
+    index = content.indexOf(marker, index + marker.length);
+  }
+  return positions;
+}
+
+function readLedger(ledgerPath) {
+  if (!fs.existsSync(ledgerPath)) {
+    return { schemaVersion: INSTRUCTION_PROJECTION_SCHEMA_VERSION, projections: [] };
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
+  } catch (err) {
+    throw new InstructionProjectionError('Projection ledger is not valid JSON', {
+      code: 'INVALID_LEDGER',
+      filePath: ledgerPath,
+      cause: err,
+    });
+  }
+  if (
+    !parsed ||
+    parsed.schemaVersion !== INSTRUCTION_PROJECTION_SCHEMA_VERSION ||
+    !Array.isArray(parsed.projections)
+  ) {
+    throw new InstructionProjectionError('Projection ledger has an invalid shape', {
+      code: 'INVALID_LEDGER',
+      filePath: ledgerPath,
+    });
+  }
+  return parsed;
+}
+
+function serializeLedger(ledger) {
+  const normalized = {
+    schemaVersion: INSTRUCTION_PROJECTION_SCHEMA_VERSION,
+    projections: [...ledger.projections].sort((a, b) => a.id.localeCompare(b.id)),
+  };
+  return `${JSON.stringify(normalized, null, 2)}\n`;
+}
+
+function upsertLedgerEntry(ledger, entry) {
+  const next = {
+    schemaVersion: INSTRUCTION_PROJECTION_SCHEMA_VERSION,
+    projections: ledger.projections.filter((item) => item.id !== entry.id),
+  };
+  next.projections.push(entry);
+  return next;
+}
+
+export function computeInstructionProjection(projectRoot, options = {}) {
+  const target = options.target ?? 'repo';
+  const host = options.host ?? PORTABLE_HOST;
+  if (host !== PORTABLE_HOST) {
+    throw new InstructionProjectionError(`Unsupported instruction projection host "${host}"`, {
+      code: 'UNSUPPORTED_PROJECTION_HOST',
+    });
+  }
+  const destinationPath = options.destinationPath ?? PORTABLE_AGENTS_DESTINATION;
+  const units = discoverInstructionSources(projectRoot, options.registryOptions ?? {});
+  const effectiveSet = composeInstructionSet(units, { target, host });
+  const effectiveSetContent = serializeEffectiveInstructionSet(effectiveSet);
+  const projectionContent = renderPortableAgentsProjection(effectiveSet);
+  const destinationRelativePath = safeRelativePath(destinationPath, 'Instruction projection destination path');
+  const effectiveSetRelative = safeEffectiveSetRelativePath(effectiveSet);
+  assertNoManagedMarkerLiterals(projectionContent, destinationRelativePath);
+  const ledgerEntry = Object.freeze({
+    id: projectionId(effectiveSet.key, host, destinationRelativePath),
+    kind: 'instruction-projection',
+    runtime: 'local-fgos',
+    source: effectiveSetRelative,
+    effectiveSetDigest: sha256(effectiveSetContent),
+    renderAdapter: PORTABLE_AGENTS_ADAPTER,
+    destinationPath: destinationRelativePath,
+    ownership: 'managed-block',
+    markers: { start: MANAGED_BLOCK_START, end: MANAGED_BLOCK_END },
+    contentDigest: sha256(projectionContent),
+  });
+  return Object.freeze({
+    effectiveSet,
+    effectiveSetRelativePath: effectiveSetRelative,
+    effectiveSetContent,
+    projectionContent,
+    destinationRelativePath,
+    ledgerRelativePath: PROJECTION_LEDGER_RELATIVE_PATH,
+    ledgerEntry,
+  });
+}
+
+export function inspectInstructionProjection(projectRoot, options = {}) {
+  const computed = computeInstructionProjection(projectRoot, options);
+  const effectivePath = path.join(projectRoot, computed.effectiveSetRelativePath);
+  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);
+  const ledgerPath = path.join(projectRoot, computed.ledgerRelativePath);
+  const problems = [];
+  let hasEffectiveSet = false;
+  let hasManagedBlock = false;
+  let hasLedgerEntry = false;
+
+  assertNoSymlinkPath(projectRoot, computed.effectiveSetRelativePath, 'Effective instruction set path');
+  assertNoSymlinkPath(projectRoot, computed.destinationRelativePath, 'Instruction projection destination path');
+  assertNoSymlinkPath(projectRoot, computed.ledgerRelativePath, 'Projection ledger path');
+
+  if (fs.existsSync(effectivePath)) {
+    hasEffectiveSet = true;
+    if (fs.readFileSync(effectivePath, 'utf8') !== computed.effectiveSetContent) {
+      problems.push(`${computed.effectiveSetRelativePath} stale`);
+    }
+  }
+
+  if (!fs.existsSync(destinationPath)) {
+    hasManagedBlock = false;
+  } else {
+    const content = fs.readFileSync(destinationPath, 'utf8');
+    const hasAnyMarker = content.includes(MANAGED_BLOCK_START) || content.includes(MANAGED_BLOCK_END);
+    if (hasAnyMarker && spliceManagedProjection(content, computed.projectionContent, destinationPath) !== content) {
+      problems.push(`${computed.destinationRelativePath} managed instruction block stale`);
+    }
+    hasManagedBlock = hasAnyMarker;
+  }
+
+  if (fs.existsSync(ledgerPath)) {
+    const ledger = readLedger(ledgerPath);
+    const existing = ledger.projections.find((entry) => entry.id === computed.ledgerEntry.id);
+    hasLedgerEntry = Boolean(existing);
+    if (existing && JSON.stringify(existing) !== JSON.stringify(computed.ledgerEntry)) {
+      problems.push(`${computed.ledgerRelativePath} missing or stale entry ${computed.ledgerEntry.id}`);
+    }
+  }
+
+  const materialized = hasEffectiveSet || hasManagedBlock || hasLedgerEntry;
+  if (hasLedgerEntry || hasEffectiveSet) {
+    if (!hasEffectiveSet) problems.push(`${computed.effectiveSetRelativePath} missing`);
+    if (!hasManagedBlock) problems.push(`${computed.destinationRelativePath} missing managed instruction block`);
+    if (!hasLedgerEntry) problems.push(`${computed.ledgerRelativePath} missing entry ${computed.ledgerEntry.id}`);
+  }
+
+  return Object.freeze({ passed: problems.length === 0, problems, materialized, computed });
+}
+
+export function materializeInstructionProjection(projectRoot, options = {}) {
+  const computed = computeInstructionProjection(projectRoot, options);
+  const effectivePath = path.join(projectRoot, computed.effectiveSetRelativePath);
+  const destinationPath = path.join(projectRoot, computed.destinationRelativePath);
+  const ledgerPath = path.join(projectRoot, computed.ledgerRelativePath);
+  assertNoSymlinkPath(projectRoot, computed.effectiveSetRelativePath, 'Effective instruction set path');
+  assertNoSymlinkPath(projectRoot, computed.destinationRelativePath, 'Instruction projection destination path');
+  assertNoSymlinkPath(projectRoot, computed.ledgerRelativePath, 'Projection ledger path');
+
+  let changed = false;
+  const writeIfChanged = (filePath, content) => {
+    const existing = fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : undefined;
+    if (existing === content) return;
+    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    fs.writeFileSync(filePath, content, 'utf8');
+    changed = true;
+  };
+
+  writeIfChanged(effectivePath, computed.effectiveSetContent);
+
+  const existingDestination = fs.existsSync(destinationPath) ? fs.readFileSync(destinationPath, 'utf8') : '';
+  const nextDestination = spliceManagedProjection(existingDestination, computed.projectionContent, destinationPath);
+  writeIfChanged(destinationPath, nextDestination);
+
+  const ledger = readLedger(ledgerPath);
+  const nextLedger = upsertLedgerEntry(ledger, computed.ledgerEntry);
+  writeIfChanged(ledgerPath, serializeLedger(nextLedger));
+
+  return Object.freeze({ changed, computed });
+}

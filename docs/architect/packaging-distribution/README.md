@@ -1,11 +1,18 @@
 # Packaging And Distribution Architecture
 
-**Status:** Architecture discussion package.
-**Date:** 2026-09-04.
-**Canonical V1 contract draft:** [Runtime Identity And Activation](./runtime-identity-and-activation.md).
+> Status: historical redirect. The active packaging-distribution portal is
+> [docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md).
+> Keep this file only as discussion-era source context; do not add new target
+> claims here.
 
-This folder designs the new fgOS packaging/distribution mechanism. The current
-delivery target is not shared web/gateway. The current target is a correct
+**Status:** Historical architecture discussion package.
+**Date:** 2026-09-04.
+**Canonical source now:** [docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md).
+**Historical draft superseded by:** [Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md).
+
+This folder preserved the discussion that shaped the promoted fgOS
+packaging/distribution mechanism. The promoted delivery target is not shared
+web/gateway. The promoted target is a correct
 project-local runtime model that can support:
 
 - `fgctl` as global/machine bootstrap and control;
@@ -16,18 +23,20 @@ project-local runtime model that can support:
 - skills, agents, prose, docs, runner, init/doctor, and projections as part of
   one runtime identity story.
 
-## 1. Read Order
+## 1. Historical Read Order
 
-Read in this order:
+For current work, start at
+[docs/platform/packaging-distribution/README.md](../../platform/packaging-distribution/README.md).
+The older discussion order was:
 
 1. [Workspace Topology Architecture](../workspace-topology.md) — root topology,
    state classes, worktree behavior, workspace activation binding, work-state
    writer compatibility, projection scope, locks, and dirty-tree rules.
-2. [Runtime Identity And Activation](./runtime-identity-and-activation.md) —
-   canonical V1 contract draft and first implementation target.
-3. [Future Constraints](./future-constraints.md) — shared web/gateway, Project
-   Runtime Adapter, and MCP/substrate constraints that packaging must not
-   block, but does not deliver now.
+2. [Promoted Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)
+   — active promoted runtime architecture and first implementation target.
+3. [Promoted Future Constraints](../../platform/packaging-distribution/architecture/future-constraints.md)
+   — shared web/gateway, Project Runtime Adapter, and MCP/substrate constraints
+   that packaging must not block, but does not deliver now.
 4. [Distribution Baseline And Scattered Spec Fragments](./history/distribution-baseline.md)
    — old Node/npm distribution baseline and generated-spec fragments preserved
    as input/history.
@@ -36,13 +45,13 @@ The older generated specs under `docs/specs/*` are not edited during this
 architecture churn. Once the design settles, update their generated source or
 owning workflow and regenerate/check the spec projections.
 
-## 2. Status / Supersession Table
+## 2. Historical Supersession Table
 
-| Topic | Current Source To Follow | Status |
+| Topic | Active source to follow | Status |
 |---|---|---|
-| Runtime/workspace/work-state topology | [Workspace Topology Architecture](../workspace-topology.md) | Current architecture target. Supersedes any simpler "one project root / one runtime root" reading. Packaging must not own physical placement for config/event/coordination roots. |
-| Release identity and activation | [Runtime Identity And Activation](./runtime-identity-and-activation.md) | Current architecture target. Uses per-workspace activation binding, not one repository-wide `active.json`. |
-| Shared gateway/web | [Future Constraints](./future-constraints.md) | Future constraint only; not current delivery scope. |
+| Runtime/workspace/work-state topology | [Workspace Topology Architecture](../workspace-topology.md) | Active architecture target. Supersedes any simpler "one project root / one runtime root" reading. Packaging must not own physical placement for config/event/coordination roots. |
+| Release identity and activation | [Promoted Runtime Identity And Activation](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md) | Active architecture target. Uses per-workspace activation binding, not one repository-wide `active.json`. |
+| Shared gateway/web | [Promoted Future Constraints](../../platform/packaging-distribution/architecture/future-constraints.md) | Future constraint only; not active delivery scope. |
 | Old npm/global/setup install story | [Distribution Baseline And Scattered Spec Fragments](./history/distribution-baseline.md) | Historical input. Do not implement as target without explicit supersession. |
 | `docs/specs/*` distribution wording | Generated specs | Read as current generated state plus historical constraints; not the target while this architecture stream is active. |
 
@@ -82,9 +91,9 @@ domainization, or gateway architecture instead.
 | pin | Git-tracked project policy that says which fgOS runtime version/digest/channel the project wants. |
 | projection ledger | Record of host-visible generated files such as `.agents/skills`, `.claude/skills`, or managed instruction blocks. |
 
-## 5. Current Design Position
+## 5. Historical Design Position
 
-The current architecture position is:
+The promoted architecture position captured from this discussion is:
 
 ```txt
 fgctl
@@ -111,7 +120,7 @@ release payload
 
 Shared web/gateway remains a future constraint: the packaging model must not
 make it impossible for one dashboard/gateway to serve many projects later, but
-that implementation is outside the current delivery scope.
+that implementation is outside the active delivery scope.
 
 ## 6. Do Not Collapse These Boundaries
 
@@ -126,9 +135,10 @@ that implementation is outside the current delivery scope.
 | install/repair vs doctor fix | `fgctl` may change runtime identity; local `fgos doctor --fix` repairs only under the active identity. |
 | distribution selection vs provider routing | Distribution selects the trusted runtime; Host Invocation routes inside that selected runtime. |
 
-## 7. Current Delivery Spine
+## 7. Historical Delivery Spine
 
-The first walking skeleton should prove:
+The first walking skeleton target captured here was promoted into the platform
+proof docs:
 
 ```txt
 fgctl obtains a release payload

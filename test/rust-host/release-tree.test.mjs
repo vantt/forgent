@@ -158,11 +158,11 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
       }
       process.env.FGOS_HARNESS_ENTRY = `bin:${stagedBinary}`;
 
-      // Generate the coverage-floor cases. For native `version`, output contains a dynamic
+      // Generate the coverage-floor cases. Some native help/read paths include a dynamic
       // ISO timestamp, so mode "semantic-json" validates the envelope without timestamp divergence.
       const rawCases = generateCoverageFloorCases({ repoRoot: REPO_ROOT, routesPath: ROUTES_PATH });
       const cases = rawCases.map((c) => {
-        if (c.id === 'coverage-help-version') {
+        if (c.id === 'coverage-help-version' || c.id === 'coverage-help-gate-bypass') {
           return { ...c, modes: ['semantic-json'] };
         }
         return c;

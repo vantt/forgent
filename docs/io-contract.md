@@ -121,7 +121,9 @@ toàn bộ mặt verb để một listener/giao diện **sinh** khung lệnh t�
 thay vì hard-code từng verb. `schema_version` hiện `'2.0'` (tăng từ `'1.0'`
 vì trường `access` bị xoá). Mỗi mục verb mang:
 
-- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`.
+- `name`, cách gọi, mô tả một dòng, lược đồ tham số, ví dụ, `deprecated`
+  (null hoặc chuỗi hướng dẫn deprecation; CLI renderer cũng chấp nhận metadata
+  cấu trúc để không rò `undefined`/`[object Object]` nếu schema tương lai mở rộng).
 - **`touchesState`** (verb có bao giờ ghi trạng thái fgOS) và
   **`externalEffect`** (verb có bao giờ gọi dịch vụ ngoài fgOS) — hai trục
   độc lập thay cho `access` cũ (từng gộp hai câu hỏi vào một giá trị,

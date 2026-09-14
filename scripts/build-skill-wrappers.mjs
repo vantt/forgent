@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 // build-skill-wrappers.mjs — forgentX's own dogfood/CI entry point for the
-// shared generator in src/setup/skill-wrappers.mjs (tsk-1qi D7): regenerates
-// every `.claude/skills/<name>/SKILL.md` thin wrapper from its
-// `.agents/skills/<name>/SKILL.md` source, in this repo's own checkout.
-// `npm run build:skills`. Replaces test/skills/fgos-mirror.test.mjs's old
-// byte-identical assertion (removed, tsk-1qi) with a proof surface: this
-// script is what a maintainer runs after editing a `.agents/skills/*`
-// source, and the mirror test now checks the generated wrappers are
-// actually up to date, not that they byte-match a hand-maintained copy.
+// shared generator in src/setup/skill-wrappers.mjs (tsk-1qi D7): assembles
+// canonical skills from `core/skills/` and `domains/*/skills/` into `.agents/skills/`,
+// regenerates `.claude/skills/<name>/SKILL.md` thin wrappers, and mirrors
+// dev-skills into `plugins/fgOS/skills/`.
+// `npm run build:skills`. This script is what a maintainer runs after editing a
+// canonical skill under `core/skills/*` or `domains/*/skills/*`.
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

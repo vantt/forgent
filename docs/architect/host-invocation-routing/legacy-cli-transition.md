@@ -83,4 +83,4 @@ The cost is temporary: a legacy CLI call pays both the small Rust launcher and N
 
 - [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — kernel contract this document depends on.
 - [External Provider Protocol](./external-provider-protocol.md)
-- [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` split that replaces the removed `setup` verb.
+- [Runtime Identity And Activation](../packaging-distribution/runtime-identity-and-activation.md) — owns the legacy payload's actual on-disk location, `fgctl` rollback mechanics, and the `fgos init` / `fgos doctor --fix` / `fgos doctor` tail that supersedes deprecated legacy `fgos setup` onboarding behavior.

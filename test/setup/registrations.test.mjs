@@ -991,4 +991,3 @@ test('domain-workflow-operations-coverage doctor check is registered and passes 
   assert.equal(result.passed, true);
   assert.match(result.message, /every stage operation across domain workflows resolves/);
 });
-

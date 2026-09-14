@@ -1,34 +1,45 @@
 # Runtime Identity And Activation
 
-**Status:** Architecture contract draft.
+> Status: historical redirect. The active promoted runtime docs are
+> [runtime-identity-and-activation.md](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md),
+> [repository-runtime-layout.md](../../platform/packaging-distribution/contracts/repository-runtime-layout.md),
+> [release-manifest.md](../../platform/packaging-distribution/contracts/release-manifest.md),
+> [activation-binding.md](../../platform/packaging-distribution/contracts/activation-binding.md),
+> [distribution-pin.md](../../platform/packaging-distribution/contracts/distribution-pin.md),
+> and [fgctl-and-local-fgos.md](../../platform/packaging-distribution/architecture/fgctl-and-local-fgos.md).
+> Keep this file only as detailed source context.
+
+**Status:** Historical architecture contract draft.
 **Date:** 2026-09-04.
 **Scope:** Project-local fgOS runtime identity, release records, per-workspace
 activation binding, pinning, drift, rollback, quarantine, and the minimum
 command boundary needed for packaging/distribution and the Rust `fgos` CLI.
 
-This document is the first contract to settle before implementing the new
-distribution mechanism. It deliberately keeps shared gateway/web as a future
-constraint, not current delivery scope.
+This document was the first contract draft before promotion into
+`docs/platform/packaging-distribution/**`. It deliberately kept shared
+gateway/web as a future constraint, not active delivery scope.
 
 ## How To Use This Document
 
-This document is intentionally detailed. Use it as the working contract for the
-first delivery slice, not as a final generated spec.
+This document is intentionally detailed historical source context. Use the
+promoted platform docs as the working contract for new changes.
 
 Read it in layers:
 
 1. Read [Workspace Topology Architecture](../workspace-topology.md) first for root
    topology, state classes, worktree behavior, and dirty-tree rules.
-2. Sections 1-3 here for the runtime identity model and on-disk records.
-3. Sections 4-6 for the record model and activation binding.
-4. Sections 7-10 for concurrency, pinning, projections, and state-schema
-   compatibility.
-5. Sections 11-14 for adoption, repair/rollback authority, command ownership,
-   `fgctl` acquisition, and the
-   first walking skeleton.
-6. Section 15 for remaining decisions.
+2. Read the promoted
+   [runtime identity architecture](../../platform/packaging-distribution/architecture/runtime-identity-and-activation.md)
+   for current runtime identity language.
+3. Read the promoted contracts for
+   [repository layout](../../platform/packaging-distribution/contracts/repository-runtime-layout.md),
+   [activation binding](../../platform/packaging-distribution/contracts/activation-binding.md),
+   [distribution pin](../../platform/packaging-distribution/contracts/distribution-pin.md),
+   and [release manifest](../../platform/packaging-distribution/contracts/release-manifest.md).
+4. Use the remaining sections here only to recover historical rationale or
+   details that the preservation audit points to.
 
-## Settled Decisions So Far
+## Historical Decisions Promoted Or Tracked
 
 | Decision | Status |
 |---|---|
@@ -48,7 +59,8 @@ Read it in layers:
 | Existing projects are adoptable: a missing state schema record is treated as schema `1` and written during local `fgos init`. | Settled for V1. |
 | Source checkouts support explicit `dev:<rev>` activation for dogfood; it is non-distributable and skips immutable release guarantees. | Settled for V1. |
 | `fgctl` V1 is a Rust bootstrap binary with local path/tarball and GitHub release asset as acquisition sources. | Settled for V1. |
-| Shared gateway/web are architecture constraints only, not current delivery scope. | Settled for current delivery. |
+| Candidate preflight is static: `fgctl` never executes candidate release code before the ready binding is published. | Settled for V1 (P7 red-team fix, 2026-09-14). |
+| Shared gateway/web are architecture constraints only, not active delivery scope. | Promoted for active delivery. |
 
 ## 1. Core Position
 

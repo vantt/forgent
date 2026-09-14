@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "artifactDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "digestKind": "sha256",
+  "releaseVersion": "0.1.0",
+  "sourceRevision": "abcdef123456",
+  "createdAt": "2026-09-14T00:00:00.000Z",
+  "target": {
+    "os": "linux",
+    "arch": "x86_64",
+    "libc": "gnu"
+  },
+  "entries": {
+    "fgos": "bin/fgos",
+    "fgosRunner": "bin/fgos-runner"
+  },
+  "components": {
+    "legacyNode": {
+      "root": "libexec/legacy-node",
+      "entry": "bin/fgos.mjs",
+      "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+    },
+    "runner": {
+      "path": "bin/fgos-runner",
+      "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+    },
+    "workshop": {
+      "skillsDigest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "agentsDigest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "proseDigest": "sha256:6666666666666666666666666666666666666666666666666666666666666666"
+    }
+  },
+  "requires": {
+    "node": ">=20.0.0",
+    "git": ">=2.30.0"
+  },
+  "stateSchemas": {
+    "read": [
+      "1"
+    ],
+    "write": [
+      "1"
+    ],
+    "migrations": []
+  },
+  "files": [
+    {
+      "path": "bin/fgos",
+      "kind": "file",
+      "digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "mode": "0755",
+      "class": "binary"
+    }
+  ]
+}
