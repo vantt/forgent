@@ -2802,6 +2802,93 @@ registerFix({
   fix: (cwd) => fixDecisionIndexStale(cwd),
 });
 
+function runInstructionProjectionHelper(root, mode) {
+  const moduleUrl = new URL('./instruction-projections.mjs', import.meta.url).href;
+  const script = `
+    import { inspectInstructionProjection, materializeInstructionProjection } from ${JSON.stringify(moduleUrl)};
+    const root = ${JSON.stringify(root)};
+    const result = ${mode === 'inspect' ? 'inspectInstructionProjection(root)' : 'materializeInstructionProjection(root)'};
+    const computed = result.computed;
+    console.log(JSON.stringify({
+      passed: result.passed,
+      changed: result.changed,
+      materialized: result.materialized,
+      problems: result.problems ?? [],
+      destinationRelativePath: computed.destinationRelativePath,
+      effectiveSetRelativePath: computed.effectiveSetRelativePath,
+      ledgerRelativePath: computed.ledgerRelativePath
+    }));
+  `;
+  try {
+    return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], {
+      cwd: root,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }));
+  } catch (err) {
+    const detail = err.stderr ? String(err.stderr).trim() : err.message;
+    throw new Error(detail || err.message);
+  }
+}
+
+function checkInstructionProjectionsStale(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  if (!fs.existsSync(path.join(root, 'core', 'instructions'))) {
+    return { passed: true, message: 'core/instructions not found -- nothing to project' };
+  }
+  try {
+    const result = runInstructionProjectionHelper(root, 'inspect');
+    if (result.passed) {
+      if (!result.materialized) {
+        return {
+          passed: true,
+          message: 'instruction projections not materialized -- run fgos doctor --fix to generate them',
+        };
+      }
+      return {
+        passed: true,
+        message: `${result.destinationRelativePath}, ${result.effectiveSetRelativePath}, and ${result.ledgerRelativePath} up to date`,
+      };
+    }
+    return {
+      passed: false,
+      message: `${result.problems.join('; ')} -- run fgos doctor --fix`,
+    };
+  } catch (err) {
+    return { passed: false, message: err.message };
+  }
+}
+
+function fixInstructionProjectionsStale(cwd) {
+  const root = resolveMainCheckout(cwd) ?? cwd;
+  if (!fs.existsSync(path.join(root, 'core', 'instructions'))) {
+    return { changed: false, message: 'core/instructions not found -- nothing to project' };
+  }
+  try {
+    const result = runInstructionProjectionHelper(root, 'materialize');
+    if (!result.changed) {
+      return { changed: false, message: 'instruction projections already up to date' };
+    }
+    return {
+      changed: true,
+      message: `regenerated ${result.destinationRelativePath}, ${result.effectiveSetRelativePath}, and ${result.ledgerRelativePath}`,
+    };
+  } catch (err) {
+    return { changed: false, message: `skipped -- ${err.message}` };
+  }
+}
+
+registerCheck({
+  id: 'instruction-projections-stale',
+  description: 'effective instruction-set projections and ledger are current (packaging-distribution P5)',
+  check: (cwd) => checkInstructionProjectionsStale(cwd),
+});
+
+registerFix({
+  id: 'instruction-projections-stale',
+  fix: (cwd) => fixInstructionProjectionsStale(cwd),
+});
+
 export const DEFAULT_DOC_REGISTRY_SETTINGS = Object.freeze({
   enforce: false,
 });
@@ -4273,4 +4360,3 @@ registerCheck({
   description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
 });
-
