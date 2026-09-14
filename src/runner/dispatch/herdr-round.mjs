@@ -145,6 +145,43 @@ export function verifyProcessExeIdentity(pid, expectedCommand) {
 }
 
 /**
+ * The argv, exe-identity, and env checks all narrow to "is the right
+ * binary running with the right claimed argv/environment" -- none of them
+ * see WHERE it runs. A `cd` line injected into the launcher script during
+ * the narrow window between the pre-launch write/readback and the actual
+ * exec changes nothing those checks look at: argv0/args/command/env are
+ * all still exactly as prepared, only the process's own working directory
+ * differs from what was launched for. `/proc/<pid>/cwd` (a symlink, like
+ * `/proc/<pid>/exe`) is the kernel's own record of where the process
+ * actually is, checked against the prepared invocation's own `cwd` -- the
+ * same value the pane itself was split into.
+ *
+ * Returns `true`/`false` when both sides resolve (Linux, process still
+ * alive, `expectedCwd` resolvable on disk), or `null` when the signal is
+ * unavailable -- same `null`-is-no-evidence contract as
+ * `verifyProcessExeIdentity`. Unlike that check's own call site below,
+ * this one must never let `null` through as a pass: an unreadable
+ * `/proc/<pid>/cwd` is exactly as unaccountable as a confirmed mismatch,
+ * so the caller checks for `=== true`, not `!== false`.
+ */
+export function verifyProcessCwd(pid, expectedCwd) {
+  if (!Number.isInteger(pid) || pid <= 0) return null;
+  let realCwd;
+  try {
+    realCwd = fs.readlinkSync(`/proc/${pid}/cwd`);
+  } catch {
+    return null;
+  }
+  let expectedReal;
+  try {
+    expectedReal = fs.realpathSync(expectedCwd);
+  } catch {
+    return null;
+  }
+  return realCwd === expectedReal;
+}
+
+/**
  * A subset of environment variables that change what code runs rather than
  * merely configuring it -- a dynamic-linker/interpreter preload hook, a
  * shell startup file, an interpreter's own options var. None of these are
@@ -1211,6 +1248,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const preparedCommand = isConfined ? preparedWorkerInvocation.command : ctx.command;
   const preparedArgs = isConfined ? (preparedWorkerInvocation.args || []) : (ctx.args || []);
   const preparedEnv = isConfined ? (preparedWorkerInvocation.env || null) : null;
+  const preparedCwd = isConfined ? (preparedWorkerInvocation.cwd || cwd) : cwd;
   // F2: recomputed from the ACTUAL {command, args} that are about to be
   // written into the launcher script and exec'd -- never trusted from
   // `preparedWorkerInvocation.workerCommandDigest`, a self-declared field
@@ -1316,11 +1354,19 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
       // F-env-baseline-fix: a second read of the SAME on-disk script this
       // round already wrote and read back once above (before `pane run`)
-      // proves nothing edited the script's content between write and
-      // execution -- an injected `cd`, an appended export, an edited
-      // command line, anything at all -- without needing any live-process
-      // environment baseline (see the removed M-3 baseline mechanism and
-      // its replacement note on `verifyProcessEnvironment` above).
+      // shows the script was still byte-identical to what was written, as
+      // of the moment THIS read happened -- strictly before the process
+      // execs it. That is a real guarantee, but a bounded one, not an
+      // absolute one: it is a snapshot at one point in time, not a lock
+      // held across the whole write-to-exec window, so an edit landing in
+      // the gap between this read and the actual exec (an injected `cd`,
+      // an appended export, an edited command line) would still slip past
+      // it undetected. No live-process environment baseline is used here
+      // (see the removed M-3 baseline mechanism and its replacement note
+      // on `verifyProcessEnvironment` above); catching that narrower gap
+      // is what the post-launch argv/exe/env/cwd checks just below are
+      // for -- they observe the process the kernel actually started, not
+      // a file read that happened moments earlier.
       let scriptMismatch = false;
       try {
         const postLaunchScript = fs.readFileSync(scriptPath, 'utf8');
@@ -1331,6 +1377,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
       let exeIdentityMismatch = false;
       let envMismatch = false;
+      let cwdMismatch = false;
       if (!scriptMismatch) {
         const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
         while (Date.now() < verifyDeadline) {
@@ -1365,6 +1412,19 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
                 verifiedProc = null;
                 break;
               }
+              // A `cd` injected into the launcher script's exec line
+              // changes where the process runs without touching its
+              // argv, executable, or environment -- none of the checks
+              // above see it. `null` here is NOT treated as a pass, unlike
+              // the exe-identity/env checks above: an unreadable
+              // `/proc/<pid>/cwd` gets the same fail-closed treatment as a
+              // confirmed mismatch, so this checks for `=== true` rather
+              // than `!== false`.
+              if (verifyProcessCwd(verifiedProc.pid, preparedCwd) !== true) {
+                cwdMismatch = true;
+                verifiedProc = null;
+                break;
+              }
               break;
             }
           } catch {}
@@ -1387,7 +1447,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
               ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
               : envMismatch
                 ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
-                : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
+                : cwdMismatch
+                  ? `foreground process in pane "${round.paneId}" matched prepared argv, executable, and environment but its real working directory (/proc/<pid>/cwd) does not match the prepared invocation's cwd "${preparedCwd}" -- possible cwd-injection tamper (e.g. an injected "cd" in the launcher script), or /proc/<pid>/cwd was unreadable; process killed and pane closed.`
+                  : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
       }
     }
 
