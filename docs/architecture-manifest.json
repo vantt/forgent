@@ -158,6 +158,7 @@
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/bin-discovery.mjs": "infra",
     "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",

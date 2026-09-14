@@ -51,9 +51,9 @@ The composition engine produces the effective instruction set before any Markdow
 
 Instruction source belongs near the authority that owns the meaning.
 
-`docs/platform/<component>/` is the design/spec/contract surface. It may define the composition contract, explain why rules exist, and link to source locations, but it should not be the default canonical source for runtime agent instructions.
+`docs/platform/<component>/` is the design/spec/contract surface. Documentation paths such as `docs/platform/<component>/instructions/*.md` (and `docs/platform/**` generally) must never be used as a runtime instruction source. They define architecture contracts and explain rationale, but they are not discovered or loaded by agent runtimes.
 
-Canonical runtime instruction sources should live in source-owned authority roots, for example:
+Canonical runtime instruction sources live strictly in source-owned authority roots:
 
 ```txt
 core/instructions/
