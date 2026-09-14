@@ -53,6 +53,21 @@ entry="$release_path/bin/fgos-runner"
 exec "$entry" "$@"
 "#;
 
+/// Frozen schema version for tracked distribution pins.
+pub const DISTRIBUTION_PIN_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for workspace activation bindings.
+pub const ACTIVATION_BINDING_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for workspace root topology bindings.
+pub const WORKSPACE_ROOT_BINDING_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for install transaction records.
+pub const INSTALL_TRANSACTION_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Tracked project runtime pin policy (`.fgos/distribution.json`).
+///
+/// Matches `contracts/distribution-pin.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct TrackedDistributionPin {
@@ -60,16 +75,27 @@ pub struct TrackedDistributionPin {
     pub project_runtime: ProjectRuntimePin,
 }
 
+/// Canonical alias for `TrackedDistributionPin`.
+pub type DistributionPin = TrackedDistributionPin;
+
+/// Runtime policy specification inside a `TrackedDistributionPin`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ProjectRuntimePin {
     pub policy: String,
     pub artifact_digest: String,
+    #[serde(default)]
     pub release_version: Option<String>,
+    #[serde(default)]
     pub channel: Option<String>,
+    #[serde(default)]
     pub allow_prerelease: bool,
 }
 
+/// Workspace root binding record snapshot (`.fgos/installation/root.json`).
+///
+/// Binds repository root, workspace identity, work-state identity, and machine release store.
+/// Matches `contracts/repository-runtime-layout.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceRootBinding {
@@ -80,6 +106,10 @@ pub struct WorkspaceRootBinding {
     pub machine_release_store: String,
 }
 
+/// Canonical alias for `WorkspaceRootBinding`.
+pub type TopologyRootBinding = WorkspaceRootBinding;
+
+/// Tool identity that performed runtime activation.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivatedByInfo {
@@ -87,6 +117,10 @@ pub struct ActivatedByInfo {
     pub version: String,
 }
 
+/// Workspace activation binding (`.fgos/installation/activation.json`).
+///
+/// Selects and verifies the active fgOS runtime for this workspace.
+/// Matches `contracts/activation-binding.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceActivationBinding {
@@ -98,6 +132,7 @@ pub struct WorkspaceActivationBinding {
     pub status: String,
     pub artifact_digest: String,
     pub release_path: String,
+    #[serde(default)]
     pub previous_artifact_digest: Option<String>,
     pub shim_version: String,
     pub resolved_dependencies: serde_json::Value,
@@ -106,6 +141,10 @@ pub struct WorkspaceActivationBinding {
     pub activated_by: ActivatedByInfo,
 }
 
+/// Canonical alias for `WorkspaceActivationBinding`.
+pub type ActivationBinding = WorkspaceActivationBinding;
+
+/// State transition entry in an install transaction history.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionHistoryEntry {
@@ -113,6 +152,9 @@ pub struct TransactionHistoryEntry {
     pub timestamp: String,
 }
 
+/// Install transaction record (`<store>/installs/<activationId>.json`).
+///
+/// Audits staging, verification, preparation, and publish lifecycle in the release store.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct InstallTransactionRecord {

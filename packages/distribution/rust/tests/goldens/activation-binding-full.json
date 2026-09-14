@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "repositoryId": "repo_8d3322d88fba3bd8",
+  "workspaceId": "8d3322d88fba3bd8",
+  "workStateId": "8d3322d88fba3bd8",
+  "activationId": "act_000001a08fe31d00",
+  "status": "ready",
+  "artifactDigest": "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+  "releasePath": "/home/user/.local/state/fgos/releases/sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+  "previousArtifactDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "shimVersion": "1",
+  "resolvedDependencies": {
+    "node": "/usr/bin/node"
+  },
+  "pinSnapshot": {
+    "schemaVersion": 1,
+    "projectRuntime": {
+      "policy": "exact-digest",
+      "artifactDigest": "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+      "releaseVersion": "0.1.0",
+      "channel": null,
+      "allowPrerelease": false
+    }
+  },
+  "activatedAt": "2026-09-14T00:00:00.000Z",
+  "activatedBy": {
+    "tool": "fgctl",
+    "version": "0.1.0"
+  }
+}

@@ -21,8 +21,9 @@ const FGCTL_BIN = path.resolve(REPO_ROOT, 'target', 'release', 'fgctl');
 let fixtureReleaseDir = null;
 let fixtureDigest = null;
 
-function runFgctl(args, { stateHome, env = {} } = {}) {
+function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGCTL_BIN, args, {
+    cwd: cwd || stateHome,
     env: {
       ...process.env,
       FGOS_STATE_HOME: stateHome,
