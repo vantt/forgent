@@ -84,9 +84,15 @@ fn valid_dev_manifest() -> serde_json::Value {
 }
 
 fn ensure_dev_manifest() -> PathBuf {
-    let root = repo_root();
-    let target = root.join("target");
-    let manifest_path = target.join("dev-manifest.json");
+    let target = std::env::temp_dir().join(format!(
+        "fgos_test_dev_manifest_{}_{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let manifest_path = target.join("manifest.json");
     let manifest = valid_dev_manifest();
     fs::create_dir_all(&target).unwrap();
     fs::write(
