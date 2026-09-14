@@ -103,10 +103,11 @@ if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-s
 if (group === 'pane' && action === 'process-info') {
   const gone = scenario.agentGone || readState().exited;
   const mockArgv = scenario.mockArgv ?? ['claude', 'worker.mjs'];
+  const foregroundPid = scenario.foregroundPid ?? 200;
   const foreground = gone
     ? [{ pid: 100, name: 'zsh' }]
-    : [{ pid: 200, name: 'bwrap', argv: mockArgv }, { pid: 100, name: 'zsh' }];
-  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : 200, foreground_processes: foreground } });
+    : [{ pid: foregroundPid, name: 'bwrap', argv: mockArgv }, { pid: 100, name: 'zsh' }];
+  ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : foregroundPid, foreground_processes: foreground } });
 }
 if (group === 'agent' && action === 'start') {
   if (scenario.startError) fail(scenario.startError, 'agent never reached a ready state');
@@ -930,12 +931,29 @@ test('18. fail-closed triggers when backend is unsupported or foreground argv mi
 });
 
 // 19. Confined execution under required bwrap executes via launcher script and produces receipt
-test('19. confined execution under required bwrap executes via launcher script and produces receipt', async () => {
+test('19. confined execution under required bwrap executes via launcher script and produces receipt', async (t) => {
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
+
+  // The /proc/<pid>/cwd verification added alongside the launcher-script
+  // guard reads real kernel state for whatever pid the mock reports as the
+  // foreground process -- a fabricated pid (e.g. 200) almost certainly
+  // belongs to no running process, so /proc/<pid>/cwd is unreadable and the
+  // check fails closed (correctly). A genuinely running child process is
+  // spawned here so its real /proc/<pid>/cwd, /proc/<pid>/exe, and
+  // environment all line up with what this test's own prepared invocation
+  // expects, the same real-process pattern test 22 below uses.
+  const fgProcess = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 10000)'], {
+    cwd: tmp,
+    env: { ...process.env, TEST_CONF_ENV: 'active' },
+    stdio: 'ignore',
+  });
+  t.after(() => { try { fgProcess.kill('SIGKILL'); } catch {} });
+
   const mock = createMockHerdr(tmp, {
     runDir,
     mockArgv: ['claude', '--ro-bind', '/', '/', 'node', 'worker.mjs'],
+    foregroundPid: fgProcess.pid,
   });
 
   const launchContext = {
