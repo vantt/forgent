@@ -735,12 +735,12 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <run\|show\|launch-master-loop\|chain>/,
+    /coordination requires a sub-verb: fgos coordination <run\|show\|launch-master-loop\|chain\|recover>/,
     'requireField usage message must enumerate "chain"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, launch-master-loop, chain\)/,
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, launch-master-loop, chain, recover\)/,
     'unknown-sub-verb error message must enumerate "chain"',
   );
 
