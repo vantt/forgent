@@ -1,20 +1,20 @@
 // skill-wrappers.mjs — generates `.claude/skills/<name>/SKILL.md` thin-
 // wrapper stubs from `.agents/skills/<name>/SKILL.md` (tsk-1qi, D5/D7 of
-// docs/history/install-setup-external-project-reliability/CONTEXT.md).
+// docs/history/install-setup-external-project-reliability/CONTEXT.md,
+// D7 of docs/history/core-foundation-domain-boundary/DISCUSSION.md).
 //
-// `.agents/skills/*` is the canonical, orchestrator-neutral skill source
-// (D5) — a wrapper's whole content is a short read-and-follow redirect to
-// it, never a full copy (Pinned terms, "Thin wrapper"). Frontmatter is
-// copied verbatim so Claude Code's own skill listing still shows the
-// real name/description; only the body becomes the redirect.
+// Canonical skill authoring lives under `core/skills/` (platform-level)
+// and `domains/<domain>/skills/` (domain-owned). `assembleSkills`
+// materializes them into `.agents/skills/*` as the orchestrator-neutral
+// portable projection. `.claude/skills/<name>/SKILL.md` thin wrappers are
+// generated from `.agents/skills/*` with short read-and-follow redirects,
+// never full copies (Pinned terms, "Thin wrapper"). Frontmatter is copied
+// verbatim so Claude Code's skill listing still displays the real
+// name/description; only the body redirects.
 //
-// One shared function, two callers (D7): `npm run build:skills`
-// (forgentX's own dogfood/CI, wrapper generation only, source and target
-// are the same repo) and `fgos setup`'s external-project materialize path
-// (`materializeSkillsIntoProject` below, which ALSO copies `.agents/
-// skills/*` into the target project first — an external project starts
-// with neither tree, so there is nothing to generate wrappers FROM until
-// the source is copied in).
+// Callers: `npm run build:skills` (repo CI/dogfood: assembles canonical skills,
+// generates thin wrappers, and mirrors dev-skills into plugins/fgOS/skills)
+// and `fgos setup`'s external-project materialize path (`materializeSkillsIntoProject`).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -235,26 +235,101 @@ export const SKILL_ADAPTER_TARGETS = Object.freeze({
     targetRelDir: '.gemini/extensions/fgos',
     kind: 'extension-package',
     triggerSyntax: '/fgos:<verb>',
-    adapterStatus: 'implemented',
+    adapterStatus: 'partial',
   }),
 });
 
 /**
+ * Checks whether a skill directory under `.claude/skills` is a generated wrapper
+ * (has `GENERATED_WRAPPER_MARKER` in its `SKILL.md`) or corresponds to a canonical/assembled skill,
+ * distinguishing generated wrappers from hand-authored skills (e.g. `ui-spec`, `gitnexus`).
+ */
+function isGeneratedClaudeSkillWrapper(skillDirName, targetPath, projectRoot) {
+  let candidateDir = null;
+  if (projectRoot) {
+    candidateDir = path.join(projectRoot, '.claude', 'skills', skillDirName);
+  } else if (path.isAbsolute(targetPath)) {
+    const idx = targetPath.indexOf(path.join('.claude', 'skills'));
+    if (idx !== -1) {
+      candidateDir = path.join(targetPath.slice(0, idx), '.claude', 'skills', skillDirName);
+    }
+  } else {
+    candidateDir = path.join('.claude', 'skills', skillDirName);
+  }
+
+  if (candidateDir) {
+    const skillMd = path.join(candidateDir, 'SKILL.md');
+    if (fs.existsSync(skillMd)) {
+      try {
+        return fs.readFileSync(skillMd, 'utf8').includes(GENERATED_WRAPPER_MARKER);
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  if (projectRoot) {
+    if (
+      fs.existsSync(path.join(projectRoot, '.agents', 'skills', skillDirName, 'SKILL.md')) ||
+      fs.existsSync(path.join(projectRoot, 'core', 'skills', skillDirName, 'SKILL.md'))
+    ) {
+      return true;
+    }
+    const domainsDir = path.join(projectRoot, 'domains');
+    if (fs.existsSync(domainsDir)) {
+      try {
+        for (const domain of fs.readdirSync(domainsDir)) {
+          if (fs.existsSync(path.join(domainsDir, domain, 'skills', skillDirName, 'SKILL.md'))) {
+            return true;
+          }
+        }
+      } catch {}
+    }
+  }
+
+  if (skillDirName.startsWith('fgos-')) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Checks whether a path is a generated adapter target rather than a canonical authoring source.
+ *
+ * Precise classification:
+ * - `.agents/skills/*`: assembled portable projection
+ * - `.gemini/extensions/fgos/*`: generated extension package
+ * - `plugins/fgOS/skills/*`: only mirrored dev-skills (`fgos-*`) and `_shared/`;
+ *   hand-authored plugin skills (e.g. `pick`, `submit`, `cook`, `triage`, `list`) are NOT generated targets.
+ * - `.claude/skills/*`: only generated thin-wrapper stubs containing `GENERATED_WRAPPER_MARKER`;
+ *   hand-authored or third-party skills (e.g. `ui-spec`, `gitnexus`) are NOT generated targets.
  */
 export function isGeneratedAdapterTarget(targetPath, projectRoot) {
   const rel = projectRoot ? path.relative(projectRoot, targetPath) : targetPath;
   const normalized = rel.split(path.sep).join('/');
-  return (
-    normalized === '.agents/skills' ||
-    normalized.startsWith('.agents/skills/') ||
-    normalized === '.claude/skills' ||
-    normalized.startsWith('.claude/skills/') ||
-    normalized === 'plugins/fgOS/skills' ||
-    normalized.startsWith('plugins/fgOS/skills/') ||
-    normalized === '.gemini/extensions/fgos' ||
-    normalized.startsWith('.gemini/extensions/fgos/')
-  );
+
+  if (normalized === '.agents/skills' || normalized.startsWith('.agents/skills/')) {
+    return true;
+  }
+
+  if (normalized === '.gemini/extensions/fgos' || normalized.startsWith('.gemini/extensions/fgos/')) {
+    return true;
+  }
+
+  if (normalized.startsWith('plugins/fgOS/skills/')) {
+    const sub = normalized.slice('plugins/fgOS/skills/'.length);
+    return sub === '_shared' || sub.startsWith('_shared/') || sub.startsWith('fgos-');
+  }
+
+  if (normalized.startsWith('.claude/skills/')) {
+    const sub = normalized.slice('.claude/skills/'.length);
+    const skillName = sub.split('/')[0];
+    if (!skillName || skillName === '_shared') return false;
+    return isGeneratedClaudeSkillWrapper(skillName, targetPath, projectRoot);
+  }
+
+  return false;
 }
 
 /**
@@ -270,11 +345,11 @@ export function isCanonicalSkillSource(sourcePath, projectRoot) {
 }
 
 /**
- * Derives canonical intent ID from frontmatter `intent:` field or skill name.
+ * Derives canonical intent ID from frontmatter `intent:` or `public-intent:` field or skill name.
  * Default shape: `fgos:<verb>` or `fgos:<compound-verb>`.
  */
 export function deriveSkillIntentId(skillName, frontmatterContent = '') {
-  const match = frontmatterContent.match(/^intent:\s*(\S+)/m);
+  const match = frontmatterContent.match(/^(?:intent|public-intent):\s*(\S+)/m);
   if (match && match[1]) {
     return match[1];
   }
@@ -299,6 +374,7 @@ export function mapSkillIntentToHostTriggers(intentId, skillName) {
     'fgos:code-panel': '/fgOS:code-panel',
     'fgos:architecture-panel': '/fgOS:architecture-panel',
   };
+  const isPartial = intentId === 'fgos:pick' || intentId === 'fgos:submit';
   return {
     intentId,
     skillName,
@@ -306,13 +382,15 @@ export function mapSkillIntentToHostTriggers(intentId, skillName) {
     claude: `/fgos:${verb}`,
     claudeCompat: knownCompat[intentId] ?? null,
     gemini: `/fgos:${verb}`,
+    status: isPartial ? 'partial' : 'implemented',
   };
 }
 
 /**
  * Scans `core/skills/` and `domains/<domain>/skills/` to discover all canonical skills.
  * Enforces exactly one canonical source per skill by default (`checkDuplicates: true`),
- * throwing an Error when duplicate skill IDs are detected across sources.
+ * and rejects duplicate canonical intent IDs and duplicate derived host command paths/triggers
+ * before any adapter or projection write.
  */
 export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } = {}) {
   const coreSkillsRoot = path.join(projectRoot, 'core', 'skills');
@@ -403,6 +481,59 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         );
       }
     }
+
+    const intentToSkills = new Map();
+    for (const skill of skills) {
+      if (!intentToSkills.has(skill.intentId)) {
+        intentToSkills.set(skill.intentId, []);
+      }
+      intentToSkills.get(skill.intentId).push(skill);
+    }
+    for (const [intentId, list] of intentToSkills.entries()) {
+      if (list.length > 1) {
+        throw new Error(
+          `duplicate canonical intent ID "${intentId}" found across skills: ${list.map((s) => `${s.name} (${s.canonicalDir})`).join(', ')}`,
+        );
+      }
+    }
+
+    const hostCommandPaths = new Map();
+    const hostTriggers = new Map();
+
+    for (const skill of skills) {
+      const verb = skill.intentId.startsWith('fgos:') ? skill.intentId.slice(5) : skill.intentId;
+      const geminiCmdPath = `commands/fgos/${verb}.toml`;
+      if (!hostCommandPaths.has(geminiCmdPath)) {
+        hostCommandPaths.set(geminiCmdPath, []);
+      }
+      hostCommandPaths.get(geminiCmdPath).push(skill);
+
+      for (const [host, trigger] of Object.entries(skill.triggers)) {
+        if (!trigger || host === 'intentId' || host === 'skillName' || host === 'status') continue;
+        const key = `${host}:${trigger}`;
+        if (!hostTriggers.has(key)) {
+          hostTriggers.set(key, []);
+        }
+        hostTriggers.get(key).push(skill);
+      }
+    }
+
+    for (const [cmdPath, list] of hostCommandPaths.entries()) {
+      if (list.length > 1) {
+        throw new Error(
+          `duplicate derived host command path "${cmdPath}" found across skills: ${list.map((s) => `${s.name} (${s.canonicalDir})`).join(', ')}`,
+        );
+      }
+    }
+
+    for (const [key, list] of hostTriggers.entries()) {
+      if (list.length > 1) {
+        const [host, trigger] = key.split(':');
+        throw new Error(
+          `duplicate derived host trigger "${trigger}" for host "${host}" found across skills: ${list.map((s) => `${s.name} (${s.canonicalDir})`).join(', ')}`,
+        );
+      }
+    }
   }
 
   return skills.sort((a, b) => a.name.localeCompare(b.name));
@@ -474,6 +605,23 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
   const canonicalSkills = skills ?? discoverCanonicalSkills(projectRoot);
   const written = [];
 
+  // Verify no duplicate command paths or intent collisions before writing any adapter files
+  const seenVerbs = new Map();
+  for (const s of canonicalSkills) {
+    const verb = s.intentId.startsWith('fgos:') ? s.intentId.slice(5) : s.intentId;
+    if (!seenVerbs.has(verb)) {
+      seenVerbs.set(verb, []);
+    }
+    seenVerbs.get(verb).push(s);
+  }
+  for (const [verb, list] of seenVerbs.entries()) {
+    if (list.length > 1) {
+      throw new Error(
+        `duplicate derived Gemini command path "commands/fgos/${verb}.toml" found across skills: ${list.map((s) => `${s.name} (${s.canonicalDir || s.name})`).join(', ')}`,
+      );
+    }
+  }
+
   fs.mkdirSync(targetOutputDir, { recursive: true });
   const commandsDir = path.join(targetOutputDir, 'commands', 'fgos');
   fs.mkdirSync(commandsDir, { recursive: true });
@@ -544,6 +692,13 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
  *
  * Safe no-op when neither `core/skills` nor `domains/` exist. Returns array
  * of target paths written/assembled.
+ *
+ * @param {string} projectRoot - Root of the project containing `core/skills/` and/or `domains/`
+ * @param {string} [targetAgentsSkills] - Destination directory for assembled skills (defaults to `<projectRoot>/.agents/skills`)
+ * @param {object} [options]
+ * @param {boolean} [options.prune=true] - When true, prunes orphan skill directories from `agentsSkillsRoot` that are not present in canonical sources (`core/skills` or `domains/[domain]/skills`). Set to false when layering domain skills on top of copied base skills.
+ * @param {boolean} [options.checkDuplicates=true] - When true, rejects duplicate skill names and canonical intent IDs.
+ * @param {boolean} [options.checkCollisions=true] - When true, rejects colliding shared fragments across core and domains.
  */
 export function assembleSkills(
   projectRoot,
@@ -605,7 +760,8 @@ export function assembleSkills(
     assembled.push(targetPath);
   }
 
-  // 5. Prune orphans
+  // 5. Prune orphans: remove directories under agentsSkillsRoot that do not
+  // correspond to any valid canonical skill or _shared fragments.
   if (prune && fs.existsSync(agentsSkillsRoot)) {
     for (const entry of fs.readdirSync(agentsSkillsRoot, { withFileTypes: true })) {
       if (isOwnTmpFile(entry.name)) continue;

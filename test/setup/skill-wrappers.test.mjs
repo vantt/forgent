@@ -576,18 +576,22 @@ test('SKILL_ADAPTER_TARGETS treats .agents/skills, .claude/skills, plugin bundle
   assert.ok(SKILL_ADAPTER_TARGETS.agents, 'agents target must be declared');
   assert.equal(SKILL_ADAPTER_TARGETS.agents.targetRelDir, '.agents/skills');
   assert.equal(SKILL_ADAPTER_TARGETS.agents.kind, 'portable-projection');
+  assert.equal(SKILL_ADAPTER_TARGETS.agents.adapterStatus, 'implemented');
 
   assert.ok(SKILL_ADAPTER_TARGETS.claude, 'claude target must be declared');
   assert.equal(SKILL_ADAPTER_TARGETS.claude.targetRelDir, '.claude/skills');
   assert.equal(SKILL_ADAPTER_TARGETS.claude.kind, 'thin-wrapper');
+  assert.equal(SKILL_ADAPTER_TARGETS.claude.adapterStatus, 'implemented');
 
   assert.ok(SKILL_ADAPTER_TARGETS.plugin, 'plugin target must be declared');
   assert.equal(SKILL_ADAPTER_TARGETS.plugin.targetRelDir, 'plugins/fgOS/skills');
   assert.equal(SKILL_ADAPTER_TARGETS.plugin.kind, 'mirrored-bundle');
+  assert.equal(SKILL_ADAPTER_TARGETS.plugin.adapterStatus, 'implemented');
 
   assert.ok(SKILL_ADAPTER_TARGETS.gemini, 'gemini target must be declared');
   assert.equal(SKILL_ADAPTER_TARGETS.gemini.targetRelDir, '.gemini/extensions/fgos');
   assert.equal(SKILL_ADAPTER_TARGETS.gemini.kind, 'extension-package');
+  assert.equal(SKILL_ADAPTER_TARGETS.gemini.adapterStatus, 'partial');
 });
 
 test('isGeneratedAdapterTarget and isCanonicalSkillSource enforce executable skill source-of-truth rules', () => {
@@ -600,9 +604,17 @@ test('isGeneratedAdapterTarget and isCanonicalSkillSource enforce executable ski
   assert.equal(isGeneratedAdapterTarget('.agents/skills/fgos-routing/SKILL.md'), true);
   assert.equal(isGeneratedAdapterTarget('.claude/skills/fgos-routing/SKILL.md'), true);
   assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/fgos-routing/SKILL.md'), true);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/_shared/citation-format.md'), true);
   assert.equal(isGeneratedAdapterTarget('.gemini/extensions/fgos/commands/fgos/code-panel.toml'), true);
   assert.equal(isGeneratedAdapterTarget('core/skills/fgos-routing/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('domains/coding/skills/fgos-code-panel/SKILL.md'), false);
+
+  // Precise classification: hand-authored plugin and claude skills are NOT generated adapter targets
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/pick/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/submit/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/cook/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('.claude/skills/ui-spec/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('.claude/skills/gitnexus/gitnexus-cli/SKILL.md'), false);
 });
 
 test('projection tests for Codex/OpenAI and Claude surfaces verify adapter projection invariants', () => {
@@ -632,22 +644,68 @@ test('projection tests for Codex/OpenAI and Claude surfaces verify adapter proje
   }
 });
 
+test('discoverCanonicalSkills and assembleSkills throw on duplicate canonical intent ID and Gemini path overwrite collision across core and domain', () => {
+  const root = mkTempDir('skill-intent-collision-');
+  const coreSkillDir = path.join(root, 'core', 'skills', 'skill-core-alpha');
+  const domainSkillDir = path.join(root, 'domains', 'coding', 'skills', 'skill-domain-beta');
+  fs.mkdirSync(coreSkillDir, { recursive: true });
+  fs.mkdirSync(domainSkillDir, { recursive: true });
+
+  const coreFrontmatter = '---\nname: skill-core-alpha\nintent: fgos:shared-op\ndescription: Core skill with shared-op intent\n---\n';
+  const domainFrontmatter = '---\nname: skill-domain-beta\nintent: fgos:shared-op\ndescription: Domain skill with shared-op intent\n---\n';
+
+  fs.writeFileSync(path.join(coreSkillDir, 'SKILL.md'), `${coreFrontmatter}\n# Core Alpha\n`);
+  fs.writeFileSync(path.join(domainSkillDir, 'SKILL.md'), `${domainFrontmatter}\n# Domain Beta\n`);
+
+  // Distinct skill names (skill-core-alpha vs skill-domain-beta), but identical canonical intent and Gemini command path (commands/fgos/shared-op.toml)
+  assert.throws(
+    () => discoverCanonicalSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate canonical intent ID "fgos:shared-op" found across skills:/);
+      assert.match(err.message, /skill-core-alpha/);
+      assert.match(err.message, /skill-domain-beta/);
+      return true;
+    },
+  );
+
+  assert.throws(
+    () => assembleSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate canonical intent ID "fgos:shared-op" found across skills:/);
+      return true;
+    },
+  );
+
+  const outDir = mkTempDir('gemini-collision-out-');
+  assert.throws(
+    () => generateGeminiSkillPackage(root, outDir),
+    (err) => {
+      assert.match(err.message, /duplicate canonical intent ID "fgos:shared-op"|duplicate derived/);
+      return true;
+    },
+  );
+  assert.equal(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'shared-op.toml')), false, 'no adapter files written on collision');
+});
+
 test('mapSkillIntentToHostTriggers maps canonical skill intent to host-native triggers across Codex, Claude, and Gemini', () => {
   const codePanel = mapSkillIntentToHostTriggers('fgos:code-panel', 'fgos-code-panel');
   assert.equal(codePanel.codex, '$fgos-code-panel');
   assert.equal(codePanel.claude, '/fgos:code-panel');
   assert.equal(codePanel.claudeCompat, '/fgOS:code-panel');
   assert.equal(codePanel.gemini, '/fgos:code-panel');
+  assert.equal(codePanel.status, 'implemented');
 
   const archPanel = mapSkillIntentToHostTriggers('fgos:architecture-panel', 'fgos-architecture-panel');
   assert.equal(archPanel.codex, '$fgos-architecture-panel');
   assert.equal(archPanel.claude, '/fgos:architecture-panel');
   assert.equal(archPanel.gemini, '/fgos:architecture-panel');
+  assert.equal(archPanel.status, 'implemented');
 
   const pick = mapSkillIntentToHostTriggers('fgos:pick', 'fgos-routing');
   assert.equal(pick.codex, '$fgos-routing', 'fgos:pick maps to $fgos-routing in Codex');
   assert.equal(pick.claude, '/fgos:pick');
   assert.equal(pick.gemini, '/fgos:pick');
+  assert.equal(pick.status, 'partial', 'routing/pick compatibility trigger mapping is partial');
 });
 
 test('generateGeminiSkillPackage generates valid Gemini CLI extension package as adapter target', () => {
