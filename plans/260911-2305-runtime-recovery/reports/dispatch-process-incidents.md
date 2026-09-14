@@ -233,3 +233,69 @@ parent process left to manage it) sat indefinitely in `working` state. Not
 itself a data-loss risk (the underlying files were intact), but a reminder that
 a completed/failed background dispatch should be checked and reconciled
 promptly rather than left to accumulate.
+
+## 18. Reviewer/red-team returning `status: "done"` with real HIGH/MEDIUM findings still gets classified `failed` in quorum (P05)
+
+Both P05's reviewer and red-team completed real, substantive work — full
+repro-backed findings with file:line evidence, not a claim-validity or
+schema-shape problem — and each explicitly wrote "NOT a clean PASS" in their
+own summary. The coordination engine still recorded both as `status: "failed"`
+in the session quorum (not `done`/`verified`), because a reviewer/red-team
+operation's pass/fail classification is driven by whether it reports a clean
+PASS, not by whether the agent executed successfully. This is correct
+behavior, not a bug — worth recording only because it looks, from the
+`coordination show` quorum view alone, indistinguishable from an actual
+execution failure (crash, claim-invalid, timeout) until the underlying
+`agent-result.json` is read. Lesson: always read the actual `agent-result.json`
+before assuming a `failed` quorum entry means the dispatch itself broke.
+
+## 19. Doer hit the account's own Claude usage/session limit mid-produce, leaving real uncommitted work behind (P05S)
+
+P05S's doer (headless `claude`, produce-candidate) wrote all 7 leased files
+(2 new, 5 modified, ~900 lines total) into the worktree exactly matching the
+cell's contract, then hit the account's own session/usage limit
+("You've hit your session limit · resets 2:10pm") before running its final
+`git add`+`git commit` — so `exit.json` shows `exitCode: 1`, no
+`agent-result.json` was ever written, and `gitBefore === gitAfter` in
+`result.json` (no commit landed) even though the working tree was genuinely,
+substantially dirty. The downstream reviewer then ran for the full 35-minute
+wall-time ceiling with nothing to review (HEAD had no diff from the produce
+step's own dispatch base) and timed out, leaving an orphaned idle herdr pane;
+red-team was dispatched after it regardless (the coordination protocol does
+not check the reviewer's own outcome before firing red-team in this pattern).
+Lesson: an `exitCode`-based failure with no `agent-result.json` and no commit,
+but a genuinely dirty worktree, should be diagnosed by reading the raw
+`protected/capture/*/stdout.log` (not just `agent-result.json`, which won't
+exist) before assuming the implementation itself is bad — real, substantial,
+on-contract work can survive an account-limit interruption and be worth
+building on (verify + finish + commit) rather than re-implementing from
+scratch with a fresh taskKey.
+
+## 20. Reviewer's real PASS-with-findings report refused as a whole-round false positive due to UNRELATED concurrent dirt in the shared main checkout (P05S)
+
+P05S's reviewer (herdr-spawn) was correctly confined to and did all its real
+work in its assigned worktree (`../runtime-recovery-p05s`) — its own
+`agent-result.json` shows a genuine, substantive review (16/16 + 759/760 +
+720/721 real test runs, 1 MEDIUM + 5 LOW findings, no HIGH). The dispatch
+infrastructure still recorded the whole round as `exitCode: 1`/quorum
+`failed`, with `stderr.log` reporting: "executor ... reported success but
+wrote outside its workspace... these paths became dirty in
+/home/vantt/projects/forgentX during the round: docs/platform/
+packaging-distribution/code-panel-rollout-plan.md" and two sibling files.
+Checked directly: those 3 files were genuinely dirty in the MAIN checkout,
+but confirmed unrelated to this reviewer's own work — they belong to a
+completely different, concurrently-running herdr pane/session on the same
+machine ("Execute code-panel rollout plan", independently observed as
+`working` at the same wall-clock time) editing the exact same docs. The
+safety check that refuses a round when unexpected paths go dirty cannot
+currently distinguish "this round's own agent leaked outside its assigned
+worktree" from "some unrelated concurrent session on the same shared machine
+happened to dirty the main checkout while this round was running" — both
+present identically as "paths dirty outside the assigned workspace" from the
+refusing round's point of view. Lesson: before discarding a `failed`-quorum
+round as a real execution failure, check whether the round's OWN
+`agent-result.json` (if one exists, as here) shows genuine substantive work —
+and if the stderr reason is "wrote outside its workspace", independently
+verify (`git status`/`git log -1 -- <path>`) whether the flagged dirty paths
+are plausibly this round's own leak versus unrelated concurrent activity on
+a shared machine, before either accepting or discarding the round's content.

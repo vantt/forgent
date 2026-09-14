@@ -369,6 +369,7 @@ lands on `main` and its trace is written under
 | P02H | `171a6510` (into `runtime-recovery`) | PASS (3 fix rounds, 1 session) | PASS (3 fix rounds, 1 session) | 1 MEDIUM crash-window edge case; 1 MEDIUM unrelated trust-store race; 1 LOW-MEDIUM self-healing digest gap; cosmetic notes | [p02h.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02h.md) |
 | P03 | `d61c8bea` (direct to `main`) | PASS (2 fix rounds) | PASS (1 fix round; folded into fix-1) | 1 LOW provenance-label cosmetic; 1 LOW unreachable-fallback residual | [p03.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p03.md) |
 | P05 | `fed6301f` (direct to `main`) | PASS (3 fix rounds) | PASS (2 fix rounds) | 1 LOW settle-ledger residual (architectural, outside lease); 2 LOW liveness/lock-window notes | [p05.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05.md) |
+| P05S | `main` tip (direct to `main`) | PASS (1 fix round) | PASS (folded into fix-1) | 1 LOW actionKey-reminting (by-design); 1 LOW reason-wording gap; 2 INFO notes | [p05s.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05s.md) |
 
 ## Design Gate Definition
 
