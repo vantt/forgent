@@ -252,26 +252,14 @@ export function recoverApplyUseCase(ctx, params = {}) {
       return { runId, runDir, outcome: check.outcome, reason: check.reason };
     }
 
-    // F5: a fresh settled-status re-check, immediately before the write --
-    // markRunSettled/reconcileRun touch run.json OUTSIDE this lock, so the
-    // snapshot read a moment ago is not proof the run is still recoverable
-    // right now.
-    const freshOutcome = classifyRunOutcome(runDir, { liveness: 'unknown' });
-    if (freshOutcome.outcome === 'settled') {
-      return {
-        runId,
-        runDir,
-        outcome: 'plan-stale',
-        reason: 'the run settled moments before this recovery apply reached its write -- refusing to record a recovery action against a settled run',
-      };
-    }
-
     // H1: the actual control-epoch mutation goes through run-lock's own
     // real CAS primitive -- the same generation ledger a live controller's
     // acquireRunControl/releaseRunControl calls fence against -- instead of
     // bumping the shadow run.json.controlEpoch field directly. A live
     // controller genuinely holding the run is refused here, never silently
-    // overwritten.
+    // overwritten. This is also the one exclusive resource this door can
+    // acquire before its own write, so F5's fresh settled re-check (below)
+    // is deliberately sequenced AFTER this, not before it.
     const controlResult = acquireRunControl(runDir, {
       holder: { id: 'dispatch-recover', pid: process.pid },
       purpose: `recovery-apply:${params.action?.type ?? 'unknown'}`,
@@ -293,6 +281,31 @@ export function recoverApplyUseCase(ctx, params = {}) {
         outcome: 'held',
         reason: `run control is currently held by a live driver (epoch ${controlResult.controlEpoch}) -- refusing to apply recovery over an active controller`,
         holder: controlResult.holder,
+      };
+    }
+
+    // F5: the LAST read before the write, not the first read after the CAS
+    // checks -- markRunSettled/reconcileRun touch run.json OUTSIDE this
+    // lock/epoch, so this has to run after acquireRunControl above (the one
+    // exclusive resource this door holds) to actually shrink the race
+    // window down to the length of the write itself, rather than covering
+    // the acquireRunControl call too. A settle-writer that never routes
+    // through acquireRunControl at all (e.g. cli.mjs's closeRun, a
+    // status-only flip) is a documented residual this reordering narrows
+    // but cannot close -- fixing that writer's own locking is out of this
+    // door's lease.
+    const freshOutcome = classifyRunOutcome(runDir, { liveness: 'unknown' });
+    if (freshOutcome.outcome === 'settled') {
+      // The control epoch was already bumped by acquireRunControl above;
+      // release it immediately rather than leaving it held with no
+      // corresponding recovery action, so a resumed/reassigned real driver
+      // is never blocked behind an apply that ultimately refused.
+      releaseRunControl(runDir, { controlEpoch: controlResult.controlEpoch, controlToken: controlResult.controlToken });
+      return {
+        runId,
+        runDir,
+        outcome: 'plan-stale',
+        reason: 'the run settled moments before this recovery apply reached its write -- refusing to record a recovery action against a settled run',
       };
     }
 

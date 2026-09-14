@@ -93,7 +93,12 @@ function checkPreconditions(snapshot, evidence) {
       reason: `unrecognized evidence type(s): ${unknown.map((e) => `${e.id}:${e.type}`).join(', ')} -- never guessing an action over evidence this door cannot interpret`,
     };
   }
-  if (snapshot.run?.status === 'settled') {
+  // R3: consult the settled-outcome signal (F1's own snapshot field), not
+  // just run.json.status -- a run whose result.json already landed is
+  // "nothing to recover" even before run.json.status has been reconciled to
+  // 'settled'. Read-door defense-in-depth alongside recover.mjs's own F5
+  // write-door re-check, not a substitute for it.
+  if (snapshot.run?.status === 'settled' || snapshot.settledSignal?.outcome === 'settled') {
     return { status: 'park', reason: 'run already settled -- there is nothing to recover' };
   }
   return null;

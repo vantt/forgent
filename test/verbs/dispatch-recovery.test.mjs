@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { Worker } from 'node:worker_threads';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 import { plan, checkApply, collectEvidence, deriveRecoveryFacts, isActionLegal } from '../../src/runner/dispatch/recovery-planner.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
@@ -209,25 +210,34 @@ test('apply refuses as plan-stale when the run\'s observed snapshot changed sinc
   } finally { cleanup(root); }
 });
 
-test('two recommendations racing on the same starting state: the first apply wins, the second sees plan-stale -- exactly one winner', () => {
-  const { root } = makeRepo();
+test('two recommendations racing on the same starting state: the first apply wins, the second never repeats or corrupts its effect', () => {
+  const { root, runDir } = makeRepo();
   try {
     // Deliberately no injected `now` here: both recommendations and both
     // applies use the real clock, milliseconds apart -- well inside the
     // default TTL, and the point of this test is the CAS/epoch mechanics,
-    // not expiry.
+    // not expiry. actionKey is now DETERMINISTICALLY derived from
+    // (snapshotHash, controlEpoch, action, expiresAt) (F3): whether recA and
+    // recB land in the same millisecond and thus share an actionKey is real,
+    // non-deterministic timing this test does not control -- asserting key
+    // inequality here was flaky, not a real invariant.
     const recA = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
     const recB = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
     assert.equal(recA.snapshotHash, recB.snapshotHash);
     assert.equal(recA.expectedControlEpoch, recB.expectedControlEpoch);
-    assert.notEqual(recA.actionKey, recB.actionKey);
 
     const applyA = recoverApplyUseCase({ repoRoot: root }, applyFrom(recA));
     assert.equal(applyA.outcome, 'applied');
     assert.equal(applyA.controlEpochAfter, 1);
 
     const applyB = recoverApplyUseCase({ repoRoot: root }, applyFrom(recB));
-    assert.equal(applyB.outcome, 'plan-stale', 'the epoch already moved under recB -- it never repeats or corrupts the first apply\'s effect');
+    assert.ok(
+      applyB.outcome === 'plan-stale' || applyB.outcome === 'already-applied',
+      `recB must never repeat or corrupt applyA's effect: expected plan-stale (distinct actionKey, epoch already moved) or already-applied (same actionKey as recA), got ${applyB.outcome}`,
+    );
+
+    const run = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+    assert.equal(run.controlEpoch, 1, 'controlEpoch bumped exactly once, not twice, regardless of which outcome recB saw');
   } finally { cleanup(root); }
 });
 
@@ -408,6 +418,66 @@ test('F1: a run that settles (result.json appears) between plan() and apply refu
     const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
     assert.equal(result.outcome, 'plan-stale', 'a settled run must refuse the apply even though run.json.status never changed');
   } finally { cleanup(root); }
+});
+
+test('F5: the settled re-check now runs as the LAST read before the write -- stress: unsafe-apply rate drops well below the pre-fix 74/100 baseline', async () => {
+  // Pre-fix, the fresh settled re-check ran BEFORE acquireRunControl (the
+  // door's one exclusive resource), so a result.json write landing anywhere
+  // across checkApply + the re-check + acquireRunControl + the final write
+  // could slip through unnoticed -- red-team's repro measured 74/100 unsafe
+  // applies over that window. Post-fix, the re-check is the LAST thing read
+  // before the write, so only a write landing in the write's own short
+  // duration can still slip through (documented residual, not closed by
+  // this reorder -- see the F5 comment in recover.mjs). This proves that
+  // narrowing, not a claim of a fully closed window.
+  //
+  // Genuine concurrency is required to exercise this: recoverApplyUseCase
+  // runs fully synchronously and blocks the main thread for its own
+  // duration, so a same-process timer/microtask could never land "during"
+  // it. A worker thread is a separate OS-schedulable thread that can.
+  const TRIALS = 40;
+  let unsafe = 0;
+  for (let i = 0; i < TRIALS; i += 1) {
+    const { root, runDir } = makeRepo();
+    try {
+      const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+      const resultPath = path.join(runDir, 'result.json');
+      const delayMs = i % 10; // spans the ~0-9ms window the repro measured
+      const worker = new Worker(
+        `
+        const { parentPort, workerData } = require('node:worker_threads');
+        const fs = require('node:fs');
+        const sab = new Int32Array(new SharedArrayBuffer(4));
+        Atomics.wait(sab, 0, 0, workerData.delayMs);
+        fs.writeFileSync(workerData.resultPath, JSON.stringify({ ok: true }));
+        parentPort.postMessage('done');
+        `,
+        { eval: true, workerData: { resultPath, delayMs } },
+      );
+      const written = new Promise((resolve, reject) => {
+        worker.once('message', resolve);
+        worker.once('error', reject);
+      });
+      const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+      try {
+        await Promise.race([
+          written,
+          new Promise((_, reject) => setTimeout(() => reject(new Error(`F5 stress worker timed out (trial ${i})`)), 2000)),
+        ]);
+      } finally {
+        await worker.terminate();
+      }
+
+      // Unsafe iff the apply performed the write ('applied') even though
+      // the settle write had already landed on disk by the time we can
+      // observe it here.
+      if (result.outcome === 'applied' && fs.existsSync(resultPath)) unsafe += 1;
+    } finally { cleanup(root); }
+  }
+  assert.ok(
+    unsafe / TRIALS < 0.3,
+    `expected the F5 reorder to cut the unsafe-apply rate well below the pre-fix 74/100 baseline, got ${unsafe}/${TRIALS}`,
+  );
 });
 
 test('F3: a valid actionKey from a different recommendation cannot be replayed against this one', () => {
