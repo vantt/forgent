@@ -524,6 +524,39 @@ const EVENT_SPECS = {
     required: ['turnId', 'turnOrdinal', 'channel', 'artifactRef', 'revision', 'externalRef', 'attributedTo', 'recordedBy'],
     accepted: ['turnId', 'turnOrdinal', 'channel', 'artifactRef', 'revision', 'externalRef', 'attributedTo', 'recordedBy', 'respondsToRefs'],
   },
+  // Coordination-session recovery: one applied recovery command
+  // against a session-owned Run. `invocationKey` is the CAS actionKey a
+  // caller may consume at most once -- store.mjs's `recordRecoveryCommand`
+  // enforces that at write time (session-scoped, schema-2 only); replay.mjs
+  // enforces it again at read time, the same first-use-uniqueness discipline
+  // `operation-authorized`'s own `invocationKey` already gets. `commandId`
+  // lets a future adapter reconcile an outcome against the exact command it
+  // resolves, without ever letting that later outcome change the action or
+  // target Run this event already declared.
+  'recovery-command-recorded': {
+    required: [
+      'invocationKey',
+      'coordinationId',
+      'runId',
+      'action',
+      'snapshotDigest',
+      'expectedEventSeq',
+      'expectedRunControlEpoch',
+      'expiresAt',
+      'commandId',
+    ],
+    accepted: [
+      'invocationKey',
+      'coordinationId',
+      'runId',
+      'action',
+      'snapshotDigest',
+      'expectedEventSeq',
+      'expectedRunControlEpoch',
+      'expiresAt',
+      'commandId',
+    ],
+  },
 };
 
 export const EVENT_KINDS = Object.freeze(Object.keys(EVENT_SPECS));
@@ -569,6 +602,14 @@ const DRIVER_PROVENANCE_COMPANION_FIELDS = ['operationId', 'nodeId', 'invocation
 // already took for the identical reason. One legal method in MVP7.
 export const AGGREGATION_METHOD_VALUES = Object.freeze(['evidence-preserving-synthesis']);
 export const AGGREGATION_OUTCOME_VALUES = Object.freeze(['consensus', 'qualified', 'no-consensus']);
+
+// Coordination-session recovery: the coordination-session-scoped
+// analog of dispatch/recover.mjs's standalone recovery door. An applied
+// recovery command always declares exactly one of these five actions --
+// 'park' is itself a legitimate, recordable driver decision here (unlike
+// the standalone door, which has no such action), not merely a planner
+// outcome kind.
+export const RECOVERY_ACTIONS = Object.freeze(['observe', 'collect', 'settle', 'close', 'park']);
 
 // `aggregation-validated`'s own optional fields. Kept local to this kind
 // rather than folded into OPTIONAL_STRING_ARRAY_FIELDS/OPTIONAL_STRING_FIELDS
@@ -725,6 +766,23 @@ export function validateEventPayload(type, payload, opts = {}) {
       // carried over to the authorization that fills a slot).
       if (!isStringArray(value)) {
         fail('validation', `event "${type}" payload.${field} must be an array of non-empty strings`);
+      }
+      continue;
+    }
+    if (field === 'runId' && type === 'recovery-command-recorded') {
+      if (value !== null && !isNonEmptyString(value)) {
+        fail('validation', `event "${type}" payload.runId must be a non-empty string or null`);
+      }
+      continue;
+    }
+    if (field === 'expectedEventSeq' || field === 'expectedRunControlEpoch') {
+      // Non-negative, not strictly positive: `expectedRunControlEpoch`
+      // legitimately reads 0 when the target Run has never acquired
+      // run-lock.mjs control at all (that module's own "no generation
+      // published yet" convention, mirrored by dispatch/recover.mjs's own
+      // 0-based public epoch numbering).
+      if (!Number.isInteger(value) || value < 0) {
+        fail('validation', `event "${type}" payload.${field} must be a non-negative integer`);
       }
       continue;
     }
@@ -892,6 +950,11 @@ export function validateEventPayload(type, payload, opts = {}) {
   }
   if (type === 'session-opened') {
     validateProvenanceRoot(body.provenanceRoot, `event "session-opened" payload.provenanceRoot`);
+  }
+  if (type === 'recovery-command-recorded') {
+    if (!RECOVERY_ACTIONS.includes(body.action)) {
+      fail('validation', `event "recovery-command-recorded" payload.action must be one of ${RECOVERY_ACTIONS.join(', ')}`);
+    }
   }
   if (type === 'actor-bound') {
     if (body.persona !== undefined && !isNonEmptyString(body.persona)) fail('validation', 'event "actor-bound" payload.persona must be a non-empty string when provided');

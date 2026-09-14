@@ -90,6 +90,7 @@ import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
+import { recoverSessionObserveUseCase, recoverSessionApplyUseCase } from '../src/verbs/coordination/recover.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3292,7 +3293,26 @@ async function runVerb(verb, flags, positional, dir) {
         const track = requireField(positional[1] ?? flags.track, 'coordination chain requires a track: fgos coordination chain <track> [--json]');
         return chainCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { track });
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop, chain).`);
+      if (sub === 'recover') {
+        // Coordination-session recovery: the session-scoped analog of
+        // `dispatch recover` -- see that verb's own case block, above, for
+        // the identical observe-vs-apply shape this mirrors.
+        const coordinationId = requireField(positional[1] ?? flags.id, 'coordination recover requires a coordinationId: fgos coordination recover <coordinationId>');
+        const recoverCtx = { cwd: cwdForCoordination, repoRoot: repoRootForCoordination };
+        if (flags.action === undefined) {
+          return recoverSessionObserveUseCase(recoverCtx, { coordinationId });
+        }
+        return recoverSessionApplyUseCase(recoverCtx, {
+          coordinationId,
+          action: flags.action,
+          expectedSnapshot: requireField(flags['expected-snapshot'], 'coordination recover --action requires --expected-snapshot'),
+          expectedEventSeq: requireField(flags['expected-event-seq'], 'coordination recover --action requires --expected-event-seq'),
+          expectedRunControlEpoch: requireField(flags['expected-run-control-epoch'], 'coordination recover --action requires --expected-run-control-epoch'),
+          expectedExpiresAt: requireField(flags['expected-expires-at'], 'coordination recover --action requires --expected-expires-at'),
+          actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
+        });
+      }
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop, chain, recover).`);
     }
 
     case 'rebuild': {
@@ -5098,7 +5118,7 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   goal: (positional) => positional[0] === 'set',
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
   knowledge: (positional) => positional[0] === 'attest',
-  coordination: (positional) => ['run', 'launch-master-loop'].includes(positional[0]),
+  coordination: (positional, flags) => ['run', 'launch-master-loop'].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,
   // `dispatch show-run`/`watch` never write; `dispatch recover` writes

@@ -28,6 +28,7 @@ import {
   assertSchemaVersionCurrent,
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
+  SCHEMA_VERSION_2,
 } from './schema.mjs';
 import { validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
@@ -158,6 +159,17 @@ export function replaySession(coordinationId, opts = {}) {
   const humanTurnIds = new Set();
   const humanTurnExternalRefs = new Map(); // externalRef -> the turnId that first claimed it
   let maxHumanTurnOrdinal = 0;
+  // Coordination-session recovery: recorded recovery commands,
+  // reconstructed the same way authorizations/aggregations are -- valid
+  // ones (pre-terminal) in `recoveryCommands`, post-terminal ones
+  // neutralized into `ignoredRecoveryCommands` rather than silently
+  // dropped. `recoveryCommandInvocationKeys` enforces first-use uniqueness
+  // read-side, the mirror of store.mjs's own lock-held write-time check --
+  // this validator never reads mutable configuration to do it, only the
+  // log itself.
+  const recoveryCommands = [];
+  const ignoredRecoveryCommands = [];
+  const recoveryCommandInvocationKeys = new Set();
   let terminalSeen = false;
 
   for (const event of events) {
@@ -569,6 +581,51 @@ export function replaySession(coordinationId, opts = {}) {
         authorizedBy: event.payload.authorizedBy,
         ts: event.ts,
       });
+    } else if (event.type === 'recovery-command-recorded') {
+      // Schema-1 sessions must be completely unaffected by this cell: a
+      // hand-crafted or corrupted schema-1 log carrying this event kind at
+      // all is refused here, the read-side mirror of store.mjs's own
+      // write-time schema-2-only gate.
+      if (manifest.schemaVersion !== SCHEMA_VERSION_2) {
+        throw new CoordinationError(
+          'validation',
+          `session "${coordinationId}": "recovery-command-recorded" event found in a schema-"${manifest.schemaVersion}" session -- session recovery commands are schema-2 only`,
+        );
+      }
+      // Read-time mirror of store.mjs's own lock-held single-use
+      // `invocationKey` check, at exact parity with `operation-authorized`'s
+      // own duplicate-`invocationKey` refusal just above it: never reads
+      // mutable configuration, only the log itself.
+      const { invocationKey, coordinationId: payloadCoordinationId } = event.payload;
+      if (recoveryCommandInvocationKeys.has(invocationKey)) {
+        throw new CoordinationError(
+          'duplicate-ref',
+          `session "${coordinationId}": invocationKey "${invocationKey}" is claimed by more than one "recovery-command-recorded" event -- a recovery action key is consumed exactly once`,
+        );
+      }
+      recoveryCommandInvocationKeys.add(invocationKey);
+      if (payloadCoordinationId !== coordinationId) {
+        throw new CoordinationError(
+          'foreign-ref',
+          `session "${coordinationId}": "recovery-command-recorded" event "${event.payload.commandId}" declares coordinationId "${payloadCoordinationId}", which does not match this session -- a recovery command may only target its own session`,
+        );
+      }
+      const record = {
+        invocationKey,
+        coordinationId: payloadCoordinationId,
+        runId: event.payload.runId,
+        action: event.payload.action,
+        snapshotDigest: event.payload.snapshotDigest,
+        expectedEventSeq: event.payload.expectedEventSeq,
+        expectedRunControlEpoch: event.payload.expectedRunControlEpoch,
+        expiresAt: event.payload.expiresAt,
+        commandId: event.payload.commandId,
+        ts: event.ts,
+      };
+      // Post-terminal: neutralized exactly like a post-terminal
+      // authorization/aggregation -- excluded from `recoveryCommands`,
+      // reported separately, never silently dropped.
+      (terminalSeen ? ignoredRecoveryCommands : recoveryCommands).push(record);
     }
 
     if (event.type === 'assignment-created') {
@@ -715,6 +772,8 @@ export function replaySession(coordinationId, opts = {}) {
     ignoredSpecialistAuthorizations: Object.freeze(ignoredSpecialistAuthorizations.map((record) => Object.freeze(record))),
     humanTurns: Object.freeze(humanTurns.map((record) => Object.freeze(record))),
     ignoredHumanTurns: Object.freeze(ignoredHumanTurns.map((record) => Object.freeze(record))),
+    recoveryCommands: Object.freeze(recoveryCommands.map((record) => Object.freeze(record))),
+    ignoredRecoveryCommands: Object.freeze(ignoredRecoveryCommands.map((record) => Object.freeze(record))),
     assignments: Object.freeze(assignments.map((record) => Object.freeze(record))),
     results: Object.freeze(results.map((record) => Object.freeze(record))),
     dispositions: Object.freeze(dispositions.map((record) => Object.freeze(record))),
