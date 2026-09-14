@@ -239,7 +239,7 @@ export function readMarker(markerPath) {
 
 // --- Per-Run control epoch/token fencing ----------------------------------
 
-function controlDirs(runDir) {
+export function controlDirs(runDir) {
   const base = path.join(runDir, 'control');
   return { generationsDir: path.join(base, 'generations'), releasesDir: path.join(base, 'releases') };
 }
