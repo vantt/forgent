@@ -23,7 +23,10 @@ const SELF_ID_PROMPT =
   'Reply with exactly one line in the format MODEL=<your model name or identifier>. No other text, no explanation.';
 
 const CODEX_BIN = findExecutableOnPath(['codex']);
-const CODEX_SKIP = CODEX_BIN ? false : 'codex binary not found on PATH -- live codex-cli test skips honestly';
+const LIVE_EXECUTOR_TESTS_ENABLED = process.env.FGOS_RUN_LIVE_EXECUTOR_TESTS === '1';
+const CODEX_SKIP = LIVE_EXECUTOR_TESTS_ENABLED && CODEX_BIN
+  ? false
+  : 'set FGOS_RUN_LIVE_EXECUTOR_TESTS=1 with codex on PATH to run the live codex-cli proof';
 
 function readGlmApiKey() {
   if (process.env.GLM_OPENROUTER_API_KEY) return process.env.GLM_OPENROUTER_API_KEY;
@@ -43,9 +46,9 @@ if (GLM_API_KEY && !process.env.GLM_OPENROUTER_API_KEY) {
 }
 const GLM_BIN = findExecutableOnPath(['claude']);
 const GLM_SKIP =
-  GLM_BIN && GLM_API_KEY
+  LIVE_EXECUTOR_TESTS_ENABLED && GLM_BIN && GLM_API_KEY
     ? false
-    : 'claude binary or GLM_OPENROUTER_API_KEY (.fgos/secrets.local.env) not found -- live glm-cli test skips honestly';
+    : 'set FGOS_RUN_LIVE_EXECUTOR_TESTS=1 with claude and GLM_OPENROUTER_API_KEY (.fgos/secrets.local.env) to run the live glm-cli proof';
 
 test('codex-cli executor (LIVE): dispatches a real self-identification prompt through this repo\'s configured codex-cli executor', { skip: CODEX_SKIP }, async () => {
   const res = await executeExecutorCli('codex-cli', {
