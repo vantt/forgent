@@ -412,8 +412,10 @@ test('fgos-code-panel canonical source has non-vacuous repo-root path references
 
   assert.deepEqual(seen, expected);
   assert.deepEqual(missing, []);
-  assert.ok(skillContent.includes('`.agents/skills/_shared/private-cell-worktree.md`'));
+  assert.ok(skillContent.includes('`core/skills/_shared/private-cell-worktree.md`'));
+  assert.ok(skillContent.includes('`_shared/private-cell-worktree.md`'));
   assert.ok(fs.existsSync(path.join(repoRoot, '.agents', 'skills', '_shared', 'private-cell-worktree.md')));
+  assert.ok(fs.existsSync(path.join(repoRoot, 'plugins', 'fgOS', 'skills', '_shared', 'private-cell-worktree.md')));
 });
 
 test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {

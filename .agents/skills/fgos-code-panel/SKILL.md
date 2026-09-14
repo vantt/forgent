@@ -137,8 +137,8 @@ A code-panel change never runs in the main checkout and never on the base
 branch. Open its own worktree on its own branch first, as a plain git
 operation, following
 the shared private-cell-worktree fragment. In this source tree it lives at
-`core/skills/_shared/private-cell-worktree.md`; in installed/projected skill
-surfaces it lives at `.agents/skills/_shared/private-cell-worktree.md`
+`core/skills/_shared/private-cell-worktree.md`; projected skill surfaces carry
+their own sibling `_shared/private-cell-worktree.md` copy next to the skill root
 with `<prefix>` = `code-panel`:
 
 ```sh
