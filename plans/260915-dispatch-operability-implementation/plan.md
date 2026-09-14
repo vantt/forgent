@@ -87,7 +87,7 @@ a manual fallback audit listing touched symbols and callers.
 
 | Cell | Capability | Phase file | Status |
 |---|---|---|---|
-| I01 | `agent-result-claim.v2` single source for prompt and validation | `phase-01-agent-result-claim-v2.md` | planned |
+| I01 | `agent-result-claim.v2` single source for prompt and validation | `phase-01-agent-result-claim-v2.md` | merged `94d3d6fa` (2 fix rounds; reviewer/red-team clean after round 2; both rounds' contested findings independently re-verified and rejected — see [I01 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md)) |
 | I02 | Effective execution contract persisted pre-launch and inspectable | `phase-02-effective-execution-contract.md` | planned |
 | I03 | RunResult v2, legacy-v1 interpretation, attribution dimensions | `phase-03-runresult-v2-and-attribution.md` | planned |
 | I04 | `dispatch.runtime.inspect` read model and CLI projection | `phase-04-dispatch-runtime-inspect.md` | planned |
