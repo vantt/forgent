@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import {
   runHerdrRound,
   reconcileHerdrSpawnRun,
@@ -16,6 +16,7 @@ import {
   HerdrLaunchCollisionError,
   buildLauncherScriptContent,
   verifyForegroundProcessArgv,
+  verifyProcessEnvironment,
 } from '../../src/runner/dispatch/herdr-round.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import {
@@ -988,11 +989,11 @@ test('19. confined execution under required bwrap executes via launcher script a
 
   assert.equal(result.outcome, 'settled');
 
+  // LOW-11: the launcher script persists the full prepared env, including
+  // session tokens, as a plain file -- settleRound removes it once the
+  // round settles so that copy does not outlive the round it belonged to.
   const launcherScript = path.join(runDir, 'protected', 'launchers', 'cmd-conf-01.sh');
-  assert.ok(fs.existsSync(launcherScript), 'launcher script must exist');
-  const scriptContent = fs.readFileSync(launcherScript, 'utf8');
-  assert.ok(scriptContent.includes('exec -a claude /usr/bin/bwrap --ro-bind / / node worker.mjs'));
-  assert.ok(scriptContent.includes('export TEST_CONF_ENV=active'));
+  assert.ok(!fs.existsSync(launcherScript), 'launcher script must be cleaned up after settle');
 
   const receipt = readHerdrAdapterReceipt(runDir, 'cmd-conf-01');
   assert.ok(receipt, 'receipt must exist');
@@ -1176,5 +1177,53 @@ test('21. confined path resourceIncarnation fencing distinguishes reattach from 
   });
   assert.equal(recMismatch.status, 'parked');
   assert.equal(recMismatch.reason, 'incarnation-mismatch');
+});
+
+// 22. verifyProcessEnvironment catches an overridden prepared value and an
+// injected addition, and stays silent when there is no live evidence.
+test('22. verifyProcessEnvironment catches value overrides and injected additions', async () => {
+  if (process.platform !== 'linux') return;
+
+  const child = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 5000)'], {
+    env: {
+      ...process.env,
+      FGOS_TEST_MARKER: 'expected-value',
+      // BASH_ENV is a known injection vector but inert for a node child --
+      // it is never read by node itself, so setting it here proves the
+      // "unexpected addition" branch without risking the child's own
+      // startup the way LD_PRELOAD pointed at a bogus path could.
+      BASH_ENV: '/tmp/fgos-test-injected-env-marker',
+    },
+    stdio: 'ignore',
+  });
+
+  try {
+    // Give the child a moment to actually be running before /proc is read.
+    await new Promise((resolve) => setTimeout(resolve, 200));
+
+    assert.equal(
+      verifyProcessEnvironment(child.pid, { FGOS_TEST_MARKER: 'expected-value' }),
+      false,
+      'BASH_ENV was set on the child but never declared in expectedEnv -- an injected addition',
+    );
+
+    assert.equal(
+      verifyProcessEnvironment(child.pid, { FGOS_TEST_MARKER: 'tampered-value', BASH_ENV: '/tmp/fgos-test-injected-env-marker' }),
+      false,
+      'a declared value that does not match what the process actually has',
+    );
+
+    assert.equal(
+      verifyProcessEnvironment(child.pid, { FGOS_TEST_MARKER: 'expected-value', BASH_ENV: '/tmp/fgos-test-injected-env-marker' }),
+      true,
+      'every declared key present with its exact prepared value, and every injection vector present was declared',
+    );
+
+    assert.equal(verifyProcessEnvironment(child.pid, null), null);
+    assert.equal(verifyProcessEnvironment(child.pid, {}), null);
+    assert.equal(verifyProcessEnvironment(999999999, { FGOS_TEST_MARKER: 'expected-value' }), null);
+  } finally {
+    child.kill('SIGKILL');
+  }
 });
 
