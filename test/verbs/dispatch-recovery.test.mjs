@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { Worker } from 'node:worker_threads';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 import { plan, checkApply, collectEvidence, deriveRecoveryFacts, isActionLegal } from '../../src/runner/dispatch/recovery-planner.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
@@ -420,63 +419,66 @@ test('F1: a run that settles (result.json appears) between plan() and apply refu
   } finally { cleanup(root); }
 });
 
-test('F5: the settled re-check now runs as the LAST read before the write -- stress: unsafe-apply rate drops well below the pre-fix 74/100 baseline', async () => {
+test('F5: a settle write landing exactly between acquireRunControl and the settled re-check is always caught, deterministically', () => {
   // Pre-fix, the fresh settled re-check ran BEFORE acquireRunControl (the
   // door's one exclusive resource), so a result.json write landing anywhere
   // across checkApply + the re-check + acquireRunControl + the final write
   // could slip through unnoticed -- red-team's repro measured 74/100 unsafe
   // applies over that window. Post-fix, the re-check is the LAST thing read
-  // before the write, so only a write landing in the write's own short
-  // duration can still slip through (documented residual, not closed by
-  // this reorder -- see the F5 comment in recover.mjs). This proves that
-  // narrowing, not a claim of a fully closed window.
+  // before the write, so a write landing right after acquireRunControl's own
+  // generation record is durably published must always be visible to that
+  // re-check (the write's own short duration afterwards is a documented
+  // residual, out of this test's scope -- see the F5 comment in recover.mjs).
   //
-  // Genuine concurrency is required to exercise this: recoverApplyUseCase
-  // runs fully synchronously and blocks the main thread for its own
-  // duration, so a same-process timer/microtask could never land "during"
-  // it. A worker thread is a separate OS-schedulable thread that can.
-  const TRIALS = 40;
+  // This used to be a worker-thread wall-clock race, and it was
+  // deterministically broken: a worker thread's own boot latency (18-28ms)
+  // outlives recoverApplyUseCase's entire synchronous duration (5-8ms), so
+  // the settle write always landed well after apply had already returned --
+  // every trial reported "unsafe" regardless of whether the fix was present,
+  // which was never a real signal either way.
+  //
+  // Instead of racing wall-clock time, this hooks the exact fs call
+  // acquireRunControl uses to durably publish its generation record
+  // (fs.linkSync onto control/generations/<epoch>.json) and writes
+  // result.json synchronously from inside that hook. That lands the settle
+  // exactly between acquireRunControl's return and the F5 re-check's own
+  // read, every single time, with zero wall-clock dependency -- and if the
+  // F5 reorder were ever reverted (the re-check moved back to before
+  // acquireRunControl), both of the module's own result.json reads would
+  // already have run by the time this hook fires, so the write would slip
+  // through unnoticed and this test would fail.
+  const TRIALS = 20;
   let unsafe = 0;
+  const realLinkSync = fs.linkSync;
   for (let i = 0; i < TRIALS; i += 1) {
     const { root, runDir } = makeRepo();
+    const resultPath = path.join(runDir, 'result.json');
+    const generationsDir = path.join(runDir, 'control', 'generations');
+    let injected = false;
+    fs.linkSync = (src, dest) => {
+      realLinkSync(src, dest);
+      if (!injected && path.dirname(dest) === generationsDir && /^\d{10}\.json$/.test(path.basename(dest))) {
+        injected = true;
+        fs.writeFileSync(resultPath, JSON.stringify({ ok: true }));
+      }
+    };
     try {
       const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
-      const resultPath = path.join(runDir, 'result.json');
-      const delayMs = i % 10; // spans the ~0-9ms window the repro measured
-      const worker = new Worker(
-        `
-        const { parentPort, workerData } = require('node:worker_threads');
-        const fs = require('node:fs');
-        const sab = new Int32Array(new SharedArrayBuffer(4));
-        Atomics.wait(sab, 0, 0, workerData.delayMs);
-        fs.writeFileSync(workerData.resultPath, JSON.stringify({ ok: true }));
-        parentPort.postMessage('done');
-        `,
-        { eval: true, workerData: { resultPath, delayMs } },
-      );
-      const written = new Promise((resolve, reject) => {
-        worker.once('message', resolve);
-        worker.once('error', reject);
-      });
       const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
-      try {
-        await Promise.race([
-          written,
-          new Promise((_, reject) => setTimeout(() => reject(new Error(`F5 stress worker timed out (trial ${i})`)), 2000)),
-        ]);
-      } finally {
-        await worker.terminate();
-      }
+      assert.ok(injected, `trial ${i}: expected acquireRunControl's generation-file link to fire the injection hook`);
 
       // Unsafe iff the apply performed the write ('applied') even though
       // the settle write had already landed on disk by the time we can
       // observe it here.
       if (result.outcome === 'applied' && fs.existsSync(resultPath)) unsafe += 1;
-    } finally { cleanup(root); }
+    } finally {
+      fs.linkSync = realLinkSync;
+      cleanup(root);
+    }
   }
-  assert.ok(
-    unsafe / TRIALS < 0.3,
-    `expected the F5 reorder to cut the unsafe-apply rate well below the pre-fix 74/100 baseline, got ${unsafe}/${TRIALS}`,
+  assert.equal(
+    unsafe, 0,
+    `expected every settle write landing in the acquire->recheck window to be caught by the F5 re-check, got ${unsafe}/${TRIALS} unsafe`,
   );
 });
 
