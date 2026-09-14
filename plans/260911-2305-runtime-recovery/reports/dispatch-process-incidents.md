@@ -188,22 +188,27 @@ pause being triggered because each individual `branch -f` looked like routine
 branch-pointer housekeeping, not a destructive operation, until the cumulative
 effect was traced through the reflog.
 
-## 15. Per-cwd dispatch lock conflict when review+red-team fan out concurrently (P03)
+## 15. Per-cwd dispatch lock held by a `node bin/fgos.mjs coordination run` process the Lead wrongly believed had already finished (P03, root cause of two wasted retries)
 
-`review-candidate` and `red-team-candidate` share one graph node
-(`phase-first-pass`) and can be dispatched concurrently against the SAME
-worktree cwd. `cli.mjs`'s own per-cwd dispatch lock (`"dispatch for cwd ... is
-already in flight"`) then refuses whichever one arrives second (and, observed
-once, appears to have refused both when the lock was still held from the
-immediately-preceding `produce` step's own dispatch, not yet released). Both
-assignments settled `failed` with an infra message, not a code finding.
-Recovery: clear the stale `dispatch.claim` files, then retry review+red-team
-alone in a follow-up call within the SAME session (referencing the
-already-committed worktree state directly rather than `$ref:produce`, since a
-plain re-run of the full open.json would re-attempt `produce` too). This
-recurred only once in this track (P03); earlier cells' review/red-team pairs
-against the same pattern did not hit it, so the trigger condition (exact
-timing of the preceding step's lock release) is narrow but real.
+The very first P03 dispatch (background task `b9srwevkr`, launched hours
+earlier) never actually exited: the Lead checked `ps aux | grep "coordination
+run"` mid-session, found no visible match (the shell wrapper's own multi-KB
+`eval` line pushed the real process line out of a truncated view), wrongly
+concluded the process had ended, closed its now-orphaned herdr reviewer pane,
+and moved on to a fresh continuation session for the same cell. The original
+process, still alive, kept holding `cli.mjs`'s own per-cwd dispatch lock
+(`.fgos/dispatch--<url-encoded-cwd>.lock` — separate from the per-assignment
+`dispatch.claim` file) for the worktree the whole time. Two subsequent
+review+red-team retries against that same worktree both failed immediately
+with `"dispatch for cwd ... is already in flight"`, because the real holder
+was still running, not because of any code or scheduling issue. Only killing
+the actual PID (found via a full, untruncated `ps aux` and matching the exact
+command line) and removing the stale lock file resolved it — the background
+task's own `failed`/`completed` notification only arrived once the process was
+explicitly killed. Lesson: when a background task's process can't be found in
+a quick `ps aux | grep`, verify with the full untruncated output (or `pgrep
+-af`) before concluding it has exited — a long wrapper line can hide the real
+process in a truncated grep view.
 
 ## 16. Long real-time gaps between dispatch completion and the Lead noticing (this session)
 
