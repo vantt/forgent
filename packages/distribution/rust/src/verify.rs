@@ -111,8 +111,17 @@ pub fn verify_release_files(
     release_root: &Path,
     manifest: &ReleaseManifest,
 ) -> Result<(), VerificationError> {
-    for entry in &manifest.files {
-        let file_path = release_root.join(&entry.path);
+    let canonical_entries = canonicalize_manifest_files(manifest)?;
+
+    let release_root_canonical = if release_root.exists() {
+        Some(release_root.canonicalize()?)
+    } else {
+        None
+    };
+
+    for canonical in &canonical_entries {
+        let entry = &canonical.original;
+        let file_path = release_root.join(&canonical.normalized_path);
 
         if !file_path.exists() {
             return Err(VerificationError::MissingFile {
@@ -128,6 +137,15 @@ pub fn verify_release_files(
             return Err(VerificationError::SymlinkRefused {
                 path: entry.path.clone(),
             });
+        }
+
+        if let Some(ref real_root) = release_root_canonical {
+            let real_path = file_path.canonicalize()?;
+            if !real_path.starts_with(real_root) {
+                return Err(VerificationError::Canonical(CanonicalError::PathTraversal(
+                    entry.path.clone(),
+                )));
+            }
         }
 
         let bytes = std::fs::read(&file_path)?;
@@ -258,6 +276,147 @@ mod tests {
         missing_manifest.files[0].path = "bin/missing".to_string();
         let err = verify_release_files(&temp_dir, &missing_manifest).unwrap_err();
         assert!(matches!(err, VerificationError::MissingFile { .. }));
+
+        let _ = std::fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn test_verify_release_files_rejects_forbidden_paths_and_symlinks() {
+        let temp_dir =
+            std::env::temp_dir().join(format!("fgos_test_verify_paths_{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&temp_dir);
+        std::fs::create_dir_all(temp_dir.join("bin")).unwrap();
+
+        let file_path = temp_dir.join("bin/fgos");
+        std::fs::write(&file_path, b"hello binary").unwrap();
+
+        let mut hasher = Sha256::new();
+        hasher.update(b"hello binary");
+        let valid_digest = format!("sha256:{:x}", hasher.finalize());
+
+        let base_manifest = ReleaseManifest {
+            schema_version: 1,
+            artifact_digest: "sha256:dummy".to_string(),
+            digest_kind: None,
+            release_version: None,
+            source_revision: None,
+            created_at: None,
+            target: TargetInfo {
+                os: "linux".to_string(),
+                arch: "x64".to_string(),
+                libc: None,
+            },
+            entries: EntriesInfo {
+                fgos: "bin/fgos".to_string(),
+                fgos_runner: None,
+            },
+            components: ComponentsInfo {
+                legacy_node: LegacyNodeComponent {
+                    root: "libexec".to_string(),
+                    entry: "bin/fgos.mjs".to_string(),
+                    digest: "sha256:dummy".to_string(),
+                },
+                runner: None,
+                workshop: None,
+            },
+            requires: RequiresInfo {
+                node: None,
+                git: None,
+            },
+            state_schemas: None,
+            files: vec![ManifestFileEntry {
+                path: "bin/fgos".to_string(),
+                kind: "file".to_string(),
+                digest: valid_digest.clone(),
+                mode: "755".to_string(),
+                class: "immutable-entry".to_string(),
+            }],
+        };
+
+        // 1. Rejects absolute path
+        let mut abs_manifest = base_manifest.clone();
+        abs_manifest.files[0].path = "/etc/passwd".to_string();
+        let err = verify_release_files(&temp_dir, &abs_manifest).unwrap_err();
+        assert!(matches!(
+            err,
+            VerificationError::Canonical(CanonicalError::AbsolutePath(_))
+        ));
+
+        // 2. Rejects parent traversal
+        let mut trav_manifest = base_manifest.clone();
+        trav_manifest.files[0].path = "../outside.txt".to_string();
+        let err = verify_release_files(&temp_dir, &trav_manifest).unwrap_err();
+        assert!(matches!(
+            err,
+            VerificationError::Canonical(CanonicalError::PathTraversal(_))
+        ));
+
+        // 3. Rejects dot segment
+        let mut dot_manifest = base_manifest.clone();
+        dot_manifest.files[0].path = "./bin/fgos".to_string();
+        let err = verify_release_files(&temp_dir, &dot_manifest).unwrap_err();
+        assert!(matches!(
+            err,
+            VerificationError::Canonical(CanonicalError::MalformedSegment(_))
+        ));
+
+        // 4. Rejects empty segment
+        let mut empty_seg_manifest = base_manifest.clone();
+        empty_seg_manifest.files[0].path = "bin//fgos".to_string();
+        let err = verify_release_files(&temp_dir, &empty_seg_manifest).unwrap_err();
+        assert!(matches!(
+            err,
+            VerificationError::Canonical(CanonicalError::MalformedSegment(_))
+        ));
+
+        // 5. Rejects symlink kind declaration
+        let mut sym_kind_manifest = base_manifest.clone();
+        sym_kind_manifest.files[0].kind = "symlink".to_string();
+        let err = verify_release_files(&temp_dir, &sym_kind_manifest).unwrap_err();
+        assert!(matches!(
+            err,
+            VerificationError::Canonical(CanonicalError::SymlinkRefused(_))
+        ));
+
+        // 6. Rejects on-disk symlink file
+        #[cfg(unix)]
+        {
+            let symlink_path = temp_dir.join("bin/sym_fgos");
+            std::os::unix::fs::symlink(&file_path, &symlink_path).unwrap();
+            let mut disk_sym_manifest = base_manifest.clone();
+            disk_sym_manifest.files[0].path = "bin/sym_fgos".to_string();
+            let err = verify_release_files(&temp_dir, &disk_sym_manifest).unwrap_err();
+            assert!(matches!(err, VerificationError::SymlinkRefused { .. }));
+        }
+
+        // 7. Rejects path resolving outside release root via directory symlink
+        #[cfg(unix)]
+        {
+            let outside_dir =
+                std::env::temp_dir().join(format!("fgos_test_outside_dir_{}", std::process::id()));
+            let _ = std::fs::remove_dir_all(&outside_dir);
+            std::fs::create_dir_all(&outside_dir).unwrap();
+            let outside_target_file = outside_dir.join("file.txt");
+            std::fs::write(&outside_target_file, b"outside").unwrap();
+            let outside_link = temp_dir.join("outside_link");
+            std::os::unix::fs::symlink(&outside_dir, &outside_link).unwrap();
+
+            let mut out_hasher = Sha256::new();
+            out_hasher.update(b"outside");
+            let outside_digest = format!("sha256:{:x}", out_hasher.finalize());
+
+            let mut outside_manifest = base_manifest.clone();
+            outside_manifest.files[0].path = "outside_link/file.txt".to_string();
+            outside_manifest.files[0].digest = outside_digest;
+
+            let err = verify_release_files(&temp_dir, &outside_manifest).unwrap_err();
+            assert!(matches!(
+                err,
+                VerificationError::Canonical(CanonicalError::PathTraversal(_))
+            ));
+
+            let _ = std::fs::remove_dir_all(&outside_dir);
+        }
 
         let _ = std::fs::remove_dir_all(&temp_dir);
     }
