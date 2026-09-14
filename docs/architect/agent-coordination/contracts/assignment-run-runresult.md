@@ -237,6 +237,34 @@ RunResult is the normalized outcome for one Run. It should identify:
 - failure classification;
 - timestamps and normalizer provenance.
 
+### Planned Dispatch Operability Addendum
+
+The dispatch-operability design track
+(`plans/260914-dispatch-operability-evidence-attribution/`) is READY for a
+future implementation track, but not shipped. Its planned RunResult contract
+adds a versioned v2 classification while preserving `result.json` as the one
+terminal RunResult location:
+
+- `RunResult` remains the only immutable terminal truth for a Run.
+- `RunObservation` is a mutable read projection for in-flight, ambiguous, or
+  incomplete facts; it cannot settle, retry, cancel, authorize, or clear a
+  guard.
+- `ProviderOutcome` is a host-invocation wrapper, not Run truth.
+- `agent-result.json` becomes `agent-result-claim.v2`, a worker claim consumed
+  by the normalizer, never independent proof.
+- New v2 results classify execution, assessment, confidence, failure, policy,
+  delivery, and provenance separately.
+- Historical v1 results are interpreted deterministically as `legacy-derived`
+  and are not rewritten on read.
+- A v2 result whose compatibility `status`/`confidence` disagrees with its
+  classification is `contract-corrupt` and fails closed.
+
+The accepted design authority is
+`plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`.
+Implementation must add production-door proof, including negative-route
+refusals for semantic recovery through reconciliation, before any behavior is
+described as shipped.
+
 ## Confidence
 
 The exact vocabulary may evolve, but these boundaries are mandatory:
@@ -253,6 +281,12 @@ The exact vocabulary may evolve, but these boundaries are mandatory:
 Mutating operations must distinguish pre-existing state from changes attributable
 to the Run. Evidence checks should use pre/post snapshots, git state, artifact
 timestamps/hashes, expected-file rules, or equivalent operation-specific proof.
+
+Planned evidence attribution makes this distinction explicit: pre/post Git
+snapshots provide correlation only, not proof of process authorship. Attribution
+levels are `proven`, `correlated`, `excluded`, and `unattributed`; only
+adapter/confinement evidence with declared positive coverage can produce
+`proven`.
 
 ## Work Boundary
 

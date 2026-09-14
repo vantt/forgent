@@ -1,0 +1,38 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Supplemental D06 panel Phase red-team: attack the synthesized packet/process integrity.",
+  "writerId": "codex-lead",
+  "coordinationId": "dispatch-operability-design-d06-panel-r2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "codex-bwrap", "persona": "person-facing-advisory-lead-codex-only" },
+    { "id": "context-investigator-actor", "executor": "codex-bwrap", "persona": "disconfirmation-seeking-scout-codex-only" },
+    { "id": "system-shaper-actor", "executor": "codex-bwrap", "persona": "baseline-design-architect-codex-only" },
+    { "id": "alternative-shaper-actor", "executor": "codex-bwrap", "persona": "different-priors-designer-codex-only" },
+    { "id": "constraint-advocate-actor", "executor": "codex-bwrap", "persona": "production-reality-advocate-codex-only" },
+    { "id": "architecture-critic-actor", "executor": "codex-bwrap", "persona": "cross-proposal-attacker-codex-only" },
+    { "id": "synthesizer-actor", "executor": "codex-bwrap", "persona": "whole-ledger-integrator-codex-only" },
+    { "id": "red-team-actor", "executor": "codex-bwrap", "persona": "process-and-authority-attacker-codex-only" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authorizeRedteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "nodeId": "phase-redteam",
+      "authorizationId": "auth-redteam-r2-1",
+      "invocationKey": "invoke-redteam-r2-1",
+      "reason": "Synthesis has a linked result; authorize independent red-team to attack panel process, artifact integrity, attribution, and readiness claims."
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "taskKey": "d06-panel-r2-redteam-1",
+      "objective": "As independent red-team, attack the supplemental D06 panel packet/process, not just the architecture. Verify actual assignment reports where available. Look for fabricated panel claims, visibility/isolation breach, Codex-only limitation being hidden, lack of session/replay durability, synthesized READY outrunning evidence, planned/shipped confusion, missing HIGH/MEDIUM disposition, or driver self-clearing. Give verdict APPROVE, REVISE, or INSUFFICIENT-EVIDENCE.",
+      "expectedOutputs": ["agent-report.md: red-team findings with evidence, attacks that failed, verdict APPROVE/REVISE/INSUFFICIENT-EVIDENCE"]
+    }
+  ]
+}

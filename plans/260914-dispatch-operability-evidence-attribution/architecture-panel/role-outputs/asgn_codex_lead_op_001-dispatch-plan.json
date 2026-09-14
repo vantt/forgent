@@ -1,0 +1,179 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "asgn_codex_lead_op_001"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "codex-bwrap",
+  "capability": "code:review",
+  "invocation": {
+    "via": "cli",
+    "adapter": "cli-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "openai-codex",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "codex",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "critical",
+  "model": "gpt-5.6-sol",
+  "providerModel": "openai-codex",
+  "provenance": {
+    "executor": {
+      "value": "codex-bwrap",
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    },
+    "provider": {
+      "value": "openai-codex",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "codex-bwrap"
+      }
+    },
+    "model": {
+      "value": "gpt-5.6-sol",
+      "source": {
+        "scope": "runnerConfig",
+        "id": "openai-codex.critical"
+      }
+    },
+    "tier": {
+      "value": "critical",
+      "source": {
+        "scope": "operation",
+        "id": "interpret-request"
+      }
+    },
+    "persona": {
+      "value": "person-facing-advisory-lead-codex-only",
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "asgn_codex_lead_op_001"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "openai-codex"
+      }
+    }
+  },
+  "policy": {
+    "role": "lead-advisor",
+    "persona": "person-facing-advisory-lead-codex-only",
+    "executorPreference": [
+      "codex-bwrap"
+    ],
+    "executorId": "codex-bwrap",
+    "providerModel": "openai-codex",
+    "tier": "critical",
+    "model": "gpt-5.6-sol",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-bwrap",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "openai-codex",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-bwrap"
+        }
+      },
+      "model": {
+        "value": "gpt-5.6-sol",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "openai-codex.critical"
+        }
+      },
+      "tier": {
+        "value": "critical",
+        "source": {
+          "scope": "operation",
+          "id": "interpret-request"
+        }
+      },
+      "persona": {
+        "value": "person-facing-advisory-lead-codex-only",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_codex_lead_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "openai-codex"
+        }
+      }
+    }
+  }
+}
