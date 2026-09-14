@@ -4,13 +4,13 @@
 //! spawns Node with preserved arguments and environment, forwards signals,
 //! enforces recursion guard, and records invocation lifecycle.
 
+use fgos_distribution::ReleaseManifest;
 use fgos_host_runtime::invocation_service::LifecycleTracker;
 use fgos_host_runtime::{InvocationLifecycleRecord, InvocationTerminalState, OperationId};
-use serde::Deserialize;
 use std::env;
 use std::ffi::OsString;
 use std::fs;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::time::SystemTime;
 
@@ -30,41 +30,6 @@ use std::time::SystemTime;
 /// source-controlled code that might recurse by bug, not as an adversary
 /// trying to evade its own host's recursion trap.
 pub const RECURSION_GUARD_VAR: &str = "FGOS_RUST_HOST_RECURSION_GUARD";
-
-/// Manifest structure for resolving the legacy-node component.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub struct ReleaseManifest {
-    pub schema_version: u32,
-    pub components: ManifestComponents,
-    #[serde(default)]
-    pub state_schemas: Option<StateSchemas>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub struct ManifestComponents {
-    pub legacy_node: LegacyNodeComponent,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub struct LegacyNodeComponent {
-    pub root: String,
-    pub entry: String,
-    pub digest: String,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-#[allow(dead_code)]
-pub struct StateSchemas {
-    #[serde(default)]
-    pub migrations: Vec<String>,
-}
 
 /// Checks the recursion guard variable. Fails closed if already set.
 pub fn check_recursion_guard() -> Result<(), String> {
@@ -170,7 +135,9 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         )
     })?;
 
-    validate_manifest_v1_invariants(&manifest)?;
+    manifest
+        .validate_v1_invariants()
+        .map_err(|err| format!("manifest {}", err))?;
 
     let legacy_node = manifest.components.legacy_node;
     let (root, entry) = (legacy_node.root, legacy_node.entry);
@@ -224,71 +191,6 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
     }
 
     Ok(payload_path_canonical)
-}
-
-fn validate_manifest_v1_invariants(manifest: &ReleaseManifest) -> Result<(), String> {
-    if manifest.schema_version != 1 {
-        return Err(format!(
-            "manifest schemaVersion {} is unsupported; expected 1",
-            manifest.schema_version
-        ));
-    }
-
-    let legacy_node = &manifest.components.legacy_node;
-    if legacy_node.root.trim().is_empty() {
-        return Err("manifest components.legacyNode.root must not be empty".to_string());
-    }
-    if legacy_node.entry.trim().is_empty() {
-        return Err("manifest components.legacyNode.entry must not be empty".to_string());
-    }
-    if legacy_node.digest.trim().is_empty() {
-        return Err("manifest components.legacyNode.digest must not be empty".to_string());
-    }
-    validate_manifest_component_path("root", &legacy_node.root)?;
-    validate_manifest_component_path("entry", &legacy_node.entry)?;
-
-    let root_prefix = format!("{}/", legacy_node.root.trim_end_matches('/'));
-    if legacy_node.entry == legacy_node.root || legacy_node.entry.starts_with(&root_prefix) {
-        return Err(
-            "manifest components.legacyNode.entry must be relative to components.legacyNode.root"
-                .to_string(),
-        );
-    }
-
-    if manifest
-        .state_schemas
-        .as_ref()
-        .map(|schemas| !schemas.migrations.is_empty())
-        .unwrap_or(false)
-    {
-        return Err(
-            "manifest stateSchemas.migrations is reserved in V1 and must be empty".to_string(),
-        );
-    }
-
-    Ok(())
-}
-
-fn validate_manifest_component_path(field: &str, value: &str) -> Result<(), String> {
-    let path = Path::new(value);
-    if path.is_absolute() {
-        return Err(format!(
-            "manifest components.legacyNode.{} must be relative",
-            field
-        ));
-    }
-    if path.components().any(|component| {
-        matches!(
-            component,
-            Component::ParentDir | Component::RootDir | Component::Prefix(_)
-        )
-    }) {
-        return Err(format!(
-            "manifest components.legacyNode.{} must not traverse outside its base",
-            field
-        ));
-    }
-    Ok(())
 }
 
 #[cfg(unix)]

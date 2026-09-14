@@ -35,12 +35,10 @@ fn repo_root() -> PathBuf {
         .to_path_buf()
 }
 
-fn ensure_dev_manifest() -> PathBuf {
-    let root = repo_root();
-    let target = root.join("target");
-    let manifest_path = target.join("dev-manifest.json");
-    let manifest = serde_json::json!({
+fn valid_dev_manifest() -> serde_json::Value {
+    serde_json::json!({
         "schemaVersion": 1,
+        "artifactDigest": "sha256:dev",
         "entries": {
             "fgos": "target/debug/fgos",
         },
@@ -51,7 +49,27 @@ fn ensure_dev_manifest() -> PathBuf {
                 "digest": "sha256:dev",
             },
         },
-    });
+        "requires": {
+            "node": ">=18",
+        },
+        "target": {
+            "os": "linux",
+            "arch": "x64",
+        },
+        "stateSchemas": {
+            "read": ["2"],
+            "write": ["2"],
+            "migrations": [],
+        },
+        "files": [],
+    })
+}
+
+fn ensure_dev_manifest() -> PathBuf {
+    let root = repo_root();
+    let target = root.join("target");
+    let manifest_path = target.join("dev-manifest.json");
+    let manifest = valid_dev_manifest();
     fs::create_dir_all(&target).unwrap();
     fs::write(
         &manifest_path,
@@ -357,16 +375,11 @@ fn test_absolute_manifest_entry_is_rejected() {
     .unwrap();
 
     let manifest_path = temp_dir.join("manifest.json");
-    let manifest = serde_json::json!({
-        "schemaVersion": 1,
-        "components": {
-            "legacyNode": {
-                "root": "payload",
-                "entry": outside_script.to_string_lossy(),
-                "digest": "sha256:test",
-            },
-        },
-    });
+    let mut manifest = valid_dev_manifest();
+    manifest["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    manifest["components"]["legacyNode"]["entry"] =
+        serde_json::json!(outside_script.to_string_lossy());
+    manifest["components"]["legacyNode"]["digest"] = serde_json::json!("sha256:test");
     fs::write(
         &manifest_path,
         serde_json::to_string_pretty(&manifest).unwrap(),
@@ -447,45 +460,32 @@ fn test_host_manifest_v1_invariants_are_rejected() {
     fs::create_dir_all(&release_root).unwrap();
     let manifest_path = temp_dir.join("manifest.json");
 
+    let mut schema_version_2 = valid_dev_manifest();
+    schema_version_2["schemaVersion"] = serde_json::json!(2);
+    let mut entry_repeats_root = valid_dev_manifest();
+    entry_repeats_root["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    entry_repeats_root["components"]["legacyNode"]["entry"] =
+        serde_json::json!("payload/bin/fgos.mjs");
+    let mut migrations = valid_dev_manifest();
+    migrations["components"]["legacyNode"]["root"] = serde_json::json!("payload");
+    migrations["stateSchemas"]["migrations"] = serde_json::json!(["2-to-1"]);
+
     let invalid_cases = [
-        serde_json::json!({
-            "schemaVersion": 2,
-            "components": {
-                "legacyNode": {
-                    "root": "payload",
-                    "entry": "bin/fgos.mjs",
-                    "digest": "sha256:test",
-                },
-            },
-        }),
-        serde_json::json!({
-            "schemaVersion": 1,
-            "components": {
-                "legacyNode": {
-                    "root": "payload",
-                    "entry": "payload/bin/fgos.mjs",
-                    "digest": "sha256:test",
-                },
-            },
-        }),
-        serde_json::json!({
-            "schemaVersion": 1,
-            "components": {
-                "legacyNode": {
-                    "root": "payload",
-                    "entry": "bin/fgos.mjs",
-                    "digest": "sha256:test",
-                },
-            },
-            "stateSchemas": {
-                "read": ["1"],
-                "write": ["1"],
-                "migrations": ["2-to-1"],
-            },
-        }),
+        (
+            schema_version_2,
+            "manifest schemaVersion is unsupported; expected 1",
+        ),
+        (
+            entry_repeats_root,
+            "manifest components.legacyNode.entry must be relative to components.legacyNode.root, not repeat it",
+        ),
+        (
+            migrations,
+            "manifest stateSchemas.migrations is reserved in V1 and must be empty",
+        ),
     ];
 
-    for manifest in invalid_cases {
+    for (manifest, expected_stderr) in invalid_cases {
         fs::write(
             &manifest_path,
             serde_json::to_string_pretty(&manifest).unwrap(),
@@ -502,9 +502,41 @@ fn test_host_manifest_v1_invariants_are_rejected() {
         assert_ne!(output.status.code(), Some(0));
         let stderr = String::from_utf8_lossy(&output.stderr);
         assert!(
-            stderr.contains("manifest"),
-            "stderr must report manifest rejection, got: {}",
+            stderr.contains(expected_stderr),
+            "stderr must report {expected_stderr:?}, got: {}",
             stderr
         );
     }
+}
+
+#[test]
+fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
+    let temp_dir =
+        std::env::temp_dir().join(format!("fgos_test_partial_manifest_{}", std::process::id()));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(&release_root).unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest.as_object_mut().unwrap().remove("artifactDigest");
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("add")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("missing field `artifactDigest`"),
+        "stderr must report the missing required V1 field, got: {}",
+        stderr
+    );
 }
