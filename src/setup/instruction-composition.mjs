@@ -61,6 +61,12 @@ export const PORTABLE_HOST = '*';
 
 const AUTHORITY_ORDER = Object.freeze({ platform: 0, component: 1, domain: 2 });
 
+const AUTHORITY_SCOPE_RULES = Object.freeze({
+  platform: new Set(['repo', 'platform', 'component', 'domain', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+  component: new Set(['component', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+  domain: new Set(['domain', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+});
+
 /** Kinds whose effect an `override`/`forbid` operation may replace. */
 const OVERRIDABLE_KINDS = new Set(['preference']);
 
@@ -162,11 +168,15 @@ function scopeRank(unit) {
   return DEFAULT_SCOPE_SPECIFICITY[unit.scope] ?? 0;
 }
 
-/** Deterministic base ordering: kind, specificity, scope, authority, sourcePath, id. */
+function authorityCanClaimScope(unit) {
+  return Boolean(AUTHORITY_SCOPE_RULES[unit.authority.type]?.has(unit.scope));
+}
+
+/** Deterministic base ordering: kind, scope, priority, authority, sourcePath, id. */
 function compareUnits(a, b) {
   return (kindRank(a) - kindRank(b))
-    || (a.specificity - b.specificity)
     || (scopeRank(a) - scopeRank(b))
+    || (a.specificity - b.specificity)
     || (AUTHORITY_ORDER[a.authority.type] - AUTHORITY_ORDER[b.authority.type])
     || (a.sourcePath < b.sourcePath ? -1 : a.sourcePath > b.sourcePath ? 1 : 0)
     || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -176,6 +186,8 @@ function compareUnits(a, b) {
 function orderPermits(before, after) {
   const kd = kindRank(before) - kindRank(after);
   if (kd !== 0) return kd < 0;
+  const sd = scopeRank(before) - scopeRank(after);
+  if (sd !== 0) return sd < 0;
   return before.specificity <= after.specificity;
 }
 
@@ -225,6 +237,10 @@ export function evaluateInstructionComposition(units, options = {}) {
   const candidates = [];
   for (const u of all) {
     if (!unitBelongsToTarget(u, target)) continue;
+    if (!authorityCanClaimScope(u)) {
+      conflict('ILLEGAL_OVERRIDE', [u], `"${u.id}" authority ${u.authority.toString()} cannot claim scope "${u.scope}"`);
+      continue;
+    }
     if (!unitAppliesToHost(u, host)) {
       deactivate(u, 'not-applicable', null);
       continue;
@@ -247,10 +263,19 @@ export function evaluateInstructionComposition(units, options = {}) {
         conflict('MISSING_DEPENDENCY', [u], `"${u.id}" supersedes unknown instruction "${targetId}"`);
         continue;
       }
+      if (!candidatesById.has(targetId)) {
+        conflict('MISSING_DEPENDENCY', [u], `"${u.id}" supersedes "${targetId}", which is not effective in ${targetKey} (host ${host})`);
+        continue;
+      }
       for (const t of (candidatesById.get(targetId) ?? []).filter((c) => c !== u)) {
         if (t.kind === 'law' && !(u.kind === 'law' && u.authority.type === 'platform')) {
           conflict('ILLEGAL_LAW_OVERRIDE', [u, t],
             `law "${t.id}" may only be superseded by a platform-authority law; "${u.id}" is ${u.kind} under ${u.authority}`);
+          continue;
+        }
+        if (t.kind === 'law' && !u.supersessionDecision) {
+          conflict('ILLEGAL_LAW_OVERRIDE', [u, t],
+            `law "${t.id}" may only be superseded with a recorded supersessionDecision; "${u.id}" has none`);
           continue;
         }
         if (t.kind !== 'law' && u.authority.type !== 'platform' && u.owner !== t.owner) {
@@ -302,7 +327,7 @@ export function evaluateInstructionComposition(units, options = {}) {
   };
 
   // 4. Override / forbid — narrow-first so a replaced unit's own overrides lapse.
-  for (const u of [...active].sort((a, b) => b.specificity - a.specificity)) {
+  for (const u of [...active].sort((a, b) => (scopeRank(b) - scopeRank(a)) || (b.specificity - a.specificity))) {
     if (inactive.has(u)) continue;
     const op = operationOf(u);
     if (op !== 'override' && op !== 'forbid') continue;
@@ -329,8 +354,8 @@ export function evaluateInstructionComposition(units, options = {}) {
         conflict('ILLEGAL_OVERRIDE', [u, t], `"${u.id}" attempts to ${op} ${t.kind} "${t.id}"; only preferences permit override`);
         continue;
       }
-      if (u.specificity <= t.specificity) {
-        conflict('INCOMPATIBLE_ORDERING', [u, t], `"${u.id}" (specificity ${u.specificity}) ${op}s "${t.id}" (specificity ${t.specificity}) at equal or broader scope; no ordered winner without supersession`);
+      if (scopeRank(u) <= scopeRank(t)) {
+        conflict('INCOMPATIBLE_ORDERING', [u, t], `"${u.id}" (scope ${u.scope}) ${op}s "${t.id}" (scope ${t.scope}) at equal or broader scope; no ordered winner without supersession`);
         continue;
       }
       deactivate(t, op === 'override' ? 'overridden' : 'forbidden', u);

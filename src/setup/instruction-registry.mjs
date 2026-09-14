@@ -79,6 +79,12 @@ export const DEFAULT_SCOPE_SPECIFICITY = Object.freeze({
   host: 80,
 });
 
+const AUTHORITY_SCOPE_RULES = Object.freeze({
+  platform: new Set(INSTRUCTION_SCOPES),
+  component: new Set(['component', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+  domain: new Set(['domain', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+});
+
 /**
  * Pattern for extracting YAML frontmatter fenced by `---`.
  */
@@ -248,6 +254,13 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     },
   });
 
+  if (!AUTHORITY_SCOPE_RULES[authorityType]?.has(scope)) {
+    throw new InstructionRegistryError(
+      `Instruction authority "${authorityType}:${unitOwner}" cannot claim scope "${scope}"`,
+      { filePath: sourcePath, code: 'AUTHORITY_SCOPE_MISMATCH' },
+    );
+  }
+
   // 6. Validate Specificity
   let specificity;
   if (meta.specificity !== undefined) {
@@ -293,6 +306,15 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
   const refines = toArrayOfStrings(meta.refines, 'refines');
   const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');
   const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');
+  const supersessionDecision = meta.supersessionDecision === undefined
+    ? null
+    : String(meta.supersessionDecision).trim();
+  if (meta.supersessionDecision !== undefined && !supersessionDecision) {
+    throw new InstructionRegistryError(
+      'Invalid "supersessionDecision": must be a non-empty string when provided',
+      { filePath: sourcePath, code: 'INVALID_METADATA' },
+    );
+  }
 
   const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)
     ? { ...meta.renderHints }
@@ -313,6 +335,7 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     dependsOn,
     refines,
     supersedes,
+    supersessionDecision,
     conflictsWith,
     renderHints,
     title: typeof meta.title === 'string' ? meta.title : '',

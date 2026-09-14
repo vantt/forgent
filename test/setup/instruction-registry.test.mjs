@@ -276,6 +276,22 @@ test('discoverInstructionSources throws INVALID_METADATA when scope is invalid',
   }
 });
 
+test('discoverInstructionSources rejects component or domain instruction roots claiming repo scope', () => {
+  const tmp = mkTempDir('fgos-inst-auth-scope-');
+  writeInstructionFile(
+    path.join(tmp, 'components', 'comp1', 'instructions'),
+    'bad.md',
+    'id: bad-component-scope\nkind: procedure\nscope: repo',
+  );
+
+  assert.throws(
+    () => discoverInstructionSources(tmp, { allowedComponents: ['comp1'] }),
+    (err) => err instanceof InstructionRegistryError
+      && err.code === 'AUTHORITY_SCOPE_MISMATCH'
+      && err.message.includes('cannot claim scope "repo"'),
+  );
+});
+
 test('discoverInstructionSources throws INVALID_METADATA when specificity is not a number', () => {
   const tmp = mkTempDir('fgos-inst-badspec-');
   try {
@@ -287,6 +303,18 @@ test('discoverInstructionSources throws INVALID_METADATA when specificity is not
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+test('discoverInstructionSources records supersessionDecision when law replacement evidence is declared', () => {
+  const tmp = mkTempDir('fgos-inst-supersession-decision-');
+  writeInstructionFile(
+    path.join(tmp, 'core', 'instructions'),
+    'new-law.md',
+    'id: new-law\nkind: law\nsupersedes: old-law\nsupersessionDecision: D-ADR9999',
+  );
+
+  const registry = discoverInstructionSources(tmp);
+  assert.equal(registry.get('new-law').supersessionDecision, 'D-ADR9999');
 });
 
 test('discoverInstructionSources throws INVALID_METADATA when appliesTo is invalid', () => {

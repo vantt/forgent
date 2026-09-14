@@ -38,6 +38,7 @@ function unit(id, overrides = {}) {
     dependsOn: overrides.dependsOn ?? [],
     refines: overrides.refines ?? [],
     supersedes: overrides.supersedes ?? [],
+    supersessionDecision: overrides.supersessionDecision ?? null,
     conflictsWith: overrides.conflictsWith ?? [],
     renderHints: overrides.renderHints ?? {},
     title: overrides.title ?? id,
@@ -146,6 +147,42 @@ test('composeInstructionSet rejects equal-authority override without ordered spe
   );
 });
 
+test('composeInstructionSet rejects component authority claiming repo scope to override platform preferences', () => {
+  const result = evaluateInstructionComposition([
+    unit('platform-pref', { kind: 'preference', scope: 'repo', specificity: 10 }),
+    unit('component-repo-override', {
+      owner: 'packaging-distribution',
+      authority: authority('component', 'packaging-distribution'),
+      sourcePath: 'components/packaging-distribution/instructions/override.md',
+      kind: 'preference',
+      mode: 'override',
+      refines: ['platform-pref'],
+      scope: 'repo',
+      specificity: 20,
+    }),
+  ], { target: 'component:packaging-distribution' });
+
+  assert.equal(result.ok, false);
+  assert.ok(result.conflicts.some((conflict) => conflict.code === 'ILLEGAL_OVERRIDE'
+    && conflict.message.includes('cannot claim scope "repo"')));
+});
+
+test('composeInstructionSet orders broad scope before narrow scope regardless of caller specificity', () => {
+  const set = composeInstructionSet([
+    unit('repo-procedure', { kind: 'procedure', scope: 'repo', specificity: 10 }),
+    unit('component-session-procedure', {
+      owner: 'packaging-distribution',
+      authority: authority('component', 'packaging-distribution'),
+      sourcePath: 'components/packaging-distribution/instructions/session.md',
+      kind: 'procedure',
+      scope: 'session',
+      specificity: 0,
+    }),
+  ], { target: 'component:packaging-distribution' });
+
+  assert.deepEqual(set.rules.map((rule) => rule.id), ['repo-procedure', 'component-session-procedure']);
+});
+
 test('composeInstructionSet rejects narrower attempts to override laws', () => {
   assert.throws(
     () => composeInstructionSet([
@@ -163,6 +200,28 @@ test('composeInstructionSet rejects narrower attempts to override laws', () => {
     (err) => err instanceof InstructionCompositionError
       && err.conflicts.some((conflict) => conflict.code === 'ILLEGAL_LAW_OVERRIDE'),
   );
+});
+
+test('composeInstructionSet requires law supersession decision evidence', () => {
+  const result = evaluateInstructionComposition([
+    unit('old-law', { kind: 'law' }),
+    unit('new-law', { kind: 'law', supersedes: ['old-law'] }),
+  ]);
+
+  assert.equal(result.ok, false);
+  assert.ok(result.conflicts.some((conflict) => conflict.code === 'ILLEGAL_LAW_OVERRIDE'
+    && conflict.message.includes('supersessionDecision')));
+});
+
+test('composeInstructionSet treats supersession target filtered by host applicability as missing from the effective set', () => {
+  const result = evaluateInstructionComposition([
+    unit('old', { appliesTo: ['gemini'] }),
+    unit('new', { appliesTo: ['claude'], supersedes: ['old'] }),
+  ], { host: 'claude' });
+
+  assert.equal(result.ok, false);
+  assert.ok(result.conflicts.some((conflict) => conflict.code === 'MISSING_DEPENDENCY'
+    && conflict.message.includes('not effective')));
 });
 
 test('composeInstructionSet rejects mutually exclusive active instructions and boundary conflicts', () => {
