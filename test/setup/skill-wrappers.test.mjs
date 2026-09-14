@@ -1111,7 +1111,51 @@ test('generateGeminiSkillPackage rejects Windows reserved skill directory basena
         rawContent: `${SAMPLE_FRONTMATTER}\n# CON\n`,
       }],
     }),
-    /invalid Gemini skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
+    /invalid skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
+  );
+});
+
+test('assembleSkills rejects Windows reserved canonical skill directory basenames before projection', () => {
+  const root = mkTempDir('assemble-device-skill-src-');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'CON',
+    '---\nname: CON\nintent: fgos:demo\ndescription: Device skill\n---\n',
+    '# CON\n',
+  );
+
+  assert.throws(
+    () => assembleSkills(root),
+    /invalid skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
+  );
+  assert.equal(fs.existsSync(path.join(root, '.agents', 'skills', 'CON')), false);
+});
+
+test('generateGeminiSkillPackage rejects Windows-normalized emitted skill path collisions', () => {
+  const root = mkTempDir('gemini-skill-path-collision-src-');
+
+  assert.throws(
+    () => generateGeminiSkillPackage(root, mkTempDir('gemini-skill-path-collision-pkg-'), {
+      skills: [
+        {
+          name: 'foo',
+          canonicalDir: null,
+          intentId: 'fgos:one',
+          userInvocable: true,
+          triggers: { gemini: '/fgos:one' },
+          rawContent: `${SAMPLE_FRONTMATTER}\n# Foo\n`,
+        },
+        {
+          name: 'FOO',
+          canonicalDir: null,
+          intentId: 'fgos:two',
+          userInvocable: true,
+          triggers: { gemini: '/fgos:two' },
+          rawContent: `${SAMPLE_FRONTMATTER}\n# FOO\n`,
+        },
+      ],
+    }),
+    /duplicate emitted skill path "foo" found across skills:/,
   );
 });
 
@@ -1209,6 +1253,55 @@ test('generateGeminiSkillPackage rewrites Windows-native absolute canonical shar
   const skillPath = path.join(outDir, 'skills', 'fgos-windows-absolute', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   assert.doesNotMatch(skillContent, /C:\\repo\\core\\skills\\_shared\\x\.md/);
+  const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
+test('generateGeminiSkillPackage rewrites forward-slash Windows drive absolute shared references', () => {
+  const root = mkTempDir('gemini-windows-drive-slash-src-');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'x.md'), '# X\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-windows-drive-slash',
+    '---\nname: fgos-windows-drive-slash\ndescription: Windows drive slash ref\n---\n',
+    '# Windows Drive Slash\nRead `C:/repo/core/skills/_shared/x.md`.\n',
+  );
+
+  const outDir = mkTempDir('gemini-windows-drive-slash-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-windows-drive-slash', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, /C:\.\.\/_shared\/x\.md/);
+  assert.doesNotMatch(skillContent, /C:\/repo\/core\/skills\/_shared\/x\.md/);
+  const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
+test('generateGeminiSkillPackage rewrites UNC absolute canonical shared references', () => {
+  const root = mkTempDir('gemini-unc-absolute-src-');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'x.md'), '# X\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-unc-absolute',
+    '---\nname: fgos-unc-absolute\ndescription: UNC ref\n---\n',
+    '# UNC Absolute\nRead `\\\\server\\share\\core\\skills\\_shared\\x.md`.\n',
+  );
+
+  const outDir = mkTempDir('gemini-unc-absolute-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-unc-absolute', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, /\\\\server\\share\\core\\skills\\_shared\\x\.md/);
   const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
   assert.ok(ref);
   assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));

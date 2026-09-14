@@ -55,6 +55,18 @@ const WINDOWS_RESERVED_BASENAMES = new Set([
   'lpt9',
 ]);
 
+function windowsPathCollisionKey(relPath) {
+  return String(relPath)
+    .replace(/\\/g, '/')
+    .split('/')
+    .map((part) => part.normalize('NFC').toLowerCase().replace(/[. ]+$/g, ''))
+    .join('/');
+}
+
+function windowsReservedBasename(segment) {
+  return String(segment).split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
+}
+
 function atomicCopyFileSync(sourcePath, targetPath) {
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.copyFileSync(sourcePath, tmpPath);
@@ -468,7 +480,7 @@ function normalizeGeminiCommandVerb(intentId) {
     !rawVerb ||
     rawVerb !== rawVerb.toLowerCase() ||
     !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(rawVerb) ||
-    WINDOWS_RESERVED_BASENAMES.has(rawVerb)
+    WINDOWS_RESERVED_BASENAMES.has(windowsReservedBasename(rawVerb))
   ) {
     throw new Error(
       `invalid Gemini command intent "${intentId}": command verb must use lowercase ASCII letters, digits, and single hyphens only`,
@@ -655,9 +667,51 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         );
       }
     }
+
+    assertPortableGeneratedSkillPaths(skills);
   }
 
   return skills.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function assertPortableGeneratedSkillName(skillName) {
+  const rawName = String(skillName || '');
+  if (!rawName || rawName.includes('/') || rawName.includes('\\')) {
+    throw new Error(
+      `invalid skill name "${skillName}": emitted skill path must be a single portable path segment`,
+    );
+  }
+  const normalizedName = rawName.normalize('NFC');
+  const windowsKey = windowsPathCollisionKey(normalizedName);
+  if (!windowsKey || windowsKey === '.' || windowsKey === '..') {
+    throw new Error(
+      `invalid skill name "${skillName}": emitted skill path must not collapse to a reserved relative segment`,
+    );
+  }
+  if (WINDOWS_RESERVED_BASENAMES.has(windowsReservedBasename(normalizedName))) {
+    throw new Error(
+      `invalid skill name "${skillName}": emitted skill path segments must not use Windows reserved basenames`,
+    );
+  }
+}
+
+function assertPortableGeneratedSkillPaths(skills) {
+  const pathToSkills = new Map();
+  for (const skill of skills) {
+    assertPortableGeneratedSkillName(skill.name);
+    const key = windowsPathCollisionKey(skill.name);
+    if (!pathToSkills.has(key)) {
+      pathToSkills.set(key, []);
+    }
+    pathToSkills.get(key).push(skill);
+  }
+  for (const [key, list] of pathToSkills.entries()) {
+    if (list.length > 1) {
+      throw new Error(
+        `duplicate emitted skill path "${key}" found across skills: ${list.map((s) => `${s.name} (${s.canonicalDir || s.name})`).join(', ')}`,
+      );
+    }
+  }
 }
 
 /**
@@ -670,15 +724,8 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   const fragments = [];
   const pathToSources = new Map();
 
-  const sharedFragmentCollisionKey = (relPath) => relPath
-    .replace(/\\/g, '/')
-    .split('/')
-    .map((part) => part.normalize('NFC').toLowerCase().replace(/[. ]+$/g, ''))
-    .join('/');
-
   const assertPortableFragmentSegment = (relPath, segment) => {
-    const basename = segment.split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
-    if (WINDOWS_RESERVED_BASENAMES.has(basename)) {
+    if (WINDOWS_RESERVED_BASENAMES.has(windowsReservedBasename(segment))) {
       throw new Error(
         `invalid shared fragment path "${relPath}": fragment names must not use Windows reserved basenames`,
       );
@@ -702,7 +749,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
           walk(fullPath, entryRel);
         } else {
           const projectRelPath = path.relative(projectRoot, fullPath);
-          const collisionKey = sharedFragmentCollisionKey(entryRel);
+          const collisionKey = windowsPathCollisionKey(entryRel);
           if (!pathToSources.has(collisionKey)) {
             pathToSources.set(collisionKey, { relPath: entryRel, sources: [] });
           }
@@ -810,22 +857,11 @@ function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
 
 function rewriteAbsoluteSharedReferences(content, filePath, skillsDir, projectRoot, sharedRoots) {
   if (!projectRoot || sharedRoots.length === 0) return content;
-  const absoluteProjectPathPattern = /(?:\/|[A-Za-z]:\\)[^`\n)"']+/g;
+  const absoluteProjectPathPattern = /(?:[A-Za-z]:[\\/]|\\\\[^\\/\s`)"']+[\\/][^\\/\s`)"']+[\\/]|\/)[^`\n)"']+/g;
   return content.replace(absoluteProjectPathPattern, (rawRef) => {
     const fragmentPath = fragmentPathForCanonicalReference(rawRef, sharedRoots);
     return fragmentPath ? packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) : rawRef;
   });
-}
-
-function assertPortableGeminiSkillName(skillName) {
-  for (const segment of String(skillName || '').split(/[\\/]/)) {
-    const basename = segment.split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
-    if (WINDOWS_RESERVED_BASENAMES.has(basename)) {
-      throw new Error(
-        `invalid Gemini skill name "${skillName}": emitted skill path segments must not use Windows reserved basenames`,
-      );
-    }
-  }
 }
 
 function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = [], projectRoot) {
@@ -882,8 +918,8 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
 
   // Verify no duplicate command paths or intent collisions before writing any adapter files
   const seenVerbs = new Map();
+  assertPortableGeneratedSkillPaths(canonicalSkills);
   for (const s of canonicalSkills) {
-    assertPortableGeminiSkillName(s.name);
     const verb = normalizeGeminiCommandVerb(s.intentId);
     if (!seenVerbs.has(verb)) {
       seenVerbs.set(verb, []);
