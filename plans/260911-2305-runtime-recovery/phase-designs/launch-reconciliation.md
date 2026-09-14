@@ -1,6 +1,16 @@
 # S2/P02H - Herdr Spawn Bwrap Launch Reconciliation
 
-**Status:** ARCHITECTURE READY; HERDR WORKER-COMMAND SEAM REQUIRED; IMPLEMENTATION HANDOFF ON HUMAN HOLD  
+**Status:** IMPLEMENTED (worker-command seam closed 2026-09-14 in the P02H
+reopen cell). See
+[p02h-reopen.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md)
+for what actually shipped, the 8 fix rounds that hardened it, and the one
+accepted residual. The "Enforcement Shape" pseudocode below reflects this
+document's original proposal, kept for its historical reasoning; the real,
+live-verified mechanism a reader should implement or extend is documented in
+the trace doc above, not the `herdr agent start ... -- <prepared-command>`
+line below (that exact invocation was tried and does not work — `agent
+start --kind` only launches the kind's own canonical executable and cannot be
+handed an arbitrary replacement command).  
 **Owner:** Herdr adapter plus Confinement Authority plus RunHandle guard  
 **Depends on:** S1 identity contract and P02L adapter-neutral launch lifecycle
 
@@ -39,12 +49,29 @@ Herdr adapter passes it through the Herdr start primitive as the worker command:
 herdr agent start <deterministicName> --kind <kind> --pane <paneId> --timeout <ms> -- <prepared-command> <prepared-args...>
 ```
 
-The exact Herdr CLI syntax may differ, but the adapter must prove one fact: the
-foreground agent process in the pane is executing the Authority-prepared command,
-not an unwrapped provider default. If the current Herdr primitive only accepts
-provider flags and cannot replace the executable with the prepared bwrap command,
-required confinement refuses before launch. It may not downgrade to partial and
-claim `enforced`.
+**This exact syntax does not work** — confirmed live: `agent start --kind`
+only launches that kind's own canonical executable and cannot be handed a
+replacement command after `--`; those trailing args are appended to the
+kind's own binary, not used to substitute it. The real, shipped mechanism
+(P02H reopen, 2026-09-14) instead: write the prepared `{command, args, env}`
+to a launcher script under the Run's own protected, non-worker-writable
+directory; `herdr pane run <paneId> bash <scriptPath>` types only that short,
+unambiguous command into the pane (nothing for the shell to mis-tokenize,
+unlike typing the full prepared command directly, which was this cell's
+first — falsified — attempt, see [p02h.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h.md));
+`herdr pane report-agent`/`report-agent-session` then register the launched
+process into Herdr's own `agent list`/`agent get` tracking so it stays
+promptable exactly like a normal Herdr-launched agent. The adapter proves the
+foreground process is genuinely the prepared command via independent
+post-launch signals — `/proc/<pid>/exe` (identity), argv, `/proc/<pid>/environ`
+(environment), `/proc/<pid>/cwd` (working directory), and a byte-equality
+re-read of the launcher script — not by trusting what it typed. Full detail:
+[p02h-reopen.md](../../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md).
+The underlying PRINCIPLE this section's opening paragraph states — "the
+adapter must prove one fact: the foreground agent process in the pane is
+executing the Authority-prepared command, not an unwrapped provider default"
+— remains exactly correct and is what the shipped mechanism proves; only the
+proposed CLI invocation shape was wrong.
 
 The bwrap driver stays provider-neutral. Provider-specific needs, such as private
 home or credentials, enter through resource grants/bindings before Authority

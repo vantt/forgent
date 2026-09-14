@@ -1,15 +1,24 @@
 ---
 area: agent-coordination-runtime
-updated: 2026-09-11
-coverage: proposed
+updated: 2026-09-14
+coverage: substantially-implemented
 ---
 
 # Runtime Recovery And Work Continuity
 
-Design status: PROPOSED detailed design. Implementation: NOT IMPLEMENTED.
-Product direction agreed; technical choices below are recommendations for review,
-not newly accepted laws. This is the entry point and proof map, not a fourth
-runtime component. Contract owners remain Run, runtime adapters and Coordination.
+Design status: PROPOSED detailed design; Slices S0-S4 and the session-recovery
+half of S5 are now IMPLEMENTED (runtime-recovery track, closed 2026-09-14 —
+see `plans/260911-2305-runtime-recovery/plan.md`'s Product Gates table and the
+per-cell trace docs under
+`docs/architect/agent-coordination/verification/runtime-recovery/` for what
+actually shipped, including where the real implementation diverged from a
+specific field name or CLI invocation proposed below). The continuation/
+transfer half of S5, S6 and S7 remain NOT IMPLEMENTED — see §9's slice table,
+now annotated with real status. Product direction agreed; technical choices
+below are recommendations for review where not yet implemented, historical
+record of accepted reasoning where they are. This is the entry point and proof
+map, not a fourth runtime component. Contract owners remain Run, runtime
+adapters and Coordination.
 
 ## 1. Scope And Reading Order
 
@@ -218,16 +227,16 @@ new config defaults. Project-over-global precedence remains unchanged.
 
 ## 9. Implementation Slices And Gates
 
-| Slice | Scope | Exit evidence; dependency |
-|---|---|---|
-| S0 | Freeze fixtures for existing ladder, budgets, retry/recheck, context and close behavior | Existing Node suites green; capture known deficiencies without marking them solved. |
-| S1 | Versioned Run admission, strict publish fencing and local lock/reclaim | Concurrent admission and every pre-launch crash window; no two winners. Node first. |
-| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through public door; isolated or read-only takeover only. The first Node adapter uses a deterministic Herdr agent name derived from `runId`; exit proof includes duplicate-name refusal and no resurrection after close. Writable partial-edit takeover parks until workspace-grant and evaluator owners exist; depends on S1. |
-| S3 | Eligible fallback through compiler and confinement | Same Assignment, bounded attempts, unknown effects park; depends on S1/S2 for takeover. |
-| S4 | Pure snapshot/planner + show | Can develop beside S1-S3 using recorded facts; no claim of automatic repair. |
-| S5 | One protocol continuation, transfer/import/budget/apply + chain read model | Parent-child crash/concurrency, fresh agent proof; needs runtime safety and relevant open/close fixes. |
-| S6 | Additional runtime/operation adapters and optional checkpoint support | Capability-specific proof before enabling; no promise all adapters ship with S2. |
-| S7 | Rust writer port | Same fixtures for all supported Node semantics, sole writer and recovery compatibility. |
+| Slice | Scope | Exit evidence; dependency | Status (2026-09-14) |
+|---|---|---|---|
+| S0 | Freeze fixtures for existing ladder, budgets, retry/recheck, context and close behavior | Existing Node suites green; capture known deficiencies without marking them solved. | **Implemented** — P00 |
+| S1 | Versioned Run admission, strict publish fencing and local lock/reclaim | Concurrent admission and every pre-launch crash window; no two winners. Node first. | **Implemented** — P01 (`run-lock.mjs`) |
+| S2 | Herdr launch reconciliation, handle guard, pending-control reconciliation, material capture | Reattach/observe/reconcile through public door; isolated or read-only takeover only. The first Node adapter uses a deterministic Herdr agent name derived from `runId`; exit proof includes duplicate-name refusal and no resurrection after close. Writable partial-edit takeover parks until workspace-grant and evaluator owners exist; depends on S1. | **Implemented** for cli-spawn (P02L) and herdr-spawn including real bwrap-confined launch (P02H, hardened in the P02H reopen); **writable partial-edit takeover correctly still parks** (P06, deferred, unchanged) |
+| S3 | Eligible fallback through compiler and confinement | Same Assignment, bounded attempts, unknown effects park; depends on S1/S2 for takeover. | **Implemented** — P03 (`recovery.mjs`) |
+| S4 | Pure snapshot/planner + show | Can develop beside S1-S3 using recorded facts; no claim of automatic repair. | **Implemented** — P04 (pure evaluators) + P05 (standalone `dispatch recover`) |
+| S5 | One protocol continuation, transfer/import/budget/apply + chain read model | Parent-child crash/concurrency, fresh agent proof; needs runtime safety and relevant open/close fixes. | **Session-recovery half implemented** — P05S (`coordination recover`, a session-owned recovery read/apply door through the existing write door). **Transfer/import/budget/apply half NOT implemented** — P07, deferred, unchanged; terminal-parent transfer stays refused as designed. |
+| S6 | Additional runtime/operation adapters and optional checkpoint support | Capability-specific proof before enabling; no promise all adapters ship with S2. | **Not implemented** — out of this track's scope |
+| S7 | Rust writer port | Same fixtures for all supported Node semantics, sole writer and recovery compatibility. | **Not implemented** — separate track (see the `rust-host-r1-kernel` track) |
 
 S5's first protocol is a coding repair-and-recheck entry consuming a candidate
 and findings. It validates inputs, authorizes repair freshly, performs fresh

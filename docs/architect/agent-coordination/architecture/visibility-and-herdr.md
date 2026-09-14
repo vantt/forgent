@@ -2,8 +2,15 @@
 
 Document type: Architecture
 Design status: Accepted
-Implementation: Partial
-Last reviewed: 2026-08-31
+Implementation: Substantial — the runtime-recovery track (closed 2026-09-14)
+implemented Run admission/control-epoch fencing (P01), cli-spawn and
+herdr-spawn launch reconciliation including a real bwrap-confined herdr-spawn
+launch (P02L, P02H, hardened in the P02H reopen), governed fallback (P03),
+and standalone/session recovery read-apply doors (P05, P05S). Every invariant
+and forbidden inference below held through that work's own independent
+review/red-team verification. See `plans/260911-2305-runtime-recovery/plan.md`
+and its per-cell trace docs for what shipped.
+Last reviewed: 2026-09-14
 Canonical for: visibility versus runtime truth
 
 ## Purpose
@@ -94,7 +101,11 @@ file remains the legacy profile or a one-way compatibility projection; the two
 must not become independent writers. The proposal requires explicit proof of
 worker-tree termination or revoked write access before writable takeover:
 closing a pane alone still does not prove that its descendants stopped.
-This successor is not implemented by the current visibility module.
+This successor's non-writable-takeover portion (control-epoch fencing,
+launch/observe/reconcile) is now implemented, per the header above; the
+writable-takeover portion it also proposes (workspace-grant issuer,
+worker-tree termination proof) remains genuinely not implemented — that
+part stays parked by design (P06, deferred).
 
 Visibility adapters should consume canonical Run/RunResult state where possible.
 Interactive transport remains useful, but correctness must survive detached,

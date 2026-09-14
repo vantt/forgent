@@ -1,12 +1,22 @@
 ---
 area: agent-coordination-runtime
-updated: 2026-09-11
-coverage: proposed
+updated: 2026-09-14
+coverage: substantially-implemented
 ---
 
 # RunHandle And Recovery Material
 
-Design status: PROPOSED detailed contract. Implementation: not implemented.
+Design status: PROPOSED detailed contract; the runtime-recovery track
+(closed 2026-09-14) implemented the recoverable-observation/control
+contract this file proposes — `run-lock.mjs` (control-epoch fencing),
+`visibility-session.mjs` (binding/reconcile), and the herdr-round.mjs launch
+reconciliation for herdr-spawn (P01/P02L/P02H, hardened further in the P02H
+reopen). Field names and exact schemas below are this proposal's own
+vocabulary; where the shipped code used different names or a simplified
+shape for the same guarantee, the per-cell trace docs under
+`docs/architect/agent-coordination/verification/runtime-recovery/` are the
+authoritative record of what is real — treat this file as the accepted
+reasoning behind those decisions, not as a byte-exact schema reference.
 Read [Runtime Recovery Design](runtime-recovery-design.md) first for ownership,
 local locking, version rollout, proof IDs and the long-horizon scope. This file
 owns runtime observation/control and recoverable-state capture, not Run admission
