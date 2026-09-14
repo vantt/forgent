@@ -125,5 +125,6 @@ Release staging and preflight reject:
 | Manifest struct frozen and documented | `packages/distribution/rust/src/manifest.rs` |
 | Manifest builder with legacy Node payload | `scripts/build-rust-distribution.mjs` |
 | Artifact digest reproducible | `test/rust-host/release-tree.test.mjs` |
-| Stage verifies manifest and files | `packages/distribution/rust/src/store.rs`, `packages/distribution/rust/src/verify.rs`, `test/rust-host/fgctl-stage.test.mjs` |
+| Stage, preflight, and host verify manifest and release files (`verify_release_files` + `verify_legacy_node`) | `packages/distribution/rust/src/store.rs`, `packages/distribution/rust/src/verify.rs`, `apps/fgos/src/legacy_exec.rs`, `test/rust-host/fgctl-stage.test.mjs` |
+| Payload safety and digest enforcement regression tests (commits 19000200, 3b3a95fc: symlink-component refusal, path traversal, legacyNode digest verification) | `packages/distribution/rust/src/verify.rs`, `apps/fgos/tests/cli_tests.rs`, `test/rust-host/fgctl-stage.test.mjs` |
 | Schema golden tests (full, minimal, forward-compat, invariant) | `packages/distribution/rust/tests/schema_golden.rs`, `packages/distribution/rust/tests/goldens/release-manifest-*.json` |

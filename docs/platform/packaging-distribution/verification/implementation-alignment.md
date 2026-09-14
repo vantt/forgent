@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Code/test/doc scan
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-14
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
@@ -45,7 +45,7 @@ Every important packaging-distribution design claim should appear here with stat
 | Repository/workspace/release-store layout boundaries are explicit. | partial | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`, `docs/architect/packaging-distribution/runtime-identity-and-activation.md`, `docs/architect/packaging-distribution/scope-map.md` | Verify worker capsule and projection ledger implementation before marking full. |
 | Workspace root binding snapshot lives under `.fgos/installation/root.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs` | Frozen V1 schema in `contracts/repository-runtime-layout.md` with golden tests. |
 | Workspace `.fgos/distribution.json` is the tracked runtime pin. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs`, `docs/platform/packaging-distribution/contracts/distribution-pin.md` | Frozen V1 schema in `contracts/distribution-pin.md` with golden tests. |
-| `fgctl stage` verifies candidate release content before trust. | implemented | `test/rust-host/fgctl-stage.test.mjs`, `packages/distribution/rust/src/verify.rs`, `packages/distribution/rust/src/store.rs` | Add human-readable contract if external release-store docs grow. |
+| `fgctl stage` verifies candidate release content before trust. | implemented | `packages/distribution/rust/src/verify.rs` (`verify_release_files`, `verify_legacy_node`), `packages/distribution/rust/src/store.rs`, `apps/fgos/src/legacy_exec.rs`, `test/rust-host/fgctl-stage.test.mjs`, `apps/fgos/tests/cli_tests.rs` (commits 19000200, 3b3a95fc) | Staging, preflight, and host admission enforce `verify_release_files` and `verify_legacy_node`, refusing symlink components (files and intermediate directories), path traversal, and payload digest mismatches before trust/execution. |
 | Workspace activation is per-workspace through `.fgos/installation/activation.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs`, `test/rust-host/fgctl-upgrade.test.mjs`, `src/setup/bin-discovery.mjs` | Frozen V1 schema in `contracts/activation-binding.md` with golden tests. |
 | Workspace command resolution prefers activated workspace installation before other tiers. | implemented | `src/setup/bin-discovery.mjs`, `scripts/fgos-shell-integration.sh`, `test/scripts/fgos-shell-integration.test.mjs` | Ensure any Rust/Herdr resolver keeps the same tier order. |
 | Legacy npm/Node install remains compatibility path. | implemented | `package.json`, `bin/fgos.mjs`, `bin/fgos-runner.mjs`, `test/install-packaging.test.mjs`, `README.md` | Keep wording as compatibility, not target architecture. |
