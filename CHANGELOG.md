@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Packaging-distribution legacy architecture redirects (code-panel track, P9):
+  `docs/architect/packaging-distribution/**` now carries explicit
+  historical/status notes pointing readers to the promoted
+  `docs/platform/packaging-distribution/**` portal, contracts, and proof docs,
+  with source-preservation audit closeout for the old architecture corpus.
 - Skill source layout and canonical discovery (packaging-distribution track, P2):
   executable source-of-truth rules for canonical skills (`core/skills/`,
   `domains/*/skills/`), duplicate skill-id/intent-id/command-path collision

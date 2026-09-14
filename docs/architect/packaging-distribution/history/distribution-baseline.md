@@ -1,5 +1,10 @@
 # Distribution Baseline And Scattered Spec Fragments
 
+> Status: historical source. The active condensed history is
+> [docs/platform/packaging-distribution/history/distribution-baseline.md](../../../platform/packaging-distribution/history/distribution-baseline.md).
+> This file remains the full discussion-era evidence ledger and is not current
+> target architecture.
+
 **Status:** Historical/input record for the new Packaging And Distribution
 architecture.
 **Date:** 2026-09-04.

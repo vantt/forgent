@@ -54,6 +54,7 @@
     "src/runner/coordination/replay.mjs": "use-case",
     "src/runner/coordination/session-engine.mjs": "use-case",
     "src/runner/coordination/cohort-planner.mjs": "use-case",
+    "src/runner/coordination/read-evaluators.mjs": "use-case",
     "src/runner/team-cognition/schema.mjs": "infra",
     "src/runner/deliberation/schema.mjs": "infra",
     "src/runner/team-cognition/aggregation-evaluator.mjs": "use-case",
@@ -189,6 +190,11 @@
     "src/runner/dispatch/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra",
-    "src/runner/dispatch/worker-session-boot.mjs": "infra"
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/cli-spawn-supervisor.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra"
   }
 }
