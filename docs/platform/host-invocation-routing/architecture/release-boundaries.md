@@ -5,7 +5,7 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define R1, R2, R3, and later proof boundaries for host invocation
 Design status: Draft
-Implementation status: Planned with current partial R1 code evidence
+Implementation status: R1 preview installed/default proof plus current partial route migration
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md and rust-cli-and-proof-components-plan.md
@@ -29,15 +29,15 @@ Related:
 | Decision | Status | Owner |
 | --- | --- | --- |
 | Current R1 route matrix | `current partial` | Code snapshot: 73 selectors, 71 `legacy-cli`, two native routes: `version -> distribution.build.show` and `gate-bypass -> work.gate-bypass.show`. |
-| First public R1 preview vs stable default | `unknown` | Packaging-distribution stream. |
-| Compatibility-window duration for R1 Node fallback | `unknown` | Packaging-distribution stream plus host invocation. |
+| First public R1 preview vs stable default | `preview approved; stable undecided` | Packaging-distribution stream. |
+| Compatibility-window duration for R1 Node fallback | `explicit escape hatch approved; removal date or release milestone undecided` | Packaging-distribution stream plus host invocation. |
 
 ## 3. Implementation Alignment
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| R1 Rust host code path exists. | `current partial` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/lib.rs](../../../../packages/host-runtime/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | Installed public release proof still belongs to [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md). |
-| R1 is a shipped host only with reproducible install/activation/rollback proof. | `planned` | [source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done) | Complete packaging-distribution release proof. |
+| R1 Rust host code path exists. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/lib.rs](../../../../packages/host-runtime/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Route migration remains partial: 71 selectors still use the manifest-owned legacy CLI lane. |
+| R1 is a shipped host only with reproducible install/activation/rollback proof. | `implemented preview` | [source plan §18](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#18-definition-of-done), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../../packaging-distribution/verification/install-and-release-proof.md](../../packaging-distribution/verification/install-and-release-proof.md) | Stable/default release graduation and exact legacy fallback removal timing remain release-owner decisions. |
 | R2 and R3 do not delay R1 installed-entry flip. | `planned` | [source plan §1](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#1-outcome) | Keep phase gates separate. |
 | `fgctl` owns rollback; runtime provider selection does not. | `accepted-not-implemented` | [packaging runtime activation](../../packaging-distribution/architecture/runtime-identity-and-activation.md) | Packaging proof required. |
 

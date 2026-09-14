@@ -182,9 +182,11 @@ Evidence recorded in `verification/implementation-alignment.md`:
 The active plan note requires the workspace activation proof where
 `.fgos/installation/bin/fgos version --runtime-json` enters the Rust host and
 reports the activated `artifactDigest`. The P7 rust-host proof suite is green
-and the alignment table records activation/runtime-tail behavior as implemented;
-release posture remains partial until the release owner approves public/default
-runtime claims.
+and the alignment table records activation/runtime-tail behavior as implemented.
+The coordinator/user has approved preview public posture: external installs
+default `fgos` through the Rust host, and public docs may state Rust host is the
+default installed runtime. Stable/default release posture and the exact legacy
+fallback removal date remain separate release-owner decisions.
 
 ## 5. Updated Status Surfaces
 
@@ -226,11 +228,13 @@ installed `fgos` entrypoint is documented as the default, and what
 compatibility/rollback promise applies to that channel. It is broader than the
 P6/P7 local proof that an activated workspace path enters the Rust host.
 
+The installed/default runtime claim is now implemented for preview public
+posture: external-installed/default `fgos` enters the Rust host, and fallback
+follows the explicit deprecated Node escape-hatch policy.
+
 The code-panel track still does not decide these product/release questions:
 
-- preview versus stable/default public release;
-- whether installed/default runtime claims may flip;
-- whether host-invocation R1 may move from the current partial posture to implemented.
+- whether this preview posture graduates to stable/default release;
 - the exact legacy Node fallback removal date or release milestone.
 
 The coordinator/user approved and completed the merge to `main` after the

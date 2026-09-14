@@ -75,6 +75,9 @@ enter the Rust host.
 
 The compatibility posture is now settled as:
 
+- The public release posture is preview.
+- External installs default `fgos` through the Rust host.
+- Public docs may state that Rust host is the default installed runtime.
 - Rust host is the default runtime path for activated workspace installs.
 - Legacy Node fallback is deprecated immediately as a public/default runtime
   posture.
@@ -91,3 +94,7 @@ This policy does not mean every component has moved to Rust. It means the
 user-facing default entrypoint is Rust-host-owned; the Rust host may still
 execute the legacy Node payload through the release manifest while that payload
 remains a component behind the host boundary.
+
+If the Rust host fails, support/rollback guidance follows the explicit
+deprecated Node fallback escape-hatch policy above. Silent fallback is not part
+of the support promise.
