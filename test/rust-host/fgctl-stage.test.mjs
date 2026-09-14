@@ -331,6 +331,117 @@ test("L1: ./bin/fgos and bin/fgos are treated as a collision, not two different 
   }
 });
 
+test('P6 HIGH regression: staging a candidate with an in-root directory symlink triggers quarantine and puts nothing in releases/', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-in-root-symlink-'));
+  const candidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-in-root-symlink-candidate-'));
+
+  try {
+    cpSyncRecursive(fixtureReleaseDir, candidateDir);
+    fs.symlinkSync(path.join(candidateDir, 'bin'), path.join(candidateDir, 'link'));
+
+    const manifestPath = path.join(candidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    const fgosEntry = manifest.files.find((f) => f.path === 'bin/fgos');
+    assert.ok(fgosEntry);
+    fgosEntry.path = 'link/fgos';
+    manifest.files.sort((a, b) => a.path.localeCompare(b.path));
+
+    const manifestCopy = { ...manifest };
+    delete manifestCopy.artifactDigest;
+    manifest.artifactDigest = computeArtifactDigest(manifestCopy);
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    const res = runFgctl(['stage', '--from', candidateDir], { stateHome });
+    assert.notEqual(res.status, 0, 'Candidate with in-root directory symlink must be refused');
+    assert.match(res.stderr, /symlink refused|quarantined/i);
+
+    const releasesDir = path.join(stateHome, 'releases');
+    if (fs.existsSync(releasesDir)) {
+      assert.equal(fs.readdirSync(releasesDir).length, 0, 'Nothing must be published under releases/');
+    }
+
+    const quarantineDir = path.join(stateHome, 'quarantine');
+    assert.ok(fs.existsSync(quarantineDir), 'quarantine/ directory must exist');
+    assert.ok(fs.readdirSync(quarantineDir).length >= 1, 'quarantine/ must contain quarantined candidate');
+  } finally {
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(candidateDir, { recursive: true, force: true });
+  }
+});
+
+test('Proof gap closure: staging a candidate with mismatched components.legacyNode.digest triggers quarantine and puts nothing in releases/', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-legacy-digest-gap-'));
+  const candidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-legacy-digest-gap-candidate-'));
+
+  try {
+    cpSyncRecursive(fixtureReleaseDir, candidateDir);
+    const manifestPath = path.join(candidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    manifest.components.legacyNode.digest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+
+    const manifestCopy = { ...manifest };
+    delete manifestCopy.artifactDigest;
+    manifest.artifactDigest = computeArtifactDigest(manifestCopy);
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    const res = runFgctl(['stage', '--from', candidateDir], { stateHome });
+    assert.notEqual(res.status, 0, 'Candidate with mismatched legacyNode.digest must be refused');
+    assert.match(res.stderr, /legacyNode\.digest mismatch|quarantined/i);
+
+    const releasesDir = path.join(stateHome, 'releases');
+    if (fs.existsSync(releasesDir)) {
+      assert.equal(fs.readdirSync(releasesDir).length, 0, 'Nothing must be published under releases/');
+    }
+
+    const quarantineDir = path.join(stateHome, 'quarantine');
+    assert.ok(fs.existsSync(quarantineDir), 'quarantine/ directory must exist');
+    assert.ok(fs.readdirSync(quarantineDir).length >= 1, 'quarantine/ must contain quarantined candidate');
+  } finally {
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(candidateDir, { recursive: true, force: true });
+  }
+});
+
+test('P6 HIGH regression: staging a candidate with an unlisted payload symlink triggers quarantine and puts nothing in releases/', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-unlisted-payload-symlink-'));
+  const candidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-unlisted-payload-symlink-candidate-'));
+
+  try {
+    cpSyncRecursive(fixtureReleaseDir, candidateDir);
+    const realEntry = path.join(candidateDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
+    const symEntry = path.join(candidateDir, 'libexec', 'legacy-node', 'bin', 'sym_fgos.mjs');
+    fs.symlinkSync(realEntry, symEntry);
+
+    const manifestPath = path.join(candidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+    manifest.components.legacyNode.entry = 'bin/sym_fgos.mjs';
+
+    const manifestCopy = { ...manifest };
+    delete manifestCopy.artifactDigest;
+    manifest.artifactDigest = computeArtifactDigest(manifestCopy);
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    const res = runFgctl(['stage', '--from', candidateDir], { stateHome });
+    assert.notEqual(res.status, 0, 'Candidate with unlisted payload symlink must be refused');
+    assert.match(res.stderr, /symlink refused|quarantined/i);
+
+    const releasesDir = path.join(stateHome, 'releases');
+    if (fs.existsSync(releasesDir)) {
+      assert.equal(fs.readdirSync(releasesDir).length, 0, 'Nothing must be published under releases/');
+    }
+
+    const quarantineDir = path.join(stateHome, 'quarantine');
+    assert.ok(fs.existsSync(quarantineDir), 'quarantine/ directory must exist');
+    assert.ok(fs.readdirSync(quarantineDir).length >= 1, 'quarantine/ must contain quarantined candidate');
+  } finally {
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(candidateDir, { recursive: true, force: true });
+  }
+});
+
 function cpSyncRecursive(src, dst) {
   fs.mkdirSync(dst, { recursive: true });
   for (const ent of fs.readdirSync(src, { withFileTypes: true })) {

@@ -4,11 +4,12 @@
 //! spawns Node with preserved arguments and environment, forwards signals,
 //! enforces recursion guard, and records invocation lifecycle.
 
-use fgos_distribution::verify::{recompute_artifact_digest, verify_release_files};
+use fgos_distribution::verify::{
+    recompute_artifact_digest, verify_legacy_node, verify_release_files,
+};
 use fgos_distribution::ReleaseManifest;
 use fgos_host_runtime::invocation_service::LifecycleTracker;
 use fgos_host_runtime::{InvocationLifecycleRecord, InvocationTerminalState, OperationId};
-use sha2::{Digest, Sha256};
 use std::env;
 use std::ffi::OsString;
 use std::fs;
@@ -146,71 +147,8 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
     verify_release_files(Path::new(&active_release_path), &manifest)
         .map_err(|err| format!("manifest file verification failed: {}", err))?;
 
-    let legacy_node = manifest.components.legacy_node;
-    let (root, entry, digest) = (legacy_node.root, legacy_node.entry, legacy_node.digest);
-
-    // R4 confinement (red-team HIGH): `Path::join` replaces its base entirely
-    // when the joined component is itself absolute, so an absolute
-    // `root`/`entry` in the manifest would silently escape
-    // `active_release_path` rather than being confined under it. Reject
-    // both up front rather than relying solely on the containment check
-    // below, since that check runs after the join has already discarded
-    // the base.
-    if Path::new(&root).is_absolute() || Path::new(&entry).is_absolute() {
-        return Err(format!(
-            "manifest legacyNode root/entry must be relative to the active release path, got root='{}' entry='{}'",
-            root, entry
-        ));
-    }
-
-    let payload_path = Path::new(&active_release_path).join(&root).join(&entry);
-    if !payload_path.exists() {
-        return Err(format!(
-            "resolved legacy payload path '{}' does not exist",
-            payload_path.display()
-        ));
-    }
-
-    // Belt-and-suspenders containment check: canonicalize both sides (which
-    // also resolves any `..`/symlink traversal, not just a bare absolute
-    // component) and require the resolved payload to still live under the
-    // resolved release root.
-    let release_root_canonical = fs::canonicalize(&active_release_path).map_err(|e| {
-        format!(
-            "cannot canonicalize active release path '{}': {}",
-            active_release_path.display(),
-            e
-        )
-    })?;
-    let payload_path_canonical = fs::canonicalize(&payload_path).map_err(|e| {
-        format!(
-            "cannot canonicalize resolved legacy payload path '{}': {}",
-            payload_path.display(),
-            e
-        )
-    })?;
-    if !payload_path_canonical.starts_with(&release_root_canonical) {
-        return Err(format!(
-            "resolved legacy payload path '{}' escapes the active release path '{}'",
-            payload_path_canonical.display(),
-            release_root_canonical.display()
-        ));
-    }
-
-    let payload_bytes = fs::read(&payload_path_canonical).map_err(|e| {
-        format!(
-            "failed to read resolved legacy payload path '{}': {}",
-            payload_path_canonical.display(),
-            e
-        )
-    })?;
-    let actual_payload_digest = format!("sha256:{:x}", Sha256::digest(&payload_bytes));
-    if actual_payload_digest != digest {
-        return Err(format!(
-            "manifest components.legacyNode.digest mismatch: declared {}, actual {}",
-            digest, actual_payload_digest
-        ));
-    }
+    let payload_path_canonical = verify_legacy_node(Path::new(&active_release_path), &manifest)
+        .map_err(|err| format!("{}", err))?;
 
     Ok(payload_path_canonical)
 }

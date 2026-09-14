@@ -342,7 +342,7 @@ fn test_distribution_pin_full_golden_roundtrip() {
         Some("0.1.0")
     );
     assert_eq!(pin.project_runtime.channel.as_deref(), Some("stable"));
-    assert_eq!(pin.project_runtime.allow_prerelease, false);
+    assert!(!pin.project_runtime.allow_prerelease);
 
     // Round-trip serialize & verify equality
     let serialized = serde_json::to_string_pretty(&pin).expect("must serialize");
@@ -364,7 +364,7 @@ fn test_distribution_pin_minimal_backward_compatible() {
     );
     assert_eq!(pin.project_runtime.release_version, None);
     assert_eq!(pin.project_runtime.channel, None);
-    assert_eq!(pin.project_runtime.allow_prerelease, false);
+    assert!(!pin.project_runtime.allow_prerelease);
 }
 
 #[test]

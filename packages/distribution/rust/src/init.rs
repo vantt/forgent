@@ -11,7 +11,7 @@ use crate::store::{
     list_releases, now_millis, resolve_machine_release_store_root, stage_release,
     ReleaseStatusEntry, StageOutcome,
 };
-use crate::verify::{recompute_artifact_digest, verify_release_files};
+use crate::verify::{recompute_artifact_digest, verify_legacy_node, verify_release_files};
 use crate::workspace::{
     compute_repository_id, compute_work_state_id, compute_workspace_id, resolve_workspace_root,
 };
@@ -488,6 +488,8 @@ pub fn preflight_candidate(
         .map_err(|e| InitError::Preflight(format!("canonicalize manifest failed: {}", e)))?;
     verify_release_files(candidate_dir, manifest)
         .map_err(|e| InitError::Preflight(format!("verify release files failed: {}", e)))?;
+    verify_legacy_node(candidate_dir, manifest)
+        .map_err(|e| InitError::Preflight(format!("verify legacy node failed: {}", e)))?;
 
     // 3. Confirm requires.node
     if let Some(req) = &manifest.requires.node {
@@ -1321,6 +1323,8 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
         verify_release_files(&candidate_dir, &manifest)
             .map_err(|e| format!("verify release files failed: {}", e))?;
+        verify_legacy_node(&candidate_dir, &manifest)
+            .map_err(|e| format!("verify candidate legacy node failed: {}", e))?;
         if manifest.artifact_digest != target_digest {
             return Err(format!(
                 "staged release manifest digest mismatch: {} declares {}, expected {}",
@@ -1446,6 +1450,8 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
         verify_release_files(&release_dir, &manifest)
             .map_err(|e| format!("file digest mismatch: {}", e))?;
+        verify_legacy_node(&release_dir, &manifest)
+            .map_err(|e| format!("legacy node verification failed: {}", e))?;
         Ok(())
     })();
 
