@@ -11,6 +11,12 @@ Do not use this legacy file for: Current model detail
 Last reviewed: 2026-09-13
 ```
 
+> Status: historical redirect. Active topology remains
+> [docs/architect/workspace-topology.md](../workspace-topology.md), while active
+> packaging-distribution runtime records live under
+> [docs/platform/packaging-distribution/](../../platform/packaging-distribution/README.md).
+> Keep this file only as the old pointer that explains the split.
+
 **Status:** Moved.
 **Date:** 2026-09-04.
 

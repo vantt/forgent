@@ -227,7 +227,7 @@ Recommended split:
    - `fgctl init/repair/upgrade/gateway`;
    - local `fgos init`;
    - local `fgos doctor` and `fgos doctor --fix`;
-   - setup removal;
+   - deprecated legacy setup compatibility and eventual setup retirement;
    - failure semantics.
 3. `project-runtime-adapter-protocol.md`
    - future shared web/gateway constraint;

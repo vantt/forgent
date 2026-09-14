@@ -55,9 +55,6 @@ see the "Distill mode" section below for how the second one differs.
   the same scout-first discipline `fgos-coding-exploring` and the local
   `ck:brainstorm` skill both already require. A question with no
   scout evidence behind it is not ready to ask yet.
-- When writing or distilling Markdown docs, use exactly one H1 as the document
-  title. All sections start at H2, including numbered sections such as
-  `## 1. Purpose`.
 - Present analysis in visible text before asking a decision question —
   never reference reasoning the person has not seen (borrowed from
   `ck:brainstorm`'s present-before-ask discipline).
@@ -68,13 +65,6 @@ see the "Distill mode" section below for how the second one differs.
   changes the design's shape — never appended to piecemeal like §3/§4/§5.
   A stale, un-regenerated §6 left standing after a shape-changing
   decision is a defect, not a minor omission.
-- Component-boundary check is mandatory for design-shaping: when a
-  discussion changes a component, parent/child responsibility, cross-area
-  dependency, state-write authority, runtime authority, or platform/domain/host
-  boundary, read `docs/platform/component-boundary.md` and update it or its
-  current detailed source. If the design does not affect that map, record
-  `No component-boundary change` in §6 or §7 so the next agent does not have
-  to guess.
 - Never invent an index file across a parent's eventual child tasks. Reuse
   the existing `parent` field, `fgos rollup <id>`, and `fgos-coding-planning`
   step 4's own mandatory split-list section — this skill does not
@@ -194,10 +184,9 @@ see the "Distill mode" section below for how the second one differs.
 4. **Regenerate §6 whenever the shape changes.** After any D-ID lands that
    materially changes what's being built (not every small wording
    clarification), rewrite §6 in full: a fresh, coherent synthesis plus a
-   diagram if there's real structure to draw. Include the component-boundary
-   impact: either the `docs/platform/component-boundary.md` update path, or
-   `No component-boundary change`. Never leave §6 stale after a shape-changing
-   decision, and never leave it as a bare list of D-IDs standing in for prose.
+   diagram if there's real structure to draw. Never leave §6 stale after a
+   shape-changing decision, and never leave it as a bare list of D-IDs
+   standing in for prose.
 
 5. **Fill §7 once the shape is real.** Once §6 describes something concrete
    enough to build, break it into candidate tasks, each with its own

@@ -12,6 +12,13 @@
     "one-directional-layer",
     "domain-siloing"
   ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
   "files": {
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
@@ -113,6 +120,7 @@
     "src/intake/plan-verdict-from-plan-md.mjs": "use-case",
     "src/intake/verify-pattern-check.mjs": "kernel",
     "src/cli/command-registry.mjs": "kernel",
+    "src/cli/deprecation.mjs": "kernel",
     "src/cli/version.mjs": "kernel",
     "src/cli/invocation-fault-log.mjs": "infra",
     "src/cli/approve-fault-log.mjs": "infra",
@@ -163,6 +171,7 @@
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/bin-discovery.mjs": "infra",
     "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
@@ -187,6 +196,11 @@
     "src/runner/dispatch/trust-store.mjs": "infra",
     "src/runner/dispatch/worker-home.mjs": "infra",
     "src/runner/dispatch/worker-session.mjs": "infra",
-    "src/runner/dispatch/worker-session-boot.mjs": "infra"
+    "src/runner/dispatch/worker-session-boot.mjs": "infra",
+    "src/runner/dispatch/cli-spawn-supervisor.mjs": "infra",
+    "src/runner/dispatch/recovery.mjs": "infra",
+    "src/runner/dispatch/run-lock.mjs": "infra",
+    "src/setup/instruction-composition.mjs": "infra",
+    "src/setup/instruction-projections.mjs": "infra"
   }
 }

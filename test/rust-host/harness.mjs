@@ -534,6 +534,30 @@ export function compareResults(testCase, resultA, resultB) {
       if (resultA.stderrText !== resultB.stderrText) {
         differences.push(`stderr mismatch in semantic-json mode: "${resultA.stderrText}" !== "${resultB.stderrText}"`);
       }
+    } else if (mode === "semantic-json-or-exact-bytes") {
+      let jsonA, jsonB;
+      try {
+        jsonA = JSON.parse(resultA.stdoutText);
+        jsonB = JSON.parse(resultB.stdoutText);
+      } catch {
+        jsonA = null;
+        jsonB = null;
+      }
+
+      if (jsonA && jsonB) {
+        const jsonDiffs = compareSemanticJson(jsonA, jsonB, testCase.timestampPredicate);
+        differences.push(...jsonDiffs);
+        if (resultA.stderrText !== resultB.stderrText) {
+          differences.push(`stderr mismatch in semantic-json-or-exact-bytes mode: "${resultA.stderrText}" !== "${resultB.stderrText}"`);
+        }
+      } else {
+        if (!resultA.stdout.equals(resultB.stdout)) {
+          differences.push(`stdout byte mismatch: A had ${resultA.stdout.length} bytes, B had ${resultB.stdout.length} bytes`);
+        }
+        if (!resultA.stderr.equals(resultB.stderr)) {
+          differences.push(`stderr byte mismatch: A had ${resultA.stderr.length} bytes, B had ${resultB.stderr.length} bytes`);
+        }
+      }
     } else if (mode === "fs-delta") {
       if (!resultA.fsDelta || !resultB.fsDelta) {
         differences.push("fs-delta mode declared but filesystem delta not captured for one or both entries");

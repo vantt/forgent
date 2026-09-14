@@ -5,7 +5,7 @@ Document type: Contract
 Audience: Maintainer, component owner, domain owner, implementation agent
 Purpose: Define how fgOS instruction fragments compose into effective agent instructions and render into host-visible files
 Design status: Draft
-Implementation status: Planned
+Implementation status: Implemented for source registry, composition engine, portable AGENTS.md rendering, and instruction projection repair; host-specific adapter expansion remains demand-driven
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Architecture discussion
@@ -51,9 +51,9 @@ The composition engine produces the effective instruction set before any Markdow
 
 Instruction source belongs near the authority that owns the meaning.
 
-`docs/platform/<component>/` is the design/spec/contract surface. It may define the composition contract, explain why rules exist, and link to source locations, but it should not be the default canonical source for runtime agent instructions.
+`docs/platform/<component>/` is the design/spec/contract surface. Documentation paths such as `docs/platform/<component>/instructions/*.md` (and `docs/platform/**` generally) must never be used as a runtime instruction source. They define architecture contracts and explain rationale, but they are not discovered or loaded by agent runtimes.
 
-Canonical runtime instruction sources should live in source-owned authority roots, for example:
+Canonical runtime instruction sources live strictly in source-owned authority roots:
 
 ```txt
 core/instructions/
@@ -70,6 +70,8 @@ domains/<domain>/instructions/
 | Host syntax wrapper | Generated adapter target, not canonical source |
 
 Component and domain additions must not hand-edit generated projections directly. They register canonical fragments and let the projection path render the correct host/workspace files.
+
+Allowed component and domain owners are resolved authoritatively from `docs/architecture-manifest.json` (or explicitly configured known owners). Unregistered component or domain roots are rejected by default discovery. Custom roots are internal/test-only options for fixture isolation and cannot be used by production default discovery.
 
 ## 5. Instruction Unit
 
@@ -230,4 +232,4 @@ Instruction projections are host-visible generated files. The long-term projecti
 - destination path;
 - repair/overwrite ownership.
 
-Until the ledger exists, docs must mark instruction projection repair as planned.
+Instruction projection repair records the portable `AGENTS.md` managed block in `.fgos/installation/projections/ledger.json`. Host-specific adapters should add ledger entries only when adapter behavior requires them.

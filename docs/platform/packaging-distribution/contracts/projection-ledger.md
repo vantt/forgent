@@ -5,7 +5,7 @@ Document type: Contract
 Audience: Maintainer, implementation agent, reviewer
 Purpose: Track the intended projection ledger boundary for packaging-distribution
 Design status: Draft
-Implementation status: Planned/unknown
+Implementation status: Partial: instruction projections have a ledger entry and doctor/fix repair; skill and wider host projections remain follow-up
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Architecture discussion
@@ -45,7 +45,9 @@ The ledger should answer:
 
 ## 4. Current Status
 
-This is not yet proven implemented in the current scan. Keep claims about projection ledger behavior out of `spec.md` unless they are marked partial/planned and linked here.
+Instruction projections now write a managed `AGENTS.md` block, effective-set JSON, and an entry in `.fgos/installation/projections/ledger.json`. The check/fix path lives in `src/setup/instruction-projections.mjs` and is registered as `instruction-projections-stale`.
+
+This does not yet prove ledger coverage for every host-visible projection. Skill packaging projections and future host adapters still need their own ledger entries before this contract can be promoted to fully implemented.
 
 ## 5. Evidence Needed
 

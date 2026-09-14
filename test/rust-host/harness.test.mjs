@@ -88,6 +88,68 @@ test("R2: Semantic JSON comparison honors timestamp predicate without exact equa
   assert.ok(diffsDataMismatch.length > 0, "Mismatched data payload must fail comparison");
 });
 
+test("R2: Semantic JSON or exact bytes mode accepts timestamped JSON and deterministic text", () => {
+  const jsonA = {
+    contract: "fgos.v1",
+    generated_at: "2026-09-10T12:00:00.000Z",
+    data: { level: "off" },
+  };
+  const jsonB = {
+    contract: "fgos.v1",
+    generated_at: "2026-09-10T12:00:00.123Z",
+    data: { level: "off" },
+  };
+  const jsonResult = compareResults(
+    { id: "json-or-bytes-json", modes: ["semantic-json-or-exact-bytes"] },
+    {
+      exitCode: 0,
+      signal: null,
+      launchError: null,
+      stdout: Buffer.from(`${JSON.stringify(jsonA)}\n`),
+      stderr: Buffer.from(""),
+      stdoutText: `${JSON.stringify(jsonA)}\n`,
+      stderrText: "",
+      spawnedChildren: [],
+    },
+    {
+      exitCode: 0,
+      signal: null,
+      launchError: null,
+      stdout: Buffer.from(`${JSON.stringify(jsonB)}\n`),
+      stderr: Buffer.from(""),
+      stdoutText: `${JSON.stringify(jsonB)}\n`,
+      stderrText: "",
+      spawnedChildren: [],
+    }
+  );
+  assert.equal(jsonResult.passed, true, jsonResult.differences.join("; "));
+
+  const textResult = compareResults(
+    { id: "json-or-bytes-text", modes: ["semantic-json-or-exact-bytes"] },
+    {
+      exitCode: 0,
+      signal: null,
+      launchError: null,
+      stdout: Buffer.from("usage text\n"),
+      stderr: Buffer.from(""),
+      stdoutText: "usage text\n",
+      stderrText: "",
+      spawnedChildren: [],
+    },
+    {
+      exitCode: 0,
+      signal: null,
+      launchError: null,
+      stdout: Buffer.from("usage text\n"),
+      stderr: Buffer.from(""),
+      stdoutText: "usage text\n",
+      stderrText: "",
+      spawnedChildren: [],
+    }
+  );
+  assert.equal(textResult.passed, true, textResult.differences.join("; "));
+});
+
 test("R3: Filesystem snapshot and delta capture", () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "harness-fs-test-"));
   try {

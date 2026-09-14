@@ -11,7 +11,7 @@ use crate::store::{
     list_releases, now_millis, resolve_machine_release_store_root, stage_release,
     ReleaseStatusEntry, StageOutcome,
 };
-use crate::verify::{recompute_artifact_digest, verify_release_files};
+use crate::verify::{recompute_artifact_digest, verify_legacy_node, verify_release_files};
 use crate::workspace::{
     compute_repository_id, compute_work_state_id, compute_workspace_id, resolve_workspace_root,
 };
@@ -53,6 +53,21 @@ entry="$release_path/bin/fgos-runner"
 exec "$entry" "$@"
 "#;
 
+/// Frozen schema version for tracked distribution pins.
+pub const DISTRIBUTION_PIN_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for workspace activation bindings.
+pub const ACTIVATION_BINDING_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for workspace root topology bindings.
+pub const WORKSPACE_ROOT_BINDING_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Frozen schema version for install transaction records.
+pub const INSTALL_TRANSACTION_SCHEMA_VERSION_V1: u32 = 1;
+
+/// Tracked project runtime pin policy (`.fgos/distribution.json`).
+///
+/// Matches `contracts/distribution-pin.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct TrackedDistributionPin {
@@ -60,16 +75,27 @@ pub struct TrackedDistributionPin {
     pub project_runtime: ProjectRuntimePin,
 }
 
+/// Canonical alias for `TrackedDistributionPin`.
+pub type DistributionPin = TrackedDistributionPin;
+
+/// Runtime policy specification inside a `TrackedDistributionPin`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ProjectRuntimePin {
     pub policy: String,
     pub artifact_digest: String,
+    #[serde(default)]
     pub release_version: Option<String>,
+    #[serde(default)]
     pub channel: Option<String>,
+    #[serde(default)]
     pub allow_prerelease: bool,
 }
 
+/// Workspace root binding record snapshot (`.fgos/installation/root.json`).
+///
+/// Binds repository root, workspace identity, work-state identity, and machine release store.
+/// Matches `contracts/repository-runtime-layout.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceRootBinding {
@@ -80,6 +106,10 @@ pub struct WorkspaceRootBinding {
     pub machine_release_store: String,
 }
 
+/// Canonical alias for `WorkspaceRootBinding`.
+pub type TopologyRootBinding = WorkspaceRootBinding;
+
+/// Tool identity that performed runtime activation.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct ActivatedByInfo {
@@ -87,6 +117,10 @@ pub struct ActivatedByInfo {
     pub version: String,
 }
 
+/// Workspace activation binding (`.fgos/installation/activation.json`).
+///
+/// Selects and verifies the active fgOS runtime for this workspace.
+/// Matches `contracts/activation-binding.md`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct WorkspaceActivationBinding {
@@ -98,6 +132,7 @@ pub struct WorkspaceActivationBinding {
     pub status: String,
     pub artifact_digest: String,
     pub release_path: String,
+    #[serde(default)]
     pub previous_artifact_digest: Option<String>,
     pub shim_version: String,
     pub resolved_dependencies: serde_json::Value,
@@ -106,6 +141,10 @@ pub struct WorkspaceActivationBinding {
     pub activated_by: ActivatedByInfo,
 }
 
+/// Canonical alias for `WorkspaceActivationBinding`.
+pub type ActivationBinding = WorkspaceActivationBinding;
+
+/// State transition entry in an install transaction history.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionHistoryEntry {
@@ -113,6 +152,9 @@ pub struct TransactionHistoryEntry {
     pub timestamp: String,
 }
 
+/// Install transaction record (`<store>/installs/<activationId>.json`).
+///
+/// Audits staging, verification, preparation, and publish lifecycle in the release store.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct InstallTransactionRecord {
@@ -430,8 +472,29 @@ pub fn check_node_requirement(req: &str) -> Result<String, String> {
     Ok(version_str)
 }
 
+/// The release-relative path the workspace shim execs after activation
+/// (`SHIM_FGOS_BODY`: `exec "$release_path/bin/fgos"`). Preflight pins the
+/// manifest's declared `entries.fgos` to this exact path so the identity the
+/// manifest commits to and the bytes the shim will run can never diverge.
+const SHIM_FGOS_ENTRY: &str = "bin/fgos";
+
 /// Preflight checks before publish (R6).
-/// No host-visible writes permitted.
+///
+/// Entirely static: preflight NEVER executes candidate release code. A
+/// candidate has no writer authority before its activation binding is
+/// published, and the only boundary this crate can actually enforce on an
+/// arbitrary `bin/fgos` is not running it -- an env-var "bootstrap context"
+/// is a request the candidate may ignore, not a confinement, and no host
+/// (Rust or Node) ever honored one. Everything the old runtime smoke could
+/// prove about identity (the candidate reports the expected
+/// `artifactDigest`) is already provable from the digest-verified tree
+/// here; whether the activated host actually enters Rust and reports that
+/// digest is proven post-publish, through the shim, with writer authority
+/// already granted (`test/rust-host/fgctl-init.test.mjs`).
+///
+/// The only child process preflight spawns is the trusted host dependency
+/// `node --version` (`check_node_requirement`), never anything under
+/// `candidate_dir`.
 pub fn preflight_candidate(
     candidate_dir: &Path,
     manifest: &ReleaseManifest,
@@ -446,50 +509,74 @@ pub fn preflight_candidate(
         .map_err(|e| InitError::Preflight(format!("canonicalize manifest failed: {}", e)))?;
     verify_release_files(candidate_dir, manifest)
         .map_err(|e| InitError::Preflight(format!("verify release files failed: {}", e)))?;
+    verify_legacy_node(candidate_dir, manifest)
+        .map_err(|e| InitError::Preflight(format!("verify legacy node failed: {}", e)))?;
 
     // 3. Confirm requires.node
     if let Some(req) = &manifest.requires.node {
         check_node_requirement(req).map_err(InitError::Preflight)?;
     }
 
-    // 4. Confirm bin/fgos present and executable
-    let fgos_bin = candidate_dir.join("bin").join("fgos");
-    if !fgos_bin.is_file() {
+    // 4. Host entry identity: the entry the shim will exec must be the one
+    //    the manifest declares, must be covered by a digest-verified
+    //    `files[]` row (so its bytes are part of `artifactDigest`, checked
+    //    in step 2), and must be a regular executable file on disk.
+    verify_candidate_host_entry(candidate_dir, manifest)?;
+
+    Ok(())
+}
+
+/// Static identity check for the candidate's host entry (`bin/fgos`).
+///
+/// Refuses, without executing anything, a candidate whose declared
+/// `entries.fgos` is not the shim's exec path, whose host entry bytes are not
+/// part of the manifest's digest-covered `files[]`, or whose on-disk entry is
+/// missing, a symlink, or not executable.
+fn verify_candidate_host_entry(
+    candidate_dir: &Path,
+    manifest: &ReleaseManifest,
+) -> Result<(), InitError> {
+    if manifest.entries.fgos != SHIM_FGOS_ENTRY {
         return Err(InitError::Preflight(format!(
-            "candidate bin/fgos not found at {}",
+            "candidate manifest entries.fgos declares {:?}; the workspace shim execs {:?}",
+            manifest.entries.fgos, SHIM_FGOS_ENTRY
+        )));
+    }
+
+    let covered = manifest.files.iter().any(|f| f.path == SHIM_FGOS_ENTRY && f.kind == "file");
+    if !covered {
+        return Err(InitError::Preflight(format!(
+            "candidate {} is not covered by a digest-verified manifest files[] entry",
+            SHIM_FGOS_ENTRY
+        )));
+    }
+
+    let fgos_bin = candidate_dir.join("bin").join("fgos");
+    let meta = match std::fs::symlink_metadata(&fgos_bin) {
+        Ok(m) => m,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            return Err(InitError::Preflight(format!(
+                "candidate bin/fgos not found at {}",
+                fgos_bin.display()
+            )));
+        }
+        Err(e) => return Err(InitError::Io(e)),
+    };
+    if meta.file_type().is_symlink() || !meta.file_type().is_file() {
+        return Err(InitError::Preflight(format!(
+            "candidate bin/fgos at {} is not a regular file",
             fgos_bin.display()
         )));
     }
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
-        let perms = std::fs::metadata(&fgos_bin)?.permissions();
-        if perms.mode() & 0o111 == 0 {
+        if meta.permissions().mode() & 0o111 == 0 {
             return Err(InitError::Preflight(format!(
                 "candidate bin/fgos at {} is not executable",
                 fgos_bin.display()
             )));
         }
-    }
-
-    // 5. Run <candidate>/bin/fgos version --runtime-json with restricted bootstrap context
-    let mut cmd = Command::new(&fgos_bin);
-    cmd.args(["version", "--runtime-json"])
-        .env("FGOS_BOOTSTRAP_CANDIDATE", "1")
-        .env("FGOS_CANDIDATE_ARTIFACT_DIGEST", &manifest.artifact_digest)
-        .env("FGOS_CANDIDATE_RELEASE_PATH", candidate_dir)
-        .current_dir(candidate_dir);
-
-    let output = cmd
-        .output()
-        .map_err(|e| InitError::Preflight(format!("failed to run candidate preflight: {}", e)))?;
-
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(InitError::Preflight(format!(
-            "candidate version --runtime-json exited with {}: {}",
-            output.status, stderr
-        )));
     }
 
     Ok(())
@@ -500,6 +587,10 @@ pub fn publish_activation_file(
     activation_path: &Path,
     binding: &WorkspaceActivationBinding,
 ) -> std::io::Result<()> {
+    if let Some(parent) = activation_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
     let tmp_path = activation_path
         .parent()
         .unwrap()
@@ -1279,6 +1370,8 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
         verify_release_files(&candidate_dir, &manifest)
             .map_err(|e| format!("verify release files failed: {}", e))?;
+        verify_legacy_node(&candidate_dir, &manifest)
+            .map_err(|e| format!("verify candidate legacy node failed: {}", e))?;
         if manifest.artifact_digest != target_digest {
             return Err(format!(
                 "staged release manifest digest mismatch: {} declares {}, expected {}",
@@ -1404,6 +1497,8 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
             .map_err(|e| format!("canonicalize manifest failed: {}", e))?;
         verify_release_files(&release_dir, &manifest)
             .map_err(|e| format!("file digest mismatch: {}", e))?;
+        verify_legacy_node(&release_dir, &manifest)
+            .map_err(|e| format!("legacy node verification failed: {}", e))?;
         Ok(())
     })();
 
@@ -1491,4 +1586,213 @@ pub fn get_workspace_status(start_dir: &Path, store_root: &Path) -> Option<Fgctl
         quarantined: activation.status == "quarantined",
         releases,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::verify::to_canonical_json;
+    use sha2::{Digest, Sha256};
+    use std::path::PathBuf;
+
+    fn sha256_of(bytes: &[u8]) -> String {
+        format!("sha256:{:x}", Sha256::digest(bytes))
+    }
+
+    fn fresh_temp_root(name: &str) -> PathBuf {
+        let dir_name = format!("fgos_test_preflight_{}_{}", name, std::process::id());
+        let root = std::env::temp_dir().join(dir_name);
+        let _ = std::fs::remove_dir_all(&root);
+        std::fs::create_dir_all(&root).unwrap();
+        root
+    }
+
+    /// Recursive, sorted listing of every path under `root` -- the "nothing
+    /// was written anywhere" witness the hostile-candidate test compares
+    /// before and after preflight.
+    fn snapshot_tree(root: &Path) -> Vec<PathBuf> {
+        let mut out = Vec::new();
+        let mut stack = vec![root.to_path_buf()];
+        while let Some(dir) = stack.pop() {
+            for entry in std::fs::read_dir(&dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    stack.push(path.clone());
+                }
+                out.push(path);
+            }
+        }
+        out.sort();
+        out
+    }
+
+    /// Writes a minimal, fully digest-consistent candidate release tree at
+    /// `root` whose host entry `bin/fgos` is `host_entry_body`, lets `mutate`
+    /// adjust the manifest before its `artifactDigest` is sealed, and returns
+    /// the manifest as the crate's own trusted reader parses it.
+    fn write_candidate(
+        root: &Path,
+        host_entry_body: &str,
+        mutate: impl FnOnce(&mut serde_json::Value),
+    ) -> ReleaseManifest {
+        std::fs::create_dir_all(root.join("bin")).unwrap();
+        std::fs::create_dir_all(root.join("libexec").join("legacy-node").join("bin")).unwrap();
+
+        let fgos_bin = root.join("bin").join("fgos");
+        std::fs::write(&fgos_bin, host_entry_body).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&fgos_bin, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+
+        let legacy_body: &[u8] = b"console.log('legacy');\n";
+        let legacy_entry = root.join("libexec").join("legacy-node").join("bin").join("fgos.mjs");
+        std::fs::write(&legacy_entry, legacy_body).unwrap();
+
+        let mut manifest = serde_json::json!({
+            "schemaVersion": 1,
+            "entries": { "fgos": "bin/fgos" },
+            "components": {
+                "legacyNode": {
+                    "root": "libexec/legacy-node",
+                    "entry": "bin/fgos.mjs",
+                    "digest": sha256_of(legacy_body)
+                }
+            },
+            "requires": {},
+            "target": { "os": "linux", "arch": "x64" },
+            "files": [
+                {
+                    "path": "bin/fgos",
+                    "kind": "file",
+                    "digest": sha256_of(host_entry_body.as_bytes()),
+                    "mode": "755",
+                    "class": "immutable-entry"
+                },
+                {
+                    "path": "libexec/legacy-node/bin/fgos.mjs",
+                    "kind": "file",
+                    "digest": sha256_of(legacy_body),
+                    "mode": "644",
+                    "class": "immutable-runtime"
+                }
+            ]
+        });
+        mutate(&mut manifest);
+
+        let digest = sha256_of(to_canonical_json(&manifest).as_bytes());
+        manifest["artifactDigest"] = serde_json::Value::String(digest);
+        std::fs::write(
+            root.join("manifest.json"),
+            serde_json::to_vec_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+
+        read_manifest_from_dir(root).unwrap()
+    }
+
+    /// A hostile candidate that is well-formed in every static respect and
+    /// whose `bin/fgos` would happily "succeed" a runtime smoke -- it prints a
+    /// plausible `version --runtime-json` envelope echoing whatever digest it
+    /// is told -- while writing a host-visible file outside the release
+    /// tree. Preflight must accept it (it IS a valid release tree) and must
+    /// never run it: the only enforceable no-write boundary is not executing
+    /// candidate code before publish.
+    #[cfg(unix)]
+    #[test]
+    fn preflight_never_executes_a_hostile_but_well_formed_candidate() {
+        let root = fresh_temp_root("hostile");
+        let candidate = root.join("candidate");
+        let host_visible = root.join("host-visible");
+        let sentinel = host_visible.join("AGENTS.md");
+
+        let script = format!(
+            "#!/bin/sh\nmkdir -p {hv}\nprintf pwned > {sentinel}\n\
+             printf '{{\"contract\":\"fgos.v1\",\"data\":{{\"host\":\"rust\",\"artifactDigest\":\"%s\"}}}}\\n' \
+             \"${{FGOS_CANDIDATE_ARTIFACT_DIGEST:-none}}\"\nexit 0\n",
+            hv = host_visible.display(),
+            sentinel = sentinel.display(),
+        );
+        let manifest = write_candidate(&candidate, &script, |_| {});
+
+        // Control: the script really does write the sentinel when run, so a
+        // missing sentinel below proves preflight never ran it -- not that
+        // the script is broken.
+        let control = Command::new(candidate.join("bin").join("fgos"))
+            .args(["version", "--runtime-json"])
+            .output()
+            .unwrap();
+        assert!(control.status.success());
+        assert_eq!(std::fs::read_to_string(&sentinel).unwrap(), "pwned");
+        std::fs::remove_dir_all(&host_visible).unwrap();
+
+        let before = snapshot_tree(&root);
+        preflight_candidate(&candidate, &manifest).expect("well-formed candidate must pass");
+        let after = snapshot_tree(&root);
+
+        assert!(
+            !sentinel.exists(),
+            "preflight executed candidate bin/fgos: sentinel {} was written",
+            sentinel.display()
+        );
+        assert_eq!(before, after, "preflight must not write anywhere under {}", root.display());
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn preflight_refuses_host_entry_not_covered_by_manifest_files() {
+        let root = fresh_temp_root("uncovered");
+        let candidate = root.join("candidate");
+        let manifest = write_candidate(&candidate, "#!/bin/sh\nexit 0\n", |m| {
+            let files = m["files"].as_array_mut().unwrap();
+            files.retain(|f| f["path"] != "bin/fgos");
+        });
+
+        let err = preflight_candidate(&candidate, &manifest).unwrap_err();
+        let msg = err.to_string();
+        assert!(matches!(err, InitError::Preflight(_)), "{msg}");
+        assert!(msg.contains("not covered by a digest-verified manifest files[] entry"), "{msg}");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[test]
+    fn preflight_refuses_entries_fgos_that_is_not_the_shim_exec_path() {
+        let root = fresh_temp_root("entry_mismatch");
+        let candidate = root.join("candidate");
+        let manifest = write_candidate(&candidate, "#!/bin/sh\nexit 0\n", |m| {
+            m["entries"]["fgos"] = serde_json::Value::String("target/release/fgos".to_string());
+        });
+
+        let err = preflight_candidate(&candidate, &manifest).unwrap_err();
+        let msg = err.to_string();
+        assert!(matches!(err, InitError::Preflight(_)), "{msg}");
+        assert!(msg.contains("entries.fgos"), "{msg}");
+        assert!(msg.contains("bin/fgos"), "{msg}");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn preflight_refuses_non_executable_host_entry() {
+        use std::os::unix::fs::PermissionsExt;
+        let root = fresh_temp_root("noexec");
+        let candidate = root.join("candidate");
+        let manifest = write_candidate(&candidate, "#!/bin/sh\nexit 0\n", |_| {});
+        std::fs::set_permissions(
+            candidate.join("bin").join("fgos"),
+            std::fs::Permissions::from_mode(0o644),
+        )
+        .unwrap();
+
+        let err = preflight_candidate(&candidate, &manifest).unwrap_err();
+        let msg = err.to_string();
+        assert!(matches!(err, InitError::Preflight(_)), "{msg}");
+        assert!(msg.contains("not executable"), "{msg}");
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }

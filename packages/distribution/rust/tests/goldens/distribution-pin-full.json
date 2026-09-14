@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "projectRuntime": {
+    "policy": "exact-digest",
+    "artifactDigest": "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+    "releaseVersion": "0.1.0",
+    "channel": "stable",
+    "allowPrerelease": false
+  }
+}

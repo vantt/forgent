@@ -9,6 +9,11 @@ Do not use this legacy file for: Current canonical history
 Last reviewed: 2026-09-13
 ```
 
+> Status: historical source. The active condensed history is
+> [docs/platform/packaging-distribution/history/distribution-baseline.md](../../../platform/packaging-distribution/history/distribution-baseline.md).
+> This file remains the full discussion-era evidence ledger and is not current
+> target architecture.
+
 **Status:** Historical/input record for the new Packaging And Distribution
 architecture.
 **Date:** 2026-09-04.

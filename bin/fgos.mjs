@@ -47,6 +47,7 @@ import { chooseStageOperation, executeDriverOperationChoice } from '../src/runne
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
+import { formatDeprecation } from '../src/cli/deprecation.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -4450,7 +4451,13 @@ async function runVerb(verb, flags, positional, dir) {
       // in-place for forgentX's own dev-checkout self-hosting run (see
       // materializeSkillsIntoProject's own self-hosting no-copy branch).
       const { copied: skillsSourceCopied, wrappersWritten: skillWrappersGenerated } = materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot);
+      const deprecation = COMMAND_REGISTRY.find((entry) => entry.name === 'setup')?.deprecated ?? null;
+      const deprecationText = formatDeprecation(deprecation);
       return {
+        deprecation,
+        deprecationMessage: deprecationText
+          ? `fgos setup is legacy compatibility; ${deprecationText}.`
+          : undefined,
         rcFilesInserted,
         rcFilesAlreadyConfigured,
         ...(rcWriteDeclinedReason !== null && { rcWriteDeclinedReason }),
@@ -4875,8 +4882,9 @@ function renderHelpText(entries = publicManifestEntries()) {
     const flagRequired = required.filter((r) => !positional.includes(r));
     if (positionalRequired.length) lines.push(`    positional: ${positionalRequired.join(', ')}`);
     if (flagRequired.length) lines.push(`    required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
-    if (entry.deprecated) {
-      lines.push(`    DEPRECATED since ${entry.deprecated.since} — use "${entry.deprecated.use_instead}" instead.`);
+    const deprecationText = formatDeprecation(entry.deprecated);
+    if (deprecationText) {
+      lines.push(`    DEPRECATED — ${deprecationText}`);
     }
     lines.push('');
   }
@@ -4930,6 +4938,9 @@ function renderPretty(verb, data) {
     }
   } else if (verb === 'setup') {
     lines.push(bold('fgos setup'));
+    if (data.deprecationMessage) {
+      lines.push(formatCheck(true, 'legacy compatibility command', data.deprecationMessage));
+    }
     for (const rc of data.rcFilesInserted) {
       lines.push(formatCheck(true, `inserted shell-integration source line`, rc));
     }

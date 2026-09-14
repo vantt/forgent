@@ -120,11 +120,57 @@ If `.fgos/distribution.json` exists but the release store has not staged its req
 
 `fgctl init` must acquire or stage the pinned release and publish this workspace's activation binding. It must not silently choose latest.
 
-## 7. Implementation Status
+## 7. Topology Records Schema (Frozen V1)
+
+### 7.1 Workspace Root Binding (`.fgos/installation/root.json`)
+
+The schema is frozen at `schemaVersion: 1`. Rust serde definition lives in `packages/distribution/rust/src/init.rs` (`WorkspaceRootBinding`, aliased as `TopologyRootBinding`).
+
+```json
+{
+  "schemaVersion": 1,
+  "repositoryRoot": "/home/user/project",
+  "workspaceId": "8d3322d88fba3bd8",
+  "workStateId": "8d3322d88fba3bd8",
+  "machineReleaseStore": "/home/user/.local/state/fgos"
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `schemaVersion` | integer | Fixed at `1` for V1. |
+| `repositoryRoot` | string | Canonical filesystem path of the repository checkout root. |
+| `workspaceId` | string | 16-hex hash of canonical workspace root. |
+| `workStateId` | string | Work-state namespace identifier (equals `workspaceId` in V1). |
+| `machineReleaseStore` | string | Absolute path to the machine release store. |
+
+### 7.2 Install Transaction Record (`<store>/installs/<activationId>.json`)
+
+The schema is frozen at `schemaVersion: 1`. Rust serde definition lives in `packages/distribution/rust/src/init.rs` (`InstallTransactionRecord`).
+
+```json
+{
+  "schemaVersion": 1,
+  "activationId": "act_000001a08fe31d00",
+  "workspaceId": "8d3322d88fba3bd8",
+  "artifactDigest": "sha256:08e33ffd77ccae43fd3b9f3034c9d4c28bdc1d8c69966f913ed66707a0486ec4",
+  "status": "ready-published",
+  "history": [
+    { "status": "staging", "timestamp": "2026-09-14T00:00:00.000Z" },
+    { "status": "verified", "timestamp": "2026-09-14T00:00:01.000Z" },
+    { "status": "preparing", "timestamp": "2026-09-14T00:00:02.000Z" },
+    { "status": "ready-published", "timestamp": "2026-09-14T00:00:03.000Z" }
+  ],
+  "updatedAt": "2026-09-14T00:00:03.000Z"
+}
+```
+
+## 8. Implementation Status
 
 | Claim | Status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Release tree has `manifest.json`, `bin/`, and `libexec/legacy-node/`. | implemented | `scripts/build-rust-distribution.mjs`, `test/rust-host/release-tree.test.mjs` | Keep exact fields in sync with `contracts/release-manifest.md`. |
-| Workspace activation lives under `.fgos/installation/activation.json`. | partial | `packages/distribution/rust/src/init.rs`, `test/rust-host/fgctl-init.test.mjs`, `test/rust-host/fgctl-upgrade.test.mjs` | Extract exact schema before freezing. |
+| Workspace activation lives under `.fgos/installation/activation.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs`, `test/rust-host/fgctl-upgrade.test.mjs` | Schema frozen at V1 with golden test coverage. |
+| Topology root binding snapshot lives under `.fgos/installation/root.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs` | Schema frozen at V1 with golden test coverage. |
 | Projection ledger path is `.fgos/installation/projections/ledger.json`. | planned/unknown | `contracts/projection-ledger.md` | Implement or verify ledger before claiming projection repair is complete. |
 | Worker workspace capsule avoids copying the whole shared `.fgos` tree. | planned/unknown | Architecture source only | Scan worker/worktree implementation before marking implemented. |

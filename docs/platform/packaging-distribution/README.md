@@ -54,6 +54,7 @@ Do not use this area as the owner for ordinary workflow semantics after a runtim
 | Understand instruction merge policy and `AGENTS.md` projection | [contracts/instruction-composition-and-projection.md](contracts/instruction-composition-and-projection.md) |
 | Understand skill/plugin/extension packaging across agent hosts | [contracts/skill-package-distribution.md](contracts/skill-package-distribution.md) |
 | See proof paths and test commands | [verification/install-and-release-proof.md](verification/install-and-release-proof.md) |
+| See code-panel packet closeout and whole-track proof | [reports/track-closeout.md](reports/track-closeout.md) |
 | Check whether legacy/history details were preserved | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |
 | Coordinate implementation through code-panel packets | [code-panel-rollout-plan.md](code-panel-rollout-plan.md) |
 | Understand historical context and supersession | [history/distribution-baseline.md](history/distribution-baseline.md) |
@@ -155,9 +156,10 @@ The old sources are preserved during migration:
 
 - `docs/specs/distribution.md` remains the legacy/generated-curated spec source.
 - `docs/distribution-vision.md` is promoted into `vision.md`; the old path remains historical source material until redirected.
-- `docs/architect/packaging-distribution/**` remains the discussion-derived architecture source until this area is reviewed.
+- `docs/architect/packaging-distribution/**` now carries historical redirect/status notes; read it only as discussion-derived source context.
 
-After review, old paths should get redirects or status notes rather than silently diverging.
+Old paths keep their bodies for source preservation, but the active navigation
+surface is this platform area.
 
 ## 10. Related Files
 
@@ -172,7 +174,8 @@ After review, old paths should get redirects or status notes rather than silentl
 | skill packaging contract | [contracts/skill-package-distribution.md](contracts/skill-package-distribution.md) |
 | implementation evidence | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
 | proof commands | [verification/install-and-release-proof.md](verification/install-and-release-proof.md) |
+| code-panel closeout | [reports/track-closeout.md](reports/track-closeout.md) |
 | preservation audit | [verification/source-preservation-audit.md](verification/source-preservation-audit.md) |
 | code-panel rollout plan | [code-panel-rollout-plan.md](code-panel-rollout-plan.md) |
 | historical source | [history/distribution-baseline.md](history/distribution-baseline.md) |
-| platform boundary map | [../component-boundary.md](../component-boundary.md) |
+| platform boundary map | [../../architect/component-boundary/README.md](../../architect/component-boundary/README.md) |

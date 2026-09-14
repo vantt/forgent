@@ -9,13 +9,17 @@ Do not use this legacy file for: Current canonical navigation
 Last reviewed: 2026-09-13
 ```
 
-**Status:** Future architecture constraints, not current delivery scope.
+> Status: historical redirect. The active promoted future-constraints document is
+> [docs/platform/packaging-distribution/architecture/future-constraints.md](../../platform/packaging-distribution/architecture/future-constraints.md).
+> Keep this file only as discussion-era source context.
+
+**Status:** Historical future-constraints source, not active delivery scope.
 **Date:** 2026-09-04.
 
-The current delivery target is packaging/distribution correctness and Rust
-`fgos` CLI readiness. Shared web/gateway and MCP/substrate work should not be
-implemented now. They remain constraints so the project-local runtime model
-does not paint the future architecture into a corner.
+The promoted delivery target is packaging/distribution correctness and Rust
+`fgos` CLI readiness. Shared web/gateway and MCP/substrate work should still
+not be implemented from this historical file. The active constraint text lives
+in [docs/platform/packaging-distribution/architecture/future-constraints.md](../../platform/packaging-distribution/architecture/future-constraints.md).
 
 ## 1. Shared Web And Gateway Position
 
