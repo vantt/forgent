@@ -46,6 +46,8 @@ Replacement review evidence before the supplemental panel was:
 ## Verdict
 
 Superseded. The supplemental panel's final advisory explanation recommends
-`NOT READY — documentation/evidence repair required`. The old READY conclusion
-must not be used to authorize canonical promotion or a separate implementation
-track.
+`NOT READY — documentation/evidence repair required`; the D06 supplemental
+repair pass then addressed those documentation/evidence blockers. The final D06
+verdict is recorded in `reviews/d06-finding-ledger.md`,
+`architecture-panel/supplemental-panel-report.md`, and
+`architecture-decision-lock.md` as `READY` design authority only.

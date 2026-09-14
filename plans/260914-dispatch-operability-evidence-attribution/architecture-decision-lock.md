@@ -1,7 +1,7 @@
 # Architecture Decision Lock
 
-**Status:** NOT READY - supplemental D06 panel found documentation/evidence repair blockers
-**Date:** 2026-09-14
+**Status:** READY design lock after supplemental D06 repair; not implementation authority
+**Date:** 2026-09-15
 
 The following decisions held through the manual design discussion. D06 may
 falsify them with direct source/contract evidence; it must not reopen them for
@@ -38,8 +38,9 @@ preference alone.
 
 ## D06 Verdict
 
-`NOT READY` on 2026-09-14 after supplemental registered architecture panel
-session `dispatch-operability-design-d06-panel-r2`.
+`READY` on 2026-09-15 after supplemental registered architecture panel session
+`dispatch-operability-design-d06-panel-r2` and D06 documentation/evidence
+repair.
 
 The earlier inline D06 closure recorded an explicit user override that waived
 external panel dispatch. A later operator instruction reopened that gap; the
@@ -47,21 +48,22 @@ supplemental panel ran with every static role bound to `codex-bwrap`. That run
 created real role-separated advisory outputs, but it did **not** provide
 cross-provider independence and did not close replay/evidence-link blockers.
 
-Current blockers before this file may return to `READY`:
+The repair changed the D06 record as follows:
 
-1. D06 review evidence must stop describing the older waiver as satisfying the
-   phase's independent-panel gate.
-2. The supplemental panel's role outputs must be durably linked or summarized
-   with their assignment/run ids, limitations, dissent, and red-team verdict.
-3. The D05/D06 proof matrix must add negative production-route checks proving
+1. D06 no longer claims the older waiver alone satisfied the panel gate.
+2. Supplemental role outputs are copied into
+   `architecture-panel/role-outputs/` and hash-bound by
+   `architecture-panel/evidence-manifest.sha256`.
+3. The D06 panel is described as operator-authorized Codex-only
+   role-separated review, not cross-provider independent review and not
+   protocol-proven staged artifact fan-in.
+4. D05 proof planning now requires negative production-route checks proving
    `dispatch.runtime.reconcile` cannot reach `kill`, `retry`, `resume`,
    `reassign`, `admit`, `cancel`, or takeover through host/CLI/operation-catalog
    indirection.
-4. Promotion and traceability records must agree that canonical-doc promotion is
-   paused while D06 is `NOT READY`.
-5. Closure metadata must list every HIGH/MEDIUM supplemental finding with owner,
-   evidence requirement, and recheck status.
+5. Closure metadata lists the supplemental HIGH/MEDIUM findings, their
+   dispositions, owners, evidence requirements, and recheck status.
 
-This file records the architectural direction as still viable, but grants no
-source mutation authority and no implementation-plan authority while D06 remains
-`NOT READY`.
+This file records convergence but grants no source mutation authority. `READY`
+authorizes only creation of a separate implementation plan; it never authorizes
+source mutation in this design track.

@@ -3,7 +3,8 @@
 **Session:** `dispatch-operability-design-d06-panel-r2`
 **Protocol:** `core.coordination-protocol.architecture-advisory-panel-v1@1.0.0`
 **Date:** 2026-09-14
-**Verdict:** `NOT READY — documentation/evidence repair required`
+**Verdict after D06 repair:** `READY — design-only, Codex-only role-separated
+review; no cross-provider-independence claim`
 
 ## Why This Exists
 
@@ -28,11 +29,18 @@ used the configured lower tiers. No request used `actors[].model`.
 - Request 06: `architecture-panel/requests/06-close.json` was refused because
   the session had already reached `aggregateBounds.maxRounds: 10`.
 - Final replay snapshot: `architecture-panel/show-final.json`
+- Durable role-output copies and SHA256 hashes:
+  `architecture-panel/evidence-manifest.md` and
+  `architecture-panel/evidence-manifest.sha256`
 
 The session remained `active` after the refused close attempt, but all
 substantive roles needed for D06 advisory verdict completed:
 interpretation, investigation, three shaping passes, critique, constraint
 assessment, synthesis, red-team, and explanation.
+
+This report no longer claims protocol-proven staged artifact fan-in. The run is
+recorded as an operator-authorized Codex-only, role-separated panel whose relied
+upon role outputs are copied and hash-bound in this repository.
 
 ## Role Outputs
 
@@ -51,17 +59,19 @@ assessment, synthesis, red-team, and explanation.
 
 ## Final Disposition
 
-The architecture itself remains viable, but D06 cannot honestly remain READY
-today. The blockers are process/evidence/documentation blockers:
+The architecture itself remained viable, and the process/evidence/documentation
+blockers have been repaired or converted into explicit limitations:
 
-1. Do not claim the older waiver satisfies the independent-panel gate.
-2. Do not claim cross-provider independence for this Codex-only panel.
-3. Bind relied-on role outputs as immutable evidence or label the procedure as
-   non-isolated/non-replay-complete.
-4. Extend D05/D06 negative production-route proof planning for every forbidden
+1. The older waiver is preserved only as history; it no longer satisfies the
+   D06 gate by itself.
+2. D06 does not claim cross-provider independence for this Codex-only panel.
+3. Relied-on role outputs are copied into the track and SHA256-bound; staged
+   fan-in is not claimed as proven by the old session event log.
+4. D05/D06 negative production-route proof planning now names every forbidden
    recovery verb through `dispatch.runtime.reconcile` and host/CLI/operation
    catalog indirection.
-5. Keep canonical promotion paused while D06 is `NOT READY`.
+5. Canonical promotion may resume only as planned design authority, not shipped
+   runtime behavior, after recheck.
 
 No source, config, test, Work lifecycle, or implementation action is authorized
 by this supplemental panel.

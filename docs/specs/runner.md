@@ -1179,6 +1179,44 @@ xem `docs/architect/agent-coordination/architecture/work-integration.md`).
 Chi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;
 quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.
 
+## Dispatch operability planned design (2026-09-15)
+
+Track `plans/260914-dispatch-operability-evidence-attribution/` reached
+`READY` as design authority only after supplemental D06 repair. It does not ship
+runtime behavior and does not authorize implementation in that track. A future
+implementation track may build the following planned capabilities:
+
+- Typed Run Result and Observation: `RunResult` v2 remains the sole immutable
+  terminal Run truth; `RunObservation` is a mutable read projection; historical
+  v1 results read as `legacy-derived` without byte rewrite.
+- Dispatch inspection and guard reconciliation: one read operation,
+  `dispatch.runtime.inspect`, accepts exactly one selector (`run`,
+  `assignment`, or `cwd`); a separate write operation,
+  `dispatch.runtime.reconcile`, repairs only proven-stale local
+  guards/projections under CAS.
+- Evidence attribution: observation, attribution, and policy stay separate;
+  Git snapshots provide correlation, never proof of authorship.
+
+Negative capabilities are part of the design: no unified recovery door, no
+automatic inspect-to-recover forwarding, no force-kill/retry/admit/resume/
+reassign/takeover through reconciliation, no cross-session authority, no
+same-`taskKey` semantic change, no host OOM/provider-limit prevention, and no
+direct-unit-only proof for shipped capabilities. Implementation proof must also
+include production-route refusals for forbidden recovery verbs and
+operation-catalog indirection.
+
+The D06 review evidence is an operator-authorized, role-separated Codex-only
+panel, not cross-provider independent review. The durable panel evidence lives
+under `plans/260914-dispatch-operability-evidence-attribution/architecture-panel/`.
+
+Canonical detailed artifacts:
+
+- `plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`
+- `plans/260914-dispatch-operability-evidence-attribution/phase-designs/inspection-surface-and-routing.md`
+- `plans/260914-dispatch-operability-evidence-attribution/phase-designs/evidence-attribution.md`
+- `plans/260914-dispatch-operability-evidence-attribution/phase-designs/guard-reconciliation.md`
+- `plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md`
+
 **Tra cứu định nghĩa (definition discovery).** Một CoordinationSession có thể
 agent-led (không cần định nghĩa nào — coordinator tự đề xuất Assignment nội
 tuyến dưới chính sách nền tảng) hoặc declared (chọn một `CoordinationProtocol`

@@ -1,0 +1,4 @@
+{
+  "status": "done",
+  "summary": "READY candidate recorded: D00-D06 is precise enough for a separate implementation-planning track, with one-terminal-truth as the load-bearing constraint, explicit implementation assumptions/falsifiers, and no claim that runtime behavior exists."
+}

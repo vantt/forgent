@@ -1,8 +1,8 @@
 # Dispatch Operability Design Track Closeout
 
 **Track:** `dispatch-operability-design`
-**Verdict:** NOT READY
-**Date:** 2026-09-14
+**Verdict:** READY
+**Date:** 2026-09-15
 **Mode:** Inline Codex-only design drafting followed by supplemental registered
 architecture panel using Codex-only actor bindings.
 
@@ -16,7 +16,7 @@ architecture panel using Codex-only actor bindings.
 | D03 | `9c1083cf` | `9b54c221` | PASS | none |
 | D04 | `83de1168` | `77a3d294` | PASS | none |
 | D05 | `5e92ae5f` | `23ec44cf` | PASS | none |
-| D06 | pending until final commit | pending until merge | NOT READY | supplemental panel found doc/evidence blockers |
+| D06 | pending until final commit | pending until merge | READY | Codex-only/non-cross-provider limitation recorded |
 
 ## Evidence
 
@@ -29,8 +29,9 @@ architecture panel using Codex-only actor bindings.
 - D05 defines worker claim, effective execution contract, and production-door
   proof matrix.
 - D06 records review, red-team, finding ledger, promotion manifest, and
-  implementation handoff, but supplemental panel evidence changed the verdict to
-  `NOT READY`.
+  implementation handoff. Supplemental panel findings were repaired by durable
+  role-output copies, a SHA256 evidence manifest, negative-route proof planning,
+  and reconciled closure metadata.
 
 ## Verification Commands
 
@@ -50,13 +51,14 @@ shaping, critique, constraint assessment, synthesis, red-team, and explanation.
 
 The session did not close because `close-dialogue` would have required an
 eleventh assignment and the session's aggregate cap is `maxRounds: 10`. Its
-substantive advisory verdict is nevertheless clear: red-team returned `REVISE`
-and lead-advisor explanation recommended `NOT READY — documentation/evidence
-repair required`.
+substantive advisory verdict required documentation/evidence repair. That repair
+was completed in the D06 supplemental repair pass and rechecked by verification
+commands. The record does not claim cross-provider independence or
+protocol-proven staged artifact fan-in.
 
 ## Open Operational Note
 
 An initial `fgos coordination run` D00 attempt was started with `agy-cli` before
 the user changed executor policy. That process was terminated and left no cell
-worktree edits. The inline D00-D06 artifacts remain the design baseline, but
-the supplemental panel verdict is now the authoritative D06 readiness result.
+worktree edits. The supplemental D06 panel and repair pass are now the
+authoritative readiness result.
