@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Code/test scan plus cross-host trigger design discussion
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-14
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md
@@ -101,6 +101,8 @@ canonical skill source
 | Gemini CLI | extension package with `gemini-extension.json`, `GEMINI.md`, and `commands/fgos/<verb>.toml` | `/fgos:<verb>` via command directory namespace | partial (prototype generator only; release/doctor wiring planned) |
 
 Claude, Gemini, and Codex are adapters. None of them should own the fgOS skill semantics.
+
+Self-containment rule for the Gemini package (and any future installable extension): the package must run with the fgOS source repo absent. Every `commands/fgos/<verb>.toml` names only its packaged copy (`packaged_source = "skills/<skill>/SKILL.md"`) as the thing the host reads; the canonical directory it was rendered from is recorded in `provenance` as ledger metadata only, never as a runnable reference. Shared fragments ship inside the package under `skills/_shared/`. Generated adapter classification for `plugins/fgOS/skills/` follows the mirror's own write rule plus provenance (`_shared/` or `fgos-*` **and** a canonical/assembled source), so a hand-authored `plugins/fgOS/skills/fgos-custom/` with no source stays unmanaged.
 
 ## 6. Trigger Vocabulary
 

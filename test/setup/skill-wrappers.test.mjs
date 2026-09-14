@@ -615,6 +615,55 @@ test('isGeneratedAdapterTarget and isCanonicalSkillSource enforce executable ski
   assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/cook/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('.claude/skills/ui-spec/SKILL.md'), false);
   assert.equal(isGeneratedAdapterTarget('.claude/skills/gitnexus/gitnexus-cli/SKILL.md'), false);
+
+  // Provenance / marker regression: hand-authored fgos-* plugin and claude skills without canonical source are NOT generated
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/fgos-custom/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('.claude/skills/fgos-custom/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/_shared/unmirrored-custom.md'), false);
+});
+
+test('isGeneratedAdapterTarget uses provenance and markers, never prefix alone (isolated fixture)', () => {
+  const root = mkTempDir('provenance-test-root-');
+  const customPluginSkillDir = path.join(root, 'plugins', 'fgOS', 'skills', 'fgos-custom');
+  fs.mkdirSync(customPluginSkillDir, { recursive: true });
+  const customPluginSkillFile = path.join(customPluginSkillDir, 'SKILL.md');
+  fs.writeFileSync(customPluginSkillFile, '---\nname: fgos-custom\ndescription: Hand-authored plugin skill\n---\n# Hand-authored custom\n');
+
+  const customClaudeSkillDir = path.join(root, '.claude', 'skills', 'fgos-custom');
+  fs.mkdirSync(customClaudeSkillDir, { recursive: true });
+  const customClaudeSkillFile = path.join(customClaudeSkillDir, 'SKILL.md');
+  fs.writeFileSync(customClaudeSkillFile, '---\nname: fgos-custom\ndescription: Hand-authored claude skill\n---\n# Hand-authored custom\n');
+
+  // Even though their directory names start with fgos-, neither has canonical source nor wrapper marker
+  assert.equal(isGeneratedAdapterTarget(customPluginSkillFile, root), false, 'hand-authored fgos-custom plugin skill is not generated target');
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/fgos-custom/SKILL.md', root), false);
+  assert.equal(isGeneratedAdapterTarget(customClaudeSkillFile, root), false, 'hand-authored fgos-custom claude skill without marker is not generated target');
+  assert.equal(isGeneratedAdapterTarget('.claude/skills/fgos-custom/SKILL.md', root), false);
+
+  // When canonical source exists, it is recognized as a generated adapter target
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+  const mirroredPluginRouting = path.join(root, 'plugins', 'fgOS', 'skills', 'fgos-routing', 'SKILL.md');
+  fs.mkdirSync(path.dirname(mirroredPluginRouting), { recursive: true });
+  fs.writeFileSync(mirroredPluginRouting, SAMPLE_FRONTMATTER + '\n# Core Routing\n');
+  assert.equal(isGeneratedAdapterTarget(mirroredPluginRouting, root), true, 'mirrored plugin skill with canonical source is generated target');
+
+  // Provenance alone is not enough either: the plugin mirror only ever writes
+  // _shared/ and fgos-* names, so a canonical `distill` skill does NOT make a
+  // plugins/fgOS/skills/distill/ entry generated -- the mirror never wrote it.
+  writeSkill(path.join(root, 'core', 'skills'), 'distill', SAMPLE_FRONTMATTER, '# Distill\n');
+  writeSkill(path.join(root, 'plugins', 'fgOS', 'skills'), 'distill', SAMPLE_FRONTMATTER, '# Hand-placed\n');
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/distill/SKILL.md', root), false, 'canonical source outside the mirror name rule is not a mirrored plugin target');
+  assert.equal(mirrorDevSkillsIntoPlugin(path.join(root, 'core', 'skills'), mkTempDir('mirror-rule-check-')).some((p) => path.basename(p) === 'distill'), false, 'the mirror itself never writes distill -- classification must agree with it');
+
+  // The moment fgos-custom gains an assembled source it IS mirror-managed
+  writeSkill(path.join(root, '.agents', 'skills'), 'fgos-custom', SAMPLE_FRONTMATTER, '# Now assembled\n');
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/fgos-custom/SKILL.md', root), true, 'fgos-custom with an assembled source is what the mirror writes');
+
+  // When wrapper marker is present in .claude/skills, it is recognized as a generated adapter target
+  const generatedWrapperClaude = path.join(root, '.claude', 'skills', 'fgos-routed', 'SKILL.md');
+  fs.mkdirSync(path.dirname(generatedWrapperClaude), { recursive: true });
+  fs.writeFileSync(generatedWrapperClaude, 'This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.\n# Wrapper\n');
+  assert.equal(isGeneratedAdapterTarget(generatedWrapperClaude, root), true, 'claude skill with generated wrapper marker is generated target');
 });
 
 test('projection tests for Codex/OpenAI and Claude surfaces verify adapter projection invariants', () => {
@@ -687,6 +736,46 @@ test('discoverCanonicalSkills and assembleSkills throw on duplicate canonical in
   assert.equal(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'shared-op.toml')), false, 'no adapter files written on collision');
 });
 
+test('discoverCanonicalSkills and generateGeminiSkillPackage throw when distinct intent IDs derive the same host command path', () => {
+  const root = mkTempDir('distinct-intent-same-path-');
+  const coreSkillDir = path.join(root, 'core', 'skills', 'skill-core-deploy');
+  const domainSkillDir = path.join(root, 'domains', 'coding', 'skills', 'skill-domain-deploy');
+  fs.mkdirSync(coreSkillDir, { recursive: true });
+  fs.mkdirSync(domainSkillDir, { recursive: true });
+
+  // Distinct intent IDs: 'fgos:deploy' vs 'deploy'
+  const coreFrontmatter = '---\nname: skill-core-deploy\nintent: fgos:deploy\ndescription: Core deploy skill\n---\n';
+  const domainFrontmatter = '---\nname: skill-domain-deploy\nintent: deploy\ndescription: Domain deploy skill\n---\n';
+
+  fs.writeFileSync(path.join(coreSkillDir, 'SKILL.md'), `${coreFrontmatter}\n# Core Deploy\n`);
+  fs.writeFileSync(path.join(domainSkillDir, 'SKILL.md'), `${domainFrontmatter}\n# Domain Deploy\n`);
+
+  // Verify intent IDs are distinct strings
+  assert.notEqual('fgos:deploy', 'deploy');
+
+  // discoverCanonicalSkills throws on duplicate host command path commands/fgos/deploy.toml
+  assert.throws(
+    () => discoverCanonicalSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate derived host command path "commands\/fgos\/deploy\.toml" found across skills:/);
+      assert.match(err.message, /skill-core-deploy/);
+      assert.match(err.message, /skill-domain-deploy/);
+      return true;
+    },
+  );
+
+  // generateGeminiSkillPackage independently throws on colliding command paths
+  const outDir = mkTempDir('gemini-distinct-intent-collision-');
+  assert.throws(
+    () => generateGeminiSkillPackage(root, outDir),
+    (err) => {
+      assert.match(err.message, /duplicate derived (?:host|Gemini) command path "commands\/fgos\/deploy\.toml" found across skills:/);
+      return true;
+    },
+  );
+  assert.equal(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'deploy.toml')), false, 'no adapter files written on collision');
+});
+
 test('mapSkillIntentToHostTriggers maps canonical skill intent to host-native triggers across Codex, Claude, and Gemini', () => {
   const codePanel = mapSkillIntentToHostTriggers('fgos:code-panel', 'fgos-code-panel');
   assert.equal(codePanel.codex, '$fgos-code-panel');
@@ -721,6 +810,8 @@ test('generateGeminiSkillPackage generates valid Gemini CLI extension package as
   assert.ok(fs.existsSync(path.join(outDir, 'GEMINI.md')));
   assert.ok(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'routing.toml')));
   assert.ok(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'code-panel.toml')));
+  assert.ok(fs.existsSync(path.join(outDir, 'skills', 'fgos-routing', 'SKILL.md')));
+  assert.ok(fs.existsSync(path.join(outDir, 'skills', 'fgos-code-panel', 'SKILL.md')));
 
   const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'gemini-extension.json'), 'utf8'));
   assert.equal(manifest.name, 'fgos');
@@ -731,5 +822,66 @@ test('generateGeminiSkillPackage generates valid Gemini CLI extension package as
 
   const toml = fs.readFileSync(path.join(outDir, 'commands', 'fgos', 'code-panel.toml'), 'utf8');
   assert.match(toml, /intent = "fgos:code-panel"/);
-  assert.match(toml, /prompt = "Read and follow the canonical fgOS skill instructions/);
+  assert.match(toml, /packaged_source = "skills\/fgos-code-panel\/SKILL\.md"/);
+  assert.match(toml, /provenance = "domains\/coding\/skills\/fgos-code-panel"/, 'provenance records the canonical dir as metadata');
+  assert.match(toml, /^prompt = "Read and follow the packaged fgOS skill instructions at skills\/fgos-code-panel\/SKILL\.md, inside this fgos extension's own install directory, directly\."$/m);
+
+  const geminiMd = fs.readFileSync(path.join(outDir, 'GEMINI.md'), 'utf8');
+  assert.match(geminiMd, /packaged skill `skills\/fgos-code-panel\/SKILL\.md`/);
+});
+
+test('generateGeminiSkillPackage produces a completely self-contained extension package runnable without source repo', () => {
+  const root = mkTempDir('gemini-standalone-src-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'fgos-code-panel', SAMPLE_FRONTMATTER, '# Coding Code Panel\n');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'standalone-fragment.md'), '# Standalone Shared Fragment\n');
+
+  const outDir = mkTempDir('gemini-standalone-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+
+  // Simulate standalone release distribution: delete the entire canonical source directory
+  fs.rmSync(root, { recursive: true, force: true });
+  assert.equal(fs.existsSync(root), false, 'source repo is deleted; package must be self-contained');
+
+  // The package in outDir must be 100% self-contained
+  const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'gemini-extension.json'), 'utf8'));
+  assert.equal(manifest.name, 'fgos');
+  assert.equal(manifest.commands.length, 2);
+
+  // Shared fragments exist in package
+  assert.ok(fs.existsSync(path.join(outDir, 'skills', '_shared', 'standalone-fragment.md')));
+  const sharedContent = fs.readFileSync(path.join(outDir, 'skills', '_shared', 'standalone-fragment.md'), 'utf8');
+  assert.match(sharedContent, /# Standalone Shared Fragment/);
+
+  // Every command TOML points to packaged source that exists inside outDir,
+  // and its runnable prompt never names an unbundled canonical repo path --
+  // `provenance` is the only line allowed to mention core/skills or domains/.
+  const unbundledSourcePattern = /(?:^|[^A-Za-z0-9_-])(?:core\/skills|domains)\//;
+  for (const cmd of manifest.commands) {
+    const tomlPath = path.join(outDir, cmd.file);
+    assert.ok(fs.existsSync(tomlPath), `command file ${cmd.file} must exist`);
+    const tomlContent = fs.readFileSync(tomlPath, 'utf8');
+    assert.match(tomlContent, /packaged_source = "skills\/[^"]+\/SKILL\.md"/);
+    assert.match(tomlContent, /^prompt = "Read and follow the packaged fgOS skill instructions at skills\/[^"]+\/SKILL\.md, inside this fgos extension's own install directory, directly\."$/m);
+    assert.doesNotMatch(tomlContent, /canonical_source/, 'no line may present the unbundled canonical path as a source to read');
+    for (const line of tomlContent.split('\n')) {
+      if (line.startsWith('provenance = ')) continue;
+      assert.doesNotMatch(line, unbundledSourcePattern, `${cmd.file} runnable line references an unbundled repo source: ${line}`);
+    }
+
+    const match = tomlContent.match(/packaged_source = "([^"]+)"/);
+    assert.ok(match, 'packaged_source must be defined');
+    const packagedSkillPath = path.join(outDir, match[1]);
+    assert.ok(fs.existsSync(packagedSkillPath), `referenced skill file ${match[1]} must exist in the standalone package`);
+    const skillContent = fs.readFileSync(packagedSkillPath, 'utf8');
+    assert.ok(skillContent.length > 0, `skill file ${match[1]} must have non-empty instruction content`);
+  }
+
+  // GEMINI.md points to packaged skill locations only
+  const geminiMd = fs.readFileSync(path.join(outDir, 'GEMINI.md'), 'utf8');
+  assert.match(geminiMd, /packaged skill `skills\/fgos-routing\/SKILL\.md`/);
+  assert.match(geminiMd, /packaged skill `skills\/fgos-code-panel\/SKILL\.md`/);
+  assert.doesNotMatch(geminiMd, unbundledSourcePattern, 'GEMINI.md must not route the host to an unbundled canonical source');
 });
