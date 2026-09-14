@@ -163,3 +163,15 @@ The design track closes only when:
 implementation plan. It does not mean any advertised runtime capability ships,
 and user-facing documentation must continue to label the capability as planned
 until production-door evidence exists.
+
+## Cell Status
+
+| Cell | Merge commit | Review/red-team verdict | Deferred findings |
+|---|---|---|---|
+| D00 | `a3414717` | PASS | none |
+| D01 | `15246f07` | PASS | none |
+| D02 | `36364eea` | PASS | none |
+| D03 | `9b54c221` | PASS | none |
+| D04 | `77a3d294` | PASS | none |
+| D05 | `23ec44cf` | PASS | none |
+| D06 | pending final merge | READY | external panel dispatch waived by user override; inline Codex review used |
