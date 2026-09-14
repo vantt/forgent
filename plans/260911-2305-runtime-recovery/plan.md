@@ -371,6 +371,7 @@ lands on `main` and its trace is written under
 | P05 | `fed6301f` (direct to `main`) | PASS (3 fix rounds) | PASS (2 fix rounds) | 1 LOW settle-ledger residual (architectural, outside lease); 2 LOW liveness/lock-window notes | [p05.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05.md) |
 | P05S | `main` tip (direct to `main`) | PASS (1 fix round) | PASS (folded into fix-1) | 1 LOW actionKey-reminting (by-design); 1 LOW reason-wording gap; 2 INFO notes | [p05s.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05s.md) |
 | P08 | `main` tip (direct to `main`) | N/A (direct audit closeout) | N/A | 41 pre-existing/environmental npm test failures, all triaged; broader architecture-manifest completeness gap (75+ unrelated files) left as-is | [p08.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p08.md) |
+| P02H reopen | `main` tip (direct to `main`) | PASS (8 fix rounds) | PASS (folded into rounds 1-2, 5) | 1 MEDIUM unlisted-env-var timing race (documented follow-up shape); 1 unreproduced INFO note | [p02h-reopen.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p02h-reopen.md) |
 
 ## Track status: CLOSED
 
