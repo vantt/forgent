@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Packaging-distribution release posture is now preview with Rust host as the
+  default installed runtime for external installs; legacy Node fallback is
+  deprecated and kept only as an explicit escape hatch until a later
+  release-owner removal milestone/date is chosen.
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.

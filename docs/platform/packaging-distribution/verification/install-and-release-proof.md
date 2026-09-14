@@ -57,14 +57,44 @@ npm test -- test/skills/fgos-mirror.test.mjs
 
 Run broader suites when implementation changes, release paths change, or a doc claim becomes a release promise.
 
-## 4. Evidence Rules
+## 4. Latest Preview Release Proof
+
+The preview installed/default runtime claim was locally re-proven on
+2026-09-15 with release-shaped assets:
+
+```bash
+cargo build --release --workspace
+node scripts/build-rust-distribution.mjs --out "$TMP_ASSETS/tree"
+tar -czf "$TMP_ASSETS/fgos-v0.1.0-preview-proof-x86_64-unknown-linux-gnu.tar.gz" -C "$TMP_ASSETS/tree" .
+tar -czf "$TMP_ASSETS/fgctl-v0.1.0-preview-proof-x86_64-unknown-linux-gnu.tar.gz" -C target/release fgctl
+cp install.sh "$TMP_ASSETS/"
+(cd "$TMP_ASSETS" && sha256sum fgos-*.tar.gz fgctl-*.tar.gz > SHA256SUMS)
+scripts/ci-external-consumer.sh --assets "$TMP_ASSETS"
+```
+
+Result:
+
+```txt
+Release tree staged successfully.
+artifactDigest: sha256:6c1aad61594b9c62ebc808a63418cbf3016f514a32e9889c2f2fa5af849176d5
+All external consumer proof steps passed successfully.
+```
+
+The external consumer proof installs `fgctl` from the release-shaped assets,
+runs `fgctl init --from <fgos tarball>` in a fresh project outside the source
+checkout, asserts `.fgos/installation/bin/fgos version --runtime-json` reports
+`host: "rust"` and an `artifactDigest` matching the verified release manifest,
+then verifies `fgos ready --json`, no-op `fgctl upgrade --from <same asset>`,
+and `fgctl repair`.
+
+## 5. Evidence Rules
 
 - Link evidence from docs instead of embedding long test explanations in specs.
 - Treat a passing local unit test as local proof, not release proof.
 - Treat external consumer CI as the strongest install/release proof.
 - Re-scan code before changing claim status in `implementation-alignment.md`.
 
-## 5. Settled Node Fallback Policy
+## 6. Settled Node Fallback Policy
 
 Public/default release posture means the officially supported release stance
 for users outside the source checkout: which release channel is published or

@@ -230,7 +230,9 @@ P6/P7 local proof that an activated workspace path enters the Rust host.
 
 The installed/default runtime claim is now implemented for preview public
 posture: external-installed/default `fgos` enters the Rust host, and fallback
-follows the explicit deprecated Node escape-hatch policy.
+follows the explicit deprecated Node escape-hatch policy. The latest
+release-shaped external-consumer proof is recorded in
+`verification/install-and-release-proof.md`.
 
 The code-panel track still does not decide these product/release questions:
 
