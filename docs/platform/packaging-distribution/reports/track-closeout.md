@@ -25,6 +25,8 @@ Panel verification HEAD before this closeout report:
 `d3384e9a merge(packaging): stabilize final verification timing`
 
 The closeout report itself is recorded by the containing panel-branch commit.
+Main-merge preview branch: `pd-main-integration-packaging-rollout`
+Main-merge preview commit: `b909476c merge(packaging): land code-panel rollout`
 
 All packet branches P1-P9 have been merged into the panel branch. The final two
 panel-only hygiene merges stabilized verification expectations exposed by the
@@ -71,6 +73,47 @@ cancelled 0
 skipped 8
 todo 0
 ```
+
+These commands passed again on the main-merge preview result
+`b909476c merge(packaging): land code-panel rollout`:
+
+```bash
+cargo build --release --workspace
+node --test test/architecture.test.mjs test/cli/fgos-manifest.test.mjs test/setup/checks-setup-rc-line.test.mjs test/setup/*.test.mjs test/skills/*.test.mjs test/install-packaging.test.mjs test/install/*.test.mjs test/rust-host/*.test.mjs
+npm run build:skills
+npm test
+git diff --check
+git diff --cached --check
+node /home/vantt/projects/forgentX/.gitnexus/run.cjs detect_changes --repo /home/vantt/projects/pd-main-merge-preview
+```
+
+Main-merge preview focused proof:
+
+```txt
+tests 699
+suites 1
+pass 699
+fail 0
+cancelled 0
+skipped 0
+todo 0
+```
+
+Main-merge preview `npm test` result:
+
+```txt
+tests 6522
+suites 1
+pass 6514
+fail 0
+cancelled 0
+skipped 8
+todo 0
+```
+
+Main-merge preview GitNexus change detection reported low risk after indexing
+the preview worktree. The analyzer's AGENTS/CLAUDE metadata count side effect
+was not included in the merge result.
 
 Additional P9 proof:
 
@@ -150,6 +193,9 @@ The panel branch satisfies the technical preconditions for a final merge:
 - `source-preservation-audit.md` is updated for legacy/source details touched by the track.
 
 The current main checkout is not merge-ready because it contains unrelated dirty
-and untracked files. A final merge to `main` should happen only after the
-release owner/coordinator approves the merge and the main checkout is made safe
-for integration.
+and untracked files, including files that overlap packaging-distribution docs.
+The merge was therefore prepared and proven on
+`pd-main-integration-packaging-rollout` instead of being applied directly to the
+dirty main checkout. A final merge to `main` should happen only after the release
+owner/coordinator approves the merge and the main checkout is made safe for
+integration.
