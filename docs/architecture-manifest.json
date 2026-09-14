@@ -12,6 +12,13 @@
     "one-directional-layer",
     "domain-siloing"
   ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
   "files": {
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",

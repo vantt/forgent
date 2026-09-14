@@ -324,44 +324,98 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
 
 /**
  * Scan directory recursively for markdown files (*.md).
+ * Enforces containment policy and lowercase .md extension case policy.
  */
-function scanMarkdownFiles(dir) {
+function scanMarkdownFiles(dir, containmentRoot = dir) {
   const results = [];
   if (!fs.existsSync(dir)) return results;
+
+  let realContainmentRoot;
+  try {
+    realContainmentRoot = fs.realpathSync(containmentRoot);
+  } catch {
+    realContainmentRoot = path.resolve(containmentRoot);
+  }
 
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.name.startsWith('.')) continue;
     const fullPath = path.join(dir, entry.name);
+
+    // Verify containment (disallow symlinks escaping containmentRoot)
+    let realEntryPath;
+    try {
+      realEntryPath = fs.realpathSync(fullPath);
+    } catch {
+      continue;
+    }
+
+    const relToRoot = path.relative(realContainmentRoot, realEntryPath);
+    if (relToRoot.startsWith('..') || path.isAbsolute(relToRoot)) {
+      throw new InstructionRegistryError(
+        `Instruction source "${toPosixPath(fullPath)}" resolves outside containment root "${toPosixPath(containmentRoot)}" via symlink`,
+        { filePath: fullPath, code: 'CONTAINMENT_VIOLATION' },
+      );
+    }
+
     if (entry.isDirectory()) {
-      results.push(...scanMarkdownFiles(fullPath));
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      results.push(fullPath);
+      results.push(...scanMarkdownFiles(fullPath, containmentRoot));
+    } else if (entry.isFile()) {
+      // Case policy: only lowercase .md extension is recognized
+      if (entry.name.endsWith('.md')) {
+        results.push(fullPath);
+      }
     }
   }
   return results;
 }
 
 /**
- * Discover known components and domains under project root.
+ * Discover allowed components and domains under project root from the authoritative
+ * architecture manifest (e.g. docs/architecture-manifest.json), rejecting unregistered roots.
+ *
+ * Options:
+ *   - manifestPath: custom path to architecture manifest (internal/test-only)
+ *   - allowedComponents: explicit array/set of allowed component names (internal/test-only)
+ *   - allowedDomains: explicit array/set of allowed domain names (internal/test-only)
  */
-export function discoverKnownOwners(projectRoot, { componentsRoot, domainsRoot } = {}) {
-  const compRoot = componentsRoot ?? path.join(projectRoot, 'components');
-  const domRoot = domainsRoot ?? path.join(projectRoot, 'domains');
-
+export function discoverKnownOwners(projectRoot, options = {}) {
+  const manifestPath = options.manifestPath ?? path.join(projectRoot, 'docs', 'architecture-manifest.json');
   const owners = new Set(['core', 'platform']);
 
-  if (fs.existsSync(compRoot)) {
-    for (const entry of fs.readdirSync(compRoot, { withFileTypes: true })) {
-      if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
-      owners.add(entry.name);
+  if (fs.existsSync(manifestPath)) {
+    try {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      if (Array.isArray(manifest.components)) {
+        for (const comp of manifest.components) {
+          if (typeof comp === 'string' && comp.trim()) {
+            owners.add(comp.trim());
+          }
+        }
+      }
+      if (Array.isArray(manifest.domains)) {
+        for (const dom of manifest.domains) {
+          if (typeof dom === 'string' && dom.trim()) {
+            owners.add(dom.trim());
+          }
+        }
+      }
+    } catch (err) {
+      throw new InstructionRegistryError(
+        `Failed to parse architecture manifest at ${manifestPath}: ${err.message}`,
+        { filePath: manifestPath, code: 'MANIFEST_ERROR', cause: err },
+      );
     }
   }
 
-  if (fs.existsSync(domRoot)) {
-    for (const entry of fs.readdirSync(domRoot, { withFileTypes: true })) {
-      if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
-      owners.add(entry.name);
+  if (options.allowedComponents) {
+    for (const comp of options.allowedComponents) {
+      if (typeof comp === 'string' && comp.trim()) owners.add(comp.trim());
+    }
+  }
+  if (options.allowedDomains) {
+    for (const dom of options.allowedDomains) {
+      if (typeof dom === 'string' && dom.trim()) owners.add(dom.trim());
     }
   }
 
@@ -370,18 +424,23 @@ export function discoverKnownOwners(projectRoot, { componentsRoot, domainsRoot }
 
 /**
  * InstructionRegistry extends Array to provide array iteration alongside query lookups.
+ * Instances are frozen post-construction to prevent mutation and index corruption.
+ * Array operations (map, slice, filter, concat) maintain correct types and lookup semantics.
  */
 export class InstructionRegistry extends Array {
-  constructor(...items) {
-    super(...items);
-    this._reindex();
+  static get [Symbol.species]() {
+    return Array;
   }
 
-  _reindex() {
+  constructor(...items) {
+    super(...items);
     this._byId = new Map();
     for (const unit of this) {
-      this._byId.set(unit.id, unit);
+      if (unit && unit.id) {
+        this._byId.set(unit.id, unit);
+      }
     }
+    Object.freeze(this);
   }
 
   get(id) {
@@ -402,6 +461,21 @@ export class InstructionRegistry extends Array {
 
   get byId() {
     return new Map(this._byId);
+  }
+
+  filter(callback, thisArg) {
+    const results = Array.prototype.filter.call(this, callback, thisArg);
+    return new InstructionRegistry(...results);
+  }
+
+  slice(start, end) {
+    const results = Array.prototype.slice.call(this, start, end);
+    return new InstructionRegistry(...results);
+  }
+
+  concat(...items) {
+    const results = Array.prototype.concat.call(this, ...items);
+    return new InstructionRegistry(...results);
   }
 
   findByOwner(owner) {
@@ -427,11 +501,20 @@ export class InstructionRegistry extends Array {
  *   - components/<component>/instructions/
  *   - domains/<domain>/instructions/
  *
+ * In production default discovery, instruction sources are strictly discovered
+ * from within projectRoot. Allowed component and domain owners are authoritatively
+ * resolved from docs/architecture-manifest.json. Unregistered default roots are rejected.
+ *
+ * Custom roots (coreRoot, componentsRoot, domainsRoot) are test-only/internal options
+ * intended solely for test harness fixture isolation and cannot be used by production
+ * default discovery.
+ *
  * Options:
- *   - coreRoot: custom path to core/instructions/
- *   - componentsRoot: custom path to components/
- *   - domainsRoot: custom path to domains/
- *   - knownOwners: Set or Array of valid owner names
+ *   - coreRoot: (internal/test-only) custom path to core/instructions/
+ *   - componentsRoot: (internal/test-only) custom path to components/
+ *   - domainsRoot: (internal/test-only) custom path to domains/
+ *   - manifestPath: (internal/test-only) custom path to architecture manifest
+ *   - knownOwners: Set or Array of valid owner names (internal/test-only override)
  *   - allowDuplicates: boolean (default false, throws on duplicate id)
  */
 export function discoverInstructionSources(projectRoot, options = {}) {
@@ -446,7 +529,11 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       ? options.knownOwners
       : new Set(options.knownOwners);
   } else {
-    knownOwners = discoverKnownOwners(projectRoot, { componentsRoot, domainsRoot });
+    knownOwners = discoverKnownOwners(projectRoot, {
+      manifestPath: options.manifestPath,
+      allowedComponents: options.allowedComponents,
+      allowedDomains: options.allowedDomains,
+    });
   }
 
   const collected = [];
@@ -454,7 +541,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
 
   // 1. Core / platform instructions
   if (fs.existsSync(coreRoot)) {
-    const files = scanMarkdownFiles(coreRoot);
+    const files = scanMarkdownFiles(coreRoot, options.coreRoot ? coreRoot : projectRoot);
     for (const fullPath of files) {
       const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
       const content = fs.readFileSync(fullPath, 'utf8');
@@ -477,7 +564,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       if (!compEntry.isDirectory() || compEntry.name.startsWith('.')) continue;
       const componentName = compEntry.name;
 
-      if (knownOwners && !knownOwners.has(componentName)) {
+      if (!knownOwners.has(componentName)) {
         throw new InstructionRegistryError(
           `Unknown component owner "${componentName}" in components directory. Known owners are: ${[...knownOwners].sort().join(', ')}`,
           {
@@ -489,7 +576,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
 
       const instructionsDir = path.join(componentsRoot, componentName, 'instructions');
       if (fs.existsSync(instructionsDir)) {
-        const files = scanMarkdownFiles(instructionsDir);
+        const files = scanMarkdownFiles(instructionsDir, options.componentsRoot ? componentsRoot : projectRoot);
         for (const fullPath of files) {
           const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
           const content = fs.readFileSync(fullPath, 'utf8');
@@ -514,7 +601,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
       if (!domainEntry.isDirectory() || domainEntry.name.startsWith('.')) continue;
       const domainName = domainEntry.name;
 
-      if (knownOwners && !knownOwners.has(domainName)) {
+      if (!knownOwners.has(domainName)) {
         throw new InstructionRegistryError(
           `Unknown domain owner "${domainName}" in domains directory. Known owners are: ${[...knownOwners].sort().join(', ')}`,
           {
@@ -526,7 +613,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
 
       const instructionsDir = path.join(domainsRoot, domainName, 'instructions');
       if (fs.existsSync(instructionsDir)) {
-        const files = scanMarkdownFiles(instructionsDir);
+        const files = scanMarkdownFiles(instructionsDir, options.domainsRoot ? domainsRoot : projectRoot);
         for (const fullPath of files) {
           const sourcePath = toPosixPath(path.relative(projectRoot, fullPath));
           const content = fs.readFileSync(fullPath, 'utf8');
