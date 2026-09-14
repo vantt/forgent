@@ -188,7 +188,24 @@ pause being triggered because each individual `branch -f` looked like routine
 branch-pointer housekeeping, not a destructive operation, until the cumulative
 effect was traced through the reflog.
 
-## 15. Long real-time gaps between dispatch completion and the Lead noticing (this session)
+## 15. Per-cwd dispatch lock conflict when review+red-team fan out concurrently (P03)
+
+`review-candidate` and `red-team-candidate` share one graph node
+(`phase-first-pass`) and can be dispatched concurrently against the SAME
+worktree cwd. `cli.mjs`'s own per-cwd dispatch lock (`"dispatch for cwd ... is
+already in flight"`) then refuses whichever one arrives second (and, observed
+once, appears to have refused both when the lock was still held from the
+immediately-preceding `produce` step's own dispatch, not yet released). Both
+assignments settled `failed` with an infra message, not a code finding.
+Recovery: clear the stale `dispatch.claim` files, then retry review+red-team
+alone in a follow-up call within the SAME session (referencing the
+already-committed worktree state directly rather than `$ref:produce`, since a
+plain re-run of the full open.json would re-attempt `produce` too). This
+recurred only once in this track (P03); earlier cells' review/red-team pairs
+against the same pattern did not hit it, so the trigger condition (exact
+timing of the preceding step's lock release) is narrow but real.
+
+## 16. Long real-time gaps between dispatch completion and the Lead noticing (this session)
 
 At least one dispatch (P03's original produce attempt) sat completed-but-unread
 for roughly 12 hours of real elapsed time before being checked, during which an
