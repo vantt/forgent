@@ -5,7 +5,7 @@ Document type: Contract
 Audience: Maintainer, component owner, domain owner, implementation agent
 Purpose: Define how fgOS instruction fragments compose into effective agent instructions and render into host-visible files
 Design status: Draft
-Implementation status: Partial: source registry and composition engine implemented; renderers/projection repair planned
+Implementation status: Implemented for source registry, composition engine, portable AGENTS.md rendering, and instruction projection repair; host-specific adapter expansion remains demand-driven
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Architecture discussion
@@ -232,4 +232,4 @@ Instruction projections are host-visible generated files. The long-term projecti
 - destination path;
 - repair/overwrite ownership.
 
-Until the ledger exists, docs must mark instruction projection repair as planned.
+Instruction projection repair records the portable `AGENTS.md` managed block in `.fgos/installation/projections/ledger.json`. Host-specific adapters should add ledger entries only when adapter behavior requires them.
