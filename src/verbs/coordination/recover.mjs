@@ -32,6 +32,7 @@ import { plan, checkApply, findEligibleAssignment } from '../../runner/coordinat
 import { controlDirs, currentGeneration } from '../../runner/dispatch/run-lock.mjs';
 import { classifyRunOutcome, readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
+import { evaluateSessionQuorum } from '../../runner/coordination/session-engine.mjs';
 
 // Mirrors visibility-session.mjs's own DRIVER_FRESH_MS rationale (six
 // missed 10s heartbeats). Duplicated rather than imported -- that constant
@@ -156,6 +157,13 @@ function buildSnapshot(coordinationId, opts, nowMs) {
   const eligibility = findEligibleAssignment({ assignments: replayed.assignments, results: replayed.results });
   const eligibleRunFacts = eligibility.status === 'one' ? resolveEligibleRunFacts(fgosDir, eligibility.assignmentId, nowMs) : null;
 
+  let quorum = null;
+  try {
+    quorum = evaluateSessionQuorum(coordinationId, opts);
+  } catch {
+    quorum = null;
+  }
+
   return {
     manifest: replayed.manifest,
     assignmentRefs: replayed.assignmentRefs,
@@ -164,6 +172,7 @@ function buildSnapshot(coordinationId, opts, nowMs) {
     recoveryCommands: replayed.recoveryCommands,
     eventCount: replayed.events.length,
     eligibleRunFacts,
+    quorum,
   };
 }
 

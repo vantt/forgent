@@ -108,6 +108,67 @@ export function findEligibleAssignment(snapshot) {
 }
 
 /**
+ * Evaluates whether quorum rules allow closing the session. Uses the same
+ * completion and partialPolicy derivation as the real write door (closeSessionByQuorum).
+ *
+ * @param {object} snapshot
+ * @returns {{eligible: boolean, reason?: string, partial?: boolean}}
+ */
+export function checkQuorumEligibility(snapshot) {
+  const coordinationId = snapshot.manifest?.coordinationId ?? '';
+  const quorum = snapshot.quorum;
+  const manifest = snapshot.manifest ?? {};
+
+  if (!quorum) {
+    const requiredActorIds = (manifest.actors ?? []).map((actor) => actor.id);
+    if (requiredActorIds.length > 0) {
+      const policy = manifest.partialPolicy;
+      if (!policy) {
+        return {
+          eligible: false,
+          reason: `session "${coordinationId}" is missing required actor(s) [${requiredActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
+        };
+      }
+    }
+    return { eligible: true };
+  }
+
+  const incomplete = [...(quorum.failed ?? []), ...(quorum.late ?? []), ...(quorum.missing ?? [])];
+  const incompleteActorIds = incomplete.map((entry) => entry.actorId);
+
+  if (incompleteActorIds.length === 0) {
+    return { eligible: true };
+  }
+
+  const policy = manifest.partialPolicy;
+  if (!policy) {
+    return {
+      eligible: false,
+      reason: `session "${coordinationId}" is missing required actor(s) [${incompleteActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
+    };
+  }
+
+  const allowed = new Set(policy.allowedOmissions ?? []);
+  const notAllowed = incompleteActorIds.filter((id) => !allowed.has(id));
+  if (notAllowed.length > 0) {
+    return {
+      eligible: false,
+      reason: `actor(s) [${notAllowed.join(', ')}] are missing/failed/late but not named in session "${coordinationId}"'s declared partialPolicy.allowedOmissions -- refusing an undeclared partial close`,
+    };
+  }
+
+  const completedCount = (quorum.completed ?? []).length;
+  if (policy.minimumActors !== undefined && completedCount < policy.minimumActors) {
+    return {
+      eligible: false,
+      reason: `only ${completedCount} actor(s) completed in session "${coordinationId}", below the declared partialPolicy.minimumActors (${policy.minimumActors})`,
+    };
+  }
+
+  return { eligible: true, partial: true };
+}
+
+/**
  * Derive the recommended action from the exact eligible Run's own
  * evidence -- never a caller-declared intent (unlike the standalone
  * sibling's `requestedIntent`, this door has no analogous caller input to
@@ -116,9 +177,27 @@ export function findEligibleAssignment(snapshot) {
  *
  * @param {{status: 'none'} | {status: 'ambiguous', candidates: string[]} | {status: 'one', assignmentId: string}} eligibility
  * @param {{assignmentId: string, runId: string|null, settledSignal?: {outcome: string}, driverLive?: boolean|null, error?: string}|null} runFacts
+ * @param {object} [snapshot]
  */
-function deriveRecommendedAction(eligibility, runFacts) {
+function deriveRecommendedAction(eligibility, runFacts, snapshot = {}) {
+  const recoveryCommands = snapshot.recoveryCommands ?? [];
+  const coordinationId = snapshot.manifest?.coordinationId ?? '';
+
   if (eligibility.status === 'none') {
+    const pendingClose = recoveryCommands.find((cmd) => cmd.action === 'close');
+    if (pendingClose) {
+      return {
+        action: 'park',
+        reason: `recovery command "${pendingClose.commandId}" (close) is already recorded for session "${coordinationId}" and has not yet been reconciled -- parking rather than duplicating command`,
+      };
+    }
+    const quorumCheck = checkQuorumEligibility(snapshot);
+    if (!quorumCheck.eligible) {
+      return {
+        action: 'park',
+        reason: `no session-member Assignment is in flight, but closing is disallowed by quorum rules: ${quorumCheck.reason} -- parking rather than guessing`,
+      };
+    }
     return {
       action: 'close',
       reason: 'no session-member Assignment is in flight (every one already has a linked result) -- normal completion rules allow closing now',
@@ -130,12 +209,29 @@ function deriveRecommendedAction(eligibility, runFacts) {
   if (!runFacts || runFacts.runId === null) {
     return { action: 'observe', reason: `assignment "${eligibility.assignmentId}" was created but no Run has started for it yet -- observe` };
   }
+
+  const pendingForRun = recoveryCommands.find((cmd) => cmd.runId && cmd.runId === runFacts.runId);
+
   if (runFacts.settledSignal?.outcome === 'settled') {
+    if (pendingForRun?.action === 'collect') {
+      return {
+        action: 'park',
+        reason: `recovery command "${pendingForRun.commandId}" (collect) is already recorded for Run "${runFacts.runId}" and has not yet been reconciled -- parking rather than duplicating command`,
+      };
+    }
     return {
       action: 'collect',
       reason: `a settled result exists for the exact eligible Run of assignment "${eligibility.assignmentId}" but the session has not linked it yet`,
     };
   }
+
+  if (pendingForRun) {
+    return {
+      action: 'park',
+      reason: `recovery command "${pendingForRun.commandId}" (${pendingForRun.action}) is already recorded for Run "${runFacts.runId}" and has not yet been reconciled -- parking rather than duplicating command`,
+    };
+  }
+
   if (runFacts.driverLive) {
     return {
       action: 'observe',
@@ -174,6 +270,7 @@ export function isActionLegal(snapshot, action) {
 
   const eligibility = findEligibleAssignment(snapshot);
   const runFacts = snapshot.eligibleRunFacts;
+  const recoveryCommands = snapshot.recoveryCommands ?? [];
 
   if (action === 'close') {
     if (eligibility.status !== 'none') {
@@ -183,9 +280,30 @@ export function isActionLegal(snapshot, action) {
         reason: `"close" refused: assignment(s) "${named}" still have no linked result -- closing now would be a premature-close hazard (X11), never silently converted into success`,
       };
     }
+    const pendingClose = recoveryCommands.find((cmd) => cmd.action === 'close');
+    if (pendingClose) {
+      return {
+        status: 'refuse',
+        reason: `"close" refused: recovery command "${pendingClose.commandId}" (close) is already recorded for session "${snapshot.manifest?.coordinationId}" and has not yet been reconciled`,
+      };
+    }
+    const quorumCheck = checkQuorumEligibility(snapshot);
+    if (!quorumCheck.eligible) {
+      return {
+        status: 'refuse',
+        reason: `"close" refused: ${quorumCheck.reason}`,
+      };
+    }
   } else if (action === 'collect') {
     if (eligibility.status !== 'one' || runFacts?.settledSignal?.outcome !== 'settled') {
       return { status: 'refuse', reason: '"collect" refused: no settled result exists yet for the exact eligible Run -- nothing to collect' };
+    }
+    const pendingCollect = recoveryCommands.find((cmd) => cmd.runId && cmd.runId === runFacts.runId && cmd.action === 'collect');
+    if (pendingCollect) {
+      return {
+        status: 'refuse',
+        reason: `"collect" refused: recovery command "${pendingCollect.commandId}" (collect) is already recorded for Run "${runFacts.runId}" and has not yet been reconciled`,
+      };
     }
   } else if (action === 'settle') {
     if (eligibility.status !== 'one') {
@@ -199,6 +317,13 @@ export function isActionLegal(snapshot, action) {
     }
     if (runFacts?.driverLive) {
       return { status: 'refuse', reason: '"settle" refused: the exact eligible Run still has a live control holder -- observe instead of forcing a settlement over an active driver' };
+    }
+    const pendingCmd = recoveryCommands.find((cmd) => cmd.runId && cmd.runId === runFacts.runId);
+    if (pendingCmd) {
+      return {
+        status: 'refuse',
+        reason: `"settle" refused: recovery command "${pendingCmd.commandId}" (${pendingCmd.action}) is already recorded for Run "${runFacts.runId}" and has not yet been reconciled`,
+      };
     }
   }
 
@@ -247,7 +372,7 @@ export function plan(snapshot, opts = {}) {
     };
   }
 
-  const derived = deriveRecommendedAction(eligibility, snapshot.eligibleRunFacts ?? null);
+  const derived = deriveRecommendedAction(eligibility, snapshot.eligibleRunFacts ?? null, snapshot);
   const legality = isActionLegal(snapshot, derived.action);
   if (legality.status !== 'ok') {
     // A recommended action that is not itself legal right now (should not

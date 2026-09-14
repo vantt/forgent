@@ -38,6 +38,7 @@ import {
 import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
+import { authorize } from './read-evaluators.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
   if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
@@ -2548,10 +2549,14 @@ export function recordRecoveryCommand(
     // already runs this identical check via the shared `authorize()`
     // evaluator before ever reaching this door; this is the lock-held
     // backstop for the race where identity changed in between.
-    if (authorizedBy?.id !== manifest.provenanceRoot.writerId || authorizedBy?.type !== 'driver') {
+    const authResult = authorize(
+      { label: 'recordRecoveryCommand', subject: 'a recovery command' },
+      { manifest, authorizedBy },
+    );
+    if (authResult.kind === 'needs-input') {
       return {
         outcome: 'needs-input',
-        reason: `recordRecoveryCommand: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a recovery command may only be recorded under the session's own driver/provenance-root identity`,
+        reason: authResult.reason,
       };
     }
 
@@ -2604,6 +2609,27 @@ export function recordRecoveryCommand(
         return {
           outcome: 'refuse',
           reason: `"close" refused: assignment(s) "${stillInFlight.join(', ')}" still have no linked result -- closing now would be a premature-close hazard (X11), never silently converted into success`,
+        };
+      }
+      const existingClose = events.find(
+        (event) => event.type === 'recovery-command-recorded' && event.payload?.action === 'close',
+      );
+      if (existingClose) {
+        return {
+          outcome: 'refuse',
+          reason: `"close" refused: recovery command "${existingClose.payload.commandId}" (close) is already recorded for session "${coordinationId}" and has not yet been reconciled`,
+        };
+      }
+    }
+
+    if (runId && (action === 'settle' || action === 'collect')) {
+      const existingCmd = events.find(
+        (event) => event.type === 'recovery-command-recorded' && event.payload?.runId === runId && (event.payload?.action === action || action === 'settle'),
+      );
+      if (existingCmd) {
+        return {
+          outcome: 'refuse',
+          reason: `action "${action}" refused: recovery command "${existingCmd.payload.commandId}" (${existingCmd.payload.action}) is already recorded for Run "${runId}" and has not yet been reconciled`,
         };
       }
     }

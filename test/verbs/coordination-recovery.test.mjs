@@ -19,6 +19,7 @@ import {
 import { computeActionKey, computeSnapshotDigest } from '../../src/runner/coordination/recovery-planner.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
+import { closeSessionByQuorum } from '../../src/runner/coordination/session-engine.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-recovery-verb-test-'));
@@ -614,3 +615,184 @@ test('apply requires all expectation flags or throws validation error', () => {
     (err) => err instanceof StoreError && /must be one of/.test(err.message),
   );
 });
+
+// ─── 10. Prevention of Duplicate Commands & Quorum Completion Parity ─────────
+
+test('already-recorded recovery command prevents duplicate recommendation and repeat apply for the target Run', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_rec_prevent_duplicate';
+  openSession(
+    {
+      coordinationId,
+      objective: 'Test duplicate command prevention on already-recorded Run.',
+      provenanceRoot: { writerId: 'driver-1' },
+      schemaVersion: SCHEMA_VERSION_2,
+    },
+    { cwd: tempDir },
+  );
+  bindActor(coordinationId, { id: 'actor-1', role: 'researcher' }, { cwd: tempDir });
+  const asgn = createSessionAssignment(
+    {
+      coordinationId,
+      taskKey: 'task-dup',
+      actorId: 'actor-1',
+      role: 'researcher',
+      contract: inlineContract(),
+      caller: { writerId: 'driver-1' },
+    },
+    { cwd: tempDir },
+  );
+  createRunningRunDir(tempDir, asgn.assignmentId, '01');
+
+  // Initial observe recommends settle because the run has no live driver and no settled result
+  const rec1 = recoverSessionObserveUseCase({ cwd: tempDir }, { coordinationId });
+  assert.equal(rec1.action, 'settle');
+  assert.equal(rec1.runId, `run_${asgn.assignmentId}_01`);
+
+  // First apply successfully records the recovery command
+  const apply1 = recoverSessionApplyUseCase({ cwd: tempDir }, {
+    coordinationId,
+    action: rec1.action,
+    expectedSnapshot: rec1.snapshotDigest,
+    expectedEventSeq: rec1.expectedEventSeq,
+    expectedRunControlEpoch: rec1.expectedRunControlEpoch,
+    expectedExpiresAt: rec1.expiresAt,
+    actionKey: rec1.actionKey,
+    authorizedBy: { type: 'driver', id: 'driver-1' },
+  });
+  assert.equal(apply1.outcome, 'applied');
+  assert.equal(typeof apply1.commandId, 'string');
+
+  const replayed1 = replaySession(coordinationId, { cwd: tempDir });
+  assert.equal(replayed1.recoveryCommands.length, 1);
+  assert.equal(replayed1.recoveryCommands[0].commandId, apply1.commandId);
+
+  // Fresh observe detects already-recorded command for the target Run and recommends park
+  const rec2 = recoverSessionObserveUseCase({ cwd: tempDir }, { coordinationId });
+  assert.equal(rec2.action, 'park');
+  assert.match(rec2.reason, new RegExp(apply1.commandId));
+  assert.match(rec2.reason, /already recorded/);
+
+  // Attempting another settle apply against this target Run is refused
+  const settleKey = computeActionKey({
+    snapshotDigest: rec2.snapshotDigest,
+    expectedEventSeq: rec2.expectedEventSeq,
+    expectedRunControlEpoch: rec2.expectedRunControlEpoch,
+    action: 'settle',
+    expiresAt: rec2.expiresAt,
+  });
+  const apply2 = recoverSessionApplyUseCase({ cwd: tempDir }, {
+    coordinationId,
+    action: 'settle',
+    expectedSnapshot: rec2.snapshotDigest,
+    expectedEventSeq: rec2.expectedEventSeq,
+    expectedRunControlEpoch: rec2.expectedRunControlEpoch,
+    expectedExpiresAt: rec2.expiresAt,
+    actionKey: settleKey,
+    authorizedBy: { type: 'driver', id: 'driver-1' },
+  });
+  assert.equal(apply2.outcome, 'refuse');
+  assert.match(apply2.reason, new RegExp(apply1.commandId));
+  assert.match(apply2.reason, /already recorded/);
+
+  // Session event log still has only the single recorded recovery command
+  const replayed2 = replaySession(coordinationId, { cwd: tempDir });
+  assert.equal(replayed2.recoveryCommands.length, 1);
+});
+
+test('close recommendation and legality match write-door closeSessionByQuorum quorum rules', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_rec_quorum_parity';
+  openSession(
+    {
+      coordinationId,
+      objective: 'Test quorum parity for close recommendation.',
+      provenanceRoot: { writerId: 'driver-1' },
+      schemaVersion: SCHEMA_VERSION_2,
+      actors: [
+        { id: 'coordinator-actor', role: 'coordinator' },
+        { id: 'proposer-actor', role: 'proposer' },
+        { id: 'objector-a-actor', role: 'objector' },
+        { id: 'objector-b-actor', role: 'objector' },
+      ],
+    },
+    { cwd: tempDir },
+  );
+
+  // Verify what the real write door throws on this exact session
+  let writeDoorError = null;
+  try {
+    closeSessionByQuorum(coordinationId, {}, { cwd: tempDir });
+  } catch (err) {
+    writeDoorError = err;
+  }
+  assert.ok(writeDoorError, 'closeSessionByQuorum should refuse when required actors are missing');
+  const expectedReasonSubstring = 'missing required actor(s) [coordinator-actor, proposer-actor, objector-a-actor, objector-b-actor] and declares no partialPolicy';
+  assert.match(writeDoorError.message, new RegExp(expectedReasonSubstring.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')));
+
+  // Observe returns park because quorum rules disallow closing now
+  const rec = recoverSessionObserveUseCase({ cwd: tempDir }, { coordinationId });
+  assert.equal(rec.action, 'park');
+  assert.match(rec.reason, new RegExp(expectedReasonSubstring.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')));
+
+  // Apply with action "close" is refused with matching reason
+  const closeKey = computeActionKey({
+    snapshotDigest: rec.snapshotDigest,
+    expectedEventSeq: rec.expectedEventSeq,
+    expectedRunControlEpoch: rec.expectedRunControlEpoch,
+    action: 'close',
+    expiresAt: rec.expiresAt,
+  });
+  const applyResult = recoverSessionApplyUseCase({ cwd: tempDir }, {
+    coordinationId,
+    action: 'close',
+    expectedSnapshot: rec.snapshotDigest,
+    expectedEventSeq: rec.expectedEventSeq,
+    expectedRunControlEpoch: rec.expectedRunControlEpoch,
+    expectedExpiresAt: rec.expiresAt,
+    actionKey: closeKey,
+    authorizedBy: { type: 'driver', id: 'driver-1' },
+  });
+  assert.equal(applyResult.outcome, 'refuse');
+  assert.match(applyResult.reason, new RegExp(expectedReasonSubstring.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')));
+
+  // Now test positive completion parity on a session where all required actors completed
+  const completedCoordId = 'coord_rec_quorum_complete';
+  openSession(
+    {
+      coordinationId: completedCoordId,
+      objective: 'Test quorum completion parity.',
+      provenanceRoot: { writerId: 'driver-1' },
+      schemaVersion: SCHEMA_VERSION_2,
+      actors: [{ id: 'worker-1', role: 'worker' }],
+    },
+    { cwd: tempDir },
+  );
+  const asgn = createSessionAssignment(
+    {
+      coordinationId: completedCoordId,
+      taskKey: 'task-comp',
+      actorId: 'worker-1',
+      role: 'worker',
+      contract: inlineContract(),
+      caller: { writerId: 'driver-1' },
+    },
+    { cwd: tempDir },
+  );
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', asgn.assignmentId, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  const runId = `run_${asgn.assignmentId}_01`;
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId, assignmentId: asgn.assignmentId, status: 'done', confidence: 'reported' }));
+  linkResult(completedCoordId, { assignmentId: asgn.assignmentId, runId }, { cwd: tempDir });
+
+  // Now all required actors completed: observe recommends close
+  const recComplete = recoverSessionObserveUseCase({ cwd: tempDir }, { coordinationId: completedCoordId });
+  assert.equal(recComplete.action, 'close');
+  assert.match(recComplete.reason, /normal completion rules allow closing now/);
+
+  // Real closeSessionByQuorum write door also succeeds on this session
+  const closeOutcome = closeSessionByQuorum(completedCoordId, {}, { cwd: tempDir });
+  assert.equal(closeOutcome.status, 'completed');
+});
+
