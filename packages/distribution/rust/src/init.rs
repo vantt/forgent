@@ -544,6 +544,10 @@ pub fn publish_activation_file(
     activation_path: &Path,
     binding: &WorkspaceActivationBinding,
 ) -> std::io::Result<()> {
+    if let Some(parent) = activation_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
     let tmp_path = activation_path
         .parent()
         .unwrap()
