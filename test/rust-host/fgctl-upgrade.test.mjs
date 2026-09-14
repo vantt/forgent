@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import {
   REPO_ROOT,
   buildRustDistribution,
+  computeArtifactDigest,
 } from '../../scripts/build-rust-distribution.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -578,5 +579,272 @@ test('R3: Repair when previousArtifactDigest is null re-verifies active release 
   } finally {
     fs.rmSync(projDir, { recursive: true, force: true });
     fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('P7: Repair failure when no runtime is active refuses with clear message', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-noact-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-noact-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+    assert.notEqual(repairRes.status, 0, 'repair must fail when no runtime is active');
+    assert.match(repairRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('P7: Repair failure when rollback previous release is missing refuses with clear message', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-missprev-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-repair-missprev-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(initRes.status, 0);
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    const missingDigest = 'sha256:0000000000000000000000000000000000000000000000000000000000000000';
+    activation.previousArtifactDigest = missingDigest;
+    fs.writeFileSync(activationPath, JSON.stringify(activation, null, 2) + '\n');
+
+    const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
+    assert.notEqual(repairRes.status, 0, 'repair must fail when previous release is missing');
+    assert.match(repairRes.stderr, new RegExp(`cannot repair: previous release ${missingDigest} not found in release store`));
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('P7: Upgrade failure when no runtime is active refuses with clear message', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-noact-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-noact-proj-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const upgRes = runFgctl(['upgrade', '--from', releaseDirB], { cwd: projDir, stateHome });
+    assert.notEqual(upgRes.status, 0, 'upgrade must fail when no runtime is active');
+    assert.match(upgRes.stderr, /no active runtime found in workspace -- run 'fgctl init' first/);
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+  }
+});
+
+test('P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-preflight-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-preflight-proj-'));
+  const badCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-badpreflight-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(initRes.status, 0);
+
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const activationContentBefore = fs.readFileSync(activationPath, 'utf8');
+
+    // Build bad candidate with impossible node requirement
+    fs.cpSync(releaseDirB, badCandidateDir, { recursive: true });
+    const manifestPath = path.join(badCandidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    manifest.requires = { node: '>=999.0.0' };
+    delete manifest.artifactDigest;
+    const newDigest = computeArtifactDigest(manifest);
+    manifest.artifactDigest = newDigest;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+    const upgRes = runFgctl(['upgrade', '--from', badCandidateDir], { cwd: projDir, stateHome });
+    assert.notEqual(upgRes.status, 0, 'upgrade must fail on preflight failure');
+    assert.match(upgRes.stderr, /preflight failed/i);
+    assert.match(upgRes.stderr, /runtime-dependency-missing/);
+
+    const activationContentAfter = fs.readFileSync(activationPath, 'utf8');
+    assert.equal(activationContentAfter, activationContentBefore, 'activation.json must remain byte-for-byte untouched');
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(badCandidateDir, { recursive: true, force: true });
+  }
+});
+
+test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-proj-'));
+  const tailFailCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-upg-tailfail-cand-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    const initRes = runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome });
+    assert.equal(initRes.status, 0);
+
+    // Copy release B and inject doctor failure when SIMULATE_TAIL_FAILURE is set
+    fs.cpSync(releaseDirB, tailFailCandidateDir, { recursive: true });
+    const fgosMjsPath = path.join(tailFailCandidateDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
+    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
+    const firstLineEnd = originalContent.indexOf('\n');
+    const shebang = originalContent.slice(0, firstLineEnd + 1);
+    const rest = originalContent.slice(firstLineEnd + 1);
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated upgrade doctor failure in tail');\n  process.exit(42);\n}\n`;
+    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
+
+    // Update manifest
+    const manifestPath = path.join(tailFailCandidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
+    const newMjsSize = fs.statSync(fgosMjsPath).size;
+
+    for (const f of manifest.files) {
+      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
+        f.digest = newMjsHash;
+        f.size = newMjsSize;
+      }
+    }
+    manifest.components.legacyNode.digest = newMjsHash;
+    delete manifest.artifactDigest;
+    const newDigest = computeArtifactDigest(manifest);
+    manifest.artifactDigest = newDigest;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+    const upgRes = runFgctl(['upgrade', '--from', tailFailCandidateDir], {
+      cwd: projDir,
+      stateHome,
+      env: { SIMULATE_TAIL_FAILURE: '1' },
+    });
+
+    assert.notEqual(upgRes.status, 0, 'upgrade must fail when tail fails');
+    assert.match(upgRes.stderr, /tail command 'doctor.*failed with status 42/);
+
+    // Activation was published before tail
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(activation.status, 'ready');
+    assert.equal(activation.artifactDigest, newDigest);
+    assert.equal(activation.previousArtifactDigest, digestA);
+
+    // Transaction in release store is ready-degraded
+    const txPath = path.join(stateHome, 'installs', `${activation.activationId}.json`);
+    assert.ok(fs.existsSync(txPath), 'Transaction record must exist');
+    const txRecord = JSON.parse(fs.readFileSync(txPath, 'utf8'));
+    assert.equal(txRecord.status, 'ready-degraded');
+
+    // Workspace is diagnosable
+    const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
+    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+      cwd: projDir,
+      env: { ...process.env, FGOS_STATE_HOME: stateHome },
+      encoding: 'utf8',
+    });
+    assert.equal(versionRes.status, 0);
+    const versionData = JSON.parse(versionRes.stdout.trim());
+    assert.equal(versionData.data.host, 'rust');
+    assert.equal(versionData.data.artifactDigest, newDigest);
+    assert.equal(versionData.data.previousArtifactDigest, digestA);
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(tailFailCandidateDir, { recursive: true, force: true });
+  }
+});
+
+test('P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction', () => {
+  const stateHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-state-'));
+  const projDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-proj-'));
+  const tailFailCandidateDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-rep-tailfail-cand-'));
+
+  try {
+    execFileSync('git', ['init'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.name', 'Test User'], { cwd: projDir });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: projDir });
+
+    // Copy release A and inject doctor failure when SIMULATE_TAIL_FAILURE is set
+    fs.cpSync(releaseDirA, tailFailCandidateDir, { recursive: true });
+    const fgosMjsPath = path.join(tailFailCandidateDir, 'libexec', 'legacy-node', 'bin', 'fgos.mjs');
+    const originalContent = fs.readFileSync(fgosMjsPath, 'utf8');
+    const firstLineEnd = originalContent.indexOf('\n');
+    const shebang = originalContent.slice(0, firstLineEnd + 1);
+    const rest = originalContent.slice(firstLineEnd + 1);
+    const failInjection = `if (process.env.SIMULATE_TAIL_FAILURE === '1' && process.argv.includes('doctor')) {\n  console.error('simulated repair doctor failure in tail');\n  process.exit(42);\n}\n`;
+    fs.writeFileSync(fgosMjsPath, shebang + failInjection + rest);
+
+    // Update manifest
+    const manifestPath = path.join(tailFailCandidateDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const newMjsHash = 'sha256:' + hashFile(fgosMjsPath);
+    const newMjsSize = fs.statSync(fgosMjsPath).size;
+
+    for (const f of manifest.files) {
+      if (f.path === 'libexec/legacy-node/bin/fgos.mjs') {
+        f.digest = newMjsHash;
+        f.size = newMjsSize;
+      }
+    }
+    manifest.components.legacyNode.digest = newMjsHash;
+    delete manifest.artifactDigest;
+    const newDigest = computeArtifactDigest(manifest);
+    manifest.artifactDigest = newDigest;
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
+    // Init with tail failure disabled so init succeeds
+    const initRes = runFgctl(['init', '--from', tailFailCandidateDir], { cwd: projDir, stateHome });
+    assert.equal(initRes.status, 0);
+
+    // Now run fgctl repair with tail failure enabled
+    const repRes = runFgctl(['repair'], {
+      cwd: projDir,
+      stateHome,
+      env: { SIMULATE_TAIL_FAILURE: '1' },
+    });
+
+    assert.notEqual(repRes.status, 0, 'repair must fail when tail fails');
+    assert.match(repRes.stderr, /tail command 'doctor.*failed with status 42/);
+
+    // Activation was published before tail
+    const activationPath = path.join(projDir, '.fgos', 'installation', 'activation.json');
+    const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+    assert.equal(activation.status, 'ready');
+    assert.equal(activation.artifactDigest, newDigest);
+
+    // Transaction in release store is ready-degraded
+    const txPath = path.join(stateHome, 'installs', `${activation.activationId}.json`);
+    assert.ok(fs.existsSync(txPath), 'Transaction record must exist');
+    const txRecord = JSON.parse(fs.readFileSync(txPath, 'utf8'));
+    assert.equal(txRecord.status, 'ready-degraded');
+
+    // Workspace is diagnosable
+    const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
+    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+      cwd: projDir,
+      env: { ...process.env, FGOS_STATE_HOME: stateHome },
+      encoding: 'utf8',
+    });
+    assert.equal(versionRes.status, 0);
+    const versionData = JSON.parse(versionRes.stdout.trim());
+    assert.equal(versionData.data.host, 'rust');
+    assert.equal(versionData.data.artifactDigest, newDigest);
+  } finally {
+    fs.rmSync(projDir, { recursive: true, force: true });
+    fs.rmSync(stateHome, { recursive: true, force: true });
+    fs.rmSync(tailFailCandidateDir, { recursive: true, force: true });
   }
 });
