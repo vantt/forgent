@@ -1182,9 +1182,10 @@ quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coor
 ## Dispatch operability planned design (2026-09-15)
 
 Track `plans/260914-dispatch-operability-evidence-attribution/` reached
-`READY` as design authority only after supplemental D06 repair. It does not ship
-runtime behavior and does not authorize implementation in that track. A future
-implementation track may build the following planned capabilities:
+`READY` as design authority only after supplemental cross-design review repair.
+It does not ship runtime behavior and does not authorize implementation in that
+track. A future implementation track may build the following planned
+capabilities:
 
 - Typed Run Result and Observation: `RunResult` v2 remains the sole immutable
   terminal Run truth; `RunObservation` is a mutable read projection; historical
@@ -1205,9 +1206,10 @@ direct-unit-only proof for shipped capabilities. Implementation proof must also
 include production-route refusals for forbidden recovery verbs and
 operation-catalog indirection.
 
-The D06 review evidence is an operator-authorized, role-separated Codex-only
-panel, not cross-provider independent review. The durable panel evidence lives
-under `plans/260914-dispatch-operability-evidence-attribution/architecture-panel/`.
+The cross-design review evidence is an operator-authorized, role-separated
+Codex-only panel, not cross-provider independent review. The durable panel
+evidence lives under
+`plans/260914-dispatch-operability-evidence-attribution/architecture-panel/`.
 
 Canonical detailed artifacts:
 
