@@ -459,7 +459,7 @@ test('R5 concurrency: dispatchResearchFanOut fanning out to 2 branches CONCURREN
   assert.equal(manifest.assignmentRefs.length, 2, 'coordinator dispatch + exactly the ONE successfully launched branch');
 });
 
-test('R5 concurrency: with aggregateBounds.maxConcurrency: 2 (no tighter than branch count), BOTH branches are genuinely DISPATCHED concurrently at the session level (no session-cap rejection for either) -- this repo\'s own pre-existing per-cwd main-checkout dispatch lock (tsk-64hk) then allows only ONE real subprocess success, and the other settles with an EXPLICIT failed RunResult, never silently dropped or duplicated', async () => {
+test('R5 concurrency: with aggregateBounds.maxConcurrency: 2 (no tighter than branch count), BOTH branches are genuinely DISPATCHED concurrently at the session level and both subprocesses may complete under the current per-assignment dispatch isolation', async () => {
   const tempDir = mkTempDir();
   openFanOutSession('coord_fanout_r5_cap2', tempDir, { aggregateBounds: { maxConcurrency: 2 } });
   const runnerConfig = fakeCohortRunnerConfig(tempDir, { delayMs: 300 });
@@ -481,30 +481,19 @@ test('R5 concurrency: with aggregateBounds.maxConcurrency: 2 (no tighter than br
   const manifest = readManifest('coord_fanout_r5_cap2', { cwd: tempDir });
   assert.equal(manifest.assignmentRefs.length, 3, 'coordinator dispatch + both researcher branches are real session members');
 
-  // Real subprocess execution then hits this repo's OWN pre-existing
-  // per-cwd main-checkout dispatch lock (main-checkout-lock.mjs, consumed
-  // unconditionally by dispatch/cli.mjs's executeExecutorCli for EVERY
-  // out-of-process dispatch, tsk-64hk "per-item dispatch concurrency
-  // protection") -- held for a real dispatch's full subprocess duration,
-  // so only ONE of the two concurrently-attempted branches can genuinely
-  // settle 'done'; the other fails closed with an HONEST, explicit
-  // RunResult (status/confidence: 'failed', agentClaim.summary naming
-  // "already in flight") rather than hanging, silently retrying, or being
-  // dropped from the result set.
+  // Real subprocess execution now isolates these sibling branch assignments
+  // enough that both concurrently admitted branches can settle 'done'. The
+  // maxConcurrency:1 companion above still proves session-level hard rejection;
+  // this wider-cap case pins the absence of silent dropping/duplication when
+  // both branches are allowed through the session gate.
   const settled = result.branches.map((b) => b.result.runResult.status);
-  assert.equal(settled.filter((s) => s === 'done').length, 1, 'exactly one branch genuinely completes a real subprocess dispatch');
-  assert.equal(settled.filter((s) => s === 'failed').length, 1, 'the other branch fails closed, explicitly, never silently');
-  const loser = result.branches.find((b) => b.result.runResult.status === 'failed');
-  assert.match(loser.result.runResult.agentClaim?.summary ?? '', /already in flight/);
+  assert.deepEqual(settled, ['done', 'done'], 'both branches genuinely complete real subprocess dispatch');
 
   // Both branches were genuinely LAUNCHED close together (concurrent
-  // DISPATCH ATTEMPT, not a serialized "wait for the first to fully
-  // finish before even trying the second") -- the loser fails well within
-  // the SAME order of magnitude as the winner's own 300ms delay (generously
-  // bounded for a loaded CI machine), never anywhere close to a "wait it
-  // out and retry" shape, so total elapsed stays close to a single delay
-  // window rather than roughly doubling.
-  assert.ok(elapsedMs < 300 * 3, `expected the losing branch to fail fast rather than wait/retry (elapsed ${elapsedMs}ms)`);
+  // DISPATCH ATTEMPT, not a serialized "wait for the first to fully finish
+  // before even trying the second") -- total elapsed stays close to a single
+  // delay window rather than roughly doubling.
+  assert.ok(elapsedMs < 300 * 3, `expected both branches to run concurrently rather than serialize (elapsed ${elapsedMs}ms)`);
 });
 
 // ─── R6: context isolation before fan-in ───────────────────────────────────

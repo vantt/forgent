@@ -489,7 +489,7 @@ test('buildCandidateInventory against the real committed .fgos/config.json: only
   assert.equal(byId['codex-pi'].providerFamily, 'openai-codex');
   assert.deepEqual(byId['codex-pi'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
   assert.equal(byId['glm-cli'].providerFamily, 'z-ai');
-  assert.deepEqual(byId['glm-cli'].supportedTiers, ['lightweight']);
+  assert.deepEqual(byId['glm-cli'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
   assert.equal(byId['claude'].providerFamily, 'claude');
   assert.deepEqual(byId['claude'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
 
