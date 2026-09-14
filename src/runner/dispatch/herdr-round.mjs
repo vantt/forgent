@@ -171,38 +171,35 @@ const ENV_INJECTION_VECTORS = Object.freeze([
  *
  * Compared against `expectedEnv` -- the prepared invocation's own env map,
  * the exact object the launcher script's `export` lines were built from --
- * and against `baselineEnv`, three ways:
+ * two ways:
  *  - every key `expectedEnv` sets must be present with the exact prepared
  *    value (catches an override of an already-expected variable).
  *  - none of `ENV_INJECTION_VECTORS` may appear UNLESS `expectedEnv` itself
  *    declared it (catches an addition, e.g. an injected `LD_PRELOAD` that
- *    was never prepared at all). Kept as a fail-closed floor for whenever
- *    `baselineEnv` is unavailable.
- *  - M-3: every OTHER key must match `baselineEnv` exactly, byte for byte.
- *    A bare, unlisted var (the reviewer's repro: an injected `HOME`
- *    override -- never on the curated vector list above, and never
- *    declared by a real prepared invocation either) used to sail through
- *    undetected, because the first two checks only ever look at names this
- *    function already knows about. `baselineEnv` closes that structurally
- *    instead of growing the name list forever: it is the pane's OWN shell
- *    environment, read from `/proc/<shellPid>/environ` right before the
- *    launcher script runs. The script's process is a plain fork of that
- *    shell, so absent tampering its environment is exactly `baselineEnv`
- *    plus the `export` lines the script itself adds (`expectedEnv`) --
- *    anything else different (a key baseline never had, or an existing
- *    baseline key with a changed value) is an unexplained addition or
- *    edit, caught by name whether or not it was ever catalogued.
- *    `SHLVL`/`_` are excluded: bash sets both on every invocation
- *    regardless of tampering, so comparing them would fail every real
- *    launch, not just a tampered one.
+ *    was never prepared at all).
  *
- * Returns `true`/`false` when `expectedEnv` or `baselineEnv` resolves, or
- * `null` when neither signal is available (non-Linux, process already
- * gone, nothing to compare against) -- `null` is "no evidence either way",
- * never a pass, same contract as `verifyProcessExeIdentity`.
+ * A prior version of this check also diffed the launched process against a
+ * "baseline" environment read from the pane's shell (`/proc/<shellPid>/environ`)
+ * right before the script ran, to catch a bare unlisted var (e.g. an
+ * injected `HOME` override) that neither list above would name. That
+ * baseline was unsound: it is captured once, at launch time, and never
+ * updated, but the pane's own shell legitimately changes its OWN live
+ * environment afterward (sourcing rc files changes `PATH`; `cd`-ing into
+ * the launch `--cwd` changes `PWD`/`OLDPWD`) -- so an honest, untampered
+ * launch's real environment always legitimately differed from that stale
+ * snapshot, and the diff killed every honest confined launch as a
+ * false-positive tamper. That class of tamper is instead caught
+ * structurally by the launcher-script byte-equality readback next to
+ * `pane run` below: the script's own `export` lines are exactly
+ * `expectedEnv`, so any edit to what the process actually gets requires
+ * editing the script's content, which that check catches regardless of
+ * which variable name was touched.
+ *
+ * Returns `true`/`false` when `expectedEnv` resolves, or `null` when no
+ * signal is available (non-Linux, process already gone, nothing to
+ * compare against) -- `null` is "no evidence either way", never a pass,
+ * same contract as `verifyProcessExeIdentity`.
  */
-const ENV_BASELINE_NOISE = Object.freeze(['SHLVL', '_']);
-
 function readProcessEnviron(pid) {
   let raw;
   try {
@@ -220,31 +217,20 @@ function readProcessEnviron(pid) {
   return env;
 }
 
-export function verifyProcessEnvironment(pid, expectedEnv, baselineEnv = null) {
+export function verifyProcessEnvironment(pid, expectedEnv) {
   if (!Number.isInteger(pid) || pid <= 0) return null;
   const hasExpected = Boolean(expectedEnv) && typeof expectedEnv === 'object' && Object.keys(expectedEnv).length > 0;
-  const hasBaseline = Boolean(baselineEnv) && typeof baselineEnv === 'object' && Object.keys(baselineEnv).length > 0;
-  if (!hasExpected && !hasBaseline) return null;
+  if (!hasExpected) return null;
 
   const actual = readProcessEnviron(pid);
   if (!actual) return null;
 
-  if (hasExpected) {
-    for (const [key, value] of Object.entries(expectedEnv)) {
-      if (actual[key] !== String(value)) return false;
-    }
+  for (const [key, value] of Object.entries(expectedEnv)) {
+    if (actual[key] !== String(value)) return false;
   }
 
   for (const key of ENV_INJECTION_VECTORS) {
-    if (!(hasExpected && key in expectedEnv) && key in actual) return false;
-  }
-
-  if (hasBaseline) {
-    for (const [key, value] of Object.entries(actual)) {
-      if (hasExpected && key in expectedEnv) continue;
-      if (ENV_BASELINE_NOISE.includes(key)) continue;
-      if (baselineEnv[key] !== value) return false;
-    }
+    if (!(key in expectedEnv) && key in actual) return false;
   }
 
   return true;
@@ -1322,78 +1308,86 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     if (!existingCmd?.resourceIncarnation && !verifiedProc) {
-      // M-3: captured before the script ever runs, so this is the pane's
-      // shell environment as it stood at that moment -- the baseline
-      // `verifyProcessEnvironment` below diffs the launched process against,
-      // to catch an unlisted/undeclared var (e.g. a bare `HOME` override)
-      // that neither `expectedEnv` nor `ENV_INJECTION_VECTORS` would name.
-      let baselineEnv = null;
-      try {
-        const preLaunchInfo = client.paneProcessInfo(round.paneId);
-        if (preLaunchInfo?.shellPid) baselineEnv = readProcessEnviron(preLaunchInfo.shellPid);
-      } catch { /* no baseline available -- verifyProcessEnvironment falls back to its other checks */ }
-
       // LOW-8: the script path is generated (`launcherDir/<launchCommandId
       // or generated id>.sh`), never user input, so this was never an
       // injection vector -- quoted anyway for defense in depth, the same
       // way every other argument this module hands to a shell already is.
       client.paneRun(round.paneId, `bash ${shellEscapeArg(scriptPath)}`);
 
+      // F-env-baseline-fix: a second read of the SAME on-disk script this
+      // round already wrote and read back once above (before `pane run`)
+      // proves nothing edited the script's content between write and
+      // execution -- an injected `cd`, an appended export, an edited
+      // command line, anything at all -- without needing any live-process
+      // environment baseline (see the removed M-3 baseline mechanism and
+      // its replacement note on `verifyProcessEnvironment` above).
+      let scriptMismatch = false;
+      try {
+        const postLaunchScript = fs.readFileSync(scriptPath, 'utf8');
+        if (postLaunchScript !== scriptContent) scriptMismatch = true;
+      } catch {
+        scriptMismatch = true;
+      }
+
       let exeIdentityMismatch = false;
       let envMismatch = false;
-      const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
-      while (Date.now() < verifyDeadline) {
-        try {
-          pInfo = client.paneProcessInfo(round.paneId);
-          verifiedProc = verifyForegroundProcessArgv({
-            foregroundProcesses: pInfo?.foregroundProcesses,
-            shellPid: pInfo?.shellPid,
-            argv0: agentKindToUse,
-            command: preparedCommand,
-            args: preparedArgs,
-          });
-          if (verifiedProc) {
-            // F3: argv is a claim the process makes about itself and cannot
-            // catch a binary swap -- same argv0/args, a different real
-            // executable behind it. Cross-check the kernel's own identity
-            // signal when it is available (Linux, process still alive);
-            // `null` (signal unavailable) is not treated as a pass, only an
-            // explicit `false` is -- there is no live evidence to act on
-            // either way when the check itself could not run.
-            if (verifyProcessExeIdentity(verifiedProc.pid, preparedCommand) === false) {
-              exeIdentityMismatch = true;
-              verifiedProc = null;
+      if (!scriptMismatch) {
+        const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
+        while (Date.now() < verifyDeadline) {
+          try {
+            pInfo = client.paneProcessInfo(round.paneId);
+            verifiedProc = verifyForegroundProcessArgv({
+              foregroundProcesses: pInfo?.foregroundProcesses,
+              shellPid: pInfo?.shellPid,
+              argv0: agentKindToUse,
+              command: preparedCommand,
+              args: preparedArgs,
+            });
+            if (verifiedProc) {
+              // F3: argv is a claim the process makes about itself and cannot
+              // catch a binary swap -- same argv0/args, a different real
+              // executable behind it. Cross-check the kernel's own identity
+              // signal when it is available (Linux, process still alive);
+              // `null` (signal unavailable) is not treated as a pass, only an
+              // explicit `false` is -- there is no live evidence to act on
+              // either way when the check itself could not run.
+              if (verifyProcessExeIdentity(verifiedProc.pid, preparedCommand) === false) {
+                exeIdentityMismatch = true;
+                verifiedProc = null;
+                break;
+              }
+              // An env-only tamper -- an injected preload hook, an overridden
+              // prepared variable -- leaves argv and the executable both
+              // untouched, so neither check above sees it. Same
+              // null-is-not-a-pass contract as the exe-identity check.
+              if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv) === false) {
+                envMismatch = true;
+                verifiedProc = null;
+                break;
+              }
               break;
             }
-            // An env-only tamper -- an injected preload hook, an overridden
-            // prepared variable -- leaves argv and the executable both
-            // untouched, so neither check above sees it. Same
-            // null-is-not-a-pass contract as the exe-identity check.
-            if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv, baselineEnv) === false) {
-              envMismatch = true;
-              verifiedProc = null;
-              break;
-            }
-            break;
-          }
-        } catch {}
-        await sleep(100);
+          } catch {}
+          await sleep(100);
+        }
       }
 
       if (!verifiedProc) {
-        // F3: a caught tamper (argv mismatch, a detected binary swap, or a
-        // detected env mismatch) must never leave a live unaccounted
-        // process running, nor the pane open for someone to unknowingly
-        // keep watching a process that is not what it claims -- actively
-        // kill whatever IS in the pane and close it, rather than only
-        // refusing and reporting.
+        // F3: a caught tamper (script-content mismatch, argv mismatch, a
+        // detected binary swap, or a detected env mismatch) must never
+        // leave a live unaccounted process running, nor the pane open for
+        // someone to unknowingly keep watching a process that is not what
+        // it claims -- actively kill whatever IS in the pane and close it,
+        // rather than only refusing and reporting.
         killPaneForegroundAndClose(client, round.paneId, pInfo);
         throw round.fail('worker-spawn-fail', 'confinement-mismatch',
-          exeIdentityMismatch
-            ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
-            : envMismatch
-              ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
-              : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
+          scriptMismatch
+            ? `launcher script at "${scriptPath}" no longer matches what this round wrote and read back before launching it in pane "${round.paneId}" -- possible script-content tamper (e.g. an injected command); process killed and pane closed.`
+            : exeIdentityMismatch
+              ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
+              : envMismatch
+                ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
+                : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
       }
     }
 

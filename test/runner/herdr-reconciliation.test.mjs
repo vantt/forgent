@@ -1016,17 +1016,17 @@ test('19. confined execution under required bwrap executes via launcher script a
 // into (see resources.mjs's HIGH-2 fix: herdr-spawn's run-output grant binds
 // that directory, not `worker-output/outbox`). A worker that settles here is
 // live proof the grant and the brief agree on where to write.
-test('20. live Herdr gateway executes confined launch end-to-end when gateway is running', async () => {
+test('20. live Herdr gateway executes confined launch end-to-end when gateway is running', async (t) => {
   const herdrBin = findExecutableOnPath(['herdr']);
-  if (!herdrBin) return;
+  if (!herdrBin) return t.skip('herdr binary not found on PATH');
   try {
     const statusOut = execFileSync(herdrBin, ['status'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
-    if (!statusOut.includes('running')) return;
+    if (!statusOut.includes('running')) return t.skip('herdr gateway is not running');
   } catch {
-    return;
+    return t.skip('herdr status check failed');
   }
   const bwrapBin = findExecutableOnPath(['bwrap']) || (fs.existsSync('/usr/bin/bwrap') ? '/usr/bin/bwrap' : null);
-  if (!bwrapBin) return;
+  if (!bwrapBin) return t.skip('bwrap binary not found');
 
   const tmp = mkTempDir('fgos-live-herdr-');
   const runDir = path.join(tmp, 'run');
