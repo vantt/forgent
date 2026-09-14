@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Skill source layout and canonical discovery (packaging-distribution track, P2):
+  executable source-of-truth rules for canonical skills (`core/skills/`,
+  `domains/*/skills/`), duplicate-id and shared-fragment collision checks,
+  adapter target definitions (`.agents/skills`, `.claude/skills`, plugin bundle,
+  Gemini package output), and canonical skill intent to host trigger mapping.
+
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
   fencing refinements, effect-aware fallback, and protocol-declared session

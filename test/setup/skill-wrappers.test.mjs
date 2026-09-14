@@ -16,6 +16,14 @@ import {
   assembleSkills,
   materializeSkillsIntoProject,
   mirrorDevSkillsIntoPlugin,
+  discoverCanonicalSkills,
+  discoverSharedFragments,
+  generateGeminiSkillPackage,
+  SKILL_ADAPTER_TARGETS,
+  isGeneratedAdapterTarget,
+  isCanonicalSkillSource,
+  deriveSkillIntentId,
+  mapSkillIntentToHostTriggers,
 } from '../../src/setup/skill-wrappers.mjs';
 
 function mkTempDir(prefix) {
@@ -442,4 +450,228 @@ test('active source and projected skill files do not path-link fgos-code-panel a
   }
 
   assert.deepEqual(linkedCodePanelPaths, []);
+});
+
+// ─── P2: Skill Source-of-Truth, Discovery, Collisions, and Projections ───
+
+test('discoverCanonicalSkills discovers canonical skills across core/skills and domains/*/skills with authority, domain, and triggers', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skills = discoverCanonicalSkills(repoRoot);
+
+  assert.ok(skills.length >= 15, 'expected at least 15 canonical skills in repo');
+
+  const coreSkill = skills.find((s) => s.name === 'fgos-routing');
+  assert.ok(coreSkill, 'fgos-routing must be discovered');
+  assert.equal(coreSkill.authority, 'core');
+  assert.equal(coreSkill.domain, null);
+  assert.equal(coreSkill.canonicalDir, 'core/skills/fgos-routing');
+  assert.equal(coreSkill.intentId, 'fgos:routing');
+  assert.equal(coreSkill.triggers.codex, '$fgos-routing');
+  assert.equal(coreSkill.triggers.claude, '/fgos:routing');
+  assert.equal(coreSkill.triggers.gemini, '/fgos:routing');
+
+  const domainSkill = skills.find((s) => s.name === 'fgos-code-panel');
+  assert.ok(domainSkill, 'fgos-code-panel must be discovered');
+  assert.equal(domainSkill.authority, 'domain');
+  assert.equal(domainSkill.domain, 'coding');
+  assert.equal(domainSkill.canonicalDir, 'domains/coding/skills/fgos-code-panel');
+  assert.equal(domainSkill.intentId, 'fgos:code-panel');
+  assert.equal(domainSkill.triggers.codex, '$fgos-code-panel');
+  assert.equal(domainSkill.triggers.claude, '/fgos:code-panel');
+  assert.equal(domainSkill.triggers.claudeCompat, '/fgOS:code-panel');
+  assert.equal(domainSkill.triggers.gemini, '/fgos:code-panel');
+});
+
+test('discoverCanonicalSkills throws when duplicate canonical skill id exists across core and domains (negative duplicate canonical skill id test)', () => {
+  const root = mkTempDir('skill-discovery-dup-core-domain-');
+  writeSkill(path.join(root, 'core', 'skills'), 'duplicate-skill', SAMPLE_FRONTMATTER, '# Core\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'duplicate-skill', SAMPLE_FRONTMATTER, '# Coding\n');
+
+  assert.throws(
+    () => discoverCanonicalSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate skill name "duplicate-skill" found in multiple files:/);
+      assert.match(err.message, /core\/skills\/duplicate-skill/);
+      assert.match(err.message, /domains\/coding\/skills\/duplicate-skill/);
+      return true;
+    },
+  );
+});
+
+test('discoverCanonicalSkills throws when duplicate canonical skill id exists across multiple domains', () => {
+  const root = mkTempDir('skill-discovery-dup-domains-');
+  writeSkill(path.join(root, 'domains', 'domainA', 'skills'), 'dup-across-domains', SAMPLE_FRONTMATTER, '# Domain A\n');
+  writeSkill(path.join(root, 'domains', 'domainB', 'skills'), 'dup-across-domains', SAMPLE_FRONTMATTER, '# Domain B\n');
+
+  assert.throws(
+    () => discoverCanonicalSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate skill name "dup-across-domains" found in multiple files:/);
+      assert.match(err.message, /domains\/domainA\/skills\/dup-across-domains/);
+      assert.match(err.message, /domains\/domainB\/skills\/dup-across-domains/);
+      return true;
+    },
+  );
+});
+
+test('discoverSharedFragments discovers shared fragments from core/skills/_shared and domains/*/skills/_shared', () => {
+  const root = mkTempDir('skill-shared-discovery-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'core-fragment.md'), '# Core Fragment\n');
+  fs.writeFileSync(path.join(domainShared, 'domain-fragment.md'), '# Domain Fragment\n');
+
+  const fragments = discoverSharedFragments(root);
+  assert.equal(fragments.length, 2);
+  const coreEntry = fragments.find((f) => f.relativeFragmentPath === 'core-fragment.md');
+  assert.ok(coreEntry);
+  assert.equal(coreEntry.sourceLabel, 'core');
+  const domainEntry = fragments.find((f) => f.relativeFragmentPath === 'domain-fragment.md');
+  assert.ok(domainEntry);
+  assert.equal(domainEntry.sourceLabel, 'domains/coding');
+});
+
+test('discoverSharedFragments throws on duplicate shared fragment collision across sources', () => {
+  const root = mkTempDir('skill-shared-collision-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'colliding-fragment.md'), '# Core Version\n');
+  fs.writeFileSync(path.join(domainShared, 'colliding-fragment.md'), '# Domain Version\n');
+
+  assert.throws(
+    () => discoverSharedFragments(root),
+    (err) => {
+      assert.match(err.message, /duplicate shared fragment "colliding-fragment\.md" found in multiple sources:/);
+      assert.match(err.message, /core\/skills\/_shared\/colliding-fragment\.md/);
+      assert.match(err.message, /domains\/coding\/skills\/_shared\/colliding-fragment\.md/);
+      return true;
+    },
+  );
+});
+
+test('assembleSkills throws on shared fragment collision across core and domains', () => {
+  const root = mkTempDir('assemble-shared-collision-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'collide.md'), '# Core\n');
+  fs.writeFileSync(path.join(domainShared, 'collide.md'), '# Domain\n');
+  writeSkill(path.join(root, 'core', 'skills'), 'skill-a', SAMPLE_FRONTMATTER, '# Body\n');
+
+  assert.throws(
+    () => assembleSkills(root),
+    (err) => {
+      assert.match(err.message, /duplicate shared fragment "collide\.md" found in multiple sources:/);
+      return true;
+    },
+  );
+});
+
+test('SKILL_ADAPTER_TARGETS treats .agents/skills, .claude/skills, plugin bundles, and Gemini package output as generated adapter targets', () => {
+  assert.ok(SKILL_ADAPTER_TARGETS.agents, 'agents target must be declared');
+  assert.equal(SKILL_ADAPTER_TARGETS.agents.targetRelDir, '.agents/skills');
+  assert.equal(SKILL_ADAPTER_TARGETS.agents.kind, 'portable-projection');
+
+  assert.ok(SKILL_ADAPTER_TARGETS.claude, 'claude target must be declared');
+  assert.equal(SKILL_ADAPTER_TARGETS.claude.targetRelDir, '.claude/skills');
+  assert.equal(SKILL_ADAPTER_TARGETS.claude.kind, 'thin-wrapper');
+
+  assert.ok(SKILL_ADAPTER_TARGETS.plugin, 'plugin target must be declared');
+  assert.equal(SKILL_ADAPTER_TARGETS.plugin.targetRelDir, 'plugins/fgOS/skills');
+  assert.equal(SKILL_ADAPTER_TARGETS.plugin.kind, 'mirrored-bundle');
+
+  assert.ok(SKILL_ADAPTER_TARGETS.gemini, 'gemini target must be declared');
+  assert.equal(SKILL_ADAPTER_TARGETS.gemini.targetRelDir, '.gemini/extensions/fgos');
+  assert.equal(SKILL_ADAPTER_TARGETS.gemini.kind, 'extension-package');
+});
+
+test('isGeneratedAdapterTarget and isCanonicalSkillSource enforce executable skill source-of-truth rules', () => {
+  assert.equal(isCanonicalSkillSource('core/skills/fgos-routing/SKILL.md'), true);
+  assert.equal(isCanonicalSkillSource('domains/coding/skills/fgos-code-panel/SKILL.md'), true);
+  assert.equal(isCanonicalSkillSource('.agents/skills/fgos-routing/SKILL.md'), false);
+  assert.equal(isCanonicalSkillSource('.claude/skills/fgos-routing/SKILL.md'), false);
+  assert.equal(isCanonicalSkillSource('plugins/fgOS/skills/fgos-routing/SKILL.md'), false);
+
+  assert.equal(isGeneratedAdapterTarget('.agents/skills/fgos-routing/SKILL.md'), true);
+  assert.equal(isGeneratedAdapterTarget('.claude/skills/fgos-routing/SKILL.md'), true);
+  assert.equal(isGeneratedAdapterTarget('plugins/fgOS/skills/fgos-routing/SKILL.md'), true);
+  assert.equal(isGeneratedAdapterTarget('.gemini/extensions/fgos/commands/fgos/code-panel.toml'), true);
+  assert.equal(isGeneratedAdapterTarget('core/skills/fgos-routing/SKILL.md'), false);
+  assert.equal(isGeneratedAdapterTarget('domains/coding/skills/fgos-code-panel/SKILL.md'), false);
+});
+
+test('projection tests for Codex/OpenAI and Claude surfaces verify adapter projection invariants', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const canonicalSkills = discoverCanonicalSkills(repoRoot);
+
+  for (const skill of canonicalSkills) {
+    const agentsPath = path.join(repoRoot, '.agents', 'skills', skill.name, 'SKILL.md');
+    assert.ok(fs.existsSync(agentsPath), `portable Codex projection must exist at ${agentsPath}`);
+    const agentsContent = fs.readFileSync(agentsPath, 'utf8');
+    assert.ok(
+      agentsContent.includes('# '),
+      `portable Codex projection ${skill.name} must carry full skill instructions`,
+    );
+
+    const claudePath = path.join(repoRoot, '.claude', 'skills', skill.name, 'SKILL.md');
+    assert.ok(fs.existsSync(claudePath), `Claude wrapper projection must exist at ${claudePath}`);
+    const claudeContent = fs.readFileSync(claudePath, 'utf8');
+    assert.ok(
+      claudeContent.includes('This is a generated thin wrapper'),
+      `Claude wrapper for ${skill.name} must be a thin wrapper redirect`,
+    );
+    assert.ok(
+      claudeContent.includes(skill.name),
+      `Claude wrapper for ${skill.name} must redirect to the correct skill name`,
+    );
+  }
+});
+
+test('mapSkillIntentToHostTriggers maps canonical skill intent to host-native triggers across Codex, Claude, and Gemini', () => {
+  const codePanel = mapSkillIntentToHostTriggers('fgos:code-panel', 'fgos-code-panel');
+  assert.equal(codePanel.codex, '$fgos-code-panel');
+  assert.equal(codePanel.claude, '/fgos:code-panel');
+  assert.equal(codePanel.claudeCompat, '/fgOS:code-panel');
+  assert.equal(codePanel.gemini, '/fgos:code-panel');
+
+  const archPanel = mapSkillIntentToHostTriggers('fgos:architecture-panel', 'fgos-architecture-panel');
+  assert.equal(archPanel.codex, '$fgos-architecture-panel');
+  assert.equal(archPanel.claude, '/fgos:architecture-panel');
+  assert.equal(archPanel.gemini, '/fgos:architecture-panel');
+
+  const pick = mapSkillIntentToHostTriggers('fgos:pick', 'fgos-routing');
+  assert.equal(pick.codex, '$fgos-routing', 'fgos:pick maps to $fgos-routing in Codex');
+  assert.equal(pick.claude, '/fgos:pick');
+  assert.equal(pick.gemini, '/fgos:pick');
+});
+
+test('generateGeminiSkillPackage generates valid Gemini CLI extension package as adapter target', () => {
+  const root = mkTempDir('gemini-package-root-');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'fgos-code-panel', SAMPLE_FRONTMATTER, '# Coding Code Panel\n');
+
+  const outDir = mkTempDir('gemini-package-output-');
+  const written = generateGeminiSkillPackage(root, outDir);
+
+  assert.ok(written.length >= 4);
+  assert.ok(fs.existsSync(path.join(outDir, 'gemini-extension.json')));
+  assert.ok(fs.existsSync(path.join(outDir, 'GEMINI.md')));
+  assert.ok(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'routing.toml')));
+  assert.ok(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'code-panel.toml')));
+
+  const manifest = JSON.parse(fs.readFileSync(path.join(outDir, 'gemini-extension.json'), 'utf8'));
+  assert.equal(manifest.name, 'fgos');
+  assert.equal(manifest.commands.length, 2);
+  const codePanelCmd = manifest.commands.find((c) => c.name === 'code-panel');
+  assert.ok(codePanelCmd);
+  assert.equal(codePanelCmd.file, 'commands/fgos/code-panel.toml');
+
+  const toml = fs.readFileSync(path.join(outDir, 'commands', 'fgos', 'code-panel.toml'), 'utf8');
+  assert.match(toml, /intent = "fgos:code-panel"/);
+  assert.match(toml, /prompt = "Read and follow the canonical fgOS skill instructions/);
 });
