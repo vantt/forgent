@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Skill source layout and canonical discovery (packaging-distribution track, P2):
+  executable source-of-truth rules for canonical skills (`core/skills/`,
+  `domains/*/skills/`), duplicate skill-id/intent-id/command-path collision
+  prevention before adapter writes, precise adapter target classification
+  preserving hand-authored plugin and Claude skills, canonical skill intent
+  to host trigger mapping (with partial/planned routing and compatibility
+  alias tracking), and prototype Gemini CLI extension package generation.
+- Instruction projection rendering (packaging-distribution track, P5):
+  effective instruction sets can now render into a managed portable
+  `AGENTS.md` block with `.fgos/installation/projections/ledger.json`
+  provenance, plus a registered `fgos doctor` check/fix that detects stale
+  generated instruction projections and repairs them without overwriting
+  unmanaged user content.
+
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
   fencing refinements, effect-aware fallback, and protocol-declared session
