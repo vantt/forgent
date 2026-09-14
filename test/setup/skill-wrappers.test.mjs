@@ -372,4 +372,74 @@ test('mirrorDevSkillsIntoPlugin is a safe no-op returning [] when agentsSkillsRo
   assert.deepEqual(mirrored, []);
 });
 
+test('fgos-code-panel is canonically located in domains/coding/skills and absent from core/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const domainSource = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const coreSource = path.join(repoRoot, 'core', 'skills', 'fgos-code-panel');
 
+  assert.ok(fs.existsSync(domainSource), 'domains/coding/skills/fgos-code-panel/SKILL.md must exist as canonical source');
+  assert.equal(fs.existsSync(coreSource), false, 'core/skills/fgos-code-panel must not exist to prevent duplicate canonical skill ids');
+
+  // Verify assembleSkills completes cleanly on the real repo without duplicate-skill collision
+  assert.doesNotThrow(() => {
+    assembleSkills(repoRoot, mkTempDir('skill-wrappers-verify-unique-'));
+  });
+});
+
+test('fgos-code-panel canonical source has non-vacuous repo-root path references after domain move', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  const repoRootPathPattern = /`((?:core|src|docs)\/[^`]+)`/g;
+  const expected = new Set([
+    'core/skills/fgos-panel/SKILL.md',
+    'src/runner/coordination/session-engine.mjs',
+    'src/verbs/coordination/schema.mjs',
+    'core/coordination-protocols/standalone-master-coordination-loop.yaml',
+    'core/skills/_shared/private-cell-worktree.md',
+    'docs/architect/agent-coordination/contracts/coordination-session.md',
+  ]);
+  const seen = new Set();
+  const missing = [];
+
+  for (const match of skillContent.matchAll(repoRootPathPattern)) {
+    const target = match[1];
+    if (!expected.has(target)) continue;
+    seen.add(target);
+    const targetPath = path.join(repoRoot, target);
+    if (!fs.existsSync(targetPath)) missing.push(target);
+  }
+
+  assert.deepEqual(seen, expected);
+  assert.deepEqual(missing, []);
+  assert.ok(skillContent.includes('`core/skills/_shared/private-cell-worktree.md`'));
+  assert.ok(skillContent.includes('`_shared/private-cell-worktree.md`'));
+  assert.ok(fs.existsSync(path.join(repoRoot, '.agents', 'skills', '_shared', 'private-cell-worktree.md')));
+  assert.ok(fs.existsSync(path.join(repoRoot, 'plugins', 'fgOS', 'skills', '_shared', 'private-cell-worktree.md')));
+});
+
+test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skillPaths = [
+    path.join(repoRoot, 'core', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    path.join(repoRoot, '.agents', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, '.agents', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  ];
+  const markdownLinkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
+  const linkedCodePanelPaths = [];
+
+  for (const skillPath of skillPaths) {
+    const content = fs.readFileSync(skillPath, 'utf8');
+    for (const match of content.matchAll(markdownLinkPattern)) {
+      const target = match[1];
+      if (target.includes('fgos-code-panel')) {
+        linkedCodePanelPaths.push(`${path.relative(repoRoot, skillPath)} -> ${target}`);
+      }
+    }
+  }
+
+  assert.deepEqual(linkedCodePanelPaths, []);
+});

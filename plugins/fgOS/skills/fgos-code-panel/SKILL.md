@@ -25,14 +25,13 @@ description: >-
 Despite the short name, this is a mutating implementation workflow. A request
 for a "coding panel" does not select it unless the person explicitly asks to
 implement/change/fix code. Advisory coding design and architecture choices
-start at [`fgos-panel`](../fgos-panel/SKILL.md), which routes without granting
+start at `core/skills/fgos-panel/SKILL.md`, which routes without granting
 mutation authority.
 
 Dispatches through the exact same CoordinationSession engine
-([`session-engine.mjs`](../../../src/runner/coordination/session-engine.mjs)),
-request schema
-([`schema.mjs`](../../../src/verbs/coordination/schema.mjs)), and
-[`standalone-master-coordination-loop`](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
+(`src/runner/coordination/session-engine.mjs`), request schema
+(`src/verbs/coordination/schema.mjs`), and
+`core/coordination-protocols/standalone-master-coordination-loop.yaml`
 FlowDefinition that `fgos-plan-loop` uses -- not a copy, the same code
 path. This is a real, necessary dependency, not a documentation
 convenience: that engine is what already earned its hardening (real
@@ -137,7 +136,9 @@ executor/tier mapping unless there is a real reason to diverge.
 A code-panel change never runs in the main checkout and never on the base
 branch. Open its own worktree on its own branch first, as a plain git
 operation, following
-[`../_shared/private-cell-worktree.md`](../_shared/private-cell-worktree.md)
+the shared private-cell-worktree fragment. In this source tree it lives at
+`core/skills/_shared/private-cell-worktree.md`; projected skill surfaces carry
+their own sibling `_shared/private-cell-worktree.md` copy next to the skill root
 with `<prefix>` = `code-panel`:
 
 ```sh
@@ -227,7 +228,7 @@ fgos coordination run --cwd "$wt" --file open.json
 (`standalone-master-coordination-loop.yaml`'s own `operations[]`); the
 engine refuses `"mutating"` whenever `cwd` resolves to the main checkout
 (full four-condition Mutation Rule:
-[`coordination-session.md`](../../../docs/architect/agent-coordination/contracts/coordination-session.md),
+`docs/architect/agent-coordination/contracts/coordination-session.md`,
 "Mutation Rule" section).
 
 ## 2. Read results, disposition findings
