@@ -1069,7 +1069,7 @@ test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized 
 
   assert.throws(
     () => discoverSharedFragments(windowsRoot),
-    /duplicate shared fragment "same\.md" found in multiple sources:/,
+    /invalid shared fragment path "same\.md\.": fragment names must not end with dots or spaces/,
   );
 });
 
@@ -1095,6 +1095,20 @@ test('discoverSharedFragments rejects Windows reserved shared fragment basenames
     () => discoverSharedFragments(root),
     /invalid shared fragment path "AUX\.md": fragment names must not use Windows reserved basenames/,
   );
+});
+
+test('discoverSharedFragments rejects standalone trailing-dot and trailing-space aliases', () => {
+  for (const name of ['foo.', 'foo ']) {
+    const root = mkTempDir('shared-trailing-alias-src-');
+    const coreShared = path.join(root, 'core', 'skills', '_shared');
+    fs.mkdirSync(coreShared, { recursive: true });
+    fs.writeFileSync(path.join(coreShared, name), '# Trailing Alias\n');
+
+    assert.throws(
+      () => discoverSharedFragments(root),
+      new RegExp(`invalid shared fragment path "${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}": fragment names must not end with dots or spaces`),
+    );
+  }
 });
 
 test('generateGeminiSkillPackage rejects Windows reserved skill directory basenames', () => {
@@ -1129,6 +1143,54 @@ test('assembleSkills rejects Windows reserved canonical skill directory basename
     /invalid skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
   );
   assert.equal(fs.existsSync(path.join(root, '.agents', 'skills', 'CON')), false);
+});
+
+test('assembleSkills rejects non-portable skill names even when legacy checkDuplicates:false is passed', () => {
+  const root = mkTempDir('assemble-device-skill-no-dupes-src-');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'CON',
+    '---\nname: CON\nintent: fgos:demo\ndescription: Device skill\n---\n',
+    '# CON\n',
+  );
+
+  assert.throws(
+    () => assembleSkills(root, undefined, { checkDuplicates: false }),
+    /invalid skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
+  );
+  assert.equal(fs.existsSync(path.join(root, '.agents', 'skills', 'CON')), false);
+});
+
+test('generated projections reject standalone trailing-dot and trailing-space skill aliases', () => {
+  for (const name of ['foo.', 'foo ']) {
+    const root = mkTempDir('skill-trailing-alias-src-');
+    writeSkill(
+      path.join(root, 'core', 'skills'),
+      name,
+      `---\nname: ${name}\nintent: fgos:demo\ndescription: Trailing alias\n---\n`,
+      '# Trailing Alias\n',
+    );
+
+    assert.throws(
+      () => assembleSkills(root),
+      new RegExp(`invalid skill name "${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}": emitted skill path segments must not end with dots or spaces`),
+    );
+    assert.equal(fs.existsSync(path.join(root, '.agents', 'skills', name)), false);
+  }
+
+  assert.throws(
+    () => generateGeminiSkillPackage(mkTempDir('gemini-trailing-skill-src-'), mkTempDir('gemini-trailing-skill-pkg-'), {
+      skills: [{
+        name: 'foo.',
+        canonicalDir: null,
+        intentId: 'fgos:demo',
+        userInvocable: true,
+        triggers: { gemini: '/fgos:demo' },
+        rawContent: `${SAMPLE_FRONTMATTER}\n# Foo\n`,
+      }],
+    }),
+    /invalid skill name "foo\.": emitted skill path segments must not end with dots or spaces/,
+  );
 });
 
 test('generateGeminiSkillPackage rejects Windows-normalized emitted skill path collisions', () => {

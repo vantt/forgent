@@ -67,6 +67,11 @@ function windowsReservedBasename(segment) {
   return String(segment).split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
 }
 
+function hasWindowsTrailingDotOrSpace(segment) {
+  const normalized = String(segment).normalize('NFC');
+  return normalized !== normalized.replace(/[. ]+$/g, '');
+}
+
 function atomicCopyFileSync(sourcePath, targetPath) {
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.copyFileSync(sourcePath, tmpPath);
@@ -607,6 +612,8 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
     }
   }
 
+  assertPortableGeneratedSkillNames(skills);
+
   if (checkDuplicates) {
     for (const [skillName, paths] of nameToSources.entries()) {
       if (paths.length > 1) {
@@ -668,8 +675,9 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
       }
     }
 
-    assertPortableGeneratedSkillPaths(skills);
   }
+
+  assertPortableGeneratedSkillPathCollisions(skills);
 
   return skills.sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -693,12 +701,22 @@ function assertPortableGeneratedSkillName(skillName) {
       `invalid skill name "${skillName}": emitted skill path segments must not use Windows reserved basenames`,
     );
   }
+  if (hasWindowsTrailingDotOrSpace(normalizedName)) {
+    throw new Error(
+      `invalid skill name "${skillName}": emitted skill path segments must not end with dots or spaces`,
+    );
+  }
 }
 
-function assertPortableGeneratedSkillPaths(skills) {
-  const pathToSkills = new Map();
+function assertPortableGeneratedSkillNames(skills) {
   for (const skill of skills) {
     assertPortableGeneratedSkillName(skill.name);
+  }
+}
+
+function assertPortableGeneratedSkillPathCollisions(skills) {
+  const pathToSkills = new Map();
+  for (const skill of skills) {
     const key = windowsPathCollisionKey(skill.name);
     if (!pathToSkills.has(key)) {
       pathToSkills.set(key, []);
@@ -728,6 +746,11 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
     if (WINDOWS_RESERVED_BASENAMES.has(windowsReservedBasename(segment))) {
       throw new Error(
         `invalid shared fragment path "${relPath}": fragment names must not use Windows reserved basenames`,
+      );
+    }
+    if (hasWindowsTrailingDotOrSpace(segment)) {
+      throw new Error(
+        `invalid shared fragment path "${relPath}": fragment names must not end with dots or spaces`,
       );
     }
   };
@@ -918,7 +941,8 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
 
   // Verify no duplicate command paths or intent collisions before writing any adapter files
   const seenVerbs = new Map();
-  assertPortableGeneratedSkillPaths(canonicalSkills);
+  assertPortableGeneratedSkillNames(canonicalSkills);
+  assertPortableGeneratedSkillPathCollisions(canonicalSkills);
   for (const s of canonicalSkills) {
     const verb = normalizeGeminiCommandVerb(s.intentId);
     if (!seenVerbs.has(verb)) {
