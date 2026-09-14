@@ -666,6 +666,19 @@ test('isGeneratedAdapterTarget uses provenance and markers, never prefix alone (
   assert.equal(isGeneratedAdapterTarget(generatedWrapperClaude, root), true, 'claude skill with generated wrapper marker is generated target');
 });
 
+test('isGeneratedAdapterTarget infers the nearest project root under an ancestor named plugins', () => {
+  const outer = mkTempDir('adapter-root-ancestor-plugins-');
+  const root = path.join(outer, 'plugins', 'repo');
+  const pluginSkillFile = path.join(root, 'plugins', 'fgOS', 'skills', 'fgos-routing', 'SKILL.md');
+
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# canonical\n');
+  fs.mkdirSync(path.dirname(pluginSkillFile), { recursive: true });
+  fs.writeFileSync(pluginSkillFile, `${SAMPLE_FRONTMATTER}\n# mirrored\n`);
+
+  assert.equal(isGeneratedAdapterTarget(pluginSkillFile), true);
+  assert.equal(isGeneratedAdapterTarget(pluginSkillFile, root), true);
+});
+
 test('projection tests for Codex/OpenAI and Claude surfaces verify adapter projection invariants', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const canonicalSkills = discoverCanonicalSkills(repoRoot);
@@ -776,6 +789,34 @@ test('discoverCanonicalSkills and generateGeminiSkillPackage throw when distinct
   assert.equal(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'deploy.toml')), false, 'no adapter files written on collision');
 });
 
+test('discoverCanonicalSkills and generateGeminiSkillPackage reject Gemini command path aliases with dot segments', () => {
+  const root = mkTempDir('gemini-dot-segment-intent-');
+  const coreSkillDir = path.join(root, 'core', 'skills', 'skill-core-routing');
+  fs.mkdirSync(coreSkillDir, { recursive: true });
+  const frontmatter = '---\nname: skill-core-routing\nintent: fgos:./routing\ndescription: Invalid alias\n---\n';
+  fs.writeFileSync(path.join(coreSkillDir, 'SKILL.md'), `${frontmatter}\n# Body\n`);
+
+  assert.throws(
+    () => discoverCanonicalSkills(root),
+    /invalid Gemini command intent "fgos:\.\/routing"/,
+  );
+
+  const outDir = mkTempDir('gemini-dot-segment-out-');
+  assert.throws(
+    () => generateGeminiSkillPackage(root, outDir, {
+      skills: [{
+        name: 'skill-core-routing',
+        canonicalDir: 'core/skills/skill-core-routing',
+        intentId: 'fgos:./routing',
+        userInvocable: true,
+        triggers: { gemini: '/fgos:./routing' },
+      }],
+    }),
+    /invalid Gemini command intent "fgos:\.\/routing"/,
+  );
+  assert.equal(fs.existsSync(path.join(outDir, 'commands', 'fgos', 'routing.toml')), false);
+});
+
 test('mapSkillIntentToHostTriggers maps canonical skill intent to host-native triggers across Codex, Claude, and Gemini', () => {
   const codePanel = mapSkillIntentToHostTriggers('fgos:code-panel', 'fgos-code-panel');
   assert.equal(codePanel.codex, '$fgos-code-panel');
@@ -833,7 +874,12 @@ test('generateGeminiSkillPackage generates valid Gemini CLI extension package as
 test('generateGeminiSkillPackage produces a completely self-contained extension package runnable without source repo', () => {
   const root = mkTempDir('gemini-standalone-src-');
   writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
-  writeSkill(path.join(root, 'domains', 'coding', 'skills'), 'fgos-code-panel', SAMPLE_FRONTMATTER, '# Coding Code Panel\n');
+  writeSkill(
+    path.join(root, 'domains', 'coding', 'skills'),
+    'fgos-code-panel',
+    SAMPLE_FRONTMATTER,
+    '# Coding Code Panel\nRead `../../../core/skills/_shared/standalone-fragment.md`.\n',
+  );
   const sharedDir = path.join(root, 'core', 'skills', '_shared');
   fs.mkdirSync(sharedDir, { recursive: true });
   fs.writeFileSync(path.join(sharedDir, 'standalone-fragment.md'), '# Standalone Shared Fragment\n');
@@ -877,6 +923,13 @@ test('generateGeminiSkillPackage produces a completely self-contained extension 
     assert.ok(fs.existsSync(packagedSkillPath), `referenced skill file ${match[1]} must exist in the standalone package`);
     const skillContent = fs.readFileSync(packagedSkillPath, 'utf8');
     assert.ok(skillContent.length > 0, `skill file ${match[1]} must have non-empty instruction content`);
+    assert.doesNotMatch(skillContent, /(?:\.\.\/)+core\/skills\/_shared\//);
+    assert.doesNotMatch(skillContent, /(?:\.\.\/)+domains\/[^/]+\/skills\/_shared\//);
+    const refPattern = /`(\.\.\/_shared\/[^`]+)`/g;
+    for (const ref of skillContent.matchAll(refPattern)) {
+      const resolved = path.resolve(path.dirname(packagedSkillPath), ref[1]);
+      assert.ok(fs.existsSync(resolved), `packaged skill reference ${ref[1]} must resolve inside package`);
+    }
   }
 
   // GEMINI.md points to packaged skill locations only

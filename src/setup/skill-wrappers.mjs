@@ -255,7 +255,7 @@ function resolveProjectRoot(targetPath, projectRoot) {
   if (path.isAbsolute(targetPath)) {
     for (const segment of ['.agents', '.claude', 'plugins', 'core', 'domains', '.gemini']) {
       const needle = path.sep + segment + path.sep;
-      const idx = targetPath.indexOf(needle);
+      const idx = targetPath.lastIndexOf(needle);
       if (idx !== -1) {
         return targetPath.slice(0, idx);
       }
@@ -435,12 +435,33 @@ export function deriveSkillIntentId(skillName, frontmatterContent = '') {
   return `fgos:${skillName}`;
 }
 
+function normalizeGeminiCommandVerb(intentId) {
+  const rawVerb = intentId.startsWith('fgos:') ? intentId.slice(5) : intentId;
+  const normalized = path.posix.normalize(rawVerb);
+  if (
+    !rawVerb ||
+    rawVerb !== normalized ||
+    rawVerb.startsWith('/') ||
+    rawVerb.includes('\\') ||
+    rawVerb.split('/').some((part) => !part || part === '.' || part === '..')
+  ) {
+    throw new Error(
+      `invalid Gemini command intent "${intentId}": command verb must be a normalized relative path without dot segments`,
+    );
+  }
+  return rawVerb;
+}
+
+function geminiCommandPathForIntent(intentId) {
+  return `commands/fgos/${normalizeGeminiCommandVerb(intentId)}.toml`;
+}
+
 /**
  * Maps a canonical skill intent ID to native host triggers across
  * Codex/OpenAI, Claude, and Gemini CLI.
  */
 export function mapSkillIntentToHostTriggers(intentId, skillName) {
-  const verb = intentId.startsWith('fgos:') ? intentId.slice(5) : intentId;
+  const verb = normalizeGeminiCommandVerb(intentId);
   const knownCodexOverrides = {
     'fgos:pick': '$fgos-routing',
   };
@@ -577,8 +598,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
     const hostTriggers = new Map();
 
     for (const skill of skills) {
-      const verb = skill.intentId.startsWith('fgos:') ? skill.intentId.slice(5) : skill.intentId;
-      const geminiCmdPath = `commands/fgos/${verb}.toml`;
+      const geminiCmdPath = geminiCommandPathForIntent(skill.intentId);
       if (!hostCommandPaths.has(geminiCmdPath)) {
         hostCommandPaths.set(geminiCmdPath, []);
       }
@@ -673,6 +693,12 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   return fragments.sort((a, b) => a.relativeFragmentPath.localeCompare(b.relativeFragmentPath));
 }
 
+function rewritePackagedSkillReferences(content) {
+  return content
+    .replace(/(?:\.\.\/)+core\/skills\/_shared\//g, '../_shared/')
+    .replace(/(?:\.\.\/)+domains\/[^/\s`)"']+\/skills\/_shared\//g, '../_shared/');
+}
+
 /**
  * Generates a self-contained Gemini CLI extension package under `targetOutputDir` from canonical skills.
  * Packages resolved skill instruction bodies/files into `skills/<name>/SKILL.md`,
@@ -686,7 +712,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
   // Verify no duplicate command paths or intent collisions before writing any adapter files
   const seenVerbs = new Map();
   for (const s of canonicalSkills) {
-    const verb = s.intentId.startsWith('fgos:') ? s.intentId.slice(5) : s.intentId;
+    const verb = normalizeGeminiCommandVerb(s.intentId);
     if (!seenVerbs.has(verb)) {
       seenVerbs.set(verb, []);
     }
@@ -748,6 +774,8 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
     }
     const packagedSkillFile = path.join(targetSkillDir, 'SKILL.md');
     if (fs.existsSync(packagedSkillFile)) {
+      const packagedContent = fs.readFileSync(packagedSkillFile, 'utf8');
+      fs.writeFileSync(packagedSkillFile, rewritePackagedSkillReferences(packagedContent), 'utf8');
       written.push(packagedSkillFile);
     }
   }
@@ -757,7 +785,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
     version: '0.1.0',
     description: 'fgOS platform skills and command adapters for Gemini CLI',
     commands: canonicalSkills.map((s) => {
-      const verb = s.intentId.startsWith('fgos:') ? s.intentId.slice(5) : s.intentId;
+      const verb = normalizeGeminiCommandVerb(s.intentId);
       return {
         name: verb,
         description: `Execute ${s.name} (${s.intentId})`,
@@ -794,7 +822,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
   // skill source produced it") and is never what the prompt tells the host
   // to read.
   for (const s of canonicalSkills) {
-    const verb = s.intentId.startsWith('fgos:') ? s.intentId.slice(5) : s.intentId;
+    const verb = normalizeGeminiCommandVerb(s.intentId);
     const tomlPath = path.join(commandsDir, `${verb}.toml`);
     const packagedRelPath = `skills/${s.name}/SKILL.md`;
     const tomlContent = [
@@ -974,4 +1002,3 @@ export function materializeSkillsIntoProject(packageRoot, targetRoot) {
   const wrappersWritten = generateAllSkillWrappers(targetAgentsSkills, targetClaudeSkills);
   return { copied, wrappersWritten };
 }
-
