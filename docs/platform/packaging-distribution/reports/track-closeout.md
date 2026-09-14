@@ -199,3 +199,20 @@ The merge was therefore prepared and proven on
 dirty main checkout. A final merge to `main` should happen only after the release
 owner/coordinator approves the merge and the main checkout is made safe for
 integration.
+
+Tracked dirty files in the current main checkout that overlap the proven
+integration branch diff:
+
+```txt
+.agents/skills/fgos-code-panel/SKILL.md
+docs/architect/host-invocation-routing/legacy-cli-transition.md
+docs/architect/packaging-distribution/README.md
+docs/architect/packaging-distribution/future-constraints.md
+docs/architect/packaging-distribution/history/distribution-baseline.md
+docs/architect/packaging-distribution/runtime-identity-and-activation.md
+docs/architect/packaging-distribution/scope-map.md
+docs/architect/packaging-distribution/workspace-runtime-model.md
+docs/architecture-map.md
+docs/enduser-docs-index.json
+docs/specs/distribution.md
+```
