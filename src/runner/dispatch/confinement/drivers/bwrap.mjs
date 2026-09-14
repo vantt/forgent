@@ -273,6 +273,10 @@ export function assessBwrap(request, backend) {
       context: {
         ...request.context,
         assignmentLaunchContext: request.assignmentLaunchContext,
+        // HIGH-2: resources.mjs needs to know which adapter's worker is
+        // actually going to run in the sandbox to bind the right outbox
+        // subdirectory writable -- see resources.mjs's own comment.
+        adapter: request.invocation?.adapter,
       },
       grants: policyGrants,
       resourceNeeds: request.resourceNeeds,

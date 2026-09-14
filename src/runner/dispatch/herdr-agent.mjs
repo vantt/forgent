@@ -151,10 +151,11 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
      * a pane, never addressed by tab id. Omitted, herdr falls back to whatever
      * pane is currently focused, which is what scatters sibling dispatches
      * across whichever tab a person happens to be looking at. */
-    paneSplit({ pane, direction = 'right', focus = false, cwd: paneCwd, env: paneEnv } = {}) {
+    paneSplit({ pane, direction = 'right', ratio, focus = false, cwd: paneCwd, env: paneEnv } = {}) {
       const args = ['pane', 'split'];
       if (pane) args.push('--pane', pane);
       args.push('--direction', direction);
+      if (ratio !== undefined && ratio !== null) args.push('--ratio', String(ratio));
       if (!focus) args.push('--no-focus');
       if (paneCwd) args.push('--cwd', paneCwd);
       for (const [key, value] of Object.entries(paneEnv ?? {})) {
@@ -309,9 +310,11 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
      */
     agentPrompt(name, text, { wait = true, until, timeoutMs = 20000 } = {}) {
       const args = ['agent', 'prompt', name, text];
-      if (wait) args.push('--wait');
-      for (const state of until ?? []) args.push('--until', state);
-      if (timeoutMs) args.push('--timeout', String(timeoutMs));
+      if (wait) {
+        args.push('--wait');
+        for (const state of until ?? []) args.push('--until', state);
+        if (timeoutMs) args.push('--timeout', String(timeoutMs));
+      }
       return invoke(args, { timeoutMs: (timeoutMs ?? 20000) + 15000 });
     },
 

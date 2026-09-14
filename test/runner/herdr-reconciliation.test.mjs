@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import {
   runHerdrRound,
   reconcileHerdrSpawnRun,
@@ -13,7 +14,10 @@ import {
   createHerdrLaunchCommand,
   readHerdrLaunchCommand,
   HerdrLaunchCollisionError,
+  buildLauncherScriptContent,
+  verifyForegroundProcessArgv,
 } from '../../src/runner/dispatch/herdr-round.mjs';
+import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import {
   buildConfinementRequest,
   validateAssignmentLaunchContext,
@@ -97,9 +101,10 @@ if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-s
 }
 if (group === 'pane' && action === 'process-info') {
   const gone = scenario.agentGone || readState().exited;
+  const mockArgv = scenario.mockArgv ?? ['claude', 'worker.mjs'];
   const foreground = gone
     ? [{ pid: 100, name: 'zsh' }]
-    : [{ pid: 200, name: 'bwrap' }, { pid: 100, name: 'zsh' }];
+    : [{ pid: 200, name: 'bwrap', argv: mockArgv }, { pid: 100, name: 'zsh' }];
   ok({ process_info: { pane_id: 'mock-pane-1', shell_pid: 100, foreground_process_group_id: gone ? 100 : 200, foreground_processes: foreground } });
 }
 if (group === 'agent' && action === 'start') {
@@ -139,8 +144,8 @@ ok({});
   };
 }
 
-// 1. Confinement Authority refuses herdr-spawn under required bwrap confinement
-test('1. Confinement Authority refuses herdr-spawn under required bwrap confinement', async () => {
+// 1. Confinement Authority prepares herdr-spawn launch under required bwrap confinement
+test('1. Confinement Authority prepares herdr-spawn launch under required bwrap confinement when workerCommandSeam is true', async () => {
   const tmp = mkTempDir();
   const fgosDir = path.join(tmp, '.fgos');
   const runDir = path.join(fgosDir, 'runs', 'run-01');
@@ -187,18 +192,17 @@ test('1. Confinement Authority refuses herdr-spawn under required bwrap confinem
     },
   });
 
-  await assert.rejects(
-    () => prepareConfinementForLaunch(
-      { ...req, assignmentLaunchContext: launchContext },
-      { adapterName: 'herdr-spawn' },
-    ),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.code, 'confinement-adapter-unsupported');
-      assert.match(err.message, /does not apply the prepared sandbox/);
-      return true;
-    },
+  const prep = await prepareConfinementForLaunch(
+    { ...req, assignmentLaunchContext: launchContext },
+    { adapterName: 'herdr-spawn' },
   );
+
+  assert.ok(prep.preparedInvocationDigest);
+  assert.equal(prep.preparedInvocation.contract, 'authority-prepared-invocation.v1');
+  assert.equal(prep.preparedInvocation.adapter, 'herdr-spawn');
+  assert.ok(prep.preparedInvocation.workerInvocation);
+  assert.ok(prep.preparedInvocation.workerInvocation.workerCommandDigest);
+  assert.ok(fs.existsSync(path.join(runDir, 'protected', 'prepared-invocation', 'cmd-01.json')));
 });
 
 // 2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false
@@ -825,3 +829,352 @@ test('16. ad-hoc run preserves legacy naming while Assignment run uses determini
   const cmd = readHerdrLaunchCommand(asgnRunDir, 'cmd-named-01');
   assert.equal(cmd.herdrName, 'fgos-run-named-01-cmd-named-01');
 });
+
+// 17. Launcher script generation and foreground argv verification
+test('17. launcher script generation and foreground argv verification', async () => {
+  const scriptContent = buildLauncherScriptContent({
+    argv0: 'claude',
+    command: '/usr/bin/bwrap',
+    args: ['--ro-bind', '/', '/', 'echo', 'hi'],
+    env: { TEST_VAR: 'value with spaces & symbols' },
+    workerCommandDigest: 'sha256:abcd',
+  });
+
+  assert.ok(scriptContent.startsWith('#!/usr/bin/env bash'));
+  assert.ok(scriptContent.includes("export TEST_VAR='value with spaces & symbols'"));
+  assert.ok(scriptContent.includes("exec -a claude /usr/bin/bwrap --ro-bind / / echo hi"));
+
+  const matched = verifyForegroundProcessArgv({
+    foregroundProcesses: [
+      { pid: 100, name: 'zsh', argv: ['zsh'] },
+      { pid: 200, name: 'bwrap', argv: ['claude', '--ro-bind', '/', '/', 'echo', 'hi'] },
+    ],
+    shellPid: 100,
+    argv0: 'claude',
+    command: '/usr/bin/bwrap',
+    args: ['--ro-bind', '/', '/', 'echo', 'hi'],
+  });
+  assert.ok(matched);
+  assert.equal(matched.pid, 200);
+
+  const mismatched = verifyForegroundProcessArgv({
+    foregroundProcesses: [
+      { pid: 200, name: 'bwrap', argv: ['claude', '--unrelated-flag'] },
+    ],
+    shellPid: 100,
+    argv0: 'claude',
+    command: '/usr/bin/bwrap',
+    args: ['--ro-bind', '/', '/', 'echo', 'hi'],
+  });
+  assert.equal(mismatched, null);
+});
+
+// 18. Fail-closed triggers when backend is unsupported or foreground argv mismatches
+test('18. fail-closed triggers when backend is unsupported or foreground argv mismatches', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  const mock = createMockHerdr(tmp, { runDir });
+
+  // 1. Unsupported backend under required mode
+  await assert.rejects(
+    () => runHerdrRound({
+      herdrBin: mock.herdrBin,
+      workId: 'item-unsupported-backend',
+      runDir,
+      command: 'echo',
+      cwd: tmp,
+      confinementRequirement: { mode: 'required' },
+      backendId: 'docker',
+      workerInvocation: { command: 'docker', args: ['run'] },
+    }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.errorClass, 'confinement-backend-unsupported');
+      return true;
+    },
+  );
+
+  // 2. Foreground process argv mismatch fails closed
+  const mockMismatched = createMockHerdr(path.join(tmp, 'mock-mismatch'), {
+    runDir,
+    mockArgv: ['bogus-executable', '--unexpected-flag'],
+  });
+
+  await assert.rejects(
+    () => runHerdrRound({
+      herdrBin: mockMismatched.herdrBin,
+      workId: 'item-mismatched-argv',
+      runDir,
+      command: 'node',
+      args: ['worker.mjs'],
+      cwd: tmp,
+      fullEnv: process.env,
+      confinementRequirement: { mode: 'required' },
+      backendId: 'bwrap',
+      workerInvocation: {
+        command: '/usr/bin/bwrap',
+        args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'],
+      },
+      transportDeadlines: {
+        startup: { readyMs: 500, promptMs: 500 },
+        round: { idleMs: 1000, ceilingMs: 2000 },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof DispatchError);
+      assert.equal(err.data?.reason ?? err.code, 'confinement-mismatch');
+      return true;
+    },
+  );
+});
+
+// 19. Confined execution under required bwrap executes via launcher script and produces receipt
+test('19. confined execution under required bwrap executes via launcher script and produces receipt', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  const mock = createMockHerdr(tmp, {
+    runDir,
+    mockArgv: ['claude', '--ro-bind', '/', '/', 'node', 'worker.mjs'],
+  });
+
+  const launchContext = {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    runId: 'run-conf-01',
+    launchCommandId: 'cmd-conf-01',
+    controlEpoch: 1,
+    controlToken: 'tok-conf',
+  };
+
+  createHerdrLaunchCommand(runDir, launchContext);
+
+  const workerInvocation = {
+    command: '/usr/bin/bwrap',
+    args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'],
+    cwd: tmp,
+    env: { TEST_CONF_ENV: 'active' },
+    workerCommandDigest: computeSha256Digest({ command: '/usr/bin/bwrap', args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'] }),
+  };
+
+  const prepDir = path.join(runDir, 'protected', 'prepared-invocation');
+  fs.mkdirSync(prepDir, { recursive: true });
+  const prepRec = {
+    contract: 'authority-prepared-invocation.v1',
+    workerInvocation,
+  };
+  const prepDigest = computeSha256Digest(prepRec);
+  publishImmutableProof(path.join(prepDir, 'cmd-conf-01.json'), { ...prepRec, digest: prepDigest });
+
+  const result = await runHerdrRound({
+    herdrBin: mock.herdrBin,
+    workId: 'item-conf-01',
+    runId: 'run-conf-01',
+    launchCommandId: 'cmd-conf-01',
+    preparedInvocationDigest: prepDigest,
+    runDir,
+    command: 'node',
+    args: ['worker.mjs'],
+    cwd: tmp,
+    fullEnv: process.env,
+    delivery: 'file-pointer',
+    agentKind: 'claude',
+    confinementRequirement: { mode: 'required' },
+    backendId: 'bwrap',
+    workerInvocation,
+    transportDeadlines: {
+      startup: { readyMs: 500, promptMs: 500 },
+      round: { idleMs: 1000, ceilingMs: 2000 },
+    },
+  });
+
+  assert.equal(result.outcome, 'settled');
+
+  const launcherScript = path.join(runDir, 'protected', 'launchers', 'cmd-conf-01.sh');
+  assert.ok(fs.existsSync(launcherScript), 'launcher script must exist');
+  const scriptContent = fs.readFileSync(launcherScript, 'utf8');
+  assert.ok(scriptContent.includes('exec -a claude /usr/bin/bwrap --ro-bind / / node worker.mjs'));
+  assert.ok(scriptContent.includes('export TEST_CONF_ENV=active'));
+
+  const receipt = readHerdrAdapterReceipt(runDir, 'cmd-conf-01');
+  assert.ok(receipt, 'receipt must exist');
+  assert.equal(receipt.contract, 'herdr-adapter-receipt.v1');
+  assert.equal(receipt.workerCommandDigest, workerInvocation.workerCommandDigest);
+  assert.ok(receipt.startArgvDigest);
+  assert.equal(receipt.completion?.kind, 'settled');
+});
+
+// 20. Live Herdr gateway executes confined launch end-to-end when gateway is running
+//
+// HIGH-2: this used to launch a bare `node -e workerCode` as the "worker
+// invocation" -- no `bwrap` anywhere in the command -- so it proved the
+// launcher-script/herdr mechanism worked, but never that a genuinely
+// bwrap-confined worker can settle. Rewritten to wrap the worker in a real
+// `bwrap` invocation shaped the same way Confinement Authority's own
+// `prepareBwrap` builds one (`--ro-bind / /` plus a single writable bind for
+// the run-output grant), so the worker can ONLY write inside `runDir/outbox`
+// -- the same directory `brief.mjs` tells every herdr-spawn worker to write
+// into (see resources.mjs's HIGH-2 fix: herdr-spawn's run-output grant binds
+// that directory, not `worker-output/outbox`). A worker that settles here is
+// live proof the grant and the brief agree on where to write.
+test('20. live Herdr gateway executes confined launch end-to-end when gateway is running', async () => {
+  const herdrBin = findExecutableOnPath(['herdr']);
+  if (!herdrBin) return;
+  try {
+    const statusOut = execFileSync(herdrBin, ['status'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    if (!statusOut.includes('running')) return;
+  } catch {
+    return;
+  }
+  const bwrapBin = findExecutableOnPath(['bwrap']) || (fs.existsSync('/usr/bin/bwrap') ? '/usr/bin/bwrap' : null);
+  if (!bwrapBin) return;
+
+  const tmp = mkTempDir('fgos-live-herdr-');
+  const runDir = path.join(tmp, 'run');
+  const outboxDir = path.join(runDir, 'outbox');
+  fs.mkdirSync(outboxDir, { recursive: true });
+
+  const launchContext = {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    runId: 'run-live-01',
+    launchCommandId: 'cmd-live-01',
+    controlEpoch: 1,
+    controlToken: 'tok-live',
+  };
+
+  createHerdrLaunchCommand(runDir, launchContext);
+
+  const resultPath = path.join(outboxDir, 'result-1.json');
+  const workerCode = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(resultPath)}, JSON.stringify({ status: 'done', summary: 'live-proof' })); setTimeout(() => {}, 2000);`;
+  // The real sandbox shape `prepareBwrap` builds: read-only root, a single
+  // writable bind for the resource under test (the run-output outbox), then
+  // the worker command after `--`. Everything the worker is NOT explicitly
+  // given a bind for is read-only -- if the outbox bind were wrong (as it
+  // was before the HIGH-2 fix), the worker's own `fs.writeFileSync` above
+  // would fail with EROFS and this test would fail closed, not silently pass.
+  const bwrapArgs = [
+    '--ro-bind', '/', '/',
+    '--dev', '/dev',
+    '--proc', '/proc',
+    '--tmpfs', '/tmp',
+    '--bind', outboxDir, outboxDir,
+    '--', process.execPath, '-e', workerCode,
+  ];
+  const workerInvocation = {
+    command: bwrapBin,
+    args: bwrapArgs,
+    cwd: tmp,
+    env: { LIVE_TEST: 'true' },
+    workerCommandDigest: computeSha256Digest({ command: bwrapBin, args: bwrapArgs }),
+  };
+
+  const prepDir = path.join(runDir, 'protected', 'prepared-invocation');
+  fs.mkdirSync(prepDir, { recursive: true });
+  const prepRec = { contract: 'authority-prepared-invocation.v1', workerInvocation };
+  const prepDigest = computeSha256Digest(prepRec);
+  publishImmutableProof(path.join(prepDir, 'cmd-live-01.json'), { ...prepRec, digest: prepDigest });
+
+  const result = await runHerdrRound({
+    herdrBin,
+    workId: 'live-item-01',
+    runId: 'run-live-01',
+    launchCommandId: 'cmd-live-01',
+    preparedInvocationDigest: prepDigest,
+    runDir,
+    command: 'node',
+    args: ['-e', workerCode],
+    cwd: tmp,
+    fullEnv: process.env,
+    delivery: 'file-pointer',
+    agentKind: 'claude',
+    confinementRequirement: { mode: 'required' },
+    backendId: 'bwrap',
+    workerInvocation,
+    transportDeadlines: {
+      startup: { readyMs: 5000, promptMs: 5000 },
+      round: { idleMs: 3000, ceilingMs: 6000 },
+    },
+  });
+
+  assert.equal(result.outcome, 'settled');
+  assert.ok(fs.existsSync(resultPath), 'a genuinely bwrap-confined worker must be able to write its own outbox/result-1.json');
+
+  const receipt = readHerdrAdapterReceipt(runDir, 'cmd-live-01');
+  assert.ok(receipt);
+  assert.equal(receipt.completion?.kind, 'settled');
+  assert.ok(receipt.resourceIncarnation);
+  assert.ok(receipt.resourceIncarnation.workerPid);
+});
+
+// 21. Confined path resourceIncarnation fencing distinguishes reattach from new process
+test('21. confined path resourceIncarnation fencing distinguishes reattach from new process', async () => {
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  fs.mkdirSync(path.join(runDir, 'controller', 'commands'), { recursive: true });
+
+  const launchContext = {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    runId: 'run-re-01',
+    launchCommandId: 'cmd-re-01',
+    controlEpoch: 1,
+    controlToken: 'tok-re',
+  };
+
+  const incarnationA = computeHerdrResourceIncarnation({
+    paneId: 'mock-pane-1',
+    shellPid: 100,
+    workerPid: 200,
+    processStartTime: '11111',
+  });
+
+  createHerdrLaunchCommand(runDir, launchContext, {
+    paneId: 'mock-pane-1',
+    resourceIncarnation: incarnationA,
+  });
+
+  const prepDir = path.join(runDir, 'protected', 'prepared-invocation');
+  fs.mkdirSync(prepDir, { recursive: true });
+  const prepRec = {
+    contract: 'authority-prepared-invocation.v1',
+    workerInvocation: {
+      command: '/usr/bin/bwrap',
+      args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'],
+      workerCommandDigest: computeSha256Digest({ command: '/usr/bin/bwrap', args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'] }),
+    },
+  };
+  const prepDigest = computeSha256Digest(prepRec);
+  publishImmutableProof(path.join(prepDir, 'cmd-re-01.json'), { ...prepRec, digest: prepDigest });
+
+  const cmd = readHerdrLaunchCommand(runDir, 'cmd-re-01');
+  cmd.preparedInvocationDigest = prepDigest;
+  publishMutableProjection(path.join(runDir, 'controller', 'commands', 'cmd-re-01.json'), cmd);
+
+  // 1. Probed matching incarnation reattaches / observes running worker
+  const recMatch = await reconcileHerdrSpawnRun(runDir, {
+    probe: async () => ({
+      status: 'working',
+      agentStatus: 'working',
+      resourceIncarnation: incarnationA,
+    }),
+  });
+  assert.equal(recMatch.status, 'waiting');
+  assert.equal(recMatch.state, 'worker-running');
+  assert.deepEqual(recMatch.resourceIncarnation, incarnationA);
+
+  // 2. Probed new process with different pid parks as incarnation-mismatch
+  const incarnationB = computeHerdrResourceIncarnation({
+    paneId: 'mock-pane-1',
+    shellPid: 100,
+    workerPid: 300,
+    processStartTime: '22222',
+  });
+
+  const recMismatch = await reconcileHerdrSpawnRun(runDir, {
+    probe: async () => ({
+      status: 'working',
+      agentStatus: 'working',
+      resourceIncarnation: incarnationB,
+    }),
+  });
+  assert.equal(recMismatch.status, 'parked');
+  assert.equal(recMismatch.reason, 'incarnation-mismatch');
+});
+

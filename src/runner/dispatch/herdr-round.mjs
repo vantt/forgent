@@ -50,6 +50,101 @@ import {
 } from './cli-spawn-supervisor.mjs';
 
 /**
+ * Robust shell escaping for command-line arguments.
+ */
+export function shellEscapeArg(arg) {
+  if (typeof arg !== 'string') arg = String(arg ?? '');
+  if (arg.length === 0) return "''";
+  if (/^[a-zA-Z0-9_./=+:,-]+$/.test(arg)) return arg;
+  return "'" + arg.replace(/'/g, "'\\''") + "'";
+}
+
+/**
+ * Generate the launcher script file content for confined launch.
+ */
+export function buildLauncherScriptContent({ argv0, command, args, env, workerCommandDigest }) {
+  const lines = [
+    '#!/usr/bin/env bash',
+    'set -e',
+    `# fgos-launcher-v1 workerCommandDigest: ${workerCommandDigest}`,
+  ];
+  if (env && typeof env === 'object') {
+    for (const [k, v] of Object.entries(env)) {
+      if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(k)) {
+        lines.push(`export ${k}=${shellEscapeArg(v)}`);
+      }
+    }
+  }
+  const escapedArgs = (args || []).map(shellEscapeArg).join(' ');
+  const execLine = `exec -a ${shellEscapeArg(argv0)} ${shellEscapeArg(command)}${escapedArgs ? ' ' + escapedArgs : ''}`;
+  lines.push(execLine);
+  return lines.join('\n') + '\n';
+}
+
+/**
+ * Verify that the foreground process in the pane is executing the prepared command.
+ *
+ * MEDIUM-3: herdr's own process-info reporting has been observed to drop
+ * empty-string argv entries (a `''` array element never makes it into
+ * `proc.argv`), which used to fail this comparison on length alone for any
+ * prepared `args` that legitimately contained one -- a false mismatch, not
+ * a real one. `args` is filtered the same way before comparing, so both
+ * sides are measured on the same terms.
+ */
+export function verifyForegroundProcessArgv({ foregroundProcesses, shellPid, argv0, command, args }) {
+  if (!Array.isArray(foregroundProcesses) || foregroundProcesses.length === 0) return null;
+  const expectedRest = Array.isArray(args) ? args.filter((a) => a !== '') : [];
+  for (const proc of foregroundProcesses) {
+    if (proc.pid && proc.pid !== shellPid && Array.isArray(proc.argv) && proc.argv.length > 0) {
+      const procArgv0 = proc.argv[0];
+      const procRest = proc.argv.slice(1);
+      const argv0Matches = procArgv0 === argv0 || procArgv0 === command || procArgv0 === path.basename(command);
+      if (argv0Matches) {
+        if (expectedRest.length === 0) {
+          if (procRest.length === 0) return proc;
+        } else if (procRest.length === expectedRest.length) {
+          const allMatch = procRest.every((a, i) => a === expectedRest[i]);
+          if (allMatch) return proc;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * F3: a binary swap (same argv0/args, a different real executable behind
+ * it) or an env-only tamper both pass `verifyForegroundProcessArgv` --
+ * argv is a claim the process makes about itself, not proof of what is
+ * actually executing. `/proc/<pid>/exe` is the kernel's own answer, the
+ * same identity signal P02L's cli-spawn confinement path already resolves
+ * for its own binary-identity proof (`getProcessStartTime`,
+ * cli-spawn-supervisor.mjs, reads `/proc/<pid>/stat` the same way).
+ *
+ * Returns `true`/`false` when both sides resolve (Linux, process still
+ * alive, `expectedCommand` resolvable on disk), or `null` when the signal
+ * is unavailable (non-Linux, process already gone, `expectedCommand` not a
+ * real path) -- `null` is "no evidence either way", never treated as a
+ * pass.
+ */
+export function verifyProcessExeIdentity(pid, expectedCommand) {
+  if (!Number.isInteger(pid) || pid <= 0) return null;
+  let realExe;
+  try {
+    realExe = fs.readlinkSync(`/proc/${pid}/exe`);
+  } catch {
+    return null;
+  }
+  let expectedReal;
+  try {
+    expectedReal = fs.realpathSync(expectedCommand);
+  } catch {
+    return null;
+  }
+  return realExe === expectedReal;
+}
+
+/**
  * The ladder's outcome is the precise answer; `errorClass` stays the coarse
  * vocabulary `recovery.mjs` matches on, so the recovery matrix keeps working
  * unchanged. A caller that wants the real reason reads `outcome`.
@@ -402,8 +497,14 @@ function briefMessage({ delivery, briefText, runDir, roundNumber }) {
  * re-send report the same failure differently.
  */
 function submitBrief({ client, round, message, promptMs }) {
+  const target = round.targetName ?? round.agentName;
+  const isConfinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
   try {
-    client.agentPrompt(round.agentName, message, { wait: true, until: ['working'], timeoutMs: promptMs });
+    if (isConfinedTarget) {
+      client.agentPrompt(target, message, { wait: false, timeoutMs: promptMs });
+    } else {
+      client.agentPrompt(target, message, { wait: true, until: ['working'], timeoutMs: promptMs });
+    }
     return null;
   } catch (err) {
     return err;
@@ -430,7 +531,8 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
   }
   let screen = null;
   if (err.code === 'agent_blocked') {
-    try { screen = lastScreenLine(client.agentRead(round.agentName, { lines: 40 })); } catch { screen = null; }
+    const target = round.targetName ?? round.agentName;
+    try { screen = lastScreenLine(client.agentRead(target, { lines: 40 })); } catch { screen = null; }
   }
   throw round.fail('worker-spawn-fail', err.code ?? 'agent_prompt_failed',
     `executor failed to brief the worker for work "${round.workId}": ${err.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
@@ -493,11 +595,12 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
    * stopped, so this never becomes a screen read per tick -- and because both
    * calls happen here, no screen text survives into the next tick.
    */
+  const target = round.targetName ?? round.agentName;
   const decide = (observation) => {
     const first = evaluateLadder({ observation, limits, prior });
     if (!first.needsScreen) return first;
     let screen = '';
-    try { screen = client.agentRead(round.agentName, { lines: 60 }); } catch { screen = ''; }
+    try { screen = client.agentRead(target, { lines: 60 }); } catch { screen = ''; }
     return evaluateLadder({ observation: { ...observation, screen }, limits, prior });
   };
 
@@ -529,7 +632,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     let agentState = 'unknown';
     let statusReadable = false;
     try {
-      agentState = client.agentGet(round.agentName).agentStatus;
+      agentState = client.agentGet(target).agentStatus;
       statusReadable = true;
     } catch {
       agentState = 'unknown';
@@ -585,9 +688,10 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
  * on a round that has already failed, so a false positive costs nothing.
  */
 function concludeFailure({ client, round, decision, closeAlways }) {
+  const target = round.targetName ?? round.agentName;
   let screenLine = decision.screenLine;
   if (!screenLine) {
-    try { screenLine = lastScreenLine(client.agentRead(round.agentName, { lines: 60 })); } catch { screenLine = null; }
+    try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { screenLine = null; }
   }
 
   // `died` and `blocked` are states a watcher can act on; the timeouts have
@@ -622,7 +726,8 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath }) {
+async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath }) {
+  const target = round.targetName ?? round.agentName;
   let stdout = '';
   try {
     stdout = fs.existsSync(paths.reportPath)
@@ -635,7 +740,7 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
   round.note({ status: 'settling', outcome: 'settled' });
 
   try {
-    client.agentPrompt(round.agentName, exitCommand, { wait: false, timeoutMs: promptMs });
+    client.agentPrompt(target, exitCommand, { wait: false, timeoutMs: promptMs });
   } catch {
     // A worker that already produced its result but will not take /exit is
     // still a completed round; the pane close below is what actually ends it.
@@ -658,6 +763,14 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
     try { removeWorkerHome(workerHomePath); } catch { /* a leftover home is not worth failing a settled round */ }
   }
 
+  // LOW-11: the launcher script persists the full prepared env, including
+  // session tokens, as a plain file -- the same lifecycle P02H's own
+  // worker HOME already gets (removed once the round settles, kept on
+  // failure for someone to inspect) applies here for the same reason.
+  if (launcherScriptPath) {
+    try { fs.rmSync(launcherScriptPath, { force: true }); } catch { /* a leftover script is not worth failing a settled round */ }
+  }
+
   return stdout;
 }
 
@@ -672,16 +785,47 @@ export async function runHerdrRound(ctx) {
   const confinementReq = ctx.confinementRequirement ?? ctx.confinement ?? ctx.requirement;
   const reqMode = confinementReq?.mode;
   if (reqMode === 'required' || reqMode === 'preferred') {
-    throw new DispatchError(
-      'confinement-adapter-unsupported',
-      `required or preferred confinement refused: herdr-spawn does not support exact-v1 execution`,
-      {
-        code: 'confinement-adapter-unsupported',
-        reason: 'confinement-adapter-unsupported',
-        workId: ctx.workId,
-        runDir: ctx.runDir,
-      },
-    );
+    if (ctx.providerKindOnly === true || ctx.workerCommandSeam === false) {
+      throw new DispatchError(
+        'confinement-adapter-unsupported',
+        `required or preferred confinement refused: herdr-spawn requires worker-command seam`,
+        {
+          code: 'confinement-adapter-unsupported',
+          reason: 'confinement-adapter-unsupported',
+          workId: ctx.workId,
+          runDir: ctx.runDir,
+        },
+      );
+    }
+    if (ctx.backendId && ctx.backendId !== 'bwrap') {
+      throw new DispatchError(
+        'confinement-backend-unsupported',
+        `confinement backend "${ctx.backendId}" unsupported for herdr-spawn`,
+        {
+          code: 'confinement-backend-unsupported',
+          reason: 'confinement-backend-unsupported',
+          workId: ctx.workId,
+          runDir: ctx.runDir,
+        },
+      );
+    }
+    let hasPrepared = Boolean(ctx.workerInvocation);
+    if (!hasPrepared && ctx.runDir && ctx.launchCommandId) {
+      const prepPath = path.join(ctx.runDir, 'protected', 'prepared-invocation', `${ctx.launchCommandId}.json`);
+      if (fs.existsSync(prepPath)) hasPrepared = true;
+    }
+    if (!hasPrepared) {
+      throw new DispatchError(
+        'confinement-adapter-unsupported',
+        `required or preferred confinement refused: herdr-spawn requires prepared invocation`,
+        {
+          code: 'confinement-adapter-unsupported',
+          reason: 'confinement-adapter-unsupported',
+          workId: ctx.workId,
+          runDir: ctx.runDir,
+        },
+      );
+    }
   }
 
   // Only what setting a round up needs; everything the round itself reads is
@@ -834,6 +978,47 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const isAssignmentRun = Boolean(ctx.runId && ctx.launchCommandId);
   const existingCmd = isAssignmentRun ? readHerdrLaunchCommand(runDir, ctx.launchCommandId) : null;
 
+  const confinementReq = ctx.confinementRequirement ?? ctx.confinement ?? ctx.requirement;
+  const reqMode = confinementReq?.mode;
+  let preparedWorkerInvocation = ctx.workerInvocation || null;
+  if (!preparedWorkerInvocation && runDir && ctx.launchCommandId) {
+    const prepPath = path.join(runDir, 'protected', 'prepared-invocation', `${ctx.launchCommandId}.json`);
+    if (fs.existsSync(prepPath)) {
+      try {
+        const prepRec = JSON.parse(fs.readFileSync(prepPath, 'utf8'));
+        // F2: a record read straight off disk here was never checked against
+        // its own `digest` field before being trusted -- a tampered record
+        // (command/args swapped, `workerCommandDigest` edited to match) would
+        // otherwise sail straight into the launcher script below. Every other
+        // reader of this same file (reconcileHerdrSpawnRun, further down)
+        // already refuses on this exact mismatch; launch itself must refuse
+        // identically rather than being the one path that skips the check.
+        const { digest: prepDigestOnDisk, ...prepBody } = prepRec;
+        if (prepDigestOnDisk && prepDigestOnDisk !== computeSha256Digest(prepBody)) {
+          throw new DispatchError('protected-artifact-corrupt',
+            `prepared-invocation record for launch "${ctx.launchCommandId}" failed digest verification -- refusing to launch from a record that may have been tampered with.`,
+            { workId: ctx.workId, runDir, launchCommandId: ctx.launchCommandId });
+        }
+        preparedWorkerInvocation = prepRec.workerInvocation || null;
+      } catch (err) {
+        if (err instanceof DispatchError) throw err;
+      }
+    }
+  }
+  const isConfined = (reqMode === 'required' || reqMode === 'preferred') && Boolean(preparedWorkerInvocation);
+
+  // LOW-10: `establishConfinement` (runHerdrRound, above) only knows the
+  // LEGACY confinement flags (ownWorktree/privateHome/isolatedSession) and
+  // wrote whatever it concluded from those into visibility.json before this
+  // function ever learns whether a bwrap-required/-preferred launch is
+  // actually happening. A bwrap-confined round with no legacy flags set
+  // left `visibility.json` reporting `unconfined` for a round that is, in
+  // fact, running inside a bwrap sandbox -- correct the record once the
+  // real answer is known.
+  if (isConfined) {
+    round.note({ confinement: { status: 'confined-bwrap', confined: true } });
+  }
+
   if (existingCmd?.paneId) {
     round.paneId = existingCmd.paneId;
     round.note({ status: 'pane-reused', paneId: round.paneId });
@@ -848,7 +1033,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     try {
-      round.paneId = client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+      round.paneId = isConfined
+        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
+        : client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
       round.note({ status: 'pane-created', paneId: round.paneId });
     } catch (err) {
       if (!anchor || err.code !== 'pane_not_found') {
@@ -857,7 +1044,9 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       }
       batchTab?.invalidate(sessionKey);
       try {
-        round.paneId = client.paneSplit({ cwd, env: effectivePaneEnv });
+        round.paneId = isConfined
+          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
+          : client.paneSplit({ cwd, env: effectivePaneEnv });
         round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
       } catch (retryErr) {
         throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
@@ -873,38 +1062,202 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
   }
 
+  round.targetName = isConfined ? round.paneId : round.agentName;
+
   const agentKindToUse = agentKind ?? (ctx.command ? path.basename(ctx.command) : 'claude');
   const effectiveAgentArgs = (agentArgs && agentArgs.length) ? agentArgs : (ctx.args || []);
-  const herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
-  // Canonical worker-command digest, defined identically to Authority's own
-  // `workerInvocation.workerCommandDigest` (confinement/authority.mjs:
-  // `computeSha256Digest({ command: workerCommand, args: workerArgs })`,
-  // computed from the SAME resolved `ctx.command`/`ctx.args` this adapter was
-  // handed). `herdrStartArgv` has its own separate digest (`startArgvDigest`,
-  // below) because it also carries transport fields (agent name, pane,
-  // timeout) that are never part of "what worker command ran" -- conflating
-  // the two meant a genuine, untampered receipt could never match what
-  // Authority recorded, and reconcile's cross-check (confinement-mismatch,
-  // below) could never pass for a real dispatch.
-  const workerCommandDigest = computeSha256Digest({ command: ctx.command, args: ctx.args || [] });
 
-  if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
-    startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
-  }
+  const preparedCommand = isConfined ? preparedWorkerInvocation.command : ctx.command;
+  const preparedArgs = isConfined ? (preparedWorkerInvocation.args || []) : (ctx.args || []);
+  const preparedEnv = isConfined ? (preparedWorkerInvocation.env || null) : null;
+  // F2: recomputed from the ACTUAL {command, args} that are about to be
+  // written into the launcher script and exec'd -- never trusted from
+  // `preparedWorkerInvocation.workerCommandDigest`, a self-declared field
+  // that a tampered on-disk record could edit right alongside the
+  // command/args it claims to attest, producing a digest that only ever
+  // agrees with itself. This is the value bound into the receipt and is
+  // what a caller checks a receipt against later, so it has to be an
+  // independent measurement of what actually ran, not an echo.
+  const workerCommandDigest = computeSha256Digest({ command: preparedCommand, args: preparedArgs });
 
+  let herdrStartArgv;
   let resourceIncarnation = null;
-  try {
-    const pInfo = client.paneProcessInfo(round.paneId);
-    const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
-    resourceIncarnation = computeHerdrResourceIncarnation({
-      paneId: round.paneId,
-      shellPid: pInfo?.shellPid || null,
-      workerPid: workerProc?.pid || null,
-      foregroundPgid: pInfo?.foregroundPgid || null,
-      processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+  // LOW-11: hoisted out of the `isConfined` block so `settleRound` (below)
+  // can remove it once the round settles -- an unconfined round never sets
+  // this, and `settleRound` treats a null path as "nothing to clean up".
+  let launcherScriptPath = null;
+
+  if (isConfined) {
+    const launcherDir = path.join(runDir, 'protected', 'launchers');
+    fs.mkdirSync(launcherDir, { recursive: true });
+    const scriptId = ctx.launchCommandId || `launcher-${Date.now().toString(36)}`;
+    const scriptPath = path.join(launcherDir, `${scriptId}.sh`);
+    launcherScriptPath = scriptPath;
+    const scriptContent = buildLauncherScriptContent({
+      argv0: agentKindToUse,
+      command: preparedCommand,
+      args: preparedArgs,
+      env: preparedEnv,
+      workerCommandDigest,
     });
-  } catch {
-    resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+    fs.writeFileSync(scriptPath, scriptContent, { mode: 0o700 });
+
+    const readBack = fs.readFileSync(scriptPath, 'utf8');
+    if (readBack !== scriptContent) {
+      throw new DispatchError('protected-artifact-corrupt', 'launcher script content corrupted before execution');
+    }
+
+    herdrStartArgv = ['pane', 'run', round.paneId, 'bash', scriptPath];
+
+    // F1: bind this pane to the launch-command record BEFORE calling
+    // `pane run`, under the same `publishMutableProjection` discipline every
+    // other commandPath write already uses. A crash between `pane run`
+    // (which actually launches the worker process) and the post-launch
+    // write further below used to leave the on-disk record with no paneId
+    // at all -- a resume for this exact launchCommandId then had no way to
+    // tell "the script may already be running in a pane we forgot about"
+    // from "nothing has happened yet", and took the create-pane-and-launch
+    // branch either way. Recording the paneId now means the NEXT attempt
+    // (this process resuming after a crash, or a genuinely later call
+    // reading this same commandPath) finds `existingCmd.paneId` already set
+    // and checks the pane's real foreground process below before ever
+    // deciding to launch a second real one.
+    if (isAssignmentRun) {
+      const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
+      if (fs.existsSync(commandPath)) {
+        try {
+          const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+          publishMutableProjection(commandPath, { ...cmd, paneId: round.paneId });
+        } catch {}
+      }
+    }
+
+    let verifiedProc = null;
+    let pInfo = null;
+
+    // F1: `existingCmd.paneId` already set (this round is reusing a pane
+    // from a prior attempt at this same launchCommandId -- see the
+    // pane-reused branch above) but no `resourceIncarnation` yet means the
+    // prior attempt may have crashed anywhere from "pane created" to "script
+    // launched, incarnation not yet recorded". Check what is REALLY running
+    // in that pane before deciding whether a launch is still needed at all.
+    if (existingCmd?.paneId && !existingCmd?.resourceIncarnation) {
+      try {
+        pInfo = client.paneProcessInfo(round.paneId);
+        verifiedProc = verifyForegroundProcessArgv({
+          foregroundProcesses: pInfo?.foregroundProcesses,
+          shellPid: pInfo?.shellPid,
+          argv0: agentKindToUse,
+          command: preparedCommand,
+          args: preparedArgs,
+        });
+      } catch {}
+    }
+
+    if (!existingCmd?.resourceIncarnation && !verifiedProc) {
+      // LOW-8: the script path is generated (`launcherDir/<launchCommandId
+      // or generated id>.sh`), never user input, so this was never an
+      // injection vector -- quoted anyway for defense in depth, the same
+      // way every other argument this module hands to a shell already is.
+      client.paneRun(round.paneId, `bash ${shellEscapeArg(scriptPath)}`);
+
+      let exeIdentityMismatch = false;
+      const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
+      while (Date.now() < verifyDeadline) {
+        try {
+          pInfo = client.paneProcessInfo(round.paneId);
+          verifiedProc = verifyForegroundProcessArgv({
+            foregroundProcesses: pInfo?.foregroundProcesses,
+            shellPid: pInfo?.shellPid,
+            argv0: agentKindToUse,
+            command: preparedCommand,
+            args: preparedArgs,
+          });
+          if (verifiedProc) {
+            // F3: argv is a claim the process makes about itself and cannot
+            // catch a binary swap -- same argv0/args, a different real
+            // executable behind it. Cross-check the kernel's own identity
+            // signal when it is available (Linux, process still alive);
+            // `null` (signal unavailable) is not treated as a pass, only an
+            // explicit `false` is -- there is no live evidence to act on
+            // either way when the check itself could not run.
+            if (verifyProcessExeIdentity(verifiedProc.pid, preparedCommand) === false) {
+              exeIdentityMismatch = true;
+              verifiedProc = null;
+              break;
+            }
+            break;
+          }
+        } catch {}
+        await sleep(100);
+      }
+
+      if (!verifiedProc) {
+        // F3: a caught tamper (argv mismatch, or a detected binary swap)
+        // must never leave a live unaccounted process running, nor the
+        // pane open for someone to unknowingly keep watching a process that
+        // is not what it claims -- actively kill whatever IS in the pane
+        // and close it, rather than only refusing and reporting.
+        try {
+          const stray = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
+          if (stray?.pid) process.kill(stray.pid, 'SIGKILL');
+        } catch { /* already gone, or not killable -- close the pane regardless */ }
+        client.paneClose(round.paneId);
+        throw round.fail('worker-spawn-fail', 'confinement-mismatch',
+          exeIdentityMismatch
+            ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
+            : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
+      }
+    }
+
+    if (!existingCmd?.resourceIncarnation) {
+      client.reportAgent(round.paneId, {
+        source: 'fgos',
+        agent: agentKindToUse,
+        state: 'working',
+      });
+
+      try {
+        const ag = client.agentGet(round.paneId);
+        if (ag?.agentSession) {
+          round.agentSession = { value: typeof ag.agentSession === 'object' ? ag.agentSession.value : ag.agentSession };
+        }
+      } catch {}
+
+      resourceIncarnation = computeHerdrResourceIncarnation({
+        paneId: round.paneId,
+        shellPid: pInfo?.shellPid || null,
+        workerPid: verifiedProc.pid,
+        foregroundPgid: pInfo?.foregroundPgid || null,
+        processStartTime: getProcessStartTime(verifiedProc.pid),
+      });
+    } else {
+      resourceIncarnation = existingCmd.resourceIncarnation;
+    }
+  } else {
+    herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
+
+    if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
+      startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
+    }
+
+    if (existingCmd?.resourceIncarnation) {
+      resourceIncarnation = existingCmd.resourceIncarnation;
+    } else {
+      try {
+        const pInfo = client.paneProcessInfo(round.paneId);
+        const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
+        resourceIncarnation = computeHerdrResourceIncarnation({
+          paneId: round.paneId,
+          shellPid: pInfo?.shellPid || null,
+          workerPid: workerProc?.pid || null,
+          foregroundPgid: pInfo?.foregroundPgid || null,
+          processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+        });
+      } catch {
+        resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
+      }
+    }
   }
 
   if (isAssignmentRun) {
@@ -917,6 +1270,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
           paneId: round.paneId,
           agentSession: round.agentSession?.value || cmd.agentSession || null,
           resourceIncarnation: resourceIncarnation || cmd.resourceIncarnation,
+          workerCommandDigest,
+          startArgvDigest: computeSha256Digest(herdrStartArgv),
         });
       } catch {}
     }
@@ -1006,7 +1361,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   const stdout = await settleRound({
     client, round, paths, exitCommand,
-    promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath,
+    promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
   });
 
   if (isAssignmentRun) {
@@ -1501,8 +1856,17 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
 
   // Check Herdr probe
   const probe = opts.probe || (opts.herdrClient ? async (herdrName, paneId) => {
+    let info = null;
     try {
-      const info = opts.herdrClient.agentGet(herdrName);
+      info = opts.herdrClient.agentGet(herdrName);
+    } catch {
+      if (paneId) {
+        try {
+          info = opts.herdrClient.agentGet(paneId);
+        } catch {}
+      }
+    }
+    if (info) {
       let pInfo = null;
       if (paneId) {
         try { pInfo = opts.herdrClient.paneProcessInfo(paneId); } catch {}
@@ -1521,27 +1885,26 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
         resourceIncarnation,
         info,
       };
-    } catch {
-      if (paneId) {
-        try {
-          const pInfo = opts.herdrClient.paneProcessInfo(paneId);
-          const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
-          return {
-            status: workerProc ? 'present' : 'absent',
-            resourceIncarnation: computeHerdrResourceIncarnation({
-              paneId,
-              shellPid: pInfo.shellPid || null,
-              workerPid: workerProc?.pid || null,
-              foregroundPgid: pInfo.foregroundPgid || null,
-              processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
-            }),
-          };
-        } catch {
-          return { status: 'absent' };
-        }
-      }
-      return { status: 'absent' };
     }
+    if (paneId) {
+      try {
+        const pInfo = opts.herdrClient.paneProcessInfo(paneId);
+        const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+        return {
+          status: workerProc ? 'present' : 'absent',
+          resourceIncarnation: computeHerdrResourceIncarnation({
+            paneId,
+            shellPid: pInfo.shellPid || null,
+            workerPid: workerProc?.pid || null,
+            foregroundPgid: pInfo.foregroundPgid || null,
+            processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
+          }),
+        };
+      } catch {
+        return { status: 'absent' };
+      }
+    }
+    return { status: 'absent' };
   } : null);
 
   if (probe) {
