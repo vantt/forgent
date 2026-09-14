@@ -60,9 +60,6 @@ function adapterConsumesPreparedSandbox(adapterName, adapterPort, request = null
   if (invocation?.providerKindOnly === true || invocation?.workerCommandSeam === false) {
     return false;
   }
-  if (adapterName === 'herdr-spawn') {
-    return false;
-  }
   if (adapterPort && typeof adapterPort === 'object') {
     if (adapterPort.workerCommandSeam === false) return false;
     if (adapterPort.preparedInvocationContract === 'exact-v1' || adapterPort.workerCommandSeam === true) return true;
@@ -918,6 +915,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     url: sourceInvocation.transport?.url ?? sourceInvocation.url,
     headers: sourceInvocation.transport?.headers ?? sourceInvocation.headers,
     body: sourceInvocation.transport?.body ?? sourceInvocation.body,
+    workerInvocation: preparedLaunch?.preparedInvocation?.workerInvocation ?? null,
   };
 
   const adapterOpts = {
@@ -935,6 +933,19 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     transportDeadlines: request.context.transportDeadlines,
     closeAlways: request.context.closeAlways,
     dispatchBatchKey: request.context.dispatchBatchKey,
+    // HIGH-1: herdr-spawn's own adapter (herdrSpawnInteractiveAdapter,
+    // transport.mjs) reads `invocation.requirement ?? opts.requirement` to
+    // decide whether `runHerdrRound` may take the confined bwrap-launcher
+    // path -- but nothing ever set either side of that on the REAL
+    // dispatch door (`executeThroughConfinement`), so a real "required" or
+    // "preferred" confinement dispatch silently fell through to the legacy
+    // unwrapped `agent start --kind` branch (reqMode undefined) even though
+    // Authority had already prepared a confined workerInvocation for it.
+    // `request.requirement` is Authority's own already-validated requirement
+    // (mode/policyId/policy) -- the same object every refusal path above
+    // already reads from, so this is not a new concept, only a missing wire.
+    requirement: request.requirement,
+    backendId: request.backendId,
   };
 
   if (preparedLaunch) {

@@ -171,7 +171,30 @@ export function resolveConfinementResources({
     }
     const declaredRoot = context.fgosDir;
     let targetDir = context.runDir;
-    if (context.assignmentLaunchContext || grant.subpath === 'worker-output' || grant.subpath === 'worker-output/outbox') {
+    // HIGH-2: which subdirectory actually needs to be writable depends on
+    // which adapter is going to run in the sandbox, not just on whether
+    // this is an Assignment-owned run. cli-spawn's own worker contract
+    // (authority.mjs's `cli-spawn-launch-envelope.v1`, `paths.workerOutboxDir`)
+    // already commits its worker to `worker-output/outbox`, and that
+    // adapter's confined path is shipped and working -- reuse that target
+    // verbatim for cli-spawn. herdr-spawn's worker contract is a DIFFERENT
+    // one (`brief.mjs`'s `briefPaths`, unchanged since before confinement
+    // existed): the worker is told to write into a bare `outbox` directly
+    // under `runDir`. Binding `worker-output/outbox` for a herdr-spawn round
+    // left the actual `outbox` the brief points the worker at outside every
+    // writable grant the bwrap sandbox allows (`--ro-bind / /` covers
+    // everything else) -- a confined herdr-spawn worker could never settle.
+    // Inventing a third, herdr-spawn-specific target would just be a second
+    // shape to keep in sync with `brief.mjs`; binding herdr-spawn's REAL
+    // outbox instead reuses the exact "bind wherever this adapter's worker
+    // actually writes" shape cli-spawn already established.
+    const isHerdrSpawn = context.adapter === 'herdr-spawn';
+    if (isHerdrSpawn) {
+      targetDir = path.join(context.runDir, 'outbox');
+      try {
+        fs.mkdirSync(targetDir, { recursive: true });
+      } catch {}
+    } else if (context.assignmentLaunchContext || grant.subpath === 'worker-output' || grant.subpath === 'worker-output/outbox') {
       targetDir = path.join(context.runDir, 'worker-output', 'outbox');
       try {
         fs.mkdirSync(targetDir, { recursive: true });

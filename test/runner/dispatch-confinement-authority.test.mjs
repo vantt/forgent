@@ -116,7 +116,7 @@ test("H3/M7: adapters outside the prepared-sandbox allowlist refuse required dis
     process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
     const runDir = path.join(tmp, '.fgos', 'runs', 'one');
     fs.mkdirSync(runDir, { recursive: true });
-    for (const adapter of ['herdr-spawn', 'http']) {
+    for (const adapter of ['http']) {
       const req = buildConfinementRequest({
         dispatchId: `disp_${adapter}_unverified`, capability: 'code:review', executorId: adapter, backendId: 'bwrap',
         invocation: { command: 'agy', args: [], adapter, interactiveMode: { kind: 'agy' } },
@@ -809,6 +809,85 @@ test("MED-5: fail-closed policy errors produce structured DispatchError with att
     assert.equal(runRecord.status, "settled", "run.json must be closed at settled, never stuck at running");
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test("HIGH-1: required confinement threads requirement through the REAL production door (executeThroughConfinement) into herdr-spawn adapterOpts", async () => {
+  // Reviewer HIGH-1: `herdrSpawnInteractiveAdapter` (transport.mjs) decides
+  // whether `runHerdrRound` may take the confined bwrap-launcher path by
+  // reading `invocation.requirement ?? opts.requirement` -- but nothing on
+  // the REAL dispatch door (`executeThroughConfinement` -> `adapterOpts`)
+  // ever set either side of that before the fix, so a real "required"
+  // dispatch silently fell through to the legacy `agent start --kind`
+  // branch. A direct unit call into `runHerdrRound`/`herdrSpawnAdapter`
+  // (passing `confinementRequirement` by hand, as most tests in this file
+  // and in herdr-reconciliation.test.mjs do) cannot catch that: it never
+  // exercises the wire this bug was in. This test goes through the actual
+  // door instead.
+  const bwrapPath = fs.existsSync('/usr/bin/bwrap') ? '/usr/bin/bwrap' : null;
+  if (!bwrapPath) return; // no real bwrap on this machine to falsification-probe against
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-high1-door-'));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(tmp, 'backends.json');
+    fs.writeFileSync(registryPath, JSON.stringify({
+      contract: 'confinement-backend-registry.v1',
+      confinementBackends: { bwrap: { type: 'bwrap', enabled: true, executable: bwrapPath } },
+    }));
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+
+    const runDir = path.join(tmp, '.fgos', 'runs', 'one');
+    fs.mkdirSync(runDir, { recursive: true });
+
+    let capturedOpts = null;
+    const fakeAdapter = async (invocation, opts) => {
+      capturedOpts = opts;
+      return { status: 0, stdout: 'ok' };
+    };
+
+    const req = buildConfinementRequest({
+      capability: 'code:implement',
+      executorId: 'claude-bwrap',
+      backendId: 'bwrap',
+      invocation: {
+        command: 'claude',
+        args: [],
+        adapter: 'herdr-spawn',
+        interactiveMode: { kind: 'claude' },
+        prompt: 'do the work',
+      },
+      requirement: {
+        mode: 'required',
+        policyId: 'host-write-denied',
+        policy: {
+          contract: 'confinement-policy.v1',
+          controls: { hostWrite: 'deny', hostRead: 'allow', networkEgress: 'allow', process: 'host', home: 'host', session: 'shared', workspace: 'shared' },
+          grants: [{ resource: 'run-output', access: 'write', scope: 'dispatch' }],
+        },
+      },
+      context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, '.fgos'), workId: 'w-high1' },
+    });
+
+    let res;
+    try {
+      res = await executeThroughConfinement(req, fakeAdapter);
+    } catch (err) {
+      // This machine's bwrap cannot pass the real falsification probe (e.g.
+      // no unprivileged user namespaces) -- an environment gap, not a wiring
+      // bug this test exists to catch.
+      if (err instanceof DispatchError && (err.errorClass === 'confinement-probe-failed' || err.errorClass === 'confinement-backend-missing')) return;
+      throw err;
+    }
+
+    assert.equal(res.status, 'completed');
+    assert.ok(capturedOpts, 'the real herdr-spawn adapter door must have been invoked');
+    assert.equal(capturedOpts.requirement?.mode, 'required',
+      'adapterOpts.requirement must carry the real requirement mode through the production door so herdr-round.mjs can route into the confined launcher path');
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 

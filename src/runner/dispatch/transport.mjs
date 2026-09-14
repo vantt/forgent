@@ -777,6 +777,8 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     permissionMode,
     command,
     args,
+    envelopePath: opts.envelopePath,
+    envelope: opts.envelope,
     workerInvocation: invocation.workerInvocation,
     confinementRequirement: invocation.requirement ?? opts.requirement,
     launchCommandId: opts.launchCommandId ?? invocation.launchCommandId,
@@ -855,6 +857,7 @@ cliSpawnAdapter.receiptContract = 'confinement-adapter-receipt.v1';
 
 herdrSpawnAdapter.execute = herdrSpawnAdapter;
 herdrSpawnAdapter.locus = 'herdr-pane';
+herdrSpawnAdapter.preparedInvocationContract = 'exact-v1';
 herdrSpawnAdapter.receiptContract = 'herdr-adapter-receipt.v1';
 
 /** Adapter metadata registry for Assignment-owned recovery profiles. */
@@ -872,6 +875,7 @@ export const ADAPTER_REGISTRY = {
   'herdr-spawn': {
     execute: herdrSpawnAdapter,
     locus: 'herdr-pane',
+    preparedInvocationContract: 'exact-v1',
     receiptContract: 'herdr-adapter-receipt.v1',
   },
 };
