@@ -4,9 +4,11 @@
 //! spawns Node with preserved arguments and environment, forwards signals,
 //! enforces recursion guard, and records invocation lifecycle.
 
+use fgos_distribution::verify::{recompute_artifact_digest, verify_release_files};
 use fgos_distribution::ReleaseManifest;
 use fgos_host_runtime::invocation_service::LifecycleTracker;
 use fgos_host_runtime::{InvocationLifecycleRecord, InvocationTerminalState, OperationId};
+use sha2::{Digest, Sha256};
 use std::env;
 use std::ffi::OsString;
 use std::fs;
@@ -139,8 +141,13 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
         .validate_v1_invariants()
         .map_err(|err| format!("manifest {}", err))?;
 
+    recompute_artifact_digest(&manifest_path)
+        .map_err(|err| format!("manifest verification failed: {}", err))?;
+    verify_release_files(Path::new(&active_release_path), &manifest)
+        .map_err(|err| format!("manifest file verification failed: {}", err))?;
+
     let legacy_node = manifest.components.legacy_node;
-    let (root, entry) = (legacy_node.root, legacy_node.entry);
+    let (root, entry, digest) = (legacy_node.root, legacy_node.entry, legacy_node.digest);
 
     // R4 confinement (red-team HIGH): `Path::join` replaces its base entirely
     // when the joined component is itself absolute, so an absolute
@@ -187,6 +194,21 @@ pub fn resolve_payload_path() -> Result<PathBuf, String> {
             "resolved legacy payload path '{}' escapes the active release path '{}'",
             payload_path_canonical.display(),
             release_root_canonical.display()
+        ));
+    }
+
+    let payload_bytes = fs::read(&payload_path_canonical).map_err(|e| {
+        format!(
+            "failed to read resolved legacy payload path '{}': {}",
+            payload_path_canonical.display(),
+            e
+        )
+    })?;
+    let actual_payload_digest = format!("sha256:{:x}", Sha256::digest(&payload_bytes));
+    if actual_payload_digest != digest {
+        return Err(format!(
+            "manifest components.legacyNode.digest mismatch: declared {}, actual {}",
+            digest, actual_payload_digest
         ));
     }
 

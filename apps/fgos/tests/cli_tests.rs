@@ -7,6 +7,7 @@
 //! - R6: Native `version` selector fails closed with SelectionRefused pre-Phase-08.
 //! - R7: Invocation record sink writes exactly one record when configured.
 
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -35,10 +36,15 @@ fn repo_root() -> PathBuf {
         .to_path_buf()
 }
 
+fn sha256_file(path: PathBuf) -> String {
+    let bytes = fs::read(path).unwrap();
+    format!("sha256:{:x}", Sha256::digest(&bytes))
+}
+
 fn valid_dev_manifest() -> serde_json::Value {
-    serde_json::json!({
+    let legacy_node_digest = sha256_file(repo_root().join("bin").join("fgos.mjs"));
+    let mut manifest = serde_json::json!({
         "schemaVersion": 1,
-        "artifactDigest": "sha256:dev",
         "entries": {
             "fgos": "target/debug/fgos",
         },
@@ -46,7 +52,7 @@ fn valid_dev_manifest() -> serde_json::Value {
             "legacyNode": {
                 "root": ".",
                 "entry": "bin/fgos.mjs",
-                "digest": "sha256:dev",
+                "digest": legacy_node_digest,
             },
         },
         "requires": {
@@ -61,8 +67,20 @@ fn valid_dev_manifest() -> serde_json::Value {
             "write": ["2"],
             "migrations": [],
         },
-        "files": [],
-    })
+        "files": [
+            {
+                "path": "bin/fgos.mjs",
+                "kind": "file",
+                "digest": legacy_node_digest,
+                "mode": "755",
+                "class": "legacy-node",
+            },
+        ],
+    });
+    let canonical = fgos_distribution::verify::to_canonical_json(&manifest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+    manifest
 }
 
 fn ensure_dev_manifest() -> PathBuf {
@@ -537,6 +555,65 @@ fn test_host_rejects_partial_manifest_missing_required_v1_fields() {
     assert!(
         stderr.contains("missing field `artifactDigest`"),
         "stderr must report the missing required V1 field, got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn test_host_rejects_full_manifest_with_mismatched_legacy_node_digest() {
+    let temp_dir = std::env::temp_dir().join(format!(
+        "fgos_test_manifest_digest_mismatch_{}",
+        std::process::id()
+    ));
+    let release_root = temp_dir.join("release");
+    fs::create_dir_all(release_root.join("bin")).unwrap();
+    fs::copy(
+        repo_root().join("bin").join("fgos.mjs"),
+        release_root.join("bin").join("fgos.mjs"),
+    )
+    .unwrap();
+    let manifest_path = temp_dir.join("manifest.json");
+    let mut manifest = valid_dev_manifest();
+    manifest["components"]["legacyNode"]["digest"] = serde_json::json!(
+        "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    );
+    manifest["files"] = serde_json::json!([
+        {
+            "path": "bin/fgos.mjs",
+            "kind": "file",
+            "digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "mode": "755",
+            "class": "legacy-node"
+        }
+    ]);
+    let mut without_digest = manifest.clone();
+    without_digest
+        .as_object_mut()
+        .unwrap()
+        .remove("artifactDigest");
+    let canonical = fgos_distribution::verify::to_canonical_json(&without_digest);
+    manifest["artifactDigest"] =
+        serde_json::json!(format!("sha256:{:x}", Sha256::digest(canonical.as_bytes())));
+
+    fs::write(
+        &manifest_path,
+        serde_json::to_string_pretty(&manifest).unwrap(),
+    )
+    .unwrap();
+
+    let output = Command::new(fgos_bin())
+        .arg("list")
+        .arg("--json")
+        .env("FGOS_ACTIVE_RELEASE_PATH", &release_root)
+        .env("FGOS_ACTIVE_MANIFEST_PATH", &manifest_path)
+        .output()
+        .expect("failed to execute fgos");
+
+    assert_ne!(output.status.code(), Some(0));
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("file digest mismatch for bin/fgos.mjs"),
+        "stderr must report payload digest refusal, got: {}",
         stderr
     );
 }
