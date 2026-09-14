@@ -12,6 +12,13 @@
     "one-directional-layer",
     "domain-siloing"
   ],
+  "components": [
+    "packaging-distribution"
+  ],
+  "domains": [
+    "coding",
+    "marketing"
+  ],
   "files": {
     "bin/fgos.mjs": "entry",
     "bin/fgos-runner.mjs": "entry",
@@ -158,6 +165,7 @@
     "src/setup/shell-rc.mjs": "infra",
     "src/setup/bin-discovery.mjs": "infra",
     "src/setup/skill-wrappers.mjs": "infra",
+    "src/setup/instruction-registry.mjs": "infra",
     "src/setup/git-hooks.mjs": "infra",
     "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
