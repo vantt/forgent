@@ -4,6 +4,75 @@ Running log of infrastructure/process problems hit while driving this track via
 `fgos-plan-loop`, kept separate from each cell's own code findings. Compiled
 into the final closeout report at P08. Updated live as issues occur.
 
+## Summary (compiled at track closeout, P08)
+
+20 incidents recorded across 9 closed cells. None caused a cell to ship
+incorrect behavior — every one was caught and worked around before a cell
+closed, but several cost real real-time (hours) and repeated Lead attention.
+Grouped by root cause:
+
+- **Worktree/git-object isolation surprises** (#1, #2, #12 critical branch-reset):
+  cross-worktree `.fgos/` access, an untracked plan directory invisible to
+  fresh worktrees, and one CRITICAL incident — the Lead's own
+  `git branch -f runtime-recovery main` calls silently discarded the
+  integration branch's own merge history each cycle, requiring a full
+  recovery merge from surviving commit objects. Root-caused via `git reflog`,
+  fully recovered, and the branch policy corrected (every cell from P03
+  onward merges directly to `main`, no separate integration branch).
+- **Coordination-engine authorization/replay edge cases** (#3, #4, #17):
+  a crashed early authorization can silently out-rank a later retry's own
+  authorization for the same operation; cross-session `contextRefs` are
+  correctly refused; re-dispatching a failed step with the SAME `taskKey`
+  replays the cached failure instead of re-executing (needs a fresh `taskKey`).
+- **Self-report unreliability** (#5, and the general pattern behind most fix
+  rounds): a "verified" self-report is not proof — a shipped syntax error
+  (#5), and repeatedly (P02L, P02H×2, P03, P05×1) a whole class of
+  "dead code"/wiring-gap bug where new logic was correctly built and
+  unit-tested in isolation but never actually reachable from the real
+  production dispatch door due to a wrong field-path read or a missing
+  field-forward. Every cell's close required the Lead to independently
+  `node --check` and run tests directly, never trusting a "done" report alone.
+- **Resource pressure on the shared machine**: repeated OOM kills (3× on
+  P02L, 5× on P02H) from ~10 unrelated pre-existing sessions sharing the
+  machine; mitigated by closing orphaned herdr panes, clearing stale
+  `dispatch.claim` files, and switching the fixer role from `agy-herdr` to
+  headless `claude` for a period (later corrected back toward `agy-cli`,
+  a lighter-footprint headless variant, once memory pressure was flagged
+  again at P05S).
+- **Executor Bash-restriction confusion** (recurring 3+ times): a headless
+  `claude` doer/fixer hits a refusal on some non-git Bash command and wrongly
+  concludes ALL Bash is blocked, reporting `blocked` without ever committing
+  already-completed real work — fixed by adding an explicit, repeated
+  reminder to every such dispatch that `git add`/`git commit` specifically
+  DO work.
+- **Account/session limits interrupting a dispatch mid-work** (#19, P05S):
+  a doer hit the executing account's own Claude usage/session limit after
+  writing a complete, on-contract implementation but before committing —
+  recovered by having the NEXT round verify/finish/commit the existing
+  uncommitted work rather than discarding it and starting over.
+- **False positives in the dispatch safety net** (#20, P05S): a reviewer's
+  genuinely passing, substantive review was flagged as a whole-round failure
+  because an UNRELATED, concurrently-running session on the same shared
+  machine happened to dirty files in the main checkout at the same time —
+  the safety check cannot yet distinguish "this round's own agent leaked
+  outside its workspace" from "unrelated concurrent activity on a shared
+  machine." Recovered by independently confirming (`git log`/`git status`)
+  the flagged files were unrelated before accepting the round's real content.
+- **Long real-time gaps and a genuine stuck process** (#17, #18-corrected):
+  a completed-but-unread dispatch sat for ~12 hours before being checked; a
+  later per-cwd dispatch-lock conflict was initially misdiagnosed as a
+  scheduling race but was actually that same original process still alive
+  12 hours later (a truncated `ps aux | grep` view hid it) — corrected via
+  full/untruncated process inspection.
+- **A real, independently-confirmed bug in the `agy` CLI itself** (found by
+  the user, not this track): `agy -i --mode <value> ...` misparses `-i`'s
+  argument, treating the next flag as `-i`'s own prompt value. Recorded but
+  out of scope for this repo to fix (it lives in the `agy` binary, not fgOS).
+
+None of these blocked the track from reaching a fully closed, independently
+verified state; the cost was entirely in real elapsed time and repeated Lead
+verification effort, not in shipped defects.
+
 ## 1. Cross-worktree `.fgos/` evidence access (P00)
 
 Dispatching a fixer/reviewer into an isolated git worktree, then pointing it at

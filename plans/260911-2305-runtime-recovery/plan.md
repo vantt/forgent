@@ -370,6 +370,19 @@ lands on `main` and its trace is written under
 | P03 | `d61c8bea` (direct to `main`) | PASS (2 fix rounds) | PASS (1 fix round; folded into fix-1) | 1 LOW provenance-label cosmetic; 1 LOW unreachable-fallback residual | [p03.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p03.md) |
 | P05 | `fed6301f` (direct to `main`) | PASS (3 fix rounds) | PASS (2 fix rounds) | 1 LOW settle-ledger residual (architectural, outside lease); 2 LOW liveness/lock-window notes | [p05.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05.md) |
 | P05S | `main` tip (direct to `main`) | PASS (1 fix round) | PASS (folded into fix-1) | 1 LOW actionKey-reminting (by-design); 1 LOW reason-wording gap; 2 INFO notes | [p05s.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p05s.md) |
+| P08 | `main` tip (direct to `main`) | N/A (direct audit closeout) | N/A | 41 pre-existing/environmental npm test failures, all triaged; broader architecture-manifest completeness gap (75+ unrelated files) left as-is | [p08.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p08.md) |
+
+## Track status: CLOSED
+
+All cells in scope (P00, P01, P02L, P02H, P03, P04, P05, P05S, P08) are closed,
+independently verified, and merged to `main`. P06 (writable takeover) and P07
+(terminal transfer) remain disabled/refused exactly as originally scoped — no
+contract, no proof, not implemented. Every advertised capability has
+executable proof (per-cell trace docs above); every unsupported capability
+returns a typed park/refuse. Final capability matrix and full-suite regression
+sweep: [p08.md](../../docs/architect/agent-coordination/verification/runtime-recovery/p08.md).
+Consolidated dispatch/process incident report:
+[dispatch-process-incidents.md](reports/dispatch-process-incidents.md).
 
 ## Design Gate Definition
 
