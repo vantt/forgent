@@ -253,17 +253,20 @@ export const SKILL_ADAPTER_TARGETS = Object.freeze({
 function resolveProjectRoot(targetPath, projectRoot) {
   if (projectRoot) return projectRoot;
   if (path.isAbsolute(targetPath)) {
+    let best = null;
     for (const segment of ['.agents', '.claude', 'plugins', 'core', 'domains', '.gemini']) {
       const needle = path.sep + segment + path.sep;
       const idx = targetPath.lastIndexOf(needle);
       if (idx !== -1) {
-        return targetPath.slice(0, idx);
+        if (!best || idx > best.idx) best = { idx, root: targetPath.slice(0, idx) };
       }
       const endNeedle = path.sep + segment;
       if (targetPath.endsWith(endNeedle)) {
-        return targetPath.slice(0, targetPath.length - endNeedle.length);
+        const endIdx = targetPath.length - endNeedle.length;
+        if (!best || endIdx > best.idx) best = { idx: endIdx, root: targetPath.slice(0, endIdx) };
       }
     }
+    if (best) return best.root;
   }
   return process.cwd();
 }
@@ -441,6 +444,7 @@ function normalizeGeminiCommandVerb(intentId) {
   if (
     !rawVerb ||
     rawVerb !== normalized ||
+    rawVerb !== rawVerb.toLowerCase() ||
     rawVerb.startsWith('/') ||
     rawVerb.includes('\\') ||
     rawVerb.split('/').some((part) => !part || part === '.' || part === '..')
@@ -696,7 +700,32 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
 function rewritePackagedSkillReferences(content) {
   return content
     .replace(/(?:\.\.\/)+core\/skills\/_shared\//g, '../_shared/')
-    .replace(/(?:\.\.\/)+domains\/[^/\s`)"']+\/skills\/_shared\//g, '../_shared/');
+    .replace(/(?:\.\.\/)+domains\/.+?\/skills\/_shared\//g, '../_shared/')
+    .replace(/(?:\.\.\/)+\.agents\/skills\/_shared\//g, '../_shared/');
+}
+
+function rewritePackagedTextReferences(root) {
+  if (!fs.existsSync(root)) return;
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+        continue;
+      }
+      if (!entry.isFile()) continue;
+      let content;
+      try {
+        content = fs.readFileSync(fullPath, 'utf8');
+      } catch {
+        continue;
+      }
+      if (content.includes('\0')) continue;
+      const rewritten = rewritePackagedSkillReferences(content);
+      if (rewritten !== content) fs.writeFileSync(fullPath, rewritten, 'utf8');
+    }
+  };
+  walk(root);
 }
 
 /**
@@ -774,11 +803,10 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
     }
     const packagedSkillFile = path.join(targetSkillDir, 'SKILL.md');
     if (fs.existsSync(packagedSkillFile)) {
-      const packagedContent = fs.readFileSync(packagedSkillFile, 'utf8');
-      fs.writeFileSync(packagedSkillFile, rewritePackagedSkillReferences(packagedContent), 'utf8');
       written.push(packagedSkillFile);
     }
   }
+  rewritePackagedTextReferences(skillsDir);
 
   const manifest = {
     name: 'fgos',
