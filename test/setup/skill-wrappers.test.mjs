@@ -1055,6 +1055,18 @@ test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized 
   );
 });
 
+test('discoverSharedFragments rejects backslash shared fragment names before Windows aliasing can occur', () => {
+  const root = mkTempDir('shared-backslash-alias-src-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'nested\\same.md'), '# Backslash Alias\n');
+
+  assert.throws(
+    () => discoverSharedFragments(root),
+    /invalid shared fragment path "nested\\same\.md": fragment names must not contain backslashes/,
+  );
+});
+
 test('generateGeminiSkillPackage rewrites absolute canonical shared references into package-local references', () => {
   const root = mkTempDir('gemini-absolute-shared-src-');
   const sharedDir = path.join(root, 'core', 'skills', '_shared');
@@ -1098,6 +1110,33 @@ test('generateGeminiSkillPackage rewrites lexically non-canonical absolute share
   const skillPath = path.join(outDir, 'skills', 'fgos-noncanonical-absolute', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   assert.doesNotMatch(skillContent, /core\/skills\/a\/\.\.\/_shared\/x\.md/);
+  const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
+test('generateGeminiSkillPackage rewrites symlinked absolute canonical shared references', () => {
+  const root = mkTempDir('gemini-symlink-absolute-src-');
+  const alias = path.join(path.dirname(root), `${path.basename(root)}-alias`);
+  fs.symlinkSync(root, alias, 'dir');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'x.md'), '# X\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-symlink-absolute',
+    '---\nname: fgos-symlink-absolute\ndescription: Symlink absolute ref\n---\n',
+    `# Symlink Absolute\nRead \`${path.join(alias, 'core', 'skills', '_shared', 'x.md').split(path.sep).join('/')}\`.\n`,
+  );
+
+  const outDir = mkTempDir('gemini-symlink-absolute-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+  fs.rmSync(alias, { force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-symlink-absolute', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, /-alias\/core\/skills\/_shared\/x\.md/);
   const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
   assert.ok(ref);
   assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));

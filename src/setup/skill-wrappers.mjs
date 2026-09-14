@@ -646,6 +646,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
   const pathToSources = new Map();
 
   const sharedFragmentCollisionKey = (relPath) => relPath
+    .replace(/\\/g, '/')
     .split('/')
     .map((part) => part.normalize('NFC').toLowerCase().replace(/[. ]+$/g, ''))
     .join('/');
@@ -655,6 +656,11 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
     const walk = (currentDir, relBase = '') => {
       for (const entry of fs.readdirSync(currentDir, { withFileTypes: true })) {
         if (isOwnTmpFile(entry.name) || entry.name.startsWith('.')) continue;
+        if (entry.name.includes('\\')) {
+          throw new Error(
+            `invalid shared fragment path "${relBase ? `${relBase}/${entry.name}` : entry.name}": fragment names must not contain backslashes`,
+          );
+        }
         const entryRel = relBase ? `${relBase}/${entry.name}` : entry.name;
         const fullPath = path.join(currentDir, entry.name);
         if (entry.isDirectory()) {
@@ -705,14 +711,6 @@ function toPosixRelativePath(fromDir, toPath) {
   return rel;
 }
 
-function toPosixPath(value) {
-  return value.split(path.sep).join('/');
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) {
   return toPosixRelativePath(path.dirname(filePath), path.join(skillsDir, '_shared', fragmentPath));
 }
@@ -730,7 +728,16 @@ function canonicalSharedRoots(projectRoot) {
       roots.push(path.join(domainsRoot, domainEntry.name, 'skills', '_shared'));
     }
   }
-  return roots.map((root) => path.resolve(root));
+  return roots.map((root) => {
+    const resolved = path.resolve(root);
+    let real = resolved;
+    try {
+      real = fs.realpathSync.native(resolved);
+    } catch {
+      // A not-yet-materialized projection root can still be a lexical rewrite source.
+    }
+    return { resolved, real };
+  });
 }
 
 function isPathInside(parent, candidate) {
@@ -740,9 +747,21 @@ function isPathInside(parent, candidate) {
 
 function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
   const resolved = path.resolve(candidatePath);
+  let real = resolved;
+  try {
+    real = fs.realpathSync.native(resolved);
+  } catch {
+    // Broken absolute refs are left untouched unless their lexical path is under a known root.
+  }
   for (const root of sharedRoots) {
-    if (!isPathInside(root, resolved)) continue;
-    const fragmentPath = path.relative(root, resolved).split(path.sep).join('/');
+    const matchedRoot = isPathInside(root.real, real)
+      ? root.real
+      : isPathInside(root.resolved, resolved)
+        ? root.resolved
+        : null;
+    if (!matchedRoot) continue;
+    const matchedPath = matchedRoot === root.real ? real : resolved;
+    const fragmentPath = path.relative(matchedRoot, matchedPath).split(path.sep).join('/');
     if (fragmentPath) return fragmentPath;
   }
   return null;
@@ -750,8 +769,7 @@ function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
 
 function rewriteAbsoluteSharedReferences(content, filePath, skillsDir, projectRoot, sharedRoots) {
   if (!projectRoot || sharedRoots.length === 0) return content;
-  const projectRootPattern = escapeRegExp(toPosixPath(path.resolve(projectRoot)));
-  const absoluteProjectPathPattern = new RegExp(`${projectRootPattern}/([^\\\`\\n)"']+)`, 'g');
+  const absoluteProjectPathPattern = /\/[^`\n)"']+/g;
   return content.replace(absoluteProjectPathPattern, (rawRef) => {
     const fragmentPath = fragmentPathForCanonicalReference(rawRef, sharedRoots);
     return fragmentPath ? packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) : rawRef;
