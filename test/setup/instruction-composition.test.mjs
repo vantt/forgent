@@ -39,6 +39,7 @@ function unit(id, overrides = {}) {
     refines: overrides.refines ?? [],
     supersedes: overrides.supersedes ?? [],
     supersessionDecision: overrides.supersessionDecision ?? null,
+    supersessionDecisionVerified: overrides.supersessionDecisionVerified ?? false,
     conflictsWith: overrides.conflictsWith ?? [],
     renderHints: overrides.renderHints ?? {},
     title: overrides.title ?? id,
@@ -211,6 +212,36 @@ test('composeInstructionSet requires law supersession decision evidence', () => 
   assert.equal(result.ok, false);
   assert.ok(result.conflicts.some((conflict) => conflict.code === 'ILLEGAL_LAW_OVERRIDE'
     && conflict.message.includes('supersessionDecision')));
+});
+
+test('composeInstructionSet rejects unverified forged law supersession decisions', () => {
+  const result = evaluateInstructionComposition([
+    unit('old-law', { kind: 'law' }),
+    unit('new-law', {
+      kind: 'law',
+      supersedes: ['old-law'],
+      supersessionDecision: 'D-ADR9999',
+    }),
+  ]);
+
+  assert.equal(result.ok, false);
+  assert.ok(result.conflicts.some((conflict) => conflict.code === 'ILLEGAL_LAW_OVERRIDE'
+    && conflict.message.includes('verified supersessionDecision')));
+});
+
+test('composeInstructionSet accepts law supersession only with verified decision evidence', () => {
+  const set = composeInstructionSet([
+    unit('old-law', { kind: 'law' }),
+    unit('new-law', {
+      kind: 'law',
+      supersedes: ['old-law'],
+      supersessionDecision: 'D-ADR0001',
+      supersessionDecisionVerified: true,
+    }),
+  ]);
+
+  assert.deepEqual(set.rules.map((rule) => rule.id), ['new-law']);
+  assert.deepEqual(set.inactive.map((rule) => rule.id), ['old-law']);
 });
 
 test('composeInstructionSet treats supersession target filtered by host applicability as missing from the effective set', () => {

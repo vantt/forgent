@@ -307,14 +307,35 @@ test('discoverInstructionSources throws INVALID_METADATA when specificity is not
 
 test('discoverInstructionSources records supersessionDecision when law replacement evidence is declared', () => {
   const tmp = mkTempDir('fgos-inst-supersession-decision-');
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '| Scope | Decision |\n|---|---|\n| test | D-ADR0001: recorded |\n');
+  writeInstructionFile(
+    path.join(tmp, 'core', 'instructions'),
+    'new-law.md',
+    'id: new-law\nkind: law\nsupersedes: old-law\nsupersessionDecision: D-ADR0001',
+  );
+
+  const registry = discoverInstructionSources(tmp);
+  assert.equal(registry.get('new-law').supersessionDecision, 'D-ADR0001');
+  assert.equal(registry.get('new-law').supersessionDecisionVerified, true);
+});
+
+test('discoverInstructionSources rejects law supersession decisions absent from the decision index', () => {
+  const tmp = mkTempDir('fgos-inst-missing-supersession-decision-');
+  fs.mkdirSync(path.join(tmp, 'docs', 'decisions'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'docs', 'decisions', 'index.md'), '| Scope | Decision |\n|---|---|\n| test | D-ADR0001: recorded |\n');
   writeInstructionFile(
     path.join(tmp, 'core', 'instructions'),
     'new-law.md',
     'id: new-law\nkind: law\nsupersedes: old-law\nsupersessionDecision: D-ADR9999',
   );
 
-  const registry = discoverInstructionSources(tmp);
-  assert.equal(registry.get('new-law').supersessionDecision, 'D-ADR9999');
+  assert.throws(
+    () => discoverInstructionSources(tmp),
+    (err) => err instanceof InstructionRegistryError
+      && err.code === 'UNKNOWN_DECISION'
+      && err.message.includes('D-ADR9999'),
+  );
 });
 
 test('discoverInstructionSources throws INVALID_METADATA when appliesTo is invalid', () => {

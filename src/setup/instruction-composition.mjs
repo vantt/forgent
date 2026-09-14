@@ -212,6 +212,7 @@ export function evaluateInstructionComposition(units, options = {}) {
   const target = normalizeCompositionTarget(options.target);
   const host = typeof options.host === 'string' && options.host.trim() ? options.host.trim() : PORTABLE_HOST;
   const targetKey = effectiveSetKey(target);
+  const validSupersessionDecisions = new Set(options.validSupersessionDecisions ?? []);
 
   const all = [...units];
   for (const u of all) assertUnitShape(u);
@@ -273,9 +274,12 @@ export function evaluateInstructionComposition(units, options = {}) {
             `law "${t.id}" may only be superseded by a platform-authority law; "${u.id}" is ${u.kind} under ${u.authority}`);
           continue;
         }
-        if (t.kind === 'law' && !u.supersessionDecision) {
+        if (
+          t.kind === 'law' &&
+          !(u.supersessionDecisionVerified || validSupersessionDecisions.has(u.supersessionDecision))
+        ) {
           conflict('ILLEGAL_LAW_OVERRIDE', [u, t],
-            `law "${t.id}" may only be superseded with a recorded supersessionDecision; "${u.id}" has none`);
+            `law "${t.id}" may only be superseded with a verified supersessionDecision; "${u.id}" has ${u.supersessionDecision || 'none'}`);
           continue;
         }
         if (t.kind !== 'law' && u.authority.type !== 'platform' && u.owner !== t.owner) {

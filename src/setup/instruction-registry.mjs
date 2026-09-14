@@ -89,6 +89,14 @@ const AUTHORITY_SCOPE_RULES = Object.freeze({
  * Pattern for extracting YAML frontmatter fenced by `---`.
  */
 const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+const DECISION_ID_PATTERN = /^D-ADR\d{4}$/;
+
+function readDecisionIds(projectRoot) {
+  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');
+  if (!fs.existsSync(indexPath)) return new Set();
+  const content = fs.readFileSync(indexPath, 'utf8');
+  return new Set([...content.matchAll(/\bD-ADR\d{4}\b/g)].map((match) => match[0]));
+}
 
 /**
  * Custom error class for instruction registry operations.
@@ -315,6 +323,23 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
       { filePath: sourcePath, code: 'INVALID_METADATA' },
     );
   }
+  let supersessionDecisionVerified = false;
+  if (kind === 'law' && supersedes.length > 0) {
+    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {
+      throw new InstructionRegistryError(
+        'Law supersession requires "supersessionDecision" naming an existing D-ADR#### decision',
+        { filePath: sourcePath, code: 'INVALID_METADATA' },
+      );
+    }
+    const knownDecisionIds = readDecisionIds(projectRoot);
+    if (!knownDecisionIds.has(supersessionDecision)) {
+      throw new InstructionRegistryError(
+        `Law supersessionDecision "${supersessionDecision}" is not recorded in docs/decisions/index.md`,
+        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },
+      );
+    }
+    supersessionDecisionVerified = true;
+  }
 
   const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)
     ? { ...meta.renderHints }
@@ -336,6 +361,7 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     refines,
     supersedes,
     supersessionDecision,
+    supersessionDecisionVerified,
     conflictsWith,
     renderHints,
     title: typeof meta.title === 'string' ? meta.title : '',
