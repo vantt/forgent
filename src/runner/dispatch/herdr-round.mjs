@@ -171,51 +171,82 @@ const ENV_INJECTION_VECTORS = Object.freeze([
  *
  * Compared against `expectedEnv` -- the prepared invocation's own env map,
  * the exact object the launcher script's `export` lines were built from --
- * two ways:
+ * and against `baselineEnv`, three ways:
  *  - every key `expectedEnv` sets must be present with the exact prepared
  *    value (catches an override of an already-expected variable).
  *  - none of `ENV_INJECTION_VECTORS` may appear UNLESS `expectedEnv` itself
  *    declared it (catches an addition, e.g. an injected `LD_PRELOAD` that
- *    was never prepared at all).
+ *    was never prepared at all). Kept as a fail-closed floor for whenever
+ *    `baselineEnv` is unavailable.
+ *  - M-3: every OTHER key must match `baselineEnv` exactly, byte for byte.
+ *    A bare, unlisted var (the reviewer's repro: an injected `HOME`
+ *    override -- never on the curated vector list above, and never
+ *    declared by a real prepared invocation either) used to sail through
+ *    undetected, because the first two checks only ever look at names this
+ *    function already knows about. `baselineEnv` closes that structurally
+ *    instead of growing the name list forever: it is the pane's OWN shell
+ *    environment, read from `/proc/<shellPid>/environ` right before the
+ *    launcher script runs. The script's process is a plain fork of that
+ *    shell, so absent tampering its environment is exactly `baselineEnv`
+ *    plus the `export` lines the script itself adds (`expectedEnv`) --
+ *    anything else different (a key baseline never had, or an existing
+ *    baseline key with a changed value) is an unexplained addition or
+ *    edit, caught by name whether or not it was ever catalogued.
+ *    `SHLVL`/`_` are excluded: bash sets both on every invocation
+ *    regardless of tampering, so comparing them would fail every real
+ *    launch, not just a tampered one.
  *
- * A full "no key outside expectedEnv" diff is deliberately not attempted: a
- * launched process legitimately inherits far more than `expectedEnv` from
- * the pane's own shell (`PATH`, `TERM`, `HERDR_SOCKET_PATH`, `HOME`, ...),
- * so treating every inherited variable as a mismatch would fail every real
- * launch. `HOME` in particular is always present and is not on the
- * injection-vector list for that reason -- a tampered `HOME` is only
- * caught here when the prepared invocation itself declares an expected
- * `HOME` value (the value-mismatch branch); a `HOME` injected into a
- * launch that never declared one is a residual gap, not one this check
- * closes.
- *
- * Returns `true`/`false` when both sides resolve, or `null` when the
- * signal is unavailable (non-Linux, process already gone, no `expectedEnv`
- * to compare against) -- `null` is "no evidence either way", never a pass,
- * same contract as `verifyProcessExeIdentity`.
+ * Returns `true`/`false` when `expectedEnv` or `baselineEnv` resolves, or
+ * `null` when neither signal is available (non-Linux, process already
+ * gone, nothing to compare against) -- `null` is "no evidence either way",
+ * never a pass, same contract as `verifyProcessExeIdentity`.
  */
-export function verifyProcessEnvironment(pid, expectedEnv) {
-  if (!Number.isInteger(pid) || pid <= 0) return null;
-  if (!expectedEnv || typeof expectedEnv !== 'object' || Object.keys(expectedEnv).length === 0) return null;
+const ENV_BASELINE_NOISE = Object.freeze(['SHLVL', '_']);
+
+function readProcessEnviron(pid) {
   let raw;
   try {
     raw = fs.readFileSync(`/proc/${pid}/environ`, 'utf8');
   } catch {
     return null;
   }
-  const actual = {};
+  const env = {};
   for (const entry of raw.split('\0')) {
     if (!entry) continue;
     const eq = entry.indexOf('=');
     if (eq === -1) continue;
-    actual[entry.slice(0, eq)] = entry.slice(eq + 1);
+    env[entry.slice(0, eq)] = entry.slice(eq + 1);
   }
-  for (const [key, value] of Object.entries(expectedEnv)) {
-    if (actual[key] !== String(value)) return false;
+  return env;
+}
+
+export function verifyProcessEnvironment(pid, expectedEnv, baselineEnv = null) {
+  if (!Number.isInteger(pid) || pid <= 0) return null;
+  const hasExpected = Boolean(expectedEnv) && typeof expectedEnv === 'object' && Object.keys(expectedEnv).length > 0;
+  const hasBaseline = Boolean(baselineEnv) && typeof baselineEnv === 'object' && Object.keys(baselineEnv).length > 0;
+  if (!hasExpected && !hasBaseline) return null;
+
+  const actual = readProcessEnviron(pid);
+  if (!actual) return null;
+
+  if (hasExpected) {
+    for (const [key, value] of Object.entries(expectedEnv)) {
+      if (actual[key] !== String(value)) return false;
+    }
   }
+
   for (const key of ENV_INJECTION_VECTORS) {
-    if (!(key in expectedEnv) && key in actual) return false;
+    if (!(hasExpected && key in expectedEnv) && key in actual) return false;
   }
+
+  if (hasBaseline) {
+    for (const [key, value] of Object.entries(actual)) {
+      if (hasExpected && key in expectedEnv) continue;
+      if (ENV_BASELINE_NOISE.includes(key)) continue;
+      if (baselineEnv[key] !== value) return false;
+    }
+  }
+
   return true;
 }
 
@@ -1213,7 +1244,6 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   if (isConfined) {
     const launcherDir = path.join(runDir, 'protected', 'launchers');
-    fs.mkdirSync(launcherDir, { recursive: true });
     const scriptId = ctx.launchCommandId || `launcher-${Date.now().toString(36)}`;
     const scriptPath = path.join(launcherDir, `${scriptId}.sh`);
     launcherScriptPath = scriptPath;
@@ -1225,6 +1255,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       workerCommandDigest,
     });
     try {
+      // MEDIUM-4b: the pane above is already split and open -- the mkdir
+      // belongs in the same try/cleanup as the write/readback right below it,
+      // not before it, or an EACCES on the directory itself leaks the pane
+      // with a bare, unwrapped fs error instead of the guarded refusal below.
+      fs.mkdirSync(launcherDir, { recursive: true });
       fs.writeFileSync(scriptPath, scriptContent, { mode: 0o700 });
       const readBack = fs.readFileSync(scriptPath, 'utf8');
       if (readBack !== scriptContent) {
@@ -1287,6 +1322,17 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     if (!existingCmd?.resourceIncarnation && !verifiedProc) {
+      // M-3: captured before the script ever runs, so this is the pane's
+      // shell environment as it stood at that moment -- the baseline
+      // `verifyProcessEnvironment` below diffs the launched process against,
+      // to catch an unlisted/undeclared var (e.g. a bare `HOME` override)
+      // that neither `expectedEnv` nor `ENV_INJECTION_VECTORS` would name.
+      let baselineEnv = null;
+      try {
+        const preLaunchInfo = client.paneProcessInfo(round.paneId);
+        if (preLaunchInfo?.shellPid) baselineEnv = readProcessEnviron(preLaunchInfo.shellPid);
+      } catch { /* no baseline available -- verifyProcessEnvironment falls back to its other checks */ }
+
       // LOW-8: the script path is generated (`launcherDir/<launchCommandId
       // or generated id>.sh`), never user input, so this was never an
       // injection vector -- quoted anyway for defense in depth, the same
@@ -1323,7 +1369,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
             // prepared variable -- leaves argv and the executable both
             // untouched, so neither check above sees it. Same
             // null-is-not-a-pass contract as the exe-identity check.
-            if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv) === false) {
+            if (verifyProcessEnvironment(verifiedProc.pid, preparedEnv, baselineEnv) === false) {
               envMismatch = true;
               verifiedProc = null;
               break;
@@ -1379,12 +1425,15 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--timeout', String(deadlines.startup.readyMs), ...((effectiveAgentArgs && effectiveAgentArgs.length) ? ['--', ...effectiveAgentArgs] : [])];
 
     if (!existingCmd?.paneId || !existingCmd?.resourceIncarnation) {
-      try {
-        startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
-      } catch (err) {
-        cleanupIfWorkerStillLive(client, round.paneId);
-        throw err;
-      }
+      // H-2/F-1: this is the legacy unconfined path -- `startAgent` already
+      // fails by name and deliberately leaves the pane open (see its own
+      // docstring above) so the screen that explains why is still there for
+      // someone to read. The confined-launch path's kill+close requirement
+      // (its own tamper checks and the write/readback guard above) is a
+      // property of THAT path's security contract, not of this one; wrapping
+      // this call the same way silently changed pre-existing, intentional
+      // behaviour (test/runner/herdr-spawn-adapter.test.mjs:477).
+      startAgent({ client, round, agentKind: agentKindToUse, agentArgs: effectiveAgentArgs, readyMs: deadlines.startup.readyMs });
     }
 
     if (existingCmd?.resourceIncarnation) {
