@@ -44,6 +44,14 @@ function mkTempDir(prefix = 'fgos-reconcile-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
+async function waitForProcessExit(pid, { attempts = 20, intervalMs = 50 } = {}) {
+  for (let i = 0; i < attempts; i++) {
+    if (!isProcessAlive(pid)) return true;
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+  return !isProcessAlive(pid);
+}
+
 function initGitRepo(repoDir) {
   execFileSync('git', ['init'], { cwd: repoDir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoDir, stdio: 'ignore' });
@@ -370,8 +378,10 @@ test('5. worker PGID differs from supervisor PGID and timeout signals only worke
   assert.notEqual(supBinding.supervisor.pid, workerBinding.worker.pid);
   assert.notEqual(supBinding.supervisor.pgid, workerBinding.worker.pgid);
 
-  // Verify worker process was terminated
-  assert.equal(isProcessAlive(workerBinding.worker.pid), false);
+  // Verify worker process was terminated. The supervisor receipt can publish
+  // just before the kernel has made the signalled process disappear from
+  // kill(0), especially under the full test suite's subprocess load.
+  assert.equal(await waitForProcessExit(workerBinding.worker.pid), true);
 });
 
 // 6. Escaped descendant keeps pipe open but timeout/maxBuffer receipt publishes immediately with partial coverage
@@ -1137,4 +1147,3 @@ test('19. pre-placed receipt with different content fails supervisor publication
   const idempotentResult = publishAdapterReceipt(identicalPath, realReceipt);
   assert.equal(idempotentResult.digest, realReceiptDigest);
 });
-
