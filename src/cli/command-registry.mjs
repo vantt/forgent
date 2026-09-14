@@ -1360,7 +1360,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'setup',
     invoke: 'fgos setup',
-    description: 'Insert the fgos shell-integration source line into detected shell rc file(s) (bash/zsh), ensure the shared config file (.fgos/config.json) has every current default key via the extensible registry, and wire core.hooksPath to .githooks (the str65 main-checkout lock hook) — do-and-announce, never asks first.',
+    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init followed by local fgos doctor --fix and fgos doctor; shell/global setup compatibility stays here until a compatibility-window decision retires it.',
     parameters: {
       type: 'object',
       properties: {
@@ -1373,7 +1373,7 @@ export const COMMAND_REGISTRY = [
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
-    deprecated: null,
+    deprecated: 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it',
   },
   {
     name: 'uninstall',

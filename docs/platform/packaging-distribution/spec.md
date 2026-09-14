@@ -37,7 +37,7 @@ The spec is written for current behavior and near-term accepted target behavior.
 | local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |
 | `fgos doctor` | Implemented | Reports environment checks without writing by default. |
 | `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |
-| `fgos setup` | Implemented legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; target architecture supersedes this with `fgctl init` plus local `fgos init`/`doctor --fix`/`doctor`. |
+| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior until a compatibility-window decision retires it. |
 
 ## 3. Install Channels
 
@@ -111,7 +111,7 @@ Repository, workspace, worker-capsule, release-store, and projection layout boun
 
 ## 6. Doctor, Fix, And Legacy Setup
 
-The target architecture has no separate setup verb. One-command onboarding is `fgctl init`; after publishing the ready workspace activation, `fgctl` invokes the active local runtime tail:
+The target architecture has no separate setup verb for workspace onboarding. One-command workspace onboarding is `fgctl init`; after publishing the ready workspace activation, `fgctl` invokes the active local runtime tail:
 
 ```txt
 local fgos init
@@ -119,13 +119,14 @@ local fgos doctor --fix
 local fgos doctor
 ```
 
-Current legacy `fgos setup` remains implemented in the Node CLI and still:
+Current legacy `fgos setup` remains implemented and deprecated in the Node CLI and still:
 
 - wires shell/helper and hook support where applicable;
 - fills missing config defaults without overwriting customized values;
 - applies both project-local and global config default handling;
 - runs every registered fix unconditionally, using the same fix registry as `doctor --fix`;
-- reports what changed.
+- reports what changed;
+- exposes a deprecation path in command help, command manifest JSON, and setup result payloads.
 
 `fgos doctor`:
 

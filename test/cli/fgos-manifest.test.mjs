@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { COMMAND_REGISTRY, MANIFEST_SCHEMA_VERSION } from '../../src/cli/command-registry.mjs';
+import { formatDeprecation } from '../../src/cli/deprecation.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -125,6 +126,44 @@ test('fgos --help prints non-empty text listing every verb', () => {
   for (const entry of COMMAND_REGISTRY) {
     assert.ok(result.stdout.includes(entry.invoke), `--help text is missing "${entry.invoke}"`);
   }
+});
+
+test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
+  const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
+  assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
+  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it');
+
+  const cwd = tmpCwd();
+  const manifestResult = run(cwd, ['--help', '--json']);
+  assert.equal(manifestResult.status, 0);
+  const setupManifestEntry = JSON.parse(manifestResult.stdout).commands.find((entry) => entry.name === 'setup');
+  assert.deepEqual(setupManifestEntry.deprecated, setupEntry.deprecated);
+
+  const helpResult = run(cwd, ['setup', '--help']);
+  assert.equal(helpResult.status, 0);
+  assert.match(helpResult.stdout, /DEPRECATED .*since 2026-09-14/);
+  assert.match(helpResult.stdout, /fgctl init/);
+  assert.match(helpResult.stdout, /\.fgos\/installation\/bin\/fgos doctor --fix/);
+  assert.match(helpResult.stdout, /shell\/global integration/);
+});
+
+test('deprecated help text handles legacy string metadata without undefined fields', () => {
+  const cwd = tmpCwd();
+  for (const entry of COMMAND_REGISTRY.filter((command) => command.deprecated)) {
+    const result = run(cwd, [entry.name, '--help']);
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /DEPRECATED/);
+    assert.ok(!result.stdout.includes('undefined'), `deprecated help leaked undefined fields for ${entry.name}:\n${result.stdout}`);
+    assert.ok(!result.stdout.includes('[object Object]'), `deprecated help leaked object formatting for ${entry.name}:\n${result.stdout}`);
+  }
+});
+
+test('formatDeprecation handles structured metadata without object leaks', () => {
+  assert.equal(
+    formatDeprecation({ since: '2026-09-14', use_instead: 'fgctl init' }),
+    'since 2026-09-14; use fgctl init',
+  );
+  assert.equal(formatDeprecation({ note: 'legacy' }), '{"note":"legacy"}');
 });
 
 // STR77: submit's `text` is read only from `positional[0]` (bin/fgos.mjs's

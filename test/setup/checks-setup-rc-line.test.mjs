@@ -45,6 +45,8 @@ test('fgos setup --pretty prints colored ANSI text describing what it did, not J
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
+  assert.ok(result.stdout.includes('legacy compatibility command'), 'expected --pretty output to disclose setup deprecation');
+  assert.ok(result.stdout.includes('fgctl init'), 'expected --pretty output to point at replacement onboarding');
   assert.ok(result.stdout.includes('.fgos/config.json'), 'expected --pretty output to describe the config file it touched');
   fs.rmSync(cwd, { recursive: true, force: true });
   fs.rmSync(homeDir, { recursive: true, force: true });
@@ -73,6 +75,8 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
+  assert.equal(data.deprecation, 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it');
+  assert.match(data.deprecationMessage, /fgos setup is legacy compatibility/);
   assert.deepEqual(data.rcFilesInserted, []);
   assert.deepEqual(data.rcFilesAlreadyConfigured, []);
   assert.ok(

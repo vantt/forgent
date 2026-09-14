@@ -27,9 +27,12 @@ of it).
   shell profile → makes `fgos` and `fgos-runner` available directly from any
   location inside a checkout of the forgent source repository itself
   (including a linked git worktree of it), with no separate install step.
-- `fgos setup` (run anywhere) → wires the shell helper's source line into
-  every shell profile the caller actually has, and brings the local config
-  file up to date with the current defaults.
+- `fgos setup` (run anywhere) → deprecated legacy compatibility command;
+  wires the shell helper's source line into every shell profile the caller
+  actually has, and brings the local config file up to date with the current
+  defaults. New workspace onboarding should use `fgctl init` plus local
+  `fgos doctor --fix` and `fgos doctor`; shell/global integration remains
+  legacy setup compatibility until the compatibility-window decision retires it.
 - `fgos doctor` (run anywhere) → reports whether the environment is set up
   correctly (Node/git present, shell helper sourced, config up to date).
 
@@ -238,10 +241,10 @@ of it).
   supersedes the original v1 "does not exist yet, Deferred Idea" wording
   — `tsk-2qz` reverses that decision deliberately, per
   `docs/distribution-vision.md` §3's trụ cột 3.
-- **RUL12 (setup also runs every registered fix, unconditionally).** `fgos setup` also runs every registered fix (the same
+- **RUL12 (setup also runs every registered fix, unconditionally).** Legacy `fgos setup` also runs every registered fix (the same
   `runFixes()` `doctor --fix` calls per RUL11 (doctor --fix exists and is real, runs every registered fix)), unconditionally and with no
   confirmation — consistent with RUL10 (setup never asks for confirmation, acts then reports)'s own act-then-report contract for
-  this verb, not an exception to it. `setup`'s result gains a `fixed` array,
+  this deprecated compatibility verb, not an exception to it. `setup`'s result gains a `fixed` array,
   the same per-entry `{id, changed, message}` shape RUL11 (doctor --fix exists and is real, runs every registered fix) already describes
   for `doctor --fix`'s own (per `tsk-5hi`,
   `docs/history/setup-runs-registered-fixes/CONTEXT.md`).
