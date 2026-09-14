@@ -7,6 +7,20 @@
 
 This is the **kernel contract**: the permanent invocation/routing boundary every fgOS host uses, independent of transport (CLI, remote, chat) and provider mechanism (built-in, legacy Node, external process, WASM). Ecosystem plugin mechanics: [External Provider Protocol](./external-provider-protocol.md). Transitional Node CLI lane: [Legacy CLI Transition](./legacy-cli-transition.md). Both depend on this document. Migration staging and first proof: [Node To Rust Component Migration](./node-to-rust-component-migration.md), [Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).
 
+## Migration Status Note
+
+This document remains a legacy-current source during the 2026-09-14 promotion
+pass. The promoted platform entry is
+[docs/platform/host-invocation-routing/README.md](../../platform/host-invocation-routing/README.md).
+Its details are split across
+[vision.md](../../platform/host-invocation-routing/vision.md),
+[invocation-kernel.md](../../platform/host-invocation-routing/architecture/invocation-kernel.md),
+[host-use-cases.md](../../platform/host-invocation-routing/architecture/host-use-cases.md),
+[provider-routing.md](../../platform/host-invocation-routing/architecture/provider-routing.md),
+and [contracts/](../../platform/host-invocation-routing/contracts/README.md).
+See the [intent preservation ledger](../../platform/host-invocation-routing/intent-preservation-ledger.md)
+for disposition by preserved claim.
+
 ## 1. Architecture Name
 
 Named **Host Invocation And Provider Routing**; central component the **Operation Provider Router**. `Component Router` is avoided — not every component is a dispatchable provider. `Command Router` is avoided — commands are only a CLI projection of semantic operations.

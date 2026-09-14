@@ -1,5 +1,16 @@
 # Luật nền platform forgent (Phase 0 — compound-learning stack)
 
+```txt
+Legacy status: Full source retained during migration
+Promoted target entry: docs/platform/platform-foundations.md
+Related target anchors:
+- docs/platform/vision.md
+- docs/platform/component-boundary.md
+Use this legacy file for: Full law wording, thresholds, and rationale
+Do not use this legacy file for: Target documentation navigation
+Last reviewed: 2026-09-13
+```
+
 Tài liệu này khóa các **luật thiết kế** đứng trên mọi code của compound stack
 (state/FSM → routing → compound-learning). Mỗi luật kèm: phát biểu, nguồn gốc
 bằng chứng (cú pháp `nguồn:slug` tra trong `docs/distillery/sources/`), hệ quả

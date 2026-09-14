@@ -1,5 +1,14 @@
 # Packaging And Distribution Architecture
 
+```txt
+Legacy status: Promoted architecture source
+Promoted to: docs/platform/packaging-distribution/README.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy folder for: Source rationale until redirects are finalized
+Do not use this legacy folder for: Current canonical navigation
+Last reviewed: 2026-09-13
+```
+
 **Status:** Architecture discussion package.
 **Date:** 2026-09-04.
 **Canonical V1 contract draft:** [Runtime Identity And Activation](./runtime-identity-and-activation.md).

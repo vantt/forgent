@@ -1,5 +1,17 @@
 # Packaging Distribution Scope Map
 
+```txt
+Legacy status: Promoted migration/source map
+Promoted to:
+- docs/platform/packaging-distribution/README.md
+- docs/platform/packaging-distribution/spec.md
+- docs/platform/packaging-distribution/verification/implementation-alignment.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Original scope classification source
+Do not use this legacy file for: Current canonical navigation
+Last reviewed: 2026-09-13
+```
+
 **Status:** Architecture discussion map.
 **Date:** 2026-09-04.
 **Purpose:** Separate the many concerns currently being discussed under

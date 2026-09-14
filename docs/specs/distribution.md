@@ -6,6 +6,19 @@ decisions: [12aedbc8, 469f4c79, 5d669ff6, 38f7e0b8, ea8b9a8d, cbb4736a, 862ac01f
 coverage: full
 ---
 
+```txt
+Legacy status: Promoted source
+Promoted to:
+- docs/platform/packaging-distribution/spec.md
+- docs/platform/packaging-distribution/contracts/setup-doctor-registry.md
+- docs/platform/packaging-distribution/verification/implementation-alignment.md
+- docs/platform/packaging-distribution/history/distribution-baseline.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Generated/curated source facts during migration
+Do not use this legacy file for: Final human navigation or post-migration authority
+Last reviewed: 2026-09-13
+```
+
 # Spec: Distribution
 
 How a developer gets the `fgos` and `fgos-runner` commands running — either

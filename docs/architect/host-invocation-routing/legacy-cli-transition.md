@@ -6,6 +6,17 @@
 
 This document depends on the kernel contract in [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — read it first, in particular "Transitional CLI Lane" under §4 and `CommandRouteDescriptor` in the §3 name table. The kernel has exactly one input (`OperationRequest`) and one output (`ProviderOutcome`); everything in this document is CLI-adapter-local scaffolding that disappears once Node migration completes. Nothing here introduces a second kernel input or output type — the legacy lane never reaches the Router or `InvocationService` at all (see §1 below).
 
+## Migration Status Note
+
+This document remains a legacy-current source during the 2026-09-14 promotion
+pass. The promoted platform docs are
+[architecture/legacy-cli-transition.md](../../platform/host-invocation-routing/architecture/legacy-cli-transition.md),
+[contracts/command-route-descriptor.md](../../platform/host-invocation-routing/contracts/command-route-descriptor.md),
+[contracts/legacy-payload.md](../../platform/host-invocation-routing/contracts/legacy-payload.md),
+and [verification/compatibility-harness.md](../../platform/host-invocation-routing/verification/compatibility-harness.md).
+See the [intent preservation ledger](../../platform/host-invocation-routing/intent-preservation-ledger.md)
+for disposition by preserved claim.
+
 ## 1. Two Distinct Adapters
 
 Node transition needs two adapters with different contracts. Treating them as one provider would create the false impression that captured CLI output is a semantic result.

@@ -1,5 +1,18 @@
 # Runtime Identity And Activation
 
+```txt
+Legacy status: Promoted architecture/contract source
+Promoted to:
+- docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
+- docs/platform/packaging-distribution/contracts/release-manifest.md
+- docs/platform/packaging-distribution/contracts/activation-binding.md
+- docs/platform/packaging-distribution/contracts/distribution-pin.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Source detail until contract extraction is complete
+Do not use this legacy file for: Current implementation status without checking implementation alignment
+Last reviewed: 2026-09-13
+```
+
 **Status:** Architecture contract draft.
 **Date:** 2026-09-04.
 **Scope:** Project-local fgOS runtime identity, release records, per-workspace

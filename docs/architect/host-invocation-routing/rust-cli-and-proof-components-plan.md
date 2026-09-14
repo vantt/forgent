@@ -15,6 +15,18 @@ rollback. Semantic contracts, provider lifecycle, authority, framing, registry
 rules, compatibility modes, and technical trade-offs are owned by the
 architecture document and are intentionally not redefined here.
 
+## Migration Status Note
+
+This document remains a legacy-current execution-plan source during the
+2026-09-14 promotion pass. The promoted platform docs are
+[architecture/release-boundaries.md](../../platform/host-invocation-routing/architecture/release-boundaries.md),
+[verification/compatibility-harness.md](../../platform/host-invocation-routing/verification/compatibility-harness.md),
+[verification/r1-rust-host-proof.md](../../platform/host-invocation-routing/verification/r1-rust-host-proof.md),
+[verification/r2-external-process-proof.md](../../platform/host-invocation-routing/verification/r2-external-process-proof.md),
+and [verification/r3-remote-peer-proof.md](../../platform/host-invocation-routing/verification/r3-remote-peer-proof.md).
+See the [intent preservation ledger](../../platform/host-invocation-routing/intent-preservation-ledger.md)
+for disposition by preserved claim.
+
 ## 1. Outcome
 
 Execution is complete in three independently shippable releases:

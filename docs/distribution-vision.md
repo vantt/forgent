@@ -1,5 +1,14 @@
 # Cài đặt / Setup / Doctor của fgOS — tầm nhìn nền tảng
 
+```txt
+Legacy status: Promoted source
+Promoted to: docs/platform/packaging-distribution/vision.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Historical wording, original rationale, and supersession trace
+Do not use this legacy file for: Current implementation status or canonical area navigation
+Last reviewed: 2026-09-13
+```
+
 **Trạng thái:** TẦM NHÌN / ĐỊNH HƯỚNG — chưa khoá thành luật (platform-foundations)
 hay spec đầy đủ; nhiều điểm còn là câu hỏi mở kiến trúc. **Ngày:** 2026-08-01.
 **Nguồn:** định hướng của chủ sản phẩm.

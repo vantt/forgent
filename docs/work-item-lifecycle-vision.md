@@ -1,5 +1,14 @@
 # Chu trình Work-Item của fgOS — tầm nhìn nền tảng
 
+```txt
+Legacy status: Vision source retained during migration
+Promoted target entry: docs/platform/vision.md
+Potential future area: docs/platform/work-state/ or docs/platform/work-lifecycle/
+Use this legacy file for: Original work-item lifecycle direction and unresolved questions
+Do not use this legacy file for: Current canonical platform navigation
+Last reviewed: 2026-09-13
+```
+
 **Trạng thái:** TẦM NHÌN / ĐỊNH HƯỚNG — chưa khoá thành luật (platform-foundations) hay spec;
 còn câu hỏi mở. **Ngày:** 2026-07-15. Nguồn: định hướng của chủ sản phẩm.
 

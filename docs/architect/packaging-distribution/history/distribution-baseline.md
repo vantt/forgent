@@ -1,5 +1,14 @@
 # Distribution Baseline And Scattered Spec Fragments
 
+```txt
+Legacy status: Promoted history source
+Promoted to: docs/platform/packaging-distribution/history/distribution-baseline.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Original baseline collection and source trace
+Do not use this legacy file for: Current canonical history
+Last reviewed: 2026-09-13
+```
+
 **Status:** Historical/input record for the new Packaging And Distribution
 architecture.
 **Date:** 2026-09-04.

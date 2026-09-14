@@ -285,7 +285,7 @@
               "{prompt}"
             ],
             "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
+              "CODEX_HOME": "${HOME}/.codex-tetnu"
             }
           }
         ]

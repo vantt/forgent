@@ -25,6 +25,17 @@ component module lives.
 The executable work breakdown lives in
 [Rust Host And Proof Providers Implementation Plan](./rust-cli-and-proof-components-plan.md).
 
+## Migration Status Note
+
+This document remains a legacy-current source during the 2026-09-14 promotion
+pass. The promoted platform docs are
+[architecture/node-to-rust-migration.md](../../platform/host-invocation-routing/architecture/node-to-rust-migration.md),
+[architecture/release-boundaries.md](../../platform/host-invocation-routing/architecture/release-boundaries.md),
+[verification/r1-rust-host-proof.md](../../platform/host-invocation-routing/verification/r1-rust-host-proof.md),
+and [history/host-invocation-baseline.md](../../platform/host-invocation-routing/history/host-invocation-baseline.md).
+See the [intent preservation ledger](../../platform/host-invocation-routing/intent-preservation-ledger.md)
+for disposition by preserved claim.
+
 ## 1. Migration Question
 
 The current harness is mostly Node and `bin/fgos.mjs` still combines entry,

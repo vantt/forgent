@@ -3454,3 +3454,9 @@ generated: true
 - Docs:
   - `overview` (active): `docs/explanation/approve-cas-mismatch-block.md`
 
+### Why .claude/settings.json hook registrations guard against a gitignored hooks script (`why-hook-registrations-guard-against-gitignored-scripts`)
+- Status: **active**
+- Purpose Slug: `why-hook-registrations-guard-against-gitignored-scripts`
+- Docs:
+  - `hook-registration-guard` (active): `docs/knowledge/why-hook-registrations-guard-against-gitignored-scripts/hook-registration-guard.md`
+

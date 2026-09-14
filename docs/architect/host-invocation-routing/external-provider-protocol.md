@@ -6,6 +6,16 @@
 
 This document depends on the kernel contract in [Host Invocation And Provider Routing](./host-invocation-provider-routing.md) — read it first for `OperationId`, `OperationRequest`, `ProviderOutcome`, `ProviderDescriptor`, `OperationProvider`, `RegistrySnapshot`, the Router, and `InvocationService`. This document covers everything specific to a provider that lives outside a statically linked Rust crate: component classes (who owns/releases it), invocation mechanisms (how it is reached), the wire protocol, and the plugin registry linker that turns manifests into a `RegistrySnapshot`.
 
+## Migration Status Note
+
+This document remains a legacy-current source during the 2026-09-14 promotion
+pass. The promoted platform docs are
+[architecture/external-provider-protocol.md](../../platform/host-invocation-routing/architecture/external-provider-protocol.md),
+[contracts/component-protocol.md](../../platform/host-invocation-routing/contracts/component-protocol.md),
+and [contracts/external-provider-manifest.md](../../platform/host-invocation-routing/contracts/external-provider-manifest.md).
+See the [intent preservation ledger](../../platform/host-invocation-routing/intent-preservation-ledger.md)
+for disposition by preserved claim.
+
 ## 1. Component Classes
 
 Invocation mechanism describes how an implementation is invoked. It does not describe the product nature, release ownership, or authority posture of the component being invoked — that is a separate axis, **component class**:

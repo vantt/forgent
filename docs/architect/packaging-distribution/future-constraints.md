@@ -1,5 +1,14 @@
 # Future Constraints: Shared Gateway, Adapter, And Substrate
 
+```txt
+Legacy status: Promoted architecture source
+Promoted to: docs/platform/packaging-distribution/architecture/future-constraints.md
+Current reader entry: docs/platform/packaging-distribution/README.md
+Use this legacy file for: Original future-constraints source
+Do not use this legacy file for: Current canonical navigation
+Last reviewed: 2026-09-13
+```
+
 **Status:** Future architecture constraints, not current delivery scope.
 **Date:** 2026-09-04.
 
@@ -80,4 +89,3 @@ Good global substrate candidates:
 
 Project workflow verbs such as submit, pick, approve, move, plan, or
 run-workflow remain safe only through the selected project's local runtime.
-

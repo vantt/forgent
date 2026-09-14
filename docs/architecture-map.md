@@ -1,5 +1,17 @@
 # Bản đồ kiến trúc fgOS — một khung chính, hai lớp phủ, hai sổ đăng ký
 
+```txt
+Legacy status: Promoted source
+Promoted to: docs/platform/architecture-map.md
+Related target anchors:
+- docs/platform/component-boundary.md
+- docs/platform/platform-foundations.md
+- docs/platform/vision.md
+Use this legacy file for: Full historical architecture-map detail during migration
+Do not use this legacy file for: The target documentation entry path
+Last reviewed: 2026-09-13
+```
+
 **Phiên bản:** v0.6. **Trạng thái:** CHUẨN — chấp nhận 2026-07-16, record
 [0010](decisions/0010-ban-do-kien-truc-la-ban-chuan.md); nâng v0.3 theo record
 [0012](decisions/0012-typed-edge-model-supersedes-deps-parent-separation.md);
