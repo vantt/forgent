@@ -20,6 +20,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { findRunDir, readRunSnapshot } from './show-run.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
+import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive } from '../../runner/dispatch/run-lock.mjs';
+import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 
 export class RecoveryError extends Error {
   constructor(code, message, details = {}) {
@@ -49,15 +51,48 @@ function resolveRunDir(ctx, runId) {
   return runDir;
 }
 
-/** The logical facts snapshot recovery-planner.mjs reasons over: run status
- * and the two artifacts (visibility, outbox) that make up this Run's own
- * "event log" (per the planner contract's snapshotHash). `runDir` itself is
- * deliberately excluded -- an absolute path is not a fact about the run's
- * state, and including it would make the hash sensitive to where the same
- * logical run happens to live on disk. */
+/** The Run's REAL control epoch, off run-lock.mjs's own generation ledger
+ * (`control/generations/`) -- never `run.json.controlEpoch`, which is only
+ * a shadow copy nothing fences against a live controller's own
+ * acquireRunControl/releaseRunControl calls. `null` (no generation ever
+ * published) reads as this module's own "epoch 0" convention, matching the
+ * pre-existing schema-1 run.json default. */
+function readRealControlEpoch(runDir) {
+  const { generationsDir } = controlDirs(runDir);
+  return currentGeneration(generationsDir)?.epoch ?? 0;
+}
+
+/** run-lock.mjs's own "no generation published yet" convention is a `null`
+ * current epoch, not `0` -- translate at the one boundary that calls into
+ * its real CAS primitive (acquireRunControl), so this module's public
+ * 0-based convention never leaks a mismatched literal into that check. */
+function toRunLockExpectedEpoch(epoch) {
+  return epoch === 0 ? null : epoch;
+}
+
+/** The logical facts snapshot recovery-planner.mjs reasons over: run status,
+ * the two artifacts (visibility, outbox) that make up this Run's own "event
+ * log" (per the planner contract's snapshotHash), the REAL control epoch
+ * (H1), and a settled-outcome signal (F1) so a run that settles between
+ * plan() and apply -- `result.json` appears, `classifyRunOutcome()` now
+ * reports `settled` -- changes the hash even though `run.json.status` may
+ * not have been reconciled yet. `runDir` itself is deliberately excluded --
+ * an absolute path is not a fact about the run's state, and including it
+ * would make the hash sensitive to where the same logical run happens to
+ * live on disk (the same reason `settledSignal` stores a path relative to
+ * `runDir`, not `resultPath` itself). */
 function buildSnapshot(runDir) {
   const { run, visibility, outbox, visibilityError = null } = readRunSnapshot(runDir);
-  return { run, visibility, outbox, visibilityError };
+  const controlEpoch = readRealControlEpoch(runDir);
+  const settled = classifyRunOutcome(runDir, { liveness: 'unknown' });
+  return {
+    run,
+    visibility,
+    outbox,
+    visibilityError,
+    controlEpoch,
+    settledSignal: { outcome: settled.outcome, resultPath: settled.resultPath ? path.relative(runDir, settled.resultPath) : null },
+  };
 }
 
 /**
@@ -91,16 +126,43 @@ export function recoverObserveUseCase(ctx, { runId, intent = DEFAULT_INTENT, now
 // file, so exactly one caller ever runs `fn`. No I/O inside `fn` is ever
 // awaited or spawned, so "acquire, compare, act, release" never spans
 // anything slow.
+function readLockHolderPid(lockPath) {
+  let raw;
+  try {
+    raw = fs.readFileSync(lockPath, 'utf8').trim();
+  } catch {
+    return null;
+  }
+  const pid = Number(raw);
+  return Number.isInteger(pid) && pid > 0 ? pid : null;
+}
+
 function withRunLock(runDir, fn) {
   const lockPath = path.join(runDir, '.recovery.lock');
   let fd;
   try {
     fd = fs.openSync(lockPath, 'wx');
   } catch (err) {
-    if (err.code === 'EEXIST') {
+    if (err.code !== 'EEXIST') throw err;
+    // M1: a crash between lock-acquire and release must not block every
+    // future recovery apply forever. The lock file records its holder's
+    // own pid; only PID-dead proof (never elapsed time alone, same
+    // discipline as run-lock.mjs's own reclaim rule) authorizes reclaiming
+    // it. An unreadable/non-numeric holder pid is treated as still live --
+    // never guessing a stale lock away.
+    const holderPid = readLockHolderPid(lockPath);
+    if (holderPid === null || isProcessAlive(holderPid)) {
       throw new RecoveryError('lock-busy', `a recovery apply is already in progress for this run (${lockPath})`, { runDir });
     }
-    throw err;
+    try { fs.unlinkSync(lockPath); } catch { /* raced with the dead holder's own cleanup -- fine either way */ }
+    try {
+      fd = fs.openSync(lockPath, 'wx');
+    } catch (retryErr) {
+      if (retryErr.code === 'EEXIST') {
+        throw new RecoveryError('lock-busy', `a recovery apply is already in progress for this run (${lockPath})`, { runDir });
+      }
+      throw retryErr;
+    }
   }
   try {
     fs.writeSync(fd, String(process.pid));
@@ -183,14 +245,63 @@ export function recoverApplyUseCase(ctx, params = {}) {
       expectedSnapshot: params.expectedSnapshot,
       expectedControlEpoch: params.expectedControlEpoch,
       expectedExpiresAt: params.expectedExpiresAt,
+      actionKey: params.actionKey,
       now: nowIso,
     });
     if (check.outcome !== 'ok') {
       return { runId, runDir, outcome: check.outcome, reason: check.reason };
     }
 
-    const controlEpochBefore = snapshot.run.controlEpoch ?? 0;
-    const controlEpochAfter = controlEpochBefore + 1;
+    // F5: a fresh settled-status re-check, immediately before the write --
+    // markRunSettled/reconcileRun touch run.json OUTSIDE this lock, so the
+    // snapshot read a moment ago is not proof the run is still recoverable
+    // right now.
+    const freshOutcome = classifyRunOutcome(runDir, { liveness: 'unknown' });
+    if (freshOutcome.outcome === 'settled') {
+      return {
+        runId,
+        runDir,
+        outcome: 'plan-stale',
+        reason: 'the run settled moments before this recovery apply reached its write -- refusing to record a recovery action against a settled run',
+      };
+    }
+
+    // H1: the actual control-epoch mutation goes through run-lock's own
+    // real CAS primitive -- the same generation ledger a live controller's
+    // acquireRunControl/releaseRunControl calls fence against -- instead of
+    // bumping the shadow run.json.controlEpoch field directly. A live
+    // controller genuinely holding the run is refused here, never silently
+    // overwritten.
+    const controlResult = acquireRunControl(runDir, {
+      holder: { id: 'dispatch-recover', pid: process.pid },
+      purpose: `recovery-apply:${params.action?.type ?? 'unknown'}`,
+      expectedControlEpoch: toRunLockExpectedEpoch(params.expectedControlEpoch),
+      now: Date.now(),
+    });
+    if (controlResult.status === 'stale') {
+      return {
+        runId,
+        runDir,
+        outcome: 'plan-stale',
+        reason: `the run's real control epoch has advanced since this recommendation was issued (expected ${params.expectedControlEpoch}, now ${controlResult.controlEpoch ?? 0})`,
+      };
+    }
+    if (controlResult.status === 'held') {
+      return {
+        runId,
+        runDir,
+        outcome: 'held',
+        reason: `run control is currently held by a live driver (epoch ${controlResult.controlEpoch}) -- refusing to apply recovery over an active controller`,
+        holder: controlResult.holder,
+      };
+    }
+
+    const controlEpochBefore = params.expectedControlEpoch;
+    const controlEpochAfter = controlResult.controlEpoch;
+    // The recovery decision is ephemeral, not an ongoing hold: release
+    // immediately so a resumed/reassigned real driver's own
+    // acquireRunControl call is never blocked behind this door's token.
+    releaseRunControl(runDir, { controlEpoch: controlEpochAfter, controlToken: controlResult.controlToken });
     writeRunJsonPatch(runDir, { controlEpoch: controlEpochAfter });
     const record = {
       actionKey: params.actionKey,

@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 import { plan, checkApply, collectEvidence, deriveRecoveryFacts, isActionLegal } from '../../src/runner/dispatch/recovery-planner.mjs';
 import { showRunUseCase } from '../../src/verbs/dispatch/show-run.mjs';
+import { acquireRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
@@ -105,14 +106,13 @@ test('recover.mjs never reaches src/runner/coordination/ or any session/event-ap
   assert.ok(closure.modules.size >= 2, `expected a real import closure, saw ${closure.modules.size} modules`);
 });
 
-test('plan() is pure and deterministic: same snapshot+evidence+intent -> same action/reason/evidenceIds', () => {
+test('plan() is pure and deterministic: same snapshot+evidence+intent -> same action/reason/evidenceIds/actionKey', () => {
   const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [], visibilityError: null };
   const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });
   const now = () => '2026-01-01T00:00:00.000Z';
-  const actionKeyFn = () => 'fixed-key';
 
-  const first = plan(snapshot, evidence, 'resume', { now, actionKeyFn });
-  const second = plan(snapshot, evidence, 'resume', { now, actionKeyFn });
+  const first = plan(snapshot, evidence, 'resume', { now });
+  const second = plan(snapshot, evidence, 'resume', { now });
 
   assert.deepEqual(first, second);
   assert.equal(first.kind, 'recommendation');
@@ -132,7 +132,7 @@ test('replay parity: repeated observe calls against an unchanged run reproduce t
     assert.deepEqual(first.evidenceIds, second.evidenceIds);
     assert.equal(first.snapshotHash, second.snapshotHash);
     assert.equal(first.expectedControlEpoch, second.expectedControlEpoch);
-    assert.notEqual(first.actionKey, second.actionKey, 'actionKey is inherently per-call');
+    assert.equal(first.actionKey, second.actionKey, 'actionKey is now deterministically derived (F3) from snapshotHash/controlEpoch/action/expiresAt -- identical facts at the same instant produce the identical key');
   } finally { cleanup(root); }
 });
 
@@ -278,13 +278,30 @@ test('a run directory already mid-apply refuses a second concurrent apply rather
   } finally { cleanup(root); }
 });
 
-test('applying an action no longer supported by current evidence is refused via the same legality check the read path uses', () => {
+test('F3: swapping the action under an unmatched actionKey is refused before ever reaching the legality check', () => {
   const { root } = makeRepo();
   try {
     const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
     const tampered = { type: 'reassign-driver', toDriverId: 'nobody' };
+    // rec.actionKey was derived for the ORIGINAL resume-driver action -- it
+    // does not match this substituted action, so the actionKey binding (F3)
+    // must catch this before isActionLegal ever runs.
     const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec, { action: tampered }));
-    assert.equal(result.outcome, 'needs-input');
+    assert.equal(result.outcome, 'plan-stale');
+  } finally { cleanup(root); }
+});
+
+test('read and write paths still derive identical legality for a genuinely matching action/actionKey pair', () => {
+  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  try {
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign' });
+    assert.equal(rec.kind, 'recommendation');
+    // Untampered: action/actionKey/snapshot/epoch/expiresAt all come
+    // straight from the same recommendation, so checkApply's actionKey
+    // check passes and legality is re-derived via isActionLegal, the same
+    // evaluator deriveRecoveryFacts used at plan() time.
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+    assert.equal(result.outcome, 'applied');
   } finally { cleanup(root); }
 });
 
@@ -318,7 +335,7 @@ test('no implicit close: applying resume-driver never touches run.status or sett
 test('checkApply is pure and agrees with the use case: same inputs, same outcome', () => {
   const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [], visibilityError: null };
   const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });
-  const rec = plan(snapshot, evidence, 'resume', { now: () => '2026-01-01T00:00:00.000Z', actionKeyFn: () => 'k' });
+  const rec = plan(snapshot, evidence, 'resume', { now: () => '2026-01-01T00:00:00.000Z' });
   const outcome = checkApply({
     snapshot,
     evidence,
@@ -326,7 +343,115 @@ test('checkApply is pure and agrees with the use case: same inputs, same outcome
     expectedSnapshot: rec.snapshotHash,
     expectedControlEpoch: rec.expectedControlEpoch,
     expectedExpiresAt: rec.expiresAt,
+    actionKey: rec.actionKey,
     now: '2026-01-01T00:00:00.000Z',
   });
   assert.equal(outcome.outcome, 'ok');
+});
+
+test('H1: expectedControlEpoch reads run-lock\'s real generation ledger, never the run.json shadow field', () => {
+  const { root, runDir } = makeRepo({ controlEpoch: 0 });
+  try {
+    // A real controller acquires control straight through run-lock.mjs --
+    // recover.mjs never touches this path, mirroring a genuinely live
+    // driver that predates this recovery attempt.
+    const acquired = acquireRunControl(runDir, { holder: { id: 'live-driver', pid: process.pid }, purpose: 'drive' });
+    assert.equal(acquired.status, 'acquired');
+    assert.equal(acquired.controlEpoch, 1);
+
+    const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+    assert.equal(runJson.controlEpoch, 0, 'the run.json shadow field is untouched by the real acquisition');
+
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    assert.equal(rec.expectedControlEpoch, 1, 'the recommendation must reflect the REAL control epoch, not the stale shadow run.json field');
+  } finally { cleanup(root); }
+});
+
+test('H1: apply refuses via the live-holder gate when the observed epoch matches but a live controller still actively holds it', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    // A live controller acquires real control and never releases.
+    const acquired = acquireRunControl(runDir, { holder: { id: 'live-driver', pid: process.pid }, purpose: 'drive' });
+    assert.equal(acquired.status, 'acquired');
+    assert.equal(acquired.controlEpoch, 1);
+
+    // Issued AFTER that acquisition, so it correctly observes epoch 1 --
+    // not stale, not tampered, exactly what a caller would legitimately see.
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    assert.equal(rec.expectedControlEpoch, 1);
+
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+    // Pre-fix, this exact scenario applied cleanly: the old code compared
+    // against run.json's shadow controlEpoch (undefined -> 0 on both
+    // sides) and bumped it to 1, entirely blind to the live controller's
+    // real, unreleased epoch-1 hold.
+    assert.equal(result.outcome, 'held', 'a live controller still holding the real epoch must block the apply, not be silently overwritten');
+    assert.equal(result.holder.id, 'live-driver');
+
+    const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+    assert.equal(runJson.controlEpoch, undefined, 'run.json must never be bumped over a live controller');
+  } finally { cleanup(root); }
+});
+
+test('F1: a run that settles (result.json appears) between plan() and apply refuses as plan-stale even though run.json.status never changed', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+
+    // The collector finishes and writes result.json -- classifyRunOutcome()
+    // now reports 'settled' -- but nothing has reconciled run.json.status
+    // yet (a separate, slower path: markRunSettled/reconcileRun).
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ ok: true }));
+    const runJsonBefore = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+    assert.equal(runJsonBefore.status, 'running', 'run.json.status is still unreconciled');
+
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+    assert.equal(result.outcome, 'plan-stale', 'a settled run must refuse the apply even though run.json.status never changed');
+  } finally { cleanup(root); }
+});
+
+test('F3: a valid actionKey from a different recommendation cannot be replayed against this one', () => {
+  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  try {
+    const now = '2026-01-01T00:00:00.000Z';
+    const recResume = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume', now });
+    const recReassign = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign', now });
+    assert.equal(recResume.snapshotHash, recReassign.snapshotHash, 'same observed run state for both recommendations');
+    assert.notEqual(recResume.actionKey, recReassign.actionKey, 'different actions must derive different keys');
+
+    // Attacker takes recReassign's still-unconsumed, valid actionKey but
+    // submits it alongside recResume's action/snapshot/epoch/expiresAt.
+    const forged = applyFrom(recResume, { actionKey: recReassign.actionKey });
+    const result = recoverApplyUseCase({ repoRoot: root }, forged);
+    assert.equal(result.outcome, 'plan-stale');
+  } finally { cleanup(root); }
+});
+
+test('M1: a stale .recovery.lock left by a dead process is reclaimed, not left stuck forever', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    // Simulate a crash between lock-acquire and release: a lock file
+    // recording a pid that is provably not alive.
+    fs.writeFileSync(path.join(runDir, '.recovery.lock'), '999999999');
+
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+    assert.equal(result.outcome, 'applied', 'a dead holder\'s lock must be reclaimed, never block recovery forever');
+  } finally { cleanup(root); }
+});
+
+test('M1: a .recovery.lock held by a live process is still refused, never reclaimed out from under it', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    fs.writeFileSync(path.join(runDir, '.recovery.lock'), String(process.pid));
+    try {
+      assert.throws(
+        () => recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)),
+        (e) => e instanceof RecoveryError && e.code === 'lock-busy',
+      );
+    } finally {
+      fs.unlinkSync(path.join(runDir, '.recovery.lock'));
+    }
+  } finally { cleanup(root); }
 });

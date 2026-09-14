@@ -13,13 +13,13 @@
 //
 // Every function below is a pure function of its arguments: no fs, no
 // child_process, no network, no mutation, no reading of ambient/global
-// state. `node:crypto`'s hash/uuid primitives are the one import, and both
-// are pure with respect to the arguments given (never touch disk/network).
+// state. `node:crypto`'s hash primitive is the one import, pure with
+// respect to the arguments given (never touches disk/network).
 // The caller (src/verbs/dispatch/recover.mjs) gathers the `snapshot` these
 // functions need -- already-read facts, never fetched here -- and passes it
 // in explicitly.
 
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 
 export class RecoveryPlannerError extends Error {
   constructor(code, message, details = {}) {
@@ -173,19 +173,34 @@ export function isActionLegal(snapshot, evidence, action) {
   return { status: 'park', reason: `unrecognized action type "${action.type}"` };
 }
 
+/** Deterministically binds `actionKey` to the exact recommendation it was
+ * issued for -- (snapshotHash, controlEpoch, action, expiresAt). A CAS/
+ * staleness binding, not a secrecy boundary: this is what lets apply-time
+ * refuse a still-unconsumed key presented alongside a DIFFERENT action or a
+ * re-declared expiresAt than what plan() actually produced for that key. */
+export function computeActionKey({ snapshotHash, controlEpoch, action, expiresAt }) {
+  return createHash('sha256').update(stableStringify({ snapshotHash, controlEpoch, action, expiresAt })).digest('hex');
+}
+
 /**
  * plan(snapshot, evidence, requestedIntent) -> RecoveryRecommendation
  *
- * Pure and deterministic: the same snapshot+evidence+requestedIntent always
- * produces the same `action`/`reason`/`evidenceIds`/`expectedControlEpoch`
- * -- only `actionKey` and `expiresAt` are inherently per-call (injectable
- * via `actionKeyFn`/`now` for deterministic replay in tests).
+ * Pure and deterministic: the same snapshot+evidence+requestedIntent+now
+ * always produces the same `action`/`reason`/`evidenceIds`/
+ * `expectedControlEpoch`/`actionKey` -- only `expiresAt` (and anything
+ * derived from it) is inherently per-call, via `now`.
+ *
+ * `expectedControlEpoch` reads `snapshot.controlEpoch` -- the caller
+ * (recover.mjs) is expected to have sourced that from run-lock.mjs's own
+ * current-generation accessor, never from the Run's own shadow
+ * `run.json.controlEpoch` field, which nothing fences against a live
+ * controller.
  *
  * @returns {{kind:'recommendation', snapshotHash:string, expectedControlEpoch:number, actionKey:string, evidenceIds:string[], action:object, expiresAt:string, reason:string}
  *         | {kind:'needs-input'|'park', reason:string, evidenceIds:string[]}}
  */
 export function plan(snapshot, evidence, requestedIntent, opts = {}) {
-  const { now = () => new Date().toISOString(), actionKeyFn = randomUUID, ttlMs = DEFAULT_TTL_MS } = opts;
+  const { now = () => new Date().toISOString(), ttlMs = DEFAULT_TTL_MS } = opts;
   const facts = deriveRecoveryFacts(snapshot, evidence, requestedIntent);
   const evidenceIds = evidenceIdsOf(evidence);
 
@@ -194,11 +209,14 @@ export function plan(snapshot, evidence, requestedIntent, opts = {}) {
 
   const nowIso = typeof now === 'function' ? now() : now;
   const expiresAt = new Date(Date.parse(nowIso) + ttlMs).toISOString();
+  const snapshotHash = computeSnapshotHash(snapshot);
+  const expectedControlEpoch = snapshot.controlEpoch ?? 0;
+  const actionKey = computeActionKey({ snapshotHash, controlEpoch: expectedControlEpoch, action: facts.action, expiresAt });
   return {
     kind: 'recommendation',
-    snapshotHash: computeSnapshotHash(snapshot),
-    expectedControlEpoch: snapshot.run?.controlEpoch ?? 0,
-    actionKey: actionKeyFn(),
+    snapshotHash,
+    expectedControlEpoch,
+    actionKey,
     evidenceIds,
     action: facts.action,
     expiresAt,
@@ -212,13 +230,26 @@ export function plan(snapshot, evidence, requestedIntent, opts = {}) {
  * to apply, says whether the apply may proceed. Never touches fs/a lock/an
  * action-key ledger itself -- recover.mjs owns those, this only judges.
  *
- * Staleness Rules: changed snapshot hash -> plan-stale; changed control
- * epoch -> plan-stale; expired -> plan-expired; anything else routes
- * through the SAME isActionLegal the read path's legality rests on.
+ * Staleness Rules: mismatched actionKey -> plan-stale; changed snapshot
+ * hash -> plan-stale; changed control epoch -> plan-stale; expired ->
+ * plan-expired; anything else routes through the SAME isActionLegal the
+ * read path's legality rests on.
  *
  * @returns {{outcome:'ok'} | {outcome:'plan-stale'|'plan-expired'|'needs-input'|'park', reason:string}}
  */
-export function checkApply({ snapshot, evidence, action, expectedSnapshot, expectedControlEpoch, expectedExpiresAt, now }) {
+export function checkApply({ snapshot, evidence, action, expectedSnapshot, expectedControlEpoch, expectedExpiresAt, actionKey, now }) {
+  const expectedActionKey = computeActionKey({
+    snapshotHash: expectedSnapshot,
+    controlEpoch: expectedControlEpoch,
+    action,
+    expiresAt: expectedExpiresAt,
+  });
+  if (actionKey !== expectedActionKey) {
+    return {
+      outcome: 'plan-stale',
+      reason: 'actionKey does not match the action/snapshot/epoch/expiresAt it was issued for -- refusing a mismatched replay',
+    };
+  }
   const currentHash = computeSnapshotHash(snapshot);
   if (currentHash !== expectedSnapshot) {
     return {
@@ -226,7 +257,7 @@ export function checkApply({ snapshot, evidence, action, expectedSnapshot, expec
       reason: 'the run\'s observed state (visibility/outbox) has changed since this recommendation was issued -- snapshot hash mismatch',
     };
   }
-  const currentEpoch = snapshot.run?.controlEpoch ?? 0;
+  const currentEpoch = snapshot.controlEpoch ?? 0;
   if (currentEpoch !== expectedControlEpoch) {
     return {
       outcome: 'plan-stale',
