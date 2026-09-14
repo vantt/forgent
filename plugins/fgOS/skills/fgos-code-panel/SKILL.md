@@ -136,7 +136,9 @@ executor/tier mapping unless there is a real reason to diverge.
 A code-panel change never runs in the main checkout and never on the base
 branch. Open its own worktree on its own branch first, as a plain git
 operation, following
-`../_shared/private-cell-worktree.md`
+the shared private-cell-worktree fragment. In this source tree it lives at
+`core/skills/_shared/private-cell-worktree.md`; in installed/projected skill
+surfaces it lives at `.agents/skills/_shared/private-cell-worktree.md`
 with `<prefix>` = `code-panel`:
 
 ```sh

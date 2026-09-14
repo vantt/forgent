@@ -32,7 +32,7 @@ extend that map in this skill.
    still never supplies its protocol id.
 4. For `code-change-panel`, continue only when the person explicitly asked to
    implement/change/fix code, then follow
-   [`fgos-code-panel`](../../../domains/coding/skills/fgos-code-panel/SKILL.md). A coding decision, design
+   `fgos-code-panel`. A coding decision, design
    review, or "plugin versus core" question is advisory and must not take this
    route.
 5. For other presets, read the selected registered FlowDefinition to learn its

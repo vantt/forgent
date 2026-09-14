@@ -396,6 +396,7 @@ test('fgos-code-panel canonical source has non-vacuous repo-root path references
     'src/runner/coordination/session-engine.mjs',
     'src/verbs/coordination/schema.mjs',
     'core/coordination-protocols/standalone-master-coordination-loop.yaml',
+    'core/skills/_shared/private-cell-worktree.md',
     'docs/architect/agent-coordination/contracts/coordination-session.md',
   ]);
   const seen = new Set();
@@ -411,31 +412,32 @@ test('fgos-code-panel canonical source has non-vacuous repo-root path references
 
   assert.deepEqual(seen, expected);
   assert.deepEqual(missing, []);
-  assert.ok(skillContent.includes('`../_shared/private-cell-worktree.md`'));
+  assert.ok(skillContent.includes('`.agents/skills/_shared/private-cell-worktree.md`'));
+  assert.ok(fs.existsSync(path.join(repoRoot, '.agents', 'skills', '_shared', 'private-cell-worktree.md')));
 });
 
-test('active core and domain skill markdown links resolve after fgos-code-panel domain move', () => {
+test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const skillPaths = [
     path.join(repoRoot, 'core', 'skills', 'fgos-panel', 'SKILL.md'),
     path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
-    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
+    path.join(repoRoot, '.agents', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, '.agents', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-panel', 'SKILL.md'),
+    path.join(repoRoot, 'plugins', 'fgOS', 'skills', 'fgos-plan-loop', 'SKILL.md'),
   ];
   const markdownLinkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
-  const missing = [];
+  const linkedCodePanelPaths = [];
 
   for (const skillPath of skillPaths) {
     const content = fs.readFileSync(skillPath, 'utf8');
     for (const match of content.matchAll(markdownLinkPattern)) {
       const target = match[1];
-      if (/^[a-z][a-z0-9+.-]*:/i.test(target) || target.startsWith('#')) continue;
-      const [targetWithoutAnchor] = target.split('#');
-      const resolved = path.resolve(path.dirname(skillPath), targetWithoutAnchor);
-      if (!fs.existsSync(resolved)) {
-        missing.push(`${path.relative(repoRoot, skillPath)} -> ${target}`);
+      if (target.includes('fgos-code-panel')) {
+        linkedCodePanelPaths.push(`${path.relative(repoRoot, skillPath)} -> ${target}`);
       }
     }
   }
 
-  assert.deepEqual(missing, []);
+  assert.deepEqual(linkedCodePanelPaths, []);
 });
