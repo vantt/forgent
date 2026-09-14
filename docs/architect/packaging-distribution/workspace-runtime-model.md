@@ -1,5 +1,11 @@
 # Workspace Runtime Model
 
+> Status: historical redirect. Active topology remains
+> [docs/architect/workspace-topology.md](../workspace-topology.md), while active
+> packaging-distribution runtime records live under
+> [docs/platform/packaging-distribution/](../../platform/packaging-distribution/README.md).
+> Keep this file only as the old pointer that explains the split.
+
 **Status:** Moved.
 **Date:** 2026-09-04.
 
@@ -12,4 +18,3 @@ Packaging/distribution consumes that topology for release store placement,
 workspace activation binding, projection ledger scope, leases, and dirty-tree
 rules. Do not update this file with new topology decisions; update
 `docs/architect/workspace-topology.md` instead.
-
