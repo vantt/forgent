@@ -1,6 +1,6 @@
 # Architecture Decision Lock
 
-**Status:** OWNER-SHAPED CANDIDATE - input to D00-D06, not implementation authority
+**Status:** READY design lock - accepted by D06 inline review, not implementation authority
 **Date:** 2026-09-14
 
 The following decisions held through the manual design discussion. D06 may
@@ -36,6 +36,13 @@ preference alone.
    I01-I06?
 6. Are the negative capabilities actually testable as absent/refused?
 
-Until D06 returns `READY`, this file records convergence but grants no source
-mutation authority. Even `READY` authorizes only creation of a separate
-implementation plan; it never authorizes source mutation in this design track.
+## D06 Verdict
+
+`READY` on 2026-09-14. The D06 external architecture panel requirement was
+waived by explicit user override to keep review inside this Codex session rather
+than dispatching other agents. The waiver is recorded in
+`reviews/d06-review-packet.md`; no fake panel session id is claimed.
+
+This file records convergence but grants no source mutation authority. `READY`
+authorizes only creation of a separate implementation plan; it never authorizes
+source mutation in this design track.
