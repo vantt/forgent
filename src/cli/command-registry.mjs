@@ -780,15 +780,21 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|watch> <runId>',
-    description: 'Read-only observation of a dispatch Run. "show-run" reads that run\'s run.json, its visibility.json binding (pane, agent session, which process is driving it, when it was last seen) and the names/sizes/times of whatever the worker has written to its outbox, once. "watch" polls the same reading until the run stops, the tick budget runs out, or the watcher is interrupted, adding a short tail of the run log. Both are read-only by construction rather than by promise: neither module imports a herdr client or a dispatch adapter, so there is no code path from either to "agent prompt", "send-text" or "send-keys". Observing and contacting are separate capabilities and this door grants only the first -- any number of people may watch a run while exactly one process drives it, and a watcher needs no permission from that driver because it holds no lease and changes nothing.',
+    invoke: 'fgos dispatch <show-run|watch|recover> <runId>',
+    description: '"show-run"/"watch" are read-only observation of a dispatch Run, unchanged (see below). "recover" is the CAS-guarded recovery door for a STANDALONE (Assignment-owned, session-authority-free) Run: called with no --action, it reads the same run facts show-run does and returns a pure, ephemeral RecoveryRecommendation (snapshot hash, expected control epoch, a fresh action key, an expiry, and the recommended action) -- no write, no session event, safe to call any number of times. Called WITH --action (plus all four --expected-* CAS fields naming the exact recommendation being applied), it re-reads CURRENT state under a short in-process lock scoped to that one run directory, refuses a changed snapshot/control-epoch as "plan-stale", a past-expiry recommendation as "plan-expired", and a repeated call with an already-consumed --action-key as "already-applied" (returning the prior outcome, never repeating the effect) -- before recording exactly one command (a controlEpoch bump plus one recovery-commands.jsonl line in the Run\'s own directory). Never invokes the unconditional close-after-steps a coordination-session Run gets from run.mjs -- a Run reached through this door sits outside any coordination session\'s authority by contract. show-run/watch are read-only by construction, not by promise (neither module imports a herdr client or a dispatch adapter, so there is no code path to "agent prompt"/"send-text"/"send-keys"); recover\'s own write path is similarly self-contained, touching only the target run directory\'s own files.',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'watch'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'watch', 'recover'] },
         'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
         interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
+        intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s own outbox, or the recommendation comes back "needs-input").' },
+        action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too.' },
+        'expected-snapshot': { type: 'string', description: '"recover" apply only: the `snapshotHash` from the recommendation being applied.' },
+        'expected-control-epoch': { type: 'string', description: '"recover" apply only: the `expectedControlEpoch` from the recommendation being applied.' },
+        'expected-expires-at': { type: 'string', description: '"recover" apply only: the `expiresAt` from the recommendation being applied.' },
+        'action-key': { type: 'string', description: '"recover" apply only: the `actionKey` from the recommendation being applied. Consumed exactly once -- a repeat call with the same key returns the prior recorded outcome instead of repeating the effect.' },
         json: { type: 'boolean', description: 'Accepted as a no-op -- the envelope is always JSON.' },
       },
       positional: ['sub', 'run-id'],
@@ -798,11 +804,16 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch show-run run_abc123',
       'fgos dispatch watch run_abc123',
       'fgos dispatch watch run_abc123 --interval 2000 --ticks 30',
+      'fgos dispatch recover run_abc123',
+      'fgos dispatch recover run_abc123 --intent reassign',
+      'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
     ],
     touchesState: false,
-    // Reads run directories and writes nothing, so per the registry's own
-    // rule it has no business requiring .fgos/ to pre-exist either -- a run
-    // that is not there is reported as not found, not as a broken install.
+    // "recover --action" writes only the target Run's own directory (a
+    // controlEpoch field on its run.json, one recovery-commands.jsonl
+    // line) -- never events.jsonl/state.json, so per this field's own
+    // documented definition (event-log append or state.json overwrite)
+    // this stays false, same reasoning show-run/watch already carry.
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,

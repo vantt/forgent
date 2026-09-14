@@ -88,6 +88,7 @@ import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
+import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
@@ -3165,7 +3166,7 @@ async function runVerb(verb, flags, positional, dir) {
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|watch> <runId>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|watch|recover> <runId>');
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       const runId = requireField(positional[1] ?? flags['run-id'], `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
       if (sub === 'show-run') {
@@ -3181,7 +3182,41 @@ async function runVerb(verb, flags, positional, dir) {
           },
         );
       }
-      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run or watch`);
+      if (sub === 'recover') {
+        const recoverCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
+        // No --action: pure, ephemeral observation -- same read-only shape
+        // show-run/watch already guarantee, never a write.
+        if (flags.action === undefined) {
+          return recoverObserveUseCase(recoverCtx, {
+            runId,
+            ...(flags.intent !== undefined ? { intent: flags.intent } : {}),
+          });
+        }
+        // Applying a recommendation requires all 5 CAS fields (Planner
+        // Contract): --action plus the four --expected-* fields naming
+        // exactly the recommendation this call re-verifies against current
+        // state. requireField below gives the same CLI-usage error every
+        // other verb gives for a missing flag; recoverApplyUseCase repeats
+        // the check itself so the same refusal is reachable by a caller
+        // that skips this CLI layer entirely.
+        let action;
+        try {
+          action = JSON.parse(flags.action);
+        } catch (err) {
+          throw new StoreError('validation', `dispatch recover --action must be valid JSON: ${err.message}`);
+        }
+        return recoverApplyUseCase(recoverCtx, {
+          runId,
+          action,
+          expectedSnapshot: requireField(flags['expected-snapshot'], 'dispatch recover --action requires --expected-snapshot'),
+          expectedControlEpoch: Number(
+            requireField(flags['expected-control-epoch'], 'dispatch recover --action requires --expected-control-epoch'),
+          ),
+          expectedExpiresAt: requireField(flags['expected-expires-at'], 'dispatch recover --action requires --expected-expires-at'),
+          actionKey: requireField(flags['action-key'], 'dispatch recover --action requires --action-key'),
+        });
+      }
+      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, watch, or recover`);
     }
 
     case 'coordination': {
@@ -5014,6 +5049,9 @@ const STORE_MISSING_WARNING_VERBS = new Set([
 //        evolve/Gate A surface -- bare `evolve` AND `evolve --pick` are
 //        both read-only (rank/inspect candidates, no write). Re-verified
 //        against the current code rather than trusted secondhand.
+//      - `dispatch`: `show-run`/`watch` never write; `recover` writes a
+//        Run's own controlEpoch/recovery-commands.jsonl only when --action
+//        is given (the bare observe form stays as read-only as show-run).
 // 3. Deliberately NOT guarded, already self-correcting via
 //    `resolveMainCheckoutRoot(process.cwd())` when `--dir` is omitted (own
 //    case-block comments, same mechanism `approve`/`sync-root`/
@@ -5063,6 +5101,10 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   coordination: (positional) => ['run', 'launch-master-loop'].includes(positional[0]),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,
+  // `dispatch show-run`/`watch` never write; `dispatch recover` writes
+  // (controlEpoch bump + one recovery-commands.jsonl line) only when
+  // --action is given -- the bare observe form stays read-only.
+  dispatch: (positional, flags) => positional[0] === 'recover' && flags.action !== undefined,
 };
 
 // True iff THIS invocation (verb + already-parsed positional/flags) will
