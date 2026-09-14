@@ -849,6 +849,8 @@ test('discoverCanonicalSkills rejects non-portable Gemini command verbs', () => 
     ['skill-colon', 'fgos:foo:bar'],
     ['skill-trailing-dot', 'fgos:foo.'],
     ['skill-unicode', 'fgos:café'],
+    ['skill-device-con', 'fgos:con'],
+    ['skill-device-com1', 'fgos:com1'],
   ]) {
     const root = mkTempDir('gemini-nonportable-intent-');
     const skillDir = path.join(root, 'core', 'skills', name);
@@ -1026,6 +1028,22 @@ test('generateGeminiSkillPackage rejects nested shared fragment collisions befor
   assert.equal(fs.existsSync(path.join(outDir, 'skills', '_shared', 'nested', 'same.md')), false);
 });
 
+test('assembleSkills rejects duplicate shared fragments even when legacy checkCollisions:false is passed', () => {
+  const root = mkTempDir('assemble-no-overwrite-shared-src-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  const domainShared = path.join(root, 'domains', 'coding', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.mkdirSync(domainShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'same.md'), '# Core Shared\n');
+  fs.writeFileSync(path.join(domainShared, 'same.md'), '# Domain Shared\n');
+  writeSkill(path.join(root, 'core', 'skills'), 'fgos-routing', SAMPLE_FRONTMATTER, '# Core Routing\n');
+
+  assert.throws(
+    () => assembleSkills(root, undefined, { checkCollisions: false }),
+    /duplicate shared fragment "same\.md" found in multiple sources:/,
+  );
+});
+
 test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized shared fragment collisions', () => {
   const root = mkTempDir('shared-normalized-collision-src-');
   const coreShared = path.join(root, 'core', 'skills', '_shared');
@@ -1064,6 +1082,36 @@ test('discoverSharedFragments rejects backslash shared fragment names before Win
   assert.throws(
     () => discoverSharedFragments(root),
     /invalid shared fragment path "nested\\same\.md": fragment names must not contain backslashes/,
+  );
+});
+
+test('discoverSharedFragments rejects Windows reserved shared fragment basenames', () => {
+  const root = mkTempDir('shared-device-name-src-');
+  const coreShared = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(coreShared, { recursive: true });
+  fs.writeFileSync(path.join(coreShared, 'AUX.md'), '# Device Name\n');
+
+  assert.throws(
+    () => discoverSharedFragments(root),
+    /invalid shared fragment path "AUX\.md": fragment names must not use Windows reserved basenames/,
+  );
+});
+
+test('generateGeminiSkillPackage rejects Windows reserved skill directory basenames', () => {
+  const root = mkTempDir('gemini-device-skill-src-');
+
+  assert.throws(
+    () => generateGeminiSkillPackage(root, mkTempDir('gemini-device-skill-pkg-'), {
+      skills: [{
+        name: 'CON',
+        canonicalDir: null,
+        intentId: 'fgos:demo',
+        userInvocable: true,
+        triggers: { gemini: '/fgos:demo' },
+        rawContent: `${SAMPLE_FRONTMATTER}\n# CON\n`,
+      }],
+    }),
+    /invalid Gemini skill name "CON": emitted skill path segments must not use Windows reserved basenames/,
   );
 });
 
@@ -1137,6 +1185,30 @@ test('generateGeminiSkillPackage rewrites symlinked absolute canonical shared re
   const skillPath = path.join(outDir, 'skills', 'fgos-symlink-absolute', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   assert.doesNotMatch(skillContent, /-alias\/core\/skills\/_shared\/x\.md/);
+  const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
+  assert.ok(ref);
+  assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
+});
+
+test('generateGeminiSkillPackage rewrites Windows-native absolute canonical shared references', () => {
+  const root = mkTempDir('gemini-windows-absolute-src-');
+  const sharedDir = path.join(root, 'core', 'skills', '_shared');
+  fs.mkdirSync(sharedDir, { recursive: true });
+  fs.writeFileSync(path.join(sharedDir, 'x.md'), '# X\n');
+  writeSkill(
+    path.join(root, 'core', 'skills'),
+    'fgos-windows-absolute',
+    '---\nname: fgos-windows-absolute\ndescription: Windows absolute ref\n---\n',
+    '# Windows Absolute\nRead `C:\\repo\\core\\skills\\_shared\\x.md`.\n',
+  );
+
+  const outDir = mkTempDir('gemini-windows-absolute-pkg-');
+  generateGeminiSkillPackage(root, outDir);
+  fs.rmSync(root, { recursive: true, force: true });
+
+  const skillPath = path.join(outDir, 'skills', 'fgos-windows-absolute', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  assert.doesNotMatch(skillContent, /C:\\repo\\core\\skills\\_shared\\x\.md/);
   const ref = skillContent.match(/`(\.\.\/_shared\/x\.md)`/);
   assert.ok(ref);
   assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));

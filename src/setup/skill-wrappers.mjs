@@ -30,6 +30,30 @@ const FRONTMATTER_PATTERN = /^---\r?\n[\s\S]*?\r?\n---\r?\n/;
 // one, never a partial state. Same tmp-then-rename shape every other
 // atomic write in this repo already uses.
 const ATOMIC_TMP_SUFFIX_PATTERN = /\.tmp-\d+-\d+-[a-z0-9]+$/;
+const WINDOWS_RESERVED_BASENAMES = new Set([
+  'con',
+  'prn',
+  'aux',
+  'nul',
+  'com1',
+  'com2',
+  'com3',
+  'com4',
+  'com5',
+  'com6',
+  'com7',
+  'com8',
+  'com9',
+  'lpt1',
+  'lpt2',
+  'lpt3',
+  'lpt4',
+  'lpt5',
+  'lpt6',
+  'lpt7',
+  'lpt8',
+  'lpt9',
+]);
 
 function atomicCopyFileSync(sourcePath, targetPath) {
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -443,7 +467,8 @@ function normalizeGeminiCommandVerb(intentId) {
   if (
     !rawVerb ||
     rawVerb !== rawVerb.toLowerCase() ||
-    !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(rawVerb)
+    !/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(rawVerb) ||
+    WINDOWS_RESERVED_BASENAMES.has(rawVerb)
   ) {
     throw new Error(
       `invalid Gemini command intent "${intentId}": command verb must use lowercase ASCII letters, digits, and single hyphens only`,
@@ -651,6 +676,15 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
     .map((part) => part.normalize('NFC').toLowerCase().replace(/[. ]+$/g, ''))
     .join('/');
 
+  const assertPortableFragmentSegment = (relPath, segment) => {
+    const basename = segment.split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
+    if (WINDOWS_RESERVED_BASENAMES.has(basename)) {
+      throw new Error(
+        `invalid shared fragment path "${relPath}": fragment names must not use Windows reserved basenames`,
+      );
+    }
+  };
+
   const scanShared = (sharedRoot, sourceLabel) => {
     if (!fs.existsSync(sharedRoot)) return;
     const walk = (currentDir, relBase = '') => {
@@ -662,6 +696,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
           );
         }
         const entryRel = relBase ? `${relBase}/${entry.name}` : entry.name;
+        assertPortableFragmentSegment(entryRel, entry.name);
         const fullPath = path.join(currentDir, entry.name);
         if (entry.isDirectory()) {
           walk(fullPath, entryRel);
@@ -746,6 +781,12 @@ function isPathInside(parent, candidate) {
 }
 
 function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
+  if (path.win32.isAbsolute(candidatePath)) {
+    const normalizedWinPath = path.win32.normalize(candidatePath);
+    const match = /(?:^|[\\/])(?:core[\\/]skills[\\/]_shared|domains[\\/][^\\/]+[\\/]skills[\\/]_shared)[\\/](.+)$/i.exec(normalizedWinPath);
+    return match ? match[1].split('\\').join('/') : null;
+  }
+
   const resolved = path.resolve(candidatePath);
   let real = resolved;
   try {
@@ -769,11 +810,22 @@ function fragmentPathForCanonicalReference(candidatePath, sharedRoots) {
 
 function rewriteAbsoluteSharedReferences(content, filePath, skillsDir, projectRoot, sharedRoots) {
   if (!projectRoot || sharedRoots.length === 0) return content;
-  const absoluteProjectPathPattern = /\/[^`\n)"']+/g;
+  const absoluteProjectPathPattern = /(?:\/|[A-Za-z]:\\)[^`\n)"']+/g;
   return content.replace(absoluteProjectPathPattern, (rawRef) => {
     const fragmentPath = fragmentPathForCanonicalReference(rawRef, sharedRoots);
     return fragmentPath ? packagedSharedReferenceFor(filePath, skillsDir, fragmentPath) : rawRef;
   });
+}
+
+function assertPortableGeminiSkillName(skillName) {
+  for (const segment of String(skillName || '').split(/[\\/]/)) {
+    const basename = segment.split('.')[0].normalize('NFC').toLowerCase().replace(/[. ]+$/g, '');
+    if (WINDOWS_RESERVED_BASENAMES.has(basename)) {
+      throw new Error(
+        `invalid Gemini skill name "${skillName}": emitted skill path segments must not use Windows reserved basenames`,
+      );
+    }
+  }
 }
 
 function rewritePackagedSkillReferences(content, filePath, skillsDir, sharedRoots = [], projectRoot) {
@@ -831,6 +883,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
   // Verify no duplicate command paths or intent collisions before writing any adapter files
   const seenVerbs = new Map();
   for (const s of canonicalSkills) {
+    assertPortableGeminiSkillName(s.name);
     const verb = normalizeGeminiCommandVerb(s.intentId);
     if (!seenVerbs.has(verb)) {
       seenVerbs.set(verb, []);
@@ -969,7 +1022,7 @@ export function generateGeminiSkillPackage(projectRoot, targetOutputDir, { skill
  * @param {object} [options]
  * @param {boolean} [options.prune=true] - When true, prunes orphan skill directories from `agentsSkillsRoot` that are not present in canonical sources (`core/skills` or `domains/[domain]/skills`). Set to false when layering domain skills on top of copied base skills.
  * @param {boolean} [options.checkDuplicates=true] - When true, rejects duplicate skill names and canonical intent IDs.
- * @param {boolean} [options.checkCollisions=true] - When true, rejects colliding shared fragments across core and domains.
+ * @param {boolean} [options.checkCollisions=true] - Legacy compatibility option; collisions are always rejected before production assembly copies shared fragments.
  */
 export function assembleSkills(
   projectRoot,
@@ -985,8 +1038,11 @@ export function assembleSkills(
     return assembled;
   }
 
-  // 1. Check shared fragment collisions across core and domains
-  discoverSharedFragments(projectRoot, { checkCollisions });
+  // 1. Check shared fragment collisions across core and domains.
+  // Collisions remain fatal even for callers that pass the legacy
+  // checkCollisions:false option; disabling the diagnostic cannot permit an
+  // actual generated-file overwrite.
+  const sharedFragments = discoverSharedFragments(projectRoot);
 
   // 2. Discover canonical skills and check for duplicate canonical skill names
   const canonicalSkills = discoverCanonicalSkills(projectRoot, { checkDuplicates });
@@ -994,26 +1050,15 @@ export function assembleSkills(
   const validSkillNames = new Set();
 
   // 3. Assemble _shared fragments into .agents/skills/_shared
-  const coreShared = path.join(coreSkillsRoot, '_shared');
-  if (fs.existsSync(coreShared)) {
+  if (sharedFragments.length > 0) {
     validSkillNames.add('_shared');
     const targetShared = path.join(agentsSkillsRoot, '_shared');
-    copyDirRecursive(coreShared, targetShared);
-    assembled.push(targetShared);
-  }
-
-  if (fs.existsSync(domainsRoot)) {
-    for (const domainEntry of fs.readdirSync(domainsRoot, { withFileTypes: true })) {
-      if (isOwnTmpFile(domainEntry.name) || domainEntry.name.startsWith('.')) continue;
-      if (!domainEntry.isDirectory()) continue;
-      const domainShared = path.join(domainsRoot, domainEntry.name, 'skills', '_shared');
-      if (fs.existsSync(domainShared)) {
-        validSkillNames.add('_shared');
-        const targetShared = path.join(agentsSkillsRoot, '_shared');
-        copyDirRecursive(domainShared, targetShared);
-        assembled.push(targetShared);
-      }
+    for (const fragment of sharedFragments) {
+      const targetPath = path.join(targetShared, fragment.relativeFragmentPath);
+      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+      atomicCopyFileSync(path.join(projectRoot, fragment.sourcePath), targetPath);
     }
+    assembled.push(targetShared);
   }
 
   // 4. Assemble canonical skills into .agents/skills/<name>
