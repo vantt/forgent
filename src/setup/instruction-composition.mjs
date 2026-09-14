@@ -31,7 +31,11 @@
 // This module emits the intermediate representation only. Rendering to AGENTS.md /
 // host files, the projection ledger, and doctor projection repair are P5.
 
-import { INSTRUCTION_KINDS, DEFAULT_SCOPE_SPECIFICITY } from './instruction-registry.mjs';
+import {
+  INSTRUCTION_KINDS,
+  DEFAULT_SCOPE_SPECIFICITY,
+  hasVerifiedSupersessionEvidence,
+} from './instruction-registry.mjs';
 
 export const EFFECTIVE_SET_SCHEMA_VERSION = 1;
 
@@ -212,8 +216,6 @@ export function evaluateInstructionComposition(units, options = {}) {
   const target = normalizeCompositionTarget(options.target);
   const host = typeof options.host === 'string' && options.host.trim() ? options.host.trim() : PORTABLE_HOST;
   const targetKey = effectiveSetKey(target);
-  const validSupersessionDecisions = new Set(options.validSupersessionDecisions ?? []);
-
   const all = [...units];
   for (const u of all) assertUnitShape(u);
   const registryIds = new Set(all.map((u) => u.id));
@@ -276,7 +278,7 @@ export function evaluateInstructionComposition(units, options = {}) {
         }
         if (
           t.kind === 'law' &&
-          !(u.supersessionDecisionVerified || validSupersessionDecisions.has(u.supersessionDecision))
+          !hasVerifiedSupersessionEvidence(u)
         ) {
           conflict('ILLEGAL_LAW_OVERRIDE', [u, t],
             `law "${t.id}" may only be superseded with a verified supersessionDecision; "${u.id}" has ${u.supersessionDecision || 'none'}`);
