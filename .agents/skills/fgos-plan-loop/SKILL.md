@@ -35,7 +35,7 @@ FlowDefinition, which declares exactly this loop's own worker graph:
 
 For a single, standalone code change that does not need a
 `plan.md`/`phase-NN-*.md` track of its own, see
-[`fgos-code-panel`](../fgos-code-panel/SKILL.md) instead -- same
+[`fgos-code-panel`](../../../domains/coding/skills/fgos-code-panel/SKILL.md) instead -- same
 mechanism, one cell, no track bookkeeping.
 
 Every request this skill composes is re-validated end to end by

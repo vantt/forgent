@@ -136,7 +136,7 @@ executor/tier mapping unless there is a real reason to diverge.
 A code-panel change never runs in the main checkout and never on the base
 branch. Open its own worktree on its own branch first, as a plain git
 operation, following
-`core/skills/_shared/private-cell-worktree.md`
+`../_shared/private-cell-worktree.md`
 with `<prefix>` = `code-panel`:
 
 ```sh
