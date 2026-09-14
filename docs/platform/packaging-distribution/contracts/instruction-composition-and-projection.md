@@ -5,7 +5,7 @@ Document type: Contract
 Audience: Maintainer, component owner, domain owner, implementation agent
 Purpose: Define how fgOS instruction fragments compose into effective agent instructions and render into host-visible files
 Design status: Draft
-Implementation status: Planned
+Implementation status: Partial: source registry and composition engine implemented; renderers/projection repair planned
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Architecture discussion

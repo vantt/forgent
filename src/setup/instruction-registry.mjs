@@ -15,6 +15,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import YAML from 'yaml';
+import { buildDecisionIndexMarkdown } from '../report/decision-index.mjs';
+import { listWork } from '../state/store.mjs';
 
 /**
  * Valid instruction rule forces (Section 6)
@@ -79,10 +81,46 @@ export const DEFAULT_SCOPE_SPECIFICITY = Object.freeze({
   host: 80,
 });
 
+const AUTHORITY_SCOPE_RULES = Object.freeze({
+  platform: new Set(INSTRUCTION_SCOPES),
+  component: new Set(['component', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+  domain: new Set(['domain', 'workspace', 'project', 'command', 'skill', 'host', 'session']),
+});
+
 /**
  * Pattern for extracting YAML frontmatter fenced by `---`.
  */
 const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/;
+const DECISION_ID_PATTERN = /^D-ADR\d{4}$/;
+const DECISION_ID_PREFIX_PATTERN = /^\s*(D-ADR\d{4})\b/;
+const VERIFIED_SUPERSESSION_UNITS = new WeakSet();
+
+function readDecisionIds(projectRoot, fgosDir = path.join(projectRoot, '.fgos')) {
+  const indexPath = path.join(projectRoot, 'docs', 'decisions', 'index.md');
+  if (!fs.existsSync(indexPath)) return new Set();
+  const content = fs.readFileSync(indexPath, 'utf8');
+
+  let view;
+  try {
+    view = listWork(fgosDir);
+  } catch {
+    return new Set();
+  }
+  if (content !== buildDecisionIndexMarkdown(view.decisions)) return new Set();
+
+  const ids = new Set();
+  for (const decision of view.decisions ?? []) {
+    if (decision.kind === 'engine') continue;
+    if (typeof decision.scope !== 'string' || !decision.scope.trim()) continue;
+    const match = DECISION_ID_PREFIX_PATTERN.exec(String(decision.text ?? ''));
+    if (match) ids.add(match[1]);
+  }
+  return ids;
+}
+
+export function hasVerifiedSupersessionEvidence(unit) {
+  return VERIFIED_SUPERSESSION_UNITS.has(unit);
+}
 
 /**
  * Custom error class for instruction registry operations.
@@ -148,7 +186,7 @@ export function extractInstructionFrontmatter(rawContent, filePath = '') {
  * Compile parsed frontmatter and body into an Instruction Unit with validated metadata.
  */
 export function compileInstructionUnit(meta, body, rawContent, context) {
-  const { projectRoot, fullPath, sourcePath, rootType, rootOwner, knownOwners } = context;
+  const { projectRoot, fullPath, sourcePath, rootType, rootOwner, knownOwners, fgosDir } = context;
 
   // 1. Validate ID
   if (!meta.id || typeof meta.id !== 'string' || !meta.id.trim()) {
@@ -248,6 +286,13 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     },
   });
 
+  if (!AUTHORITY_SCOPE_RULES[authorityType]?.has(scope)) {
+    throw new InstructionRegistryError(
+      `Instruction authority "${authorityType}:${unitOwner}" cannot claim scope "${scope}"`,
+      { filePath: sourcePath, code: 'AUTHORITY_SCOPE_MISMATCH' },
+    );
+  }
+
   // 6. Validate Specificity
   let specificity;
   if (meta.specificity !== undefined) {
@@ -293,12 +338,38 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
   const refines = toArrayOfStrings(meta.refines, 'refines');
   const supersedes = toArrayOfStrings(meta.supersedes, 'supersedes');
   const conflictsWith = toArrayOfStrings(meta.conflictsWith, 'conflictsWith');
+  const supersessionDecision = meta.supersessionDecision === undefined
+    ? null
+    : String(meta.supersessionDecision).trim();
+  if (meta.supersessionDecision !== undefined && !supersessionDecision) {
+    throw new InstructionRegistryError(
+      'Invalid "supersessionDecision": must be a non-empty string when provided',
+      { filePath: sourcePath, code: 'INVALID_METADATA' },
+    );
+  }
+  let supersessionDecisionVerified = false;
+  if (kind === 'law' && supersedes.length > 0) {
+    if (!supersessionDecision || !DECISION_ID_PATTERN.test(supersessionDecision)) {
+      throw new InstructionRegistryError(
+        'Law supersession requires "supersessionDecision" naming an existing D-ADR#### decision',
+        { filePath: sourcePath, code: 'INVALID_METADATA' },
+      );
+    }
+    const knownDecisionIds = readDecisionIds(projectRoot, fgosDir);
+    if (!knownDecisionIds.has(supersessionDecision)) {
+      throw new InstructionRegistryError(
+        `Law supersessionDecision "${supersessionDecision}" is not recorded in docs/decisions/index.md`,
+        { filePath: sourcePath, code: 'UNKNOWN_DECISION' },
+      );
+    }
+    supersessionDecisionVerified = true;
+  }
 
   const renderHints = meta.renderHints && typeof meta.renderHints === 'object' && !Array.isArray(meta.renderHints)
     ? { ...meta.renderHints }
     : {};
 
-  return Object.freeze({
+  const unit = Object.freeze({
     id,
     owner: unitOwner,
     authority,
@@ -313,6 +384,8 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     dependsOn,
     refines,
     supersedes,
+    supersessionDecision,
+    supersessionDecisionVerified,
     conflictsWith,
     renderHints,
     title: typeof meta.title === 'string' ? meta.title : '',
@@ -320,6 +393,8 @@ export function compileInstructionUnit(meta, body, rawContent, context) {
     body: body.trim(),
     rawContent,
   });
+  if (supersessionDecisionVerified) VERIFIED_SUPERSESSION_UNITS.add(unit);
+  return unit;
 }
 
 /**
@@ -555,6 +630,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
         rootType: 'platform',
         rootOwner: 'core',
         knownOwners,
+        fgosDir: options.fgosDir,
       });
       collected.push(unit);
     }
@@ -590,6 +666,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
             rootType: 'component',
             rootOwner: componentName,
             knownOwners,
+            fgosDir: options.fgosDir,
           });
           collected.push(unit);
         }
@@ -627,6 +704,7 @@ export function discoverInstructionSources(projectRoot, options = {}) {
             rootType: 'domain',
             rootOwner: domainName,
             knownOwners,
+            fgosDir: options.fgosDir,
           });
           collected.push(unit);
         }
