@@ -386,5 +386,19 @@ test('fgos-code-panel is canonically located in domains/coding/skills and absent
   });
 });
 
+test('fgos-code-panel canonical source has no broken markdown file links after domain move', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const skillContent = fs.readFileSync(skillPath, 'utf8');
+  const linkPattern = /\[[^\]]+\]\(([^)]+)\)/g;
+  const missing = [];
 
+  for (const match of skillContent.matchAll(linkPattern)) {
+    const target = match[1];
+    if (/^[a-z][a-z0-9+.-]*:/.test(target) || target.startsWith('#')) continue;
+    const targetPath = path.resolve(path.dirname(skillPath), target.split('#')[0]);
+    if (!fs.existsSync(targetPath)) missing.push(target);
+  }
 
+  assert.deepEqual(missing, []);
+});
