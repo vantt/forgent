@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Code/test scan plus cross-host trigger design discussion
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-14
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md
@@ -50,9 +50,10 @@ domains/<domain>/skills/
 Current generated or assembled distribution targets:
 
 ```txt
-.agents/skills/
-.claude/skills/
-plugins/fgOS/skills/
+.agents/skills/ (assembled portable projection)
+.claude/skills/ (generated thin wrappers for canonical skills; hand-authored skills preserved)
+plugins/fgOS/skills/ (mirrored fgos-* dev skills and _shared/; hand-authored plugin skills preserved)
+.gemini/extensions/fgos/ (prototype extension package generator; partial/planned)
 ```
 
 Current build/proof surfaces:
@@ -63,8 +64,9 @@ Current build/proof surfaces:
 | Generate Claude wrapper skills from `.agents/skills` | implemented | `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` |
 | Mirror `fgos-*` dev skills into the fgOS plugin for plugin-only consumers | implemented | `plugins/fgOS/skills/`, `test/skills/fgos-mirror.test.mjs` |
 | Detect missing/stale plugin skill packaging through doctor/fix registry | implemented | `src/setup/registrations.mjs`, `test/skills/fgos-mirror.test.mjs` |
+| Generate Gemini CLI extension package layout and commands | partial | `src/setup/skill-wrappers.mjs` (`generateGeminiSkillPackage`), `test/setup/skill-wrappers.test.mjs` |
 
-Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator.
+Generated targets are not the source of truth. They may be committed for host compatibility, but edits should flow from the canonical source through the generator. Note that host trees may be mixed: `plugins/fgOS/skills/` contains hand-authored user commands (`pick`, `submit`, `cook`, `list`, etc.) alongside mirrored `fgos-*` dev skills, and `.claude/skills/` preserves hand-authored skills (`ui-spec`, `gitnexus`) without treating them as generated wrappers.
 
 ## 4. Source-Of-Truth Rule
 
@@ -93,12 +95,14 @@ canonical skill source
 
 | Host / consumer | Adapter target | Trigger shape | Status |
 | --- | --- | --- | --- |
-| Codex / OpenAI skills | `.agents/skills/<skill>/SKILL.md` | `$fgos-...` or implicit selection by skill description | implemented for current skills |
+| Codex / OpenAI skills | `.agents/skills/<skill>/SKILL.md` | `$fgos-...` or implicit selection by skill description | implemented for current canonical skills |
 | Claude | `.claude/skills/<skill>/SKILL.md` plus fgOS plugin wrappers/commands where needed | existing `/fgOS:<verb>` compatibility, target lowercase alias `/fgos:<verb>` where host allows | partial |
 | Claude plugin-only consumer | `plugins/fgOS/skills/<skill>/SKILL.md` | plugin-exposed command/skill surface | implemented for current `fgos-*` dev skills |
-| Gemini CLI | extension package with `gemini-extension.json`, `GEMINI.md`, and `commands/fgos/<verb>.toml` | `/fgos:<verb>` via command directory namespace | planned |
+| Gemini CLI | extension package with `gemini-extension.json`, `GEMINI.md`, and `commands/fgos/<verb>.toml` | `/fgos:<verb>` via command directory namespace | partial (prototype generator only; release/doctor wiring planned) |
 
 Claude, Gemini, and Codex are adapters. None of them should own the fgOS skill semantics.
+
+Self-containment rule for the Gemini package (and any future installable extension): the package must run with the fgOS source repo absent. Every `commands/fgos/<verb>.toml` names only its packaged copy (`packaged_source = "skills/<skill>/SKILL.md"`) as the thing the host reads; the canonical directory it was rendered from is recorded in `provenance` as ledger metadata only, never as a runnable reference. Shared fragments ship inside the package under `skills/_shared/`. Generated adapter classification for `plugins/fgOS/skills/` follows the mirror's own write rule plus provenance (`_shared/` or `fgos-*` **and** a canonical/assembled source), so a hand-authored `plugins/fgOS/skills/fgos-custom/` with no source stays unmanaged.
 
 ## 6. Trigger Vocabulary
 
@@ -122,11 +126,15 @@ fgos:architecture-panel
 
 Adapter mapping:
 
-| Intent id | Codex/OpenAI skill | Claude | Gemini |
-| --- | --- | --- | --- |
-| `fgos:code-panel` | `$fgos-code-panel` | `/fgos:code-panel` and compatibility `/fgOS:code-panel` if already shipped | `/fgos:code-panel` |
-| `fgos:architecture-panel` | `$fgos-architecture-panel` | `/fgos:architecture-panel` | `/fgos:architecture-panel` |
-| `fgos:pick` | `$fgos-routing` or explicit host wrapper | `/fgos:pick` | `/fgos:pick` |
+| Intent id | Codex/OpenAI skill | Claude | Gemini | Status |
+| --- | --- | --- | --- | --- |
+| `fgos:code-panel` | `$fgos-code-panel` | `/fgos:code-panel` and compatibility `/fgOS:code-panel` if already shipped | `/fgos:code-panel` | implemented |
+| `fgos:architecture-panel` | `$fgos-architecture-panel` | `/fgos:architecture-panel` | `/fgos:architecture-panel` | implemented |
+| `fgos:routing` | `$fgos-routing` | `/fgos:routing` | `/fgos:routing` | implemented |
+| `fgos:pick` | `$fgos-routing` (alias) | `/fgos:pick` (compat `/fgOS:pick`) | `/fgos:pick` | partial (hand-authored plugin command; canonical public-intent mapping planned) |
+| `fgos:submit` | `$fgos-clarifying` (target) | `/fgos:submit` (compat `/fgOS:submit`) | `/fgos:submit` | partial (hand-authored plugin command; canonical public-intent mapping planned) |
+
+Direct 1:1 intent-to-trigger mapping is implemented for canonical skills whose intent matches their canonical name or frontmatter `intent:` / `public-intent:`. Compatibility mapping for legacy `/fgOS:*` commands where discovery does not yet produce explicit intent aliases (e.g. `fgos:pick` vs `fgos-routing`) is partial and tracked for subsequent instruction/routing phases.
 
 The lowercase `fgos:*` vocabulary is the desired cross-host user surface where the host supports slash commands and auto-suggest. Codex/OpenAI skills do not use slash command namespaces today, so `$fgos-*` remains the native portable trigger there.
 
