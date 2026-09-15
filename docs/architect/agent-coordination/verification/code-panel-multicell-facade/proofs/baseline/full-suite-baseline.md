@@ -112,19 +112,57 @@ AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
   expected: { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 2 }
 ```
 
-Confirmed deterministic: reproduced identically both in the full-suite run
-and in an isolated re-run (`node --test test/cli/fgos-intake-4.test.mjs`).
-Unrelated to coordination/session-engine/code-panel/plan-loop scope
-(fgos-intake CLI area) — pre-existing at BASE_REF, not introduced by this
-track.
+**Correction (Lead, after P00 fix-round-2 red-team finding N2/reviewer R2-02):**
+this is an **in-session environment artifact, not a pre-existing deterministic
+bug**. `seq` is derived per-writer-log
+(`src/util/events.mjs:443-453`/session-identity.mjs:66) from
+`CLAUDE_CODE_SESSION_ID` — every CLI spawned inside one Claude session shares
+a single log, inflating `seq`. The BASELINE command above unsets
+`CLAUDE_CODE_ENTRYPOINT`/`CLAUDECODE`/`CLAUDE_CODE_SSE_PORT` but **not**
+`CLAUDE_CODE_SESSION_ID`, and both the original capture and the "isolated
+re-run" that first called this "confirmed deterministic" ran inside the same
+Claude session. Lead directly re-ran with the var also unset:
+
+```sh
+env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT \
+  -u CLAUDE_CODE_SESSION_ID -u FGOS_SESSION_ID \
+  node --test test/cli/fgos-intake-4.test.mjs
+# -> 15 pass / 0 fail (was 14 pass / 1 fail with CLAUDE_CODE_SESSION_ID set)
+```
+
+**The true, environment-independent baseline is 51 failures (all
+`test/rust-host/*`), not 52.** The "52" figure recorded throughout this
+track so far (this file, P00's own docs, P04's full-suite gate result below)
+reflects a CONSISTENT in-session artifact applied uniformly to every run
+captured inside this same Claude session — so every *relative* comparison
+already made in this track (baseline vs P04, "zero regressions") remains
+valid, since both sides carried the identical +1 artifact. Only the
+*absolute* count and this failure's classification were wrong.
+**Going forward, any FULL_TEST run for this track (including P05's final
+gate) must also unset `CLAUDE_CODE_SESSION_ID` and `FGOS_SESSION_ID`** — the
+corrected, canonical `FULL_TEST` command is:
+
+```sh
+env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT \
+  -u CLAUDE_CODE_SESSION_ID -u FGOS_SESSION_ID npm test
+```
+
+A gate run with this corrected command should show 51 known baseline
+failures, not 52; a gate that still shows the fgos-intake-4 failure was run
+without unsetting `CLAUDE_CODE_SESSION_ID`/`FGOS_SESSION_ID` and is not
+itself a regression.
 
 ## Invariant
 
-This list of 52 may only **shrink**, never grow, at any later full-suite
-gate in this track (P04, P05). A new failure not on this list at a later
-gate is a real regression from this track's own diff, not baseline noise —
-it must be fixed or explicitly triaged as a distinct, non-baseline finding
-before that gate can close.
+This list of **51** (`test/rust-host/*` only, per the correction above) may
+only **shrink**, never grow, at any later full-suite gate in this track run
+with the corrected `FULL_TEST` command (P05's final gate). A new failure not
+on this list at a later gate is a real regression from this track's own
+diff, not baseline noise — it must be fixed or explicitly triaged as a
+distinct, non-baseline finding before that gate can close. (P04's own gate,
+recorded below, was captured before this correction and shows the
+uncorrected 52-count for internal comparison purposes only — see that
+section's own note.)
 
 ## P04 full-suite gate result (first confirmation of this invariant)
 
@@ -132,4 +170,11 @@ Run 2026-09-15 against `testedSha` `b16dd524621cbf97690663e9764f9ede286583be`
 (P04's own worktree, same environment fingerprint): tests 6530, pass 6469,
 fail 52. The 2 extra tests are the new regression tests P04 added, both
 passing. The 52 failing titles are byte-identical to the list above (empty
-diff) — zero regressions, zero incidental fixes.
+diff) — zero regressions, zero incidental fixes. **Captured before the
+CLAUDE_CODE_SESSION_ID correction above** — like the original baseline, this
+run did not unset that variable, so it also carries the same +1
+(fgos-intake-4) artifact. The *comparison itself* (baseline vs P04, no new
+failures) stays valid regardless, since both runs shared the identical
+artifact; a future re-run of this exact gate with the corrected command
+would show 51/6469 (or 6470, since the artifact-affected test would then
+pass), not 52/6469.
