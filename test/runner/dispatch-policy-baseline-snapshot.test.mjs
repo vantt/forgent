@@ -28,9 +28,7 @@ import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs'
  * - 'none' otherwise
  */
 export function deriveReadOnlyMechanism(args, confinement) {
-  const hasReadOnlyFlag =
-    args.some((arg, idx) => arg === '-s' && args[idx + 1] === 'read-only') ||
-    args.includes('-s read-only');
+  const hasReadOnlyFlag = args.some((arg, idx) => arg === '-s' && args[idx + 1] === 'read-only');
   if (hasReadOnlyFlag) {
     return 'provider-native-read-only';
   }
