@@ -17,7 +17,8 @@ description: >-
   change", "get an independent review and red-team on this patch before I
   merge it". Do not use for advisory coding decisions such as plugin versus
   core, option comparison, or architecture red-team; those route through
-  fgos-panel without mutation.
+  fgos-panel without mutation. A request that references a multi-cell
+  plan.md/phase-NN track is a fgos-plan-loop track, not this skill.
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

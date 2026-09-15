@@ -49,6 +49,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `domains/coding/instructions/verification-discipline.md` (`kind:
   procedure`) as the single source of the coding-worker verification rule
   rather than restating it.
+- `fgos-plan-loop` baseline step, proof-sufficiency wording, and close-rule
+  evidence lifecycle (code-implementation-track-policy track, P02):
+  `core/skills/fgos-plan-loop/SKILL.md` gains a baseline step (run the
+  track's full proof command once, record it in `plan.md` Execution
+  Inputs, list may only shrink) before its unattended loop; `produce`/
+  `revise` objectives now say to run only the phase's declared
+  Verification unless a full-suite gate applies; `review`/`redTeam` and
+  their recheck objectives now judge proof sufficiency, not only
+  correctness, and report a coverage gap as a finding for the Lead to
+  accept or evidence-backed reject; close wording states the durable
+  evidence schema (`coordination-accepted` / `merged-to-track` /
+  `checkpoint-verified`), checkpoint identity, escalation authority scoped
+  to the current cell, and the `testedSha != integratedSha` non-inference
+  rule; the description now routes "run/execute this code implementation
+  plan (track)" requests here. `fgos-code-panel` gains one routing line
+  (description + Non-Goals) pointing a multi-cell `plan.md`/`phase-NN`
+  request to `fgos-plan-loop` instead, plus a fix -- its fix-round
+  `authReviewRecheck`/`authRedTeamRecheck` example steps now declare
+  `grantedContextRefs: ["$ref:revise"]` so the template dispatches as
+  written instead of being refused.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result

@@ -17,7 +17,8 @@ description: >-
   change", "get an independent review and red-team on this patch before I
   merge it". Do not use for advisory coding decisions such as plugin versus
   core, option comparison, or architecture red-team; those route through
-  fgos-panel without mutation.
+  fgos-panel without mutation. A request that references a multi-cell
+  plan.md/phase-NN track is a fgos-plan-loop track, not this skill.
 ---
 
 # fgos-code-panel
@@ -66,6 +67,9 @@ here requires opening `fgos-plan-loop` to understand or use.
   separate design document. A change big enough to need its own design
   discussion before implementation is a `fgos-plan-loop` track, not this
   skill.
+- **No multi-cell track.** A request that references a multi-cell
+  `plan.md`/`phase-NN` track is a `fgos-plan-loop` track; this skill is
+  one cell.
 
 ## Verify the doer's real outcome yourself
 
@@ -279,9 +283,9 @@ step per position, all resuming the same `coordinationId`:
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
     { "type": "operation", "as": "revise", "operationId": "revise-candidate", "targetActorId": "fixer", "taskKey": "revise-candidate-fixer", "objective": "First run `git rev-parse --abbrev-ref HEAD` and stop immediately if it is not `code-panel--<change-slug>`. Then apply the accepted findings. Land a real commit; re-run the target project's real test command.", "expectedOutputs": ["a real git commit", "agent-result.json (status, summary, the test command's real outcome)"], "mutation": "mutating" },
-    { "type": "authorize", "as": "authReviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "authorizationId": "auth_codepanel_<change-slug>_fix1_reviewer_recheck", "invocationKey": "code-panel:<change-slug>:fix1:reviewer-recheck:1", "reason": "Revision landed; recheck against the original finding." },
+    { "type": "authorize", "as": "authReviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "authorizationId": "auth_codepanel_<change-slug>_fix1_reviewer_recheck", "invocationKey": "code-panel:<change-slug>:fix1:reviewer-recheck:1", "reason": "Revision landed; recheck against the original finding.", "grantedContextRefs": ["$ref:revise"] },
     { "type": "operation", "as": "reviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "taskKey": "reviewer-recheck-reviewer", "objective": "Recheck the revised commit against the accepted findings.", "expectedOutputs": ["agent-result.json (status, summary)"], "contextRefs": ["$ref:revise"] },
-    { "type": "authorize", "as": "authRedTeamRecheck", "operationId": "red-team-recheck", "targetActorId": "red-team", "authorizationId": "auth_codepanel_<change-slug>_fix1_red_team_recheck", "invocationKey": "code-panel:<change-slug>:fix1:red-team-recheck:1", "reason": "Revision landed; re-attempt the same class of attack." },
+    { "type": "authorize", "as": "authRedTeamRecheck", "operationId": "red-team-recheck", "targetActorId": "red-team", "authorizationId": "auth_codepanel_<change-slug>_fix1_red_team_recheck", "invocationKey": "code-panel:<change-slug>:fix1:red-team-recheck:1", "reason": "Revision landed; re-attempt the same class of attack.", "grantedContextRefs": ["$ref:revise"] },
     { "type": "operation", "as": "redTeamRecheck", "operationId": "red-team-recheck", "targetActorId": "red-team", "taskKey": "red-team-recheck-red-team", "objective": "Re-attempt any attack that previously succeeded against the revised commit.", "expectedOutputs": ["agent-result.json (status, summary)"], "contextRefs": ["$ref:revise"] }
   ]
 }
