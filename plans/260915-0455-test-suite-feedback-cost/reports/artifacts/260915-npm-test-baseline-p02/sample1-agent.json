@@ -1,0 +1,30 @@
+{
+  "status": 0,
+  "wallSeconds": 335.218591501,
+  "userSeconds": 2508.37,
+  "systemSeconds": 587.32,
+  "maxRssKb": 290940,
+  "cpuScope": "process-tree (GNU time -v wait4 rusage, includes reaped descendants)",
+  "stdoutPath": "/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/sample1-agent/stdout.log",
+  "stderrPath": "/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/sample1-agent/stderr.log",
+  "before": {
+    "clean": true,
+    "env": {
+      "sha": "456bff9bd844855d83721022fd7db8616cf6bc76",
+      "node": "v24.18.0",
+      "platform": "linux",
+      "arch": "x64",
+      "cpuCount": 16,
+      "loadavg": [
+        0.83,
+        0.73,
+        0.74
+      ],
+      "timestamp": "2026-09-15T13:18:48.172Z"
+    }
+  },
+  "after": {
+    "clean": true
+  },
+  "valid": true
+}

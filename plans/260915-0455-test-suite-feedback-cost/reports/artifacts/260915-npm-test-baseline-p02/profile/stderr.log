@@ -1,0 +1,23 @@
+	Command being timed: "/home/vantt/.nvm/versions/node/v24.18.0/bin/node /home/vantt/projects/test-suite-feedback-cost-p02/scripts/run-tests.mjs --test-reporter=junit --test-reporter-destination=/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/profile/junit.xml"
+	User time (seconds): 2502.53
+	System time (seconds): 580.73
+	Percent of CPU this job got: 903%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 5:41.22
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 287420
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 346
+	Minor (reclaiming a frame) page faults: 98325166
+	Voluntary context switches: 2714382
+	Involuntary context switches: 1791347
+	Swaps: 0
+	File system inputs: 32552
+	File system outputs: 5707536
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
