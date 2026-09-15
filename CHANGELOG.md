@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
+  exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
+  observations, terminal RunResults where present, duplicate identities, and
+  non-authorizing recovery ownership hints.
+
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
   historical/status notes pointing readers to the promoted

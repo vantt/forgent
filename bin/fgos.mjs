@@ -88,6 +88,7 @@ import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
+import { inspectDispatchUseCase } from '../src/verbs/dispatch/inspect.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
@@ -3168,8 +3169,14 @@ async function runVerb(verb, flags, positional, dir) {
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|watch|recover> <runId>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover>');
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
+      if (sub === 'inspect') {
+        return inspectDispatchUseCase(
+          { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
+          { run: flags.run, assignment: flags.assignment, cwd: flags.cwd },
+        );
+      }
       const runId = requireField(positional[1] ?? flags['run-id'], `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
       if (sub === 'show-run') {
         return showRunUseCase({ cwd: repoRootForDispatch, repoRoot: repoRootForDispatch }, { runId });
@@ -3218,7 +3225,7 @@ async function runVerb(verb, flags, positional, dir) {
           actionKey: requireField(flags['action-key'], 'dispatch recover --action requires --action-key'),
         });
       }
-      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, watch, or recover`);
+      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, inspect, watch, or recover`);
     }
 
     case 'coordination': {

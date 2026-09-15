@@ -788,12 +788,15 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|watch|recover> <runId>',
-    description: '"show-run"/"watch" are read-only observation of a dispatch Run, unchanged (see below). "recover" is the CAS-guarded recovery door for a STANDALONE (Assignment-owned, session-authority-free) Run: called with no --action, it reads the same run facts show-run does and returns a pure, ephemeral RecoveryRecommendation (snapshot hash, expected control epoch, a fresh action key, an expiry, and the recommended action) -- no write, no session event, safe to call any number of times. Called WITH --action (plus all four --expected-* CAS fields naming the exact recommendation being applied), it re-reads CURRENT state under a short in-process lock scoped to that one run directory, refuses a changed snapshot/control-epoch as "plan-stale", a past-expiry recommendation as "plan-expired", and a repeated call with an already-consumed --action-key as "already-applied" (returning the prior outcome, never repeating the effect) -- before recording exactly one command (a controlEpoch bump plus one recovery-commands.jsonl line in the Run\'s own directory). Never invokes the unconditional close-after-steps a coordination-session Run gets from run.mjs -- a Run reached through this door sits outside any coordination session\'s authority by contract. show-run/watch are read-only by construction, not by promise (neither module imports a herdr client or a dispatch adapter, so there is no code path to "agent prompt"/"send-text"/"send-keys"); recover\'s own write path is similarly self-contained, touching only the target run directory\'s own files.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover> [runId]',
+    description: '"inspect" is Dispatch-owned runtime inspection: exactly one of --run, --assignment, or --cwd is required. It resolves subjects and exposes recovery ownership only as a read hint; it never executes, forwards, or authorizes recovery. "show-run"/"watch" are read-only observation of a dispatch Run. "recover" is the CAS-guarded recovery door for a STANDALONE Run.',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'watch', 'recover'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover'] },
+        run: { type: 'string', description: '"inspect" only: Run id selector.' },
+        assignment: { type: 'string', description: '"inspect" only: Assignment id selector.' },
+        cwd: { type: 'string', description: '"inspect" only: cwd selector.' },
         'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
         interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
@@ -810,6 +813,9 @@ export const COMMAND_REGISTRY = [
     },
     examples: [
       'fgos dispatch show-run run_abc123',
+      'fgos dispatch inspect --run run_abc123',
+      'fgos dispatch inspect --assignment asgn_abc123',
+      'fgos dispatch inspect --cwd /workspace/project',
       'fgos dispatch watch run_abc123',
       'fgos dispatch watch run_abc123 --interval 2000 --ticks 30',
       'fgos dispatch recover run_abc123',
