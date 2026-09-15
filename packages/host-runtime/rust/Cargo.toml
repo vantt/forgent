@@ -3,6 +3,10 @@ name = "fgos-host-runtime"
 version = "0.1.0"
 edition.workspace = true
 
+[[bin]]
+name = "fixture-echo-process"
+path = "tests/fixtures/external-provider/echo_process.rs"
+
 [dependencies]
 tokio = { workspace = true, features = ["sync"] }
 serde.workspace = true

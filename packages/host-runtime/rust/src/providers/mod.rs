@@ -12,4 +12,9 @@ pub use external_process::{
     ExternalProvidesDeclaration, ExternalRuntimeDeclaration, LinkerError, ManifestError,
     DEFAULT_KNOWN_CAPABILITIES, DEFAULT_RESERVED_NAMESPACES, SUPPORTED_MANIFEST_VERSIONS,
     SUPPORTED_PROTOCOLS, SUPPORTED_RUNTIME_KINDS,
+    frame_codec, supervisor, CodecError, ExternalProcessConfig, ExternalProcessOutcome,
+    ExternalProcessRequest, ExternalProcessSupervisor, FrameCodec, FrameMessage, JsonRpcError,
+    JsonRpcNotification, JsonRpcRequest, JsonRpcResponse, RequestId, COMPONENT_PROTOCOL_VERSION,
+    DEFAULT_MAX_FRAME_SIZE, FIXTURE_OPERATION_ID, FIXTURE_OUTCOME_CONTRACT, FIXTURE_PROVIDER_ID,
+    FIXTURE_REQUEST_CONTRACT,
 };
