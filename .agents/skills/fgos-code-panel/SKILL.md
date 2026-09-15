@@ -60,10 +60,9 @@ here requires opening `fgos-plan-loop` to understand or use.
   `revise-candidate` step may commit its own work on the cell's own
   worktree branch (the default executor already permits `git add`/`git
   commit` there) -- but only the Lead merges that branch into the target
-  branch, by hand, outside any coordination request. This is about WHO
-  merges (never a dispatched worker), not WHEN relative to close -- the
-  Lead merges before running `close.json` (section 4), so the close
-  rationale can describe the real, final, post-merge-verified state.
+  branch, by hand, outside any coordination request, **after** the cell
+  closes (section 4): the target branch must never receive this cell's
+  code before the close gate actually passed.
 - **No design-doc ceremony.** `objective` names the exact file(s)/
   behavior to change directly, in plain text -- not a pointer to a
   separate design document. A change big enough to need its own design
@@ -232,39 +231,37 @@ evidence-backed rationale).
 
 ### Record it, so the policy's own effect is measurable
 
-**The cell trace is a `git note` on the merge commit -- not a new file,
-and not the coordination session's own directory either.** Two options
-were tried and rejected first: a `docs/`-tree directory keyed by
-"code-panel" (as if it were one track) would conflate every unrelated
-one-off change ever run through this skill into a single shared,
-ever-growing directory -- exactly the "no `index.md`, no track directory"
-line this skill's own closing sentence already rejects (bottom of this
-file). The coordination session's own directory
+**The record is the sequence of ordinary, tracked commits and their own
+messages -- not a new file, not a `git note`, and not the coordination
+session's own directory.** Three were tried and rejected: a `docs/`-tree
+directory keyed by "code-panel" (as if it were one track) would conflate
+every unrelated one-off change ever run through this skill into a single
+shared, ever-growing directory -- exactly the "no `index.md`, no track
+directory" line this skill's own closing sentence already rejects (bottom
+of this file). The coordination session's own directory
 (`.fgos/coordination/sessions/code-panel--<change-slug>/`) is `.gitignore`d
-(`.gitignore:25`) -- it is local, ephemeral, agent-execution state, not a
+(`.gitignore:25`) -- local, ephemeral, agent-execution state, not a
 repository record; a routine `git clean -fdX` deletes it with zero trace
-left in the repo. Neither is the durable record.
+left in the repo. A `git note` looked committed (it lives in the object
+store) but is not durable at the project level: `refs/notes/*` sits
+outside the default commit graph, does not push/fetch by default, and a
+fresh clone never sees it without extra configuration this repo does not
+carry.
 
-A `git note`, attached to the merge commit right after the post-merge
-verification and before `close.json` (the exact command is in section 4,
-where it actually runs), is: committed to the repository's own object
-store (survives `git clean`, unlike the session directory), attached to
-the exact commit it documents (no separate docs-tree ceremony, no index),
-and native git -- no schema/engine change needed.
+An ordinary commit has none of those problems: default commit graph,
+pushed/fetched like any other commit, visible in plain `git log`, no
+schema/engine change, no push/fetch policy to register. `close.json`'s
+rationale records the cell's own pre-merge proof (tier/command/duration/
+executed-or-reused for each test run); the post-merge verification
+commit (section 4) records the merge's own outcome. Between the two,
+every fact this section used to ask a `git note` to carry is covered by
+a real commit somewhere in the cell's own history.
 
-The `close.json` rationale still restates the same content for the
-session's own immediate bookkeeping (cheap, and useful while the session
-is still open) -- but the `git note` on the merge commit is the one
-readers should trust later, since it is the only copy that is actually
-committed. Read it back with `git notes show <mergedSha>` or
-`git log --show-notes`. To compare "full-suite runs per change" or wall
-time across many real cells, walk `git log --show-notes` for merge commits
-matching this pattern -- no separate report generator exists for this
-yet; add one only once a second real consumer of that aggregate needs it
-(ADR-007 §4). (Notes do not push/pull by default --
-`git push origin refs/notes/*` if the team wants them shared beyond this
-checkout; that is a policy choice for whoever owns this repo's remote, not
-decided here.)
+To compare "full-suite runs per change" or wall time across many real
+cells, `git log --all --grep "post-merge verification"` finds every
+code-panel cell's own record -- no separate report generator, docs
+directory, or push/fetch policy needed; add a real generator only once a
+second real consumer of that aggregate needs it (ADR-007 §4).
 
 **Known limits (not enforced by the engine).** Two distinct gaps, both
 Lead discipline in prose:
@@ -278,10 +275,10 @@ Lead discipline in prose:
 - The post-merge verification gate (section 4) specifically: it is a
   plain git operation the Lead performs by hand, same as the merge itself
   -- nothing stops a Lead from running `git worktree remove`/`git branch
-  -d` immediately after the merge without ever running the check. The
-  immediate-before-cleanup re-assertion in section 4 catches a `HEAD` that
-  moved during the check window; it does not catch a Lead who skips the
-  check outright.
+  -d` immediately after the merge without ever running the check or
+  making the record commit. The immediate-before-cleanup re-assertion in
+  section 4 catches a `HEAD` that moved during the check window; it does
+  not catch a Lead who skips the check outright.
 
 Building a validator/schema for either is deliberately deferred
 (ADR-007 §4: a second real consumer needed first) -- this note exists so
@@ -505,81 +502,32 @@ fgos coordination run --cwd "$wt" --file fix-1.json
 Repeat with `fix-2.json`, ... (new `authorizationId`/`invocationKey`
 values each time) if a recheck itself surfaces a new accepted finding.
 
-## 4. Merge, verify, then close
+## 4. Close, then merge, then verify
+
+**Close before merge, not after.** The target branch must never receive
+this cell's code before the close gate actually passed -- merging on an
+unclosed or failed session is not a supported door. `close.json` certifies
+`testedSha` (the cell's own worktree tip) only; the merge and its
+post-merge verification are separate, later, plain-git steps performed
+*after* a successful close, recorded outside the coordination session
+entirely (the session is already closed by then -- no field/door writes a
+new disposition into a closed session, the engine refuses it,
+`store.mjs`). This is the same close-then-merge order `fgos-plan-loop`
+already uses for its own cells; code-panel had briefly swapped the order
+so the close rationale could narrate the merge in the same breath, but
+that traded away the actual safety property (target branch never sees
+unclosed code) for a documentation convenience -- not a good trade,
+reverted here.
 
 Close only once the required first pass and every fix round this change
 needed have dispatched cleanly, and either `FULL_TEST` has run for the
 cell's own worktree-tip `(tree, environment)` state or the rationale
-states why `AFFECTED_TESTS` already covered the blast radius without it.
-**Merge
-comes before `close.json`, not after** -- the coordination session stays
-open (no field/door writes a disposition into a closed session; the
-engine refuses it, `store.mjs`) exactly so the close rationale can
-describe the REAL final state including the merge, instead of a promise
-about a merge that has not happened yet. This is still fully outside the
-coordination session -- the Lead's own git operation, never a
-coordination request (`## Non-Goals`'s "no git merge authority inside the
-session" is about a dispatched worker never being granted merge
-authority; it does not require merge to happen after close):
-
-```sh
-git -C "$main" merge --no-ff code-panel--<change-slug>
-```
-
-**Post-merge verification -- required before `close.json`.** The
-first-pass/fix-round proof only ever ran in the cell's own worktree; the
-merge commit is a DIFFERENT tree whenever `$base` moved during the cell's
-lifetime (a clean, conflict-free merge still unions in every commit
-`$base` gained while the cell was open) or the merge itself needed
-conflict resolution. Never assume the merge commit inherits that proof —
-check:
-
-```sh
-mergedSha=$(git -C "$main" rev-parse HEAD)
-mergedTree=$(git -C "$main" rev-parse HEAD^{tree})
-# The branch tip IS testedTree only if the Lead re-verified it after the
-# LAST fix round -- "Verify the doer's real outcome yourself" (above) is
-# what makes this assumption hold; if it does not hold, re-verify the tip
-# for real before trusting this comparison.
-testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
-baseBeforeMerge=$(git -C "$main" merge-base HEAD^1 HEAD^2 2>/dev/null || git -C "$main" rev-parse HEAD^1)
-```
-
-- `mergedTree` equals `testedTree` **and** the environment fingerprint
-  (above) is unchanged: the cell's own proof already certifies the merge
-  commit -- record `treeIdentical: true` with both shas, no re-run.
-- Otherwise: run `AFFECTED_TESTS` against `$main` at the new `HEAD` at
-  minimum; escalate to `FULL_TEST` if a `FULL_TRIGGERS` category fired.
-  Check the trigger against the actual merged diff, not just the cell's
-  own diff -- `$base`'s own new commits can trigger it too:
-  `git -C "$main" diff "$baseBeforeMerge" HEAD -- .` (this is the diff a
-  clean merge produced end to end; a conflict-resolution merge should
-  instead be read directly, since no single two-way diff represents a
-  three-way resolution). Escalate on the blast radius too when it
-  otherwise requires it. If this re-run fails, do not close as
-  `cell-closed` -- open a fix round (section 3, the session is still
-  active) targeting the real problem before merging again.
-
-Once post-merge verification passes, attach the durable record (see
-"Record it" above -- the `git note` is the copy readers should trust
-later; the session's own close rationale below is immediate bookkeeping):
-
-```sh
-git -C "$main" notes add -m "$(cat <<'NOTE'
-code-panel--<change-slug>
-Tests this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each
-Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS/FULL_TEST re-run: <result>>
-NOTE
-)" HEAD
-```
-
-Then close -- `runCoordinationUseCase` always attempts a quorum close as
-its own last step after every declared step finishes dispatching:
+states why `AFFECTED_TESTS` already covered the blast radius without it:
 
 ```json
 {
   "kind": "declared-protocol",
-  "objective": "Close: independent review + red-team both clean, merge landed and post-merge-verified.",
+  "objective": "Close: independent review + red-team both clean, tests run for this cell's own state.",
   "writerId": "<lead-identity>",
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
@@ -594,7 +542,7 @@ its own last step after every declared step finishes dispatching:
       "as": "closeCell",
       "targetRef": "<real assignment id of the final, accepted revise/recheck dispatch>",
       "disposition": "cell-closed",
-      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran for state <sha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <hash> merged into code-panel--<change-slug>'s base as <mergedSha>. Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS re-run at <mergedSha>: <result> | FULL_TEST re-run at <mergedSha>: <result>>. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each, including the post-merge check above. git note added on <mergedSha>.",
+      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran for state <testedSha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <testedSha> is the cell's own final, verified state. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each. Merge and post-merge verification happen after this close, as separate tracked commits (see below) -- not yet part of this session.",
       "evidenceRefs": ["<real assignment id of reviewRecheck>", "<real assignment id of redTeamRecheck>"]
     }
   ]
@@ -605,13 +553,80 @@ its own last step after every declared step finishes dispatching:
 fgos coordination run --cwd "$wt" --file close.json
 ```
 
-Only after `close.json` succeeds, and only if `$main`'s `HEAD` has not
-moved since the post-merge check above (another writer could have
-advanced it in the meantime -- re-assert immediately before cleanup,
-not just at check time):
+Only after `close.json` succeeds:
 
 ```sh
-[ "$(git -C "$main" rev-parse HEAD)" = "$mergedSha" ] || {
+testedSha=$(git -C "$wt" rev-parse code-panel--<change-slug>)
+git -C "$main" merge --no-ff code-panel--<change-slug>
+mainMergedSha=$(git -C "$main" rev-parse HEAD)
+mainMergedTree=$(git -C "$main" rev-parse HEAD^{tree})
+testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
+baseBeforeMerge=$(git -C "$main" merge-base HEAD^1 HEAD^2 2>/dev/null || git -C "$main" rev-parse HEAD^1)
+```
+
+`testedSha`, `mainMergedSha`, and (below) `postMergeVerifiedSha` name
+three DIFFERENT commits -- a stranger reading this cell's history later
+must be able to tell which one to trust for what; never collapse them
+into one field even when two happen to be identical.
+
+**Post-merge verification -- required before cleanup.** The first-pass/
+fix-round proof only ever ran in the cell's own worktree; `mainMergedSha`
+is a DIFFERENT tree whenever `$base` moved during the cell's lifetime (a
+clean, conflict-free merge still unions in every commit `$base` gained
+while the cell was open) or the merge itself needed conflict resolution.
+Never assume the merge commit inherits that proof -- check:
+
+- `mainMergedTree` equals `testedTree` **and** the environment fingerprint
+  (above) is unchanged: the cell's own proof already certifies the merge
+  commit -- no re-run needed.
+- Otherwise: run `AFFECTED_TESTS` against `$main` at `mainMergedSha` at
+  minimum; escalate to `FULL_TEST` if a `FULL_TRIGGERS` category fired.
+  Check the trigger against the actual merged diff, not just the cell's
+  own diff -- `$base`'s own new commits can trigger it too:
+  `git -C "$main" diff "$baseBeforeMerge" "$mainMergedSha" -- .` (this is
+  the diff a clean merge produced end to end; a conflict-resolution merge
+  should instead be read directly, since no single two-way diff
+  represents a three-way resolution). Escalate on the blast radius too
+  when it otherwise requires it.
+- If this re-run finds a REAL problem: the session is already closed, so
+  fixing it does not reopen this cell -- open a **new** code-panel cell
+  for the fix (a normal follow-up change), naming `mainMergedSha` as the
+  "what broke" context in its own `open.json` objective.
+
+**Record the result as an ordinary tracked commit -- not a `git note`.**
+`refs/notes/*` are not in the default commit graph, do not push/fetch by
+default, and a fresh clone will not see them without extra configuration
+this repo does not carry (`git notes list` on this repo returns nothing
+today, confirming no note from this skill's own earlier version was ever
+actually durable). An ordinary commit has none of that: default commit
+graph, pushed/fetched like any other commit, visible in plain `git log`.
+
+```sh
+git -C "$main" commit --allow-empty -m "$(cat <<MSG
+chore(code-panel--<change-slug>): post-merge verification
+
+testedSha: $testedSha
+mainMergedSha: $mainMergedSha
+Result: <treeIdentical: true, matches testedSha | AFFECTED_TESTS/FULL_TEST re-run: <result>>
+MSG
+)"
+postMergeVerifiedSha=$(git -C "$main" rev-parse HEAD)
+```
+
+(`--allow-empty` when the check needed no code change; when a real fix
+landed instead per the bullet above, that fix's own real commit IS
+`postMergeVerifiedSha` -- do not also add an empty one on top.) To find
+every code-panel cell's post-merge record later, `git log --all --grep
+"post-merge verification"` -- no separate report generator, docs
+directory, or push/fetch policy registration needed; add a real generator
+only once a second real consumer of that aggregate needs it (ADR-007 §4).
+
+Only once `postMergeVerifiedSha` exists, and only if `$main`'s `HEAD` has
+not moved since (another writer could have advanced it in the meantime --
+re-assert immediately before cleanup, not just at check time):
+
+```sh
+[ "$(git -C "$main" rev-parse HEAD)" = "$postMergeVerifiedSha" ] || {
   echo "refuse: HEAD moved since post-merge verification -- re-verify before cleanup" >&2
   exit 1
 }
