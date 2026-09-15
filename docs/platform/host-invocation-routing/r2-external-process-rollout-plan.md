@@ -5,7 +5,7 @@ Document type: Implementation plan
 Audience: Code-panel coordinator, implementation agent, reviewer, red-team
 Purpose: Break R2 external process provider preview into independently reviewable packets
 Design status: Draft
-Implementation status: Planned
+Implementation status: Implemented preview — all packets (R2-P0 through R2-P6) closed 2026-09-15
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Derived from host-invocation R2 architecture, contracts, and proof gate
@@ -75,12 +75,12 @@ implementation needs a reusable helper crate. It is not a shipped provider.
 | Packet | Goal | Likely surfaces | Depends on | Status |
 | --- | --- | --- | --- | --- |
 | R2-P0 | Lock fixture operation and manifest shape in docs/tests | R2 proof doc, manifest contract, test fixtures | none | Done 2026-09-15 — see [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md)#2 |
-| R2-P1 | Static manifest parser and validator | host-runtime Rust module or external-provider module, manifest tests | R2-P0 | Ready — combine with R2-P2 |
-| R2-P2 | Derived registry/linker and claim refusal | registry snapshot/linker code, negative tests | R2-P1 | Ready — combine with R2-P1 |
-| R2-P3 | Frame codec for component protocol | frame codec module, codec tests | R2-P0 | Ready — combine with R2-P4 |
-| R2-P4 | Process supervisor and lifecycle mapping | supervisor module, fixture process, timeout/crash tests | R2-P3 | Ready — combine with R2-P3 |
-| R2-P5 | Router integration and fixture invocation | provider adapter, InvocationService tests | R2-P2, R2-P4 | Blocked on P1/P2 and P3/P4 packets both closing |
-| R2-P6 | Conformance suite and docs closeout | R2 proof, implementation alignment, source audit if needed | R2-P5 | Blocked on R2-P5 |
+| R2-P1 | Static manifest parser and validator | host-runtime Rust module or external-provider module, manifest tests | R2-P0 | Done 2026-09-15 — merged `bc989a66` (combined with R2-P2) |
+| R2-P2 | Derived registry/linker and claim refusal | registry snapshot/linker code, negative tests | R2-P1 | Done 2026-09-15 — merged `bc989a66` (combined with R2-P1) |
+| R2-P3 | Frame codec for component protocol | frame codec module, codec tests | R2-P0 | Done 2026-09-15 — merged `4d625bc5` (combined with R2-P4) |
+| R2-P4 | Process supervisor and lifecycle mapping | supervisor module, fixture process, timeout/crash tests | R2-P3 | Done 2026-09-15 — merged `4d625bc5` (combined with R2-P3) |
+| R2-P5 | Router integration and fixture invocation | provider adapter, InvocationService tests | R2-P2, R2-P4 | Done 2026-09-15 — merged `60cbd111` |
+| R2-P6 | Conformance suite and docs closeout | R2 proof, implementation alignment, source audit if needed | R2-P5 | Done 2026-09-15 — see [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md)#4 |
 
 Packets may be combined only if the resulting review still has one clear proof
 surface. R2-P1/R2-P2 and R2-P3/R2-P4 are the natural combine candidates; R2-P5
