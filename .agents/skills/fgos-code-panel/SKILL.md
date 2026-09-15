@@ -94,8 +94,9 @@ suite belongs to declared gates... never every implement or fix round") to
 a single code-panel cell specifically, split into three tiers instead of
 plan-loop's two, because most code-panel changes are small enough that even
 "targeted" was ambiguous -- **this is the actual performance fix**: most
-cells never need more than the first tier, and the full suite runs at most
-once per cell, not once per round.
+cells never need more than the first tier, and the full suite never
+re-runs against a `(tree, environment)` state it already certified --
+usually once per cell, never once per round.
 
 - **focused** -- the direct test(s) for the exact module/symbol/behavior
   changed. Doer and fixer run this by default, every round.
@@ -229,39 +230,69 @@ evidence-backed rationale).
 
 ### Record it, so the policy's own effect is measurable
 
-**The cell trace is the coordination session's own event log -- not a new
-file.** Creating a `docs/`-tree directory keyed by "code-panel" (as if it
-were one track) would conflate every unrelated one-off change ever run
-through this skill into a single shared, ever-growing directory -- exactly
-the "no `index.md`, no track directory" line this skill's own closing
-sentence already rejects (bottom of this file). The durable record already
-exists: `close.json`'s
-disposition `rationale`, persisted in `.fgos/coordination/sessions/
-code-panel--<change-slug>/` and readable any time via
-`fgos coordination show code-panel--<change-slug> --json`.
+**The cell trace is a `git note` on the merge commit -- not a new file,
+and not the coordination session's own directory either.** Two options
+were tried and rejected first: a `docs/`-tree directory keyed by
+"code-panel" (as if it were one track) would conflate every unrelated
+one-off change ever run through this skill into a single shared,
+ever-growing directory -- exactly the "no `index.md`, no track directory"
+line this skill's own closing sentence already rejects (bottom of this
+file). The coordination session's own directory
+(`.fgos/coordination/sessions/code-panel--<change-slug>/`) is `.gitignore`d
+(`.gitignore:25`) -- it is local, ephemeral, agent-execution state, not a
+repository record; a routine `git clean -fdX` deletes it with zero trace
+left in the repo. Neither is the durable record.
 
-Every close rationale must therefore state, for every test command run
-this cell: the tier (focused / affected / full), the exact command,
-whether it executed or was reused via tree-identity (naming the sha and
-shared environment fingerprint), duration, the reason for any escalation
-past `focused`, and the failing-test delta versus whatever it was compared
-against -- not a summary like "tests passed," which cannot be checked
-later. To compare "full-suite runs per change" or wall time across many
-real cells, enumerate `.fgos/coordination/sessions/code-panel--*/` and
-read each session's close rationale the same way -- no separate report
-generator exists for this yet; add one only once a second real consumer
-of that aggregate needs it (ADR-007 §4).
+A `git note`, attached to the merge commit right after the post-merge
+verification (section 4) and before `close.json`, is: committed to the
+repository's own object store (survives `git clean`, unlike the session
+directory), attached to the exact commit it documents (no separate
+docs-tree ceremony, no index), and native git -- no schema/engine change
+needed.
 
-**Known limit (not enforced by the engine).** Everything in this section
-and "Proof tiers" above is Lead discipline in prose -- the coordination
-session's request schema has no field for a proof tier, `FULL_TRIGGERS`,
-or an environment fingerprint, and `disposition`/`rationale` accepts any
-non-empty string regardless of what it claims. A Lead who does not
-actually run `FULL_TEST` once, or who mislabels a real regression as
-`environmental-precondition`, is not caught by anything the engine checks.
-Building a validator/schema for it is deliberately deferred (ADR-007 §4: a
-second real consumer needed first) -- this note exists so that limit is
-stated, not silently assumed away.
+```sh
+git -C "$main" notes add -m "$(cat <<'NOTE'
+code-panel--<change-slug>
+Tests this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each
+Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS/FULL_TEST re-run: <result>>
+NOTE
+)" HEAD
+```
+
+The `close.json` rationale still restates the same content for the
+session's own immediate bookkeeping (cheap, and useful while the session
+is still open) -- but the `git note` on the merge commit is the one
+readers should trust later, since it is the only copy that is actually
+committed. Read it back with `git notes show <mergedSha>` or
+`git log --show-notes`. To compare "full-suite runs per change" or wall
+time across many real cells, walk `git log --show-notes` for merge commits
+matching this pattern -- no separate report generator exists for this
+yet; add one only once a second real consumer of that aggregate needs it
+(ADR-007 §4). (Notes do not push/pull by default --
+`git push origin refs/notes/*` if the team wants them shared beyond this
+checkout; that is a policy choice for whoever owns this repo's remote, not
+decided here.)
+
+**Known limits (not enforced by the engine).** Two distinct gaps, both
+Lead discipline in prose:
+- Everything in this section and "Proof tiers" above: the coordination
+  session's request schema has no field for a proof tier, `FULL_TRIGGERS`,
+  or an environment fingerprint, and `disposition`/`rationale` accepts any
+  non-empty string regardless of what it claims. A Lead who does not
+  actually run `FULL_TEST`, or who mislabels a real regression as
+  `environmental-precondition`, is not caught by anything the engine
+  checks.
+- The post-merge verification gate (section 4) specifically: it is a
+  plain git operation the Lead performs by hand, same as the merge itself
+  -- nothing stops a Lead from running `git worktree remove`/`git branch
+  -d` immediately after the merge without ever running the check. The
+  immediate-before-cleanup re-assertion in section 4 catches a `HEAD` that
+  moved during the check window; it does not catch a Lead who skips the
+  check outright.
+
+Building a validator/schema for either is deliberately deferred
+(ADR-007 §4: a second real consumer needed first) -- this note exists so
+both limits are stated, not silently assumed away.
 
 ## Default actor roster
 
@@ -484,9 +515,10 @@ values each time) if a recheck itself surfaces a new accepted finding.
 ## 4. Merge, verify, then close
 
 Close only once the required first pass and every fix round this change
-needed have dispatched cleanly, and either `FULL_TEST` has run once
-against the cell's own worktree tip or the rationale states why
-`AFFECTED_TESTS` already covered the blast radius without it. **Merge
+needed have dispatched cleanly, and either `FULL_TEST` has run for the
+cell's own worktree-tip `(tree, environment)` state or the rationale
+states why `AFFECTED_TESTS` already covered the blast radius without it.
+**Merge
 comes before `close.json`, not after** -- the coordination session stays
 open (no field/door writes a disposition into a closed session; the
 engine refuses it, `store.mjs`) exactly so the close rationale can
@@ -559,7 +591,7 @@ trace):
       "as": "closeCell",
       "targetRef": "<real assignment id of the final, accepted revise/recheck dispatch>",
       "disposition": "cell-closed",
-      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran once at <sha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <hash> merged into code-panel--<change-slug>'s base as <mergedSha>. Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS re-run at <mergedSha>: <result> | FULL_TEST re-run at <mergedSha>: <result>>. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each, including the post-merge check above.",
+      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran for state <sha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <hash> merged into code-panel--<change-slug>'s base as <mergedSha>. Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS re-run at <mergedSha>: <result> | FULL_TEST re-run at <mergedSha>: <result>>. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each, including the post-merge check above. git note added on <mergedSha>.",
       "evidenceRefs": ["<real assignment id of reviewRecheck>", "<real assignment id of redTeamRecheck>"]
     }
   ]
@@ -570,9 +602,16 @@ trace):
 fgos coordination run --cwd "$wt" --file close.json
 ```
 
-Only after `close.json` succeeds:
+Only after `close.json` succeeds, and only if `$main`'s `HEAD` has not
+moved since the post-merge check above (another writer could have
+advanced it in the meantime -- re-assert immediately before cleanup,
+not just at check time):
 
 ```sh
+[ "$(git -C "$main" rev-parse HEAD^{tree})" = "$mergedTree" ] || {
+  echo "refuse: HEAD moved since post-merge verification -- re-verify before cleanup" >&2
+  exit 1
+}
 git -C "$main" worktree remove "$wt"
 git -C "$main" branch -d code-panel--<change-slug>
 ```
