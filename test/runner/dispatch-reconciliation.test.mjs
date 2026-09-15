@@ -16,6 +16,7 @@ function assignmentDir(dir, id) { const d = path.join(dir, '.fgos', 'assignments
 function runDirFor(dir, id, attempt, value, result) { const d = path.join(dir, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ assignmentId: id, ...value })); if (result) fs.writeFileSync(path.join(d, 'result.json'), JSON.stringify(result)); return d; }
 function admitGen(dir, id, epoch, value) { const d = path.join(dir, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
 const legacyResult = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
+function deadClaim(dir, assignmentId, extra = {}) { const d = path.join(dir, '.fgos', 'assignments', assignmentId); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'dispatch.claim'), JSON.stringify({ pid: 99999999, startTime: '1', ...extra })); }
 
 test('reconcile clears only a dead-proven cwd lock and replay is idempotent', () => {
   const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
@@ -202,4 +203,87 @@ test('reconcile collect-result is blocked (not refused/applied) when no result e
   assert.equal(pending.outcome, 'blocked');
   const noRunId = planReconciliation(dir, { action: 'collect-result', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(noRunId.outcome, 'refused');
+});
+
+test('reconcile clear-assignment-claim clears a dead-holder claim when nothing is pending, and replay is idempotent', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  deadClaim(dir, 'a');
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'planned');
+  assert.equal(plan.proposedAction.kind, 'clear-assignment-claim');
+  const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(applied.outcome, 'applied');
+  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments', 'a', 'dispatch.claim')), false);
+  const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
+  assert.equal(replay.outcome, 'already-applied');
+  assert.equal(replay.priorOutcome, 'applied');
+});
+
+test('reconcile clear-assignment-claim blocks when a pending (unmaterialized) launch is admitted for the assignment', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  deadClaim(dir, 'a');
+  admitGen(dir, 'a', 1, { runId: 'run-pending-launch', attempt: 1 });
+  // No runDirFor call: the admitted runId never materialized a run.json.
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /pending launch/);
+  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments', 'a', 'dispatch.claim')), true);
+});
+
+test('reconcile clear-assignment-claim blocks when an admitted current Run has not settled', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  deadClaim(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-unsettled' });
+  admitGen(dir, 'a', 1, { runId: 'run-unsettled', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /unsettled Run/);
+});
+
+test('reconcile clear-assignment-claim blocks when the current Run settled but its result is still pending collect-result', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  deadClaim(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-uncollected' }, legacyResult('run-uncollected', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-uncollected', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /pending collection/);
+  // Collecting the result first must unblock the claim clear.
+  const collectPlan = planReconciliation(dir, { action: 'collect-result', runId: 'run-uncollected', now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(applyReconciliation(dir, collectPlan, { now: '2026-09-15T00:00:02.000Z' }).outcome, 'applied');
+  const claimPlan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:03.000Z' });
+  assert.equal(claimPlan.outcome, 'planned');
+});
+
+test('reconcile clear-assignment-claim needs-input on a corrupt/unparseable claim, and on conflicting admission facts', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  const claimDir = path.join(dir, '.fgos', 'assignments', 'a');
+  fs.mkdirSync(claimDir, { recursive: true });
+  fs.writeFileSync(path.join(claimDir, 'dispatch.claim'), '{ not json');
+  const corrupt = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(corrupt.outcome, 'needs-input');
+  assert.match(corrupt.reason, /corrupt/);
+
+  const dir2 = root();
+  assignmentDir(dir2, 'b');
+  deadClaim(dir2, 'b');
+  runDirFor(dir2, 'b', '01', { runId: 'run-a' }, legacyResult('run-a', 'b'));
+  runDirFor(dir2, 'b', '02', { runId: 'run-b' }, legacyResult('run-b', 'b'));
+  admitGen(dir2, 'b', 1, { runId: 'run-a', attempt: 1 });
+  fs.writeFileSync(path.join(dir2, '.fgos', 'assignments', 'b', 'admission', 'generations', '0000000002.json'), JSON.stringify({ runId: 'run-b', attempt: 1 }));
+  const conflicting = planReconciliation(dir2, { action: 'clear-assignment-claim', assignmentId: 'b', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(conflicting.outcome, 'needs-input');
+});
+
+test('reconcile clear-assignment-claim refuses without an assignmentId, and is blocked for an unknown assignment', () => {
+  const dir = root();
+  const noId = planReconciliation(dir, { action: 'clear-assignment-claim', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(noId.outcome, 'refused');
+  const unknown = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'does-not-exist', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(unknown.outcome, 'blocked');
 });
