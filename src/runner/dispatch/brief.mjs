@@ -42,6 +42,7 @@ export function briefPaths(runDir, round) {
     ackPath: path.join(outbox, `ack-${round}.json`),
     reportPath: path.join(outbox, `report-${round}.md`),
     resultPath: path.join(outbox, `result-${round}.json`),
+    effectiveExecutionContractPath: path.join(dir, 'effective-execution-contract.json'),
   };
 }
 
@@ -49,10 +50,17 @@ export function briefPaths(runDir, round) {
  * Render the brief the worker reads. `prompt` is the real work, verbatim --
  * this function wraps it, it never rewrites it.
  */
-export function renderBrief({ prompt, round, runDir, agentName }) {
+export function renderBrief({ prompt, round, runDir, agentName, effectiveContract }) {
   const p = briefPaths(runDir, round);
+  const contractSection = effectiveContract
+    ? `\n## Execution contract\n\n` +
+      `- Mutation: ${effectiveContract.mutation}\n` +
+      `- Result claim path: ${effectiveContract.resultClaim?.path || p.resultPath}\n` +
+      `- Timeout: ${effectiveContract.limits?.executorTimeoutMs ?? effectiveContract.limits?.timeoutMs}ms\n` +
+      `- Persisted contract: ${p.effectiveExecutionContractPath}\n`
+    : '';
   return `# Brief ${round}
-
+${contractSection}
 ## Acknowledge first
 
 Before you start, write this file:

@@ -88,6 +88,17 @@ import {
   computeSha256Digest,
   canonicalJson,
 } from './cli-spawn-supervisor.mjs';
+import {
+  buildEffectiveExecutionContract,
+  EFFECTIVE_EXECUTION_CONTRACT_FILE,
+  readEffectiveExecutionContract,
+} from './effective-execution-contract.mjs';
+
+export {
+  buildEffectiveExecutionContract,
+  EFFECTIVE_EXECUTION_CONTRACT_FILE,
+  readEffectiveExecutionContract,
+};
 
 function normalizeDigest(digest) {
   if (!digest || typeof digest !== 'string') return null;
@@ -756,7 +767,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -962,6 +973,15 @@ function admitRunAttempt(
       fsyncFileBestEffort(dispatchPlanPath);
     }
   }
+
+  if (buildEffectiveContractOpt) {
+    const effectiveContract = buildEffectiveContractOpt(record);
+    if (effectiveContract) {
+      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
+      fs.writeFileSync(contractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+      fsyncFileBestEffort(contractPath);
+    }
+  }
   fsyncDirBestEffort(stagingDir);
 
   try {
@@ -1121,6 +1141,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // persisted record instead of leaving an auditor to infer it by comparing
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
+  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
 
   const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
@@ -1173,6 +1194,7 @@ export async function executeAssignment(assignment, opts = {}) {
       delivery: 'not-sent',
       executorId: resolvedExecutorId,
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
+      effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
       ...(planContentHash ? { planContentHash } : {}),
       cwd,
       startedAt,
@@ -1180,9 +1202,45 @@ export async function executeAssignment(assignment, opts = {}) {
       status: 'running',
     }),
     buildDispatchPlan: () => compiledPlan,
+    buildEffectiveExecutionContract: (record) => buildEffectiveExecutionContract({
+      assignment: effectiveAssignment,
+      dispatchPlan: compiledPlan,
+      runId: record.runId,
+      runDir: path.join(runsDir, record.attemptStr),
+      cwd: effectiveCwd,
+      repoRoot: root,
+      runnerConfig: cfg,
+      timeoutMs,
+      executorId: resolvedExecutorId,
+      adapter: resolvedAdapter,
+    }),
   });
   const { attemptStr, runId, runDir } = admitted;
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
+  const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
+  let effectiveContract;
+  if (!fs.existsSync(effectiveContractPath)) {
+    effectiveContract = buildEffectiveExecutionContract({
+      assignment: effectiveAssignment,
+      dispatchPlan: compiledPlan,
+      runId,
+      runDir,
+      cwd: effectiveCwd,
+      repoRoot: root,
+      runnerConfig: cfg,
+      timeoutMs,
+      executorId: resolvedExecutorId,
+      adapter: resolvedAdapter,
+    });
+    fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+    fsyncFileBestEffort(effectiveContractPath);
+  } else {
+    try {
+      effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
+    } catch {
+      effectiveContract = null;
+    }
+  }
 
   const resultJsonPath = path.join(runDir, 'result.json');
   if (admitted.resumed) {
@@ -1242,7 +1300,11 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
-  const prompt = renderAssignmentPrompt(effectiveAssignment, { cwd, runDir: path.resolve(runDir) });
+  const prompt = renderAssignmentPrompt(effectiveAssignment, {
+    cwd,
+    runDir: path.resolve(runDir),
+    effectiveContract,
+  });
 
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
@@ -1299,7 +1361,6 @@ export async function executeAssignment(assignment, opts = {}) {
   // including a real herdr-spawn `invocations[]` executor -- misrouting it
   // into the cli-spawn supervisor, which then spawns against a herdr
   // launch-command file it cannot parse.
-  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
   const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
   // Both cli-spawn (via the local supervisor process, below) and herdr-spawn
   // (via `executeExecutorCli`'s own confinement-authority door) are

@@ -721,6 +721,17 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     lines.push('- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment is the lifecycle driver.');
   }
 
+  if (options.effectiveContract) {
+    const ec = options.effectiveContract;
+    lines.push('Effective execution contract:');
+    lines.push(`- Contract: ${ec.contract?.id || 'effective-execution-contract'}.v${ec.contract?.version || 1}`);
+    lines.push(`- Mutation: ${ec.mutation}`);
+    lines.push(`- Claim path: ${ec.resultClaim?.path || (options.runDir ? path.join(options.runDir, 'agent-result.json') : '(none)')}`);
+    lines.push(`- Timeout: ${ec.limits?.executorTimeoutMs ?? ec.limits?.timeoutMs}ms`);
+    lines.push(`- Write scope: ${ec.workspace?.writeScope && ec.workspace.writeScope.length > 0 ? ec.workspace.writeScope.join(', ') : '(none - read-only)'}`);
+    lines.push(`- Permission enforcement: ${ec.enforcementPosture ?? 'instructed'}`);
+  }
+
   return lines.join('\n');
 }
 
