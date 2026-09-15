@@ -5642,76 +5642,51 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
   assert.equal(outcome.verdictPayload, undefined);
 });
 
-test('chooseStageOperation skips contract-corrupt RunResult v2 (fails closed)', () => {
+test('chooseStageOperation consumes fully-bound contract-corrupt RunResults as no-evidence and fails closed', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
   initStore(tempDir);
   seedTaskSpecs(tempDir, ['validate-plan']);
 
-  const docsDir = path.join(tempDir, 'docs', 'history', 'feat-corrupt-v2');
-  fs.mkdirSync(docsDir, { recursive: true });
-  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n');
-
-  const asgnDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_corrupt_v2');
-  const runDir = path.join(asgnDir, 'runs', '01');
-  fs.mkdirSync(runDir, { recursive: true });
-
-  fs.writeFileSync(
-    path.join(asgnDir, 'assignment.json'),
-    JSON.stringify({
-      assignmentId: 'asgn_corrupt_v2',
-      workId: 'tsk-corrupt-v2',
-      stage: 'planning',
-      operation: 'validate-plan',
-      resultKind: 'gate-verdict',
-      dispatchedRuns: ['01'],
-      mutation: 'read-only',
-    }),
-  );
-
-  // Write contract-corrupt RunResult v2: projection status mismatch
-  fs.writeFileSync(
-    path.join(runDir, 'result.json'),
-    JSON.stringify({
-      contract: { id: 'assignment-run-result', version: 2 },
-      runId: 'run_asgn_corrupt_v2_01',
-      assignmentId: 'asgn_corrupt_v2',
-      classification: {
-        execution: { status: 'completed', exitCode: 0 },
-        assessment: { verdict: 'pass' },
-        confidence: { level: 'reported', basis: ['valid-agent-result-claim'] },
-        failure: null,
-        policy: { disposition: 'allow', code: null },
-        delivery: { mode: 'fresh' },
-        provenance: 'native-v2',
-      },
-      status: 'failed', // Projection mismatch! (Should be 'done')
-      confidence: 'reported',
-      runtime: { exitCode: 0 },
-      agentClaim: { status: 'done', summary: 'ok' },
-      settleReports: [],
-      evidence: { artifacts: [] },
-    }),
-  );
-
-  const work = {
-    id: 'tsk-corrupt-v2',
-    stage: 'planning',
-    domain: 'coding',
-    workflow: 'feature',
-    docsRef: 'docs/history/feat-corrupt-v2',
+  const validClassification = {
+    execution: { status: 'completed', exitCode: 0 },
+    assessment: { verdict: 'pass' },
+    confidence: { level: 'reported', basis: ['valid-agent-result-claim'] },
+    failure: null,
+    policy: { disposition: 'allow', code: null },
+    delivery: { mode: 'fresh' },
+    provenance: 'native-v2',
   };
 
-  const choice = chooseStageOperation({
-    work,
-    stage: 'planning',
-    contextSignals: { hasPlan: true, validationDue: true },
-    repoRoot: tempDir,
-  });
+  for (const [label, contract] of [
+    ['v2 projection mismatch', { id: 'assignment-run-result', version: 2 }],
+    ['present contract version demotion', { id: 'assignment-run-result', version: 1 }],
+  ]) {
+    const id = `tsk-corrupt-${label.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`;
+    const docsRef = `docs/history/${id}`;
+    const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+      id,
+      docsRef,
+      withHash: true,
+      withReport: true,
+      resultExtra: {
+        contract,
+        classification: validClassification,
+        runtime: { exitCode: 0 },
+        // The v2 contract projects this classification to done/reported.
+        // These tampered projections must survive all evidence bindings as a
+        // contract-corrupt, no-evidence result rather than being skipped.
+        status: 'failed',
+        confidence: 'reported',
+      },
+    });
+    assert.ok(fs.existsSync(resultPath), `${label}: fixture writes result.json`);
 
-  // Since corrupt v2 is skipped, validate-plan is requested rather than advancing
-  assert.equal(choice.operation, 'validate-plan');
-  assert.equal(choice.dispatch, 'assignment');
-  assert.equal(choice.stop, false);
-  assert.equal(choice.canAdvanceEdge, false);
+    const choice = choosePlanning(tempDir, planningWorkFor(id, docsRef), {
+      contextSignals: { hasPlan: true, validationDue: true },
+    });
+
+    assert.equal(choice.stop, true, `${label}: a fully-bound corrupt result stops the driver`);
+    assert.equal(choice.canAdvanceEdge, false, `${label}: a fully-bound corrupt result cannot advance`);
+  }
 });

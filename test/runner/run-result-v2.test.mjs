@@ -286,3 +286,26 @@ test('interpretRunResult interprets legacy v1 deterministically and preserves fi
   assert.equal(interpreted.evidence.sourceVersion, 'v1');
   assert.equal(interpreted.evidence.bytesRewritten, false);
 });
+
+test('interpretRunResult treats a present unsupported contract as corrupt, never as legacy v1', () => {
+  const nativeV2 = normalizeRunResultV2({
+    runId: 'run_contract_demoted',
+    assignmentId: 'asgn_contract_demoted',
+    runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
+    agentClaim: { status: 'done', summary: 'Worker supplied a forged legacy-looking projection.' },
+    confidenceLevel: 'reported',
+  });
+
+  for (const contract of [
+    { id: 'assignment-run-result', version: 1 },
+    { id: 'assignment-run-result', version: 3 },
+    { id: 'other-run-result', version: 2 },
+  ]) {
+    const interpreted = interpretRunResult({ ...nativeV2, contract });
+    assert.equal(interpreted.contractCorrupt, true);
+    assert.equal(interpreted.corrupt, true);
+    assert.equal(interpreted.status, 'no-evidence');
+    assert.equal(interpreted.confidence, 'failed');
+    assert.equal(interpreted.classification.provenance, 'contract-corrupt');
+  }
+});

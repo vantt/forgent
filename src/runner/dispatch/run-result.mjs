@@ -513,7 +513,7 @@ export function normalizeRunResultV2({
  * For v2 files:
  * Validates against v2 contract and invariants; returns contract-corrupt projection if invalid.
  *
- * For legacy v1 files (no contract.version):
+ * For legacy v1 files (contract entirely absent):
  * Deterministically derives classification with provenance: "legacy-derived" WITHOUT rewriting bytes.
  *
  * @param {object|string} input Object or file path
@@ -554,7 +554,10 @@ export function interpretRunResult(input, options = {}) {
     });
   }
 
-  // Check if v2
+  // A present contract is an explicit claim of a versioned format. Only the
+  // complete absence of that field is historical v1; a partial, unknown, or
+  // mismatched contract must never demote itself into attacker-controlled v1
+  // projections.
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
     const validation = validateRunResultV2(rawObj);
     if (!validation.valid) {
@@ -573,6 +576,24 @@ export function interpretRunResult(input, options = {}) {
       };
     }
     return { ...rawObj };
+  }
+
+  if (rawObj.contract !== undefined) {
+    return {
+      ...rawObj,
+      contract: { ...RUN_RESULT_CONTRACT },
+      classification: {
+        ...(rawObj.classification || {}),
+        provenance: 'contract-corrupt',
+      },
+      status: 'no-evidence',
+      confidence: 'failed',
+      contractCorrupt: true,
+      corrupt: true,
+      corruptionReasons: [
+        `contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: ${RUN_RESULT_CONTRACT.version}}`,
+      ],
+    };
   }
 
   // Historical legacy v1 interpretation
