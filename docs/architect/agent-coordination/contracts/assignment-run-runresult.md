@@ -2,7 +2,7 @@
 
 Document type: Contract
 Design status: Accepted
-Implementation: Partial
+Implementation: Partial (RunResult v2 and Dispatch runtime inspection implemented)
 Last reviewed: 2026-09-11
 Canonical for: semantic requests, runtime attempts, normalized results, and evidence
 
@@ -237,13 +237,12 @@ RunResult is the normalized outcome for one Run. It should identify:
 - failure classification;
 - timestamps and normalizer provenance.
 
-### Planned Dispatch Operability Addendum
+### Dispatch Operability Addendum
 
 The dispatch-operability design track
-(`plans/260914-dispatch-operability-evidence-attribution/`) is READY for a
-future implementation track, but not shipped. Its planned RunResult contract
-adds a versioned v2 classification while preserving `result.json` as the one
-terminal RunResult location:
+(`plans/260914-dispatch-operability-evidence-attribution/`) now supplies RunResult
+v2 interpretation and read-only Dispatch runtime inspection while preserving
+`result.json` as the one terminal RunResult location:
 
 - `RunResult` remains the only immutable terminal truth for a Run.
 - `RunObservation` is a mutable read projection for in-flight, ambiguous, or

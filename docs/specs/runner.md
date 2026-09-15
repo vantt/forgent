@@ -8,6 +8,24 @@ coverage: full
 
 # Spec: Runner (vòng tự hành)
 
+## Dispatch runtime inspection
+
+`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a
+read-only operation. It accepts exactly one selector: `--run`, `--assignment`,
+or `--cwd`. Resolution, duplicate detection, current-run derivation, and any
+recovery ownership hint happen inside Dispatch; the CLI only passes the typed
+payload. Inspection never executes, forwards, or authorizes recovery.
+
+Assignment and workspace projections fail closed: every materialized Run must
+be unambiguous and corroborated by its Assignment admission ledger before an
+inspection is ownership-complete or exposes a recovery hint. A duplicate
+materialization of a current admitted run is conflicting, returns every
+candidate location, and selects no single Run.
+
+The reader returns mutable `RunObservation` facts and the immutable terminal
+`RunResult` when present. A RunObservation never settles a Run; `result.json`
+remains the only terminal Run truth.
+
 Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng.
 
 ## Entry Points & Triggers

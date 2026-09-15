@@ -9,11 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
+  materializations and incomplete sibling admission evidence, including cwd
+  aggregates; ambiguous or incomplete evidence never produces a recovery hint.
+
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.
 
 ### Added
+
+- `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
+  exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
+  observations, terminal RunResults where present, duplicate identities, and
+  non-authorizing recovery ownership hints.
 
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
