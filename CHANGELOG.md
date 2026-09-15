@@ -76,7 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FOCUSED_TESTS`/`AFFECTED_TESTS`/`FULL_TEST`/`FULL_TRIGGERS`
   test-selection block (`AFFECTED_TESTS` uses the impact-analysis
   capability, e.g. GitNexus, when registered and present); the full suite
-  now runs at most once per cell near merge instead of once per round;
+  now never re-runs against a `(tree, environment)` state it already
+  certified (usually once per cell near merge, but never mechanically
+  once per round; refined further at P04);
   recheck steps read the fixer's own evidence by default instead of
   re-running; a tree-identity proof-reuse rule (record `treeIdentical:
   true` when `git diff testedSha integratedSha` is empty under the same

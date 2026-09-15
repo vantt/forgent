@@ -60,8 +60,10 @@ here requires opening `fgos-plan-loop` to understand or use.
   `revise-candidate` step may commit its own work on the cell's own
   worktree branch (the default executor already permits `git add`/`git
   commit` there) -- but only the Lead merges that branch into the target
-  branch, by hand, outside any coordination request, after the cell
-  closes.
+  branch, by hand, outside any coordination request. This is about WHO
+  merges (never a dispatched worker), not WHEN relative to close -- the
+  Lead merges before running `close.json` (section 4), so the close
+  rationale can describe the real, final, post-merge-verified state.
 - **No design-doc ceremony.** `objective` names the exact file(s)/
   behavior to change directly, in plain text -- not a pointer to a
   separate design document. A change big enough to need its own design
@@ -244,20 +246,11 @@ repository record; a routine `git clean -fdX` deletes it with zero trace
 left in the repo. Neither is the durable record.
 
 A `git note`, attached to the merge commit right after the post-merge
-verification (section 4) and before `close.json`, is: committed to the
-repository's own object store (survives `git clean`, unlike the session
-directory), attached to the exact commit it documents (no separate
-docs-tree ceremony, no index), and native git -- no schema/engine change
-needed.
-
-```sh
-git -C "$main" notes add -m "$(cat <<'NOTE'
-code-panel--<change-slug>
-Tests this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each
-Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS/FULL_TEST re-run: <result>>
-NOTE
-)" HEAD
-```
+verification and before `close.json` (the exact command is in section 4,
+where it actually runs), is: committed to the repository's own object
+store (survives `git clean`, unlike the session directory), attached to
+the exact commit it documents (no separate docs-tree ceremony, no index),
+and native git -- no schema/engine change needed.
 
 The `close.json` rationale still restates the same content for the
 session's own immediate bookkeeping (cheap, and useful while the session
@@ -542,9 +535,10 @@ conflict resolution. Never assume the merge commit inherits that proof —
 check:
 
 ```sh
+mergedSha=$(git -C "$main" rev-parse HEAD)
 mergedTree=$(git -C "$main" rev-parse HEAD^{tree})
 # The branch tip IS testedTree only if the Lead re-verified it after the
-# LAST fix round -- section 3's own "re-verify before disposition" rule is
+# LAST fix round -- "Verify the doer's real outcome yourself" (above) is
 # what makes this assumption hold; if it does not hold, re-verify the tip
 # for real before trusting this comparison.
 testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
@@ -566,12 +560,21 @@ baseBeforeMerge=$(git -C "$main" merge-base HEAD^1 HEAD^2 2>/dev/null || git -C 
   `cell-closed` -- open a fix round (section 3, the session is still
   active) targeting the real problem before merging again.
 
-Only once post-merge verification passes, close -- `runCoordinationUseCase`
-always attempts a quorum close as its own last step after every declared
-step finishes dispatching, and the rationale below is where the post-merge
-result actually gets recorded (see "Record it" above: this rationale, in
-`.fgos/coordination/sessions/code-panel--<change-slug>/`, IS the cell
-trace):
+Once post-merge verification passes, attach the durable record (see
+"Record it" above -- the `git note` is the copy readers should trust
+later; the session's own close rationale below is immediate bookkeeping):
+
+```sh
+git -C "$main" notes add -m "$(cat <<'NOTE'
+code-panel--<change-slug>
+Tests this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each
+Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS/FULL_TEST re-run: <result>>
+NOTE
+)" HEAD
+```
+
+Then close -- `runCoordinationUseCase` always attempts a quorum close as
+its own last step after every declared step finishes dispatching:
 
 ```json
 {
@@ -608,13 +611,17 @@ advanced it in the meantime -- re-assert immediately before cleanup,
 not just at check time):
 
 ```sh
-[ "$(git -C "$main" rev-parse HEAD^{tree})" = "$mergedTree" ] || {
+[ "$(git -C "$main" rev-parse HEAD)" = "$mergedSha" ] || {
   echo "refuse: HEAD moved since post-merge verification -- re-verify before cleanup" >&2
   exit 1
 }
 git -C "$main" worktree remove "$wt"
 git -C "$main" branch -d code-panel--<change-slug>
 ```
+
+(Comparing the commit SHA, not just its tree -- an intervening empty or
+metadata-only commit changes `HEAD` while leaving the tree unchanged, and
+would slip past a tree-only check.)
 
 (`worktree remove` and `branch -d` from the main checkout, never from
 inside `$wt`.)
