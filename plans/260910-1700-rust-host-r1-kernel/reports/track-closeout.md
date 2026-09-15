@@ -4,6 +4,9 @@
 - Plan: [`plans/260910-1700-rust-host-r1-kernel/plan.md`](../plan.md)
 - Date: 2026-09-11
 - Reference Target: `x86_64-unknown-linux-gnu`
+- Status as of 2026-09-15: DONE for R1 preview installed/default proof.
+  Public GitHub prerelease tag proof and stable/default graduation remain
+  release-publication follow-ups.
 
 ## 1. Overview and Delivered Scope
 
@@ -16,6 +19,12 @@ The `rust-host-r1-kernel` track implemented and delivered the full Rust `fgos` h
 5. **`fgctl` Binary & Lifecycle Management (`apps/fgctl`)**: Content-addressed machine release store under `${XDG_STATE_HOME:-$HOME/.local/state}/fgos/`, atomic activation (`.fgos/installation/activation.json`), upgrade, rollback repair, and quarantine on integrity violation.
 6. **Standalone Installer ([`install.sh`](../../../install.sh))**: Downloads and installs `fgctl` from GitHub releases with `SHA256SUMS` verification without cloning or requiring build toolchains.
 7. **CI Release Pipeline & External Consumer Proof**: Workflow [`.github/workflows/release.yml`](../../../.github/workflows/release.yml) and automated verification script [`scripts/ci-external-consumer.sh`](../../../scripts/ci-external-consumer.sh).
+
+The 2026-09-15 packaging-distribution proof re-ran the external-consumer flow
+against release-shaped local assets and proved the preview installed/default
+runtime claim: external/default `fgos` enters the Rust host and reports the
+activated manifest digest. Legacy Node fallback is now a deprecated explicit
+escape hatch for 30 calendar days after preview release publication.
 
 ## 2. Cell Merge History
 

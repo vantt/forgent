@@ -1,0 +1,53 @@
+✔ move doing -> awaiting-approval applies via the real CLI, exit 0 (1808.600521ms)
+✔ move awaiting-approval -> delivered (approval) applies via the real CLI, exit 0 (2073.842516ms)
+✔ move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written (1719.651856ms)
+✔ move awaiting-approval -> todo with an empty --reason "" is rejected as validation, exit 4, no event written (1510.424389ms)
+✔ move awaiting-approval -> todo (rejection) with --reason carries the reason into the event payload, exit 0 (1511.55529ms)
+✔ move awaiting-approval -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written (1523.849711ms)
+✔ move awaiting-approval -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written (1995.007145ms)
+✔ move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload (1365.432541ms)
+✔ ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready (2772.144221ms)
+✔ ask --rationale and answer --rationale both persist on gates[id], neither overwriting the other (1800.289594ms)
+✔ ask/answer round-trip on a CLAIMED item: ask releases the claim and settles directly to awaiting-human, answer resumes to the durable base — never a durable doing (claim-lock §5.1 + tsk-40m P1 fix) (2306.209656ms)
+✖ ask/answer round-trip on a genuinely legacy durable-doing item (no claim): answer clamps to todo — awaiting-human -> doing no longer exists (684.155896ms)
+✔ ask without --text is rejected as validation, exit 4, no event written, item stays in its prior status (665.058382ms)
+✔ answer on an item that is not awaiting-human is rejected as precondition, exit 2, no event written (677.533061ms)
+✔ ask rejects a CAS expected-status mismatch as conflict, exit 3, no event written (636.870548ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23388.513807
+
+✖ failing tests:
+
+test at test/cli/fgos-intake-4.test.mjs:318:1
+✖ ask/answer round-trip on a genuinely legacy durable-doing item (no claim): answer clamps to todo — awaiting-human -> doing no longer exists (684.155896ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+      from: 'doing',
+      id: 'gated-legacy-doing-item',
+  +   seq: 3,
+  -   seq: 2,
+      to: 'awaiting-human'
+    }
+
+      at TestContext.<anonymous> (file:///home/vantt/projects/forgentX/test/cli/fgos-intake-4.test.mjs:332:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:911:18)
+      at Test.postRun (node:internal/test_runner/test:1465:19)
+      at Test.run (node:internal/test_runner/test:1390:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:911:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 3 },
+    expected: { id: 'gated-legacy-doing-item', from: 'doing', to: 'awaiting-human', seq: 2 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

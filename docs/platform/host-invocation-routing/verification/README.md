@@ -23,7 +23,7 @@ Related:
 | [implementation-alignment.md](implementation-alignment.md) | `current snapshot` | Claim-by-claim implementation status. |
 | [compatibility-harness.md](compatibility-harness.md) | `planned` | Node/Rust CLI compatibility and command descriptor proof. |
 | [source-preservation-audit.md](source-preservation-audit.md) | `current snapshot` | Source-by-source proof that legacy intent was preserved or explicitly classified. |
-| [r1-rust-host-proof.md](r1-rust-host-proof.md) | `planned` | R1 installed Rust host proof. |
+| [r1-rust-host-proof.md](r1-rust-host-proof.md) | `implemented preview` | R1 preview installed/default Rust host proof, with stable/default graduation still open. |
 | [r2-external-process-proof.md](r2-external-process-proof.md) | `planned` | External process provider conformance proof. |
 | [r3-remote-peer-proof.md](r3-remote-peer-proof.md) | `planned` | Gateway peer-host semantic route proof. |
 
@@ -39,4 +39,3 @@ Verification records whether implementation matches a claim at a point in time. 
 | source preservation audit | [source-preservation-audit.md](source-preservation-audit.md) |
 | area portal | [../README.md](../README.md) |
 | ledger | [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
-

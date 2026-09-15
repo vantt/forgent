@@ -182,9 +182,11 @@ Evidence recorded in `verification/implementation-alignment.md`:
 The active plan note requires the workspace activation proof where
 `.fgos/installation/bin/fgos version --runtime-json` enters the Rust host and
 reports the activated `artifactDigest`. The P7 rust-host proof suite is green
-and the alignment table records activation/runtime-tail behavior as implemented;
-release posture remains partial until the release owner approves public/default
-runtime claims.
+and the alignment table records activation/runtime-tail behavior as implemented.
+The coordinator/user has approved preview public posture: external installs
+default `fgos` through the Rust host, and public docs may state Rust host is the
+default installed runtime. Stable/default release posture remains a separate
+release-owner decision.
 
 ## 5. Updated Status Surfaces
 
@@ -213,12 +215,32 @@ promoted by packet proof:
 
 ## 7. Release Decisions Still Required
 
-The code-panel track does not decide these product/release questions:
+The coordinator/user has settled the Node fallback posture: Rust host is the
+default runtime path for activated workspace installs; legacy Node fallback is
+deprecated immediately and may remain only as an explicit escape hatch with a
+warning/log/proof marker during a short compatibility window. The escape hatch
+must not silently catch Rust-host failures. The escape hatch is supported for
+30 calendar days after the preview release publication date; for the 2026-09-15
+preview proof/public-posture decision, the earliest removal date is 2026-10-15,
+unless the public preview tag is published later.
 
-- preview versus stable/default public release;
-- Node fallback compatibility window;
-- whether installed/default runtime claims may flip;
-- whether host-invocation R1 may move from the current partial posture to implemented.
+Public/default release posture means the official stance for users outside the
+source checkout: which release channel is published or recommended, which
+installed `fgos` entrypoint is documented as the default, and what
+compatibility/rollback promise applies to that channel. It is broader than the
+P6/P7 local proof that an activated workspace path enters the Rust host.
+
+The installed/default runtime claim is now implemented for preview public
+posture: external-installed/default `fgos` enters the Rust host, and fallback
+follows the explicit deprecated Node escape-hatch policy. The latest
+release-shaped external-consumer proof is recorded in
+`verification/install-and-release-proof.md`.
+
+The code-panel track still does not decide these product/release questions:
+
+- whether this preview posture graduates to stable/default release;
+- whether any public preview tag published after 2026-09-15 shifts the
+  30-day fallback removal date later.
 
 The coordinator/user approved and completed the merge to `main` after the
 panel-branch proof and main-merge preview proof passed.

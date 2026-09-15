@@ -9,7 +9,7 @@ Implementation status: Planned
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
@@ -32,9 +32,9 @@ Component class and invocation mechanism are separate axes. Core component, pack
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Process protocol framing is length-prefixed JSON-RPC over stdio. | `planned` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) | P7 conformance tests. |
-| Static manifest discovery does not execute provider code. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | P7 discovery proof. |
-| Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md) | Future ecosystem decision. |
+| Process protocol framing is length-prefixed JSON-RPC over stdio. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance tests closed 2026-09-15. |
+| Static manifest discovery does not execute provider code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 discovery proof closed 2026-09-15. |
+| Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md) | Still future ecosystem decision -- unaffected by R2 closing. |
 
 ## 4. Related Files
 
@@ -44,4 +44,3 @@ Component class and invocation mechanism are separate axes. Core component, pack
 | manifest contract | [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
 | source protocol | [../../../architect/host-invocation-routing/external-provider-protocol.md](../../../architect/host-invocation-routing/external-provider-protocol.md) |
-

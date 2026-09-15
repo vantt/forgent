@@ -2575,3 +2575,52 @@ test('a driver-authorized operation used AS a window source is stamp-anchored ex
   assert.equal(windowState('coord_vw_driver_authorized_source', ctx).open, true, 'no false negative for this shape');
   authorizeDeclaredOperation('coord_vw_driver_authorized_source', synthesizeAuthorization(), ctx.opts);
 });
+
+// ─── tsk-1bh: orphaned authorization must never permanently block a later,
+// correctly-scoped retry at the SAME binding ────────────────────────────────
+//
+// Every existing authorization-consumption test above supplies an explicit
+// `taskKey`, which bypasses `resolveTaskKeyAuthorization`'s own default-key
+// derivation entirely (`dispatchDeclaredOperation` only calls it when
+// `explicitTaskKey === undefined`). The bug this section covers only exists
+// on that default-derivation path, so a passing suite full of explicit-key
+// tests alone could never have caught it.
+
+test('tsk-1bh: an orphaned unconsumed authorization never permanently blocks a THIRD default-taskKey dispatch at the same binding', async () => {
+  const ctx = setup('coord_da_tsk1bh_orphan_retry');
+
+  // Authorization A: issued, then orphaned. The dispatch attempt against it
+  // throws BEFORE any Assignment is created (a contextRefs grant violation,
+  // same shape tsk-1bh's own real repro hit), so A is never consumed and
+  // stays unconsumed forever -- exactly the "earlier one was orphaned"
+  // scenario resolveBindingAuthorization's own comment names.
+  authorizeDeclaredOperation('coord_da_tsk1bh_orphan_retry', authorization({ authorizationId: 'auth_A', invocationKey: 'recheck:A' }), ctx.opts);
+  await assert.rejects(
+    dispatch('coord_da_tsk1bh_orphan_retry', ctx, { contextRefs: ['not-granted-ref'] }),
+    (err) => err instanceof CoordinationError && /is not granted by authorization "auth_A"/.test(err.message),
+  );
+  assert.equal(readManifest('coord_da_tsk1bh_orphan_retry', ctx.opts).assignmentRefs.length, 0, 'the orphaned attempt created no Assignment at all');
+
+  // Authorization B: a correctly-scoped retry, no explicit taskKey. Must
+  // dispatch as a genuinely new Assignment, consuming B -- A stays orphaned
+  // and unconsumed on the log, untouched.
+  authorizeDeclaredOperation('coord_da_tsk1bh_orphan_retry', authorization({ authorizationId: 'auth_B', invocationKey: 'recheck:B' }), ctx.opts);
+  const second = await dispatch('coord_da_tsk1bh_orphan_retry', ctx);
+  assert.equal(second.resumed, false);
+  assert.equal(readManifest('coord_da_tsk1bh_orphan_retry', ctx.opts).assignmentRefs.length, 1);
+
+  // Authorization C: a SECOND correction at the exact same binding, again no
+  // explicit taskKey, with A still sitting unconsumed on the log alongside
+  // it. Pre-fix, `resolveTaskKeyAuthorization`'s oldest-first `.find()` kept
+  // naming A in the derived taskKey (the same stale key B's own dispatch
+  // happened to use), so this third call collided with B's already-claimed
+  // key and was refused by the "fresher unconsumed authorization" guard --
+  // permanently blocking C's own retry despite C being a fresh, genuine,
+  // correctly-scoped authorization. Fixed: this must dispatch as a THIRD,
+  // genuinely new Assignment, consuming C.
+  authorizeDeclaredOperation('coord_da_tsk1bh_orphan_retry', authorization({ authorizationId: 'auth_C', invocationKey: 'recheck:C' }), ctx.opts);
+  const third = await dispatch('coord_da_tsk1bh_orphan_retry', ctx);
+  assert.equal(third.resumed, false, 'C must reach a genuinely new dispatch, never be refused as a stale collision with B\'s own key');
+  assert.notEqual(third.assignment.assignmentId, second.assignment.assignmentId);
+  assert.equal(readManifest('coord_da_tsk1bh_orphan_retry', ctx.opts).assignmentRefs.length, 2, 'A stays orphaned/unconsumed; only B and C ever materialize an Assignment');
+});

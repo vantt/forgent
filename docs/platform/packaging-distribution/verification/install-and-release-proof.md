@@ -57,9 +57,76 @@ npm test -- test/skills/fgos-mirror.test.mjs
 
 Run broader suites when implementation changes, release paths change, or a doc claim becomes a release promise.
 
-## 4. Evidence Rules
+## 4. Latest Preview Release Proof
+
+The preview installed/default runtime claim was locally re-proven on
+2026-09-15 with release-shaped assets:
+
+```bash
+cargo build --release --workspace
+node scripts/build-rust-distribution.mjs --out "$TMP_ASSETS/tree"
+tar -czf "$TMP_ASSETS/fgos-v0.1.0-preview-proof-x86_64-unknown-linux-gnu.tar.gz" -C "$TMP_ASSETS/tree" .
+tar -czf "$TMP_ASSETS/fgctl-v0.1.0-preview-proof-x86_64-unknown-linux-gnu.tar.gz" -C target/release fgctl
+cp install.sh "$TMP_ASSETS/"
+(cd "$TMP_ASSETS" && sha256sum fgos-*.tar.gz fgctl-*.tar.gz > SHA256SUMS)
+scripts/ci-external-consumer.sh --assets "$TMP_ASSETS"
+```
+
+Result:
+
+```txt
+Release tree staged successfully.
+artifactDigest: sha256:6c1aad61594b9c62ebc808a63418cbf3016f514a32e9889c2f2fa5af849176d5
+All external consumer proof steps passed successfully.
+```
+
+The external consumer proof installs `fgctl` from the release-shaped assets,
+runs `fgctl init --from <fgos tarball>` in a fresh project outside the source
+checkout, asserts `.fgos/installation/bin/fgos version --runtime-json` reports
+`host: "rust"` and an `artifactDigest` matching the verified release manifest,
+then verifies `fgos ready --json`, no-op `fgctl upgrade --from <same asset>`,
+and `fgctl repair`.
+
+## 5. Evidence Rules
 
 - Link evidence from docs instead of embedding long test explanations in specs.
 - Treat a passing local unit test as local proof, not release proof.
 - Treat external consumer CI as the strongest install/release proof.
 - Re-scan code before changing claim status in `implementation-alignment.md`.
+
+## 6. Settled Node Fallback Policy
+
+Public/default release posture means the officially supported release stance
+for users outside the source checkout: which release channel is published or
+recommended, which installed `fgos` entrypoint is documented as the default,
+and what compatibility/rollback promise the release owner makes for that
+channel. It is broader than local proof that a workspace-installed path can
+enter the Rust host.
+
+The compatibility posture is now settled as:
+
+- The public release posture is preview.
+- External installs default `fgos` through the Rust host.
+- Public docs may state that Rust host is the default installed runtime.
+- Rust host is the default runtime path for activated workspace installs.
+- Legacy Node fallback is deprecated immediately as a public/default runtime
+  posture.
+- Legacy Node fallback may remain only as an explicit escape hatch during a
+  short compatibility window. It must require an intentional selector such as
+  an environment variable, flag, or equivalent supported mechanism; it must not
+  silently catch Rust-host failures.
+- Any escape-hatch invocation must emit a warning, log entry, or proof marker
+  that distinguishes deliberate legacy fallback use from default Rust-host use.
+- The escape hatch remains supported for 30 calendar days after the preview
+  release publication date. For the 2026-09-15 preview proof/public-posture
+  decision, the earliest removal date is 2026-10-15; if the public preview tag
+  is published later, use that publication date plus 30 calendar days.
+
+This policy does not mean every component has moved to Rust. It means the
+user-facing default entrypoint is Rust-host-owned; the Rust host may still
+execute the legacy Node payload through the release manifest while that payload
+remains a component behind the host boundary.
+
+If the Rust host fails, support/rollback guidance follows the explicit
+deprecated Node fallback escape-hatch policy above. Silent fallback is not part
+of the support promise.

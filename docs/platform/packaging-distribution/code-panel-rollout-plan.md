@@ -5,11 +5,11 @@ Document type: Implementation plan
 Audience: Code-panel coordinator, implementation agent, reviewer, red-team
 Purpose: Break packaging-distribution work into independently reviewable code-panel packets
 Design status: Draft
-Implementation status: Planned
+Implementation status: Done
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Derived from docs/platform/packaging-distribution/** and the source preservation audit
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/packaging-distribution/README.md
 - docs/platform/packaging-distribution/verification/source-preservation-audit.md
@@ -18,6 +18,10 @@ Related:
 - docs/platform/packaging-distribution/contracts/instruction-composition-and-projection.md
 - docs/platform/packaging-distribution/contracts/repository-runtime-layout.md
 ```
+
+Status: DONE. P1-P9 are merged, the panel branch has merged to `main`, and
+the R1 preview installed/default Rust-host proof is recorded. Stable/default
+graduation remains a release-owner follow-up.
 
 ## 1. Operating Rule
 
@@ -55,7 +59,10 @@ Before opening any packet:
 No packet may silently delete a legacy/history detail. If a detail moves, update `source-preservation-audit.md`.
 
 Coordinator note, 2026-09-14:
-Recent host-invocation R1 handoff proof edits in this plan and the packaging-distribution verification docs are accepted for the active track. Apply them by packet boundary: P6 owns the Rust manifest/release handoff fields and manifest-based Rust host fallback proof; P7 owns the workspace activation end-to-end proof where `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`. Keep implementation-alignment status partial until release assets and public/default posture are decided.
+Recent host-invocation R1 handoff proof edits in this plan and the packaging-distribution verification docs are accepted for the active track. Apply them by packet boundary: P6 owns the Rust manifest/release handoff fields and manifest-based Rust host fallback proof; P7 owns the workspace activation end-to-end proof where `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`.
+
+Coordinator note, 2026-09-15:
+Public/default posture is settled for preview: this release posture is preview, external installs default `fgos` through the Rust host, public docs may state Rust host is the default installed runtime, and Rust-host failure support follows the explicit deprecated Node fallback escape-hatch policy. The escape hatch is supported for 30 calendar days after preview release publication; for the 2026-09-15 preview proof/public-posture decision, the earliest removal date is 2026-10-15 unless the public preview tag is published later.
 
 ## 3. Packet Queue
 
@@ -121,7 +128,7 @@ For P6/P7 closeout, report:
 4. Whether any claim remains partial and why.
 5. Which release decisions still need human/coordinator approval.
 
-The following decisions remain coordinator/release-owner decisions even when packet tests pass: preview versus stable/default public release, Node fallback compatibility window, whether installed/default runtime claims may flip, whether the panel branch may merge to `main`, and whether host-invocation R1 may move from current partial to implemented.
+The following decision remains a coordinator/release-owner decision even when packet tests pass: whether preview public posture graduates to stable/default release and whether host-invocation R1 may move beyond preview installed/default proof into a broader stable/default claim. The panel branch merge to `main` has been approved and completed.
 
 The panel track merges to `main` only after P9 closes and whole-track verification has passed.
 

@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/specs/distribution.md, README.md, code/test scan
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/packaging-distribution/README.md
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
@@ -28,18 +28,20 @@ The spec is written for current behavior and near-term accepted target behavior.
 | Entry point | Status | Purpose |
 | --- | --- | --- |
 | `install.sh` | Implemented | Installs `fgctl` from release assets into a machine-local install directory. |
-| `fgctl init` | Partial | Initializes a project/workspace from a staged or acquired fgOS release. |
-| `fgctl upgrade` | Partial | Moves a workspace activation to another release when supplied. |
-| `fgctl repair` | Partial | Repairs a workspace installation under the selected release model. |
-| `.fgos/installation/bin/fgos` | Partial | Stable workspace command surface after activation. |
-| `npm install -g github:vantt/forgent` | Implemented compatibility | Installs the legacy Node `fgos` and `fgos-runner` entry points. |
+| `fgctl init` | Implemented preview | Initializes a project/workspace from a staged or acquired fgOS release; current preview proof covers release-shaped assets. |
+| `fgctl upgrade` | Implemented preview | Moves a workspace activation to another release when supplied; current preview proof covers no-op upgrade against the verified asset. |
+| `fgctl repair` | Implemented preview | Repairs a workspace installation under the selected release model; current preview proof covers repair after activation. |
+| `.fgos/installation/bin/fgos` | Implemented preview | Stable workspace command surface after activation; current preview proof reports `host: "rust"` and the activated `artifactDigest`. |
+| `npm install -g github:vantt/forgent` | Implemented legacy deprecated | Installs the legacy Node `fgos` and `fgos-runner` entry points; explicit deprecated escape hatch during the compatibility window, not the public/default posture. |
 | `scripts/fgos-shell-integration.sh` | Implemented | Contributor/dev helper that resolves fgOS command tiers from shell functions. |
 | local `fgos init` | Partial target | Adopts/materializes workspace state after `fgctl` publishes a ready activation. |
 | `fgos doctor` | Implemented | Reports environment checks without writing by default. |
 | `fgos doctor --fix` | Implemented | Runs registered fixes and then reports checks. |
-| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior until a compatibility-window decision retires it. |
+| `fgos setup` | Implemented deprecated legacy compatibility | Wires local development support and runs registered environment repairs in the current Node CLI; command surfaces point workspace onboarding to `fgctl init` plus local `fgos doctor --fix`/`fgos doctor`, while shell/global integration remains compatibility behavior through the 30-day preview fallback window unless a later release decision replaces it. |
 
 ## 3. Install Channels
+
+**Release posture (coordinator decision, 2026-09-15):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for 30 calendar days after the preview release publication date; for the 2026-09-15 preview proof/public-posture decision, the earliest removal date is 2026-10-15, unless the public preview tag is published later.
 
 ## 3.1 Recommended Native Channel
 

@@ -3,13 +3,13 @@
 ```txt
 Document type: Roadmap
 Audience: Human reviewer, architect, maintainer, implementation agent
-Purpose: Plan the remaining work needed to move host-invocation-routing from release-candidate code to released/default runtime behavior
+Purpose: Plan the remaining work after R1 preview installed/default runtime proof
 Design status: Draft
-Implementation status: Planning
+Implementation status: R1 preview installed/default proof recorded; stable/default graduation still planned
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Created after 2026-09-14 code scan of host-runtime, apps/fgos, GitHub release state, and packaging-distribution links
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/spec.md
@@ -20,7 +20,11 @@ Related:
 
 ## 1. Current Baseline
 
-The codebase has a Rust-host release-candidate slice, but it is not released as the public/default installed runtime yet.
+The codebase has a Rust-host preview installed/default slice.
+Packaging-distribution proof shows external/default installed `fgos` enters the
+Rust host. The legacy Node fallback escape hatch is supported for 30 calendar
+days after preview release publication. Stable/default graduation remains a
+release-owner decision.
 
 | Evidence | Current state |
 | --- | --- |
@@ -32,9 +36,11 @@ The codebase has a Rust-host release-candidate slice, but it is not released as 
 | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14 during code scan and local Phase A proof refresh. |
 | `node --test test/rust-host/command-routes.test.mjs` | Passed on 2026-09-14 during local Phase A proof refresh. |
 | [package.json](../../../package.json) | npm `bin.fgos` still points to `bin/fgos.mjs`, the legacy Node compatibility entry. |
-| GitHub Releases | No public release asset was found on 2026-09-14. |
+| Preview release proof | Local release-shaped assets passed `scripts/ci-external-consumer.sh --assets <dir>` on 2026-09-15, including `install.sh`, `fgctl init`, Rust-host `version --runtime-json`, ready, no-op upgrade, and repair. |
 
-This means host-invocation is code-ready for a partial R1 slice, while public release/default installation is still a packaging-distribution concern.
+This means host-invocation has R1 preview installed/default proof, while
+stable/default graduation remains a packaging-distribution and release-owner
+concern.
 
 ## 2. Dependency Answer
 
@@ -45,10 +51,10 @@ Host-invocation-routing does not need to wait for packaging-distribution to cont
 | Keep Rust host/runtime tests green | Yes | No | This is local host-invocation code proof. |
 | Maintain command route matrix and drift checks | Yes | No | Route descriptors are host-invocation routing inputs. |
 | Add another native read route | Yes, after component ownership is clear | Only if route touches release/install/runtime selection | Native operation design is host-invocation plus owning component. |
-| Decide preview vs stable public release | No | Yes | This is public release posture. |
-| Decide Node fallback support window | No | Yes | This is support/rollback policy. |
-| Flip installed `fgos` to Rust by default | No | Yes | Packaging-distribution owns install, activation, release assets, and rollback. |
-| Prove `fgctl init` activates Rust host from release asset | No | Yes | `fgctl` and `.fgos/installation` are packaging-distribution. |
+| Decide preview vs stable public release | No | Yes | Preview is approved; stable/default graduation remains public release posture. |
+| Decide Node fallback support window | Closed for preview | Yes | Explicit fallback policy is approved for 30 calendar days after preview release publication. |
+| Flip installed `fgos` to Rust by default | Closed for preview | Yes | Packaging-distribution owns install, activation, release assets, and rollback; preview default flip is now recorded. |
+| Prove `fgctl init` activates Rust host from release asset | Closed for preview | Yes | `fgctl` and `.fgos/installation` proof is recorded in packaging-distribution. |
 | R2 external provider preview implementation | Mostly yes | Lightly, for release packaging of provider fixtures if shipped | Protocol and routing are host-invocation; artifact delivery may involve packaging. |
 | R3 remote peer | Mostly yes | Lightly, for project-local runtime adapter selection | Remote host must call selected project runtime, not become runtime selector. |
 | Chat host contract | Yes | No immediate dependency | No release/install dependency until a shipped host adapter exists. |
@@ -57,8 +63,8 @@ Host-invocation-routing does not need to wait for packaging-distribution to cont
 
 ```txt
 A. Close local R1 host proof
-B. Close packaging release decisions
-C. Cut and verify public release/default path
+B. Close remaining packaging release decisions
+C. Cut and verify stable/default public path
 D. Add next native read route
 E. Build R2 external provider preview
 F. Build R3 remote peer
@@ -66,7 +72,12 @@ G. Define chat host contract
 H. Retire legacy Node after zero-route proof
 ```
 
-Phase A can happen now without waiting. Phase B/C require packaging-distribution. Phase D can proceed in parallel only if it does not claim public release status. Phase E/F can be designed now, but shipped proof may touch packaging lightly.
+Phase A, Phase D's local native-read proof, Phase E (R2, closed 2026-09-15),
+and the preview parts of Phase B/C are closed. Stable/default graduation still
+requires packaging-distribution or release-owner decisions. Phase F now has
+its precondition satisfied (Phase E delivered `fixture.echo.echo`, a semantic
+operation that is not only a built-in CLI route) and can proceed on its own
+rollout plan.
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -89,28 +100,30 @@ Done when:
 - The relevant Node route-matrix tests pass.
 - [verification/implementation-alignment.md](verification/implementation-alignment.md) labels local code claims `current partial` or `implemented` with evidence.
 
-## 5. Phase B: Close Packaging Release Decisions
+## 5. Phase B: Close Remaining Packaging Release Decisions
 
-Goal: decide the remaining product/release questions that code cannot decide.
+Goal: decide the remaining product/release questions that preview proof cannot
+decide.
 
 Packaging-distribution decisions:
 
 | Decision | Needed because | Output |
 | --- | --- | --- |
-| Preview versus stable/default | Rust host code exists, but public rollout posture is not encoded by code. | Update packaging-distribution release docs and [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md). |
-| Node fallback compatibility window | Legacy fallback exists, but support duration is product/rollback policy. | Update [verification/compatibility-harness.md](verification/compatibility-harness.md) and Node-retirement criteria. |
-| Installed `fgos` flip gate | The repo can build Rust host, but users need release assets and activation. | Update packaging release proof and host-invocation R1 proof. |
+| Stable/default graduation | Preview public posture is approved, but stable/default release posture remains a product decision. | Update packaging-distribution release docs and [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) if/when stable is approved. |
+| Node fallback removal timing | Closed for preview: 30 calendar days after preview release publication. | Update Node-retirement criteria if stable/default graduation changes the support promise. |
 
 Host-invocation can prepare the exact ask for packaging-distribution, but it should not answer these decisions alone.
 
 Done when:
 
-- [architecture/release-boundaries.md](architecture/release-boundaries.md) no longer marks preview/stable or compatibility window as `unknown`.
+- [architecture/release-boundaries.md](architecture/release-boundaries.md) no longer marks stable/default or fallback timing as `unknown`.
 - Packaging-distribution docs record the same decision and link back to host-invocation.
 
-## 6. Phase C: Cut And Verify Public Release / Default Path
+## 6. Phase C: Cut And Verify Stable/Default Public Path
 
-Goal: prove that the release a user installs actually enters the Rust host.
+Goal: prove that a stable/default release a user installs actually enters the
+Rust host. The preview equivalent is already recorded in packaging-distribution
+proof docs.
 
 Packaging-distribution tasks:
 
@@ -134,7 +147,7 @@ Done when:
 
 - Release assets exist and are installable.
 - External consumer install/init/version proof passes.
-- R1 status can move from `current partial` to `implemented` for released/default runtime behavior.
+- R1 status can move from `implemented preview` to `implemented stable/default` for released/default runtime behavior.
 
 ## 7. Phase D: Add The Next Native Read Route
 
@@ -175,7 +188,8 @@ Goal: make external provider protocol real as a preview after R1 host semantics 
 
 Host-invocation tasks:
 
-- Implement static provider manifest validation.
+- Shape the R2 packet boundary before code: manifest-only discovery, process protocol, supervision, registry/linker, router admission, fixture provider, and proof docs.
+- Implement static provider manifest validation without executing provider code.
 - Implement length-prefixed JSON-RPC 2.0 stdio framing.
 - Implement bounded supervision, cancellation, backpressure, timeout, crash, and completion-unknown mapping.
 - Add duplicate claim, reserved namespace, unknown capability, and incompatible contract negative tests.
@@ -183,14 +197,16 @@ Host-invocation tasks:
 
 Packaging dependency: light. If preview providers ship as release artifacts, packaging-distribution must include and verify their files. If they are test fixtures only, host-invocation can proceed without packaging release work.
 
-Done when:
+Closed 2026-09-15 (all sub-tasks above done via R2-P0 through R2-P5). Done when:
 
-- [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) names the fixture provider and conformance suite.
-- External provider docs move from `planned` to `current preview` or `implemented preview` based on release posture.
+- [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) names the fixture provider and conformance suite. -- done, see its §4.
+- External provider docs move from `planned` to `current preview` or `implemented preview` based on release posture. -- done, `implemented preview`.
 
 ## 9. Phase F: R3 Production Remote Peer
 
 Goal: prove a project-local remote host is a peer of CLI for at least one native operation.
+
+Detailed rollout plan: [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
 
 Host-invocation tasks:
 
@@ -253,12 +269,10 @@ Done when:
 
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
-| 1 | Run route-matrix and rust-host targeted tests, fix only host-invocation failures. | Host invocation | No |
-| 2 | Create a short packaging decision note asking for preview/stable, fallback window, and flip gate. | Host invocation prepares; packaging decides | Yes |
-| 3 | Run packaging-distribution release proof tests already listed in packaging docs. | Packaging-distribution | Yes |
-| 4 | If release proof passes, cut/publish GitHub release assets. | Packaging-distribution | Yes |
-| 5 | Verify installed `.fgos/installation/bin/fgos version` enters Rust host. | Both | Yes |
-| 6 | Keep the implemented native read route `gate-bypass -> work.gate-bypass.show` verified as a local proof, using the confirmed work/state read ownership and no component-boundary change. | Host invocation plus existing work/state owner | No, unless bundled into release |
+| 1 | Keep route-matrix and Rust-host targeted tests green for the current preview baseline: 73 selectors, 71 `legacy-cli`, two native. | Host invocation | No |
+| 2 | R2 external process provider preview closed 2026-09-15: all packets (R2-P0 through R2-P6) merged and verified per [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) and [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
+| 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
+| 4 | R2 now proves at least one external provider operation through the common router (fixture.echo.echo, R2-P5) -- the condition this item was waiting on is met. R3 sequencing itself is [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md)'s own call, not restated here. | Host invocation | Light, for project runtime adapter selection |
 
 ## 13. Related Files
 
@@ -267,6 +281,8 @@ Done when:
 | area portal | [README.md](README.md) |
 | spec | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
+| R2 rollout plan | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
+| R3 rollout plan | [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md) |
 | R1 proof | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
 | R2 proof | [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
 | R3 proof | [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |

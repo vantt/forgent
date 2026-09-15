@@ -1,0 +1,15 @@
+# 12 most recent CI runs (workflow CI, branch main), checked 2026-09-15 via `gh run view <id> --log-failed`
+# glob-miss = lines matching "Could not find" (Node 20 received quoted glob 'test/**/*.test.mjs' literally)
+# cargo-err = clippy/compile error lines ; suite-ran = lines "# tests"/"# pass" (0 = node --test never ran)
+34700199177 2026-09-12 glob-miss=2 cargo-err=8 suite-ran=0
+34586483845 2026-09-11 glob-miss=2 cargo-err=8 suite-ran=0
+34576245219 2026-09-11 glob-miss=2 cargo-err=0 suite-ran=0
+34335695681 2026-09-09 glob-miss=2 cargo-err=0 suite-ran=0
+34321979826 2026-09-09 glob-miss=2 cargo-err=0 suite-ran=0
+34209113127 2026-09-08 glob-miss=2 cargo-err=0 suite-ran=0
+34206945497 2026-09-08 glob-miss=2 cargo-err=0 suite-ran=0
+34204738144 2026-09-08 glob-miss=2 cargo-err=0 suite-ran=0
+33781143696 2026-09-03 glob-miss=2 cargo-err=0 suite-ran=0
+33768437154 2026-09-03 glob-miss=2 cargo-err=0 suite-ran=0
+33756641083 2026-09-03 glob-miss=2 cargo-err=0 suite-ran=0
+33729232415 2026-09-03 glob-miss=2 cargo-err=0 suite-ran=0

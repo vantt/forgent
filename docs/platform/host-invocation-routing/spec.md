@@ -5,7 +5,7 @@ Document type: Area spec
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: State current and transition-state behavior for fgOS host invocation
 Design status: Draft
-Implementation status: Partial
+Implementation status: Preview installed/default proof plus partial route migration
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/**
@@ -26,7 +26,7 @@ This spec separates what is current from what is accepted target, planned, legac
 | --- | --- | --- | --- |
 | Existing Node CLI payload | `legacy-current` | Existing commands still run through the Node payload. `bin/fgos.mjs` remains in the source tree and must not be renamed or moved while the legacy payload exists. | [verification/implementation-alignment.md](verification/implementation-alignment.md#2-alignment-table) |
 | Legacy Node payload identity | `accepted-not-implemented` target over `legacy-current` file | R1 names the payload `legacy-node` in the release manifest and locates it through `components.legacyNode.root` and `components.legacyNode.entry`. | [contracts/legacy-payload.md](contracts/legacy-payload.md) |
-| Rust host code path | `current partial` | `apps/fgos` exists as a Rust CLI host, embeds `command-routes.json`, routes `version` natively to `distribution.build.show`, routes `gate-bypass` natively to `work.gate-bypass.show`, and routes other selectors through `legacy-cli`. Installed-default release posture still depends on packaging gates. | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
+| Rust host code path | `implemented preview` | `apps/fgos` exists as a Rust CLI host, embeds `command-routes.json`, routes `version` natively to `distribution.build.show`, routes `gate-bypass` natively to `work.gate-bypass.show`, and routes other selectors through `legacy-cli`. Packaging-distribution preview proof shows external/default installed `fgos` enters the Rust host. | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
 | Native invocation kernel | `current partial` | `packages/host-runtime/rust` implements `OperationId`, `OperationRequest`, `ProviderOutcome`, `OperationProvider`, pure router, registry snapshot, authority gates, and `InvocationService` for the current Rust-host slice. | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Transitional `legacy-cli` route | `current partial` | `command-routes.json` currently contains 71 `legacy-cli` selectors, and `apps/fgos/src/legacy_exec.rs` resolves the legacy Node payload from release/dev manifest fields before spawning Node. | [architecture/legacy-cli-transition.md](architecture/legacy-cli-transition.md) |
 | External process providers | `planned` | External providers use static manifest discovery and framed component protocol after R1. | [contracts/component-protocol.md](contracts/component-protocol.md) |
@@ -38,7 +38,7 @@ This spec separates what is current from what is accepted target, planned, legac
 | Entry path | Status | Rule |
 | --- | --- | --- |
 | `node bin/fgos.mjs ...` | `legacy-current` | Valid for current Node payload behavior and Node payload tests. It is not the target public runtime entry after R1. |
-| `apps/fgos` Rust host binary | `current partial` | Code and tests exist for the Rust host binary. Whether this is the installed default remains a packaging/release proof question. |
+| `apps/fgos` Rust host binary | `implemented preview` | Code, tests, and packaging-distribution preview release proof show the external/default installed `fgos` enters the Rust host. |
 | remote gateway route | `planned` | Planned peer host route after a route is migrated. It must not shell through CLI or parse `fgos.v1` internally. |
 | chat adapter | `planned` | Future host surface after contracts exist. |
 
@@ -56,7 +56,7 @@ HostInvocation + OperationRequest
   -> host presenter
 ```
 
-This is current partial behavior for the native `version -> distribution.build.show` route, the native `gate-bypass -> work.gate-bypass.show` route, and the host-runtime test fixture. It is not yet proof that the Rust host is the installed public default; that release proof remains in [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md).
+This is implemented preview behavior for the native `version -> distribution.build.show` route, the native `gate-bypass -> work.gate-bypass.show` route, and the host-runtime test fixture. Installed/default preview release proof is recorded in [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) and packaging-distribution proof docs.
 
 ## 5. Legacy Compatibility Rule
 
@@ -69,8 +69,8 @@ These are not missing migration work. They are deliberately preserved as `unknow
 | Unknown | Kind | What is unclear | Blocking scope | Closure condition |
 | --- | --- | --- | --- | --- |
 | R1 command route matrix | Code-verified current snapshot | The checked-in route matrix exists: 73 selectors total, 71 `legacy-cli` selectors and two native selectors: `version -> distribution.build.show` and `gate-bypass -> work.gate-bypass.show`. | Does not by itself prove installed-default release. | Keep `packages/host-runtime/contracts/command-routes.json` as the source snapshot and rerun drift tests when selectors change. |
-| Preview vs stable default | Product / release decision | Code can show the Rust host exists, but cannot decide whether the first public release is preview/opt-in or stable/default. | Blocks public R1 release posture. | Packaging-distribution records the release posture and activation default. |
-| Node fallback compatibility-window duration | Product / support decision | Code can prove fallback behavior exists, but cannot decide how long users are supported on it after Rust host becomes public. | Blocks rollback-window policy. | Support window and removal gate are written into release policy and compatibility proof docs. |
+| Preview vs stable default | Product / release decision | Preview public posture is approved; stable/default graduation remains undecided. | Blocks only stable/default graduation, not preview installed/default proof. | Release owner approves stable/default graduation after any additional release proof required. |
+| Node fallback compatibility-window duration | Product / support decision | Explicit deprecated fallback escape hatch is approved for 30 calendar days after preview release publication. | Blocks only removal before the 30-day window closes, not Rust-host default preview posture. | Use preview publication date plus 30 calendar days; for the 2026-09-15 preview proof/public-posture decision, earliest removal is 2026-10-15 unless the public preview tag is published later. |
 | Exact native descriptors beyond `distribution.build.show` | Code-verified current snapshot | `gate-bypass -> work.gate-bypass.show` is now the second production native selector; `test.fixture.echo` remains a test fixture in the host-runtime catalog/provider. | Blocks only future expansion, not the current docs migration. | Reopen when another production native selector is proposed. |
 | `gate-bypass` component ownership | Closed; local native proof implemented | Current code places gate-bypass read behavior in `src/state/gate-bypass.mjs`, exposes CLI descriptors in `src/cli/command-registry.mjs`, and setup/doctor config readiness in `src/setup/registrations.mjs`. The Rust route implements the read-only surface as `work.gate-bypass.show`, using existing work/state read ownership; setup/doctor config readiness remains Packaging-Distribution. | Does not prove full Work/State migration or installed-default release posture. | Keep `work.gate-bypass.show` as a local native read proof and record no component-boundary change. |
 | First external provider preview set | Product / conformance decision | Scan found no current external process provider implementation or manifest set beyond docs/planned protocol language. | Blocks R2 conformance fixture finalization. | R2 proof doc names the fixture provider, operations, manifest, and negative tests. |

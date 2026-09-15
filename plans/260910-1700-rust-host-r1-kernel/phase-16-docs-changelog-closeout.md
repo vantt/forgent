@@ -1,5 +1,8 @@
 # Phase 16 — Docs, Changelog, Closeout
 
+Status: DONE for R1 preview installed/default proof. Public GitHub prerelease
+tag proof remains a release-publication follow-up.
+
 Depends on: Phase 15 closed and merged. This is the track's last cell — by
 this point every cell (P00-P15: Node lane, Rust lane, fgctl lane, install, CI) is merged.
 

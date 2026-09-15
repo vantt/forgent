@@ -9,7 +9,7 @@ Implementation status: Planned
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
@@ -33,8 +33,8 @@ Discovery scans static manifests and does not execute provider code. The derived
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Static discovery does not execute code. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | P7 manifest fixture. |
-| Registry is derived rebuildable state. | `planned` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker) | R2 linker/cache proof. |
+| Static discovery does not execute code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 manifest fixture closed 2026-09-15. |
+| Registry is derived rebuildable state. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P2 linker proof closed 2026-09-15 (in-memory only; persisted cache/lock by fingerprint remains future work). |
 
 ## 4. Related Files
 
@@ -43,4 +43,3 @@ Discovery scans static manifests and does not execute provider code. The derived
 | external provider architecture | [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
-

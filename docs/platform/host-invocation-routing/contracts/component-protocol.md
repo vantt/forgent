@@ -9,7 +9,7 @@ Implementation status: Planned
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/verification/r2-external-process-proof.md
@@ -35,8 +35,8 @@ The semantic component protocol is versioned independently from CLI `fgos.v1` an
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Component protocol is distinct from public host protocols. | `planned` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol) | P7 conformance proof. |
-| `EncodedMessage` never enters built-in kernel. | `planned` | [invocation kernel](../architecture/invocation-kernel.md) | P3/P7 boundary tests. |
+| Component protocol is distinct from public host protocols. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance proof closed 2026-09-15. |
+| `EncodedMessage` never enters built-in kernel. | `implemented preview` | [invocation kernel](../architecture/invocation-kernel.md), [../../../../packages/host-runtime/rust/src/providers/external_process/adapter.rs](../../../../packages/host-runtime/rust/src/providers/external_process/adapter.rs) | R2-P5 defines `EncodedMessage` as a private struct fully contained in the external adapter module; confirmed by review not to appear in `contracts.rs`, the `OperationProvider` trait signature, or `builtin.rs`. Closed 2026-09-15. |
 
 ## 4. Related Files
 
@@ -45,4 +45,3 @@ The semantic component protocol is versioned independently from CLI `fgos.v1` an
 | external provider architecture | [../architecture/external-provider-protocol.md](../architecture/external-provider-protocol.md) |
 | request/outcome contract | [operation-request-outcome.md](operation-request-outcome.md) |
 | R2 proof | [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) |
-
