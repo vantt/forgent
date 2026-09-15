@@ -18,14 +18,22 @@ digest, resource incarnation, and expiry; apply re-reads under a local lock.
 It never recovers, signals, retries, relaunches, resumes, reassigns, admits,
 cancels, or takes over a Run.
 
-Two actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch
-lock after proving its holder's exact PID/start-time incarnation is dead) and
+Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch
+lock after proving its holder's exact PID/start-time incarnation is dead),
 `collect-result --run <runId>` (links an already-written, already-valid
 `result.json` through its owning Assignment, reusing
 `dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views
 so the two operations can never disagree about ownership or currency; a
 CoordinationSession-owned Run is refused, since linking its result is that
-session's own driver-authored write).
+session's own driver-authored write), `clear-assignment-claim --assignment
+<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-
+unmaterialized launch, unsettled Run, or uncollected result is still pending
+for that Assignment; also refused on a CoordinationSession-owned claim), and
+`repair-projection --run <runId>` (additively patches a stale
+`run.json.status` back to `settled` once an already-validated terminal
+RunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own
+RunResult interpretation so it can never disagree with inspection or
+collect-result about whether a Run settled).
 
 `fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a
 read-only operation. It accepts exactly one selector: `--run`, `--assignment`,

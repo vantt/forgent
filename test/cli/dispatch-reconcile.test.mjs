@@ -59,6 +59,15 @@ test('CLI plans repair-projection through --action and --run, and refuses it wit
   assert.equal(JSON.parse(missingRunId.stdout).data.outcome, 'refused');
 });
 
+test('CLI apply refuses a forbidden/unsupported action smuggled into a plan\'s proposedAction.kind', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-'));
+  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  const tampered = { actionKey: 'reconcile_forbidden', snapshot: { expiresAt: '2099-01-01T00:00:00.000Z' }, proposedAction: { kind: 'resume-driver' } };
+  const applied = run(root, ['dispatch', 'reconcile', 'apply', '--plan', JSON.stringify(tampered)]);
+  assert.equal(applied.status, 0, applied.stderr);
+  assert.equal(JSON.parse(applied.stdout).data.outcome, 'refused');
+});
+
 test('CLI apply refuses a same-byte outside-root target tampered into a plan', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   const bytes = JSON.stringify({ pid: 99999999, startTime: '1' });

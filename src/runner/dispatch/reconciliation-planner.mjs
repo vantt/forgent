@@ -24,8 +24,10 @@ const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8'));
 // module is the cli-spawn ADAPTER (it also owns child_process.spawn, worker
 // PGID signalling, receipt publication) and importing any one export from it
 // would put the whole adapter/process-control module on this file's import
-// graph, which the file-top comment and H4's static import-graph test both
-// forbid. The algorithm below is intentionally byte-identical to
+// graph, which the file-top comment and
+// test/runner/dispatch-reconciliation-import-graph.test.mjs's own static
+// import-graph walk both forbid. The algorithm below is intentionally
+// byte-identical to
 // getProcessStartTime's: split on the LAST ")" so a comm field containing
 // spaces or parens (e.g. "(some (weird) name)") never desyncs the fixed-index
 // fields that follow it, then take field 19 (starttime) of the
@@ -263,7 +265,8 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
 // markRunSettled to stamp run.json.status to agree with it. (An earlier
 // version of this action targeted a `run.json.phase` field that no
 // production writer ever set -- `status` is the one real marker every
-// reader above actually consults; fixed as part of H1.) Like collect-result
+// reader above actually consults, so the target field was corrected to
+// match.) Like collect-result
 // and clear-assignment-claim, it never derives Run/result facts itself: it
 // reuses inspectDispatchRuntime's --run view verbatim (the SAME RunResult
 // interpretation runtime-inspection.mjs's `one()` already performs, backed
