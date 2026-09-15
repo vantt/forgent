@@ -34,12 +34,12 @@ Source traces: `docs/architect/agent-coordination/verification/code-implementati
   - Proof tier: `targeted` with initial baseline capture
   - Focused runs: 1 (167 pass)
   - Affected runs: 0
-  - Full-suite runs: 1 (`npm test` clean env; established corrected baseline of 51 unique failing tests due to missing compiled Rust binary in worktree)
+  - Full-suite runs: 1 (`npm test` clean env; established corrected baseline of 52 unique failing tests: 51 test/rust-host/* due to missing compiled Rust binary in worktree + 1 in test/cli/fgos-intake-4.test.mjs:318 deterministic pre-existing seq mismatch; 6467 pass + 52 fail + 9 skipped = 6528 total)
 - **P03 (FOCUSED_TESTS / AFFECTED_TESTS / FULL_TEST Execution Contract):**
   - Proof tier: escalated to `full-suite-gate` per Lead judgment
   - Focused runs: 1 (`node --test test/skills/*.test.mjs test/setup/*instruction*.test.mjs test/setup/skill-wrappers.test.mjs test/architecture.test.mjs`, 167 pass, ~1.9s)
   - Affected runs: 0
-  - Full-suite runs: 1 (51/51 matched baseline, 0 new)
+  - Full-suite runs: 1 (52/52 matched baseline, 0 new)
 - **P04 (Proof Reuse & Tree-Identity Edge Cases):**
   - Proof tier: `targeted` (no FULL_TRIGGERS fired)
   - Focused runs: 2 (reviewer op_026 + lead re-run, 167 pass, ~1.8s)
@@ -49,7 +49,7 @@ Source traces: `docs/architect/agent-coordination/verification/code-implementati
   - Proof tier: `targeted` (839 coordination tests) + Lead full run
   - Focused runs: 2 (839/839 coordination suite + 167/167 targeted suite)
   - Affected runs: 0
-  - Full-suite runs: 1 (Lead clean env run: 6467 pass, 52 fail [51 baseline + 1 flake])
+  - Full-suite runs: 1 (Lead clean env run: 6467 pass, 52 fail [51 rust-host pre-existing + 1 fgos-intake-4 pre-existing], 9 skipped = 6528 total)
 
 **Total `code-implementation-track-policy` counts:**
 - Focused runs: 7
@@ -58,7 +58,7 @@ Source traces: `docs/architect/agent-coordination/verification/code-implementati
 
 ---
 
-## 3. Targets for `code-panel-multicell-facade` (To Be Proven in Phase 04)
+## 3. Targets for `code-panel-multicell-facade` (P00–P05)
 
 1. **Targeted / Focused tier:** Used as the default on every implementation and fix round for every cell.
 2. **Affected tier:** Materialized when blast radius indicates downstream impact (e.g. via GitNexus impact analysis), avoiding immediate jump to full suite.
@@ -66,10 +66,11 @@ Source traces: `docs/architect/agent-coordination/verification/code-implementati
    - Run at most once per distinct `(tree, environment)` state per cell.
    - Run only when explicit `FULL_TRIGGERS` fire or at the final integrated gate before merging to main.
    - Reviewer and red-team evaluate existing valid proofs rather than re-running `npm test` mechanically.
-4. **Expected total full suite runs for track (P00–P04):**
+4. **Expected total full suite runs for track (P00–P05):**
    - P00: 0 (docs-only cell; focused 130-test suite)
    - P01: 0 or 1 (full-suite gate only if projected/shared skill mechanical triggers hit)
    - P02: 0 (targeted test fixtures)
    - P03: 0 or 1 (full-suite gate only if resume implementation exceeds skill prose)
-   - P04: 1 (final integrated gate on track branch synced with main)
-   - **Target full suite runs:** <= 3 across all 5 cells.
+   - P04: 1 (merged; full-suite gate on session-engine.mjs orphaned-authorization engine bugfix certified clean at testedSha `b16dd524` / integratedSha `d13570c4` / post-merge `ebeef714`; 6530 tests, 6469 pass, 52 fail matching baseline)
+   - P05: 1 (final integrated gate on track branch synced with main)
+   - **Target full suite runs:** <= 3 across all cells.

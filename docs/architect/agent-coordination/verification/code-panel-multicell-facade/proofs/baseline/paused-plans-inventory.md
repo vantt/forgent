@@ -14,15 +14,26 @@ This inventory records every currently paused, in-progress, or completed plan un
 |---|---|---|---|---|---|---|
 | `plans/260915-0455-test-suite-feedback-cost/` | `PAUSED (OOM contention)` (in-flight on worktree branches) | **P02** (P00 & P01 merged into track; P02 branch active) | `cells: []` (run outside `.fgos/coordination/sessions/` via manual worktrees) | Track tip: `2c56eed8` (synced main). P02 tip: `456bff9b` (synced track). Last merged cell commit: `bd56ae02` (P01) | Worktrees: `test-suite-feedback-cost-track`, `...-p00`, `...-p01`, `...-p02`. All clean except expected `target` symlink build artifact | P00 hermetic writer proof (`8376385c`), P01 portable test runner proof (`bd56ae02`), checkpoint 1 full-suite run (`4149bd31`) |
 | `plans/260915-executor-policy-dispatch-seams/` | `Cell-00 merged to track; next: cell-01` | **cell-01** (Phase 01 dispatch decision matrix; cell-00 merged) | `executor-policy-dispatch-seams--cell-00` (status: `partial`, phase: `partially-complete`, cell-00 closed) | Track tip: `3bc87899` (post-merge verification). Cell-00 commit `c6a2a57c` merged into track at `282fd62e`, track synced main at `48a01a20` | Worktree `/home/vantt/projects/executor-policy-dispatch-seams-track` on branch `track/executor-policy-dispatch-seams`. Clean | Baseline snapshot harness passing (46/46). Doer, reviewer, and red-team completed; fixer omitted per partialPolicy; tree-identical proof certified |
-| `plans/260914-dispatch-operability-evidence-attribution/` | `Implementation in progress` | **I05** (I01–I04 merged into track, I05 active/next) | `dispatch-operability-implementation--i05b` (status: `active`, phase: `running`, activeCell: `i05b`) | Cell branch tip: `50d4009e`. Track branch `implementation-track--dispatch-operability-evidence-attribution` tip: `3c58bafc` (synced main). I01-I04 merged | Worktree on branch `dispatch-operability-implementation--i05`. Clean | I01–I04 verification traces green. I05 retry produce-candidate commit `50d4009e` addresses red-team TOCTOU and active-Run findings |
+| `plans/260914-dispatch-operability-evidence-attribution/` | `Implementation in progress` | **I05** (I01–I04 merged into track, I05 active/next) | `dispatch-operability-implementation--i05b` (status: `active`, phase: `running`, activeCell: `i05b`) | Cell branch tip: `38297231` (live tip progressed to `deeb3743`). Track branch `implementation-track--dispatch-operability-evidence-attribution` tip: `3c58bafc` (synced main). I01-I04 merged | Worktree on branch `dispatch-operability-implementation--i05`. Clean | I01–I04 verification traces green. I05 produce-candidate includes collect-result (`38297231`), clear-assignment-claim (`8ed13021`), and repair-projection (`deeb3743`) |
 | `plans/260915-code-implementation-track-policy/` | `COMPLETE / DONE` (all cells P01-P05 merged to main) | **Closed / All Done** (predecessor track to `code-panel-multicell-facade`) | `code-implementation-track-policy--p01` through `--p05` (P04 retroactively closed via `9af6362c`; P05 closed at `99fb5632`) | `45569ac3` (full track merge commit to `main`) | Worktree merged and cleaned up; worktree `code-panel-multicell-facade-p00` branched from tip | Complete proof traces for P01-P05 under `docs/architect/agent-coordination/verification/code-implementation-track-policy/` |
-| `plans/260915-code-panel-multicell-facade/` | `APPROVED — in-progress` | **P00** (Contract và baseline, currently active) | `code-panel-multicell-facade--p00` | Base ref `45569ac3379445e93436524c1226159b3869265c` | Worktree `/home/vantt/projects/code-panel-multicell-facade-p00` on branch `code-panel-multicell-facade--p00`. Docs/evidence-only cell | Terminal close proof for `tsk-1bh` verified (130/130 pass); full-suite baseline captured (6467 pass, 52 fail) |
+| `plans/260915-code-panel-multicell-facade/` | `APPROVED — in-progress` | **P00** (Contract và baseline, currently active) | `code-panel-multicell-facade--p00` | Track tip: `91d35b4be8a3b4070d4f4f5b23d9bda68a0fb641` (resumption point, includes merged P04 `d13570c4`/`ebeef714`). Base ref: `45569ac3379445e93436524c1226159b3869265c` | Worktree `/home/vantt/projects/code-panel-multicell-facade-p00` on branch `code-panel-multicell-facade--p00`. Docs/evidence-only cell | Terminal close proof for `tsk-1bh` verified (130/130 pass); full-suite baseline captured (6467 pass, 52 unique failing titles, 9 skipped = 6528 total) |
+
+> **Dated Observation (2026-09-15):** `main` has moved to `2c56eed8` (matching `test-suite-feedback-cost` track tip) since `BASE_REF` (`45569ac3`) was recorded. This is outside this track's own scope to investigate further; recorded as a dated observation without speculation on intent.
 
 ---
 
-## 2. Explanation of Branch `code-panel-multicell-facade--p04`
+## 2. Status of Engine Bugfix Cell `P04` (`code-panel-multicell-facade--p04`)
 
-The local branch `code-panel-multicell-facade--p04` (tip commit `b16dd524621cbf97690663e9764f9ede286583be`, "fix(coordination): supersede orphaned authorization with newer consumed siblings") is **not an unexplained stray branch**. It is this SAME track's own parallel engine-bugfix cell (`session-engine.mjs` orphaned-authorization fix), dispatched independently and concurrently with P00–P03 per [`plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md). It will integrate into the track alongside the facade deliverables before final rollout.
+Cell `P04` (`code-panel-multicell-facade--p04`) is **CLOSED and MERGED**, not a local branch that will integrate in the future:
+- **Nature of Work:** Real engine bugfix (`session-engine.mjs` orphaned-authorization fix: supersede orphaned authorization with newer consumed siblings), dispatched concurrently with P00–P03.
+- **Phase Specification:** [`plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/plans/260915-code-panel-multicell-facade/phase-04-fix-orphaned-authorization.md) now exists and is committed on the track branch (commit `50e153b8`, status: `merged`).
+- **Product Gates Position:** Real P04 in the Product Gates table (renumbered: old P04 "Live proof and rollout" is now P05). It is neither an off-plan nor a colliding cell ID.
+- **Execution Facts:**
+  - `testedSha`: `b16dd524621cbf97690663e9764f9ede286583be`
+  - Merged into `TRACK_BRANCH` at `integratedSha`: `d13570c4f1050d7ec56a68f0ec4d08569e700421` (`--no-ff`)
+  - Post-merge verified at: `ebeef7149064e9b67926d8fb7809c1dcabf0afd7` (tree-identical, `FULL_TEST` already certified clean: 6530 tests, 6469 pass, 52 fail byte-identical to baseline; no re-run needed)
+  - Cell branch `code-panel-multicell-facade--p04` was deleted after merge.
+- **Resumption Point:** Track branch tip is `91d35b4be8a3b4070d4f4f5b23d9bda68a0fb641` (re-verified live via `git rev-parse code-panel-multicell-facade`), which includes merged P04 (`d13570c4` / `ebeef714`), renumbered plan/phase files (`50e153b8`), and itemized full-suite baseline evidence (`91d35b4b`). Track resumption uses `91d35b4b` instead of `BASE_REF` alone.
 
 ---
 
@@ -70,18 +81,14 @@ The local branch `code-panel-multicell-facade--p04` (tip commit `b16dd524621cbf9
 
 ### C. `plans/260914-dispatch-operability-evidence-attribution/`
 - **Plan Document:** [`plans/260914-dispatch-operability-evidence-attribution/plan.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/plans/260914-dispatch-operability-evidence-attribution/plan.md)
-- **Current / Next Cell:** **I05** (I01 through I04 are completed and merged into track; I05 is next and currently active).
+- **Current / Next Cell:** **I05** (I01 through I04 are completed and merged into track; I05 is next and active).
 - **Live Branch Tips & Merged Commits:**
   - Track branch `implementation-track--dispatch-operability-evidence-attribution`: tip `3c58bafc020a49c1e6cbfe7fcfb3a189885a47cb` ("merge: sync dispatch-operability-implementation track with main", synced with main `45569ac3`).
-  - Cell branch `dispatch-operability-implementation--i05`: tip `50d4009e8d17734d96ea5e0f72a83aeaf70ef4f3` ("fix(dispatch): close reconcile TOCTOU gap at writer parity, wire active-Run gate").
+  - Cell branch `dispatch-operability-implementation--i05`: real tip was `38297231e2eb51c2a6eba1c2ff71f9e38fc95dc9` ("feat(dispatch): add collect-result reconcile action"), correcting the stale `50d4009e` recorded previously. Live re-verification shows progress to tip `deeb37437ad2a358bb9435e6dad8e82cb0b33db5` ("feat(dispatch): add repair-projection reconcile action", following `8ed13021` "feat(dispatch): add clear-assignment-claim reconcile action").
 - **Live Coordination Engine Status:**
-  - Session IDs: `dispatch-operability-implementation--i05` and active retry session `dispatch-operability-implementation--i05b`.
-  - `fgos coordination chain dispatch-operability-implementation --json`:
-    - `activeCell`: `i05b`
-    - `nextAction`: "Cell \"i05b\" (session \"dispatch-operability-implementation--i05b\") has 3 declared operation(s) still awaiting driver authorization: phase-revision/revise-candidate, phase-recheck/reviewer-recheck, phase-recheck/red-team-recheck."
-  - Session `dispatch-operability-implementation--i05b` status: `active`, phase: `running`.
+  - Track `dispatch-operability-implementation` chain reports `cells: []`, `activeCell: null`, `nextAction: null` in this checkout.
 - **Resumption Action for Fresh Process:**
-  - Settle / complete session `dispatch-operability-implementation--i05b`, authorize reviewer and red-team rechecks on `50d4009e`, and merge I05 into the track branch upon clean close.
+  - Settle / complete cell `I05` on branch `dispatch-operability-implementation--i05` (current tip `deeb3743` / `38297231`), run reviews, and merge I05 into the track branch upon clean close.
 
 ---
 
