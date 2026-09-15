@@ -465,7 +465,32 @@ distinct, non-collapsible states:
 **Non-inference rule.** If `testedSha != integratedSha`,
 `checkpoint-verified` can never be inferred from the pre-merge proof
 recorded at `coordination-accepted` — gate proof must execute against
-`integratedSha` itself before the checkpoint is certified.
+`integratedSha` itself before the checkpoint is certified. **The one
+documented exception: tree identity, AND ONLY WITH a matching environment
+fingerprint.** `git diff <testedSha> <integratedSha> -- .` empty (the
+normal case for a `--no-ff` merge with no conflicts — its SHA always
+differs from the cell tip even when nothing else changed) proves the two
+commits share a *tracked-content* tree; it proves nothing about the
+runtime/toolchain, lockfile, or a built prerequisite the proof command
+itself depends on, none of which git tracks. Both must hold: an empty
+tree diff **and** an unchanged environment fingerprint (minimum: runtime/
+toolchain version(s) + lockfile hash + any built prerequisite the command
+depends on — the same fingerprint code-panel's own tree-identity rule
+requires). Record BOTH shas, the empty-diff confirmation, and the
+fingerprint match as `treeIdentical: true`; a non-empty diff OR a changed
+fingerprint always forces the real re-run — there is no shortcut for
+either kind of drift.
+
+**Known limit (not enforced by the engine).** This rule, `Escalation
+authority & scope` below, and `Close rule` below are Lead discipline in
+prose — the coordination-session schema/engine has no field for
+`treeIdentical`, a proof tier, or a fix-round cap, and accepts any
+non-empty disposition rationale regardless of what it claims. A Lead who
+does not actually follow this section can record `checkpoint-verified`
+without having checked either condition, and nothing here catches that.
+Building a validator/schema for it is deliberately deferred (ADR-007 §4:
+a second real consumer needed first) — this note exists so that limit is
+stated, not silently assumed away.
 
 **Escalation authority & scope.** The Lead evaluates every
 Reviewer/Red-Team proof-gap finding. The Lead may `accepted` it —
@@ -476,16 +501,20 @@ cell only**; it does not by itself create a permanent Product Gate in
 plan.md for future cells.
 
 **Checkpoint identity.** Before `close.json`, record in the cell trace:
-`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`, and
+`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`,
+`treeIdentical` (true only when the non-inference rule's tree-identity
+exception applied instead of a real re-run at `integratedSha`), and
 `outcome`.
 
 **Close rule.** Close with `Proof: targeted` only when no accepted
 coverage-gap finding is open and the diff touches none of the
 isolation-breaking paths. Otherwise the cell is a full-suite gate: run
 the track's full proof command, compare against the recorded baseline,
-triage every new failure as patch-related / pre-existing /
-environmental, verify `integratedSha` itself when it differs from
-`testedSha` (non-inference rule above), and record
+triage every new failure as patch-related / environmental-transient /
+environmental-precondition / pre-existing (the how-to's Execution Inputs
+section defines each bucket), verify `integratedSha` itself when it
+differs from `testedSha` unless the tree-identity exception above applies
+(non-inference rule above), and record
 `Proof: full-suite-gate | escalated-to-full` with the complete checkpoint
 identity tuple in the trace — all before `close.json`.
 
@@ -624,12 +653,20 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    focused test in the worktree yourself before reading `show`.
 4. Disposition every finding: `accepted` when its evidence holds, `rejected`
    when the Lead can prove it wrong, `deferred` only when it is outside the
-   cell's scope and the rationale says so. Any `accepted` finding opens a
-   fix round (section 3). Cap: three fix rounds per cell; past that, close
-   the cell with the remaining findings `deferred` and named in the trace.
+   cell's scope and the rationale says so. **A proof-gap finding (Reviewer/
+   Red-Team judging the declared verification insufficient) never gets
+   `deferred` — section 4's Escalation authority admits only `accepted`
+   (upgrading to `Proof: escalated-to-full`) or an evidence-backed
+   `rejected`.** Any `accepted` finding opens a fix round (section 3). Cap:
+   three fix rounds per cell; past that, close remaining non-proof-gap
+   findings as `deferred` and named in the trace. If a proof-gap finding
+   was `accepted` and the fix rounds did not resolve it before the cap,
+   the cell still closes, but only after running the full proof command
+   and recording `Proof: escalated-to-full` (never `targeted`, and never
+   left as a silent `deferred` in the trace).
 5. Close (section 4): confirm the checkpoint identity (`phase/cell id`,
-   `command`, `baseline`, `testedSha`, `integratedSha`, `outcome`) is
-   recorded in the cell trace under
+   `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`,
+   `outcome`) is recorded in the cell trace under
    `docs/architect/agent-coordination/verification/<track>/<cell>.md`,
    merge `git merge --no-ff <track>--<cell-id>` into the track branch
    (producing `integratedSha`), drop the worktree, and append one row to
@@ -640,8 +677,11 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    in the cell worktree before the merge, compared against the recorded
    baseline; when `testedSha != integratedSha`, re-run the gate's full
    proof command against `integratedSha` itself before recording
-   `checkpoint-verified` — never inferred from the pre-merge run
-   (non-inference rule, section 4).
+   `checkpoint-verified` — unless `git diff testedSha integratedSha -- .`
+   is empty AND the environment fingerprint is unchanged, in which case
+   record `treeIdentical: true` and certify from the pre-merge run (the
+   non-inference rule's one documented exception, section 4) — never
+   inferred when either the diff is non-empty or the fingerprint moved.
 6. Back to step 1. When the loop ends, write
    `<plan dir>/reports/track-closeout.md`: every cell's merge commit, every
    deferred finding, and the exact commands that reproduce the evidence.
