@@ -1,5 +1,4 @@
 import { test, before, after } from 'node:test';
-import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -9,37 +8,31 @@ import { spawnSync } from 'node:child_process';
 import { buildEnduserIndex, findSourceCaptureId, findSourceCaptureIds, QUADRANT_META, QUADRANTS } from '../../src/report/enduser-index.mjs';
 import { enumerateDocEntries } from '../../src/report/enduser-index-generate.mjs';
 import { parseFrontmatter } from '../../src/report/frontmatter.mjs';
+import { makeDocsIndexStateFixture, REAL_DEMO_OUTCOME_ID, REAL_DEMO_DOC_PATH } from './helpers/docs-index-state-fixture.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const FGOS = path.join(REPO_ROOT, 'bin', 'fgos.mjs');
 const MANIFEST_PATH = path.join(REPO_ROOT, 'docs', 'enduser-docs-index.json');
 
-function runDocsIndex() {
-  // Deliberately run against the REAL repo cwd (never a temp fixture): this
-  // cell's must_haves forbid a proxy test that would pass with the manifest
-  // absent, so this exercises the actual generator over the actual
-  // docs/<quadrant>/ tree and reads the actual produced manifest file.
-  return spawnSync(process.execPath, [FGOS, 'docs-index'], { cwd: REPO_ROOT, encoding: 'utf8' });
-}
+// P03 pilot (test-suite-feedback-cost, TFC-D06): this file's own 4
+// `runDocsIndex()` calls were the single most expensive file in the P02
+// baseline profile (195.46s of a ~5460s suite; see
+// plans/260915-0455-test-suite-feedback-cost/reports/green-baseline.md) --
+// each spawn folded this repo's own large, real `.fgos/state.json`
+// (thousands of unrelated events) just to answer questions about the
+// SAME small set of real docs. The docs/<quadrant>/ tree scanned is still
+// the genuine one on disk (never a copy): `docs-index-state-fixture.mjs`
+// symlinks `docs/` into the fixture root, and only the Work-state input
+// (the thing actually driving the repeated large fold) shrinks. Built
+// once and reused across every test below (node:test runs a file's tests
+// sequentially, so there is no cross-test race on the shared fixture root
+// or on the real docs/ tree it symlinks into).
+let docsIndexFixtureCwd;
 
-// tsk-63j: a fresh fgOS worktree deliberately strips `.fgos/` down to a
-// lock file (worktree.mjs's own createSession/removeWorktree symlink
-// discipline) — the real compound-learn history the demo assertion below
-// checks (`doc-fgos-rollup-howto`) only exists in a checkout that actually
-// carries `.fgos/state.json`'s real event history (the main checkout, or a
-// worktree reclaiming it). Detecting that absence and skipping ONLY that
-// one assertion — never fabricating the id as a fixture — keeps this
-// test's own "not a fabricated id" intent (see the demo test's comment)
-// intact while making it worktree-safe.
-function hasRealCompoundHistory(outcomeId) {
-  try {
-    const statePath = resolveFgosFile(path.join(REPO_ROOT, '.fgos'), FGOS_FILE.STATE);
-    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-    return Boolean(state.outcomes?.[outcomeId]);
-  } catch {
-    return false;
-  }
+function runDocsIndex() {
+  docsIndexFixtureCwd ??= makeDocsIndexStateFixture();
+  return spawnSync(process.execPath, [FGOS, 'docs-index'], { cwd: docsIndexFixtureCwd, encoding: 'utf8' });
 }
 
 // tsk-2ce: `runDocsIndex()` above deliberately writes the REAL tracked
@@ -175,13 +168,14 @@ test('fgos docs-index writes repo/docs/enduser-docs-index.json with the real how
   // Slice ① gộp-sống (CONTEXT.md D13/D16/D17) links this demo doc to its
   // real compound-learn capture via `fgos compound doc-fgos-rollup-howto
   // --doc-type how-to --doc-path docs/how-to/check-rollup-progress.md` —
-  // CoS-3 evidence, not a fabricated id (the real event log now carries it).
-  // Only asserted when this checkout actually carries that real history
-  // (tsk-63j: a fresh worktree's `.fgos/` never does — see
-  // hasRealCompoundHistory's comment above).
-  if (hasRealCompoundHistory('doc-fgos-rollup-howto')) {
-    assert.equal(demo.sourceCaptureId, 'doc-fgos-rollup-howto');
-  }
+  // CoS-3 evidence, not a fabricated id. P03 (test-suite-feedback-cost)
+  // made this unconditional: the fixture seeds this exact capture through
+  // the real store writer (docs-index-state-fixture.mjs), so it no longer
+  // depends on whether the invoking checkout's own ambient `.fgos/`
+  // history happens to carry it (tsk-63j's original worry — a fresh
+  // worktree's `.fgos/` never does).
+  assert.equal(demo.sourceCaptureId, REAL_DEMO_OUTCOME_ID);
+  assert.equal(demo.docPath, REAL_DEMO_DOC_PATH);
 });
 
 test('fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) with no crash and no entries from it', () => {
