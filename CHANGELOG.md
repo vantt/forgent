@@ -114,9 +114,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changed from an "at most once" KPI framing to "never twice for the same
   (tree, environment) state" to stop a Lead from skipping a genuinely
   needed rerun just to keep a count low. Final commit range for this cell:
-  `63b01fa9..81c54a43` (5 commits: initial fix, cell trace, close-vs-merge
-  reorder, git-notes durable trace, and a 3rd round resolving 7 recheck
-  residuals).
+  `63b01fa9..70eb4485` (superseded at P05 below: the close-vs-merge
+  ordering and the git-notes durable-trace design both changed again).
+- `fgos-code-panel` close-before-merge ordering restored, `git notes`
+  replaced with ordinary commits, `tsk-1bh` fixed (code-implementation-track-policy
+  track, P05): a real review of P04's own shipped design found the
+  close-after-merge reorder had traded away a real safety property --
+  target branch could receive a cell's code even when the coordination
+  session never actually closed (confirmed live: P04's own session stayed
+  `active` due to `tsk-1bh`, yet its merge still landed). Reverted to
+  close-then-merge (matching `fgos-plan-loop`'s own cells); post-merge
+  verification and its result now happen after a successful close, as
+  separate plain-git steps recorded via an ordinary tracked commit instead
+  of a `git note` (`refs/notes/*` are outside the default commit graph and
+  do not push/fetch by default -- confirmed via `git notes list` returning
+  empty on this repo, i.e. the P04 note was never actually durable).
+  `session-engine.mjs`'s quorum classification also fixed: a
+  driver-authorized position (e.g. `fixer`) that failed once and then
+  succeeded under a fresh authorization now correctly counts as completed
+  instead of being stuck `failed` forever, and `resolveBindingAuthorization`
+  now prefers the newest unconsumed authorization for a binding instead of
+  an oldest-wins order that made a corrected retry unreachable once a bad
+  authorization existed for the same binding.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
