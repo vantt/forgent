@@ -158,11 +158,32 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
   state. Each waits for a second real consumer (ADR-007 §4 bar).
 - Test selection, caching, tiering.
 
+## Execution Inputs
+
+```text
+TRACK_BRANCH: code-implementation-track-policy
+FULL_TEST: npm test   (run with CLAUDE_CODE_*/CLAUDECODE env vars unset -- a known
+  session-leak-into-spawned-CLI contamination otherwise adds ~10 spurious failures)
+BASELINE: 103 known failures, recorded at commit f60cae1b (pre-P02 track HEAD),
+  all in test/rust-host/** (fgctl-init/fgctl-stage/fgctl-upgrade/release-tree and
+  a few others) -- every one requires a compiled target/release/{fgctl,fgos}
+  binary that no fresh worktree here has ever built (cargo build --release
+  --workspace never run); environmental, not content. List may only shrink.
+ROSTER: doer/fixer -> claude (agy-cli/gemini and codex-cli both hit transient
+  external-resource failures during this track -- see cell traces; retry with
+  claude when either misbehaves), reviewer -> claude-reviewer, red-team -> codex-cli
+```
+
+(Recorded retroactively at P02, closing the gap P01's own red-team flagged as
+RT-09 -- this track authors the how-to that requires this section of every
+future track and had not dogfooded it on itself until now.)
+
 ## Cell status
 
 | Cell | Merge commit | Review / red-team | Deferred findings |
 |---|---|---|---|
-| P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |
+| P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block — now added above), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |
+| P02 | `ddb9e78e` | 1 fix round; reviewer: 3 HIGH (1 root cause: projections not regenerated)+1 MEDIUM+2 LOW; red-team: 1 HIGH (same root cause); HIGH root cause + MEDIUM fixed by Lead (build:skills regen + npm test) and fixer respectively; full-suite gate: 103/103 failures match the newly-recorded baseline exactly, 0 new | LOW-1/LOW-2 (pre-existing, not regressions); how-to gap: no documented tree-equality shortcut for the non-inference rule — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |
 
 ## Open decision (owner)
 
