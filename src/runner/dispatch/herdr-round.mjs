@@ -41,6 +41,7 @@ import { seedTrust, seedCodexTrust } from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
+import { interpretRunResult } from './run-result.mjs';
 import {
   publishImmutableProof,
   publishMutableProjection,
@@ -1886,7 +1887,7 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
