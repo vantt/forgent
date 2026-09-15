@@ -135,7 +135,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of being stuck `failed` forever, and `resolveBindingAuthorization`
   now prefers the newest unconsumed authorization for a binding instead of
   an oldest-wins order that made a corrected retry unreachable once a bad
-  authorization existed for the same binding.
+  authorization existed for the same binding. Two independent review
+  rounds on this fix (real reviewer + red-team dispatches, not
+  self-review) then found and fixed two further real bugs: (1)
+  `resolveTaskKeyAuthorization`, the sibling function deriving a
+  driver-authorized dispatch's default `taskKey`, was still oldest-wins,
+  disagreeing with `resolveBindingAuthorization` and blocking a legitimate
+  third retry at the same binding -- fixed to newest-wins too; (2) the
+  quorum fallback's same-binding retry credit trusted raw
+  `assignment-created.payload.operationId`/`nodeId` fields, which an
+  exported raw door (`createSessionAssignment`) can legitimately carry for
+  an unrelated task while spending a real authorization -- fixed to
+  require the same reserved `protocol-operation:` contract stamp the
+  gating path already checks, which only `dispatchDeclaredOperation`'s own
+  common path can write. Five new regression tests added across both
+  fixes, each confirmed by reverting its fix to fail against the
+  pre-fix/pre-hardening code. Full trace:
+  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
