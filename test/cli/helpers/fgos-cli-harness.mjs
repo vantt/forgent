@@ -29,6 +29,31 @@ import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registr
 const __dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
+// TFC-D02/D03 (test-suite-feedback-cost P00): resolveWriterIdentity
+// (session-identity.mjs) resolves a writer identity per PROCESS: a CLI
+// child spawned via run() below always agreed with every OTHER run()-spawned
+// child in the same test (they all inherit the same process.env), but
+// whether a spawned child agreed with a fixture that writes IN-PROCESS (e.g.
+// moveToDurableDoingForTest below, which calls resolveWriterLogPath/
+// appendEvent directly, no subprocess involved) depended on the invoking
+// shell: under an agent session, both sides read the identical
+// CLAUDE_CODE_SESSION_ID string and collapsed onto ONE shared writer log
+// (an in-process write landing in the same per-writer sequence a later
+// spawned call also writes to); under an ordinary shell, session-identity's
+// pid-walk fallback resolves differently for a spawned child (one process
+// hop deeper) than for the in-process caller, keeping them apart. Fixtures
+// combining both styles (R4) hardcode the ordinary-shell shape (in-process
+// write isolated from subsequent spawned writes). Pinning one fixed,
+// test-only, charset-valid session id on every run()-spawned child's own
+// env — never on process.env itself, so an in-process call keeps resolving
+// however the real environment/pid-walk would — reproduces that same
+// isolation deterministically regardless of the invoking shell: spawned
+// children keep agreeing with each other (same pinned id), while an
+// in-process call can never coincidentally collide with this literal
+// string. A caller's own extraEnv.FGOS_SESSION_ID (e.g. the multi-actor
+// return/post-merge tests) still overrides it (R2), applied after.
+const DEFAULT_CLI_SESSION_ID = 'fgos-cli-harness-test';
+
 // A fresh scratch dir with no `.fgos/` at all — never auto-inited. Only
 // the handful of tests that specifically exercise pre-init/first-init
 // behavior (the `init` verb's own tests, and tsk-4fu-2's new
@@ -54,12 +79,12 @@ function tmpCwd() {
 
 function run(cwd, args, extraEnv = {}) {
   const opts = { cwd, encoding: 'utf8' };
-  // Only override env when the caller actually injects one (e.g. the GitHub
-  // tests' FGOS_GH_COMMAND): omitting the `env` key entirely lets spawnSync
-  // inherit process.env, keeping every existing call site byte-identical.
-  if (Object.keys(extraEnv).length > 0) {
-    opts.env = { ...process.env, ...extraEnv };
-  }
+  // Every spawned child gets the pinned test-only FGOS_SESSION_ID by
+  // default (R1/R3: every other inherited env value passes through
+  // unchanged via the `...process.env` spread), and an explicit
+  // extraEnv.FGOS_SESSION_ID from the caller still wins (R2) since it is
+  // spread last.
+  opts.env = { ...process.env, FGOS_SESSION_ID: DEFAULT_CLI_SESSION_ID, ...extraEnv };
   return spawnSync(process.execPath, [FGOS, ...args], opts);
 }
 
