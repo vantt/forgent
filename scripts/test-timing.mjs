@@ -98,6 +98,31 @@ export function minMax(numbers) {
   return { min: Math.min(...numbers), max: Math.max(...numbers) };
 }
 
+// Real GNU-time-wrapped invocation used by runOneSample's default. Never
+// asks spawnSync to buffer the child's stdout/stderr in JS memory --
+// node --test's own text output across thousands of tests can run well
+// past spawnSync's default 1MB maxBuffer, which would silently truncate
+// or error out a real baseline run. Both streams are redirected straight
+// to real file descriptors instead: stdout becomes a retained log
+// artifact, and stderr (GNU time -v's own small ~20-line block) is read
+// back afterward for parsing.
+export function defaultTimedSpawn({ execPath, scriptPath, forwardedArgs, cwd, env, timeBinary, logDir }) {
+  const dir = logDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-'));
+  fs.mkdirSync(dir, { recursive: true });
+  const stdoutPath = path.join(dir, 'stdout.log');
+  const stderrPath = path.join(dir, 'stderr.log');
+  const stdoutFd = fs.openSync(stdoutPath, 'w');
+  const stderrFd = fs.openSync(stderrPath, 'w');
+  let result;
+  try {
+    result = spawnSync(timeBinary, ['-v', execPath, scriptPath, ...forwardedArgs], { cwd, env, stdio: ['ignore', stdoutFd, stderrFd] });
+  } finally {
+    fs.closeSync(stdoutFd);
+    fs.closeSync(stderrFd);
+  }
+  return { status: result.status, stderr: fs.readFileSync(stderrPath, 'utf8'), stdoutPath, stderrPath };
+}
+
 /**
  * Runs the full suite ONCE via `node scripts/run-tests.mjs`, as its own
  * child process (never in-process) so an available `/usr/bin/time -v`
@@ -110,11 +135,13 @@ export function runOneSample({
   cwd = REPO_ROOT,
   forwardedArgs = [],
   spawn = spawnSync,
+  timedSpawn = defaultTimedSpawn,
   hasTime = hasGnuTimeV(),
   timeBinary = '/usr/bin/time',
   env = process.env,
   checkClean = () => isGitClean(cwd),
   environment = () => gatherEnvironment({ cwd }),
+  logDir,
 } = {}) {
   const before = { clean: checkClean(), env: environment() };
   const startNs = process.hrtime.bigint();
@@ -122,10 +149,14 @@ export function runOneSample({
   let result;
   let gnuTime = null;
   if (hasTime) {
-    result = spawn(timeBinary, ['-v', process.execPath, path.join(cwd, 'scripts', 'run-tests.mjs'), ...forwardedArgs], {
+    result = timedSpawn({
+      execPath: process.execPath,
+      scriptPath: path.join(cwd, 'scripts', 'run-tests.mjs'),
+      forwardedArgs,
       cwd,
       env,
-      encoding: 'utf8',
+      timeBinary,
+      logDir,
     });
     gnuTime = parseGnuTimeV(result.stderr ?? '');
   } else {
@@ -142,6 +173,8 @@ export function runOneSample({
     systemSeconds: gnuTime?.systemSeconds ?? null,
     maxRssKb: gnuTime?.maxRssKb ?? null,
     cpuScope: gnuTime?.cpuScope ?? 'unavailable (no /usr/bin/time -v on this platform; wall-clock only)',
+    stdoutPath: result.stdoutPath ?? null,
+    stderrPath: result.stderrPath ?? null,
     before,
     after,
     valid: (result.status ?? 1) === 0 && before.clean && after.clean,
@@ -170,7 +203,11 @@ export function summarizeSamples(samples) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const mode = process.argv[2];
   if (mode === 'sample') {
-    const sample = runOneSample({ forwardedArgs: process.argv.slice(3) });
+    const rest = process.argv.slice(3);
+    const logDirIdx = rest.indexOf('--log-dir');
+    const logDir = logDirIdx === -1 ? undefined : rest[logDirIdx + 1];
+    const forwardedArgs = logDirIdx === -1 ? rest : [...rest.slice(0, logDirIdx), ...rest.slice(logDirIdx + 2)];
+    const sample = runOneSample({ forwardedArgs, logDir });
     console.log(JSON.stringify(sample, null, 2));
     process.exitCode = sample.valid ? 0 : 1;
   } else if (mode === 'env') {

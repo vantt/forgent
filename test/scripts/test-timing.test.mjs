@@ -1,5 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   parseGnuTimeVRaw,
   parseGnuElapsed,
@@ -10,6 +13,7 @@ import {
   gatherEnvironment,
   runOneSample,
   summarizeSamples,
+  defaultTimedSpawn,
 } from '../../scripts/test-timing.mjs';
 
 const SAMPLE_TIME_V_OUTPUT = `\tCommand being timed: "node scripts/run-tests.mjs"
@@ -151,7 +155,7 @@ test('runOneSample marks a sample invalid on a non-zero exit status (a failed ru
 test('runOneSample with GNU time available parses userSeconds/systemSeconds/maxRssKb from the wrapped child\'s stderr', () => {
   const sample = runOneSample({
     hasTime: true,
-    spawn: () => ({ status: 0, stderr: SAMPLE_TIME_V_OUTPUT }),
+    timedSpawn: () => ({ status: 0, stderr: SAMPLE_TIME_V_OUTPUT, stdoutPath: '/tmp/fake-stdout.log', stderrPath: '/tmp/fake-stderr.log' }),
     checkClean: () => true,
     environment: () => ({}),
   });
@@ -159,6 +163,26 @@ test('runOneSample with GNU time available parses userSeconds/systemSeconds/maxR
   assert.equal(sample.systemSeconds, 605.24);
   assert.equal(sample.maxRssKb, 288088);
   assert.match(sample.cpuScope, /process-tree/);
+  assert.equal(sample.stdoutPath, '/tmp/fake-stdout.log');
+});
+
+test('runOneSample never asks the real spawn to buffer child output in JS memory for the GNU-time path (uses file-descriptor redirection, not encoding:"utf8" pipes)', () => {
+  // Regression proof for a real bug caught during P02: spawnSync's default
+  // 1MB maxBuffer would silently truncate/error a real ~6500-test run's
+  // stdout if it were captured as an in-memory string. defaultTimedSpawn
+  // must never be handed opts requesting string-encoded buffered stdio.
+  let capturedOpts = null;
+  runOneSample({
+    hasTime: true,
+    timedSpawn: (opts) => {
+      capturedOpts = opts;
+      return { status: 0, stderr: SAMPLE_TIME_V_OUTPUT };
+    },
+    checkClean: () => true,
+    environment: () => ({}),
+  });
+  assert.ok(capturedOpts, 'timedSpawn must be invoked on the hasTime path');
+  assert.equal(capturedOpts.encoding, undefined, 'must not request buffered string encoding');
 });
 
 test('runOneSample without GNU time reports wall-clock only and an explicit "unavailable" CPU scope -- never a fabricated CPU number', () => {
@@ -185,6 +209,34 @@ test('summarizeSamples computes median/min/max wall time over valid samples', ()
   assert.equal(summary.sampleCount, 3);
   assert.equal(summary.wallMedianSeconds, 20);
   assert.deepEqual(summary.wall, { min: 10, max: 30 });
+});
+
+// --- defaultTimedSpawn: real integration, past spawnSync's 1MB default buffer ---
+
+test('defaultTimedSpawn survives a child that writes well past spawnSync\'s default 1MB maxBuffer to stdout, and still parses stderr', { skip: !hasGnuTimeV() }, () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-integration-'));
+  const bigScript = path.join(dir, 'big-stdout.mjs');
+  // 2 million bytes of stdout -- well past the 1MB default maxBuffer that
+  // bit the pre-fix version of runOneSample against the real ~6500-test
+  // suite's own output volume.
+  fs.writeFileSync(bigScript, "process.stdout.write('x'.repeat(2_000_000) + '\\n'); process.exit(0);\n");
+
+  const result = defaultTimedSpawn({
+    execPath: process.execPath,
+    scriptPath: bigScript,
+    forwardedArgs: [],
+    cwd: dir,
+    env: process.env,
+    timeBinary: '/usr/bin/time',
+    logDir: dir,
+  });
+
+  assert.equal(result.status, 0, 'a large-stdout child must not be killed/errored by buffer limits');
+  assert.ok(fs.existsSync(result.stdoutPath));
+  assert.equal(fs.statSync(result.stdoutPath).size, 2_000_001);
+  const parsed = parseGnuTimeV(result.stderr);
+  assert.equal(parsed.exitStatus, 0);
+  assert.ok(parsed.elapsedSeconds !== null);
 });
 
 test('summarizeSamples throws rather than averaging when any sample is invalid', () => {
