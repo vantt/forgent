@@ -155,8 +155,16 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
 - Editing `plans/260915-0455-test-suite-feedback-cost/` (Invariant #2 stays
   until its owner decides — see below).
 - Any runtime schema, validator script, CLI command, or persisted checkpoint
-  state. Each waits for a second real consumer (ADR-007 §4 bar).
-- Test selection, caching, tiering.
+  state. Each waits for a second real consumer (ADR-007 §4 bar). Still firm
+  through P03 — its focused/affected/full proof tiers and tree-identity
+  reuse rule are Lead-discipline prose only, no schema/engine change.
+- ~~Test selection, caching, tiering~~ — **superseded at P03** by explicit
+  real-time user direction ("mục tiêu thật của việc làm này là phải cải
+  thiện hiệu suất của code panel... nên tập trung vào tối ưu test"):
+  `fgos-code-panel` now declares a focused/affected/full test-selection
+  contract and a tree-identity proof-reuse rule. This narrows only that one
+  bullet — the schema/validator/engine exclusion above is untouched and
+  still governs.
 
 ## Execution Inputs
 
@@ -164,11 +172,15 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
 TRACK_BRANCH: code-implementation-track-policy
 FULL_TEST: npm test   (run with CLAUDE_CODE_*/CLAUDECODE env vars unset -- a known
   session-leak-into-spawned-CLI contamination otherwise adds ~10 spurious failures)
-BASELINE: 103 known failures, recorded at commit f60cae1b (pre-P02 track HEAD),
-  all in test/rust-host/** (fgctl-init/fgctl-stage/fgctl-upgrade/release-tree and
-  a few others) -- every one requires a compiled target/release/{fgctl,fgos}
-  binary that no fresh worktree here has ever built (cargo build --release
-  --workspace never run); environmental, not content. List may only shrink.
+BASELINE: 51 unique known-failing tests (exact names, not a count/category
+  summary -- an earlier recording here said "103" by double-counting each
+  failure's inline report and its final-summary recap line; corrected at P03),
+  recorded at commit f60cae1b (pre-P02 track HEAD), listed verbatim at
+  docs/architect/agent-coordination/verification/code-implementation-track-policy/baseline-f60cae1b.txt.
+  All 51 bucket as environmental-precondition: every one requires a compiled
+  target/release/{fgctl,fgos} binary that no fresh worktree here has ever
+  built (cargo build --release --workspace never run); confirmed identical
+  on pristine main HEAD, so not new to this track. List may only shrink.
 ROSTER: doer/fixer -> claude (agy-cli/gemini and codex-cli both hit transient
   external-resource failures during this track -- see cell traces; retry with
   claude when either misbehaves), reviewer -> claude-reviewer, red-team -> codex-cli
@@ -183,7 +195,8 @@ future track and had not dogfooded it on itself until now.)
 | Cell | Merge commit | Review / red-team | Deferred findings |
 |---|---|---|---|
 | P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block — now added above), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |
-| P02 | `ddb9e78e` | 1 fix round; reviewer: 3 HIGH (1 root cause: projections not regenerated)+1 MEDIUM+2 LOW; red-team: 1 HIGH (same root cause); HIGH root cause + MEDIUM fixed by Lead (build:skills regen + npm test) and fixer respectively; full-suite gate: 103/103 failures match the newly-recorded baseline exactly, 0 new | LOW-1/LOW-2 (pre-existing, not regressions); how-to gap: no documented tree-equality shortcut for the non-inference rule — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |
+| P02 | `ddb9e78e` | 1 fix round; reviewer: 3 HIGH (1 root cause: projections not regenerated)+1 MEDIUM+2 LOW; red-team: 1 HIGH (same root cause); HIGH root cause + MEDIUM fixed by Lead (build:skills regen + npm test) and fixer respectively; full-suite gate: 51/51 unique failures match the newly-recorded baseline exactly (corrected at P03 from a "103" double-count — see plan.md's own BASELINE note), 0 new | LOW-1/LOW-2 (pre-existing, not regressions); how-to gap: no documented tree-equality shortcut for the non-inference rule (fixed at P03) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |
+| P03 | (pending) | Fixed real review findings: HIGH tree-identity exception needed an environment-fingerprint conjunct (docs said tree diff alone "still catches" drift — false); baseline needed exact names + environmental-transient/-precondition split; MEDIUM proof-gap-could-be-silently-deferred at the fix-round cap; PRIMARY — `fgos-code-panel` gained a real focused/affected/full proof-tier contract (the actual goal: code-panel test-cost reduction) | tsk-1bh (engine-level authorization/quorum bugs) and dogfooding-over-real-runs both explicitly deferred by the user; several more real findings from this cell's own review/red-team round fixed in the same commit — see cell trace (pending) |
 
 ## Open decision (owner)
 

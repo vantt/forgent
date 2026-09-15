@@ -64,6 +64,15 @@ Record these once in `plan.md`, verbatim across every request in the track:
     that finishes in the track's own time budget), satisfy it and get a
     real green result instead of recording this category — it exists for
     when that is not practical here, not as a default escape hatch.
+    **Before labeling a failure this way, confirm it also fails the same
+    way on the track/main baseline commit (or that no baseline commit
+    exists yet for it)** — a test that only starts failing after this
+    patch, for this same missing-precondition reason, is patch-related,
+    not environmental-precondition; the label is for a precondition the
+    patch did not create, never a way to wave off a real regression.
+    Recorded on the baseline list, in its own bucket, same as any other
+    named failure — never omitted from the exact-names list because it
+    "doesn't block."
   - **pre-existing** — blocks unless already on the recorded baseline
     list.
 
@@ -143,8 +152,10 @@ baseline: <recorded baseline reference>
 testedSha: <sha proof ran against pre-merge>
 integratedSha: <sha proof ran against post-merge, or same as testedSha if no merge occurred yet>
 treeIdentical: true only if `git diff testedSha integratedSha -- .` was empty
-  and this checkpoint was certified from the pre-merge run instead of a real
-  re-run at integratedSha (the non-inference rule's one documented exception)
+  AND the environment fingerprint (toolchain/lockfile/built prerequisites)
+  was unchanged, and this checkpoint was certified from the pre-merge run
+  instead of a real re-run at integratedSha (the non-inference rule's one
+  documented exception -- an empty diff alone is necessary, not sufficient)
 outcome: pass | fail (with triage: patch-related | environmental-transient | environmental-precondition | pre-existing)
 ```
 
@@ -239,6 +250,9 @@ command: <exact command>
 baseline: <recorded baseline reference>
 testedSha: <sha>
 integratedSha: <sha>
+treeIdentical: true only if git diff testedSha integratedSha -- . was empty
+  AND the environment fingerprint (toolchain/lockfile/built prerequisites)
+  was unchanged, and this checkpoint was certified from the pre-merge run
 outcome: <pass|fail + triage if applicable>
 ```
 
@@ -255,7 +269,10 @@ outcome: <pass|fail + triage if applicable>
   merge cadence, producing `integratedSha`.
 - Post-merge gate execution when `testedSha != integratedSha`: re-run the
   gate's full proof command against `integratedSha` before certifying
-  `checkpoint-verified` — never infer it from the pre-merge run.
+  `checkpoint-verified` — never infer it from the pre-merge run, unless
+  `git diff testedSha integratedSha -- .` is empty AND the environment
+  fingerprint is unchanged (the non-inference rule's one documented
+  exception, above), in which case record `treeIdentical: true` instead.
 - Final close: run the full proof command on the integrated track branch
   before the last merge to main; missing proof blocks close.
 

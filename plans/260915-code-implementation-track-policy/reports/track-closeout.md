@@ -1,5 +1,16 @@
 # Track Closeout — code-implementation-track-policy
 
+> **Correction (recorded at P03, after this closeout landed):** every
+> "103"/"105" figure below double-counts each failure (node's test runner
+> reports a failure both inline and in its final recap; the `grep`s below
+> counted both). The real baseline is **51 unique failing tests**; the
+> final run here was 52 unique with the same one flake identified. Full
+> corrected figures and the exact-names baseline file live in `plan.md`'s
+> Execution Inputs and P03's own closeout addendum. Substantive conclusions
+> (0 new regressions, one confirmed flake) are unaffected — only the counts
+> were wrong. See also: P03 added a fourth cell to this track after this
+> report was written; this document covers P01+P02 only.
+
 **Track branch:** `code-implementation-track-policy` (2 cells, both merged)
 **Track worktree:** `/home/vantt/projects/code-implementation-track-policy-track`
 **Mode:** docs-only rollout (`plan.md` rev 2)

@@ -108,17 +108,23 @@ once per cell, not once per round.
   `git grep`/call-graph reading when no such capability is registered or
   present. Escalate to this tier when the diff's blast radius is not
   obviously contained to the changed file(s) -- a real judgment call, made
-  once, before dispatching `open.json`.
+  once, before dispatching `open.json`. **Who runs it:** this is not a
+  separate dispatched step -- when the Lead escalates to this tier, the
+  SAME doer/fixer round's objective names `AFFECTED_TESTS` instead of
+  `FOCUSED_TESTS` for that round; there is no round where nobody runs it.
 - **full** -- the whole project test command. Runs **at most once per
-  cell**, right before merge, never mechanically after every round.
+  distinct (tree, environment) state per cell**, right before merge, never
+  mechanically after every round.
 
 ### Test-selection block -- declared once, before `open.json`
 
 Write this into the Lead's own working notes (there is no dedicated
 request-schema field for it, same as a plan-loop phase file's own
-`## Verification` block) and have every produce/revise/recheck objective
-below reference it **by name** instead of restating or vaguely gesturing at
-a command:
+`## Verification` block) and **inline the actual command into every
+produce/revise/recheck objective that needs it** -- a headless dispatch
+only ever sees its own objective string, never the Lead's private notes,
+so naming `FOCUSED_TESTS` without also writing the real command reaches
+the worker as an undefined token, not an instruction:
 
 ```text
 FOCUSED_TESTS: <exact command(s) exercising the changed module/symbol/behavior>
@@ -126,18 +132,24 @@ AFFECTED_TESTS: <exact command(s) covering the diff's blast radius, from
   impact-analysis when present, or "same as FOCUSED_TESTS" when the Lead
   judges blast radius contained>
 FULL_TEST: <the project's whole test command>
-FULL_TRIGGERS: shared schema or public API; dispatch, coordination,
-  confinement, or mutation authority; test-harness or build scripts;
-  migrations; package/install/release boundary; blast radius HIGH/CRITICAL
-  per impact-analysis when present; reviewer/red-team names an uncovered
-  contract
+FULL_TRIGGERS (mechanical -- diff-path facts, fire regardless of what was
+  declared): dispatch/self-host hooks; session/replay/schema core; shared
+  invariants; migrations; test-harness foundations; package manifest/
+  install/release-boundary scripts (the exact categories
+  `docs/how-to/author-a-plan-loop-track.md`'s Mechanical-gate rule names,
+  so the two stay in lockstep); blast radius HIGH/CRITICAL per
+  impact-analysis when present.
 ```
 
-Reviewer and red-team evaluate this selection **together with the patch**
--- a selection that obviously misses the changed contract is itself a
-finding (see "Reviewer/red-team judge proof sufficiency" below), not
-something they route around by quietly running something wider on their
-own.
+A reviewer/red-team finding that the declared tier misses a changed
+contract is **not** a `FULL_TRIGGERS` entry -- unlike the diff-path facts
+above, it is a judgment call the Lead dispositions like any other finding
+(accept and re-dispatch at the named tier, or reject with an evidence-
+backed rationale; see "Reviewer/red-team judge proof sufficiency" below).
+Reviewer and red-team evaluate the test-selection block **together with
+the patch** -- a selection that obviously misses the changed contract is
+itself such a finding, not something they route around by quietly running
+something wider on their own.
 
 ### Full suite: once, near merge, never mechanically per round
 
@@ -175,6 +187,18 @@ environment fingerprint (minimum) = runtime/toolchain version(s)
   (e.g. a compiled binary's own version/build identity)
 ```
 
+Compute it with something as simple as this repo's own shape (adjust the
+toolchain/lockfile/prerequisite lines to what the target project actually
+has):
+
+```sh
+node --version; sha256sum package-lock.json; <toolchain> --version   # e.g. cargo --version if the command exercises compiled output
+```
+
+Record the resulting string (or its hash) alongside the proof key -- two
+runs with an identical tree but no recorded fingerprint for either one
+cannot be compared, so this is not optional when claiming reuse.
+
 If the merge commit's tree hash equals the cell tip's tree hash **and** the
 environment fingerprint is unchanged, the cell-tip proof certifies the
 merge commit directly -- record both shas and the shared tree hash, never
@@ -196,11 +220,23 @@ evidence-backed rationale).
 
 Every cell trace records: every test command run (tier: focused / affected
 / full), whether it executed or was reused via tree-identity (naming the
-sha it was reused from), duration, the reason for any escalation past
-`focused`, and the failing-test delta versus whatever it was compared
-against. This is what makes "full-suite runs per change" and "wall time to
-merge" measurable across a run of real cells -- evidence a policy claim can
-be checked against later, not ceremony.
+sha it was reused from and the environment fingerprint both runs shared),
+duration, the reason for any escalation past `focused`, and the
+failing-test delta versus whatever it was compared against. This is what
+makes "full-suite runs per change" and "wall time to merge" measurable
+across a run of real cells -- evidence a policy claim can be checked
+against later, not ceremony.
+
+**Known limit (not enforced by the engine).** Everything in this section
+and "Proof tiers" above is Lead discipline in prose -- the coordination
+session's request schema has no field for a proof tier, `FULL_TRIGGERS`,
+or an environment fingerprint, and `disposition`/`rationale` accepts any
+non-empty string regardless of what it claims. A Lead who does not
+actually run `FULL_TEST` once, or who mislabels a real regression as
+`environmental-precondition`, is not caught by anything the engine checks.
+Building a validator/schema for it is deliberately deferred (ADR-007 §4: a
+second real consumer needed first) -- this note exists so that limit is
+stated, not silently assumed away.
 
 ## Default actor roster
 
@@ -401,7 +437,7 @@ step per position, all resuming the same `coordinationId`:
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
-    { "type": "operation", "as": "revise", "operationId": "revise-candidate", "targetActorId": "fixer", "taskKey": "revise-candidate-fixer", "objective": "First run `git rev-parse --abbrev-ref HEAD` and stop immediately if it is not `code-panel--<change-slug>`. Then apply the accepted findings. Land a real commit; re-run FOCUSED_TESTS for the changed region plus a regression test for the specific finding being fixed -- do not mechanically re-run more than that.", "expectedOutputs": ["a real git commit", "agent-result.json (status, summary, the real test outcome)"], "mutation": "mutating" },
+    { "type": "operation", "as": "revise", "operationId": "revise-candidate", "targetActorId": "fixer", "taskKey": "revise-candidate-fixer", "objective": "First run `git rev-parse --abbrev-ref HEAD` and stop immediately if it is not `code-panel--<change-slug>`. Then apply the accepted findings. Land a real commit; re-run FOCUSED_TESTS (<name the exact command here>) for the changed region plus a regression test for the specific finding being fixed -- do not mechanically re-run more than that.", "expectedOutputs": ["a real git commit", "agent-result.json (status, summary, the real test outcome)"], "mutation": "mutating" },
     { "type": "authorize", "as": "authReviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "authorizationId": "auth_codepanel_<change-slug>_fix1_reviewer_recheck", "invocationKey": "code-panel:<change-slug>:fix1:reviewer-recheck:1", "reason": "Revision landed; recheck against the original finding.", "grantedContextRefs": ["$ref:revise"] },
     { "type": "operation", "as": "reviewRecheck", "operationId": "reviewer-recheck", "targetActorId": "reviewer", "taskKey": "reviewer-recheck-reviewer", "objective": "Recheck the revised commit against the accepted findings. Read the fixer's own commit and real test output as evidence first -- do not re-run the same command unless that evidence is itself in doubt.", "expectedOutputs": ["agent-result.json (status, summary)"], "contextRefs": ["$ref:revise"] },
     { "type": "authorize", "as": "authRedTeamRecheck", "operationId": "red-team-recheck", "targetActorId": "red-team", "authorizationId": "auth_codepanel_<change-slug>_fix1_red_team_recheck", "invocationKey": "code-panel:<change-slug>:fix1:red-team-recheck:1", "reason": "Revision landed; re-attempt the same class of attack.", "grantedContextRefs": ["$ref:revise"] },
@@ -427,9 +463,13 @@ close mechanism -- `runCoordinationUseCase` always attempts a quorum
 close as its own last step after every declared step finishes
 dispatching. Close only once the required first pass and every fix round
 this change needed have dispatched cleanly, and either `FULL_TEST` has run
-once against this cell (worktree tip, or the merge commit via the
-tree-identity rule above) or the rationale states why `AFFECTED_TESTS`
-already covered the blast radius without it:
+once against the cell's own worktree tip (close happens before the merge
+in this skill's sequence -- there is no separate post-merge gate here the
+way a plan-loop track's own full-suite gate re-verifies `integratedSha`;
+the tree-identity rule above still applies if a later fix round's tree
+turns out identical to an earlier round's own tested tree) or the
+rationale states why `AFFECTED_TESTS` already covered the blast radius
+without it:
 
 ```json
 {
