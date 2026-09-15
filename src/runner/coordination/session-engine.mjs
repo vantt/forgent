@@ -1152,7 +1152,24 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
   const resumeMatch = resumedAssignmentId
     ? forThisBinding.find((record) => record.consumedByAssignmentId === resumedAssignmentId)
     : undefined;
-  return resumeMatch ?? forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  // tsk-1bh fix: prefer the NEWEST unconsumed authorization for this binding,
+  // not the oldest. In the normal flow (authorize + operation dispatched
+  // together in one `fgos coordination run` call) there is only ever one
+  // unconsumed authorization at a time, so this changes nothing. Multiple
+  // unconsumed authorizations for the same binding only pile up when an
+  // earlier one was orphaned -- its paired operation step was refused
+  // (e.g. a `contextRefs` grant violation) before ever reaching
+  // `createSessionAssignment`, so it was never marked consumed and never
+  // will be. An oldest-first `.find()` would then hand every future
+  // dispatch attempt back to that same dead authorization forever, making a
+  // corrected retry (a fresh authorization with the fix applied) permanently
+  // unreachable for this binding (confirmed live: `code-implementation-
+  // track-policy--p01`'s `reviewer-recheck` hit exactly this). The newest
+  // authorization is the Lead's most recent, presumably corrected, intent;
+  // an older orphaned one is dead weight, never a competing valid grant --
+  // no real flow authorizes the same binding twice on purpose without
+  // consuming the first before issuing the second.
+  return resumeMatch ?? forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
 }
 
 /**
@@ -3500,40 +3517,75 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
       continue;
     }
 
-    // Fallback (pre-existing, unchanged): no gating binding anywhere for
-    // this actor -- either this session has no declared protocol at all, or
-    // every binding this actor has is an ungated driver-authorized one
-    // (`actorGatingOperationIds`). "First assignment-created event for this
-    // actor, anywhere" is exactly correct for a session with no protocol
-    // (no graph to consult in the first place) and for the real shipped
-    // shape this fallback exists to preserve (`standalone-master-
-    // coordination-loop.yaml`'s "fixer", whose only binding, revise-
-    // candidate, is a single ungated driver-authorized operation --
-    // `coordination-launch-master-loop.test.mjs`'s own `coord_launcher_live`
-    // proves and depends on "missing until dispatched" for exactly this
-    // shape). A HYPOTHETICAL actor with two-or-more ungated
-    // driver-authorized bindings and no required binding at all would still
-    // see this fallback count it complete after only the FIRST of those
-    // settles -- the same limitation this whole fix addresses for gating
-    // bindings, just not (yet) extended to the ungated case, because no
-    // real fixture in this repo has that shape today (P10-KERNEL-FIX.md
-    // Gaps).
-    const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
-    if (!createdEvent) {
+    // Fallback: no gating binding anywhere for this actor -- either this
+    // session has no declared protocol at all, or every binding this actor
+    // has is an ungated driver-authorized one (`actorGatingOperationIds`).
+    // "Missing until dispatched" (no `createdEvents` at all) is exactly
+    // correct for a session with no protocol (no graph to consult in the
+    // first place) and for the real shipped shape this fallback exists to
+    // preserve (`standalone-master-coordination-loop.yaml`'s "fixer", whose
+    // only binding, revise-candidate, is a single ungated driver-authorized
+    // operation -- `coordination-launch-master-loop.test.mjs`'s own
+    // `coord_launcher_live` proves and depends on that for exactly this
+    // shape, unaffected below since it never dispatches a second attempt).
+    //
+    // tsk-1bh fix: with TWO OR MORE assignments for this actor (a retry
+    // after a failed/no-evidence first attempt, dispatched under a fresh
+    // authorization for the SAME graph binding), this used to classify by
+    // the FIRST assignment-created event alone -- a later, genuinely
+    // successful re-attempt of that same binding could never un-stick a
+    // `failed` classification, so `closeSessionByQuorum` would refuse
+    // forever even after real, verified work landed (confirmed live, not
+    // hypothetical: `fgos-plan-loop` cells
+    // `code-implementation-track-policy--p01`'s `reviewer-recheck` and
+    // `--p04`'s `fixer` both hit exactly this; both re-attempts arrived
+    // through `dispatchDeclaredOperation`, so both carry the same
+    // `(nodeId, operationId)` stamp as the first attempt).
+    //
+    // This must NOT be read as "any later assignment for this actorId can
+    // supersede an earlier one" -- that is precisely the laundering attack
+    // `coordination-r6-security-adversarial.test.mjs`'s "partial-consensus
+    // false success" case exercises: a SECOND, unrelated ad-hoc dispatch
+    // (`dispatchPrimaryTask`, no operationId/nodeId stamp at all) under the
+    // same actorId must never be mistaken for a retry of the first,
+    // required task. The first assignment-created event for this actor
+    // decides the binding: when it carries no `operationId`/`nodeId` stamp
+    // (an unmediated door -- `dispatchPrimaryTask`/`proposeConsult`/a bare
+    // `createSessionAssignment` call), there is no reliable signal that
+    // distinguishes "a legitimate retry of this same obligation" from "an
+    // unrelated task that merely reused the actorId", so only that first
+    // event is ever considered here -- byte-identical to the pre-fix
+    // behavior for every unstamped-first-event actor, laundering included.
+    // Only when the first event IS stamped do later events sharing that
+    // EXACT `(nodeId, operationId)` pair count as further attempts at the
+    // same binding, mirroring `resolveBindingOutcome`'s own
+    // `assignmentServesOperation` scoping (same file, above): walk every
+    // such attempt in event order, the first SATISFIED one settles the
+    // actor; with none satisfied, the LAST attempt's own outcome is
+    // reported, same as before for the single-attempt case.
+    const allCreatedEvents = events.filter((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
+    if (allCreatedEvents.length === 0) {
       missing.push({ actorId: originalActorId });
       continue;
     }
-    const assignmentId = createdEvent.payload.assignmentId;
-    const latestLink = lastEventFor(events, 'result-linked', assignmentId);
-    if (!latestLink) {
-      late.push({ actorId: originalActorId, assignmentId });
-      continue;
+    const firstCreatedEvent = allCreatedEvents[0];
+    const firstOperationId = firstCreatedEvent.payload.operationId;
+    const firstNodeId = firstCreatedEvent.payload.nodeId;
+    const createdEvents =
+      firstOperationId && firstNodeId
+        ? allCreatedEvents.filter((event) => event.payload.operationId === firstOperationId && event.payload.nodeId === firstNodeId)
+        : [firstCreatedEvent];
+    let lastOutcome;
+    for (const createdEvent of createdEvents) {
+      lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveId, createdEvent.payload.assignmentId);
+      if (lastOutcome.satisfied) break;
     }
-    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, latestLink.payload.runId);
-    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
-      failed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+    if (lastOutcome.satisfied) {
+      completed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
+    } else if (lastOutcome.reason === 'late') {
+      late.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId });
     } else {
-      completed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+      failed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
     }
   }
 
