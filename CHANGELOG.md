@@ -46,6 +46,121 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   provenance, plus a registered `fgos doctor` check/fix that detects stale
   generated instruction projections and repairs them without overwriting
   unmanaged user content.
+- Plan-loop track authoring how-to and coding verification-discipline
+  fragment (code-implementation-track-policy track, P01):
+  `docs/how-to/author-a-plan-loop-track.md` gives a Lead a copyable template
+  for a Work-independent `fgos-plan-loop` track's precedence/compatibility
+  rule, Execution Inputs (baseline that may only shrink), durable evidence
+  schema (`coordination-accepted` / `merged-to-track` / `checkpoint-verified`
+  with the `testedSha != integratedSha` non-inference rule), checkpoint
+  identity, Product Gates with the mechanical-gate rule, escalation
+  authority scoped to the current cell, and cell trace format; it links
+  `domains/coding/instructions/verification-discipline.md` (`kind:
+  procedure`) as the single source of the coding-worker verification rule
+  rather than restating it.
+- `fgos-plan-loop` baseline step, proof-sufficiency wording, and close-rule
+  evidence lifecycle (code-implementation-track-policy track, P02):
+  `core/skills/fgos-plan-loop/SKILL.md` gains a baseline step (run the
+  track's full proof command once, record it in `plan.md` Execution
+  Inputs, list may only shrink) before its unattended loop; `produce`/
+  `revise` objectives now say to run only the phase's declared
+  Verification unless a full-suite gate applies; `review`/`redTeam` and
+  their recheck objectives now judge proof sufficiency, not only
+  correctness, and report a coverage gap as a finding for the Lead to
+  accept or evidence-backed reject; close wording states the durable
+  evidence schema (`coordination-accepted` / `merged-to-track` /
+  `checkpoint-verified`), checkpoint identity, escalation authority scoped
+  to the current cell, and the `testedSha != integratedSha` non-inference
+  rule; the description now routes "run/execute this code implementation
+  plan (track)" requests here. `fgos-code-panel` gains one routing line
+  (description + Non-Goals) pointing a multi-cell `plan.md`/`phase-NN`
+  request to `fgos-plan-loop` instead, plus a fix -- its fix-round
+  `authReviewRecheck`/`authRedTeamRecheck` example steps now declare
+  `grantedContextRefs: ["$ref:revise"]` so the template dispatches as
+  written instead of being refused.
+- `fgos-code-panel` focused/affected/full proof tiers and plan-loop
+  proof-contract fixes (code-implementation-track-policy track, P03):
+  `domains/coding/skills/fgos-code-panel/SKILL.md` replaces its generic
+  "run the target project's real test command" wording with a declared
+  `FOCUSED_TESTS`/`AFFECTED_TESTS`/`FULL_TEST`/`FULL_TRIGGERS`
+  test-selection block (`AFFECTED_TESTS` uses the impact-analysis
+  capability, e.g. GitNexus, when registered and present); the full suite
+  now never re-runs against a `(tree, environment)` state it already
+  certified (usually once per cell near merge, but never mechanically
+  once per round; refined further at P04);
+  recheck steps read the fixer's own evidence by default instead of
+  re-running; a tree-identity proof-reuse rule (record `treeIdentical:
+  true` when `git diff testedSha integratedSha` is empty under the same
+  environment fingerprint, instead of re-running) replaces the raw-SHA
+  comparison that forced a redundant re-run after every `--no-ff` merge;
+  cell traces now record every test command's tier, duration, and
+  executed-vs-reused status. `core/skills/fgos-plan-loop/SKILL.md` and
+  `docs/how-to/author-a-plan-loop-track.md` get the same tree-identity
+  exception (with a new `treeIdentical` checkpoint-identity field) and
+  fix two contract bugs found in a review of P01/P02: a proof-gap finding
+  could previously be silently `deferred` at the 3-fix-round cap
+  (contradicting the accepted/evidence-backed-rejected-only rule) --
+  it now forces `Proof: escalated-to-full` instead; the baseline's
+  `environmental` bucket is split into `environmental-transient` (rerun
+  until green) and `environmental-precondition` (a named, disclosed
+  structural gap, e.g. an uncompiled binary, that does not block close
+  but must never be silently folded into `pre-existing`); the baseline
+  must record every failing test's exact name, not a count/category
+  summary. `docs/enduser-docs-index.json` regenerated to index the how-to.
+- `fgos-code-panel` post-merge verification gate (code-implementation-track-policy
+  track, P04): closing a cell only certified the cell's own worktree tip,
+  never the merge commit — if `$base` moved during the cell's lifetime or
+  the merge needed conflict resolution, the merged result was never
+  actually tested. `## 4. Close` now requires a post-merge tree-identity
+  check (reuse the close's proof only when the merge commit's tree matches
+  the cell tip's under the same environment fingerprint; otherwise run
+  `AFFECTED_TESTS` at minimum, `FULL_TEST` if triggered) before the
+  worktree/branch may be removed. "Record it" now defines the cell trace
+  as the coordination session's own event log (`close.json`'s disposition
+  rationale, readable via `fgos coordination show`) instead of leaving
+  "every cell trace" undefined — no new `docs/` directory, matching this
+  skill's own "no index, no track directory" design. "Full suite" wording
+  changed from an "at most once" KPI framing to "never twice for the same
+  (tree, environment) state" to stop a Lead from skipping a genuinely
+  needed rerun just to keep a count low. Final commit range for this cell:
+  `63b01fa9..70eb4485` (superseded at P05 below: the close-vs-merge
+  ordering and the git-notes durable-trace design both changed again).
+- `fgos-code-panel` close-before-merge ordering restored, `git notes`
+  replaced with ordinary commits, `tsk-1bh` fixed (code-implementation-track-policy
+  track, P05): a real review of P04's own shipped design found the
+  close-after-merge reorder had traded away a real safety property --
+  target branch could receive a cell's code even when the coordination
+  session never actually closed (confirmed live: P04's own session stayed
+  `active` due to `tsk-1bh`, yet its merge still landed). Reverted to
+  close-then-merge (matching `fgos-plan-loop`'s own cells); post-merge
+  verification and its result now happen after a successful close, as
+  separate plain-git steps recorded via an ordinary tracked commit instead
+  of a `git note` (`refs/notes/*` are outside the default commit graph and
+  do not push/fetch by default -- confirmed via `git notes list` returning
+  empty on this repo, i.e. the P04 note was never actually durable).
+  `session-engine.mjs`'s quorum classification also fixed: a
+  driver-authorized position (e.g. `fixer`) that failed once and then
+  succeeded under a fresh authorization now correctly counts as completed
+  instead of being stuck `failed` forever, and `resolveBindingAuthorization`
+  now prefers the newest unconsumed authorization for a binding instead of
+  an oldest-wins order that made a corrected retry unreachable once a bad
+  authorization existed for the same binding. Two independent review
+  rounds on this fix (real reviewer + red-team dispatches, not
+  self-review) then found and fixed two further real bugs: (1)
+  `resolveTaskKeyAuthorization`, the sibling function deriving a
+  driver-authorized dispatch's default `taskKey`, was still oldest-wins,
+  disagreeing with `resolveBindingAuthorization` and blocking a legitimate
+  third retry at the same binding -- fixed to newest-wins too; (2) the
+  quorum fallback's same-binding retry credit trusted raw
+  `assignment-created.payload.operationId`/`nodeId` fields, which an
+  exported raw door (`createSessionAssignment`) can legitimately carry for
+  an unrelated task while spending a real authorization -- fixed to
+  require the same reserved `protocol-operation:` contract stamp the
+  gating path already checks, which only `dispatchDeclaredOperation`'s own
+  common path can write. Five new regression tests added across both
+  fixes, each confirmed by reverting its fix to fail against the
+  pre-fix/pre-hardening code. Full trace:
+  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result

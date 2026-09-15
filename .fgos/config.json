@@ -148,7 +148,10 @@
               "30m",
               "--model",
               "{model}"
-            ]
+            ],
+            "env": {
+              "HOME": "${HOME}/.agy-homes/mucdong"
+            }
           }
         ],
         "providerModel": "gemini",
@@ -178,6 +181,9 @@
             "interactiveMode": {
               "exitCommand": "/exit",
               "kind": "agy"
+            },
+            "env": {
+              "HOME": "${HOME}/.agy-homes/mucdong"
             }
           }
         ],
@@ -234,7 +240,10 @@
               "{prompt}",
               "--model",
               "{model}"
-            ]
+            ],
+            "env": {
+              "HOME": "${HOME}/.agy-homes/mucdong"
+            }
           }
         ],
         "rigorOverrides": {
@@ -285,7 +294,7 @@
               "{prompt}"
             ],
             "env": {
-              "CODEX_HOME": "${HOME}/.codex-tetnu"
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
             }
           }
         ]

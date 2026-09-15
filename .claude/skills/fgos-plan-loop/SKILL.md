@@ -14,7 +14,8 @@ description: >-
   process with zero hand-fed chat history) matters. Examples: "resume
   <track> and tell me what's next", "open the next cell for <track>",
   "authorize a fix round for cell <id>", "close cell <id> and report the
-  commit".
+  commit", "run this code implementation plan", "execute this code
+  implementation track".
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

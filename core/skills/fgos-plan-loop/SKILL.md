@@ -14,7 +14,8 @@ description: >-
   process with zero hand-fed chat history) matters. Examples: "resume
   <track> and tell me what's next", "open the next cell for <track>",
   "authorize a fix round for cell <id>", "close cell <id> and report the
-  commit".
+  commit", "run this code implementation plan", "execute this code
+  implementation track".
 ---
 
 # fgos-plan-loop
@@ -174,7 +175,7 @@ filename.
          "operationId": "produce-candidate",
          "targetActorId": "doer",
          "taskKey": "produce-candidate-doer",
-         "objective": "Implement the current-cell contract. Source plan/artifact: plans/<track>/phase-01-<name>.md.",
+         "objective": "Implement the current-cell contract. Source plan/artifact: plans/<track>/phase-01-<name>.md. Run exactly the Verification commands the phase file declares for this cell and report each command's real outcome. Do not run the track's full proof command unless plan.md marks this phase a full-suite gate or this objective says so explicitly.",
          "expectedOutputs": ["agent-result.json (status, summary)"],
          "mutation": "mutating"
        },
@@ -184,7 +185,7 @@ filename.
          "operationId": "review-candidate",
          "targetActorId": "reviewer",
          "taskKey": "review-candidate-reviewer",
-         "objective": "Independently review the candidate produced from the current-cell contract.",
+         "objective": "Independently review the candidate produced from the current-cell contract. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
          "expectedOutputs": ["agent-result.json (status, summary)"],
          "contextRefs": ["$ref:produce"]
        },
@@ -194,7 +195,7 @@ filename.
          "operationId": "red-team-candidate",
          "targetActorId": "red-team",
          "taskKey": "red-team-candidate-red-team",
-         "objective": "Attempt to falsify the candidate's success claims through named bug/invariant attacks.",
+         "objective": "Attempt to falsify the candidate's success claims through named bug/invariant attacks. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
          "expectedOutputs": ["agent-result.json (status, summary)"],
          "contextRefs": ["$ref:produce"]
        }
@@ -354,7 +355,7 @@ resuming the SAME `coordinationId`:
       "operationId": "revise-candidate",
       "targetActorId": "fixer",
       "taskKey": "revise-candidate-fixer",
-      "objective": "Apply the accepted findings from Reviewer HIGH-1 and Red-Team (if any accepted).",
+      "objective": "Apply the accepted findings from Reviewer HIGH-1 and Red-Team (if any accepted). Run exactly the Verification commands the phase file declares for this cell and report each command's real outcome. Do not run the track's full proof command unless plan.md marks this phase a full-suite gate or this objective says so explicitly.",
       "expectedOutputs": ["agent-result.json (status, summary)"],
       "mutation": "mutating"
     },
@@ -373,7 +374,7 @@ resuming the SAME `coordinationId`:
       "operationId": "reviewer-recheck",
       "targetActorId": "reviewer",
       "taskKey": "reviewer-recheck-reviewer",
-      "objective": "Recheck the revised candidate against the accepted findings.",
+      "objective": "Recheck the revised candidate against the accepted findings. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
       "expectedOutputs": ["agent-result.json (status, summary)"],
       "contextRefs": ["$ref:revise"]
     },
@@ -392,7 +393,7 @@ resuming the SAME `coordinationId`:
       "operationId": "red-team-recheck",
       "targetActorId": "red-team",
       "taskKey": "red-team-recheck-red-team",
-      "objective": "Recheck the revised candidate; re-attempt any attack that previously succeeded.",
+      "objective": "Recheck the revised candidate; re-attempt any attack that previously succeeded. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
       "expectedOutputs": ["agent-result.json (status, summary)"],
       "contextRefs": ["$ref:revise"]
     }
@@ -439,10 +440,88 @@ own last, automatic step after every declared step in a request finishes
 dispatching (documented behavior this skill relies on, never
 reimplements — see the `fgos-group-thinking` skill's own "The gate, and
 why it holds" section for the same claim proven against a sibling
-protocol pack). Close only once every required first-pass step **and**
-every fix round this cell needed have already dispatched cleanly and the
-Lead has re-run the phase's stated test command and compared it against
-the recorded baseline (master-coordinator.md section H, `CLOSE CELL`):
+protocol pack).
+
+**Precedence & compatibility.** A phase file's own `## Verification` and
+plan.md's Product Gates govern over this skill's generic defaults; a
+mechanical isolation-breaking diff and a Lead-accepted escalation finding
+both override targeted mode for the current cell regardless of what the
+Product Gates marker says. A track that predates this rule, with no
+baseline or checkpoint block, stays fully compatible — nothing here
+forces a retroactive schema migration.
+
+**Durable evidence schema.** A cell's proof passes through three
+distinct, non-collapsible states:
+
+1. `coordination-accepted` — this cell's coordination loop reached
+   quorum and the cell-declared verification passed on the cell worktree
+   at `testedSha`.
+2. `merged-to-track` — the cell branch was integrated into the track
+   branch, producing `integratedSha`.
+3. `checkpoint-verified` — the gate's full proof command executed
+   against `integratedSha`, was compared against the recorded baseline,
+   every new failure was triaged, and it passed.
+
+**Non-inference rule.** If `testedSha != integratedSha`,
+`checkpoint-verified` can never be inferred from the pre-merge proof
+recorded at `coordination-accepted` — gate proof must execute against
+`integratedSha` itself before the checkpoint is certified. **The one
+documented exception: tree identity, AND ONLY WITH a matching environment
+fingerprint.** `git diff <testedSha> <integratedSha> -- .` empty (the
+normal case for a `--no-ff` merge with no conflicts — its SHA always
+differs from the cell tip even when nothing else changed) proves the two
+commits share a *tracked-content* tree; it proves nothing about the
+runtime/toolchain, lockfile, or a built prerequisite the proof command
+itself depends on, none of which git tracks. Both must hold: an empty
+tree diff **and** an unchanged environment fingerprint (minimum: runtime/
+toolchain version(s) + lockfile hash + any built prerequisite the command
+depends on — the same fingerprint code-panel's own tree-identity rule
+requires). Record BOTH shas, the empty-diff confirmation, and the
+fingerprint match as `treeIdentical: true`; a non-empty diff OR a changed
+fingerprint always forces the real re-run — there is no shortcut for
+either kind of drift.
+
+**Known limit (not enforced by the engine).** This rule, `Escalation
+authority & scope` below, and `Close rule` below are Lead discipline in
+prose — the coordination-session schema/engine has no field for
+`treeIdentical`, a proof tier, or a fix-round cap, and accepts any
+non-empty disposition rationale regardless of what it claims. A Lead who
+does not actually follow this section can record `checkpoint-verified`
+without having checked either condition, and nothing here catches that.
+Building a validator/schema for it is deliberately deferred (ADR-007 §4:
+a second real consumer needed first) — this note exists so that limit is
+stated, not silently assumed away.
+
+**Escalation authority & scope.** The Lead evaluates every
+Reviewer/Red-Team proof-gap finding. The Lead may `accepted` it —
+upgrading the current cell's proof requirement to
+`Proof: escalated-to-full` — or provide an evidence-backed `rejected`.
+An accepted escalation upgrades the proof requirement for **the current
+cell only**; it does not by itself create a permanent Product Gate in
+plan.md for future cells.
+
+**Checkpoint identity.** Before `close.json`, record in the cell trace:
+`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`,
+`treeIdentical` (true only when the non-inference rule's tree-identity
+exception applied instead of a real re-run at `integratedSha`), and
+`outcome`.
+
+**Close rule.** Close with `Proof: targeted` only when no accepted
+coverage-gap finding is open and the diff touches none of the
+isolation-breaking paths. Otherwise the cell is a full-suite gate: run
+the track's full proof command, compare against the recorded baseline,
+triage every new failure as patch-related / environmental-transient /
+environmental-precondition / pre-existing (the how-to's Execution Inputs
+section defines each bucket), verify `integratedSha` itself when it
+differs from `testedSha` unless the tree-identity exception above applies
+(non-inference rule above), and record
+`Proof: full-suite-gate | escalated-to-full` with the complete checkpoint
+identity tuple in the trace — all before `close.json`.
+
+Close only once every required first-pass step **and** every fix round
+this cell needed have already dispatched cleanly and the checkpoint
+identity above is recorded (master-coordinator.md section H, `CLOSE
+CELL`):
 
 ```json
 {
@@ -550,6 +629,15 @@ policy below, reading state only from `chain` and the track's own
 `plan.md` — never from chat history — so re-running the same instruction
 resumes wherever the previous session stopped.
 
+0. **Baseline, once, before the loop below ever runs.** Run the track's
+   full proof command once and record the outcome in `plan.md`'s
+   Execution Inputs: command, date, commit, and the exact names of
+   already-failing tests as known baseline failures (see
+   [`docs/how-to/author-a-plan-loop-track.md`](../../../docs/how-to/author-a-plan-loop-track.md)
+   Execution Inputs section for the exact block shape). Every later gate's
+   full-proof run, at any phase, is compared against this recorded
+   baseline; the list of known failures may only shrink, never grow.
+
 Loop, until the last phase in `plan.md`'s Product Gates carries a
 `merged` row in its cell-status table:
 
@@ -565,15 +653,35 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    focused test in the worktree yourself before reading `show`.
 4. Disposition every finding: `accepted` when its evidence holds, `rejected`
    when the Lead can prove it wrong, `deferred` only when it is outside the
-   cell's scope and the rationale says so. Any `accepted` finding opens a
-   fix round (section 3). Cap: three fix rounds per cell; past that, close
-   the cell with the remaining findings `deferred` and named in the trace.
-5. Close (section 4), write the cell trace under
+   cell's scope and the rationale says so. **A proof-gap finding (Reviewer/
+   Red-Team judging the declared verification insufficient) never gets
+   `deferred` — section 4's Escalation authority admits only `accepted`
+   (upgrading to `Proof: escalated-to-full`) or an evidence-backed
+   `rejected`.** Any `accepted` finding opens a fix round (section 3). Cap:
+   three fix rounds per cell; past that, close remaining non-proof-gap
+   findings as `deferred` and named in the trace. If a proof-gap finding
+   was `accepted` and the fix rounds did not resolve it before the cap,
+   the cell still closes, but only after running the full proof command
+   and recording `Proof: escalated-to-full` (never `targeted`, and never
+   left as a silent `deferred` in the trace).
+5. Close (section 4): confirm the checkpoint identity (`phase/cell id`,
+   `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`,
+   `outcome`) is recorded in the cell trace under
    `docs/architect/agent-coordination/verification/<track>/<cell>.md`,
-   merge `git merge --no-ff <track>--<cell-id>` into the track branch, drop
-   the worktree, and append one row to `plan.md`'s cell-status table:
-   cell, merge commit, review/red-team verdicts, deferred findings. Phases
-   the plan marks as full-suite gates run the full suite before the merge.
+   merge `git merge --no-ff <track>--<cell-id>` into the track branch
+   (producing `integratedSha`), drop the worktree, and append one row to
+   `plan.md`'s cell-status table: cell, merge commit, review/red-team
+   verdicts, deferred findings. Phases the plan marks as full-suite gates
+   (or a mechanical isolation-breaking trigger, or a Lead-accepted
+   escalation finding (section 4)) run the full proof command
+   in the cell worktree before the merge, compared against the recorded
+   baseline; when `testedSha != integratedSha`, re-run the gate's full
+   proof command against `integratedSha` itself before recording
+   `checkpoint-verified` — unless `git diff testedSha integratedSha -- .`
+   is empty AND the environment fingerprint is unchanged, in which case
+   record `treeIdentical: true` and certify from the pre-merge run (the
+   non-inference rule's one documented exception, section 4) — never
+   inferred when either the diff is non-empty or the fingerprint moved.
 6. Back to step 1. When the loop ends, write
    `<plan dir>/reports/track-closeout.md`: every cell's merge commit, every
    deferred finding, and the exact commands that reproduce the evidence.

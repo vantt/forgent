@@ -69,6 +69,11 @@ impl InvocationControl {
         self
     }
 
+    /// Returns the cancellation receiver channel if registered.
+    pub fn cancellation_receiver(&self) -> Option<tokio::sync::watch::Receiver<bool>> {
+        self.cancellation_rx.clone()
+    }
+
     /// Checks if cancellation has been requested.
     pub fn is_cancelled(&self) -> bool {
         if let Some(rx) = &self.cancellation_rx {

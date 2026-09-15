@@ -72,11 +72,12 @@ G. Define chat host contract
 H. Retire legacy Node after zero-route proof
 ```
 
-Phase A, Phase D's local native-read proof, and the preview parts of Phase B/C
-are closed. Stable/default graduation still requires packaging-distribution or
-release-owner decisions. Phase E is now the next host-invocation implementation
-frontier. Phase F can be designed after Phase E has at least one semantic
-operation that is not only a built-in CLI route.
+Phase A, Phase D's local native-read proof, Phase E (R2, closed 2026-09-15),
+and the preview parts of Phase B/C are closed. Stable/default graduation still
+requires packaging-distribution or release-owner decisions. Phase F now has
+its precondition satisfied (Phase E delivered `fixture.echo.echo`, a semantic
+operation that is not only a built-in CLI route) and can proceed on its own
+rollout plan.
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -196,14 +197,16 @@ Host-invocation tasks:
 
 Packaging dependency: light. If preview providers ship as release artifacts, packaging-distribution must include and verify their files. If they are test fixtures only, host-invocation can proceed without packaging release work.
 
-Done when:
+Closed 2026-09-15 (all sub-tasks above done via R2-P0 through R2-P5). Done when:
 
-- [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) names the fixture provider and conformance suite.
-- External provider docs move from `planned` to `current preview` or `implemented preview` based on release posture.
+- [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) names the fixture provider and conformance suite. -- done, see its §4.
+- External provider docs move from `planned` to `current preview` or `implemented preview` based on release posture. -- done, `implemented preview`.
 
 ## 9. Phase F: R3 Production Remote Peer
 
 Goal: prove a project-local remote host is a peer of CLI for at least one native operation.
+
+Detailed rollout plan: [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
 
 Host-invocation tasks:
 
@@ -267,9 +270,9 @@ Done when:
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
 | 1 | Keep route-matrix and Rust-host targeted tests green for the current preview baseline: 73 selectors, 71 `legacy-cli`, two native. | Host invocation | No |
-| 2 | Fixture contract frozen 2026-09-15 ([verification/r2-external-process-proof.md](verification/r2-external-process-proof.md)#2). Next: run R2-P1+P2 (manifest parser/registry) and R2-P3+P4 (frame codec/supervisor) as parallel code-panel packets per [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
+| 2 | R2 external process provider preview closed 2026-09-15: all packets (R2-P0 through R2-P6) merged and verified per [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) and [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
-| 4 | Defer R3 remote peer until R2 proves at least one external provider operation through the common router. | Host invocation | Light, for project runtime adapter selection |
+| 4 | R2 now proves at least one external provider operation through the common router (fixture.echo.echo, R2-P5) -- the condition this item was waiting on is met. R3 sequencing itself is [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md)'s own call, not restated here. | Host invocation | Light, for project runtime adapter selection |
 
 ## 13. Related Files
 
@@ -279,6 +282,7 @@ Done when:
 | spec | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
 | R2 rollout plan | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
+| R3 rollout plan | [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md) |
 | R1 proof | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
 | R2 proof | [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
 | R3 proof | [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
