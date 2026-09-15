@@ -76,7 +76,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `FOCUSED_TESTS`/`AFFECTED_TESTS`/`FULL_TEST`/`FULL_TRIGGERS`
   test-selection block (`AFFECTED_TESTS` uses the impact-analysis
   capability, e.g. GitNexus, when registered and present); the full suite
-  now runs at most once per cell near merge instead of once per round;
+  now never re-runs against a `(tree, environment)` state it already
+  certified (usually once per cell near merge, but never mechanically
+  once per round; refined further at P04);
   recheck steps read the fixer's own evidence by default instead of
   re-running; a tree-identity proof-reuse rule (record `treeIdentical:
   true` when `git diff testedSha integratedSha` is empty under the same
@@ -96,6 +98,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   but must never be silently folded into `pre-existing`); the baseline
   must record every failing test's exact name, not a count/category
   summary. `docs/enduser-docs-index.json` regenerated to index the how-to.
+- `fgos-code-panel` post-merge verification gate (code-implementation-track-policy
+  track, P04): closing a cell only certified the cell's own worktree tip,
+  never the merge commit — if `$base` moved during the cell's lifetime or
+  the merge needed conflict resolution, the merged result was never
+  actually tested. `## 4. Close` now requires a post-merge tree-identity
+  check (reuse the close's proof only when the merge commit's tree matches
+  the cell tip's under the same environment fingerprint; otherwise run
+  `AFFECTED_TESTS` at minimum, `FULL_TEST` if triggered) before the
+  worktree/branch may be removed. "Record it" now defines the cell trace
+  as the coordination session's own event log (`close.json`'s disposition
+  rationale, readable via `fgos coordination show`) instead of leaving
+  "every cell trace" undefined — no new `docs/` directory, matching this
+  skill's own "no index, no track directory" design. "Full suite" wording
+  changed from an "at most once" KPI framing to "never twice for the same
+  (tree, environment) state" to stop a Lead from skipping a genuinely
+  needed rerun just to keep a count low. Final commit range for this cell:
+  `63b01fa9..81c54a43` (5 commits: initial fix, cell trace, close-vs-merge
+  reorder, git-notes durable trace, and a 3rd round resolving 7 recheck
+  residuals).
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
