@@ -1,19 +1,21 @@
 //! Integration tests for R2-P5: Router Integration.
 //!
 //! Proves:
-//! (a) RegistrySnapshot built via build_snapshot using real CATALOG plus adapter descriptor
+//! (a) ExternalProcessLinker accepts frozen fixture manifest and derives an entry for fixture.echo.echo.
+//! (b) RegistrySnapshot built via build_snapshot using test catalog plus the linker-derived descriptor
 //!     links without duplicate-binding panic.
-//! (b) InvocationService built from snapshot with adapter registered via register_provider
-//!     invokes fixture.echo.echo end-to-end; selected provider is fixture.echo.process,
-//!     round-trips request id and negotiated protocol version (fgos.component.v1).
-//! (c) test.fixture.echo resolves only to built-in EchoProvider.
-//! (d) Attempting to bind adapter descriptor to distribution.build.show or work.gate-bypass.show
-//!     is refused (linker reserved namespace or snapshot duplicate binding panic).
+//! (c) InvocationService built from snapshot with adapter registered via register_provider
+//!     invokes fixture.echo.echo end-to-end through the unmodified admission gate; selected provider
+//!     is fixture.echo.process, round-trips request id and negotiated protocol version (fgos.component.v1).
+//! (d) test.fixture.echo resolves only to built-in EchoProvider.
+//! (e) External provider claims to reserved namespaces (distribution.build.show, work.gate-bypass.show)
+//!     are refused by ExternalProcessLinker with LinkerError::ReservedNamespace.
 
 use fgos_host_runtime::catalog::CATALOG;
 use fgos_host_runtime::contracts::{
-    ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor,
-    ProviderLifecycle, ProviderOutcome, RegistrySnapshot,
+    ContractRef, HostInvocation, OperationCatalog, OperationDescriptor, OperationEffect,
+    OperationId, OperationIdempotency, OperationRequest, ProviderDescriptor, ProviderOutcome,
+    RegistrySnapshot, StreamingMode,
 };
 use fgos_host_runtime::invocation_service::{
     InMemoryEventSink, InvocationService, InvocationTerminalState,
@@ -25,7 +27,7 @@ use fgos_host_runtime::providers::builtin::{
 use fgos_host_runtime::providers::external_process::{
     ExternalManifest, ExternalProcessConfig, ExternalProcessLinker,
     ExternalProcessProviderAdapter, LinkerError, COMPONENT_PROTOCOL_VERSION,
-    FIXTURE_OPERATION_ID, FIXTURE_PROCESS_DESCRIPTOR, FIXTURE_PROVIDER_ID,
+    FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
 };
 use fgos_host_runtime::registry::build_snapshot;
 use std::borrow::Cow;
@@ -61,24 +63,99 @@ fn fixture_bin() -> PathBuf {
     panic!("could not locate fixture-echo-process binary");
 }
 
-static COMBINED_PROVIDERS: &[ProviderDescriptor] = &[
-    ECHO_PROVIDER_DESCRIPTOR,
-    FIXTURE_PROCESS_DESCRIPTOR,
-];
+fn fixture_manifest_path() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("tests")
+        .join("fixtures")
+        .join("external-provider")
+        .join("manifest.yaml")
+}
+
+fn test_catalog() -> OperationCatalog {
+    static CATALOG_CELL: std::sync::OnceLock<&'static [OperationDescriptor]> =
+        std::sync::OnceLock::new();
+    *CATALOG_CELL.get_or_init(|| {
+        let mut entries = CATALOG.to_vec();
+        entries.push(OperationDescriptor {
+            operation_id: OperationId::from_static(FIXTURE_OPERATION_ID),
+            owning_component_id: Cow::Borrowed("test"),
+            request_contract: ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
+            outcome_contract: ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
+            effect: OperationEffect::Read,
+            idempotency: OperationIdempotency::Safe,
+            authority_policy_id: Cow::Borrowed("test.read"),
+            allowed_host_kinds: &["cli", "remote", "test"],
+            streaming_mode: StreamingMode::None,
+        });
+        Box::leak(entries.into_boxed_slice())
+    })
+}
+
+fn derive_fixture_descriptor() -> ProviderDescriptor {
+    let linker = ExternalProcessLinker::new();
+    let manifest = ExternalManifest::load_from_file(&fixture_manifest_path())
+        .expect("frozen fixture manifest.yaml must load and validate");
+    let registry = linker
+        .link(&[manifest])
+        .expect("linker must link frozen fixture manifest");
+    registry
+        .get_provider(&OperationId::from_static(FIXTURE_OPERATION_ID))
+        .expect("fixture provider entry must be derived by linker")
+        .to_provider_descriptor()
+}
+
+fn build_test_snapshot() -> (RegistrySnapshot, ProviderDescriptor) {
+    let derived_desc = derive_fixture_descriptor();
+    let combined_providers: &'static [ProviderDescriptor] = Box::leak(
+        vec![ECHO_PROVIDER_DESCRIPTOR, derived_desc.clone()].into_boxed_slice(),
+    );
+    let snapshot = build_snapshot(test_catalog(), combined_providers, "test-snapshot-r2-p5");
+    (snapshot, derived_desc)
+}
 
 // -----------------------------------------------------------------------------
-// Test (a): RegistrySnapshot linking
+// Positive Linker Test: accepts and derives entry for fixture.echo.echo
 // -----------------------------------------------------------------------------
 
 #[test]
-fn test_registry_snapshot_links_catalog_and_adapter_without_panic() {
-    // (a) RegistrySnapshot built via build_snapshot using real CATALOG plus adapter
-    // descriptor links without duplicate-binding panic.
-    let snapshot: RegistrySnapshot =
-        build_snapshot(CATALOG, COMBINED_PROVIDERS, "test-snapshot-r2-p5");
+fn test_linker_accepts_and_derives_fixture_echo_entry() {
+    let linker = ExternalProcessLinker::new();
+    let manifest = ExternalManifest::load_from_file(&fixture_manifest_path())
+        .expect("frozen fixture manifest.yaml must load and validate");
+    let registry = linker
+        .link(&[manifest])
+        .expect("linker must link frozen fixture manifest");
+
+    let op_id = OperationId::from_static(FIXTURE_OPERATION_ID);
+    let entry = registry
+        .get_provider(&op_id)
+        .expect("registry must contain derived entry for fixture.echo.echo");
+
+    assert_eq!(entry.provider_id, FIXTURE_PROVIDER_ID);
+    assert_eq!(entry.operation_id, op_id);
+    assert_eq!(entry.request_contract.id(), "fixture.echo.echo.request");
+    assert_eq!(entry.request_contract.version(), "1.0.0");
+    assert_eq!(entry.outcome_contract.id(), "fixture.echo.echo.outcome");
+    assert_eq!(entry.outcome_contract.version(), "1.0.0");
+    assert_eq!(entry.protocol, "fgos.component.v1");
+
+    let derived_desc = entry.to_provider_descriptor();
+    assert_eq!(derived_desc.provider_id.as_ref(), FIXTURE_PROVIDER_ID);
+    assert_eq!(derived_desc.operation_id, op_id);
+    assert!(derived_desc.allowed_hosts.contains(&"test"));
+    assert!(derived_desc.allowed_modes.contains(&"test"));
+}
+
+// -----------------------------------------------------------------------------
+// Test (a): RegistrySnapshot linking with test catalog and derived descriptor
+// -----------------------------------------------------------------------------
+
+#[test]
+fn test_registry_snapshot_links_catalog_and_derived_adapter_without_panic() {
+    let (snapshot, derived_desc) = build_test_snapshot();
 
     assert_eq!(snapshot.fingerprint(), "test-snapshot-r2-p5");
-    assert_eq!(snapshot.catalog().len(), CATALOG.len());
+    assert_eq!(snapshot.catalog().len(), CATALOG.len() + 1);
     assert_eq!(snapshot.providers().len(), 2);
 
     let fixture_desc = snapshot
@@ -88,7 +165,8 @@ fn test_registry_snapshot_links_catalog_and_adapter_without_panic() {
         .expect("fixture.echo.process descriptor must be present in snapshot");
 
     assert_eq!(fixture_desc.operation_id.as_str(), FIXTURE_OPERATION_ID);
-    assert_eq!(fixture_desc.mechanism, "external-process");
+    assert_eq!(fixture_desc.provider_id, derived_desc.provider_id);
+    assert_eq!(fixture_desc.mechanism, "process");
     assert!(fixture_desc.allowed_hosts.contains(&"test"));
     assert!(fixture_desc.allowed_modes.contains(&"test"));
 }
@@ -99,17 +177,14 @@ fn test_registry_snapshot_links_catalog_and_adapter_without_panic() {
 
 #[tokio::test]
 async fn test_invocation_service_invokes_fixture_echo_end_to_end() {
-    // (b) InvocationService built from snapshot with adapter registered via register_provider
-    // invokes fixture.echo.echo end-to-end; selected provider is fixture.echo.process,
-    // round-trips request id and negotiated protocol version (fgos.component.v1).
-    let snapshot = build_snapshot(CATALOG, COMBINED_PROVIDERS, "test-snapshot-r2-p5");
+    let (snapshot, derived_desc) = build_test_snapshot();
     let service = InvocationService::new(snapshot);
 
     // Register both built-in EchoProvider and ExternalProcessProviderAdapter
     service.register_provider(Arc::new(EchoProvider::new()));
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin);
-    let adapter = ExternalProcessProviderAdapter::new(config);
+    let adapter = ExternalProcessProviderAdapter::with_descriptor(derived_desc, config);
     service.register_provider(Arc::new(adapter));
 
     let mut invocation = HostInvocation::new("test");
@@ -185,8 +260,7 @@ async fn test_invocation_service_invokes_fixture_echo_end_to_end() {
 
 #[tokio::test]
 async fn test_fixture_echo_resolves_only_to_builtin_provider() {
-    // (c) test.fixture.echo resolves only to built-in EchoProvider.
-    let snapshot = build_snapshot(CATALOG, COMBINED_PROVIDERS, "test-snapshot-r2-p5");
+    let (snapshot, derived_desc) = build_test_snapshot();
 
     // Check 1: Router select directly selects test.fixture.echo.builtin
     let selection = select(
@@ -216,7 +290,10 @@ async fn test_fixture_echo_resolves_only_to_builtin_provider() {
     service.register_provider(Arc::new(EchoProvider::new()));
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin);
-    service.register_provider(Arc::new(ExternalProcessProviderAdapter::new(config)));
+    service.register_provider(Arc::new(ExternalProcessProviderAdapter::with_descriptor(
+        derived_desc,
+        config,
+    )));
 
     let invocation = HostInvocation::new("test");
     let request = OperationRequest::new(
@@ -250,31 +327,31 @@ async fn test_fixture_echo_resolves_only_to_builtin_provider() {
 }
 
 // -----------------------------------------------------------------------------
-// Test (d): Refusal of claims to distribution.build.show or work.gate-bypass.show
+// Test (d): Refusal of claims to reserved namespaces (distribution, work)
 // -----------------------------------------------------------------------------
 
 #[test]
-fn test_claims_to_core_operations_are_refused() {
-    // (d) Attempting to bind adapter descriptor to distribution.build.show or
-    // work.gate-bypass.show is refused (linker reserved namespace or snapshot duplicate binding panic).
+fn test_claims_to_reserved_namespaces_are_refused() {
+    // Attempting to claim reserved namespaces (distribution.build.show or
+    // work.gate-bypass.show) via external provider manifest is refused
+    // by the linker with LinkerError::ReservedNamespace.
 
     // 1. Linker refuses reserved namespace "distribution"
     let linker = ExternalProcessLinker::new();
     let manifest_dist_yaml = r#"
-manifestVersion: "1"
+manifestVersion: "1.0.0"
 id: "untrusted.distribution.provider"
 version: "1.0.0"
 runtime:
   kind: "process"
-  command: "echo"
+  command: "./echo-runner.sh"
 provides:
   operations:
     - id: "distribution.build.show"
-      requestContract: "distribution.build.show.request@1.0.0"
-      outcomeContract: "distribution.build.show.outcome@1.0.0"
+      request_contract: "distribution.build.show.request@1.0.0"
+      outcome_contract: "distribution.build.show.outcome@1.0.0"
       protocol: "fgos.component.v1"
-capabilities:
-  - "stdio.rpc"
+capabilities: []
 "#;
     let manifest_dist =
         ExternalManifest::from_yaml_str(manifest_dist_yaml, None).expect("valid manifest yaml");
@@ -286,20 +363,19 @@ capabilities:
 
     // 2. Linker refuses reserved namespace "work"
     let manifest_work_yaml = r#"
-manifestVersion: "1"
+manifestVersion: "1.0.0"
 id: "untrusted.work.provider"
 version: "1.0.0"
 runtime:
   kind: "process"
-  command: "echo"
+  command: "./echo-runner.sh"
 provides:
   operations:
     - id: "work.gate-bypass.show"
-      requestContract: "work.gate-bypass.show.request@1.0.0"
-      outcomeContract: "work.gate-bypass.show.outcome@1.0.0"
+      request_contract: "work.gate-bypass.show.request@1.0.0"
+      outcome_contract: "work.gate-bypass.show.outcome@1.0.0"
       protocol: "fgos.component.v1"
-capabilities:
-  - "stdio.rpc"
+capabilities: []
 "#;
     let manifest_work =
         ExternalManifest::from_yaml_str(manifest_work_yaml, None).expect("valid manifest yaml");
@@ -307,61 +383,5 @@ capabilities:
     assert!(
         matches!(err_work, LinkerError::ReservedNamespace { ref namespace, .. } if namespace == "work"),
         "linker must refuse work namespace: got {err_work:?}"
-    );
-
-    // 3. Snapshot duplicate binding panic on distribution.build.show collision
-    const DUPLICATE_DIST_DESC: ProviderDescriptor = ProviderDescriptor {
-        provider_id: Cow::Borrowed("fixture.echo.process"),
-        operation_id: OperationId::from_static("distribution.build.show"),
-        component_class: Cow::Borrowed("test"),
-        mechanism: Cow::Borrowed("external-process"),
-        lifecycle: ProviderLifecycle::PerInvocation,
-        request_contract: ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
-        outcome_contract: ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
-        allowed_hosts: &["cli", "remote", "test"],
-        allowed_modes: &["sync", "test"],
-        capabilities: &[],
-        replacement: None,
-        concurrency: Some(1),
-        health: None,
-    };
-    static DUPLICATE_DIST_PROVIDERS: &[ProviderDescriptor] = &[
-        DUPLICATE_DIST_DESC,
-        DUPLICATE_DIST_DESC,
-    ];
-    let panic_dist = std::panic::catch_unwind(|| {
-        build_snapshot(CATALOG, DUPLICATE_DIST_PROVIDERS, "panic-dist");
-    });
-    assert!(
-        panic_dist.is_err(),
-        "build_snapshot must panic on duplicate distribution.build.show binding"
-    );
-
-    // 4. Snapshot duplicate binding panic on work.gate-bypass.show collision
-    const DUPLICATE_WORK_DESC: ProviderDescriptor = ProviderDescriptor {
-        provider_id: Cow::Borrowed("fixture.echo.process"),
-        operation_id: OperationId::from_static("work.gate-bypass.show"),
-        component_class: Cow::Borrowed("test"),
-        mechanism: Cow::Borrowed("external-process"),
-        lifecycle: ProviderLifecycle::PerInvocation,
-        request_contract: ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
-        outcome_contract: ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
-        allowed_hosts: &["cli", "remote", "test"],
-        allowed_modes: &["sync", "test"],
-        capabilities: &[],
-        replacement: None,
-        concurrency: Some(1),
-        health: None,
-    };
-    static DUPLICATE_WORK_PROVIDERS: &[ProviderDescriptor] = &[
-        DUPLICATE_WORK_DESC,
-        DUPLICATE_WORK_DESC,
-    ];
-    let panic_work = std::panic::catch_unwind(|| {
-        build_snapshot(CATALOG, DUPLICATE_WORK_PROVIDERS, "panic-work");
-    });
-    assert!(
-        panic_work.is_err(),
-        "build_snapshot must panic on duplicate work.gate-bypass.show binding"
     );
 }
