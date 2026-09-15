@@ -9,7 +9,7 @@ Implementation status: Next implementation frontier
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/r2-external-process-rollout-plan.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
@@ -20,7 +20,28 @@ Related:
 
 R2 proves framed process protocol, static manifest validation without execution, bounded supervision, handshake, cancellation, backpressure, crash/completion-unknown mapping, namespace refusal, duplicate refusal, unknown capability refusal, and one vendor-scoped fixture operation through the common router.
 
-## 2. Suggested Packet Shape
+## 2. Fixture Contract (Frozen At R2-P0)
+
+| Field | Value |
+| --- | --- |
+| Provider id | `fixture.echo.process` |
+| Operation id | `fixture.echo.echo` |
+| Request contract | `fixture.echo.echo.request@1.0.0` |
+| Outcome contract | `fixture.echo.echo.outcome@1.0.0` |
+| Manifest filename | `manifest.yaml` |
+| Manifest fields used | `manifestVersion`, `id`, `version`, `runtime.kind: process`, `runtime.command` (manifest-relative), `provides.operations[]` (operation id, request contract, outcome contract, protocol), `capabilities` (declared only, not an authority grant) |
+| Fixture location | `packages/host-runtime/rust/tests/fixtures/external-provider/` |
+
+The fixture echoes the request payload plus the round-tripped request id and
+negotiated protocol version, proving the response came from a real
+length-prefixed stdio decode, not an in-memory mock. This freeze is a
+docs/contract decision only: no row in this file or in
+[../contracts/component-protocol.md](../contracts/component-protocol.md) or
+[../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md)
+moves above `planned` as a result. R2-P1 onward implement against these fixed
+ids.
+
+## 3. Suggested Packet Shape
 
 Open R2 as a host-invocation packet, not as packaging-distribution work:
 
@@ -35,11 +56,11 @@ Packaging-distribution is needed only if the fixture provider becomes a shipped
 release artifact. A test fixture provider can stay fully inside
 host-invocation proof.
 
-## 3. Non-Gates
+## 4. Non-Gates
 
 Marketplace, publisher trust, signature system, production WASM, and core-provider replacement do not gate R2.
 
-## 4. Related Files
+## 5. Related Files
 
 | Relationship | File |
 | --- | --- |

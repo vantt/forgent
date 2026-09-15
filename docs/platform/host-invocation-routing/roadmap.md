@@ -9,7 +9,7 @@ Implementation status: R1 preview installed/default proof recorded; stable/defau
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Created after 2026-09-14 code scan of host-runtime, apps/fgos, GitHub release state, and packaging-distribution links
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-15
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/spec.md
@@ -267,7 +267,7 @@ Done when:
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
 | 1 | Keep route-matrix and Rust-host targeted tests green for the current preview baseline: 73 selectors, 71 `legacy-cli`, two native. | Host invocation | No |
-| 2 | Open R2 external process provider shaping from [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md), starting with fixture contract, manifest discovery, and protocol proof boundaries. | Host invocation | No, unless fixture providers are shipped as release artifacts |
+| 2 | Fixture contract frozen 2026-09-15 ([verification/r2-external-process-proof.md](verification/r2-external-process-proof.md)#2). Next: run R2-P1+P2 (manifest parser/registry) and R2-P3+P4 (frame codec/supervisor) as parallel code-panel packets per [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
 | 4 | Defer R3 remote peer until R2 proves at least one external provider operation through the common router. | Host invocation | Light, for project runtime adapter selection |
 

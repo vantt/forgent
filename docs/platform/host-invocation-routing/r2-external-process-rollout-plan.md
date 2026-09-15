@@ -72,19 +72,28 @@ implementation needs a reusable helper crate. It is not a shipped provider.
 
 ## 4. Packet Queue
 
-| Packet | Goal | Likely surfaces | Depends on |
-| --- | --- | --- | --- |
-| R2-P0 | Lock fixture operation and manifest shape in docs/tests | R2 proof doc, manifest contract, test fixtures | none |
-| R2-P1 | Static manifest parser and validator | host-runtime Rust module or external-provider module, manifest tests | R2-P0 |
-| R2-P2 | Derived registry/linker and claim refusal | registry snapshot/linker code, negative tests | R2-P1 |
-| R2-P3 | Frame codec for component protocol | frame codec module, codec tests | R2-P0 |
-| R2-P4 | Process supervisor and lifecycle mapping | supervisor module, fixture process, timeout/crash tests | R2-P3 |
-| R2-P5 | Router integration and fixture invocation | provider adapter, InvocationService tests | R2-P2, R2-P4 |
-| R2-P6 | Conformance suite and docs closeout | R2 proof, implementation alignment, source audit if needed | R2-P5 |
+| Packet | Goal | Likely surfaces | Depends on | Status |
+| --- | --- | --- | --- | --- |
+| R2-P0 | Lock fixture operation and manifest shape in docs/tests | R2 proof doc, manifest contract, test fixtures | none | Done 2026-09-15 — see [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md)#2 |
+| R2-P1 | Static manifest parser and validator | host-runtime Rust module or external-provider module, manifest tests | R2-P0 | Ready — combine with R2-P2 |
+| R2-P2 | Derived registry/linker and claim refusal | registry snapshot/linker code, negative tests | R2-P1 | Ready — combine with R2-P1 |
+| R2-P3 | Frame codec for component protocol | frame codec module, codec tests | R2-P0 | Ready — combine with R2-P4 |
+| R2-P4 | Process supervisor and lifecycle mapping | supervisor module, fixture process, timeout/crash tests | R2-P3 | Ready — combine with R2-P3 |
+| R2-P5 | Router integration and fixture invocation | provider adapter, InvocationService tests | R2-P2, R2-P4 | Blocked on P1/P2 and P3/P4 packets both closing |
+| R2-P6 | Conformance suite and docs closeout | R2 proof, implementation alignment, source audit if needed | R2-P5 | Blocked on R2-P5 |
 
 Packets may be combined only if the resulting review still has one clear proof
 surface. R2-P1/R2-P2 and R2-P3/R2-P4 are the natural combine candidates; R2-P5
 should stay separate if the adapter touches core routing.
+
+Sequencing decision (made 2026-09-15, applying §8): R2-P1+R2-P2 (manifest
+parser/validator + derived registry/linker) and R2-P3+R2-P4 (frame codec +
+process supervisor) touch disjoint file surfaces with no shared dependency
+between the two branches beyond R2-P0, so they run as two independent
+code-panel packets in parallel. R2-P5 stays a separate packet and does not
+open until both branches have a closed proof, since it is the first surface
+that touches core routing (`OperationProvider` adapter into the existing
+Rust host runtime). R2-P6 does not open until R2-P5 closes.
 
 ## 5. Packet Details
 
