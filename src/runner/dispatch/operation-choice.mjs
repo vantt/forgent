@@ -20,6 +20,7 @@ import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
+import { interpretRunResult } from './run-result.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { detectTrunk } from '../worktree.mjs';
 
@@ -154,11 +155,11 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // runs of the same assignment.
           let runResult = null;
           try {
-            runResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+            runResult = interpretRunResult(JSON.parse(fs.readFileSync(resultJsonPath, 'utf8')));
           } catch {
             continue;
           }
-          if (!runResult || typeof runResult !== 'object') continue;
+          if (!runResult || typeof runResult !== 'object' || runResult.corrupt) continue;
 
           // runId-vs-member identity: the runner writes runId as
           // `run_<assignmentId>_<runSub>` when it dispatches this member. A

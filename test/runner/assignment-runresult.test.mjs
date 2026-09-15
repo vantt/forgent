@@ -147,6 +147,11 @@ test('executeAssignment produces status: done and confidence: reported when work
   assert.equal(exitData.exitCode, 0);
 
   const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  // Production-door proof: executeAssignment writes through the sole v2
+  // normalizer, rather than a hand-built terminal result.
+  assert.deepEqual(storedResult.contract, { id: 'assignment-run-result', version: 2 });
+  assert.equal(storedResult.classification.provenance, 'native-v2');
+  assert.equal(storedResult.classification.execution.status, 'completed');
   assert.equal(storedResult.runId, 'run_' + assignment.assignmentId + '_01');
   assert.equal(storedResult.status, 'done');
   assert.equal(storedResult.confidence, 'reported');
