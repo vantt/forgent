@@ -788,12 +788,12 @@ export const COMMAND_REGISTRY = [
   },
   {
     name: 'dispatch',
-    invoke: 'fgos dispatch <show-run|inspect|watch|recover> [runId]',
-    description: '"inspect" is Dispatch-owned runtime inspection: exactly one of --run, --assignment, or --cwd is required. It resolves subjects and exposes recovery ownership only as a read hint; it never executes, forwards, or authorizes recovery. "show-run"/"watch" are read-only observation of a dispatch Run. "recover" is the CAS-guarded recovery door for a STANDALONE Run.',
+    invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile> [runId]',
+    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair and never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run.',
     parameters: {
       type: 'object',
       properties: {
-        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover'] },
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['show-run', 'inspect', 'watch', 'recover', 'reconcile'] },
         run: { type: 'string', description: '"inspect" only: Run id selector.' },
         assignment: { type: 'string', description: '"inspect" only: Assignment id selector.' },
         cwd: { type: 'string', description: '"inspect" only: cwd selector.' },
@@ -802,6 +802,7 @@ export const COMMAND_REGISTRY = [
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
         intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s own outbox, or the recommendation comes back "needs-input").' },
         action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too.' },
+        plan: { type: 'string', description: '"reconcile apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
         'expected-snapshot': { type: 'string', description: '"recover" apply only: the `snapshotHash` from the recommendation being applied.' },
         'expected-control-epoch': { type: 'string', description: '"recover" apply only: the `expectedControlEpoch` from the recommendation being applied.' },
         'expected-expires-at': { type: 'string', description: '"recover" apply only: the `expiresAt` from the recommendation being applied.' },
@@ -819,6 +820,8 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch watch run_abc123',
       'fgos dispatch watch run_abc123 --interval 2000 --ticks 30',
       'fgos dispatch recover run_abc123',
+      'fgos dispatch reconcile plan',
+      'fgos dispatch reconcile apply --plan \'<plan-json>\'',
       'fgos dispatch recover run_abc123 --intent reassign',
       'fgos dispatch recover run_abc123 --action \'{"type":"resume-driver"}\' --expected-snapshot <hash> --expected-control-epoch 0 --expected-expires-at <iso> --action-key <key>',
     ],

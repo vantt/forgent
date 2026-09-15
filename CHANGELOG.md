@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
+  repair door. It only removes a lock after proving its exact PID/start-time
+  incarnation is dead; it never performs semantic recovery or execution control.
+
 - `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
   exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
   observations, terminal RunResults where present, duplicate identities, and

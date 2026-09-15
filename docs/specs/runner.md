@@ -10,6 +10,14 @@ coverage: full
 
 ## Dispatch runtime inspection
 
+### Guard reconciliation
+
+`fgos dispatch reconcile` is the separate Dispatch-owned write door for local
+guard/projection repair. Its plan/apply protocol binds the action key, snapshot
+digest, resource incarnation, and expiry; apply re-reads under a local lock.
+It never recovers, signals, retries, relaunches, resumes, reassigns, admits,
+cancels, or takes over a Run.
+
 `fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a
 read-only operation. It accepts exactly one selector: `--run`, `--assignment`,
 or `--cwd`. Resolution, duplicate detection, current-run derivation, and any
