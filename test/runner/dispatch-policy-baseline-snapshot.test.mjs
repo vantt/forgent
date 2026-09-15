@@ -23,9 +23,8 @@ import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs'
 /**
  * Derive read-only enforcement mechanism from policy-shaped flags present in args:
  * - 'provider-native-read-only' if provider-level read-only flags (e.g. -s read-only) are present
- * - 'tool-gating' if an allowedTools-style allowlist is configured on an otherwise-write-capable executor (--allowedTools)
- * - 'sandbox' if confinement.backend is set and guarantees include host-write-denied
- * - 'none' otherwise
+ * - 'tool-allowlist-not-read-only-enforced' if an allowedTools-style allowlist is configured on an otherwise-write-capable executor (--allowedTools)
+ * - 'none' otherwise (no executor in the baseline matrix declares a sandboxed read-only confinement backend)
  */
 export function deriveReadOnlyMechanism(args, confinement) {
   const hasReadOnlyFlag = args.some((arg, idx) => arg === '-s' && args[idx + 1] === 'read-only');
@@ -34,22 +33,22 @@ export function deriveReadOnlyMechanism(args, confinement) {
   }
   const hasAllowedTools = args.includes('--allowedTools');
   if (hasAllowedTools) {
-    return 'tool-gating';
+    return 'tool-allowlist-not-read-only-enforced';
   }
-  if (confinement?.backend && Array.isArray(confinement.guarantees) && confinement.guarantees.includes('host-write-denied')) {
-    return 'sandbox';
-  }
+  // Note: No executor in the current baseline matrix declares a sandboxed
+  // read-only confinement backend (host-write-denied lives at capability level,
+  // while codex-bwrap declares backend: 'bwrap' with write-capable danger-full-access).
   return 'none';
 }
 
 /**
- * Stable, secret-free summary of executor resource bindings (target names/keys/resources).
+ * Stable, secret-free summary of executor resource bindings.
+ * Preserves the full binding object structure (resource, target.kind, target.name, etc.)
+ * so any regression in binding shape is caught.
  */
 export function summarizeResourceBindings(bindings) {
   if (!Array.isArray(bindings)) return [];
-  return bindings
-    .map((b) => b?.target?.name ?? b?.target?.token ?? (typeof b === 'string' ? b : b?.resource))
-    .filter(Boolean);
+  return bindings.map((b) => (typeof b === 'object' && b !== null ? structuredClone(b) : b));
 }
 
 /**
@@ -88,7 +87,7 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
     envKeys: Object.keys(resolvedCmd.env ?? {}),
     resourceBindings: summarizeResourceBindings(resolvedCmd.resourceBindings),
     adapter: resolvedCmd.adapter,
-    promptDelivery: resolvedCmd.promptDelivery ?? 'argv',
+    promptDelivery: resolvedCmd.promptDelivery ?? (resolvedCmd.adapter === 'herdr-spawn' ? 'file-pointer' : undefined),
     confinement: resolvedCmd.confinement?.backend ?? 'none',
     readOnlyMechanism: deriveReadOnlyMechanism(normalizedArgs, resolvedCmd.confinement),
   };
@@ -123,9 +122,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude",
@@ -147,9 +146,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude",
@@ -171,9 +170,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer",
@@ -197,9 +196,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer",
@@ -223,9 +222,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer",
@@ -249,9 +248,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer-herdr",
@@ -274,9 +273,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer-herdr",
@@ -299,9 +298,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "claude-reviewer-herdr",
@@ -324,9 +323,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "agy-cli",
@@ -351,7 +350,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -378,7 +377,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -405,7 +404,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -429,7 +428,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -453,7 +452,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -477,7 +476,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -501,7 +500,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -525,7 +524,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -549,7 +548,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -572,7 +571,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -595,7 +594,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -618,7 +617,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -640,10 +639,16 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "envKeys": [],
     "resourceBindings": [
-      "CODEX_HOME"
+      {
+        "resource": "private-home",
+        "target": {
+          "kind": "env",
+          "name": "CODEX_HOME"
+        }
+      }
     ],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "bwrap",
     "readOnlyMechanism": "none"
   },
@@ -665,10 +670,16 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "envKeys": [],
     "resourceBindings": [
-      "CODEX_HOME"
+      {
+        "resource": "private-home",
+        "target": {
+          "kind": "env",
+          "name": "CODEX_HOME"
+        }
+      }
     ],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "bwrap",
     "readOnlyMechanism": "none"
   },
@@ -690,10 +701,16 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "envKeys": [],
     "resourceBindings": [
-      "CODEX_HOME"
+      {
+        "resource": "private-home",
+        "target": {
+          "kind": "env",
+          "name": "CODEX_HOME"
+        }
+      }
     ],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "bwrap",
     "readOnlyMechanism": "none"
   },
@@ -717,7 +734,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "provider-native-read-only"
   },
@@ -741,7 +758,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "provider-native-read-only"
   },
@@ -765,7 +782,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "provider-native-read-only"
   },
@@ -792,7 +809,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -819,7 +836,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -846,7 +863,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -870,7 +887,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -894,7 +911,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -918,7 +935,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "herdr-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": "file-pointer",
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -945,7 +962,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -972,7 +989,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -999,7 +1016,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "envKeys": [],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
     "readOnlyMechanism": "none"
   },
@@ -1031,9 +1048,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "glm-cli",
@@ -1063,9 +1080,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   },
   {
     "selector": "glm-cli",
@@ -1095,9 +1112,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     ],
     "resourceBindings": [],
     "adapter": "cli-spawn",
-    "promptDelivery": "argv",
+    "promptDelivery": undefined,
     "confinement": "none",
-    "readOnlyMechanism": "tool-gating"
+    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
   }
 ];
 
@@ -1220,8 +1237,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       }
     });
 
-    // (d) codex-readonly derives 'provider-native-read-only' while claude/claude-reviewer/claude-reviewer-herdr/glm-cli derive 'tool-gating'
-    test('fact (d): readOnlyMechanism distinguishes provider-native-read-only from tool-gating', () => {
+    // (d) codex-readonly derives 'provider-native-read-only' while claude/claude-reviewer/claude-reviewer-herdr/glm-cli derive 'tool-allowlist-not-read-only-enforced'
+    test('fact (d): readOnlyMechanism distinguishes provider-native-read-only from tool-allowlist-not-read-only-enforced', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
         const codexReadOnly = resolveNormalizedSnapshotRow(cfg, 'codex-readonly', tier, throwawayDir);
@@ -1235,8 +1252,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           const row = resolveNormalizedSnapshotRow(cfg, toolGated, tier, throwawayDir);
           assert.equal(
             row.readOnlyMechanism,
-            'tool-gating',
-            `${toolGated} [${tier}] readOnlyMechanism must be tool-gating`
+            'tool-allowlist-not-read-only-enforced',
+            `${toolGated} [${tier}] readOnlyMechanism must be tool-allowlist-not-read-only-enforced`
           );
         }
 
@@ -1256,8 +1273,16 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
         const bwrapRow = resolveNormalizedSnapshotRow(cfg, 'codex-bwrap', tier, throwawayDir);
         assert.deepEqual(
           bwrapRow.resourceBindings,
-          ['CODEX_HOME'],
-          `codex-bwrap [${tier}] must declare resourceBindings ['CODEX_HOME']`
+          [
+            {
+              resource: 'private-home',
+              target: {
+                kind: 'env',
+                name: 'CODEX_HOME',
+              },
+            },
+          ],
+          `codex-bwrap [${tier}] must declare resourceBindings with private-home CODEX_HOME env target`
         );
 
         const cliRow = resolveNormalizedSnapshotRow(cfg, 'codex-cli', tier, throwawayDir);
