@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
+  materializations and incomplete sibling admission evidence, including cwd
+  aggregates; ambiguous or incomplete evidence never produces a recovery hint.
+
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.

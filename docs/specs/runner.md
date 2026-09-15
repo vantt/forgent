@@ -16,6 +16,12 @@ or `--cwd`. Resolution, duplicate detection, current-run derivation, and any
 recovery ownership hint happen inside Dispatch; the CLI only passes the typed
 payload. Inspection never executes, forwards, or authorizes recovery.
 
+Assignment and workspace projections fail closed: every materialized Run must
+be unambiguous and corroborated by its Assignment admission ledger before an
+inspection is ownership-complete or exposes a recovery hint. A duplicate
+materialization of a current admitted run is conflicting, returns every
+candidate location, and selects no single Run.
+
 The reader returns mutable `RunObservation` facts and the immutable terminal
 `RunResult` when present. A RunObservation never settles a Run; `result.json`
 remains the only terminal Run truth.
