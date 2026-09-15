@@ -14,6 +14,7 @@ import {
   runOneSample,
   summarizeSamples,
   defaultTimedSpawn,
+  isGitClean,
 } from '../../scripts/test-timing.mjs';
 
 const SAMPLE_TIME_V_OUTPUT = `\tCommand being timed: "node scripts/run-tests.mjs"
@@ -83,6 +84,24 @@ test('minMax reports the extremes regardless of input order', () => {
 test('hasGnuTimeV reflects the injected existence check, never touches the real filesystem when overridden', () => {
   assert.equal(hasGnuTimeV('/usr/bin/time', () => true), true);
   assert.equal(hasGnuTimeV('/usr/bin/time', () => false), false);
+});
+
+// --- isGitClean: symlinked build-artifact directories don't count as dirty ---
+
+test('isGitClean is true on a genuinely empty git status', () => {
+  assert.equal(isGitClean('/fake/cwd', () => ''), true);
+});
+
+test('isGitClean ignores the bare "?? node_modules" and "?? target" symlink entries this track deliberately creates', () => {
+  assert.equal(isGitClean('/fake/cwd', () => '?? node_modules\n?? target\n'), true);
+});
+
+test('isGitClean still reports dirty for a real untracked directory with the same name shown WITH a trailing slash', () => {
+  assert.equal(isGitClean('/fake/cwd', () => '?? target/\n'), false);
+});
+
+test('isGitClean still reports dirty for any real change alongside the symlink entries', () => {
+  assert.equal(isGitClean('/fake/cwd', () => '?? node_modules\n?? target\n M src/foo.mjs\n'), false);
 });
 
 // --- gatherEnvironment -------------------------------------------------------

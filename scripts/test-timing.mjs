@@ -18,8 +18,25 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT } from './run-tests.mjs';
 
+// Untracked build-artifact directories this track's worktrees deliberately
+// symlink in from the main checkout for fast dependency/binary reuse
+// (node_modules, and a Rust `target/` symlink so rust-host tests find a
+// prebuilt binary without a from-scratch cargo build per worktree). Both
+// have a repo `.gitignore` entry, but only as a directory pattern (e.g.
+// `/target/`), which does not match a SYMLINK to a directory -- `git
+// status --porcelain` reports it as a bare untracked entry (`?? target`,
+// no trailing slash, unlike `?? target/` for a genuinely untracked real
+// directory with content). Excluded here by exact match only, so a real
+// dirty file nested under either name (which always shows as its own
+// distinct porcelain line, never collapsed into this bare form) still
+// fails the clean check.
+const SYMLINKED_BUILD_ARTIFACT_ENTRIES = new Set(['?? node_modules', '?? target']);
+
 export function isGitClean(cwd = REPO_ROOT, exec = execFileSync) {
-  return exec('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' }).trim() === '';
+  const lines = exec('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
+    .split('\n')
+    .filter((line) => line.trim() !== '' && !SYMLINKED_BUILD_ARTIFACT_ENTRIES.has(line.trim()));
+  return lines.length === 0;
 }
 
 export function gitHead(cwd = REPO_ROOT, exec = execFileSync) {
