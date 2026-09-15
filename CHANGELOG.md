@@ -96,6 +96,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   but must never be silently folded into `pre-existing`); the baseline
   must record every failing test's exact name, not a count/category
   summary. `docs/enduser-docs-index.json` regenerated to index the how-to.
+- `fgos-code-panel` post-merge verification gate (code-implementation-track-policy
+  track, P04): closing a cell only certified the cell's own worktree tip,
+  never the merge commit — if `$base` moved during the cell's lifetime or
+  the merge needed conflict resolution, the merged result was never
+  actually tested. `## 4. Close` now requires a post-merge tree-identity
+  check (reuse the close's proof only when the merge commit's tree matches
+  the cell tip's under the same environment fingerprint; otherwise run
+  `AFFECTED_TESTS` at minimum, `FULL_TEST` if triggered) before the
+  worktree/branch may be removed. "Record it" now defines the cell trace
+  as the coordination session's own event log (`close.json`'s disposition
+  rationale, readable via `fgos coordination show`) instead of leaving
+  "every cell trace" undefined — no new `docs/` directory, matching this
+  skill's own "no index, no track directory" design. "Full suite" wording
+  changed from an "at most once" KPI framing to "never twice for the same
+  (tree, environment) state" to stop a Lead from skipping a genuinely
+  needed rerun just to keep a count low.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result

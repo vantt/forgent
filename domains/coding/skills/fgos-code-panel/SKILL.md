@@ -151,7 +151,15 @@ the patch** -- a selection that obviously misses the changed contract is
 itself such a finding, not something they route around by quietly running
 something wider on their own.
 
-### Full suite: once, near merge, never mechanically per round
+### Full suite: never twice for the same (tree, environment) state, never mechanically per round
+
+The target is not a KPI of "≤1 full run" to hit for its own sake -- that
+framing tempts a Lead to skip a rerun a real production-tree change
+actually needs, just to keep the count low. The real rule: never re-run
+`FULL_TEST` against a `(tree, environment)` state it already certified;
+always re-run it when either one changed. For most single, small code-panel
+changes that resolves to once, near merge -- but "once" is the common
+case, not the contract.
 
 - Doer runs `FOCUSED_TESTS`. A fix round runs `FOCUSED_TESTS` again for the
   changed region plus a regression test for the specific finding being
@@ -218,14 +226,27 @@ evidence-backed rationale).
 
 ### Record it, so the policy's own effect is measurable
 
-Every cell trace records: every test command run (tier: focused / affected
-/ full), whether it executed or was reused via tree-identity (naming the
-sha it was reused from and the environment fingerprint both runs shared),
-duration, the reason for any escalation past `focused`, and the
-failing-test delta versus whatever it was compared against. This is what
-makes "full-suite runs per change" and "wall time to merge" measurable
-across a run of real cells -- evidence a policy claim can be checked
-against later, not ceremony.
+**The cell trace is the coordination session's own event log -- not a new
+file.** Creating a `docs/`-tree directory keyed by "code-panel" (as if it
+were one track) would conflate every unrelated one-off change ever run
+through this skill into a single shared, ever-growing directory -- exactly
+the "index.md, track directory" ceremony this skill's own Non-Goals
+already reject. The durable record already exists: `close.json`'s
+disposition `rationale`, persisted in `.fgos/coordination/sessions/
+code-panel--<change-slug>/` and readable any time via
+`fgos coordination show code-panel--<change-slug> --json`.
+
+Every close rationale must therefore state, for every test command run
+this cell: the tier (focused / affected / full), the exact command,
+whether it executed or was reused via tree-identity (naming the sha and
+shared environment fingerprint), duration, the reason for any escalation
+past `focused`, and the failing-test delta versus whatever it was compared
+against -- not a summary like "tests passed," which cannot be checked
+later. To compare "full-suite runs per change" or wall time across many
+real cells, enumerate `.fgos/coordination/sessions/code-panel--*/` and
+read each session's close rationale the same way -- no separate report
+generator exists for this yet; add one only once a second real consumer
+of that aggregate needs it (ADR-007 §4).
 
 **Known limit (not enforced by the engine).** Everything in this section
 and "Proof tiers" above is Lead discipline in prose -- the coordination
@@ -463,13 +484,12 @@ close mechanism -- `runCoordinationUseCase` always attempts a quorum
 close as its own last step after every declared step finishes
 dispatching. Close only once the required first pass and every fix round
 this change needed have dispatched cleanly, and either `FULL_TEST` has run
-once against the cell's own worktree tip (close happens before the merge
-in this skill's sequence -- there is no separate post-merge gate here the
-way a plan-loop track's own full-suite gate re-verifies `integratedSha`;
-the tree-identity rule above still applies if a later fix round's tree
-turns out identical to an earlier round's own tested tree) or the
-rationale states why `AFFECTED_TESTS` already covered the blast radius
-without it:
+once against the cell's own worktree tip or the rationale states why
+`AFFECTED_TESTS` already covered the blast radius without it. This closes
+the *coordination session* -- it does not yet certify the merge commit;
+the Lead still owes a **post-merge verification** (below) before the
+worktree/branch can be removed, exactly like a plan-loop track's own
+full-suite gate re-verifies `integratedSha`:
 
 ```json
 {
@@ -502,14 +522,44 @@ fgos coordination run --cwd "$wt" --file close.json
 
 Then, outside this skill and outside the coordination session entirely
 -- the Lead's own git operation, never a coordination request (the merge
-target is the `$base` recorded in section 0; run `worktree remove` from the
-main checkout, never from inside `$wt`):
+target is the `$base` recorded in section 0):
 
 ```sh
 git -C "$main" merge --no-ff code-panel--<change-slug>
+```
+
+**Post-merge verification -- required before removing anything.** The
+close above only certified the cell's own worktree tip; the merge commit
+is a DIFFERENT tree whenever `$base` moved during the cell's lifetime (a
+clean, conflict-free merge still unions in every commit `$base` gained
+while the cell was open) or the merge itself needed conflict resolution.
+Never assume the merge commit inherits the close's proof — check:
+
+```sh
+mergedTree=$(git -C "$main" rev-parse HEAD^{tree})
+testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
+```
+
+- `mergedTree` equals `testedTree` **and** the environment fingerprint
+  (above) is unchanged: the close's proof already certifies the merge
+  commit -- record `treeIdentical: true` with both shas in the cell trace,
+  no re-run.
+- Otherwise: run `AFFECTED_TESTS` against `$main` at the new `HEAD` at
+  minimum; escalate to `FULL_TEST` if a `FULL_TRIGGERS` category fired
+  (recompute against the actual merged diff, not just the cell's own diff
+  -- `$base`'s own new commits can trigger it too) or the blast radius
+  otherwise requires it. Record the real outcome in the cell trace before
+  proceeding.
+
+Only after this check passes:
+
+```sh
 git -C "$main" worktree remove "$wt"
 git -C "$main" branch -d code-panel--<change-slug>
 ```
+
+(`worktree remove` and `branch -d` from the main checkout, never from
+inside `$wt`.)
 
 No `index.md`, no track directory, no cross-cell sequencing -- one
 change, one cell, done.
