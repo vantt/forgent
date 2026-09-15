@@ -37,6 +37,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   provenance, plus a registered `fgos doctor` check/fix that detects stale
   generated instruction projections and repairs them without overwriting
   unmanaged user content.
+- Plan-loop track authoring how-to and coding verification-discipline
+  fragment (code-implementation-track-policy track, P01):
+  `docs/how-to/author-a-plan-loop-track.md` gives a Lead a copyable template
+  for a Work-independent `fgos-plan-loop` track's precedence/compatibility
+  rule, Execution Inputs (baseline that may only shrink), durable evidence
+  schema (`coordination-accepted` / `merged-to-track` / `checkpoint-verified`
+  with the `testedSha != integratedSha` non-inference rule), checkpoint
+  identity, Product Gates with the mechanical-gate rule, escalation
+  authority scoped to the current cell, and cell trace format; it links
+  `domains/coding/instructions/verification-discipline.md` (`kind:
+  procedure`) as the single source of the coding-worker verification rule
+  rather than restating it.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
