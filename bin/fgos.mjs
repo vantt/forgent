@@ -3181,7 +3181,7 @@ async function runVerb(verb, flags, positional, dir) {
       }
       if (sub === 'reconcile') {
         const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
-        if ((positional[1] ?? 'plan') === 'plan') return reconcilePlanUseCase(reconcileCtx, { action: flags.action });
+        if ((positional[1] ?? 'plan') === 'plan') return reconcilePlanUseCase(reconcileCtx, { action: flags.action, runId: flags.run });
         if (positional[1] === 'apply') {
           let plan;
           try { plan = JSON.parse(requireField(flags.plan, 'dispatch reconcile apply requires --plan')); } catch (error) { throw new StoreError('validation', `dispatch reconcile apply --plan must be valid JSON: ${error.message}`); }

@@ -8,6 +8,15 @@ import { planReconciliation, applyReconciliation } from '../../src/runner/dispat
 function root() { const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-')); fs.mkdirSync(path.join(out, '.fgos'), { recursive: true }); return out; }
 function deadLock(dir, extra = {}) { fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1', ...extra })); }
 
+// collect-result fixture helpers -- same shapes as test/runner/dispatch-runtime-inspect.test.mjs,
+// since collect-result's own plan/apply is built entirely on top of inspectDispatchRuntime's
+// --run/--assignment views and must never disagree with what that module considers a Run,
+// an owner, or a current admitted Run.
+function assignmentDir(dir, id) { const d = path.join(dir, '.fgos', 'assignments', id); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'assignment.json'), JSON.stringify({ assignmentId: id })); return d; }
+function runDirFor(dir, id, attempt, value, result) { const d = path.join(dir, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ assignmentId: id, ...value })); if (result) fs.writeFileSync(path.join(d, 'result.json'), JSON.stringify(result)); return d; }
+function admitGen(dir, id, epoch, value) { const d = path.join(dir, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
+const legacyResult = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
+
 test('reconcile clears only a dead-proven cwd lock and replay is idempotent', () => {
   const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned'); assert.match(plan.snapshot.resourceIncarnation, /^pid:/);
@@ -117,4 +126,80 @@ test('apply blocks a dead-holder cleanup when a pending (unsettled) dispatch lau
   assert.equal(result.outcome, 'blocked');
   assert.match(result.reason, /active Run/);
   assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), true);
+});
+
+test('reconcile collect-result links an already-written valid result for a standalone Assignment Run', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-1' }, legacyResult('run-1', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-1', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'collect-result', runId: 'run-1', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'planned');
+  assert.equal(plan.proposedAction.kind, 'collect-result');
+  assert.equal(plan.snapshot.ownerAuthority.kind, 'standalone-run');
+  const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(applied.outcome, 'applied');
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.resultCollectedAt, '2026-09-15T00:00:01.000Z');
+  assert.equal(runJson.runId, 'run-1', 'the patch must be additive, never dropping existing run.json fields');
+});
+
+test('reconcile collect-result action-key replay returns the recorded outcome without re-mutating', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-1' }, legacyResult('run-1', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-1', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'collect-result', runId: 'run-1', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'applied');
+  const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
+  assert.equal(replay.outcome, 'already-applied');
+  assert.equal(replay.priorOutcome, 'applied');
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.resultCollectedAt, '2026-09-15T00:00:01.000Z', 'the replay must not overwrite the timestamp the first apply recorded');
+});
+
+test('reconcile collect-result needs-input on a corrupt/unparseable result and never auto-collects it', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-corrupt' }, { contract: { id: 'assignment-run-result', version: 2 }, runId: 'run-corrupt' });
+  admitGen(dir, 'a', 1, { runId: 'run-corrupt', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'collect-result', runId: 'run-corrupt', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'needs-input');
+  assert.match(plan.reason, /corrupt/);
+});
+
+test('reconcile collect-result refuses a CoordinationSession-owned Run: linking belongs to its own recovery door, not this one', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-sess', coordinationId: 'sess-1' }, legacyResult('run-sess', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-sess', attempt: 1 });
+  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', 'sess-1');
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(path.join(sessionDir, 'session.json'), JSON.stringify({ assignmentRefs: ['a'] }));
+  const plan = planReconciliation(dir, { action: 'collect-result', runId: 'run-sess', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'refused');
+  assert.match(plan.reason, /CoordinationSession/);
+});
+
+test('reconcile collect-result blocks when a newer current Run supersedes the target for its assignment', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-old' }, legacyResult('run-old', 'a'));
+  runDirFor(dir, 'a', '02', { runId: 'run-new' }, legacyResult('run-new', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-old', attempt: 1 });
+  admitGen(dir, 'a', 2, { runId: 'run-new', attempt: 2, predecessorRunId: 'run-old' });
+  const plan = planReconciliation(dir, { action: 'collect-result', runId: 'run-old', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /supersedes/);
+});
+
+test('reconcile collect-result is blocked (not refused/applied) when no result exists yet, and refuses without a runId', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-pending' });
+  admitGen(dir, 'a', 1, { runId: 'run-pending', attempt: 1 });
+  const pending = planReconciliation(dir, { action: 'collect-result', runId: 'run-pending', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(pending.outcome, 'blocked');
+  const noRunId = planReconciliation(dir, { action: 'collect-result', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(noRunId.outcome, 'refused');
 });

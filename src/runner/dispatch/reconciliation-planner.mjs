@@ -20,6 +20,7 @@ const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha2
 function lockFile(root) { return path.join(root, '.fgos', 'dispatch.lock'); }
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
 function localLock(root) { return path.join(root, '.fgos', 'dispatch', 'reconcile.lock'); }
+function resultFile(runDir) { return path.join(runDir, 'result.json'); }
 // Plans arrive over a public CLI boundary.  A path in one is descriptive only;
 // apply derives its actual target from the trusted root and action kind.
 function canonicalAction(root, kind) {
@@ -38,7 +39,8 @@ function holder(lock) {
   return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
 }
 
-export function planReconciliation(root, { action = 'clear-cwd-lock', now = new Date().toISOString(), ttlMs = 300000 } = {}) {
+export function planReconciliation(root, { action = 'clear-cwd-lock', runId, now = new Date().toISOString(), ttlMs = 300000 } = {}) {
+  if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
   const proposedAction = canonicalAction(root, action);
   if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
   const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
@@ -51,13 +53,108 @@ export function planReconciliation(root, { action = 'clear-cwd-lock', now = new 
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
 }
 
+// collect-result links/collects an already-written, already-valid result.json
+// through its owning authority (the Assignment that admitted it, or a bare
+// ad-hoc dispatch-run with no Assignment at all). It never derives ownership
+// or admission facts itself: it reuses inspectDispatchRuntime's --run and
+// --assignment views verbatim (the SAME owner/admission-ledger logic
+// runtime-inspection.mjs already implements for I04), so this action can
+// never disagree with dispatch.runtime.inspect about who owns a Run or which
+// Run is current. A CoordinationSession-owned Run is refused, not planned:
+// linking its result is that session's own driver-authored write
+// (`result-linked`, src/runner/coordination/replay.mjs) -- a different,
+// more privileged door this narrow guard/projection repair must never
+// substitute for.
+function planCollectResult(root, { runId, now, ttlMs }) {
+  if (typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'collect-result requires a runId' };
+  const view = inspectDispatchRuntime(root, { run: runId });
+  if (view.inspectionStatus === 'not-found') return { outcome: 'blocked', reason: 'no matching Run was found for collect-result' };
+  if (view.inspectionStatus === 'ambiguous') return { outcome: 'needs-input', reason: 'more than one Run repository owns this run id' };
+  const loc = view.subject.locations[0];
+  if (!loc) return { outcome: 'blocked', reason: 'no matching Run was found for collect-result' };
+  const runResult = view.runResult;
+  if (!runResult) return { outcome: 'blocked', reason: 'no result exists yet to collect' };
+  if (runResult.corrupt || runResult.contractCorrupt) return { outcome: 'needs-input', reason: 'result is corrupt or fails RunResult validation and cannot be auto-collected' };
+  const hint = view.recoveryAuthority;
+  if (!hint) return { outcome: 'needs-input', reason: 'owner authority for this Run is incomplete or inconsistent' };
+  if (hint.kind === 'coordination-session') return { outcome: 'refused', reason: `owning authority is a CoordinationSession ("${hint.id}"); result linking belongs to its own recovery door (${hint.observeCommand}), not dispatch.runtime.reconcile` };
+  const assignmentId = view.links.assignmentIds[0] ?? null;
+  if (assignmentId) {
+    const assignmentView = inspectDispatchRuntime(root, { assignment: assignmentId });
+    const currentRunIds = assignmentView.observations?.[0]?.value?.currentRunIds ?? [];
+    if (!currentRunIds.includes(runId)) return { outcome: 'blocked', reason: `a newer current Run supersedes this one for assignment "${assignmentId}" (current: ${currentRunIds.join(', ') || 'none'})` };
+  }
+  const runDir = loc.path;
+  let raw;
+  try {
+    raw = fs.readFileSync(resultFile(runDir), 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { outcome: 'blocked', reason: 'no result exists yet to collect' };
+    throw err;
+  }
+  const runMeta = json(path.join(runDir, 'run.json')) ?? {};
+  const snapshot = { digest: digest({ raw }), runId, ownerAuthority: { kind: hint.kind, id: hint.id }, controlEpoch: runMeta.controlEpoch ?? null, expiresAt: expires(now, ttlMs) };
+  const proposedAction = { kind: 'collect-result', runId, path: path.join(runDir, 'run.json') };
+  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['result-valid', 'owner-authority-standalone', 'not-superseded'] };
+}
+
 function withLocalLock(root, fn) {
   const file = localLock(root); fs.mkdirSync(path.dirname(file), { recursive: true });
   let fd; try { fd = fs.openSync(file, 'wx'); } catch (e) { return { outcome: 'blocked', reason: 'another reconcile apply is in progress' }; }
   try { fs.writeSync(fd, String(process.pid)); return fn(); } finally { fs.closeSync(fd); try { fs.unlinkSync(file); } catch {} }
 }
 
+// collect-result's own target (a specific run.json, keyed by runId) cannot be
+// re-derived from `root` and `action` kind alone the way clear-cwd-lock's
+// single global cwd-lock file can -- it needs the runId too. Kept as its own
+// apply path rather than folding into canonicalAction()'s (root, kind) shape.
+function applyCollectResult(root, plan, { now }) {
+  const runId = plan?.proposedAction?.runId;
+  if (!plan?.actionKey || !plan?.snapshot || typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+  return withLocalLock(root, () => {
+    const prior = records(root).find((r) => r.actionKey === plan.actionKey);
+    if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
+    if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
+    // Full re-derivation from root+runId alone -- the caller-supplied
+    // proposedAction.path is never trusted as the mutation target until it is
+    // proven identical to what a fresh, from-scratch plan computes right now.
+    const fresh = planCollectResult(root, { runId, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
+    if (fresh.outcome !== 'planned' || stable(fresh.proposedAction) !== stable(plan.proposedAction) || stable(fresh.snapshot) !== stable(plan.snapshot)) {
+      return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'run facts changed since planning' };
+    }
+    const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
+    if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
+    const runDir = path.dirname(plan.proposedAction.path);
+    // Writer parity with clear-cwd-lock's own pre-mutation re-read (see
+    // below): unlike a lock's delete-semantics, collect-result's goal state
+    // (a persisted marker) is never satisfied by an absent file, so ENOENT
+    // here is always plan-stale (facts changed), never "goal already
+    // achieved" -- that shortcut only fits an action whose goal IS absence.
+    let raw;
+    try {
+      raw = fs.readFileSync(resultFile(runDir), 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the result was removed since planning' };
+      throw err;
+    }
+    if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'the result changed since planning' };
+    let runMeta;
+    try {
+      runMeta = JSON.parse(fs.readFileSync(plan.proposedAction.path, 'utf8'));
+    } catch (err) {
+      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
+      throw err;
+    }
+    const tmp = `${plan.proposedAction.path}.tmp-${process.pid}-${Date.now().toString(36)}`;
+    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, resultCollectedAt: now }, null, 2)}\n`);
+    fs.renameSync(tmp, plan.proposedAction.path);
+    fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    return { outcome: 'applied', actionKey: plan.actionKey };
+  });
+}
+
 export function applyReconciliation(root, plan, { now = new Date().toISOString() } = {}) {
+  if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
   const canonical = canonicalAction(root, plan?.proposedAction?.kind);
   if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
   // Do this before looking up a prior record: a replay must not turn a

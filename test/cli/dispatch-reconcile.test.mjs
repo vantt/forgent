@@ -13,6 +13,26 @@ test('CLI exposes only the narrow reconcile plan and refuses forbidden actions',
   const refused = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'resume-driver']); assert.equal(refused.status, 0, refused.stderr); assert.equal(JSON.parse(refused.stdout).data.outcome, 'refused');
 });
 
+test('CLI plans collect-result through --action and --run, and refuses it without a runId', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-'));
+  const assignmentDir = path.join(root, '.fgos', 'assignments', 'a');
+  fs.mkdirSync(assignmentDir, { recursive: true });
+  fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), JSON.stringify({ assignmentId: 'a' }));
+  const runDir = path.join(assignmentDir, 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ assignmentId: 'a', runId: 'run-1' }));
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'run-1', assignmentId: 'a', status: 'done', confidence: 'reported' }));
+  const admissionDir = path.join(assignmentDir, 'admission', 'generations');
+  fs.mkdirSync(admissionDir, { recursive: true });
+  fs.writeFileSync(path.join(admissionDir, '0000000001.json'), JSON.stringify({ runId: 'run-1', attempt: 1 }));
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'collect-result', '--run', 'run-1']);
+  assert.equal(planned.status, 0, planned.stderr);
+  assert.equal(JSON.parse(planned.stdout).data.outcome, 'planned');
+  const missingRunId = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'collect-result']);
+  assert.equal(missingRunId.status, 0, missingRunId.stderr);
+  assert.equal(JSON.parse(missingRunId.stdout).data.outcome, 'refused');
+});
+
 test('CLI apply refuses a same-byte outside-root target tampered into a plan', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   const bytes = JSON.stringify({ pid: 99999999, startTime: '1' });
