@@ -4,60 +4,22 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { inspectDispatchRuntime, validateInspectionSelector } from '../../src/runner/dispatch/runtime-inspection.mjs';
+import { invokeDispatchInspectOperation } from '../../src/verbs/dispatch/inspect.mjs';
 
-function fixture() { return fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-')); }
-function writeRun(root, assignmentId, attempt, run, result) {
-  const dir = path.join(root, '.fgos', 'assignments', assignmentId, 'runs', attempt);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify(run));
-  if (result) fs.writeFileSync(path.join(dir, 'result.json'), JSON.stringify(result));
-  return dir;
-}
-function v1Result(runId, assignmentId) { return { runId, assignmentId, status: 'done', confidence: 'reported' }; }
+const fixture = () => fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-'));
+function assignment(root, id) { const dir = path.join(root, '.fgos', 'assignments', id); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'assignment.json'), JSON.stringify({ assignmentId: id })); return dir; }
+function run(root, id, attempt, value, result) { const dir = path.join(root, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify({ assignmentId: id, ...value })); if (result) fs.writeFileSync(path.join(dir, 'result.json'), JSON.stringify(result)); return dir; }
+function admit(root, id, epoch, value) { const dir = path.join(root, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
+const v1 = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
 
-test('inspection requires exactly one typed selector', () => {
-  assert.throws(() => validateInspectionSelector({}), /exactly one selector/);
-  assert.throws(() => validateInspectionSelector({ run: 'r', cwd: '/tmp' }), /exactly one selector/);
-  assert.deepEqual(validateInspectionSelector({ run: 'r' }), { kind: 'run', id: 'r' });
-});
-
-test('duplicate run identities return every candidate and never first-match', () => {
-  const root = fixture();
-  writeRun(root, 'asgn_a', '01', { runId: 'run_same', assignmentId: 'asgn_a', status: 'running' });
-  writeRun(root, 'asgn_b', '01', { runId: 'run_same', assignmentId: 'asgn_b', status: 'running' });
-  const report = inspectDispatchRuntime(root, { run: 'run_same' });
-  assert.equal(report.inspectionStatus, 'ambiguous');
-  assert.equal(report.subject.locations.length, 2);
-  assert.equal(report.recoveryAuthority, undefined);
-});
-
-test('assignment current run derives from supersession facts rather than attempt order', () => {
-  const root = fixture();
-  const assignmentDir = path.join(root, '.fgos', 'assignments', 'asgn_one');
-  fs.mkdirSync(assignmentDir, { recursive: true });
-  fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), JSON.stringify({ assignmentId: 'asgn_one' }));
-  writeRun(root, 'asgn_one', '01', { runId: 'run_old', assignmentId: 'asgn_one', status: 'running' });
-  writeRun(root, 'asgn_one', '02', { runId: 'run_current', assignmentId: 'asgn_one', supersedesRunId: 'run_old', status: 'running' });
-  const report = inspectDispatchRuntime(root, { assignment: 'asgn_one' });
-  assert.equal(report.inspectionStatus, 'partial');
-  assert.equal(report.runObservation.subject.runId, 'run_current');
-});
-
-test('cwd inspection aggregates lock, active, and historical runs', () => {
-  const root = fixture();
-  const cwd = path.join(root, 'work'); fs.mkdirSync(cwd);
-  writeRun(root, 'asgn_a', '01', { runId: 'run_active', assignmentId: 'asgn_a', cwd, status: 'running' });
-  writeRun(root, 'asgn_b', '01', { runId: 'run_done', assignmentId: 'asgn_b', cwd, status: 'settled' }, v1Result('run_done', 'asgn_b'));
-  fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), JSON.stringify({ holder: 'driver' }));
-  const report = inspectDispatchRuntime(root, { cwd });
-  assert.deepEqual(report.observations[0].value.activeRunIds, ['run_active']);
-  assert.deepEqual(report.observations[0].value.historicalRunIds, ['run_done']);
-  assert.deepEqual(report.observations[0].value.lock, { holder: 'driver' });
-});
-
-test('inspection has no recovery, adapter, process-control, or Git-mutation dependency', () => {
-  const source = fs.readFileSync(new URL('../../src/runner/dispatch/runtime-inspection.mjs', import.meta.url), 'utf8');
-  assert.doesNotMatch(source, /from ['"][^'"]*(recover|recovery|adapter|transport|child_process|run-lock|merge)[^'"]*['"]/);
-  assert.doesNotMatch(source, /\b(?:exec|spawn|kill|signal|reset|clean|commit|writeFileSync|mkdirSync|rmSync)\s*\(/);
-});
+test('inspection requires exactly one typed selector', () => { assert.throws(() => validateInspectionSelector({}), /exactly one selector/); assert.throws(() => validateInspectionSelector({ run: 'r', cwd: '/tmp' }), /exactly one selector/); });
+test('run and assignment not-found include no authority hint', () => { const root = fixture(); assert.equal(inspectDispatchRuntime(root, { run: 'none' }).inspectionStatus, 'not-found'); assert.equal(inspectDispatchRuntime(root, { assignment: 'none' }).inspectionStatus, 'not-found'); });
+test('duplicate Run ids remain ambiguous and never select a candidate', () => { const root = fixture(); run(root, 'a', '01', { runId: 'same' }); run(root, 'b', '01', { runId: 'same' }); const got = inspectDispatchRuntime(root, { run: 'same' }); assert.equal(got.inspectionStatus, 'ambiguous'); assert.equal(got.subject.locations.length, 2); assert.equal(got.recoveryAuthority, undefined); });
+test('assignment current comes from admission ledger and terminal current retains RunResult', () => { const root = fixture(); assignment(root, 'a'); run(root, 'a', '01', { runId: 'old' }); run(root, 'a', '02', { runId: 'current' }, v1('current', 'a')); admit(root, 'a', 1, { runId: 'old', attempt: 1 }); admit(root, 'a', 2, { runId: 'current', attempt: 2, predecessorRunId: 'old' }); const got = inspectDispatchRuntime(root, { assignment: 'a' }); assert.equal(got.runObservation.subject.runId, 'current'); assert.ok(got.runResult); });
+test('missing admission materialization is partial and has no hint', () => { const root = fixture(); assignment(root, 'a'); admit(root, 'a', 1, { runId: 'ghost', attempt: 1 }); const got = inspectDispatchRuntime(root, { assignment: 'a' }); assert.equal(got.inspectionStatus, 'partial'); assert.equal(got.recoveryAuthority, undefined); });
+test('multiple current admission facts are conflicting and have no hint', () => { const root = fixture(); assignment(root, 'a'); run(root, 'a', '01', { runId: 'one' }); run(root, 'a', '02', { runId: 'two' }); admit(root, 'a', 1, { runId: 'one', attempt: 2 }); admit(root, 'a', 2, { runId: 'two', attempt: 2 }); const got = inspectDispatchRuntime(root, { assignment: 'a' }); assert.equal(got.inspectionStatus, 'conflicting'); assert.equal(got.recoveryAuthority, undefined); });
+test('incomplete or mismatched Assignment ownership never emits recovery authority', () => { const root = fixture(); run(root, 'orphan', '01', { runId: 'orphan' }); assert.equal(inspectDispatchRuntime(root, { run: 'orphan' }).recoveryAuthority, undefined); assignment(root, 'bad'); run(root, 'bad', '01', { runId: 'bad-run', assignmentId: 'other' }); admit(root, 'bad', 1, { runId: 'bad-run' }); assert.equal(inspectDispatchRuntime(root, { assignment: 'bad' }).recoveryAuthority, undefined); });
+test('cwd canonicalizes a worktree identity and exposes dirt/guard conflicts', () => { const root = fixture(), work = path.join(root, 'work'); fs.mkdirSync(path.join(work, '.git'), { recursive: true }); fs.writeFileSync(path.join(work, '.git', 'commondir'), '.'); assignment(root, 'a'); run(root, 'a', '01', { runId: 'active', cwd: path.join(work, 'child') }); admit(root, 'a', 1, { runId: 'active' }); fs.mkdirSync(path.join(work, 'child')); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), JSON.stringify({ dirt: 'dirty' })); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), JSON.stringify([{ kind: 'projection' }])); const got = inspectDispatchRuntime(root, { cwd: work }); assert.equal(got.inspectionStatus, 'conflicting'); assert.equal(got.observations[0].value.workspace.dirt, 'dirty'); assert.equal(got.recoveryAuthority, undefined); });
+test('cwd not-found and concurrency-permitted active runs are distinct from conflict', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'not-found'); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'a', cwd, concurrency: 'permitted' }); run(root, 'b', '01', { runId: 'b', cwd, concurrency: 'permitted' }); admit(root, 'a', 1, { runId: 'a' }); admit(root, 'b', 1, { runId: 'b' }); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'resolved'); });
+test('host routing selects solely operation/effect; Dispatch alone receives selector payload', () => { const selected = []; const answer = invokeDispatchInspectOperation({ operationId: 'dispatch.runtime.inspect', effect: 'read', payload: { selector: { run: 'none' } }, ctx: { repoRoot: fixture() } }, { selectProvider: (route) => { selected.push(route); return (ctx, selector) => ({ ctx, selector }); } }); assert.deepEqual(selected, [{ operationId: 'dispatch.runtime.inspect', effect: 'read' }]); assert.deepEqual(answer.selector, { run: 'none' }); });
+test('public inspect use-case import graph cannot reach mutation/recovery/process/Git execution', () => { const root = path.resolve(new URL('../..', import.meta.url).pathname), seen = new Set(); function walk(file) { if (seen.has(file)) return; seen.add(file); const source = fs.readFileSync(file, 'utf8'); assert.doesNotMatch(source, /node:child_process|\b(?:recoverApply|executeAssignment|spawn|execFile|process\.kill|\.kill\(|\.signal\(|git\s+(?:reset|clean|commit|add)|writeFileSync|mkdirSync|rmSync)\b/); for (const m of source.matchAll(/from\s+['"](\.{1,2}\/[^'"]+)['"]/g)) { let target = path.resolve(path.dirname(file), m[1]); if (!path.extname(target)) target += '.mjs'; walk(target); } } walk(path.join(root, 'src/verbs/dispatch/inspect.mjs')); assert.ok(seen.has(path.join(root, 'src/runner/dispatch/runtime-inspection.mjs'))); });

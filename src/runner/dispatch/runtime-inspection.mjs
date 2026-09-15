@@ -1,114 +1,44 @@
-// Dispatch runtime inspection is deliberately a filesystem reader.  It does
-// not import recovery, adapters, process control, or Git mutation helpers.
-
+// Read-only Dispatch runtime inspection. Keep this below recovery, adapter,
+// process-control, and Git-mutation layers.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fgosDirFromRoot } from '../paths.mjs';
-import { interpretRunResult } from './run-result.mjs';
 
 const INSPECTION_STATUSES = new Set(['resolved', 'partial', 'ambiguous', 'conflicting', 'not-found']);
-
-function readJson(file) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
+const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } };
+const text = (file) => { try { return fs.readFileSync(file, 'utf8').trim(); } catch { return null; } };
+const dirs = (dir) => { try { return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { return []; } };
+const uniq = (xs) => [...new Set(xs.filter(Boolean))];
+const real = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
+const fgosDir = (root) => path.join(root, '.fgos');
+function allRuns(root) { const base = fgosDir(root), out = [];
+  for (const assignmentId of dirs(path.join(base, 'assignments'))) for (const attempt of dirs(path.join(base, 'assignments', assignmentId, 'runs'))) { const runDir = path.join(base, 'assignments', assignmentId, 'runs', attempt), run = json(path.join(runDir, 'run.json')); if (run) out.push({ kind: 'assignment-run', assignmentId, attempt, runDir, run }); }
+  for (const group of dirs(path.join(base, 'dispatch-runs'))) for (const attempt of dirs(path.join(base, 'dispatch-runs', group))) { const runDir = path.join(base, 'dispatch-runs', group, attempt), run = json(path.join(runDir, 'run.json')); if (run) out.push({ kind: 'dispatch-run', group, attempt, runDir, run }); }
+  return out;
 }
-
-function directories(dir) {
-  try { return fs.readdirSync(dir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name); } catch { return []; }
+const project = (l) => ({ kind: l.kind, assignmentId: l.assignmentId ?? null, attempt: l.attempt, path: l.runDir });
+function result(l) { return json(path.join(l.runDir, 'result.json')); }
+// The admission ledger is read directly. Importing run-lock would make the
+// inspect graph reach its writer/process-control functions.
+function admissions(dir) { const genDir = path.join(dir, 'admission', 'generations'); let names; try { names = fs.readdirSync(genDir); } catch { return { records: [], corrupt: false }; } let corrupt = false, records = [];
+  for (const name of names.filter((n) => /^\d{10}\.json$/.test(n)).sort()) { const record = json(path.join(genDir, name)); if (!record?.runId) { corrupt = true; continue; } const aborted = record.retryId && json(path.join(dir, 'admission', 'markers', `${record.retryId}.aborted.json`)); if (!aborted) records.push({ ...record, epoch: Number(name.slice(0, 10)) }); }
+  return { records, corrupt };
 }
-
-function allRunLocations(repoRoot) {
-  const fgosDir = fgosDirFromRoot(repoRoot);
-  const locations = [];
-  for (const assignmentId of directories(path.join(fgosDir, 'assignments'))) {
-    const assignmentDir = path.join(fgosDir, 'assignments', assignmentId);
-    for (const attempt of directories(path.join(assignmentDir, 'runs'))) {
-      locations.push({ kind: 'assignment-run', assignmentId, attempt, runDir: path.join(assignmentDir, 'runs', attempt) });
-    }
-  }
-  for (const group of directories(path.join(fgosDir, 'dispatch-runs'))) {
-    for (const attempt of directories(path.join(fgosDir, 'dispatch-runs', group))) {
-      locations.push({ kind: 'dispatch-run', group, attempt, runDir: path.join(fgosDir, 'dispatch-runs', group, attempt) });
-    }
-  }
-  return locations.map((location) => ({ ...location, run: readJson(path.join(location.runDir, 'run.json')) })).filter((location) => location.run);
+function owner(l, root) { if (l.kind !== 'assignment-run') return l.run.runId ? { complete: true, kind: 'standalone-run', id: l.run.runId } : { complete: false };
+  const assignment = json(path.join(fgosDir(root), 'assignments', l.assignmentId, 'assignment.json'));
+  if (!assignment || assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId) return { complete: false };
+  const id = l.run.coordinationId ?? l.run.coordinationSessionId;
+  if (!id) return { complete: true, kind: 'standalone-run', id: l.run.runId };
+  const session = json(path.join(fgosDir(root), 'coordination', 'sessions', id, 'session.json'));
+  return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
 }
+function authority(l, root) { const o = owner(l, root); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
+function one(l, root, now) { const runResult = result(l), o = owner(l, root), phase = l.run.phase ?? (runResult ? 'settled' : l.run.status ?? 'unknown'); const observation = { contract: { id: 'run-observation', version: 1 }, observedAt: now(), subject: { kind: 'run', runId: l.run.runId }, phase, resourceState: json(path.join(l.runDir, 'visibility.json'))?.status ?? 'unknown', delivery: l.run.delivery ?? 'unknown', inspectionStatus: runResult ? 'resolved' : 'partial', evidenceCompleteness: { identity: 'complete', lifecycle: 'complete', resource: 'missing', result: runResult ? 'complete' : 'missing', ownership: o.complete ? 'complete' : 'partial', workspace: 'partial' }, recoveryAuthority: null, observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }] }; const hint = authority(l, root); return { inspectionStatus: o.complete && runResult ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } }; }
+function workspace(input) { const absolute = path.resolve(input); let cursor = absolute; try { if (!fs.statSync(cursor).isDirectory()) cursor = path.dirname(cursor); } catch { return { path: absolute, root: absolute, commonDir: null, key: absolute }; } for (;;) { const dot = path.join(cursor, '.git'); if (fs.existsSync(dot)) { let gitDir = dot; try { if (fs.statSync(dot).isFile()) { const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8')); if (m) gitDir = path.resolve(cursor, m[1]); } } catch {} const common = text(path.join(gitDir, 'commondir')); const commonDir = common ? path.resolve(gitDir, common) : gitDir; return { path: absolute, root: real(cursor), commonDir: real(commonDir), key: `${real(cursor)}::${real(commonDir)}` }; } const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent; } return { path: absolute, root: absolute, commonDir: null, key: absolute }; }
+const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject: { kind, id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } });
 
-function locationProjection(location) {
-  return { kind: location.kind, assignmentId: location.assignmentId ?? null, attempt: location.attempt, path: location.runDir };
-}
-
-function resultFor(location) {
-  const resultPath = path.join(location.runDir, 'result.json');
-  if (!fs.existsSync(resultPath)) return null;
-  try { return interpretRunResult(resultPath); } catch { return null; }
-}
-
-function observationFor(location, result, now) {
-  const visibility = readJson(path.join(location.runDir, 'visibility.json'));
-  const phase = location.run.phase ?? (result ? 'settled' : location.run.status ?? 'unknown');
-  return {
-    contract: { id: 'run-observation', version: 1 }, observedAt: now(),
-    subject: { kind: 'run', runId: location.run.runId }, phase,
-    resourceState: visibility?.status ?? 'unknown', delivery: location.run.delivery ?? 'unknown',
-    inspectionStatus: result ? 'resolved' : 'partial',
-    evidenceCompleteness: { identity: 'complete', lifecycle: location.run ? 'complete' : 'missing', resource: visibility ? 'complete' : 'missing', result: result ? 'complete' : 'missing', ownership: location.run.coordinationId || location.run.coordinationSessionId || location.assignmentId ? 'complete' : 'partial', workspace: 'unsupported' },
-    recoveryAuthority: null,
-    observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: location.run.status ?? null, phase } }],
-  };
-}
-
-function recoveryAuthority(location) {
-  const coordinationId = location.run.coordinationId ?? location.run.coordinationSessionId ?? null;
-  if (coordinationId) return { kind: 'coordination-session', id: coordinationId, observeCommand: `fgos coordination recover ${coordinationId}` };
-  if (location.run.runId) return { kind: 'standalone-run', id: location.run.runId, observeCommand: `fgos dispatch recover ${location.run.runId}` };
-  return null;
-}
-
-function inspectOne(location, { now }) {
-  const runResult = resultFor(location);
-  const runObservation = observationFor(location, runResult, now);
-  return {
-    inspectionStatus: runResult ? 'resolved' : 'partial',
-    subject: { kind: 'run', id: location.run.runId, locations: [locationProjection(location)] },
-    observations: runObservation.observations, runObservation, runResult,
-    recoveryAuthority: recoveryAuthority(location),
-    reconciliation: { state: 'not-needed', reason: 'No stale local guard was observed.' },
-    links: { assignmentIds: location.assignmentId ? [location.assignmentId] : [], coordinationIds: location.run.coordinationId ? [location.run.coordinationId] : [], runIds: [location.run.runId] },
-  };
-}
-
-export function validateInspectionSelector(options = {}) {
-  const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, value]) => typeof value === 'string' && value.trim());
-  if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, or --cwd');
-  const [kind, id] = supplied[0];
-  return { kind, id };
-}
-
-export function inspectDispatchRuntime(repoRoot, options = {}, { now = () => new Date().toISOString() } = {}) {
-  const selector = validateInspectionSelector(options);
-  const locations = allRunLocations(repoRoot);
-  if (selector.kind === 'run') {
-    const matches = locations.filter((location) => location.run.runId === selector.id);
-    if (matches.length === 0) return { inspectionStatus: 'not-found', subject: { kind: 'run', id: selector.id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason: 'No matching Run was found.' }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } };
-    if (matches.length > 1) return { inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: matches.map(locationProjection) }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: [...new Set(matches.map((match) => match.assignmentId).filter(Boolean))], coordinationIds: [], runIds: [selector.id] } };
-    return inspectOne(matches[0], { now });
-  }
-  if (selector.kind === 'assignment') {
-    const assignmentDir = path.join(fgosDirFromRoot(repoRoot), 'assignments', selector.id);
-    const assignment = readJson(path.join(assignmentDir, 'assignment.json'));
-    if (!assignment) return { inspectionStatus: 'not-found', subject: { kind: 'assignment', id: selector.id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason: 'No matching Assignment was found.' }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } };
-    const runs = locations.filter((location) => location.assignmentId === selector.id);
-    const current = runs.filter((location) => !runs.some((other) => other.run.supersedesRunId === location.run.runId) && !resultFor(location));
-    const status = current.length > 1 ? 'conflicting' : runs.length ? (current.length ? 'partial' : 'resolved') : 'resolved';
-    const inspected = current.length === 1 ? inspectOne(current[0], { now }) : null;
-    return { inspectionStatus: status, subject: { kind: 'assignment', id: selector.id, locations: runs.map(locationProjection) }, observations: [{ kind: 'assignment-history', source: 'assignment-repository', level: 'correlated', value: { delivery: runs.length ? 'started' : 'not-started', currentRunIds: current.map((run) => run.run.runId), runIds: runs.map((run) => run.run.runId) } }], runObservation: inspected?.runObservation ?? null, runResult: inspected?.runResult ?? null, ...(current.length === 1 ? { recoveryAuthority: inspected.recoveryAuthority } : {}), reconciliation: { state: current.length > 1 ? 'manual-required' : 'not-needed', reason: current.length > 1 ? 'Multiple current Runs were derived from admission facts.' : 'No stale local guard was observed.' }, links: { assignmentIds: [selector.id], coordinationIds: [], runIds: runs.map((run) => run.run.runId) } };
-  }
-  const canonicalCwd = path.resolve(selector.id);
-  const matches = locations.filter((location) => location.run.cwd && path.resolve(location.run.cwd) === canonicalCwd);
-  const lock = readJson(path.join(fgosDirFromRoot(repoRoot), 'dispatch.lock'));
-  const active = matches.filter((location) => !resultFor(location));
-  const authority = active.length === 1 ? recoveryAuthority(active[0]) : null;
-  return { inspectionStatus: matches.length ? (active.length > 1 ? 'conflicting' : 'resolved') : 'not-found', subject: { kind: 'cwd', id: canonicalCwd, locations: matches.map(locationProjection) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: 'correlated', value: { lock, activeRunIds: active.map((run) => run.run.runId), historicalRunIds: matches.filter((run) => resultFor(run)).map((run) => run.run.runId), workspace: 'unsupported' } }], runObservation: null, runResult: null, ...(authority ? { recoveryAuthority: authority } : {}), reconciliation: { state: 'not-needed', reason: 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: [...new Set(matches.map((match) => match.assignmentId).filter(Boolean))], coordinationIds: [], runIds: matches.map((match) => match.run.runId) } };
-}
-
+export function validateInspectionSelector(options = {}) { const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, v]) => typeof v === 'string' && v.trim()); if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, or --cwd'); return { kind: supplied[0][0], id: supplied[0][1] }; }
+export function inspectDispatchRuntime(root, options = {}, { now = () => new Date().toISOString() } = {}) { const selector = validateInspectionSelector(options), all = allRuns(root), base = fgosDir(root);
+  if (selector.kind === 'run') { const found = all.filter((l) => l.run.runId === selector.id); if (!found.length) return missing('run', selector.id, 'No matching Run was found in registered Assignment or ad-hoc Run repositories.'); if (found.length > 1) return { ...missing('run', selector.id, 'More than one Run repository owns this run id.'), inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: found.map(project) }, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: [selector.id] } }; return one(found[0], root, now); }
+  if (selector.kind === 'assignment') { const dir = path.join(base, 'assignments', selector.id), assignment = json(path.join(dir, 'assignment.json')); if (!assignment) return missing('assignment', selector.id, 'No matching Assignment was found.'); const facts = admissions(dir), runs = all.filter((l) => l.assignmentId === selector.id), byId = new Map(runs.map((l) => [l.run.runId, l])), latest = facts.records.at(-1), currentIds = latest ? facts.records.filter((r) => r.attempt === latest.attempt && r.runId !== latest.runId ? true : r === latest).map((r) => r.runId) : [], current = currentIds.map((id) => byId.get(id)).filter(Boolean), absent = currentIds.filter((id) => !byId.has(id)), inspected = current.length === 1 ? one(current[0], root, now) : null, status = facts.corrupt || absent.length ? 'partial' : current.length > 1 ? 'conflicting' : inspected?.inspectionStatus ?? 'resolved'; return { inspectionStatus: status, subject: { kind: 'assignment', id: selector.id, locations: runs.map(project) }, observations: [{ kind: 'assignment-history', source: 'admission-generation-ledger', level: facts.corrupt || absent.length ? 'partial' : 'correlated', value: { delivery: facts.records.length ? 'started' : 'not-started', currentRunIds: currentIds, runIds: facts.records.map((r) => r.runId), missingMaterializations: absent } }], runObservation: inspected?.runObservation ?? null, runResult: inspected?.runResult ?? null, ...(!facts.corrupt && !absent.length && status !== 'conflicting' && inspected?.recoveryAuthority ? { recoveryAuthority: inspected.recoveryAuthority } : {}), reconciliation: { state: facts.corrupt || absent.length || status === 'conflicting' ? 'manual-required' : 'not-needed', reason: facts.corrupt || absent.length ? 'Admission ledger and Run materialization are incomplete or corrupt.' : status === 'conflicting' ? 'Multiple current Runs were derived from admission facts.' : 'No stale local guard was observed.' }, links: { assignmentIds: [selector.id], coordinationIds: [], runIds: facts.records.map((r) => r.runId) } }; }
+  const identity = workspace(selector.id), found = all.filter((l) => l.run.cwd && workspace(l.run.cwd).key === identity.key), active = found.filter((l) => !result(l)), lock = json(path.join(base, 'dispatch.lock')), dirt = json(path.join(base, 'workspace-evidence.json')) ?? { dirt: 'unknown' }, conflicts = json(path.join(base, 'dispatch', 'projection-conflicts.json')) ?? [], conflict = (active.length > 1 && active.some((l) => l.run.concurrency === 'forbidden')) || (Array.isArray(conflicts) && conflicts.length > 0); if (!found.length) return { ...missing('cwd', identity.path, 'No Runs are bound to this canonical workspace identity.'), subject: { kind: 'cwd', id: identity.path, locations: [] }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: 'partial', value: { git: identity, lock, activeRunIds: [], historicalRunIds: [], workspace: dirt, guardConflicts: conflicts } }] }; const hint = active.length === 1 && !conflict ? authority(active[0], root) : null; return { inspectionStatus: conflict ? 'conflicting' : 'resolved', subject: { kind: 'cwd', id: identity.path, locations: found.map(project) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: conflict ? 'partial' : 'correlated', value: { git: identity, lock, activeRunIds: active.map((l) => l.run.runId), historicalRunIds: found.filter((l) => result(l)).map((l) => l.run.runId), workspace: dirt, guardConflicts: conflicts } }], runObservation: null, runResult: null, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: conflict ? 'manual-required' : 'not-needed', reason: conflict ? 'Workspace guard/projection or concurrency facts conflict.' : 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: found.map((l) => l.run.runId) } }; }
 export { INSPECTION_STATUSES };

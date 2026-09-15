@@ -14,3 +14,14 @@ export function inspectDispatchUseCase(ctx, options = {}) {
     throw new DispatchInspectError(error.message);
   }
 }
+
+// Host routing selects a provider from operation/effect only.  Selector
+// resolution stays inside the provider, which is this Dispatch use case.
+export function invokeDispatchInspectOperation(request, { selectProvider = () => inspectDispatchUseCase } = {}) {
+  if (request?.operationId !== 'dispatch.runtime.inspect' || request?.effect !== 'read') {
+    throw new DispatchInspectError('unsupported Dispatch inspection operation');
+  }
+  const provider = selectProvider({ operationId: request.operationId, effect: request.effect });
+  if (typeof provider !== 'function') throw new DispatchInspectError('no read provider is registered for dispatch.runtime.inspect');
+  return provider(request.ctx ?? {}, request.payload?.selector ?? {});
+}
