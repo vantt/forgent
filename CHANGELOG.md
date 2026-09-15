@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
+  discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
+  `node --test` with an explicit file-argument array, instead of a
+  shell-globbed `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
+  string. The old form silently selected zero files on the CI Ubuntu/macOS
+  Node 20 lane (no built-in glob support for that Node version) and failed
+  outright on Windows's default `cmd.exe` npm shell (POSIX `VAR=value`
+  env-assignment syntax is not valid there); the new runner sets that env var
+  on the spawned child directly and works unchanged across OS/shell.
 - Packaging-distribution release posture is now preview with Rust host as the
   default installed runtime for external installs; legacy Node fallback is
   deprecated and kept only as an explicit escape hatch for 30 calendar days
@@ -114,9 +123,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changed from an "at most once" KPI framing to "never twice for the same
   (tree, environment) state" to stop a Lead from skipping a genuinely
   needed rerun just to keep a count low. Final commit range for this cell:
-  `63b01fa9..81c54a43` (5 commits: initial fix, cell trace, close-vs-merge
-  reorder, git-notes durable trace, and a 3rd round resolving 7 recheck
-  residuals).
+  `63b01fa9..70eb4485` (superseded at P05 below: the close-vs-merge
+  ordering and the git-notes durable-trace design both changed again).
+- `fgos-code-panel` close-before-merge ordering restored, `git notes`
+  replaced with ordinary commits, `tsk-1bh` fixed (code-implementation-track-policy
+  track, P05): a real review of P04's own shipped design found the
+  close-after-merge reorder had traded away a real safety property --
+  target branch could receive a cell's code even when the coordination
+  session never actually closed (confirmed live: P04's own session stayed
+  `active` due to `tsk-1bh`, yet its merge still landed). Reverted to
+  close-then-merge (matching `fgos-plan-loop`'s own cells); post-merge
+  verification and its result now happen after a successful close, as
+  separate plain-git steps recorded via an ordinary tracked commit instead
+  of a `git note` (`refs/notes/*` are outside the default commit graph and
+  do not push/fetch by default -- confirmed via `git notes list` returning
+  empty on this repo, i.e. the P04 note was never actually durable).
+  `session-engine.mjs`'s quorum classification also fixed: a
+  driver-authorized position (e.g. `fixer`) that failed once and then
+  succeeded under a fresh authorization now correctly counts as completed
+  instead of being stuck `failed` forever, and `resolveBindingAuthorization`
+  now prefers the newest unconsumed authorization for a binding instead of
+  an oldest-wins order that made a corrected retry unreachable once a bad
+  authorization existed for the same binding. Two independent review
+  rounds on this fix (real reviewer + red-team dispatches, not
+  self-review) then found and fixed two further real bugs: (1)
+  `resolveTaskKeyAuthorization`, the sibling function deriving a
+  driver-authorized dispatch's default `taskKey`, was still oldest-wins,
+  disagreeing with `resolveBindingAuthorization` and blocking a legitimate
+  third retry at the same binding -- fixed to newest-wins too; (2) the
+  quorum fallback's same-binding retry credit trusted raw
+  `assignment-created.payload.operationId`/`nodeId` fields, which an
+  exported raw door (`createSessionAssignment`) can legitimately carry for
+  an unrelated task while spending a real authorization -- fixed to
+  require the same reserved `protocol-operation:` contract stamp the
+  gating path already checks, which only `dispatchDeclaredOperation`'s own
+  common path can write. Five new regression tests added across both
+  fixes, each confirmed by reverting its fix to fail against the
+  pre-fix/pre-hardening code. Full trace:
+  `docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result

@@ -32,8 +32,9 @@ jobs:
       - name: npm test (includes install-packaging matrix proof)
         run: npm test
 
-  # `npm test` is `node --test test/**/*.test.mjs` and cannot see the Rust
-  # crate at all, so until this job existed herdr-plugin had no automated
+  # `npm test` (scripts/run-tests.mjs, a portable `node --test` wrapper over
+  # every discovered test/**/*.test.mjs) cannot see the Rust crate at all,
+  # so until this job existed herdr-plugin had no automated
   # coverage anywhere — not locally, not here. It bit for real (tsk-1l9): a
   # one-line stage fixture change in src/app.rs broke an assertion in
   # src/ui.rs, and only a hand-typed `cargo test` caught it.

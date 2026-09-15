@@ -1459,3 +1459,234 @@ test('schema-2 session retry: aborting a retry declaration whose Run already mat
   assert.equal(retried2.nextRunId, `run_${assignmentId}_03`);
   assert.equal(fs.existsSync(path.join(asgnDir, 'runs', '03', 'result.json')), true);
 });
+
+// ─── tsk-1bh: classifySessionQuorum's ungated-actor fallback -- same-binding
+// retry credit, scoped to never launder an unrelated dispatch ──────────────
+//
+// A dedicated actor bound to TWO driver-authorized, ungated operations (no
+// required binding at all, no visibility window) -- the real
+// `standalone-master-coordination-loop.yaml` "fixer" shape
+// (`actorGatingOperationIds` returns `[]` for it), so it genuinely reaches
+// `classifySessionQuorum`'s fallback path rather than the stricter
+// `resolveBindingOutcome` gating path the multi-op fixture above exercises.
+
+function ungatedOnlyFallbackDefinition() {
+  return {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: 'test.coordination-protocol.ungated-only-fallback', version: '1.0.0' },
+    spec: {
+      profile: { kind: 'CoordinationProtocol' },
+      roles: ['setup', 'fixer'],
+      actors: [
+        { id: 'setup-actor', role: 'setup' },
+        { id: 'fixer', role: 'fixer' },
+      ],
+      operations: [
+        { id: 'op-setup', role: 'setup', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'op-fix-a', role: 'fixer', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'op-fix-b', role: 'fixer', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+      ],
+      graph: {
+        entry: 'phase-setup',
+        nodes: [
+          { id: 'phase-setup', operations: [{ ref: 'op-setup', actor: 'setup-actor' }], transitions: ['phase-fix'] },
+          {
+            id: 'phase-fix',
+            operations: [
+              { ref: 'op-fix-a', actor: 'fixer', activation: { mode: 'driver-authorized' } },
+              { ref: 'op-fix-b', actor: 'fixer', activation: { mode: 'driver-authorized' } },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+}
+
+function setupUngatedOnlyFallbackFixture(coordinationId) {
+  const tempDir = mkTempDir();
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'ungated-only-fallback.json'), `${JSON.stringify(ungatedOnlyFallbackDefinition(), null, 2)}\n`);
+  openDeclaredProtocolSession(
+    { definitionId: 'test.coordination-protocol.ungated-only-fallback', coordinationId, objective: 'tsk-1bh ungated-actor fallback fixture.', writerId: 'writer-1' },
+    { cwd: tempDir },
+  );
+  return { tempDir, opts: { cwd: tempDir, repoRoot: tempDir } };
+}
+
+function fixAuthorization(overrides = {}) {
+  return {
+    operationId: 'op-fix-a',
+    nodeId: 'phase-fix',
+    targetActorId: 'fixer',
+    authorizedBy: { type: 'driver', id: 'writer-1' },
+    reason: 'Fix round.',
+    grantedContextRefs: [],
+    ...overrides,
+  };
+}
+
+test('tsk-1bh: an ungated actor (no required binding at all) that fails its first attempt and succeeds on a SAME-binding retry under a fresh authorization is credited as completed, and the session closes', async () => {
+  const coordinationId = 'coord_p10_tsk1bh_fallback_retry_credit';
+  const ctx = setupUngatedOnlyFallbackFixture(coordinationId);
+
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-setup', targetActorId: 'setup-actor', objective: 'Setup.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir) },
+  );
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_1', invocationKey: 'fix:1' }), ctx.opts);
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'First attempt.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'failed', summary: 'Genuinely failed.' }) },
+  );
+
+  const afterFirstAttempt = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterFirstAttempt.failed.map((f) => f.actorId), ['fixer']);
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_2', invocationKey: 'fix:2' }), ctx.opts);
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'Corrected retry, same binding.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'done', summary: 'Fixed for real.' }) },
+  );
+
+  const afterRetry = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(afterRetry.failed, []);
+  assert.deepEqual(afterRetry.completed.map((c) => c.actorId).sort(), ['fixer', 'setup-actor']);
+
+  const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
+  assert.equal(closed.status, 'completed');
+});
+
+test('tsk-1bh (negative): a stamped success at a DIFFERENT operation binding for the same actor never launders a failed attempt at the FIRST binding', async () => {
+  const coordinationId = 'coord_p10_tsk1bh_fallback_different_binding';
+  const ctx = setupUngatedOnlyFallbackFixture(coordinationId);
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_a', invocationKey: 'fix:a', operationId: 'op-fix-a' }), ctx.opts);
+  const first = await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'The required first attempt at op-fix-a.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'failed', summary: 'Genuinely failed.' }) },
+  );
+
+  // A SECOND, genuinely successful dispatch at a DIFFERENT operation binding
+  // (op-fix-b, not op-fix-a) for the SAME actor -- still stamped (arrives
+  // through dispatchDeclaredOperation), but not a retry of the first
+  // binding at all.
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_b', invocationKey: 'fix:b', operationId: 'op-fix-b' }), ctx.opts);
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-b', targetActorId: 'fixer', objective: 'An unrelated operation, same actor.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'done', summary: 'Unrelated success.' }) },
+  );
+
+  const quorum = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(quorum.failed.map((f) => f.actorId), ['fixer'], 'the different-binding success never launders the first, failed binding');
+  assert.equal(quorum.failed[0].assignmentId, first.assignment.assignmentId);
+  assert.equal(quorum.completed.find((c) => c.actorId === 'fixer'), undefined);
+});
+
+test('tsk-1bh (negative, R6 extension): an UNSTAMPED assignment for the same actorId (never dispatched through dispatchDeclaredOperation) never launders a failed stamped attempt', async () => {
+  const coordinationId = 'coord_p10_tsk1bh_fallback_unstamped';
+  const ctx = setupUngatedOnlyFallbackFixture(coordinationId);
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_1', invocationKey: 'fix:1' }), ctx.opts);
+  const first = await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'The required first attempt.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'failed', summary: 'Genuinely failed.' }) },
+  );
+
+  // A second Assignment for the SAME actorId, created straight through the
+  // raw store door -- no authorizationProvenance, so no operationId/nodeId
+  // stamp at all, exactly like `dispatchPrimaryTask`/`proposeConsult` would
+  // produce. A genuinely successful result is linked to it directly.
+  const unstamped = createSessionAssignment(
+    { coordinationId, taskKey: 'unrelated-ad-hoc-task', actorId: 'fixer', contract: inlineContract({ role: 'fixer' }), caller: { writerId: 'writer-1' } },
+    ctx.opts,
+  );
+  const runsDir = path.join(ctx.tempDir, '.fgos', 'assignments', unstamped.assignmentId, 'runs', '01');
+  fs.mkdirSync(runsDir, { recursive: true });
+  const runId = `run_${unstamped.assignmentId}_01`;
+  fs.writeFileSync(path.join(runsDir, 'result.json'), JSON.stringify({ runId, assignmentId: unstamped.assignmentId, status: 'done', confidence: 'reported' }));
+  linkResult(coordinationId, { assignmentId: unstamped.assignmentId, runId }, ctx.opts);
+
+  const quorum = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(quorum.failed.map((f) => f.actorId), ['fixer'], 'the unstamped, unrelated success never launders the first, stamped, failed attempt');
+  assert.equal(quorum.failed[0].assignmentId, first.assignment.assignmentId);
+});
+
+test('tsk-1bh (negative, red-team recheck on aa328e70): a raw createSessionAssignment call spending a REAL, matching, fresh authorization for the same binding -- with an unrelated task -- never launders a failed attempt', async () => {
+  // The exact attack the red-team recheck on commit aa328e70 demonstrated:
+  // `createSessionAssignment` (store.mjs) is an exported raw door that
+  // accepts a caller-supplied `authorizationProvenance` object directly,
+  // and only verifies its fields MATCH a real, already-issued, unspent
+  // authorization -- never that the call actually passed through
+  // `dispatchDeclaredOperation`'s own gate. A caller who legitimately knows
+  // a fresh authorization's id/operationId/nodeId/invocationKey can spend
+  // it through this raw door for an ENTIRELY UNRELATED inline contract,
+  // completing it successfully -- so raw `operationId`/`nodeId` PAYLOAD
+  // equality alone (an earlier version of this fix's own scoping) could be
+  // satisfied without ever going through the mediated door at all. Fixed by
+  // scoping same-binding retries via `assignmentServesOperation`'s reserved
+  // `protocol-operation:` CONTRACT STAMP instead -- written only on
+  // `dispatchDeclaredOperation`'s own common path, and refused on every
+  // door (including this raw one) by `assertNoReservedOperationStamp`. This
+  // raw assignment can copy the payload fields; it can never carry the real
+  // stamp.
+  const coordinationId = 'coord_p10_tsk1bh_fallback_raw_provenance_forgery';
+  const ctx = setupUngatedOnlyFallbackFixture(coordinationId);
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_1', invocationKey: 'fix:1' }), ctx.opts);
+  const first = await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'The required first attempt.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'failed', summary: 'Genuinely failed.' }) },
+  );
+
+  // A genuinely fresh authorization for the SAME binding -- exactly what a
+  // real correction round would issue.
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_2', invocationKey: 'fix:2' }), ctx.opts);
+
+  // Spent through the RAW door, not `dispatchDeclaredOperation`, for an
+  // entirely unrelated task -- `authorizationProvenance` fields match
+  // `auth_fix_2`'s real "operation-authorized" event exactly (as
+  // `assertAuthorizationSpendable` requires), so the raw door accepts it.
+  const forged = createSessionAssignment(
+    {
+      coordinationId,
+      taskKey: 'totally-unrelated-raw-task',
+      actorId: 'fixer',
+      contract: inlineContract({ role: 'fixer', objective: 'Nothing to do with op-fix-a at all.' }),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: {
+        authorizationId: 'auth_fix_2',
+        operationId: 'op-fix-a',
+        nodeId: 'phase-fix',
+        invocationKey: 'fix:2',
+        contextGrant: { refs: [] },
+      },
+    },
+    ctx.opts,
+  );
+  const runsDir = path.join(ctx.tempDir, '.fgos', 'assignments', forged.assignmentId, 'runs', '01');
+  fs.mkdirSync(runsDir, { recursive: true });
+  const runId = `run_${forged.assignmentId}_01`;
+  fs.writeFileSync(path.join(runsDir, 'result.json'), JSON.stringify({ runId, assignmentId: forged.assignmentId, status: 'done', confidence: 'reported' }));
+  linkResult(coordinationId, { assignmentId: forged.assignmentId, runId }, ctx.opts);
+
+  const quorum = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    quorum.failed.map((f) => f.actorId),
+    ['fixer'],
+    'a raw assignment with copied (nodeId, operationId) payload fields but no real reserved contract stamp never launders the first, genuinely failed, mediated attempt',
+  );
+  assert.equal(quorum.failed[0].assignmentId, first.assignment.assignmentId);
+  assert.equal(quorum.completed.find((c) => c.actorId === 'fixer'), undefined);
+});

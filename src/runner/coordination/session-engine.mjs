@@ -1152,7 +1152,24 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
   const resumeMatch = resumedAssignmentId
     ? forThisBinding.find((record) => record.consumedByAssignmentId === resumedAssignmentId)
     : undefined;
-  return resumeMatch ?? forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  // tsk-1bh fix: prefer the NEWEST unconsumed authorization for this binding,
+  // not the oldest. In the normal flow (authorize + operation dispatched
+  // together in one `fgos coordination run` call) there is only ever one
+  // unconsumed authorization at a time, so this changes nothing. Multiple
+  // unconsumed authorizations for the same binding only pile up when an
+  // earlier one was orphaned -- its paired operation step was refused
+  // (e.g. a `contextRefs` grant violation) before ever reaching
+  // `createSessionAssignment`, so it was never marked consumed and never
+  // will be. An oldest-first `.find()` would then hand every future
+  // dispatch attempt back to that same dead authorization forever, making a
+  // corrected retry (a fresh authorization with the fix applied) permanently
+  // unreachable for this binding (confirmed live: `code-implementation-
+  // track-policy--p01`'s `reviewer-recheck` hit exactly this). The newest
+  // authorization is the Lead's most recent, presumably corrected, intent;
+  // an older orphaned one is dead weight, never a competing valid grant --
+  // no real flow authorizes the same binding twice on purpose without
+  // consuming the first before issuing the second.
+  return resumeMatch ?? forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
 }
 
 /**
@@ -1181,7 +1198,25 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
  */
 function resolveTaskKeyAuthorization(authorizations, binding) {
   const forThisBinding = bindingAuthorizations(authorizations, binding);
-  const unconsumed = forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  // tsk-1bh fix: this MUST pick the same unconsumed authorization
+  // `resolveBindingAuthorization` (above) will independently resolve to
+  // consume for this same dispatch -- `.findLast()`, not `.find()`, for the
+  // identical "newest is the Lead's real current intent, an orphaned older
+  // one is dead weight" reasoning that function's own comment gives. Before
+  // this fix the two disagreed: this taskKey-derivation half kept naming the
+  // OLDEST unconsumed (often orphaned) authorization, while dispatch itself
+  // consumed the NEWEST one, so the taskKey a caller's own later invocation
+  // recomputes never changes across retries even after a fresh, correctly-
+  // scoped authorization is issued -- `isResumeOfThisRound` then resolves to
+  // an EARLIER attempt's own claim, and the same-binding "fresher unconsumed
+  // authorization exists" guard (this file, `dispatchDeclaredOperation`'s
+  // `freshUnconsumed` check) refuses the retry outright instead of minting a
+  // new claim for it. Confirmed live via the exact repro this fixes:
+  // orphaned auth A, a successful dispatch under auth B, and a THIRD
+  // correction auth C for the same binding -- the pre-fix mismatch names A
+  // (or B, once B is consumed) in the taskKey while C sits unconsumed,
+  // permanently blocking the retry C exists to make.
+  const unconsumed = forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
   if (unconsumed) return unconsumed;
   // No fresh authorization pending: this is either a genuine idempotent
   // resume (exactly one prior invocation was ever consumed at this binding
@@ -3500,40 +3535,106 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
       continue;
     }
 
-    // Fallback (pre-existing, unchanged): no gating binding anywhere for
-    // this actor -- either this session has no declared protocol at all, or
-    // every binding this actor has is an ungated driver-authorized one
-    // (`actorGatingOperationIds`). "First assignment-created event for this
-    // actor, anywhere" is exactly correct for a session with no protocol
-    // (no graph to consult in the first place) and for the real shipped
-    // shape this fallback exists to preserve (`standalone-master-
-    // coordination-loop.yaml`'s "fixer", whose only binding, revise-
-    // candidate, is a single ungated driver-authorized operation --
-    // `coordination-launch-master-loop.test.mjs`'s own `coord_launcher_live`
-    // proves and depends on "missing until dispatched" for exactly this
-    // shape). A HYPOTHETICAL actor with two-or-more ungated
-    // driver-authorized bindings and no required binding at all would still
-    // see this fallback count it complete after only the FIRST of those
-    // settles -- the same limitation this whole fix addresses for gating
-    // bindings, just not (yet) extended to the ungated case, because no
-    // real fixture in this repo has that shape today (P10-KERNEL-FIX.md
-    // Gaps).
-    const createdEvent = events.find((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
-    if (!createdEvent) {
+    // Fallback: no gating binding anywhere for this actor -- either this
+    // session has no declared protocol at all, or every binding this actor
+    // has is an ungated driver-authorized one (`actorGatingOperationIds`).
+    // "Missing until dispatched" (no `createdEvents` at all) is exactly
+    // correct for a session with no protocol (no graph to consult in the
+    // first place) and for the real shipped shape this fallback exists to
+    // preserve (`standalone-master-coordination-loop.yaml`'s "fixer", whose
+    // only binding, revise-candidate, is a single ungated driver-authorized
+    // operation -- `coordination-launch-master-loop.test.mjs`'s own
+    // `coord_launcher_live` proves and depends on that for exactly this
+    // shape, unaffected below since it never dispatches a second attempt).
+    //
+    // tsk-1bh fix: with TWO OR MORE assignments for this actor (a retry
+    // after a failed/no-evidence first attempt, dispatched under a fresh
+    // authorization for the SAME graph binding), this used to classify by
+    // the FIRST assignment-created event alone -- a later, genuinely
+    // successful re-attempt of that same binding could never un-stick a
+    // `failed` classification, so `closeSessionByQuorum` would refuse
+    // forever even after real, verified work landed (confirmed live:
+    // `fgos-plan-loop` cell `code-implementation-track-policy--p04`'s
+    // `fixer`, an ungated driver-authorized actor that genuinely reaches
+    // this fallback. `--p01`'s `reviewer-recheck` hit the SAME symptom for
+    // a DIFFERENT reason -- `reviewer` also binds `review-candidate`
+    // [required], so `actorGatingOperationIds` returns non-empty for it and
+    // it never reaches this fallback at all; that occurrence was purely
+    // `resolveBindingAuthorization`/`resolveTaskKeyAuthorization` (above)
+    // repeatedly handing dispatch back to a dead orphaned authorization, an
+    // upstream fix to a DIFFERENT bug in a DIFFERENT function -- cited here
+    // only to avoid re-attributing it to this fallback).
+    //
+    // This must NOT be read as "any later assignment for this actorId can
+    // supersede an earlier one" -- that is precisely the laundering attack
+    // `coordination-r6-security-adversarial.test.mjs`'s "partial-consensus
+    // false success" case exercises: a SECOND, unrelated ad-hoc dispatch
+    // (`dispatchPrimaryTask`, no operationId/nodeId stamp at all) under the
+    // same actorId must never be mistaken for a retry of the first,
+    // required task.
+    //
+    // tsk-1bh follow-up (red-team recheck on `aa328e70`, HIGH): an EARLIER
+    // version of this fix scoped same-binding retries by raw
+    // `assignment-created.payload.operationId`/`nodeId` equality alone,
+    // reasoning that "only `dispatchDeclaredOperation` ever writes them."
+    // That reasoning was wrong -- `createSessionAssignment` (store.mjs) is
+    // an exported RAW door that accepts a caller-supplied
+    // `authorizationProvenance` object directly, and only checks that its
+    // fields MATCH a real, already-issued authorization record, never that
+    // the call actually passed through `dispatchDeclaredOperation`'s own
+    // gate. A caller holding a genuine, freshly-authorized (nodeId,
+    // operationId) for this exact binding could spend it through the raw
+    // door with an entirely unrelated inline contract/task, complete it,
+    // and have THIS fallback credit that unrelated result as the retry --
+    // the raw payload fields alone proved nothing about provenance.
+    //
+    // Fixed to use `assignmentServesOperation` (the SAME reserved
+    // `protocol-operation:` contract-stamp predicate `resolveBindingOutcome`
+    // already uses above), not raw payload-field equality. That stamp is
+    // written unconditionally on `dispatchDeclaredOperation`'s own common
+    // path, before the activation-mode branch, into the Assignment's own
+    // persisted contract -- and `buildSessionContract`'s
+    // `assertNoReservedOperationStamp` refuses ANY caller-supplied entry in
+    // that reserved namespace, on every door, including the raw one. So the
+    // raw-door attack above can still forge the EVENT payload's
+    // `operationId`/`nodeId` fields, and can still legitimately consume a
+    // real authorization through the raw door -- but it can never produce
+    // an Assignment carrying the actual reserved stamp, and only a stamped
+    // Assignment counts as a same-binding attempt here. The first
+    // assignment-created event for this actor still decides the binding: an
+    // unstamped first event (no declared protocol at all, or a first
+    // attempt that itself never reached `dispatchDeclaredOperation`) means
+    // there is no reliable signal to compare later events against at all,
+    // so only that first event is ever considered -- byte-identical to the
+    // pre-fix behavior for every such actor, laundering included. With a
+    // stamped first event, only LATER events that themselves carry the
+    // genuine stamp for that SAME operationId count as further attempts;
+    // walk every such attempt in event order, the first SATISFIED one
+    // settles the actor, with none satisfied the LAST attempt's own outcome
+    // is reported, same as before for the single-attempt case.
+    const allCreatedEvents = events.filter((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
+    if (allCreatedEvents.length === 0) {
       missing.push({ actorId: originalActorId });
       continue;
     }
-    const assignmentId = createdEvent.payload.assignmentId;
-    const latestLink = lastEventFor(events, 'result-linked', assignmentId);
-    if (!latestLink) {
-      late.push({ actorId: originalActorId, assignmentId });
-      continue;
+    const firstCreatedEvent = allCreatedEvents[0];
+    const firstOperationId = firstCreatedEvent.payload.operationId;
+    const stampedSameBinding =
+      definition && firstOperationId
+        ? allCreatedEvents.filter((event) => assignmentServesOperation(definition, firstOperationId, { assignmentId: event.payload.assignmentId, fgosDir }))
+        : [];
+    const createdEvents = stampedSameBinding.length > 0 ? stampedSameBinding : [firstCreatedEvent];
+    let lastOutcome;
+    for (const createdEvent of createdEvents) {
+      lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveId, createdEvent.payload.assignmentId);
+      if (lastOutcome.satisfied) break;
     }
-    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, latestLink.payload.runId);
-    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
-      failed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+    if (lastOutcome.satisfied) {
+      completed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
+    } else if (lastOutcome.reason === 'late') {
+      late.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId });
     } else {
-      completed.push({ actorId: originalActorId, assignmentId, runId: runResult.runId });
+      failed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
     }
   }
 
