@@ -1,8 +1,14 @@
 // Narrow, local guard/projection reconciliation.  This module deliberately
 // contains no adapter, recovery, process-control, or execution imports.
+// runtime-inspection.mjs is the one exception: it is itself a read-only
+// Dispatch inspection layer (same layer as this module, not adapter/
+// recovery/process-control/execution), and reusing its already-proven
+// --cwd Run/admission view here avoids re-deriving that same read a second
+// time (RUL11: consolidate, do not duplicate a scattered near-copy).
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { inspectDispatchRuntime } from './runtime-inspection.mjs';
 
 const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map(stable).join(',')}]` : `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`) : JSON.stringify(v);
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
@@ -65,12 +71,47 @@ export function applyReconciliation(root, plan, { now = new Date().toISOString()
     if (fresh.outcome !== 'planned' || stable(fresh.snapshot) !== stable(plan.snapshot)) return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'guard facts changed since planning' };
     const expectedActionKey = actionKey(fresh.snapshot, canonical, fresh.snapshot.expiresAt);
     if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
-    // Re-read the canonical guard bytes immediately before unlink.  The
-    // unlink remains deliberately confined even if a serialized plan is
-    // tampered with after planning.
-    const raw = fs.readFileSync(canonical.path, 'utf8');
+    // no-active-run-for-holder (the second precondition planReconciliation
+    // already names): a dead cwd-lock holder does not mean the Run it was
+    // guarding is actually finished -- a successor process could be mid
+    // launch against this same cwd with no result.json written yet. Reuse
+    // the real read-only Run/admission view (runtime-inspection.mjs's own
+    // --cwd selector) instead of trusting the unverified precondition
+    // string. activeRunIds is populated purely from Run materialization
+    // (run.json present, result.json absent) and is computed before that
+    // view's own ownership/evidence-completeness checks, so it is reliable
+    // even when the rest of the view is only 'partial'.
+    const runtimeView = inspectDispatchRuntime(root, { cwd: root });
+    const activeRunIds = runtimeView.observations?.[0]?.value?.activeRunIds ?? [];
+    if (activeRunIds.length > 0) return { outcome: 'blocked', reason: `active Run(s) still bound to this holder's cwd: ${activeRunIds.join(', ')}` };
+    if (runtimeView.inspectionStatus === 'partial' || runtimeView.inspectionStatus === 'conflicting' || runtimeView.inspectionStatus === 'ambiguous') {
+      return { outcome: 'needs-input', reason: 'dispatch runtime inspection for this cwd is incomplete or conflicting; no-active-run-for-holder cannot be verified' };
+    }
+    // Re-read the canonical guard bytes immediately before unlink -- writer
+    // parity with tryAcquireOnce's own reclaim (src/runner/main-checkout-lock.mjs
+    // lines 304-323): any successor guard visible at this re-read (changed
+    // digest) survives untouched (plan-stale below). The residual window
+    // between this read and the unlink syscall itself is the same accepted,
+    // inherent-to-POSIX-pathname-locks race tryAcquireOnce and
+    // releaseMainCheckoutLockIfOwn already carry for the identical
+    // dead-holder-reclaim scenario -- not closable without a writer-side
+    // protocol change (every dispatch-lock writer taking a sidecar
+    // meta-lock), recorded as accepted residual risk, not a defect.
+    let raw;
+    try {
+      raw = fs.readFileSync(canonical.path, 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'cwd lock was already removed by a concurrent cleanup' };
+      throw err;
+    }
     if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'cwd lock changed since planning' };
-    fs.unlinkSync(canonical.path);
+    try {
+      fs.unlinkSync(canonical.path);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+      // Goal state (guard absent) already achieved by a concurrent cleanup --
+      // same spirit as tryAcquireOnce's own unlink-ENOENT tolerance.
+    }
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
