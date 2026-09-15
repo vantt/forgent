@@ -10,9 +10,10 @@ below — this document does not restate that fragment's rule, only points to it
 ## Precedence & compatibility rule
 
 Plan-level Product Gates and a phase's own `## Verification` take precedence
-over generic skill defaults. Isolation-breaking diffs (see
-[Escalation authority & scope](#escalation-authority--scope)) and
-Lead-accepted escalations override the targeted default for that cell. Work
+over generic skill defaults. An isolation-breaking diff — the same
+mechanical-gate trigger defined in the [Product Gates table](#product-gates-table)'s
+**Mechanical-gate rule** — and a Lead-accepted escalation both override the
+targeted default for that cell. Work
 items running under fgOS Work use the item's `verify` contract instead of
 this document's plan/phase inputs. Existing running tracks that lack a
 baseline or checkpoint block remain fully compatible without any forced
@@ -21,7 +22,10 @@ being authored or revised, not a retrofit requirement.
 
 ```text
 Precedence order for "what do I run":
-1. An explicit Lead objective for this round, if it says otherwise.
+1. An explicit Lead objective for this round — may only ADD proof beyond
+   #2-#4 below; it may never remove a plan-declared Product Gate or a
+   mechanical-gate trigger. Anything that would remove a gate is a plan
+   revision, not a round objective.
 2. This cell's phase file `## Verification`.
 3. plan.md Product Gates marker for this phase (`**Full-suite gate.**`).
 4. Generic skill default (targeted proof).
@@ -44,14 +48,17 @@ Record these once in `plan.md`, verbatim across every request in the track:
 - **Recorded baseline** — full proof command, run once before the first
   cell; date; commit; and the exact names of already-failing tests as
   "known baseline failures". Every later full-proof run is judged against
-  this list: a baseline failure is unrelated unless the current cell
-  touches its subject; any new failure blocks close. **The baseline list
-  may only shrink** — a shrink is recorded as evidence; it never grows
-  silently.
+  this list, triaged by bucket: **patch-related** — blocks close;
+  **environmental** — rerun; blocks until reproducibly green;
+  **pre-existing** — blocks unless already on the recorded baseline list.
+  **The baseline list may only shrink** — a shrink is recorded as
+  evidence; it never grows.
 - **Merge cadence to main** — per cell, per gate, or final-only. This is a
   per-plan choice; there is no default.
 - **Main→track sync point** (optional) — if the track pulls `main` back in
-  at checkpoints, say where and how sync-induced failures are triaged.
+  at checkpoints, say where and how sync-induced failures are triaged. A
+  sync point may only **replace** the recorded baseline with a new
+  dated/commit-stamped record — never append to the old one.
 
 ```text
 ## Execution Inputs
@@ -95,7 +102,9 @@ checkpoint can be certified.
 
 ## Checkpoint identity
 
-Every checkpoint is a durable record tuple. Record it in the cell trace:
+Every checkpoint is a durable record tuple. Record it in the cell trace —
+`docs/architect/agent-coordination/verification/<track>/<cell>.md`
+(fgos-plan-loop `SKILL.md` §5 step 5):
 
 ```text
 phase/cell id: <phase>/<cell>
@@ -128,7 +137,12 @@ and record the outcome before close.
 **Mechanical-gate rule:** regardless of what the Product Gates marker says,
 a cell is a full-suite gate if its diff touches any of: dispatch/self-host
 hooks, session/replay/schema core, shared invariants, migrations,
-test-harness foundations, or `package.json` scripts.
+test-harness foundations, or `package.json` scripts — for example, in this
+repo, `src/runner/dispatch/**`, `src/verbs/coordination/**`, or
+`package.json` itself. The Lead determines whether a mechanical trigger
+fired for a given diff and records that determination in the cell trace
+(`docs/architect/agent-coordination/verification/<track>/<cell>.md`) with
+the matching path(s) that fired it — never left implicit.
 
 ## Per-phase `## Verification`
 
@@ -138,20 +152,31 @@ changes. The full proof command appears in a phase file's `## Verification`
 only when that phase is itself a gate (Product Gates marker or the
 mechanical-gate rule above fired).
 
-```text
+````text
 ## Verification
 
-​```sh
+```sh
 <targeted command(s) for this phase's contract only>
-​```
 ```
+````
 
 ## Escalation authority & scope
 
-Reviewer and Red-Team report proof gaps as advisory findings only — naming
-the missing test or contract, severity-tagged — and never expand their own
-run to cover it. The Lead holds sole authority to decide `accepted` or to
-provide an evidence-backed `rejected`.
+The coding-worker behavioural rule for proof-gap findings — advisory-only
+reporting, no unilateral run expansion, sole Lead escalation authority — is
+the single source of truth in
+[Coding verification discipline](#coding-verification-discipline); it is
+not restated here. This section records only the authoring-side artefacts:
+the disposition template, the trace values, and the Lead-authority
+statement below.
+
+The Lead holds sole authority to decide `accepted` or to provide an
+evidence-backed `rejected`. A proof-gap finding admits exactly two
+dispositions — `accepted`, or evidence-backed `rejected`; **`deferred` is
+not a legal disposition for a proof-gap finding.** If a cell hits the
+fix-round cap (3 rounds) with an open proof-gap finding, the disposition is
+forced to `accepted -> Proof: escalated-to-full` for that cell — never a
+silent close.
 
 An accepted escalation upgrades the proof requirement for **the current
 cell only** (`Proof: escalated-to-full`). It does not create a permanent
@@ -162,11 +187,16 @@ add one.
 Finding: proof insufficient — targeted set does not cover <contract> (severity: <level>)
 Lead disposition: accepted -> Proof: escalated-to-full for cell <id> only
              | rejected -> <evidence-backed rationale>
+             (deferred is not legal for a proof-gap finding; hitting the
+             fix-round cap (3 rounds) with this finding still open forces
+             accepted -> Proof: escalated-to-full)
 ```
 
 ## Cell trace format
 
-Every cell trace records:
+Every cell trace
+(`docs/architect/agent-coordination/verification/<track>/<cell>.md`)
+records:
 
 ```text
 Proof: targeted | full-suite-gate | escalated-to-full

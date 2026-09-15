@@ -102,6 +102,7 @@ R4. `CHANGELOG.md` `## [Unreleased]` entry.
 ```sh
 node --input-type=module -e "import { discoverInstructionSources } from './src/setup/instruction-registry.mjs'; const u = discoverInstructionSources(process.cwd()); console.log(u.filter(x => x.id === 'coding-verification-discipline').length === 1 ? 'fragment ok' : 'fragment missing')"
 node --input-type=module -e "import { inspectInstructionProjection } from './src/setup/instruction-projections.mjs'; const r = inspectInstructionProjection(process.cwd()); if (!r.passed) { console.error(r.problems); process.exit(1) }"
+node --input-type=module -e "import { discoverInstructionSources } from './src/setup/instruction-registry.mjs'; import { evaluateInstructionComposition } from './src/setup/instruction-composition.mjs'; const units = discoverInstructionSources(process.cwd()); const r = evaluateInstructionComposition(units, { target: 'domain:coding' }); const ids = new Set((r.effectiveSet?.rules ?? []).map(x => x.id)); if (r.ok === true && ids.has('coding-verification-discipline') && ids.has('coding-worktree-safety')) { console.log('domain:coding composition ok') } else { console.error({ ok: r.ok, conflicts: r.conflicts, ids: [...ids] }); process.exit(1) }"
 node --test test/setup/instruction-registry.test.mjs test/setup/instruction-composition.test.mjs
 grep -rn "trackKind\|executionPolicy" docs/how-to domains/coding/instructions && exit 1 || true
 ```
