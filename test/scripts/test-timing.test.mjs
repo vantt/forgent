@@ -15,6 +15,9 @@ import {
   summarizeSamples,
   defaultTimedSpawn,
   isGitClean,
+  parseJUnitTestcases,
+  runProfile,
+  summarizeProfile,
 } from '../../scripts/test-timing.mjs';
 
 const SAMPLE_TIME_V_OUTPUT = `\tCommand being timed: "node scripts/run-tests.mjs"
@@ -228,6 +231,104 @@ test('summarizeSamples computes median/min/max wall time over valid samples', ()
   assert.equal(summary.sampleCount, 3);
   assert.equal(summary.wallMedianSeconds, 20);
   assert.deepEqual(summary.wall, { min: 10, max: 30 });
+});
+
+// --- parseJUnitTestcases / summarizeProfile: R3/R6 profile parsing --------
+
+const SAMPLE_JUNIT_XML = `<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+\t<testcase name="fast one" time="0.003150" classname="test" file="/repo/test/cli/a.test.mjs"/>
+\t<testcase name="slow one" time="1.500000" classname="test" file="/repo/test/cli/a.test.mjs"/>
+\t<testcase name="state test" time="0.500000" classname="test" file="/repo/test/state/store.test.mjs"/>
+\t<testcase name="root test" time="0.010000" classname="test" file="/repo/test/architecture.test.mjs"/>
+</testsuites>
+`;
+
+test('parseJUnitTestcases extracts name/time/file from every self-closing testcase tag, attribute order notwithstanding', () => {
+  const testcases = parseJUnitTestcases(SAMPLE_JUNIT_XML);
+  assert.equal(testcases.length, 4);
+  assert.deepEqual(testcases[1], { name: 'slow one', time: 1.5, file: '/repo/test/cli/a.test.mjs' });
+});
+
+test('parseJUnitTestcases skips a malformed tag missing time/file rather than fabricating a value', () => {
+  const testcases = parseJUnitTestcases('<testcase name="broken" classname="test"/>\n' + SAMPLE_JUNIT_XML);
+  assert.equal(testcases.length, 4, 'the malformed leading tag must be skipped, not counted');
+});
+
+test('parseJUnitTestcases returns an empty array for empty or non-matching input', () => {
+  assert.deepEqual(parseJUnitTestcases(''), []);
+  assert.deepEqual(parseJUnitTestcases('<testsuites></testsuites>'), []);
+});
+
+test('summarizeProfile ranks top tests by time descending', () => {
+  const { topTests } = summarizeProfile(parseJUnitTestcases(SAMPLE_JUNIT_XML), { topN: 2 });
+  assert.equal(topTests.length, 2);
+  assert.equal(topTests[0].name, 'slow one');
+  assert.equal(topTests[1].name, 'state test');
+});
+
+test('summarizeProfile sums per-file totals and ranks files descending', () => {
+  const { topFiles } = summarizeProfile(parseJUnitTestcases(SAMPLE_JUNIT_XML));
+  const a = topFiles.find((f) => f.file === '/repo/test/cli/a.test.mjs');
+  assert.ok(a);
+  assert.ok(Math.abs(a.totalSeconds - 1.50315) < 1e-9);
+  assert.equal(a.count, 2);
+  assert.equal(topFiles[0].file, '/repo/test/cli/a.test.mjs', 'the file with the higher total must rank first');
+});
+
+test('summarizeProfile groups directory totals by the first path segment under test/, with a root bucket for direct test/*.test.mjs files', () => {
+  const { directoryTotals } = summarizeProfile(parseJUnitTestcases(SAMPLE_JUNIT_XML));
+  const cli = directoryTotals.find((d) => d.dir === 'cli');
+  const state = directoryTotals.find((d) => d.dir === 'state');
+  const root = directoryTotals.find((d) => d.dir === '(test root)');
+  assert.ok(cli && Math.abs(cli.totalSeconds - 1.50315) < 1e-9);
+  assert.ok(state && Math.abs(state.totalSeconds - 0.5) < 1e-9);
+  assert.ok(root && Math.abs(root.totalSeconds - 0.01) < 1e-9);
+});
+
+test('summarizeProfile never enforces or reports a timing threshold verdict -- R6 explicitly leaves that to a later pilot cell', () => {
+  const summary = summarizeProfile(parseJUnitTestcases(SAMPLE_JUNIT_XML));
+  assert.deepEqual(Object.keys(summary).sort(), ['directoryTotals', 'topFiles', 'topTests']);
+});
+
+// --- runProfile: wiring between runOneSample and the JUnit parser ---------
+
+test('runProfile forwards a --test-reporter=junit destination pointing at logDir/junit.xml, and reads back real testcases from the file the (mocked) child actually wrote', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-profile-'));
+  let capturedForwardedArgs = null;
+  const profile = runProfile({
+    logDir: dir,
+    hasTime: false,
+    checkClean: () => true,
+    environment: () => ({}),
+    spawn: (execPath, argv) => {
+      capturedForwardedArgs = argv;
+      // Simulates the real `node --test --test-reporter=junit
+      // --test-reporter-destination=<path>` child actually writing its
+      // report file before exiting 0.
+      const destFlag = argv.find((a) => a.startsWith('--test-reporter-destination='));
+      fs.writeFileSync(destFlag.slice('--test-reporter-destination='.length), SAMPLE_JUNIT_XML);
+      return { status: 0 };
+    },
+  });
+
+  assert.equal(profile.valid, true);
+  assert.ok(capturedForwardedArgs.includes('--test-reporter=junit'));
+  assert.equal(profile.junitPath, path.join(dir, 'junit.xml'));
+  assert.equal(profile.testcases.length, 4);
+});
+
+test('runProfile returns an empty testcases array (never throws) when the run is invalid', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-profile-'));
+  const profile = runProfile({
+    logDir: dir,
+    hasTime: false,
+    checkClean: () => true,
+    environment: () => ({}),
+    spawn: () => ({ status: 1 }),
+  });
+  assert.equal(profile.valid, false);
+  assert.deepEqual(profile.testcases, []);
 });
 
 // --- defaultTimedSpawn: real integration, past spawnSync's 1MB default buffer ---

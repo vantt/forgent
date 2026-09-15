@@ -198,6 +198,84 @@ export function runOneSample({
   };
 }
 
+// --- R3/R6: separate profile run, per-test/file machine-readable data -----
+
+/**
+ * Extracts every `<testcase name=".." time=".." classname=".." file=".."/>`
+ * self-closing element Node's own `--test-reporter=junit` emits (this
+ * repo's own retained baseline artifact,
+ * plans/reports/artifacts/260915-npm-test-baseline-224f0803/junit.xml, is
+ * the reference shape). A small regex extraction, not a full XML parser
+ * (KISS): the reporter's own output is flat, self-closing, and this
+ * function only reads the three attributes it needs -- attribute ORDER is
+ * never assumed, only that all three are present on the tag.
+ */
+export function parseJUnitTestcases(xml) {
+  const testcases = [];
+  const tagRe = /<testcase\b([^>]*?)\/>/g;
+  let m;
+  while ((m = tagRe.exec(xml)) !== null) {
+    const attrs = m[1];
+    const name = attrs.match(/\bname="([^"]*)"/)?.[1] ?? null;
+    const timeRaw = attrs.match(/\btime="([^"]*)"/)?.[1] ?? null;
+    const file = attrs.match(/\bfile="([^"]*)"/)?.[1] ?? null;
+    if (timeRaw === null || file === null) continue; // malformed/incomplete tag -- skip rather than fabricate
+    testcases.push({ name, time: Number(timeRaw), file });
+  }
+  return testcases;
+}
+
+/**
+ * Runs the full suite once more with a JUnit reporter, retaining the raw
+ * XML as a machine-readable artifact (R3). Never folded into the 3-sample
+ * wall-time median -- the reporter itself adds overhead the plain samples
+ * must stay free of (Adversarial: "profiling overhead mixed into baseline
+ * samples").
+ */
+export function runProfile({ logDir, junitPath, ...rest } = {}) {
+  const dir = logDir ?? fs.mkdtempSync(path.join(os.tmpdir(), 'test-timing-profile-'));
+  fs.mkdirSync(dir, { recursive: true });
+  const resolvedJunitPath = junitPath ?? path.join(dir, 'junit.xml');
+  const sample = runOneSample({
+    ...rest,
+    logDir: dir,
+    forwardedArgs: ['--test-reporter=junit', `--test-reporter-destination=${resolvedJunitPath}`, ...(rest.forwardedArgs ?? [])],
+  });
+  const testcases = sample.valid && fs.existsSync(resolvedJunitPath) ? parseJUnitTestcases(fs.readFileSync(resolvedJunitPath, 'utf8')) : [];
+  return { ...sample, junitPath: resolvedJunitPath, testcases };
+}
+
+/**
+ * Top-N slowest individual tests, top-N slowest files (summed test time per
+ * file), and per-directory (first path segment under `test/`) totals --
+ * R6's "top files/tests and directory totals", deliberately with no
+ * enforced timing threshold (a later pilot cell registers its own
+ * threshold against this data, per the Measurement Contract).
+ */
+export function summarizeProfile(testcases, { topN = 20 } = {}) {
+  const byFile = new Map();
+  const byDir = new Map();
+  for (const tc of testcases) {
+    const fileEntry = byFile.get(tc.file) ?? { file: tc.file, totalSeconds: 0, count: 0 };
+    fileEntry.totalSeconds += tc.time;
+    fileEntry.count += 1;
+    byFile.set(tc.file, fileEntry);
+
+    const relFromTest = tc.file.includes('/test/') ? tc.file.slice(tc.file.indexOf('/test/') + '/test/'.length) : tc.file;
+    const dir = relFromTest.includes('/') ? relFromTest.slice(0, relFromTest.indexOf('/')) : '(test root)';
+    const dirEntry = byDir.get(dir) ?? { dir, totalSeconds: 0, count: 0 };
+    dirEntry.totalSeconds += tc.time;
+    dirEntry.count += 1;
+    byDir.set(dir, dirEntry);
+  }
+
+  const topTests = [...testcases].sort((a, b) => b.time - a.time).slice(0, topN);
+  const topFiles = [...byFile.values()].sort((a, b) => b.totalSeconds - a.totalSeconds).slice(0, topN);
+  const directoryTotals = [...byDir.values()].sort((a, b) => b.totalSeconds - a.totalSeconds);
+
+  return { topTests, topFiles, directoryTotals };
+}
+
 /**
  * Aggregates N sample records into a report-ready summary. Throws (rather
  * than silently averaging over bad data) when any sample is invalid --
@@ -227,10 +305,19 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const sample = runOneSample({ forwardedArgs, logDir });
     console.log(JSON.stringify(sample, null, 2));
     process.exitCode = sample.valid ? 0 : 1;
+  } else if (mode === 'profile') {
+    const rest = process.argv.slice(3);
+    const logDirIdx = rest.indexOf('--log-dir');
+    const logDir = logDirIdx === -1 ? undefined : rest[logDirIdx + 1];
+    const forwardedArgs = logDirIdx === -1 ? rest : [...rest.slice(0, logDirIdx), ...rest.slice(logDirIdx + 2)];
+    const profile = runProfile({ logDir, forwardedArgs });
+    const summary = summarizeProfile(profile.testcases);
+    console.log(JSON.stringify({ ...profile, testcases: undefined, summary }, null, 2));
+    process.exitCode = profile.valid ? 0 : 1;
   } else if (mode === 'env') {
     console.log(JSON.stringify(gatherEnvironment(), null, 2));
   } else {
-    console.error('usage: node scripts/test-timing.mjs <sample|env> [-- extra run-tests.mjs args]');
+    console.error('usage: node scripts/test-timing.mjs <sample|profile|env> [--log-dir <dir>]');
     process.exitCode = 1;
   }
 }
