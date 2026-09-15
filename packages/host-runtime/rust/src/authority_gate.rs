@@ -184,6 +184,21 @@ impl CallerAdmission {
         self
     }
 
+    /// Returns true if this gate denies all callers.
+    pub fn is_denied_all(&self) -> bool {
+        self.deny_all
+    }
+
+    /// Returns the allowed principals set, if configured.
+    pub fn allowed_principals(&self) -> Option<&HashSet<String>> {
+        self.allowed_principals.as_ref()
+    }
+
+    /// Returns the admitted capabilities set, if configured.
+    pub fn admitted_capabilities(&self) -> Option<&HashSet<String>> {
+        self.admitted_capabilities.as_ref()
+    }
+
     /// Evaluates caller admission against the invocation and the operation catalog.
     pub fn admit(
         &self,

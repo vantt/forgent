@@ -8,6 +8,7 @@ pub mod registry;
 
 pub mod frame_codec;
 pub mod supervisor;
+pub mod adapter;
 
 pub use manifest::{
     parse_contract_ref, ExternalManifest, ExternalOperationDeclaration,
@@ -26,6 +27,7 @@ pub use frame_codec::{
 pub use supervisor::{
     ExternalProcessConfig, ExternalProcessOutcome, ExternalProcessRequest, ExternalProcessSupervisor,
 };
+pub use adapter::{ExternalProcessProviderAdapter, FIXTURE_PROCESS_DESCRIPTOR};
 
 /// Frozen fixture contract constants (R2-P0 / docs/platform/host-invocation-routing/verification/r2-external-process-proof.md#2)
 pub const FIXTURE_PROVIDER_ID: &str = "fixture.echo.process";

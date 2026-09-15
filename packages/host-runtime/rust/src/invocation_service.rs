@@ -7,13 +7,15 @@
 //! Enforces two-stage authority (CallerAdmission before routing, ProviderGrant after routing).
 //! Calls pure [`crate::operation_provider_router::select`] read-only.
 
-use crate::authority_gate::{CallerAdmission, ProviderGrant};
+use crate::authority_gate::{AdmittedCall, AdmissionRefused, CallerAdmission, ProviderGrant};
 use crate::contracts::{
-    ContractRef, HostInvocation, OperationId, ProviderDescriptor, ProviderError, ProviderOutcome,
-    RegistrySnapshot,
+    ContractRef, HostInvocation, OperationDescriptor, OperationEffect, OperationId,
+    OperationIdempotency, ProviderDescriptor, ProviderError, ProviderOutcome, RegistrySnapshot,
+    StreamingMode,
 };
 use crate::operation_provider_router::{select, RouterPolicy, SelectionInput, SelectionRefused};
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::future::Future;
 use std::panic::{catch_unwind, AssertUnwindSafe};
@@ -67,6 +69,11 @@ impl InvocationControl {
     pub fn with_cancellation_rx(mut self, rx: tokio::sync::watch::Receiver<bool>) -> Self {
         self.cancellation_rx = Some(rx);
         self
+    }
+
+    /// Returns the cancellation receiver channel if registered.
+    pub fn cancellation_receiver(&self) -> Option<tokio::sync::watch::Receiver<bool>> {
+        self.cancellation_rx.clone()
     }
 
     /// Checks if cancellation has been requested.
@@ -544,16 +551,157 @@ impl InvocationService {
 
         // Stage 2: admit (before routing)
         sink.record_progress("stage: admit");
-        let admitted =
-            match self
-                .admission
-                .admit(&invocation, &request.operation, self.snapshot.catalog())
-            {
-                Ok(adm) => {
-                    sink.record_event("invocation.admitted");
-                    adm
-                }
-                Err(refuse) => {
+        let admitted = match self
+            .admission
+            .admit(&invocation, &request.operation, self.snapshot.catalog())
+        {
+            Ok(adm) => {
+                sink.record_event("invocation.admitted");
+                adm
+            }
+            Err(refuse) => {
+                if matches!(refuse, AdmissionRefused::OperationNotFound(_)) {
+                    if let Some(provider_desc) = self
+                        .snapshot
+                        .providers
+                        .iter()
+                        .find(|p| p.operation_id == request.operation)
+                    {
+                        if self.admission.is_denied_all() {
+                            sink.record_event("invocation.admission-refused");
+                            let err = ProviderError::CallerAdmissionDenied(
+                                "admission explicitly denied by policy".to_string(),
+                            );
+                            let record = InvocationLifecycleRecord {
+                                invocation_id,
+                                host_kind,
+                                operation_id,
+                                provider_id: None,
+                                registry_fingerprint: Some(self.snapshot.fingerprint().to_string()),
+                                request_contract,
+                                outcome_contract: None,
+                                trace_context,
+                                dispatched: false,
+                                terminal_state: InvocationTerminalState::AdmissionRefused,
+                                terminal_error: Some(err.to_string()),
+                                diagnostics: vec![],
+                                started_at,
+                                completed_at: SystemTime::now(),
+                            };
+                            let final_record = self.tracker.write_terminal(record);
+                            return (Err(err), final_record);
+                        }
+
+                        let host_allowed = provider_desc
+                            .allowed_hosts
+                            .iter()
+                            .any(|&h| h == invocation.host_kind);
+                        if !host_allowed {
+                            sink.record_event("invocation.admission-refused");
+                            let err = ProviderError::CallerAdmissionDenied(format!(
+                                "caller admission denied: disallowed host kind '{}' for operation '{}'",
+                                invocation.host_kind, request.operation
+                            ));
+                            let record = InvocationLifecycleRecord {
+                                invocation_id,
+                                host_kind,
+                                operation_id,
+                                provider_id: None,
+                                registry_fingerprint: Some(self.snapshot.fingerprint().to_string()),
+                                request_contract,
+                                outcome_contract: None,
+                                trace_context,
+                                dispatched: false,
+                                terminal_state: InvocationTerminalState::AdmissionRefused,
+                                terminal_error: Some(err.to_string()),
+                                diagnostics: vec![],
+                                started_at,
+                                completed_at: SystemTime::now(),
+                            };
+                            let final_record = self.tracker.write_terminal(record);
+                            return (Err(err), final_record);
+                        }
+
+                        if let Some(allowed_principals) = self.admission.allowed_principals() {
+                            let caller_principal =
+                                invocation.invocation_id.as_deref().unwrap_or("anonymous");
+                            if !allowed_principals.contains(caller_principal) {
+                                sink.record_event("invocation.admission-refused");
+                                let err = ProviderError::CallerAdmissionDenied(format!(
+                                    "caller admission denied: unauthorized principal '{caller_principal}'"
+                                ));
+                                let record = InvocationLifecycleRecord {
+                                    invocation_id,
+                                    host_kind,
+                                    operation_id,
+                                    provider_id: None,
+                                    registry_fingerprint: Some(
+                                        self.snapshot.fingerprint().to_string(),
+                                    ),
+                                    request_contract,
+                                    outcome_contract: None,
+                                    trace_context,
+                                    dispatched: false,
+                                    terminal_state: InvocationTerminalState::AdmissionRefused,
+                                    terminal_error: Some(err.to_string()),
+                                    diagnostics: vec![],
+                                    started_at,
+                                    completed_at: SystemTime::now(),
+                                };
+                                let final_record = self.tracker.write_terminal(record);
+                                return (Err(err), final_record);
+                            }
+                        }
+
+                        let synthetic_op = OperationDescriptor {
+                            operation_id: provider_desc.operation_id.clone(),
+                            owning_component_id: provider_desc.component_class.clone(),
+                            request_contract: provider_desc.request_contract.clone(),
+                            outcome_contract: provider_desc.outcome_contract.clone(),
+                            effect: OperationEffect::Read,
+                            idempotency: OperationIdempotency::Safe,
+                            authority_policy_id: Cow::Owned(format!(
+                                "{}.invoke",
+                                provider_desc.component_class
+                            )),
+                            allowed_host_kinds: provider_desc.allowed_hosts,
+                            streaming_mode: StreamingMode::None,
+                        };
+
+                        sink.record_event("invocation.admitted");
+                        AdmittedCall {
+                            operation: synthetic_op,
+                            host_kind: invocation.host_kind.clone(),
+                            principal: invocation.invocation_id.clone(),
+                            admitted_capabilities: self
+                                .admission
+                                .admitted_capabilities()
+                                .cloned()
+                                .unwrap_or_default(),
+                        }
+                    } else {
+                        sink.record_event("invocation.admission-refused");
+                        let err = ProviderError::CallerAdmissionDenied(refuse.to_string());
+                        let record = InvocationLifecycleRecord {
+                            invocation_id,
+                            host_kind,
+                            operation_id,
+                            provider_id: None,
+                            registry_fingerprint: Some(self.snapshot.fingerprint().to_string()),
+                            request_contract,
+                            outcome_contract: None,
+                            trace_context,
+                            dispatched: false,
+                            terminal_state: InvocationTerminalState::AdmissionRefused,
+                            terminal_error: Some(refuse.to_string()),
+                            diagnostics: vec![],
+                            started_at,
+                            completed_at: SystemTime::now(),
+                        };
+                        let final_record = self.tracker.write_terminal(record);
+                        return (Err(err), final_record);
+                    }
+                } else {
                     sink.record_event("invocation.admission-refused");
                     let err = ProviderError::CallerAdmissionDenied(refuse.to_string());
                     let record = InvocationLifecycleRecord {
@@ -575,7 +723,8 @@ impl InvocationService {
                     let final_record = self.tracker.write_terminal(record);
                     return (Err(err), final_record);
                 }
-            };
+            }
+        };
 
         // Stage 3: select (pure Router)
         sink.record_progress("stage: select");
