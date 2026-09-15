@@ -392,7 +392,17 @@ impl ExternalProcessSupervisor {
                     // Handshake successfully completed!
                     break;
                 }
+                Ok(Ok(FrameMessage::Notification(_))) => {
+                    continue;
+                }
                 Ok(Ok(other)) => {
+                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                        kill_child(&mut child);
+                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                        return Err(ProviderError::ProtocolViolation(format!(
+                            "protocol violation during handshake: {err}{stderr_tail}"
+                        )));
+                    }
                     kill_child(&mut child);
                     let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
@@ -400,6 +410,13 @@ impl ExternalProcessSupervisor {
                     )));
                 }
                 Ok(Err(codec_err)) => {
+                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                        kill_child(&mut child);
+                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                        return Err(ProviderError::ProtocolViolation(format!(
+                            "protocol violation during handshake: {err}{stderr_tail}"
+                        )));
+                    }
                     kill_child(&mut child);
                     let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
@@ -460,7 +477,17 @@ impl ExternalProcessSupervisor {
                                     }
                                     break 'handshake;
                                 }
+                                Ok(Ok(FrameMessage::Notification(_))) => {
+                                    continue;
+                                }
                                 Ok(Ok(other)) => {
+                                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                        kill_child(&mut child);
+                                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "protocol violation during handshake: {err}{stderr_tail}"
+                                        )));
+                                    }
                                     kill_child(&mut child);
                                     let stderr_tail = format_stderr_tail(&stderr_captured);
                                     return Err(ProviderError::ProtocolViolation(format!(
@@ -468,6 +495,13 @@ impl ExternalProcessSupervisor {
                                     )));
                                 }
                                 Ok(Err(codec_err)) => {
+                                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                        kill_child(&mut child);
+                                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "protocol violation during handshake: {err}{stderr_tail}"
+                                        )));
+                                    }
                                     kill_child(&mut child);
                                     let stderr_tail = format_stderr_tail(&stderr_captured);
                                     return Err(ProviderError::ProtocolViolation(format!(
@@ -621,7 +655,17 @@ impl ExternalProcessSupervisor {
                     kill_child(&mut child);
                     return Ok(outcome);
                 }
+                Ok(Ok(FrameMessage::Notification(_))) => {
+                    continue;
+                }
                 Ok(Ok(other)) => {
+                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                        kill_child(&mut child);
+                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                        return Err(ProviderError::ProtocolViolation(format!(
+                            "protocol violation: {err}{stderr_tail}"
+                        )));
+                    }
                     kill_child(&mut child);
                     let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
@@ -629,6 +673,13 @@ impl ExternalProcessSupervisor {
                     )));
                 }
                 Ok(Err(codec_err)) => {
+                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                        kill_child(&mut child);
+                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                        return Err(ProviderError::ProtocolViolation(format!(
+                            "protocol violation: {err}{stderr_tail}"
+                        )));
+                    }
                     kill_child(&mut child);
                     let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
@@ -699,7 +750,17 @@ impl ExternalProcessSupervisor {
                                     kill_child(&mut child);
                                     return Ok(outcome);
                                 }
+                                Ok(Ok(FrameMessage::Notification(_))) => {
+                                    continue;
+                                }
                                 Ok(Ok(other)) => {
+                                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                        kill_child(&mut child);
+                                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "protocol violation: {err}{stderr_tail}"
+                                        )));
+                                    }
                                     kill_child(&mut child);
                                     let stderr_tail = format_stderr_tail(&stderr_captured);
                                     return Err(ProviderError::ProtocolViolation(format!(
@@ -707,6 +768,13 @@ impl ExternalProcessSupervisor {
                                     )));
                                 }
                                 Ok(Err(codec_err)) => {
+                                    if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                        kill_child(&mut child);
+                                        let stderr_tail = format_stderr_tail(&stderr_captured);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "protocol violation: {err}{stderr_tail}"
+                                        )));
+                                    }
                                     kill_child(&mut child);
                                     let stderr_tail = format_stderr_tail(&stderr_captured);
                                     return Err(ProviderError::ProtocolViolation(format!(
