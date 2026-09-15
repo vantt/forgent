@@ -14,6 +14,12 @@ const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha2
 function lockFile(root) { return path.join(root, '.fgos', 'dispatch.lock'); }
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
 function localLock(root) { return path.join(root, '.fgos', 'dispatch', 'reconcile.lock'); }
+// Plans arrive over a public CLI boundary.  A path in one is descriptive only;
+// apply derives its actual target from the trusted root and action kind.
+function canonicalAction(root, kind) {
+  if (kind === 'clear-cwd-lock') return { kind, path: lockFile(root) };
+  return null;
+}
 function records(root) { try { return fs.readFileSync(actionLog(root), 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse); } catch { return []; } }
 function holder(lock) {
   if (!lock || typeof lock !== 'object' || !Number.isInteger(lock.pid) || lock.pid < 1) return { state: 'unparseable' };
@@ -27,15 +33,15 @@ function holder(lock) {
 }
 
 export function planReconciliation(root, { action = 'clear-cwd-lock', now = new Date().toISOString(), ttlMs = 300000 } = {}) {
-  if (action !== 'clear-cwd-lock') return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
-  const file = lockFile(root), raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
+  const proposedAction = canonicalAction(root, action);
+  if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
+  const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
   if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
   if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
   const proof = holder(lock);
   if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
   if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
   const snapshot = { digest: digest({ raw }), controlEpoch: lock.controlEpoch ?? null, resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
-  const proposedAction = { kind: action, path: file };
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
 }
 
@@ -46,17 +52,25 @@ function withLocalLock(root, fn) {
 }
 
 export function applyReconciliation(root, plan, { now = new Date().toISOString() } = {}) {
-  if (!plan?.actionKey || !plan?.snapshot || plan?.proposedAction?.kind !== 'clear-cwd-lock') return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+  const canonical = canonicalAction(root, plan?.proposedAction?.kind);
+  if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+  // Do this before looking up a prior record: a replay must not turn a
+  // caller-controlled path/action-key combination into an authorization.
+  if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
   return withLocalLock(root, () => {
     const prior = records(root).find((r) => r.actionKey === plan.actionKey);
     if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
     if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
-    const fresh = planReconciliation(root, { action: plan.proposedAction.kind, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
+    const fresh = planReconciliation(root, { action: canonical.kind, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
     if (fresh.outcome !== 'planned' || stable(fresh.snapshot) !== stable(plan.snapshot)) return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'guard facts changed since planning' };
-    // Re-read exact bytes immediately before unlink: this protects a successor.
-    const raw = fs.readFileSync(plan.proposedAction.path, 'utf8');
+    const expectedActionKey = actionKey(fresh.snapshot, canonical, fresh.snapshot.expiresAt);
+    if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
+    // Re-read the canonical guard bytes immediately before unlink.  The
+    // unlink remains deliberately confined even if a serialized plan is
+    // tampered with after planning.
+    const raw = fs.readFileSync(canonical.path, 'utf8');
     if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'cwd lock changed since planning' };
-    fs.unlinkSync(plan.proposedAction.path);
+    fs.unlinkSync(canonical.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
