@@ -24,7 +24,7 @@
     "docs/enduser-docs-index.json"
   ],
   "scripts": {
-    "test": "FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'",
+    "test": "node scripts/run-tests.mjs",
     "setup:hooks": "node scripts/install-git-hooks.mjs",
     "cli": "node bin/fgos.mjs",
     "build:skills": "node scripts/build-skill-wrappers.mjs"

@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
+  discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
+  `node --test` with an explicit file-argument array, instead of a
+  shell-globbed `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
+  string. The old form silently selected zero files on the CI Ubuntu/macOS
+  Node 20 lane (no built-in glob support for that Node version) and failed
+  outright on Windows's default `cmd.exe` npm shell (POSIX `VAR=value`
+  env-assignment syntax is not valid there); the new runner sets that env var
+  on the spawned child directly and works unchanged across OS/shell.
 - Packaging-distribution release posture is now preview with Rust host as the
   default installed runtime for external installs; legacy Node fallback is
   deprecated and kept only as an explicit escape hatch for 30 calendar days
