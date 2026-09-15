@@ -158,6 +158,12 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
   state. Each waits for a second real consumer (ADR-007 §4 bar).
 - Test selection, caching, tiering.
 
+## Cell status
+
+| Cell | Merge commit | Review / red-team | Deferred findings |
+|---|---|---|---|
+| P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |
+
 ## Open decision (owner)
 
 Test-suite track: keep full-per-cell for all phases (Invariant #2 as written)
