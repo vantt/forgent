@@ -134,8 +134,11 @@ lifecycle verify/reverify ↔ gate/final full suite):
 |---|---|---|---|
 | 01 | [phase-01-authoring-template-and-coding-fragment.md](phase-01-authoring-template-and-coding-fragment.md) | `docs/how-to/author-a-plan-loop-track.md`; `domains/coding/instructions/verification-discipline.md` | A stranger Lead can author a track whose phases name targeted commands, mark gates, record baseline, precedence/compatibility, durable evidence schema (`coordination-accepted`, `merged-to-track`, `checkpoint-verified`), checkpoint identity (`testedSha`, `integratedSha`), escalation authority (accept / evidence-backed reject, current cell only), and non-inference rule; fragment passes `discoverInstructionSources` + composition with no conflict |
 | 02 | [phase-02-plan-loop-wording-and-routing.md](phase-02-plan-loop-wording-and-routing.md) | `fgos-plan-loop` baseline step + generic verification/proof-sufficiency sentences + close wording (durable evidence states, checkpoint identity, escalation authority, non-inference when `testedSha != integratedSha`) + description routing; `fgos-code-panel` one routing line; rebuilt projections | No code-kind branch in `core/`; wrapper/projection tests green; close wording enforces evidence lifecycle and checkpoint identity; "run this code implementation plan" routes to plan-loop |
+| 03 | (no `phase-NN.md` — mid-session real-time user redirection during P01/P02's own review, not a pre-authored phase: "mục tiêu thật của việc làm này là phải cải thiện hiệu suất của code panel") | `fgos-code-panel`'s focused/affected/full proof-tier contract (the actual goal); 4 fixed contract bugs in `fgos-plan-loop`/the how-to: tree-identity+environment-fingerprint exception, exact-names baseline with environmental-transient/precondition split, proof-gap-never-deferred, baseline-count correction (103→51) | Commits `4f1010a5` + `ba29344c` on this branch; reviewed+red-teamed clean (7 MEDIUM+6 LOW and 2 HIGH+2 MEDIUM found and fixed, 1 LOW attack failed); full suite 51/51 matches corrected baseline, 0 new; targeted 167/167 pass |
 
-Dependency: 01 → 02 (02 links to the how-to). Both land in one cell on one
+Dependency: 01 → 02 (02 links to the how-to). P03 has no phase file and depends
+on P01+P02's shipped policy being live to review; it lands on its own cell.
+Phases 01+02 both land in one cell on one
 branch; `code:implement` capability for the skill edits, docs otherwise.
 
 ## Acceptance (track)
