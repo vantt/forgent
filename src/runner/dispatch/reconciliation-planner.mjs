@@ -8,28 +8,78 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { inspectDispatchRuntime } from './runtime-inspection.mjs';
+import { inspectDispatchRuntime, findCoordinationSessionOwningAssignment } from './runtime-inspection.mjs';
+// visibility-session.mjs's own import graph is fs/path + worker-artifacts.mjs
+// (also fs/path only) -- no adapter/process-control, so importing its
+// RUN_STATUSES vocabulary here does not widen this module's excluded-import
+// boundary (see the file-top comment and the static import-graph test in
+// test/runner/dispatch-reconciliation-import-graph.test.mjs).
+import { RUN_STATUSES } from './visibility-session.mjs';
 
 const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map(stable).join(',')}]` : `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`) : JSON.stringify(v);
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
-const startTime = (pid) => { try { return fs.readFileSync(`/proc/${pid}/stat`, 'utf8').trim().split(' ')[21] ?? null; } catch { return null; } };
+// Paren-aware /proc/<pid>/stat parser, deliberately kept as its own copy
+// rather than importing cli-spawn-supervisor.mjs's getProcessStartTime: that
+// module is the cli-spawn ADAPTER (it also owns child_process.spawn, worker
+// PGID signalling, receipt publication) and importing any one export from it
+// would put the whole adapter/process-control module on this file's import
+// graph, which the file-top comment and H4's static import-graph test both
+// forbid. The algorithm below is intentionally byte-identical to
+// getProcessStartTime's: split on the LAST ")" so a comm field containing
+// spaces or parens (e.g. "(some (weird) name)") never desyncs the fixed-index
+// fields that follow it, then take field 19 (starttime) of the
+// space-separated remainder. A regression test in
+// test/runner/dispatch-reconciliation.test.mjs pins the two parsers to
+// agreement on a comm-with-space fixture.
+function startTime(pid) {
+  let stat;
+  try {
+    stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
+  } catch (err) {
+    // ENOENT (or ESRCH-shaped absence) proves the incarnation is gone -- the
+    // caller's holder() below is entitled to read that as dead. Anything
+    // else (EACCES, EIO, ...) is a read failure that proves nothing about
+    // whether the process exists, so it must propagate as "we could not
+    // read this" (return undefined), never be folded into the same `null`
+    // "confirmed absent" signal absence-by-ENOENT uses.
+    return err && err.code === 'ENOENT' ? null : undefined;
+  }
+  const lastParen = stat.lastIndexOf(')');
+  if (lastParen === -1) return undefined;
+  const rest = stat.slice(lastParen + 2).split(' ');
+  return rest[19] || null;
+}
 const expires = (now, ttlMs) => new Date(Date.parse(now) + ttlMs).toISOString();
+// Reuse visibility-session.mjs's own RUN_STATUSES vocabulary rather than
+// inventing a second one -- this assertion is a load-time tripwire, not a
+// per-call check, against that vocabulary ever dropping 'settled'.
+const SETTLED_STATUS = 'settled';
+if (!RUN_STATUSES.includes(SETTLED_STATUS)) throw new Error('reconciliation-planner: repair-projection target status must be a member of visibility-session.mjs RUN_STATUSES');
 const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha256').update(stable({ snapshot, action, expiresAt })).digest('hex')}`;
 
 function lockFile(root) { return path.join(root, '.fgos', 'dispatch.lock'); }
 // Per-Assignment counterpart to lockFile's per-cwd `dispatch.lock`: the same
 // holder-identity guard shape (pid/startTime/controlEpoch, see `holder()`
-// below), scoped to one Assignment instead of one cwd. No writer in this
-// codebase creates this file yet -- D04/D05 committed the design authority
-// (plans/260914-dispatch-operability-evidence-attribution) but explicitly
-// deferred implementation, and the acquire-side writer belongs to whichever
-// future cell adds Assignment-level launch/drive exclusivity. Until then,
-// `clear-assignment-claim` legitimately reports `blocked: 'no assignment
-// claim exists'` for every real Assignment -- the same shape clear-cwd-lock
-// reports before any cwd lock has ever been written, and the same reason
-// test fixtures for both actions write this file directly rather than
-// relying on a real writer (see dispatch-reconciliation.test.mjs).
+// below), scoped to one Assignment instead of one cwd. A real writer DOES
+// exist: coordination/session-engine.mjs's `createAndExecuteSessionTask`
+// creates this exact file (0 bytes, `fs.openSync(dispatchClaimPath, 'wx')`,
+// src/runner/coordination/session-engine.mjs) as a CoordinationSession's own
+// in-process dispatch-exclusivity marker -- never populated with
+// pid/startTime/controlEpoch content the way `dispatch.lock` is, and never
+// removed on success (see that function's own doc comment). Because it
+// carries no holder identity, `holder()` below can only ever read it as
+// corrupt/unparseable; the CoordinationSession-ownership check in
+// `planClearAssignmentClaim` (via `findCoordinationSessionOwningAssignment`)
+// refuses BEFORE that parse is even attempted, matching collect-result's own
+// CoordinationSession refusal. D04/D05 (plans/260914-dispatch-operability-
+// evidence-attribution) separately deferred a STANDALONE (non-session)
+// Assignment-level launch/drive exclusivity writer -- for that case,
+// `clear-assignment-claim` still legitimately reports `blocked: 'no
+// assignment claim exists'`, the same shape clear-cwd-lock reports before
+// any cwd lock has ever been written, and non-session test fixtures for both
+// actions write this file directly rather than relying on a real writer
+// (see dispatch-reconciliation.test.mjs).
 function assignmentClaimFile(root, assignmentId) { return path.join(root, '.fgos', 'assignments', assignmentId, 'dispatch.claim'); }
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
 function localLock(root) { return path.join(root, '.fgos', 'dispatch', 'reconcile.lock'); }
@@ -46,8 +96,14 @@ function holder(lock) {
   const recorded = String(lock.startTime ?? lock.processStartTime ?? '');
   const actual = startTime(lock.pid);
   if (!recorded) return { state: 'ambiguous', pid: lock.pid };
-  // An absent proc entry proves the recorded incarnation is gone.  A reused
-  // pid (different start time) proves this incarnation is gone too.
+  // startTime() returning `undefined` means the read itself failed for a
+  // reason OTHER than the process being gone (EACCES, EIO, an unparseable
+  // /proc line) -- that is a fact we could not observe, not proof of death,
+  // so it must fall to the same 'ambiguous' -> needs-input outcome as a
+  // holder with no recorded start time at all. Only a confirmed absence
+  // (`null`, ENOENT) or a confirmed mismatch (a live but different
+  // incarnation reusing the pid) counts as proof of death.
+  if (actual === undefined) return { state: 'ambiguous', pid: lock.pid };
   if (actual === null || actual !== recorded) return { state: 'dead', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
   return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
 }
@@ -148,6 +204,19 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
   if (typeof assignmentId !== 'string' || !assignmentId.trim()) return { outcome: 'refused', reason: 'clear-assignment-claim requires an assignmentId' };
   const view = inspectDispatchRuntime(root, { assignment: assignmentId });
   if (view.inspectionStatus === 'not-found') return { outcome: 'blocked', reason: 'no matching Assignment was found for clear-assignment-claim' };
+  // A CoordinationSession-owned claim (session-engine.mjs's own exclusivity
+  // marker, see assignmentClaimFile's doc comment above) is refused before
+  // any settlement/admission facts are even consulted: clearing it belongs
+  // to that session's own recovery door, never this narrow guard repair --
+  // the same refusal shape planCollectResult already applies to a
+  // CoordinationSession-owned Run. Checked ahead of the corrupt/unparseable
+  // branch below too, since a 0-byte session claim would otherwise only ever
+  // reach that generic "needs-input" outcome, which does not name the real
+  // owning door.
+  const sessionOwner = findCoordinationSessionOwningAssignment(root, assignmentId);
+  if (sessionOwner) {
+    return { outcome: 'refused', reason: `owning authority is a CoordinationSession ("${sessionOwner.id}"); clearing its dispatch.claim belongs to its own recovery door (${sessionOwner.observeCommand}), not dispatch.runtime.reconcile` };
+  }
   const obs = view.observations?.[0]?.value ?? {};
   const currentRunIds = obs.currentRunIds ?? [];
   const missingMaterializations = obs.missingMaterializations ?? [];
@@ -184,13 +253,18 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-pending-result-collection', 'no-admitted-unsettled-run-or-pending-launch'] };
 }
 
-// repair-projection additively patches run.json.phase to 'settled' when an
+// repair-projection additively patches run.json.status to 'settled' when an
 // already-validated, immutable terminal RunResult proves the Run finished
-// but the cached local projection marker (run.json.phase) still reads
-// something stale like 'running' -- the crash window this closes is a
-// supervisor/writer that wrote result.json but died before stamping
-// run.json.phase to agree with it. Like collect-result and
-// clear-assignment-claim, it never derives Run/result facts itself: it
+// but the real production settlement marker (run.json.status --
+// visibility-session.mjs's markRunSettled/RUN_STATUSES, read by
+// findRunningRuns, watch.mjs, and classifyRunOutcome) still reads a
+// non-terminal value like 'running' -- the crash window this closes is a
+// supervisor/writer that wrote result.json but died before calling
+// markRunSettled to stamp run.json.status to agree with it. (An earlier
+// version of this action targeted a `run.json.phase` field that no
+// production writer ever set -- `status` is the one real marker every
+// reader above actually consults; fixed as part of H1.) Like collect-result
+// and clear-assignment-claim, it never derives Run/result facts itself: it
 // reuses inspectDispatchRuntime's --run view verbatim (the SAME RunResult
 // interpretation runtime-inspection.mjs's `one()` already performs, backed
 // by run-result.mjs's single interpretRunResult path), so this guard can
@@ -207,16 +281,17 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
 // controlEpoch) makes the plan stale instead of letting a repair land on
 // top of a newer incarnation's state.
 //
-// A phase that is already absent or already 'settled' is not a supported
-// precondition failing incompletely -- runtime-inspection.mjs's own `one()`
-// already derives 'settled' for an absent phase once a terminal result is
-// present (line: `phase = l.run.phase ?? (terminal.present ? 'settled' :
-// ...)`), so there is nothing for a caller to observe as wrong. Reported
-// `blocked`, matching every other "nothing to act on" case in this module
-// (clear-cwd-lock's "no cwd lock exists", clear-assignment-claim's "no
-// assignment claim exists", collect-result's "no result exists yet") rather
-// than a silent no-op `applied` that would falsely claim a mutation
-// happened.
+// Unlike the retired `phase` field, `status` DOES have a real writer (every
+// materialized run.json starts life with a status, per visibility-session.mjs's
+// own doc comment), so an absent status is itself part of the defect this
+// module exists to close, not a legitimately-already-correct state -- it is
+// treated as stale (repairable) exactly like 'running'/'died'/'unknown'.
+// Only `status === 'settled'` already matches what a terminal RunResult
+// proves, so only that value is reported `blocked` ("nothing to repair"),
+// matching every other "nothing to act on" case in this module (clear-cwd-
+// lock's "no cwd lock exists", clear-assignment-claim's "no assignment claim
+// exists", collect-result's "no result exists yet") rather than a silent
+// no-op `applied` that would falsely claim a mutation happened.
 function planRepairProjection(root, { runId, now, ttlMs }) {
   if (typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'repair-projection requires a runId' };
   const view = inspectDispatchRuntime(root, { run: runId });
@@ -236,11 +311,11 @@ function planRepairProjection(root, { runId, now, ttlMs }) {
     throw err;
   }
   const runMeta = json(path.join(runDir, 'run.json')) ?? {};
-  const currentPhase = runMeta.phase ?? null;
-  if (currentPhase === null || currentPhase === 'settled') return { outcome: 'blocked', reason: 'run.json.phase already reflects settlement; nothing to repair' };
-  const snapshot = { digest: digest({ raw }), runId, currentPhase, controlEpoch: runMeta.controlEpoch ?? null, expiresAt: expires(now, ttlMs) };
+  const currentStatus = runMeta.status ?? null;
+  if (currentStatus === SETTLED_STATUS) return { outcome: 'blocked', reason: 'run.json.status already reflects settlement; nothing to repair' };
+  const snapshot = { digest: digest({ raw }), runId, currentStatus, controlEpoch: runMeta.controlEpoch ?? null, expiresAt: expires(now, ttlMs) };
   const proposedAction = { kind: 'repair-projection', runId, path: path.join(runDir, 'run.json') };
-  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['terminal-result-valid', 'phase-stale', 'projection-epoch-matches'] };
+  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['terminal-result-valid', 'status-stale', 'projection-epoch-matches'] };
 }
 
 function withLocalLock(root, fn) {
@@ -341,10 +416,26 @@ function applyClearAssignmentClaim(root, plan, { now }) {
 }
 
 // Delete-semantics siblings above unlink a file; repair-projection instead
-// additively patches one field on an existing file, the same shape as
+// additively patches run.json.status the same way visibility-session.mjs's
+// own markRunSettled does (status + settledAt), the same shape as
 // applyCollectResult -- kept as its own function for the same reason
 // collect-result is: its target depends on a caller-supplied runId that
 // canonicalAction()'s (root, kind) shape cannot carry.
+//
+// This deliberately does NOT call markRunSettled itself, for two reasons:
+//   1. markRunSettled stamps `settledAt` from its own `new Date()`, not from
+//      the `now` this reconcile apply path threads through every other CAS
+//      check and every other companion-timestamp write (collect-result's
+//      own `resultCollectedAt: now`) -- calling it would make this the one
+//      apply path with a non-deterministic, untestable timestamp.
+//   2. markRunSettled does its own unconditional read-then-write with no
+//      CAS re-verification; folding it in here would bypass the
+//      digest/controlEpoch re-check this function already performs
+//      immediately before the write (the same tmp+rename write already used
+//      by every other action in this file).
+// The field shape it writes (`status`, `settledAt`) is copied verbatim from
+// markRunSettled so the two paths can never disagree about what "settled"
+// looks like on disk.
 function applyRepairProjection(root, plan, { now }) {
   const runId = plan?.proposedAction?.runId;
   if (!plan?.actionKey || !plan?.snapshot || typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
@@ -363,7 +454,7 @@ function applyRepairProjection(root, plan, { now }) {
     if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
     const runDir = path.dirname(plan.proposedAction.path);
     // Writer parity with applyCollectResult's own pre-mutation re-read: the
-    // goal state (an explicit 'settled' phase) is never satisfied by an
+    // goal state (an explicit 'settled' status) is never satisfied by an
     // absent result, so ENOENT here is always plan-stale, never "goal
     // already achieved".
     let raw;
@@ -382,7 +473,7 @@ function applyRepairProjection(root, plan, { now }) {
       throw err;
     }
     const tmp = `${plan.proposedAction.path}.tmp-${process.pid}-${Date.now().toString(36)}`;
-    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, phase: 'settled' }, null, 2)}\n`);
+    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, status: SETTLED_STATUS, settledAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
     return { outcome: 'applied', actionKey: plan.actionKey };

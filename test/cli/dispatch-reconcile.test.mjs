@@ -40,7 +40,7 @@ test('CLI plans repair-projection through --action and --run, and refuses it wit
   fs.writeFileSync(path.join(assignmentDir, 'assignment.json'), JSON.stringify({ assignmentId: 'a' }));
   const runDir = path.join(assignmentDir, 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ assignmentId: 'a', runId: 'run-1', phase: 'running' }));
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ assignmentId: 'a', runId: 'run-1', status: 'running' }));
   fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'run-1', assignmentId: 'a', status: 'done', confidence: 'reported' }));
   const admissionDir = path.join(assignmentDir, 'admission', 'generations');
   fs.mkdirSync(admissionDir, { recursive: true });
@@ -53,7 +53,7 @@ test('CLI plans repair-projection through --action and --run, and refuses it wit
   assert.equal(applied.status, 0, applied.stderr);
   assert.equal(JSON.parse(applied.stdout).data.outcome, 'applied');
   const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
-  assert.equal(runJson.phase, 'settled');
+  assert.equal(runJson.status, 'settled');
   const missingRunId = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'repair-projection']);
   assert.equal(missingRunId.status, 0, missingRunId.stderr);
   assert.equal(JSON.parse(missingRunId.stdout).data.outcome, 'refused');

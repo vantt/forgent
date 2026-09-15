@@ -45,6 +45,60 @@ test('planReconciliation refuses a live holder (real resource-incarnation match)
   assert.match(plan.reason, /live/);
 });
 
+test('holder() start-time parser is paren-aware: a comm field containing a space does not desync the starttime column, so a live holder with such a comm is still detected live', () => {
+  const dir = root();
+  const original = fs.readFileSync;
+  const realStat = original.call(fs, `/proc/${process.pid}/stat`, 'utf8');
+  const realLastParen = realStat.lastIndexOf(')');
+  const realRest = realStat.slice(realLastParen + 2);
+  // Splice in a comm field containing a space -- if the parser naively
+  // split(' ') the whole line from the start, this would desync every
+  // fixed-index field after it (including starttime) by one or more
+  // positions; the paren-aware parser must still agree with the real
+  // starttime because it anchors on the LAST ')', which this synthetic
+  // stat line still has exactly one of.
+  const syntheticStat = `${process.pid} (some weird name)${realRest}`;
+  fs.readFileSync = function patchedReadFileSync(file, ...rest) {
+    if (file === `/proc/${process.pid}/stat`) return syntheticStat;
+    return original.call(fs, file, ...rest);
+  };
+  let plan;
+  try {
+    const realStartTime = realRest.split(' ')[19];
+    fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: realStartTime }));
+    plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  } finally {
+    fs.readFileSync = original;
+  }
+  assert.equal(plan.outcome, 'refused', 'a comm-with-space live holder must still be detected live, not miscounted as a different/dead incarnation');
+  assert.match(plan.reason, /live/);
+});
+
+test('holder() treats an unreadable (non-ENOENT) /proc read as ambiguous, never as proof of death', () => {
+  const dir = root();
+  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: 'some-recorded-start-time' }));
+  const original = fs.readFileSync;
+  fs.readFileSync = function patchedReadFileSync(file, ...rest) {
+    if (file === `/proc/${process.pid}/stat`) {
+      const err = new Error('EACCES: permission denied');
+      err.code = 'EACCES';
+      throw err;
+    }
+    return original.call(fs, file, ...rest);
+  };
+  let plan;
+  try {
+    plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  } finally {
+    fs.readFileSync = original;
+  }
+  // Must NOT be 'refused' (dead-cleared) or 'planned' (would let the caller
+  // proceed to unlink a holder we could not actually prove is dead) -- an
+  // unreadable /proc entry proves nothing either way.
+  assert.notEqual(plan.outcome, 'planned', 'an unreadable /proc entry must never be treated as proven-dead');
+  assert.equal(plan.outcome, 'needs-input');
+});
+
 test('apply detects a controlEpoch change on the still-dead holder between planning and apply as plan-stale', () => {
   const dir = root();
   fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1', controlEpoch: 1 }));
@@ -259,6 +313,25 @@ test('reconcile clear-assignment-claim blocks when the current Run settled but i
   assert.equal(claimPlan.outcome, 'planned');
 });
 
+test('reconcile clear-assignment-claim refuses a CoordinationSession-owned claim: clearing it belongs to its own recovery door, not this one', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  // A real session-engine.mjs claim is 0 bytes -- no holder identity at all,
+  // which on its own would only ever reach the generic corrupt/unparseable
+  // needs-input branch. The CoordinationSession-ownership check must refuse
+  // BEFORE that parse is attempted, naming the real owning door.
+  const claimDir = path.join(dir, '.fgos', 'assignments', 'a');
+  fs.mkdirSync(claimDir, { recursive: true });
+  fs.writeFileSync(path.join(claimDir, 'dispatch.claim'), '');
+  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', 'sess-1');
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(path.join(sessionDir, 'session.json'), JSON.stringify({ assignmentRefs: ['a'] }));
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'refused');
+  assert.match(plan.reason, /CoordinationSession/);
+  assert.equal(fs.existsSync(path.join(claimDir, 'dispatch.claim')), true);
+});
+
 test('reconcile clear-assignment-claim needs-input on a corrupt/unparseable claim, and on conflicting admission facts', () => {
   const dir = root();
   assignmentDir(dir, 'a');
@@ -288,19 +361,20 @@ test('reconcile clear-assignment-claim refuses without an assignmentId, and is b
   assert.equal(unknown.outcome, 'blocked');
 });
 
-test('reconcile repair-projection rewrites a stale "running" phase to settled once a valid terminal RunResult exists, and replay is idempotent', () => {
+test('reconcile repair-projection rewrites a stale "running" status to settled once a valid terminal RunResult exists, and replay is idempotent', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-stale', phase: 'running', controlEpoch: 1 }, legacyResult('run-stale', 'a'));
+  runDirFor(dir, 'a', '01', { runId: 'run-stale', status: 'running', controlEpoch: 1 }, legacyResult('run-stale', 'a'));
   admitGen(dir, 'a', 1, { runId: 'run-stale', attempt: 1 });
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-stale', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   assert.equal(plan.proposedAction.kind, 'repair-projection');
-  assert.equal(plan.snapshot.currentPhase, 'running');
+  assert.equal(plan.snapshot.currentStatus, 'running');
   const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(applied.outcome, 'applied');
   const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
-  assert.equal(runJson.phase, 'settled');
+  assert.equal(runJson.status, 'settled');
+  assert.equal(runJson.settledAt, '2026-09-15T00:00:01.000Z', 'settledAt must use reconcile\'s own injected now, not wall-clock time');
   assert.equal(runJson.runId, 'run-stale', 'the patch must be additive, never dropping existing run.json fields');
   assert.equal(runJson.controlEpoch, 1, 'the patch must preserve the unrelated controlEpoch field');
   const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
@@ -311,7 +385,7 @@ test('reconcile repair-projection rewrites a stale "running" phase to settled on
 test('reconcile repair-projection action-key replay returns the recorded outcome without re-mutating', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-stale-2', phase: 'running' }, legacyResult('run-stale-2', 'a'));
+  runDirFor(dir, 'a', '01', { runId: 'run-stale-2', status: 'running' }, legacyResult('run-stale-2', 'a'));
   admitGen(dir, 'a', 1, { runId: 'run-stale-2', attempt: 1 });
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-stale-2', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'applied');
@@ -319,13 +393,13 @@ test('reconcile repair-projection action-key replay returns the recorded outcome
   assert.equal(replay.outcome, 'already-applied');
   assert.equal(replay.priorOutcome, 'applied');
   const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
-  assert.equal(runJson.phase, 'settled', 'the replay must not re-run the mutation');
+  assert.equal(runJson.status, 'settled', 'the replay must not re-run the mutation');
 });
 
 test('reconcile repair-projection is blocked (not refused) when no terminal result exists yet, and refuses without a runId', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-pending', phase: 'running' });
+  runDirFor(dir, 'a', '01', { runId: 'run-pending', status: 'running' });
   admitGen(dir, 'a', 1, { runId: 'run-pending', attempt: 1 });
   const pending = planReconciliation(dir, { action: 'repair-projection', runId: 'run-pending', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(pending.outcome, 'blocked');
@@ -337,47 +411,55 @@ test('reconcile repair-projection is blocked (not refused) when no terminal resu
 test('reconcile repair-projection needs-input on a corrupt/contract-corrupt result and never repairs on unproven settlement', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-corrupt', phase: 'running' }, { contract: { id: 'assignment-run-result', version: 2 }, runId: 'run-corrupt' });
+  runDirFor(dir, 'a', '01', { runId: 'run-corrupt', status: 'running' }, { contract: { id: 'assignment-run-result', version: 2 }, runId: 'run-corrupt' });
   admitGen(dir, 'a', 1, { runId: 'run-corrupt', attempt: 1 });
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-corrupt', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'needs-input');
   assert.match(plan.reason, /corrupt/);
   const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
-  assert.equal(runJson.phase, 'running', 'an unproven result must never trigger a repair');
+  assert.equal(runJson.status, 'running', 'an unproven result must never trigger a repair');
 });
 
-test('reconcile repair-projection blocks as a no-op when phase already reflects settlement', () => {
+test('reconcile repair-projection blocks as a no-op when status already reflects settlement', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-already-settled', phase: 'settled' }, legacyResult('run-already-settled', 'a'));
+  runDirFor(dir, 'a', '01', { runId: 'run-already-settled', status: 'settled' }, legacyResult('run-already-settled', 'a'));
   admitGen(dir, 'a', 1, { runId: 'run-already-settled', attempt: 1 });
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-already-settled', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'blocked');
   assert.match(plan.reason, /already reflects settlement/);
 });
 
-test('reconcile repair-projection blocks when phase is absent and terminal result already proves settlement (nothing to repair)', () => {
+test('reconcile repair-projection repairs (not blocks) when status is absent even though a terminal result already exists', () => {
+  // Unlike the retired `phase` field, `status` has a real production writer
+  // (visibility-session.mjs stamps it when a run.json is first materialized),
+  // so an absent status is itself the defect this action exists to close --
+  // never a legitimately-already-correct state to leave alone.
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-no-phase-field' }, legacyResult('run-no-phase-field', 'a'));
-  admitGen(dir, 'a', 1, { runId: 'run-no-phase-field', attempt: 1 });
-  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-no-phase-field', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'blocked');
-  assert.match(plan.reason, /already reflects settlement/);
+  runDirFor(dir, 'a', '01', { runId: 'run-no-status-field' }, legacyResult('run-no-status-field', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-no-status-field', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-no-status-field', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'planned');
+  assert.equal(plan.snapshot.currentStatus, null);
+  const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(applied.outcome, 'applied');
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.status, 'settled');
 });
 
 test('reconcile repair-projection apply detects a controlEpoch change between planning and apply as plan-stale', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-epoch', phase: 'running', controlEpoch: 1 }, legacyResult('run-epoch', 'a'));
+  runDirFor(dir, 'a', '01', { runId: 'run-epoch', status: 'running', controlEpoch: 1 }, legacyResult('run-epoch', 'a'));
   admitGen(dir, 'a', 1, { runId: 'run-epoch', attempt: 1 });
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-epoch', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   assert.equal(plan.snapshot.controlEpoch, 1);
   const runPath = path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json');
-  fs.writeFileSync(runPath, JSON.stringify({ runId: 'run-epoch', assignmentId: 'a', phase: 'running', controlEpoch: 2 }));
+  fs.writeFileSync(runPath, JSON.stringify({ runId: 'run-epoch', assignmentId: 'a', status: 'running', controlEpoch: 2 }));
   const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(result.outcome, 'plan-stale');
   const runJson = JSON.parse(fs.readFileSync(runPath, 'utf8'));
-  assert.equal(runJson.phase, 'running', 'a successor incarnation (bumped controlEpoch) must never be overwritten');
+  assert.equal(runJson.status, 'running', 'a successor incarnation (bumped controlEpoch) must never be overwritten');
 });

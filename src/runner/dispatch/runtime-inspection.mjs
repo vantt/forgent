@@ -55,6 +55,34 @@ function assignmentEvidence(root, assignmentId, all) {
   const admitted = new Set(facts.records.map((record) => record.runId)), unadmitted = runs.filter((l) => !admitted.has(l.run.runId)), latest = facts.records.at(-1), currentIds = latest ? facts.records.filter((r) => r.attempt === latest.attempt && r.runId !== latest.runId ? true : r === latest).map((r) => r.runId) : [], current = currentIds.flatMap((id) => byId.get(id) ?? []), absent = currentIds.filter((id) => !byId.has(id)), duplicateCurrent = currentIds.filter((id) => (byId.get(id)?.length ?? 0) > 1);
   return { facts, records, malformed, runs, byId, unadmitted, currentIds, current, absent, duplicateCurrent, incomplete: facts.corrupt || malformed.length || unadmitted.length || absent.length };
 }
+function coordinationSessionsDir(root) { return path.join(fgosDir(root), 'coordination', 'sessions'); }
+
+/** Which CoordinationSession (if any) registered `assignmentId` in its own
+ * manifest.assignmentRefs -- read directly off session.json rather than
+ * through coordination/store.mjs or coordination/session-engine.mjs (those
+ * own the write/execute path; importing either here would put process-
+ * control/execution on this read-only module's import graph, the same
+ * reason admissions() above reads run-lock's ledger directly instead of
+ * importing it). `manifest.assignmentRefs` is appended
+ * (completeAssignmentRegistration, coordination/store.mjs) strictly BEFORE
+ * that same session ever writes its own `dispatch.claim`
+ * (session-engine.mjs's `createAndExecuteSessionTask`), so this lookup is
+ * complete for exactly the claims that matter: one written under
+ * session-engine.mjs's own exclusivity door, independent of whether any Run
+ * has materialized for the assignment yet (owner()/authority() below only
+ * resolve ownership through an existing Run's own `coordinationId` field,
+ * which is not yet on disk in that window). */
+export function findCoordinationSessionOwningAssignment(root, assignmentId) {
+  const base = coordinationSessionsDir(root);
+  for (const id of dirs(base)) {
+    const session = json(path.join(base, id, 'session.json'));
+    if (session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(assignmentId)) {
+      return { id, observeCommand: `fgos coordination recover ${id}` };
+    }
+  }
+  return null;
+}
+
 function owner(l, root, all) {
   if (l.malformed || !l.run?.runId) return { complete: false };
   if (l.kind !== 'assignment-run') return { complete: true, kind: 'standalone-run', id: l.run.runId };
