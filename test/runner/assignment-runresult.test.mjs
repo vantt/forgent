@@ -1260,4 +1260,85 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
   assert.equal(evidenceData.gitBeforeSource, 'pre-launch');
 });
 
+test('executeAssignment persists effective-execution-contract.json pre-launch and prompt agrees with it (I02)', async () => {
+  const tempDir = mkTempDir();
+  execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: tempDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(tempDir, 'README.md'), '# test\n');
+  execFileSync('git', ['add', '.'], { cwd: tempDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: tempDir, stdio: 'ignore' });
 
+  const executorScript = path.join(tempDir, 'executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `#!/usr/bin/env node
+    import fs from 'node:fs';
+    import path from 'node:path';
+
+    // Verify contract exists BEFORE executor completes or produces result
+    const assignmentsDir = path.join(process.cwd(), '.fgos', 'assignments');
+    const asgns = fs.readdirSync(assignmentsDir);
+    const runDir = path.join(assignmentsDir, asgns[0], 'runs', '01');
+    const contractPath = path.join(runDir, 'effective-execution-contract.json');
+    if (!fs.existsSync(contractPath)) {
+      process.exit(10);
+    }
+    const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+
+    // Check prompt argument contains effective execution contract
+    const promptArg = process.argv[2] || '';
+    if (!promptArg.includes('Effective execution contract:') || !promptArg.includes(contract.resultClaim.path)) {
+      process.exit(11);
+    }
+
+    const claim = {
+      contract: { id: 'agent-result-claim', version: 2 },
+      status: 'done',
+      summary: 'Task completed successfully',
+      assessment: { verdict: 'pass' },
+      evidenceRefs: [],
+    };
+    fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify(claim, null, 2));
+    fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Evidence report text for validation.\\n');
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 15000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-contract-test',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const contractPath = path.join(runDir, 'effective-execution-contract.json');
+  assert.ok(fs.existsSync(contractPath), 'effective-execution-contract.json must exist');
+
+  const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+  assert.equal(contract.contract.id, 'effective-execution-contract');
+  assert.equal(contract.contract.version, 1);
+  assert.equal(contract.assignmentId, assignment.assignmentId);
+  assert.equal(contract.mutation, 'read-only');
+  assert.equal(contract.limits.executorTimeoutMs, 15000);
+  assert.equal(contract.resultClaim.path, path.join(runDir, 'agent-result.json'));
+});
