@@ -2,11 +2,11 @@
 
 **Track:** `code-implementation-track-policy`
 
-**Status:** done — P01 + P02 merged to track branch; track Acceptance verified; see [`reports/track-closeout.md`](reports/track-closeout.md)
+**Status:** done — P01-P05 merged to track branch; track Acceptance verified (P01+P02 scope: see [`reports/track-closeout.md`](reports/track-closeout.md), corrected below for P03-P05); ready for merge to `main`.
 
-**Date:** 2026-09-15 (rev 2)
+**Date:** 2026-09-15 (rev 3 — P03-P05 added; scope widened from docs-only, see Mode below)
 
-**Mode:** docs-only
+**Mode:** docs-only through P02; **P05 widened this to include a real engine fix** (`src/runner/coordination/session-engine.mjs`) per the user's explicit, one-cell-scoped reversal of the "Not in scope" runtime-schema/engine exclusion below — see P05's own cell trace for the full rationale and evidence.
 
 ## Objective
 
@@ -157,17 +157,27 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
 
 - Editing `plans/260915-0455-test-suite-feedback-cost/` (Invariant #2 stays
   until its owner decides — see below).
-- Any runtime schema, validator script, CLI command, or persisted checkpoint
-  state. Each waits for a second real consumer (ADR-007 §4 bar). Still firm
-  through P03 — its focused/affected/full proof tiers and tree-identity
-  reuse rule are Lead-discipline prose only, no schema/engine change.
+- ~~Any runtime schema, validator script, CLI command, or persisted
+  checkpoint state.~~ Each waits for a second real consumer (ADR-007 §4
+  bar). Still firm through P04 — every cell's own focused/affected/full
+  proof tiers and tree-identity reuse rule stayed Lead-discipline prose
+  only, no schema/engine change. **Superseded at P05, narrowly:** the user
+  explicitly reversed this exclusion for `tsk-1bh` specifically (a
+  confirmed-live coordination-engine bug in
+  `src/runner/coordination/session-engine.mjs`, blocking this exact
+  track's own `--p01`/`--p04` sessions from closing), asked for it fixed
+  directly in this same track, and it was — see
+  [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md).
+  This narrows only that one named bug's fix (plus the raw-provenance
+  hardening its own review round needed) — no new schema, validator
+  script, CLI command, or persisted checkpoint state field was added; the
+  ADR-007 §4 bar itself is untouched and still governs everything else.
 - ~~Test selection, caching, tiering~~ — **superseded at P03** by explicit
   real-time user direction ("mục tiêu thật của việc làm này là phải cải
   thiện hiệu suất của code panel... nên tập trung vào tối ưu test"):
   `fgos-code-panel` now declares a focused/affected/full test-selection
   contract and a tree-identity proof-reuse rule. This narrows only that one
-  bullet — the schema/validator/engine exclusion above is untouched and
-  still governs.
+  bullet.
 
 ## Execution Inputs
 
