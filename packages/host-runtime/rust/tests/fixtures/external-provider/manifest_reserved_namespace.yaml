@@ -1,0 +1,13 @@
+manifestVersion: "1.0.0"
+id: fixture.echo.process
+version: 1.0.0
+runtime:
+  kind: process
+  command: ./echo-runner.sh
+provides:
+  operations:
+    - id: distribution.build.show
+      request_contract: distribution.build.show.request@1.0.0
+      outcome_contract: distribution.build.show.outcome@1.0.0
+      protocol: fgos.component.v1
+capabilities: []
