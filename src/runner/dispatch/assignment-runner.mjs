@@ -16,6 +16,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
+import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS } from './run-result.mjs';
+import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 
 // Shared with reconciliation, which must never disagree with this collector
 // about which file is the worker's claim. Re-exported because callers and
@@ -103,6 +105,92 @@ export {
 function normalizeDigest(digest) {
   if (!digest || typeof digest !== 'string') return null;
   return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
+
+function classificationForSettlement({ status, confidence, exitCode, signal, isTimeout, executionError, claimInvalid, agentClaim, assignment }) {
+  const reviewer = ['reviewer', 'red-team', 'redteam'].includes(assignment?.role);
+  const processFailed = isTimeout || Boolean(signal) || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || Boolean(executionError);
+  const claimFinding = reviewer && (agentClaim?.status === 'failed' || status === 'failed' || agentClaim?.assessment?.verdict === 'findings') && !processFailed && !claimInvalid;
+  const executionStatus = processFailed || claimInvalid ? 'failed' : status === 'no-evidence' ? 'completion-unknown' : 'completed';
+  const assessmentVerdict = claimFinding
+    ? 'findings'
+    : (agentClaim?.assessment?.verdict && ASSESSMENT_VERDICTS.includes(agentClaim.assessment.verdict))
+      ? agentClaim.assessment.verdict
+      : status === 'blocked'
+        ? 'blocked'
+        : status === 'done'
+          ? 'pass'
+          : executionStatus === 'completed'
+            ? 'inconclusive'
+            : 'not-applicable';
+
+  let family = null;
+  let code = null;
+  if (isTimeout || exitCode === 124) {
+    family = 'resource';
+    code = 'execution-timeout';
+  } else if (exitCode === 137) {
+    family = 'resource';
+    code = 'oom-killed';
+  } else if (executionError) {
+    family = 'provider';
+    code = executionError.code || 'provider-spawn-error';
+  } else if (processFailed) {
+    family = 'provider';
+    code = 'nonzero-exit';
+  } else if (claimInvalid) {
+    family = 'contract';
+    code = 'invalid-agent-result-claim';
+  } else if (status === 'failed' && !claimFinding) {
+    family = 'policy';
+    code = 'policy-refusal';
+  }
+
+  const refused = claimInvalid || (status === 'failed' && !claimFinding && !processFailed);
+  const policyDisposition = refused
+    ? 'refuse'
+    : (family === 'provider' || family === 'resource' || status === 'blocked' || status === 'no-evidence')
+      ? 'needs-input'
+      : 'allow';
+
+  const policyCode = refused
+    ? (claimInvalid ? 'invalid-agent-result-claim' : 'policy-refusal')
+    : (status === 'no-evidence' ? 'completion-unknown' : (family ? code : null));
+
+  return {
+    execution: {
+      status: executionStatus,
+      exitCode: executionStatus === 'completion-unknown' ? null : exitCode,
+    },
+    assessment: {
+      verdict: assessmentVerdict,
+      ...(claimFinding
+        ? {
+            summary: agentClaim?.summary || 'reviewer finding',
+            ...(agentClaim?.assessment?.severityFloor ? { severityFloor: agentClaim.assessment.severityFloor } : {}),
+          }
+        : (agentClaim?.assessment?.severityFloor ? { severityFloor: agentClaim.assessment.severityFloor } : {})),
+    },
+    confidence: {
+      level: confidence,
+      basis: [
+        claimInvalid
+          ? 'invalid-agent-result-claim'
+          : isTimeout
+            ? 'timeout'
+            : processFailed
+              ? 'provider-exit'
+              : 'runner-evidence',
+      ],
+    },
+    failure: family ? { family, code } : null,
+    policy: {
+      disposition: policyDisposition,
+      code: policyCode,
+    },
+    delivery: { mode: 'fresh' },
+    provenance: 'native-v2',
+  };
 }
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
@@ -476,6 +564,7 @@ export function classifyRunEvidence({
   repoRoot,
   assignment,
   work,
+  role,
 }) {
   if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
     return { status: 'failed', confidence: 'failed' };
@@ -486,7 +575,24 @@ export function classifyRunEvidence({
     return { status: 'failed', confidence: 'failed' };
   }
 
+  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
+  // A read-only operation classifies as reported only with a companion report
+  // artifact (e.g. agent-report.md) the runner detected in the run dir.
+  // Self-attested evidenceRefs strings never substitute for it: the worker
+  // fully controls agent-result.json, so string refs prove nothing on disk.
+  // The claim never counts as its own companion report, under either of the
+  // two names it may have been written with.
+  const companionReportArtifacts = workerArtifacts.filter(
+    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
+  );
+  const hasWorkerReport = companionReportArtifacts.length > 0;
+
   if (agentClaim?.status === 'failed') {
+    const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
+    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
+    if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
+      return { status: 'failed', confidence: 'reported' };
+    }
     return { status: 'failed', confidence: 'failed' };
   }
 
@@ -506,18 +612,6 @@ export function classifyRunEvidence({
   if (agentClaim?.status === 'blocked') {
     return { status: 'blocked', confidence: 'reported' };
   }
-
-  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation classifies as reported only with a companion report
-  // artifact (e.g. agent-report.md) the runner detected in the run dir.
-  // Self-attested evidenceRefs strings never substitute for it: the worker
-  // fully controls agent-result.json, so string refs prove nothing on disk.
-  // The claim never counts as its own companion report, under either of the
-  // two names it may have been written with.
-  const companionReportArtifacts = workerArtifacts.filter(
-    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
-  );
-  const hasWorkerReport = companionReportArtifacts.length > 0;
 
   if (agentClaim && agentClaim.status === 'done') {
     // Reported for read-only consult/review only when a runner-detected
@@ -1238,7 +1332,7 @@ export async function executeAssignment(assignment, opts = {}) {
   if (admitted.resumed) {
     if (fs.existsSync(resultJsonPath)) {
       try {
-        const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+        const settledResult = interpretRunResult(resultJsonPath);
         return Object.freeze(settledResult);
       } catch {}
     }
@@ -1918,12 +2012,13 @@ export async function executeAssignment(assignment, opts = {}) {
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
     artifacts: workerArtifacts,
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
@@ -1937,13 +2032,21 @@ export async function executeAssignment(assignment, opts = {}) {
     executorId: resolvedExecutorId,
     policy: effectivePolicy,
     executorRedirected,
+    settledAt,
+    durationMs,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
     status,
     confidence,
+    role: effectiveAssignment.role,
+    operation: effectiveAssignment.operation,
+    isReadOnlyOperation: isReadOnly,
+    confidenceLevel: confidence,
     runtime: {
       exitCode,
+      isTimeout,
+      executionError: executionError ? { message: executionError.message, code: executionError.code } : null,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
@@ -1964,10 +2067,11 @@ export async function executeAssignment(assignment, opts = {}) {
       gitBeforeSource,
       changedFiles,
       mutatedDirtyBeforeFiles,
+      attribution: evidenceData.attribution,
       artifacts: workerArtifactPaths,
       tests: [],
     },
-  };
+  });
 
   if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
     throw new RunnerConfigError(
@@ -2001,7 +2105,7 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -2046,18 +2150,20 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
     mutatedDirtyBeforeFiles: [],
     changedFiles: [],
     changedFileReasons: {},
+    attribution: [],
     artifacts: [],
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     controlEpoch,
     controlToken,
     status: 'failed',
     confidence: 'failed',
+    confidenceLevel: 'failed',
     runtime: {
       exitCode: 1,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
@@ -2073,10 +2179,11 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
       gitBeforeSource: 'pre-launch',
       changedFiles: [],
       mutatedDirtyBeforeFiles: [],
+      attribution: [],
       artifacts: [],
       tests: [],
     },
-  };
+  });
 
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
   const runJsonPath = path.join(runDir, 'run.json');
@@ -2094,7 +2201,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -2262,12 +2369,13 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
     artifacts: workerArtifacts,
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     workId: runMeta.workId || asgn?.workId,
@@ -2278,8 +2386,13 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     settleReports,
     status,
     confidence,
+    role: asgn?.role,
+    operation: asgn?.operation,
+    isReadOnlyOperation: isReadOnly,
+    confidenceLevel: confidence,
     runtime: {
       exitCode,
+      isTimeout,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
@@ -2293,10 +2406,11 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
       gitBeforeSource,
       changedFiles,
       mutatedDirtyBeforeFiles,
+      attribution: evidenceData.attribution,
       artifacts: workerArtifactPaths,
       tests: [],
     },
-  };
+  });
 
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
   const runJsonPath = path.join(runDir, 'run.json');
@@ -2329,7 +2443,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }

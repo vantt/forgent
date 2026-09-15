@@ -5641,3 +5641,52 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
   assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
   assert.equal(outcome.verdictPayload, undefined);
 });
+
+test('chooseStageOperation consumes fully-bound contract-corrupt RunResults as no-evidence and fails closed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan']);
+
+  const validClassification = {
+    execution: { status: 'completed', exitCode: 0 },
+    assessment: { verdict: 'pass' },
+    confidence: { level: 'reported', basis: ['valid-agent-result-claim'] },
+    failure: null,
+    policy: { disposition: 'allow', code: null },
+    delivery: { mode: 'fresh' },
+    provenance: 'native-v2',
+  };
+
+  for (const [label, contract] of [
+    ['v2 projection mismatch', { id: 'assignment-run-result', version: 2 }],
+    ['present contract version demotion', { id: 'assignment-run-result', version: 1 }],
+  ]) {
+    const id = `tsk-corrupt-${label.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`;
+    const docsRef = `docs/history/${id}`;
+    const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+      id,
+      docsRef,
+      withHash: true,
+      withReport: true,
+      resultExtra: {
+        contract,
+        classification: validClassification,
+        runtime: { exitCode: 0 },
+        // The v2 contract projects this classification to done/reported.
+        // These tampered projections must survive all evidence bindings as a
+        // contract-corrupt, no-evidence result rather than being skipped.
+        status: 'failed',
+        confidence: 'reported',
+      },
+    });
+    assert.ok(fs.existsSync(resultPath), `${label}: fixture writes result.json`);
+
+    const choice = choosePlanning(tempDir, planningWorkFor(id, docsRef), {
+      contextSignals: { hasPlan: true, validationDue: true },
+    });
+
+    assert.equal(choice.stop, true, `${label}: a fully-bound corrupt result stops the driver`);
+    assert.equal(choice.canAdvanceEdge, false, `${label}: a fully-bound corrupt result cannot advance`);
+  }
+});

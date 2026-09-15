@@ -5,6 +5,31 @@ import path from "node:path";
 import os from "node:os";
 import { reconcileHerdrSpawnRun, publishHerdrAdapterReceipt } from "../../src/runner/dispatch/herdr-round.mjs";
 import { computeSha256Digest } from "../../src/runner/dispatch/cli-spawn-supervisor.mjs";
+import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
+
+test('reconcileHerdrSpawnRun preserves contract-corrupt provenance for a tampered v2 result.json', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-herdr-result-corrupt-'));
+  try {
+    const runDir = path.join(tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const corruptResult = normalizeRunResultV2({
+      runId: 'run-corrupt-result',
+      runtime: { exitCode: 0 },
+      agentClaim: { status: 'done', summary: 'original valid result' },
+    });
+    corruptResult.status = 'failed';
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify(corruptResult));
+
+    const result = await reconcileHerdrSpawnRun(runDir);
+
+    assert.equal(result.status, 'settled');
+    assert.equal(result.runResult.contractCorrupt, true);
+    assert.equal(result.runResult.classification.provenance, 'contract-corrupt');
+    assert.equal(result.runResult.confidence, 'failed');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
 
 test("reconcileHerdrSpawnRun rejects a fabricated workerCommandDigest checked against the real workerInvocation-nested digest", async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-medb-test-"));
