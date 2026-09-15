@@ -2,7 +2,7 @@
 
 **Track:** `code-implementation-track-policy`
 
-**Status:** revised after review; ready for authoring (one docs cell)
+**Status:** done — P01 + P02 merged to track branch; track Acceptance verified; see [`reports/track-closeout.md`](reports/track-closeout.md)
 
 **Date:** 2026-09-15 (rev 2)
 
