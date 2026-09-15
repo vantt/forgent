@@ -113,7 +113,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   skill's own "no index, no track directory" design. "Full suite" wording
   changed from an "at most once" KPI framing to "never twice for the same
   (tree, environment) state" to stop a Lead from skipping a genuinely
-  needed rerun just to keep a count low.
+  needed rerun just to keep a count low. Final commit range for this cell:
+  `63b01fa9..81c54a43` (5 commits: initial fix, cell trace, close-vs-merge
+  reorder, git-notes durable trace, and a 3rd round resolving 7 recheck
+  residuals).
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result
