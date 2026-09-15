@@ -214,10 +214,16 @@ export function buildEffectiveExecutionContract({
     ?? runnerConfig?.executor?.confinement
     ?? null;
 
+  // A declared policy is only a request. The production launch path supplies
+  // the Authority's prepared requirement/backend pair, which is the durable
+  // statement of what will actually be applied.
+  const resolvedRequirement = conf?.requirement ?? conf;
+  const resolvedBackend = conf?.backend ?? null;
   const isConfinementEnforced = Boolean(
-    conf &&
-    conf.mode !== 'unconfined' &&
-    (conf.policyId || conf.controls || conf.mode === 'required'),
+    resolvedRequirement &&
+    resolvedRequirement.mode !== 'unconfined' &&
+    (resolvedRequirement.policyId || resolvedRequirement.controls || resolvedRequirement.mode === 'required') &&
+    (!resolvedBackend || (resolvedBackend.id !== 'none' && resolvedBackend.type !== 'none')),
   );
 
   // Shell command filtering is not enforced by current adapters (cli-spawn, herdr-spawn)
@@ -286,7 +292,6 @@ export function buildEffectiveExecutionContract({
     },
     limits: {
       executorTimeoutMs: effectiveTimeoutMs,
-      timeoutMs: effectiveTimeoutMs,
       ...(sessionWallTimeExpiresAt ? { sessionWallTimeExpiresAt } : {}),
     },
     resultClaim: {
@@ -353,6 +358,9 @@ export function validateEffectiveExecutionContract(value) {
   if (!Array.isArray(value.workspace.writeScope)) {
     throw new RunnerConfigError('effective-execution-contract: workspace.writeScope must be an array');
   }
+  if (!Object.hasOwn(value.workspace, 'mainCheckout') || (value.workspace.mainCheckout !== null && (typeof value.workspace.mainCheckout !== 'string' || !value.workspace.mainCheckout.trim()))) {
+    throw new RunnerConfigError('effective-execution-contract: workspace.mainCheckout must be a non-empty string or null');
+  }
 
   if (!value.tools || typeof value.tools !== 'object' || Array.isArray(value.tools)) {
     throw new RunnerConfigError('effective-execution-contract: tools must be a non-null object');
@@ -363,12 +371,23 @@ export function validateEffectiveExecutionContract(value) {
   if (typeof value.tools.shell.enforced !== 'boolean') {
     throw new RunnerConfigError('effective-execution-contract: tools.shell.enforced must be a boolean');
   }
+  if (!value.permissions || typeof value.permissions !== 'object' || Array.isArray(value.permissions)) {
+    throw new RunnerConfigError('effective-execution-contract: permissions must be a non-null object');
+  }
+  if (typeof value.permissions.filesystem?.enforced !== 'boolean') {
+    throw new RunnerConfigError('effective-execution-contract: permissions.filesystem.enforced must be a boolean');
+  }
+  if (value.enforcementPosture !== 'enforced' && value.enforcementPosture !== 'instructed') {
+    throw new RunnerConfigError('effective-execution-contract: enforcementPosture must be "enforced" or "instructed"');
+  }
+  if (typeof value.adapterFamily !== 'string' || !value.adapterFamily.trim()) {
+    throw new RunnerConfigError('effective-execution-contract: adapterFamily must be a non-empty string');
+  }
 
   if (!value.limits || typeof value.limits !== 'object' || Array.isArray(value.limits)) {
     throw new RunnerConfigError('effective-execution-contract: limits must be a non-null object');
   }
-  const timeout = value.limits.executorTimeoutMs ?? value.limits.timeoutMs;
-  if (!Number.isInteger(timeout) || timeout <= 0) {
+  if (!Number.isInteger(value.limits.executorTimeoutMs) || value.limits.executorTimeoutMs <= 0) {
     throw new RunnerConfigError('effective-execution-contract: limits.executorTimeoutMs must be a positive integer');
   }
 

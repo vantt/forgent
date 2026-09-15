@@ -1202,24 +1202,18 @@ export async function executeAssignment(assignment, opts = {}) {
       status: 'running',
     }),
     buildDispatchPlan: () => compiledPlan,
-    buildEffectiveExecutionContract: (record) => buildEffectiveExecutionContract({
-      assignment: effectiveAssignment,
-      dispatchPlan: compiledPlan,
-      runId: record.runId,
-      runDir: path.join(runsDir, record.attemptStr),
-      cwd: effectiveCwd,
-      repoRoot: root,
-      runnerConfig: cfg,
-      timeoutMs,
-      executorId: resolvedExecutorId,
-      adapter: resolvedAdapter,
-    }),
   });
   const { attemptStr, runId, runDir } = admitted;
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
   const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
   let effectiveContract;
-  if (!fs.existsSync(effectiveContractPath)) {
+  if (fs.existsSync(effectiveContractPath)) {
+    try {
+      effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
+    } catch {
+      effectiveContract = null;
+    }
+  } else {
     effectiveContract = buildEffectiveExecutionContract({
       assignment: effectiveAssignment,
       dispatchPlan: compiledPlan,
@@ -1231,15 +1225,13 @@ export async function executeAssignment(assignment, opts = {}) {
       timeoutMs,
       executorId: resolvedExecutorId,
       adapter: resolvedAdapter,
+      // The prompt is built before Authority preparation. Derive its posture
+      // from the same requirement that will be handed to Authority, never
+      // from an executor profile's merely requested confinement fragment.
+      confinement: compiledPlan.policy?.confinement
+        ? { requirement: compiledPlan.policy.confinement }
+        : { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } },
     });
-    fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
-    fsyncFileBestEffort(effectiveContractPath);
-  } else {
-    try {
-      effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
-    } catch {
-      effectiveContract = null;
-    }
   }
 
   const resultJsonPath = path.join(runDir, 'result.json');
@@ -1551,6 +1543,27 @@ export async function executeAssignment(assignment, opts = {}) {
         throw err;
       }
 
+      // Persist after Authority resolution, yet before the supervisor is
+      // spawned. A requested policy alone is not enforcement evidence.
+      effectiveContract = buildEffectiveExecutionContract({
+        assignment: effectiveAssignment,
+        dispatchPlan: compiledPlan,
+        runId,
+        runDir,
+        cwd: effectiveCwd,
+        repoRoot: root,
+        runnerConfig: cfg,
+        timeoutMs,
+        executorId: resolvedExecutorId,
+        adapter: resolvedAdapter,
+        confinement: {
+          requirement: prepResult.preparedInvocation.requirement,
+          backend: prepResult.preparedInvocation.backend,
+        },
+      });
+      fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+      fsyncFileBestEffort(effectiveContractPath);
+
       // 6. Guarded update of pending command with envelopeDigest
       commandState.envelopeDigest = prepResult.envelope.digest;
       publishMutableProjection(commandPath, commandState);
@@ -1666,6 +1679,13 @@ export async function executeAssignment(assignment, opts = {}) {
         stderr: stderrText,
       };
     } else {
+      // Legacy/non-supervisor adapters retain the existing pre-spawn write
+      // guarantee. cli-spawn writes later, immediately after Authority
+      // preparation, so its persisted posture reflects that preparation.
+      if (!fs.existsSync(effectiveContractPath)) {
+        fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+        fsyncFileBestEffort(effectiveContractPath);
+      }
       try {
         rawResult = await executeExecutorCli(executorId, {
           prompt,

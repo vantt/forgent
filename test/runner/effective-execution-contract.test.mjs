@@ -175,6 +175,37 @@ test('buildEffectiveExecutionContract is honest about permissions: does not labe
   assert.equal(contract.permissions.shell.enforcement, 'instructed');
 });
 
+test('buildEffectiveExecutionContract reports an Authority-resolved unconfined backend as instructed', () => {
+  const contract = buildEffectiveExecutionContract({
+    assignment: validAssignment(),
+    dispatchPlan: validDispatchPlan({ policy: { confinement: { mode: 'required', policyId: 'missing-backend' } } }),
+    runId: 'run_unconfined_01', runDir: '/tmp/runs/01', cwd: '/tmp/test',
+    confinement: {
+      requirement: { mode: 'unconfined', policyId: null },
+      backend: { id: 'none', type: 'none' },
+    },
+  });
+  assert.equal(contract.enforcementPosture, 'instructed');
+  assert.equal(contract.permissions.filesystem.enforced, false);
+});
+
+test('validateEffectiveExecutionContract rejects missing required contract fields', () => {
+  const contract = buildEffectiveExecutionContract({
+    assignment: validAssignment(), dispatchPlan: validDispatchPlan(), runId: 'run_required_01', runDir: '/tmp/runs/01', cwd: '/tmp/test',
+  });
+  for (const mutate of [
+    (value) => { delete value.workspace.mainCheckout; },
+    (value) => { delete value.permissions; },
+    (value) => { delete value.enforcementPosture; },
+    (value) => { delete value.adapterFamily; },
+    (value) => { delete value.limits.executorTimeoutMs; },
+  ]) {
+    const malformed = structuredClone(contract);
+    mutate(malformed);
+    assert.throws(() => validateEffectiveExecutionContract(malformed), RunnerConfigError);
+  }
+});
+
 test('stripSecrets removes secret keys and environment variables from contract provenance', () => {
   const dirty = {
     apiKey: 'sk-ant-1234567890',
@@ -422,7 +453,17 @@ process.exit(0);
 
   const updatedCfg = {
     ...runnerCfg,
-    executor: { command: process.execPath, args: [mockBinPath], adapter: 'cli-spawn', allowCrossProvider: true },
+    // The cli-spawn profile requests confinement, but the compiled
+    // capability resolves unconfined and Authority therefore prepares the
+    // explicit { id: 'none', type: 'none' } backend. The persisted contract
+    // must report that real outcome, not this requested fragment.
+    executor: {
+      command: process.execPath,
+      args: [mockBinPath],
+      adapter: 'cli-spawn',
+      allowCrossProvider: true,
+      confinement: { mode: 'required', policyId: 'missing-backend', controls: { hostWrite: 'deny' } },
+    },
     executors: {
       claude: { command: process.execPath, args: [mockBinPath], adapter: 'cli-spawn', allowCrossProvider: true },
     },
