@@ -169,13 +169,16 @@ case, not the contract.
   (commit, real test output) by default; they do not re-run the same
   command.** Only re-run when the evidence itself is in doubt, or a
   genuinely new attack needs falsifying with fresh output of its own.
-- The Lead runs `FULL_TEST` **once**, right before merge -- not after every
-  round. `FULL_TRIGGERS` firing early (mechanically, regardless of what was
-  declared) is the one thing that moves it earlier. Skipping it entirely is
-  legal only when nothing in `FULL_TRIGGERS` fired and `AFFECTED_TESTS`
-  convincingly covers the blast radius -- a real policy choice the Lead
-  states in the close rationale, not a silent default; when unsure, run it
-  once.
+- The Lead runs `FULL_TEST` for the pre-merge `(tree, environment)` state
+  right before merge -- not after every round. `FULL_TRIGGERS` firing
+  early (mechanically, regardless of what was declared) is the one thing
+  that moves it earlier. Skipping it entirely is legal only when nothing
+  in `FULL_TRIGGERS` fired and `AFFECTED_TESTS` convincingly covers the
+  blast radius -- a real policy choice the Lead states in the close
+  rationale, not a silent default. The post-merge check (section 4) may
+  add a second, genuinely distinct `(tree, environment)` state that also
+  needs it -- that is not a violation of "never twice for the same state,"
+  because it is not the same state.
 - `FULL_TEST` already ran clean at some commit X: a later fix that touches
   only docs/metadata (no production tree or test-harness change) does not
   need it re-run. A fix that touches the production tree or test harness
@@ -230,8 +233,9 @@ evidence-backed rationale).
 file.** Creating a `docs/`-tree directory keyed by "code-panel" (as if it
 were one track) would conflate every unrelated one-off change ever run
 through this skill into a single shared, ever-growing directory -- exactly
-the "index.md, track directory" ceremony this skill's own Non-Goals
-already reject. The durable record already exists: `close.json`'s
+the "no `index.md`, no track directory" line this skill's own closing
+sentence already rejects (bottom of this file). The durable record already
+exists: `close.json`'s
 disposition `rationale`, persisted in `.fgos/coordination/sessions/
 code-panel--<change-slug>/` and readable any time via
 `fgos coordination show code-panel--<change-slug> --json`.
@@ -477,24 +481,70 @@ fgos coordination run --cwd "$wt" --file fix-1.json
 Repeat with `fix-2.json`, ... (new `authorizationId`/`invocationKey`
 values each time) if a recheck itself surfaces a new accepted finding.
 
-## 4. Close
+## 4. Merge, verify, then close
 
-A `disposition` step with `disposition: "cell-closed"` is the whole
-close mechanism -- `runCoordinationUseCase` always attempts a quorum
-close as its own last step after every declared step finishes
-dispatching. Close only once the required first pass and every fix round
-this change needed have dispatched cleanly, and either `FULL_TEST` has run
-once against the cell's own worktree tip or the rationale states why
-`AFFECTED_TESTS` already covered the blast radius without it. This closes
-the *coordination session* -- it does not yet certify the merge commit;
-the Lead still owes a **post-merge verification** (below) before the
-worktree/branch can be removed, exactly like a plan-loop track's own
-full-suite gate re-verifies `integratedSha`:
+Close only once the required first pass and every fix round this change
+needed have dispatched cleanly, and either `FULL_TEST` has run once
+against the cell's own worktree tip or the rationale states why
+`AFFECTED_TESTS` already covered the blast radius without it. **Merge
+comes before `close.json`, not after** -- the coordination session stays
+open (no field/door writes a disposition into a closed session; the
+engine refuses it, `store.mjs`) exactly so the close rationale can
+describe the REAL final state including the merge, instead of a promise
+about a merge that has not happened yet. This is still fully outside the
+coordination session -- the Lead's own git operation, never a
+coordination request (`## Non-Goals`'s "no git merge authority inside the
+session" is about a dispatched worker never being granted merge
+authority; it does not require merge to happen after close):
+
+```sh
+git -C "$main" merge --no-ff code-panel--<change-slug>
+```
+
+**Post-merge verification -- required before `close.json`.** The
+first-pass/fix-round proof only ever ran in the cell's own worktree; the
+merge commit is a DIFFERENT tree whenever `$base` moved during the cell's
+lifetime (a clean, conflict-free merge still unions in every commit
+`$base` gained while the cell was open) or the merge itself needed
+conflict resolution. Never assume the merge commit inherits that proof —
+check:
+
+```sh
+mergedTree=$(git -C "$main" rev-parse HEAD^{tree})
+# The branch tip IS testedTree only if the Lead re-verified it after the
+# LAST fix round -- section 3's own "re-verify before disposition" rule is
+# what makes this assumption hold; if it does not hold, re-verify the tip
+# for real before trusting this comparison.
+testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
+baseBeforeMerge=$(git -C "$main" merge-base HEAD^1 HEAD^2 2>/dev/null || git -C "$main" rev-parse HEAD^1)
+```
+
+- `mergedTree` equals `testedTree` **and** the environment fingerprint
+  (above) is unchanged: the cell's own proof already certifies the merge
+  commit -- record `treeIdentical: true` with both shas, no re-run.
+- Otherwise: run `AFFECTED_TESTS` against `$main` at the new `HEAD` at
+  minimum; escalate to `FULL_TEST` if a `FULL_TRIGGERS` category fired.
+  Check the trigger against the actual merged diff, not just the cell's
+  own diff -- `$base`'s own new commits can trigger it too:
+  `git -C "$main" diff "$baseBeforeMerge" HEAD -- .` (this is the diff a
+  clean merge produced end to end; a conflict-resolution merge should
+  instead be read directly, since no single two-way diff represents a
+  three-way resolution). Escalate on the blast radius too when it
+  otherwise requires it. If this re-run fails, do not close as
+  `cell-closed` -- open a fix round (section 3, the session is still
+  active) targeting the real problem before merging again.
+
+Only once post-merge verification passes, close -- `runCoordinationUseCase`
+always attempts a quorum close as its own last step after every declared
+step finishes dispatching, and the rationale below is where the post-merge
+result actually gets recorded (see "Record it" above: this rationale, in
+`.fgos/coordination/sessions/code-panel--<change-slug>/`, IS the cell
+trace):
 
 ```json
 {
   "kind": "declared-protocol",
-  "objective": "Close: independent review + red-team both clean, FULL_TEST run once (or AFFECTED_TESTS coverage stated), commit lands.",
+  "objective": "Close: independent review + red-team both clean, merge landed and post-merge-verified.",
   "writerId": "<lead-identity>",
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
@@ -509,7 +559,7 @@ full-suite gate re-verifies `integratedSha`:
       "as": "closeCell",
       "targetRef": "<real assignment id of the final, accepted revise/recheck dispatch>",
       "disposition": "cell-closed",
-      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran once at <sha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <hash> lands on code-panel--<change-slug>. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each.",
+      "rationale": "Reviewer + Red-Team recheck both clean; FULL_TEST <ran once at <sha> | skipped -- AFFECTED_TESTS covered <blast radius>, no FULL_TRIGGERS fired>; commit <hash> merged into code-panel--<change-slug>'s base as <mergedSha>. Post-merge verification: <treeIdentical: true, matches <testedSha> | AFFECTED_TESTS re-run at <mergedSha>: <result> | FULL_TEST re-run at <mergedSha>: <result>>. Tests run this cell: <tier: command -> executed|reused-from-<sha>, duration, outcome> for each, including the post-merge check above.",
       "evidenceRefs": ["<real assignment id of reviewRecheck>", "<real assignment id of redTeamRecheck>"]
     }
   ]
@@ -520,38 +570,7 @@ full-suite gate re-verifies `integratedSha`:
 fgos coordination run --cwd "$wt" --file close.json
 ```
 
-Then, outside this skill and outside the coordination session entirely
--- the Lead's own git operation, never a coordination request (the merge
-target is the `$base` recorded in section 0):
-
-```sh
-git -C "$main" merge --no-ff code-panel--<change-slug>
-```
-
-**Post-merge verification -- required before removing anything.** The
-close above only certified the cell's own worktree tip; the merge commit
-is a DIFFERENT tree whenever `$base` moved during the cell's lifetime (a
-clean, conflict-free merge still unions in every commit `$base` gained
-while the cell was open) or the merge itself needed conflict resolution.
-Never assume the merge commit inherits the close's proof — check:
-
-```sh
-mergedTree=$(git -C "$main" rev-parse HEAD^{tree})
-testedTree=$(git -C "$wt" rev-parse code-panel--<change-slug>^{tree})
-```
-
-- `mergedTree` equals `testedTree` **and** the environment fingerprint
-  (above) is unchanged: the close's proof already certifies the merge
-  commit -- record `treeIdentical: true` with both shas in the cell trace,
-  no re-run.
-- Otherwise: run `AFFECTED_TESTS` against `$main` at the new `HEAD` at
-  minimum; escalate to `FULL_TEST` if a `FULL_TRIGGERS` category fired
-  (recompute against the actual merged diff, not just the cell's own diff
-  -- `$base`'s own new commits can trigger it too) or the blast radius
-  otherwise requires it. Record the real outcome in the cell trace before
-  proceeding.
-
-Only after this check passes:
+Only after `close.json` succeeds:
 
 ```sh
 git -C "$main" worktree remove "$wt"
