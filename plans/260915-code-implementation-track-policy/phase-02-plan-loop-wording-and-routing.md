@@ -69,12 +69,30 @@ R5. `fgos-plan-loop` description gains the trigger phrases "run / execute
     plans here.
 R6. `fgos-code-panel` description and Non-Goals gain one line: a request that
     references a multi-cell `plan.md`/`phase-NN` track is a `fgos-plan-loop`
-    track; this skill is one cell. No other body change.
+    track; this skill is one cell. No other body change, except R10 below
+    (a user-approved bug fix landing in this same file this phase already
+    touches).
 R7. No domain name, `trackKind`, or `executionPolicy` in any new plan-loop
     sentence. No new markdown link from plan-loop to a code-panel path.
 R8. `npm run build:skills`; commit the regenerated `.agents/`, `.claude/`,
     `plugins/` copies with the source edits.
 R9. `CHANGELOG.md` `## [Unreleased]` line (user-visible skill behaviour).
+R10. Bug fix (user-approved, observed live while driving this track's own
+    P01 cell): `fgos-code-panel`'s "3. Fix round" `fix-1.json` template
+    declares `authorize` steps for `reviewer-recheck`/`red-team-recheck`
+    with no `grantedContextRefs`, while their paired `operation` steps
+    declare `contextRefs: ["$ref:revise"]` -- the dispatch is refused
+    (`dispatchDeclaredOperation: contextRefs entry ... is not granted by
+    authorization ...`) the moment anyone copies the template verbatim.
+    Add `"grantedContextRefs": ["$ref:revise"]` to both the
+    `authReviewRecheck` and `authRedTeamRecheck` example steps so the
+    template actually dispatches as written. Do not touch
+    `src/runner/coordination/session-engine.mjs` or any other engine file
+    for this -- the companion engine-level bug (a stale, wrongly-scoped
+    authorization for the same binding permanently blocking a corrected
+    retry, and a first-pass-actor-genuinely-failed session that can never
+    close even after a clean recheck) is out of scope for this track and is
+    tracked separately as `tsk-1bh`.
 
 ## Files
 
@@ -101,6 +119,8 @@ R9. `CHANGELOG.md` `## [Unreleased]` line (user-visible skill behaviour).
 - Hand edit landing in `.agents/` or `plugins/` instead of the source
   (silently reverted by the next `assembleSkills`).
 - Description edit that breaks the `>-` folded YAML front-matter.
+- R10 fix landing in `.agents`/`plugins` only, or the source `authorize`
+  step still missing `grantedContextRefs` after the edit.
 
 ## Verification
 
@@ -109,6 +129,7 @@ node --test test/setup/skill-wrappers.test.mjs test/skills/fgos-mirror.test.mjs 
 npm run build:skills && git status --porcelain .agents .claude plugins   # expect empty after commit
 grep -n "npm test\|trackKind\|executionPolicy\|coding\b" core/skills/fgos-plan-loop/SKILL.md && exit 1 || true
 grep -c "full proof command" core/skills/fgos-plan-loop/SKILL.md          # >= 4 (produce, revise, close, baseline)
+grep -c "grantedContextRefs" domains/coding/skills/fgos-code-panel/SKILL.md  # >= 2 (authReviewRecheck, authRedTeamRecheck)
 npm test                                                                  # full-suite gate: this cell edits projected skills
 ```
 
@@ -121,7 +142,9 @@ Objective templates in §1/§3 carry R2/R3 verbatim; §5 has the baseline step;
 (Lead accept / evidence-backed reject, current cell only), non-inference rule
 (`testedSha != integratedSha`), and precedence/compatibility; routing descriptions
 updated on both skills; projections regenerated and byte-identical to source
-render; all listed tests green; full `npm test` green once before merge.
+render; all listed tests green; full `npm test` green once before merge; the
+`fgos-code-panel` fix-round template's `authReviewRecheck`/`authRedTeamRecheck`
+steps carry `grantedContextRefs: ["$ref:revise"]` (R10).
 
 ## Risks and rollback
 
