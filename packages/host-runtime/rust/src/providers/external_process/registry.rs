@@ -12,7 +12,7 @@ use crate::contracts::{
 use sha2::{Digest, Sha256};
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Default list of reserved/core namespaces that external providers cannot claim.
 pub const DEFAULT_RESERVED_NAMESPACES: &[&str] = &[
@@ -237,15 +237,7 @@ impl ExternalProcessLinker {
             reserved_namespaces.insert(ns.to_string());
         }
 
-        let mut expected_contracts = HashMap::new();
-        // Register frozen fixture contract expectation
-        expected_contracts.insert(
-            OperationId::from_static("fixture.echo.echo"),
-            ExpectedContracts {
-                request_contract: ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
-                outcome_contract: ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
-            },
-        );
+        let expected_contracts = HashMap::new();
 
         Self {
             catalog: Some(crate::catalog::CATALOG),
@@ -313,6 +305,9 @@ impl ExternalProcessLinker {
         let mut entries = Vec::new();
 
         for manifest in manifests {
+            let base_dir = manifest.manifest_path.as_deref().and_then(Path::parent);
+            manifest.validate(base_dir)?;
+
             // Check 1: Refuse replacement of built-in providers by provider_id or replacement field
             for bp in &self.builtin_providers {
                 if manifest.id == bp.provider_id.as_ref() {
@@ -418,26 +413,6 @@ impl ExternalProcessLinker {
                     }
                 }
 
-                // Check against catalog if operation exists in catalog
-                if let Some(cat) = self.catalog {
-                    if let Some(cat_op) = cat.iter().find(|o| o.operation_id == parsed_op_id) {
-                        if !Self::contracts_compatible(
-                            &parsed_req_contract,
-                            &cat_op.request_contract,
-                        ) || !Self::contracts_compatible(
-                            &parsed_out_contract,
-                            &cat_op.outcome_contract,
-                        ) {
-                            return Err(LinkerError::IncompatibleContract {
-                                operation_id: parsed_op_id.clone(),
-                                declared_request: Box::new(parsed_req_contract.clone()),
-                                expected_request: Box::new(cat_op.request_contract.clone()),
-                                declared_outcome: Box::new(parsed_out_contract.clone()),
-                                expected_outcome: Box::new(cat_op.outcome_contract.clone()),
-                            });
-                        }
-                    }
-                }
 
                 entries.push(ExternalProviderEntry {
                     provider_id: manifest.id.clone(),
@@ -515,13 +490,9 @@ impl ExternalProcessLinker {
 
     /// Checks whether two contract references are compatible.
     ///
-    /// Contracts are compatible if their IDs match and their major versions match.
+    /// Requires exact contract ID and version equality, matching
+    /// operation provider router's exact-match requirement.
     pub fn contracts_compatible(declared: &ContractRef, expected: &ContractRef) -> bool {
-        if declared.id() != expected.id() {
-            return false;
-        }
-        let decl_major = declared.version().split('.').next().unwrap_or("");
-        let exp_major = expected.version().split('.').next().unwrap_or("");
-        !decl_major.is_empty() && decl_major == exp_major
+        declared.id() == expected.id() && declared.version() == expected.version()
     }
 }

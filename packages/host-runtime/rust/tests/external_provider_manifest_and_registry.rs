@@ -11,7 +11,7 @@
 use fgos_host_runtime::providers::external_process::{
     parse_contract_ref, ExternalManifest, ExternalProcessLinker, LinkerError, ManifestError,
 };
-use fgos_host_runtime::{CATALOG, ECHO_PROVIDER_DESCRIPTOR};
+use fgos_host_runtime::{ContractRef, OperationId, CATALOG, ECHO_PROVIDER_DESCRIPTOR};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -358,7 +358,11 @@ fn linker_refusal_unknown_capability() {
 
 #[test]
 fn linker_refusal_incompatible_contract() {
-    let linker = ExternalProcessLinker::new();
+    let linker = ExternalProcessLinker::new().with_expected_contract(
+        OperationId::from_static("fixture.echo.echo"),
+        ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
+        ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
+    );
     let path = fixture_path("manifest_incompatible_contract.yaml");
     let manifest = ExternalManifest::load_from_file(&path)
         .expect("manifest with incompatible contract parses structurally");
@@ -368,6 +372,106 @@ fn linker_refusal_incompatible_contract() {
         matches!(result, Err(LinkerError::IncompatibleContract { .. })),
         "manifest declaring incompatible contract version must be refused with IncompatibleContract, got {result:?}"
     );
+}
+
+#[test]
+fn linker_refuses_invalid_manifest_directly_deserialized() {
+    let linker = ExternalProcessLinker::new();
+
+    // Directly deserialize an invalid manifest with path-escaping command, bypassing load_from_file / validate
+    let invalid_yaml = r#"
+manifestVersion: "1.0.0"
+id: fixture.escaping.process
+version: 1.0.0
+runtime:
+  kind: process
+  command: ../../secret/runner.sh
+provides:
+  operations:
+    - id: fixture.escaping.op
+      request_contract: fixture.escaping.op.request@1.0.0
+      outcome_contract: fixture.escaping.op.outcome@1.0.0
+      protocol: fgos.component.v1
+capabilities: []
+"#;
+
+    let invalid_manifest: ExternalManifest =
+        serde_yaml::from_str(invalid_yaml).expect("deserializes structurally without validation");
+
+    let result = linker.link(&[invalid_manifest]);
+    assert!(
+        matches!(
+            result,
+            Err(LinkerError::Manifest(ManifestError::PathEscaping { .. }))
+        ),
+        "linker must enforce validation and refuse path-escaping command, got {result:?}"
+    );
+}
+
+#[test]
+fn linker_refusal_contract_version_exact_match_regression() {
+    let linker = ExternalProcessLinker::new().with_expected_contract(
+        OperationId::from_static("fixture.echo.echo"),
+        ContractRef::from_static("fixture.echo.echo.request", "1.0.0"),
+        ContractRef::from_static("fixture.echo.echo.outcome", "1.0.0"),
+    );
+
+    let base_manifest = ExternalManifest::load_from_file(fixture_path("manifest.yaml"))
+        .expect("base fixture loads");
+
+    // 1. Same-major, different-minor request contract (1.1.0 vs 1.0.0)
+    let mut req_diff_minor = base_manifest.clone();
+    req_diff_minor.provides.operations[0].request_contract =
+        "fixture.echo.echo.request@1.1.0".to_string();
+    let res_req_minor = linker.link(&[req_diff_minor]);
+    assert!(
+        matches!(res_req_minor, Err(LinkerError::IncompatibleContract { .. })),
+        "same-major/different-minor request claim must be refused as IncompatibleContract, got {res_req_minor:?}"
+    );
+
+    // 2. Same-major, different-patch request contract (1.0.1 vs 1.0.0)
+    let mut req_diff_patch = base_manifest.clone();
+    req_diff_patch.provides.operations[0].request_contract =
+        "fixture.echo.echo.request@1.0.1".to_string();
+    let res_req_patch = linker.link(&[req_diff_patch]);
+    assert!(
+        matches!(res_req_patch, Err(LinkerError::IncompatibleContract { .. })),
+        "same-major/different-patch request claim must be refused as IncompatibleContract, got {res_req_patch:?}"
+    );
+
+    // 3. Same-major, different-minor outcome contract (1.1.0 vs 1.0.0)
+    let mut out_diff_minor = base_manifest.clone();
+    out_diff_minor.provides.operations[0].outcome_contract =
+        "fixture.echo.echo.outcome@1.1.0".to_string();
+    let res_out_minor = linker.link(&[out_diff_minor]);
+    assert!(
+        matches!(res_out_minor, Err(LinkerError::IncompatibleContract { .. })),
+        "same-major/different-minor outcome claim must be refused as IncompatibleContract, got {res_out_minor:?}"
+    );
+
+    // 4. Same-major, different-patch outcome contract (1.0.1 vs 1.0.0)
+    let mut out_diff_patch = base_manifest.clone();
+    out_diff_patch.provides.operations[0].outcome_contract =
+        "fixture.echo.echo.outcome@1.0.1".to_string();
+    let res_out_patch = linker.link(&[out_diff_patch]);
+    assert!(
+        matches!(res_out_patch, Err(LinkerError::IncompatibleContract { .. })),
+        "same-major/different-patch outcome claim must be refused as IncompatibleContract, got {res_out_patch:?}"
+    );
+
+    // Direct unit test of contracts_compatible helper
+    let expected = ContractRef::from_static("fixture.echo.echo.request", "1.0.0");
+    let exact_match = ContractRef::from_static("fixture.echo.echo.request", "1.0.0");
+    let diff_minor = ContractRef::from_static("fixture.echo.echo.request", "1.1.0");
+    let diff_patch = ContractRef::from_static("fixture.echo.echo.request", "1.0.1");
+    let diff_major = ContractRef::from_static("fixture.echo.echo.request", "2.0.0");
+    let diff_id = ContractRef::from_static("other.contract.id", "1.0.0");
+
+    assert!(ExternalProcessLinker::contracts_compatible(&exact_match, &expected));
+    assert!(!ExternalProcessLinker::contracts_compatible(&diff_minor, &expected));
+    assert!(!ExternalProcessLinker::contracts_compatible(&diff_patch, &expected));
+    assert!(!ExternalProcessLinker::contracts_compatible(&diff_major, &expected));
+    assert!(!ExternalProcessLinker::contracts_compatible(&diff_id, &expected));
 }
 
 #[test]
