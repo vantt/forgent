@@ -2,11 +2,11 @@
 
 **Track:** `code-implementation-track-policy`
 
-**Status:** done — P01 + P02 merged to track branch; track Acceptance verified; see [`reports/track-closeout.md`](reports/track-closeout.md)
+**Status:** done — P01-P05 merged to track branch; track Acceptance verified (P01+P02 scope: see [`reports/track-closeout.md`](reports/track-closeout.md), corrected below for P03-P05); ready for merge to `main`.
 
-**Date:** 2026-09-15 (rev 2)
+**Date:** 2026-09-15 (rev 3 — P03-P05 added; scope widened from docs-only, see Mode below)
 
-**Mode:** docs-only
+**Mode:** docs-only through P02; **P05 widened this to include a real engine fix** (`src/runner/coordination/session-engine.mjs`) per the user's explicit, one-cell-scoped reversal of the "Not in scope" runtime-schema/engine exclusion below — see P05's own cell trace for the full rationale and evidence.
 
 ## Objective
 
@@ -157,17 +157,27 @@ branch; `code:implement` capability for the skill edits, docs otherwise.
 
 - Editing `plans/260915-0455-test-suite-feedback-cost/` (Invariant #2 stays
   until its owner decides — see below).
-- Any runtime schema, validator script, CLI command, or persisted checkpoint
-  state. Each waits for a second real consumer (ADR-007 §4 bar). Still firm
-  through P03 — its focused/affected/full proof tiers and tree-identity
-  reuse rule are Lead-discipline prose only, no schema/engine change.
+- ~~Any runtime schema, validator script, CLI command, or persisted
+  checkpoint state.~~ Each waits for a second real consumer (ADR-007 §4
+  bar). Still firm through P04 — every cell's own focused/affected/full
+  proof tiers and tree-identity reuse rule stayed Lead-discipline prose
+  only, no schema/engine change. **Superseded at P05, narrowly:** the user
+  explicitly reversed this exclusion for `tsk-1bh` specifically (a
+  confirmed-live coordination-engine bug in
+  `src/runner/coordination/session-engine.mjs`, blocking this exact
+  track's own `--p01`/`--p04` sessions from closing), asked for it fixed
+  directly in this same track, and it was — see
+  [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md).
+  This narrows only that one named bug's fix (plus the raw-provenance
+  hardening its own review round needed) — no new schema, validator
+  script, CLI command, or persisted checkpoint state field was added; the
+  ADR-007 §4 bar itself is untouched and still governs everything else.
 - ~~Test selection, caching, tiering~~ — **superseded at P03** by explicit
   real-time user direction ("mục tiêu thật của việc làm này là phải cải
   thiện hiệu suất của code panel... nên tập trung vào tối ưu test"):
   `fgos-code-panel` now declares a focused/affected/full test-selection
   contract and a tree-identity proof-reuse rule. This narrows only that one
-  bullet — the schema/validator/engine exclusion above is untouched and
-  still governs.
+  bullet.
 
 ## Execution Inputs
 
@@ -200,7 +210,8 @@ future track and had not dogfooded it on itself until now.)
 | P01 | `06e73303` | 1 fix round; reviewer: 2 MEDIUM+4 LOW; red-team: 1 HIGH+5 MEDIUM+6 LOW (4 LOW attacks already failed on their own report), all accepted items fixed and Lead-reverified against `testedSha` (independent recheck not dispatched — session hit `aggregateBounds.maxRounds`; known limit, see cell trace) | RT-09 (this plan lacks an Execution Inputs/baseline block — now added above), RT-12c (`docs/enduser-docs-index.json` not regenerated) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p01.md) |
 | P02 | `ddb9e78e` | 1 fix round; reviewer: 3 HIGH (1 root cause: projections not regenerated)+1 MEDIUM+2 LOW; red-team: 1 HIGH (same root cause); HIGH root cause + MEDIUM fixed by Lead (build:skills regen + npm test) and fixer respectively; full-suite gate: 51/51 unique failures match the newly-recorded baseline exactly (corrected at P03 from a "103" double-count — see plan.md's own BASELINE note), 0 new | LOW-1/LOW-2 (pre-existing, not regressions); how-to gap: no documented tree-equality shortcut for the non-inference rule (fixed at P03) — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p02.md) |
 | P03 | `945e6026` | 1 fix round; reviewer: 7 MEDIUM+6 LOW (no HIGH); red-team: 2 HIGH+2 MEDIUM succeeded (env-fingerprint gap; precondition-mislabeling risk; FULL_TRIGGERS mismatch; unenforced close rationale)+1 MEDIUM failed, all accepted findings fixed in one commit; also caught and corrected a real baseline-count bug mid-cell (103→51, double-counted); full-suite gate: 51/51 unique failures match corrected baseline, 0 new; 167/167 targeted pass; `treeIdentical: true` certifies `integratedSha` | tsk-1bh (engine-level authorization/quorum bugs) and dogfooding-over-real-runs both explicitly deferred by the user — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p03.md) |
-| P04 | `37248760` | No cell-worktree/merge boundary (fix landed as commits directly on `code-implementation-track-policy--p04`, same shape as P03's late fixes); 3 fix rounds (at this track's own cap): reviewer 1 HIGH+1 MEDIUM+4 LOW then 3 MEDIUM+2 LOW on recheck; red-team 2 HIGH+2 MEDIUM succeeded (unenforced-gate disclosure; TOCTOU cleanup race; gitignored-trace correctness bug fixed via `git notes`; residual once-wording) then 2 MEDIUM failed on final recheck; all fixed; reviewer independently re-executed targeted suite twice (167/167 both times); coordination session could not auto-close (`tsk-1bh` recurrence on the `fixer` driver-authorized position — new evidence, same engine bug, still deferred) | tsk-1bh (now hit twice); dogfooding-over-real-runs still deferred by the user — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md) |
+| P04 | `37248760` (cell branch `code-implementation-track-policy--p04`, `testedSha` `70eb4485` — trace originally mislabeled this as "no cell branch," corrected at P05) | 3 fix rounds (at this track's own cap): reviewer 1 HIGH+1 MEDIUM+4 LOW then 3 MEDIUM+2 LOW on recheck; red-team 2 HIGH+2 MEDIUM succeeded (unenforced-gate disclosure; TOCTOU cleanup race; gitignored-trace correctness bug, fixed via `git notes` at P04 then superseded by plain tracked commits at P05; residual once-wording) then 2 MEDIUM failed on final recheck; all fixed; reviewer independently re-executed targeted suite twice (167/167 both times); coordination session could not auto-close (`tsk-1bh` recurrence on the `fixer` driver-authorized position — new evidence, same engine bug; fixed directly at P05 per reversed scope decision) | dogfooding-over-real-runs still deferred by the user — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p04.md) |
+| P05 | `99fb5632` (cell branch `code-implementation-track-policy--p05`, `testedSha` `7b0af304`; `treeIdentical: true` vs `trackIntegratedSha`) | 2 review rounds: round 1 reviewer 1 HIGH (proof gap)+1 MEDIUM (`resolveTaskKeyAuthorization` still oldest-wins)+1 MEDIUM (SKILL.md contradiction)+3 LOW, red-team 1 HIGH (same root cause as reviewer's MEDIUM, found independently), all fixed; round 1 recheck reviewer confirmed by real mutation-testing + filed 1 NEW MEDIUM (orphaned authorization never retired, deferred), red-team filed 1 NEW HIGH (raw `createSessionAssignment` door could launder an unrelated task via a copied `(nodeId, operationId)` payload, since the fallback trusted raw payload fields instead of the reserved contract stamp `assignmentServesOperation` already checks) — fixed; round 2 recheck could not dispatch live (session `aggregateBounds.wallTimeMs` exhausted, partly from a Lead-side wrong-binary mistake and a repeated missing-`grantedContextRefs` mistake, both documented) — mitigated by Lead mutation-testing the fix directly; coordination session could not auto-close (`doer`/`fixer` Bash-restricted, no retroactive `partialPolicy`) — merged on Lead's own re-verification, same precedent as P01/P04 | 1 MEDIUM (orphaned authorization never retired — pre-existing, not introduced here) explicitly deferred to a future engine cell — see [`docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md`](../../docs/architect/agent-coordination/verification/code-implementation-track-policy/p05.md) |
 
 ## Open decision (owner)
 
