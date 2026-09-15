@@ -4,9 +4,8 @@
 **Branch:** `implementation-track--dispatch-operability-evidence-attribution`
 **Worktree:** `/home/vantt/projects/dispatch-operability-implementation`
 **Base:** `main` at `57dfad49`
-**Status:** paused after I03 (I01-I03 merged) — holding for a fgos-code-panel
-efficiency improvement before resuming I04. See Product Gates below for
-per-cell merge commits and trace links.
+**Status:** I01-I04 merged. Next cell: I05 (`dispatch.runtime.reconcile`). See
+Product Gates below for per-cell merge commits and trace links.
 
 ## Objective
 
@@ -92,7 +91,7 @@ a manual fallback audit listing touched symbols and callers.
 | I01 | `agent-result-claim.v2` single source for prompt and validation | `phase-01-agent-result-claim-v2.md` | merged `94d3d6fa` (2 fix rounds; reviewer/red-team clean after round 2; both rounds' contested findings independently re-verified and rejected — see [I01 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I01.md)) |
 | I02 | Effective execution contract persisted pre-launch and inspectable | `phase-02-effective-execution-contract.md` | merged `f718d78b` (1 fix round; reviewer/red-team clean after fix — see [I02 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I02.md)) |
 | I03 | RunResult v2, legacy-v1 interpretation, attribution dimensions | `phase-03-runresult-v2-and-attribution.md` | merged `8e8e7f65` (3 fix rounds, cap reached; production fixes independently proven, 2 documented non-blocking test-coverage residuals — see [I03 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md)) |
-| I04 | `dispatch.runtime.inspect` read model and CLI projection | `phase-04-dispatch-runtime-inspect.md` | planned |
+| I04 | `dispatch.runtime.inspect` read model and CLI projection | `phase-04-dispatch-runtime-inspect.md` | merged `97c183cc` (3 fix rounds, cap reached; reviewer clean except 1 deferred label-consistency residual, red-team clean after round 3; Lead rejected a repeated host-routing/operation-catalog proof-gap escalation as out of this phase's declared scope — see [I04 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md)) |
 | I05 | `dispatch.runtime.reconcile` CAS guard/projection repair | `phase-05-dispatch-runtime-reconcile.md` | planned |
 | I06 | Production-door and negative-route proof matrix | `phase-06-production-door-proof.md` | planned |
 | C00 | Integration docs, changelog, final review/red-team | `phase-07-integration-closeout.md` | planned |
