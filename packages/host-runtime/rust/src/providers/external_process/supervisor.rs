@@ -138,15 +138,23 @@ pub struct ExternalProcessOutcome {
 }
 
 impl ExternalProcessOutcome {
-    pub fn to_provider_outcome(&self) -> ProviderOutcome {
-        let (id, version) = match self.outcome_contract.split_once('@') {
-            Some((id, ver)) => (id, ver),
-            None => (self.outcome_contract.as_str(), "1.0.0"),
-        };
-        ProviderOutcome::completed(
+    pub fn to_provider_outcome(&self) -> Result<ProviderOutcome, ProviderError> {
+        let (id, version) = self.outcome_contract.split_once('@').ok_or_else(|| {
+            ProviderError::ProtocolViolation(format!(
+                "outcome_contract '{}' missing version delimiter '@'",
+                self.outcome_contract
+            ))
+        })?;
+        if id.is_empty() || version.is_empty() {
+            return Err(ProviderError::ProtocolViolation(format!(
+                "outcome_contract '{}' has empty id or version",
+                self.outcome_contract
+            )));
+        }
+        Ok(ProviderOutcome::completed(
             ContractRef::new(id, version),
             Box::new(self.echo.clone()),
-        )
+        ))
     }
 }
 
@@ -210,7 +218,7 @@ impl ExternalProcessSupervisor {
             kill_child(&mut child);
             ProviderError::ProviderUnavailable("failed to capture child stdin".to_string())
         })?;
-        let mut stdout = child.stdout.take().ok_or_else(|| {
+        let stdout = child.stdout.take().ok_or_else(|| {
             kill_child(&mut child);
             ProviderError::ProviderUnavailable("failed to capture child stdout".to_string())
         })?;
@@ -222,42 +230,88 @@ impl ExternalProcessSupervisor {
         let max_capture = self.config.max_capture_bytes;
         if let Some(mut stderr) = stderr_opt {
             std::thread::spawn(move || {
+                const TRUNCATION_MARKER: &[u8] = b"\n[stderr truncated]\n";
                 let mut buf = [0u8; 1024];
                 let mut total = 0;
+                let mut truncated = false;
                 while let Ok(n) = stderr.read(&mut buf) {
                     if n == 0 {
                         break;
+                    }
+                    if truncated {
+                        continue;
                     }
                     let mut lock = stderr_clone.lock().unwrap();
                     if total + n <= max_capture {
                         lock.extend_from_slice(&buf[..n]);
                         total += n;
-                    } else if total < max_capture {
-                        let remaining = max_capture - total;
-                        lock.extend_from_slice(&buf[..remaining]);
-                        lock.extend_from_slice(b"\n[stderr truncated]\n");
+                    } else {
+                        truncated = true;
+                        if max_capture >= TRUNCATION_MARKER.len() {
+                            let available = max_capture - TRUNCATION_MARKER.len();
+                            if total < available {
+                                let take = available - total;
+                                lock.extend_from_slice(&buf[..take.min(n)]);
+                            } else {
+                                lock.truncate(available);
+                            }
+                            lock.extend_from_slice(TRUNCATION_MARKER);
+                        } else {
+                            let remaining = max_capture.saturating_sub(total);
+                            lock.extend_from_slice(&buf[..remaining.min(n)]);
+                        }
                         total = max_capture;
                     }
                 }
             });
         }
 
-        // Step 4: Background stdout reader thread sending frames to channel
-        let (tx, rx) = std::sync::mpsc::channel();
+        // Step 4: Background stdout reader thread sending frames to bounded channel
+        const STDOUT_FRAME_QUEUE_BOUND: usize = 32;
+        let (tx, rx) = std::sync::mpsc::sync_channel(STDOUT_FRAME_QUEUE_BOUND);
+        let overflow_captured = Arc::new(Mutex::new(None));
+        let overflow_clone = Arc::clone(&overflow_captured);
         let codec_clone = self.codec.clone();
+        let max_stdout_bytes = self.config.max_capture_bytes;
         std::thread::spawn(move || {
+            let mut reader = BudgetReader {
+                inner: stdout,
+                bytes_read: 0,
+                max_bytes: max_stdout_bytes,
+            };
             loop {
-                match codec_clone.decode_from_reader(&mut stdout) {
+                match codec_clone.decode_from_reader(&mut reader) {
                     Ok(Some(msg)) => {
-                        if tx.send(Ok(msg)).is_err() {
+                        if reader.bytes_read > reader.max_bytes {
+                            *overflow_clone.lock().unwrap() = Some(format!(
+                                "stdout byte budget exceeded: {} bytes > max {}",
+                                reader.bytes_read, reader.max_bytes
+                            ));
                             break;
                         }
+                        match tx.try_send(Ok(msg)) {
+                            Ok(()) => {}
+                            Err(std::sync::mpsc::TrySendError::Full(_)) => {
+                                *overflow_clone.lock().unwrap() = Some(format!(
+                                    "stdout frame queue capacity exceeded (bound: {STDOUT_FRAME_QUEUE_BOUND})"
+                                ));
+                                break;
+                            }
+                            Err(std::sync::mpsc::TrySendError::Disconnected(_)) => {
+                                break;
+                            }
+                        }
                     }
-                    Ok(None) => {
-                        break;
-                    }
+                    Ok(None) => break,
                     Err(e) => {
-                        let _ = tx.send(Err(e));
+                        if reader.bytes_read > reader.max_bytes {
+                            *overflow_clone.lock().unwrap() = Some(format!(
+                                "stdout byte budget exceeded: {} bytes > max {}",
+                                reader.bytes_read, reader.max_bytes
+                            ));
+                        } else {
+                            let _ = tx.try_send(Err(e));
+                        }
                         break;
                     }
                 }
@@ -276,18 +330,20 @@ impl ExternalProcessSupervisor {
 
         if let Err(e) = self.codec.encode_to_writer(&handshake_req, &mut stdin) {
             kill_child(&mut child);
+            let stderr_tail = format_stderr_tail(&stderr_captured);
             return Err(ProviderError::ProviderCrash(format!(
-                "failed to send handshake to provider process: {e}"
+                "failed to send handshake to provider process: {e}{stderr_tail}"
             )));
         }
 
         let handshake_deadline = Instant::now() + self.config.startup_timeout;
-        loop {
+        'handshake: loop {
             if Instant::now() > handshake_deadline {
                 kill_child(&mut child);
-                return Err(ProviderError::DeadlineExceeded(
-                    "startup/handshake deadline exceeded".to_string(),
-                ));
+                let stderr_tail = format_stderr_tail(&stderr_captured);
+                return Err(ProviderError::DeadlineExceeded(format!(
+                    "startup/handshake deadline exceeded{stderr_tail}"
+                )));
             }
 
             if cancellation_rx.as_ref().map(|rx| *rx.borrow()).unwrap_or(false) {
@@ -297,25 +353,30 @@ impl ExternalProcessSupervisor {
                 ));
             }
 
-            if let Ok(Some(status)) = child.try_wait() {
+            if let Some(ref err) = *overflow_captured.lock().unwrap() {
                 kill_child(&mut child);
-                return Err(ProviderError::ProviderCrash(format!(
-                    "provider process exited before handshake completed with status {status:?}"
+                let stderr_tail = format_stderr_tail(&stderr_captured);
+                return Err(ProviderError::ProtocolViolation(format!(
+                    "protocol violation during handshake: {err}{stderr_tail}"
                 )));
             }
 
+            // Drain response channel non-blocking BEFORE calling child.try_wait()
             match rx.try_recv() {
                 Ok(Ok(FrameMessage::Response(res))) => {
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     if let Some(err) = res.error {
                         kill_child(&mut child);
                         return Err(ProviderError::ProtocolViolation(format!(
-                            "handshake error response from provider: {}: {}",
+                            "handshake error response from provider: {}: {}{stderr_tail}",
                             err.code, err.message
                         )));
                     }
                     let result = res.result.ok_or_else(|| {
                         kill_child(&mut child);
-                        ProviderError::ProtocolViolation("handshake response missing result".to_string())
+                        ProviderError::ProtocolViolation(format!(
+                            "handshake response missing result{stderr_tail}"
+                        ))
                     })?;
                     let provider_id = result
                         .get("provider_id")
@@ -324,7 +385,7 @@ impl ExternalProcessSupervisor {
                     if provider_id != self.config.provider_id {
                         kill_child(&mut child);
                         return Err(ProviderError::ProtocolViolation(format!(
-                            "handshake provider id mismatch: expected '{}', got '{}'",
+                            "handshake provider id mismatch: expected '{}', got '{}'{stderr_tail}",
                             self.config.provider_id, provider_id
                         )));
                     }
@@ -333,24 +394,85 @@ impl ExternalProcessSupervisor {
                 }
                 Ok(Ok(other)) => {
                     kill_child(&mut child);
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
-                        "expected handshake response, received {:?}",
-                        other
+                        "expected handshake response, received {other:?}{stderr_tail}"
                     )));
                 }
                 Ok(Err(codec_err)) => {
                     kill_child(&mut child);
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
-                        "protocol violation during handshake: {codec_err}"
+                        "protocol violation during handshake: {codec_err}{stderr_tail}"
                     )));
                 }
                 Err(std::sync::mpsc::TryRecvError::Disconnected) => {
                     kill_child(&mut child);
-                    return Err(ProviderError::ProviderCrash(
-                        "provider stdout disconnected during handshake".to_string(),
-                    ));
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                    return Err(ProviderError::ProviderCrash(format!(
+                        "provider stdout disconnected during handshake{stderr_tail}"
+                    )));
                 }
                 Err(std::sync::mpsc::TryRecvError::Empty) => {
+                    // Only classify child exit as ProviderCrash when channel is empty AND disconnected
+                    if let Ok(Some(status)) = child.try_wait() {
+                        loop {
+                            match rx.try_recv() {
+                                Ok(Ok(FrameMessage::Response(res))) => {
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    if let Some(err) = res.error {
+                                        kill_child(&mut child);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "handshake error response from provider: {}: {}{stderr_tail}",
+                                            err.code, err.message
+                                        )));
+                                    }
+                                    let result = res.result.ok_or_else(|| {
+                                        kill_child(&mut child);
+                                        ProviderError::ProtocolViolation(format!(
+                                            "handshake response missing result{stderr_tail}"
+                                        ))
+                                    })?;
+                                    let provider_id = result
+                                        .get("provider_id")
+                                        .and_then(|v| v.as_str())
+                                        .unwrap_or("");
+                                    if provider_id != self.config.provider_id {
+                                        kill_child(&mut child);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "handshake provider id mismatch: expected '{}', got '{}'{stderr_tail}",
+                                            self.config.provider_id, provider_id
+                                        )));
+                                    }
+                                    break 'handshake;
+                                }
+                                Ok(Ok(other)) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::ProtocolViolation(format!(
+                                        "expected handshake response, received {other:?}{stderr_tail}"
+                                    )));
+                                }
+                                Ok(Err(codec_err)) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::ProtocolViolation(format!(
+                                        "protocol violation during handshake: {codec_err}{stderr_tail}"
+                                    )));
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::ProviderCrash(format!(
+                                        "provider process exited before handshake completed with status {status:?}{stderr_tail}"
+                                    )));
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Empty) => {
+                                    tokio::time::sleep(Duration::from_millis(2)).await;
+                                }
+                            }
+                        }
+                    }
                     tokio::time::sleep(Duration::from_millis(5)).await;
                 }
             }
@@ -359,8 +481,9 @@ impl ExternalProcessSupervisor {
         // Step 6: Check child liveness and cancellation BEFORE dispatch
         if let Ok(Some(status)) = child.try_wait() {
             kill_child(&mut child);
+            let stderr_tail = format_stderr_tail(&stderr_captured);
             return Err(ProviderError::ProviderCrash(format!(
-                "provider process crashed before dispatch with status {status:?}"
+                "provider process crashed before dispatch with status {status:?}{stderr_tail}"
             )));
         }
 
@@ -389,8 +512,9 @@ impl ExternalProcessSupervisor {
 
         if let Err(e) = self.codec.encode_to_writer(&invoke_msg, &mut stdin) {
             kill_child(&mut child);
+            let stderr_tail = format_stderr_tail(&stderr_captured);
             return Err(ProviderError::ProviderCrash(format!(
-                "failed to dispatch request to provider: {e}"
+                "failed to dispatch request to provider: {e}{stderr_tail}"
             )));
         }
 
@@ -424,27 +548,30 @@ impl ExternalProcessSupervisor {
             // Check request deadline
             if Instant::now() > request_deadline {
                 kill_child(&mut child);
+                let stderr_tail = format_stderr_tail(&stderr_captured);
                 return Err(ProviderError::DeadlineExceeded(format!(
-                    "request deadline exceeded ({}ms)",
+                    "request deadline exceeded ({}ms){stderr_tail}",
                     self.config.request_timeout.as_millis()
                 )));
             }
 
-            // Check if child crashed AFTER dispatch
-            if let Ok(Some(status)) = child.try_wait() {
+            // Check overflow
+            if let Some(ref err) = *overflow_captured.lock().unwrap() {
                 kill_child(&mut child);
-                return Err(ProviderError::CompletionUnknown(format!(
-                    "provider process crashed after dispatch before response received (status: {status:?})"
+                let stderr_tail = format_stderr_tail(&stderr_captured);
+                return Err(ProviderError::ProtocolViolation(format!(
+                    "protocol violation: {err}{stderr_tail}"
                 )));
             }
 
-            // Check response channel
+            // Drain response channel non-blocking BEFORE calling child.try_wait()
             match rx.try_recv() {
                 Ok(Ok(FrameMessage::Response(res))) => {
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     if res.id != Some(req_id.clone()) {
                         kill_child(&mut child);
                         return Err(ProviderError::ProtocolViolation(format!(
-                            "response id mismatch: expected {:?}, got {:?}",
+                            "response id mismatch: expected {:?}, got {:?}{stderr_tail}",
                             req_id, res.id
                         )));
                     }
@@ -452,50 +579,156 @@ impl ExternalProcessSupervisor {
                     if let Some(err) = res.error {
                         kill_child(&mut child);
                         return Err(ProviderError::ProviderFailed(format!(
-                            "provider error {}: {}",
+                            "provider error {}: {}{stderr_tail}",
                             err.code, err.message
                         )));
                     }
 
                     let result = res.result.ok_or_else(|| {
                         kill_child(&mut child);
-                        ProviderError::ProtocolViolation("response missing result".to_string())
+                        ProviderError::ProtocolViolation(format!("response missing result{stderr_tail}"))
                     })?;
 
                     let outcome: ExternalProcessOutcome = serde_json::from_value(result).map_err(|e| {
                         kill_child(&mut child);
                         ProviderError::ProtocolViolation(format!(
-                            "failed to parse outcome payload: {e}"
+                            "failed to parse outcome payload: {e}{stderr_tail}"
                         ))
                     })?;
+
+                    if outcome.outcome_contract.split_once('@').is_none() {
+                        kill_child(&mut child);
+                        return Err(ProviderError::ProtocolViolation(format!(
+                            "outcome_contract '{}' missing version delimiter '@'{stderr_tail}",
+                            outcome.outcome_contract
+                        )));
+                    }
 
                     kill_child(&mut child);
                     return Ok(outcome);
                 }
                 Ok(Ok(other)) => {
                     kill_child(&mut child);
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
-                        "expected response, received {:?}",
-                        other
+                        "expected response, received {other:?}{stderr_tail}"
                     )));
                 }
                 Ok(Err(codec_err)) => {
                     kill_child(&mut child);
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
                     return Err(ProviderError::ProtocolViolation(format!(
-                        "protocol violation in response frame: {codec_err}"
+                        "protocol violation in response frame: {codec_err}{stderr_tail}"
                     )));
                 }
                 Err(std::sync::mpsc::TryRecvError::Disconnected) => {
                     kill_child(&mut child);
-                    return Err(ProviderError::CompletionUnknown(
-                        "provider process closed stdout after dispatch before completing response"
-                            .to_string(),
-                    ));
+                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                    return Err(ProviderError::CompletionUnknown(format!(
+                        "provider process closed stdout after dispatch before completing response{stderr_tail}"
+                    )));
                 }
                 Err(std::sync::mpsc::TryRecvError::Empty) => {
+                    // Check if child crashed AFTER dispatch
+                    if let Ok(Some(status)) = child.try_wait() {
+                        // Wait until rx yields the response or channel is disconnected
+                        loop {
+                            match rx.try_recv() {
+                                Ok(Ok(FrameMessage::Response(res))) => {
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    if res.id != Some(req_id.clone()) {
+                                        kill_child(&mut child);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "response id mismatch: expected {:?}, got {:?}{stderr_tail}",
+                                            req_id, res.id
+                                        )));
+                                    }
+                                    if let Some(err) = res.error {
+                                        kill_child(&mut child);
+                                        return Err(ProviderError::ProviderFailed(format!(
+                                            "provider error {}: {}{stderr_tail}",
+                                            err.code, err.message
+                                        )));
+                                    }
+                                    let result = res.result.ok_or_else(|| {
+                                        kill_child(&mut child);
+                                        ProviderError::ProtocolViolation(format!("response missing result{stderr_tail}"))
+                                    })?;
+                                    let outcome: ExternalProcessOutcome = serde_json::from_value(result).map_err(|e| {
+                                        kill_child(&mut child);
+                                        ProviderError::ProtocolViolation(format!(
+                                            "failed to parse outcome payload: {e}{stderr_tail}"
+                                        ))
+                                    })?;
+                                    if outcome.outcome_contract.split_once('@').is_none() {
+                                        kill_child(&mut child);
+                                        return Err(ProviderError::ProtocolViolation(format!(
+                                            "outcome_contract '{}' missing version delimiter '@'{stderr_tail}",
+                                            outcome.outcome_contract
+                                        )));
+                                    }
+                                    kill_child(&mut child);
+                                    return Ok(outcome);
+                                }
+                                Ok(Ok(other)) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::ProtocolViolation(format!(
+                                        "expected response, received {other:?}{stderr_tail}"
+                                    )));
+                                }
+                                Ok(Err(codec_err)) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::ProtocolViolation(format!(
+                                        "protocol violation in response frame: {codec_err}{stderr_tail}"
+                                    )));
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                                    kill_child(&mut child);
+                                    let stderr_tail = format_stderr_tail(&stderr_captured);
+                                    return Err(ProviderError::CompletionUnknown(format!(
+                                        "provider process crashed after dispatch before response received (status: {status:?}){stderr_tail}"
+                                    )));
+                                }
+                                Err(std::sync::mpsc::TryRecvError::Empty) => {
+                                    tokio::time::sleep(Duration::from_millis(2)).await;
+                                }
+                            }
+                        }
+                    }
                     tokio::time::sleep(Duration::from_millis(5)).await;
                 }
             }
+        }
+    }
+}
+
+struct BudgetReader<R> {
+    inner: R,
+    bytes_read: usize,
+    max_bytes: usize,
+}
+
+impl<R: Read> Read for BudgetReader<R> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let n = self.inner.read(buf)?;
+        self.bytes_read += n;
+        Ok(n)
+    }
+}
+
+fn format_stderr_tail(stderr_captured: &Arc<Mutex<Vec<u8>>>) -> String {
+    let lock = stderr_captured.lock().unwrap();
+    if lock.is_empty() {
+        String::new()
+    } else {
+        let text = String::from_utf8_lossy(&lock);
+        let trimmed = text.trim();
+        if trimmed.is_empty() {
+            String::new()
+        } else {
+            format!(" (stderr: {trimmed})")
         }
     }
 }

@@ -132,6 +132,44 @@ fn main() -> io::Result<()> {
                         continue;
                     }
 
+                    if action == "flood"
+                        || payload.get("flood").and_then(|f| f.as_bool()) == Some(true)
+                        || args.iter().any(|a| a == "--flood")
+                    {
+                        // Emits many/large valid frames to test bounded memory/capture
+                        let chunk = "x".repeat(32 * 1024);
+                        for i in 0..10_000 {
+                            let notif = FrameMessage::notification(
+                                "flood_event",
+                                Some(serde_json::json!({ "seq": i, "data": &chunk })),
+                            );
+                            if codec.encode_to_writer(&notif, &mut writer).is_err() {
+                                break;
+                            }
+                        }
+                        return Ok(());
+                    }
+
+                    if action == "cooperative_cancel"
+                        || payload.get("cooperative_cancel").and_then(|c| c.as_bool()) == Some(true)
+                    {
+                        // Actually read and block on stdin for the cancellation notification
+                        eprintln!("fixture echo_process cooperative_cancel: listening on stdin");
+                        match codec.decode_from_reader(&mut reader) {
+                            Ok(Some(FrameMessage::Notification(notif))) if notif.method == "cancel" => {
+                                eprintln!("fixture echo_process received cancellation notification");
+                                if let Ok(path) = env::var("CANCEL_SENTINEL_FILE") {
+                                    let _ = fs::write(path, "cancelled\n");
+                                }
+                                std::process::exit(0);
+                            }
+                            other => {
+                                eprintln!("fixture echo_process cooperative_cancel: unexpected frame: {other:?}");
+                                std::process::exit(1);
+                            }
+                        }
+                    }
+
                     if let Some(delay_ms) = payload.get("delay_ms").and_then(|d| d.as_u64()) {
                         std::thread::sleep(Duration::from_millis(delay_ms));
                     }
@@ -166,6 +204,9 @@ fn main() -> io::Result<()> {
             FrameMessage::Notification(notif) => {
                 if notif.method == "cancel" {
                     eprintln!("fixture echo_process received cancellation notification");
+                    if let Ok(path) = env::var("CANCEL_SENTINEL_FILE") {
+                        let _ = fs::write(path, "cancelled\n");
+                    }
                     std::thread::sleep(Duration::from_millis(5));
                     std::process::exit(0);
                 }

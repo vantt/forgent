@@ -291,7 +291,7 @@ async fn test_supervisor_happy_path_fixture_invocation() {
     assert_eq!(outcome.protocol_version, COMPONENT_PROTOCOL_VERSION);
     assert_eq!(outcome.echo, payload);
 
-    let provider_outcome = outcome.to_provider_outcome();
+    let provider_outcome = outcome.to_provider_outcome().expect("to_provider_outcome succeeds");
     assert_eq!(provider_outcome.contract().id(), "fixture.echo.echo.outcome");
     assert_eq!(provider_outcome.contract().version(), "1.0.0");
 }
@@ -396,11 +396,15 @@ async fn test_supervisor_crash_before_dispatch() {
     );
 
     let err = supervisor.invoke(&request).await.unwrap_err();
-    assert!(
-        matches!(err, ProviderError::ProviderCrash(_)),
-        "expected ProviderCrash before dispatch, got {:?}",
-        err
-    );
+    match err {
+        ProviderError::ProviderCrash(ref msg) => {
+            assert!(
+                msg.contains("before dispatch"),
+                "expected ProviderCrash before dispatch, got: {msg}"
+            );
+        }
+        other => panic!("expected ProviderCrash before dispatch, got {:?}", other),
+    }
 }
 
 #[tokio::test]
@@ -446,32 +450,144 @@ async fn test_supervisor_malformed_frame() {
 #[tokio::test]
 async fn test_supervisor_cancellation_path() {
     let bin = fixture_bin();
+    let cancel_marker_path = std::env::temp_dir().join(format!(
+        "fgos_test_cancel_marker_{}_{}.marker",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    if cancel_marker_path.exists() {
+        let _ = std::fs::remove_file(&cancel_marker_path);
+    }
+
+    let spawn_sentinel_path = std::env::temp_dir().join(format!(
+        "fgos_test_spawn_marker_{}_{}.marker",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    if spawn_sentinel_path.exists() {
+        let _ = std::fs::remove_file(&spawn_sentinel_path);
+    }
+
+    let mut env = std::collections::HashMap::new();
+    env.insert(
+        "CANCEL_SENTINEL_FILE".to_string(),
+        cancel_marker_path.to_string_lossy().to_string(),
+    );
+    env.insert(
+        "SENTINEL_FILE".to_string(),
+        spawn_sentinel_path.to_string_lossy().to_string(),
+    );
+
+    let grace_period = Duration::from_millis(1000);
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
-        .with_cancellation_grace_period(Duration::from_millis(50));
+        .with_environment(env)
+        .with_cancellation_grace_period(grace_period);
     let supervisor = ExternalProcessSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
         FIXTURE_REQUEST_CONTRACT,
-        serde_json::json!({ "delay_ms": 2000 }),
+        serde_json::json!({ "action": "cooperative_cancel" }),
     );
 
     let (cancel_tx, cancel_rx) = tokio::sync::watch::channel(false);
 
-    // Cancel after 30ms while the 2000ms delay is running
+    // Cancel after 30ms while the child is blocking on stdin
     tokio::spawn(async move {
         tokio::time::sleep(Duration::from_millis(30)).await;
         let _ = cancel_tx.send(true);
     });
 
+    let invoke_start = std::time::Instant::now();
     let err = supervisor
         .invoke_with_cancellation(&request, Some(cancel_rx))
         .await
         .unwrap_err();
+    let elapsed = invoke_start.elapsed();
 
+    // 1. Assert CallerCancelled was returned
     assert!(
         matches!(err, ProviderError::CallerCancelled(_)),
         "expected CallerCancelled on cancellation, got {:?}",
+        err
+    );
+
+    // 2. Assert the cancel notification was genuinely sent and received by the child
+    assert!(
+        cancel_marker_path.exists(),
+        "fixture MUST have received the cooperative cancel notification and written marker"
+    );
+
+    // 3. Assert the grace bound was respected (elapsed comfortably under the 1000ms grace deadline)
+    assert!(
+        elapsed < Duration::from_millis(400),
+        "cooperative cancellation took too long ({:?}), expected exit well under grace deadline (1000ms)",
+        elapsed
+    );
+
+    // 4. Assert the child process was terminated
+    let spawn_content = std::fs::read_to_string(&spawn_sentinel_path).expect("read spawn sentinel");
+    let pid_str = spawn_content
+        .lines()
+        .next()
+        .and_then(|l| l.strip_prefix("spawned: "))
+        .expect("parse pid from spawn sentinel");
+    let pid: u32 = pid_str.trim().parse().expect("parse pid as integer");
+
+    #[cfg(target_os = "linux")]
+    {
+        let proc_path = format!("/proc/{}", pid);
+        assert!(
+            !std::path::Path::new(&proc_path).exists(),
+            "child process (pid {pid}) MUST be terminated and reaped"
+        );
+    }
+
+    // Clean up markers
+    let _ = std::fs::remove_file(&cancel_marker_path);
+    let _ = std::fs::remove_file(&spawn_sentinel_path);
+}
+
+#[tokio::test]
+async fn test_supervisor_flood_bounds_memory_and_terminates() {
+    let bin = fixture_bin();
+    let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
+        .with_max_capture_bytes(64 * 1024); // 64 KB limit
+    let supervisor = ExternalProcessSupervisor::new(config);
+
+    let request = ExternalProcessRequest::new(
+        FIXTURE_OPERATION_ID,
+        FIXTURE_REQUEST_CONTRACT,
+        serde_json::json!({ "action": "flood" }),
+    );
+
+    let err = supervisor.invoke(&request).await.unwrap_err();
+    assert!(
+        matches!(err, ProviderError::ProtocolViolation(_)),
+        "expected ProtocolViolation on flood overflow, got {:?}",
+        err
+    );
+}
+
+#[test]
+fn test_to_provider_outcome_rejects_missing_version_delimiter() {
+    let outcome = fgos_host_runtime::providers::external_process::supervisor::ExternalProcessOutcome {
+        provider_id: FIXTURE_PROVIDER_ID.to_string(),
+        operation_id: FIXTURE_OPERATION_ID.to_string(),
+        outcome_contract: "fixture.echo.echo.outcome".to_string(), // missing '@'
+        protocol_version: COMPONENT_PROTOCOL_VERSION.to_string(),
+        echo: serde_json::json!({}),
+    };
+    let err = outcome.to_provider_outcome().unwrap_err();
+    assert!(
+        matches!(err, ProviderError::ProtocolViolation(_)),
+        "expected ProtocolViolation for missing '@', got {:?}",
         err
     );
 }
