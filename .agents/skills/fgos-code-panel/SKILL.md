@@ -589,9 +589,13 @@ Never assume the merge commit inherits that proof -- check:
   represents a three-way resolution). Escalate on the blast radius too
   when it otherwise requires it.
 - If this re-run finds a REAL problem: the session is already closed, so
-  fixing it does not reopen this cell -- open a **new** code-panel cell
-  for the fix (a normal follow-up change), naming `mainMergedSha` as the
-  "what broke" context in its own `open.json` objective.
+  fixing it does not reopen this cell -- always open a **new** code-panel
+  cell for the fix (a normal follow-up change, its own worktree/branch/
+  session), naming `mainMergedSha` as the "what broke" context in its own
+  `open.json` objective. This cell's own record (below) documents the
+  problem and points at the new cell's id -- it is never blocked on that
+  new cell's own fix actually landing, since the new cell has its own
+  independent close/merge/post-merge-verify lifecycle on its own timeline.
 
 **Record the result as an ordinary tracked commit -- not a `git note`.**
 `refs/notes/*` are not in the default commit graph, do not push/fetch by
@@ -607,19 +611,23 @@ chore(code-panel--<change-slug>): post-merge verification
 
 testedSha: $testedSha
 mainMergedSha: $mainMergedSha
-Result: <treeIdentical: true, matches testedSha | AFFECTED_TESTS/FULL_TEST re-run: <result>>
+Result: <treeIdentical: true, matches testedSha | AFFECTED_TESTS/FULL_TEST re-run: <result> | REAL PROBLEM found, follow-up cell: <new cell id>>
 MSG
 )"
 postMergeVerifiedSha=$(git -C "$main" rev-parse HEAD)
 ```
 
-(`--allow-empty` when the check needed no code change; when a real fix
-landed instead per the bullet above, that fix's own real commit IS
-`postMergeVerifiedSha` -- do not also add an empty one on top.) To find
-every code-panel cell's post-merge record later, `git log --all --grep
-"post-merge verification"` -- no separate report generator, docs
-directory, or push/fetch policy registration needed; add a real generator
-only once a second real consumer of that aggregate needs it (ADR-007 §4).
+This commit is always `--allow-empty` -- it records this cell's own
+check outcome, never a code change. Even the "REAL PROBLEM found" case
+records here (with the follow-up cell's id as the pointer), because the
+fix itself lands through that OTHER cell's own separate close/merge/
+post-merge-verify cycle, not this one -- this cell's `postMergeVerifiedSha`
+only needs to prove the check ran and was recorded, not that any problem
+it found is already fixed. To find every code-panel cell's post-merge
+record later, `git log --all --grep "post-merge verification"` -- no
+separate report generator, docs directory, or push/fetch policy
+registration needed; add a real generator only once a second real
+consumer of that aggregate needs it (ADR-007 §4).
 
 Only once `postMergeVerifiedSha` exists, and only if `$main`'s `HEAD` has
 not moved since (another writer could have advanced it in the meantime --

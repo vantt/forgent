@@ -1198,7 +1198,25 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
  */
 function resolveTaskKeyAuthorization(authorizations, binding) {
   const forThisBinding = bindingAuthorizations(authorizations, binding);
-  const unconsumed = forThisBinding.find((record) => record.consumedByAssignmentId === null);
+  // tsk-1bh fix: this MUST pick the same unconsumed authorization
+  // `resolveBindingAuthorization` (above) will independently resolve to
+  // consume for this same dispatch -- `.findLast()`, not `.find()`, for the
+  // identical "newest is the Lead's real current intent, an orphaned older
+  // one is dead weight" reasoning that function's own comment gives. Before
+  // this fix the two disagreed: this taskKey-derivation half kept naming the
+  // OLDEST unconsumed (often orphaned) authorization, while dispatch itself
+  // consumed the NEWEST one, so the taskKey a caller's own later invocation
+  // recomputes never changes across retries even after a fresh, correctly-
+  // scoped authorization is issued -- `isResumeOfThisRound` then resolves to
+  // an EARLIER attempt's own claim, and the same-binding "fresher unconsumed
+  // authorization exists" guard (this file, `dispatchDeclaredOperation`'s
+  // `freshUnconsumed` check) refuses the retry outright instead of minting a
+  // new claim for it. Confirmed live via the exact repro this fixes:
+  // orphaned auth A, a successful dispatch under auth B, and a THIRD
+  // correction auth C for the same binding -- the pre-fix mismatch names A
+  // (or B, once B is consumed) in the taskKey while C sits unconsumed,
+  // permanently blocking the retry C exists to make.
+  const unconsumed = forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
   if (unconsumed) return unconsumed;
   // No fresh authorization pending: this is either a genuine idempotent
   // resume (exactly one prior invocation was ever consumed at this binding
@@ -3535,12 +3553,17 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
     // the FIRST assignment-created event alone -- a later, genuinely
     // successful re-attempt of that same binding could never un-stick a
     // `failed` classification, so `closeSessionByQuorum` would refuse
-    // forever even after real, verified work landed (confirmed live, not
-    // hypothetical: `fgos-plan-loop` cells
-    // `code-implementation-track-policy--p01`'s `reviewer-recheck` and
-    // `--p04`'s `fixer` both hit exactly this; both re-attempts arrived
-    // through `dispatchDeclaredOperation`, so both carry the same
-    // `(nodeId, operationId)` stamp as the first attempt).
+    // forever even after real, verified work landed (confirmed live:
+    // `fgos-plan-loop` cell `code-implementation-track-policy--p04`'s
+    // `fixer`, an ungated driver-authorized actor that genuinely reaches
+    // this fallback. `--p01`'s `reviewer-recheck` hit the SAME symptom for
+    // a DIFFERENT reason -- `reviewer` also binds `review-candidate`
+    // [required], so `actorGatingOperationIds` returns non-empty for it and
+    // it never reaches this fallback at all; that occurrence was purely
+    // `resolveBindingAuthorization`/`resolveTaskKeyAuthorization` (above)
+    // repeatedly handing dispatch back to a dead orphaned authorization, an
+    // upstream fix to a DIFFERENT bug in a DIFFERENT function -- cited here
+    // only to avoid re-attributing it to this fallback).
     //
     // This must NOT be read as "any later assignment for this actorId can
     // supersede an earlier one" -- that is precisely the laundering attack
@@ -3558,11 +3581,23 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
     // behavior for every unstamped-first-event actor, laundering included.
     // Only when the first event IS stamped do later events sharing that
     // EXACT `(nodeId, operationId)` pair count as further attempts at the
-    // same binding, mirroring `resolveBindingOutcome`'s own
-    // `assignmentServesOperation` scoping (same file, above): walk every
-    // such attempt in event order, the first SATISFIED one settles the
-    // actor; with none satisfied, the LAST attempt's own outcome is
-    // reported, same as before for the single-attempt case.
+    // same binding. This is a WEAKER check than `resolveBindingOutcome`'s
+    // own `assignmentServesOperation` reserved-stamp predicate just above --
+    // deliberately so, not a mirror of it: `operationId`/`nodeId` on
+    // `assignment-created.payload` are exactly the predicate
+    // `assignmentServesOperation`'s own doc comment (above) already
+    // rejected as forgeable/redundant for THAT stricter, opens-after-window
+    // check. Here there is no window to forge open early; the only property
+    // this scoping needs is "did this later assignment arrive through the
+    // same mediated `dispatchDeclaredOperation` binding as the first one",
+    // and `operationId`/`nodeId` are sufficient for that narrower question
+    // because, per `schema.mjs`, only `dispatchDeclaredOperation` ever
+    // writes them onto `assignment-created` at all -- an unmediated door
+    // (the laundering attack's own vector) can never forge that pair.
+    // With a same-binding attempt confirmed, walk every such attempt in
+    // event order, the first SATISFIED one settles the actor; with none
+    // satisfied, the LAST attempt's own outcome is reported, same as before
+    // for the single-attempt case.
     const allCreatedEvents = events.filter((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
     if (allCreatedEvents.length === 0) {
       missing.push({ actorId: originalActorId });
