@@ -89,7 +89,7 @@ import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mjs';
-import { reconcilePlanUseCase, reconcileApplyUseCase } from '../src/verbs/dispatch/reconcile.mjs';
+import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
@@ -3181,11 +3181,21 @@ async function runVerb(verb, flags, positional, dir) {
       }
       if (sub === 'reconcile') {
         const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
-        if ((positional[1] ?? 'plan') === 'plan') return reconcilePlanUseCase(reconcileCtx, { action: flags.action, runId: flags.run, assignmentId: flags.assignment });
+        if ((positional[1] ?? 'plan') === 'plan') {
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: { action: flags.action, runId: flags.run, assignmentId: flags.assignment },
+          });
+        }
         if (positional[1] === 'apply') {
           let plan;
           try { plan = JSON.parse(requireField(flags.plan, 'dispatch reconcile apply requires --plan')); } catch (error) { throw new StoreError('validation', `dispatch reconcile apply --plan must be valid JSON: ${error.message}`); }
-          return reconcileApplyUseCase(reconcileCtx, { plan });
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: { apply: true, plan },
+          });
         }
         throw new StoreError('validation', 'dispatch reconcile expects plan or apply');
       }
