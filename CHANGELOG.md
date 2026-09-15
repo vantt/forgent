@@ -69,6 +69,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `authReviewRecheck`/`authRedTeamRecheck` example steps now declare
   `grantedContextRefs: ["$ref:revise"]` so the template dispatches as
   written instead of being refused.
+- `fgos-code-panel` focused/affected/full proof tiers and plan-loop
+  proof-contract fixes (code-implementation-track-policy track, P03):
+  `domains/coding/skills/fgos-code-panel/SKILL.md` replaces its generic
+  "run the target project's real test command" wording with a declared
+  `FOCUSED_TESTS`/`AFFECTED_TESTS`/`FULL_TEST`/`FULL_TRIGGERS`
+  test-selection block (`AFFECTED_TESTS` uses the impact-analysis
+  capability, e.g. GitNexus, when registered and present); the full suite
+  now runs at most once per cell near merge instead of once per round;
+  recheck steps read the fixer's own evidence by default instead of
+  re-running; a tree-identity proof-reuse rule (record `treeIdentical:
+  true` when `git diff testedSha integratedSha` is empty under the same
+  environment fingerprint, instead of re-running) replaces the raw-SHA
+  comparison that forced a redundant re-run after every `--no-ff` merge;
+  cell traces now record every test command's tier, duration, and
+  executed-vs-reused status. `core/skills/fgos-plan-loop/SKILL.md` and
+  `docs/how-to/author-a-plan-loop-track.md` get the same tree-identity
+  exception (with a new `treeIdentical` checkpoint-identity field) and
+  fix two contract bugs found in a review of P01/P02: a proof-gap finding
+  could previously be silently `deferred` at the 3-fix-round cap
+  (contradicting the accepted/evidence-backed-rejected-only rule) --
+  it now forces `Proof: escalated-to-full` instead; the baseline's
+  `environmental` bucket is split into `environmental-transient` (rerun
+  until green) and `environmental-precondition` (a named, disclosed
+  structural gap, e.g. an uncompiled binary, that does not block close
+  but must never be silently folded into `pre-existing`); the baseline
+  must record every failing test's exact name, not a count/category
+  summary. `docs/enduser-docs-index.json` regenerated to index the how-to.
 
 - Detailed runtime-recovery design (PROPOSED, no runtime behavior enabled):
   arbitrary worker takeover without mandatory checkpoints, Run admission/result

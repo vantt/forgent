@@ -465,7 +465,16 @@ distinct, non-collapsible states:
 **Non-inference rule.** If `testedSha != integratedSha`,
 `checkpoint-verified` can never be inferred from the pre-merge proof
 recorded at `coordination-accepted` — gate proof must execute against
-`integratedSha` itself before the checkpoint is certified.
+`integratedSha` itself before the checkpoint is certified. **The one
+documented exception: tree identity.** `git diff <testedSha> <integratedSha>
+-- .` empty (the normal case for a `--no-ff` merge with no conflicts —
+its SHA always differs from the cell tip even when nothing else changed)
+means the two commits share a tree, and the `testedSha` proof already
+covers `integratedSha`'s actual content under the same toolchain/
+environment. Record BOTH shas plus the empty-diff confirmation in the
+checkpoint identity as `treeIdentical: true`; do not re-run for real
+content or environment drift, which this check still catches (a non-empty
+diff always forces the real re-run — there is no shortcut for it).
 
 **Escalation authority & scope.** The Lead evaluates every
 Reviewer/Red-Team proof-gap finding. The Lead may `accepted` it —
@@ -476,7 +485,9 @@ cell only**; it does not by itself create a permanent Product Gate in
 plan.md for future cells.
 
 **Checkpoint identity.** Before `close.json`, record in the cell trace:
-`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`, and
+`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`,
+`treeIdentical` (true only when the non-inference rule's tree-identity
+exception applied instead of a real re-run at `integratedSha`), and
 `outcome`.
 
 **Close rule.** Close with `Proof: targeted` only when no accepted
@@ -624,12 +635,18 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    focused test in the worktree yourself before reading `show`.
 4. Disposition every finding: `accepted` when its evidence holds, `rejected`
    when the Lead can prove it wrong, `deferred` only when it is outside the
-   cell's scope and the rationale says so. Any `accepted` finding opens a
-   fix round (section 3). Cap: three fix rounds per cell; past that, close
-   the cell with the remaining findings `deferred` and named in the trace.
+   cell's scope and the rationale says so. **A proof-gap finding (Reviewer/
+   Red-Team judging the declared verification insufficient) never gets
+   `deferred` — section 4's Escalation authority admits only `accepted`
+   (upgrading to `Proof: escalated-to-full`) or an evidence-backed
+   `rejected`.** Any `accepted` finding opens a fix round (section 3). Cap:
+   three fix rounds per cell; past that, close the cell with remaining
+   non-proof-gap findings `deferred` and named in the trace — an open
+   proof-gap finding at the cap forces `Proof: escalated-to-full` for this
+   cell instead of a close, never a silent defer.
 5. Close (section 4): confirm the checkpoint identity (`phase/cell id`,
-   `command`, `baseline`, `testedSha`, `integratedSha`, `outcome`) is
-   recorded in the cell trace under
+   `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`,
+   `outcome`) is recorded in the cell trace under
    `docs/architect/agent-coordination/verification/<track>/<cell>.md`,
    merge `git merge --no-ff <track>--<cell-id>` into the track branch
    (producing `integratedSha`), drop the worktree, and append one row to
@@ -640,8 +657,10 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    in the cell worktree before the merge, compared against the recorded
    baseline; when `testedSha != integratedSha`, re-run the gate's full
    proof command against `integratedSha` itself before recording
-   `checkpoint-verified` — never inferred from the pre-merge run
-   (non-inference rule, section 4).
+   `checkpoint-verified` — unless `git diff testedSha integratedSha -- .`
+   is empty, in which case record `treeIdentical: true` and certify from
+   the pre-merge run (the non-inference rule's one documented exception,
+   section 4) — never inferred on a non-empty diff.
 6. Back to step 1. When the loop ends, write
    `<plan dir>/reports/track-closeout.md`: every cell's merge commit, every
    deferred finding, and the exact commands that reproduce the evidence.

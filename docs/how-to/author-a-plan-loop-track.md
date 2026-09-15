@@ -46,11 +46,27 @@ Record these once in `plan.md`, verbatim across every request in the track:
 - **Full proof command** — the repository's real full-suite command (e.g.
   `npm test`).
 - **Recorded baseline** — full proof command, run once before the first
-  cell; date; commit; and the exact names of already-failing tests as
-  "known baseline failures". Every later full-proof run is judged against
-  this list, triaged by bucket: **patch-related** — blocks close;
-  **environmental** — rerun; blocks until reproducibly green;
-  **pre-existing** — blocks unless already on the recorded baseline list.
+  cell; date; commit; and **the exact names of every already-failing
+  test** as "known baseline failures" — a count or a category summary
+  alone (e.g. "103 failures in test/rust-host") does not satisfy this
+  requirement; the literal list is what later runs diff against. Every
+  later full-proof run is judged against this list, triaged by bucket:
+  - **patch-related** — blocks close.
+  - **environmental-transient** — a flaky/order-dependent/session-leak
+    failure that can pass on a clean rerun: rerun; blocks until
+    reproducibly green.
+  - **environmental-precondition** — fails for a structural reason no
+    rerun fixes without an explicit setup step this worktree shape never
+    ran (an uncompiled release binary, a missing service, an unset
+    credential) — name the exact missing precondition per test; does not
+    block close, but is never silently absorbed into "pre-existing"
+    either. If the precondition is cheap to satisfy (a build/doctor step
+    that finishes in the track's own time budget), satisfy it and get a
+    real green result instead of recording this category — it exists for
+    when that is not practical here, not as a default escape hatch.
+  - **pre-existing** — blocks unless already on the recorded baseline
+    list.
+
   **The baseline list may only shrink** — a shrink is recorded as
   evidence; it never grows.
 - **Merge cadence to main** — per cell, per gate, or final-only. This is a
@@ -90,14 +106,28 @@ cannot be inferred from the pre-merge proof recorded at `coordination-accepted`.
 Full gate verification must execute against `integratedSha` before the
 checkpoint can be certified.
 
+**The one documented exception: tree identity.** A `--no-ff` merge with no
+conflicts always produces an `integratedSha` distinct from `testedSha`, even
+though its tree is byte-identical to the cell tip's — comparing raw SHAs is
+the wrong test for "did anything actually change." Run
+`git diff <testedSha> <integratedSha> -- .`; an empty result means the two
+commits share a tree under the same toolchain/environment, so the
+`testedSha` proof already covers `integratedSha`'s real content. Record
+BOTH shas and `treeIdentical: true` in the checkpoint identity instead of
+re-running. A non-empty diff always forces the real re-run — there is no
+shortcut for actual content or environment drift (a toolchain upgrade, a
+changed lockfile, a rebuilt prerequisite binary all count as drift even
+when the tracked tree itself is unchanged; treat the tree-diff check as
+necessary, not sufficient, when any of those moved since `testedSha`).
+
 ```text
 ## Evidence states for cell <id>
 
 - coordination-accepted: testedSha=<sha>, command=<targeted command>, outcome=pass
 - merged-to-track: integratedSha=<sha>
 - checkpoint-verified: only if this gate ran the full proof command against
-  integratedSha itself (never inferred from testedSha's result when the
-  two shas differ)
+  integratedSha itself, or git diff testedSha integratedSha -- . is empty
+  (treeIdentical: true) -- never inferred on a non-empty diff
 ```
 
 ## Checkpoint identity
@@ -112,7 +142,10 @@ command: <exact command executed>
 baseline: <recorded baseline reference>
 testedSha: <sha proof ran against pre-merge>
 integratedSha: <sha proof ran against post-merge, or same as testedSha if no merge occurred yet>
-outcome: pass | fail (with triage: patch-related | pre-existing | environmental)
+treeIdentical: true only if `git diff testedSha integratedSha -- .` was empty
+  and this checkpoint was certified from the pre-merge run instead of a real
+  re-run at integratedSha (the non-inference rule's one documented exception)
+outcome: pass | fail (with triage: patch-related | environmental-transient | environmental-precondition | pre-existing)
 ```
 
 ## Product Gates table
@@ -129,10 +162,11 @@ Mark each phase's proof obligation explicitly; do not leave it implicit.
 ```
 
 `**Full-suite gate.**` means: run the track's full proof command in the
-cell worktree (and again on `integratedSha` if it differs from `testedSha`,
-per the non-inference rule above), compare against the recorded baseline,
-triage every new failure as patch-related / pre-existing / environmental,
-and record the outcome before close.
+cell worktree, compare against the recorded baseline, triage every new
+failure as patch-related / environmental-transient / environmental-precondition / pre-existing, and record the
+outcome before close. If `integratedSha` differs from `testedSha`, re-run
+against `integratedSha` too — unless the tree-identity exception above
+applies, in which case record `treeIdentical: true` instead.
 
 **Mechanical-gate rule:** regardless of what the Product Gates marker says,
 a cell is a full-suite gate if its diff touches any of: dispatch/self-host
@@ -216,7 +250,7 @@ outcome: <pass|fail + triage if applicable>
   `rejected`) before close.
 - Gate full proof + triage: at a `**Full-suite gate.**` phase or a
   mechanical-gate trigger, run the full proof command, compare to baseline,
-  triage every new failure (patch-related / pre-existing / environmental).
+  triage every new failure (patch-related / environmental-transient / environmental-precondition / pre-existing).
 - Track integration merge: merge the cell branch per the plan's recorded
   merge cadence, producing `integratedSha`.
 - Post-merge gate execution when `testedSha != integratedSha`: re-run the
