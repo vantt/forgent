@@ -8,7 +8,9 @@ import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import {
   executeAssignment,
   classifyRunEvidence,
+  reconcileCliSpawnRun,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-runresult-test-'));
@@ -1346,4 +1348,159 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
   assert.equal(contract.mutation, 'read-only');
   assert.equal(contract.limits.executorTimeoutMs, 15000);
   assert.equal(contract.resultClaim.path, path.join(runDir, 'agent-result.json'));
+});
+
+test('executeAssignment writes RunResult v2 with contract version 2, valid classification, and attribution', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'v2-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      const asgnDirs = fs.readdirSync(runsDir);
+      for (const asgn of asgnDirs) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Validation Report\\nAll good.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({
+              contract: { id: 'agent-result-claim', version: 2 },
+              status: 'done',
+              summary: 'Plan validated successfully',
+              assessment: { verdict: 'pass' },
+            }),
+          );
+        }
+      }
+    }
+    process.stdout.write("Done.\\n");
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-v2-exec-test',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.confidence, 'reported');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+
+  assert.equal(storedResult.contract.id, 'assignment-run-result');
+  assert.equal(storedResult.contract.version, 2);
+  assert.equal(storedResult.classification.provenance, 'native-v2');
+  assert.equal(storedResult.classification.execution.status, 'completed');
+  assert.equal(storedResult.classification.execution.exitCode, 0);
+  assert.equal(storedResult.classification.assessment.verdict, 'pass');
+  assert.equal(storedResult.classification.failure, null);
+  assert.equal(storedResult.classification.policy.disposition, 'allow');
+  assert.ok(Array.isArray(storedResult.evidence.attribution));
+
+  const validation = validateRunResultV2(storedResult);
+  assert.ok(validation.valid, `Stored result must be valid RunResult v2: ${validation.reasons?.join(', ')}`);
+});
+
+test('executeAssignment for reviewer findings produces execution.completed with assessment.findings and failure: null', async () => {
+  const tempDir = mkTempDir();
+
+  const executorScript = path.join(tempDir, 'reviewer-findings-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const cwd = process.cwd();
+    const runsDir = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(runsDir)) {
+      const asgnDirs = fs.readdirSync(runsDir);
+      for (const asgn of asgnDirs) {
+        const runDir = path.join(runsDir, asgn, 'runs', '01');
+        if (fs.existsSync(runDir)) {
+          fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Review Report\\nIdentified security flaw.\\n');
+          fs.writeFileSync(
+            path.join(runDir, 'agent-result.json'),
+            JSON.stringify({
+              contract: { id: 'agent-result-claim', version: 2 },
+              status: 'failed',
+              summary: 'Found high-severity finding',
+              error: 'Security flaw found',
+              assessment: { verdict: 'findings', severityFloor: 'high' },
+              evidenceRefs: ['review:SEC-01'],
+            }),
+          );
+        }
+      }
+    }
+    process.stdout.write("Review complete with findings.\\n");
+    process.exit(0);
+    `,
+  );
+
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const assignment = buildAssignment({
+    workId: 'tsk-v2-review-findings',
+    stage: 'executing',
+    operation: 'review-item',
+    role: 'reviewer',
+  });
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+  });
+
+  // Legacy projection is failed to block quorum conservatively
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'reported');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+
+  // RunResult v2 canonical classification
+  assert.equal(storedResult.contract.id, 'assignment-run-result');
+  assert.equal(storedResult.contract.version, 2);
+  assert.equal(storedResult.classification.execution.status, 'completed');
+  assert.equal(storedResult.classification.execution.exitCode, 0);
+  assert.equal(storedResult.classification.assessment.verdict, 'findings');
+  assert.equal(storedResult.classification.failure, null, 'Reviewer finding must have null failure, not provider crash');
+  assert.equal(storedResult.classification.policy.disposition, 'allow');
+
+  const validation = validateRunResultV2(storedResult);
+  assert.ok(validation.valid, `Stored reviewer finding must be valid RunResult v2: ${validation.reasons?.join(', ')}`);
 });

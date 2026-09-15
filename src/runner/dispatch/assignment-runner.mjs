@@ -564,6 +564,7 @@ export function classifyRunEvidence({
   repoRoot,
   assignment,
   work,
+  role,
 }) {
   if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
     return { status: 'failed', confidence: 'failed' };
@@ -574,7 +575,24 @@ export function classifyRunEvidence({
     return { status: 'failed', confidence: 'failed' };
   }
 
+  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
+  // A read-only operation classifies as reported only with a companion report
+  // artifact (e.g. agent-report.md) the runner detected in the run dir.
+  // Self-attested evidenceRefs strings never substitute for it: the worker
+  // fully controls agent-result.json, so string refs prove nothing on disk.
+  // The claim never counts as its own companion report, under either of the
+  // two names it may have been written with.
+  const companionReportArtifacts = workerArtifacts.filter(
+    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
+  );
+  const hasWorkerReport = companionReportArtifacts.length > 0;
+
   if (agentClaim?.status === 'failed') {
+    const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
+    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
+    if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
+      return { status: 'failed', confidence: 'reported' };
+    }
     return { status: 'failed', confidence: 'failed' };
   }
 
@@ -594,18 +612,6 @@ export function classifyRunEvidence({
   if (agentClaim?.status === 'blocked') {
     return { status: 'blocked', confidence: 'reported' };
   }
-
-  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation classifies as reported only with a companion report
-  // artifact (e.g. agent-report.md) the runner detected in the run dir.
-  // Self-attested evidenceRefs strings never substitute for it: the worker
-  // fully controls agent-result.json, so string refs prove nothing on disk.
-  // The claim never counts as its own companion report, under either of the
-  // two names it may have been written with.
-  const companionReportArtifacts = workerArtifacts.filter(
-    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
-  );
-  const hasWorkerReport = companionReportArtifacts.length > 0;
 
   if (agentClaim && agentClaim.status === 'done') {
     // Reported for read-only consult/review only when a runner-detected
@@ -1326,7 +1332,7 @@ export async function executeAssignment(assignment, opts = {}) {
   if (admitted.resumed) {
     if (fs.existsSync(resultJsonPath)) {
       try {
-        const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+        const settledResult = interpretRunResult(resultJsonPath);
         return Object.freeze(settledResult);
       } catch {}
     }
@@ -2026,6 +2032,8 @@ export async function executeAssignment(assignment, opts = {}) {
     executorId: resolvedExecutorId,
     policy: effectivePolicy,
     executorRedirected,
+    settledAt,
+    durationMs,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
@@ -2097,7 +2105,7 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -2193,7 +2201,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -2435,7 +2443,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
