@@ -417,6 +417,20 @@ impl ExternalProcessSupervisor {
                     // Only classify child exit as ProviderCrash when channel is empty AND disconnected
                     if let Ok(Some(status)) = child.try_wait() {
                         loop {
+                            if Instant::now() > handshake_deadline {
+                                kill_child(&mut child);
+                                let stderr_tail = format_stderr_tail(&stderr_captured);
+                                return Err(ProviderError::DeadlineExceeded(format!(
+                                    "startup/handshake deadline exceeded{stderr_tail}"
+                                )));
+                            }
+                            if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                kill_child(&mut child);
+                                let stderr_tail = format_stderr_tail(&stderr_captured);
+                                return Err(ProviderError::ProtocolViolation(format!(
+                                    "protocol violation during handshake: {err}{stderr_tail}"
+                                )));
+                            }
                             match rx.try_recv() {
                                 Ok(Ok(FrameMessage::Response(res))) => {
                                     let stderr_tail = format_stderr_tail(&stderr_captured);
@@ -499,7 +513,7 @@ impl ExternalProcessSupervisor {
         let req_id = request
             .request_id
             .clone()
-            .unwrap_or_else(|| RequestId::Number(2));
+            .unwrap_or(RequestId::Number(2));
         let invoke_msg = FrameMessage::request(
             "invoke",
             Some(serde_json::json!({
@@ -633,6 +647,21 @@ impl ExternalProcessSupervisor {
                     if let Ok(Some(status)) = child.try_wait() {
                         // Wait until rx yields the response or channel is disconnected
                         loop {
+                            if Instant::now() > request_deadline {
+                                kill_child(&mut child);
+                                let stderr_tail = format_stderr_tail(&stderr_captured);
+                                return Err(ProviderError::DeadlineExceeded(format!(
+                                    "request deadline exceeded ({}ms){stderr_tail}",
+                                    self.config.request_timeout.as_millis()
+                                )));
+                            }
+                            if let Some(ref err) = *overflow_captured.lock().unwrap() {
+                                kill_child(&mut child);
+                                let stderr_tail = format_stderr_tail(&stderr_captured);
+                                return Err(ProviderError::ProtocolViolation(format!(
+                                    "protocol violation: {err}{stderr_tail}"
+                                )));
+                            }
                             match rx.try_recv() {
                                 Ok(Ok(FrameMessage::Response(res))) => {
                                     let stderr_tail = format_stderr_tail(&stderr_captured);

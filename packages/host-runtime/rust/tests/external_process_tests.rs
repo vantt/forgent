@@ -383,6 +383,106 @@ async fn test_supervisor_timeout_request() {
 }
 
 #[tokio::test]
+async fn test_supervisor_drain_bounded_when_grandchild_holds_stdout_handshake() {
+    // Scenario: Direct child process exits immediately during handshake, but a grandchild
+    // process inherits stdout and keeps the pipe open. The inner drain loop must be bounded
+    // by the startup deadline and terminate instead of spinning unboundedly.
+    let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, PathBuf::from("sh"))
+        .with_arguments(vec!["-c".to_string(), "sleep 10 & exit 0".to_string()])
+        .with_startup_timeout(Duration::from_millis(50));
+    let supervisor = ExternalProcessSupervisor::new(config);
+
+    let request = ExternalProcessRequest::new(
+        FIXTURE_OPERATION_ID,
+        FIXTURE_REQUEST_CONTRACT,
+        serde_json::json!({}),
+    );
+
+    let start = std::time::Instant::now();
+    let err = supervisor.invoke(&request).await.unwrap_err();
+    let elapsed = start.elapsed();
+
+    assert!(
+        matches!(err, ProviderError::DeadlineExceeded(_)),
+        "expected DeadlineExceeded when child exits but pipe remains open, got {:?}",
+        err
+    );
+    assert!(
+        elapsed < Duration::from_millis(1500),
+        "drain loop took too long ({:?}), expected bounded by startup timeout (~50ms)",
+        elapsed
+    );
+}
+
+#[tokio::test]
+async fn test_supervisor_drain_bounded_when_grandchild_holds_stdout_dispatch() {
+    // Scenario: Direct child completes handshake, but upon receiving invoke dispatch,
+    // spawns a background grandchild holding stdout open and exits immediately.
+    // The inner response-drain loop after dispatch must be bounded by request deadline.
+    if std::process::Command::new("python3").arg("--version").output().is_err() {
+        return;
+    }
+
+    let py_script = r#"
+import sys, struct, json, os, time
+# Step 1: Handshake
+prefix = sys.stdin.buffer.read(4)
+if len(prefix) == 4:
+    n = struct.unpack('>I', prefix)[0]
+    sys.stdin.buffer.read(n)
+    resp = json.dumps({
+        'jsonrpc': '2.0',
+        'id': 1,
+        'result': {
+            'provider_id': 'fixture.echo.process',
+            'protocol_version': 'fgos.component.v1',
+            'supported_operations': []
+        }
+    }).encode('utf-8')
+    sys.stdout.buffer.write(struct.pack('>I', len(resp)) + resp)
+    sys.stdout.buffer.flush()
+
+    # Step 2: Invoke dispatch
+    prefix = sys.stdin.buffer.read(4)
+    if len(prefix) == 4:
+        n = struct.unpack('>I', prefix)[0]
+        sys.stdin.buffer.read(n)
+        # Fork grandchild that inherits stdout and sleeps
+        if os.fork() == 0:
+            time.sleep(10)
+            os._exit(0)
+        # Direct child exits immediately
+        os._exit(0)
+"#;
+
+    let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, PathBuf::from("python3"))
+        .with_arguments(vec!["-c".to_string(), py_script.to_string()])
+        .with_request_timeout(Duration::from_millis(50));
+    let supervisor = ExternalProcessSupervisor::new(config);
+
+    let request = ExternalProcessRequest::new(
+        FIXTURE_OPERATION_ID,
+        FIXTURE_REQUEST_CONTRACT,
+        serde_json::json!({}),
+    );
+
+    let start = std::time::Instant::now();
+    let err = supervisor.invoke(&request).await.unwrap_err();
+    let elapsed = start.elapsed();
+
+    assert!(
+        matches!(err, ProviderError::DeadlineExceeded(_)),
+        "expected DeadlineExceeded when child exits after dispatch but grandchild holds pipe, got {:?}",
+        err
+    );
+    assert!(
+        elapsed < Duration::from_millis(1500),
+        "dispatch drain loop took too long ({:?}), expected bounded by request timeout (~50ms)",
+        elapsed
+    );
+}
+
+#[tokio::test]
 async fn test_supervisor_crash_before_dispatch() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
@@ -568,11 +668,16 @@ async fn test_supervisor_flood_bounds_memory_and_terminates() {
     );
 
     let err = supervisor.invoke(&request).await.unwrap_err();
-    assert!(
-        matches!(err, ProviderError::ProtocolViolation(_)),
-        "expected ProtocolViolation on flood overflow, got {:?}",
-        err
-    );
+    match err {
+        ProviderError::ProtocolViolation(ref msg) => {
+            assert!(
+                msg.contains("stdout byte budget exceeded")
+                    || msg.contains("stdout frame queue capacity exceeded"),
+                "expected ProtocolViolation due to byte budget or queue capacity overflow, got: {msg}"
+            );
+        }
+        other => panic!("expected ProtocolViolation on flood overflow, got {:?}", other),
+    }
 }
 
 #[test]
