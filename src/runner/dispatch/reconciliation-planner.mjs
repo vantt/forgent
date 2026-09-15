@@ -55,6 +55,7 @@ function holder(lock) {
 export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, now = new Date().toISOString(), ttlMs = 300000 } = {}) {
   if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
   if (action === 'clear-assignment-claim') return planClearAssignmentClaim(root, { assignmentId, now, ttlMs });
+  if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
   const proposedAction = canonicalAction(root, action);
   if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
   const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
@@ -183,6 +184,65 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-pending-result-collection', 'no-admitted-unsettled-run-or-pending-launch'] };
 }
 
+// repair-projection additively patches run.json.phase to 'settled' when an
+// already-validated, immutable terminal RunResult proves the Run finished
+// but the cached local projection marker (run.json.phase) still reads
+// something stale like 'running' -- the crash window this closes is a
+// supervisor/writer that wrote result.json but died before stamping
+// run.json.phase to agree with it. Like collect-result and
+// clear-assignment-claim, it never derives Run/result facts itself: it
+// reuses inspectDispatchRuntime's --run view verbatim (the SAME RunResult
+// interpretation runtime-inspection.mjs's `one()` already performs, backed
+// by run-result.mjs's single interpretRunResult path), so this guard can
+// never disagree with dispatch.runtime.inspect -- or with collect-result --
+// about whether a Run settled or whether its result is corrupt. There is
+// exactly one RunResult-interpretation path in this codebase; re-deriving a
+// second one here would let this narrow guard disagree with inspection
+// about the same bytes.
+//
+// D04's "projection source epoch still matches" maps to run.json's own
+// controlEpoch field -- the same field collect-result and
+// clear-assignment-claim already fold into their CAS snapshot -- so a
+// concurrent writer that legitimately re-drives this Run (bumping
+// controlEpoch) makes the plan stale instead of letting a repair land on
+// top of a newer incarnation's state.
+//
+// A phase that is already absent or already 'settled' is not a supported
+// precondition failing incompletely -- runtime-inspection.mjs's own `one()`
+// already derives 'settled' for an absent phase once a terminal result is
+// present (line: `phase = l.run.phase ?? (terminal.present ? 'settled' :
+// ...)`), so there is nothing for a caller to observe as wrong. Reported
+// `blocked`, matching every other "nothing to act on" case in this module
+// (clear-cwd-lock's "no cwd lock exists", clear-assignment-claim's "no
+// assignment claim exists", collect-result's "no result exists yet") rather
+// than a silent no-op `applied` that would falsely claim a mutation
+// happened.
+function planRepairProjection(root, { runId, now, ttlMs }) {
+  if (typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'repair-projection requires a runId' };
+  const view = inspectDispatchRuntime(root, { run: runId });
+  if (view.inspectionStatus === 'not-found') return { outcome: 'blocked', reason: 'no matching Run was found for repair-projection' };
+  if (view.inspectionStatus === 'ambiguous') return { outcome: 'needs-input', reason: 'more than one Run repository owns this run id' };
+  const loc = view.subject.locations[0];
+  if (!loc) return { outcome: 'blocked', reason: 'no matching Run was found for repair-projection' };
+  const runResult = view.runResult;
+  if (!runResult) return { outcome: 'blocked', reason: 'no terminal result exists yet to prove settlement' };
+  if (runResult.corrupt || runResult.contractCorrupt) return { outcome: 'needs-input', reason: 'result is corrupt or fails RunResult validation and cannot prove settlement' };
+  const runDir = loc.path;
+  let raw;
+  try {
+    raw = fs.readFileSync(resultFile(runDir), 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { outcome: 'blocked', reason: 'no terminal result exists yet to prove settlement' };
+    throw err;
+  }
+  const runMeta = json(path.join(runDir, 'run.json')) ?? {};
+  const currentPhase = runMeta.phase ?? null;
+  if (currentPhase === null || currentPhase === 'settled') return { outcome: 'blocked', reason: 'run.json.phase already reflects settlement; nothing to repair' };
+  const snapshot = { digest: digest({ raw }), runId, currentPhase, controlEpoch: runMeta.controlEpoch ?? null, expiresAt: expires(now, ttlMs) };
+  const proposedAction = { kind: 'repair-projection', runId, path: path.join(runDir, 'run.json') };
+  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['terminal-result-valid', 'phase-stale', 'projection-epoch-matches'] };
+}
+
 function withLocalLock(root, fn) {
   const file = localLock(root); fs.mkdirSync(path.dirname(file), { recursive: true });
   let fd; try { fd = fs.openSync(file, 'wx'); } catch (e) { return { outcome: 'blocked', reason: 'another reconcile apply is in progress' }; }
@@ -280,9 +340,59 @@ function applyClearAssignmentClaim(root, plan, { now }) {
   });
 }
 
+// Delete-semantics siblings above unlink a file; repair-projection instead
+// additively patches one field on an existing file, the same shape as
+// applyCollectResult -- kept as its own function for the same reason
+// collect-result is: its target depends on a caller-supplied runId that
+// canonicalAction()'s (root, kind) shape cannot carry.
+function applyRepairProjection(root, plan, { now }) {
+  const runId = plan?.proposedAction?.runId;
+  if (!plan?.actionKey || !plan?.snapshot || typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+  return withLocalLock(root, () => {
+    const prior = records(root).find((r) => r.actionKey === plan.actionKey);
+    if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
+    if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
+    // Full re-derivation from root+runId alone -- the caller-supplied
+    // proposedAction.path is never trusted as the mutation target until it is
+    // proven identical to what a fresh, from-scratch plan computes right now.
+    const fresh = planRepairProjection(root, { runId, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
+    if (fresh.outcome !== 'planned' || stable(fresh.proposedAction) !== stable(plan.proposedAction) || stable(fresh.snapshot) !== stable(plan.snapshot)) {
+      return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'projection facts changed since planning' };
+    }
+    const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
+    if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
+    const runDir = path.dirname(plan.proposedAction.path);
+    // Writer parity with applyCollectResult's own pre-mutation re-read: the
+    // goal state (an explicit 'settled' phase) is never satisfied by an
+    // absent result, so ENOENT here is always plan-stale, never "goal
+    // already achieved".
+    let raw;
+    try {
+      raw = fs.readFileSync(resultFile(runDir), 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the result was removed since planning' };
+      throw err;
+    }
+    if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'the result changed since planning' };
+    let runMeta;
+    try {
+      runMeta = JSON.parse(fs.readFileSync(plan.proposedAction.path, 'utf8'));
+    } catch (err) {
+      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
+      throw err;
+    }
+    const tmp = `${plan.proposedAction.path}.tmp-${process.pid}-${Date.now().toString(36)}`;
+    fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, phase: 'settled' }, null, 2)}\n`);
+    fs.renameSync(tmp, plan.proposedAction.path);
+    fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    return { outcome: 'applied', actionKey: plan.actionKey };
+  });
+}
+
 export function applyReconciliation(root, plan, { now = new Date().toISOString() } = {}) {
   if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
   if (plan?.proposedAction?.kind === 'clear-assignment-claim') return applyClearAssignmentClaim(root, plan, { now });
+  if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
   const canonical = canonicalAction(root, plan?.proposedAction?.kind);
   if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
   // Do this before looking up a prior record: a replay must not turn a

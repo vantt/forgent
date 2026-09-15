@@ -287,3 +287,97 @@ test('reconcile clear-assignment-claim refuses without an assignmentId, and is b
   const unknown = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'does-not-exist', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(unknown.outcome, 'blocked');
 });
+
+test('reconcile repair-projection rewrites a stale "running" phase to settled once a valid terminal RunResult exists, and replay is idempotent', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-stale', phase: 'running', controlEpoch: 1 }, legacyResult('run-stale', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-stale', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-stale', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'planned');
+  assert.equal(plan.proposedAction.kind, 'repair-projection');
+  assert.equal(plan.snapshot.currentPhase, 'running');
+  const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(applied.outcome, 'applied');
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.phase, 'settled');
+  assert.equal(runJson.runId, 'run-stale', 'the patch must be additive, never dropping existing run.json fields');
+  assert.equal(runJson.controlEpoch, 1, 'the patch must preserve the unrelated controlEpoch field');
+  const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
+  assert.equal(replay.outcome, 'already-applied');
+  assert.equal(replay.priorOutcome, 'applied');
+});
+
+test('reconcile repair-projection action-key replay returns the recorded outcome without re-mutating', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-stale-2', phase: 'running' }, legacyResult('run-stale-2', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-stale-2', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-stale-2', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'applied');
+  const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
+  assert.equal(replay.outcome, 'already-applied');
+  assert.equal(replay.priorOutcome, 'applied');
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.phase, 'settled', 'the replay must not re-run the mutation');
+});
+
+test('reconcile repair-projection is blocked (not refused) when no terminal result exists yet, and refuses without a runId', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-pending', phase: 'running' });
+  admitGen(dir, 'a', 1, { runId: 'run-pending', attempt: 1 });
+  const pending = planReconciliation(dir, { action: 'repair-projection', runId: 'run-pending', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(pending.outcome, 'blocked');
+  assert.match(pending.reason, /no terminal result/);
+  const noRunId = planReconciliation(dir, { action: 'repair-projection', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(noRunId.outcome, 'refused');
+});
+
+test('reconcile repair-projection needs-input on a corrupt/contract-corrupt result and never repairs on unproven settlement', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-corrupt', phase: 'running' }, { contract: { id: 'assignment-run-result', version: 2 }, runId: 'run-corrupt' });
+  admitGen(dir, 'a', 1, { runId: 'run-corrupt', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-corrupt', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'needs-input');
+  assert.match(plan.reason, /corrupt/);
+  const runJson = JSON.parse(fs.readFileSync(path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json'), 'utf8'));
+  assert.equal(runJson.phase, 'running', 'an unproven result must never trigger a repair');
+});
+
+test('reconcile repair-projection blocks as a no-op when phase already reflects settlement', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-already-settled', phase: 'settled' }, legacyResult('run-already-settled', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-already-settled', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-already-settled', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /already reflects settlement/);
+});
+
+test('reconcile repair-projection blocks when phase is absent and terminal result already proves settlement (nothing to repair)', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-no-phase-field' }, legacyResult('run-no-phase-field', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-no-phase-field', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-no-phase-field', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'blocked');
+  assert.match(plan.reason, /already reflects settlement/);
+});
+
+test('reconcile repair-projection apply detects a controlEpoch change between planning and apply as plan-stale', () => {
+  const dir = root();
+  assignmentDir(dir, 'a');
+  runDirFor(dir, 'a', '01', { runId: 'run-epoch', phase: 'running', controlEpoch: 1 }, legacyResult('run-epoch', 'a'));
+  admitGen(dir, 'a', 1, { runId: 'run-epoch', attempt: 1 });
+  const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-epoch', now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'planned');
+  assert.equal(plan.snapshot.controlEpoch, 1);
+  const runPath = path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json');
+  fs.writeFileSync(runPath, JSON.stringify({ runId: 'run-epoch', assignmentId: 'a', phase: 'running', controlEpoch: 2 }));
+  const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
+  assert.equal(result.outcome, 'plan-stale');
+  const runJson = JSON.parse(fs.readFileSync(runPath, 'utf8'));
+  assert.equal(runJson.phase, 'running', 'a successor incarnation (bumped controlEpoch) must never be overwritten');
+});
