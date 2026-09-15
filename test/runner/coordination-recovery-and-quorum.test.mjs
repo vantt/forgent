@@ -1621,3 +1621,72 @@ test('tsk-1bh (negative, R6 extension): an UNSTAMPED assignment for the same act
   assert.deepEqual(quorum.failed.map((f) => f.actorId), ['fixer'], 'the unstamped, unrelated success never launders the first, stamped, failed attempt');
   assert.equal(quorum.failed[0].assignmentId, first.assignment.assignmentId);
 });
+
+test('tsk-1bh (negative, red-team recheck on aa328e70): a raw createSessionAssignment call spending a REAL, matching, fresh authorization for the same binding -- with an unrelated task -- never launders a failed attempt', async () => {
+  // The exact attack the red-team recheck on commit aa328e70 demonstrated:
+  // `createSessionAssignment` (store.mjs) is an exported raw door that
+  // accepts a caller-supplied `authorizationProvenance` object directly,
+  // and only verifies its fields MATCH a real, already-issued, unspent
+  // authorization -- never that the call actually passed through
+  // `dispatchDeclaredOperation`'s own gate. A caller who legitimately knows
+  // a fresh authorization's id/operationId/nodeId/invocationKey can spend
+  // it through this raw door for an ENTIRELY UNRELATED inline contract,
+  // completing it successfully -- so raw `operationId`/`nodeId` PAYLOAD
+  // equality alone (an earlier version of this fix's own scoping) could be
+  // satisfied without ever going through the mediated door at all. Fixed by
+  // scoping same-binding retries via `assignmentServesOperation`'s reserved
+  // `protocol-operation:` CONTRACT STAMP instead -- written only on
+  // `dispatchDeclaredOperation`'s own common path, and refused on every
+  // door (including this raw one) by `assertNoReservedOperationStamp`. This
+  // raw assignment can copy the payload fields; it can never carry the real
+  // stamp.
+  const coordinationId = 'coord_p10_tsk1bh_fallback_raw_provenance_forgery';
+  const ctx = setupUngatedOnlyFallbackFixture(coordinationId);
+
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_1', invocationKey: 'fix:1' }), ctx.opts);
+  const first = await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'op-fix-a', targetActorId: 'fixer', objective: 'The required first attempt.', expectedOutputs: ['agent-result.json'], writerId: 'writer-1' },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status: 'failed', summary: 'Genuinely failed.' }) },
+  );
+
+  // A genuinely fresh authorization for the SAME binding -- exactly what a
+  // real correction round would issue.
+  authorizeDeclaredOperation(coordinationId, fixAuthorization({ authorizationId: 'auth_fix_2', invocationKey: 'fix:2' }), ctx.opts);
+
+  // Spent through the RAW door, not `dispatchDeclaredOperation`, for an
+  // entirely unrelated task -- `authorizationProvenance` fields match
+  // `auth_fix_2`'s real "operation-authorized" event exactly (as
+  // `assertAuthorizationSpendable` requires), so the raw door accepts it.
+  const forged = createSessionAssignment(
+    {
+      coordinationId,
+      taskKey: 'totally-unrelated-raw-task',
+      actorId: 'fixer',
+      contract: inlineContract({ role: 'fixer', objective: 'Nothing to do with op-fix-a at all.' }),
+      caller: { writerId: 'writer-1' },
+      authorizationProvenance: {
+        authorizationId: 'auth_fix_2',
+        operationId: 'op-fix-a',
+        nodeId: 'phase-fix',
+        invocationKey: 'fix:2',
+        contextGrant: { refs: [] },
+      },
+    },
+    ctx.opts,
+  );
+  const runsDir = path.join(ctx.tempDir, '.fgos', 'assignments', forged.assignmentId, 'runs', '01');
+  fs.mkdirSync(runsDir, { recursive: true });
+  const runId = `run_${forged.assignmentId}_01`;
+  fs.writeFileSync(path.join(runsDir, 'result.json'), JSON.stringify({ runId, assignmentId: forged.assignmentId, status: 'done', confidence: 'reported' }));
+  linkResult(coordinationId, { assignmentId: forged.assignmentId, runId }, ctx.opts);
+
+  const quorum = evaluateSessionQuorum(coordinationId, ctx.opts);
+  assert.deepEqual(
+    quorum.failed.map((f) => f.actorId),
+    ['fixer'],
+    'a raw assignment with copied (nodeId, operationId) payload fields but no real reserved contract stamp never launders the first, genuinely failed, mediated attempt',
+  );
+  assert.equal(quorum.failed[0].assignmentId, first.assignment.assignmentId);
+  assert.equal(quorum.completed.find((c) => c.actorId === 'fixer'), undefined);
+});

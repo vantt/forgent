@@ -3571,33 +3571,47 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
     // false success" case exercises: a SECOND, unrelated ad-hoc dispatch
     // (`dispatchPrimaryTask`, no operationId/nodeId stamp at all) under the
     // same actorId must never be mistaken for a retry of the first,
-    // required task. The first assignment-created event for this actor
-    // decides the binding: when it carries no `operationId`/`nodeId` stamp
-    // (an unmediated door -- `dispatchPrimaryTask`/`proposeConsult`/a bare
-    // `createSessionAssignment` call), there is no reliable signal that
-    // distinguishes "a legitimate retry of this same obligation" from "an
-    // unrelated task that merely reused the actorId", so only that first
-    // event is ever considered here -- byte-identical to the pre-fix
-    // behavior for every unstamped-first-event actor, laundering included.
-    // Only when the first event IS stamped do later events sharing that
-    // EXACT `(nodeId, operationId)` pair count as further attempts at the
-    // same binding. This is a WEAKER check than `resolveBindingOutcome`'s
-    // own `assignmentServesOperation` reserved-stamp predicate just above --
-    // deliberately so, not a mirror of it: `operationId`/`nodeId` on
-    // `assignment-created.payload` are exactly the predicate
-    // `assignmentServesOperation`'s own doc comment (above) already
-    // rejected as forgeable/redundant for THAT stricter, opens-after-window
-    // check. Here there is no window to forge open early; the only property
-    // this scoping needs is "did this later assignment arrive through the
-    // same mediated `dispatchDeclaredOperation` binding as the first one",
-    // and `operationId`/`nodeId` are sufficient for that narrower question
-    // because, per `schema.mjs`, only `dispatchDeclaredOperation` ever
-    // writes them onto `assignment-created` at all -- an unmediated door
-    // (the laundering attack's own vector) can never forge that pair.
-    // With a same-binding attempt confirmed, walk every such attempt in
-    // event order, the first SATISFIED one settles the actor; with none
-    // satisfied, the LAST attempt's own outcome is reported, same as before
-    // for the single-attempt case.
+    // required task.
+    //
+    // tsk-1bh follow-up (red-team recheck on `aa328e70`, HIGH): an EARLIER
+    // version of this fix scoped same-binding retries by raw
+    // `assignment-created.payload.operationId`/`nodeId` equality alone,
+    // reasoning that "only `dispatchDeclaredOperation` ever writes them."
+    // That reasoning was wrong -- `createSessionAssignment` (store.mjs) is
+    // an exported RAW door that accepts a caller-supplied
+    // `authorizationProvenance` object directly, and only checks that its
+    // fields MATCH a real, already-issued authorization record, never that
+    // the call actually passed through `dispatchDeclaredOperation`'s own
+    // gate. A caller holding a genuine, freshly-authorized (nodeId,
+    // operationId) for this exact binding could spend it through the raw
+    // door with an entirely unrelated inline contract/task, complete it,
+    // and have THIS fallback credit that unrelated result as the retry --
+    // the raw payload fields alone proved nothing about provenance.
+    //
+    // Fixed to use `assignmentServesOperation` (the SAME reserved
+    // `protocol-operation:` contract-stamp predicate `resolveBindingOutcome`
+    // already uses above), not raw payload-field equality. That stamp is
+    // written unconditionally on `dispatchDeclaredOperation`'s own common
+    // path, before the activation-mode branch, into the Assignment's own
+    // persisted contract -- and `buildSessionContract`'s
+    // `assertNoReservedOperationStamp` refuses ANY caller-supplied entry in
+    // that reserved namespace, on every door, including the raw one. So the
+    // raw-door attack above can still forge the EVENT payload's
+    // `operationId`/`nodeId` fields, and can still legitimately consume a
+    // real authorization through the raw door -- but it can never produce
+    // an Assignment carrying the actual reserved stamp, and only a stamped
+    // Assignment counts as a same-binding attempt here. The first
+    // assignment-created event for this actor still decides the binding: an
+    // unstamped first event (no declared protocol at all, or a first
+    // attempt that itself never reached `dispatchDeclaredOperation`) means
+    // there is no reliable signal to compare later events against at all,
+    // so only that first event is ever considered -- byte-identical to the
+    // pre-fix behavior for every such actor, laundering included. With a
+    // stamped first event, only LATER events that themselves carry the
+    // genuine stamp for that SAME operationId count as further attempts;
+    // walk every such attempt in event order, the first SATISFIED one
+    // settles the actor, with none satisfied the LAST attempt's own outcome
+    // is reported, same as before for the single-attempt case.
     const allCreatedEvents = events.filter((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
     if (allCreatedEvents.length === 0) {
       missing.push({ actorId: originalActorId });
@@ -3605,11 +3619,11 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
     }
     const firstCreatedEvent = allCreatedEvents[0];
     const firstOperationId = firstCreatedEvent.payload.operationId;
-    const firstNodeId = firstCreatedEvent.payload.nodeId;
-    const createdEvents =
-      firstOperationId && firstNodeId
-        ? allCreatedEvents.filter((event) => event.payload.operationId === firstOperationId && event.payload.nodeId === firstNodeId)
-        : [firstCreatedEvent];
+    const stampedSameBinding =
+      definition && firstOperationId
+        ? allCreatedEvents.filter((event) => assignmentServesOperation(definition, firstOperationId, { assignmentId: event.payload.assignmentId, fgosDir }))
+        : [];
+    const createdEvents = stampedSameBinding.length > 0 ? stampedSameBinding : [firstCreatedEvent];
     let lastOutcome;
     for (const createdEvent of createdEvents) {
       lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveId, createdEvent.payload.assignmentId);
