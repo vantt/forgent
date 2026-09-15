@@ -635,7 +635,8 @@ Loop, until the last phase in `plan.md`'s Product Gates carries a
    (producing `integratedSha`), drop the worktree, and append one row to
    `plan.md`'s cell-status table: cell, merge commit, review/red-team
    verdicts, deferred findings. Phases the plan marks as full-suite gates
-   (or a mechanical isolation-breaking trigger) run the full proof command
+   (or a mechanical isolation-breaking trigger, or a Lead-accepted
+   escalation finding (section 4)) run the full proof command
    in the cell worktree before the merge, compared against the recorded
    baseline; when `testedSha != integratedSha`, re-run the gate's full
    proof command against `integratedSha` itself before recording
