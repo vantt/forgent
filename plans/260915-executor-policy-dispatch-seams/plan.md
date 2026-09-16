@@ -1,8 +1,10 @@
-# Executor policy dispatch seams — plan-loop track
+# Executor policy dispatch seams — direct implementation plan
 
-This is a Work-independent implementation track. Do not run it through fgOS
-Work items. Use `fgos-plan-loop` for coordinated cells, or use `fgos-code-panel`
-for one phase/cell at a time when a single change is small enough.
+This is a Work-independent implementation track. Execute each phase directly
+from its phase file in a dedicated branch/worktree. Do not use `fgos-plan-loop`,
+`fgos-code-panel`, executor dispatch, or any skill/harness wrapper. Account
+rotation slice 1 is now handled by
+`plans/260916-account-rotator/`; this track resumes above that layer.
 
 ## Goal
 
@@ -23,11 +25,11 @@ The plan is grounded by:
 
 ## Execution Inputs
 
-- Track branch: `track/executor-policy-dispatch-seams`
-- Cell branch/coordination-id convention:
-  - branch: `executor-policy-dispatch-seams--cell-NN`
-  - coordination id: `executor-policy-dispatch-seams--cell-NN`
-- Roster: doer=`agy-cli` standard meticulous implementer; reviewer=`claude` analytical skeptical reviewer; red-team=`codex-bwrap` analytical adversarial tester, unless a cell explicitly overrides for provider-specific proof.
+- Worktree: create a dedicated branch/worktree for the phase being implemented;
+  do not edit the shared checkout's source files directly.
+- Branch convention: `executor-policy-dispatch-seams--phase-NN`.
+- The implementing agent owns inspection, edits, tests, diff review, and the
+  final evidence report. There is no delegated roster or coordination id.
 - Full proof command: `npm test`
 - Recorded baseline: recorded retroactively 2026-09-16 (should have preceded Phase 00; corrected before Phase 01/02). Command `npm test` on track branch commit `3bc87899` (node v24.18.0, package-lock sha256 `b097ecd8...`). Result: 6589 tests, 6527 pass, 53 fail, 9 skipped, ~499s.
   - 51 of 53 failures are `test/rust-host/{fgctl-init,fgctl-stage,fgctl-upgrade,release-tree}.test.mjs` — all fail the same precondition ("Compiled Rust binary must exist at target/release/fgctl|fgos" — `cargo build --release --workspace` was never run in this worktree). Category: **environmental-precondition**, unrelated to this track.
@@ -49,16 +51,19 @@ Hotfix scope in this branch:
 - keep the existing write-safety invariant for read-only assignments;
 - replace the hardcoded `claude -> claude-reviewer` redirect with a configured,
   provider-aware read-only redirect pool;
-- route this repo's read-only Claude fallbacks to `codex-bwrap` until a proper
-  PlacementPolicy/ExecutorProfile migration owns account placement;
+- route this repo's read-only Claude fallbacks to `codex-bwrap` as a temporary
+  bridge until PlacementPolicy owns provider/model/executor placement;
+- rely on Provider Capacity Rotator for same-provider account capacity
+  selection and structured capacity refusals;
 - let `codex-bwrap` provision credentials from an ordered Codex home pool so it
   is not pinned to only `${HOME}/.codex-fgovn`;
 - clear stale assignment `dispatch.claim` during dead-driver `resume-driver`
   recovery, using the same liveness basis that authorizes recovery.
 
-This is not the final account-rotation design. It is a production-stability
-bridge that prevents the current Claude quota leak and unblocks paused workers
-when quota returns. Proper account/principal modeling remains Phase 05/06 work.
+This is not the final placement design. It is a production-stability bridge
+that prevents the current Claude quota leak and unblocks paused workers when
+quota returns. Proper provider/model/executor placement remains Phase 05/06+
+work; same-provider account rotation is no longer owned by this track.
 
 ## Product Gates
 
@@ -68,15 +73,25 @@ when quota returns. Proper account/principal modeling remains Phase 05/06 work.
 | 01 | provider adapter shadow | code:implement | ProviderAdapter renders current legacy argv equivalently in shadow mode; no dispatch behavior change. |
 | 02 | persona prompt envelope | code:implement | Resolved persona is delivered through PromptEnvelope with delivery provenance and tests. |
 | 03 | reasoning effort + alias seam | code:implement | Compatibility aliases expand at caller scope with `viaAlias`; `reasoningEffort` is canonical but legacy argv remains equivalent. |
-| 04 | quality bridge | code:implement | Legacy tier maps into canonical quality with implied mode precedence; minRigor-only raise semantics tested. **Full-suite gate.** |
-| 05 | placement policy skeleton | code:implement | PlacementPolicy exists in shadow/read-only mode and reports divergence from legacy capability/executor sources without changing binding. |
-| 06 | executor profile/invocation schema sketch | code:implement | Executor identity/invocation vocabulary is documented and validator/doctor warnings exist; no destructive config migration yet. **Full-suite gate.** |
+| 04 | quality bridge | code:implement | Legacy tier maps into canonical quality with implied mode precedence; semantic-tier raise-only composition and derived/read-only minRigor are tested; no six-tier modelTier production wiring. **Full-suite gate.** |
+| 05 | placement policy skeleton | code:implement | PlacementPolicy exists in shadow/read-only mode, consumes provider-capacity refusal facts, and reports divergence from legacy capability/executor sources without changing binding. |
+| 06 | executor profile/invocation schema sketch | code:implement | Executor identity/invocation vocabulary is documented and validator/doctor warnings exist; account capacity stays in Provider Capacity Rotator; no destructive config migration yet. **Full-suite gate.** |
+| 07 | placement production binder | code:implement | After shadow proof, PlacementPolicy becomes the production provider/model/executor binder; Provider Capacity Rotator remains the account-capacity oracle. **Full-suite gate.** |
+| 08 | legacy placement retirement | code:implement | Retire `readOnlyExecutorRedirects` and other legacy placement bridges only after Phase 07 proof; config/executor id migration remains incremental. |
 
 ## Cell status
 
 | Phase | Cell | Merge commit | Review/red-team verdict | Deferred findings | Evidence |
 |---|---|---|---|---|---|
 | 00 | executor-policy-dispatch-seams--cell-00 | `282fd62e` (integrated), tree-identical to tested `c6a2a57c` | Reviewer + red-team: ready to merge as-is (2 rounds; provider-quota retry substituted claude-bwrap for codex-bwrap) | 4 executors outside declared matrix (claude-bwrap/agy-bwrap/claude-herdr/codex-herdr); several cosmetic LOW items | `docs/architect/agent-coordination/verification/executor-policy-dispatch-seams/p00.md` |
+| 01 | integrated into `executor-policy-dispatch-seams--implementation` (2026-09-16, single-owner takeover — cell-01's session had stopped with one unmerged commit) | `9ee52f9e` (merge of cell-01's `3bb4cf74` into the consolidated implementation branch) | Self-verified only (no separate reviewer/red-team round this session): 102/102 tests incl. the full 13-executor × 3-tier (39-pair) shadow-vs-legacy argv equivalence matrix; Phase 00 baseline snapshot re-run green (46/46) | None found in cell-01's own commit; not independently red-teamed | `test/runner/provider-adapter.test.mjs`, `test/runner/dispatch-policy-baseline-snapshot.test.mjs` |
+| 04 | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `09937553` (quality bridge), preceded by unrelated pre-existing-bug fix `05444595` | Self-verified only (no separate reviewer/red-team round this session): 38/38 targeted (`assignment-policy.test.mjs`, 11 new Phase 04 tests), 148/148 Phase 00/01 re-run, 2927/2929 across `test/runner/` (2 pre-existing failures independently confirmed present on vanilla `main`, unrelated), full `npm test` gate: 56 failures all triaged as pre-existing (54 rust-host Cargo-build-precondition, 2 import-graph boundary tests confirmed on `main`) — zero new | None found; implementation deliberately scoped to `assignment-policy.mjs` only (the one resolver every dispatch path shares), no schema.mjs/session-engine.mjs changes | `test/runner/assignment-policy.test.mjs`, commit messages `05444595`/`09937553` |
+
+Phase 02 and 03 have not started. Before opening Phase 05, the track must also
+land the Provider Capacity Rotator corrections recorded in the Phase 04
+readiness review: quarantine filtering/classification, structured refusal
+settlement, credential fail-closed behavior, and the legacy read-only
+governance regression (see "Pre-Phase-05 runtime gates" below).
 
 Mechanical-gate rule applies: any diff touching `src/runner/dispatch/**`,
 `src/runner/coordination/**`, `src/verbs/coordination/**`,
@@ -107,7 +122,9 @@ proof even if the phase file names targeted tests.
 6. `reasoningEffort` defaults from `minRigor`, not `mode`.
 7. BusinessCasePreset owns semantic defaults; PlacementPolicy owns
    provider/model/executor ranking and must replace legacy scattered placement
-   sources rather than sit beside them forever.
+   sources rather than sit beside them forever. Same-provider account capacity
+   is delegated to Provider Capacity Rotator and is not a PlacementPolicy
+   config axis.
 8. ProviderAdapter renders canonical runtime options; transport only spawns.
 9. Persona must reach PromptEnvelope and DispatchPlan must record delivery mode.
 10. Governance vetoes/refuses/asks for approval; it does not lower requirements
@@ -144,20 +161,54 @@ gate: every later behavior-preservation claim depends on its snapshot fixture.
 |---|---|---:|---|
 | W0 | Phase 00 baseline snapshot | No | Must land first. Establishes golden behavior fixture. |
 | W1 | Phase 01 ProviderAdapter shadow; Phase 02 Persona PromptEnvelope | Yes | Both depend on Phase 00. They touch adjacent runtime/prompt surfaces; if both edit `assignment-runner`/DispatchPlan evidence, merge carefully and re-run both targeted suites. |
-| W2 | Phase 03 reasoningEffort + alias seam; Phase 06 doctor/vocabulary warnings | Partly | Phase 03 depends on Phase 01 and should see Phase 02's prompt evidence shape. Phase 06 can start after Phase 00 as doc/doctor warnings, but any config-validator edits must rebase over Phase 01/03. |
-| W3 | Phase 04 quality bridge | No | Depends on Phase 00 and should run after Phase 03 because effort defaults refer to canonical `minRigor`. Full-suite gate. |
-| W4 | Phase 05 PlacementPolicy shadow | No | Depends on Phase 04's quality vocabulary and Phase 01's adapter/shadow snapshot surfaces. |
+| W2 | Phase 04 quality bridge | No | Depends on Phase 00 and the required main-to-track sync. It establishes canonical `minRigor` for Phase 03; full-suite gate. |
+| W3 | Phase 03 reasoningEffort + alias seam; Phase 06 doc-only warnings | Partly | Phase 03 depends on Phase 04 for effort defaults and on Phase 01/02 for its runtime evidence shape. Phase 06 doc-only work may proceed, but validator/config edits must respect the later placement/account seams. |
+| W4 | Phase 05 PlacementPolicy shadow | No | Depends on Phase 04, Phase 01's adapter/shadow surfaces, the Provider Capacity Rotator refusal/evidence contract, and completion of the pre-Phase-05 runtime fixes below. |
+| W5 | Phase 06 ExecutorProfile/invocation warnings | No | Depends on Phase 05 vocabulary if validator changes touch placement/account seams. |
+| W6 | Phase 07 production binder | No | Depends on Phase 05 shadow proof and Phase 06 warnings. Full-suite gate. |
+| W7 | Phase 08 legacy bridge retirement | No | Depends on Phase 07 production proof. |
 
 Recommended fast path:
 
 1. Land Phase 00.
-2. Run Phase 01 and Phase 02 in parallel code-panel/plan-loop cells.
-3. After both land, run Phase 03. Phase 06 may run in parallel with Phase 03
-   only if scoped to docs/doctor warnings and not hard config validation.
-4. Run Phase 04 as a full-suite gate.
-5. Run Phase 05.
-6. Finish or extend Phase 06 if earlier parallel slice intentionally left
-   config-validator pieces for after Phase 04/05.
+2. Sync main into the track and run Phase 04 as a full-suite gate.
+3. Run Phase 01/02 as their dependencies become available, then finish Phase
+   03 against the Phase 04 quality contract.
+4. Fix and prove the Provider Capacity Rotator quarantine, refusal settlement,
+   and Codex credential fail-closed paths; add the legacy redirect governance
+   regression before opening Phase 05.
+5. Run Phase 05 in shadow mode against structured Provider Capacity Rotator
+   refusal facts.
+6. Run or finish Phase 06 warnings/schema work.
+7. Only after shadow proof, run Phase 07 production binder.
+8. Retire `readOnlyExecutorRedirects` in Phase 08, not before.
+
+### Pre-Phase-05 runtime gates
+
+These are implementation gates, not reasons to delay the independent Phase 04
+quality bridge:
+
+- Quota/auth classification must pass `quarantineKind`, `until`, and detail
+  fields accepted by the rotator; temporary quarantine without an expiry must
+  not be considered healthy or selectable.
+- Quota reset evidence must produce a conservative future quarantine boundary;
+  missing reset text must not silently create an immediately selectable
+  account.
+- Provider-capacity refusal after admission must settle the current attempt as
+  `provider-capacity-refused` and use the existing
+  `retryId`/`predecessorRunId`/`supersedesRunId` admission path for a bounded
+  `settle-and-reattempt` flow. It must not leave an admitted Run in
+  `running`/unsettled state or use an unclassified throw.
+- The refusal must be represented in the result-ladder vocabulary and
+  `result.json`; reconciliation must not treat a settled refusal as an
+  admitted-unsettled blocker. One owner must define the retry cap; do not add
+  a second counter beside the existing attempt history without an explicit
+  decision.
+- Codex credential materialization must fail closed before bwrap spawn when no
+  selected credential exists or copying fails. The legacy
+  `FGOS_CODEX_CREDENTIAL_HOMES` rotation path must not be silently revived.
+- Add a regression test proving `readOnlyExecutorRedirects` cannot bypass
+  `disallowedProviders` before Phase 05 production work.
 
 ### Parallel safety rules
 
@@ -173,13 +224,30 @@ Recommended fast path:
 - A parallel cell may not update the shared golden snapshot fixture unless it is
   Phase 00 or explicitly records an intentional delta approved by the Lead.
 
-## How to hand a phase to code-panel
+## Direct phase execution contract
 
-For `fgos-code-panel`, pass exactly one phase file plus
-`plans/260915-executor-policy-dispatch-seams/design.md` and this `plan.md`.
-The phase file is the implementation scope; `design.md` is the contract. If the
-doer finds the phase cannot preserve Phase 00 snapshots, it must stop and report
-the intentional delta instead of widening scope.
+An agent implementing a phase must:
+
+1. Read `AGENTS.md`, `docs/specs/reading-map.md`, the relevant area specs,
+   `docs/routing-handoff-contract.md`, this plan, `design.md`, and the target
+   phase file before editing.
+2. Inspect the current worktree and preserve unrelated dirty changes. Never
+   reset, checkout, clean, or overwrite files outside the phase scope.
+3. Create or enter a dedicated phase branch/worktree and record its base SHA.
+4. Inspect the named symbols and their callers before changing behavior. Use
+   the repository's existing helpers and provenance conventions; do not create
+   parallel policy or model abstractions.
+5. Implement only the phase contract. If a required behavior belongs to a
+   later phase, record it as a blocker or deferred finding instead of widening
+   scope.
+6. Add focused regression tests for every changed contract, then run the
+   phase's targeted tests and the required full-suite gate.
+7. Run `git diff --check`, inspect the final diff, and record commands, base
+   SHA, tested SHA, outcome, snapshot impact, and any baseline failures.
+8. Do not commit or merge unless the user explicitly asks for that operation.
+
+The agent must not use skills, `fgos dispatch`, `fgos plan-loop`,
+`fgos code-panel`, or any coordination harness.
 
 ## Close criteria
 
@@ -190,6 +258,9 @@ The track is complete when:
 - current behavior has golden snapshots before and after each phase;
 - resolved persona, effort, quality, provider/model, invocation, and prompt
   delivery appear in DispatchPlan/runtime evidence with provenance;
+- PlacementPolicy consumes structured provider-capacity refusals from
+  Provider Capacity Rotator for fallback decisions instead of doing account
+  rotation itself;
 - config/doctor can identify policy-shaped flags in executor args;
 - no production path has a fourth hidden placement source beside
   PlacementPolicy target semantics.

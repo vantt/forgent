@@ -21,7 +21,7 @@ Can be split:
 
 ExecutorProfile identifies stable runtime boundary:
 
-- principal/account reference;
+- principal/account family reference, not a concrete rotating account id;
 - runtime backend reference;
 - trust domain;
 - egress class;
@@ -38,6 +38,7 @@ Invocation describes how that profile is used:
 
 Do not create executor identity from:
 
+- provider-capacity account id;
 - model;
 - quality tier;
 - reasoning effort;
@@ -46,6 +47,11 @@ Do not create executor identity from:
 - prompt delivery alone;
 - CLI/herdr/API adapter alone;
 - `--allowedTools`, `--permission-mode`, Codex `-s`, or similar argv flags.
+
+Provider Capacity Rotator owns concrete account inventory, leases,
+quarantine, and credential materialization. ExecutorProfile may identify the
+provider/principal family needed for placement and governance, but it must not
+contain account pools or credential homes.
 
 ## Likely files
 
@@ -64,6 +70,8 @@ Add warnings first, not hard failures, for legacy config entries that:
 - encode role/persona behavior in executor names;
 - duplicate the same principal/backend/trust boundary as separate executor ids
   without a machine-checkable separation reason.
+- encode account pools, credential homes, or provider-capacity rotation inside
+  executor env/args instead of the Provider Capacity Rotator inventory.
 
 Warnings must name the migration target:
 
@@ -72,6 +80,7 @@ Warnings must name the migration target:
 - adapter executor → invocation;
 - bwrap/confinement executor → invocation confinement envelope unless trust or
   egress boundary truly changes.
+- executor-owned account env/pool → Provider Capacity Rotator global inventory.
 
 ## Verification
 
@@ -86,6 +95,8 @@ baseline from `plan.md` and triage every new failure.
 
 - Doctor/config validation can identify policy-shaped executor entries without
   breaking existing config.
+- Doctor/config validation can warn about executor-owned account placement
+  without reintroducing account pools into ExecutorProfile.
 - Target ExecutorProfile/invocation terms are documented near the dispatch
   config/spec surface.
 - Legacy executor ids remain accepted.

@@ -233,6 +233,12 @@ to, these legacy sources:
 - `capabilities.*.overrides.rigorOverrides`
 - executor `rigorOverrides` when used as model calibration
 
+PlacementPolicy does not own same-provider account rotation. Provider Capacity
+Rotator (`plans/260916-account-rotator/`) owns account inventory, leases,
+quarantine, and credential provisioning. PlacementPolicy may consume its
+structured capacity refusal as one signal for fallback, but it must not
+configure account pools or choose provider accounts.
+
 Target shape:
 
 ```jsonc
@@ -248,11 +254,16 @@ Target shape:
     {"profile": "claude-primary", "invocation": "headless"},
     {"profile": "codex-primary", "invocation": "bwrap"}
   ],
-  "fallback": {"on": ["capacity", "transient"], "maxAttempts": 2}
+  "fallback": {"on": ["provider-capacity-refusal", "transient"], "maxAttempts": 2}
 }
 ```
 
 Phase 05 implements this in shadow mode only.
+
+Fallback admission must re-check governance for every candidate: disallowed
+providers, runtime class, confinement, tool/mutation policy, and cross-provider
+permission must be admitted before launch. A provider lacking the required
+runtime/invocation class is skipped, never silently downgraded.
 
 ### 3.7 ExecutorProfile and Invocation
 
@@ -262,7 +273,7 @@ ExecutorProfile answers “which principal/backend/trust boundary is this?”
 {
   "id": "claude-primary",
   "identity": {
-    "principalRef": "account://claude-fgovn",
+    "principalRef": "principal://claude-primary",
     "runtimeBackendRef": "backend://claude-cli",
     "trustDomain": "local-operator",
     "egressClass": "provider-only"
@@ -362,12 +373,12 @@ Current `work.tier` should become `work.size` over time. The mapping from work
 size to `minRigor` is a runner-scope semantic default, not a model catalog
 concern and not placement.
 
-Initial compatibility:
+Initial semantic compatibility:
 
 ```text
 light -> low
 standard -> standard
-heavy -> critical unless overridden by existing compatibility path
+heavy -> critical
 ```
 
 The exact compatibility result must be verified against Phase 00 snapshots
@@ -375,21 +386,24 @@ before changing catalog behavior.
 
 ### 5.3 Creative-column trap
 
-Current raw `agy-cli` and `agy-herdr` heavy work uses:
+The semantic tier and the model-calibration lookup tier are separate. Current
+raw `agy-cli` and `agy-herdr` heavy work uses:
 
 ```text
-heavy -> creative -> gemini-3.8-flash-high
+semantic heavy -> critical
+lookupPolicyTier creative -> gemini-3.8-flash-high
 ```
 
-Current `fgos-coding-implement` overrides heavy to:
+Current `fgos-coding-implement` calibration overrides the lookup tier to:
 
 ```text
-heavy -> standard -> gemini-3.8-flash-medium
+lookupPolicyTier standard -> gemini-3.8-flash-medium
 ```
 
-Therefore a catalog keyed only by `minRigor` must include a deliberate
-calibration step. Any loss of `gemini-3.8-flash-high` for raw agy heavy work is
-an intentional behavior delta and must be named as such; it is not a refactor.
+Therefore Phase 04 must retain both values in provenance. It must not derive
+semantic `minRigor` from the calibration tier, and it must not re-key the live
+catalog by `minRigor`. Any later change to the selected model is a PlacementPolicy
+or calibration decision and must be named as an intentional behavior delta.
 
 ## 6. DispatchPlan evidence
 
@@ -400,17 +414,32 @@ The eventual DispatchPlan should snapshot the admitted result:
   "selector": {"type": "assignment", "value": "asgn_..."},
   "policy": {
     "persona": {"value": "code-reviewer@2", "source": "..."},
-    "quality": {"minRigor": "...", "mode": "..."},
+    "semanticTier": {"value": "heavy", "source": "..."},
+    "quality": {
+      "minRigor": {"value": "critical", "source": "..."},
+      "mode": {"value": "...", "source": "..."}
+    },
+    "lookupPolicyTier": {
+      "value": "creative",
+      "source": {"kind": "calibration", "scope": "..."}
+    },
     "reasoningEffort": {"value": "high", "source": "..."},
     "permissionContract": {"value": "read-only", "source": "..."}
   },
   "placement": {
     "provider": "claude",
-    "model": "opus",
+    "model": {
+      "value": "opus",
+      "source": {"provider": "claude", "lookupPolicyTier": "..."}
+    },
     "executorProfile": "claude-primary",
     "invocation": "visible",
     "confinement": {"backend": "none"},
-    "reasonCodes": ["visibility=visible", "supports.effort.high"]
+    "reasonCodes": ["visibility=visible", "supports.effort.high"],
+    "providerCapacity": {
+      "status": "not-applicable|selected|refused",
+      "refusalReason": "provider-capacity.exhausted-or-quarantined"
+    }
   },
   "prompt": {
     "persona": {"ref": "code-reviewer@2", "delivery": "system", "digest": "sha256:..."}
@@ -434,9 +463,14 @@ prove behavior equivalence.
 3. PromptEnvelope/persona propagation.
 4. reasoningEffort and same-scope legacy aliases.
 5. Quality split bridge.
-6. PlacementPolicy shadow mode.
+6. PlacementPolicy shadow mode; consume Provider Capacity Rotator structured
+   refusals, but do not change production binding.
 7. ExecutorProfile/invocation vocabulary and doctor warnings.
-8. Only after those are green: migrate config entries and retire legacy ids.
+8. PlacementPolicy production binder after shadow proof.
+9. Retire `readOnlyExecutorRedirects` only after production PlacementPolicy
+   proof.
+10. Later migration: config entries, executor ids, and six-tier modelTier if
+   still wanted.
 
 No phase may claim “no behavior change” without comparing against the Phase 00
 snapshot.
@@ -448,8 +482,9 @@ snapshot.
 - ProviderAdapter unit tests: pure rendering and `applied` statuses.
 - PromptEnvelope tests: resolved persona must reach prompt with delivery mode.
 - Alias tests: alias patch applies at original scope with `viaAlias`.
-- Quality tests: minRigor raise-only; mode sourceKind precedence; conflict
-  validation when legacy/canonical disagree.
+- Quality tests: semantic-tier-derived minRigor raise-only; explicit
+  minRigor-above-derived rejection; mode sourceKind precedence; separate
+  `semanticTier` and `lookupPolicyTier` provenance.
 - Placement shadow tests: legacy binding and shadow placement divergence are
   reported but not applied.
 - Doctor/config tests: policy-shaped flags and executor `rigorOverrides` warn
@@ -459,6 +494,7 @@ snapshot.
 
 - Removing legacy executor ids.
 - Rewriting `.fgos/config.json` to the final ExecutorProfile schema.
-- Making PlacementPolicy the only production binder.
+- Making PlacementPolicy the only production binder before Phase 07 proof.
 - Hard-failing policy-shaped flags in executor args.
 - Changing real provider/model choices without an intentional-delta decision.
+- Moving account inventory or credential provisioning into PlacementPolicy.
