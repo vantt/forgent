@@ -746,7 +746,16 @@ export async function executeExecutorCli(
         fallbackFrom: anchorCapability,
         anchorCapability,
         cfg,
-        providerCapacity: opts.providerCapacity,
+        // Pre-existing bug fix (unrelated to this track's own scope): `opts`
+        // is not a parameter of `executeExecutorCli` -- this function
+        // destructures its options object directly (no catch-all binding),
+        // and the caller-supplied governance/call options bag is named
+        // `options` (destructured above). Every existing caller already
+        // passes no `providerCapacity` of its own, so this is
+        // value-preserving (still `undefined`) for all of them; it only
+        // stops the `ReferenceError: opts is not defined` crash this
+        // function hit on every call.
+        providerCapacity: options?.providerCapacity,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -944,7 +953,9 @@ export async function executeExecutorCli(
         anchorCapability,
         cfg,
         assignmentLaunchContext,
-        providerCapacity: opts.providerCapacity,
+        // Same pre-existing `opts`-is-not-defined fix as the in-process
+        // branch above -- see its comment.
+        providerCapacity: options?.providerCapacity,
         invocation: {
           command,
           args,
