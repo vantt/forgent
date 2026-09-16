@@ -1,48 +1,39 @@
-# Current Cell — P00: Contract và baseline
+# Current Cell — P05: Live proof và rollout
 
-- **Cell:** P00
+- **Cell:** P05
 - **Track:** `code-panel-multicell-facade`
-- **Plan:** [`plans/260915-code-panel-multicell-facade/plan.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/plans/260915-code-panel-multicell-facade/plan.md)
-- **Coordination ID:** `code-panel-multicell-facade--p00`
-- **Cell Branch:** `code-panel-multicell-facade--p00`
-- **Base Ref:** `45569ac3379445e93436524c1226159b3869265c` (track branch tip: `91d35b4be8a3b4070d4f4f5b23d9bda68a0fb641`, includes merged P04)
-- **Status:** in-progress (candidate-produced, fix round 3 applied, ready for close)
-- **Role:** doer (`agy-cli` / `focused-code-implementer`)
-- **Primary Lease:** `facade-contract` (DOCS/EVIDENCE-ONLY)
-- **Forbidden Paths:** `src/**`, `core/**`, `domains/**`, `test/**`, active `tsk-1bh` worktree
+- **Plan:** `plans/260915-code-panel-multicell-facade/plan.md`
+- **Track Branch:** `code-panel-multicell-facade`
+- **Status:** proven-on-track; publication to `main` pending safe dirty-worktree handling
+- **Execution Mode:** direct hotfix-continuation because Claude quota was exhausted and the dispatch/panel path was the broken surface being repaired.
 
----
+## Result
 
-## 1. Cell Objective & Scope
+P00-P03 and P04 are merged into the track branch. The final integrated proof
+passed on the synced track tree:
 
-Lock the ownership boundary between `fgos-code-panel`, `fgos-plan-loop`, and the shared coordination engine with durable evidence before any implementation code changes, and record a resumable baseline inventory of paused plans.
+- tested SHA: `069e93cffd6da26f9ce1702c9fec220216b5dddd`
+- tested tree: `094be49654b757d62dee26ffad0c94acd047dbb3`
+- environment: Node `v24.18.0`, npm `11.16.0`, Linux x86_64, `package-lock.json` sha256 `b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc`
 
-Summary of deliverables:
-1. **Precondition R1:** Verify commit `9af6362c` (`tsk-1bh` fix) and run focused driver-authorization and recovery tests; record real pass/fail output.
-2. **Mode-selection contract R2:** Formulate unambiguous rules (including edge cases CE1–CE5):
-   - `planned-multi-cell`: plan/phase path is the actual execution target (bare path, or explicit run/resume/execute instruction directed AT the plan/phase artifact itself); track referenced by name with run/resume/open verb (e.g. "resume the <track> track", resolving to `plans/<name>/plan.md` or registered track — CE1); or explicit run/resume/execute instruction naming any `plan.md`/`phase-NN-*.md` file outside `plans/` (CE5).
-   - `direct-single-cell`: concrete code changes, passing plan/phase citations, plan file cited as an edit target (e.g. "fix typo in plans/X/plan.md"), plan cited as background context while run/resume verb is directed at another object (e.g. "run focused tests in plans/X/phase-01.md against src/x.mjs" or "resume my work on src/auth.mjs, context in plans/X/plan.md"), negated instructions (e.g. "don't run plans/X/plan.md yet, just fix src/foo.mjs" — CE2), or non-execution inspection verbs directed at a plan (e.g. "review plans/X/plan.md" — CE4).
-   - Target interaction & anti-guessing: when naming a specific phase path as execution target, phase selection is preserved without silent override: track is derived and plan-loop picks next cell via chain, refusing if named phase mismatches next open cell (CE3). Genuinely unresolved or ambiguous intent refused or clarification requested, never silently guessed either way.
-3. **Ownership boundary R3:** Establish explicit ownership matrix and exact contract assertions (with file:line citations) that Phase 01 must implement as tests.
-4. **Paused plans inventory R4:** Survey all active and paused plans under `plans/` with open cell-status tables, recording current/next cell, coordination session, merged commits, worktree status, and proof validity.
-5. **Test run count baseline R5:** Establish before/after test count baseline from existing coordination traces for comparison in Phase 05, and durable full-suite baseline (6467 pass, 52 unique failing titles: 51 rust-host + 1 intake seq mismatch, 9 skipped = 6528 total).
-
----
-
-## 2. Verification Commands
+## Verification Commands
 
 ```sh
-# Focused coordination tests (130 pass, 0 fail)
-node --test test/runner/coordination-driver-authorization.test.mjs test/runner/coordination-recovery-and-quorum.test.mjs test/verbs/coordination-recovery.test.mjs
-
-# Tree purity check (must be clean -- no forbidden code paths touched or untracked)
-git diff --exit-code -- src core domains test
-git status --porcelain --untracked-files=all -- src core domains test
+cargo build --release --workspace
+node --test test/rust-host/*.test.mjs
+node --test test/cli/fgos-intake-4.test.mjs
+env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test
 ```
 
----
+Evidence:
 
-## 3. Next Action
+- `node --test test/rust-host/*.test.mjs` → 102/102 pass.
+- `node --test test/cli/fgos-intake-4.test.mjs` → 15/15 pass.
+- Final `npm test` → 6593 tests, 6584 pass, 0 fail, 9 skipped, duration `395982.212118ms`.
 
-- Independent review by `reviewer` (`claude-reviewer` / `independent-code-reviewer`) against requirements R1-R5 and proof sufficiency.
-- Adversarial review by `red-team` (`codex-cli` / `adversarial-code-red-team`) testing mode-selection ambiguity, algorithm duplication seams, inventory accuracy, and tree cleanliness.
+## Next Action
+
+Publish the already-proven track branch to `main` only after preserving or
+clearing user-owned dirty/untracked files in the main checkout. If publication
+changes the final tree, sync `main` back into the track and rerun the full proof
+instead of certifying an untested tree.

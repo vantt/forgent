@@ -1,6 +1,6 @@
-# Phase 04 — Live proof và rollout
+# Phase 05 — Live proof và rollout
 
-Lease: `facade-live-proof` | Vào được sau: P03
+Lease: `facade-live-proof` | Vào được sau: P00-P03 và P04
 
 ## Mục tiêu
 
@@ -76,6 +76,33 @@ node --test test/setup/skill-wrappers.test.mjs test/skills/fgos-mirror.test.mjs 
 env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test
 test "$(git rev-parse "${TESTED_SHA}^{tree}")" = "$(git rev-parse "${MAIN_INTEGRATED_SHA}^{tree}")"
 ```
+
+## 2026-09-16 Direct hotfix execution note
+
+Claude quota was exhausted during the incident response, so P02/P03/P05 were
+completed by the lead session directly instead of through the broken
+plan-loop/code-panel dispatch path. The final integrated proof was still run on
+the real track branch after syncing main hotfixes:
+
+```sh
+cargo build --release --workspace
+node --test test/rust-host/*.test.mjs
+node --test test/cli/fgos-intake-4.test.mjs
+env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test
+```
+
+Final proof result on track branch `code-panel-multicell-facade`:
+
+- tested SHA: `069e93cffd6da26f9ce1702c9fec220216b5dddd`
+- tested tree: `094be49654b757d62dee26ffad0c94acd047dbb3`
+- environment: Node `v24.18.0`, npm `11.16.0`, Linux x86_64, `package-lock.json` sha256 `b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc`
+- final `npm test`: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration `395982.212118ms`
+
+The earlier red full-suite attempt on the same tree reproduced the P00 baseline
+environment precondition (missing `target/release/fgos` and
+`target/release/fgctl`). After building Rust release binaries, `rust-host`
+passed 102/102 and the formerly failing intake regression passed 15/15 before
+the final full-suite proof.
 
 ## Rollback
 

@@ -3,9 +3,9 @@
 - **Plan:** [`plans/260915-code-panel-multicell-facade/plan.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/plans/260915-code-panel-multicell-facade/plan.md)
 - **Track Branch:** `code-panel-multicell-facade`
 - **Base Ref:** `45569ac3379445e93436524c1226159b3869265c` (immutable SHA from main after `tsk-1bh` landed)
-- **Status:** In-progress (Phase 00 Contract and Baseline active)
+- **Status:** Proven on track; awaiting safe publication to `main`
 - **Capability:** `code:implement`
-- **Current Cell:** `P00` ([`current-cell.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md))
+- **Current Cell:** `P05` ([`current-cell.md`](current-cell.md))
 
 ---
 
@@ -57,19 +57,20 @@ Phase 00 confirmed all track entry conditions before touching any implementation
 
 | Phase | Cell | Capability | Status | Exit Criteria |
 |---|---|---|---|---|
-| **00** | [Contract & baseline](p00.md) | `code:implement` | in-progress | `tsk-1bh` terminal-close proof + durable resume inventory + contract assertions; targeted proof |
-| **01** | Facade hai mode | `code:implement` | planned | mode/delegation tests pass; projected skills in sync. Full-suite gate if mechanical triggers hit |
-| **02** | Coding test-policy overlay | `code:implement` | planned | tier/reuse/escalation fixtures pass; targeted proof |
-| **03** | Resume & compatibility | `code:implement` | planned | fresh-process + legacy + direct regressions pass. Full-suite gate if implementation exceeds skill prose |
+| **00** | [Contract & baseline](p00.md) | `code:implement` | merged | `tsk-1bh` terminal-close proof + durable resume inventory + contract assertions; targeted proof |
+| **01** | Facade hai mode | `code:implement` | merged | mode/delegation tests pass; projected skills in sync. Full-suite gate if mechanical triggers hit |
+| **02** | Coding test-policy overlay | `code:implement` | merged | tier/reuse/escalation fixtures pass; targeted proof |
+| **03** | Resume & compatibility | `code:implement` | merged | fresh-process + legacy + direct regressions pass. Full-suite gate if implementation exceeds skill prose |
 | **04** | Fix orphaned authorization (engine bugfix) | `code:implement` | merged | mutation-verified regression tests pass; session-engine.mjs fix merged at `d13570c4` / `ebeef714`. Full-suite gate |
-| **05** | Live proof & rollout | `code:implement` | planned | multi-cell / live resume / direct smoke pass; final integrated `npm test` gate. Full-suite gate |
+| **05** | [Live proof & rollout](p05.md) | `code:implement` | proven-on-track | final integrated `npm test` gate passed on `069e93cf` / tree `094be49654b757d62dee26ffad0c94acd047dbb3`; publication to `main` pending safe dirty-worktree handling |
 
 ---
 
 ## 5. Verification References
 
 - Cell trace P00: [`p00.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md)
-- Current cell status: [`current-cell.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md)
+- Cell trace P05: [`p05.md`](p05.md)
+- Current cell status: [`current-cell.md`](current-cell.md)
 - Proof artifacts:
   - [`proofs/baseline/terminal-close-tsk-1bh-proof.txt`](file:///home/vantt/projects/code-panel-multicell-facade-p00/docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt)
   - [`proofs/baseline/paused-plans-inventory.md`](file:///home/vantt/projects/code-panel-multicell-facade-p00/docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md)
