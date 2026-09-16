@@ -4,9 +4,19 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { planReconciliation, applyReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
+import { dispatchLockFile } from '../../src/runner/main-checkout-lock.mjs';
 
 function root() { const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-')); fs.mkdirSync(path.join(out, '.fgos'), { recursive: true }); return out; }
-function deadLock(dir, extra = {}) { fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1', ...extra })); }
+// Real production per-cwd dispatch lock path and record shape (see
+// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments):
+// `dispatch--<encodeURIComponent(cwd)>.lock`, `{pid: "<pid>:<acquiredAtMs>:
+// <rand>", ts: <int>}`. `dir` doubles as the cwd under test unless a
+// different `cwd` is supplied.
+function lockPathFor(dir, cwd = dir) { return path.join(dir, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
+function deadLock(dir, cwd = dir, extra = {}) {
+  const ts = Date.now();
+  fs.writeFileSync(lockPathFor(dir, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts, ...extra }));
+}
 
 // collect-result fixture helpers -- same shapes as test/runner/dispatch-runtime-inspect.test.mjs,
 // since collect-result's own plan/apply is built entirely on top of inspectDispatchRuntime's
@@ -16,33 +26,61 @@ function assignmentDir(dir, id) { const d = path.join(dir, '.fgos', 'assignments
 function runDirFor(dir, id, attempt, value, result) { const d = path.join(dir, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'run.json'), JSON.stringify({ assignmentId: id, ...value })); if (result) fs.writeFileSync(path.join(d, 'result.json'), JSON.stringify(result)); return d; }
 function admitGen(dir, id, epoch, value) { const d = path.join(dir, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify(value)); }
 const legacyResult = (runId, assignmentId) => ({ runId, assignmentId, status: 'done', confidence: 'reported' });
+// Real control/generations/ ledger a live controller's own
+// acquireRunControl publishes to (src/runner/dispatch/run-lock.mjs) -- F2's
+// snapshot.controlEpoch now reads this, never run.json's own shadow field.
+function publishControlGeneration(runDir, epoch) {
+  const d = path.join(runDir, 'control', 'generations');
+  fs.mkdirSync(d, { recursive: true });
+  fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify({ epoch }));
+}
 function deadClaim(dir, assignmentId, extra = {}) { const d = path.join(dir, '.fgos', 'assignments', assignmentId); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'dispatch.claim'), JSON.stringify({ pid: 99999999, startTime: '1', ...extra })); }
 
 test('reconcile clears only a dead-proven cwd lock and replay is idempotent', () => {
-  const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned'); assert.match(plan.snapshot.resourceIncarnation, /^pid:/);
   assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'applied');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), false);
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
   assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' }).outcome, 'already-applied');
 });
 
-test('reconcile refuses ttl-only or live/ambiguous proof and never unlinks a successor', () => {
-  const dir = root(); fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: 'wrong', expiresAt: '2000-01-01T00:00:00.000Z' }));
-  // Reused/mismatched incarnation is dead proof, but successor replacement is CAS-stale.
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' }); assert.equal(plan.outcome, 'planned');
-  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: 'other' }));
-  assert.equal(applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' }).outcome, 'plan-stale');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), true);
+test('reconcile refuses a live holder proof and never unlinks a successor', () => {
+  const dir = root();
+  const now = Date.now();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
+  // The real process (self) is live and started before `now`, so this is
+  // proof of a live incarnation, not dead proof.
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' }); assert.equal(plan.outcome, 'refused');
   assert.equal(planReconciliation(dir, { action: 'kill-process' }).outcome, 'refused');
 });
 
 test('planReconciliation refuses a live holder (real resource-incarnation match) and never produces a plan', () => {
   const dir = root();
-  const actualStart = fs.readFileSync(`/proc/${process.pid}/stat`, 'utf8').trim().split(' ')[21];
-  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: actualStart }));
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const now = Date.now();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'refused');
   assert.match(plan.reason, /live/);
+});
+
+test('cwdLockHolder refuses/unparses any record not matching the real production composite-identity shape, including the old fixture-only {pid: integer, startTime} shape', () => {
+  const dir = root();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: process.pid, startTime: '1' }));
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+  assert.equal(plan.outcome, 'needs-input');
+  assert.match(plan.reason, /verifiable resource incarnation/);
+});
+
+test('clear-cwd-lock plans against the exact file the real production dispatchLockFile export names, proving reconciliation-planner.mjs\'s own local path computation can never silently drift from it', () => {
+  for (const cwd of ['/path/to/worktree-a', '/tmp/has spaces/and?query=1']) {
+    const dir = root();
+    const ts = Date.now();
+    const realPath = path.join(dir, '.fgos', dispatchLockFile(cwd));
+    fs.writeFileSync(realPath, JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
+    const plan = planReconciliation(dir, { cwd, now: '2026-09-15T00:00:00.000Z' });
+    assert.equal(plan.outcome, 'planned', `reconciliation-planner.mjs's own lock-path computation must resolve to the exact file dispatchLockFile(${JSON.stringify(cwd)}) names`);
+    assert.equal(plan.proposedAction.path, realPath);
+  }
 });
 
 test('holder() start-time parser is paren-aware: a comm field containing a space does not desync the starttime column, so a live holder with such a comm is still detected live', () => {
@@ -64,9 +102,11 @@ test('holder() start-time parser is paren-aware: a comm field containing a space
   };
   let plan;
   try {
-    const realStartTime = realRest.split(' ')[19];
-    fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: realStartTime }));
-    plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+    const realStartTime = Number(realRest.split(' ')[19]);
+    const identityTs = Date.now();
+    fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${identityTs}:x`, ts: identityTs }));
+    plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
+    void realStartTime; // the synthetic stat above already carries the real ticks verbatim
   } finally {
     fs.readFileSync = original;
   }
@@ -74,9 +114,10 @@ test('holder() start-time parser is paren-aware: a comm field containing a space
   assert.match(plan.reason, /live/);
 });
 
-test('holder() treats an unreadable (non-ENOENT) /proc read as ambiguous, never as proof of death', () => {
+test('cwdLockHolder treats an unreadable (non-ENOENT) /proc read as ambiguous, never as proof of death', () => {
   const dir = root();
-  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: process.pid, startTime: 'some-recorded-start-time' }));
+  const identityTs = Date.now();
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${identityTs}:x`, ts: identityTs }));
   const original = fs.readFileSync;
   fs.readFileSync = function patchedReadFileSync(file, ...rest) {
     if (file === `/proc/${process.pid}/stat`) {
@@ -88,7 +129,7 @@ test('holder() treats an unreadable (non-ENOENT) /proc read as ambiguous, never 
   };
   let plan;
   try {
-    plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+    plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   } finally {
     fs.readFileSync = original;
   }
@@ -99,24 +140,13 @@ test('holder() treats an unreadable (non-ENOENT) /proc read as ambiguous, never 
   assert.equal(plan.outcome, 'needs-input');
 });
 
-test('apply detects a controlEpoch change on the still-dead holder between planning and apply as plan-stale', () => {
-  const dir = root();
-  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1', controlEpoch: 1 }));
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  assert.equal(plan.snapshot.controlEpoch, 1);
-  fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1', controlEpoch: 2 }));
-  const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(result.outcome, 'plan-stale');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), true);
-});
-
 test('apply against a dead holder proves plan-stale when a successor guard replaces it, and the successor bytes survive intact', () => {
   const dir = root(); deadLock(dir);
-  const lockPath = path.join(dir, '.fgos', 'dispatch.lock');
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const lockPath = lockPathFor(dir);
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
-  const successorBytes = JSON.stringify({ pid: 12345, startTime: 'successor-incarnation' });
+  const successorTs = Date.now();
+  const successorBytes = JSON.stringify({ pid: `12345:${successorTs}:z`, ts: successorTs });
   fs.writeFileSync(lockPath, successorBytes);
   const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(result.outcome, 'plan-stale');
@@ -125,23 +155,23 @@ test('apply against a dead holder proves plan-stale when a successor guard repla
 
 test('a cwd lock removed by a concurrent cleanup before apply\'s final re-read returns plan-stale, not a throw', () => {
   const dir = root(); deadLock(dir);
-  const lockPath = path.join(dir, '.fgos', 'dispatch.lock');
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const lockPath = lockPathFor(dir);
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   const original = fs.readFileSync;
-  // applyReconciliation reads lockPath 3 times before its own explicit
-  // final re-read: twice inside the internal `fresh = planReconciliation(...)`
-  // re-verify (its own `raw` read, then `json(file)`'s internal read), and
-  // once more inside `inspectDispatchRuntime`'s cwd-evidence lookup. Only the
-  // 4th read is the actual target this test races against -- delete the
-  // file BEFORE that read runs (not after, which would let the read still
-  // succeed and only make the later unlink hit ENOENT instead, a different,
-  // already-tolerated branch), so the read itself genuinely throws ENOENT.
+  // applyReconciliation reads lockPath twice before its own explicit final
+  // re-read: inside the internal `fresh = planReconciliation(...)`
+  // re-verify (its own `raw` read, then `json(file)`'s internal read).
+  // Only the 3rd read is the actual target this test races against --
+  // delete the file BEFORE that read runs (not after, which would let the
+  // read still succeed and only make the later unlink hit ENOENT instead, a
+  // different, already-tolerated branch), so the read itself genuinely
+  // throws ENOENT.
   let lockPathReads = 0;
   fs.readFileSync = function patchedReadFileSync(file, ...rest) {
     if (file === lockPath) {
       lockPathReads += 1;
-      if (lockPathReads === 4) fs.unlinkSync(lockPath); // simulate a concurrent cleanup racing the final re-read
+      if (lockPathReads === 3) fs.unlinkSync(lockPath); // simulate a concurrent cleanup racing the final re-read
     }
     return original.call(fs, file, ...rest);
   };
@@ -158,7 +188,7 @@ test('a cwd lock removed by a concurrent cleanup before apply\'s final re-read r
 
 test('apply blocks a dead-holder cleanup when an active assignment Run is still bound to this cwd', () => {
   const dir = root(); deadLock(dir);
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   const runDir = path.join(dir, '.fgos', 'assignments', 'asgn-x', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -166,12 +196,12 @@ test('apply blocks a dead-holder cleanup when an active assignment Run is still 
   const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(result.outcome, 'blocked');
   assert.match(result.reason, /active Run/);
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), true);
+  assert.equal(fs.existsSync(lockPathFor(dir)), true);
 });
 
 test('apply blocks a dead-holder cleanup when a pending (unsettled) dispatch launch is still bound to this cwd', () => {
   const dir = root(); deadLock(dir);
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   const runDir = path.join(dir, '.fgos', 'dispatch-runs', 'fanout-group-x', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -180,7 +210,7 @@ test('apply blocks a dead-holder cleanup when a pending (unsettled) dispatch lau
   const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(result.outcome, 'blocked');
   assert.match(result.reason, /active Run/);
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), true);
+  assert.equal(fs.existsSync(lockPathFor(dir)), true);
 });
 
 test('reconcile collect-result links an already-written valid result for a standalone Assignment Run', () => {
@@ -353,6 +383,21 @@ test('reconcile clear-assignment-claim needs-input on a corrupt/unparseable clai
   assert.equal(conflicting.outcome, 'needs-input');
 });
 
+test('reconcile clear-assignment-claim refuses a path-escaping assignmentId and never reads/writes outside .fgos/assignments/', () => {
+  const dir = root();
+  // A file placed exactly where `../../outside-target` would resolve to
+  // (one level above `.fgos/assignments`) proves the guard refuses BEFORE
+  // ever joining the raw id into a path, not merely that the join happens
+  // to miss by chance.
+  const outsideFile = path.join(dir, '.fgos', 'outside-target', 'dispatch.claim');
+  fs.mkdirSync(path.dirname(outsideFile), { recursive: true });
+  fs.writeFileSync(outsideFile, JSON.stringify({ pid: 99999999, startTime: '1' }));
+  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: '../outside-target', now: '2026-09-15T00:00:00.000Z' });
+  assert.notEqual(plan.outcome, 'planned');
+  assert.notEqual(plan.outcome, 'applied');
+  assert.equal(fs.existsSync(outsideFile), true, 'a path-escaping assignmentId must never reach a file outside .fgos/assignments/');
+});
+
 test('reconcile clear-assignment-claim refuses without an assignmentId, and is blocked for an unknown assignment', () => {
   const dir = root();
   const noId = planReconciliation(dir, { action: 'clear-assignment-claim', now: '2026-09-15T00:00:00.000Z' });
@@ -448,18 +493,21 @@ test('reconcile repair-projection repairs (not blocks) when status is absent eve
   assert.equal(runJson.status, 'settled');
 });
 
-test('reconcile repair-projection apply detects a controlEpoch change between planning and apply as plan-stale', () => {
+test('reconcile repair-projection apply detects a REAL control-epoch change (control/generations/) between planning and apply as plan-stale, never a run.json.controlEpoch field edit', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-epoch', status: 'running', controlEpoch: 1 }, legacyResult('run-epoch', 'a'));
+  const runDir = runDirFor(dir, 'a', '01', { runId: 'run-epoch', status: 'running' }, legacyResult('run-epoch', 'a'));
   admitGen(dir, 'a', 1, { runId: 'run-epoch', attempt: 1 });
+  publishControlGeneration(runDir, 1);
   const plan = planReconciliation(dir, { action: 'repair-projection', runId: 'run-epoch', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   assert.equal(plan.snapshot.controlEpoch, 1);
-  const runPath = path.join(dir, '.fgos', 'assignments', 'a', 'runs', '01', 'run.json');
-  fs.writeFileSync(runPath, JSON.stringify({ runId: 'run-epoch', assignmentId: 'a', status: 'running', controlEpoch: 2 }));
+  // A live controller re-driving the Run bumps the REAL ledger -- run.json
+  // itself is never touched here, proving F2's fix reads the real ledger,
+  // not a shadow field that would otherwise miss this entirely.
+  publishControlGeneration(runDir, 2);
   const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
   assert.equal(result.outcome, 'plan-stale');
-  const runJson = JSON.parse(fs.readFileSync(runPath, 'utf8'));
+  const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
   assert.equal(runJson.status, 'running', 'a successor incarnation (bumped controlEpoch) must never be overwritten');
 });

@@ -18,7 +18,13 @@ function root() {
   fs.mkdirSync(path.join(out, '.fgos'), { recursive: true });
   return out;
 }
-function deadLock(dir) { fs.writeFileSync(path.join(dir, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1' })); }
+// Real production per-cwd dispatch lock path/shape (see
+// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
+function lockPathFor(dir, cwd = dir) { return path.join(dir, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
+function deadLock(dir, cwd = dir) {
+  const ts = Date.now();
+  fs.writeFileSync(lockPathFor(dir, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
+}
 
 test('invokeDispatchReconcileOperation refuses a mismatched operationId or effect, and never a read effect', () => {
   const ctx = { repoRoot: root() };
@@ -38,7 +44,7 @@ test('invokeDispatchReconcileOperation with no --apply defaults to the plan path
   const dir = root();
   deadLock(dir);
   const ctx = { repoRoot: dir };
-  const result = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { now: '2026-09-15T00:00:00.000Z' } });
+  const result = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { cwd: dir } });
   assert.equal(result.outcome, 'planned');
 });
 
@@ -46,9 +52,37 @@ test('invokeDispatchReconcileOperation with payload.apply routes to the real app
   const dir = root();
   deadLock(dir);
   const ctx = { repoRoot: dir };
-  const plan = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { now: '2026-09-15T00:00:00.000Z' } });
+  const plan = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { cwd: dir } });
   assert.equal(plan.outcome, 'planned');
-  const applied = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { apply: true, plan, now: '2026-09-15T00:00:01.000Z' } });
+  const applied = invokeDispatchReconcileOperation({ operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx, payload: { apply: true, plan } });
   assert.equal(applied.outcome, 'applied');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'dispatch.lock')), false);
+  assert.equal(fs.existsSync(lockPathFor(dir)), false);
+});
+
+test('invokeDispatchReconcileOperation ignores a forged now/ttlMs in payload for both plan and apply (F6)', () => {
+  const dir = root();
+  deadLock(dir);
+  const ctx = { repoRoot: dir };
+  const forgedFuture = '2099-01-01T00:00:00.000Z';
+  const plan = invokeDispatchReconcileOperation({
+    operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
+    payload: { cwd: dir, now: forgedFuture, ttlMs: 999999999 },
+  });
+  assert.equal(plan.outcome, 'planned');
+  // A forged now/ttlMs must never reach planReconciliation: expiresAt has
+  // to be derived from the real wall clock plus the real default ttlMs
+  // (5 minutes), never anywhere near the forged future timestamp.
+  const expectedExpiresAtMs = Date.now() + 5 * 60 * 1000;
+  assert.ok(
+    Math.abs(Date.parse(plan.snapshot.expiresAt) - expectedExpiresAtMs) < 10000,
+    `expiresAt (${plan.snapshot.expiresAt}) must track the real wall clock's default TTL, not the forged now/ttlMs`,
+  );
+  assert.ok(Date.parse(plan.snapshot.expiresAt) < Date.parse(forgedFuture));
+  // A forged PAST now on apply must never make a still-fresh real plan look
+  // expired.
+  const applied = invokeDispatchReconcileOperation({
+    operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
+    payload: { apply: true, plan, now: '1970-01-01T00:00:00.000Z' },
+  });
+  assert.equal(applied.outcome, 'applied');
 });

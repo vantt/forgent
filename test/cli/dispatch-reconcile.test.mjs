@@ -6,10 +6,18 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 const repo = path.resolve(new URL('../..', import.meta.url).pathname);
 const run = (root, args) => spawnSync(process.execPath, ['bin/fgos.mjs', ...args, '--dir', root], { cwd: repo, encoding: 'utf8' });
+// Real production per-cwd dispatch lock path/shape (see
+// reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
+function lockPathFor(root, cwd = root) { return path.join(root, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
+function deadLock(root, cwd = root) {
+  const ts = Date.now();
+  fs.writeFileSync(lockPathFor(root, cwd), JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
+}
+
 test('CLI exposes only the narrow reconcile plan and refuses forbidden actions', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), JSON.stringify({ pid: 99999999, startTime: '1' }));
-  const planned = run(root, ['dispatch', 'reconcile', 'plan']); assert.equal(planned.status, 0, planned.stderr); assert.equal(JSON.parse(planned.stdout).data.outcome, 'planned');
+  deadLock(root);
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--cwd', root]); assert.equal(planned.status, 0, planned.stderr); assert.equal(JSON.parse(planned.stdout).data.outcome, 'planned');
   const refused = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'resume-driver']); assert.equal(refused.status, 0, refused.stderr); assert.equal(JSON.parse(refused.stdout).data.outcome, 'refused');
 });
 
@@ -70,14 +78,28 @@ test('CLI apply refuses a forbidden/unsupported action smuggled into a plan\'s p
 
 test('CLI apply refuses a same-byte outside-root target tampered into a plan', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  const bytes = JSON.stringify({ pid: 99999999, startTime: '1' });
-  const guard = path.join(root, '.fgos', 'dispatch.lock'); fs.writeFileSync(guard, bytes);
+  const ts = Date.now();
+  const bytes = JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts });
+  const guard = lockPathFor(root); fs.writeFileSync(guard, bytes);
   const outside = path.join(path.dirname(root), `${path.basename(root)}-outside-lock`); fs.writeFileSync(outside, bytes);
-  const planned = run(root, ['dispatch', 'reconcile', 'plan']); assert.equal(planned.status, 0, planned.stderr);
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--cwd', root]); assert.equal(planned.status, 0, planned.stderr);
   const plan = JSON.parse(planned.stdout).data; plan.proposedAction.path = outside;
   const applied = run(root, ['dispatch', 'reconcile', 'apply', '--plan', JSON.stringify(plan)]);
   assert.equal(applied.status, 0, applied.stderr);
   assert.equal(JSON.parse(applied.stdout).data.outcome, 'plan-stale');
   assert.equal(fs.existsSync(outside), true, 'outside same-byte file must never be unlinked');
   assert.equal(fs.existsSync(guard), true, 'canonical guard must remain after refusal');
+});
+
+test('CLI refuses a path-escaping --assignment for clear-assignment-claim and never touches anything outside .fgos/assignments/', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
+  const outsideFile = path.join(root, '.fgos', 'outside-target', 'dispatch.claim');
+  fs.mkdirSync(path.dirname(outsideFile), { recursive: true });
+  fs.writeFileSync(outsideFile, JSON.stringify({ pid: 99999999, startTime: '1' }));
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'clear-assignment-claim', '--assignment', '../outside-target']);
+  assert.equal(planned.status, 0, planned.stderr);
+  const outcome = JSON.parse(planned.stdout).data.outcome;
+  assert.notEqual(outcome, 'planned');
+  assert.notEqual(outcome, 'applied');
+  assert.equal(fs.existsSync(outsideFile), true, 'a path-escaping --assignment must never reach a file outside .fgos/assignments/');
 });

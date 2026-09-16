@@ -35,9 +35,12 @@ function runWorker(rootDir, planPath, readyFile, goFile, nowIso) {
 
 test('two real concurrent OS processes racing applyReconciliation against the same dead-holder plan: exactly one applies, the action log is never torn or double-written', async () => {
   const dir = root();
-  const lockPath = path.join(dir, '.fgos', 'dispatch.lock');
-  fs.writeFileSync(lockPath, JSON.stringify({ pid: 99999999, startTime: '1' }));
-  const plan = planReconciliation(dir, { now: '2026-09-15T00:00:00.000Z' });
+  // Real production per-cwd dispatch lock path/shape (see
+  // reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).
+  const lockPath = path.join(dir, '.fgos', `dispatch--${encodeURIComponent(dir)}.lock`);
+  const ts = Date.now();
+  fs.writeFileSync(lockPath, JSON.stringify({ pid: `99999999:${ts}:deadfixture`, ts }));
+  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'planned');
   const planPath = path.join(dir, 'plan.json');
   fs.writeFileSync(planPath, JSON.stringify(plan));

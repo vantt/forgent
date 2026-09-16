@@ -3182,10 +3182,16 @@ async function runVerb(verb, flags, positional, dir) {
       if (sub === 'reconcile') {
         const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
         if ((positional[1] ?? 'plan') === 'plan') {
+          // F1: --cwd names the specific working directory whose per-cwd
+          // dispatch lock clear-cwd-lock targets -- distinct from --dir
+          // above (the main checkout root). Omitted, the use case's own
+          // default (the CLI process's real process.cwd()) applies, same
+          // ergonomics as running the command from inside the stuck cwd.
+          const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({
             operationId: 'dispatch.runtime.reconcile', effect: 'write',
             ctx: reconcileCtx,
-            payload: { action: flags.action, runId: flags.run, assignmentId: flags.assignment },
+            payload: { action: flags.action, runId: flags.run, assignmentId: flags.assignment, cwd },
           });
         }
         if (positional[1] === 'apply') {
