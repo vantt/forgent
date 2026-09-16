@@ -3610,6 +3610,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md",
+    "title": "Operate Dispatch Runtime Inspection And Reconciliation",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/run-a-coordination-session.md",
     "title": "How to run a coordination session with `fgos coordination`",
     "sourceCaptureId": null

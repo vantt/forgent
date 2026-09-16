@@ -2624,3 +2624,79 @@ test('tsk-1bh: an orphaned unconsumed authorization never permanently blocks a T
   assert.notEqual(third.assignment.assignmentId, second.assignment.assignmentId);
   assert.equal(readManifest('coord_da_tsk1bh_orphan_retry', ctx.opts).assignmentRefs.length, 2, 'A stays orphaned/unconsumed; only B and C ever materialize an Assignment');
 });
+
+// ─── Regression: older orphaned authorization superseded by newer consumed sibling
+
+test('an older orphaned authorization is superseded by newer consumed siblings -- keyless repeat dispatch refuses rather than minting a 4th Assignment spending the orphan', async () => {
+  const ctx = setup('coord_da_orphaned_auth_superseded_three');
+
+  // Authorization A: issued, then orphaned. Dispatch throws BEFORE Assignment creation.
+  authorizeDeclaredOperation('coord_da_orphaned_auth_superseded_three', authorization({ authorizationId: 'auth_A', invocationKey: 'recheck:A' }), ctx.opts);
+  await assert.rejects(
+    dispatch('coord_da_orphaned_auth_superseded_three', ctx, { contextRefs: ['not-granted-ref'] }),
+    (err) => err instanceof CoordinationError && /is not granted by authorization "auth_A"/.test(err.message),
+  );
+  assert.equal(readManifest('coord_da_orphaned_auth_superseded_three', ctx.opts).assignmentRefs.length, 0, 'orphan created no Assignment');
+
+  // Authorization B: authorized and consumed.
+  authorizeDeclaredOperation('coord_da_orphaned_auth_superseded_three', authorization({ authorizationId: 'auth_B', invocationKey: 'recheck:B' }), ctx.opts);
+  const second = await dispatch('coord_da_orphaned_auth_superseded_three', ctx);
+  assert.equal(second.resumed, false);
+  assert.equal(readManifest('coord_da_orphaned_auth_superseded_three', ctx.opts).assignmentRefs.length, 1);
+
+  // Authorization C: authorized and consumed.
+  authorizeDeclaredOperation('coord_da_orphaned_auth_superseded_three', authorization({ authorizationId: 'auth_C', invocationKey: 'recheck:C' }), ctx.opts);
+  const third = await dispatch('coord_da_orphaned_auth_superseded_three', ctx);
+  assert.equal(third.resumed, false);
+  assert.notEqual(third.assignment.assignmentId, second.assignment.assignmentId);
+  assert.equal(readManifest('coord_da_orphaned_auth_superseded_three', ctx.opts).assignmentRefs.length, 2);
+
+  // Repeat keyless dispatch with no new authorization:
+  // Pre-fix bug: findLast selects unconsumed orphan A, minting a 4th Assignment that spends A.
+  // Fixed: newest authorization C is already consumed, superseding orphan A; with two consumed
+  // and none pending, keyless dispatch refuses (ambiguous repeat), never minting a 4th Assignment.
+  await assert.rejects(
+    dispatch('coord_da_orphaned_auth_superseded_three', ctx),
+    (err) => err instanceof CoordinationError && /no unconsumed "operation-authorized"/.test(err.message),
+  );
+  assert.equal(
+    readManifest('coord_da_orphaned_auth_superseded_three', ctx.opts).assignmentRefs.length,
+    2,
+    'orphan A remains unconsumed; zero 4th Assignment was minted',
+  );
+});
+
+test('an older orphaned authorization is superseded by a newer consumed sibling -- repeat keyless dispatch idempotently resumes the consumed Assignment instead of spending the orphan', async () => {
+  const ctx = setup('coord_da_orphaned_auth_superseded_single');
+
+  // Authorization A: issued, then orphaned.
+  authorizeDeclaredOperation('coord_da_orphaned_auth_superseded_single', authorization({ authorizationId: 'auth_A', invocationKey: 'recheck:A' }), ctx.opts);
+  await assert.rejects(
+    dispatch('coord_da_orphaned_auth_superseded_single', ctx, { contextRefs: ['not-granted-ref'] }),
+    (err) => err instanceof CoordinationError && /is not granted by authorization "auth_A"/.test(err.message),
+  );
+  assert.equal(readManifest('coord_da_orphaned_auth_superseded_single', ctx.opts).assignmentRefs.length, 0);
+
+  // Authorization B: authorized and consumed.
+  authorizeDeclaredOperation('coord_da_orphaned_auth_superseded_single', authorization({ authorizationId: 'auth_B', invocationKey: 'recheck:B' }), ctx.opts);
+  const first = await dispatch('coord_da_orphaned_auth_superseded_single', ctx);
+  assert.equal(first.resumed, false);
+  assert.equal(readManifest('coord_da_orphaned_auth_superseded_single', ctx.opts).assignmentRefs.length, 1);
+  const createdEvents = readSessionEvents('coord_da_orphaned_auth_superseded_single', ctx.opts).filter((e) => e.type === 'assignment-created');
+  assert.equal(createdEvents.length, 1);
+  assert.equal(createdEvents[0].payload.authorizationId, 'auth_B');
+
+  // Repeat keyless dispatch with no new authorization:
+  // Pre-fix bug: findLast selects unconsumed orphan A, minting a 2nd Assignment spending A.
+  // Fixed: newest authorization B is consumed, superseding orphan A; falls through to the sole
+  // consumed authorization B, idempotently resuming first.
+  const second = await dispatch('coord_da_orphaned_auth_superseded_single', ctx);
+  assert.equal(second.resumed, true, 'repeat keyless call must idempotently resume first');
+  assert.equal(second.assignment.assignmentId, first.assignment.assignmentId);
+  assert.equal(
+    readManifest('coord_da_orphaned_auth_superseded_single', ctx.opts).assignmentRefs.length,
+    1,
+    'orphan A remains unconsumed; zero duplicate Assignment was minted',
+  );
+});
+

@@ -16,6 +16,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
+import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS } from './run-result.mjs';
+import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 
 // Shared with reconciliation, which must never disagree with this collector
 // about which file is the worker's claim. Re-exported because callers and
@@ -56,6 +58,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveConte
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -88,10 +91,107 @@ import {
   computeSha256Digest,
   canonicalJson,
 } from './cli-spawn-supervisor.mjs';
+import {
+  buildEffectiveExecutionContract,
+  EFFECTIVE_EXECUTION_CONTRACT_FILE,
+  readEffectiveExecutionContract,
+} from './effective-execution-contract.mjs';
+
+export {
+  buildEffectiveExecutionContract,
+  EFFECTIVE_EXECUTION_CONTRACT_FILE,
+  readEffectiveExecutionContract,
+};
 
 function normalizeDigest(digest) {
   if (!digest || typeof digest !== 'string') return null;
   return digest.startsWith('sha256:') ? digest.slice(7) : digest;
+}
+
+function classificationForSettlement({ status, confidence, exitCode, signal, isTimeout, executionError, claimInvalid, agentClaim, assignment }) {
+  const reviewer = ['reviewer', 'red-team', 'redteam'].includes(assignment?.role);
+  const processFailed = isTimeout || Boolean(signal) || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || Boolean(executionError);
+  const claimFinding = reviewer && (agentClaim?.status === 'failed' || status === 'failed' || agentClaim?.assessment?.verdict === 'findings') && !processFailed && !claimInvalid;
+  const executionStatus = processFailed || claimInvalid ? 'failed' : status === 'no-evidence' ? 'completion-unknown' : 'completed';
+  const assessmentVerdict = claimFinding
+    ? 'findings'
+    : (agentClaim?.assessment?.verdict && ASSESSMENT_VERDICTS.includes(agentClaim.assessment.verdict))
+      ? agentClaim.assessment.verdict
+      : status === 'blocked'
+        ? 'blocked'
+        : status === 'done'
+          ? 'pass'
+          : executionStatus === 'completed'
+            ? 'inconclusive'
+            : 'not-applicable';
+
+  let family = null;
+  let code = null;
+  if (isTimeout || exitCode === 124) {
+    family = 'resource';
+    code = 'execution-timeout';
+  } else if (exitCode === 137) {
+    family = 'resource';
+    code = 'oom-killed';
+  } else if (executionError) {
+    family = 'provider';
+    code = executionError.code || 'provider-spawn-error';
+  } else if (processFailed) {
+    family = 'provider';
+    code = 'nonzero-exit';
+  } else if (claimInvalid) {
+    family = 'contract';
+    code = 'invalid-agent-result-claim';
+  } else if (status === 'failed' && !claimFinding) {
+    family = 'policy';
+    code = 'policy-refusal';
+  }
+
+  const refused = claimInvalid || (status === 'failed' && !claimFinding && !processFailed);
+  const policyDisposition = refused
+    ? 'refuse'
+    : (family === 'provider' || family === 'resource' || status === 'blocked' || status === 'no-evidence')
+      ? 'needs-input'
+      : 'allow';
+
+  const policyCode = refused
+    ? (claimInvalid ? 'invalid-agent-result-claim' : 'policy-refusal')
+    : (status === 'no-evidence' ? 'completion-unknown' : (family ? code : null));
+
+  return {
+    execution: {
+      status: executionStatus,
+      exitCode: executionStatus === 'completion-unknown' ? null : exitCode,
+    },
+    assessment: {
+      verdict: assessmentVerdict,
+      ...(claimFinding
+        ? {
+            summary: agentClaim?.summary || 'reviewer finding',
+            ...(agentClaim?.assessment?.severityFloor ? { severityFloor: agentClaim.assessment.severityFloor } : {}),
+          }
+        : (agentClaim?.assessment?.severityFloor ? { severityFloor: agentClaim.assessment.severityFloor } : {})),
+    },
+    confidence: {
+      level: confidence,
+      basis: [
+        claimInvalid
+          ? 'invalid-agent-result-claim'
+          : isTimeout
+            ? 'timeout'
+            : processFailed
+              ? 'provider-exit'
+              : 'runner-evidence',
+      ],
+    },
+    failure: family ? { family, code } : null,
+    policy: {
+      disposition: policyDisposition,
+      code: policyCode,
+    },
+    delivery: { mode: 'fresh' },
+    provenance: 'native-v2',
+  };
 }
 
 // ADR-006 R7 (P02.4 Red-Team HIGH fix): executeAssignment's own
@@ -114,6 +214,64 @@ function fallbackMutationForAssignment(asgn) {
   } catch {
     return undefined;
   }
+}
+
+function stableIndex(seed, size) {
+  if (!Number.isInteger(size) || size <= 0) return 0;
+  const hash = crypto.createHash('sha256').update(String(seed)).digest();
+  return hash.readUInt32BE(0) % size;
+}
+
+function normalizeRedirectCandidates(value) {
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+  return [];
+}
+
+function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
+  const configured = cfg?.readOnlyExecutorRedirects?.[sourceExecutorId];
+  if (configured === undefined) {
+    return sourceExecutorId === 'claude' && cfg?.executors?.['claude-reviewer'] ? ['claude-reviewer'] : [];
+  }
+  const operation = assignment?.operation;
+  if (configured && typeof configured === 'object' && !Array.isArray(configured)) {
+    return normalizeRedirectCandidates(configured.operations?.[operation] ?? configured.default);
+  }
+  return normalizeRedirectCandidates(configured);
+}
+
+function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
+  const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  const candidates = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment)
+    .filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
+  if (candidates.length === 0) return sourceExecutorId;
+  return candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+}
+
+function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
+  if (executorId === sourceExecutorId) return policy;
+  const executorEntry = cfg?.executors?.[executorId];
+  const providerModel = deriveProviderFamily(executorEntry);
+  const model = providerModel === policy.providerModel
+    ? policy.model
+    : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+  return {
+    ...policy,
+    executorId,
+    providerModel,
+    model,
+    provenance: {
+      ...policy.provenance,
+      provider: providerModel === policy.providerModel ? policy.provenance?.provider : {
+        value: providerModel,
+        source: { scope: 'readOnlyExecutorRedirect', id: executorId },
+      },
+      model: model === policy.model ? policy.provenance?.model : {
+        value: model,
+        source: { scope: 'readOnlyExecutorRedirect', id: `${providerModel}.${policy.tier}` },
+      },
+    },
+  };
 }
 
 /**
@@ -465,6 +623,7 @@ export function classifyRunEvidence({
   repoRoot,
   assignment,
   work,
+  role,
 }) {
   if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
     return { status: 'failed', confidence: 'failed' };
@@ -475,7 +634,24 @@ export function classifyRunEvidence({
     return { status: 'failed', confidence: 'failed' };
   }
 
+  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
+  // A read-only operation classifies as reported only with a companion report
+  // artifact (e.g. agent-report.md) the runner detected in the run dir.
+  // Self-attested evidenceRefs strings never substitute for it: the worker
+  // fully controls agent-result.json, so string refs prove nothing on disk.
+  // The claim never counts as its own companion report, under either of the
+  // two names it may have been written with.
+  const companionReportArtifacts = workerArtifacts.filter(
+    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
+  );
+  const hasWorkerReport = companionReportArtifacts.length > 0;
+
   if (agentClaim?.status === 'failed') {
+    const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
+    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
+    if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
+      return { status: 'failed', confidence: 'reported' };
+    }
     return { status: 'failed', confidence: 'failed' };
   }
 
@@ -495,18 +671,6 @@ export function classifyRunEvidence({
   if (agentClaim?.status === 'blocked') {
     return { status: 'blocked', confidence: 'reported' };
   }
-
-  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation classifies as reported only with a companion report
-  // artifact (e.g. agent-report.md) the runner detected in the run dir.
-  // Self-attested evidenceRefs strings never substitute for it: the worker
-  // fully controls agent-result.json, so string refs prove nothing on disk.
-  // The claim never counts as its own companion report, under either of the
-  // two names it may have been written with.
-  const companionReportArtifacts = workerArtifacts.filter(
-    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
-  );
-  const hasWorkerReport = companionReportArtifacts.length > 0;
 
   if (agentClaim && agentClaim.status === 'done') {
     // Reported for read-only consult/review only when a runner-detected
@@ -756,7 +920,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -962,6 +1126,15 @@ function admitRunAttempt(
       fsyncFileBestEffort(dispatchPlanPath);
     }
   }
+
+  if (buildEffectiveContractOpt) {
+    const effectiveContract = buildEffectiveContractOpt(record);
+    if (effectiveContract) {
+      const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
+      fs.writeFileSync(contractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+      fsyncFileBestEffort(contractPath);
+    }
+  }
   fsyncDirBestEffort(stagingDir);
 
   try {
@@ -1090,28 +1263,23 @@ export async function executeAssignment(assignment, opts = {}) {
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
 
-  const effectivePolicy = compiledPlan.policy;
+  let effectivePolicy = compiledPlan.policy;
 
-  // Reviewer/researcher/advisor executor scoping (Red-team finding, Cell 6.3
-  // Fix Round 1; widened in Fix Round 2 to cover operation-based read-only
-  // classification too, not just role): a read-only Assignment (per
-  // isReadOnlyAssignment -- assignment.mutation === 'read-only', stamped
-  // once at build time by assignment-normalizer.mjs from role/operation)
-  // must never resolve to the same executor profile as a worker (acceptEdits
-  // + Bash(git add/commit)) when the resolved family is the default
-  // "claude". Only
-  // ever redirects a *default* "claude" resolution -- an explicit
-  // non-"claude" preferExecutor (pi, agy-cli, codex, ...) is untouched.
-  // Absent-safe: no `runner.executors.claude-reviewer` entry configured ->
-  // falls through to the unchanged `defaultExecutorId`, byte-identical to
-  // before this fix.
+  // Reviewer/researcher/advisor executor scoping. A read-only Assignment must
+  // never resolve to the same executor profile as a worker (acceptEdits +
+  // Bash(git add/commit)) when the resolved family is the default "claude".
+  // Historically this was a literal claude -> claude-reviewer redirect. That
+  // kept the write-safety fix but also concentrated every read-only Claude
+  // role onto one executor/account. The default remains byte-identical when no
+  // config is present; projects can now declare per-operation/pool redirects
+  // under runner.readOnlyExecutorRedirects without changing the higher-level
+  // operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
   const resolvedExecutorId =
-    isReadOnlyAssignment(effectiveAssignment) &&
-    defaultExecutorId === 'claude' &&
-    cfg.executors?.['claude-reviewer']
-      ? 'claude-reviewer'
+    isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude'
+      ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
+  effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
   // for a redirected read-only op (above). `policy.executorPreference[0]`
   // (persisted below, unchanged) always records the DECLARED preference
@@ -1121,6 +1289,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // persisted record instead of leaving an auditor to infer it by comparing
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
+  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
 
   const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
@@ -1173,6 +1342,7 @@ export async function executeAssignment(assignment, opts = {}) {
       delivery: 'not-sent',
       executorId: resolvedExecutorId,
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
+      effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
       ...(planContentHash ? { planContentHash } : {}),
       cwd,
       startedAt,
@@ -1183,12 +1353,40 @@ export async function executeAssignment(assignment, opts = {}) {
   });
   const { attemptStr, runId, runDir } = admitted;
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
+  const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
+  let effectiveContract;
+  if (fs.existsSync(effectiveContractPath)) {
+    try {
+      effectiveContract = JSON.parse(fs.readFileSync(effectiveContractPath, 'utf8'));
+    } catch {
+      effectiveContract = null;
+    }
+  } else {
+    effectiveContract = buildEffectiveExecutionContract({
+      assignment: effectiveAssignment,
+      dispatchPlan: compiledPlan,
+      runId,
+      runDir,
+      cwd: effectiveCwd,
+      repoRoot: root,
+      runnerConfig: cfg,
+      timeoutMs,
+      executorId: resolvedExecutorId,
+      adapter: resolvedAdapter,
+      // The prompt is built before Authority preparation. Derive its posture
+      // from the same requirement that will be handed to Authority, never
+      // from an executor profile's merely requested confinement fragment.
+      confinement: compiledPlan.policy?.confinement
+        ? { requirement: compiledPlan.policy.confinement }
+        : { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } },
+    });
+  }
 
   const resultJsonPath = path.join(runDir, 'result.json');
   if (admitted.resumed) {
     if (fs.existsSync(resultJsonPath)) {
       try {
-        const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+        const settledResult = interpretRunResult(resultJsonPath);
         return Object.freeze(settledResult);
       } catch {}
     }
@@ -1242,7 +1440,11 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
-  const prompt = renderAssignmentPrompt(effectiveAssignment, { cwd, runDir: path.resolve(runDir) });
+  const prompt = renderAssignmentPrompt(effectiveAssignment, {
+    cwd,
+    runDir: path.resolve(runDir),
+    effectiveContract,
+  });
 
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files
   // are never counted as post-run evidence.
@@ -1299,7 +1501,6 @@ export async function executeAssignment(assignment, opts = {}) {
   // including a real herdr-spawn `invocations[]` executor -- misrouting it
   // into the cli-spawn supervisor, which then spawns against a herdr
   // launch-command file it cannot parse.
-  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
   const useSupervisorRecovery = resolvedAdapter === 'cli-spawn' && !opts.legacySpawn;
   // Both cli-spawn (via the local supervisor process, below) and herdr-spawn
   // (via `executeExecutorCli`'s own confinement-authority door) are
@@ -1490,6 +1691,27 @@ export async function executeAssignment(assignment, opts = {}) {
         throw err;
       }
 
+      // Persist after Authority resolution, yet before the supervisor is
+      // spawned. A requested policy alone is not enforcement evidence.
+      effectiveContract = buildEffectiveExecutionContract({
+        assignment: effectiveAssignment,
+        dispatchPlan: compiledPlan,
+        runId,
+        runDir,
+        cwd: effectiveCwd,
+        repoRoot: root,
+        runnerConfig: cfg,
+        timeoutMs,
+        executorId: resolvedExecutorId,
+        adapter: resolvedAdapter,
+        confinement: {
+          requirement: prepResult.preparedInvocation.requirement,
+          backend: prepResult.preparedInvocation.backend,
+        },
+      });
+      fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+      fsyncFileBestEffort(effectiveContractPath);
+
       // 6. Guarded update of pending command with envelopeDigest
       commandState.envelopeDigest = prepResult.envelope.digest;
       publishMutableProjection(commandPath, commandState);
@@ -1605,6 +1827,13 @@ export async function executeAssignment(assignment, opts = {}) {
         stderr: stderrText,
       };
     } else {
+      // Legacy/non-supervisor adapters retain the existing pre-spawn write
+      // guarantee. cli-spawn writes later, immediately after Authority
+      // preparation, so its persisted posture reflects that preparation.
+      if (!fs.existsSync(effectiveContractPath)) {
+        fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+        fsyncFileBestEffort(effectiveContractPath);
+      }
       try {
         rawResult = await executeExecutorCli(executorId, {
           prompt,
@@ -1718,7 +1947,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // Malformed JSON: treat as invalid claim (not absent)
       claimInvalid = true;
     } else {
-      const validation = validateAgentResultClaim(parsedClaim);
+      const validation = validateAgentResultClaim(parsedClaim, { role: assignment.role, operation: assignment.operation });
       if (validation.valid) {
         agentClaim = parsedClaim;
         try {
@@ -1837,12 +2066,13 @@ export async function executeAssignment(assignment, opts = {}) {
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
     artifacts: workerArtifacts,
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId,
     assignmentId: effectiveAssignment.assignmentId,
     workId: effectiveAssignment.workId,
@@ -1856,13 +2086,21 @@ export async function executeAssignment(assignment, opts = {}) {
     executorId: resolvedExecutorId,
     policy: effectivePolicy,
     executorRedirected,
+    settledAt,
+    durationMs,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
     status,
     confidence,
+    role: effectiveAssignment.role,
+    operation: effectiveAssignment.operation,
+    isReadOnlyOperation: isReadOnly,
+    confidenceLevel: confidence,
     runtime: {
       exitCode,
+      isTimeout,
+      executionError: executionError ? { message: executionError.message, code: executionError.code } : null,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
@@ -1883,10 +2121,11 @@ export async function executeAssignment(assignment, opts = {}) {
       gitBeforeSource,
       changedFiles,
       mutatedDirtyBeforeFiles,
+      attribution: evidenceData.attribution,
       artifacts: workerArtifactPaths,
       tests: [],
     },
-  };
+  });
 
   if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
     throw new RunnerConfigError(
@@ -1920,7 +2159,7 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -1965,18 +2204,20 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
     mutatedDirtyBeforeFiles: [],
     changedFiles: [],
     changedFileReasons: {},
+    attribution: [],
     artifacts: [],
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     controlEpoch,
     controlToken,
     status: 'failed',
     confidence: 'failed',
+    confidenceLevel: 'failed',
     runtime: {
       exitCode: 1,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
@@ -1992,10 +2233,11 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
       gitBeforeSource: 'pre-launch',
       changedFiles: [],
       mutatedDirtyBeforeFiles: [],
+      attribution: [],
       artifacts: [],
       tests: [],
     },
-  };
+  });
 
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
   const runJsonPath = path.join(runDir, 'run.json');
@@ -2013,7 +2255,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
@@ -2063,6 +2305,19 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
   const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
 
+  // Read assignment before validating its worker claim so role/operation
+  // requirements are enforced at this recovery settlement gate too.
+  const candidateAssignmentPaths = [
+    path.join(path.dirname(runDir), '..', 'assignment.json'),
+    path.join(runDir, 'assignment.json'),
+  ];
+  let asgn = null;
+  for (const p of candidateAssignmentPaths) {
+    if (fs.existsSync(p)) {
+      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
+    }
+  }
+
   let agentClaim = null;
   let claimInvalid = false;
   let claimSha256 = null;
@@ -2071,7 +2326,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     try {
       const claimBytes = fs.readFileSync(agentResultPath);
       const parsed = JSON.parse(claimBytes.toString('utf8'));
-      const validation = validateAgentResultClaim(parsed);
+      const validation = validateAgentResultClaim(parsed, { role: asgn?.role, operation: asgn?.operation });
       if (validation.valid) {
         agentClaim = parsed;
         claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
@@ -2112,17 +2367,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
 
   const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
 
-  // Read assignment to check read-only
-  const candidateAssignmentPaths = [
-    path.join(path.dirname(runDir), '..', 'assignment.json'),
-    path.join(runDir, 'assignment.json'),
-  ];
-  let asgn = null;
-  for (const p of candidateAssignmentPaths) {
-    if (fs.existsSync(p)) {
-      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
-    }
-  }
+  // Assignment was read before claim validation so both gates share its context.
   const isReadOnly = isReadOnlyAssignment(asgn);
 
   const effectiveCwd = baseline?.cwd || root;
@@ -2178,12 +2423,13 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     mutatedDirtyBeforeFiles,
     changedFiles,
     changedFileReasons,
+    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
     artifacts: workerArtifacts,
     tests: [],
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
-  const runResult = {
+  const runResult = normalizeRunResultV2({
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     workId: runMeta.workId || asgn?.workId,
@@ -2194,8 +2440,13 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     settleReports,
     status,
     confidence,
+    role: asgn?.role,
+    operation: asgn?.operation,
+    isReadOnlyOperation: isReadOnly,
+    confidenceLevel: confidence,
     runtime: {
       exitCode,
+      isTimeout,
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
@@ -2209,10 +2460,11 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
       gitBeforeSource,
       changedFiles,
       mutatedDirtyBeforeFiles,
+      attribution: evidenceData.attribution,
       artifacts: workerArtifactPaths,
       tests: [],
     },
-  };
+  });
 
   fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
   const runJsonPath = path.join(runDir, 'run.json');
@@ -2245,7 +2497,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+      const settledResult = interpretRunResult(resultJsonPath);
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }

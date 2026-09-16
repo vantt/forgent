@@ -4699,6 +4699,26 @@ test('tampered stored validate-plan result with a schema-broken agentClaim is ne
   assert.equal(choice.reason, 'plan-written-needs-reality-check');
 });
 
+test('cross-pass does not consume a byte-bound reviewer v2 claim missing assessment.verdict', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+  const docsRef = 'docs/history/reviewer-missing-assessment';
+  const { asgnDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-reviewer-missing-assessment', docsRef, withHash: true,
+    claimOverride: { contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Review completed', assessment: {} },
+  });
+  const assignmentPath = path.join(asgnDir, 'assignment.json');
+  const assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  assignment.role = 'reviewer';
+  fs.writeFileSync(assignmentPath, JSON.stringify(assignment));
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-reviewer-missing-assessment', docsRef));
+  assert.equal(choice.canAdvanceEdge, false);
+  assert.equal(choice.reason, 'plan-written-needs-reality-check');
+});
+
 test('tampered stored validate-plan result whose recorded evidence refs point at missing files is never consumed cross-pass', () => {
   const tempDir = mkTempDir();
   initRepo(tempDir);
@@ -5620,4 +5640,53 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
   assert.equal(outcome.canAdvanceEdge, true);
   assert.equal(outcome.assignment.onAdvance, 'derive-plan-verdict-from-plan-md');
   assert.equal(outcome.verdictPayload, undefined);
+});
+
+test('chooseStageOperation consumes fully-bound contract-corrupt RunResults as no-evidence and fails closed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan']);
+
+  const validClassification = {
+    execution: { status: 'completed', exitCode: 0 },
+    assessment: { verdict: 'pass' },
+    confidence: { level: 'reported', basis: ['valid-agent-result-claim'] },
+    failure: null,
+    policy: { disposition: 'allow', code: null },
+    delivery: { mode: 'fresh' },
+    provenance: 'native-v2',
+  };
+
+  for (const [label, contract] of [
+    ['v2 projection mismatch', { id: 'assignment-run-result', version: 2 }],
+    ['present contract version demotion', { id: 'assignment-run-result', version: 1 }],
+  ]) {
+    const id = `tsk-corrupt-${label.replace(/[^a-z0-9]/gi, '-').toLowerCase()}`;
+    const docsRef = `docs/history/${id}`;
+    const { resultPath } = seedStoredValidatePlanResult(tempDir, {
+      id,
+      docsRef,
+      withHash: true,
+      withReport: true,
+      resultExtra: {
+        contract,
+        classification: validClassification,
+        runtime: { exitCode: 0 },
+        // The v2 contract projects this classification to done/reported.
+        // These tampered projections must survive all evidence bindings as a
+        // contract-corrupt, no-evidence result rather than being skipped.
+        status: 'failed',
+        confidence: 'reported',
+      },
+    });
+    assert.ok(fs.existsSync(resultPath), `${label}: fixture writes result.json`);
+
+    const choice = choosePlanning(tempDir, planningWorkFor(id, docsRef), {
+      contextSignals: { hasPlan: true, validationDue: true },
+    });
+
+    assert.equal(choice.stop, true, `${label}: a fully-bound corrupt result stops the driver`);
+    assert.equal(choice.canAdvanceEdge, false, `${label}: a fully-bound corrupt result cannot advance`);
+  }
 });

@@ -28,6 +28,7 @@
 // only works for workers that happen to live in this repo.
 
 import path from 'node:path';
+import { renderAgentResultClaimInstructions } from './agent-result-claim-contract.mjs';
 
 /** Where one round's artifacts live, all absolute -- a worker's cwd is its
  * own worktree and has no relationship to the run directory. */
@@ -41,6 +42,7 @@ export function briefPaths(runDir, round) {
     ackPath: path.join(outbox, `ack-${round}.json`),
     reportPath: path.join(outbox, `report-${round}.md`),
     resultPath: path.join(outbox, `result-${round}.json`),
+    effectiveExecutionContractPath: path.join(dir, 'effective-execution-contract.json'),
   };
 }
 
@@ -48,10 +50,17 @@ export function briefPaths(runDir, round) {
  * Render the brief the worker reads. `prompt` is the real work, verbatim --
  * this function wraps it, it never rewrites it.
  */
-export function renderBrief({ prompt, round, runDir, agentName }) {
+export function renderBrief({ prompt, round, runDir, agentName, effectiveContract }) {
   const p = briefPaths(runDir, round);
+  const contractSection = effectiveContract
+    ? `\n## Execution contract\n\n` +
+      `- Mutation: ${effectiveContract.mutation}\n` +
+      `- Result claim path: ${effectiveContract.resultClaim?.path || p.resultPath}\n` +
+      `- Timeout: ${effectiveContract.limits?.executorTimeoutMs ?? effectiveContract.limits?.timeoutMs}ms\n` +
+      `- Persisted contract: ${p.effectiveExecutionContractPath}\n`
+    : '';
   return `# Brief ${round}
-
+${contractSection}
 ## Acknowledge first
 
 Before you start, write this file:
@@ -78,10 +87,12 @@ Write these two files, in this order, each one \`.tmp\`-then-rename:
    understand or check your work belongs here.
 2. \`${p.resultPath}\` -- a JSON object:
 
-       {"status": "done" | "blocked" | "failed" | "no-evidence",
-        "summary": "<one or two sentences>",
-        "findings": [],
-        "evidenceRefs": []}
+       {"contract":{"id":"agent-result-claim","version":2},
+        "status": "done" | "blocked" | "failed" | "no-evidence",
+        "summary": "<one or two sentences>", "evidenceRefs": []}
+
+   Claim requirements:
+${renderAgentResultClaimInstructions()}
 
    "settled" is not a valid status here -- that word names the run reaching
    its end, not whether the work succeeded; a worker that writes "settled"

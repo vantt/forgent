@@ -268,8 +268,18 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
   return found;
 }
 
-export { reconcileHerdrSpawnRun } from './herdr-round.mjs';
-
+// No static re-export of reconcileHerdrSpawnRun here (dead as of this fix --
+// every real caller already imports it directly from herdr-round.mjs, and
+// reconcileRun below only ever needs it through its own dynamic import()
+// three lines down). A static named re-export of a herdr-round.mjs binding
+// at this file's top level would load and evaluate herdr-round.mjs's whole
+// module graph -- including the cli-spawn-supervisor.mjs process-control
+// adapter it imports -- the moment ANYTHING imports this file for ANY
+// reason, including reconciliation-planner.mjs's own read of RUN_STATUSES
+// below. That silently broke this file's documented "fs/path +
+// worker-artifacts.mjs only" transitive-import claim (reconciliation-
+// planner.mjs's own file-top comment), the exact property
+// test/runner/dispatch-reconciliation-import-graph.test.mjs exists to prove.
 export function reconcileRun(runDir, { liveness = 'unknown' } = {}) {
   const dir = path.resolve(runDir);
   const commandsDir = path.join(dir, 'controller', 'commands');

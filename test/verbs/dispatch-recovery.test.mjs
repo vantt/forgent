@@ -341,6 +341,22 @@ test('no implicit close: applying resume-driver never touches run.status or sett
   } finally { cleanup(root); }
 });
 
+test('applying resume-driver clears the assignment dispatch.claim after dead-driver recovery so retry can launch', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    const assignmentDir = path.dirname(path.dirname(runDir));
+    const claimPath = path.join(assignmentDir, 'dispatch.claim');
+    fs.writeFileSync(claimPath, 'stale dispatch claim from dead driver\n');
+
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec));
+
+    assert.equal(result.outcome, 'applied');
+    assert.equal(result.dispatchClaimCleared, true);
+    assert.equal(fs.existsSync(claimPath), false, 'resume-driver recovery must clear the stale assignment dispatch claim');
+  } finally { cleanup(root); }
+});
+
 test('checkApply is pure and agrees with the use case: same inputs, same outcome', () => {
   const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [], visibilityError: null };
   const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });

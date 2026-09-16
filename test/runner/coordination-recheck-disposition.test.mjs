@@ -413,7 +413,25 @@ test('R3: recordDriverDisposition appends driver-disposition-recorded, and no wo
     produced.runResult.runId.slice(`run_${produced.assignment.assignmentId}_`.length),
     'result.json',
   );
-  assert.ok(!fs.readFileSync(runResultPath, 'utf8').includes('disposition'));
+  const workerResult = JSON.parse(fs.readFileSync(runResultPath, 'utf8'));
+  assert.ok(
+    ['allow', 'refuse', 'needs-input', 'not-applicable'].includes(workerResult.classification?.policy?.disposition),
+    'RunResult v2 may carry only its own closed policy-disposition vocabulary',
+  );
+  const driverDispositionValues = new Set(['accepted', 'rejected', 'deferred', 'cell-closed']);
+  const leakedDriverDispositions = [];
+  const findDriverDispositionLeaks = (value, path = []) => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      const childPath = [...path, key];
+      if (/disposition/i.test(key) && typeof child === 'string' && driverDispositionValues.has(child)) {
+        leakedDriverDispositions.push(childPath.join('.'));
+      }
+      findDriverDispositionLeaks(child, childPath);
+    }
+  };
+  findDriverDispositionLeaks(workerResult);
+  assert.deepEqual(leakedDriverDispositions, [], 'no driver disposition vocabulary may leak into a worker RunResult');
   assert.throws(
     () => validateEventPayload('result-linked', { assignmentId: produced.assignment.assignmentId, runId: produced.runResult.runId, disposition: 'accepted' }),
     (err) => err instanceof CoordinationError && /unknown field "disposition"/.test(err.message),

@@ -933,6 +933,39 @@ test('15. recovered collection uses pre-launch evaluator baseline', async () => 
   assert.deepEqual(evidence.dirtyBefore, [dirtyFile]);
 });
 
+test('recovery settles a reviewer v2 claim missing assessment.verdict as failed evidence', async () => {
+  const tmp = mkTempDir();
+  initGitRepo(tmp);
+  const asgnDir = path.join(tmp, '.fgos', 'assignments', 'asgn_reviewer_missing_assessment');
+  const runDir = path.join(asgnDir, 'runs', '01');
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipts');
+  const captureDir = path.join(runDir, 'protected', 'capture', 'cmd_reviewer_missing_assessment');
+  fs.mkdirSync(commandsDir, { recursive: true });
+  fs.mkdirSync(receiptsDir, { recursive: true });
+  fs.mkdirSync(captureDir, { recursive: true });
+  const assignment = { assignmentId: 'asgn_reviewer_missing_assessment', workId: 'tsk-reviewer-missing-assessment', stage: 'planning', operation: 'validate-plan', role: 'reviewer', mutation: 'read-only' };
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment));
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ contract: 'run-meta.v1', runId: 'run_asgn_reviewer_missing_assessment_01', assignmentId: assignment.assignmentId, workId: assignment.workId, attempt: 1, status: 'running' }));
+  const launchCommandId = 'cmd_reviewer_missing_assessment';
+  const receipt = { contract: 'cli-spawn-adapter-receipt.v1', launchCommandId, completion: { kind: 'exit', exitCode: 0, durationMs: 0 } };
+  fs.writeFileSync(path.join(receiptsDir, `${launchCommandId}.json`), canonicalJson(receipt));
+  fs.writeFileSync(path.join(captureDir, 'stdout.log'), 'review completed\n');
+  fs.writeFileSync(path.join(captureDir, 'stderr.log'), '');
+  const baseline = { contract: 'evaluator-baseline.v1', gitBefore: null, dirtyBefore: [] };
+  baseline.digest = computeSha256Digest(baseline);
+  fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'controller', 'evaluator-baseline.json'), canonicalJson(baseline));
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Review completed', assessment: {} }));
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ contract: 'assignment-command-state.v1', launchCommandId, state: 'reconciled', controlEpoch: 1, controlTokenDigest: computeSha256Digest('tok_reviewer_missing_assessment'), outcome: { kind: 'receipt-backed', exitCode: 0, receiptDigest: computeSha256Digest(receipt) } }));
+
+  const settled = await reconcileCliSpawnRun(runDir, { controlToken: 'tok_reviewer_missing_assessment', controlEpoch: 1 });
+  assert.equal(settled.status, 'settled');
+  assert.equal(settled.runResult.status, 'failed');
+  assert.equal(settled.runResult.confidence, 'failed');
+  assert.equal(JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8')).status, 'settled');
+});
+
 // 16. Confinement temporary resources are cleaned or retained idempotently
 test('16. confinement temporary resources are cleaned or retained idempotently with an explicit finalization record', async () => {
   const tmp = mkTempDir();

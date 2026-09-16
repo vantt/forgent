@@ -8,6 +8,49 @@ coverage: full
 
 # Spec: Runner (vòng tự hành)
 
+## Dispatch runtime inspection
+
+### Guard reconciliation
+
+`fgos dispatch reconcile` is the separate Dispatch-owned write door for local
+guard/projection repair. Its plan/apply protocol binds the action key, snapshot
+digest, resource incarnation, and expiry; apply re-reads under a local lock.
+It never recovers, signals, retries, relaunches, resumes, reassigns, admits,
+cancels, or takes over a Run.
+
+Four actions are supported: `clear-cwd-lock` (default; removes a cwd dispatch
+lock after proving its holder's exact PID/start-time incarnation is dead),
+`collect-result --run <runId>` (links an already-written, already-valid
+`result.json` through its owning Assignment, reusing
+`dispatch.runtime.inspect`'s own owner and admission-ledger current-Run views
+so the two operations can never disagree about ownership or currency; a
+CoordinationSession-owned Run is refused, since linking its result is that
+session's own driver-authored write), `clear-assignment-claim --assignment
+<id>` (removes a dead-holder `dispatch.claim` once no admitted-but-
+unmaterialized launch, unsettled Run, or uncollected result is still pending
+for that Assignment; also refused on a CoordinationSession-owned claim), and
+`repair-projection --run <runId>` (additively patches a stale
+`run.json.status` back to `settled` once an already-validated terminal
+RunResult proves the Run finished, reusing `dispatch.runtime.inspect`'s own
+RunResult interpretation so it can never disagree with inspection or
+collect-result about whether a Run settled).
+
+`fgos dispatch inspect` projects Dispatch-owned `dispatch.runtime.inspect` as a
+read-only operation. It accepts exactly one selector: `--run`, `--assignment`,
+or `--cwd`. Resolution, duplicate detection, current-run derivation, and any
+recovery ownership hint happen inside Dispatch; the CLI only passes the typed
+payload. Inspection never executes, forwards, or authorizes recovery.
+
+Assignment and workspace projections fail closed: every materialized Run must
+be unambiguous and corroborated by its Assignment admission ledger before an
+inspection is ownership-complete or exposes a recovery hint. A duplicate
+materialization of a current admitted run is conflicting, returns every
+candidate location, and selects no single Run.
+
+The reader returns mutable `RunObservation` facts and the immutable terminal
+`RunResult` when present. A RunObservation never settles a Run; `result.json`
+remains the only terminal Run truth.
+
 Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-state, giao cho một trợ lý thông minh chạy nền trong không gian cô lập, tự chấm kết quả bằng proof của chính việc đó, rồi ghi lại thành **đề xuất chờ duyệt**. Người dùng: người vận hành repo (khởi động vòng, duyệt đề xuất). Nguyên tắc sống còn: trong vòng dispatch, chỉ runner được ghi trạng thái; worker chỉ để lại commit trên nhánh riêng.
 
 ## Entry Points & Triggers
@@ -1179,13 +1222,12 @@ xem `docs/architect/agent-coordination/architecture/work-integration.md`).
 Chi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;
 quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.
 
-## Dispatch operability planned design (2026-09-15)
+## Dispatch operability implementation slice (2026-09-16)
 
-Track `plans/260914-dispatch-operability-evidence-attribution/` reached
-`READY` as design authority only after supplemental cross-design review repair.
-It does not ship runtime behavior and does not authorize implementation in that
-track. A future implementation track may build the following planned
-capabilities:
+Track `plans/260915-dispatch-operability-implementation/` implements the
+accepted dispatch-operability design from
+`plans/260914-dispatch-operability-evidence-attribution/` for the local
+Assignment/Run runtime. The shipped slice is intentionally narrow:
 
 - Typed Run Result and Observation: `RunResult` v2 remains the sole immutable
   terminal Run truth; `RunObservation` is a mutable read projection; historical
@@ -1198,13 +1240,23 @@ capabilities:
 - Evidence attribution: observation, attribution, and policy stay separate;
   Git snapshots provide correlation, never proof of authorship.
 
-Negative capabilities are part of the design: no unified recovery door, no
-automatic inspect-to-recover forwarding, no force-kill/retry/admit/resume/
-reassign/takeover through reconciliation, no cross-session authority, no
+`fgos dispatch inspect --run <runId>`, `--assignment <assignmentId>`, and
+`--cwd <path>` are read-only public doors for this projection. `fgos dispatch
+reconcile plan|apply` is the only public door for the shipped reconciliation
+actions. The supported actions are exactly `clear-cwd-lock`,
+`collect-result`, `clear-assignment-claim`, and `repair-projection`; every
+action is planned from current facts, carries a CAS action key/snapshot/expiry,
+and is re-read before apply.
+
+Negative capabilities remain explicit: no unified recovery door, no automatic
+inspect-to-recover forwarding, no force-kill/retry/admit/resume/reassign/
+takeover/cancel through reconciliation, no cross-session authority, no
 same-`taskKey` semantic change, no host OOM/provider-limit prevention, and no
-direct-unit-only proof for shipped capabilities. Implementation proof must also
-include production-route refusals for forbidden recovery verbs and
-operation-catalog indirection.
+claim that an inspection hint grants authority. The production-door proof lives
+in `test/runner/dispatch-operability-production-door.test.mjs` and covers
+positive Assignment/RunResult/inspect behavior plus forbidden recovery routes
+through the CLI, command registry/operation boundary, dynamic import, and a
+subprocess path.
 
 The cross-design review evidence is an operator-authorized, role-separated
 Codex-only panel, not cross-provider independent review. The durable panel
@@ -1218,6 +1270,7 @@ Canonical detailed artifacts:
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/evidence-attribution.md`
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/guard-reconciliation.md`
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md`
+- `docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md`
 
 **Tra cứu định nghĩa (definition discovery).** Một CoordinationSession có thể
 agent-led (không cần định nghĩa nào — coordinator tự đề xuất Assignment nội
