@@ -23,6 +23,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
+  repair door. It only removes a lock after proving its exact PID/start-time
+  incarnation is dead; it never performs semantic recovery or execution control.
+- `fgos dispatch reconcile plan --action collect-result --run <runId>`, a
+  second reconcile action that links an already-written, already-valid
+  `result.json` through its owning Assignment once admission-ledger facts
+  prove it is not superseded. It reuses `dispatch.runtime.inspect`'s own
+  owner/current-Run views and refuses outright on a CoordinationSession-owned
+  Run, whose result linking stays that session's own driver-authored write.
+- `fgos dispatch reconcile plan --action clear-assignment-claim --assignment <id>`,
+  a third reconcile action that removes a dead-holder `dispatch.claim` once no
+  admitted-but-unmaterialized launch, unsettled Run, or uncollected result is
+  still pending for that Assignment. It refuses outright on a
+  CoordinationSession-owned claim, whose clearing stays that session's own
+  recovery door.
+- `fgos dispatch reconcile plan --action repair-projection --run <runId>`, a
+  fourth reconcile action that additively patches a stale `run.json.status`
+  (e.g. still `running`) back to `settled` once an already-validated terminal
+  RunResult proves the Run finished. It reuses `dispatch.runtime.inspect`'s
+  own RunResult interpretation and never repairs on an unproven or corrupt
+  result.
+
 - `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
   exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
   observations, terminal RunResults where present, duplicate identities, and

@@ -16,6 +16,18 @@ const dirs = (dir) => { try { return fs.readdirSync(dir, { withFileTypes: true }
 const uniq = (xs) => [...new Set(xs.filter(Boolean))];
 const real = (p) => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
 const fgosDir = (root) => path.join(root, '.fgos');
+/** True when `candidatePath` resolves to `parentDir` itself or somewhere
+ * inside it. The one guard every caller-supplied id (assignmentId today;
+ * runId is audited but never joined into a path in this module or
+ * reconciliation-planner.mjs, so it needs no guard of its own) joined into
+ * a path here or in reconciliation-planner.mjs must pass before that path
+ * is ever read or written -- closing a `../`/absolute-path escape out of
+ * the assignments directory a raw id string would otherwise allow. */
+export function isWithinDir(parentDir, candidatePath) {
+  const resolvedParent = path.resolve(parentDir);
+  const resolvedCandidate = path.resolve(candidatePath);
+  return resolvedCandidate === resolvedParent || resolvedCandidate.startsWith(resolvedParent + path.sep);
+}
 
 function allRuns(root) {
   const base = fgosDir(root), out = [];
@@ -55,6 +67,34 @@ function assignmentEvidence(root, assignmentId, all) {
   const admitted = new Set(facts.records.map((record) => record.runId)), unadmitted = runs.filter((l) => !admitted.has(l.run.runId)), latest = facts.records.at(-1), currentIds = latest ? facts.records.filter((r) => r.attempt === latest.attempt && r.runId !== latest.runId ? true : r === latest).map((r) => r.runId) : [], current = currentIds.flatMap((id) => byId.get(id) ?? []), absent = currentIds.filter((id) => !byId.has(id)), duplicateCurrent = currentIds.filter((id) => (byId.get(id)?.length ?? 0) > 1);
   return { facts, records, malformed, runs, byId, unadmitted, currentIds, current, absent, duplicateCurrent, incomplete: facts.corrupt || malformed.length || unadmitted.length || absent.length };
 }
+function coordinationSessionsDir(root) { return path.join(fgosDir(root), 'coordination', 'sessions'); }
+
+/** Which CoordinationSession (if any) registered `assignmentId` in its own
+ * manifest.assignmentRefs -- read directly off session.json rather than
+ * through coordination/store.mjs or coordination/session-engine.mjs (those
+ * own the write/execute path; importing either here would put process-
+ * control/execution on this read-only module's import graph, the same
+ * reason admissions() above reads run-lock's ledger directly instead of
+ * importing it). `manifest.assignmentRefs` is appended
+ * (completeAssignmentRegistration, coordination/store.mjs) strictly BEFORE
+ * that same session ever writes its own `dispatch.claim`
+ * (session-engine.mjs's `createAndExecuteSessionTask`), so this lookup is
+ * complete for exactly the claims that matter: one written under
+ * session-engine.mjs's own exclusivity door, independent of whether any Run
+ * has materialized for the assignment yet (owner()/authority() below only
+ * resolve ownership through an existing Run's own `coordinationId` field,
+ * which is not yet on disk in that window). */
+export function findCoordinationSessionOwningAssignment(root, assignmentId) {
+  const base = coordinationSessionsDir(root);
+  for (const id of dirs(base)) {
+    const session = json(path.join(base, id, 'session.json'));
+    if (session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(assignmentId)) {
+      return { id, observeCommand: `fgos coordination recover ${id}` };
+    }
+  }
+  return null;
+}
+
 function owner(l, root, all) {
   if (l.malformed || !l.run?.runId) return { complete: false };
   if (l.kind !== 'assignment-run') return { complete: true, kind: 'standalone-run', id: l.run.runId };
@@ -81,7 +121,12 @@ export function inspectDispatchRuntime(root, options = {}, { now = () => new Dat
   const selector = validateInspectionSelector(options), all = allRuns(root), base = fgosDir(root);
   if (selector.kind === 'run') { const found = all.filter((l) => !l.malformed && l.run.runId === selector.id); if (!found.length) return missing('run', selector.id, 'No matching Run was found in registered Assignment or ad-hoc Run repositories.'); if (found.length > 1) return { ...missing('run', selector.id, 'More than one Run repository owns this run id.'), inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: found.map(project) }, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: [selector.id] } }; return one(found[0], root, now, all); }
   if (selector.kind === 'assignment') {
-    const dir = path.join(base, 'assignments', selector.id), assignment = json(path.join(dir, 'assignment.json')); if (!assignment) return missing('assignment', selector.id, 'No matching Assignment was found.');
+    const assignmentsRoot = path.join(base, 'assignments'), dir = path.join(assignmentsRoot, selector.id);
+    // F4: selector.id arrives over the public CLI boundary (--assignment)
+    // and is joined into a path -- refuse before any read of a resolved
+    // path outside the assignments directory (a `../` escape) is attempted.
+    if (!isWithinDir(assignmentsRoot, dir)) return missing('assignment', selector.id, 'assignmentId must not escape the assignments directory.');
+    const assignment = json(path.join(dir, 'assignment.json')); if (!assignment) return missing('assignment', selector.id, 'No matching Assignment was found.');
     const evidence = assignmentEvidence(root, selector.id, all), { facts, records, malformed, currentIds, current, absent, duplicateCurrent, unadmitted, incomplete } = evidence, ambiguous = current.length > 1 || duplicateCurrent.length > 0, inspected = !ambiguous && current.length === 1 ? one(current[0], root, now, all) : null, status = incomplete ? 'partial' : ambiguous ? 'conflicting' : inspected?.inspectionStatus ?? 'resolved';
     return { inspectionStatus: status, subject: { kind: 'assignment', id: selector.id, locations: records.map(project) }, observations: [{ kind: 'assignment-history', source: 'admission-generation-ledger', level: incomplete ? 'partial' : 'correlated', value: { delivery: facts.records.length ? 'started' : 'not-started', currentRunIds: currentIds, runIds: facts.records.map((r) => r.runId), missingMaterializations: absent, malformedMaterializations: malformed.map(project), unadmittedMaterializations: unadmitted.map(project), duplicateCurrentMaterializations: duplicateCurrent } }], runObservation: inspected?.runObservation ?? null, runResult: inspected?.runResult ?? null, ...(!incomplete && !ambiguous && inspected?.recoveryAuthority ? { recoveryAuthority: inspected.recoveryAuthority } : {}), reconciliation: { state: incomplete || ambiguous ? 'manual-required' : 'not-needed', reason: incomplete ? 'Admission ledger and Run materialization are incomplete or corrupt.' : ambiguous ? 'Multiple current Run materializations were derived from admission facts.' : 'No stale local guard was observed.' }, links: { assignmentIds: [selector.id], coordinationIds: [], runIds: facts.records.map((r) => r.runId) } };
   }

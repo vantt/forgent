@@ -89,6 +89,7 @@ import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mjs';
+import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
@@ -3169,7 +3170,7 @@ async function runVerb(verb, flags, positional, dir) {
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile>');
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       if (sub === 'inspect') {
         return invokeDispatchInspectOperation({
@@ -3177,6 +3178,32 @@ async function runVerb(verb, flags, positional, dir) {
           ctx: { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
           payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd } },
         });
+      }
+      if (sub === 'reconcile') {
+        const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
+        if ((positional[1] ?? 'plan') === 'plan') {
+          // F1: --cwd names the specific working directory whose per-cwd
+          // dispatch lock clear-cwd-lock targets -- distinct from --dir
+          // above (the main checkout root). Omitted, the use case's own
+          // default (the CLI process's real process.cwd()) applies, same
+          // ergonomics as running the command from inside the stuck cwd.
+          const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: { action: flags.action, runId: flags.run, assignmentId: flags.assignment, cwd },
+          });
+        }
+        if (positional[1] === 'apply') {
+          let plan;
+          try { plan = JSON.parse(requireField(flags.plan, 'dispatch reconcile apply requires --plan')); } catch (error) { throw new StoreError('validation', `dispatch reconcile apply --plan must be valid JSON: ${error.message}`); }
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: { apply: true, plan },
+          });
+        }
+        throw new StoreError('validation', 'dispatch reconcile expects plan or apply');
       }
       const runId = requireField(positional[1] ?? flags['run-id'], `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
       if (sub === 'show-run') {
@@ -3226,7 +3253,7 @@ async function runVerb(verb, flags, positional, dir) {
           actionKey: requireField(flags['action-key'], 'dispatch recover --action requires --action-key'),
         });
       }
-      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, inspect, watch, or recover`);
+      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, inspect, watch, recover, or reconcile`);
     }
 
     case 'coordination': {
