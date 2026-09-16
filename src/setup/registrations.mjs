@@ -33,6 +33,7 @@ import { mergeConfigDefaults } from './config-merge.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
+import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
@@ -3692,6 +3693,18 @@ registerCheck({
       return checkHerdrExecutorKinds(loadRunnerConfigFromDir(cwd));
     } catch (err) {
       return { passed: true, message: `runner config not loadable here, herdr executor kinds not evaluated: ${err.message}` };
+    }
+  },
+});
+
+registerCheck({
+  id: 'executor-profile-warnings',
+  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor/capability entries hardcoding policy-shaped flags, rigorOverrides-as-identity, or account-pool-like env, each named with its documented migration target',
+  check: (cwd) => {
+    try {
+      return checkExecutorProfileWarnings(cwd, loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, executor-profile warnings not evaluated: ${err.message}` };
     }
   },
 });

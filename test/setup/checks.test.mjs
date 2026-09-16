@@ -117,6 +117,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'trust-store-readable',
       'executor-confinement',
       'herdr-executor-kinds',
+      // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
+      // executor/capability warnings, named with their migration target.
+      'executor-profile-warnings',
       // Phase 09: rust-host-r1-kernel release tree builder and doctor.
       'rust-host-binary-present',
       'rust-host-target-supported',

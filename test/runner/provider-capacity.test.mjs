@@ -158,6 +158,96 @@ test('classifier quarantines only high-confidence stderr/provider outcomes', () 
   assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
 });
 
+// Pre-Phase-05 gate H1 (plans/260915-executor-policy-dispatch-seams/plan.md):
+// quota/auth classification must pass quarantineKind/until/detail; a
+// temporary quarantine without an expiry must not be considered healthy or
+// selectable; missing reset text must not silently create an immediately
+// selectable account.
+test('H1: paused-limit adapter/structured-agent outcomes always carry a conservative until, never an expiry-less temporary quarantine', () => {
+  const byAdapter = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'paused-limit' });
+  assert.equal(byAdapter.quarantineKind, 'temporary');
+  assert.ok(byAdapter.until, 'adapterOutcome: paused-limit must always produce a conservative until');
+  assert.ok(Date.parse(byAdapter.until) > Date.now());
+
+  const byStructured = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', structuredAgent: { stopReason: 'paused-limit' } });
+  assert.ok(byStructured.until, 'structuredAgent.stopReason: paused-limit must always produce a conservative until');
+});
+
+test('H1: a quota message with no parseable reset window still gets a conservative until, not an expiry-less quarantine', () => {
+  const withoutResetWindow = classifyProviderCapacityFault({
+    provider: 'openai-codex',
+    stderr: 'ERROR: usage limit has been reached.',
+  });
+  assert.equal(withoutResetWindow.reasonCode, 'quota-limit');
+  assert.equal(withoutResetWindow.quarantineKind, 'temporary');
+  assert.ok(withoutResetWindow.until, 'missing reset text must not silently omit until');
+  assert.ok(Date.parse(withoutResetWindow.until) > Date.now());
+
+  const now = Date.parse('2026-09-16T00:00:00.000Z');
+  const withResetWindow = classifyProviderCapacityFault({
+    provider: 'openai-codex',
+    stderr: "You've hit your usage limit. It resets in 3h.",
+    now,
+  });
+  assert.equal(withResetWindow.until, new Date(now + 3 * 60 * 60 * 1000).toISOString(), 'a real parsed reset window is used verbatim, not overridden by the conservative default');
+});
+
+test('H1: a temporary quarantine with no until (a malformed/legacy state record) is never healthy/selectable -- fails closed like manual-clear', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  // Simulate a record written by a hypothetical future/legacy caller that
+  // forgot to set `until` -- the read-time defensive check must still
+  // refuse to select this account, not silently treat it as expired.
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: {
+      'openai-codex': {
+        accounts: {
+          a: { leases: {}, quarantine: { kind: 'temporary', reasonCode: 'quota-limit' } },
+          b: { leases: {}, lastSelectedAt: '2026-09-16T01:00:00.000Z' },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }));
+
+  const inspected = inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir });
+  assert.equal(inspected.providers['openai-codex'].accounts.a.healthy, false);
+
+  const inventory = validateProviderAccountInventory(runnerConfig());
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  const ranked = rankProviderAccounts({ provider: 'openai-codex', inventory, state, seed: 's' });
+  assert.ok(!ranked.includes('a'), 'an expiry-less temporary quarantine must never be selectable');
+  // `runnerConfig()`'s shared fixture also declares account "c" (no state
+  // entry at all, genuinely never quarantined) -- this test only asserts
+  // the H1 property (quarantined "a" excluded), not the full ranking.
+  assert.ok(ranked.includes('b'));
+});
+
+test('H1: a real conservative-TTL quarantine correctly EXPIRES once "until" has passed', () => {
+  const acct = { quarantine: { kind: 'temporary', reasonCode: 'quota-limit', until: '2026-09-16T01:00:00.000Z' } };
+  const inventory = validateProviderAccountInventory(runnerConfig());
+  const beforeExpiry = rankProviderAccounts({
+    provider: 'openai-codex',
+    inventory,
+    state: { providers: { 'openai-codex': { accounts: { a: acct, b: { leases: {} } } } }, assignments: {} },
+    seed: 's',
+    now: Date.parse('2026-09-16T00:00:00.000Z'),
+  });
+  assert.ok(!beforeExpiry.includes('a'));
+
+  const afterExpiry = rankProviderAccounts({
+    provider: 'openai-codex',
+    inventory,
+    state: { providers: { 'openai-codex': { accounts: { a: acct, b: { leases: {} } } } }, assignments: {} },
+    seed: 's',
+    now: Date.parse('2026-09-16T02:00:00.000Z'),
+  });
+  assert.ok(afterExpiry.includes('a'), 'a temporary quarantine with a real past `until` must expire normally');
+});
+
 test('manual clear refuses unknown and non-quarantined accounts unless forced, then writes audit', () => {
   const runtimeDir = mkTempDir();
   assert.throws(() => clearProviderAccountQuarantine({

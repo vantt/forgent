@@ -15,7 +15,7 @@ import { openSession, createSessionAssignment } from '../../src/runner/coordinat
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
-import { inspectProviderCapacity } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -1020,6 +1020,89 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
   assert.ok(!codexArgs.includes('sonnet'), 'Claude model literals must not leak into a cross-provider redirect');
 });
 
+// Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
+// readOnlyExecutorRedirects must never bypass disallowedProviders/
+// disallowedExecutors governance for the executor it retargets to.
+test('H5: a readOnlyExecutorRedirects target cannot bypass disallowedProviders governance', async () => {
+  const tempDir = mkTempDir();
+  const worker = writeArgvRecordingExecutor(tempDir, 'h5-worker');
+  const codex = writeArgvRecordingExecutor(tempDir, 'h5-codex');
+
+  const runnerConfig = {
+    readOnlyExecutorRedirects: {
+      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+    },
+    executors: {
+      claude: {
+        command: process.execPath,
+        args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+        allowCrossProvider: true,
+      },
+      'codex-bwrap': {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        providerModel: 'openai-codex',
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+  };
+
+  const work = { id: 'tsk-h5-redirect-governance', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+
+  // Project governance disallows openai-codex outright -- the redirect
+  // target is exactly that provider. Before the H5 fix, this call silently
+  // dispatched through codex-bwrap anyway: the disallowedProviders check
+  // only ever ran against the DECLARED "claude" executor, never against
+  // what the redirect actually resolved to.
+  await assert.rejects(
+    executeAssignment(assignment, {
+      cwd: tempDir,
+      repoRoot: tempDir,
+      runnerConfig,
+      options: { disallowedProviders: ['openai-codex'] },
+    }),
+    (err) => /governance gate rejected provider "openai-codex"/.test(err.message) && /readOnlyExecutorRedirects/.test(err.message),
+  );
+  assert.equal(fs.existsSync(codex.argvCapturePath), false, 'the disallowed redirect target must never actually spawn');
+
+  // Same shape, disallowedExecutors naming the redirect target by id instead
+  // of by provider family.
+  const assignment2 = buildAssignment({ work: { ...work, id: 'tsk-h5-redirect-governance-2' }, stage: 'planning', operation: 'shape-plan' });
+  await assert.rejects(
+    executeAssignment(assignment2, {
+      cwd: tempDir,
+      repoRoot: tempDir,
+      runnerConfig,
+      options: { disallowedExecutors: ['codex-bwrap'] },
+    }),
+    (err) => /governance gate rejected executor "codex-bwrap"/.test(err.message),
+  );
+
+  // Control: the SAME governance options do not spuriously refuse an
+  // UNREDIRECTED dispatch (a mutating operation, never routed through
+  // readOnlyExecutorRedirects at all) -- this fix must be a no-op when
+  // nothing was actually redirected.
+  const mutatingAssignment = buildAssignment({
+    work: { ...work, id: 'tsk-h5-control' },
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+  const controlResult = await executeAssignment(mutatingAssignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    options: { disallowedProviders: ['openai-codex'] },
+  });
+  assert.equal(controlResult.executorId, 'claude');
+  assert.equal(controlResult.executorRedirected, false);
+});
+
 test('provider capacity selection happens after Run admission, records redacted run-owned evidence, and releases lease at settle', async () => {
   const tempDir = mkTempDir();
   const runtimeDir = mkTempDir();
@@ -1086,6 +1169,97 @@ test('provider capacity selection happens after Run admission, records redacted 
 
   const inspected = inspectProviderCapacity({ runnerConfig, runtimeDir });
   assert.deepEqual(inspected.providers['openai-codex'].accounts.tetcu72.openLeases, []);
+});
+
+// Pre-Phase-05 gate H2 (plans/260915-executor-policy-dispatch-seams/plan.md):
+// provider-capacity refusal after Run admission must settle the attempt as
+// provider-capacity-refused, never leave an admitted Run permanently
+// "running"/unsettled via an unclassified throw.
+test('provider capacity refusal after Run admission settles the attempt (never an orphaned running Run / unclassified throw)', async () => {
+  const tempDir = mkTempDir();
+  const runtimeDir = mkTempDir();
+  const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity-refused');
+
+  const runnerConfig = {
+    readOnlyExecutorRedirects: {
+      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+    },
+    executors: {
+      claude: { command: process.execPath, args: [codex.scriptPath, '{prompt}'], allowCrossProvider: true },
+      'codex-bwrap': {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        providerModel: 'openai-codex',
+        kind: 'agent',
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetcu72: {
+            label: 'codex/tetcu72',
+            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
+          },
+        },
+      },
+    },
+  };
+
+  // Pre-seed the ONE declared account as already quarantined (manual-clear,
+  // no expiry) so real selection logic genuinely refuses -- not a stubbed
+  // refusal, the actual rankProviderAccounts/acquireProviderAccountLease
+  // path this test exercises end to end.
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: PROVIDER_CAPACITY_STATE_CONTRACT,
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetcu72: { quarantine: { kind: 'manual-clear', reasonCode: 'auth-token', quarantinedAt: new Date().toISOString() } },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }));
+
+  const work = { id: 'tsk-provider-capacity-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+  });
+
+  // Settled, not thrown: the caller gets a real result back.
+  assert.equal(result.status, 'failed');
+  assert.equal(result.classification.execution.status, 'failed');
+  assert.equal(result.classification.failure.family, 'provider');
+  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.match(result.classification.failure.message, /provider capacity refused/);
+  // "needs-input" -- not a terminal contract violation -- matches the
+  // bounded settle-and-reattempt spirit: a caller may retry with
+  // predecessorRunId using the existing admission retry channel.
+  assert.equal(result.classification.policy.disposition, 'needs-input');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  assert.ok(fs.existsSync(path.join(runDir, 'result.json')), 'result.json must exist -- the Run must not be left admitted-but-unsettled');
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  // markRunSettled's own vocabulary: "settled" means the Run reached its end
+  // and produced a RunResult -- the verdict itself lives in result.json's
+  // classification, asserted above. The property this test exists to prove
+  // is simply that run.json is no longer "running".
+  assert.equal(runMeta.status, 'settled');
+  assert.notEqual(runMeta.status, 'running', 'run.json must never be left "running" after a provider-capacity refusal');
+  assert.equal(fs.existsSync(codex.argvCapturePath), false, 'a refused account must never let the worker actually spawn');
 });
 
 test('tool executors bypass provider capacity selection even with matching provider accounts configured', async () => {

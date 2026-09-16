@@ -470,6 +470,26 @@ export function normalizeRunResultV2({
     ...(executorId !== undefined ? { executorId } : {}),
     ...(executorRedirected !== undefined ? { executorRedirected } : {}),
     ...(dispatchPolicy !== undefined ? { policy: dispatchPolicy } : {}),
+    // Phase 02 (executor-policy-dispatch-seams, design.md §3.4): derived
+    // entirely from `dispatchPolicy` (no new caller-supplied param) --
+    // `renderAssignmentPrompt` renders persona as a `# Persona` section
+    // whenever `dispatchPolicy.persona` resolved non-null (assignment-runner.mjs's
+    // call site threads that exact same value through), so delivery here is
+    // deterministically `section`/`applied: true` for this phase. `null`
+    // when no persona resolved, additive/absent for any caller that never
+    // passes a `policy` object at all.
+    ...(dispatchPolicy?.persona
+      ? {
+          promptEnvelope: {
+            persona: {
+              ref: dispatchPolicy.persona,
+              delivery: 'section',
+              applied: true,
+              source: dispatchPolicy.provenance?.persona?.source ?? null,
+            },
+          },
+        }
+      : {}),
     ...(settledAt !== undefined ? { settledAt } : {}),
     ...(durationMs !== undefined ? { durationMs } : {}),
     ...(planContentHash ? { planContentHash } : {}),

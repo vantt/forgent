@@ -26,6 +26,7 @@ import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
+import { resolveVerifiedPlacementModel } from './placement-policy.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
@@ -298,10 +299,22 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Claude's model names for a non-Claude executor's own dispatch.
   const executorId = executorIdForWork(work, opts.stage);
   const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
-  const model = modelForTier(cfg, tier, {
+  const legacyModel = modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
     rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
   });
+  // Phase 07 (executor-policy-dispatch-seams): PlacementPolicy production
+  // binder, self-verifying -- see resolveVerifiedPlacementModel's own
+  // docstring (placement-policy.mjs) for the full safety argument. The
+  // legacy formula above is UNCHANGED and always computed; this only picks
+  // which of the two (legacy vs PlacementPolicy) the real spawn actually
+  // uses.
+  const { model, source: modelSource, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
+  if (placementDivergence) {
+    process.stderr.write(
+      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
+    );
+  }
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
   // a command-less/adapter-less/invocation-less executor with no static
@@ -335,7 +348,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // through which adapter/provider/model/tier. Diagnostic-only: never read
   // back by any caller, never part of this function's return value.
   process.stderr.write(
-    `fgos: dispatch job=${executorId} executor=${resolvedExecutorId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
+    `fgos: dispatch job=${executorId} executor=${resolvedExecutorId ?? '(global executor)'} via=${adapter} provider=${provider} model=${model} tier=${tier} modelSource=${modelSource}\n`,
   );
 
   // P49: same mechanical selection buildPrompt used internally, called again
@@ -746,7 +759,16 @@ export async function executeExecutorCli(
         fallbackFrom: anchorCapability,
         anchorCapability,
         cfg,
-        providerCapacity: opts.providerCapacity,
+        // Pre-existing bug fix (unrelated to this track's own scope): `opts`
+        // is not a parameter of `executeExecutorCli` -- this function
+        // destructures its options object directly (no catch-all binding),
+        // and the caller-supplied governance/call options bag is named
+        // `options` (destructured above). Every existing caller already
+        // passes no `providerCapacity` of its own, so this is
+        // value-preserving (still `undefined`) for all of them; it only
+        // stops the `ReferenceError: opts is not defined` crash this
+        // function hit on every call.
+        providerCapacity: options?.providerCapacity,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -834,10 +856,22 @@ export async function executeExecutorCli(
   // policy-tier), where both readings agree.
   const rigorOverrides = capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides;
   const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
-  const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? modelForTier(cfg, tier, {
+  const legacyModel = modelForTier(cfg, tier, {
     providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
     rigorOverrides,
   });
+  // Phase 07 (executor-policy-dispatch-seams): same self-verifying
+  // PlacementPolicy production binder as spawnWorker above -- only applies
+  // to the `modelForTier` fallback branch, never to an explicit
+  // modelOverride/capabilityOverrides.model/executor.model, which must
+  // always win outright regardless of what PlacementPolicy would choose.
+  const { model: fallbackModel, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
+  if (placementDivergence) {
+    process.stderr.write(
+      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
+    );
+  }
+  const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? fallbackModel;
   // `minTier` is informational/provenance only here (nothing else raises
   // it in this ad-hoc dispatch path -- no Work/Assignment risk
   // classification is in play) -- translated via the SAME
@@ -944,7 +978,9 @@ export async function executeExecutorCli(
         anchorCapability,
         cfg,
         assignmentLaunchContext,
-        providerCapacity: opts.providerCapacity,
+        // Same pre-existing `opts`-is-not-defined fix as the in-process
+        // branch above -- see its comment.
+        providerCapacity: options?.providerCapacity,
         invocation: {
           command,
           args,

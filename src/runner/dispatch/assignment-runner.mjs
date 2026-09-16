@@ -59,6 +59,7 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
+import { resolveVerifiedRedirectExecutor } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -250,10 +251,33 @@ function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
 
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  const candidates = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment)
-    .filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
-  if (candidates.length === 0) return sourceExecutorId;
-  return candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+  const rawPool = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment);
+  const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
+  const legacyExecutorId = candidates.length === 0
+    ? sourceExecutorId
+    : candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+  // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
+  // binder for redirect EXECUTOR selection, self-verifying -- same safety
+  // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
+  // is UNCHANGED, always computed first; PlacementPolicy's own selection
+  // (placement-policy.mjs's resolveVerifiedRedirectExecutor) is used only
+  // when it agrees, so a real dispatch can never regress. `rawPool` (before
+  // the admissibility filter above) is passed through -- the verified
+  // resolver does its own identical filtering internally, mirroring exactly
+  // what this function's own `candidates` line already does.
+  const { executorId: verifiedExecutorId, divergence: placementDivergence } = resolveVerifiedRedirectExecutor({
+    cfg,
+    sourceExecutorId,
+    candidatePool: rawPool,
+    seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`,
+    legacyExecutorId,
+  });
+  if (placementDivergence) {
+    process.stderr.write(
+      `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
+    );
+  }
+  return verifiedExecutorId;
 }
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
@@ -1288,6 +1312,26 @@ export async function executeAssignment(assignment, opts = {}) {
       ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
   effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
+  // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
+  // resolveAssignmentDispatchPolicy (inside compileDispatchPlan above) already
+  // checked opts.options.disallowedProviders/disallowedExecutors against the
+  // DECLARED executor -- but a readOnlyExecutorRedirects redirect (right
+  // above) can retarget to a DIFFERENT executor/provider that was never
+  // checked at all. A project that disallows a provider while also
+  // configuring a redirect pool containing an executor of that same
+  // provider would have the redirect silently bypass governance. Re-run the
+  // exact same two checks resolveAssignmentDispatchPolicy uses, against the
+  // resolved (post-redirect) executor/provider, only when the redirect
+  // actually changed anything -- a value-preserving no-op for every
+  // unredirected dispatch.
+  if (resolvedExecutorId !== defaultExecutorId) {
+    if (opts.options?.disallowedProviders?.includes(effectivePolicy.providerModel)) {
+      throw new RunnerConfigError(`governance gate rejected provider "${effectivePolicy.providerModel}": disallowed egress (via readOnlyExecutorRedirects "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+    }
+    if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
+      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyExecutorRedirects "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+    }
+  }
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
   // for a redirected read-only op (above). `policy.executorPreference[0]`
   // (persisted below, unchanged) always records the DECLARED preference
@@ -1381,7 +1425,69 @@ export async function executeAssignment(assignment, opts = {}) {
       runIsDead: opts.providerCapacityRunIsDead,
     });
     if (providerCapacitySelection?.status === 'refused') {
-      throw new RunnerConfigError(`provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}`);
+      // Pre-Phase-05 gate H2 (executor-policy-dispatch-seams plan.md): this
+      // refusal happens AFTER admitRunAttempt already created runId/runDir
+      // (run.json written `status: "running"` above) -- an unclassified
+      // throw here used to leave that Run permanently `running`/unsettled,
+      // with nothing to tell an orphan apart from one still genuinely in
+      // flight. Settle it properly instead, using the exact same
+      // result.json/run.json/markRunSettled sequence the normal completion
+      // path below uses, classified via runtime.executionError so
+      // normalizeRunResultV2 derives execStatus:"failed",
+      // failure:{family:"provider", code:"provider-capacity-refused"}, and
+      // policy:{disposition:"needs-input"} through its own existing rules --
+      // no new override channel invented. `predecessorRunId`/`retryId` are
+      // executeAssignment's EXISTING admission-time retry channel (see
+      // admitRunAttempt above): a caller that wants to reattempt calls
+      // executeAssignment again with `predecessorRunId: runId`, which
+      // supersedes this settled attempt through the same path every other
+      // retry already uses -- this settlement does not need its own retry
+      // loop, only to stop being unsettled.
+      const settledAt = new Date().toISOString();
+      const stderrText = `provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}`;
+      fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
+      fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+      const evidenceData = {
+        operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
+        gitBefore: null,
+        gitAfter: null,
+        gitBeforeSource: 'pre-launch',
+        dirtyBefore: [],
+        dirtyAfter: [],
+        mutatedDirtyBeforeFiles: [],
+        changedFiles: [],
+        changedFileReasons: {},
+        attribution: [],
+        artifacts: [],
+        tests: [],
+      };
+      fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+      const refusedRunResult = normalizeRunResultV2({
+        runId,
+        assignmentId: effectiveAssignment.assignmentId,
+        workId: effectiveAssignment.workId,
+        executorId: resolvedExecutorId,
+        policy: effectivePolicy,
+        settledAt,
+        role: effectiveAssignment.role,
+        operation: effectiveAssignment.operation,
+        isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
+        runtime: {
+          exitCode: null,
+          executionError: { code: 'provider-capacity-refused', message: stderrText },
+          stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+          stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+        },
+        evidence: evidenceData,
+      });
+      fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(refusedRunResult, null, 2)}\n`);
+      // Same convention as the normal completion path below: markRunSettled
+      // is the sole writer of run.json's own `status` field (default
+      // "settled" -- "reached its end and produced a RunResult", distinct
+      // from result.json's own success/failure verdict). No separate manual
+      // run.json write here.
+      markRunSettled(runDir);
+      return Object.freeze(refusedRunResult);
     }
     if (providerCapacitySelection?.status === 'selected') {
       providerCapacityEvidence = {
@@ -1489,10 +1595,19 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
+  // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
+  // persona (effectivePolicy.persona/provenance.persona, computed above by
+  // the same resolveAssignmentDispatchPolicy() every dispatch path shares)
+  // into the actual worker-visible prompt -- previously resolved but never
+  // delivered. Additive: `undefined` when no persona resolved, byte-identical
+  // to the pre-Phase-02 prompt for every such assignment.
   const prompt = renderAssignmentPrompt(effectiveAssignment, {
     cwd,
     runDir: path.resolve(runDir),
     effectiveContract,
+    ...(effectivePolicy.persona
+      ? { persona: { value: effectivePolicy.persona, source: effectivePolicy.provenance?.persona?.source ?? null } }
+      : {}),
   });
 
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files

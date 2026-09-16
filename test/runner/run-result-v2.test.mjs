@@ -309,3 +309,49 @@ test('interpretRunResult treats a present unsupported contract as corrupt, never
     assert.equal(interpreted.classification.provenance, 'contract-corrupt');
   }
 });
+
+// ─── Phase 02 (executor-policy-dispatch-seams): PromptEnvelope evidence ────
+
+test('normalizeRunResultV2: promptEnvelope.persona is derived from policy.persona/provenance.persona, delivery "section", applied true', () => {
+  const res = normalizeRunResultV2({
+    runId: 'run_persona_001',
+    assignmentId: 'asgn_persona_001',
+    policy: {
+      persona: 'code-reviewer',
+      provenance: { persona: { value: 'code-reviewer', source: { scope: 'default', id: 'reviewer' } } },
+    },
+    runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
+    agentClaim: { status: 'done', summary: 'Clean pass' },
+    confidenceLevel: 'reported',
+  });
+
+  assert.deepEqual(res.promptEnvelope, {
+    persona: {
+      ref: 'code-reviewer',
+      delivery: 'section',
+      applied: true,
+      source: { scope: 'default', id: 'reviewer' },
+    },
+  });
+});
+
+test('normalizeRunResultV2: promptEnvelope is absent when no persona resolved (additive no-op)', () => {
+  const withNoPolicy = normalizeRunResultV2({
+    runId: 'run_persona_002',
+    assignmentId: 'asgn_persona_002',
+    runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
+    agentClaim: { status: 'done', summary: 'Clean pass' },
+    confidenceLevel: 'reported',
+  });
+  const withPolicyNoPersona = normalizeRunResultV2({
+    runId: 'run_persona_003',
+    assignmentId: 'asgn_persona_003',
+    policy: { tier: 'standard', persona: undefined },
+    runtime: { exitCode: 0, stdoutLog: 'stdout.log' },
+    agentClaim: { status: 'done', summary: 'Clean pass' },
+    confidenceLevel: 'reported',
+  });
+
+  assert.equal('promptEnvelope' in withNoPolicy, false);
+  assert.equal('promptEnvelope' in withPolicyNoPersona, false);
+});

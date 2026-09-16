@@ -215,8 +215,17 @@ function isQuarantined(accountStateValue, now = Date.now()) {
   const quarantine = accountStateValue?.quarantine;
   if (!quarantine) return false;
   if (quarantine.kind === 'manual-clear') return true;
-  if (quarantine.until && Date.parse(quarantine.until) > now) return true;
-  return false;
+  // Pre-Phase-05 gate H1 (plans/260915-executor-policy-dispatch-seams/plan.md):
+  // a temporary quarantine with no `until` must not be treated as healthy/
+  // selectable -- it must fail closed the same way manual-clear does, not
+  // silently expire on the spot. Every writer below now always supplies a
+  // conservative `until` for a temporary quarantine, but this read-time
+  // check stays defensive: a quarantine record with a missing/unparseable
+  // `until` can never be misread as "already expired".
+  if (!quarantine.until) return true;
+  const untilMs = Date.parse(quarantine.until);
+  if (Number.isNaN(untilMs)) return true;
+  return untilMs > now;
 }
 
 function isPidAlive(pid) {
@@ -401,17 +410,38 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
   return { contract: 'provider-capacity-inspect.v1', providers };
 }
 
-export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent } = {}) {
+// Pre-Phase-05 gate H1 / post-review-recut.md "Fault classifier correction":
+// "quota/rate-limit -> account quarantine with parsed reset window when
+// available, otherwise conservative long TTL". A quota quarantine must never
+// resolve to a missing `until` -- isQuarantined() above now also fails
+// closed on that case defensively, but the classifier is the one place that
+// actually KNOWS "no reset window was parseable" and should say so plainly
+// rather than lean on the defensive fallback silently.
+const DEFAULT_QUOTA_QUARANTINE_TTL_MS = 60 * 60 * 1000; // 1 hour, conservative default reset window.
+
+export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, now = Date.now() } = {}) {
   const text = typeof stderr === 'string' ? stderr : '';
   const lower = text.toLowerCase();
   if (adapterOutcome === 'paused-limit' || structuredAgent?.stopReason === 'paused-limit') {
-    return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary' };
+    // No stderr text to parse a reset window from at all in this branch --
+    // always the conservative default, never an expiry-less quarantine.
+    return {
+      action: 'quarantine',
+      reasonCode: 'quota-limit',
+      quarantineKind: 'temporary',
+      until: new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString(),
+    };
   }
   if (provider === 'openai-codex' || provider === undefined) {
     if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
       const reset = /resets?\s+in\s+(\d+)\s*h/i.exec(text);
-      const until = reset ? new Date(Date.now() + Number(reset[1]) * 60 * 60 * 1000).toISOString() : undefined;
-      return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', ...(until ? { until } : {}) };
+      // Missing/unparseable reset text falls back to the SAME conservative
+      // default TTL -- never an expiry-less "temporary" quarantine, which
+      // isQuarantined() would otherwise have to catch defensively instead.
+      const until = reset
+        ? new Date(now + Number(reset[1]) * 60 * 60 * 1000).toISOString()
+        : new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
+      return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until };
     }
     if (/\b(login|auth|authentication|token)\b/i.test(lower) && /\b(failed|expired|invalid|required|missing|no api key)\b/i.test(lower)) {
       return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
