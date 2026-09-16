@@ -1535,7 +1535,7 @@ export function classifyCodePanelRequest(request, options = {}) {
   const clauses = trimmed.split(/(?<=[.!?;])\s+|\n+/);
   for (const clause of clauses) {
     const c = clause.trim();
-    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|(?:run|resume|execute|ran|resumed|executed)\s+(?:the\s+)?[\w-]+\s+track\b|(?:run|resume|execute|ran|resumed|executed)\s+track\s+|open\s+(?:the\s+next\s+cell\s+for\s+)[\w-]+)/i.test(c);
+    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|(?:run|resume|execute|ran|resumed|executed)\s+(?:the\s+)?[\w-]+\s+track\b|(?:run|resume|execute|ran|resumed|executed)\s+track\s+|open\s+(?:the\s+next\s+cell\s+for\s+)[\w-]+|(?:run|resume|execute|ran|resumed|executed)\s+phase-\d+\S*\s+of\s+)/i.test(c);
     if (!hasPlanOrTrack) continue;
 
     const hasRunVerb = /\b(?:run|resume|execute|open)\b/i.test(c);
@@ -1825,6 +1825,52 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
     }
   }
 
+  // 4. Verbatim-overlap check against fgos-plan-loop's real Section 5 body
+  // (red-team V-1/V-3, op_032): a byte-identical or near-verbatim copy of
+  // the real orchestration loop text evades checks 1-3 whenever it sits
+  // under a heading outside the section-3 allowlist, or under no heading
+  // at all. This is NOT a rewrite (zero synonyms, zero restructuring) --
+  // squarely inside what this discriminator's own limitations note (p01.md
+  // section 3) promises to catch ("verbatim or near-verbatim copies using
+  // fgos-plan-loop's own anchor phrasing"), so it must be caught regardless
+  // of heading/section placement, not just within the structural check's
+  // own heading-gated scope. Deterministic line-overlap, not a heading or
+  // keyword match: >=3 identical substantive lines (>=30 chars each) is
+  // the threshold verified by red-team (canonical domains/coding/skills/
+  // fgos-code-panel/SKILL.md shares 0/69 substantive lines with the real
+  // Section 5 body; a verbatim copy shares 68/69).
+  try {
+    const repoRootForOverlap = path.resolve(fileURLToPath(import.meta.url), '../../..');
+    const planLoopSkill = fs.readFileSync(
+      path.join(repoRootForOverlap, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+      'utf8'
+    );
+    const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
+    if (section5Match) {
+      const section5Lines = new Set(
+        section5Match[1]
+          .split('\n')
+          .map((l) => l.trim())
+          .filter((l) => l.length >= 30)
+      );
+      const candidateLines = skillContent
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length >= 30);
+      const overlapCount = candidateLines.filter((l) => section5Lines.has(l)).length;
+      if (overlapCount >= 3) {
+        return {
+          pass: false,
+          reason: `Detected ${overlapCount} substantive lines verbatim-identical to fgos-plan-loop's real Section 5 orchestration loop body -- a byte-identical or near-verbatim copy, regardless of heading or section placement`,
+        };
+      }
+    }
+  } catch {
+    // core/skills/fgos-plan-loop/SKILL.md unreadable in this environment:
+    // fail open on THIS check only (checks 1-3 above still ran) rather than
+    // throwing out of a pure validator on an environment/path issue.
+  }
+
   return { pass: true };
 }
 
@@ -1837,6 +1883,29 @@ test('Assertion 3 Discriminator: canonical domains/coding/skills/fgos-code-panel
   );
   const result = validateCodePanelNoPlanLoopDuplication(skillContent);
   assert.equal(result.pass, true, `Expected canonical skill to pass discriminator, but got: ${result.reason}`);
+});
+
+test('Assertion 3 Discriminator: verbatim fgos-plan-loop Section 5 body is caught regardless of heading (V-1/V-3, red-team op_032)', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const planLoopSkill = fs.readFileSync(
+    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    'utf8'
+  );
+  const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
+  assert.ok(section5Match, 'Section 5 must be found in fgos-plan-loop SKILL.md');
+  const body = section5Match[1];
+
+  // V-1: verbatim body under a heading outside the structural check's own allowlist
+  const v1 = validateCodePanelNoPlanLoopDuplication('# fgos-code-panel\n## Execution details\n' + body);
+  assert.equal(v1.pass, false, 'verbatim Section 5 body under a non-allowlisted heading must be caught');
+
+  // V-3: verbatim body appended with no heading at all
+  const canonical = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
+    'utf8'
+  );
+  const v3 = validateCodePanelNoPlanLoopDuplication(canonical + '\n\n' + body);
+  assert.equal(v3.pass, false, 'verbatim Section 5 body with no heading at all must be caught');
 });
 
 test('Assertion 3 Discriminator: passes cleanly on baseline unmodified fgos-code-panel without planned section', () => {
@@ -2435,6 +2504,39 @@ test('Assertion 1 Mode-Selection: imperative mood requirement rejects questions,
 
   const f2_4 = classifyCodePanelRequest('open src/track.mjs and fix the off-by-one if present');
   assert.equal(f2_4.mode, 'direct-single-cell');
+
+  // Regression tests (reviewer R-1 / op_031): F-2's fix omitted the
+  // phase-of-track shape, letting non-imperative phase-of-track
+  // instructions execute a real track. Must refuse like the path/
+  // bare-track-name forms above.
+  assert.throws(
+    () => classifyCodePanelRequest('run phase-02 of the code-panel-multicell-facade track if CI is green'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest('should I run phase-02 of the code-panel-multicell-facade track?'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest('maybe run phase-02 of the code-panel-multicell-facade track'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest('could you run phase-02 of the code-panel-multicell-facade track'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest('if CI is green, run phase-02 of the code-panel-multicell-facade track'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest('run phase-02 of track code-panel-multicell-facade if CI is green'),
+    AmbiguousIntentError
+  );
+
+  // Control: the same phase-of-track shape with no hedge still resolves
+  const r1Affirmative = classifyCodePanelRequest('run phase-02 of the code-panel-multicell-facade track');
+  assert.equal(r1Affirmative.mode, 'planned-multi-cell');
 });
 
 test('Assertion 1 Mode-Selection: phase selection mismatch throws PhaseSelectionMismatchError (CE3 / M2)', () => {
