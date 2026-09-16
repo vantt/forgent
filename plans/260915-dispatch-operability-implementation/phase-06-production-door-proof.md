@@ -1,7 +1,7 @@
 # I06 - Production Door Proof
 
 **Capability:** `code:test`, `code:review`
-**Status:** planned
+**Status:** complete in branch closeout commit; pending merge to `main`
 
 ## Goal
 

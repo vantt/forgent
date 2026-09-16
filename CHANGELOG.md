@@ -68,6 +68,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
   observations, terminal RunResults where present, duplicate identities, and
   non-authorizing recovery ownership hints.
+- Dispatch runtime inspection/reconciliation now has an operator how-to and a
+  production-door proof matrix covering Assignment execution, public inspect,
+  historical/replayed RunResult interpretation, and forbidden reconciliation
+  recovery routes.
 - Code-panel multi-cell facade (code-panel-multicell-facade track, P01):
   `fgos-code-panel` now operates as a two-mode facade for coding implementation
   work with independent review and red-team. Direct mode (`direct-single-cell`)

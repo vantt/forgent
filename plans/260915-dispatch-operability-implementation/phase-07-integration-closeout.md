@@ -1,7 +1,7 @@
 # C00 - Integration Closeout
 
 **Capability:** `docs:update`, `code:review`
-**Status:** planned
+**Status:** complete in branch closeout commit; pending merge to `main`
 
 ## Goal
 

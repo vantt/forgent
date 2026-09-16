@@ -2385,11 +2385,11 @@ test('Assertion 1 Mode-Selection: track by name resolves to plan or live session
   assert.equal(res2.planPath, 'plans/260915-code-panel-multicell-facade/plan.md');
 
   // Resolves via options.hasLiveSession hook without reading host .fgos
-  const resLive = classifyCodePanelRequest('resume the dispatch-operability-implementation track', {
-    hasLiveSession: (track) => track === 'dispatch-operability-implementation',
+  const resLive = classifyCodePanelRequest('resume the live-session-only-track track', {
+    hasLiveSession: (track) => track === 'live-session-only-track',
   });
   assert.equal(resLive.mode, 'planned-multi-cell');
-  assert.equal(resLive.track, 'dispatch-operability-implementation');
+  assert.equal(resLive.track, 'live-session-only-track');
   assert.equal(resLive.planPath, undefined);
 
   // Resolves via fixture sessionsDir

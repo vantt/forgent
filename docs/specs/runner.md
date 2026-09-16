@@ -1222,13 +1222,12 @@ xem `docs/architect/agent-coordination/architecture/work-integration.md`).
 Chi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;
 quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.
 
-## Dispatch operability planned design (2026-09-15)
+## Dispatch operability implementation slice (2026-09-16)
 
-Track `plans/260914-dispatch-operability-evidence-attribution/` reached
-`READY` as design authority only after supplemental cross-design review repair.
-It does not ship runtime behavior and does not authorize implementation in that
-track. A future implementation track may build the following planned
-capabilities:
+Track `plans/260915-dispatch-operability-implementation/` implements the
+accepted dispatch-operability design from
+`plans/260914-dispatch-operability-evidence-attribution/` for the local
+Assignment/Run runtime. The shipped slice is intentionally narrow:
 
 - Typed Run Result and Observation: `RunResult` v2 remains the sole immutable
   terminal Run truth; `RunObservation` is a mutable read projection; historical
@@ -1241,13 +1240,23 @@ capabilities:
 - Evidence attribution: observation, attribution, and policy stay separate;
   Git snapshots provide correlation, never proof of authorship.
 
-Negative capabilities are part of the design: no unified recovery door, no
-automatic inspect-to-recover forwarding, no force-kill/retry/admit/resume/
-reassign/takeover through reconciliation, no cross-session authority, no
+`fgos dispatch inspect --run <runId>`, `--assignment <assignmentId>`, and
+`--cwd <path>` are read-only public doors for this projection. `fgos dispatch
+reconcile plan|apply` is the only public door for the shipped reconciliation
+actions. The supported actions are exactly `clear-cwd-lock`,
+`collect-result`, `clear-assignment-claim`, and `repair-projection`; every
+action is planned from current facts, carries a CAS action key/snapshot/expiry,
+and is re-read before apply.
+
+Negative capabilities remain explicit: no unified recovery door, no automatic
+inspect-to-recover forwarding, no force-kill/retry/admit/resume/reassign/
+takeover/cancel through reconciliation, no cross-session authority, no
 same-`taskKey` semantic change, no host OOM/provider-limit prevention, and no
-direct-unit-only proof for shipped capabilities. Implementation proof must also
-include production-route refusals for forbidden recovery verbs and
-operation-catalog indirection.
+claim that an inspection hint grants authority. The production-door proof lives
+in `test/runner/dispatch-operability-production-door.test.mjs` and covers
+positive Assignment/RunResult/inspect behavior plus forbidden recovery routes
+through the CLI, command registry/operation boundary, dynamic import, and a
+subprocess path.
 
 The cross-design review evidence is an operator-authorized, role-separated
 Codex-only panel, not cross-provider independent review. The durable panel
@@ -1261,6 +1270,7 @@ Canonical detailed artifacts:
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/evidence-attribution.md`
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/guard-reconciliation.md`
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md`
+- `docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md`
 
 **Tra cứu định nghĩa (definition discovery).** Một CoordinationSession có thể
 agent-led (không cần định nghĩa nào — coordinator tự đề xuất Assignment nội

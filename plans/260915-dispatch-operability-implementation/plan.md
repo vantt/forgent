@@ -4,9 +4,9 @@
 **Branch:** `implementation-track--dispatch-operability-evidence-attribution`
 **Worktree:** `/home/vantt/projects/dispatch-operability-implementation`
 **Base:** `main` at `57dfad49`
-**Status:** I01-I05 merged. Next cell: I06 (Production-door and negative-route
-proof matrix). See Product Gates below for per-cell merge commits and trace
-links.
+**Status:** I01-C00 complete on branch. Final branch closeout commit is the
+commit carrying this status/report update; pending merge to `main`. See Product
+Gates below for per-cell merge commits and trace links.
 
 ## Objective
 
@@ -94,8 +94,8 @@ a manual fallback audit listing touched symbols and callers.
 | I03 | RunResult v2, legacy-v1 interpretation, attribution dimensions | `phase-03-runresult-v2-and-attribution.md` | merged `8e8e7f65` (3 fix rounds, cap reached; production fixes independently proven, 2 documented non-blocking test-coverage residuals — see [I03 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I03.md)) |
 | I04 | `dispatch.runtime.inspect` read model and CLI projection | `phase-04-dispatch-runtime-inspect.md` | merged `97c183cc` (3 fix rounds, cap reached; reviewer clean except 1 deferred label-consistency residual, red-team clean after round 3; Lead rejected a repeated host-routing/operation-catalog proof-gap escalation as out of this phase's declared scope — see [I04 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I04.md)) |
 | I05 | `dispatch.runtime.reconcile` CAS guard/projection repair | `phase-05-dispatch-runtime-reconcile.md` | merged `36b97235` (2 full review/red-team cycles; cycle 1 fixed 5 HIGH incl. a fixture-only wrong-field bug and an unsafe liveness parser; cycle 2 (probe-based red-team) fixed a HIGH production-shape mismatch for the default action plus a path-traversal elevated to HIGH, resolved via architecture-advisor consult twice (TOCTOU design + wall-clock incarnation proof); 5 LOW/MEDIUM residuals documented, none blocking — see [I05 trace](../../docs/architect/agent-coordination/verification/dispatch-operability-implementation/I05.md)) |
-| I06 | Production-door and negative-route proof matrix | `phase-06-production-door-proof.md` | planned |
-| C00 | Integration docs, changelog, final review/red-team | `phase-07-integration-closeout.md` | planned |
+| I06 | Production-door and negative-route proof matrix | `phase-06-production-door-proof.md` | complete in branch closeout commit (`test/runner/dispatch-operability-production-door.test.mjs`; production Assignment door, public inspect CLI, historical/replayed RunResult interpretation, and negative reconciliation routes) |
+| C00 | Integration docs, changelog, final review/red-team | `phase-07-integration-closeout.md` | complete in branch closeout commit (`reports/track-closeout.md`; focused proof, full `npm test`, docs/how-to, changelog, GitNexus fallback audit) |
 
 ## Capability Annotations
 

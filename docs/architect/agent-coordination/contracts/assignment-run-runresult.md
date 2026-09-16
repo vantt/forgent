@@ -260,9 +260,12 @@ v2 interpretation and read-only Dispatch runtime inspection while preserving
 
 The accepted design authority is
 `plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`.
-Implementation must add production-door proof, including negative-route
-refusals for semantic recovery through reconciliation, before any behavior is
-described as shipped.
+The implementation proof for this slice is
+`test/runner/dispatch-operability-production-door.test.mjs`, which exercises
+the production Assignment door, public inspect CLI, historical/replayed result
+interpretation, and negative reconciliation routes. Reconciliation remains
+guard/projection repair only; it does not recover, retry, relaunch, resume,
+reattach, reassign, take over, admit, cancel, kill, or signal execution.
 
 ## Confidence
 
