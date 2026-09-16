@@ -32,6 +32,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `codex-bwrap` can now provision its sandbox credential from a configured
   ordered Codex home pool, so the repo is no longer locked to only
   `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
+- Coordination sessions now default `aggregateBounds.wallTimeMs` to 3 hours
+  instead of 1 hour, matching measured multi-step dispatch latency so a valid
+  revise/recheck chain is less likely to be killed by the aggregate wall-time
+  ceiling before all authorized steps can finish.
 
 ### Added
 
