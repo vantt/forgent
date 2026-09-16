@@ -855,7 +855,11 @@ test('Phase 04: evidence separately exposes semanticTier, canonical quality, loo
   assert.equal(effective.lookupPolicyTier, 'creative');
   assert.equal(effective.quality.minRigor.value, 'critical');
   assert.equal(effective.quality.mode.value, 'analytical');
-  assert.deepEqual(effective.provenance.model.source, { scope: 'runnerConfig', id: 'gemini.creative' });
+  // Follow-up (post-Phase-08): model provenance is now PlacementPolicy-
+  // attributed (resolveVerifiedAssignmentModel), not "runnerConfig" --
+  // closes the track's own "no fourth hidden placement source" close
+  // criterion for this resolver. The literal model VALUE is unchanged.
+  assert.deepEqual(effective.provenance.model.source, { scope: 'placement-policy', id: 'gemini.creative' });
   assert.equal(effective.model, 'gemini-3.8-flash-high');
 });
 

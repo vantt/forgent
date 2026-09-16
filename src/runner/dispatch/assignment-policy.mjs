@@ -25,6 +25,7 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
+import { resolveVerifiedAssignmentModel } from './placement-policy.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 
 export const TIER_STRENGTH = Object.freeze({
@@ -450,8 +451,23 @@ export function resolveAssignmentDispatchPolicy({
     // against `lookupPolicyTier`, not `effectiveTier` directly (Phase 04):
     // value-preserving for every caller that never supplies
     // `rigorOverrides`, since `lookupPolicyTier === effectiveTier` then.
-    resolvedModel = resolvePolicyTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
-    modelSource = { scope: 'runnerConfig', id: `${resolvedProvider}.${lookupPolicyTier}` };
+    const legacyModel = resolvePolicyTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
+    // Follow-up (post-Phase-08): PlacementPolicy production-binder
+    // unification -- see resolveVerifiedAssignmentModel's own docstring
+    // (placement-policy.mjs) for why this closes the track's own "no
+    // fourth hidden placement source" close criterion. legacyModel above
+    // is unchanged and always computed first; PlacementPolicy's value is
+    // used only when it agrees, so this cannot regress any config.
+    const { model: verifiedModel, source: verifiedSource } = resolveVerifiedAssignmentModel({
+      cfg: runnerConfig,
+      lookupPolicyTier,
+      provider: resolvedProvider,
+      legacyModel,
+    });
+    resolvedModel = verifiedModel;
+    modelSource = verifiedSource === 'placement-policy'
+      ? { scope: 'placement-policy', id: `${resolvedProvider}.${lookupPolicyTier}` }
+      : { scope: 'runnerConfig', id: `${resolvedProvider}.${lookupPolicyTier}` };
   }
 
   // 5. Visibility Resolution
