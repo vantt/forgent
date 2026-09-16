@@ -1489,10 +1489,19 @@ export async function executeAssignment(assignment, opts = {}) {
 
   // Step 04 §5.1: pass concrete runDir so worker knows exactly where to write
   // agent-result.json and agent-report.md. Use absolute path to avoid worktree ambiguity.
+  // Phase 02 (executor-policy-dispatch-seams): thread the ALREADY-resolved
+  // persona (effectivePolicy.persona/provenance.persona, computed above by
+  // the same resolveAssignmentDispatchPolicy() every dispatch path shares)
+  // into the actual worker-visible prompt -- previously resolved but never
+  // delivered. Additive: `undefined` when no persona resolved, byte-identical
+  // to the pre-Phase-02 prompt for every such assignment.
   const prompt = renderAssignmentPrompt(effectiveAssignment, {
     cwd,
     runDir: path.resolve(runDir),
     effectiveContract,
+    ...(effectivePolicy.persona
+      ? { persona: { value: effectivePolicy.persona, source: effectivePolicy.provenance?.persona?.source ?? null } }
+      : {}),
   });
 
   // Step 04 §5.3: snapshot dirty state BEFORE the run so pre-existing dirty files

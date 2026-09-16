@@ -160,6 +160,44 @@ test('renderAssignmentPrompt formats prompt with references and outputs without 
   assert.match(prompt, /- findings if blocked/);
   // Without runDir, result artifact section should not appear
   assert.doesNotMatch(prompt, /Result artifact/);
+  // No persona resolved -> no persona section (Phase 02 additive no-op).
+  assert.doesNotMatch(prompt, /# Persona/);
+});
+
+// ─── Phase 02 (executor-policy-dispatch-seams): persona PromptEnvelope ─────
+
+test('renderAssignmentPrompt renders a # Persona section when options.persona is supplied, without disturbing existing sections', () => {
+  const assignment = buildAssignment({
+    workId: 'tsk-789',
+    stage: 'planning',
+    operation: 'validate-plan',
+    objective: 'Validate the plan against repo reality',
+  });
+
+  const prompt = renderAssignmentPrompt(assignment, {
+    persona: { value: 'code-reviewer', source: { scope: 'default', id: 'reviewer' } },
+  });
+
+  assert.match(prompt, /^Role: reviewer/m);
+  assert.match(prompt, /^Objective: Validate the plan against repo reality/m);
+  assert.match(prompt, /^# Persona$/m);
+  assert.match(prompt, /resolved persona "code-reviewer"/);
+});
+
+test('renderAssignmentPrompt omits the persona section when options.persona is absent or empty (byte-identical no-op)', () => {
+  const assignment = buildAssignment({
+    workId: 'tsk-790',
+    stage: 'planning',
+    operation: 'validate-plan',
+  });
+
+  const withoutOption = renderAssignmentPrompt(assignment);
+  const withUndefinedValue = renderAssignmentPrompt(assignment, { persona: { value: undefined } });
+  const withEmptyValue = renderAssignmentPrompt(assignment, { persona: { value: '   ' } });
+
+  assert.equal(withoutOption, withUndefinedValue);
+  assert.equal(withoutOption, withEmptyValue);
+  assert.doesNotMatch(withoutOption, /# Persona/);
 });
 
 // ─── Step 04 Tests ───────────────────────────────────────────────────────────

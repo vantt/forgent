@@ -663,6 +663,17 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options)
     : null;
 
+  // Phase 02 (executor-policy-dispatch-seams, design.md §3.4 PromptEnvelope):
+  // when dispatch policy resolved a persona, it must reach the worker-visible
+  // prompt, not just live in provenance. `options.persona` is additive --
+  // undefined for every pre-Phase-02 caller, so this is a byte-identical
+  // no-op unless a caller opts in. No native system-prompt slot exists in
+  // this prompt renderer yet, so delivery is always `section`: a clearly
+  // delimited block a worker cannot mistake for its own Objective/Role text.
+  const personaRef = options.persona && typeof options.persona.value === 'string' && options.persona.value.trim()
+    ? options.persona.value
+    : null;
+
   const lines = [
     `Assignment: ${assignment.assignmentId}`,
     `Work: ${assignment.workId || '(none)'}`,
@@ -671,6 +682,16 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     ...(taskSpecRelPath ? [`Task-spec: ${taskSpecRelPath}`] : []),
     `Objective: ${assignment.objective}`,
   ];
+
+  if (personaRef) {
+    lines.push(
+      '',
+      '# Persona',
+      `You are acting under the resolved persona "${personaRef}". Let this persona`,
+      'shape tone, emphasis, and judgment calls for this assignment, without',
+      'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+    );
+  }
 
   lines.push('Context refs:');
   if (assignment.contextRefs && assignment.contextRefs.length > 0) {
