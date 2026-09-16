@@ -39,6 +39,23 @@ export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './disp
 
 export { compileDispatchPlan } from './dispatch/plan.mjs';
 
+export {
+  ProviderCapacityConfigError,
+  rejectProjectProviderAccountInventory,
+  validateProviderAccountInventory,
+  providerAccountInventory,
+  hasProviderAccounts,
+  stableHash,
+  rankProviderAccounts,
+  acquireProviderAccountLease,
+  releaseProviderAccountLease,
+  quarantineProviderAccount,
+  clearProviderAccountQuarantine,
+  inspectProviderCapacity,
+  classifyProviderCapacityFault,
+  redactProviderCapacitySelection,
+} from './dispatch/provider-capacity.mjs';
+
 export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
 
 export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';

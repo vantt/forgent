@@ -6,7 +6,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const repo = path.resolve(new URL('../..', import.meta.url).pathname);
-function run(args) { return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], { cwd: repo, encoding: 'utf8' }); }
+function run(args, extra = {}) { return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], { cwd: repo, encoding: 'utf8', ...extra }); }
 function assignment(root, id) { const dir = path.join(root, '.fgos', 'assignments', id); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'assignment.json'), JSON.stringify({ assignmentId: id })); return dir; }
 function admission(root, id, runId) { const dir = path.join(root, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, '0000000001.json'), JSON.stringify({ runId, attempt: 1 })); }
 function materialize(root, id, runId, cwd, settled = false, attempt = '01') { const dir = path.join(root, '.fgos', 'assignments', id, 'runs', attempt); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'run.json'), JSON.stringify({ assignmentId: id, runId, ...(cwd ? { cwd } : {}) })); if (settled) fs.writeFileSync(path.join(dir, 'result.json'), JSON.stringify({ assignmentId: id, runId, status: 'done', confidence: 'reported' })); }
@@ -20,6 +20,35 @@ test('dispatch inspect projects only its typed selector and rejects zero or mult
   assert.equal(many.status, 4); assert.match(many.stderr, /exactly one selector/);
   const one = run(['dispatch', 'inspect', '--dir', root, '--run', 'run_a']);
   assert.equal(one.status, 0); assert.equal(JSON.parse(one.stdout).data.inspectionStatus, 'not-found');
+});
+
+test('dispatch inspect --provider-capacity reports redacted global account state', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-inspect-provider-home-'));
+  const fgosHome = path.join(home, '.fgos');
+  fs.mkdirSync(fgosHome, { recursive: true });
+  fs.writeFileSync(path.join(fgosHome, 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        'openai-codex': {
+          accounts: {
+            tetnu: {
+              label: 'Tetnu',
+              credentialSource: { kind: 'codex-home', home: path.join(home, 'codex-tetnu') },
+            },
+          },
+        },
+      },
+    },
+  }, null, 2));
+  const answer = run(['dispatch', 'inspect', '--provider-capacity'], { env: { ...process.env, HOME: home } });
+  assert.equal(answer.status, 0, answer.stderr);
+  const data = JSON.parse(answer.stdout).data;
+  const account = data.providers['openai-codex'].accounts.tetnu;
+  assert.equal(data.contract, 'provider-capacity-inspect.v1');
+  assert.equal(account.label, 'Tetnu');
+  assert.equal(account.credentialSource, undefined);
+  assert.equal(account.credentialHome, undefined);
+  assert.equal(account.quarantine, null);
 });
 
 test('public CLI routes run, assignment, and cwd selectors into the operation envelope', () => {

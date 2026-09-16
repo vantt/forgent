@@ -25,6 +25,10 @@ import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../../config/global-config.mjs';
 import { findExecutableOnPath } from '../../state/tool-registry.mjs';
+import {
+  rejectProjectProviderAccountInventory,
+  validateProviderAccountInventory,
+} from './provider-capacity.mjs';
 // EXECUTOR_ADAPTERS lives in ./transport.mjs (the adapter registry is a
 // transport-layer concern) but validateExecutorShape below still needs its
 // key set to validate a config-declared `adapter` name — same cross-module
@@ -264,6 +268,7 @@ export function loadRunnerConfigFromDir(dir) {
   } catch (err) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
+  rejectProjectProviderAccountInventory(parsed, sharedPath);
   const withGlobal = mergeWithGlobalConfig(parsed);
   const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
@@ -309,6 +314,7 @@ export function ensureRunnerConfigForDir(dir) {
 
   if (fs.existsSync(sharedPath)) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
+    rejectProjectProviderAccountInventory(parsed, sharedPath);
     const existingRunner = parsed.runner ?? {};
     // tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable —
     // either alone satisfies validateRunnerConfigShape's requirement, and
@@ -1168,6 +1174,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       `runner config (${sourceLabel}) must declare a "models" object mapping tier -> model, or a "modelPolicies" object mapping provider -> tier -> model (tsk-5tm-5 D9).`,
     );
   }
+  validateProviderAccountInventory(cfg, sourceLabel);
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);
   }

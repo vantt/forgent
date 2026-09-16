@@ -4,6 +4,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { invokeDispatchReconcileOperation, DispatchReconcileError } from '../../src/verbs/dispatch/reconcile.mjs';
+import {
+  providerCapacityStatePaths,
+  quarantineProviderAccount,
+} from '../../src/runner/dispatch/provider-capacity.mjs';
 
 // invokeDispatchReconcileOperation had zero direct tests before this file --
 // every prior test exercised planReconciliation/applyReconciliation
@@ -85,4 +89,89 @@ test('invokeDispatchReconcileOperation ignores a forged now/ttlMs in payload for
     payload: { apply: true, plan, now: '1970-01-01T00:00:00.000Z' },
   });
   assert.equal(applied.outcome, 'applied');
+});
+
+test('dispatch reconcile provider-capacity clear-quarantine validates global inventory and writes audit', () => {
+  const dir = root();
+  const globalConfigPath = path.join(dir, 'global-config.json');
+  const runtimeDir = path.join(dir, 'runtime');
+  const runnerConfig = {
+    runner: {
+      providers: {
+        'openai-codex': {
+          accounts: {
+            tetnu: {
+              label: 'Tetnu',
+              credentialSource: { kind: 'codex-home', home: path.join(dir, 'codex-tetnu') },
+            },
+          },
+        },
+      },
+    },
+  };
+  fs.writeFileSync(globalConfigPath, `${JSON.stringify(runnerConfig, null, 2)}\n`);
+
+  const ctx = { repoRoot: dir, actor: 'test-operator' };
+  const unknown = invokeDispatchReconcileOperation({
+    operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
+    payload: {
+      providerCapacity: {
+        action: 'clear-quarantine',
+        provider: 'openai-codex',
+        account: 'missing',
+        reason: 'token refreshed',
+        globalConfigPath,
+        runtimeDir,
+      },
+    },
+  });
+  assert.equal(unknown.status, 'refused');
+  assert.equal(unknown.reasonCode, 'unknown-account');
+
+  const notQuarantined = invokeDispatchReconcileOperation({
+    operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
+    payload: {
+      providerCapacity: {
+        action: 'clear-quarantine',
+        provider: 'openai-codex',
+        account: 'tetnu',
+        reason: 'token refreshed',
+        globalConfigPath,
+        runtimeDir,
+      },
+    },
+  });
+  assert.equal(notQuarantined.status, 'refused');
+  assert.equal(notQuarantined.reasonCode, 'not-quarantined');
+
+  quarantineProviderAccount({
+    runnerConfig,
+    provider: 'openai-codex',
+    accountId: 'tetnu',
+    reasonCode: 'auth-token-expired',
+    manualClear: true,
+    runtimeDir,
+    evidence: { runId: 'run_provider_capacity_clear_test' },
+  });
+
+  const cleared = invokeDispatchReconcileOperation({
+    operationId: 'dispatch.runtime.reconcile', effect: 'write', ctx,
+    payload: {
+      providerCapacity: {
+        action: 'clear-quarantine',
+        provider: 'openai-codex',
+        account: 'tetnu',
+        reason: 'token refreshed',
+        globalConfigPath,
+        runtimeDir,
+      },
+    },
+  });
+  assert.equal(cleared.status, 'cleared');
+  assert.equal(cleared.provider, 'openai-codex');
+  assert.equal(cleared.accountId, 'tetnu');
+  const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
+  assert.equal(state.providers['openai-codex'].accounts.tetnu.quarantine, null);
+  assert.equal(state.audit.at(-1).action, 'clear-quarantine');
+  assert.equal(state.audit.at(-1).actor, 'test-operator');
 });

@@ -29,6 +29,7 @@ const ALLOWED_REQUEST_KEYS = new Set([
   "backendId",
   "authorityScope",
   "assignmentLaunchContext",
+  "providerCapacity",
 ]);
 
 export function crossCheckAssignmentLaunchContext(launchContext, context = null) {
@@ -270,6 +271,7 @@ export function buildConfinementRequest({
   backendId = null,
   authorityScope = null,
   assignmentLaunchContext = null,
+  providerCapacity = null,
   dispatchId = null,
 } = {}) {
   const cap = capability || executorId || "(unknown-capability)";
@@ -411,6 +413,7 @@ export function buildConfinementRequest({
     backendId: backendId ?? cfg?.executors?.[execId]?.confinement?.backend ?? null,
     ...(authorityScope ? { authorityScope } : {}),
     ...(assignmentLaunchContext ? { assignmentLaunchContext } : {}),
+    ...(providerCapacity ? { providerCapacity } : {}),
   };
 
   return validateConfinementRequest(req);

@@ -106,6 +106,29 @@ test('buildEffectiveExecutionContract projects a well-formed read-only contract'
   assert.doesNotThrow(() => validateEffectiveExecutionContract(contract));
 });
 
+test('buildEffectiveExecutionContract records provider capacity without credential source or secrets', () => {
+  const contract = buildEffectiveExecutionContract({
+    assignment: validAssignment(),
+    dispatchPlan: validDispatchPlan(),
+    runId: 'run_provider_capacity_01',
+    runDir: '/tmp/runs/01',
+    cwd: '/tmp/test',
+    providerCapacity: {
+      provider: 'openai-codex',
+      accountId: 'tetcu72',
+      accountLabel: 'codex/tetcu72',
+      credentialProvisioned: false,
+      lease: { runId: 'run_provider_capacity_01', assignmentId: 'asgn_test_validate_001', pid: 123 },
+    },
+  });
+
+  assert.equal(contract.providerCapacity.provider, 'openai-codex');
+  assert.equal(contract.providerCapacity.accountId, 'tetcu72');
+  assert.equal(contract.providerCapacity.credentialProvisioned, false);
+  assert.equal(contract.providerCapacity.credentialSource, undefined);
+  assert.doesNotThrow(() => validateEffectiveExecutionContract(contract));
+});
+
 test('buildEffectiveExecutionContract projects mutating contract with writeScope in linked worktree', () => {
   const repoDir = mkTempDir();
   initGitRepo(repoDir);

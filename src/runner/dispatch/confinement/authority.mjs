@@ -1440,6 +1440,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       maxBuffer: request.context.maxBuffer || 10485760,
     },
     resourceBindings: resourceBindingsList,
+    ...(preparedConfinement?.providerCapacity ? { providerCapacity: preparedConfinement.providerCapacity } : {}),
     proof: {
       confinementPlanDigest: attestationPlanDigest,
       preparedAttestationDigest: computeSha256Digest(backendPlan),
@@ -1579,6 +1580,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       envelopePath: launchCommandPath,
       preparedInvocation: preparedInvocationRecord,
       preparedInvocationDigest,
+      providerCapacity: preparedConfinement?.providerCapacity || null,
       finalizationPath,
       finalizationDescriptor: finalizationDescBody,
     };
@@ -1648,6 +1650,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     envelopePath,
     preparedInvocation: preparedInvocationRecord,
     preparedInvocationDigest,
+    providerCapacity: preparedConfinement?.providerCapacity || null,
     finalizationPath,
     finalizationDescriptor: finalizationDescBody,
   };
@@ -1764,4 +1767,3 @@ export async function finalizeConfinementResources({
     descriptor: updatedDesc,
   };
 }
-

@@ -36,6 +36,8 @@ import {
   executorIdForWork,
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
+  validateProviderAccountInventory,
+  ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
@@ -521,6 +523,88 @@ test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a 
     }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('validateProviderAccountInventory accepts keyed global Codex accounts', () => {
+  const inventory = validateProviderAccountInventory({
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetcu72: {
+            label: 'codex/tetcu72',
+            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetcu72' },
+          },
+          tetnu: {
+            credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
+          },
+        },
+      },
+    },
+  }, 'global runner config');
+  assert.equal(inventory['openai-codex'].accounts.tetcu72.label, 'codex/tetcu72');
+  assert.equal(inventory['openai-codex'].accounts.tetnu.label, 'tetnu');
+});
+
+test('loadRunnerConfig rejects provider accounts declared as an array', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'provider-accounts-array.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+      providers: { 'openai-codex': { accounts: [] } },
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), ProviderCapacityConfigError);
+});
+
+test('loadRunnerConfig rejects provider account entries that declare placement policy', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'provider-account-placement.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+      providers: {
+        'openai-codex': {
+          accounts: {
+            tetnu: {
+              credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' },
+              model: 'gpt-5-codex',
+            },
+          },
+        },
+      },
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), /must not declare "model"/);
+});
+
+test('loadRunnerConfigFromDir rejects project-local provider account inventory before global merge', () => {
+  const repo = mkTempGitRepo();
+  fs.writeFileSync(
+    path.join(repo.fgosDir, 'config.json'),
+    JSON.stringify({
+      runner: {
+        executor: { command: 'claude', args: ['{prompt}'] },
+        modelPolicies: { claude: { standard: 'sonnet' } },
+        timeoutMs: 1000,
+        providers: {
+          'openai-codex': {
+            accounts: {
+              tetnu: { credentialSource: { kind: 'codex-home', home: '${HOME}/.codex-tetnu' } },
+            },
+          },
+        },
+      },
+    }),
+  );
+  assert.throws(() => loadRunnerConfigFromDir(repo.repoRoot), /global-only/);
+  fs.rmSync(repo.repoRoot, { recursive: true, force: true });
 });
 
 test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
