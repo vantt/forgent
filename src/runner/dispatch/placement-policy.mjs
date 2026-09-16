@@ -228,3 +228,55 @@ export function evaluatePlacementPolicyShadow({
     divergence: Object.freeze(divergence.map((d) => Object.freeze(d))),
   });
 }
+
+/**
+ * Phase 07 production binder, self-verifying. `buildPlacementPolicyCandidate`
+ * is proven identical to the legacy `modelForTier` formula for every
+ * canonical executor × work-tier pair this track's own matrix coverage
+ * proves (`test/runner/placement-policy-matrix-coverage.test.mjs`), but
+ * that proof only covers the executors THIS repo declares today -- never an
+ * arbitrary project's own custom executor. Trusting the new path
+ * unconditionally would risk a silent behavior change for exactly the
+ * configs this track never tested against.
+ *
+ * Real production call sites (`cli.mjs`'s `spawnWorker`/`executeExecutorCli`)
+ * call this with the model their OWN unchanged legacy formula already
+ * computed -- `legacyModel` is never recomputed here, so this function
+ * cannot itself introduce a second, drifting model-resolution algorithm.
+ * PlacementPolicy's candidate is used ONLY when it agrees with that legacy
+ * value; a genuine divergence (an untested/custom executor) falls back to
+ * the legacy value and is reported, never silently applied. The real spawn
+ * decision can therefore never regress relative to before this function
+ * existed, for any config, while still being PlacementPolicy-sourced for
+ * every case the matrix already proves.
+ *
+ * @param {object} params
+ * @param {object} params.cfg
+ * @param {string} params.executorId
+ * @param {string} [params.workTier]
+ * @param {string} params.legacyModel the model the caller's own unchanged
+ *   legacy formula already computed for this exact executorId/workTier
+ * @returns {{model: string, source: 'placement-policy'|'legacy', divergence: {executorId: string, workTier: string, legacyModel: string, placementModel: string}|null}}
+ */
+export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legacyModel }) {
+  if (!executorId) {
+    return { model: legacyModel, source: 'legacy', divergence: null };
+  }
+  let candidate;
+  try {
+    candidate = buildPlacementPolicyCandidate({ cfg, capabilityId: executorId, workTier });
+  } catch {
+    candidate = null;
+  }
+  if (!candidate) {
+    return { model: legacyModel, source: 'legacy', divergence: null };
+  }
+  if (candidate.model !== legacyModel) {
+    return {
+      model: legacyModel,
+      source: 'legacy',
+      divergence: Object.freeze({ executorId, workTier: workTier ?? null, legacyModel, placementModel: candidate.model }),
+    };
+  }
+  return { model: candidate.model, source: 'placement-policy', divergence: null };
+}
