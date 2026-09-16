@@ -28,6 +28,7 @@
 // represent current behavior before any config migration (a Phase 07/08
 // concern, out of scope here).
 
+import crypto from 'node:crypto';
 import { DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily, resolveExecutorAndOverrides } from './resolve.mjs';
 
@@ -279,4 +280,91 @@ export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legac
     };
   }
   return { model: candidate.model, source: 'placement-policy', divergence: null };
+}
+
+// ─── Phase 08 (executor-policy-dispatch-seams): read-only redirect executor
+// ranking/selection ────────────────────────────────────────────────────────
+//
+// `readOnlyExecutorRedirects` (assignment-runner.mjs) does EXECUTOR
+// selection among a declared candidate pool -- a different job than
+// buildPlacementPolicyCandidate's model/provider ranking above. Its
+// selection algorithm is a deterministic, assignment-seeded stable-hash
+// distribution across the pool (never a "prefer the best one" ranking),
+// so PlacementPolicy's equivalent here is its own dedicated function, not
+// a reuse of buildPlacementPolicyCandidate.
+//
+// This module still does not own the candidate POOL declaration itself --
+// `readOnlyExecutorRedirects` config remains the source of which executors
+// are even eligible (design.md §9: rewriting `.fgos/config.json` to a final
+// ExecutorProfile schema is out of scope for this whole track, not just
+// this phase). What moves to PlacementPolicy is the SELECTION algorithm
+// among that pool, self-verified against the legacy formula exactly like
+// Phase 07's resolveVerifiedPlacementModel.
+
+/**
+ * Deterministic index into a size-`size` pool from `seed`. BYTE-IDENTICAL
+ * to assignment-runner.mjs's own `stableIndex` -- deliberately duplicated
+ * rather than imported (assignment-runner.mjs already imports FROM this
+ * module; importing back would be circular), so any accidental drift
+ * between the two copies shows up immediately as a
+ * `resolveVerifiedRedirectExecutor` divergence, never silently.
+ */
+export function stablePoolIndex(seed, size) {
+  if (!Number.isInteger(size) || size <= 0) return 0;
+  const hash = crypto.createHash('sha256').update(String(seed)).digest();
+  return hash.readUInt32BE(0) % size;
+}
+
+/**
+ * PlacementPolicy's own read-only redirect selection: filter the declared
+ * candidate pool to admissible entries (not the source executor itself,
+ * and actually registered), then pick deterministically by `seed`. Returns
+ * `sourceExecutorId` unchanged when nothing is admissible -- same
+ * "no candidate, no redirect" fallback the legacy function already uses.
+ */
+export function selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool, seed }) {
+  const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  const admissible = (Array.isArray(candidatePool) ? candidatePool : [])
+    .filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
+  if (admissible.length === 0) return sourceExecutorId;
+  return admissible[stablePoolIndex(seed, admissible.length)];
+}
+
+/**
+ * Phase 08 production binder, self-verifying -- same safety posture as
+ * Phase 07's `resolveVerifiedPlacementModel`. The caller's own UNCHANGED
+ * legacy selection (`legacyExecutorId`, already computed by
+ * `selectReadOnlyRedirectExecutor`) is never recomputed here. PlacementPolicy's
+ * own selection is used ONLY when it agrees; a genuine divergence (a bug in
+ * this module, or a future drift between the two stable-hash copies) falls
+ * back to the legacy value and is reported, never silently applied. Because
+ * both algorithms are the SAME deterministic formula over the SAME pool,
+ * they are expected to agree for every real config -- this wrapper exists
+ * as defense-in-depth, not because disagreement is expected.
+ *
+ * @param {object} params
+ * @param {object} params.cfg
+ * @param {string} params.sourceExecutorId
+ * @param {string[]} params.candidatePool the SAME pool
+ *   `readOnlyRedirectCandidates` already computed for this call
+ * @param {string} params.seed the SAME seed string the legacy
+ *   `stableIndex` call already used (`${operation}:${assignmentId}`)
+ * @param {string} params.legacyExecutorId what `selectReadOnlyRedirectExecutor`
+ *   already computed for this exact input
+ */
+export function resolveVerifiedRedirectExecutor({ cfg, sourceExecutorId, candidatePool, seed, legacyExecutorId }) {
+  let placementExecutorId;
+  try {
+    placementExecutorId = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool, seed });
+  } catch {
+    return { executorId: legacyExecutorId, source: 'legacy', divergence: null };
+  }
+  if (placementExecutorId !== legacyExecutorId) {
+    return {
+      executorId: legacyExecutorId,
+      source: 'legacy',
+      divergence: Object.freeze({ sourceExecutorId, candidatePool: Object.freeze([...candidatePool]), legacyExecutorId, placementExecutorId }),
+    };
+  }
+  return { executorId: placementExecutorId, source: 'placement-policy', divergence: null };
 }

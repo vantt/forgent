@@ -59,6 +59,7 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
+import { resolveVerifiedRedirectExecutor } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -250,10 +251,33 @@ function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
 
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  const candidates = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment)
-    .filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
-  if (candidates.length === 0) return sourceExecutorId;
-  return candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+  const rawPool = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment);
+  const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
+  const legacyExecutorId = candidates.length === 0
+    ? sourceExecutorId
+    : candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+  // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
+  // binder for redirect EXECUTOR selection, self-verifying -- same safety
+  // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
+  // is UNCHANGED, always computed first; PlacementPolicy's own selection
+  // (placement-policy.mjs's resolveVerifiedRedirectExecutor) is used only
+  // when it agrees, so a real dispatch can never regress. `rawPool` (before
+  // the admissibility filter above) is passed through -- the verified
+  // resolver does its own identical filtering internally, mirroring exactly
+  // what this function's own `candidates` line already does.
+  const { executorId: verifiedExecutorId, divergence: placementDivergence } = resolveVerifiedRedirectExecutor({
+    cfg,
+    sourceExecutorId,
+    candidatePool: rawPool,
+    seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`,
+    legacyExecutorId,
+  });
+  if (placementDivergence) {
+    process.stderr.write(
+      `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
+    );
+  }
+  return verifiedExecutorId;
 }
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {

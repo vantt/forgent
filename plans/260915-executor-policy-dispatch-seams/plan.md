@@ -91,16 +91,33 @@ work; same-provider account rotation is no longer owned by this track.
 | pre-05 gates | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `63cf7e5e` | Self-verified only: H1/H2/H5 confirmed real via direct code inspection + regression test reproducing genuine refusal/quarantine/redirect scenarios end to end (not stubs); H3 verified already correct in slice-1 (`ec6a0745`) via existing green test, no change made; 486/486 across every account-rotator-related test file, 2945/2947 `test/runner/` (same 2 pre-existing) | None found | `test/runner/provider-capacity.test.mjs`, `test/runner/assignment-dispatch.test.mjs`, commit `63cf7e5e` |
 | 05 | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `fa34fa69` | Self-verified only: 12/12 targeted (`placement-policy.test.mjs`), including both real Phase 00 baseline proof cases (agy-cli/agy-herdr heavy, fgos-coding-implement heavy) reproduced exactly against a fixture mirroring the live `.fgos/config.json` shapes, 660/660 phase-mandated command, 2958/2960 `test/runner/` (same 2 pre-existing) | Two real bugs found and fixed while proving the shadow module against the real config (dual-source rigorOverrides precedence gap; invocations[]-shaped-executor provider-family gap) — both were caught BEFORE any test was written, by the equivalence proof itself, then each got a dedicated regression test | `test/runner/placement-policy.test.mjs`, commit `fa34fa69` |
 | 06 | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `3f7cdef8` | Self-verified only: 10/10 targeted (`executor-profile-warnings.test.mjs`), 590/590 `test/setup/`, full `npm test` gate: 56 failures, byte-identical failing-test-name set to Phase 04's own full-suite gate run — zero new, zero fixed (rust-host + the same 2 pre-existing) | None found; found a real, currently-true stale-config finding while proving the check against live config (`codex-bwrap` still declares the retired `FGOS_CODEX_CREDENTIAL_HOMES` env var) — left as a correctly-surfaced doctor warning, not fixed (config data, out of this track's scope) | `test/setup/executor-profile-warnings.test.mjs`, `docs/specs/runner.md`'s new ExecutorProfile/Invocation section, commit `3f7cdef8` |
+| 07 | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `3d64a6be` (matrix coverage proof), `aecf7d0a` (production binder) | Self-verified only, with an explicit user go-ahead obtained before implementing the production flip (the first phase in this track that changes real spawn behavior, not just shadow evidence). Matrix proof: 39/39 canonical executor×tier pairs agree exactly between PlacementPolicy and legacy, zero divergence. Binder design: self-verifying (`resolveVerifiedPlacementModel`) — the caller's own unchanged legacy formula is always computed first; PlacementPolicy's candidate is used ONLY when it agrees, so the real spawn decision cannot regress for any config, proven or not. Full `npm test` gate: failing-test-name set byte-identical to Phase 06's own gate run — zero new, zero fixed | None found; `resolveAssignmentDispatchPolicy`'s own separate model-resolution world (Phase 04's `lookupPolicyTier`, a different vocabulary from `modelForTier`'s work-tier world) deliberately left untouched — unifying it needs its own vocabulary-bridging design this phase did not scope | `test/runner/placement-policy-matrix-coverage.test.mjs`, commits `3d64a6be`/`aecf7d0a` |
+| 08 | `executor-policy-dispatch-seams--implementation` (2026-09-16) | `<pending>` | Self-verified only, with an explicit user go-ahead obtained before implementing (the second production-behavior change in this track). New `resolveVerifiedRedirectExecutor`/`selectPlacementPolicyRedirectExecutor`/`stablePoolIndex` in `placement-policy.mjs`, same self-verifying pattern as Phase 07. Proof: `stablePoolIndex` agrees byte-for-byte with an independently-reproduced copy of the legacy `stableIndex` formula across many seeds/pool sizes; the real live single-candidate redirect (`claude -> codex-bwrap`) reproduces exactly; a synthetic 3-candidate pool distributes identically to legacy across 200 distinct seeds (not a trivial always-same-answer coincidence — genuinely touches multiple candidates); a synthetic divergence correctly falls back and is reported. Full `npm test` gate: pending | Compatibility decision (see below) | `test/runner/placement-policy-redirect-selection.test.mjs`, commit `<pending>` |
 
-Phases 00–06 and all four pre-Phase-05 runtime gates (H1/H2/H3/H5) are done.
-Phase 07 (PlacementPolicy production binder) and Phase 08 (legacy placement
-retirement) remain. Phase 07 is qualitatively different from every phase
-above: it is the first to change real production binding rather than add
-shadow-mode evidence, and its own exit criteria require full matrix-coverage
-proof (every executor × tier, read-only/mutating, confined/unconfined,
-capacity refusal with/without fallback, disallowed provider/executor,
-tool/MCP not-applicable) before promotion — see "Phases" table above for its
-full exit bar.
+**Phase 08 compatibility decision** (its own exit criteria: "`readOnlyExecutorRedirects`
+is retired or marked ignored with a removal warning, depending on compatibility
+decision"): the config field is **not** retired or deprecated in this phase —
+it remains the declared candidate-pool source, config schema unchanged
+(consistent with design.md §9's explicit out-of-scope declaration for config
+migration, which applies to the whole track, not just this phase). What is
+retired is the standalone, unverified static *selection algorithm*:
+`selectReadOnlyRedirectExecutor` no longer independently decides the executor
+— it computes the legacy value only as the safety-net input to
+PlacementPolicy's self-verified selection, which is now the real production
+authority for picking among the declared pool. "No production path depends
+on a static read-only redirect pool" is satisfied for the *selection* step;
+the *pool declaration* step remains config-driven, honestly, pending a later
+track's config-schema migration.
+
+Phases 00–08 and all four pre-Phase-05 runtime gates (H1/H2/H3/H5) are done.
+Phase 07 and Phase 08 both required an explicit user go-ahead before
+implementation, since both change real production dispatch behavior rather
+than add shadow-mode evidence — every phase before them was provably a no-op
+for existing callers, verifiable by unit tests alone. Both used the same
+self-verifying pattern: the legacy formula is always computed first and
+never removed; PlacementPolicy's value is used only when it agrees, so
+neither change can regress behavior for a config outside this track's own
+proven matrix.
 
 Mechanical-gate rule applies: any diff touching `src/runner/dispatch/**`,
 `src/runner/coordination/**`, `src/verbs/coordination/**`,
