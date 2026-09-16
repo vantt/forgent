@@ -2,7 +2,7 @@
 
 **Track:** `test-suite-feedback-cost`
 
-**Status:** P00-P04 complete on track; P05 next
+**Status:** P00-P04 and P06 complete on track; P07 next; P05 still planned
 
 **Date:** 2026-09-15
 
@@ -86,8 +86,9 @@ P00 -> P01 -> P02 -> P03 -> P04 -> P05 -> P06 -> P07 -> P08
 
 P00 and P01 repair independent defects but remain sequential in this track so
 their full-suite runs do not compete for machine resources. P02 locks the common
-baseline. P03-P06 stay sequential for attributable timing. P07 audits the
-remaining harness cost without mutating it. P08 is evidence-only.
+baseline. P03-P06 stay sequential for attributable timing. P06 was intentionally
+advanced before P05 by operator prioritization to reduce CLI fixture cost sooner;
+P07 audits the remaining harness cost without mutating it. P08 is evidence-only.
 
 ## Phase Index
 
@@ -99,8 +100,8 @@ remaining harness cost without mutating it. P08 is evidence-only.
 | P03 | complete on track | [phase-03-docs-index-pilot.md](phase-03-docs-index-pilot.md) | docs-index state-fixture pilot recorded `expand` in [reports/docs-index-pilot.md](reports/docs-index-pilot.md) |
 | P04 | complete on track | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | external-Claude isolation pilot recorded `expand` in [reports/external-claude-pilot.md](reports/external-claude-pilot.md) |
 | P05 | planned | [phase-05-related-test-selector-pilot.md](phase-05-related-test-selector-pilot.md) | shadow-evaluated conservative selector |
-| P06 | planned | [phase-06-cli-fixture-init-pilot.md](phase-06-cli-fixture-init-pilot.md) | measured fixture strategy verdict |
-| P07 | planned | [phase-07-cli-harness-responsibility-audit.md](phase-07-cli-harness-responsibility-audit.md) | complete harness cost/responsibility map and two bounded candidates |
+| P06 | complete on track | [phase-06-cli-fixture-init-pilot.md](phase-06-cli-fixture-init-pilot.md) | CLI fixture init pilot recorded `expand` in [reports/fixture-init-pilot.md](reports/fixture-init-pilot.md) |
+| P07 | next | [phase-07-cli-harness-responsibility-audit.md](phase-07-cli-harness-responsibility-audit.md) | complete harness cost/responsibility map and two bounded candidates |
 | P08 | planned | [phase-08-evidence-decision-and-handoff.md](phase-08-evidence-decision-and-handoff.md) | accepted/rejected/deferred follow-up map |
 
 ## Track-Wide Invariants

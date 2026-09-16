@@ -44,11 +44,11 @@ import {
   fs,
   gitAtCwd,
   gitHead,
-  initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
-  initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
-  initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -77,7 +77,8 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFast,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -96,15 +97,40 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
+test('P06 fixture pilot: in-process initialized cwd preserves the CLI-ready store shape', () => {
+  const cwd = tmpCwdFast();
+  assert.ok(fs.existsSync(path.join(cwd, '.fgos')), 'fixture must create .fgos/');
+  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), '', 'fresh fixture event log starts empty');
+  assert.deepEqual(Object.keys(stateView(cwd).work), [], 'fresh fixture view has no work');
+  const manifest = JSON.parse(fs.readFileSync(coexistPath(cwd), 'utf8'));
+  assert.equal(manifest.v, 1);
+  assert.equal(manifest.territory.data, '.fgos/');
+
+  const result = run(cwd, ['list']);
+  assert.equal(result.status, 0, result.stderr);
+});
+
+
+test('P06 fixture pilot: template-copy cwd is a fresh copy, not shared mutable state', () => {
+  const first = tmpCwdFromTemplate();
+  const second = tmpCwdFromTemplate();
+  addOk(first, 'template-copy-only-first');
+
+  assert.equal(stateView(first).work['template-copy-only-first'].id, 'template-copy-only-first');
+  assert.equal(stateView(second).work['template-copy-only-first'], undefined, 'template state must not leak between cases');
+  assert.deepEqual(JSON.parse(fs.readFileSync(coexistPath(first), 'utf8')), JSON.parse(fs.readFileSync(coexistPath(second), 'utf8')));
+});
+
+
 test('review on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['review', 'ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('review on a non-proposed item is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'not-proposed-review');
   const result = run(cwd, ['review', 'not-proposed-review']);
   assert.equal(result.status, 2);
@@ -112,8 +138,7 @@ test('review on a non-proposed item is rejected as precondition, exit 2', () => 
 
 
 test('review of a runner-source proposed item prints the branch diff and no warnings, exit 0', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'review-runner-item');
 
   const result = run(cwd, ['review', 'review-runner-item']);
@@ -127,8 +152,7 @@ test('review of a runner-source proposed item prints the branch diff and no warn
 
 
 test('review of a pull-door proposed item prints the headAtTake..headAtReturn diff, exit 0', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'review-pull-item', { verify: 'test -f proof.txt' });
   run(cwd, ['take', '--id', 'review-pull-item']);
   commitFile(cwd, 'proof.txt');
@@ -144,7 +168,7 @@ test('review of a pull-door proposed item prints the headAtTake..headAtReturn di
 
 
 test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) degrades honestly — a warning, no throw, exit 0 (must_have: legacy degrade)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'review-legacy-item');
   run(cwd, ['move', 'review-legacy-item', '--to', 'doing']);
   run(cwd, ['move', 'review-legacy-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -158,8 +182,7 @@ test('review of a legacy proposed item (no branch, no headAtTake/headAtReturn) d
 
 
 test('review of a leaf proposed item diffs against its resolved root branch (fgw/<root>), not main', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedLeafItem(cwd, 'review-leaf-root', 'review-leaf-child', { rootDivergesFromMain: true });
 
   const result = run(cwd, ['review', 'review-leaf-child']);
@@ -172,8 +195,7 @@ test('review of a leaf proposed item diffs against its resolved root branch (fgw
 
 
 test('review of a root proposed item is unchanged — still diffs against main (regression)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'review-root-regression-item');
 
   const result = run(cwd, ['review', 'review-root-regression-item']);
@@ -185,16 +207,14 @@ test('review of a root proposed item is unchanged — still diffs against main (
 
 
 test('sync-root on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   const result = run(cwd, ['sync-root', 'sync-root-ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('sync-root on a root with no fgw/<id> branch is rejected as validation, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'sync-root-no-branch', { verify: 'true' });
   const result = run(cwd, ['sync-root', 'sync-root-no-branch']);
   assert.equal(result.status, 4);
@@ -203,8 +223,7 @@ test('sync-root on a root with no fgw/<id> branch is rejected as validation, exi
 
 
 test('sync-root happy path: merges fgw/<root> into main, root item status/stage UNCHANGED, fgw/<root> survives (not deleted)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-happy', { verify: `test -f sync-root-happy-produced.txt` });
   commitPendingBeforeApprove(cwd, 'sync-root-happy');
 
@@ -226,8 +245,7 @@ test('sync-root happy path: merges fgw/<root> into main, root item status/stage 
 
 
 test('sync-root records a real decision on the root item', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-decision', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-decision');
 
@@ -250,8 +268,7 @@ test('sync-root records a real decision on the root item', () => {
 // verb. Asserted end to end, on the decision the real verb actually wrote,
 // because the gate itself was never the defective half.
 test('sync-root tags its decision as engine bookkeeping, so it cannot satisfy the retrospective gate', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-engine-kind', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-engine-kind');
 
@@ -270,8 +287,7 @@ test('sync-root tags its decision as engine bookkeeping, so it cannot satisfy th
 
 
 test('sync-root nested: a root with a parent merges into fgw/<parentId>, not main; main stays untouched; the child root\'s status stays unchanged', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // grandroot (target for the nested sync) is itself a plain root with a
   // real branch but no drift of its own.
   const dir = path.join(cwd, '.fgos');
@@ -310,8 +326,7 @@ test('sync-root nested: a root with a parent merges into fgw/<parentId>, not mai
 
 
 test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte unchanged, root status untouched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-conflict', { verify: 'true' });
   // Create a conflicting change on main AFTER the root branch forked, on
   // the exact same path the root's own commit touches.
@@ -333,8 +348,7 @@ test('sync-root aborts cleanly on a genuine conflict: main left byte-for-byte un
 
 
 test('sync-root on a no-parent root refuses when the shared main checkout carries an uncommitted change on a path the root itself touches, exit 4, no merge lands (tsk-66t)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-dirty', { verify: 'true' });
   // sync-root-dirty-produced.txt IS in this root's own fgw/sync-root-dirty
   // diff (makeDriftedRoot committed it there) — re-dirtying that SAME path
@@ -356,8 +370,7 @@ test('sync-root on a no-parent root refuses when the shared main checkout carrie
 
 
 test('sync-root refuses from inside a linked worktree (must land on the real main checkout)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-worktree-guard', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-worktree-guard');
 
@@ -385,8 +398,7 @@ test('sync-root refuses from inside a linked worktree (must land on the real mai
 // never changes the root item's own status.
 
 test('sync-root of a root whose diff touches a self-modifying-capable module REFUSES without --acknowledge-iron-law: exit 4, root status untouched, no merge', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'sync-root-iron-refuse', title: 'Title sync-root-iron-refuse', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'test -f src/runner/probe.mjs' });
   commitPending(cwd, 'state: add sync-root-iron-refuse');
@@ -419,8 +431,7 @@ test('sync-root of a root whose diff touches a self-modifying-capable module REF
 
 
 test('sync-root of a root whose staged merge fails its own verify: outcome blocked reason verify-fail, root status untouched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-verify-fail', { verify: 'test -f file-never-produced.txt' });
   commitPendingBeforeApprove(cwd, 'sync-root-verify-fail');
 
@@ -440,8 +451,7 @@ test('sync-root of a root whose staged merge fails its own verify: outcome block
 
 
 test('promote-to-component requires at least 2 ids, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-solo-a');
 
   const result = run(cwd, ['promote-to-component', '--ids', 'ptc-solo-a', '--root-title', 'Component solo']);
@@ -451,8 +461,7 @@ test('promote-to-component requires at least 2 ids, exit 4', () => {
 
 
 test('promote-to-component on a nonexistent member id is rejected as validation, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-real-a');
 
   const result = run(cwd, ['promote-to-component', '--ids', 'ptc-real-a,ptc-ghost', '--root-title', 'Component ghost']);
@@ -462,8 +471,7 @@ test('promote-to-component on a nonexistent member id is rejected as validation,
 
 
 test('promote-to-component refuses a member that already has a parent, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-sibling');
   makeFlatMember(cwd, 'ptc-already-parented', { deps: ['ptc-sibling'] });
   editWork(path.join(cwd, '.fgos'), { id: 'ptc-already-parented', patch: { parent: 'some-other-root' } });
@@ -476,8 +484,7 @@ test('promote-to-component refuses a member that already has a parent, exit 4', 
 
 
 test('promote-to-component refuses ids that are not connected via deps/mergeAfter, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-disconnected-a');
   makeFlatMember(cwd, 'ptc-disconnected-b');
 
@@ -488,8 +495,7 @@ test('promote-to-component refuses ids that are not connected via deps/mergeAfte
 
 
 test('promote-to-component happy path (D1 new-item): creates a fresh root, merges both members into it, sets parent only after real success, records one decision', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   registerFlatMember(cwd, 'ptc-new-root-a');
   registerFlatMember(cwd, 'ptc-new-root-b', { deps: ['ptc-new-root-a'] });
   commitPending(cwd, 'state: setup ptc-new-root members');
@@ -527,8 +533,7 @@ test('promote-to-component happy path (D1 new-item): creates a fresh root, merge
 
 
 test('promote-to-component happy path (D1 reuse-member): promotes an existing member to root, root itself is skipped not merged', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // Connectivity edge direction matters here: buildUnifiedAdjacency
   // (src/state/dep-graph.mjs) adds parent -> child for a `parent` edge and
   // id -> target for both `deps` and `mergeAfter` — the SAME direction.
@@ -562,8 +567,7 @@ test('promote-to-component happy path (D1 reuse-member): promotes an existing me
 
 
 test('promote-to-component reports merged-parent-rejected (never crashes) when the real git merge succeeds but setting parent would close a deps+parent cycle', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   registerFlatMember(cwd, 'ptc-cycle-root');
   // deps (not mergeAfter) deliberately: ptc-cycle-other depends on the very
   // item this test promotes to root, so setting ptc-cycle-other.parent =
@@ -597,8 +601,7 @@ test('promote-to-component reports merged-parent-rejected (never crashes) when t
 
 
 test('promote-to-component bails a conflicting member without setting its parent, still processes and merges the rest', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
 
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'ptc-conflict-b', title: 'Title conflict b', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
@@ -646,8 +649,7 @@ test('promote-to-component bails a conflicting member without setting its parent
 
 
 test('review --github on a legacy (non-runner) item is a validation error, no state change, and no gh call is attempted', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeLegacyProposedItem(cwd, 'gh-review-legacy');
   const marker = path.join(cwd, 'gh-was-called');
   const fake = writeMarkerFake(cwd, marker);
@@ -661,8 +663,7 @@ test('review --github on a legacy (non-runner) item is a validation error, no st
 
 
 test('review --github on a runner item pushes the branch and opens a PR via a real subprocess-injected fake gh, reports the PR number, and never mutates FSM state', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-review-ok');
   addBareOrigin(cwd);
   const ghLog = path.join(cwd, 'gh-invocations.log');
@@ -686,8 +687,7 @@ test('review --github on a runner item pushes the branch and opens a PR via a re
 
 
 test('review --github reports a gh failure as plain output with no state mutation (read-only contract holds on the blocked path)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-review-blocked');
   addBareOrigin(cwd);
   const fake = writeAuthFailFake(cwd);
@@ -712,8 +712,7 @@ test('review --github reports a gh failure as plain output with no state mutatio
 // the same subprocess-injected fake; no real gh binary, no network call.
 
 test('review --github --pr on a legacy (non-runner) item is the same runner-sourced validation error as without --pr, and no gh call is attempted', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeLegacyProposedItem(cwd, 'gh-status-legacy');
   const marker = path.join(cwd, 'gh-was-called');
   const fake = writeMarkerFake(cwd, marker);
@@ -726,8 +725,7 @@ test('review --github --pr on a legacy (non-runner) item is the same runner-sour
 });
 
 test('review --github --pr on a still-open PR (closed:false) reports it is open and mutates neither FSM state nor friction', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-status-open');
   const ghLog = path.join(cwd, 'gh-view.log');
   const fake = writeViewFake(cwd, 'gh-view-open.cjs', ghLog,
@@ -746,8 +744,7 @@ test('review --github --pr on a still-open PR (closed:false) reports it is open 
 });
 
 test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it merged, informational only, with no local state or friction change', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-status-merged');
   const ghLog = path.join(cwd, 'gh-view.log');
   const fake = writeViewFake(cwd, 'gh-view-merged.cjs', ghLog,
@@ -766,8 +763,7 @@ test('review --github --pr on a merged PR (closed:true, mergedAt set) reports it
 });
 
 test('review --github --pr on a closed-without-merge PR names the PR, points to fgos reject, mutates nothing, and resolves in exactly one gh invocation with mergeable UNKNOWN — proving pollTimeoutMs:0', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-status-closed');
   const ghLog = path.join(cwd, 'gh-view.log');
   // mergeable:"UNKNOWN" is the honest test: were pollTimeoutMs the default 10s
@@ -796,8 +792,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
 });
 
 test('review --github --pr reports a gh status-check failure as plain output with no state mutation or friction', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'gh-status-failed');
   const fake = writeAuthFailFake(cwd);
 
@@ -814,8 +809,7 @@ test('review --github --pr reports a gh status-check failure as plain output wit
 // --- tsk-4j9-3: `fgos merge list` (merge-readiness ranking) ---------------
 
 test('merge list: unknown sub-verb is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['merge', 'bogus']);
   assert.equal(result.status, 4);
 });
@@ -857,8 +851,7 @@ test('merge next run from inside a linked worktree without --dir is refused, exi
 });
 
 test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no event appended', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
@@ -867,8 +860,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
 });
 
 test('merge list: a proposed item whose dep is already done is ready', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   // Built explicitly (not via toCompoundLearn/addOk) so --verify is a
   // trivially-passing command: addOk's default ('npm test') has no
   // package.json to run against in this bare sandbox, so approve would
@@ -897,8 +889,7 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'dep').status, 0); // stays todo
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
@@ -914,8 +905,7 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'a');
@@ -928,16 +918,14 @@ test('merge list: two dep-clear proposed items sharing a footprint are excluded 
 // --- tsk-4j9-4: `fgos merge next` (merge-readiness automation) -----------
 
 test('merge next on an empty store: reports nothing ready, exit 0, no merge attempted', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), { picked: null, reason: 'nothing ready to merge' });
 });
 
 test('merge next merges the single ready item by recursing into approve, item reaches done', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   // Explicit --verify true (not addOk's 'npm test' default) -- same
   // sandbox pitfall documented in docs/how-to/add-a-read-only-fgos-verb-
   // and-plugin-skill.md.
@@ -954,8 +942,7 @@ test('merge next merges the single ready item by recursing into approve, item re
 });
 
 test('merge next picks the higher-ranked (mvp goalTier) item first when two are ready', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   for (const id of ['plain', 'important']) {
     assert.equal(run(cwd, ['add', id, '--title', id, '--kind', 'task', '--risk', 'light', '--verify', 'true', '--description', 'tsk-535 fixture description.', ...(id === 'important' ? ['--goal-tier', 'mvp'] : [])]).status, 0);
     // tsk-40m: no real claim needed (no branch) -- straight todo -> awaiting-approval.
@@ -977,8 +964,7 @@ test('merge next picks the higher-ranked (mvp goalTier) item first when two are 
 // a turn").
 
 test('merge next on a SOLE ready item that trips the Iron Law: skips it without attempting a merge, never auto-acknowledges', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
@@ -999,8 +985,7 @@ test('merge next on a SOLE ready item that trips the Iron Law: skips it without 
 });
 
 test('merge next with one Iron-Law-required ready item AND one ordinary ready item: skips the first, picks and merges the other (the core acceptance criterion)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
@@ -1019,8 +1004,7 @@ test('merge next with one Iron-Law-required ready item AND one ordinary ready it
 });
 
 test('merge next --acknowledge-iron-law forwarded by the caller: the picker does not pre-skip -- the flag applies to whichever item is picked, exactly as before', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'iron-next-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
@@ -1036,8 +1020,7 @@ test('merge next --acknowledge-iron-law forwarded by the caller: the picker does
 // merge-next-auto-sync-root/) -----------------------------------------------
 
 test('merge next with nothing ready and no blockedOnSync candidate: unchanged shape, no syncRoot key at all (zero behavior change, D1)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['merge', 'next']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -1046,8 +1029,7 @@ test('merge next with nothing ready and no blockedOnSync candidate: unchanged sh
 });
 
 test('merge next auto-syncs a blockedOnSync root before giving up: drift clears, the now-ready item merges to delivered (tsk-173 D1)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'auto-sync-happy', { verify: 'test -f auto-sync-happy-produced.txt' });
   // driftStatus's own findRootIds only tracks ids that are some OTHER
   // item's `parent` -- a childless root is invisible to it, so it would
@@ -1068,8 +1050,7 @@ test('merge next auto-syncs a blockedOnSync root before giving up: drift clears,
 });
 
 test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine conflict: picked is the root id (never null), blocked, main untouched (tsk-173 D1/D2)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'auto-sync-conflict', { verify: 'true' });
   // Same collision shape as the direct sync-root conflict test above: an
   // unrelated main commit on the exact path the root's own commit touches.
@@ -1100,8 +1081,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a genuine 
 });
 
 test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty main checkout: picked is the root id (never null), blocked: dirty-tree, main untouched (tsk-66t)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'auto-sync-dirty', { verify: 'true' });
   // See auto-sync-happy above: driftStatus only tracks ids that are some
   // other item's `parent`.
@@ -1135,8 +1115,7 @@ test('merge next on a blockedOnSync root whose sync-root attempt hits a dirty ma
 });
 
 test('merge next --no-wait fails immediately on a live-held lock -- proves the flag actually forwards into approve (bin/fgos.mjs:1152), not just documented as if it did', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'wait-merge-next-no-wait', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
@@ -1154,8 +1133,7 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-blocked-other', { verify: 'true' });
 
   // Simulate another item's in-progress/abandoned merge already staged on
@@ -1191,8 +1169,7 @@ test('sync-root never reports outcome "synced" when mergeRunnerItem returns an o
 });
 
 test('sync-root outcome guard catches merge-failed-unclassified and records unhandled-outcome friction (tsk-12o)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-merge-failed', { verify: 'true' });
 
   // tsk-18a D1: `git merge --no-commit --no-ff` can fail WITHOUT ever
@@ -1255,8 +1232,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
 });
 
 test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
 
   const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
   const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
@@ -1292,8 +1268,7 @@ test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-
 });
 
 test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (tsk-4uj)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-trust-dir', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-trust-dir');
 
@@ -1310,8 +1285,7 @@ test('sync-root --trust-dir with --dir succeeds from inside a linked worktree (t
 });
 
 test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-4uj)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeDriftedRoot(cwd, 'sync-root-trust-dir-noop', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'sync-root-trust-dir-noop');
 
@@ -1327,8 +1301,7 @@ test('sync-root --trust-dir WITHOUT --dir is a no-op -- still refuses from insid
 });
 
 test('promote-to-component refuses from inside a linked worktree (must land on the real main checkout)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-worktree-guard-a');
   makeFlatMember(cwd, 'ptc-worktree-guard-b', { deps: ['ptc-worktree-guard-a'] });
 
@@ -1344,8 +1317,7 @@ test('promote-to-component refuses from inside a linked worktree (must land on t
 });
 
 test('promote-to-component --trust-dir with --dir succeeds from inside a linked worktree (tsk-2bg)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   registerFlatMember(cwd, 'ptc-trust-dir-a');
   registerFlatMember(cwd, 'ptc-trust-dir-b', { deps: ['ptc-trust-dir-a'] });
   commitPending(cwd, 'state: setup ptc-trust-dir members');
@@ -1370,8 +1342,7 @@ test('promote-to-component --trust-dir with --dir succeeds from inside a linked 
 });
 
 test('promote-to-component --trust-dir WITHOUT --dir is a no-op -- still refuses from inside a linked worktree (tsk-2bg)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeFlatMember(cwd, 'ptc-trust-dir-noop-a');
   makeFlatMember(cwd, 'ptc-trust-dir-noop-b', { deps: ['ptc-trust-dir-noop-a'] });
 

@@ -16,12 +16,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild } from '../../../src/state/store.mjs';
+import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../../src/state/events.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
+import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -74,6 +75,40 @@ function rawTmpCwd() {
 function tmpCwd() {
   const cwd = rawTmpCwd();
   assert.equal(run(cwd, ['init']).status, 0, 'tmpCwd(): "fgos init" failed to bootstrap .fgos/');
+  return cwd;
+}
+
+function initFgosFixtureInProcess(cwd) {
+  const dir = path.join(cwd, '.fgos');
+  initStore(dir);
+  try {
+    writeCoexistenceManifest(cwd, dir);
+  } catch {
+    // Mirrors fgos init's fail-safe: coexistence detection must never make a
+    // ready store unavailable to tests that are not proving init itself.
+  }
+  return cwd;
+}
+
+function tmpCwdFast() {
+  return initFgosFixtureInProcess(rawTmpCwd());
+}
+
+let fgosTemplateDir = null;
+
+function fgosTemplateSourceDir() {
+  if (fgosTemplateDir) {
+    return fgosTemplateDir;
+  }
+  const templateRoot = rawTmpCwd();
+  initFgosFixtureInProcess(templateRoot);
+  fgosTemplateDir = path.join(templateRoot, '.fgos');
+  return fgosTemplateDir;
+}
+
+function tmpCwdFromTemplate() {
+  const cwd = rawTmpCwd();
+  fs.cpSync(fgosTemplateSourceDir(), path.join(cwd, '.fgos'), { recursive: true });
   return cwd;
 }
 
@@ -224,6 +259,18 @@ function initGitCwd() {
   return cwd;
 }
 
+function initGitCwdFast() {
+  const cwd = tmpCwdFast();
+  execFileSync('git', ['init', '-q'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  return cwd;
+}
+
 function gitHead(cwd) {
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
 }
@@ -232,6 +279,12 @@ function gitHead(cwd) {
 // repo with no resolvable HEAD, for the str86 gitHeadless notice tests.
 function initHeadlessGitCwd() {
   const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q'], { cwd });
+  return cwd;
+}
+
+function initHeadlessGitCwdFast() {
+  const cwd = tmpCwdFast();
   execFileSync('git', ['init', '-q'], { cwd });
   return cwd;
 }
@@ -515,6 +568,18 @@ function writeHangScript(cwd, ms) {
 
 function initGitCwdMain() {
   const cwd = tmpCwd();
+  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
+  fs.writeFileSync(path.join(cwd, '.gitignore'), '.fgos/cache/\n.fgos/runtime/\n');
+  fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
+  execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
+  execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
+  return cwd;
+}
+
+function initGitCwdMainFast() {
+  const cwd = tmpCwdFast();
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
@@ -1133,11 +1198,15 @@ export {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
+  initFgosFixtureInProcess,
   linkFgosBinInto,
   logPath,
   mainCheckoutLockPath,
@@ -1169,6 +1238,8 @@ export {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,

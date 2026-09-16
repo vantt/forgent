@@ -40,11 +40,11 @@ import {
   fs,
   gitAtCwd,
   gitHead,
-  initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
-  initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
-  initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -74,7 +74,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -94,8 +94,7 @@ import {
 
 
 test('return happy path: verify passes -> doing to proposed, actual outcome recorded, no settlement (settlement belongs to the -> done edge)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-ok', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-ok']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -123,9 +122,8 @@ test('return happy path: verify passes -> doing to proposed, actual outcome reco
 
 
 test('return (verify passes, main-source): a live main-checkout.lock recorded under THIS session\'s own identity is released early, instead of waiting out the TTL (tsk-45z D1/D2)', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const sessionId = 'tsk-45z-test-session-ok';
-  run(cwd, ['init']);
   addOk(cwd, 'pull-return-releases-own-lock', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-releases-own-lock'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -141,9 +139,8 @@ test('return (verify passes, main-source): a live main-checkout.lock recorded un
 
 
 test('return (verify FAILS, main-source): a live own-identity lock is released too — settling to blocked is just as much "done with the checkout" as proposed (tsk-45z D1/D2)', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const sessionId = 'tsk-45z-test-session-blocked';
-  run(cwd, ['init']);
   addOk(cwd, 'pull-return-own-lock-blocked', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-own-lock-blocked'], { FGOS_SESSION_ID: sessionId }).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, never satisfies verify
@@ -159,8 +156,7 @@ test('return (verify FAILS, main-source): a live own-identity lock is released t
 
 
 test('return (main-source) never touches a DIFFERENT session\'s live lock — never a blind unlink (tsk-45z D2)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-other-untouched', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-other-untouched'], { FGOS_SESSION_ID: 'tsk-45z-this-session' }).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -177,8 +173,7 @@ test('return (main-source) never touches a DIFFERENT session\'s live lock — ne
 
 
 test('return: a changed sensitive file outside the item\'s footprint surfaces a frozenJudgeHits advisory, and never blocks the return', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-judge', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-judge']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -194,8 +189,7 @@ test('return: a changed sensitive file outside the item\'s footprint surfaces a 
 
 
 test('return: a changed sensitive file DECLARED in the item\'s footprint is not a hit', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   assert.equal(run(cwd, ['add', 'pull-return-judge-declared', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'package.json', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', 'pull-return-judge-declared']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -215,8 +209,7 @@ test('return: a changed sensitive file DECLARED in the item\'s footprint is not 
 // exempt when no footprint is declared at all (D5). ---
 
 test('return: a changed file outside the item\'s footprint surfaces a footprintDiffHits advisory even when it matches no frozenJudgeHits pattern, never blocks (tsk-4hl)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   assert.equal(run(cwd, ['add', 'pull-return-footprint-diff', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-diff']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -237,8 +230,7 @@ test('return: a changed file outside the item\'s footprint surfaces a footprintD
 
 
 test('return: footprintDiffHits is empty when the item declares NO footprint at all (D5 absent-footprint exemption, same as footprintDiffHits\' own unit tests)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-no-footprint', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-no-footprint']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -251,8 +243,7 @@ test('return: footprintDiffHits is empty when the item declares NO footprint at 
 
 
 test('return: a .fgos/* change bundled into the item\'s own commit (git add -A sweeping in take\'s own event-log write) is exempt from footprintDiffHits (tsk-x5r self-exempt)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   // tsk-5iv D2: commit the store's own bootstrap files (config.json,
   // coexistence.json, etc) BEFORE take/add -- matching the real main
   // checkout's topology, where these were committed long ago and only
@@ -294,8 +285,7 @@ test('return: a .fgos/* change bundled into the item\'s own commit (git add -A s
 // exclusion could still commit this file alongside real work) via the same
 // force-add.
 test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-guard-warnings.jsonl changes bundled into the item\'s own commit are exempt from footprintDiffHits, same as events.jsonl (tsk-3tp-1, tsk-vim)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'bootstrap .fgos/'], { cwd });
   const id = 'pull-return-guard-files-exempt';
@@ -304,7 +294,7 @@ test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-g
   fs.writeFileSync(path.join(cwd, '.fgos', 'events-jsonl.truncation-guard.json'), JSON.stringify({ seq: 1, hash: 'abc' }));
   fs.mkdirSync(path.join(cwd, '.fgos', 'logs'), { recursive: true });
   fs.writeFileSync(path.join(cwd, '.fgos', 'logs', 'main-checkout-guard-warnings.jsonl'), '{"kind":"truncation-break"}\n');
-  // -f: both files sit under paths this fixture's own .gitignore (initGitCwd)
+  // -f: both files sit under paths this fixture's own .gitignore (initGitCwdFast)
   // now excludes -- events-jsonl.truncation-guard.json individually, and
   // main-checkout-guard-warnings.jsonl since phase-01
   // (plans/260825-0842-fgos-logs-dir-bucketing) moved it under the
@@ -337,8 +327,7 @@ test('return: .fgos/events-jsonl.truncation-guard.json and .fgos/main-checkout-g
 // footprintDiffHits; only the append-only lifecycle noise (events.jsonl,
 // entropy-history.jsonl) stays exempt.
 test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commit DOES surface in footprintDiffHits, unlike events.jsonl (tsk-5iv D2: exemption narrowed to noise only)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const id = 'pull-return-gb-not-exempt';
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
@@ -362,8 +351,7 @@ test('return: a .fgos/gate-bypass.json change bundled into the item\'s own commi
 
 
 test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt from footprintDiffHits (tsk-4hl self-exempt, avoids self-flagging every Iron-Law-gated item)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const id = 'pull-return-evidence-exempt';
   assert.equal(run(cwd, ['add', id, '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'test -f proof.txt', '--footprint', 'proof.txt', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['take', '--id', id]).status, 0);
@@ -385,8 +373,7 @@ test('return: the item\'s own docs/history/<id>/iron-law-evidence.md is exempt f
 });
 
 test('return: the item\'s own docs/history/<feature>/RESEARCH.md (via docsRef) is exempt from footprintDiffHits (tsk-67o)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const id = 'pull-return-research-exempt';
   const docsRef = 'docs/history/some-feature-slug';
   assert.equal(
@@ -419,8 +406,7 @@ test('return: the item\'s own docs/history/<feature>/RESEARCH.md (via docsRef) i
 });
 
 test('return refuses a dirty working tree (uncommitted changes) as validation, exit 4, item stays doing', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-dirty']).status, 0);
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
@@ -438,8 +424,7 @@ test('return refuses a dirty working tree (uncommitted changes) as validation, e
 
 
 test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own committed progress (tsk-598 D1/D2) — own-file-set scoping, not a whole-tree gate', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-unrelated-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-unrelated-dirty']).status, 0);
   commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
@@ -457,8 +442,7 @@ test('return succeeds when a dirty file on cwd is UNRELATED to the item\'s own c
 
 
 test('return still refuses when the SAME path the item committed is dirty again — a real conflict, tsk-598 D2, exit 4, item stays doing', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-real-conflict', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-real-conflict']).status, 0);
   commitFile(cwd, 'proof.txt'); // proof.txt is now IN this item's own committed diff
@@ -474,8 +458,7 @@ test('return still refuses when the SAME path the item committed is dirty again 
 });
 
 test('return with a declared footprint still refuses on an uncommitted footprint path (tsk-598 D3) even though it was never committed', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-footprint-dirty', { verify: 'test -f proof.txt', footprint: 'footprint-guarded.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-footprint-dirty']).status, 0);
   commitFile(cwd, 'proof.txt'); // real committed progress since headAtTake
@@ -492,8 +475,7 @@ test('return with a declared footprint still refuses on an uncommitted footprint
 });
 
 test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own take/return writes are excluded from the clean-tree gate (no more manual events.jsonl commit before every return)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-fgos-only-dirty']).status, 0);
 
@@ -532,7 +514,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
 
 test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
   const { cwd } = initGitCwdInSubdir();
-  run(cwd, ['init']);
+  assert.equal(run(cwd, ['init']).status, 0);
   addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-fgos-only-dirty']).status, 0);
 
@@ -550,7 +532,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
 
 test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
   const { cwd, topLevel } = initGitCwdInSubdir();
-  run(cwd, ['init']);
+  assert.equal(run(cwd, ['init']).status, 0);
   addOk(cwd, 'sub-return-scope-ok', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-scope-ok']).status, 0);
 
@@ -569,7 +551,7 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
 
 test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
   const { cwd } = initGitCwdInSubdir();
-  run(cwd, ['init']);
+  assert.equal(run(cwd, ['init']).status, 0);
   addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-dirty']).status, 0);
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
@@ -580,8 +562,7 @@ test('return still refuses when cwd is a subdirectory and a non-.fgos file is di
 });
 
 test('return refuses a main-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo: previously shelled out to the placeholder text itself, "<word>: not found", exit 127)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-placeholder']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -594,8 +575,7 @@ test('return refuses a main-source claim whose verify is still a discovery-stage
 });
 
 test('return refuses a branch-source claim whose verify is still a discovery-stage placeholder — clean validation, exit 4, item stays doing (tsk-1zo)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-placeholder', { verify: 'chưa xác định — P15 bổ sung' });
 
   const pickResult = run(cwd, ['pick', '--id', 'branch-return-placeholder']);
@@ -613,13 +593,13 @@ test('return refuses a branch-source claim whose verify is still a discovery-sta
 });
 
 test('return refuses when HEAD has not advanced past headAtTake — a clean tree with zero real progress — as validation, exit 4, item stays doing', () => {
-  // `.fgos/` entirely gitignored here (unlike initGitCwd's `.fgos/state.json`
+  // `.fgos/` entirely gitignored here (unlike initGitCwdFast's `.fgos/state.json`
   // only) so the tree is genuinely clean right after `take` with no commit
   // at all — isolating the HEAD-advance check from the tree-clean check,
   // which a tracked events.jsonl would otherwise always fail together (this
   // repo's own convention commits events.jsonl, so making the tree clean
   // there always requires a commit that also advances HEAD).
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
@@ -627,8 +607,6 @@ test('return refuses when HEAD has not advanced past headAtTake — a clean tree
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', 'seed.txt', '.gitignore'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-
-  run(cwd, ['init']);
   addOk(cwd, 'pull-return-stale', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-stale']).status, 0);
 
@@ -639,7 +617,7 @@ test('return refuses when HEAD has not advanced past headAtTake — a clean tree
 });
 
 test('return --no-new-commits-ok closes out a main-source claim whose HEAD already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
@@ -647,8 +625,6 @@ test('return --no-new-commits-ok closes out a main-source claim whose HEAD alrea
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'work already done before claim'], { cwd });
-
-  run(cwd, ['init']);
   addOk(cwd, 'main-return-predone', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'main-return-predone']).status, 0);
 
@@ -661,7 +637,7 @@ test('return --no-new-commits-ok closes out a main-source claim whose HEAD alrea
 });
 
 test('return --no-new-commits-ok never bypasses verify itself for a main-source claim — still parks doing -> blocked + friction when verify fails (tsk-4on)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   execFileSync('git', ['init', '-q'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
@@ -669,8 +645,6 @@ test('return --no-new-commits-ok never bypasses verify itself for a main-source 
   fs.writeFileSync(path.join(cwd, 'seed.txt'), 'seed\n');
   execFileSync('git', ['add', '-A'], { cwd });
   execFileSync('git', ['commit', '-q', '-m', 'seed'], { cwd });
-
-  run(cwd, ['init']);
   addOk(cwd, 'main-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // never created
   assert.equal(run(cwd, ['take', '--id', 'main-return-flag-verify-fail']).status, 0);
 
@@ -683,8 +657,7 @@ test('return --no-new-commits-ok never bypasses verify itself for a main-source 
 });
 
 test('return verify-fail: doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error) — mirrors the runner\'s own park path', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-red', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-red']).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, but never satisfies verify
@@ -702,8 +675,7 @@ test('return verify-fail: doing -> blocked + friction (verification layer), exit
 });
 
 test("return verify-fail: park edge stamps role 'system' (not human) on the doing -> blocked event", () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-red-role', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-red-role']).status, 0);
   commitFile(cwd, 'wrong-file.txt'); // advances HEAD, but never satisfies verify
@@ -719,16 +691,14 @@ test("return verify-fail: park edge stamps role 'system' (not human) on the doin
 });
 
 test('return on an item that is not "doing" (still todo) is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-not-doing');
   const result = run(cwd, ['return', 'pull-return-not-doing']);
   assert.equal(result.status, 4);
 });
 
 test('return on an item claimed by the runner (claimRole "runner", no headAtTake) is rejected as validation — return only completes a take', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-runner-claim');
   moveToDurableDoingForTest(cwd, 'pull-return-runner-claim', 'todo', { role: 'runner' });
 
@@ -738,15 +708,13 @@ test('return on an item claimed by the runner (claimRole "runner", no headAtTake
 });
 
 test('return with no id at all is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const result = run(cwd, ['return']);
   assert.equal(result.status, 4);
 });
 
 test('return --timeout with a non-numeric or non-positive value is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-bad-timeout', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-bad-timeout']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -757,8 +725,7 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
 });
 
 test('return omitting --timeout falls back to the runner config\'s timeoutMs, blocking a verify that outlives it', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   writeShortRunnerConfig(cwd, 200);
   const scriptPath = writeHangScript(cwd, 1500);
   addOk(cwd, 'pull-return-fallback-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
@@ -772,8 +739,7 @@ test('return omitting --timeout falls back to the runner config\'s timeoutMs, bl
 });
 
 test('return --no-timeout opts out of the fallback, letting a verify that outlives the config timeout finish and pass', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   writeShortRunnerConfig(cwd, 200);
   const scriptPath = writeHangScript(cwd, 500);
   addOk(cwd, 'pull-return-no-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
@@ -787,8 +753,7 @@ test('return --no-timeout opts out of the fallback, letting a verify that outliv
 });
 
 test('return --timeout and --no-timeout together are rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-timeout-conflict', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-conflict']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -800,8 +765,7 @@ test('return --timeout and --no-timeout together are rejected as validation, exi
 });
 
 test('return --timeout error text no longer claims omitting --timeout means no timeout', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-timeout-error-text', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-error-text']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -815,13 +779,13 @@ test('return --timeout error text no longer claims omitting --timeout means no t
 });
 
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
   assert.equal(result.status, 4);
 });
 
 test('reject without --reason is rejected as validation, exit 4, item stays proposed', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'reject-no-reason-item');
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -832,15 +796,14 @@ test('reject without --reason is rejected as validation, exit 4, item stays prop
 });
 
 test('reject on a non-proposed item is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'reject-not-proposed-item');
   const result = run(cwd, ['reject', 'reject-not-proposed-item', '--reason', 'nope']);
   assert.equal(result.status, 2);
 });
 
 test('reject moves awaiting-approval -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
   run(cwd, ['take', '--id', 'reject-pull-item']);
   commitFile(cwd, 'proof.txt');
@@ -878,8 +841,7 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
 // "branch-source", which this test's title never matches, for exactly
 // this reason.
 test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'pick-fresh-return-ok', { verify: 'test -f proof.txt' });
   const mainHeadBefore = gitHead(cwd);
 
@@ -909,8 +871,7 @@ test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch
 });
 
 test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> awaiting-approval, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-ok', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-ok']).status, 0);
   // take's own event lands on events.jsonl in the SAME main tree (take never
@@ -941,8 +902,7 @@ test('return on a branch-source take: verify passes in a disposable detached wor
 });
 
 test('return on a branch-source take: the disposable detached verify worktree never carries a checked-out .fgos/ (ADR0020, tsk-26r — same strip createWorktree already does, applied to return\'s own ephemeral tmpWorktree)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // `.fgos/` is git-tracked in this repo (state.json excepted) — by the time
   // makeBlockedBranchItem's own commitPending runs, .fgos/config.json,
   // .fgos/coexistence.json, and .fgos/events.jsonl are all committed on
@@ -968,8 +928,7 @@ test('return on a branch-source take: the disposable detached verify worktree ne
 });
 
 test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
 
   const localDep = mkLocalDependency();
   fs.writeFileSync(
@@ -998,8 +957,7 @@ test('return on a branch-source take whose branch declares a real npm dependency
 });
 
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // tsk-40m: settleClaim now verifies the settling caller is the SAME
   // session that acquired the claim (writer-identity check) — take and
   // return must share the SAME FGOS_SESSION_ID for this test's own actor
@@ -1028,8 +986,7 @@ test('return on a branch-source take never touches a live main-checkout.lock (ts
 });
 
 test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-stale', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-stale']).status, 0);
 
@@ -1040,8 +997,7 @@ test('return on a branch-source take refuses when the branch has NOT advanced pa
 });
 
 test('return without --no-new-commits-ok still refuses a branch-source claim with zero commits since take, even when the branch already satisfies verify (tsk-4on default-unchanged)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-predone-noflag', { verify: 'test -f proof.txt' });
   // The real work is already done and committed BEFORE this claim — mirrors
   // tsk-4j9: a parent whose children's merged content already sits on its
@@ -1059,8 +1015,7 @@ test('return without --no-new-commits-ok still refuses a branch-source claim wit
 });
 
 test('return --no-new-commits-ok closes out a branch-source claim whose branch already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-predone', { verify: 'test -f proof.txt' });
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
   execFileSync('git', ['add', '-A'], { cwd });
@@ -1082,8 +1037,7 @@ test('return --no-new-commits-ok closes out a branch-source claim whose branch a
 });
 
 test('return --no-new-commits-ok refuses a branch-source claim that was already blocked by a real verify-fail — the flag closes out work never returned, never rescues a failed retry (tsk-4on D2)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-cheat', { verify: 'test -f proof.txt' });
 
   const pickResult = run(cwd, ['pick', '--id', 'branch-return-cheat']);
@@ -1114,8 +1068,7 @@ test('return --no-new-commits-ok refuses a branch-source claim that was already 
 });
 
 test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fresh branch-source claim whose branch tip still fails verify still parks doing -> blocked + friction (tsk-4on)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // proof.txt never created anywhere
 
   assert.equal(run(cwd, ['pick', '--id', 'branch-return-flag-verify-fail']).status, 0);
@@ -1132,8 +1085,7 @@ test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fr
 });
 
 test('return on a branch-source take never requires the human\'s own main tree to be clean ("tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-dirty-main']).status, 0);
   commitPending(cwd, 'state: take branch-return-dirty-main');
@@ -1155,8 +1107,7 @@ test('return on a branch-source take never requires the human\'s own main tree t
 });
 
 test('return on a branch-source take: verify-fail -> doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-red', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-red']).status, 0);
   commitPending(cwd, 'state: take branch-return-red');
@@ -1180,7 +1131,6 @@ test('return on a branch-source take: verify-fail -> doing -> blocked + friction
 
 test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> awaiting-approval, exit 0', () => {
   const cwd = initSessionSafeCwd();
-  run(cwd, ['init']);
   addOk(cwd, 'return-in-session', { verify: 'test -f proof.txt' });
   run(cwd, ['take', '--id', 'return-in-session']); // headAtTake = current main HEAD
 
@@ -1212,8 +1162,7 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
   // via "fgos session start" (no `sessions.json` entry), so it must be
   // refused exactly like approve's own adhoc-worktree tests prove for
   // approve.
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   commitPending(cwd, 'state: init');
   addOk(cwd, 'return-adhoc-mainsource', { verify: 'test -f proof.txt' });
   commitPending(cwd, 'state: add');
@@ -1237,8 +1186,7 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
 });
 
 test('return --worker-verified-sha skips runGoalCheck when sha matches branchHead, moving item to awaiting-approval with verify skipped output', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'worker-verified-item', { verify: 'exit 1' });
   const pickResult = run(cwd, ['pick', '--id', 'worker-verified-item']);
   assert.equal(pickResult.status, 0);
@@ -1260,8 +1208,7 @@ test('return --worker-verified-sha skips runGoalCheck when sha matches branchHea
 });
 
 test('return --worker-verified-sha falls through to real verify when sha is stale or mismatched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'worker-stale-item', { verify: 'exit 1' });
   const pickResult = run(cwd, ['pick', '--id', 'worker-stale-item']);
   assert.equal(pickResult.status, 0);
@@ -1280,8 +1227,7 @@ test('return --worker-verified-sha falls through to real verify when sha is stal
 });
 
 test('tsk-34o5: return halts and parks item blocked when attestation diverges', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'return-attest-diverged', { verify: 'exit 0' });
 
   const pickResult = run(cwd, ['pick', '--id', 'return-attest-diverged']);
