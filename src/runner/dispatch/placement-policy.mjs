@@ -368,3 +368,52 @@ export function resolveVerifiedRedirectExecutor({ cfg, sourceExecutorId, candida
   }
   return { executorId: placementExecutorId, source: 'placement-policy', divergence: null };
 }
+
+// ─── Follow-up (post-Phase-08): resolveAssignmentDispatchPolicy unification ─
+//
+// design.md's close criteria: "no production path has a fourth hidden
+// placement source beside PlacementPolicy target semantics." Phase 07 only
+// wired cli.mjs's modelForTier-based paths (spawnWorker/executeExecutorCli).
+// resolveAssignmentDispatchPolicy (assignment-policy.mjs) -- the resolver
+// executeAssignment's real production dispatch path uses -- has its OWN
+// separate model resolution: `resolvePolicyTierModel(cfg, lookupPolicyTier,
+// provider)`, called directly, never through this module. That is the
+// remaining "fourth source" this closes.
+//
+// Unlike Phase 07's model/redirect binders, this one's two sides were
+// ALREADY calling the identical underlying primitive
+// (resolvePolicyTierModel) with the identical inputs -- lookupPolicyTier
+// and provider are computed once, by resolveAssignmentDispatchPolicy itself
+// (Phase 04), and simply handed to this wrapper rather than recomputed. So
+// this is honestly more a PROVENANCE/OWNERSHIP move (marking `modelSource`
+// as PlacementPolicy-attributed in evidence) than a case where a genuine
+// algorithmic divergence was ever possible -- the self-verify guard is kept
+// anyway, as the same defense-in-depth posture as every other verified
+// binder in this track, in case a future change to either side drifts.
+
+/**
+ * @param {object} params
+ * @param {object} params.cfg
+ * @param {string} params.lookupPolicyTier the SAME value
+ *   resolveAssignmentDispatchPolicy already computed (Phase 04)
+ * @param {string} params.provider the SAME resolvedProvider
+ *   resolveAssignmentDispatchPolicy already computed
+ * @param {string} params.legacyModel what resolvePolicyTierModel already
+ *   produced for this exact (lookupPolicyTier, provider) pair
+ */
+export function resolveVerifiedAssignmentModel({ cfg, lookupPolicyTier, provider, legacyModel }) {
+  let placementModel;
+  try {
+    placementModel = resolvePolicyTierModel(cfg, lookupPolicyTier, provider);
+  } catch {
+    return { model: legacyModel, source: 'legacy', divergence: null };
+  }
+  if (placementModel !== legacyModel) {
+    return {
+      model: legacyModel,
+      source: 'legacy',
+      divergence: Object.freeze({ lookupPolicyTier, provider, legacyModel, placementModel }),
+    };
+  }
+  return { model: placementModel, source: 'placement-policy', divergence: null };
+}
