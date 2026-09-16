@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Code-panel multi-cell facade (code-panel-multicell-facade track, P01):
+  `fgos-code-panel` now operates as a two-mode facade for coding implementation
+  work with independent review and red-team. Direct mode (`direct-single-cell`)
+  retains existing single-cell mutation and quorum behavior, while planned mode
+  (`planned-multi-cell`) delegates track execution to `fgos-plan-loop` by
+  reference when a plan/phase file or registered track is the execution target,
+  with recursive-dispatch protection and automated contract tests covering
+  mode selection (CE1-CE5, imperative mood M1, and anti-guessing).
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
   historical/status notes pointing readers to the promoted

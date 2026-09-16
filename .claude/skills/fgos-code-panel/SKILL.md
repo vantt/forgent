@@ -2,23 +2,18 @@
 name: fgos-code-panel
 user-invocable: false
 description: >-
-  Get a single, straightforward code change implemented and independently
-  reviewed + red-teamed through the real `fgos coordination` CLI doors --
-  no plan.md/phase-NN.md track required, no fgOS Work items, no lifecycle
-  stage, no UI/dashboard. Self-contained: dispatches through the same
-  hardened CoordinationSession engine and `standalone-master-coordination-
-  loop` protocol `fgos-plan-loop` uses (real mutation-gating, real quorum
-  close), with its own coding-flavored doer/reviewer/red-team persona
-  roster and its own concrete request examples -- reading `fgos-plan-loop`
-  is not required to use this skill. Use when someone has one concrete
-  code change in mind and wants it done with a real independent
-  second/third opinion, not a whole multi-cell track. Examples: "implement
-  this fix and get it reviewed+red-teamed", "run a code panel on this
-  change", "get an independent review and red-team on this patch before I
-  merge it". Do not use for advisory coding decisions such as plugin versus
-  core, option comparison, or architecture red-team; those route through
-  fgos-panel without mutation. A request that references a multi-cell
-  plan.md/phase-NN track is a fgos-plan-loop track, not this skill.
+  Get a single code change implemented or drive a plan-driven coding track with
+  independent review + red-team through the real `fgos coordination` CLI doors.
+  Self-contained: dispatches through the same hardened CoordinationSession engine
+  and `standalone-master-coordination-loop` protocol `fgos-plan-loop` uses (real
+  mutation-gating, real quorum close), with its own coding-flavored doer/reviewer/
+  red-team persona roster. Two modes: direct-single-cell (default, concrete code
+  changes without a plan target) and planned-multi-cell (when a plan/phase file or
+  track is the execution target, delegating multi-cell orchestration to
+  `fgos-plan-loop` by reference). Examples: "implement this fix and get it
+  reviewed+red-teamed", "run a code panel on this change", "run plans/260915-foo/plan.md",
+  "resume track plans/260915-foo/plan.md". Do not use for advisory coding decisions;
+  those route through fgos-panel without mutation.
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

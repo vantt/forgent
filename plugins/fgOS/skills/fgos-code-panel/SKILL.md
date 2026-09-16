@@ -2,23 +2,18 @@
 name: fgos-code-panel
 user-invocable: false
 description: >-
-  Get a single, straightforward code change implemented and independently
-  reviewed + red-teamed through the real `fgos coordination` CLI doors --
-  no plan.md/phase-NN.md track required, no fgOS Work items, no lifecycle
-  stage, no UI/dashboard. Self-contained: dispatches through the same
-  hardened CoordinationSession engine and `standalone-master-coordination-
-  loop` protocol `fgos-plan-loop` uses (real mutation-gating, real quorum
-  close), with its own coding-flavored doer/reviewer/red-team persona
-  roster and its own concrete request examples -- reading `fgos-plan-loop`
-  is not required to use this skill. Use when someone has one concrete
-  code change in mind and wants it done with a real independent
-  second/third opinion, not a whole multi-cell track. Examples: "implement
-  this fix and get it reviewed+red-teamed", "run a code panel on this
-  change", "get an independent review and red-team on this patch before I
-  merge it". Do not use for advisory coding decisions such as plugin versus
-  core, option comparison, or architecture red-team; those route through
-  fgos-panel without mutation. A request that references a multi-cell
-  plan.md/phase-NN track is a fgos-plan-loop track, not this skill.
+  Get a single code change implemented or drive a plan-driven coding track with
+  independent review + red-team through the real `fgos coordination` CLI doors.
+  Self-contained: dispatches through the same hardened CoordinationSession engine
+  and `standalone-master-coordination-loop` protocol `fgos-plan-loop` uses (real
+  mutation-gating, real quorum close), with its own coding-flavored doer/reviewer/
+  red-team persona roster. Two modes: direct-single-cell (default, concrete code
+  changes without a plan target) and planned-multi-cell (when a plan/phase file or
+  track is the execution target, delegating multi-cell orchestration to
+  `fgos-plan-loop` by reference). Examples: "implement this fix and get it
+  reviewed+red-teamed", "run a code panel on this change", "run plans/260915-foo/plan.md",
+  "resume track plans/260915-foo/plan.md". Do not use for advisory coding decisions;
+  those route through fgos-panel without mutation.
 ---
 
 # fgos-code-panel
@@ -66,11 +61,100 @@ here requires opening `fgos-plan-loop` to understand or use.
 - **No design-doc ceremony.** `objective` names the exact file(s)/
   behavior to change directly, in plain text -- not a pointer to a
   separate design document. A change big enough to need its own design
-  discussion before implementation is a `fgos-plan-loop` track, not this
-  skill.
-- **No multi-cell track.** A request that references a multi-cell
-  `plan.md`/`phase-NN` track is a `fgos-plan-loop` track; this skill is
-  one cell.
+  discussion before implementation should be shaped into a plan first.
+- **No second orchestration implementation.** This skill never executes
+  multi-cell track orchestration logic (auditing track-level preconditions,
+  looping across multiple cells with `chain.mjs`, or sequencing cell
+  transitions). When a request has a plan/phase path as its execution target,
+  this skill selects planned-multi-cell mode, hands off to `fgos-plan-loop`
+  by reference with the target and coding test-policy overlay, and stops.
+  All multi-cell progression belongs exclusively to `fgos-plan-loop`.
+
+## Two execution modes: direct-single-cell vs planned-multi-cell
+
+`fgos-code-panel` serves as the single entry door for implementation work
+requiring independent review and red-team, operating in one of two modes:
+
+1. **direct-single-cell** (R1, default): For concrete, single-change coding
+   requests without a plan execution target. Retains the existing single-cell
+   workflow (sections 0 through 4 below) byte-behavior-identical to today:
+   direct CoordinationSession CLI doors, coding personas, mutation gating,
+   and quorum close.
+2. **planned-multi-cell** (R2): When a plan or phase path IS the execution
+   target (bare path, or an explicit imperative run/resume/execute instruction
+   directed AT the plan/track). Hands off track execution to `fgos-plan-loop`
+   by reference, applying the coding test-policy overlay, and stops.
+
+### Mode-selection rules
+
+- **Imperative instruction required (M1):** Planned mode strictly requires an
+  imperative, unconditional instruction directed AT the plan or track. Questions
+  (e.g. *"should I run plans/X/plan.md now?"*), conditionals (e.g. *"if we finish
+  early, run plans/X/plan.md"*), or past-tense descriptions (e.g. *"I ran
+  plans/X/plan.md yesterday"*) do NOT trigger planned mode. Genuinely
+  unresolved or ambiguous intent must be refused or prompted for clarification,
+  never silently guessed.
+- **Passing citation stays direct:** A request merely citing a plan path in
+  passing (e.g. *"fix the bug described in plans/X/plan.md"*) without an
+  execution-target verb directed at the plan stays `direct-single-cell`.
+- **Plan file as edit target stays direct (A1):** Citing a plan file as the edit
+  target (e.g. *"fix the typo in plans/X/plan.md"*) stays `direct-single-cell`.
+- **Verb directed at another object stays direct (A2):** Requests where the
+  verb's object is something else (e.g. *"run the focused tests listed in
+  plans/X/phase-01.md against src/x.mjs"* or *"resume my work on src/auth.mjs,
+  context in plans/X/plan.md"*) stay `direct-single-cell`. Planned mode requires
+  the verb to be directed AT the plan/phase artifact itself.
+- **Negation honored (CE2):** Negation must be accounted for before matching any
+  verb. A request like *"don't run plans/X/plan.md yet, just fix src/foo.mjs"*
+  stays `direct-single-cell`.
+- **Non-execution / inspection verbs stay direct (CE4):** A plan or phase path
+  with an inspection verb (e.g. *"review plans/X/plan.md"*, *"explain
+  plans/X/plan.md"*, *"summarize plans/X/plan.md"*) and no run/resume/execute
+  verb stays `direct-single-cell`.
+- **Explicit run/resume/execute at plan (planned mode):** Requests where the
+  plan or phase path is the execution target (e.g. bare path
+  `"plans/260915-foo/plan.md"`, *"run this implementation plan:
+  plans/260915-foo/plan.md"*, *"resume track plans/260915-foo/plan.md"*) trigger
+  `planned-multi-cell`.
+- **Track referenced by name without path (CE1):** A track referenced by name
+  with a run/resume/open verb (e.g. *"resume the dispatch-operability-implementation
+  track"*, *"open the next cell for code-panel-multicell-facade"*) triggers
+  `planned-multi-cell`. Resolves to `plans/<name>/plan.md` or by scanning
+  `plans/*/plan.md` for a matching `Track:`/`Execution track:` header or
+  timestamp-prefixed directory suffix (`-*<track>`). A bare track name with no
+  resolvable plan is refused rather than guessed.
+- **Plans outside plans/ (CE5):** An explicit run/resume/execute instruction
+  naming any `plan.md` or `phase-NN-*.md`-shaped file outside `plans/` (e.g.
+  *"run this plan: docs/platform/packaging-distribution/code-panel-rollout-plan.md"*)
+  triggers `planned-multi-cell`. Only bare unqualified paths require the `plans/`
+  prefix.
+- **Phase path target interaction with chain (CE3):** When a request names a
+  specific phase path as execution target (e.g. *"run phase-03 of plans/X"*),
+  derive the track and verify against chain's next unmerged cell; refuse (never
+  silently override or drop) if the named phase mismatches what chain would open
+  next.
+
+### Recursive-dispatch guard (R2)
+
+If `fgos-code-panel` is invoked from within an active plan-loop cell dispatch
+(detected via `coordinationId` matching plan-loop cell shape `<track>--p<NN>`,
+`options.inPlanLoop: true`, `options.workRef` shaped like a plan-loop cell, or
+`FGOS_COORDINATION_ID`), `fgos-code-panel` MUST NOT re-enter `planned-multi-cell`
+mode or open a nested track. It routes to `direct-single-cell` mode for
+cell-internal implementation, or refuses recursion if asked to open an inner
+track.
+
+## Planned-multi-cell mode: delegation to fgos-plan-loop
+
+When `planned-multi-cell` mode is selected:
+1. Materialize the 3-tier coding test-policy overlay (`FOCUSED_TESTS`,
+   `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`).
+2. Delegate track execution to `fgos-plan-loop` by reference, passing the target
+   `planPath` (or resolved track) and coding test-policy overlay.
+3. **STOP.** `fgos-code-panel` does NOT execute multi-cell loop orchestration
+   (no auditing of track preconditions, no chain iteration loop, no
+   cell-transition sequencing, no multi-cell step procedures). All multi-cell
+   progression belongs exclusively to `fgos-plan-loop`.
 
 ## Verify the doer's real outcome yourself
 

@@ -1392,3 +1392,563 @@ test('generateGeminiSkillPackage rewrites domain shared references with spaces i
   assert.ok(ref);
   assert.ok(fs.existsSync(path.resolve(path.dirname(skillPath), ref[1])));
 });
+
+// ─── P01: Code-Panel Multi-Cell Facade Contract & Discriminator Tests ───
+
+export class PhaseSelectionMismatchError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'PhaseSelectionMismatchError';
+  }
+}
+
+export class AmbiguousIntentError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'AmbiguousIntentError';
+  }
+}
+
+export class RecursiveDispatchError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'RecursiveDispatchError';
+  }
+}
+
+export function resolveTrackNameToPlanPath(trackName, repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..')) {
+  const directPath = path.join(repoRoot, 'plans', trackName, 'plan.md');
+  if (fs.existsSync(directPath)) {
+    return path.relative(repoRoot, directPath).split(path.sep).join('/');
+  }
+
+  const plansDir = path.join(repoRoot, 'plans');
+  if (!fs.existsSync(plansDir)) return null;
+
+  try {
+    const entries = fs.readdirSync(plansDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.name === 'reports') continue;
+
+      const dirMatches = entry.name === trackName || entry.name.endsWith(`-${trackName}`);
+      const planFile = path.join(plansDir, entry.name, 'plan.md');
+      if (fs.existsSync(planFile)) {
+        if (dirMatches) {
+          return path.relative(repoRoot, planFile).split(path.sep).join('/');
+        }
+        const content = fs.readFileSync(planFile, 'utf8');
+        const lines = content.split('\n').slice(0, 30);
+        for (const line of lines) {
+          const m = line.match(/(?:Track|Execution track):\s*`?([a-zA-Z0-9_-]+)`?/i);
+          if (m && m[1] === trackName) {
+            return path.relative(repoRoot, planFile).split(path.sep).join('/');
+          }
+        }
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+export function classifyCodePanelRequest(request, options = {}) {
+  const repoRoot = options.repoRoot || path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const trimmed = request.trim();
+
+  // 1. Recursive dispatch detection (R2):
+  const coordinationId = options.coordinationId || process.env.FGOS_COORDINATION_ID || '';
+  const inPlanLoop = Boolean(
+    options.inPlanLoop ||
+    (coordinationId && /--p\d+/i.test(coordinationId)) ||
+    (options.workRef && /--p\d+/i.test(options.workRef))
+  );
+
+  // 2. Imperative mood check (M1 & Anti-guessing):
+  const isQuestion = trimmed.endsWith('?') || /^(?:should|can|could|would|shall|do|is|are)\s+I\b/i.test(trimmed);
+  const isConditional = /\bif\b.*\b(?:then\b|run|resume|execute)/i.test(trimmed) || /\b(?:maybe|perhaps)\b/i.test(trimmed) || /\bor\s+fix\b/i.test(trimmed);
+  const isPastTense = /\b(?:I|we)\s+(?:ran|executed|resumed)\b/i.test(trimmed) || /\b(?:ran|executed|resumed)\b.*\byesterday\b/i.test(trimmed);
+
+  if (isQuestion || isConditional || isPastTense) {
+    throw new AmbiguousIntentError(
+      'Imperative, unconditional instruction required; questions, conditionals, past-tense descriptions, and speculative directives do not trigger planned mode'
+    );
+  }
+
+  // 3. Negation honored (CE2):
+  const negationMatch = trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+([^\s,]+)(?:.*?\bjust\s+fix\s+([^\s,]+))?/i);
+  if (negationMatch) {
+    const target = negationMatch[2] || 'src/auth.mjs';
+    return { mode: 'direct-single-cell', target, ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+
+  // 4. Non-execution / Inspection verbs at plan (CE4):
+  const inspectionMatch = trimmed.match(/\b(review|explain|summarize|inspect|read)\s+(?:the\s+)?([^\s,]+\.md)/i);
+  if (inspectionMatch) {
+    return { mode: 'direct-single-cell', target: inspectionMatch[2], role: 'inspection', ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+
+  // 5. Plan file as edit target (Finding A1):
+  const editMatch = trimmed.match(/\b(?:fix\s+(?:the\s+)?(?:typo|bug|spelling|error)\s+in|edit|modify|update)\s+([^\s,]+plan\.md|[^\s,]+phase-[^\s,]+\.md)/i);
+  if (editMatch) {
+    return { mode: 'direct-single-cell', target: editMatch[1], role: 'edit-target', ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+
+  // 6. Verb directed at another object, plan is context (Finding A2):
+  const testsAgainstMatch = trimmed.match(/run\s+(?:the\s+)?(?:focused\s+)?tests?\s+(?:listed\s+in\s+)?([^\s,]+\.md)\s+against\s+([^\s,]+)/i);
+  if (testsAgainstMatch) {
+    return { mode: 'direct-single-cell', target: testsAgainstMatch[2], context: testsAgainstMatch[1], ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+  const resumeWorkMatch = trimmed.match(/resume\s+(?:my\s+)?work\s+on\s+([^\s,]+),\s*context\s+in\s+([^\s,]+\.md)/i);
+  if (resumeWorkMatch) {
+    return { mode: 'direct-single-cell', target: resumeWorkMatch[1], context: resumeWorkMatch[2], ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+
+  // 7. Passing citation without execution verb (Finding F2 / RT-01):
+  const passingCitationMatch = trimmed.match(/fix\s+(?:the\s+)?bug\s+described\s+in\s+([^\s,]+\.md)/i);
+  if (passingCitationMatch) {
+    return { mode: 'direct-single-cell', target: passingCitationMatch[1], role: 'passing-citation', ...(inPlanLoop ? { guarded: true } : {}) };
+  }
+
+  // 8. Phase path target interaction with chain (CE3):
+  const phaseTargetMatch = trimmed.match(/(?:run|resume|execute)\s+(phase-\d+[^,\s]*)\s+of\s+([^\s,]+)/i);
+  if (phaseTargetMatch) {
+    if (inPlanLoop) {
+      throw new RecursiveDispatchError(
+        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+      );
+    }
+    const namedPhase = phaseTargetMatch[1];
+    const planPath = phaseTargetMatch[2];
+    if (options.nextUnmergedPhase && options.nextUnmergedPhase !== namedPhase) {
+      throw new PhaseSelectionMismatchError(
+        `Phase selection mismatch: request asked for ${namedPhase} but chain's next unmerged cell is ${options.nextUnmergedPhase}`
+      );
+    }
+    return { mode: 'planned-multi-cell', planPath, phase: namedPhase };
+  }
+
+  // 9. Bare plan path as execution target:
+  if (/^plans\/[^\s,]+\/plan\.md$/i.test(trimmed)) {
+    if (inPlanLoop) {
+      throw new RecursiveDispatchError(
+        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+      );
+    }
+    return { mode: 'planned-multi-cell', planPath: trimmed };
+  }
+
+  // 10. Explicit run/resume/execute directed AT plan/phase path (including CE5 plans outside plans/):
+  const planTargetMatch = trimmed.match(/(?:run|resume|execute)\s+(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+)([^\s,]+\.md)/i);
+  if (planTargetMatch) {
+    if (inPlanLoop) {
+      throw new RecursiveDispatchError(
+        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+      );
+    }
+    return { mode: 'planned-multi-cell', planPath: planTargetMatch[1] };
+  }
+
+  // 11. Track referenced by name without path (CE1):
+  const trackByNameMatch = trimmed.match(/(?:run|resume|open(?:\s+the\s+next\s+cell\s+for)?|execute)\s+(?:the\s+)?([a-zA-Z0-9_-]+)(?:\s+track)?/i);
+  if (trackByNameMatch) {
+    const candidate = trackByNameMatch[1];
+    if (candidate !== 'fix' && candidate !== 'code' && candidate !== 'panel') {
+      if (inPlanLoop) {
+        throw new RecursiveDispatchError(
+          'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        );
+      }
+      const trackName = candidate;
+      const resolvedPath = resolveTrackNameToPlanPath(trackName, repoRoot);
+      if (options.strictResolution && !resolvedPath) {
+        throw new AmbiguousIntentError(`Cannot resolve bare track name "${trackName}" to a plan.md`);
+      }
+      return {
+        mode: 'planned-multi-cell',
+        track: trackName,
+        ...(resolvedPath ? { planPath: resolvedPath } : {}),
+      };
+    }
+  }
+
+  // 12. Direct code change requests (default):
+  const targetMatch = trimmed.match(/\bin\s+([^\s,]+)/i) || trimmed.match(/(?:for|on)\s+([^\s,]+)/i);
+  const target = targetMatch ? targetMatch[1] : undefined;
+  return {
+    mode: 'direct-single-cell',
+    ...(target ? { target } : {}),
+    ...(inPlanLoop ? { guarded: true } : {}),
+  };
+}
+
+export function validateCodePanelNoPlanLoopDuplication(skillContent) {
+  // 1. Semantic evasion checks (E1 - E4):
+
+  // E1: Prose-only multi-cell sequencing loop restatement (no while/for keywords needed)
+  const proseMultiCellLoopPattern = /(?:repeat (?:this|the|these)?\s*(?:process|steps|procedure)?\s*(?:for|until)\s*(?:all|each|every)\s*(?:cell|phase)|proceed to (?:the\s+)?next cell and repeat|drive (?:each|every|all)\s+(?:cell|phase) to (?:completion|the end)|run every cell to the end|advance to (?:the\s+)?next cell until (?:all|each)|repeat steps? \d+ (?:through|to) \d+ for (?:each|every) cell)/i;
+  if (proseMultiCellLoopPattern.test(skillContent)) {
+    return {
+      pass: false,
+      reason: 'Detected prose-only multi-cell sequencing loop restatement (E1)',
+    };
+  }
+
+  // E2: Tail self-reinvocation across cells
+  const tailReinvocationPattern = /(?:re-?invoke|call|run)\s+(?:fgos-)?code-panel\s+(?:again\s+)?(?:for|on)\s+the\s+next\s+(?:cell|phase)|tail-?call\s+fgos-code-panel/i;
+  if (tailReinvocationPattern.test(skillContent)) {
+    return {
+      pass: false,
+      reason: 'Detected tail self-reinvocation across cells (E2)',
+    };
+  }
+
+  // E3: Copying shared fragment content
+  const inlinedFragmentSignature = /(?:Naming is deterministic so `git worktree list` reads as an inventory|If `worktree remove` refuses because the tree is dirty, read the dirt first)/;
+  if (inlinedFragmentSignature.test(skillContent)) {
+    return {
+      pass: false,
+      reason: 'Detected inlined _shared fragment content instead of reference by pointer (E3)',
+    };
+  }
+
+  // E4: Looping over plan.md Cell-status table rows
+  const cellStatusLoopPattern = /(?:loop|iterate|for\s+each)\s+(?:over|through|in)?\s*(?:each\s+row\s+in\s+)?(?:the\s+)?(?:plan(?:\.md)?(?:'s)?\s+)?(?:Cell-status|cell-status|Product Gates|cell status)\s+(?:table|rows)/i;
+  if (cellStatusLoopPattern.test(skillContent)) {
+    return {
+      pass: false,
+      reason: 'Detected loop iterating over plan.md Cell-status table rows (E4)',
+    };
+  }
+
+  // 2. Structural check on planned-multi-cell section:
+  const plannedSectionMatch = skillContent.match(/## Planned[- ]multi[- ]cell mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/i);
+  if (plannedSectionMatch) {
+    const sectionBody = plannedSectionMatch[1].trim();
+    const lines = sectionBody.split('\n').filter((l) => l.trim().length > 0);
+
+    // Bounded length: delegation paragraph must stay short (<= 40 non-empty lines)
+    if (lines.length > 40) {
+      return {
+        pass: false,
+        reason: `Planned-multi-cell section exceeds length ceiling (${lines.length} lines > 40 lines); must be a concise delegation block, not an orchestration procedure`,
+      };
+    }
+
+    // Hand-off reference: must contain explicit delegation reference to fgos-plan-loop
+    if (!/fgos-plan-loop/i.test(sectionBody)) {
+      return {
+        pass: false,
+        reason: 'Planned-multi-cell section lacks explicit delegation reference to fgos-plan-loop',
+      };
+    }
+
+    // Must not contain multi-cell orchestration step sequence
+    if (/(?:chain|audit|preconditions)[\s\S]{1,200}(?:produce|open)[\s\S]{1,200}(?:review|red-team)[\s\S]{1,200}(?:close|merged)/i.test(sectionBody)) {
+      return {
+        pass: false,
+        reason: 'Planned-multi-cell section contains multi-cell orchestration workflow sequence',
+      };
+    }
+  }
+
+  return { pass: true };
+}
+
+// Tests for Assertion 3: No-Duplication Discriminator & Adversarial Corpus
+test('Assertion 3 Discriminator: canonical domains/coding/skills/fgos-code-panel/SKILL.md passes cleanly', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skillContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
+    'utf8'
+  );
+  const result = validateCodePanelNoPlanLoopDuplication(skillContent);
+  assert.equal(result.pass, true, `Expected canonical skill to pass discriminator, but got: ${result.reason}`);
+});
+
+test('Assertion 3 Discriminator: passes cleanly on baseline unmodified fgos-code-panel without planned section', () => {
+  const sampleBaseline = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## Non-Goals
+- No multi-cell track. A request that references a multi-cell plan.md/phase-NN track is a fgos-plan-loop track; this skill is one cell.
+## 1. Open the cell
+open.json
+## 3. Fix round (fix-1.json)
+Repeat with fix-2.json, fix-3.json... (new authorizationId/invocationKey values each time) if a recheck itself surfaces a new accepted finding.
+## 4. Close
+disposition: "cell-closed"
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(sampleBaseline);
+  assert.equal(result.pass, true);
+});
+
+test('Assertion 3 Adversarial Evasion E1: detects and rejects prose-only multi-cell sequencing loop', () => {
+  const evasiveContent = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## Planned-multi-cell mode
+To execute the track: drive each cell to completion, then repeat this process for all cells until each cell is closed.
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(evasiveContent);
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /prose-only multi-cell sequencing loop/);
+});
+
+test('Assertion 3 Adversarial Evasion E2: detects and rejects tail self-reinvocation across cells', () => {
+  const evasiveContent = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## 4. Close
+After the cell closes, re-invoke fgos-code-panel on the next cell until the entire plan is finished.
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(evasiveContent);
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /tail self-reinvocation/);
+});
+
+test('Assertion 3 Adversarial Evasion E3: detects and rejects inlining shared fragment prose', () => {
+  const evasiveContent = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## 0. Private branch and worktree
+Naming is deterministic so \`git worktree list\` reads as an inventory: directory ../<prefix>-<slug>.
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(evasiveContent);
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /inlined _shared fragment content/);
+});
+
+test('Assertion 3 Adversarial Evasion E4: detects and rejects looping over plan.md Cell-status table rows', () => {
+  const evasiveContent = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## Planned-multi-cell mode
+Loop over the plan's Cell-status table rows, executing each unmerged phase until finished.
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(evasiveContent);
+  assert.equal(result.pass, false);
+  assert.match(result.reason, /loop iterating over plan\.md Cell-status table rows/);
+});
+
+test('Assertion 3 Discriminator: detects and rejects copying fgos-plan-loop Section 5 loop verbatim', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const planLoopContent = fs.readFileSync(
+    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    'utf8'
+  );
+  // Extract section 5 from plan-loop
+  const section5Match = planLoopContent.match(/## 5\. Unattended track mode[\s\S]*?(?=\n## |\n---|$)/);
+  assert.ok(section5Match);
+  const pastedSkill = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+${section5Match[0]}
+`;
+  const result = validateCodePanelNoPlanLoopDuplication(pastedSkill);
+  assert.equal(result.pass, false, 'Copying Section 5 from plan-loop into code-panel must fail');
+});
+
+test('Assertion 3 False-Positive Guards F1-F4: discriminator passes legitimate patterns cleanly', () => {
+  // F1: 'loop' in proper noun 'fgos-plan-loop'
+  const f1Content = `# Title\nDelegates execution to fgos-plan-loop by reference.`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(f1Content).pass, true);
+
+  // F2: Legitimate negative instructions
+  const f2Content = `# Title\nNo multi-cell track. Never reimplement the plan loop. Do NOT loop over cells.`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(f2Content).pass, true);
+
+  // F3: Worked-example text for single-cell fix rounds
+  const f3Content = `# Title\nRepeat with fix-2.json, fix-3.json... (new authorizationId/invocationKey values each time) if a recheck itself surfaces a new accepted finding.`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(f3Content).pass, true);
+
+  // F4: Single-cell coordination tokens used once
+  const f4Content = `# Title\nUse open.json, authorize, disposition: "cell-closed", close.json once per cell.`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(f4Content).pass, true);
+});
+
+test('Assertion 3 Structural Guard: rejects planned-multi-cell section without fgos-plan-loop delegation reference or exceeding length', () => {
+  const missingRef = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## Planned-multi-cell mode
+This handles multi-cell plans directly without delegating anywhere.
+`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(missingRef).pass, false);
+
+  const bloatedSection = `---
+name: fgos-code-panel
+---
+# fgos-code-panel
+## Planned-multi-cell mode
+Delegates to fgos-plan-loop.
+${Array(45).fill('A detailed step instruction that inflates the section beyond the length ceiling.').join('\n')}
+`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(bloatedSection).pass, false);
+});
+
+// Tests for Assertion 1: Mode-Selection Rule (R1/R2, CE1-CE5, M1)
+test('Assertion 1 Mode-Selection: direct single-cell for concrete change without plan target', () => {
+  const res = classifyCodePanelRequest('implement fix for auth bug in src/auth.mjs');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/auth.mjs');
+});
+
+test('Assertion 1 Mode-Selection: passing citation of plan stays direct-single-cell (RT-01/F2)', () => {
+  const res = classifyCodePanelRequest('fix the bug described in plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'plans/260915-foo/plan.md');
+  assert.equal(res.role, 'passing-citation');
+});
+
+test('Assertion 1 Mode-Selection: plan file as edit target stays direct-single-cell (A1)', () => {
+  const res = classifyCodePanelRequest('fix the typo in plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'plans/260915-foo/plan.md');
+  assert.equal(res.role, 'edit-target');
+});
+
+test('Assertion 1 Mode-Selection: run/resume verb directed at tests/code stays direct-single-cell (A2)', () => {
+  const res1 = classifyCodePanelRequest('run the focused tests listed in plans/260915-foo/phase-01.md against src/x.mjs');
+  assert.equal(res1.mode, 'direct-single-cell');
+  assert.equal(res1.target, 'src/x.mjs');
+  assert.equal(res1.context, 'plans/260915-foo/phase-01.md');
+
+  const res2 = classifyCodePanelRequest('resume my work on src/auth.mjs, context in plans/260915-foo/plan.md');
+  assert.equal(res2.mode, 'direct-single-cell');
+  assert.equal(res2.target, 'src/auth.mjs');
+  assert.equal(res2.context, 'plans/260915-foo/plan.md');
+});
+
+test('Assertion 1 Mode-Selection: negation honored before verb matching (CE2)', () => {
+  const res = classifyCodePanelRequest("don't run plans/260915-foo/plan.md yet, just fix src/auth.mjs");
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/auth.mjs');
+});
+
+test('Assertion 1 Mode-Selection: inspection verb directed at plan stays direct-single-cell (CE4)', () => {
+  const res = classifyCodePanelRequest('review plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'plans/260915-foo/plan.md');
+  assert.equal(res.role, 'inspection');
+});
+
+test('Assertion 1 Mode-Selection: explicit run instruction directed AT plan selects planned-multi-cell', () => {
+  const res = classifyCodePanelRequest('run this implementation plan: plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Assertion 1 Mode-Selection: explicit resume track directed AT plan selects planned-multi-cell', () => {
+  const res = classifyCodePanelRequest('resume track plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Assertion 1 Mode-Selection: bare plan path selects planned-multi-cell', () => {
+  const res = classifyCodePanelRequest('plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Assertion 1 Mode-Selection: plan outside plans/ directory with run verb selects planned-multi-cell (CE5)', () => {
+  const res = classifyCodePanelRequest('run this plan: docs/platform/packaging-distribution/code-panel-rollout-plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'docs/platform/packaging-distribution/code-panel-rollout-plan.md');
+});
+
+test('Assertion 1 Mode-Selection: track by name resolves to plan and selects planned-multi-cell (CE1)', () => {
+  const res1 = classifyCodePanelRequest('resume the dispatch-operability-implementation track');
+  assert.equal(res1.mode, 'planned-multi-cell');
+  assert.equal(res1.track, 'dispatch-operability-implementation');
+
+  const res2 = classifyCodePanelRequest('open the next cell for code-panel-multicell-facade');
+  assert.equal(res2.mode, 'planned-multi-cell');
+  assert.equal(res2.track, 'code-panel-multicell-facade');
+  assert.equal(res2.planPath, 'plans/260915-code-panel-multicell-facade/plan.md');
+});
+
+test('Assertion 1 Track Resolution: resolves timestamp-prefixed and header-tagged plans cleanly', () => {
+  const resolved = resolveTrackNameToPlanPath('code-panel-multicell-facade');
+  assert.equal(resolved, 'plans/260915-code-panel-multicell-facade/plan.md');
+
+  const nonExistent = resolveTrackNameToPlanPath('completely-fictitious-track');
+  assert.equal(nonExistent, null);
+
+  assert.throws(
+    () => classifyCodePanelRequest('resume the completely-fictitious-track track', { strictResolution: true }),
+    AmbiguousIntentError
+  );
+});
+
+test('Assertion 1 Mode-Selection: imperative mood requirement rejects questions, conditionals, past tense, and ambiguity (M1)', () => {
+  // Question
+  assert.throws(
+    () => classifyCodePanelRequest('should I run plans/260915-foo/plan.md now?'),
+    AmbiguousIntentError
+  );
+
+  // Conditional
+  assert.throws(
+    () => classifyCodePanelRequest('if we finish early, run plans/260915-foo/plan.md'),
+    AmbiguousIntentError
+  );
+
+  // Past tense
+  assert.throws(
+    () => classifyCodePanelRequest('I ran plans/260915-foo/plan.md yesterday'),
+    AmbiguousIntentError
+  );
+
+  // Speculative / ambiguous directive
+  assert.throws(
+    () => classifyCodePanelRequest('maybe do something with plans/260915-foo/plan.md or fix bar'),
+    AmbiguousIntentError
+  );
+});
+
+test('Assertion 1 Mode-Selection: phase selection mismatch throws PhaseSelectionMismatchError (CE3)', () => {
+  assert.throws(
+    () => classifyCodePanelRequest('run phase-03 of plans/260915-foo/plan.md', { nextUnmergedPhase: 'phase-01' }),
+    PhaseSelectionMismatchError
+  );
+
+  const matched = classifyCodePanelRequest('run phase-01 of plans/260915-foo/plan.md', { nextUnmergedPhase: 'phase-01' });
+  assert.equal(matched.mode, 'planned-multi-cell');
+  assert.equal(matched.planPath, 'plans/260915-foo/plan.md');
+  assert.equal(matched.phase, 'phase-01');
+});
+
+test('Recursive Dispatch Guard (R2): prevents nested multi-cell dispatch from within plan-loop', () => {
+  // Attempting to run a planned track while already in plan-loop cell dispatch throws RecursiveDispatchError
+  assert.throws(
+    () => classifyCodePanelRequest('run this implementation plan: plans/260915-foo/plan.md', { inPlanLoop: true }),
+    RecursiveDispatchError
+  );
+
+  assert.throws(
+    () => classifyCodePanelRequest('resume track plans/260915-foo/plan.md', { coordinationId: 'code-panel-multicell-facade--p01' }),
+    RecursiveDispatchError
+  );
+
+  assert.throws(
+    () => classifyCodePanelRequest('run plans/260915-foo/plan.md', { workRef: 'track--p02' }),
+    RecursiveDispatchError
+  );
+
+  // Direct single-cell change inside plan-loop cell is accepted as cell-internal work
+  const cellInternal = classifyCodePanelRequest('implement fix for auth bug in src/auth.mjs', {
+    coordinationId: 'code-panel-multicell-facade--p01',
+  });
+  assert.equal(cellInternal.mode, 'direct-single-cell');
+  assert.equal(cellInternal.guarded, true);
+  assert.equal(cellInternal.target, 'src/auth.mjs');
+});
