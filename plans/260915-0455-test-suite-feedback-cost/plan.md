@@ -2,7 +2,8 @@
 
 **Track:** `test-suite-feedback-cost`
 
-**Status:** P00-P04, P06, and P07 complete on track; P08 next; P05 still planned
+**Status:** P00-P04, P06, P07, and P08 complete on track; P05 stopped/deferred
+without implementation evidence; track closing
 
 **Date:** 2026-09-15
 
@@ -99,10 +100,10 @@ P07 audited the remaining harness cost without mutating it. P08 is evidence-only
 | P02 | complete on track | [phase-02-green-baseline-and-profile.md](phase-02-green-baseline-and-profile.md) | accepted baseline and hotspot report recorded in [reports/green-baseline.md](reports/green-baseline.md) |
 | P03 | complete on track | [phase-03-docs-index-pilot.md](phase-03-docs-index-pilot.md) | docs-index state-fixture pilot recorded `expand` in [reports/docs-index-pilot.md](reports/docs-index-pilot.md) |
 | P04 | complete on track | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | external-Claude isolation pilot recorded `expand` in [reports/external-claude-pilot.md](reports/external-claude-pilot.md) |
-| P05 | planned | [phase-05-related-test-selector-pilot.md](phase-05-related-test-selector-pilot.md) | shadow-evaluated conservative selector |
+| P05 | stopped/deferred | [phase-05-related-test-selector-pilot.md](phase-05-related-test-selector-pilot.md) | not implemented in this track; no selector verdict, fallback rate, or miss analysis may be claimed |
 | P06 | complete on track | [phase-06-cli-fixture-init-pilot.md](phase-06-cli-fixture-init-pilot.md) | CLI fixture init pilot recorded `expand` in [reports/fixture-init-pilot.md](reports/fixture-init-pilot.md) |
 | P07 | complete on track | [phase-07-cli-harness-responsibility-audit.md](phase-07-cli-harness-responsibility-audit.md) | harness responsibility audit recorded in [reports/cli-harness-responsibility-audit.md](reports/cli-harness-responsibility-audit.md) with two bounded candidates |
-| P08 | next | [phase-08-evidence-decision-and-handoff.md](phase-08-evidence-decision-and-handoff.md) | accepted/rejected/deferred follow-up map |
+| P08 | complete on track | [phase-08-evidence-decision-and-handoff.md](phase-08-evidence-decision-and-handoff.md) | final evaluation and follow-up packets recorded in [reports/final-evaluation.md](reports/final-evaluation.md) |
 
 ## Track-Wide Invariants
 
