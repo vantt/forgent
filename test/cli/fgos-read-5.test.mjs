@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { graphUseCase, staleUseCase } from '../../src/verbs/state/read.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -142,15 +143,13 @@ test('graph verb: reports connected components (independent parallel tracks) in 
 });
 
 
-test('graph --what-if <id>: reports what completing that item unblocks, in a fgos.v1 envelope, pure read', () => {
+test('graph use case --what-if <id>: reports what completing that item unblocks, pure read', () => {
   const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
 
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['graph', '--what-if', 'a']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
+  const data = graphUseCase({ dir: path.join(cwd, '.fgos') }, { whatIfId: 'a' });
   // tsk-4zj D6: a via addOk carries addOk's own explicit --stage executing
   // default; b via the raw CLI `add` (no --stage) stamps 'discovery' by
   // default (add-stage-default-gap D1/D2; tsk-qod D1/D2: discovery is
@@ -160,11 +159,9 @@ test('graph --what-if <id>: reports what completing that item unblocks, in a fgo
 });
 
 
-test('graph --what-if on an unknown id: exists false, zero impact, still exit 0 + envelope', () => {
+test('graph use case --what-if on an unknown id: exists false, zero impact', () => {
   const cwd = tmpCwdFast();
-  const result = run(cwd, ['graph', '--what-if', 'ghost']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
+  assert.deepEqual(graphUseCase({ dir: path.join(cwd, '.fgos') }, { whatIfId: 'ghost' }), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
 });
 
 
@@ -186,10 +183,10 @@ test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + 
 });
 
 
-test('stale verb on a store with nothing in doing: empty advisory, exit 0', () => {
+test('stale use case on a store with nothing in doing: empty advisory', () => {
   const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never claimed
-  const data = envelopeData(run(cwd, ['stale']).stdout);
+  const data = staleUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.stale, []);
 });
 
@@ -198,12 +195,12 @@ test('stale verb on a store with nothing in doing: empty advisory, exit 0', () =
 // `postDelivery` field, additive alongside the existing `stale`/`thresholds`
 // this verb already returns -- same one-verb surface, no new CLI command.
 
-test('stale verb: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
+test('stale use case: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
   const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   moveToDurableDoingForTest(cwd, 'a');
 
-  const data = envelopeData(run(cwd, ['stale']).stdout);
+  const data = staleUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd, cleanupTtlDays: 7 });
   assert.deepEqual(data.stale, [], 'existing doing-advisory shape untouched');
   assert.equal(data.thresholds.agentMs, 15 * 60 * 1000, 'existing doing-advisory thresholds untouched');
   assert.deepEqual(data.postDelivery.stale, [], 'no delivered/retrospective/cleanup items yet');

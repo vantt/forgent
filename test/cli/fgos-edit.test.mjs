@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { editUseCase } from '../../src/verbs/state/edit.mjs';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -92,12 +93,12 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test('edit changes only the targeted field, every other field unchanged, exit 0', () => {
+test('edit use case changes only the targeted field, every other field unchanged', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'edit-risk', { risk: 'light' });
   const before = eventLines(cwd).length;
-  const result = run(cwd, ['edit', 'edit-risk', '--risk', 'heavy']);
-  assert.equal(result.status, 0);
+  const result = editUseCase({ dir: path.join(cwd, '.fgos') }, { id: 'edit-risk', patch: { risk: 'heavy' } });
+  assert.deepEqual(result.fields, ['risk']);
   assert.equal(eventLines(cwd).length, before + 1);
   const item = stateView(cwd).work['edit-risk'];
   assert.equal(item.risk, 'heavy');

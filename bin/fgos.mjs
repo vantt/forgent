@@ -27,7 +27,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -43,8 +43,7 @@ import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
-import { chooseStageOperation, executeDriverOperationChoice } from '../src/runner/dispatch/operation-choice.mjs';
-import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../src/state/gate-bypass.mjs';
+import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
@@ -60,8 +59,8 @@ const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 import { resolveFgosDir, fgosDirFromRoot, resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs';
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
-import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification, hasRealVerify } from '../src/intake/discovery.mjs';
-import { resolvePlan, replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
+import { hasRealVerify } from '../src/intake/discovery.mjs';
+import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
 import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
@@ -69,7 +68,6 @@ import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
-import { findRunningRuns, classifyRunOutcome, reconcileRun } from '../src/runner/dispatch/visibility-session.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
@@ -84,6 +82,10 @@ import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-compone
 import { approveUseCase } from '../src/verbs/merge/approve.mjs';
 import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
+import { discoverUseCase, planUseCase } from '../src/verbs/state/stage.mjs';
+import { editUseCase } from '../src/verbs/state/edit.mjs';
+import { moveUseCase } from '../src/verbs/state/move.mjs';
+import { graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
@@ -115,7 +117,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSes
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, discoverableStages, resolveDomainName, operationsForStage } from '../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
@@ -175,21 +177,6 @@ function gitAt(cwd, args) {
 // `currentHead`/`resolveRefSha` live in src/runner/worktree.mjs (tsk-49i
 // D3) — the merge-cluster use cases need the identical reads, and a use
 // case cannot import back up into this entry file.
-
-// tsk-5dk: ancestry probe for `move --to delivered`'s refusal check below.
-// Plain execFileSync + try/catch, not gitAt (gitAt always throws on any
-// non-zero exit; here exit 1 is a legitimate "not an ancestor" answer, not
-// an error) — same shape the upstream-branch probe a little below already
-// uses for the same reason.
-function isBranchReachableFromTrunk(cwd, branch, trunk) {
-  try {
-    execFileSync('git', ['merge-base', '--is-ancestor', `refs/heads/${branch}`, trunk], { cwd, encoding: 'utf8', shell: false });
-    return true;
-  } catch (err) {
-    if (err.status === 1) return false;
-    throw new StoreError('validation', `git merge-base --is-ancestor "${branch}" "${trunk}" failed in "${cwd}": ${err.message}`);
-  }
-}
 
 // `return`'s per-item gate — scoped to `cwd`'s OWN subtree, never the whole
 // real repo (`cwd` is the item's working directory, not necessarily the git
@@ -1297,34 +1284,6 @@ async function runVerb(verb, flags, positional, dir) {
     // bin/fgos-runner.mjs loads it.
     case 'discover': {
       const id = requireField(positional[0] ?? flags.id, 'discover requires an id: fgos discover <id> [--config <path>]');
-      const work = listWork(dir).work[id];
-      const stage = work?.stage;
-      // tsk-4b2 D3/D6: domain-aware -- a domain that registers discovery/
-      // exploring (today: coding) can call `discover` from any of its own
-      // three stages; a domain that never registered them (triage/
-      // synthetic) keeps the original single-stage precondition unchanged.
-      const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
-      const validStages = discoverableStages(discoverDomain);
-      if (!validStages.includes(stage)) {
-        // tsk-1l9: only point at `plan` when `plan` would actually take the
-        // item. Suggesting it unconditionally made the two gates refer the
-        // reader to each other in a closed loop for any stage NEITHER verb
-        // serves -- which is exactly what the three items stranded at retired
-        // `clarify` hit, leaving them with no verb-shaped way out at all.
-        const planStage = stageForStep(discoverDomain, 'Divide');
-        const planTakesIt = stage === planStage
-          || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
-        throw new StoreError(
-          'validation',
-          `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
-            + (planTakesIt
-              ? ` -- use "fgos plan ${id}" instead.`
-              : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
-                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
-                + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
-                + ' work-stage-vocabulary check.'),
-        );
-      }
       // An explicit --config path stays a loud, unmodified failure on ENOENT
       // (loadRunnerConfig); only the default, unflagged path bootstraps a
       // missing config (D1/D3, ensureRunnerConfigForDir — tsk-5vf D1/D2).
@@ -1341,24 +1300,7 @@ async function runVerb(verb, flags, positional, dir) {
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
-      // D12: refuse an out-of-vocabulary --tier/--kind/--risk BEFORE
-      // resolveDiscovery writes anything — the same validation editWork
-      // applies below, run early so a typo can never leave the item with its
-      // stage advanced and its classification rejected.
-      assertCallerClassification(work, callerVerdict);
-      const result = resolveDiscovery(dir, id, cfg, 'session', callerVerdict);
-      // The interactive half of D12's classification contract, applied
-      // through the SAME guard the headless sweep uses (loop.mjs re-exports
-      // it from discovery.mjs) rather than a second copy: only a resolved
-      // `clear` outcome carrying a clear caller verdict ever produces a
-      // patch, so an unclear verdict or a parked verify dispute applies
-      // nothing. A call that passed no classification flags leaves the patch
-      // empty, editWork is never called, and the returned payload keeps its
-      // exact pre-existing shape.
-      const classificationPatch = classificationPatchFromVerdict(result.outcome, callerVerdict);
-      if (Object.keys(classificationPatch).length === 0) return result;
-      editWork(dir, { id, patch: classificationPatch, role: 'session' });
-      return { ...result, classification: classificationPatch };
+      return discoverUseCase({ dir, runnerConfig: cfg }, { id, callerVerdict, role: 'session' });
     }
 
     // The sync branch's entry point into chia-việc/split-work judgment
@@ -1373,37 +1315,6 @@ async function runVerb(verb, flags, positional, dir) {
     // `awaiting-human` (D3).
     case 'plan': {
       const id = requireField(positional[0] ?? flags.id, 'plan requires an id: fgos plan <id> [--config <path>]');
-      const work = listWork(dir).work[id];
-      const stage = work?.stage;
-      const domain = getDomain(work?.domain, { onUnrecognized: () => {} });
-      const planningStage = stageForStep(domain, 'Divide');
-      // tsk-403 D18: `decompose` is coding's own drain-only legacy alias
-      // for this same step -- still legal for an item that reached it
-      // before the rename (kept legal in this domain's own `stages`/
-      // `transitions`), even though `stageForStep` no longer resolves a
-      // NEW item there. Only activates when a domain actually declares
-      // both names distinctly (today: only `coding`) -- a domain that
-      // never had this rename (e.g. the `decompose`-native fixture
-      // domains) has `planningStage === 'decompose'` already, so this
-      // stays a no-op for them.
-      const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
-      if (stage !== planningStage && stage !== legacyPlanStage) {
-        // tsk-1l9: mirror of the discover gate above -- only refer the reader
-        // to `discover` when `discover` would actually accept the item, so
-        // the two gates can never form a closed loop around a stage neither
-        // of them serves.
-        const discoverTakesIt = discoverableStages(domain).includes(stage);
-        throw new StoreError(
-          'validation',
-          `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
-            + (discoverTakesIt
-              ? ` -- use "fgos discover ${id}" instead.`
-              : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
-                + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
-                + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
-                + ' work-stage-vocabulary check.'),
-        );
-      }
       // path.dirname(dir), not process.cwd() -- see the discover case above
       // for why (tsk-5hv, found by fgos-coding-implement).
       const cfg = flags.config
@@ -1411,47 +1322,10 @@ async function runVerb(verb, flags, positional, dir) {
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
-      const isValidateRequested = Boolean(flags.validate);
-      const choice = chooseStageOperation({
-        work,
-        stage: work.stage,
-        domain: domain.name ?? work.domain,
-        workflow: work.workflow,
-        repoRoot,
-      });
-      const shouldValidate = !flags.direct && (isValidateRequested || choice.operation === 'validate-plan' || !callerVerdict);
-
-      let validatedVerdict;
-      if (shouldValidate) {
-        let validateChoice = choice;
-        if (validateChoice.operation !== 'validate-plan') {
-          validateChoice = {
-            dispatch: 'assignment',
-            operation: 'validate-plan',
-            taskSpecName: 'validate-plan',
-          };
-        }
-        if (validateChoice.dispatch === 'assignment' && validateChoice.operation === 'validate-plan') {
-          const contentRoot = resolveContentRoot(repoRoot, work.id, work.docsRef);
-          const outcome = await executeDriverOperationChoice(work, validateChoice, {
-            cwd: contentRoot,
-            repoRoot,
-            runnerConfig: cfg,
-            work,
-          });
-
-          if (!outcome.canAdvanceEdge) {
-            if (outcome.nextOperation === 'shape-plan') {
-              throw new StoreError('validation', `plan: validation for "${id}" returned NOT READY -- routing back to shape-plan.`);
-            }
-            throw new StoreError('validation', `plan: validation for "${id}" did not report READY (${outcome.reason}) -- cannot advance Work.`);
-          }
-          validatedVerdict = outcome.verdictPayload ?? { verdict: 'pass-through', reason: 'Plan validated READY by planning.validate-plan' };
-        }
-      }
-
-      const finalVerdict = callerVerdict ?? validatedVerdict;
-      return resolvePlan(dir, id, cfg, 'session', finalVerdict);
+      return planUseCase(
+        { dir, repoRoot, runnerConfig: cfg },
+        { id, callerVerdict, validate: Boolean(flags.validate), direct: Boolean(flags.direct), role: 'session' },
+      );
     }
 
     case 'move': {
@@ -1473,70 +1347,16 @@ async function runVerb(verb, flags, positional, dir) {
       // wontfix. Optional here exactly like `reason` above -- ignored by
       // transitionWork for every edge that doesn't require it.
       const answer = optionalField(flags.answer, 'move --answer requires a non-empty value (omit --answer entirely when not resuming/closing an item out of awaiting-human)');
-      // tsk-5dk: a hand-typed move to delivered writes no merge evidence
-      // (mergedSha/mergedInto only ever come from approve's real merge
-      // paths, src/state/store.mjs) — refuse when fgw/<id> is a live
-      // branch not yet reachable from trunk, so this door can't silently
-      // mark real, unmerged work "delivered". --override-reason keeps a
-      // real escape hatch, but only when it actually carries a reason,
-      // and only after that reason lands in the decision log first.
-      if (to === 'delivered') {
-        const repoRoot = process.cwd();
-        const branch = branchNameFor(id);
-        if (branchExists(repoRoot, branch)) {
-          const trunk = detectTrunk(repoRoot);
-          if (!isBranchReachableFromTrunk(repoRoot, branch, trunk)) {
-            const overrideReason = optionalField(flags['override-reason'], 'move --to delivered --override-reason requires a non-empty reason value (omit --override-reason entirely when the branch is already reachable, or use "fgos approve" to merge for real)');
-            if (!overrideReason) {
-              throw new StoreError(
-                'validation',
-                `move: "${id}" has a live "${branch}" branch not yet reachable from "${trunk}" — moving it to "delivered" here would record no merge evidence (mergedSha/mergedInto). `
-                  + `Use "fgos approve ${id}" to merge for real, or pass --override-reason "<why>" to force this move anyway (recorded to the decision log).`,
-              );
-            }
-            addDecision(dir, {
-              id,
-              text: `move --to delivered override for "${id}": "${branch}" not reachable from "${trunk}"`,
-              rationale: overrideReason,
-              kind: 'engine',
-            });
-          }
-        }
-      }
-      // tsk-280: `return` (bin/fgos.mjs's own `case 'return'`) is the one
-      // door built to prove real progress before `doing -> awaiting-
-      // approval` — branch-advanced (or an explicit `--no-new-commits-ok`,
-      // tsk-4on), a clean working tree, and the item's own `verify`
-      // command actually passing. `move` had zero precondition for this
-      // exact edge, so it silently bypassed every one of those guarantees.
-      // Mirrors the `--to delivered` guard immediately above: refuse by
-      // default, require an explicit non-empty `--skip-return-guard`
-      // reason (never `--override-reason` — that flag's own error message
-      // is scoped specifically to the missing-merge-evidence case above,
-      // a different guarantee than "no proof of real progress"), logged
-      // to the decision log before proceeding.
-      if (to === 'awaiting-approval') {
-        const view = listWork(dir);
-        const item = view.work[id];
-        if (item?.status === 'doing') {
-          const skipReason = optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)');
-          if (!skipReason) {
-            throw new StoreError(
-              'validation',
-              `move: "${id}" is "doing" — moving it to "awaiting-approval" here would record no proof of real progress (no branch-advance check, no clean-tree check, no verify run). `
-                + `Use "fgos return ${id}" to prove it for real (pass --no-new-commits-ok if the work was already done before this claim), or pass --skip-return-guard "<why>" to force this move anyway (recorded to the decision log).`,
-            );
-          }
-          addDecision(dir, {
-            id,
-            text: `move --to awaiting-approval skip-return-guard override for "${id}": status was "doing"`,
-            rationale: skipReason,
-            kind: 'engine',
-          });
-        }
-      }
-      const { event } = moveWork(dir, { id, to, expectedStatus, reason, answer, role: 'human' });
-      return { id, from: event.payload.from, to: event.payload.to, seq: event.seq };
+      const overrideReason = to === 'delivered'
+        ? optionalField(flags['override-reason'], 'move --to delivered --override-reason requires a non-empty reason value (omit --override-reason entirely when the branch is already reachable, or use "fgos approve" to merge for real)')
+        : undefined;
+      const skipReturnGuard = to === 'awaiting-approval'
+        ? optionalField(flags['skip-return-guard'], 'move --to awaiting-approval --skip-return-guard requires a non-empty reason value (omit --skip-return-guard entirely when the item is not "doing", or use "fgos return" to prove real progress for real)')
+        : undefined;
+      return moveUseCase(
+        { dir, repoRoot: process.cwd() },
+        { id, to, expectedStatus, reason, answer, overrideReason, skipReturnGuard, role: 'human' },
+      );
     }
 
     // work-item-status-delivered-retrospective-cleanup D9: the mechanical
@@ -2245,10 +2065,7 @@ async function runVerb(verb, flags, positional, dir) {
           `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`;
       }
       if (Object.keys(patch).length === 0) {
-        throw new StoreError(
-          'validation',
-          'edit requires at least one field to change: --title/--description/--kind/--risk/--verify/--tier/--refs/--deps/--footprint/--acceptance/--priority/--intent/--docs-ref/--parent/--urgent/--impact/--effort/--merge-after/--superseded-by/--duplicates/--domain-fields/--verify-from-children/--verify-from-targets.',
-        );
+        return editUseCase({ dir }, { id, patch });
       }
       // tsk-34o: mirrors `take --role`'s own pattern (see the `case 'take'`
       // block below) -- optional, defaults to 'human' so every existing
@@ -2257,22 +2074,9 @@ async function runVerb(verb, flags, positional, dir) {
       // through this verb being indistinguishable provenance.
       const role = optionalField(flags.role, 'edit --role requires "human" or "session" (omit --role entirely to default to human)') ?? 'human';
       if (role !== 'human' && role !== 'session') {
-        throw new StoreError('validation', `edit --role must be "human" or "session" (got "${role}").`);
+        return editUseCase({ dir }, { id, patch, role });
       }
-      const { event } = editWork(dir, { id, patch, role });
-      if (patch.priority !== undefined) {
-        // tsk-sq9: mark this priority as human-set so plan.mjs's resolvePlan
-        // refined pass (~line 639) knows to skip its own auto-recompute
-        // instead of silently overwriting it.
-        addDecision(dir, {
-          id,
-          text: `priority set to ${patch.priority} via edit --priority`,
-          source: 'edit',
-          kind: 'priority-override',
-          rationale: "tsk-sq9: mark this as a human override so plan.mjs's refined pass does not silently overwrite it",
-        });
-      }
-      return { id, fields: Object.keys(patch), seq: event.seq };
+      return editUseCase({ dir }, { id, patch, role });
     }
 
     case 'resolve-park-reason': {
@@ -2872,9 +2676,9 @@ async function runVerb(verb, flags, positional, dir) {
       // metrics umbrella. Both are pure reads through the store facade.
       if (flags['what-if'] !== undefined) {
         const id = requireField(flags['what-if'], 'graph --what-if requires a non-empty work id');
-        return graphWhatIf(dir, id);
+        return graphUseCase({ dir }, { whatIfId: id });
       }
-      return graphMetrics(dir);
+      return graphUseCase({ dir });
     }
 
     // Request-class per D1 (same contract as `ready`/`list`/`graph`): a pure
@@ -2915,36 +2719,25 @@ async function runVerb(verb, flags, positional, dir) {
       }
       const domain = flags.domain || DEFAULT_DOMAIN;
       const workflow = flags.workflow || undefined;
-      const ops = operationsForStage(domain, stage, { kind: workflow });
-      return {
-        domain: resolveDomainName(domain),
-        workflow: workflow || 'feature',
-        stage,
-        operations: ops,
-      };
+      return workflowUseCase({ dir }, { stage, domain, workflow });
     }
 
     case 'gate-check': {
       const id = requireField(positional[0] ?? flags.id, 'gate-check requires an id: fgos gate-check <id> --gate <contextApprove|validateApprove> ...');
       const gate = requireField(flags.gate, 'gate-check requires --gate <contextApprove|validateApprove>');
-      const item = listWork(dir).work[id];
-      if (!item) {
-        throw new StoreError('validation', `gate-check: no work item "${id}"`);
-      }
-      const level = readGateBypassLevel(dir);
       if (gate === 'contextApprove') {
         const artifactPath = requireField(flags.artifact, 'gate-check --gate contextApprove requires --artifact <path>');
         const artifactText = fs.readFileSync(artifactPath, 'utf8');
-        return { canAutoApprove: canAutoApprove(item, artifactText, level) };
+        return gateCheckUseCase({ dir }, { id, gate, artifactText });
       }
       if (gate === 'validateApprove') {
         const planPath = requireField(flags.plan, 'gate-check --gate validateApprove requires --plan <path>');
         const planText = fs.readFileSync(planPath, 'utf8');
         const childSpecs = flags.children !== undefined ? JSON.parse(flags.children) : [];
         const cost = requireField(flags.cost, 'gate-check --gate validateApprove requires --cost <REVERSIBLE|EXPENSIVE>');
-        return { canAutoApprove: canAutoApproveMergedGate(item, planText, childSpecs, cost, level) };
+        return gateCheckUseCase({ dir }, { id, gate, planText, childSpecs, cost });
       }
-      throw new StoreError('validation', `gate-check: --gate must be "contextApprove" or "validateApprove", got "${gate}"`);
+      return gateCheckUseCase({ dir }, { id, gate });
     }
 
     case 'stale': {
@@ -2953,46 +2746,10 @@ async function runVerb(verb, flags, positional, dir) {
       // returns — same one-verb surface, no new CLI command, per this
       // item's own scope note. ttlDays resolution mirrors `case 'cleanup'`
       // above exactly (shared-config value, never guessed).
-      const doing = staleDoingAdvisory(dir);
       const repoRoot = process.cwd();
       const sharedConfig = readSharedConfig(repoRoot);
       const ttlDays = sharedConfig?.cleanup?.ttlDays ?? DEFAULT_CLEANUP_TTL_DAYS;
-      const postDelivery = stalePostDeliveryAdvisory(dir, { ttlDays });
-
-      // Runs whose dispatch process is gone but whose run.json still says
-      // "running". Read-only by default, because that is what this verb
-      // documents about itself; `--reconcile` is the explicit opt-in that
-      // actually writes the answer back.
-      //
-      // Liveness is never probed here -- `stale` has no herdr client and no
-      // business starting one -- so the answer is `settled` when the worker's
-      // own result file is on disk and `unknown` otherwise. It is specifically
-      // never `died`: that would be an assertion about a process nobody
-      // looked at.
-      const orphans = [];
-      for (const run of findRunningRuns(dir)) {
-        let verdict;
-        try {
-          verdict = classifyRunOutcome(run.runDir, { liveness: 'unknown' });
-        } catch {
-          continue;
-        }
-        if (!verdict.changed) continue;
-        const row = {
-          runId: run.runId,
-          runDir: path.relative(path.dirname(dir), run.runDir),
-          startedAt: run.startedAt,
-          wouldBecome: verdict.outcome,
-          hasWorkerResult: Boolean(verdict.resultPath),
-        };
-        if (flags.reconcile) {
-          reconcileRun(run.runDir, { liveness: 'unknown' });
-          row.reconciled = true;
-        }
-        orphans.push(row);
-      }
-
-      return { ...doing, postDelivery, orphanedRuns: orphans, reconciled: Boolean(flags.reconcile) };
+      return staleUseCase({ dir, repoRoot, cleanupTtlDays: ttlDays }, { reconcile: Boolean(flags.reconcile) });
     }
 
     // Request-class per D1 (same contract as `ready`/`graph`/`stale`): a pure
