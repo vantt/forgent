@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -74,6 +77,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -104,8 +108,7 @@ import {
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
 
 test('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read (no event appended, exit 0)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(addOk(cwd, 'c').status, 0); // isolated -> its own track
@@ -140,8 +143,7 @@ test('graph verb: reports connected components (independent parallel tracks) in 
 
 
 test('graph --what-if <id>: reports what completing that item unblocks, in a fgos.v1 envelope, pure read', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
 
@@ -159,8 +161,7 @@ test('graph --what-if <id>: reports what completing that item unblocks, in a fgo
 
 
 test('graph --what-if on an unknown id: exists false, zero impact, still exit 0 + envelope', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['graph', '--what-if', 'ghost']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
@@ -170,8 +171,7 @@ test('graph --what-if on an unknown id: exists false, zero impact, still exit 0 
 // --- work-graph-intelligence S8: `fgos stale` advisory --------------------
 
 test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + pure read (no event, exit 0)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   moveToDurableDoingForTest(cwd, 'a');
 
@@ -187,8 +187,7 @@ test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + 
 
 
 test('stale verb on a store with nothing in doing: empty advisory, exit 0', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never claimed
   const data = envelopeData(run(cwd, ['stale']).stdout);
   assert.deepEqual(data.stale, []);
@@ -200,8 +199,7 @@ test('stale verb on a store with nothing in doing: empty advisory, exit 0', () =
 // this verb already returns -- same one-verb surface, no new CLI command.
 
 test('stale verb: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0);
   moveToDurableDoingForTest(cwd, 'a');
 
@@ -214,8 +212,7 @@ test('stale verb: postDelivery is additive — existing stale/thresholds shape i
 
 
 test('stale verb: a just-delivered item is NOT flagged in postDelivery (well within the 3d threshold)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   addOk(cwd, 'just-delivered');
   moveToDurableDoingForTest(cwd, 'just-delivered');
   run(cwd, ['move', 'just-delivered', '--to', 'delivered']);
@@ -228,8 +225,7 @@ test('stale verb: a just-delivered item is NOT flagged in postDelivery (well wit
 
 
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/w.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
@@ -249,8 +245,7 @@ test('conflicts verb: two ready items sharing a footprint path are flagged with 
 
 
 test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
   assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), { conflicts: [], stageByItem: {} });
 });
@@ -260,8 +255,7 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
 // Execute (docs/history/execution-fanout/CONTEXT-tsk-4so.md) -------------
 
 test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged (the real gap: a single-step frontier never saw this)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'planning', '--description', 'tsk-4so fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
@@ -291,8 +285,7 @@ test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged 
 // vocabulary now?) outside this test-fixing pass's own scope -- recorded
 // here plainly rather than silently patched over.
 test('conflicts verb: a discovery-stage item and an executing-stage item sharing a footprint are NOT flagged (discovery has no step mapping, so footprintConflicts cannot see it — see comment above)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(run(cwd, ['add', 'atdiscovery', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'discovery', '--description', 'tsk-4so fixture description.']).status, 0);
   assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
@@ -307,8 +300,7 @@ test('conflicts verb: a discovery-stage item and an executing-stage item sharing
 // stance `fgos catchup`'s own eligibility gate already takes). ------------
 
 test('recheck-blocked verb on a store with nothing blocked: all-empty envelope, exit 0, pure read (no event)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never blocked
   const before = eventLines(cwd).length;
   const result = run(cwd, ['recheck-blocked']);
@@ -319,8 +311,7 @@ test('recheck-blocked verb on a store with nothing blocked: all-empty envelope, 
 
 
 test('recheck-blocked verb: a blocked item whose recorded commit is (still) a real ancestor of HEAD is reported resolvable, never auto-transitioned', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'catches-up', { verify: 'test -f proof.txt' });
   // Real claim -> commit -> return shape (mirrors fgos-return.test.mjs's
   // own happy-path fixture) so `headAtReturn` is a REAL recorded commit,
@@ -348,8 +339,7 @@ test('recheck-blocked verb: a blocked item whose recorded commit is (still) a re
 
 
 test('recheck-blocked verb: a blocked item whose recorded commit is no longer reachable (force-pushed away) is reported stillBlocked, never resolvable', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'never-merged', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'never-merged']).status, 0);
   // Scoped `git add proof.txt` -- deliberately NOT `commitFile`'s own
@@ -375,8 +365,7 @@ test('recheck-blocked verb: a blocked item whose recorded commit is no longer re
 
 
 test('graph verb on an empty store: zero components, still a valid envelope, exit 0', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['graph']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
@@ -386,7 +375,7 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
 
 
 test('list --limit paginates work into {items, nextCursor}, AND scopes every other view key to just the paged ids (tsk-483, supersedes D5/D35)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'list-page-a');
   addOk(cwd, 'list-page-b');
   assert.equal(run(cwd, ['decision', '--id', 'list-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
@@ -408,7 +397,7 @@ test('list --limit paginates work into {items, nextCursor}, AND scopes every oth
 
 
 test('list --all --limit combined: scopes side-logs to the paged ids too -- a combination herdr-plugin never uses (tsk-483 D2)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'list-all-page-a');
   addOk(cwd, 'list-all-page-b');
   assert.equal(run(cwd, ['decision', '--id', 'list-all-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
@@ -426,7 +415,7 @@ test('list --all --limit combined: scopes side-logs to the paged ids too -- a co
 
 
 test('list default (no flags at all) scopes side-logs to only the open (non-done) ids -- a done item\'s own decision must not appear (tsk-483)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'list-default-open');
   assert.equal(run(cwd, ['decision', '--id', 'list-default-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
   toProposed(cwd, 'list-default-done');
@@ -441,7 +430,7 @@ test('list default (no flags at all) scopes side-logs to only the open (non-done
 
 
 test('list --all --json with NO pagination flags stays byte-identical -- herdr-plugin\'s own protected contract (tsk-483 D2)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'list-protected-open');
   assert.equal(run(cwd, ['decision', '--id', 'list-protected-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
   toProposed(cwd, 'list-protected-done');

@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -73,6 +76,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -135,8 +139,7 @@ test('approve from the main checkout is unaffected by the guard even while a ses
 
 
 test('approve refuses from an ad-hoc worktree never created through "fgos session start" (runner source) — no merge, item stays proposed, main HEAD unchanged, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'approve-adhoc-runner', { verify: 'test -f approve-adhoc-runner-produced.txt' });
   const headBefore = gitHead(cwd);
 
@@ -154,8 +157,7 @@ test('approve refuses from an ad-hoc worktree never created through "fgos sessio
 
 
 test('approve refuses from an ad-hoc worktree never created through "fgos session start" (pull source) — refuses before any goal-check, item stays proposed, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   commitPending(cwd, 'state: init');
   addOk(cwd, 'approve-adhoc-pull', { verify: 'test -f proof.txt' });
   commitPending(cwd, 'state: add');
@@ -181,7 +183,7 @@ test('approve refuses from an ad-hoc worktree never created through "fgos sessio
 
 
 test('approve from the main checkout is unaffected by the ad-hoc-worktree guard — runner and pull both still close to done, exit 0', () => {
-  const cwdR = initGitCwdMain();
+  const cwdR = initGitCwdMainFast();
   run(cwdR, ['init']);
   makeRunnerProposedItem(cwdR, 'approve-adhoc-main-runner', { verify: 'test -f approve-adhoc-main-runner-produced.txt' });
   commitPendingBeforeApprove(cwdR, 'approve-adhoc-main-runner');
@@ -189,7 +191,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
   assert.equal(resR.status, 0, `runner approve from main must still succeed: ${resR.stderr}`);
   assert.equal(stateView(cwdR).work['approve-adhoc-main-runner'].status, 'delivered');
 
-  const cwdP = initGitCwdMain();
+  const cwdP = initGitCwdMainFast();
   run(cwdP, ['init']);
   addOk(cwdP, 'approve-adhoc-main-pull', { verify: 'test -f proof.txt' });
   run(cwdP, ['take', '--id', 'approve-adhoc-main-pull']);
@@ -216,8 +218,7 @@ test('approve from the main checkout is unaffected by the ad-hoc-worktree guard 
 // ahead of the --github branch, both refuse cleanly, proving the fix.
 
 test('approve --github --pr refuses from an ad-hoc worktree never created through "fgos session start" — no gh call, no moveWork, item stays proposed, exit 4', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'approve-adhoc-github', { verify: 'test -f approve-adhoc-github-produced.txt' });
   const headBefore = gitHead(cwd);
   const marker = path.join(cwd, 'gh-was-called');
@@ -239,7 +240,6 @@ test('approve --github --pr refuses from an ad-hoc worktree never created throug
 
 test('approve --github --pr refuses from inside a registered session worktree, with the registry guard\'s friendlier session-naming message (same precedence as the local path) — no gh call, item stays proposed, exit 4', () => {
   const cwd = initSessionSafeCwd();
-  run(cwd, ['init']);
   makeSessionSafeRunnerItem(cwd, 'approve-session-github', { verify: 'test -f approve-session-github-produced.txt' });
   const marker = path.join(cwd, 'gh-was-called');
   const fake = writeMarkerFake(cwd, marker);
@@ -263,8 +263,7 @@ test('approve --github --pr refuses from inside a registered session worktree, w
 // via GitHub without ever being classified, mirroring the local path exactly.
 
 test('approve --github --pr on a runner item touching a self-modifying-capable module REFUSES without --acknowledge-iron-law -- no gh call, item stays proposed, exit 4 (f01)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'gh-iron-refuse-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
@@ -281,8 +280,7 @@ test('approve --github --pr on a runner item touching a self-modifying-capable m
 
 
 test('approve --github --pr on the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges via the fake gh, awaiting-approval -> done (f01)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
   });
@@ -297,7 +295,7 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
 
 
 test('approve on a proposed item with a missing-evidence acceptance clause is refused the same way as move --to done: precondition, exit 2, item stays proposed, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'approve-cos-missing', { verify: 'true' });
   run(cwd, ['edit', 'approve-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   run(cwd, ['move', 'approve-cos-missing', '--to', 'doing']);
@@ -321,8 +319,7 @@ test('approve on a proposed item with a missing-evidence acceptance clause is re
 // completely untouched by a refused approve, not just that approve reports
 // an error.
 test('approve on a runner-sourced item with a missing-evidence acceptance clause is refused BEFORE the real git merge: precondition, exit 2, main HEAD unchanged, item stays awaiting-approval', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'runner-cos-missing');
   run(cwd, ['edit', 'runner-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
   commitPendingBeforeApprove(cwd, 'runner-cos-missing');

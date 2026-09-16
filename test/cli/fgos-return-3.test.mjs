@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -73,6 +76,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -93,16 +97,14 @@ import {
 
 
 test('return with no id at all is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const result = run(cwd, ['return']);
   assert.equal(result.status, 4);
 });
 
 
 test('return --timeout with a non-numeric or non-positive value is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-bad-timeout', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-bad-timeout']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -114,8 +116,7 @@ test('return --timeout with a non-numeric or non-positive value is rejected as v
 
 
 test('return omitting --timeout falls back to the runner config\'s timeoutMs, blocking a verify that outlives it', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   writeShortRunnerConfig(cwd, 200);
   const scriptPath = writeHangScript(cwd, 1500);
   addOk(cwd, 'pull-return-fallback-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
@@ -130,8 +131,7 @@ test('return omitting --timeout falls back to the runner config\'s timeoutMs, bl
 
 
 test('return --no-timeout opts out of the fallback, letting a verify that outlives the config timeout finish and pass', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   writeShortRunnerConfig(cwd, 200);
   const scriptPath = writeHangScript(cwd, 500);
   addOk(cwd, 'pull-return-no-timeout', { verify: `${process.execPath} ${JSON.stringify(scriptPath)}` });
@@ -146,8 +146,7 @@ test('return --no-timeout opts out of the fallback, letting a verify that outliv
 
 
 test('return --timeout and --no-timeout together are rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-timeout-conflict', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-conflict']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -160,8 +159,7 @@ test('return --timeout and --no-timeout together are rejected as validation, exi
 
 
 test('return --timeout error text no longer claims omitting --timeout means no timeout', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-return-timeout-error-text', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'pull-return-timeout-error-text']).status, 0);
   commitFile(cwd, 'proof.txt');
@@ -176,14 +174,14 @@ test('return --timeout error text no longer claims omitting --timeout means no t
 
 
 test('reject on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['reject', 'ghost', '--reason', 'nope']);
   assert.equal(result.status, 4);
 });
 
 
 test('reject without --reason is rejected as validation, exit 4, item stays proposed', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'reject-no-reason-item');
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'doing']);
   run(cwd, ['move', 'reject-no-reason-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -195,7 +193,7 @@ test('reject without --reason is rejected as validation, exit 4, item stays prop
 
 
 test('reject on a non-proposed item is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   addOk(cwd, 'reject-not-proposed-item');
   const result = run(cwd, ['reject', 'reject-not-proposed-item', '--reason', 'nope']);
   assert.equal(result.status, 2);
@@ -203,8 +201,7 @@ test('reject on a non-proposed item is rejected as precondition, exit 2', () => 
 
 
 test('reject moves awaiting-approval -> todo with the reason recorded, role human, and runs no git command at all — never a revert', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'reject-pull-item', { verify: 'test -f proof.txt' });
   run(cwd, ['take', '--id', 'reject-pull-item']);
   commitFile(cwd, 'proof.txt');
@@ -232,8 +229,7 @@ test('reject moves awaiting-approval -> todo with the reason recorded, role huma
 
 
 test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch) once real work is committed on the fresh fgw/<id> worktree — a fresh pick claim records branchHeadAtTake exactly like a blocked reclaim does, so return recognizes the branch\'s own progress instead of checking the (unchanged) main checkout', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'pick-fresh-return-ok', { verify: 'test -f proof.txt' });
   const mainHeadBefore = gitHead(cwd);
 
@@ -264,8 +260,7 @@ test('return succeeds after a FIRST pick (todo -> doing, no prior blocked branch
 
 
 test('return on a branch-source take: verify passes in a disposable detached worktree at the branch tip -> awaiting-approval, branchHeadAtReturn recorded (never headAtReturn), the human\'s own main checkout is untouched and no worktree is left behind', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-ok', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-ok']).status, 0);
   // take's own event lands on events.jsonl in the SAME main tree (take never
@@ -297,8 +292,7 @@ test('return on a branch-source take: verify passes in a disposable detached wor
 
 
 test('return on a branch-source take whose branch declares a real npm dependency: verify passes because the disposable detached worktree gets its own node_modules provisioned first (tsk-2vd — reproduces the real failure that blocked tsk-32n\'s own return)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
 
   const localDep = mkLocalDependency();
   fs.writeFileSync(
@@ -328,8 +322,7 @@ test('return on a branch-source take whose branch declares a real npm dependency
 
 
 test('return on a branch-source take never touches a live main-checkout.lock (tsk-45z D1 scope: only the main-source path releases early — worktree commits never contend for this shared lock)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // tsk-40m: settleClaim now verifies the settling caller is the SAME
   // session that acquired the claim (writer-identity check) — take and
   // return must share the SAME FGOS_SESSION_ID for this test's own actor

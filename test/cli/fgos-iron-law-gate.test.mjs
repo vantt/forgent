@@ -32,6 +32,7 @@ import {
   commitPendingBeforeApprove,
   envelopeData,
   initGitCwdMain,
+  initGitCwdMainFast,
   makeRunnerProposedItemTouching,
 } from './helpers/fgos-cli-harness.mjs';
 
@@ -128,8 +129,7 @@ function ironLawSkipRecords(cwd, id) {
 // ─── D1: the trunk boundary ────────────────────────────────────────────────
 
 test('approve of a ROOT item (target is trunk) whose diff touches a gated module still REFUSES — the gate is alive at the only boundary it guards', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-root-trip');
 
   const headBefore = gitHead(cwd);
@@ -142,8 +142,7 @@ test('approve of a ROOT item (target is trunk) whose diff touches a gated module
 });
 
 test('approve of a LEAF item (target is fgw/<root>, never trunk) whose OWN commit touches the SAME gated module PROCEEDS with no --acknowledge-iron-law (D1)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedLeaf(cwd, 'gate-leaf-root', 'gate-leaf-child');
 
   const result = run(cwd, ['approve', 'gate-leaf-child']);
@@ -153,8 +152,7 @@ test('approve of a LEAF item (target is fgw/<root>, never trunk) whose OWN commi
 });
 
 test('sync-root of a root with NO parent (target is trunk) whose branch touches a gated module REFUSES', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedSyncRoot(cwd, 'gate-sync-trunk');
 
   const headBefore = gitHead(cwd);
@@ -165,8 +163,7 @@ test('sync-root of a root with NO parent (target is trunk) whose branch touches 
 });
 
 test('sync-root of a NESTED root (target is fgw/<parent>) whose branch touches the same gated module PROCEEDS (D1)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'gate-sync-parent', title: 'parent', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true' });
   commitPending(cwd, 'state: add gate-sync-parent');
@@ -178,8 +175,7 @@ test('sync-root of a NESTED root (target is fgw/<parent>) whose branch touches t
 });
 
 test("sync-root discriminates on !item.parent, NOT resolveRoot: a root whose parent id is absent from the view still targets fgw/<parent>, so the gate stays quiet (plan.md A1b)", () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   // `fgw/ghost-parent` exists as a branch (the helper cuts it), but no work
   // item `ghost-parent` does — resolveRoot bails at root-affinity.mjs:75 and
   // returns the item itself, which would read as "target is trunk" and trip
@@ -194,8 +190,7 @@ test("sync-root discriminates on !item.parent, NOT resolveRoot: a root whose par
 // ─── D3/D7: ironLaw.level, fail-closed to ask ──────────────────────────────
 
 test('a missing ironLaw key fails closed to ask — the root approve above still refuses (D7)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-absent');
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.ok(
@@ -209,8 +204,7 @@ test('a missing ironLaw key fails closed to ask — the root approve above still
 });
 
 test('an unrecognized ironLaw.level fails closed to ask rather than reading as warn (D7)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-bogus');
   writeIronLawLevel(cwd, 'whatever');
 
@@ -222,8 +216,7 @@ test('an unrecognized ironLaw.level fails closed to ask rather than reading as w
 // ─── D8: the warn-level record ─────────────────────────────────────────────
 
 test('ironLaw.level = warn lets the same root approve through AND writes exactly one decision record with kind engine (D3/D8)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-level-warn');
   writeIronLawLevel(cwd, 'warn');
 
@@ -242,8 +235,7 @@ test('ironLaw.level = warn lets the same root approve through AND writes exactly
 });
 
 test('ironLaw.level = ask writes NO skip record when it refuses — the record marks a real skip, never an attempt (D8)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-ask-no-record');
   writeIronLawLevel(cwd, 'ask');
 
@@ -252,8 +244,7 @@ test('ironLaw.level = ask writes NO skip record when it refuses — the record m
 });
 
 test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-check reads the same level the real gate does', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-merge-next-warn');
   writeIronLawLevel(cwd, 'warn');
 
@@ -273,8 +264,7 @@ test('merge next at level warn does NOT skip an Iron-Law item — the pure pre-c
 // `/iron law/i` grep `ironLawSkipRecords` already uses.
 
 test('approve with --acknowledge-iron-law on a gated ROOT proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedRoot(cwd, 'gate-ack-approve');
 
   const result = run(cwd, ['approve', 'gate-ack-approve', '--acknowledge-iron-law']);
@@ -289,8 +279,7 @@ test('approve with --acknowledge-iron-law on a gated ROOT proceeds AND writes ex
 });
 
 test('sync-root with --acknowledge-iron-law on a gated root (no parent) proceeds AND writes exactly one "acknowledged" decision record with kind engine, never "skipped" (tsk-sdr)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeGatedSyncRoot(cwd, 'gate-ack-sync');
 
   const result = run(cwd, ['sync-root', 'gate-ack-sync', '--acknowledge-iron-law']);

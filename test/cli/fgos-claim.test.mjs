@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -74,6 +77,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -150,7 +154,7 @@ test('main-checkout-reset from a linked worktree WITH --dir <mainRoot> targets t
 // main-checkout-cwd path (no --dir) still resolves and runs at all, not
 // commit-loss consent.
 test('main-checkout-reset from the main checkout itself, no --dir, still works exactly as before (no regression on the common case)', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   commitFile(cwd, 'second.txt');
   const targetSha = gitHead(cwd);
   commitFile(cwd, 'third.txt');
@@ -173,8 +177,7 @@ test('session start inside a .fgos/-less linked worktree still succeeds (D10 sym
 // --- take/return: cửa pull giao–nhận việc (stage-decompose S2-pull D1) -----
 
 test('take with no --id claims the frontier head, defaults role to human, records headAtTake, and writes a predicted outcome', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-a', { verify: 'test -f done.txt' });
   const headBefore = gitHead(cwd);
 
@@ -195,8 +198,7 @@ test('take with no --id claims the frontier head, defaults role to human, record
 
 
 test('take --role session records claimRole "session" instead of the default human', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-session');
 
   const result = run(cwd, ['take', '--role', 'session']);
@@ -206,8 +208,7 @@ test('take --role session records claimRole "session" instead of the default hum
 
 
 test('take --role with an invalid value is rejected as validation, exit 4, no event written', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-bad-actor');
   const before = eventLines(cwd).length;
 
@@ -218,8 +219,7 @@ test('take --role with an invalid value is rejected as validation, exit 4, no ev
 
 
 test('take on an empty frontier is rejected as validation, exit 4, no event written', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const before = eventLines(cwd).length;
 
   const result = run(cwd, ['take']);
@@ -229,8 +229,7 @@ test('take on an empty frontier is rejected as validation, exit 4, no event writ
 
 
 test('take --id on a todo item outside the frontier (dep not done) is rejected as validation — take opens only the same set the runner would dispatch', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-dep-source');
   run(cwd, ['add', 'pull-dep-blocked', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--deps', 'pull-dep-source', '--description', 'tsk-535 fixture description.']);
   const before = eventLines(cwd).length;
@@ -243,8 +242,7 @@ test('take --id on a todo item outside the frontier (dep not done) is rejected a
 
 
 test('take --id on an item already claimed (doing) falls through to moveWork\'s own CAS — conflict, exit 3, not a duplicated validation message', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pull-double-take');
   assert.equal(run(cwd, ['take', '--id', 'pull-double-take']).status, 0);
 
@@ -255,8 +253,7 @@ test('take --id on an item already claimed (doing) falls through to moveWork\'s 
 
 
 test('take --id not found is rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const result = run(cwd, ['take', '--id', 'no-such-item']);
   assert.equal(result.status, 4);
 });
@@ -291,8 +288,7 @@ test('take --id from --dir records headAtTake against the real root, not the wor
 // --- pick: take + createWorktree combined (str83-fgos-slash-commands-4) ---
 
 test('pick with no --id claims the frontier head exactly like take does today, role fixed to "session", and stands up a real (non-detached) git branch/worktree for the claim', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-a', { verify: 'test -f done.txt' });
   const headBefore = gitHead(cwd);
 
@@ -377,8 +373,7 @@ test('pick --id from --dir stands up the worktree under --dir\'s own .claude/wor
 // createClaimWorktree's reattach succeeds instead — same path, no removal,
 // no crash, an even safer outcome than reclaim-and-recreate would be.
 test('pick --id reattaches to its own already-existing worktree/branch when invoked FROM INSIDE that worktree via --dir, without crashing (tsk-k8u repro)', () => {
-  const main = initGitCwd();
-  run(main, ['init']);
+  const main = initGitCwdFast();
   addOk(main, 'reclaim-from-inside');
 
   const firstPick = envelopeData(run(main, ['pick', '--id', 'reclaim-from-inside']).stdout);
@@ -402,8 +397,7 @@ test('pick --id reattaches to its own already-existing worktree/branch when invo
 
 
 test('pick --id claims that specific item, role fixed to "session" — pick has no --role flag at all, unlike take', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-explicit-other');
   addOk(cwd, 'pick-explicit-target');
 
@@ -421,8 +415,7 @@ test('pick --id claims that specific item, role fixed to "session" — pick has 
 
 
 test('pick --id on an item already claimed (doing) fails the same way take does today — conflict, exit 3, no double-claim', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-double');
   assert.equal(run(cwd, ['pick', '--id', 'pick-double']).status, 0);
 
@@ -433,8 +426,7 @@ test('pick --id on an item already claimed (doing) fails the same way take does 
 
 
 test('pick surfaces a real createWorktree failure and reverts the claim it already made, instead of orphaning the item in doing (tsk-4m0 D1)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-wt-fail');
   // Force `git worktree add -b fgw/pick-wt-fail ...` to fail deterministically
   // and for real (no mock): git's ref namespace cannot hold both a leaf ref
@@ -462,8 +454,7 @@ test('pick surfaces a real createWorktree failure and reverts the claim it alrea
 // --- pick: claim-lock §3a/§3c/§7 (guard loosen, branch-reuse generalize, claimTrigger) ---
 
 test('pick --id claims a status:todo item at stage discovery (not the frontier at all) — the frontier/stage guard is gone (claim-lock §3a)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   const id = JSON.parse(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).data.id;
   assert.equal(stateView(cwd).work[id].stage, 'discovery');
   assert.ok(!envelopeData(run(cwd, ['ready']).stdout).some((i) => i.id === id), 'a discovery-stage item is never in the frontier');
@@ -479,8 +470,7 @@ test('pick --id claims a status:todo item at stage discovery (not the frontier a
 
 
 test('pick with no --id still only opens the frontier head — the loosened guard applies to the explicit --id branch alone', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   run(cwd, ['submit', 'Fuzzy request never picked by id']); // stage discovery, never in the frontier
   const result = run(cwd, ['pick']);
   assert.notEqual(result.status, 0, 'the frontier is empty — a clarify-stage item must not be silently auto-picked');
@@ -488,8 +478,7 @@ test('pick with no --id still only opens the frontier head — the loosened guar
 
 
 test('pick --via stamps claimTrigger on the item; omitting --via leaves it entirely absent (claim-lock §7)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-via-herdr');
   addOk(cwd, 'pick-via-none');
 
@@ -502,8 +491,7 @@ test('pick --via stamps claimTrigger on the item; omitting --via leaves it entir
 
 
 test('pick --via requires a non-empty value, rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'pick-via-empty');
   const result = run(cwd, ['pick', '--id', 'pick-via-empty', '--via']);
   assert.equal(result.status, 4);
@@ -512,8 +500,7 @@ test('pick --via requires a non-empty value, rejected as validation, exit 4', ()
 
 
 test('pick reclaims a released todo item onto its OWN existing branch tip, not a fresh HEAD (claim-lock §3c: branch-reuse keyed on branchExists alone, not status)', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'reuse-branch-item');
 
   const firstPick = envelopeData(run(cwd, ['pick', '--id', 'reuse-branch-item']).stdout);
@@ -551,8 +538,7 @@ test('pick on a leaf item whose root has no fgw/<rootId> branch yet forks from r
   // baseRef used to throw AFTER moveWork had already committed the
   // doing-claim, leaving the item stuck in doing with no branch/worktree and
   // no automatic recovery (startupReap skips human/session claims by design).
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'orphan-root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'orphan-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', parent: 'orphan-root-item' });
@@ -575,8 +561,7 @@ test('pick on a leaf item whose root DOES have a live fgw/<rootId> branch forks 
   // split (bin/fgos.mjs's D3 comment) — never from main/repoRoot HEAD,
   // which would silently drop whatever the root branch already carries
   // (the tsk-1wd-3 dogfood incident this item exists to close).
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'baseref-root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'baseref-leaf-item', title: 'Leaf Item', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', parent: 'baseref-root-item' });
@@ -610,8 +595,7 @@ test('pick on a leaf item refuses the claim when a dep is not yet status:done, i
   // into the root branch (bin/fgos.mjs's leaf approve case) — so a dep
   // that isn't 'done' yet is exactly the case that must be refused, not
   // silently forked from a root branch missing that dep's content.
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'guard-root-item', { title: 'Root Item' });
   addOk(cwd, 'guard-dep-item', { title: 'Dep Item' }); // left status: todo — never approved
   const dir = path.join(cwd, '.fgos');
@@ -646,8 +630,7 @@ test('pick on a leaf item refuses the claim when a dep is not yet status:done, i
 
 
 test('take --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing, recording branchHeadAtTake (the branch\'s own HEAD, never the main-based headAtTake)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-take-a');
   const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/branch-take-a']).trim();
   const mainHeadBefore = gitHead(cwd);
@@ -671,8 +654,7 @@ test('take --id on a blocked item with a live fgw/<id> branch claims via blocked
 
 
 test('take --id on a blocked item with NO live branch still falls through to the old todo-only CAS — conflict, exit 3, item stays blocked', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'blocked-no-branch');
   run(cwd, ['move', 'blocked-no-branch', '--to', 'blocked']);
 
@@ -683,8 +665,7 @@ test('take --id on a blocked item with NO live branch still falls through to the
 
 
 test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked -> doing (the same edge take uses), role "session", and REUSES the existing branch/worktree instead of creating a duplicate', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'pick-branch-a');
   const branchHead = gitAtCwd(cwd, ['rev-parse', 'fgw/pick-branch-a']).trim();
   const mainHeadBefore = gitHead(cwd);
@@ -714,7 +695,7 @@ test('pick --id on a blocked item with a live fgw/<id> branch claims via blocked
 
 
 test('session start returns a session id and an existing worktree path, exit 0', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { result, sessionId, worktreePath } = startSession(cwd);
   assert.equal(result.status, 0, `session start should succeed: ${result.stderr}`);
   assert.ok(sessionId, 'data names a session id');

@@ -9,6 +9,7 @@ import {
   envelopeData,
   gitAtCwd,
   initGitCwdMain,
+  initGitCwdMainFast,
   makeRunnerProposedItem,
   run,
   stateView,
@@ -28,8 +29,7 @@ import {
 // --override-reason for a real exception, logged to the decision log.
 
 test('move --to delivered is allowed when no fgw/<id> branch exists at all (pull/legacy item, or a plain state fixture)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-no-branch');
   run(cwd, ['take', '--id', 'move-no-branch']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['move', 'move-no-branch', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -40,8 +40,7 @@ test('move --to delivered is allowed when no fgw/<id> branch exists at all (pull
 });
 
 test('move --to delivered is allowed when fgw/<id> exists and IS reachable from trunk', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-reachable');
   run(cwd, ['take', '--id', 'move-reachable']); // tsk-40m: real claim, no durable move anymore
   gitAtCwd(cwd, ['branch', 'fgw/move-reachable', 'main']); // branched off main, never diverged: trivially an ancestor
@@ -53,8 +52,7 @@ test('move --to delivered is allowed when fgw/<id> exists and IS reachable from 
 });
 
 test('move --to delivered is REFUSED when fgw/<id> exists and is NOT reachable from trunk, no event written', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'move-unmerged', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-unmerged');
 
@@ -69,8 +67,7 @@ test('move --to delivered is REFUSED when fgw/<id> exists and is NOT reachable f
 });
 
 test('move --to delivered with --override-reason proceeds despite an unreachable branch, and logs the reason to the decision log', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'move-override', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-override');
 
@@ -86,8 +83,7 @@ test('move --to delivered with --override-reason proceeds despite an unreachable
 });
 
 test('move --to delivered without --override-reason refuses even with an EMPTY --override-reason value (validation, not a silent bypass)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'move-empty-override', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-empty-override');
 
@@ -97,8 +93,7 @@ test('move --to delivered without --override-reason refuses even with an EMPTY -
 });
 
 test('move --to a status other than delivered is never gated by the branch-reachability check, even with a live unmerged branch', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'move-not-delivered', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-not-delivered');
 
@@ -116,8 +111,7 @@ test('move --to a status other than delivered is never gated by the branch-reach
 // decision log.
 
 test('move --to awaiting-approval on a "doing" item is REFUSED without --skip-return-guard, no event written', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-guard-doing');
   run(cwd, ['take', '--id', 'move-guard-doing']); // tsk-40m: real claim, no durable move anymore
 
@@ -132,8 +126,7 @@ test('move --to awaiting-approval on a "doing" item is REFUSED without --skip-re
 });
 
 test('move --to awaiting-approval with --skip-return-guard proceeds despite "doing" status, and logs the reason to the decision log', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-guard-override');
   run(cwd, ['take', '--id', 'move-guard-override']); // tsk-40m: real claim, no durable move anymore
 
@@ -149,8 +142,7 @@ test('move --to awaiting-approval with --skip-return-guard proceeds despite "doi
 });
 
 test('move --to awaiting-approval on a "doing" item refuses even with an EMPTY --skip-return-guard value (validation, not a silent bypass)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-guard-empty');
   run(cwd, ['take', '--id', 'move-guard-empty']); // tsk-40m: real claim, no durable move anymore
 
@@ -160,8 +152,7 @@ test('move --to awaiting-approval on a "doing" item refuses even with an EMPTY -
 });
 
 test('move --to awaiting-approval on a NON-"doing" item is never gated by the return-guard check', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeRunnerProposedItem(cwd, 'move-guard-not-doing', { verify: 'true' });
   commitPendingBeforeApprove(cwd, 'move-guard-not-doing');
   run(cwd, ['take', '--id', 'move-guard-not-doing']); // tsk-40m: real claim, no durable move anymore
@@ -182,8 +173,7 @@ test('move --to awaiting-approval on a NON-"doing" item is never gated by the re
 // targets wontfix at all. ---
 
 test('move --to wontfix from awaiting-human succeeds when --answer is supplied, closing a moot question without fabricating a resume', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-wontfix-from-ask');
   run(cwd, ['take', '--id', 'move-wontfix-from-ask']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['ask', 'move-wontfix-from-ask', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);
@@ -195,8 +185,7 @@ test('move --to wontfix from awaiting-human succeeds when --answer is supplied, 
 });
 
 test('move --to wontfix from awaiting-human still refuses with no --answer, same validation shape as before this item', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'move-wontfix-no-answer');
   run(cwd, ['take', '--id', 'move-wontfix-no-answer']); // tsk-40m: real claim, no durable move anymore
   run(cwd, ['ask', 'move-wontfix-no-answer', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: still relevant?']);

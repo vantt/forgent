@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -73,6 +76,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -93,8 +97,7 @@ import {
 
 
 test('return on a branch-source take refuses when the branch has NOT advanced past branchHeadAtTake (no new commit) — validation, exit 4, item stays doing', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-stale', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-stale']).status, 0);
 
@@ -106,8 +109,7 @@ test('return on a branch-source take refuses when the branch has NOT advanced pa
 
 
 test('return without --no-new-commits-ok still refuses a branch-source claim with zero commits since take, even when the branch already satisfies verify (tsk-4on default-unchanged)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-predone-noflag', { verify: 'test -f proof.txt' });
   // The real work is already done and committed BEFORE this claim — mirrors
   // tsk-4j9: a parent whose children's merged content already sits on its
@@ -126,8 +128,7 @@ test('return without --no-new-commits-ok still refuses a branch-source claim wit
 
 
 test('return --no-new-commits-ok closes out a branch-source claim whose branch already reflects fully-done, verify-passing work before this claim (tsk-4on) — succeeds, records aheadCount:0', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-predone', { verify: 'test -f proof.txt' });
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'already done\n');
   execFileSync('git', ['add', '-A'], { cwd });
@@ -150,8 +151,7 @@ test('return --no-new-commits-ok closes out a branch-source claim whose branch a
 
 
 test('return --no-new-commits-ok refuses a branch-source claim that was already blocked by a real verify-fail — the flag closes out work never returned, never rescues a failed retry (tsk-4on D2)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-cheat', { verify: 'test -f proof.txt' });
 
   const pickResult = run(cwd, ['pick', '--id', 'branch-return-cheat']);
@@ -183,8 +183,7 @@ test('return --no-new-commits-ok refuses a branch-source claim that was already 
 
 
 test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fresh branch-source claim whose branch tip still fails verify still parks doing -> blocked + friction (tsk-4on)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'branch-return-flag-verify-fail', { verify: 'test -f proof.txt' }); // proof.txt never created anywhere
 
   assert.equal(run(cwd, ['pick', '--id', 'branch-return-flag-verify-fail']).status, 0);
@@ -202,8 +201,7 @@ test('return --no-new-commits-ok never bypasses verify itself — a genuinely-fr
 
 
 test('return on a branch-source take never requires the human\'s own main tree to be clean ("tree người là việc của người") — a dirty main tree never blocks it and is left untouched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-dirty-main', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-dirty-main']).status, 0);
   commitPending(cwd, 'state: take branch-return-dirty-main');
@@ -226,8 +224,7 @@ test('return on a branch-source take never requires the human\'s own main tree t
 
 
 test('return on a branch-source take: verify-fail -> doing -> blocked + friction (verification layer), exit 0 (a defined outcome, not a CLI error)', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   makeBlockedBranchItem(cwd, 'branch-return-red', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'branch-return-red']).status, 0);
   commitPending(cwd, 'state: take branch-return-red');
@@ -252,7 +249,6 @@ test('return on a branch-source take: verify-fail -> doing -> blocked + friction
 
 test('return succeeds unchanged from inside a real session worktree (created via session.mjs createSession) — doing -> awaiting-approval, exit 0', () => {
   const cwd = initSessionSafeCwd();
-  run(cwd, ['init']);
   addOk(cwd, 'return-in-session', { verify: 'test -f proof.txt' });
   run(cwd, ['take', '--id', 'return-in-session']); // headAtTake = current main HEAD
 
@@ -285,8 +281,7 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
   // via "fgos session start" (no `sessions.json` entry), so it must be
   // refused exactly like approve's own adhoc-worktree tests prove for
   // approve.
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   commitPending(cwd, 'state: init');
   addOk(cwd, 'return-adhoc-mainsource', { verify: 'test -f proof.txt' });
   commitPending(cwd, 'state: add');
@@ -311,8 +306,7 @@ test('tsk-ikd: return refuses from an ad-hoc worktree never created through "fgo
 
 
 test('return --worker-verified-sha skips runGoalCheck when sha matches branchHead, moving item to awaiting-approval with verify skipped output', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'worker-verified-item', { verify: 'exit 1' });
   const pickResult = run(cwd, ['pick', '--id', 'worker-verified-item']);
   assert.equal(pickResult.status, 0);
@@ -335,8 +329,7 @@ test('return --worker-verified-sha skips runGoalCheck when sha matches branchHea
 
 
 test('return --worker-verified-sha falls through to real verify when sha is stale or mismatched', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
+  const cwd = initGitCwdMainFast();
   addOk(cwd, 'worker-stale-item', { verify: 'exit 1' });
   const pickResult = run(cwd, ['pick', '--id', 'worker-stale-item']);
   assert.equal(pickResult.status, 0);

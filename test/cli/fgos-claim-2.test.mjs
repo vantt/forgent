@@ -40,10 +40,13 @@ import {
   gitAtCwd,
   gitHead,
   initGitCwd,
+  initGitCwdFast,
   initGitCwdInSubdir,
   initGitCwdMain,
+  initGitCwdMainFast,
   initGitCwdWithWorktree,
   initHeadlessGitCwd,
+  initHeadlessGitCwdFast,
   initSessionSafeCwd,
   linkFgosBinInto,
   logPath,
@@ -74,6 +77,7 @@ import {
   startSession,
   stateView,
   tmpCwd,
+  tmpCwdFast,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -94,7 +98,7 @@ import {
 
 
 test('session list shows a started session, then omits it after it ends', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd, ['--item', 'work-x']);
 
   const listed = run(cwd, ['session', 'list']);
@@ -115,7 +119,7 @@ test('session list shows a started session, then omits it after it ends', () => 
 
 
 test('session end removes a non-diverged session cleanly — exit 0, worktree gone', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
   assert.ok(fs.existsSync(worktreePath));
 
@@ -126,7 +130,7 @@ test('session end removes a non-diverged session cleanly — exit 0, worktree go
 
 
 test('session end on a diverged session refuses at the CLI level and names the dangling sha, exit 4', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
   const danglingSha = commitInWorktree(worktreePath, 'change.txt');
 
@@ -141,7 +145,7 @@ test('session end on a diverged session refuses at the CLI level and names the d
 
 
 test('session end --force removes a diverged session anyway, exit 0', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
   commitInWorktree(worktreePath, 'change.txt');
 
@@ -155,7 +159,7 @@ test('session end --force removes a diverged session anyway, exit 0', () => {
 
 
 test('session end on an unknown session id is a clean validation error, exit 4, no crash', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const result = run(cwd, ['session', 'end', 'no-such-session']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /unknown or already-ended session/);
@@ -163,7 +167,7 @@ test('session end on an unknown session id is a clean validation error, exit 4, 
 
 
 test('session with no sub-verb, and an unknown sub-verb, are both rejected as validation, exit 4', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   assert.equal(run(cwd, ['session']).status, 4);
   assert.equal(run(cwd, ['session', 'bogus']).status, 4);
 });
@@ -177,7 +181,7 @@ test('session with no sub-verb, and an unknown sub-verb, are both rejected as va
 // touch, matching test/runner/session.test.mjs's own reclaim coverage.
 
 test('session gc reclaims a clean, untouched session and reports it, exit 0', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
 
   const gced = run(cwd, ['session', 'gc']);
@@ -191,7 +195,7 @@ test('session gc reclaims a clean, untouched session and reports it, exit 0', ()
 
 
 test('session gc spares a diverged session and reports it as skipped, exit 0', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
   const danglingSha = commitInWorktree(worktreePath, 'change.txt');
 
@@ -209,7 +213,7 @@ test('session gc spares a diverged session and reports it as skipped, exit 0', (
 
 
 test('session gc spares a session with uncommitted (never-committed) changes, exit 0', () => {
-  const cwd = initGitCwd();
+  const cwd = initGitCwdFast();
   const { sessionId, worktreePath } = startSession(cwd);
   fs.writeFileSync(path.join(worktreePath, 'wip.txt'), 'not committed yet\n');
 
@@ -225,8 +229,7 @@ test('session gc spares a session with uncommitted (never-committed) changes, ex
 
 
 test('unlock: no lock file present -- reports cleared, exit 0', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['unlock']);
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);
@@ -236,8 +239,7 @@ test('unlock: no lock file present -- reports cleared, exit 0', () => {
 
 
 test('unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   // A pid essentially guaranteed dead: an implausibly high, never-assigned value.
   fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
@@ -252,8 +254,7 @@ test('unlock: lock held by a dead pid -- self-heals via the existing reclaim pat
 
 
 test('unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   // The test process's own pid is genuinely alive and distinct from the
   // spawned CLI child's pid -- a real live-other-holder case.
@@ -269,8 +270,7 @@ test('unlock: lock genuinely held by a live session -- refuses, reports the hold
 
 
 test('unlock: string-identity lock within TTL -- still refuses (D5 fail-closed, unchanged), but never claims "live session" (tsk-24t)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   // The exact shape .githooks/pre-commit writes per commit: a STRING
   // identity, not a numeric pid -- tryAcquireOnce can never probe its
@@ -293,8 +293,7 @@ test('unlock: string-identity lock within TTL -- still refuses (D5 fail-closed, 
 
 
 test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
 
@@ -309,7 +308,7 @@ test('unlock: corrupt (unparseable) lock content -- force-reclaims via forceRecl
 
 
 test('unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['--help', '--json']);
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(result.stdout);
@@ -323,8 +322,7 @@ test('unlock: registered in the --help --json manifest with write-only touchesSt
 // --- `fgos lock-status` (tsk-5z2, D1): read-only main-checkout.lock report -
 
 test('lock-status: no lock file present -- reports "free"', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['lock-status']);
   assert.equal(result.status, 0, result.stderr);
   const data = envelopeData(result.stdout);
@@ -334,8 +332,7 @@ test('lock-status: no lock file present -- reports "free"', () => {
 
 
 test('lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses)', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: process.pid, ts: Date.now() }));
 
@@ -353,8 +350,7 @@ test('lock-status: held by a live session -- reports "live" with holder identity
 
 
 test('lock-status: held by a dead pid -- reports "stale" and never reclaims the file', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   fs.writeFileSync(mainCheckoutLockPath(cwd), JSON.stringify({ pid: 999999999, ts: Date.now() }));
 
@@ -369,8 +365,7 @@ test('lock-status: held by a dead pid -- reports "stale" and never reclaims the 
 
 
 test('lock-status: corrupt lock content -- reports "ambiguous" and never removes the file', () => {
-  const cwd = tmpCwd();
-  assert.equal(run(cwd, ['init']).status, 0);
+  const cwd = tmpCwdFast();
   fs.mkdirSync(path.dirname(mainCheckoutLockPath(cwd)), { recursive: true });
   fs.writeFileSync(mainCheckoutLockPath(cwd), 'not json at all {{{');
 
@@ -385,7 +380,7 @@ test('lock-status: corrupt lock content -- reports "ambiguous" and never removes
 
 
 test('lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['--help', '--json']);
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(result.stdout);
@@ -397,8 +392,7 @@ test('lock-status: registered in the --help --json manifest as read-only (touche
 
 
 test('take --no-wait fails immediately on a live-held lock, same message/exit code as an unwaited claim, no retry delay', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
   writeLiveLock(cwd, 1000); // well within DEFAULT_TTL_MS -- would never clear on its own during this test
 
@@ -414,8 +408,7 @@ test('take --no-wait fails immediately on a live-held lock, same message/exit co
 
 
 test('take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3\'s default-ON behavior', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-default-take', { verify: 'true' });
   // remainingTtlMs ~= 3s at write time: short enough to clear inside this
   // test without waiting out the real DEFAULT_TTL_MS (3 minutes). The
@@ -437,8 +430,7 @@ test('take (default, no flags) retries through a lock whose remainingTtlMs is sh
 
 
 test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs, and fails with the exhausted-budget message once spent', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-tight-budget-take', { verify: 'true' });
   writeLiveLock(cwd, 1000); // remainingTtlMs ~179s -- would never clear naturally in a test
 
@@ -453,8 +445,7 @@ test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs,
 
 
 test('take --wait rejects a non-numeric or non-positive value the same way --timeout already does', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-bad-value-take');
 
   const result = run(cwd, ['take', 'wait-bad-value-take', '--wait', 'nope']);
@@ -464,8 +455,7 @@ test('take --wait rejects a non-numeric or non-positive value the same way --tim
 
 
 test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-over-cap-take');
 
   const result = run(cwd, ['take', 'wait-over-cap-take', '--wait', '900001']);
@@ -475,8 +465,7 @@ test('take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3'
 
 
 test('pick --no-wait fails immediately on a live-held lock, same as take --no-wait', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
   writeLiveLock(cwd, 1000);
 
@@ -491,7 +480,7 @@ test('pick --no-wait fails immediately on a live-held lock, same as take --no-wa
 
 
 test('take/pick/approve are documented in the --help --json manifest with wait/no-wait properties', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFast();
   const result = run(cwd, ['--help', '--json']);
   assert.equal(result.status, 0, result.stderr);
   const manifest = JSON.parse(result.stdout);
@@ -508,8 +497,7 @@ test('take/pick/approve are documented in the --help --json manifest with wait/n
 // (tsk-65n) -----------------------------------------------------------------
 
 test('pick on an item whose fgw/<id> worktree is still live hands back that SAME worktree instead of removing it out from under the session working there', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'repick-live-item');
 
   const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-live-item']).stdout);
@@ -531,8 +519,7 @@ test('pick on an item whose fgw/<id> worktree is still live hands back that SAME
 
 
 test('pick reattaches even when the live worktree has uncommitted work, leaving that work untouched', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'repick-dirty-item');
 
   const firstPick = envelopeData(run(cwd, ['pick', '--id', 'repick-dirty-item']).stdout);
@@ -551,8 +538,7 @@ test('pick reattaches even when the live worktree has uncommitted work, leaving 
 
 
 test('take refuses a todo item whose own fgw/<id> branch already exists, naming pick instead of silently claiming source:main', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'take-with-branch-item');
 
   // the branch (and worktree) come into being via pick; the claim is then
@@ -570,8 +556,7 @@ test('take refuses a todo item whose own fgw/<id> branch already exists, naming 
 
 
 test('take still claims a todo item that has no fgw/<id> branch of its own', () => {
-  const cwd = initGitCwd();
-  run(cwd, ['init']);
+  const cwd = initGitCwdFast();
   addOk(cwd, 'take-no-branch-item');
 
   const taken = run(cwd, ['take', '--id', 'take-no-branch-item']);
