@@ -1528,13 +1528,14 @@ export function classifyCodePanelRequest(request, options = {}) {
     (workRef && cellIdPattern.test(workRef))
   );
 
-  // 2. Imperative mood check (M1 & Anti-guessing & NEW-9 / R-M3):
+  // 2. Imperative mood check (M1 & Anti-guessing & NEW-9 / R-M3 & reviewer F-2):
   // Detect hedges, questions, conditionals, and past-tense descriptions DIRECTED AT running a plan/track.
   // Conditionals/hedges are detected at clause level (leading or trailing, comma or not).
-  const clauses = trimmed.split(/[;\n]+/);
+  // Gate on explicit track syntax, never a bare \btrack\b substring (F-2).
+  const clauses = trimmed.split(/(?<=[.!?;])\s+|\n+/);
   for (const clause of clauses) {
     const c = clause.trim();
-    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|\btrack\b)/i.test(c);
+    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|(?:run|resume|execute|ran|resumed|executed)\s+(?:the\s+)?[\w-]+\s+track\b|(?:run|resume|execute|ran|resumed|executed)\s+track\s+|open\s+(?:the\s+next\s+cell\s+for\s+)[\w-]+)/i.test(c);
     if (!hasPlanOrTrack) continue;
 
     const hasRunVerb = /\b(?:run|resume|execute|open)\b/i.test(c);
@@ -1554,23 +1555,23 @@ export function classifyCodePanelRequest(request, options = {}) {
     }
   }
 
-  // 3. Negation honored (CE2 & R-H1 / NEW-2):
+  // 3. Negation honored (CE2 & R-H1 / NEW-2 / reviewer F-1):
   // Negation directed at running a plan or track must be handled before verb matching.
-  // Covers both path negation and track-by-name negation ("(don't|do not|never) (run|resume|execute) (the )?<name> track",
-  // "... open the next cell for <name>", "... track <name>").
+  // Covers path negation, track-by-name negation, and phase-of-track / phase-of-path negation (F-1).
   const negationOnPlanMatch =
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+track\s+([a-zA-Z0-9_-]+)/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?track\s+([a-zA-Z0-9_-]+)/i) ||
     trimmed.match(/\b(?:don't|do not|never)\s+open\s+(?:the\s+next\s+cell\s+for\s+)([a-zA-Z0-9_-]+)/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?[^\s,;]+\.md)/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:the\s+)?([^\s,;]+(?:\.md|\btrack\b|[a-zA-Z0-9_-]+[-/]plan\.md))/i);
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?[^\s,;]+\.md)/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([^\s,;]+(?:\.md|\btrack\b|[a-zA-Z0-9_-]+[-/]plan\.md))/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*)\s+of\s+/i);
   if (negationOnPlanMatch) {
     // Look for affirmative alternative target
     const altTargetMatch = trimmed.match(
       /\b(?:just\s+|instead\s+)?(?:fix|edit|modify|update|refactor|work\s+on)\s+(?:the\s+bug\s+in\s+)?([^\s,;]+)/i
     );
     if (altTargetMatch) {
-      const target = altTargetMatch[1];
+      let target = altTargetMatch[1].replace(/[.,;]+$/, '');
       return { mode: 'direct-single-cell', target, ...(inPlanLoop ? { guarded: true } : {}) };
     }
     // No explicit alternate target: never fabricate 'src/auth.mjs'
@@ -1705,8 +1706,9 @@ export function classifyCodePanelRequest(request, options = {}) {
   const targetMatch =
     trimmed.match(/\bin\s+([^\s,;]+)/i) ||
     trimmed.match(/(?:for|on)\s+([^\s,;]+)/i) ||
-    trimmed.match(/\b(?:fix|refactor|update|edit|modify)\s+(?:(?:the\s+)?(?:bug|flaky\s+retry|assertion|typo)\s+in\s+)?([^\s,;]+)/i);
-  const target = targetMatch ? targetMatch[1] : undefined;
+    trimmed.match(/\b(?:fix|refactor|update|edit|modify)\s+(?:(?:the\s+)?(?:bug|flaky\s+retry|assertion|typo)\s+in\s+)?([^\s,;]+)/i) ||
+    trimmed.match(/\bopen\s+([^\s,;]+)/i);
+  const target = targetMatch ? targetMatch[1].replace(/[.,;]+$/, '') : undefined;
   return {
     mode: 'direct-single-cell',
     ...(target ? { target } : {}),
@@ -1730,9 +1732,9 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
   }
 
   // 2. Specific evasion checks against affirmative statements
-  // Split on statement boundaries including semicolons (NEW-5) so a leading negation clause never shields an affirmative loop
+  // Split on statement boundaries including newlines and semicolons (NEW-5, D-1)
   const statements = skillContent
-    .split(/(?<=[.!?\n])\s+|;\s*/)
+    .split(/(?<=[.!?])\s+|\n+|;\s*/)
     .map((s) => s.trim())
     .filter(Boolean);
 
@@ -1982,6 +1984,19 @@ Walk plan.md's Cell status table top to bottom; for every row that is not merged
   // NEW-6: Inlined fragment with contractions / apostrophes in surrounding prose
   const evContraction = `Read the plan's header first. Naming is deterministic so \`git worktree list\` reads as an inventory: ... That's the rule.`;
   assert.equal(validateCodePanelNoPlanLoopDuplication(evContraction).pass, false, 'NEW-6 contraction probe must fail');
+
+  // D-1 (op_030 red-team): Negative bullet line shielding affirmative loop bullets without blank line/punctuation
+  const evD1_1 = `- Never fork the engine\n- Repeat this process for every cell until all are closed`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(evD1_1).pass, false, 'D-1 evasion 1 must fail');
+
+  const evD1_2 = `# Do not fork\nRepeat this process for every cell until all are closed`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(evD1_2).pass, false, 'D-1 evasion 2 must fail');
+
+  const evD1_3 = `- Do not merge yourself\n- Re-invoke fgos-code-panel for the next cell until the plan is finished`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(evD1_3).pass, false, 'D-1 evasion 3 must fail');
+
+  const evD1_4 = `- Never guess the phase\n- Iterate over the plan.md Cell-status table rows and open each unmerged one`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(evD1_4).pass, false, 'D-1 evasion 4 must fail');
 });
 
 test('Assertion 3 False-Positive Guards F1-F4 & H4: discriminator passes legitimate patterns cleanly', () => {
@@ -2016,6 +2031,10 @@ test('Assertion 3 False-Positive Guards F1-F4 & H4: discriminator passes legitim
   // H4-4: Citing fragment in quotes
   const h4_4 = `# Title\nCiting the paragraph beginning "Naming is deterministic so \`git worktree list\` reads as an inventory" in the report.`;
   assert.equal(validateCodePanelNoPlanLoopDuplication(h4_4).pass, true);
+
+  // D-1 (op_030 red-team): Legitimate multi-line wrapped negative bullet must not over-trigger
+  const d1Legit = `# T\n- Never iterate over the plan.md Cell-status table yourself;\n  hand off to fgos-plan-loop instead\n- Do not repeat these steps for every cell\n`;
+  assert.equal(validateCodePanelNoPlanLoopDuplication(d1Legit).pass, true, 'D-1 legitimate wrapped negative bullet must pass');
 });
 
 test('Assertion 3 Structural Guard: rejects planned-multi-cell section without fgos-plan-loop delegation reference or exceeding length', () => {
@@ -2196,6 +2215,26 @@ test('Assertion 1 Mode-Selection: negation honored without fabricating fallback 
   );
   assert.equal(altTrackRes.mode, 'direct-single-cell');
   assert.equal(altTrackRes.target, 'src/x.mjs');
+
+  // Regression tests (reviewer F-1 / op_030): negated phase-of-track / phase-of-path
+  assert.throws(
+    () => classifyCodePanelRequest("don't run phase-02 of the code-panel-multicell-facade track"),
+    AmbiguousIntentError
+  );
+  const altPhaseRes = classifyCodePanelRequest(
+    'do not run phase-02 of the code-panel-multicell-facade track, just fix src/x.mjs'
+  );
+  assert.equal(altPhaseRes.mode, 'direct-single-cell');
+  assert.equal(altPhaseRes.target, 'src/x.mjs');
+
+  assert.throws(
+    () => classifyCodePanelRequest('never execute phase-02 of plans/260915-foo/plan.md'),
+    AmbiguousIntentError
+  );
+  assert.throws(
+    () => classifyCodePanelRequest("don't resume phase-01-foo of plans/260915-foo/plan.md"),
+    AmbiguousIntentError
+  );
 });
 
 test('Assertion 1 Mode-Selection: inspection verb directed at plan stays direct-single-cell (CE4)', () => {
@@ -2380,6 +2419,22 @@ test('Assertion 1 Mode-Selection: imperative mood requirement rejects questions,
 
   const r3 = classifyCodePanelRequest('implement retry in src/a.mjs, ok?');
   assert.equal(r3.mode, 'direct-single-cell');
+
+  // Regression tests (reviewer F-2 / op_030): direct requests containing English 'track' stay direct-single-cell
+  const f2_1 = classifyCodePanelRequest('keep track of the retry count in src/foo.mjs and run the tests if they fail');
+  assert.equal(f2_1.mode, 'direct-single-cell');
+  assert.equal(f2_1.target, 'src/foo.mjs');
+
+  const f2_2 = classifyCodePanelRequest('run the unit tests for src/track.mjs if CI is green');
+  assert.equal(f2_2.mode, 'direct-single-cell');
+  assert.equal(f2_2.target, 'src/track.mjs');
+
+  const f2_3 = classifyCodePanelRequest('fix the bug in src/auth.mjs so we can track failures, then run the tests');
+  assert.equal(f2_3.mode, 'direct-single-cell');
+  assert.equal(f2_3.target, 'src/auth.mjs');
+
+  const f2_4 = classifyCodePanelRequest('open src/track.mjs and fix the off-by-one if present');
+  assert.equal(f2_4.mode, 'direct-single-cell');
 });
 
 test('Assertion 1 Mode-Selection: phase selection mismatch throws PhaseSelectionMismatchError (CE3 / M2)', () => {
