@@ -35,10 +35,35 @@ const CODEX_HOME_CREDENTIAL_EXECUTOR_IDS = Object.freeze(['codex-bwrap']);
 /**
  * Copies the host's Codex credential file into a Codex executor's own
  * per-dispatch private-home (which that executor's config binds to
- * CODEX_HOME), never any other executor's. Non-fatal on read/copy failure.
+ * CODEX_HOME), never any other executor's. The optional configured home list
+ * is not a full account placement policy; it is only an ordered credential
+ * source pool, stably offset by dispatch id to avoid pinning every bwrap run
+ * to the same first source. Non-fatal on read/copy failure.
  */
-function provisionCodexCredential(privateHomeTarget) {
+function stableIndex(seed, size) {
+  if (!Number.isInteger(size) || size <= 0) return 0;
+  let hash = 0;
+  for (const ch of String(seed)) hash = ((hash * 33) + ch.charCodeAt(0)) >>> 0;
+  return hash % size;
+}
+
+function configuredCodexCredentialHomes(invocationEnv = {}, dispatchId = '') {
+  const configured = [
+    ...(typeof invocationEnv.FGOS_CODEX_CREDENTIAL_HOMES === 'string'
+      ? invocationEnv.FGOS_CODEX_CREDENTIAL_HOMES.split(path.delimiter)
+      : []),
+    invocationEnv.FGOS_CODEX_CREDENTIAL_HOME,
+    invocationEnv.CODEX_CREDENTIAL_HOME,
+  ].filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+  if (configured.length === 0) return [];
+  const start = stableIndex(dispatchId, configured.length);
+  return [...configured.slice(start), ...configured.slice(0, start)];
+}
+
+function provisionCodexCredential(privateHomeTarget, request) {
+  const credentialHomes = configuredCodexCredentialHomes(request?.invocation?.env, request?.dispatchId);
   const authCandidates = [
+    ...credentialHomes.map((home) => path.join(home, 'auth.json')),
     path.join(process.env.HOME || '', '.codex', 'auth.json'),
     path.join(process.env.HOME || '', '.codex-fgovn', 'auth.json'),
   ];
@@ -370,7 +395,7 @@ export async function prepareBwrap(plan, request, backend) {
         fs.mkdirSync(res.hostTarget, { recursive: true });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         if (res.resource === 'private-home' && CODEX_HOME_CREDENTIAL_EXECUTOR_IDS.includes(request.executorId)) {
-          provisionCodexCredential(res.hostTarget);
+          provisionCodexCredential(res.hostTarget, request);
         }
         allocatedPaths.push(res.hostTarget);
       }

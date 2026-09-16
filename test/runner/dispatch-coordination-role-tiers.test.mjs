@@ -84,6 +84,90 @@ function fakeExecutorMissingCriticalTier(tempDir) {
   return { ...cfg, modelPolicies: { claude: restTiers } };
 }
 
+function argvRecordingExecutor(tempDir, label) {
+  const scriptPath = path.join(tempDir, `${label}-coord-executor.mjs`);
+  const argvCapturePath = path.join(tempDir, `${label}-argv.json`);
+  fs.writeFileSync(
+    scriptPath,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    fs.writeFileSync(${JSON.stringify(argvCapturePath)}, JSON.stringify(process.argv.slice(2)));
+    const cwd = process.cwd();
+    const assignmentsRoot = path.join(cwd, '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+        if (!fs.existsSync(runsDir)) continue;
+        for (const run of fs.readdirSync(runsDir)) {
+          const runDir = path.join(runsDir, run);
+          if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+            fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\n${label} completed.\\n');
+            fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: '${label} done' }));
+          }
+        }
+      }
+    }
+    process.exit(0);
+    `,
+  );
+  return { scriptPath, argvCapturePath };
+}
+
+function fakeCrossProviderRedirectConfig(tempDir) {
+  const claude = argvRecordingExecutor(tempDir, 'claude');
+  const reviewer = argvRecordingExecutor(tempDir, 'claude-reviewer');
+  const codex = argvRecordingExecutor(tempDir, 'codex-bwrap');
+  return {
+    captures: { claude, reviewer, codex },
+    runnerConfig: {
+      readOnlyExecutorRedirects: {
+        claude: {
+          default: ['codex-bwrap'],
+          operations: {
+            'red-team-candidate': ['codex-bwrap'],
+          },
+        },
+      },
+      executors: {
+        claude: {
+          command: process.execPath,
+          args: [claude.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+          allowCrossProvider: true,
+        },
+        'claude-reviewer': {
+          command: process.execPath,
+          args: [reviewer.scriptPath, '{prompt}', '--model', '{model}'],
+          allowCrossProvider: true,
+        },
+        'codex-bwrap': {
+          command: process.execPath,
+          args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+          providerModel: 'openai-codex',
+          allowCrossProvider: true,
+        },
+      },
+      modelPolicies: {
+        claude: {
+          lightweight: 'haiku',
+          standard: 'sonnet',
+          creative: 'sonnet',
+          analytical: 'opus',
+          critical: 'opus',
+        },
+        'openai-codex': {
+          lightweight: 'gpt-test-low',
+          standard: 'gpt-test-standard',
+          creative: 'gpt-test-standard',
+          analytical: 'gpt-test-analytical',
+          critical: 'gpt-test-critical',
+        },
+      },
+      timeoutMs: 5000,
+    },
+  };
+}
+
 function openSessionWithConfig(coordinationId, tempDir, overrides = {}) {
   return openDeclaredProtocolSession(
     {
@@ -163,6 +247,34 @@ test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve th
   // contract rather than re-asserted as a new behavior this phase adds.
   assert.equal(review.assignment.mutation, 'read-only');
   assert.equal(redTeam.assignment.mutation, 'read-only');
+});
+
+test('read-only red-team-candidate pinned to claude can redirect to codex-bwrap with a provider-correct model', async () => {
+  const tempDir = mkTempDir();
+  openSessionWithConfig('coord_role_tiers_redteam_redirect', tempDir);
+  const { runnerConfig, captures } = fakeCrossProviderRedirectConfig(tempDir);
+
+  const produce = await dispatchProduce('coord_role_tiers_redteam_redirect', tempDir, runnerConfig);
+  const redTeam = await dispatchFirstPass(
+    'coord_role_tiers_redteam_redirect',
+    tempDir,
+    runnerConfig,
+    'red-team-candidate',
+    produce.assignment.assignmentId,
+    { assignmentPolicy: { preferExecutor: 'claude' } },
+  );
+
+  assert.equal(redTeam.assignment.mutation, 'read-only');
+  assert.equal(redTeam.runResult.executorId, 'codex-bwrap');
+  assert.equal(redTeam.runResult.executorRedirected, true);
+  assert.equal(redTeam.runResult.policy.executorPreference[0], 'claude');
+  assert.equal(redTeam.runResult.policy.providerModel, 'openai-codex');
+  assert.equal(redTeam.runResult.policy.model, 'gpt-test-analytical');
+  assert.equal(fs.existsSync(captures.reviewer.argvCapturePath), false, 'red-team override must not fall through to claude-reviewer');
+
+  const codexArgs = JSON.parse(fs.readFileSync(captures.codex.argvCapturePath, 'utf8'));
+  assert.ok(codexArgs.includes('gpt-test-analytical'), 'red-team argv must use the target provider model');
+  assert.ok(!codexArgs.includes('opus'), 'Claude model literals must not leak into the redirected red-team executor');
 });
 
 test('R8: Red-Team escalation to "critical" for a named high-risk round resolves via a caller-supplied assignment-scope PolicyPatch, raising above the fixture\'s own "analytical" floor', async () => {
