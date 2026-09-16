@@ -123,7 +123,7 @@ requests, not permission to bypass execution-time dispatch governance.
 | Phase | Cell | Capability | Status | Exit |
 |---|---|---|---|---|
 | 00 | Contract và baseline | `code:implement` | merged | `tsk-1bh` terminal-close proof + durable resume inventory; targeted proof |
-| 01 | Facade hai mode | `code:implement` | planned | mode/delegation tests xanh; projected skills đồng bộ. **Full-suite gate** nếu projected/shared skill mechanical trigger được xác nhận |
+| 01 | Facade hai mode | `code:implement` | merged | mode/delegation tests xanh; projected skills đồng bộ. Targeted proof — chỉ đụng fgos-code-panel/SKILL.md + test riêng, không đụng `_shared` fragment nên full-suite trigger không áp dụng |
 | 02 | Coding test-policy overlay | `code:implement` | planned | tier/reuse/escalation fixtures xanh; targeted proof |
 | 03 | Resume và compatibility | `code:implement` | planned | fresh-process + legacy + direct regressions xanh. **Full-suite gate** vì chạm resume contract nếu implementation vượt quá skill prose |
 | 04 | Fix orphaned authorization (engine bugfix, chạy song song P00-P03) | `code:implement` | merged | mutation-verified regression test cho repro orphan-A/B-consumed/C-consumed; **Full-suite gate** (session-engine.mjs = FULL_TRIGGERS) |
@@ -178,7 +178,7 @@ Mỗi phase là một cell của plan-loop, dispatch capability `code:implement`
 | Cell | Status | Coordination | Commit | Evidence |
 |---|---|---|---|---|
 | P00 | merged | `code-panel-multicell-facade--p00` (+ `--p00-fix1`/`--p00-fix2`/`--p00-fix3`/`--p00-fix3-recheck`, each a fresh session after wall-time/rate-limit walls) | testedSha `df6a00aab80178da544f94aa314536900c4807cf`; mainMergedSha `f21d8641`; postMergeVerifiedSha `33bcd426` (not tree-identical -- real add/add conflict resolved on full-suite-baseline.md; diff vs src/core/domains/test empty; FOCUSED_TESTS re-run 132/132) | 3 real fix rounds, each with genuine findings; final round reviewer+red-team both explicit "close" verdict, no HIGH/CRITICAL; remaining MEDIUM/LOW filed as P01 carry-forwards (mode-selection edge cases CE1/CE5 precision, Assertion-3 E1 mechanization, classifyCodePanelRequest subject) |
-| P01 | planned | — | — | — |
+| P01 | merged | `code-panel-multicell-facade--p01` (+ `--p01-fix1`/`--p01-fix1-recheck`/`--p01-fix2`/`--p01-fix3`) | testedSha `22bf97ba` (Lead-direct fix on round-3 tip `47d4e3b6`); mainMergedSha `0481ff7a`; postMergeVerifiedSha `3e159a77` (treeIdentical: true) | 3 real fix rounds + 2 Lead-direct regressions fixed post-recheck; 119/119 focused tests; no-duplication discriminator framed as best-effort lint (documented, not a security boundary) |
 | P02 | planned | — | — | — |
 | P03 | planned | — | — | — |
 | P04 | merged | `code-panel-multicell-facade--p04` (doer+reviewer) + `--p04-redteam1` (red-team, original session wall-time-exhausted) | testedSha `b16dd524621cbf97690663e9764f9ede286583be`; integratedSha `d13570c4` (`--no-ff` into track); postMergeVerifiedSha `ebeef714` (treeIdentical: true) | Reviewer/red-team both clean (no HIGH/CRITICAL); full suite 6530/6469/52-fail, byte-identical to baseline (zero regressions); deferred F1/F3/F4/F5 filed as follow-up |
