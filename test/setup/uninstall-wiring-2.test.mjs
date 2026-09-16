@@ -12,6 +12,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
+const NO_CLAUDE_ENV = { FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -36,7 +37,7 @@ test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
   const home = mkTemp('uninstall-cli-noyes-home-');
   initGitRepo(cwd);
   assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { HOME: home });
+  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
   const hooksPathBefore = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
   assert.equal(hooksPathBefore, path.join(cwd, '.githooks'), 'setup must have wired hooksPath before this test proves uninstall refuses to touch it');

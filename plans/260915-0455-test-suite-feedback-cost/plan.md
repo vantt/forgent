@@ -2,7 +2,7 @@
 
 **Track:** `test-suite-feedback-cost`
 
-**Status:** P00-P03 complete on track; P04 next
+**Status:** P00-P04 complete on track; P05 next
 
 **Date:** 2026-09-15
 
@@ -97,7 +97,7 @@ remaining harness cost without mutating it. P08 is evidence-only.
 | P01 | complete on track | [phase-01-portable-test-runner-ci.md](phase-01-portable-test-runner-ci.md) | one Node >=18 test door landed on track; CI execution proof remains an external gate when remote CI is unavailable |
 | P02 | complete on track | [phase-02-green-baseline-and-profile.md](phase-02-green-baseline-and-profile.md) | accepted baseline and hotspot report recorded in [reports/green-baseline.md](reports/green-baseline.md) |
 | P03 | complete on track | [phase-03-docs-index-pilot.md](phase-03-docs-index-pilot.md) | docs-index state-fixture pilot recorded `expand` in [reports/docs-index-pilot.md](reports/docs-index-pilot.md) |
-| P04 | next | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | measured external-process isolation verdict |
+| P04 | complete on track | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | external-Claude isolation pilot recorded `expand` in [reports/external-claude-pilot.md](reports/external-claude-pilot.md) |
 | P05 | planned | [phase-05-related-test-selector-pilot.md](phase-05-related-test-selector-pilot.md) | shadow-evaluated conservative selector |
 | P06 | planned | [phase-06-cli-fixture-init-pilot.md](phase-06-cli-fixture-init-pilot.md) | measured fixture strategy verdict |
 | P07 | planned | [phase-07-cli-harness-responsibility-audit.md](phase-07-cli-harness-responsibility-audit.md) | complete harness cost/responsibility map and two bounded candidates |

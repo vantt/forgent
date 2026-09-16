@@ -33,6 +33,13 @@ import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, DEFAULT_DOC_REGISTRY_SETTINGS } from '../../src/setup/registrations.mjs';
 
+const EXTERNAL_CLAUDE_GUARDED_TEST_FILES = [
+  'test/setup/checks.test.mjs',
+  'test/setup/checks-doctor-config.test.mjs',
+  'test/setup/uninstall-wiring-2.test.mjs',
+  'test/setup/uninstall-wiring-3.test.mjs',
+];
+
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
 // other executor, never through a `fgos tool register` event.
@@ -55,6 +62,24 @@ function declareExecutor(cwd, id, fields) {
   }
   fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2));
 }
+
+test('setup/doctor CLI e2e tests fail closed against real Claude provider execution', () => {
+  const unsafeDoctorEnv = ['env: { ...process.env', 'HOME: homeDir }'].join(', ');
+  const unsafeSetupEnv = ["run(cwd, ['setup']", '{ HOME: home })'].join(', ');
+  for (const rel of EXTERNAL_CLAUDE_GUARDED_TEST_FILES) {
+    const source = fs.readFileSync(path.join(process.cwd(), rel), 'utf8');
+    assert.equal(
+      source.includes(unsafeDoctorEnv),
+      false,
+      `${rel} has a setup/doctor spawn using the real process env instead of NO_CLAUDE_ENV`,
+    );
+    assert.equal(
+      source.includes(unsafeSetupEnv),
+      false,
+      `${rel} runs setup without the FGOS_CLAUDE_COMMAND guard`,
+    );
+  }
+});
 
 test('tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)', () => {
   const cwd = mkTemp('fgos-tool-registry-inactive-');
@@ -715,7 +740,7 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
 test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('doctor-cli-json-');
   const homeDir = mkTemp('doctor-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
@@ -728,7 +753,7 @@ test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout',
 test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
   const cwd = mkTemp('doctor-cli-pretty-');
   const homeDir = mkTemp('doctor-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--pretty'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--pretty'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
@@ -741,7 +766,7 @@ test('fgos doctor against a fresh cwd with no runner config never creates the sh
   const homeDir = mkTemp('doctor-cli-readonly-home-');
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
@@ -915,4 +940,3 @@ test('no-stuck-merge-abort check fails and fix reports manual command when MERGE
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
-

@@ -12,6 +12,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
+const NO_CLAUDE_ENV = { FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -37,7 +38,7 @@ test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source
   fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');
   initGitRepo(cwd);
   assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { HOME: home });
+  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
 
   const rcFile = path.join(home, '.bashrc');

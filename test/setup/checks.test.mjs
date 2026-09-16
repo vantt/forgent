@@ -1564,7 +1564,7 @@ test('main-checkout-hook-wired doctor check reports passed/failed matching mainC
 test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout', () => {
   const cwd = mkTemp('doctor-cli-json-');
   const homeDir = mkTemp('doctor-cli-json-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(typeof envelope.contract, 'string');
@@ -1577,7 +1577,7 @@ test('fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout',
 test('fgos doctor --pretty prints colored ANSI text, not JSON', () => {
   const cwd = mkTemp('doctor-cli-pretty-');
   const homeDir = mkTemp('doctor-cli-pretty-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--pretty'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--pretty'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   assert.ok(result.stdout.includes('\x1b['), 'expected ANSI escape codes in --pretty output');
   assert.throws(() => JSON.parse(result.stdout), 'expected --pretty output to NOT be valid JSON');
@@ -1590,7 +1590,7 @@ test('fgos doctor against a fresh cwd with no runner config never creates the sh
   const homeDir = mkTemp('doctor-cli-readonly-home-');
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...process.env, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   assert.equal(fs.existsSync(configPath), false, 'fgos doctor must never create .fgos/config.json');
   const envelope = JSON.parse(result.stdout);
