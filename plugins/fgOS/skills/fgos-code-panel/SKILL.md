@@ -178,6 +178,36 @@ When `planned-multi-cell` mode is selected:
    cell-transition sequencing, no multi-cell step procedures). All multi-cell
    progression belongs exclusively to `fgos-plan-loop`.
 
+### Fresh-session resume contract
+
+Planned-mode resume must be reconstructable from durable state alone. A new
+session with no chat history may use the user's request, the resolved plan path,
+the plan's cell-status table, `.fgos/coordination/sessions/**`, and Git evidence
+only. It must not rely on a previous assistant's narration.
+
+Before handing off to `fgos-plan-loop`, classify the durable state as one of:
+
+- **active cell** -- an existing coordination session for the current/next cell
+  is active or has an authorized fix/recheck round. Delegate a resume of that
+  same cell. Do not open a new cell.
+- **terminal cell not integrated** -- the cell's coordination session is
+  completed/closed but the plan row or Git merge evidence does not yet show the
+  cell integrated into the track. Delegate close/integration follow-through for
+  that cell, not the following phase.
+- **merged cell with stale session evidence** -- Git/plan evidence says the cell
+  landed, but the session log is stale or not terminal. Delegate reconciliation
+  through `fgos-plan-loop`/coordination recovery; never hand-edit JSONL/state to
+  make the row look closed.
+- **no open cell** -- only then select the lowest unmerged phase as the next
+  cell.
+- **completed track** -- all phase rows are merged/closed; report complete and
+  do not open a new session.
+
+Legacy plans remain valid. If a plan or phase file has no explicit test-policy
+metadata, compose the coding overlay from the phase's `## Verification` block,
+repo evidence, and the mechanical `FULL_TRIGGERS` above. Missing metadata is not
+a migration gate.
+
 ## Verify the doer's real outcome yourself
 
 `src/verbs/coordination/run.mjs` forwards a step's own `mutation: "mutating"`

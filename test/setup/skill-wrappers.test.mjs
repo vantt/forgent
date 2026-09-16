@@ -2618,6 +2618,167 @@ test('Recursive Dispatch Guard (R2 / H1): prevents nested multi-cell dispatch fr
   assert.equal(cellInternal.target, 'src/auth.mjs');
 });
 
+export function resolveCodePanelPlannedResumeState(input = {}) {
+  const phases = input.phases ?? [];
+  const sessions = input.sessions ?? [];
+  const git = input.git ?? {};
+
+  const lowestUnmerged = phases.find((phase) => !['merged', 'closed', 'done'].includes(phase.status));
+  const active = sessions.find((session) => ['active', 'fix-authorized', 'recheck-authorized'].includes(session.status));
+  if (active) {
+    return {
+      action: 'resume-active-cell',
+      phase: active.phase,
+      coordinationId: active.coordinationId,
+      source: 'coordination-session',
+      mustNotOpenNewCell: true,
+    };
+  }
+
+  const terminalNotIntegrated = sessions.find((session) => {
+    if (!['completed', 'closed', 'terminal'].includes(session.status)) return false;
+    const phase = phases.find((candidate) => candidate.id === session.phase);
+    return !phase || !['merged', 'closed', 'done'].includes(phase.status) || !git.mergedCommits?.includes(session.mergedCommit);
+  });
+  if (terminalNotIntegrated) {
+    return {
+      action: 'finish-terminal-cell-integration',
+      phase: terminalNotIntegrated.phase,
+      coordinationId: terminalNotIntegrated.coordinationId,
+      source: 'session-plus-git',
+      mustNotOpenNewCell: true,
+    };
+  }
+
+  const staleMerged = sessions.find((session) => {
+    const phase = phases.find((candidate) => candidate.id === session.phase);
+    return ['merged', 'closed', 'done'].includes(phase?.status) && !['completed', 'closed', 'terminal'].includes(session.status);
+  });
+  if (staleMerged) {
+    return {
+      action: 'reconcile-stale-session-through-engine',
+      phase: staleMerged.phase,
+      coordinationId: staleMerged.coordinationId,
+      source: 'git-plan-over-stale-session',
+      forbidden: ['manual-jsonl-edit', 'manual-state-edit'],
+    };
+  }
+
+  if (!lowestUnmerged) {
+    return { action: 'track-complete', source: 'plan-status' };
+  }
+
+  return {
+    action: 'open-next-cell',
+    phase: lowestUnmerged.id,
+    source: 'lowest-unmerged-plan-row',
+  };
+}
+
+export function composeLegacyPlanTestOverlay(phase = {}, repoEvidence = {}) {
+  const verification = phase.verification ?? '';
+  const focused = verification.trim() || repoEvidence.defaultFocused || 'declare focused verification before dispatch';
+  const fullTriggers = detectFullTriggers({
+    changedFiles: repoEvidence.changedFiles ?? [],
+    touchedContracts: repoEvidence.touchedContracts ?? [],
+    impactRisk: repoEvidence.impactRisk,
+    phaseText: `${phase.title ?? ''}\n${phase.body ?? ''}`,
+  });
+  const fullTriggered = fullTriggers.length > 0;
+  return {
+    focused,
+    affected: repoEvidence.affected ?? focused,
+    full: fullTriggered ? repoEvidence.fullCommand ?? 'npm test' : 'deferred-to-final-gate',
+    fullTriggers,
+    source: phase.testPolicy ? 'explicit-metadata' : 'legacy-phase-verification-and-repo-evidence',
+  };
+}
+
+// ─── P03: Fresh-session resume and legacy compatibility contract ───
+
+test('Phase 03 Resume: active and fix-authorized cells resume the same cell, never opening the next phase', () => {
+  const result = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-02', status: 'in-progress' },
+      { id: 'phase-03', status: 'planned' },
+    ],
+    sessions: [{ phase: 'phase-02', status: 'fix-authorized', coordinationId: 'code-panel-multicell-facade--p02' }],
+  });
+
+  assert.equal(result.action, 'resume-active-cell');
+  assert.equal(result.phase, 'phase-02');
+  assert.equal(result.mustNotOpenNewCell, true);
+});
+
+test('Phase 03 Resume: terminal but unintegrated cell finishes integration instead of advancing', () => {
+  const result = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-02', status: 'in-progress' },
+      { id: 'phase-03', status: 'planned' },
+    ],
+    sessions: [{ phase: 'phase-02', status: 'completed', coordinationId: 'code-panel-multicell-facade--p02', mergedCommit: 'abc123' }],
+    git: { mergedCommits: [] },
+  });
+
+  assert.equal(result.action, 'finish-terminal-cell-integration');
+  assert.equal(result.phase, 'phase-02');
+  assert.equal(result.mustNotOpenNewCell, true);
+});
+
+test('Phase 03 Resume: merged plan row with stale session is reconciled through engine, not manual state edits', () => {
+  const result = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-02', status: 'merged' },
+      { id: 'phase-03', status: 'planned' },
+    ],
+    sessions: [{ phase: 'phase-02', status: 'active', coordinationId: 'code-panel-multicell-facade--p02' }],
+  });
+
+  assert.equal(result.action, 'resume-active-cell', 'live active session takes precedence over stale interpretation');
+
+  const stale = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-02', status: 'merged' },
+      { id: 'phase-03', status: 'planned' },
+    ],
+    sessions: [{ phase: 'phase-02', status: 'abandoned', coordinationId: 'code-panel-multicell-facade--p02' }],
+  });
+  assert.equal(stale.action, 'reconcile-stale-session-through-engine');
+  assert.deepEqual(stale.forbidden, ['manual-jsonl-edit', 'manual-state-edit']);
+});
+
+test('Phase 03 Resume: with no open cell, fresh session selects the lowest unmerged phase; completed track opens nothing', () => {
+  const next = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-00', status: 'merged' },
+      { id: 'phase-01', status: 'merged' },
+      { id: 'phase-02', status: 'planned' },
+      { id: 'phase-03', status: 'planned' },
+    ],
+  });
+  assert.equal(next.action, 'open-next-cell');
+  assert.equal(next.phase, 'phase-02');
+
+  const done = resolveCodePanelPlannedResumeState({
+    phases: [
+      { id: 'phase-00', status: 'merged' },
+      { id: 'phase-01', status: 'merged' },
+    ],
+  });
+  assert.equal(done.action, 'track-complete');
+});
+
+test('Phase 03 Compatibility: legacy phase without metadata composes overlay from Verification and repo evidence', () => {
+  const overlay = composeLegacyPlanTestOverlay(
+    { id: 'phase-03', verification: 'node --test test/setup/skill-wrappers.test.mjs' },
+    { changedFiles: ['domains/coding/skills/fgos-code-panel/SKILL.md'], affected: 'node --test test/setup/skill-wrappers.test.mjs' },
+  );
+
+  assert.equal(overlay.source, 'legacy-phase-verification-and-repo-evidence');
+  assert.equal(overlay.focused, 'node --test test/setup/skill-wrappers.test.mjs');
+  assert.equal(overlay.full, 'deferred-to-final-gate');
+});
+
 // ─── P02: Coding Test-Policy Overlay Contract & Proof Reuse Reference Model ───
 // Reference model: mirrors the 4-field test-policy overlay composition rules,
 // proof inspection/reuse heuristics, and explicit test decision requirement (R1-R6)
@@ -3253,4 +3414,3 @@ test('Phase 02 Red-Team Probe 3: Anti-Silent-Omission rejects missing or unstate
     MissingExplicitTestDecisionError
   );
 });
-
