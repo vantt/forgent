@@ -122,7 +122,7 @@ requests, not permission to bypass execution-time dispatch governance.
 
 | Phase | Cell | Capability | Status | Exit |
 |---|---|---|---|---|
-| 00 | Contract và baseline | `code:implement` | in-progress | `tsk-1bh` terminal-close proof + durable resume inventory; targeted proof |
+| 00 | Contract và baseline | `code:implement` | merged | `tsk-1bh` terminal-close proof + durable resume inventory; targeted proof |
 | 01 | Facade hai mode | `code:implement` | planned | mode/delegation tests xanh; projected skills đồng bộ. **Full-suite gate** nếu projected/shared skill mechanical trigger được xác nhận |
 | 02 | Coding test-policy overlay | `code:implement` | planned | tier/reuse/escalation fixtures xanh; targeted proof |
 | 03 | Resume và compatibility | `code:implement` | planned | fresh-process + legacy + direct regressions xanh. **Full-suite gate** vì chạm resume contract nếu implementation vượt quá skill prose |
@@ -177,7 +177,7 @@ Mỗi phase là một cell của plan-loop, dispatch capability `code:implement`
 
 | Cell | Status | Coordination | Commit | Evidence |
 |---|---|---|---|---|
-| P00 | in-progress | `code-panel-multicell-facade--p00` (fix round in `--p00-fix1`, original session wall-time-exhausted before fixer dispatch) | — | — |
+| P00 | merged | `code-panel-multicell-facade--p00` (+ `--p00-fix1`/`--p00-fix2`/`--p00-fix3`/`--p00-fix3-recheck`, each a fresh session after wall-time/rate-limit walls) | testedSha `df6a00aab80178da544f94aa314536900c4807cf`; mainMergedSha `f21d8641`; postMergeVerifiedSha `33bcd426` (not tree-identical -- real add/add conflict resolved on full-suite-baseline.md; diff vs src/core/domains/test empty; FOCUSED_TESTS re-run 132/132) | 3 real fix rounds, each with genuine findings; final round reviewer+red-team both explicit "close" verdict, no HIGH/CRITICAL; remaining MEDIUM/LOW filed as P01 carry-forwards (mode-selection edge cases CE1/CE5 precision, Assertion-3 E1 mechanization, classifyCodePanelRequest subject) |
 | P01 | planned | — | — | — |
 | P02 | planned | — | — | — |
 | P03 | planned | — | — | — |
