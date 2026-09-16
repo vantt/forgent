@@ -373,6 +373,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
       fallbackFrom: anchorCapability,
       anchorCapability,
       cfg,
+      providerCapacity: opts.providerCapacity,
       invocation: {
         command,
         args,
@@ -745,6 +746,7 @@ export async function executeExecutorCli(
         fallbackFrom: anchorCapability,
         anchorCapability,
         cfg,
+        providerCapacity: opts.providerCapacity,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -942,6 +944,7 @@ export async function executeExecutorCli(
         anchorCapability,
         cfg,
         assignmentLaunchContext,
+        providerCapacity: opts.providerCapacity,
         invocation: {
           command,
           args,

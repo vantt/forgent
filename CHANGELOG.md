@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Provider Capacity Rotator slice 1: Codex agent dispatch can now select a
+  global `runner.providers.openai-codex.accounts` account after Run admission,
+  lease it through `~/.fgos/runtime/provider-capacity/`, provision only the
+  selected `auth.json` into private bwrap `CODEX_HOME`, report/quarantine
+  account capacity faults, and expose inspect/manual-clear/doctor reporting
+  without project-local account inventory or cross-provider fallback.
 - `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
   materializations and incomplete sibling admission evidence, including cwd
   aggregates; ambiguous or incomplete evidence never produces a recovery hint.

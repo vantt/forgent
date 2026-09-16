@@ -463,86 +463,62 @@ test('R4: prepareBwrap materializes mounts strictly from resolved resources and 
   }
 });
 
-test('H-1 regression: prepareBwrap provisions the Codex credential only into codex-bwrap\'s private-home, never claude-bwrap/agy-bwrap\'s', async () => {
+test('provider capacity: prepareBwrap copies selected account auth.json into private CODEX_HOME', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-cred-test-'));
-  const originalHome = process.env.HOME;
   try {
-    // Fake host HOME carrying a Codex credential, isolated from the real one.
-    const fakeHome = path.join(tmp, 'fake-home');
-    fs.mkdirSync(path.join(fakeHome, '.codex'), { recursive: true });
-    const fakeAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'not-a-real-token' });
-    fs.writeFileSync(path.join(fakeHome, '.codex', 'auth.json'), fakeAuthContent);
-    process.env.HOME = fakeHome;
-
-    async function preparedPrivateHome(executorId) {
-      const privateHomeHost = path.join(tmp, `home-${executorId}`);
-      const plan = {
-        contract: 'confinement-plan.v1',
-        dispatchId: `disp_test_${executorId}`,
-        decision: 'execute',
-        coverage: {},
-        resources: [
-          {
-            resource: 'private-home',
-            hostTarget: privateHomeHost,
-            executionTarget: { location: 'host', path: '/home/sandbox' },
-            access: 'read-write',
-            delivery: 'mount',
-            allocation: 'temporary',
-          },
-        ],
-      };
-      const req = {
-        dispatchId: `disp_test_${executorId}`,
-        executorId,
-        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
-        context: { cwd: tmp, runDir: tmp },
-      };
-      const prepared = await prepareBwrap(plan, req, { id: 'bwrap', type: 'bwrap', config: {} });
-      // Inspect the materialized private-home BEFORE cleanup removes it.
-      return { hostTarget: privateHomeHost, cleanup: prepared.cleanup };
-    }
-
-    const codex = await preparedPrivateHome('codex-bwrap');
+    const selectedHome = path.join(tmp, 'selected-codex-home');
+    fs.mkdirSync(selectedHome, { recursive: true });
+    const authContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'selected-token' });
+    fs.writeFileSync(path.join(selectedHome, 'auth.json'), authContent);
+    const privateHomeHost = path.join(tmp, 'private-home');
+    const plan = {
+      contract: 'confinement-plan.v1',
+      dispatchId: 'disp_selected_home',
+      decision: 'execute',
+      coverage: {},
+      resources: [{
+        resource: 'private-home',
+        hostTarget: privateHomeHost,
+        executionTarget: { location: 'host', path: '/home/sandbox' },
+        access: 'read-write',
+        delivery: 'mount',
+        allocation: 'temporary',
+      }],
+    };
+    const req = {
+      dispatchId: 'disp_selected_home',
+      executorId: 'codex-bwrap',
+      invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+      providerCapacity: {
+        provider: 'openai-codex',
+        accountId: 'tetnu',
+        credentialSource: { kind: 'codex-home', home: selectedHome },
+      },
+      context: { cwd: tmp, runDir: tmp },
+    };
+    const prepared = await prepareBwrap(plan, req, { id: 'bwrap', type: 'bwrap', config: {} });
     try {
-      assert.ok(fs.existsSync(path.join(codex.hostTarget, 'auth.json')), 'codex-bwrap must receive its own Codex credential');
-      assert.equal(fs.readFileSync(path.join(codex.hostTarget, 'auth.json'), 'utf8'), fakeAuthContent);
+      assert.equal(fs.readFileSync(path.join(privateHomeHost, 'auth.json'), 'utf8'), authContent);
     } finally {
-      await codex.cleanup();
-    }
-
-    for (const executorId of ['claude-bwrap', 'agy-bwrap']) {
-      const other = await preparedPrivateHome(executorId);
-      try {
-        assert.ok(fs.existsSync(other.hostTarget), `${executorId} private-home must still be allocated`);
-        assert.ok(
-          !fs.existsSync(path.join(other.hostTarget, 'auth.json')),
-          `${executorId} must NOT receive the Codex credential (H-1 regression)`,
-        );
-      } finally {
-        await other.cleanup();
-      }
+      await prepared.cleanup();
     }
   } finally {
-    process.env.HOME = originalHome;
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 
-test('H-1b: codex-bwrap can provision credentials from a configured Codex home pool before host HOME fallbacks', async () => {
+test('provider capacity: old FGOS_CODEX_CREDENTIAL_HOMES hash rotation is ignored on selected path', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-cred-pool-test-'));
-  const originalHome = process.env.HOME;
   try {
-    const fakeHome = path.join(tmp, 'fake-home');
-    const poolHome = path.join(tmp, 'codex-pool-home');
-    fs.mkdirSync(path.join(fakeHome, '.codex'), { recursive: true });
+    const selectedHome = path.join(tmp, 'selected-home');
+    const poolHome = path.join(tmp, 'legacy-pool-home');
+    fs.mkdirSync(selectedHome, { recursive: true });
     fs.mkdirSync(poolHome, { recursive: true });
 
-    const fallbackAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'fallback-home-token' });
+    const selectedAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'selected-token' });
     const poolAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'pool-home-token' });
-    fs.writeFileSync(path.join(fakeHome, '.codex', 'auth.json'), fallbackAuthContent);
+    fs.writeFileSync(path.join(selectedHome, 'auth.json'), selectedAuthContent);
     fs.writeFileSync(path.join(poolHome, 'auth.json'), poolAuthContent);
-    process.env.HOME = fakeHome;
 
     const privateHomeHost = path.join(tmp, 'private-home');
     const plan = {
@@ -572,6 +548,11 @@ test('H-1b: codex-bwrap can provision credentials from a configured Codex home p
         },
         resourceBindings: [],
       },
+      providerCapacity: {
+        provider: 'openai-codex',
+        accountId: 'selected',
+        credentialSource: { kind: 'codex-home', home: selectedHome },
+      },
       context: { cwd: tmp, runDir: tmp },
     };
 
@@ -579,14 +560,51 @@ test('H-1b: codex-bwrap can provision credentials from a configured Codex home p
     try {
       assert.equal(
         fs.readFileSync(path.join(privateHomeHost, 'auth.json'), 'utf8'),
-        poolAuthContent,
-        'configured Codex credential home must win over host HOME fallbacks',
+        selectedAuthContent,
+        'selected provider account must win over legacy FGOS_CODEX_CREDENTIAL_HOMES',
       );
     } finally {
       await prepared.cleanup();
     }
   } finally {
-    process.env.HOME = originalHome;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: selected missing credential fails closed before spawn', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-cred-missing-test-'));
+  try {
+    const privateHomeHost = path.join(tmp, 'private-home');
+    const plan = {
+      contract: 'confinement-plan.v1',
+      dispatchId: 'disp_missing_home',
+      decision: 'execute',
+      coverage: {},
+      resources: [{
+        resource: 'private-home',
+        hostTarget: privateHomeHost,
+        executionTarget: { location: 'host', path: '/home/sandbox' },
+        access: 'read-write',
+        delivery: 'mount',
+        allocation: 'temporary',
+      }],
+    };
+    await assert.rejects(
+      () => prepareBwrap(plan, {
+        dispatchId: 'disp_missing_home',
+        executorId: 'codex-bwrap',
+        invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [] },
+        providerCapacity: {
+          provider: 'openai-codex',
+          accountId: 'missing',
+          credentialSource: { kind: 'codex-home', home: path.join(tmp, 'missing-home') },
+        },
+        context: { cwd: tmp, runDir: tmp },
+      }, { id: 'bwrap', type: 'bwrap', config: {} }),
+      /selected Codex credential auth\.json is missing/,
+    );
+    assert.equal(fs.existsSync(privateHomeHost), false, 'allocated private home must be cleaned up on provisioning failure');
+  } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });

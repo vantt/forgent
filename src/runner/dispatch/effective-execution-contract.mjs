@@ -74,6 +74,10 @@ export function stripSecrets(value) {
   }
   const clean = {};
   for (const [key, val] of Object.entries(value)) {
+    if (key === 'credentialProvisioned' && typeof val === 'boolean') {
+      clean[key] = val;
+      continue;
+    }
     if (SECRET_KEY_PATTERN.test(key) || key === 'env' || key === 'environment' || key === 'headers') {
       continue;
     }
@@ -98,6 +102,9 @@ export function assertNoSecrets(value, pathStr = '') {
   }
   for (const [key, val] of Object.entries(value)) {
     const currentPath = pathStr ? `${pathStr}.${key}` : key;
+    if (key === 'credentialProvisioned' && typeof val === 'boolean') {
+      continue;
+    }
     if (SECRET_KEY_PATTERN.test(key)) {
       throw new RunnerConfigError(
         `effective-execution-contract: prohibited secret field "${currentPath}" detected in effective contract`,
@@ -123,6 +130,7 @@ export function assertNoSecrets(value, pathStr = '') {
  * @param {string} [params.executorId] Resolved executor id
  * @param {string} [params.adapter] Resolved adapter
  * @param {object} [params.confinement] Confinement configuration
+ * @param {object} [params.providerCapacity] Redacted provider account selection
  * @param {string} [params.resultClaimPath] Custom result claim path
  * @returns {Readonly<object>}
  */
@@ -139,6 +147,7 @@ export function buildEffectiveExecutionContract({
   executorId,
   adapter,
   confinement,
+  providerCapacity,
   resultClaimPath,
 } = {}) {
   if (!assignment || typeof assignment !== 'object') {
@@ -305,6 +314,7 @@ export function buildEffectiveExecutionContract({
       adapter: resolvedAdapter,
       adapterFamily: resolvedAdapter,
     },
+    ...(providerCapacity ? { providerCapacity: stripSecrets(providerCapacity) } : {}),
     enforcementPosture: overallPosture,
     permissionEnforcementPosture: overallPosture,
     executorId: resolvedExecutorId,
@@ -414,6 +424,22 @@ export function validateEffectiveExecutionContract(value) {
   }
   if (typeof value.provenance.adapter !== 'string' || !value.provenance.adapter.trim()) {
     throw new RunnerConfigError('effective-execution-contract: provenance.adapter must be a non-empty string');
+  }
+  if (value.providerCapacity !== undefined) {
+    if (!value.providerCapacity || typeof value.providerCapacity !== 'object' || Array.isArray(value.providerCapacity)) {
+      throw new RunnerConfigError('effective-execution-contract: providerCapacity must be an object when present');
+    }
+    for (const forbidden of ['credentialSource', 'home', 'env', 'environment', 'authJsonDigest', 'sha256']) {
+      if (Object.hasOwn(value.providerCapacity, forbidden)) {
+        throw new RunnerConfigError(`effective-execution-contract: providerCapacity must not persist "${forbidden}"`);
+      }
+    }
+    if (typeof value.providerCapacity.provider !== 'string' || !value.providerCapacity.provider.trim()) {
+      throw new RunnerConfigError('effective-execution-contract: providerCapacity.provider must be a non-empty string when present');
+    }
+    if (typeof value.providerCapacity.accountId !== 'string' || !value.providerCapacity.accountId.trim()) {
+      throw new RunnerConfigError('effective-execution-contract: providerCapacity.accountId must be a non-empty string when present');
+    }
   }
 }
 

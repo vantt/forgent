@@ -57,7 +57,8 @@ import { isResolvedStatus } from '../state/frontier.mjs';
 import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecPath } from '../state/workflow-stage-graphs.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
-import { describeConfigAwareness } from '../config/global-config.mjs';
+import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
+import { inspectProviderCapacity } from '../runner/dispatch/provider-capacity.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
   sharedConfigFilePath,
@@ -1659,6 +1660,37 @@ registerCheck({
   id: 'config-awareness',
   description: 'which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)',
   check: (cwd) => checkGlobalProjectAwareness(cwd),
+});
+
+function checkProviderCapacityState() {
+  let report;
+  try {
+    report = inspectProviderCapacity({ runnerConfig: loadGlobalConfig() });
+  } catch (err) {
+    return { passed: false, message: `provider-capacity state unreadable: ${err.message}` };
+  }
+  const providers = Object.values(report.providers || {});
+  const accounts = providers.flatMap((provider) => Object.values(provider.accounts || {}));
+  if (!accounts.length) {
+    return { passed: true, message: 'inactive — no global runner.providers.*.accounts inventory configured' };
+  }
+  const quarantined = accounts.filter((account) => account.quarantine);
+  if (!quarantined.length) {
+    return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };
+  }
+  const summary = quarantined
+    .map((account) => `${account.id}:${account.quarantine.reasonCode || account.quarantine.kind || 'quarantined'}${account.quarantine.manualClear ? ':manual-clear' : ''}`)
+    .join(', ');
+  return {
+    passed: false,
+    message: `provider-capacity quarantine present (${summary}) — inspect with "fgos dispatch inspect --provider-capacity"; clear manually with "fgos dispatch reconcile provider-capacity clear-quarantine" after the operator fix`,
+  };
+}
+
+registerCheck({
+  id: 'provider-capacity-state',
+  description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',
+  check: () => checkProviderCapacityState(),
 });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/

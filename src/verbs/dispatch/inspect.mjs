@@ -1,4 +1,6 @@
 import { inspectDispatchRuntime, validateInspectionSelector } from '../../runner/dispatch/runtime-inspection.mjs';
+import { loadGlobalConfig } from '../../config/global-config.mjs';
+import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 
 export class DispatchInspectError extends Error {
   constructor(message) { super(message); this.name = 'DispatchInspectError'; this.code = 'validation'; this.category = 'validation'; }
@@ -6,6 +8,12 @@ export class DispatchInspectError extends Error {
 
 export function inspectDispatchUseCase(ctx, options = {}) {
   try {
+    if (options.providerCapacity === true) {
+      return inspectProviderCapacity({
+        runnerConfig: loadGlobalConfig(options.globalConfigPath),
+        runtimeDir: options.runtimeDir,
+      });
+    }
     validateInspectionSelector(options);
     const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
     return inspectDispatchRuntime(repoRoot, options);

@@ -62,6 +62,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'shell-integration-sourced',
       'tool-registry-configured',
       'config-awareness',
+      'provider-capacity-state',
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',
@@ -1480,6 +1481,54 @@ test('config-awareness falls back to global active with project not present, whe
     assert.equal(passed, true);
     assert.match(message, /active: global/);
     assert.match(message, /project config not present/);
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('provider-capacity-state doctor check reports quarantine without clearing it', () => {
+  const homeDir = mkTemp('doctor-provider-capacity-home-');
+  const cwd = mkTemp('doctor-provider-capacity-cwd-');
+  const fgosHome = path.join(homeDir, '.fgos');
+  fs.mkdirSync(fgosHome, { recursive: true });
+  fs.writeFileSync(path.join(fgosHome, 'config.json'), JSON.stringify({
+    runner: {
+      providers: {
+        'openai-codex': {
+          accounts: {
+            tetnu: {
+              label: 'Tetnu',
+              credentialSource: { kind: 'codex-home', home: path.join(homeDir, 'codex-tetnu') },
+            },
+          },
+        },
+      },
+    },
+  }, null, 2));
+  const stateDir = path.join(fgosHome, 'runtime', 'provider-capacity');
+  fs.mkdirSync(stateDir, { recursive: true });
+  const statePath = path.join(stateDir, 'state.json');
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetnu: {
+            quarantine: { reasonCode: 'auth-token', manualClear: true, quarantinedAt: '2026-09-16T00:00:00.000Z' },
+            leases: {},
+          },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }, null, 2));
+  withHome(homeDir, () => {
+    const { passed, message } = checkById('provider-capacity-state').check(cwd);
+    assert.equal(passed, false);
+    assert.match(message, /auth-token:manual-clear/);
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    assert.equal(state.providers['openai-codex'].accounts.tetnu.quarantine.reasonCode, 'auth-token');
   });
   fs.rmSync(homeDir, { recursive: true, force: true });
   fs.rmSync(cwd, { recursive: true, force: true });

@@ -15,6 +15,7 @@ import { openSession, createSessionAssignment } from '../../src/runner/coordinat
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
+import { inspectProviderCapacity } from '../../src/runner/dispatch/provider-capacity.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -1017,6 +1018,121 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
   assert.ok(codexArgs.includes('gpt-test-standard'), 'spawned argv must receive the target provider model, not Claude sonnet');
   assert.ok(!codexArgs.includes('opus'), 'Claude model literals must not leak into a cross-provider redirect');
   assert.ok(!codexArgs.includes('sonnet'), 'Claude model literals must not leak into a cross-provider redirect');
+});
+
+test('provider capacity selection happens after Run admission, records redacted run-owned evidence, and releases lease at settle', async () => {
+  const tempDir = mkTempDir();
+  const runtimeDir = mkTempDir();
+  const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity');
+
+  const runnerConfig = {
+    readOnlyExecutorRedirects: {
+      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+    },
+    executors: {
+      claude: { command: process.execPath, args: [codex.scriptPath, '{prompt}'], allowCrossProvider: true },
+      'codex-bwrap': {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        providerModel: 'openai-codex',
+        kind: 'agent',
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetcu72: {
+            label: 'codex/tetcu72',
+            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
+          },
+        },
+      },
+    },
+  };
+
+  const work = { id: 'tsk-provider-capacity-run', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+  });
+
+  assert.equal(result.executorId, 'codex-bwrap');
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const dispatchPlan = JSON.parse(fs.readFileSync(path.join(runDir, 'dispatch-plan.json'), 'utf8'));
+  assert.equal(dispatchPlan.providerCapacity, undefined, 'dispatch-plan must not preselect an account before admission');
+
+  const selection = JSON.parse(fs.readFileSync(path.join(runDir, 'provider-capacity-selection.json'), 'utf8'));
+  assert.equal(selection.provider, 'openai-codex');
+  assert.equal(selection.accountId, 'tetcu72');
+  assert.equal(selection.lease.runId, `run_${assignment.assignmentId}_01`);
+  assert.equal(selection.credentialSource, undefined);
+
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.providerCapacitySelectionPath, path.relative(tempDir, path.join(runDir, 'provider-capacity-selection.json')));
+
+  const effectiveContract = JSON.parse(fs.readFileSync(path.join(runDir, 'effective-execution-contract.json'), 'utf8'));
+  assert.equal(effectiveContract.providerCapacity.provider, 'openai-codex');
+  assert.equal(effectiveContract.providerCapacity.accountId, 'tetcu72');
+  assert.equal(effectiveContract.providerCapacity.credentialSource, undefined);
+
+  const inspected = inspectProviderCapacity({ runnerConfig, runtimeDir });
+  assert.deepEqual(inspected.providers['openai-codex'].accounts.tetcu72.openLeases, []);
+});
+
+test('tool executors bypass provider capacity selection even with matching provider accounts configured', async () => {
+  const tempDir = mkTempDir();
+  const runtimeDir = mkTempDir();
+  const codex = writeArgvRecordingExecutor(tempDir, 'codex-tool-capacity-bypass');
+
+  const runnerConfig = {
+    executor: {
+      command: process.execPath,
+      args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+      providerModel: 'openai-codex',
+      kind: 'tool',
+      allowCrossProvider: true,
+    },
+    modelPolicies: {
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+    providers: {
+      'openai-codex': {
+        accounts: {
+          tetcu72: {
+            label: 'codex/tetcu72',
+            credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-tetcu72') },
+          },
+        },
+      },
+    },
+  };
+
+  const work = { id: 'tsk-provider-capacity-tool-bypass', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+  });
+
+  assert.equal(result.status, 'done');
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  assert.equal(fs.existsSync(path.join(runDir, 'provider-capacity-selection.json')), false);
+  const effectiveContract = JSON.parse(fs.readFileSync(path.join(runDir, 'effective-execution-contract.json'), 'utf8'));
+  assert.equal(effectiveContract.providerCapacity, undefined);
+  const inspected = inspectProviderCapacity({ runnerConfig, runtimeDir });
+  assert.deepEqual(inspected.providers['openai-codex'].accounts.tetcu72.openLeases, []);
 });
 
 test('a genuinely mutating assignment (implement-item, default implementer role) is unaffected -- still resolves the git-write claude profile', async () => {

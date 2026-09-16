@@ -18,65 +18,36 @@ import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 export const BWRAP_DRIVER_TYPE = 'bwrap';
 export const BWRAP_DRIVER_VERSION = 'local-bwrap-v1';
 
-// Executors whose private-home resource is the Codex CLI's own CODEX_HOME
-// (config-declared via a `resourceBindings` entry pointing private-home at
-// the CODEX_HOME env var) and therefore need the host Codex credential
-// provisioned into it -- otherwise codex starts with no auth and cannot run.
-// This is a closed, explicit identity allowlist, not a resource-type branch:
-// it does not weaken any confinement guarantee (mount read/write-ness,
-// hostWrite posture, network egress, ...) for the named executor, it only
-// narrows which executor receives an opt-in credential grant that every
-// other executor gets by default (none). Keying this off `res.resource`
-// alone (as the migration first shipped it) leaked the Codex credential
-// into every private-home, including claude-bwrap/agy-bwrap, which have no
-// relationship to Codex.
-const CODEX_HOME_CREDENTIAL_EXECUTOR_IDS = Object.freeze(['codex-bwrap']);
-
-/**
- * Copies the host's Codex credential file into a Codex executor's own
- * per-dispatch private-home (which that executor's config binds to
- * CODEX_HOME), never any other executor's. The optional configured home list
- * is not a full account placement policy; it is only an ordered credential
- * source pool, stably offset by dispatch id to avoid pinning every bwrap run
- * to the same first source. Non-fatal on read/copy failure.
- */
-function stableIndex(seed, size) {
-  if (!Number.isInteger(size) || size <= 0) return 0;
-  let hash = 0;
-  for (const ch of String(seed)) hash = ((hash * 33) + ch.charCodeAt(0)) >>> 0;
-  return hash % size;
+function expandCredentialHome(home) {
+  if (typeof home !== 'string' || !home.trim()) return null;
+  return home
+    .replace(/^\$\{HOME\}(?=\/|$)/, process.env.HOME || '')
+    .replace(/^~(?=\/|$)/, process.env.HOME || '');
 }
 
-function configuredCodexCredentialHomes(invocationEnv = {}, dispatchId = '') {
-  const configured = [
-    ...(typeof invocationEnv.FGOS_CODEX_CREDENTIAL_HOMES === 'string'
-      ? invocationEnv.FGOS_CODEX_CREDENTIAL_HOMES.split(path.delimiter)
-      : []),
-    invocationEnv.FGOS_CODEX_CREDENTIAL_HOME,
-    invocationEnv.CODEX_CREDENTIAL_HOME,
-  ].filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
-  if (configured.length === 0) return [];
-  const start = stableIndex(dispatchId, configured.length);
-  return [...configured.slice(start), ...configured.slice(0, start)];
-}
-
-function provisionCodexCredential(privateHomeTarget, request) {
-  const credentialHomes = configuredCodexCredentialHomes(request?.invocation?.env, request?.dispatchId);
-  const authCandidates = [
-    ...credentialHomes.map((home) => path.join(home, 'auth.json')),
-    path.join(process.env.HOME || '', '.codex', 'auth.json'),
-    path.join(process.env.HOME || '', '.codex-fgovn', 'auth.json'),
-  ];
-  for (const authCandidate of authCandidates) {
-    if (fs.existsSync(authCandidate)) {
-      try {
-        fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
-      } catch {
-        // non-fatal
-      }
-      break;
-    }
+function provisionSelectedCodexCredential(privateHomeTarget, request) {
+  const source = request?.providerCapacity?.credentialSource;
+  if (!source) return false;
+  if (source.kind !== 'codex-home') {
+    const err = new Error(`unsupported provider credential source kind "${source.kind}"`);
+    err.code = 'credential-provisioning';
+    throw err;
   }
+  const home = expandCredentialHome(source.home);
+  const authCandidate = home ? path.join(home, 'auth.json') : null;
+  if (!authCandidate || !fs.existsSync(authCandidate)) {
+    const err = new Error('selected Codex credential auth.json is missing');
+    err.code = 'credential-provisioning';
+    throw err;
+  }
+  try {
+    fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
+  } catch (copyErr) {
+    const err = new Error(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
+    err.code = 'credential-provisioning';
+    throw err;
+  }
+  return true;
 }
 
 const ALLOWED_BWRAP_CONFIG_KEYS = Object.freeze([
@@ -368,15 +339,16 @@ export function assessBwrap(request, backend) {
  * confinement guarantee (which resources get mounted, read/write-ness,
  * hostWrite/hostRead/networkEgress posture, ...) -- that stays purely
  * resource-driven. The one narrow, explicitly-documented exception is
- * provisioning a Codex-specific credential file (see
- * CODEX_HOME_CREDENTIAL_EXECUTOR_IDS above), which grants nothing away from
- * any other executor and is not a confinement control.
+ * provisioning a selected provider account credential file into a private
+ * home, which grants nothing away from any other executor and is not a
+ * confinement control.
  */
 export async function prepareBwrap(plan, request, backend) {
   // Verify attestation store isolation before materializing mounts (H1)
   assertAttestationStoreIsolated(request.context, plan.resources || []);
 
   const allocatedPaths = [];
+  let credentialProvisioned = false;
 
   try {
     const executable = backend?.config?.executable || '/usr/bin/bwrap';
@@ -394,10 +366,10 @@ export async function prepareBwrap(plan, request, backend) {
       if (res.allocation === 'temporary') {
         fs.mkdirSync(res.hostTarget, { recursive: true });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
-        if (res.resource === 'private-home' && CODEX_HOME_CREDENTIAL_EXECUTOR_IDS.includes(request.executorId)) {
-          provisionCodexCredential(res.hostTarget, request);
-        }
         allocatedPaths.push(res.hostTarget);
+        if (res.resource === 'private-home') {
+          credentialProvisioned = provisionSelectedCodexCredential(res.hostTarget, request) || credentialProvisioned;
+        }
       }
 
       const isWritable = res.access === 'write' || res.access === 'read-write';
@@ -455,6 +427,7 @@ export async function prepareBwrap(plan, request, backend) {
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
+      providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
     };
   } catch (err) {

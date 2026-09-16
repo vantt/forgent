@@ -96,6 +96,14 @@ import {
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
   readEffectiveExecutionContract,
 } from './effective-execution-contract.mjs';
+import {
+  acquireProviderAccountLease,
+  classifyProviderCapacityFault,
+  hasProviderAccounts,
+  quarantineProviderAccount,
+  redactProviderCapacitySelection,
+  releaseProviderAccountLease,
+} from './provider-capacity.mjs';
 
 export {
   buildEffectiveExecutionContract,
@@ -1354,6 +1362,46 @@ export async function executeAssignment(assignment, opts = {}) {
   const { attemptStr, runId, runDir } = admitted;
   const dispatchPlanPath = path.join(runDir, 'dispatch-plan.json');
   const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
+  let providerCapacitySelection = null;
+  let providerCapacityEvidence = null;
+  const providerCapacityProvider = effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor);
+  const shouldSelectProviderAccount =
+    !admitted.resumed &&
+    compiledPlan.mechanism === 'out-of-process' &&
+    cfg.executors?.[resolvedExecutorId]?.kind !== 'tool' &&
+    hasProviderAccounts(cfg, providerCapacityProvider);
+  if (shouldSelectProviderAccount) {
+    providerCapacitySelection = acquireProviderAccountLease({
+      runnerConfig: cfg,
+      provider: providerCapacityProvider,
+      assignmentId: effectiveAssignment.assignmentId,
+      runId,
+      seed: `${effectiveAssignment.assignmentId}:${runId}`,
+      runtimeDir: opts.providerCapacityRuntimeDir,
+      runIsDead: opts.providerCapacityRunIsDead,
+    });
+    if (providerCapacitySelection?.status === 'refused') {
+      throw new RunnerConfigError(`provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}`);
+    }
+    if (providerCapacitySelection?.status === 'selected') {
+      providerCapacityEvidence = {
+        ...redactProviderCapacitySelection(providerCapacitySelection),
+        credentialProvisioned: false,
+      };
+      const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+      fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+      fsyncFileBestEffort(selectionPath);
+      const runJsonPath = path.join(runDir, 'run.json');
+      try {
+        const runJson = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+        fs.writeFileSync(
+          runJsonPath,
+          `${JSON.stringify({ ...runJson, providerCapacitySelectionPath: path.relative(root, selectionPath) }, null, 2)}\n`,
+        );
+        fsyncFileBestEffort(runJsonPath);
+      } catch {}
+    }
+  }
   let effectiveContract;
   if (fs.existsSync(effectiveContractPath)) {
     try {
@@ -1373,6 +1421,7 @@ export async function executeAssignment(assignment, opts = {}) {
       timeoutMs,
       executorId: resolvedExecutorId,
       adapter: resolvedAdapter,
+      providerCapacity: providerCapacityEvidence,
       // The prompt is built before Authority preparation. Derive its posture
       // from the same requirement that will be handed to Authority, never
       // from an executor profile's merely requested confinement fragment.
@@ -1480,6 +1529,16 @@ export async function executeAssignment(assignment, opts = {}) {
   const controlHolder = { id: `${runId}:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
   const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
   if (control.status !== 'acquired') {
+    if (providerCapacitySelection?.status === 'selected') {
+      try {
+        releaseProviderAccountLease({
+          provider: providerCapacitySelection.provider,
+          accountId: providerCapacitySelection.accountId,
+          runId,
+          runtimeDir: opts.providerCapacityRuntimeDir,
+        });
+      } catch {}
+    }
     throw new RunnerConfigError(
       `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
     );
@@ -1648,6 +1707,7 @@ export async function executeAssignment(assignment, opts = {}) {
             body: resolvedCmd.body,
             resourceBindings: resolvedCmd.resourceBindings,
           },
+          providerCapacity: providerCapacitySelection,
           context: {
             cwd: effectiveCwd,
             repoRoot: root,
@@ -1691,6 +1751,15 @@ export async function executeAssignment(assignment, opts = {}) {
         throw err;
       }
 
+      if (providerCapacityEvidence && prepResult?.providerCapacity?.credentialProvisioned === true) {
+        providerCapacityEvidence = { ...providerCapacityEvidence, credentialProvisioned: true };
+        const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+        try {
+          fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+          fsyncFileBestEffort(selectionPath);
+        } catch {}
+      }
+
       // Persist after Authority resolution, yet before the supervisor is
       // spawned. A requested policy alone is not enforcement evidence.
       effectiveContract = buildEffectiveExecutionContract({
@@ -1704,6 +1773,7 @@ export async function executeAssignment(assignment, opts = {}) {
         timeoutMs,
         executorId: resolvedExecutorId,
         adapter: resolvedAdapter,
+        providerCapacity: providerCapacityEvidence,
         confinement: {
           requirement: prepResult.preparedInvocation.requirement,
           backend: prepResult.preparedInvocation.backend,
@@ -1861,6 +1931,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // `needsAssignmentLaunchContext`, so `assignmentLaunchContext` stays
           // null here and this call is byte-identical to before this fix.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
+          ...(providerCapacitySelection ? { providerCapacity: providerCapacitySelection } : {}),
         });
       } catch (err) {
         executionError = err;
@@ -2054,6 +2125,57 @@ export async function executeAssignment(assignment, opts = {}) {
     work: opts.work,
   });
 
+  let providerCapacityFault = null;
+  if (providerCapacitySelection?.status === 'selected') {
+    const fault = classifyProviderCapacityFault({
+      stderr: stderrText,
+      adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
+      structuredAgent: agentClaim,
+    });
+    if (fault?.action && fault.action !== 'none') {
+      providerCapacityFault = {
+        provider: providerCapacitySelection.provider,
+        accountId: providerCapacitySelection.accountId,
+        action: fault.action,
+        reasonCode: fault.reasonCode,
+        confidence: fault.confidence,
+        manualClear: Boolean(fault.manualClear),
+      };
+      if (fault.action === 'quarantine') {
+        const quarantine = quarantineProviderAccount({
+          runnerConfig: cfg,
+          provider: providerCapacitySelection.provider,
+          accountId: providerCapacitySelection.accountId,
+          reasonCode: fault.reasonCode,
+          manualClear: fault.manualClear,
+          runtimeDir: opts.providerCapacityRuntimeDir,
+          evidence: {
+            kind: 'provider-stderr-classifier',
+            runId,
+            assignmentId: effectiveAssignment.assignmentId,
+          },
+        });
+        providerCapacityFault.quarantine = {
+          state: quarantine?.status || 'quarantined',
+          manualClear: Boolean(quarantine?.manualClear),
+          quarantinedAt: quarantine?.quarantinedAt || null,
+        };
+      }
+      if (providerCapacityEvidence) {
+        providerCapacityEvidence = {
+          ...providerCapacityEvidence,
+          reasonCodes: [...new Set([...(providerCapacityEvidence.reasonCodes || []), fault.reasonCode].filter(Boolean))],
+          ...(providerCapacityFault.quarantine ? { quarantine: providerCapacityFault.quarantine } : {}),
+        };
+        const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+        try {
+          fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+          fsyncFileBestEffort(selectionPath);
+        } catch {}
+      }
+    }
+  }
+
   // Step 04 §5.5: richer evidence.json with provenance fields.
   // Keep changedFiles for backward compatibility; add richer fields beside it.
   const evidenceData = {
@@ -2069,6 +2191,7 @@ export async function executeAssignment(assignment, opts = {}) {
     attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
     artifacts: workerArtifacts,
     tests: [],
+    ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
@@ -2149,6 +2272,16 @@ export async function executeAssignment(assignment, opts = {}) {
     if (useSupervisorRecovery && launchCommandId) {
       try {
         await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
+      } catch {}
+    }
+    if (providerCapacitySelection?.status === 'selected') {
+      try {
+        releaseProviderAccountLease({
+          provider: providerCapacitySelection.provider,
+          accountId: providerCapacitySelection.accountId,
+          runId,
+          runtimeDir: opts.providerCapacityRuntimeDir,
+        });
       } catch {}
     }
     releaseRunControl(runDir, { controlEpoch, controlToken });

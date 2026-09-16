@@ -2933,11 +2933,26 @@ async function runVerb(verb, flags, positional, dir) {
         return invokeDispatchInspectOperation({
           operationId: 'dispatch.runtime.inspect', effect: 'read',
           ctx: { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch },
-          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd } },
+          payload: { selector: { run: flags.run, assignment: flags.assignment, cwd: flags.cwd, providerCapacity: flags['provider-capacity'] === true } },
         });
       }
       if (sub === 'reconcile') {
         const reconcileCtx = { cwd: repoRootForDispatch, repoRoot: repoRootForDispatch };
+        if (positional[1] === 'provider-capacity' && positional[2] === 'clear-quarantine') {
+          return invokeDispatchReconcileOperation({
+            operationId: 'dispatch.runtime.reconcile', effect: 'write',
+            ctx: reconcileCtx,
+            payload: {
+              providerCapacity: {
+                action: 'clear-quarantine',
+                provider: flags.provider,
+                account: flags.account,
+                reason: flags.reason,
+                force: flags.force === true,
+              },
+            },
+          });
+        }
         if ((positional[1] ?? 'plan') === 'plan') {
           // F1: --cwd names the specific working directory whose per-cwd
           // dispatch lock clear-cwd-lock targets -- distinct from --dir

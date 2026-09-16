@@ -789,7 +789,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'dispatch',
     invoke: 'fgos dispatch <show-run|inspect|watch|recover|reconcile> [runId]',
-    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair and never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run.',
+    description: '"inspect" is Dispatch-owned runtime inspection. "reconcile" is a narrow, local CAS-guarded guard repair plus provider-capacity quarantine clear door; it never recovers, launches, signals, or controls a Run. "recover" remains the semantic recovery door for a STANDALONE Run.',
     parameters: {
       type: 'object',
       properties: {
@@ -797,11 +797,16 @@ export const COMMAND_REGISTRY = [
         run: { type: 'string', description: '"inspect" selector, and "reconcile plan --action collect-result" only: Run id selector / target runId.' },
         assignment: { type: 'string', description: '"inspect" selector, and "reconcile plan --action clear-assignment-claim" only: Assignment id selector.' },
         cwd: { type: 'string', description: '"inspect" only: cwd selector.' },
+        'provider-capacity': { type: 'boolean', description: '"inspect" only: report provider-capacity inventory/state/quarantine/leases from global config/state.' },
         'run-id': { type: 'string', description: 'The runId to read (positional or --run-id).' },
         interval: { type: 'string', description: '"watch" only: milliseconds between readings (default 1000).' },
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
         intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s own outbox, or the recommendation comes back "needs-input").' },
         action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too. "reconcile plan" only (different meaning): the plain action-kind string to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
+        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: provider id, e.g. openai-codex.' },
+        account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: account id from ~/.fgos/config.json.' },
+        reason: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: operator reason, e.g. token refreshed.' },
+        force: { type: 'boolean', description: '"reconcile provider-capacity clear-quarantine" only: permit clearing an account that is not currently quarantined.' },
         plan: { type: 'string', description: '"reconcile apply" only: JSON-encoded plan returned by `dispatch reconcile plan`.' },
         'expected-snapshot': { type: 'string', description: '"recover" apply only: the `snapshotHash` from the recommendation being applied.' },
         'expected-control-epoch': { type: 'string', description: '"recover" apply only: the `expectedControlEpoch` from the recommendation being applied.' },
