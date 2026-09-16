@@ -1152,24 +1152,14 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
   const resumeMatch = resumedAssignmentId
     ? forThisBinding.find((record) => record.consumedByAssignmentId === resumedAssignmentId)
     : undefined;
-  // tsk-1bh fix: prefer the NEWEST unconsumed authorization for this binding,
-  // not the oldest. In the normal flow (authorize + operation dispatched
-  // together in one `fgos coordination run` call) there is only ever one
-  // unconsumed authorization at a time, so this changes nothing. Multiple
-  // unconsumed authorizations for the same binding only pile up when an
-  // earlier one was orphaned -- its paired operation step was refused
-  // (e.g. a `contextRefs` grant violation) before ever reaching
-  // `createSessionAssignment`, so it was never marked consumed and never
-  // will be. An oldest-first `.find()` would then hand every future
-  // dispatch attempt back to that same dead authorization forever, making a
-  // corrected retry (a fresh authorization with the fix applied) permanently
-  // unreachable for this binding (confirmed live: `code-implementation-
-  // track-policy--p01`'s `reviewer-recheck` hit exactly this). The newest
-  // authorization is the Lead's most recent, presumably corrected, intent;
-  // an older orphaned one is dead weight, never a competing valid grant --
-  // no real flow authorizes the same binding twice on purpose without
-  // consuming the first before issuing the second.
-  return resumeMatch ?? forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
+  if (resumeMatch) return resumeMatch;
+  // A newer already-consumed authorization supersedes any older unconsumed
+  // orphan sibling: resolve against the newest authorization overall for this
+  // binding (array order is chronological). If that newest-overall record is
+  // unconsumed, it is the fresh one to use. If it is already consumed, there
+  // is no fresh authorization pending regardless of any older orphan.
+  const newest = forThisBinding.at(-1);
+  return newest?.consumedByAssignmentId === null ? newest : undefined;
 }
 
 /**
@@ -1198,26 +1188,16 @@ function resolveBindingAuthorization(authorizations, { nodeId, operationId, targ
  */
 function resolveTaskKeyAuthorization(authorizations, binding) {
   const forThisBinding = bindingAuthorizations(authorizations, binding);
-  // tsk-1bh fix: this MUST pick the same unconsumed authorization
-  // `resolveBindingAuthorization` (above) will independently resolve to
-  // consume for this same dispatch -- `.findLast()`, not `.find()`, for the
-  // identical "newest is the Lead's real current intent, an orphaned older
-  // one is dead weight" reasoning that function's own comment gives. Before
-  // this fix the two disagreed: this taskKey-derivation half kept naming the
-  // OLDEST unconsumed (often orphaned) authorization, while dispatch itself
-  // consumed the NEWEST one, so the taskKey a caller's own later invocation
-  // recomputes never changes across retries even after a fresh, correctly-
-  // scoped authorization is issued -- `isResumeOfThisRound` then resolves to
-  // an EARLIER attempt's own claim, and the same-binding "fresher unconsumed
-  // authorization exists" guard (this file, `dispatchDeclaredOperation`'s
-  // `freshUnconsumed` check) refuses the retry outright instead of minting a
-  // new claim for it. Confirmed live via the exact repro this fixes:
-  // orphaned auth A, a successful dispatch under auth B, and a THIRD
-  // correction auth C for the same binding -- the pre-fix mismatch names A
-  // (or B, once B is consumed) in the taskKey while C sits unconsumed,
-  // permanently blocking the retry C exists to make.
-  const unconsumed = forThisBinding.findLast((record) => record.consumedByAssignmentId === null);
-  if (unconsumed) return unconsumed;
+  // A newer already-consumed authorization supersedes any older unconsumed
+  // orphan sibling: resolve against the newest authorization overall for this
+  // binding. If that newest-overall record is unconsumed, it is the fresh one
+  // to key a genuinely new Assignment. If it is already consumed, there is no
+  // fresh authorization pending regardless of any older orphan, and resolution
+  // falls through to the existing consumed-idempotent-resume path below.
+  const newest = forThisBinding.at(-1);
+  if (newest && newest.consumedByAssignmentId === null) {
+    return newest;
+  }
   // No fresh authorization pending: this is either a genuine idempotent
   // resume (exactly one prior invocation was ever consumed at this binding
   // -- the ONLY shape resume actually needs) or an AMBIGUOUS repeat (two or
@@ -2563,8 +2543,10 @@ export async function dispatchDeclaredOperation(
       // already consumed (a genuine resume-match) -- still refuse if a
       // FRESHER unconsumed sibling authorization for this exact triple
       // exists, so a caller-issued second invocation at the SAME binding is
-      // never silently ignored either.
-      const freshUnconsumed = authorizations.find(
+      // never silently ignored either. Older orphaned authorizations are
+      // superseded and do not block the resume.
+      const authIndex = authorizations.indexOf(authorization);
+      const freshUnconsumed = (authIndex >= 0 ? authorizations.slice(authIndex + 1) : authorizations).find(
         (record) =>
           record.nodeId === node.id &&
           record.operationId === operationId &&
