@@ -72,8 +72,9 @@ here requires opening `fgos-plan-loop` to understand or use.
 
 ## Two execution modes: direct-single-cell vs planned-multi-cell
 
-`fgos-code-panel` serves as the single entry door for implementation work
-requiring independent review and red-team, operating in one of two modes:
+`fgos-code-panel` serves as the front facade door for implementation work
+requiring independent review and red-team (while `fgos-plan-loop` remains
+directly invocable for track coordination per R4), operating in one of two modes:
 
 1. **direct-single-cell** (R1, default): For concrete, single-change coding
    requests without a plan execution target. Retains the existing single-cell
@@ -81,7 +82,7 @@ requiring independent review and red-team, operating in one of two modes:
    direct CoordinationSession CLI doors, coding personas, mutation gating,
    and quorum close.
 2. **planned-multi-cell** (R2): When a plan or phase path IS the execution
-   target (bare path, or an explicit imperative run/resume/execute instruction
+   target (bare plan or phase path, or an explicit imperative run/resume/execute instruction
    directed AT the plan/track). Hands off track execution to `fgos-plan-loop`
    by reference, applying the coding test-policy overlay, and stops.
 
@@ -89,11 +90,13 @@ requiring independent review and red-team, operating in one of two modes:
 
 - **Imperative instruction required (M1):** Planned mode strictly requires an
   imperative, unconditional instruction directed AT the plan or track. Questions
-  (e.g. *"should I run plans/X/plan.md now?"*), conditionals (e.g. *"if we finish
-  early, run plans/X/plan.md"*), or past-tense descriptions (e.g. *"I ran
-  plans/X/plan.md yesterday"*) do NOT trigger planned mode. Genuinely
-  unresolved or ambiguous intent must be refused or prompted for clarification,
-  never silently guessed.
+  (e.g. *"should I run plans/X/plan.md now?"*, *"should we run plans/X/plan.md"*),
+  conditionals (e.g. *"if we finish early, run plans/X/plan.md"*), or past-tense
+  descriptions (e.g. *"I ran plans/X/plan.md yesterday"*) directed at running the
+  plan do NOT trigger planned mode. Genuinely unresolved or ambiguous intent must
+  be refused or prompted for clarification, never silently guessed. Ordinary direct
+  requests containing past-tense narration or conditional implementation logic
+  stay `direct-single-cell`.
 - **Passing citation stays direct:** A request merely citing a plan path in
   passing (e.g. *"fix the bug described in plans/X/plan.md"*) without an
   execution-target verb directed at the plan stays `direct-single-cell`.
@@ -106,23 +109,31 @@ requiring independent review and red-team, operating in one of two modes:
   the verb to be directed AT the plan/phase artifact itself.
 - **Negation honored (CE2):** Negation must be accounted for before matching any
   verb. A request like *"don't run plans/X/plan.md yet, just fix src/foo.mjs"*
-  stays `direct-single-cell`.
+  stays `direct-single-cell` with target `src/foo.mjs`. If negation on a plan or
+  track is detected without an affirmative alternative target, it is refused for
+  clarification, never defaulting to a fabricated target.
 - **Non-execution / inspection verbs stay direct (CE4):** A plan or phase path
   with an inspection verb (e.g. *"review plans/X/plan.md"*, *"explain
   plans/X/plan.md"*, *"summarize plans/X/plan.md"*) and no run/resume/execute
-  verb stays `direct-single-cell`.
+  verb directed at the plan stays `direct-single-cell`. When an explicit
+  run/resume/execute verb is directed at a plan, it takes precedence over
+  secondary inspection phrases (e.g. *"run plans/X/plan.md and read docs/notes.md first"*
+  triggers `planned-multi-cell`).
 - **Explicit run/resume/execute at plan (planned mode):** Requests where the
   plan or phase path is the execution target (e.g. bare path
-  `"plans/260915-foo/plan.md"`, *"run this implementation plan:
-  plans/260915-foo/plan.md"*, *"resume track plans/260915-foo/plan.md"*) trigger
+  `"plans/260915-foo/plan.md"` or `"plans/260915-foo/phase-02-foo.md"` (including with
+  `./plans/` prefix), *"run this implementation plan: plans/260915-foo/plan.md"*,
+  *"run plans/260915-foo/plan.md"*, *"resume track plans/260915-foo/plan.md"*) trigger
   `planned-multi-cell`.
 - **Track referenced by name without path (CE1):** A track referenced by name
-  with a run/resume/open verb (e.g. *"resume the dispatch-operability-implementation
+  with an explicit run/resume/open verb (e.g. *"resume the dispatch-operability-implementation
   track"*, *"open the next cell for code-panel-multicell-facade"*) triggers
   `planned-multi-cell`. Resolves to `plans/<name>/plan.md` or by scanning
-  `plans/*/plan.md` for a matching `Track:`/`Execution track:` header or
-  timestamp-prefixed directory suffix (`-*<track>`). A bare track name with no
-  resolvable plan is refused rather than guessed.
+  `plans/*/plan.md` for a unique exact match against the file's own
+  `Track:`/`Execution track:` header, or by matching a live registered coordination
+  session with cells (`fgos coordination chain <name>`). Substring or partial
+  matches (e.g. 'facade', 'policy') and bare track names with no unique resolvable
+  plan or live session are refused for clarification rather than guessed.
 - **Plans outside plans/ (CE5):** An explicit run/resume/execute instruction
   naming any `plan.md` or `phase-NN-*.md`-shaped file outside `plans/` (e.g.
   *"run this plan: docs/platform/packaging-distribution/code-panel-rollout-plan.md"*)
@@ -133,16 +144,22 @@ requiring independent review and red-team, operating in one of two modes:
   derive the track and verify against chain's next unmerged cell; refuse (never
   silently override or drop) if the named phase mismatches what chain would open
   next.
+- **Direct requests with commands stay direct:** Requests combining code edits
+  with run commands (e.g. *"fix the flaky retry in src/runner/retry.mjs and run npm test"*,
+  *"add null-check in src/auth.mjs and run the linter"*) are direct code changes,
+  stay `direct-single-cell`, and inside an active cell are accepted as cell-internal work.
 
 ### Recursive-dispatch guard (R2)
 
 If `fgos-code-panel` is invoked from within an active plan-loop cell dispatch
-(detected via `coordinationId` matching plan-loop cell shape `<track>--p<NN>`,
-`options.inPlanLoop: true`, `options.workRef` shaped like a plan-loop cell, or
-`FGOS_COORDINATION_ID`), `fgos-code-panel` MUST NOT re-enter `planned-multi-cell`
-mode or open a nested track. It routes to `direct-single-cell` mode for
-cell-internal implementation, or refuses recursion if asked to open an inner
-track.
+(detected via `coordinationId` or `workRef` matching plan-loop cell shape
+`<track>--<cell-id>` such as `<track>--cell-01` or `<track>--i05`,
+`options.inPlanLoop: true`, or active worktree branch), `fgos-code-panel`
+MUST NOT re-enter `planned-multi-cell` mode or open a nested track. It routes
+to `direct-single-cell` mode for cell-internal implementation, or refuses
+recursion if asked to open an inner track. (Note: `FGOS_COORDINATION_ID` is a
+documented invariant; currently no runtime producer in the repo sets this
+environment variable).
 
 ## Planned-multi-cell mode: delegation to fgos-plan-loop
 
