@@ -2,7 +2,7 @@
 
 **Track:** `test-suite-feedback-cost`
 
-**Status:** READY FOR CODE PANEL
+**Status:** P00-P03 complete on track; P04 next
 
 **Date:** 2026-09-15
 
@@ -93,11 +93,11 @@ remaining harness cost without mutating it. P08 is evidence-only.
 
 | Cell | Status | Brief | Outcome |
 |---|---|---|---|
-| P00 | planned | [phase-00-harness-writer-hermeticity.md](phase-00-harness-writer-hermeticity.md) | shell-independent writer behavior |
-| P01 | planned | [phase-01-portable-test-runner-ci.md](phase-01-portable-test-runner-ci.md) | one Node >=18 test door; CI actually executes tests |
-| P02 | planned | [phase-02-green-baseline-and-profile.md](phase-02-green-baseline-and-profile.md) | accepted baseline and hotspot report |
-| P03 | planned | [phase-03-docs-index-pilot.md](phase-03-docs-index-pilot.md) | measured docs-index optimization verdict |
-| P04 | planned | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | measured external-process isolation verdict |
+| P00 | complete on track | [phase-00-harness-writer-hermeticity.md](phase-00-harness-writer-hermeticity.md) | shell-independent writer behavior landed on track |
+| P01 | complete on track | [phase-01-portable-test-runner-ci.md](phase-01-portable-test-runner-ci.md) | one Node >=18 test door landed on track; CI execution proof remains an external gate when remote CI is unavailable |
+| P02 | complete on track | [phase-02-green-baseline-and-profile.md](phase-02-green-baseline-and-profile.md) | accepted baseline and hotspot report recorded in [reports/green-baseline.md](reports/green-baseline.md) |
+| P03 | complete on track | [phase-03-docs-index-pilot.md](phase-03-docs-index-pilot.md) | docs-index state-fixture pilot recorded `expand` in [reports/docs-index-pilot.md](reports/docs-index-pilot.md) |
+| P04 | next | [phase-04-external-claude-isolation-pilot.md](phase-04-external-claude-isolation-pilot.md) | measured external-process isolation verdict |
 | P05 | planned | [phase-05-related-test-selector-pilot.md](phase-05-related-test-selector-pilot.md) | shadow-evaluated conservative selector |
 | P06 | planned | [phase-06-cli-fixture-init-pilot.md](phase-06-cli-fixture-init-pilot.md) | measured fixture strategy verdict |
 | P07 | planned | [phase-07-cli-harness-responsibility-audit.md](phase-07-cli-harness-responsibility-audit.md) | complete harness cost/responsibility map and two bounded candidates |
