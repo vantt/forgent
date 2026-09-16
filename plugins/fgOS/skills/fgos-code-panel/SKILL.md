@@ -2,23 +2,18 @@
 name: fgos-code-panel
 user-invocable: false
 description: >-
-  Get a single, straightforward code change implemented and independently
-  reviewed + red-teamed through the real `fgos coordination` CLI doors --
-  no plan.md/phase-NN.md track required, no fgOS Work items, no lifecycle
-  stage, no UI/dashboard. Self-contained: dispatches through the same
-  hardened CoordinationSession engine and `standalone-master-coordination-
-  loop` protocol `fgos-plan-loop` uses (real mutation-gating, real quorum
-  close), with its own coding-flavored doer/reviewer/red-team persona
-  roster and its own concrete request examples -- reading `fgos-plan-loop`
-  is not required to use this skill. Use when someone has one concrete
-  code change in mind and wants it done with a real independent
-  second/third opinion, not a whole multi-cell track. Examples: "implement
-  this fix and get it reviewed+red-teamed", "run a code panel on this
-  change", "get an independent review and red-team on this patch before I
-  merge it". Do not use for advisory coding decisions such as plugin versus
-  core, option comparison, or architecture red-team; those route through
-  fgos-panel without mutation. A request that references a multi-cell
-  plan.md/phase-NN track is a fgos-plan-loop track, not this skill.
+  Get a single code change implemented or drive a plan-driven coding track with
+  independent review + red-team through the real `fgos coordination` CLI doors.
+  Self-contained: dispatches through the same hardened CoordinationSession engine
+  and `standalone-master-coordination-loop` protocol `fgos-plan-loop` uses (real
+  mutation-gating, real quorum close), with its own coding-flavored doer/reviewer/
+  red-team persona roster. Two modes: direct-single-cell (default, concrete code
+  changes without a plan target) and planned-multi-cell (when a plan/phase file or
+  track is the execution target, delegating multi-cell orchestration to
+  `fgos-plan-loop` by reference). Examples: "implement this fix and get it
+  reviewed+red-teamed", "run a code panel on this change", "run plans/260915-foo/plan.md",
+  "resume track plans/260915-foo/plan.md". Do not use for advisory coding decisions;
+  those route through fgos-panel without mutation.
 ---
 
 # fgos-code-panel
@@ -66,11 +61,152 @@ here requires opening `fgos-plan-loop` to understand or use.
 - **No design-doc ceremony.** `objective` names the exact file(s)/
   behavior to change directly, in plain text -- not a pointer to a
   separate design document. A change big enough to need its own design
-  discussion before implementation is a `fgos-plan-loop` track, not this
-  skill.
-- **No multi-cell track.** A request that references a multi-cell
-  `plan.md`/`phase-NN` track is a `fgos-plan-loop` track; this skill is
-  one cell.
+  discussion before implementation should be shaped into a plan first.
+- **No second orchestration implementation.** This skill never executes
+  multi-cell track orchestration logic (auditing track-level preconditions,
+  looping across multiple cells with `chain.mjs`, or sequencing cell
+  transitions). When a request has a plan/phase path as its execution target,
+  this skill selects planned-multi-cell mode, hands off to `fgos-plan-loop`
+  by reference with the target and coding test-policy overlay, and stops.
+  All multi-cell progression belongs exclusively to `fgos-plan-loop`.
+
+## Two execution modes: direct-single-cell vs planned-multi-cell
+
+`fgos-code-panel` serves as the front facade door for implementation work
+requiring independent review and red-team (while `fgos-plan-loop` remains
+directly invocable for track coordination per R4), operating in one of two modes:
+
+1. **direct-single-cell** (R1, default): For concrete, single-change coding
+   requests without a plan execution target. Retains the existing single-cell
+   workflow (sections 0 through 4 below) byte-behavior-identical to today:
+   direct CoordinationSession CLI doors, coding personas, mutation gating,
+   and quorum close.
+2. **planned-multi-cell** (R2): When a plan or phase path IS the execution
+   target (bare plan or phase path, or an explicit imperative run/resume/execute instruction
+   directed AT the plan/track). Hands off track execution to `fgos-plan-loop`
+   by reference, applying the coding test-policy overlay, and stops.
+
+### Mode-selection rules
+
+- **Imperative instruction required (M1):** Planned mode strictly requires an
+  imperative, unconditional instruction directed AT the plan or track. Questions
+  (e.g. *"should I run plans/X/plan.md now?"*, *"should we run plans/X/plan.md"*),
+  conditionals (e.g. *"if we finish early, run plans/X/plan.md"*), or past-tense
+  descriptions (e.g. *"I ran plans/X/plan.md yesterday"*) directed at running the
+  plan do NOT trigger planned mode. Genuinely unresolved or ambiguous intent must
+  be refused or prompted for clarification, never silently guessed. Ordinary direct
+  requests containing past-tense narration or conditional implementation logic
+  stay `direct-single-cell`.
+- **Passing citation stays direct:** A request merely citing a plan path in
+  passing (e.g. *"fix the bug described in plans/X/plan.md"*) without an
+  execution-target verb directed at the plan stays `direct-single-cell`.
+- **Plan file as edit target stays direct (A1):** Citing a plan file as the edit
+  target (e.g. *"fix the typo in plans/X/plan.md"*) stays `direct-single-cell`.
+- **Verb directed at another object stays direct (A2):** Requests where the
+  verb's object is something else (e.g. *"run the focused tests listed in
+  plans/X/phase-01.md against src/x.mjs"* or *"resume my work on src/auth.mjs,
+  context in plans/X/plan.md"*) stay `direct-single-cell`. Planned mode requires
+  the verb to be directed AT the plan/phase artifact itself.
+- **Negation honored (CE2):** Negation must be accounted for before matching any
+  verb. A request like *"don't run plans/X/plan.md yet, just fix src/foo.mjs"*
+  stays `direct-single-cell` with target `src/foo.mjs`. If negation on a plan or
+  track is detected without an affirmative alternative target, it is refused for
+  clarification, never defaulting to a fabricated target.
+- **Non-execution / inspection verbs stay direct (CE4):** A plan or phase path
+  with an inspection verb (e.g. *"review plans/X/plan.md"*, *"explain
+  plans/X/plan.md"*, *"summarize plans/X/plan.md"*) and no run/resume/execute
+  verb directed at the plan stays `direct-single-cell`. When an explicit
+  run/resume/execute verb is directed at a plan, it takes precedence over
+  secondary inspection phrases (e.g. *"run plans/X/plan.md and read docs/notes.md first"*
+  triggers `planned-multi-cell`).
+- **Explicit run/resume/execute at plan (planned mode):** Requests where the
+  plan or phase path is the execution target (e.g. bare path
+  `"plans/260915-foo/plan.md"` or `"plans/260915-foo/phase-02-foo.md"` (including with
+  `./plans/` prefix), *"run this implementation plan: plans/260915-foo/plan.md"*,
+  *"run plans/260915-foo/plan.md"*, *"resume track plans/260915-foo/plan.md"*) trigger
+  `planned-multi-cell`.
+- **Track referenced by name without path (CE1):** A track referenced by name
+  with an explicit run/resume/open verb (e.g. *"resume the dispatch-operability-implementation
+  track"*, *"open the next cell for code-panel-multicell-facade"*) triggers
+  `planned-multi-cell`. Resolves to `plans/<name>/plan.md` or by scanning
+  `plans/*/plan.md` for a unique exact match against the file's own
+  `Track:`/`Execution track:` header, or by matching a live registered coordination
+  session with cells (`fgos coordination chain <name>`). Substring or partial
+  matches (e.g. 'facade', 'policy') and bare track names with no unique resolvable
+  plan or live session are refused for clarification rather than guessed.
+- **Plans outside plans/ (CE5):** An explicit run/resume/execute instruction
+  naming any `plan.md` or `phase-NN-*.md`-shaped file outside `plans/` (e.g.
+  *"run this plan: docs/platform/packaging-distribution/code-panel-rollout-plan.md"*)
+  triggers `planned-multi-cell`. Only bare unqualified paths require the `plans/`
+  prefix.
+- **Phase path target interaction with chain (CE3):** When a request names a
+  specific phase path as execution target (e.g. *"run phase-03 of plans/X"*),
+  derive the track and verify against chain's next unmerged cell; refuse (never
+  silently override or drop) if the named phase mismatches what chain would open
+  next.
+- **Direct requests with commands stay direct:** Requests combining code edits
+  with run commands (e.g. *"fix the flaky retry in src/runner/retry.mjs and run npm test"*,
+  *"add null-check in src/auth.mjs and run the linter"*) are direct code changes,
+  stay `direct-single-cell`, and inside an active cell are accepted as cell-internal work.
+
+### Recursive-dispatch guard (R2)
+
+If `fgos-code-panel` is invoked from within an active plan-loop cell dispatch
+(detected via `coordinationId` or `workRef` matching plan-loop cell shape
+`<track>--<cell-id>` such as `<track>--cell-01` or `<track>--i05`,
+`options.inPlanLoop: true`, or active worktree branch), `fgos-code-panel`
+MUST NOT re-enter `planned-multi-cell` mode or open a nested track. It routes
+to `direct-single-cell` mode for cell-internal implementation, or refuses
+recursion if asked to open an inner track. (Note: `FGOS_COORDINATION_ID` is a
+documented invariant; currently no runtime producer in the repo sets this
+environment variable).
+
+## Planned-multi-cell mode: delegation to fgos-plan-loop
+
+When `planned-multi-cell` mode is selected:
+1. Materialize the 3-tier coding test-policy overlay (`FOCUSED_TESTS`,
+   `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) as data attached to each
+   coding cell's own dispatch objective. `fgos-code-panel` composes this overlay
+   from phase text + repo evidence (GitNexus impact when available,
+   touched-contract detection, existing test ownership) BEFORE handing the
+   request to `fgos-plan-loop`; `fgos-plan-loop` receives only the
+   already-composed objective/evidence text, never a new schema field.
+2. Delegate track execution to `fgos-plan-loop` by reference, passing the target
+   `planPath` (or resolved track) and coding test-policy overlay.
+3. **STOP.** `fgos-code-panel` does NOT execute multi-cell loop orchestration
+   (no auditing of track preconditions, no chain iteration loop, no
+   cell-transition sequencing, no multi-cell step procedures). All multi-cell
+   progression belongs exclusively to `fgos-plan-loop`.
+
+### Fresh-session resume contract
+
+Planned-mode resume must be reconstructable from durable state alone. A new
+session with no chat history may use the user's request, the resolved plan path,
+the plan's cell-status table, `.fgos/coordination/sessions/**`, and Git evidence
+only. It must not rely on a previous assistant's narration.
+
+Before handing off to `fgos-plan-loop`, classify the durable state as one of:
+
+- **active cell** -- an existing coordination session for the current/next cell
+  is active or has an authorized fix/recheck round. Delegate a resume of that
+  same cell. Do not open a new cell.
+- **terminal cell not integrated** -- the cell's coordination session is
+  completed/closed but the plan row or Git merge evidence does not yet show the
+  cell integrated into the track. Delegate close/integration follow-through for
+  that cell, not the following phase.
+- **merged cell with stale session evidence** -- Git/plan evidence says the cell
+  landed, but the session log is stale or not terminal. Delegate reconciliation
+  through `fgos-plan-loop`/coordination recovery; never hand-edit JSONL/state to
+  make the row look closed.
+- **no open cell** -- only then select the lowest unmerged phase as the next
+  cell.
+- **completed track** -- all phase rows are merged/closed; report complete and
+  do not open a new session.
+
+Legacy plans remain valid. If a plan or phase file has no explicit test-policy
+metadata, compose the coding overlay from the phase's `## Verification` block,
+repo evidence, and the mechanical `FULL_TRIGGERS` above. Missing metadata is not
+a migration gate.
 
 ## Verify the doer's real outcome yourself
 
@@ -100,7 +236,8 @@ re-runs against a `(tree, environment)` state it already certified --
 usually once per cell, never once per round.
 
 - **focused** -- the direct test(s) for the exact module/symbol/behavior
-  changed. Doer and fixer run this by default, every round.
+  changed. Doer and fixer run this by default, every round (R2: doer/fixer run
+  focused first always).
 - **affected** -- tests covering the consumers/processes in the diff's
   blast radius. Use the impact-analysis capability when this project has
   one registered and present (`fgos tool query --capability impact-analysis
@@ -110,13 +247,15 @@ usually once per cell, never once per round.
   `git grep`/call-graph reading when no such capability is registered or
   present. Escalate to this tier when the diff's blast radius is not
   obviously contained to the changed file(s) -- a real judgment call, made
-  once, before dispatching `open.json`. **Who runs it:** this is not a
-  separate dispatched step -- when the Lead escalates to this tier, the
-  SAME doer/fixer round's objective names `AFFECTED_TESTS` instead of
-  `FOCUSED_TESTS` for that round; there is no round where nobody runs it.
+  once, before dispatching `open.json`. Affected scope escalation is a Lead/prose
+  judgment call based on GitNexus impact + touched contracts, not automatic.
+  **Who runs it:** this is not a separate dispatched step -- when the Lead
+  escalates to this tier, the SAME doer/fixer round's objective names
+  `AFFECTED_TESTS` instead of `FOCUSED_TESTS` for that round; there is no
+  round where nobody runs it.
 - **full** -- the whole project test command. Runs **at most once per
-  distinct (tree, environment) state per cell**, right before merge, never
-  mechanically after every round.
+  distinct (tree, environment) state per cell**, right before merge or when
+  a declared FULL_TRIGGERS fires, never mechanically after every round (R5).
 
 ### Test-selection block -- declared once, before `open.json`
 
@@ -141,6 +280,7 @@ FULL_TRIGGERS (mechanical -- diff-path facts, fire regardless of what was
   `docs/how-to/author-a-plan-loop-track.md`'s Mechanical-gate rule names,
   so the two stay in lockstep); blast radius HIGH/CRITICAL per
   impact-analysis when present.
+DECISION: focused: <cmd>; affected: <cmd | same-as-focused>; full: <deferred-to-final-gate | triggered (<category>) | required (<reason>)>
 ```
 
 A reviewer/red-team finding that the declared tier misses a changed
@@ -152,6 +292,20 @@ Reviewer and red-team evaluate the test-selection block **together with
 the patch** -- a selection that obviously misses the changed contract is
 itself such a finding, not something they route around by quietly running
 something wider on their own.
+
+### Explicit test decision required for every cell (R6)
+
+A model that silently omits deciding is itself a bug: every coding cell must
+record an explicit test decision attached to its dispatch objective and close
+rationale, including an explicit declaration when full-suite testing is deferred:
+
+- `focused`: `<exact command>`
+- `affected`: `<exact command>` or `"same-as-focused (<contained blast radius rationale>)"`
+- `full`: `"deferred-to-final-gate (<rationale>)"` | `"triggered (<category>) (<command>)"` | `"required (<reason>)"`
+- `full_triggers`: evaluated categories or `"none"`
+
+Silent omission of any of these determinations is prohibited; a dispatch or
+disposition without an explicit decision record is invalid.
 
 ### Full suite: never twice for the same (tree, environment) state, never mechanically per round
 
@@ -220,7 +374,17 @@ re-run "to be sure." A tree-hash match under a *different* fingerprint
 qualify -- re-run for real; there is no shortcut for actual environment
 drift.
 
-### Reviewer/red-team judge proof sufficiency, never expand the run themselves
+### Reviewer/red-team inspect proof by default, judge proof sufficiency (R3)
+
+Reviewer and red-team default to INSPECTING existing proof: they read the
+recorded command, Git tree hash, and environment fingerprint from the
+preceding worker's result. They do NOT re-run the same command unless:
+1. Proof is stale (the Git tree hash or environment fingerprint has changed,
+   or an intervening patch invalidated the proof's scope);
+2. Proof is insufficient (the declared command does not actually exercise
+   the contract this diff changes);
+3. A specific counterexample or attack finding is discovered that requires
+   fresh test output to demonstrate/falsify.
 
 If the declared tier's command does not actually exercise a contract this
 diff changes, that is a finding (HIGH on a public or shared contract)

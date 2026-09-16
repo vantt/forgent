@@ -20,6 +20,7 @@ import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
+import { interpretRunResult } from './run-result.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { detectTrunk } from '../worktree.mjs';
 
@@ -154,11 +155,23 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // runs of the same assignment.
           let runResult = null;
           try {
-            runResult = JSON.parse(fs.readFileSync(resultJsonPath, 'utf8'));
+            runResult = interpretRunResult(JSON.parse(fs.readFileSync(resultJsonPath, 'utf8')));
           } catch {
             continue;
           }
           if (!runResult || typeof runResult !== 'object') continue;
+
+          // A contract-corrupt result (stored status/confidence disagrees with
+          // its own classification) is NOT the same as an absent result: the
+          // run-result-and-observation contract requires readers to fail
+          // closed by treating it as a no-evidence terminal fact, never as
+          // "this member has no evidence yet" (which would route the driver
+          // back to a fresh re-dispatch on forged fields). Do not skip it
+          // here -- let it fall through the same runId/claim-bytes/settle-
+          // report/plan-hash bindings and read-back re-derivation below,
+          // which already re-derive the true status/confidence from the
+          // untamperable runtime and settle-bound evidence regardless of
+          // what the corrupt top-level fields claim.
 
           // runId-vs-member identity: the runner writes runId as
           // `run_<assignmentId>_<runSub>` when it dispatches this member. A
@@ -188,7 +201,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // classification time; re-run the same gate here.
           if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
             try {
-              if (!validateAgentResultClaim(runResult.agentClaim).valid) continue;
+              if (!validateAgentResultClaim(runResult.agentClaim, { role: asgn?.role, operation: asgn?.operation }).valid) continue;
             } catch {
               continue;
             }

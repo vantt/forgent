@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
+  materializations and incomplete sibling admission evidence, including cwd
+  aggregates; ambiguous or incomplete evidence never produces a recovery hint.
 - `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
   discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
   `node --test` with an explicit file-argument array, instead of a
@@ -32,9 +35,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `codex-bwrap` can now provision its sandbox credential from a configured
   ordered Codex home pool, so the repo is no longer locked to only
   `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
+- Coordination sessions now default `aggregateBounds.wallTimeMs` to 3 hours
+  instead of 1 hour, matching measured multi-step dispatch latency so a valid
+  revise/recheck chain is less likely to be killed by the aggregate wall-time
+  ceiling before all authorized steps can finish.
 
 ### Added
 
+- `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
+  repair door. It only removes a lock after proving its exact PID/start-time
+  incarnation is dead; it never performs semantic recovery or execution control.
+- `fgos dispatch reconcile plan --action collect-result --run <runId>`, a
+  second reconcile action that links an already-written, already-valid
+  `result.json` through its owning Assignment once admission-ledger facts
+  prove it is not superseded. It reuses `dispatch.runtime.inspect`'s own
+  owner/current-Run views and refuses outright on a CoordinationSession-owned
+  Run, whose result linking stays that session's own driver-authored write.
+- `fgos dispatch reconcile plan --action clear-assignment-claim --assignment <id>`,
+  a third reconcile action that removes a dead-holder `dispatch.claim` once no
+  admitted-but-unmaterialized launch, unsettled Run, or uncollected result is
+  still pending for that Assignment. It refuses outright on a
+  CoordinationSession-owned claim, whose clearing stays that session's own
+  recovery door.
+- `fgos dispatch reconcile plan --action repair-projection --run <runId>`, a
+  fourth reconcile action that additively patches a stale `run.json.status`
+  (e.g. still `running`) back to `settled` once an already-validated terminal
+  RunResult proves the Run finished. It reuses `dispatch.runtime.inspect`'s
+  own RunResult interpretation and never repairs on an unproven or corrupt
+  result.
+
+- `fgos dispatch inspect`, a read-only Dispatch runtime inspection surface with
+  exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
+  observations, terminal RunResults where present, duplicate identities, and
+  non-authorizing recovery ownership hints.
+- Dispatch runtime inspection/reconciliation now has an operator how-to and a
+  production-door proof matrix covering Assignment execution, public inspect,
+  historical/replayed RunResult interpretation, and forbidden reconciliation
+  recovery routes.
+- Code-panel multi-cell facade (code-panel-multicell-facade track, P01):
+  `fgos-code-panel` now operates as a two-mode facade for coding implementation
+  work with independent review and red-team. Direct mode (`direct-single-cell`)
+  retains existing single-cell mutation and quorum behavior, while planned mode
+  (`planned-multi-cell`) delegates track execution to `fgos-plan-loop` by
+  reference when a plan/phase file or registered track is the execution target,
+  with recursive-dispatch protection and automated contract tests covering
+  mode selection (CE1-CE5, imperative mood M1, and anti-guessing).
+- Coding test-policy overlay for code-panel facade (code-panel-multicell-facade track, P02):
+  `fgos-code-panel` attaches an explicit 4-field test-policy overlay (`FOCUSED_TESTS`,
+  `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) to coding cell objectives dispatched
+  through `fgos-plan-loop`. Doer/fixer execute focused tests first; affected scope
+  escalates based on impact analysis and touched contracts; reviewer and red-team
+  inspect existing proof records by default, re-running only when proof is stale
+  (differing Git tree hash or environment fingerprint), insufficient, or counterexamples
+  are discovered; every cell requires an explicit test decision (including
+  `full: deferred-to-final-gate`) with no silent omission.
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
   historical/status notes pointing readers to the promoted

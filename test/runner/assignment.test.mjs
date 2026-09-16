@@ -194,6 +194,7 @@ test('renderAssignmentPrompt states the real agent-result.json status enum -- ts
   });
   const prompt = renderAssignmentPrompt(assignment, { runDir: '/tmp/fgos-asgn-rd-test-2/runs/01' });
   assert.match(prompt, /"status" must be exactly one of: done \| blocked \| failed \| no-evidence/m);
+  assert.match(prompt, /assessment\.verdict" is required for this assessment role/m);
 });
 
 test('renderAssignmentPrompt still calls the companion report Optional for a mutating operation -- classifyRunEvidence only requires it for read-only', () => {
@@ -322,6 +323,12 @@ test('validateAgentResultClaim rejects invalid schema and unknown status (Step 0
   const evidenceRefsEmptyString = validateAgentResultClaim({ status: 'done', summary: 'Done', evidenceRefs: [''] });
   assert.equal(evidenceRefsEmptyString.valid, false);
   assert.match(evidenceRefsEmptyString.reason, /non-empty strings/i);
+});
+
+test('validateAgentResultClaim delegates reviewer and recheck assessment requirements to the v2 contract', () => {
+  const claim = { contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Reviewed.' };
+  assert.equal(validateAgentResultClaim(claim, { role: 'reviewer' }).valid, false);
+  assert.equal(validateAgentResultClaim({ ...claim, assessment: { verdict: 'pass' } }, { operation: 'reviewer-recheck' }).valid, true);
 });
 
 test('buildAssignment refuses missing taskSpec file when repoRoot is supplied (Step 04 §5.6)', () => {

@@ -1883,6 +1883,53 @@ console.log('done');
   assert.equal(result.status, 'done');
 });
 
+test('executeAssignment rejects a reviewer v2 claim without assessment.verdict at the production classification gate', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'reviewer-missing-assessment.mjs');
+  fs.writeFileSync(executorScript, `
+import fs from 'node:fs';
+import path from 'node:path';
+const prompt = process.argv.slice(2).join(' ');
+const runDir = path.dirname(/Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)[1]);
+fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Reviewer report with substantive detail.');
+fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Reviewed.' }));
+`);
+  const assignment = buildAssignment({
+    work: { id: 'tsk-reviewer-assessment-gate', status: 'todo', stage: 'planning', domain: 'coding' },
+    stage: 'planning', operation: 'validate-plan', role: 'reviewer',
+  });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir, repoRoot: tempDir,
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
+  });
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+  assert.deepEqual(result.agentClaim, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+});
+
+test('executeAssignment rejects a legacy failed claim with an object error at the production classification gate', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'legacy-object-error.mjs');
+  fs.writeFileSync(executorScript, `
+import fs from 'node:fs';
+import path from 'node:path';
+const prompt = process.argv.slice(2).join(' ');
+const runDir = path.dirname(/Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt)[1]);
+fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'failed', summary: 'Legacy failure.', error: { code: 'ELEGACY' } }));
+`);
+  const assignment = buildAssignment({
+    work: { id: 'tsk-legacy-error-gate', status: 'todo', stage: 'planning', domain: 'coding' },
+    stage: 'planning', operation: 'validate-plan',
+  });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir, repoRoot: tempDir,
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
+  });
+  assert.equal(result.status, 'failed');
+  assert.equal(result.confidence, 'failed');
+  assert.deepEqual(result.agentClaim, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+});
+
 
 test('resolveWorkerArtifactPath prefers the outbox, and orders rounds by number rather than by name', () => {
   const tempDir = mkTempDir();

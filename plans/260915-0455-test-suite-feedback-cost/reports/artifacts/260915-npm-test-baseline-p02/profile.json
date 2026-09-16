@@ -1,0 +1,324 @@
+{
+  "status": 0,
+  "wallSeconds": 341.224753264,
+  "userSeconds": 2502.53,
+  "systemSeconds": 580.73,
+  "maxRssKb": 287420,
+  "cpuScope": "process-tree (GNU time -v wait4 rusage, includes reaped descendants)",
+  "stdoutPath": "/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/profile/stdout.log",
+  "stderrPath": "/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/profile/stderr.log",
+  "before": {
+    "clean": true,
+    "env": {
+      "sha": "22c003db230627e6e72ebd9757ee6e16ed2ce565",
+      "node": "v24.18.0",
+      "platform": "linux",
+      "arch": "x64",
+      "cpuCount": 16,
+      "loadavg": [
+        0.91,
+        8.05,
+        9.22
+      ],
+      "timestamp": "2026-09-15T13:39:07.563Z"
+    }
+  },
+  "after": {
+    "clean": true
+  },
+  "valid": true,
+  "junitPath": "/tmp/claude-1000/-home-vantt-projects-forgentX/c75f56d4-822e-4cf7-aaf7-593a17daf139/scratchpad/p02-baseline/profile/junit.xml",
+  "summary": {
+    "topTests": [
+      {
+        "name": "fgos docs-index writes repo/docs/enduser-docs-index.json with the real how-to demo entry",
+        "time": 89.113151,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/report/enduser-index.test.mjs"
+      },
+      {
+        "name": "fgos docs-index is idempotent — re-running yields the same entries, no duplicate docPath/sourceCaptureId pairs",
+        "time": 48.044325,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/report/enduser-index.test.mjs"
+      },
+      {
+        "name": "R11 &amp; R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail",
+        "time": 33.639347,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "fgos docs-index tolerates a missing quadrant dir (tutorials has no alias) with no crash and no entries from it",
+        "time": 32.874362,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/report/enduser-index.test.mjs"
+      },
+      {
+        "name": "Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)",
+        "time": 25.596896,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "fgos docs-index reads BOTH the docs/decisions/ alias and the primary docs/explanation/ dir into the explanation quadrant, tagged by quadrant name not source dir name",
+        "time": 24.886193,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/report/enduser-index.test.mjs"
+      },
+      {
+        "name": "Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin",
+        "time": 24.188941,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts",
+        "time": 22.704891,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)",
+        "time": 22.566338,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "uninstall with no --yes refuses (exit 4) and touches nothing",
+        "time": 22.019099,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/setup/uninstall-wiring-2.test.mjs"
+      },
+      {
+        "name": "uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical",
+        "time": 21.960942,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/setup/uninstall-wiring-3.test.mjs"
+      },
+      {
+        "name": "setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)",
+        "time": 21.591024,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-setup.test.mjs"
+      },
+      {
+        "name": "Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever",
+        "time": 20.480009,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free",
+        "time": 20.067946,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init",
+        "time": 19.457826,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "R5: Node-against-Node passes all coverage-floor cases",
+        "time": 15.032095,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/harness.test.mjs"
+      },
+      {
+        "name": "R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH",
+        "time": 12.159933,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/release-tree.test.mjs"
+      },
+      {
+        "name": "a genuine, untampered herdr-spawn receipt is accepted -- workerCommandDigest agrees with Authority's own prepared-invocation digest",
+        "time": 11.824155,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      },
+      {
+        "name": "executeAssignment dispatches a herdr-spawn executor (invocations[] shape) through the real herdr seam",
+        "time": 11.065786,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      },
+      {
+        "name": "executeAssignment dispatches a herdr-spawn executor (flat adapter shape) through the real herdr seam",
+        "time": 10.822795,
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      }
+    ],
+    "topFiles": [
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/report/enduser-index.test.mjs",
+        "totalSeconds": 195.457982,
+        "count": 20
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-init.test.mjs",
+        "totalSeconds": 189.66230899999996,
+        "count": 20
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-merge.test.mjs",
+        "totalSeconds": 137.44712399999997,
+        "count": 57
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-return.test.mjs",
+        "totalSeconds": 101.44190299999998,
+        "count": 44
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-merge-2.test.mjs",
+        "totalSeconds": 75.99181700000001,
+        "count": 30
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/rust-host/fgctl-upgrade.test.mjs",
+        "totalSeconds": 57.262555,
+        "count": 15
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-edit.test.mjs",
+        "totalSeconds": 50.002866000000004,
+        "count": 29
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-claim.test.mjs",
+        "totalSeconds": 49.04562299999999,
+        "count": 26
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-edit-3.test.mjs",
+        "totalSeconds": 45.121269000000005,
+        "count": 19
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-claim-2.test.mjs",
+        "totalSeconds": 45.082665,
+        "count": 27
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/loop.test.mjs",
+        "totalSeconds": 45.042351000000004,
+        "count": 92
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-read-5.test.mjs",
+        "totalSeconds": 44.648488,
+        "count": 18
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/coordination-driver-authorization.test.mjs",
+        "totalSeconds": 41.14962800000001,
+        "count": 68
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-setup.test.mjs",
+        "totalSeconds": 40.86409600000001,
+        "count": 17
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-read-2.test.mjs",
+        "totalSeconds": 36.872088999999995,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-read-4.test.mjs",
+        "totalSeconds": 34.79608799999999,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/herdr-spawn-adapter.test.mjs",
+        "totalSeconds": 34.702862999999994,
+        "count": 35
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-post-merge-4.test.mjs",
+        "totalSeconds": 34.193135,
+        "count": 12
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/cli/fgos-stage.test.mjs",
+        "totalSeconds": 33.999989,
+        "count": 18
+      },
+      {
+        "file": "/home/vantt/projects/test-suite-feedback-cost-p02/test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+        "totalSeconds": 33.712736,
+        "count": 3
+      }
+    ],
+    "directoryTotals": [
+      {
+        "dir": "cli",
+        "totalSeconds": 1512.5628599999989,
+        "count": 855
+      },
+      {
+        "dir": "runner",
+        "totalSeconds": 505.7131030000006,
+        "count": 2500
+      },
+      {
+        "dir": "rust-host",
+        "totalSeconds": 281.86826800000006,
+        "count": 100
+      },
+      {
+        "dir": "report",
+        "totalSeconds": 223.458784,
+        "count": 136
+      },
+      {
+        "dir": "verbs",
+        "totalSeconds": 151.86748599999999,
+        "count": 217
+      },
+      {
+        "dir": "setup",
+        "totalSeconds": 108.75701700000002,
+        "count": 532
+      },
+      {
+        "dir": "e2e",
+        "totalSeconds": 71.561108,
+        "count": 57
+      },
+      {
+        "dir": "state",
+        "totalSeconds": 42.09347699999997,
+        "count": 1189
+      },
+      {
+        "dir": "scripts",
+        "totalSeconds": 19.451065000000018,
+        "count": 246
+      },
+      {
+        "dir": "skills",
+        "totalSeconds": 6.672185,
+        "count": 14
+      },
+      {
+        "dir": "intake",
+        "totalSeconds": 3.200036,
+        "count": 173
+      },
+      {
+        "dir": "install",
+        "totalSeconds": 0.396046,
+        "count": 17
+      },
+      {
+        "dir": "(test root)",
+        "totalSeconds": 0.368757,
+        "count": 14
+      },
+      {
+        "dir": "evolve",
+        "totalSeconds": 0.29226199999999997,
+        "count": 35
+      },
+      {
+        "dir": "util",
+        "totalSeconds": 0.24688300000000002,
+        "count": 38
+      },
+      {
+        "dir": "docs",
+        "totalSeconds": 0.03466400000000001,
+        "count": 10
+      },
+      {
+        "dir": "config",
+        "totalSeconds": 0.029660000000000006,
+        "count": 21
+      }
+    ]
+  }
+}
