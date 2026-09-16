@@ -84,7 +84,7 @@ const FORBIDDEN_ON_ASSIGNMENT = new Set(['sessionId', 'coordinationId', 'threadI
 // unbounded by omission"). These are that ceiling -- generous enough for a
 // real bounded agent-led session, never infinite.
 export const DEFAULT_AGGREGATE_BOUNDS = Object.freeze({
-  wallTimeMs: 3600000, // 1 hour
+  wallTimeMs: 10800000, // 3 hours
   maxAssignments: 20,
   maxConcurrency: 4,
   maxRounds: 10,

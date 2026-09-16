@@ -198,6 +198,22 @@ function appendRecoveryCommand(runDir, record) {
   fs.appendFileSync(file, `${JSON.stringify(record)}\n`);
 }
 
+function dispatchClaimPathForRunDir(runDir) {
+  return path.join(path.dirname(path.dirname(runDir)), 'dispatch.claim');
+}
+
+function clearDispatchClaimForRecoveredDriver(runDir, action) {
+  if (action?.type !== 'resume-driver') return false;
+  const claimPath = dispatchClaimPathForRunDir(runDir);
+  try {
+    fs.unlinkSync(claimPath);
+    return true;
+  } catch (err) {
+    if (err.code === 'ENOENT') return false;
+    throw err;
+  }
+}
+
 const REQUIRED_APPLY_FIELDS = ['action', 'expectedSnapshot', 'expectedControlEpoch', 'expectedExpiresAt', 'actionKey'];
 
 function isMissing(value) {
@@ -325,6 +341,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
       snapshotHash: params.expectedSnapshot,
     };
     appendRecoveryCommand(runDir, record);
-    return { runId, runDir, outcome: 'applied', ...record };
+    const dispatchClaimCleared = clearDispatchClaimForRecoveredDriver(runDir, params.action);
+    return { runId, runDir, outcome: 'applied', ...record, dispatchClaimCleared };
   });
 }

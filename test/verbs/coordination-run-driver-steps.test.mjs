@@ -170,6 +170,19 @@ function reviewStep() {
   };
 }
 
+function redTeamStep(overrides = {}) {
+  return {
+    type: 'operation',
+    as: 'red-team',
+    operationId: 'red-team-candidate',
+    targetActorId: 'red-team',
+    objective: 'Red-team the candidate.',
+    expectedOutputs: ['agent-result.json (status, summary)'],
+    contextRefs: ['$ref:produce'],
+    ...overrides,
+  };
+}
+
 function request(overrides = {}) {
   return {
     kind: 'declared-protocol',
@@ -195,6 +208,33 @@ function authorizeStep(overrides = {}) {
   };
 }
 
+function authorizeReviseStep(overrides = {}) {
+  return {
+    type: 'authorize',
+    as: 'authorize-revise',
+    operationId: 'revise-candidate',
+    targetActorId: 'fixer',
+    authorizationId: 'auth_revise_1',
+    invocationKey: 'revise:candidate@2',
+    reason: 'The candidate needs a revision before recheck.',
+    grantedContextRefs: ['$ref:produce'],
+    ...overrides,
+  };
+}
+
+function reviseStep(overrides = {}) {
+  return {
+    type: 'operation',
+    as: 'revise',
+    operationId: 'revise-candidate',
+    targetActorId: 'fixer',
+    objective: 'Revise the candidate.',
+    expectedOutputs: ['agent-result.json (status, summary)'],
+    contextRefs: ['$ref:produce'],
+    ...overrides,
+  };
+}
+
 function recheckStep(overrides = {}) {
   return {
     type: 'operation',
@@ -204,6 +244,19 @@ function recheckStep(overrides = {}) {
     objective: 'Recheck the revised candidate.',
     expectedOutputs: ['agent-result.json (status, summary)'],
     contextRefs: ['$ref:produce'],
+    ...overrides,
+  };
+}
+
+function redTeamRecheckStep(overrides = {}) {
+  return {
+    type: 'operation',
+    as: 'red-team-recheck',
+    operationId: 'red-team-recheck',
+    targetActorId: 'red-team',
+    objective: 'Red-team recheck the revised candidate.',
+    expectedOutputs: ['agent-result.json (status, summary)'],
+    contextRefs: ['$ref:revise'],
     ...overrides,
   };
 }
@@ -472,6 +525,68 @@ test('an unauthorized optional operation is refused at the request door: the rec
   // produce + review only -- the refused recheck materialized nothing.
   assert.equal(manifest.assignmentRefs.length, 2);
   assert.equal(eventsOfType(tempDir, sessions[0], 'operation-authorized').length, 0);
+});
+
+test('a resume request runs every step before quorum close: revise completing the fixer does not close the session before later recheck steps in the same request', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_no_mid_request_quorum_close';
+  const opts = { cwd: tempDir, repoRoot: tempDir };
+
+  const first = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      coordinationId,
+      steps: [produceStep(), reviewStep(), redTeamStep()],
+    }),
+  });
+  assert.equal(first.closed, false, 'before the fixer revision, the first-pass request must leave the session open');
+  assert.equal(readManifest(coordinationId, opts).status, 'active');
+
+  const produceId = first.steps.find((step) => step.as === 'produce').assignmentId;
+  const second = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      coordinationId,
+      steps: [
+        authorizeReviseStep({
+          grantedContextRefs: [produceId],
+        }),
+        reviseStep({
+          contextRefs: [produceId],
+        }),
+        authorizeStep({
+          grantedContextRefs: ['$ref:revise'],
+        }),
+        recheckStep({
+          contextRefs: ['$ref:revise'],
+        }),
+        authorizeStep({
+          as: 'authorize-red-team-recheck',
+          operationId: 'red-team-recheck',
+          targetActorId: 'red-team',
+          authorizationId: 'auth_red_team_recheck_1',
+          invocationKey: 'red-team-recheck:candidate@2',
+          grantedContextRefs: ['$ref:revise'],
+        }),
+        redTeamRecheckStep(),
+      ],
+    }),
+  });
+
+  assert.equal(second.closed, true, 'the session should close only after all resume-request steps have run');
+  assert.equal(readManifest(coordinationId, opts).status, 'completed');
+  assert.deepEqual(
+    second.steps.map((step) => step.as),
+    ['authorize-revise', 'revise', 'authorize-recheck', 'recheck', 'authorize-red-team-recheck', 'red-team-recheck'],
+  );
+  assert.equal(second.steps.find((step) => step.as === 'revise').status, 'done');
+  assert.equal(second.steps.find((step) => step.as === 'recheck').status, 'done');
+  assert.equal(second.steps.find((step) => step.as === 'red-team-recheck').status, 'done');
+
+  const events = readSessionEvents(coordinationId, opts);
+  const terminalIndex = events.findIndex((event) => event.type === 'session-completed');
+  assert.ok(terminalIndex > 0, 'quorum close must write a terminal event after the dispatch events');
+  const redTeamRecheckId = second.steps.find((step) => step.as === 'red-team-recheck').assignmentId;
+  const redTeamRecheckIndex = events.findIndex((event) => event.type === 'assignment-created' && event.payload.assignmentId === redTeamRecheckId);
+  assert.ok(redTeamRecheckIndex >= 0 && redTeamRecheckIndex < terminalIndex, 'the final recheck assignment must be created before the terminal close event');
 });
 
 test('hidden context is refused at the request door: a recheck naming a sibling ref the authorize step never granted creates no Assignment', async () => {

@@ -58,6 +58,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveConte
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -213,6 +214,64 @@ function fallbackMutationForAssignment(asgn) {
   } catch {
     return undefined;
   }
+}
+
+function stableIndex(seed, size) {
+  if (!Number.isInteger(size) || size <= 0) return 0;
+  const hash = crypto.createHash('sha256').update(String(seed)).digest();
+  return hash.readUInt32BE(0) % size;
+}
+
+function normalizeRedirectCandidates(value) {
+  if (typeof value === 'string' && value.trim()) return [value.trim()];
+  if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+  return [];
+}
+
+function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
+  const configured = cfg?.readOnlyExecutorRedirects?.[sourceExecutorId];
+  if (configured === undefined) {
+    return sourceExecutorId === 'claude' && cfg?.executors?.['claude-reviewer'] ? ['claude-reviewer'] : [];
+  }
+  const operation = assignment?.operation;
+  if (configured && typeof configured === 'object' && !Array.isArray(configured)) {
+    return normalizeRedirectCandidates(configured.operations?.[operation] ?? configured.default);
+  }
+  return normalizeRedirectCandidates(configured);
+}
+
+function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
+  const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  const candidates = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment)
+    .filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
+  if (candidates.length === 0) return sourceExecutorId;
+  return candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+}
+
+function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
+  if (executorId === sourceExecutorId) return policy;
+  const executorEntry = cfg?.executors?.[executorId];
+  const providerModel = deriveProviderFamily(executorEntry);
+  const model = providerModel === policy.providerModel
+    ? policy.model
+    : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+  return {
+    ...policy,
+    executorId,
+    providerModel,
+    model,
+    provenance: {
+      ...policy.provenance,
+      provider: providerModel === policy.providerModel ? policy.provenance?.provider : {
+        value: providerModel,
+        source: { scope: 'readOnlyExecutorRedirect', id: executorId },
+      },
+      model: model === policy.model ? policy.provenance?.model : {
+        value: model,
+        source: { scope: 'readOnlyExecutorRedirect', id: `${providerModel}.${policy.tier}` },
+      },
+    },
+  };
 }
 
 /**
@@ -1204,28 +1263,23 @@ export async function executeAssignment(assignment, opts = {}) {
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
 
-  const effectivePolicy = compiledPlan.policy;
+  let effectivePolicy = compiledPlan.policy;
 
-  // Reviewer/researcher/advisor executor scoping (Red-team finding, Cell 6.3
-  // Fix Round 1; widened in Fix Round 2 to cover operation-based read-only
-  // classification too, not just role): a read-only Assignment (per
-  // isReadOnlyAssignment -- assignment.mutation === 'read-only', stamped
-  // once at build time by assignment-normalizer.mjs from role/operation)
-  // must never resolve to the same executor profile as a worker (acceptEdits
-  // + Bash(git add/commit)) when the resolved family is the default
-  // "claude". Only
-  // ever redirects a *default* "claude" resolution -- an explicit
-  // non-"claude" preferExecutor (pi, agy-cli, codex, ...) is untouched.
-  // Absent-safe: no `runner.executors.claude-reviewer` entry configured ->
-  // falls through to the unchanged `defaultExecutorId`, byte-identical to
-  // before this fix.
+  // Reviewer/researcher/advisor executor scoping. A read-only Assignment must
+  // never resolve to the same executor profile as a worker (acceptEdits +
+  // Bash(git add/commit)) when the resolved family is the default "claude".
+  // Historically this was a literal claude -> claude-reviewer redirect. That
+  // kept the write-safety fix but also concentrated every read-only Claude
+  // role onto one executor/account. The default remains byte-identical when no
+  // config is present; projects can now declare per-operation/pool redirects
+  // under runner.readOnlyExecutorRedirects without changing the higher-level
+  // operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
   const resolvedExecutorId =
-    isReadOnlyAssignment(effectiveAssignment) &&
-    defaultExecutorId === 'claude' &&
-    cfg.executors?.['claude-reviewer']
-      ? 'claude-reviewer'
+    isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude'
+      ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
+  effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
   // for a redirected read-only op (above). `policy.executorPreference[0]`
   // (persisted below, unchanged) always records the DECLARED preference

@@ -12,7 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `fgos dispatch inspect` now fails closed for duplicate current Assignment Run
   materializations and incomplete sibling admission evidence, including cwd
   aggregates; ambiguous or incomplete evidence never produces a recovery hint.
-
+- `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
+  discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
+  `node --test` with an explicit file-argument array, instead of a
+  shell-globbed `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
+  string. The old form silently selected zero files on the CI Ubuntu/macOS
+  Node 20 lane (no built-in glob support for that Node version) and failed
+  outright on Windows's default `cmd.exe` npm shell (POSIX `VAR=value`
+  env-assignment syntax is not valid there); the new runner sets that env var
+  on the spawned child directly and works unchanged across OS/shell.
 - Packaging-distribution release posture is now preview with Rust host as the
   default installed runtime for external installs; legacy Node fallback is
   deprecated and kept only as an explicit escape hatch for 30 calendar days
@@ -20,6 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.
+- Read-only dispatches that would have fallen through to the default `claude`
+  executor can now use configured provider-aware redirect pools; this repo now
+  routes those read-only Claude fallbacks to `codex-bwrap` so reviewer/red-team
+  recovery does not keep burning the exhausted Claude seat.
+- `codex-bwrap` can now provision its sandbox credential from a configured
+  ordered Codex home pool, so the repo is no longer locked to only
+  `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
+- Coordination sessions now default `aggregateBounds.wallTimeMs` to 3 hours
+  instead of 1 hour, matching measured multi-step dispatch latency so a valid
+  revise/recheck chain is less likely to be killed by the aggregate wall-time
+  ceiling before all authorized steps can finish.
 
 ### Added
 
@@ -49,7 +68,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   exactly one `--run`, `--assignment`, or `--cwd` selector. It reports
   observations, terminal RunResults where present, duplicate identities, and
   non-authorizing recovery ownership hints.
-
+- Code-panel multi-cell facade (code-panel-multicell-facade track, P01):
+  `fgos-code-panel` now operates as a two-mode facade for coding implementation
+  work with independent review and red-team. Direct mode (`direct-single-cell`)
+  retains existing single-cell mutation and quorum behavior, while planned mode
+  (`planned-multi-cell`) delegates track execution to `fgos-plan-loop` by
+  reference when a plan/phase file or registered track is the execution target,
+  with recursive-dispatch protection and automated contract tests covering
+  mode selection (CE1-CE5, imperative mood M1, and anti-guessing).
+- Coding test-policy overlay for code-panel facade (code-panel-multicell-facade track, P02):
+  `fgos-code-panel` attaches an explicit 4-field test-policy overlay (`FOCUSED_TESTS`,
+  `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) to coding cell objectives dispatched
+  through `fgos-plan-loop`. Doer/fixer execute focused tests first; affected scope
+  escalates based on impact analysis and touched contracts; reviewer and red-team
+  inspect existing proof records by default, re-running only when proof is stale
+  (differing Git tree hash or environment fingerprint), insufficient, or counterexamples
+  are discovered; every cell requires an explicit test decision (including
+  `full: deferred-to-final-gate`) with no silent omission.
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
   historical/status notes pointing readers to the promoted
