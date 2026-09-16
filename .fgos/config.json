@@ -84,6 +84,21 @@
         "prefer": "claude"
       }
     },
+    "readOnlyExecutorRedirects": {
+      "claude": {
+        "default": [
+          "codex-bwrap"
+        ],
+        "operations": {
+          "review-candidate": [
+            "codex-bwrap"
+          ],
+          "red-team-candidate": [
+            "codex-bwrap"
+          ]
+        }
+      }
+    },
     "executors": {
       "claude": {
         "kind": "agent",
@@ -558,6 +573,9 @@
               "{model}",
               "{prompt}"
             ],
+            "env": {
+              "FGOS_CODEX_CREDENTIAL_HOMES": "${HOME}/.codex-tetcu72:${HOME}/.codex-tetnu:${HOME}/.codex-fgovn:${HOME}/.codex"
+            },
             "resourceBindings": [
               {
                 "resource": "private-home",

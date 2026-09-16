@@ -637,7 +637,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-luna",
       "<prompt>"
     ],
-    "envKeys": [],
+    "envKeys": [
+      "FGOS_CODEX_CREDENTIAL_HOMES"
+    ],
     "resourceBindings": [
       {
         "resource": "private-home",
@@ -668,7 +670,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-terra",
       "<prompt>"
     ],
-    "envKeys": [],
+    "envKeys": [
+      "FGOS_CODEX_CREDENTIAL_HOMES"
+    ],
     "resourceBindings": [
       {
         "resource": "private-home",
@@ -699,7 +703,9 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-sol",
       "<prompt>"
     ],
-    "envKeys": [],
+    "envKeys": [
+      "FGOS_CODEX_CREDENTIAL_HOMES"
+    ],
     "resourceBindings": [
       {
         "resource": "private-home",
@@ -1295,4 +1301,3 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     });
   });
 });
-

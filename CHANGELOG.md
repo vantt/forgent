@@ -25,6 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.
+- Read-only dispatches that would have fallen through to the default `claude`
+  executor can now use configured provider-aware redirect pools; this repo now
+  routes those read-only Claude fallbacks to `codex-bwrap` so reviewer/red-team
+  recovery does not keep burning the exhausted Claude seat.
+- `codex-bwrap` can now provision its sandbox credential from a configured
+  ordered Codex home pool, so the repo is no longer locked to only
+  `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
 
 ### Added
 

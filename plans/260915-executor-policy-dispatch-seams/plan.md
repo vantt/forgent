@@ -36,6 +36,30 @@ The plan is grounded by:
 - Merge cadence to main: final-only unless a phase is marked full-suite gate and the Lead decides to checkpoint.
 - Main→track sync point: before Phase 04, if main changed dispatch/session/schema files during earlier phases.
 
+## Emergency takeover / hotfix note — 2026-09-16
+
+Claude quota exhaustion exposed a real dispatch bottleneck while this track was
+in flight: read-only assignments resolving to default `claude` were all
+compatibility-redirected into the single `claude-reviewer` executor. During the
+outage this track is being patched directly in this worktree, not through
+`fgos-plan-loop`, `fgos-code-panel`, Work items, or executor dispatch.
+
+Hotfix scope in this branch:
+
+- keep the existing write-safety invariant for read-only assignments;
+- replace the hardcoded `claude -> claude-reviewer` redirect with a configured,
+  provider-aware read-only redirect pool;
+- route this repo's read-only Claude fallbacks to `codex-bwrap` until a proper
+  PlacementPolicy/ExecutorProfile migration owns account placement;
+- let `codex-bwrap` provision credentials from an ordered Codex home pool so it
+  is not pinned to only `${HOME}/.codex-fgovn`;
+- clear stale assignment `dispatch.claim` during dead-driver `resume-driver`
+  recovery, using the same liveness basis that authorizes recovery.
+
+This is not the final account-rotation design. It is a production-stability
+bridge that prevents the current Claude quota leak and unblocks paused workers
+when quota returns. Proper account/principal modeling remains Phase 05/06 work.
+
 ## Product Gates
 
 | Phase | Cell | Capability | Exit |
