@@ -1193,6 +1193,53 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.
 - Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md).
 
+## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams)
+
+Target vocabulary only (design.md §3.7 of
+`plans/260915-executor-policy-dispatch-seams/design.md`) — documented here so
+config/doctor warnings (`executor-profile-warnings` check,
+`src/setup/executor-profile-warnings.mjs`) have a named migration target to
+point at. **No config migration has happened yet**: every currently
+registered `runner.executors.<id>` entry stays exactly as it is, and legacy
+executor ids remain fully accepted. This section describes where the
+vocabulary above (`executor`/`capability`) is headed, not what exists today.
+
+**ExecutorProfile** answers "which principal/backend/trust boundary is
+this?" — a stable runtime boundary, never a policy choice:
+
+| Field | Answers | Must NOT be derived from |
+|---|---|---|
+| `identity.principalRef` | which account/credential family | a concrete rotating account id (Provider Capacity Rotator's own scope, `plans/260916-account-rotator/`) |
+| `identity.runtimeBackendRef` | which CLI/runtime this is | model, quality tier, reasoning effort |
+| `identity.trustDomain` | how privileged this principal is | persona/role/business case |
+| `identity.egressClass` | what it may reach over the network | visibility (visible/headless) alone |
+
+**Invocation** answers "how is this profile actually used for one dispatch?":
+adapter (`cli-spawn`/`herdr-spawn`/mcp/api), prompt delivery (argv vs
+file-pointer), visible/headless mode, confinement backend/envelope, resource
+bindings, provider adapter id. Confinement is normally an invocation
+envelope, not identity — it only becomes identity when it changes principal,
+backend trust, or egress boundary materially (the same rule design.md's
+ProviderAdapter section already states for the shadow-mode Phase 01 module,
+`src/runner/dispatch/provider-adapter.mjs`).
+
+Migration targets a legacy config entry maps onto once this vocabulary is
+real config (Phase 07/08, not yet):
+
+| Legacy pattern | Target |
+|---|---|
+| policy-shaped flag hardcoded in `executors.<id>` args (`--model`, `--effort`, `--allowedTools`, `--permission-mode`, Codex `-s`, …) | `ProviderAdapter` runtime option (design.md §3.5) |
+| role/persona baked into an executor id (`claude-reviewer`) | a compatibility alias patch (Phase 03, `LEGACY_EXECUTOR_ALIASES` in `src/runner/dispatch/assignment-policy.mjs`) carrying `personaRef`/`toolIntent`/`reasoningEffort` |
+| `executors.<id>.rigorOverrides` or `capabilities.<name>.overrides.rigorOverrides` | `PlacementPolicy` model calibration (design.md §3.6, shadow module `src/runner/dispatch/placement-policy.mjs`, Phase 05) |
+| adapter choice encoded as a separate executor id | an `invocation` on one `ExecutorProfile` |
+| bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |
+| account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |
+
+A later migration can map `claude` + `claude-herdr` + reviewer aliases into
+one `ExecutorProfile` with multiple invocations, but Phase 06 does not
+perform that migration — it only makes the gap between current config and
+this target vocabulary machine-visible via `fgos doctor`.
+
 ## CoordinationSession — điều phối agent Work-độc-lập (Step 08 Phase 00)
 
 Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới
