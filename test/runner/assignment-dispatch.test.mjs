@@ -943,6 +943,82 @@ test('Cell 6.3 Fix Round 1: a role:reviewer assignment resolves the scoped claud
   assert.equal(result.executorRedirected, true);
 });
 
+test('read-only claude redirect can leave the Claude provider and recomputes the model for the target executor', async () => {
+  const tempDir = mkTempDir();
+  const worker = writeArgvRecordingExecutor(tempDir, 'worker');
+  const reviewer = writeArgvRecordingExecutor(tempDir, 'reviewer');
+  const codex = writeArgvRecordingExecutor(tempDir, 'codex');
+
+  const runnerConfig = {
+    readOnlyExecutorRedirects: {
+      claude: {
+        default: ['claude-reviewer'],
+        operations: {
+          'shape-plan': ['codex-bwrap'],
+        },
+      },
+    },
+    executors: {
+      claude: {
+        command: process.execPath,
+        args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+        allowCrossProvider: true,
+      },
+      'claude-reviewer': {
+        command: process.execPath,
+        args: [reviewer.scriptPath, '{prompt}', '--model', '{model}'],
+        allowCrossProvider: true,
+      },
+      'codex-bwrap': {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
+        providerModel: 'openai-codex',
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: {
+        lightweight: 'haiku',
+        standard: 'sonnet',
+        creative: 'sonnet',
+        analytical: 'opus',
+        critical: 'opus',
+      },
+      'openai-codex': {
+        lightweight: 'gpt-test-low',
+        standard: 'gpt-test-standard',
+        creative: 'gpt-test-standard',
+        analytical: 'gpt-test-analytical',
+        critical: 'gpt-test-critical',
+      },
+    },
+    timeoutMs: 5000,
+  };
+
+  const work = { id: 'tsk-readonly-cross-provider-redirect', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({
+    work,
+    stage: 'planning',
+    operation: 'shape-plan',
+  });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  assert.equal(result.status, 'done');
+  assert.equal(result.executorId, 'codex-bwrap');
+  assert.equal(result.executorRedirected, true);
+  assert.equal(result.policy.executorPreference[0], 'claude');
+  assert.equal(result.policy.providerModel, 'openai-codex');
+  assert.equal(result.policy.model, 'gpt-test-standard');
+  assert.equal(fs.existsSync(worker.argvCapturePath), false, 'read-only operation must not spawn the git-write claude profile');
+  assert.equal(fs.existsSync(reviewer.argvCapturePath), false, 'operation override must not fall through to claude-reviewer');
+
+  const codexArgs = JSON.parse(fs.readFileSync(codex.argvCapturePath, 'utf8'));
+  assert.ok(codexArgs.includes('gpt-test-standard'), 'spawned argv must receive the target provider model, not Claude sonnet');
+  assert.ok(!codexArgs.includes('opus'), 'Claude model literals must not leak into a cross-provider redirect');
+  assert.ok(!codexArgs.includes('sonnet'), 'Claude model literals must not leak into a cross-provider redirect');
+});
+
 test('a genuinely mutating assignment (implement-item, default implementer role) is unaffected -- still resolves the git-write claude profile', async () => {
   // Fix Round 1's original version of this test used operation:
   // 'validate-plan' with an explicit role:'implementer' override. That op is

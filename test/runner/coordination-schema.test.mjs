@@ -127,6 +127,10 @@ test('applyAggregateBoundDefaults fills every omitted bound from DEFAULT_AGGREGA
   assert.equal(resolved.maxTaskDepth, DEFAULT_AGGREGATE_BOUNDS.maxTaskDepth);
 });
 
+test('DEFAULT_AGGREGATE_BOUNDS.wallTimeMs allows measured multi-step coordination sessions', () => {
+  assert.equal(DEFAULT_AGGREGATE_BOUNDS.wallTimeMs, 10_800_000);
+});
+
 test('applyAggregateBoundDefaults with no argument returns the full default set', () => {
   assert.deepEqual(applyAggregateBoundDefaults(undefined), DEFAULT_AGGREGATE_BOUNDS);
 });

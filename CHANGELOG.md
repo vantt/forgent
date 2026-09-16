@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `npm test` now runs `scripts/run-tests.mjs`, a portable full-suite door that
+  discovers every `test/**/*.test.mjs` file itself via `fs` and spawns
+  `node --test` with an explicit file-argument array, instead of a
+  shell-globbed `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 node --test 'test/**/*.test.mjs'`
+  string. The old form silently selected zero files on the CI Ubuntu/macOS
+  Node 20 lane (no built-in glob support for that Node version) and failed
+  outright on Windows's default `cmd.exe` npm shell (POSIX `VAR=value`
+  env-assignment syntax is not valid there); the new runner sets that env var
+  on the spawned child directly and works unchanged across OS/shell.
 - Packaging-distribution release posture is now preview with Rust host as the
   default installed runtime for external installs; legacy Node fallback is
   deprecated and kept only as an explicit escape hatch for 30 calendar days
@@ -16,6 +25,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code-panel reviewers now use the scoped `claude-reviewer` profile with
   Claude `--effort high`, including the visible-pane `claude-reviewer-herdr`
   variant.
+- Read-only dispatches that would have fallen through to the default `claude`
+  executor can now use configured provider-aware redirect pools; this repo now
+  routes those read-only Claude fallbacks to `codex-bwrap` so reviewer/red-team
+  recovery does not keep burning the exhausted Claude seat.
+- `codex-bwrap` can now provision its sandbox credential from a configured
+  ordered Codex home pool, so the repo is no longer locked to only
+  `${HOME}/.codex-fgovn` when multiple Codex accounts are available.
+- Coordination sessions now default `aggregateBounds.wallTimeMs` to 3 hours
+  instead of 1 hour, matching measured multi-step dispatch latency so a valid
+  revise/recheck chain is less likely to be killed by the aggregate wall-time
+  ceiling before all authorized steps can finish.
 
 ### Added
 

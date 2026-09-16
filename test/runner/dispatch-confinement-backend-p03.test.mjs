@@ -529,6 +529,68 @@ test('H-1 regression: prepareBwrap provisions the Codex credential only into cod
   }
 });
 
+test('H-1b: codex-bwrap can provision credentials from a configured Codex home pool before host HOME fallbacks', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-cred-pool-test-'));
+  const originalHome = process.env.HOME;
+  try {
+    const fakeHome = path.join(tmp, 'fake-home');
+    const poolHome = path.join(tmp, 'codex-pool-home');
+    fs.mkdirSync(path.join(fakeHome, '.codex'), { recursive: true });
+    fs.mkdirSync(poolHome, { recursive: true });
+
+    const fallbackAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'fallback-home-token' });
+    const poolAuthContent = JSON.stringify({ auth_mode: 'chatgpt', secret: 'pool-home-token' });
+    fs.writeFileSync(path.join(fakeHome, '.codex', 'auth.json'), fallbackAuthContent);
+    fs.writeFileSync(path.join(poolHome, 'auth.json'), poolAuthContent);
+    process.env.HOME = fakeHome;
+
+    const privateHomeHost = path.join(tmp, 'private-home');
+    const plan = {
+      contract: 'confinement-plan.v1',
+      dispatchId: 'disp_pool_home',
+      decision: 'execute',
+      coverage: {},
+      resources: [
+        {
+          resource: 'private-home',
+          hostTarget: privateHomeHost,
+          executionTarget: { location: 'host', path: '/home/sandbox' },
+          access: 'read-write',
+          delivery: 'mount',
+          allocation: 'temporary',
+        },
+      ],
+    };
+    const req = {
+      dispatchId: 'disp_pool_home',
+      executorId: 'codex-bwrap',
+      invocation: {
+        command: 'agent-cli',
+        args: [],
+        env: {
+          FGOS_CODEX_CREDENTIAL_HOMES: poolHome,
+        },
+        resourceBindings: [],
+      },
+      context: { cwd: tmp, runDir: tmp },
+    };
+
+    const prepared = await prepareBwrap(plan, req, { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      assert.equal(
+        fs.readFileSync(path.join(privateHomeHost, 'auth.json'), 'utf8'),
+        poolAuthContent,
+        'configured Codex credential home must win over host HOME fallbacks',
+      );
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    process.env.HOME = originalHome;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 // =========================================================================
 // R5: Ownership markers and idempotent reaper
 // =========================================================================
