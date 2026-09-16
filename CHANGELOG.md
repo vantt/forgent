@@ -47,6 +47,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reference when a plan/phase file or registered track is the execution target,
   with recursive-dispatch protection and automated contract tests covering
   mode selection (CE1-CE5, imperative mood M1, and anti-guessing).
+- Coding test-policy overlay for code-panel facade (code-panel-multicell-facade track, P02):
+  `fgos-code-panel` attaches an explicit 4-field test-policy overlay (`FOCUSED_TESTS`,
+  `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) to coding cell objectives dispatched
+  through `fgos-plan-loop`. Doer/fixer execute focused tests first; affected scope
+  escalates based on impact analysis and touched contracts; reviewer and red-team
+  inspect existing proof records by default, re-running only when proof is stale
+  (differing Git tree hash or environment fingerprint), insufficient, or counterexamples
+  are discovered; every cell requires an explicit test decision (including
+  `full: deferred-to-final-gate`) with no silent omission.
 - Packaging-distribution legacy architecture redirects (code-panel track, P9):
   `docs/architect/packaging-distribution/**` now carries explicit
   historical/status notes pointing readers to the promoted

@@ -2617,3 +2617,640 @@ test('Recursive Dispatch Guard (R2 / H1): prevents nested multi-cell dispatch fr
   assert.equal(cellInternal.guarded, true);
   assert.equal(cellInternal.target, 'src/auth.mjs');
 });
+
+// ─── P02: Coding Test-Policy Overlay Contract & Proof Reuse Reference Model ───
+// Reference model: mirrors the 4-field test-policy overlay composition rules,
+// proof inspection/reuse heuristics, and explicit test decision requirement (R1-R6)
+// stated in domains/coding/skills/fgos-code-panel/SKILL.md prose.
+// As with P01's mode-selection reference model, no runtime production code calls this;
+// fgos-code-panel is read and followed by an LLM, not executed as this JS function
+// (zero runtime callers exist in src/core/domains/bin). The test corpus is the contract,
+// pinning the behavior and invariants specified in prose.
+//
+// Scope Boundary & Limitations Note for Proof Staleness / Reuse Detection (R3-R5):
+// This proof freshness check is a text-pattern / metadata heuristic, same class as the
+// P01 no-duplication discriminator.
+//
+// What it catches:
+// - Literal tree-hash mismatches (proofRecord.tree !== candidateState.tree)
+// - Command mismatches (proofRecord.command !== candidateState.command)
+// - Environment fingerprint mismatches (proofRecord.environmentFingerprint !== candidateState.environmentFingerprint)
+// - Explicit staleness markers (proofRecord.stale === true, stalenessMarkers in record)
+// - Dirty working tree / uncommitted changes in candidate state
+// - Subsequent patch invalidation (candidateState.subsequentPatchTouchedFiles, invalidatedByPatch)
+// - Falsification / counterexample discoveries (candidateState.hasCounterexample === true)
+//
+// What it does NOT catch:
+// - A deliberately falsified proof record claiming a command ran when it did not -- that requires
+//   human/review-time trust in the doer's own evidence (same limitation documented for Assertion 3).
+
+export class MissingExplicitTestDecisionError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'MissingExplicitTestDecisionError';
+  }
+}
+
+export const FULL_TRIGGER_CATEGORIES = Object.freeze([
+  'shared engine/protocol',
+  'CLI contract',
+  'persistence/resume',
+  'mutation gate',
+  'quorum/close',
+  'install/setup/distribution',
+  'blast radius uncovered',
+]);
+
+/**
+ * Detects whether touched files, diff text, or phase text match any of plan.md's named
+ * mechanical FULL_TRIGGERS categories.
+ */
+export function detectFullTriggers({ touchedFiles = [], diffText = '', phaseText = '', repoEvidence = {} } = {}) {
+  const triggered = new Set();
+  const normalizedFiles = touchedFiles.map((f) => f.replace(/\\/g, '/'));
+  const combinedText = `${diffText}\n${phaseText}`;
+
+  for (const file of normalizedFiles) {
+    // 1. shared engine/protocol:
+    // Coordination session engine, protocol definitions, dispatch hooks, shared invariants
+    if (
+      file.startsWith('src/runner/coordination/') ||
+      file.startsWith('core/coordination-protocols/') ||
+      file.startsWith('src/runner/dispatch/') ||
+      file.startsWith('src/verbs/coordination/')
+    ) {
+      triggered.add('shared engine/protocol');
+    }
+
+    // 2. CLI contract:
+    // bin/fgos.mjs, CLI verbs, intake, CLI commands
+    if (
+      file === 'bin/fgos.mjs' ||
+      file.startsWith('src/verbs/') ||
+      file.startsWith('src/cli/')
+    ) {
+      triggered.add('CLI contract');
+    }
+
+    // 3. persistence/resume:
+    // Session store, event log, state persistence
+    if (
+      file === 'src/verbs/coordination/store.mjs' ||
+      file === 'src/runner/coordination/session-store.mjs' ||
+      file.startsWith('src/runner/state/')
+    ) {
+      triggered.add('persistence/resume');
+    }
+
+    // 4. mutation gate:
+    // Mutation gating rules and verification in coordination session-engine
+    if (file === 'src/runner/coordination/session-engine.mjs') {
+      triggered.add('mutation gate');
+    }
+
+    // 5. quorum/close:
+    // Quorum close rules in coordination session-engine
+    if (file === 'src/runner/coordination/session-engine.mjs') {
+      triggered.add('quorum/close');
+    }
+
+    // 6. install/setup/distribution:
+    // package.json, lockfile, setup checks, distribution boundaries
+    if (
+      file === 'package.json' ||
+      file === 'package-lock.json' ||
+      file.startsWith('src/setup/') ||
+      file.startsWith('bin/')
+    ) {
+      triggered.add('install/setup/distribution');
+    }
+
+    // 7. test-harness foundations / blast radius:
+    if (file.startsWith('test/setup/') || file.startsWith('test/harness/')) {
+      triggered.add('blast radius uncovered');
+    }
+  }
+
+  // Textual triggers in phaseText or diffText
+  if (/\b(?:shared\s+engine\/protocol|session\/replay\/schema\s+core|dispatch\/self-host\s+hooks|shared\s+invariants)\b/i.test(combinedText)) {
+    triggered.add('shared engine/protocol');
+  }
+  if (/\bCLI\s+contract\b/i.test(combinedText)) {
+    triggered.add('CLI contract');
+  }
+  if (/\bpersistence\/resume\b/i.test(combinedText)) {
+    triggered.add('persistence/resume');
+  }
+  if (/\bmutation\s+gate\b/i.test(combinedText)) {
+    triggered.add('mutation gate');
+  }
+  if (/\bquorum\/close\b/i.test(combinedText)) {
+    triggered.add('quorum/close');
+  }
+  if (/\b(?:install\/setup\/distribution|package\s+manifest\/install\/release-boundary)\b/i.test(combinedText)) {
+    triggered.add('install/setup/distribution');
+  }
+
+  // Repo evidence: blast radius HIGH/CRITICAL per impact-analysis
+  if (
+    repoEvidence.blastRadius === 'HIGH' ||
+    repoEvidence.blastRadius === 'CRITICAL' ||
+    repoEvidence.uncoveredBlastRadius === true
+  ) {
+    triggered.add('blast radius uncovered');
+  }
+
+  return Array.from(triggered);
+}
+
+/**
+ * Validates that an explicit test decision is present, conforming to R6.
+ * Fails with MissingExplicitTestDecisionError if decision is omitted or silently drops 'full'.
+ */
+export function validateCodingTestDecision(decision) {
+  if (!decision) {
+    throw new MissingExplicitTestDecisionError(
+      'Every cell must have an explicit test decision; silent omission is prohibited (R6)'
+    );
+  }
+
+  if (typeof decision === 'string') {
+    const trimmed = decision.trim();
+    if (!trimmed) {
+      throw new MissingExplicitTestDecisionError(
+        'Test decision string cannot be empty; explicit record required (R6)'
+      );
+    }
+    const hasFocused = /\bfocused\s*:/i.test(trimmed);
+    const hasAffected = /\baffected\s*:/i.test(trimmed);
+    const hasFull = /\bfull\s*:\s*(?:deferred-to-final-gate|triggered|required)/i.test(trimmed);
+    if (!hasFocused || !hasAffected || !hasFull) {
+      throw new MissingExplicitTestDecisionError(
+        `Test decision string "${trimmed}" misses required explicit determinations (focused, affected, and full, including deferred-to-final-gate)`
+      );
+    }
+    return true;
+  }
+
+  if (typeof decision === 'object') {
+    if (!decision.focused || typeof decision.focused !== 'string') {
+      throw new MissingExplicitTestDecisionError('Missing explicit focused test decision (R6)');
+    }
+    if (!decision.affected || typeof decision.affected !== 'string') {
+      throw new MissingExplicitTestDecisionError('Missing explicit affected test decision (R6)');
+    }
+    if (!decision.full || typeof decision.full !== 'string') {
+      throw new MissingExplicitTestDecisionError(
+        'Missing explicit full test decision; must be explicitly declared (e.g. "deferred-to-final-gate" or "triggered") (R6)'
+      );
+    }
+    const fullNormalized = decision.full.trim();
+    if (
+      !fullNormalized.startsWith('deferred-to-final-gate') &&
+      !fullNormalized.startsWith('triggered') &&
+      !fullNormalized.startsWith('required')
+    ) {
+      throw new MissingExplicitTestDecisionError(
+        `Full test decision "${decision.full}" is not an explicit valid status (must begin with "deferred-to-final-gate", "triggered", or "required")`
+      );
+    }
+    return true;
+  }
+
+  throw new MissingExplicitTestDecisionError('Invalid test decision format');
+}
+
+/**
+ * Composes the 4-field test-policy overlay for a coding cell (R1).
+ * Attaches focusedCommands, affectedCommands, fullCommand, fullTriggers, and an explicit decision.
+ */
+export function composeCodingTestPolicyOverlay({
+  phaseText = '',
+  touchedFiles = [],
+  diffText = '',
+  repoEvidence = {},
+  defaultFullCommand = 'env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test',
+  isFinalGate = false,
+  explicitDecision = true,
+} = {}) {
+  // 1. Focused command(s):
+  let focusedCommands = [];
+  const focusedMatch = phaseText.match(/FOCUSED_TESTS:\s*([^\n]+)/i);
+  if (focusedMatch) {
+    focusedCommands = [focusedMatch[1].trim()];
+  } else {
+    const codeBlockMatch = phaseText.match(/##\s+Verification[\s\S]*?```(?:sh|bash)?\n([\s\S]*?)```/i);
+    if (codeBlockMatch) {
+      focusedCommands = codeBlockMatch[1]
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l && !l.startsWith('#'));
+    }
+  }
+  if (focusedCommands.length === 0) {
+    focusedCommands = ['node --test test/setup/skill-wrappers.test.mjs'];
+  }
+
+  // 2. Affected command(s):
+  // Lead escalation based on GitNexus impact / touched contracts
+  let affectedCommands = [];
+  const affectedMatch = phaseText.match(/AFFECTED_TESTS:\s*([^\n]+)/i);
+  if (affectedMatch && !/same\s+as\s+FOCUSED_TESTS/i.test(affectedMatch[1])) {
+    affectedCommands = [affectedMatch[1].trim()];
+  } else if (
+    repoEvidence.touchedContracts?.length > 0 &&
+    repoEvidence.consumers?.length > 0
+  ) {
+    // Escalated based on impact-analysis
+    affectedCommands = [
+      ...focusedCommands,
+      ...repoEvidence.consumers.map((c) => `node --test ${c}`),
+    ];
+  } else {
+    // Contained blast radius
+    affectedCommands = [...focusedCommands];
+  }
+
+  // 3. Full command:
+  const fullMatch = phaseText.match(/FULL_TEST:\s*([^\n]+)/i);
+  const fullCommand = fullMatch ? fullMatch[1].trim() : defaultFullCommand;
+
+  // 4. Full triggers:
+  const fullTriggers = detectFullTriggers({ touchedFiles, diffText, phaseText, repoEvidence });
+
+  // 5. Decision formulation (R6):
+  let decision = null;
+  if (explicitDecision) {
+    let fullDecision;
+    if (isFinalGate) {
+      fullDecision = 'required (final-integrated-gate)';
+    } else if (fullTriggers.length > 0) {
+      fullDecision = `triggered (${fullTriggers.join(', ')})`;
+    } else {
+      fullDecision = 'deferred-to-final-gate';
+    }
+
+    const affectedDecision =
+      affectedCommands.length > 0 && affectedCommands.join(' && ') !== focusedCommands.join(' && ')
+        ? affectedCommands.join(' && ')
+        : 'same-as-focused (blast radius contained)';
+
+    decision = {
+      focused: focusedCommands.join(' && '),
+      affected: affectedDecision,
+      full: fullDecision,
+      fullTriggers: [...fullTriggers],
+      rawRecord: `FOCUSED_TESTS: ${focusedCommands.join(' && ')}\nAFFECTED_TESTS: ${affectedDecision}\nFULL_TEST: ${fullCommand}\nFULL_TRIGGERS: ${fullTriggers.length > 0 ? fullTriggers.join(', ') : 'none'}\nDECISION: focused: ${focusedCommands.join(' && ')}; affected: ${affectedDecision}; full: ${fullDecision}`,
+    };
+
+    validateCodingTestDecision(decision);
+  }
+
+  return {
+    focusedCommands,
+    affectedCommands,
+    fullCommand,
+    fullTriggers,
+    decision,
+    rawRecord: decision ? decision.rawRecord : '',
+  };
+}
+
+/**
+ * Judges whether an existing proof record is fresh enough to reuse (R3/R4).
+ * Key: (command, Git tree hash, environment fingerprint).
+ */
+export function isProofFreshToReuse(proofRecord, candidateState) {
+  if (!proofRecord) {
+    return { fresh: false, reusable: false, reason: 'no-proof-record' };
+  }
+  if (proofRecord.status !== 'passed') {
+    return { fresh: false, reusable: false, reason: 'proof-failed' };
+  }
+  if (proofRecord.stale === true || (proofRecord.stalenessMarkers && proofRecord.stalenessMarkers.length > 0)) {
+    return { fresh: false, reusable: false, reason: 'explicit-staleness-marker' };
+  }
+  if (!candidateState) {
+    return { fresh: false, reusable: false, reason: 'no-candidate-state' };
+  }
+  if (candidateState.hasCounterexample === true) {
+    return { fresh: false, reusable: false, reason: 'counterexample-found' };
+  }
+  if (candidateState.dirtyWorkingTree === true || candidateState.uncommittedChanges === true) {
+    return { fresh: false, reusable: false, reason: 'dirty-working-tree' };
+  }
+  if (candidateState.invalidatedByPatch === true || candidateState.invalidated === true) {
+    return { fresh: false, reusable: false, reason: 'patch-invalidated' };
+  }
+  if (
+    Array.isArray(candidateState.subsequentPatchTouchedFiles) &&
+    candidateState.subsequentPatchTouchedFiles.length > 0
+  ) {
+    return { fresh: false, reusable: false, reason: 'patch-invalidated' };
+  }
+  if (!proofRecord.command || !candidateState.command || proofRecord.command !== candidateState.command) {
+    return { fresh: false, reusable: false, reason: 'command-mismatch' };
+  }
+  if (!proofRecord.tree || !candidateState.tree || proofRecord.tree !== candidateState.tree) {
+    return { fresh: false, reusable: false, reason: 'tree-mismatch' };
+  }
+  if (
+    !proofRecord.environmentFingerprint ||
+    !candidateState.environmentFingerprint ||
+    proofRecord.environmentFingerprint !== candidateState.environmentFingerprint
+  ) {
+    return { fresh: false, reusable: false, reason: 'environment-mismatch' };
+  }
+
+  return {
+    fresh: true,
+    reusable: true,
+    key: {
+      command: proofRecord.command,
+      tree: proofRecord.tree,
+      environmentFingerprint: proofRecord.environmentFingerprint,
+    },
+  };
+}
+
+// ─── Tests for Phase 02: Coding Test-Policy Overlay (R1-R6) ───
+
+// Fixture 1: Focused-only cell
+test('Phase 02 Fixture 1: focused-only change declares focused tests and defers full suite (R1/R2/R5)', () => {
+  const overlay = composeCodingTestPolicyOverlay({
+    phaseText: `## Verification\n\`\`\`sh\nnode --test test/setup/skill-wrappers.test.mjs\n\`\`\``,
+    touchedFiles: ['domains/coding/skills/fgos-code-panel/SKILL.md'],
+    repoEvidence: { blastRadius: 'contained' },
+  });
+
+  assert.deepEqual(overlay.focusedCommands, ['node --test test/setup/skill-wrappers.test.mjs']);
+  assert.deepEqual(overlay.affectedCommands, ['node --test test/setup/skill-wrappers.test.mjs']);
+  assert.equal(overlay.fullTriggers.length, 0);
+  assert.equal(overlay.decision.full, 'deferred-to-final-gate');
+  assert.match(overlay.decision.affected, /same-as-focused/);
+  assert.match(overlay.rawRecord, /FOCUSED_TESTS: node --test test\/setup\/skill-wrappers\.test\.mjs/);
+  assert.match(overlay.rawRecord, /full: deferred-to-final-gate/);
+
+  // In doer/fixer verification, only focusedCommands run; fullCommand is NOT executed
+  const executedCommands = [...overlay.focusedCommands];
+  assert.equal(executedCommands.includes(overlay.fullCommand), false, 'Focused-only cell must not execute full suite');
+});
+
+// Fixture 2: Affected escalation
+test('Phase 02 Fixture 2: affected scope escalation incorporates blast radius consumers (R1/R2)', () => {
+  const overlay = composeCodingTestPolicyOverlay({
+    phaseText: `FOCUSED_TESTS: node --test test/setup/skill-wrappers.test.mjs`,
+    touchedFiles: ['src/utils/intent-helper.mjs'],
+    repoEvidence: {
+      touchedContracts: ['deriveSkillIntentId'],
+      consumers: ['test/skills/fgos-mirror.test.mjs', 'test/architecture.test.mjs'],
+      blastRadius: 'wide',
+    },
+  });
+
+  assert.deepEqual(overlay.focusedCommands, ['node --test test/setup/skill-wrappers.test.mjs']);
+  assert.equal(overlay.affectedCommands.length, 3);
+  assert.ok(overlay.affectedCommands.includes('node --test test/skills/fgos-mirror.test.mjs'));
+  assert.equal(overlay.fullTriggers.length, 0);
+  assert.equal(overlay.decision.full, 'deferred-to-final-gate');
+  assert.match(overlay.decision.affected, /test\/skills\/fgos-mirror\.test\.mjs/);
+  assert.match(overlay.rawRecord, /AFFECTED_TESTS: node --test test\/setup\/skill-wrappers\.test\.mjs && node --test test\/skills\/fgos-mirror\.test\.mjs/);
+});
+
+// Fixture 3: Full-triggered cell
+test('Phase 02 Fixture 3: mechanical FULL_TRIGGERS fires full suite requirement (R1/R5)', () => {
+  // session-engine.mjs touches session/replay/schema core, mutation gate, quorum/close
+  const overlay = composeCodingTestPolicyOverlay({
+    phaseText: `FOCUSED_TESTS: node --test test/runner/session-engine.test.mjs`,
+    touchedFiles: ['src/runner/coordination/session-engine.mjs'],
+    repoEvidence: { blastRadius: 'contained' },
+  });
+
+  assert.ok(overlay.fullTriggers.length > 0);
+  assert.ok(overlay.fullTriggers.includes('shared engine/protocol'));
+  assert.ok(overlay.fullTriggers.includes('mutation gate'));
+  assert.ok(overlay.fullTriggers.includes('quorum/close'));
+  assert.match(overlay.decision.full, /^triggered \(/);
+  assert.match(overlay.rawRecord, /full: triggered \(/);
+
+  // Package manifest trigger
+  const overlayPkg = composeCodingTestPolicyOverlay({
+    phaseText: `FOCUSED_TESTS: node --test test/setup/skill-wrappers.test.mjs`,
+    touchedFiles: ['package.json'],
+  });
+  assert.ok(overlayPkg.fullTriggers.includes('install/setup/distribution'));
+  assert.match(overlayPkg.decision.full, /install\/setup\/distribution/);
+});
+
+// Fixture 4: Stale proof detection
+test('Phase 02 Fixture 4: proof staleness detection catches tree, command, environment, and counterexample drift (R3/R4)', () => {
+  const baseProof = {
+    command: 'node --test test/setup/skill-wrappers.test.mjs',
+    tree: 'tree_sha_1234567890abcdef',
+    environmentFingerprint: 'node:24.18.0|npm:11.16.0|linux',
+    status: 'passed',
+  };
+
+  // 1. Tree mismatch (patch changed git tree)
+  const staleTree = isProofFreshToReuse(baseProof, {
+    command: baseProof.command,
+    tree: 'tree_sha_different_after_patch',
+    environmentFingerprint: baseProof.environmentFingerprint,
+  });
+  assert.equal(staleTree.fresh, false);
+  assert.equal(staleTree.reusable, false);
+  assert.equal(staleTree.reason, 'tree-mismatch');
+
+  // 2. Command mismatch
+  const staleCommand = isProofFreshToReuse(baseProof, {
+    command: 'npm test',
+    tree: baseProof.tree,
+    environmentFingerprint: baseProof.environmentFingerprint,
+  });
+  assert.equal(staleCommand.fresh, false);
+  assert.equal(staleCommand.reason, 'command-mismatch');
+
+  // 3. Environment fingerprint mismatch (drift in node/lockfile/prereq)
+  const staleEnv = isProofFreshToReuse(baseProof, {
+    command: baseProof.command,
+    tree: baseProof.tree,
+    environmentFingerprint: 'node:25.0.0|npm:11.16.0|linux',
+  });
+  assert.equal(staleEnv.fresh, false);
+  assert.equal(staleEnv.reason, 'environment-mismatch');
+
+  // 4. Counterexample found by reviewer or red-team
+  const counterexampleState = isProofFreshToReuse(baseProof, {
+    command: baseProof.command,
+    tree: baseProof.tree,
+    environmentFingerprint: baseProof.environmentFingerprint,
+    hasCounterexample: true,
+  });
+  assert.equal(counterexampleState.fresh, false);
+  assert.equal(counterexampleState.reason, 'counterexample-found');
+
+  // 5. Explicit staleness markers
+  const explicitStale = isProofFreshToReuse(
+    { ...baseProof, stale: true },
+    {
+      command: baseProof.command,
+      tree: baseProof.tree,
+      environmentFingerprint: baseProof.environmentFingerprint,
+    }
+  );
+  assert.equal(explicitStale.fresh, false);
+  assert.equal(explicitStale.reason, 'explicit-staleness-marker');
+
+  // 6. Failed proof is not reusable
+  const failedProof = isProofFreshToReuse(
+    { ...baseProof, status: 'failed' },
+    {
+      command: baseProof.command,
+      tree: baseProof.tree,
+      environmentFingerprint: baseProof.environmentFingerprint,
+    }
+  );
+  assert.equal(failedProof.fresh, false);
+  assert.equal(failedProof.reason, 'proof-failed');
+});
+
+// Fixture 5: Unchanged proof reuse
+test('Phase 02 Fixture 5: unchanged proof certifies identical tree and environment without re-running (R4/R5)', () => {
+  const proof = {
+    command: 'env -u CLAUDE_CODE_ENTRYPOINT npm test',
+    tree: 'tree_sha_target_12345',
+    environmentFingerprint: 'node:24.18.0|npm:11.16.0|lockfile:b097ecd8',
+    status: 'passed',
+  };
+
+  // Candidate has identical tree (e.g. clean merge with treeIdentical: true)
+  const candidate = {
+    command: 'env -u CLAUDE_CODE_ENTRYPOINT npm test',
+    tree: 'tree_sha_target_12345',
+    environmentFingerprint: 'node:24.18.0|npm:11.16.0|lockfile:b097ecd8',
+  };
+
+  const result = isProofFreshToReuse(proof, candidate);
+  assert.equal(result.fresh, true);
+  assert.equal(result.reusable, true);
+  assert.deepEqual(result.key, {
+    command: proof.command,
+    tree: proof.tree,
+    environmentFingerprint: proof.environmentFingerprint,
+  });
+});
+
+// Red-Team Probes:
+test('Phase 02 Red-Team Probe 1: patch invalidation prevents illegitimate proof reuse', () => {
+  const proof = {
+    command: 'node --test test/setup/skill-wrappers.test.mjs',
+    tree: 'tree_pre_patch_123',
+    environmentFingerprint: 'env_fingerprint_linux',
+    status: 'passed',
+  };
+
+  // Candidate attempts reuse but working tree is dirty or has subsequent patch touched files
+  const dirtyCandidate = {
+    command: proof.command,
+    tree: proof.tree,
+    environmentFingerprint: proof.environmentFingerprint,
+    dirtyWorkingTree: true,
+  };
+  assert.equal(isProofFreshToReuse(proof, dirtyCandidate).reusable, false);
+
+  const patchCandidate = {
+    command: proof.command,
+    tree: proof.tree,
+    environmentFingerprint: proof.environmentFingerprint,
+    subsequentPatchTouchedFiles: ['src/setup/skill-wrappers.mjs'],
+  };
+  assert.equal(isProofFreshToReuse(proof, patchCandidate).reusable, false);
+  assert.equal(isProofFreshToReuse(proof, patchCandidate).reason, 'patch-invalidated');
+});
+
+test('Phase 02 Red-Team Probe 2: all named FULL_TRIGGERS categories are recognized without omission', () => {
+  for (const category of FULL_TRIGGER_CATEGORIES) {
+    let triggered = [];
+    switch (category) {
+      case 'shared engine/protocol':
+        triggered = detectFullTriggers({ touchedFiles: ['src/runner/coordination/session-engine.mjs'] });
+        break;
+      case 'CLI contract':
+        triggered = detectFullTriggers({ touchedFiles: ['bin/fgos.mjs'] });
+        break;
+      case 'persistence/resume':
+        triggered = detectFullTriggers({ touchedFiles: ['src/verbs/coordination/store.mjs'] });
+        break;
+      case 'mutation gate':
+        triggered = detectFullTriggers({ diffText: 'update mutation gate assertion in coordination' });
+        break;
+      case 'quorum/close':
+        triggered = detectFullTriggers({ diffText: 'update quorum/close resolution in coordination session' });
+        break;
+      case 'install/setup/distribution':
+        triggered = detectFullTriggers({ touchedFiles: ['package.json'] });
+        break;
+      case 'blast radius uncovered':
+        triggered = detectFullTriggers({ repoEvidence: { blastRadius: 'HIGH' } });
+        break;
+    }
+    assert.ok(
+      triggered.includes(category),
+      `Category "${category}" must be recognized by detectFullTriggers`
+    );
+
+    const overlay = composeCodingTestPolicyOverlay({
+      phaseText: `Trigger check for ${category}`,
+      touchedFiles: category === 'CLI contract' ? ['bin/fgos.mjs'] : [],
+      diffText: category === 'mutation gate' ? 'mutation gate update' : '',
+      repoEvidence: category === 'blast radius uncovered' ? { blastRadius: 'CRITICAL' } : {},
+    });
+    if (['CLI contract', 'mutation gate', 'blast radius uncovered'].includes(category)) {
+      assert.match(overlay.decision.full, /^triggered \(/, `Category ${category} must flag full test as triggered`);
+    }
+  }
+});
+
+test('Phase 02 Red-Team Probe 3: Anti-Silent-Omission rejects missing or unstated test decisions (R6)', () => {
+  // Silent omission (null or undefined) throws MissingExplicitTestDecisionError
+  assert.throws(() => validateCodingTestDecision(null), MissingExplicitTestDecisionError);
+  assert.throws(() => validateCodingTestDecision(undefined), MissingExplicitTestDecisionError);
+  assert.throws(() => validateCodingTestDecision(''), MissingExplicitTestDecisionError);
+
+  // Incomplete decision object missing full
+  assert.throws(
+    () => validateCodingTestDecision({ focused: 'cmd1', affected: 'cmd2' }),
+    MissingExplicitTestDecisionError
+  );
+
+  // Incomplete decision object missing focused
+  assert.throws(
+    () => validateCodingTestDecision({ affected: 'cmd2', full: 'deferred-to-final-gate' }),
+    MissingExplicitTestDecisionError
+  );
+
+  // Incomplete decision string missing full determination
+  assert.throws(
+    () => validateCodingTestDecision('focused: node --test x.test.mjs; affected: same-as-focused'),
+    MissingExplicitTestDecisionError
+  );
+
+  // Invalid full status that silently skips without valid deferred/triggered/required marker
+  assert.throws(
+    () => validateCodingTestDecision({ focused: 'cmd1', affected: 'cmd2', full: 'skipped' }),
+    MissingExplicitTestDecisionError
+  );
+
+  // composeCodingTestPolicyOverlay with explicitDecision: false throws on validation
+  assert.throws(
+    () => {
+      const overlay = composeCodingTestPolicyOverlay({
+        phaseText: 'sample',
+        explicitDecision: false,
+      });
+      validateCodingTestDecision(overlay.decision);
+    },
+    MissingExplicitTestDecisionError
+  );
+});
+

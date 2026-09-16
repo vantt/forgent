@@ -165,7 +165,12 @@ environment variable).
 
 When `planned-multi-cell` mode is selected:
 1. Materialize the 3-tier coding test-policy overlay (`FOCUSED_TESTS`,
-   `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`).
+   `AFFECTED_TESTS`, `FULL_TEST`, `FULL_TRIGGERS`) as data attached to each
+   coding cell's own dispatch objective. `fgos-code-panel` composes this overlay
+   from phase text + repo evidence (GitNexus impact when available,
+   touched-contract detection, existing test ownership) BEFORE handing the
+   request to `fgos-plan-loop`; `fgos-plan-loop` receives only the
+   already-composed objective/evidence text, never a new schema field.
 2. Delegate track execution to `fgos-plan-loop` by reference, passing the target
    `planPath` (or resolved track) and coding test-policy overlay.
 3. **STOP.** `fgos-code-panel` does NOT execute multi-cell loop orchestration
@@ -201,7 +206,8 @@ re-runs against a `(tree, environment)` state it already certified --
 usually once per cell, never once per round.
 
 - **focused** -- the direct test(s) for the exact module/symbol/behavior
-  changed. Doer and fixer run this by default, every round.
+  changed. Doer and fixer run this by default, every round (R2: doer/fixer run
+  focused first always).
 - **affected** -- tests covering the consumers/processes in the diff's
   blast radius. Use the impact-analysis capability when this project has
   one registered and present (`fgos tool query --capability impact-analysis
@@ -211,13 +217,15 @@ usually once per cell, never once per round.
   `git grep`/call-graph reading when no such capability is registered or
   present. Escalate to this tier when the diff's blast radius is not
   obviously contained to the changed file(s) -- a real judgment call, made
-  once, before dispatching `open.json`. **Who runs it:** this is not a
-  separate dispatched step -- when the Lead escalates to this tier, the
-  SAME doer/fixer round's objective names `AFFECTED_TESTS` instead of
-  `FOCUSED_TESTS` for that round; there is no round where nobody runs it.
+  once, before dispatching `open.json`. Affected scope escalation is a Lead/prose
+  judgment call based on GitNexus impact + touched contracts, not automatic.
+  **Who runs it:** this is not a separate dispatched step -- when the Lead
+  escalates to this tier, the SAME doer/fixer round's objective names
+  `AFFECTED_TESTS` instead of `FOCUSED_TESTS` for that round; there is no
+  round where nobody runs it.
 - **full** -- the whole project test command. Runs **at most once per
-  distinct (tree, environment) state per cell**, right before merge, never
-  mechanically after every round.
+  distinct (tree, environment) state per cell**, right before merge or when
+  a declared FULL_TRIGGERS fires, never mechanically after every round (R5).
 
 ### Test-selection block -- declared once, before `open.json`
 
@@ -242,6 +250,7 @@ FULL_TRIGGERS (mechanical -- diff-path facts, fire regardless of what was
   `docs/how-to/author-a-plan-loop-track.md`'s Mechanical-gate rule names,
   so the two stay in lockstep); blast radius HIGH/CRITICAL per
   impact-analysis when present.
+DECISION: focused: <cmd>; affected: <cmd | same-as-focused>; full: <deferred-to-final-gate | triggered (<category>) | required (<reason>)>
 ```
 
 A reviewer/red-team finding that the declared tier misses a changed
@@ -253,6 +262,20 @@ Reviewer and red-team evaluate the test-selection block **together with
 the patch** -- a selection that obviously misses the changed contract is
 itself such a finding, not something they route around by quietly running
 something wider on their own.
+
+### Explicit test decision required for every cell (R6)
+
+A model that silently omits deciding is itself a bug: every coding cell must
+record an explicit test decision attached to its dispatch objective and close
+rationale, including an explicit declaration when full-suite testing is deferred:
+
+- `focused`: `<exact command>`
+- `affected`: `<exact command>` or `"same-as-focused (<contained blast radius rationale>)"`
+- `full`: `"deferred-to-final-gate (<rationale>)"` | `"triggered (<category>) (<command>)"` | `"required (<reason>)"`
+- `full_triggers`: evaluated categories or `"none"`
+
+Silent omission of any of these determinations is prohibited; a dispatch or
+disposition without an explicit decision record is invalid.
 
 ### Full suite: never twice for the same (tree, environment) state, never mechanically per round
 
@@ -321,7 +344,17 @@ re-run "to be sure." A tree-hash match under a *different* fingerprint
 qualify -- re-run for real; there is no shortcut for actual environment
 drift.
 
-### Reviewer/red-team judge proof sufficiency, never expand the run themselves
+### Reviewer/red-team inspect proof by default, judge proof sufficiency (R3)
+
+Reviewer and red-team default to INSPECTING existing proof: they read the
+recorded command, Git tree hash, and environment fingerprint from the
+preceding worker's result. They do NOT re-run the same command unless:
+1. Proof is stale (the Git tree hash or environment fingerprint has changed,
+   or an intervening patch invalidated the proof's scope);
+2. Proof is insufficient (the declared command does not actually exercise
+   the contract this diff changes);
+3. A specific counterexample or attack finding is discovered that requires
+   fresh test output to demonstrate/falsify.
 
 If the declared tier's command does not actually exercise a contract this
 diff changes, that is a finding (HIGH on a public or shared contract)
