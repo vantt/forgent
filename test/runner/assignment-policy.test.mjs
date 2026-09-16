@@ -669,3 +669,192 @@ test('resolveAssignmentDispatchPolicy: contract.policy = {minTier: "lightweight"
   assert.deepEqual(effective.provenance.tier, { value: 'lightweight', source: { scope: 'opPolicy', id: undefined } });
 });
 
+// ─── Phase 04 (executor-policy-dispatch-seams): quality bridge ─────────────
+//
+// design.md §3.2 / phase-04-quality-bridge.md. `resolveAssignmentDispatchPolicy`
+// is the single canonical resolver every dispatch path already funnels
+// through (plan.mjs's compileDispatchPlan, cli.mjs's executeExecutorCli,
+// cohort-planner.mjs's FlowDefinition dispatch) -- the quality bridge lives
+// here so every caller gets it for free, additively: `quality` and
+// `lookupPolicyTier` are new fields nobody read before this phase, and
+// `effectiveTier`/`tier`/`model` stay byte-identical for every caller that
+// never supplies the new optional `rigorOverrides`/`mode`/`minRigor` inputs.
+
+import { QUALITY_TIER_BRIDGE, MIN_RIGOR_VALUES, QUALITY_MODE_VALUES } from '../../src/runner/dispatch/assignment-policy.mjs';
+
+test('Phase 04: legacy tier bridge maps every MODEL_POLICY_TIERS value to its canonical quality', () => {
+  assert.deepEqual(QUALITY_TIER_BRIDGE.lightweight, { minRigor: 'low', mode: 'balanced' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.standard, { minRigor: 'standard', mode: 'balanced' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.creative, { minRigor: 'standard', mode: 'creative' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.analytical, { minRigor: 'high', mode: 'analytical' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.critical, { minRigor: 'critical', mode: 'analytical' });
+});
+
+test('Phase 04: quality.minRigor/mode are derived from the raise-only-composed semantic tier, sourceKind implied-by-tier-bridge', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
+  const heavyWork = { id: 'tsk-quality-1', risk: 'heavy' };
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, work: heavyWork });
+
+  // Unchanged pre-existing composition: work.risk === 'heavy' raises the
+  // floor to 'analytical' (pinned by the "high-risk work raises tier rigor"
+  // test above) -- the quality bridge must derive FROM that already-composed
+  // value, never re-derive tier composition of its own.
+  assert.equal(effective.tier, 'analytical');
+  assert.equal(effective.quality.minRigor.value, 'high');
+  assert.deepEqual(effective.quality.minRigor.source, { scope: 'derived', id: 'analytical' });
+  assert.equal(effective.quality.mode.value, 'analytical');
+  assert.equal(effective.quality.mode.sourceKind, 'implied-by-tier-bridge');
+  assert.ok(Object.isFrozen(effective.quality));
+});
+
+test('Phase 04: mode source precedence -- explicit wins over implied-by-tier-bridge', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
+
+  const viaCliOverride = resolveAssignmentDispatchPolicy({
+    assignment,
+    cliOverride: { tier: 'creative', mode: 'adversarial' },
+  });
+  assert.equal(viaCliOverride.quality.mode.value, 'adversarial');
+  assert.equal(viaCliOverride.quality.mode.sourceKind, 'explicit');
+  assert.deepEqual(viaCliOverride.quality.mode.source, { scope: 'cliOverride' });
+  // minRigor stays derived from the tier bridge regardless of explicit mode.
+  assert.equal(viaCliOverride.quality.minRigor.value, 'standard');
+
+  const viaOpPolicy = resolveAssignmentDispatchPolicy({
+    assignment: buildAssignment({
+      stage: 'planning',
+      operation: 'validate-plan',
+      policy: { minTier: 'creative', mode: 'adversarial' },
+    }),
+  });
+  assert.equal(viaOpPolicy.quality.mode.value, 'adversarial');
+  assert.equal(viaOpPolicy.quality.mode.sourceKind, 'explicit');
+
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment, cliOverride: { mode: 'not-a-real-mode' } }),
+    (err) => err instanceof RunnerConfigError && /invalid mode/i.test(err.message),
+  );
+});
+
+test('Phase 04: explicit minRigor at or below the derived value is accepted; the effective value stays the derived one (read-only, not an independent raise channel)', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'analytical' } });
+
+  // 'analytical' derives minRigor 'high'. An explicit 'standard' (weaker) or
+  // 'high' (equal) must both be accepted without changing the effective
+  // value away from the derived one.
+  for (const explicit of ['standard', 'high']) {
+    const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride: { minRigor: explicit } });
+    assert.equal(effective.quality.minRigor.value, 'high', `explicit minRigor "${explicit}" must not change the derived value`);
+  }
+});
+
+test('Phase 04: explicit minRigor stronger than the semantic-tier-derived value is rejected', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'standard' } });
+
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment, cliOverride: { minRigor: 'critical' } }),
+    (err) => err instanceof RunnerConfigError && /stronger than the semantic-tier-derived value/i.test(err.message),
+  );
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment, cliOverride: { minRigor: 'not-a-real-rigor' } }),
+    (err) => err instanceof RunnerConfigError && /invalid minRigor/i.test(err.message),
+  );
+});
+
+test('Phase 04: raw agy heavy work preserves lookupPolicyTier "creative" -> gemini-3.8-flash-high, while semanticTier/quality.minRigor stay "critical"', () => {
+  // Mirrors the real agy-cli/agy-herdr executor shape (rigorOverrides keyed
+  // by this resolver's own policy-tier vocabulary): heavy work composes up
+  // to the 'critical' semantic tier (DEFAULT_TIER_TO_POLICY.heavy ===
+  // 'critical', dispatch/config.mjs), and agy's own rigorOverrides retarget
+  // ONLY the model-lookup key for 'critical' to 'creative' -- design.md
+  // §5.3's "creative-column trap" this phase must not fall into.
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { minTier: 'critical', rigorOverrides: { critical: 'creative' } },
+  });
+  const runnerConfig = {
+    executor: { command: 'agy' },
+    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', creative: 'gemini-3.8-flash-high', critical: 'gemini-3.8-flash-critical-unused' } },
+  };
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
+
+  assert.equal(effective.tier, 'critical', 'legacy flat tier field unaffected');
+  assert.equal(effective.provenance.semanticTier.value, 'critical');
+  assert.equal(effective.quality.minRigor.value, 'critical', 'canonical minRigor must not follow the calibration lookup tier');
+  assert.equal(effective.lookupPolicyTier, 'creative');
+  assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'executor', kind: 'calibration' });
+  assert.equal(effective.model, 'gemini-3.8-flash-high');
+});
+
+test('Phase 04: fgos-coding-implement capability override retargets lookupPolicyTier to "standard" -> gemini-3.8-flash-medium, for the SAME critical semantic tier/heavy work', () => {
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { minTier: 'critical', rigorOverrides: { critical: 'standard' } },
+  });
+  const runnerConfig = {
+    executor: { command: 'agy' },
+    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', creative: 'gemini-3.8-flash-high' } },
+  };
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
+
+  assert.equal(effective.provenance.semanticTier.value, 'critical');
+  assert.equal(effective.quality.minRigor.value, 'critical', 'the same heavy work item keeps the same semantic rigor regardless of which provider calibration it dispatches through');
+  assert.equal(effective.lookupPolicyTier, 'standard');
+  assert.equal(effective.model, 'gemini-3.8-flash-medium');
+});
+
+test('Phase 04: without rigorOverrides, lookupPolicyTier equals semanticTier/effectiveTier (value-preserving no-op for every pre-Phase-04 caller)', () => {
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'creative' } });
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment });
+
+  assert.equal(effective.lookupPolicyTier, 'creative');
+  assert.equal(effective.provenance.semanticTier.value, 'creative');
+  assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'opPolicy', id: 'validate-plan', kind: 'semantic' });
+});
+
+test('Phase 04: rigorOverrides naming an unrecognized policy tier fails closed', () => {
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { minTier: 'critical', rigorOverrides: { critical: 'not-a-real-tier' } },
+  });
+
+  assert.throws(
+    () => resolveAssignmentDispatchPolicy({ assignment }),
+    (err) => err instanceof RunnerConfigError && /not a recognized policy tier/i.test(err.message),
+  );
+});
+
+test('Phase 04: evidence separately exposes semanticTier, canonical quality, lookupPolicyTier, and model source provenance', () => {
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { minTier: 'critical', rigorOverrides: { critical: 'creative' } },
+  });
+  const runnerConfig = {
+    executor: { command: 'agy' },
+    modelPolicies: { gemini: { creative: 'gemini-3.8-flash-high' } },
+  };
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
+
+  assert.notEqual(effective.provenance.semanticTier.value, effective.lookupPolicyTier, 'semanticTier and lookupPolicyTier must be independently inspectable, not the same collapsed value');
+  assert.equal(effective.provenance.semanticTier.value, 'critical');
+  assert.equal(effective.lookupPolicyTier, 'creative');
+  assert.equal(effective.quality.minRigor.value, 'critical');
+  assert.equal(effective.quality.mode.value, 'analytical');
+  assert.deepEqual(effective.provenance.model.source, { scope: 'runnerConfig', id: 'gemini.creative' });
+  assert.equal(effective.model, 'gemini-3.8-flash-high');
+});
+
+test('Phase 04: MIN_RIGOR_VALUES/QUALITY_MODE_VALUES are the exact contract vocabularies', () => {
+  assert.deepEqual(MIN_RIGOR_VALUES, ['low', 'standard', 'high', 'critical']);
+  assert.deepEqual(QUALITY_MODE_VALUES, ['balanced', 'creative', 'analytical', 'adversarial']);
+});
+
