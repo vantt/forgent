@@ -1,0 +1,106 @@
+{
+  "auditedSha": "da5684afac155d7605ec6c254c037cca0ace9c6c",
+  "selected": [
+    {
+      "id": "p06-fast-fixture-expansion",
+      "capability": "code:refactor",
+      "primaryResponsibility": "fixture-construction",
+      "files": [
+        "test/cli/fgos-claim.test.mjs",
+        "test/cli/fgos-claim-2.test.mjs",
+        "test/cli/fgos-read-5.test.mjs",
+        "test/cli/fgos-return-2.test.mjs",
+        "test/cli/fgos-iron-law-gate.test.mjs",
+        "test/cli/fgos-move.test.mjs",
+        "test/cli/fgos-approve-5.test.mjs",
+        "test/cli/fgos-return-3.test.mjs",
+        "test/cli/fgos-return-4.test.mjs"
+      ],
+      "symbols": [
+        "tmpCwd",
+        "tmpCwdFast",
+        "initGitCwd",
+        "initGitCwdFast",
+        "initGitCwdMain",
+        "initGitCwdMainFast",
+        "initHeadlessGitCwd",
+        "initHeadlessGitCwdFast",
+        "initGitCwdInSubdir"
+      ],
+      "staticInitCallsitesInNamedFiles": 128,
+      "retainedCliDoors": [
+        "fgos init process-boundary tests",
+        "subdir init/cwd-resolution tests",
+        "setup/init idempotence and coexistence output tests",
+        "take/pick/return/approve/merge/sync-root git transport tests"
+      ],
+      "requiresCallableCliCore": false,
+      "verification": [
+        "node --test <named files>",
+        "npm test",
+        "git diff --check"
+      ],
+      "rollback": "Revert only the opt-in helper import/call-site substitutions; keep P06 helpers until P08 decides their global future."
+    },
+    {
+      "id": "bin-local-state-verb-usecase-extraction",
+      "capability": "code:refactor",
+      "primaryResponsibility": "business/use-case-behavior",
+      "files": [
+        "test/cli/fgos-stage.test.mjs",
+        "test/cli/fgos-stage-2.test.mjs",
+        "test/cli/fgos-stage-3.test.mjs",
+        "test/cli/fgos-edit.test.mjs",
+        "test/cli/fgos-edit-2.test.mjs",
+        "test/cli/fgos-edit-3.test.mjs",
+        "test/cli/fgos-read.test.mjs",
+        "test/cli/fgos-read-2.test.mjs",
+        "test/cli/fgos-read-3.test.mjs",
+        "test/cli/fgos-read-4.test.mjs",
+        "test/cli/fgos-read-5.test.mjs"
+      ],
+      "symbols": [
+        "bin/fgos.mjs case 'discover'",
+        "bin/fgos.mjs case 'plan'",
+        "bin/fgos.mjs case 'edit'",
+        "bin/fgos.mjs case 'move'",
+        "bin/fgos.mjs case 'graph'",
+        "bin/fgos.mjs case 'stale'",
+        "resolveDiscovery",
+        "resolvePlan",
+        "editWork",
+        "moveWork",
+        "graphMetrics",
+        "staleDoingAdvisory"
+      ],
+      "staticBusinessCallsitesInNamedFiles": 259,
+      "retainedCliDoors": [
+        "one parser/envelope/error-mapping smoke per verb",
+        "cwd/--dir resolution cases",
+        "process env/config cases for discover/plan",
+        "existing git/process integration cases untouched"
+      ],
+      "requiresCallableCliCore": "narrow use-case modules, not a global runCli(argv, ctx)",
+      "existingDirectTests": [
+        "test/intake/discovery.test.mjs",
+        "test/intake/plan.test.mjs",
+        "test/state/store.test.mjs",
+        "test/state/graph-metrics.test.mjs",
+        "test/state/runtime-coordination.test.mjs"
+      ],
+      "verification": [
+        "node --test test/intake/discovery.test.mjs test/intake/plan.test.mjs test/state/store.test.mjs test/state/graph-metrics.test.mjs test/state/runtime-coordination.test.mjs",
+        "node --test <named CLI files>",
+        "npm test",
+        "git diff --check"
+      ],
+      "rollback": "Revert the extracted use-case modules and restore the affected bin/fgos.mjs cases; keep direct tests only if they still exercise exported production symbols."
+    }
+  ],
+  "deferred": [
+    {
+      "id": "merge-return-approve-consolidation",
+      "reason": "High boundary risk: approve, merge next, sync-root, review --github, return, rollback, locks, and durable writes have distinct process/Git contracts that must stay subprocess-backed until a separate plan proves exact preserved doors."
+    }
+  ]
+}
