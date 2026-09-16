@@ -4,13 +4,14 @@ Date: 2026-09-16
 
 ## Outcome
 
-The track is proven on branch `code-panel-multicell-facade` and ready for safe
-publication to `main`.
+The track is published to `main`.
 
 Tested state:
 
 - tested SHA: `069e93cffd6da26f9ce1702c9fec220216b5dddd`
 - tested tree: `094be49654b757d62dee26ffad0c94acd047dbb3`
+- main merged SHA: `4386a835e684d32837eff412c8e44457acc12dc6`
+- main merged tree: `c254e988199978b354b03386bf9e93a979c32297`
 - environment: Node `v24.18.0`, npm `11.16.0`, Linux x86_64
 - `package-lock.json` sha256: `b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc`
 
@@ -28,8 +29,10 @@ Results:
 - Rust build: success.
 - Rust-host suite: 102/102 pass.
 - Intake baseline check: 15/15 pass.
-- Full suite: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration
+- Track full suite: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration
   `395982.212118ms`.
+- Main publication full suite on merge commit `4386a835`: 6593 tests, 6584
+  pass, 0 fail, 9 skipped, duration `390376.330836ms`.
 
 ## What changed operationally
 
@@ -42,15 +45,11 @@ Results:
   so read-only Claude leakage and recovery claim cleanup are present before
   publication.
 
-## Remaining publication step
+## Publication note
 
-The direct run intentionally did not merge to `main` because the main checkout
-had user-owned dirty/untracked files. To publish:
-
-1. preserve or clear those main-checkout changes;
-2. merge branch `code-panel-multicell-facade` to `main`;
-3. compare `git rev-parse main^{tree}` with
-   `094be49654b757d62dee26ffad0c94acd047dbb3`;
-4. if identical and the environment fingerprint is unchanged, reuse this proof;
-5. if not identical, sync latest `main` back into the track branch and rerun the
-   final full proof there.
+The main checkout had user-owned dirty/untracked files before publication, so
+they were stashed under `pre-code-panel-facade-publication-20260916`, the track
+branch was merged to `main`, and non-overlapping dirty files were restored after
+the main proof. The older untracked `plans/260915-code-panel-multicell-facade/`
+copy from the stash was not restored because it would overwrite the published
+plan; it remains recoverable from that stash if needed.

@@ -104,6 +104,15 @@ environment precondition (missing `target/release/fgos` and
 passed 102/102 and the formerly failing intake regression passed 15/15 before
 the final full-suite proof.
 
+Publication to `main` was completed at merge commit
+`4386a835e684d32837eff412c8e44457acc12dc6` (tree
+`c254e988199978b354b03386bf9e93a979c32297`). Because the post-proof evidence
+commit changed docs, the final full suite was rerun on that exact main merge
+commit:
+
+- `env -u CLAUDE_CODE_ENTRYPOINT -u CLAUDECODE -u CLAUDE_CODE_SSE_PORT npm test`
+- result: 6593 tests, 6584 pass, 0 fail, 9 skipped, duration `390376.330836ms`
+
 ## Rollback
 
 Nếu live proof fail, giữ các plan đang dừng và disable planned facade; direct code-panel cùng standalone plan-loop vẫn là fallback rõ ràng.
