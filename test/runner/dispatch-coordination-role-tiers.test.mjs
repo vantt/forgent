@@ -17,6 +17,7 @@ import {
   dispatchDeclaredOperation,
 } from '../../src/runner/coordination/session-engine.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
+import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 
 const DEFINITION_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
 
@@ -333,4 +334,81 @@ test('R8: a missing frontier-tier provider fails closed (RunnerConfigError) rath
       return fs.existsSync(runsDir) ? fs.readdirSync(runsDir) : [];
     });
   assert.equal(redTeamRuns.length, 0, 'a fail-closed missing-frontier-tier dispatch must never produce a settled run');
+});
+
+// ─── model-tier-vocabulary-and-coordination-fallback (2026-09-17): ────────
+// actors[].fallbackExecutors plumbing ───────────────────────────────────────
+//
+// The retry-on-failure mechanism itself (Provider Capacity Rotator,
+// attemptProviderCapacityFallback) is already proven end to end by
+// assignment-dispatch.test.mjs's own "Phase B" battery. What is proven HERE
+// is the one thing that was missing before this change: that a REQUEST-level
+// actors[].fallbackExecutors override (the shape a coordination request
+// like fgos-code-panel's own actually declares) genuinely reaches
+// resolveAssignmentDispatchPolicy's executorPreference -- through
+// runCoordinationUseCase's real actorPolicyFields plumbing (run.mjs), not a
+// hand-built cliOverride. Triggering a REAL provider-capacity refusal here
+// would need a live ~/.fgos/runtime/provider-capacity account/quarantine
+// fixture that runCoordinationUseCase has no way to redirect to an isolated
+// test directory (a separate, pre-existing gap, not this test's concern) --
+// so this proves the wire via the SAME executorPreference array
+// resolveAssignmentDispatchPolicy always computes up front, unconditionally,
+// regardless of whether the primary ever actually fails
+// (assignment-policy.test.mjs's own "narrow executor preference" test
+// asserts the identical shape for opPolicy.fallbackExecutors).
+test('R8/Phase 2: a request-level actors[].fallbackExecutors override reaches resolveAssignmentDispatchPolicy\'s executorPreference through runCoordinationUseCase (not just dispatchDeclaredOperation\'s own cliPolicy param)', async () => {
+  const tempDir = mkTempDir();
+  // Deliberately NOT fakeCrossProviderRedirectConfig -- its
+  // placementPolicy.readOnlyRedirects.claude.default fires for EVERY
+  // read-only operation on claude (every declared-protocol dispatch is
+  // read-only-mode, regardless of result.kind -- runExecutorAttempt always
+  // passes isReadOnlyMode: true), which would make codex spawn via the
+  // UNRELATED redirect mechanism and contaminate this test's proof that
+  // fallbackExecutors alone drives executorPreference.
+  const claude = argvRecordingExecutor(tempDir, 'claude-fallback-plumbing-primary');
+  const codex = argvRecordingExecutor(tempDir, 'claude-fallback-plumbing-candidate');
+  const runnerConfig = {
+    executors: {
+      claude: { command: process.execPath, args: [claude.scriptPath, '{prompt}', '--model', '{model}'], allowCrossProvider: true },
+      'codex-bwrap': { command: process.execPath, args: [codex.scriptPath, '{prompt}', '--model', '{model}'], providerModel: 'openai-codex', allowCrossProvider: true },
+    },
+    modelPolicies: { claude: { standard: 'sonnet' }, 'openai-codex': { standard: 'gpt-test-standard' } },
+    timeoutMs: 5000,
+  };
+  const captures = { codex };
+
+  const data = await runCoordinationUseCase(
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig },
+    {
+      requestObject: {
+        kind: 'declared-protocol',
+        objective: 'Prove actors[].fallbackExecutors reaches executorPreference.',
+        writerId: 'coordinator-fallback-plumbing',
+        protocolRef: { id: DEFINITION_ID },
+        actors: [{ id: 'doer', executor: 'claude', fallbackExecutors: ['codex-bwrap'] }],
+        steps: [
+          {
+            type: 'operation',
+            as: 'produce',
+            operationId: 'produce-candidate',
+            targetActorId: 'doer',
+            objective: 'Produce a candidate.',
+            expectedOutputs: ['agent-result.json (status, summary)'],
+          },
+        ],
+      },
+    },
+  );
+
+  const produce = data.steps.find((step) => step.as === 'produce');
+  assert.equal(produce.executor, 'claude', 'the primary executor actually dispatched -- no refusal, no substitution');
+  assert.equal(fs.existsSync(captures.codex.argvCapturePath), false, 'the undeclared-failure case must never spawn the fallback');
+
+  const dispatchPlanPath = path.join(tempDir, '.fgos', 'assignments', produce.assignmentId, 'runs', '01', 'dispatch-plan.json');
+  const dispatchPlan = JSON.parse(fs.readFileSync(dispatchPlanPath, 'utf8'));
+  assert.deepEqual(
+    dispatchPlan.policy.executorPreference,
+    ['claude', 'codex-bwrap'],
+    'actors[].fallbackExecutors must compose into executorPreference exactly like opPolicy.fallbackExecutors already does -- the new plumbing this change adds, not a new mechanism',
+  );
 });

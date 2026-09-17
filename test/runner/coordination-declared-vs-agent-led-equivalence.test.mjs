@@ -68,7 +68,7 @@ function fakeExecutor(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', lightweight: 'test-model', creative: 'test-model', analytical: 'test-model', critical: 'test-model' },
+    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
     timeoutMs: 5000,
   };
 }
@@ -103,11 +103,11 @@ test('R7: one bounded question dispatched once agent-led and once declared produ
   const tempDir = mkTempDir();
   const runnerConfig = fakeExecutor(tempDir);
   // Deliberately NOT the system default tier (R3's own precedent, this same
-  // test file's cousin, uses "critical" for the identical reason): a tier
+  // test file's cousin, uses "frontier" for the identical reason): a tier
   // equal to the default never actually exercises the override mechanism,
   // since raising to an already-resolved value produces source "default"
   // regardless of whether a caller supplied it at all.
-  const TRUSTED_TIER = 'critical';
+  const TRUSTED_TIER = 'frontier';
 
   // ── Mode 1: agent-led (Phase 01) -- openStandaloneSession -> dispatchPrimaryTask -> proposeConsult
   openStandaloneSession(

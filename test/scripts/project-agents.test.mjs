@@ -114,7 +114,7 @@ test('readRunnerModels resolves via modelPolicies when present, not the legacy m
   const dir = mkTempDir();
   writeSharedConfig(dir, {
     modelPolicies: {
-      claude: { lightweight: 'haiku-custom', standard: 'sonnet-custom', creative: 'sonnet-custom', analytical: 'sonnet-custom', critical: 'opus-custom' },
+      claude: { nano: 'haiku-custom', standard: 'sonnet-custom', advanced: 'sonnet-custom', flagship: 'sonnet-custom', frontier: 'opus-custom' },
     },
   });
   assert.deepEqual(readRunnerModels(dir), { light: 'haiku-custom', standard: 'sonnet-custom', heavy: 'opus-custom' });

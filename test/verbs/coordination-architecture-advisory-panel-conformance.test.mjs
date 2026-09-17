@@ -50,7 +50,7 @@ function countEventLines(tempDir, coordinationId) {
 }
 
 /** Two REGISTERED executors, provider families `family-a`/`family-b`, with
- *  `family-a` mapping "analytical" and "critical" to genuinely DIFFERENT
+ *  `family-a` mapping "flagship" and "frontier" to genuinely DIFFERENT
  *  model strings -- the fixture this suite's own heterogeneous-actor-binding
  *  case needs so a tier assertion is real (per phase-03's own text: "a tier
  *  assertion counts only when the selected executor's model policy maps
@@ -104,9 +104,9 @@ function fakeRunnerConfig(tempDir) {
       },
     },
     modelPolicies: {
-      claude: { standard: 'test-model', analytical: 'test-model', critical: 'test-model' },
-      'family-a': { standard: 'model-a-standard', analytical: 'model-a-analytical', critical: 'model-a-critical' },
-      'family-b': { standard: 'model-b-standard', analytical: 'model-b-analytical', critical: 'model-b-critical' },
+      claude: { standard: 'test-model', flagship: 'test-model', frontier: 'test-model' },
+      'family-a': { standard: 'model-a-standard', flagship: 'model-a-analytical', frontier: 'model-a-critical' },
+      'family-b': { standard: 'model-b-standard', flagship: 'model-b-analytical', frontier: 'model-b-critical' },
     },
     timeoutMs: 8000,
   };
@@ -1037,7 +1037,7 @@ test('heterogeneous actor bindings: two shaper roles resolve through genuinely d
   const shapeAlt = call1.steps.find((s) => s.as === 'shapeAlt');
   assert.equal(shapeSystem.executor, 'exec-family-a');
   assert.equal(shapeSystem.provider, 'family-a');
-  assert.equal(shapeSystem.tier, 'analytical', 'system-shaper\'s own operation-declared minTier floor');
+  assert.equal(shapeSystem.tier, 'flagship', 'system-shaper\'s own operation-declared minTier floor');
   assert.equal(shapeAlt.executor, 'exec-family-b');
   assert.equal(shapeAlt.provider, 'family-b');
   assert.notEqual(shapeSystem.executor, shapeAlt.executor, 'two genuinely different registered executors, not one global default');
@@ -1074,12 +1074,12 @@ test('heterogeneous actor bindings: two shaper roles resolve through genuinely d
   );
   const synth = call2.steps.find((s) => s.as === 'synth');
   assert.equal(synth.executor, 'exec-family-a', 'the SAME executor as system-shaper, proving the model difference below is a tier effect, not an executor effect');
-  assert.equal(synth.tier, 'critical', 'synthesizer\'s own operation-declared minTier floor');
+  assert.equal(synth.tier, 'frontier', 'synthesizer\'s own operation-declared minTier floor');
 
   // Read the real RunResult files to compare the actually-resolved MODEL
   // string -- summarizeDispatch's own step-result shape does not surface
-  // "model" -- proving family-a's modelPolicy maps "analytical" and
-  // "critical" to genuinely DIFFERENT models (phase-03's own named
+  // "model" -- proving family-a's modelPolicy maps "flagship" and
+  // "frontier" to genuinely DIFFERENT models (phase-03's own named
   // condition for a tier assertion to count).
   function resolvedModelFor(assignmentId) {
     const runsDir = path.join(tempDir, '.fgos', 'assignments', assignmentId, 'runs');

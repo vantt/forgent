@@ -49,15 +49,15 @@ function baseRunnerConfig(overrides = {}) {
       },
     },
     modelPolicies: {
-      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
-      gemini: { lightweight: 'gemini-flash' },
+      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+      gemini: { nano: 'gemini-flash' },
     },
     timeoutMs: 900000,
     ...overrides,
   };
 }
 
-function twoActorDefinition({ minTier = 'lightweight', distinctProviderFamilies = 2, requiredCapabilities, actorPolicy } = {}) {
+function twoActorDefinition({ minTier = 'nano', distinctProviderFamilies = 2, requiredCapabilities, actorPolicy } = {}) {
   const raw = {
     apiVersion: 'fgos.dev/v1alpha1',
     kind: 'FlowDefinition',
@@ -166,7 +166,7 @@ const claudeCandidate = Object.freeze({
   providerFamily: 'claude',
   resolvedCommand: 'claude',
   invocationMechanism: 'cli',
-  supportedTiers: Object.freeze(['lightweight', 'standard']),
+  supportedTiers: Object.freeze(['nano', 'standard']),
   capabilities: Object.freeze(['fgos-coding-implement']),
   persona: undefined,
   tools: undefined,
@@ -193,11 +193,11 @@ test('rejection-by-provider-mismatch: candidate resolves to a different provider
 });
 
 test('rejection-by-tier-mismatch: candidate does not support the required minTier', () => {
-  const result = matchCandidateToRequirement(claudeCandidate, { role: 'researcher', minTier: 'critical' });
+  const result = matchCandidateToRequirement(claudeCandidate, { role: 'researcher', minTier: 'frontier' });
   assert.equal(result.ok, false);
   assert.equal(result.field, 'tier');
-  assert.match(result.reason, /needs tier "critical"/);
-  assert.match(result.reason, /only supports \[lightweight, standard\]/);
+  assert.match(result.reason, /needs tier "frontier"/);
+  assert.match(result.reason, /only supports \[nano, standard\]/);
 });
 
 test('rejection-by-capability-mismatch: candidate is missing a required capability', () => {
@@ -224,22 +224,22 @@ test('rejection-by-context: candidate declares no contextLimit against a declare
 });
 
 test('matchCandidateToRequirement returns ok:true when every declared dimension is satisfied', () => {
-  const result = matchCandidateToRequirement(claudeCandidate, { role: 'researcher', minTier: 'lightweight', requiredCapabilities: ['fgos-coding-implement'] });
+  const result = matchCandidateToRequirement(claudeCandidate, { role: 'researcher', minTier: 'nano', requiredCapabilities: ['fgos-coding-implement'] });
   assert.deepEqual(result, { ok: true });
 });
 
 // ─── R3: hard-unsatisfied case ────────────────────────────────────────────
 
 test('planCohort hard-fails naming the actor/field/candidate and what tier support IS available, when required minTier is not configured for any candidate', () => {
-  // No family in this fixture configures "critical" at all (claude stops at
-  // "standard", gemini is lightweight-only) -- genuinely unsatisfiable.
+  // No family in this fixture configures "frontier" at all (claude stops at
+  // "standard", gemini is nano-only) -- genuinely unsatisfiable.
   const cfg = baseRunnerConfig({
     modelPolicies: {
-      claude: { lightweight: 'haiku', standard: 'sonnet' },
-      gemini: { lightweight: 'gemini-flash' },
+      claude: { nano: 'haiku', standard: 'sonnet' },
+      gemini: { nano: 'gemini-flash' },
     },
   });
-  const definition = twoActorDefinition({ minTier: 'critical' });
+  const definition = twoActorDefinition({ minTier: 'frontier' });
 
   const plan = planCohort({ definition, runnerConfig: cfg });
 
@@ -248,9 +248,9 @@ test('planCohort hard-fails naming the actor/field/candidate and what tier suppo
   assert.equal(plan.failure.role, 'researcher');
   assert.equal(plan.failure.field, 'tier');
   assert.match(plan.failure.reason, /actor "alpha"/);
-  assert.match(plan.failure.reason, /needs tier "critical"/);
+  assert.match(plan.failure.reason, /needs tier "frontier"/);
   // "what support IS available" -- names which family (claude) IS
-  // configured for a WEAKER tier, and that none supports "critical" at all.
+  // configured for a WEAKER tier, and that none supports "frontier" at all.
   assert.match(plan.failure.availableSupport, /no candidate currently configures that tier/);
   assert.deepEqual(plan.allocations, []);
 });
@@ -258,7 +258,7 @@ test('planCohort hard-fails naming the actor/field/candidate and what tier suppo
 test('planCohort hard-fails naming which provider family IS configured for the required tier, when only a subset of candidates qualify', () => {
   const cfg = baseRunnerConfig();
   // "standard" is configured only for the "claude" family in this fixture
-  // (gemini is lightweight-only) -- once both claude candidates are
+  // (gemini is nano-only) -- once both claude candidates are
   // consumed by other actors, the example wording from R3
   // ("role X needs tier Y; only Z is configured for any candidate") must
   // be reproducible.
@@ -352,7 +352,7 @@ test('planCohort emits a per-actor PolicyPatch in the exact shape mergePolicySta
   const plan = planCohort({ definition, runnerConfig: cfg });
 
   for (const allocation of plan.allocations) {
-    assert.equal(allocation.policyPatch.minTier, 'lightweight');
+    assert.equal(allocation.policyPatch.minTier, 'nano');
     assert.equal(allocation.policyPatch.preferExecutor, allocation.executorId);
     assert.ok(Object.isFrozen(allocation.policyPatch));
     // Only the documented PolicyPatch fields ever appear.
@@ -414,7 +414,7 @@ test('verifyPlannedAllocationAgainstCurrentConfig aborts when the planned tier i
     ...cfg,
     modelPolicies: {
       ...cfg.modelPolicies,
-      claude: { lightweight: 'haiku' }, // "standard" removed from the live config since planning time
+      claude: { nano: 'haiku' }, // "standard" removed from the live config since planning time
     },
   };
 
@@ -485,13 +485,13 @@ test('buildCandidateInventory against the real committed .fgos/config.json: only
 
   const byId = Object.fromEntries(inventory.map((c) => [c.executorId, c]));
   assert.equal(byId.agy.providerFamily, 'gemini');
-  assert.deepEqual(byId.agy.supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+  assert.deepEqual(byId.agy.supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
   assert.equal(byId['codex-pi'].providerFamily, 'openai-codex');
-  assert.deepEqual(byId['codex-pi'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+  assert.deepEqual(byId['codex-pi'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
   assert.equal(byId['glm-cli'].providerFamily, 'z-ai');
-  assert.deepEqual(byId['glm-cli'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+  assert.deepEqual(byId['glm-cli'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
   assert.equal(byId['claude'].providerFamily, 'claude');
-  assert.deepEqual(byId['claude'].supportedTiers, ['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+  assert.deepEqual(byId['claude'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
 
   // Explicit stable order: ascending by executorId.
   const ids = inventory.map((c) => c.executorId);
@@ -502,9 +502,9 @@ test('buildCandidateInventory against the real committed .fgos/config.json: only
   assert.ok(distinctFamilies.size >= 3);
 });
 
-test('planCohort against the real committed .fgos/config.json allocates 2 actors requiring lightweight tier across 2 distinct provider families', () => {
+test('planCohort against the real committed .fgos/config.json allocates 2 actors requiring nano tier across 2 distinct provider families', () => {
   const cfg = committedRunnerConfig();
-  const definition = twoActorDefinition({ minTier: 'lightweight', distinctProviderFamilies: 2 });
+  const definition = twoActorDefinition({ minTier: 'nano', distinctProviderFamilies: 2 });
 
   const plan = planCohort({ definition, runnerConfig: cfg });
 

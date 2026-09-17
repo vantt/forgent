@@ -120,7 +120,7 @@ function fakeRunnerConfig(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', critical: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', frontier: 'test-model' } },
     timeoutMs: 8000,
   };
 }
@@ -424,7 +424,7 @@ test('a request naming standalone-master-coordination-loop dispatches successful
 
   const runnerConfig = {
     executor: { allowCrossProvider: true, command: process.execPath, args: [path.join(tempDir, 'fake-executor.mjs'), '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', analytical: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'test-model' } },
     timeoutMs: 8000,
   };
   fs.writeFileSync(

@@ -35,9 +35,9 @@ function mkTempDir() {
  * spawning `process.execPath` against a real fake-executor script (the same
  * "real subprocess writes agent-report.md/agent-result.json into the run
  * dir executeExecutorCli created" shape every other test file in this
- * track uses). Every family configures BOTH `lightweight` and `standard`
+ * track uses). Every family configures BOTH `nano` and `standard`
  * (see the modelPolicies comment below for why `standard` matters even for
- * a `lightweight`-declared operation).
+ * a `nano`-declared operation).
  */
 // Default summary text must pass assignment-runner.mjs's
 // isSubstantiveReportText() heuristic (rejects reports whose only words are
@@ -96,7 +96,7 @@ function fakeCohortRunnerConfig(tempDir, { delayMs, status = 'done', summary = '
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [executorScript, '{prompt}'] }],
       },
     },
-    // Every family configures BOTH lightweight and standard (a deliberate
+    // Every family configures BOTH nano and standard (a deliberate
     // divergence from the real .fgos/config.json, documented in this
     // cell's own report): resolveAssignmentDispatchPolicy's tier FLOOR
     // (assignment-policy.mjs's `opPolicy.minTier || 'standard'`) can only
@@ -114,10 +114,10 @@ function fakeCohortRunnerConfig(tempDir, { delayMs, status = 'done', summary = '
     // reach a genuine second, non-claude provider family -- see this
     // cell's report.
     modelPolicies: {
-      claude: { lightweight: 'test-model', standard: 'test-model' },
-      'family-a': { lightweight: 'test-model', standard: 'test-model' },
-      'family-b': { lightweight: 'test-model', standard: 'test-model' },
-      'family-c': { lightweight: 'test-model', standard: 'test-model' },
+      claude: { nano: 'test-model', standard: 'test-model' },
+      'family-a': { nano: 'test-model', standard: 'test-model' },
+      'family-b': { nano: 'test-model', standard: 'test-model' },
+      'family-c': { nano: 'test-model', standard: 'test-model' },
     },
     timeoutMs: 5000,
   };

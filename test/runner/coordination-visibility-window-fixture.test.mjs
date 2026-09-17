@@ -100,10 +100,10 @@ function fakeCohortRunnerConfig(tempDir, { status = 'done', summary = 'Research 
       'exec-family-c': { kind: 'agent', providerModel: 'family-c', allowCrossProvider: true, invocations: [invocation] },
     },
     modelPolicies: {
-      claude: { lightweight: 'test-model', standard: 'test-model' },
-      'family-a': { lightweight: 'test-model', standard: 'test-model' },
-      'family-b': { lightweight: 'test-model', standard: 'test-model' },
-      'family-c': { lightweight: 'test-model', standard: 'test-model' },
+      claude: { nano: 'test-model', standard: 'test-model' },
+      'family-a': { nano: 'test-model', standard: 'test-model' },
+      'family-b': { nano: 'test-model', standard: 'test-model' },
+      'family-c': { nano: 'test-model', standard: 'test-model' },
     },
     timeoutMs: 5000,
   };

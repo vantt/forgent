@@ -99,9 +99,9 @@ function fakeRunnerConfig(tempDir) {
       },
     },
     modelPolicies: {
-      claude: { lightweight: 'test-model', standard: 'test-model' },
-      'family-facilitator': { lightweight: 'test-model', standard: 'test-model' },
-      'family-participant': { lightweight: 'test-model', standard: 'test-model' },
+      claude: { nano: 'test-model', standard: 'test-model' },
+      'family-facilitator': { nano: 'test-model', standard: 'test-model' },
+      'family-participant': { nano: 'test-model', standard: 'test-model' },
     },
     timeoutMs: 8000,
   };
@@ -332,7 +332,7 @@ test('Nominal-Group-Lite per-actor provider/tier: the facilitator role and the p
   // having been declared at all (`{scope: 'default'}`) -- `resolveStrongerTier`'s
   // own `>` (never `>=`) comparison against the default floor. Only a tier
   // STRICTLY ABOVE 'standard' would attribute to the real declaring scope.
-  assert.equal(participantProvenance.tier.value, 'lightweight');
+  assert.equal(participantProvenance.tier.value, 'nano');
   assert.equal(participantProvenance.tier.source.scope, 'opPolicy');
   assert.equal(facilitatorProvenance.tier.value, 'standard');
   assert.equal(facilitatorProvenance.tier.source.scope, 'default');

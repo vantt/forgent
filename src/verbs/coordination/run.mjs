@@ -98,11 +98,21 @@ function actorPolicyFields(actorEntry, { globalExecutor, globalTier } = {}) {
   // there to require `executor` alongside it) -- there is no global/CLI
   // equivalent to `globalExecutor`/`globalTier` for it.
   const preferInvocation = actorEntry?.invocation;
+  // `fallbackExecutors` (model-tier-vocabulary-and-coordination-fallback,
+  // 2026-09-17): same "only ever comes from the actor entry itself" shape
+  // as `preferInvocation` above -- no global/CLI equivalent. Reaching
+  // `cliOverride.fallbackExecutors` here is the ONLY missing step for a
+  // declared-protocol actor to opt into the real Provider Capacity Rotator
+  // fallback (`resolveAssignmentDispatchPolicy` already reads
+  // `cliOverride.fallbackExecutors ?? opPolicy.fallbackExecutors`,
+  // assignment-policy.mjs) -- this does not build a new fallback mechanism.
+  const fallbackExecutors = actorEntry?.fallbackExecutors;
   return {
     ...(preferExecutor !== undefined ? { preferExecutor } : {}),
     ...(preferInvocation !== undefined ? { preferInvocation } : {}),
     ...(minTier !== undefined ? { minTier } : {}),
     ...(preferPersona !== undefined ? { preferPersona } : {}),
+    ...(fallbackExecutors !== undefined ? { fallbackExecutors } : {}),
   };
 }
 
