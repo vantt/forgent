@@ -573,9 +573,6 @@
               "{model}",
               "{prompt}"
             ],
-            "env": {
-              "FGOS_CODEX_CREDENTIAL_HOMES": "${HOME}/.codex-tetcu72:${HOME}/.codex-tetnu:${HOME}/.codex-fgovn:${HOME}/.codex"
-            },
             "resourceBindings": [
               {
                 "resource": "private-home",

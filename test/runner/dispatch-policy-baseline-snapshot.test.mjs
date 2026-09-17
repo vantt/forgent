@@ -637,9 +637,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-luna",
       "<prompt>"
     ],
-    "envKeys": [
-      "FGOS_CODEX_CREDENTIAL_HOMES"
-    ],
+    "envKeys": [],
     "resourceBindings": [
       {
         "resource": "private-home",
@@ -670,9 +668,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-terra",
       "<prompt>"
     ],
-    "envKeys": [
-      "FGOS_CODEX_CREDENTIAL_HOMES"
-    ],
+    "envKeys": [],
     "resourceBindings": [
       {
         "resource": "private-home",
@@ -703,9 +699,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       "gpt-5.6-sol",
       "<prompt>"
     ],
-    "envKeys": [
-      "FGOS_CODEX_CREDENTIAL_HOMES"
-    ],
+    "envKeys": [],
     "resourceBindings": [
       {
         "resource": "private-home",
