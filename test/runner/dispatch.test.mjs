@@ -40,6 +40,7 @@ import {
   ProviderCapacityConfigError,
 } from '../../src/runner/dispatch.mjs';
 import { EXECUTOR_ADAPTERS } from '../../src/runner/dispatch/transport.mjs';
+import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs';
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
@@ -1005,14 +1006,15 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the agy-cli reference executor (tsk-5tm-4 D11, renamed from executors.agy at tsk-5jl/tsk-2ii so it stands apart from executors.agy-herdr): invocations[]-shaped, kind agent (migrated at tsk-in1-4 D5), allowCrossProvider true, resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the consolidated agy executor (executor-id-consolidation Step 2, replacing the former separate agy-cli/agy-herdr/agy-bwrap ids): invocations[]-shaped, kind agent, allowCrossProvider true, its "cli" invocation resolves to the real installed agy binary', () => {
   const cfg = committedRunnerConfig();
-  const executor = cfg.executors?.['agy-cli'];
-  assert.ok(executor, 'executors.agy-cli must exist');
+  const executor = cfg.executors?.agy;
+  assert.ok(executor, 'executors.agy must exist');
   assert.equal(executor.kind, 'agent');
   assert.equal(executor.allowCrossProvider, true);
-  assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 1);
-  const invocation = executor.invocations[0];
+  assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 3);
+  const invocation = executor.invocations.find((inv) => inv.id === 'cli');
+  assert.ok(invocation, 'agy must declare a "cli" invocation');
   assert.equal(invocation.via, 'cli');
   assert.equal(invocation.adapter, 'cli-spawn');
   assert.equal(invocation.command, 'agy');
@@ -1346,9 +1348,9 @@ test('the committed .fgos/config.json runner section loads and is well-formed', 
   assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
 });
 
-test('the committed .fgos/config.json runner section wires the agy-cli executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece fixes; key renamed from executors.agy at tsk-5jl/tsk-2ii)', () => {
+test('the committed .fgos/config.json runner section wires the consolidated agy executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece originally fixed)', () => {
   const cfg = committedRunnerConfig();
-  assert.equal(cfg.executors?.['agy-cli']?.providerModel, 'gemini');
+  assert.equal(cfg.executors?.agy?.providerModel, 'gemini');
   assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
   assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
 });
@@ -1939,13 +1941,13 @@ test('resolveExecutorCommand substitutes {prompt} and {model} per array element'
   assert.deepEqual(args, ['-p', 'do the thing', '--model', 'sonnet']);
 });
 
-test('codex-cli consumes model placeholder in invocation args: analytical assignment resolves model from policy into argv', () => {
+test('codex\'s cli-bypass invocation consumes model placeholder in invocation args: analytical assignment resolves model from policy into argv', () => {
   const cfg = loadRunnerConfigFromDir(process.cwd());
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
     policy: {
-      preferExecutor: 'codex-cli',
+      preferExecutor: 'codex',
       minTier: 'analytical',
     },
   });
@@ -1963,7 +1965,8 @@ test('codex-cli consumes model placeholder in invocation args: analytical assign
   const resolved = resolveExecutorCommand(cfg, {
     prompt,
     model: effectivePolicy.model,
-    executorId: 'codex-cli',
+    executorId: 'codex',
+    invocationId: 'cli-bypass',
   });
 
   assert.equal(resolved.command, 'codex');
@@ -4700,6 +4703,143 @@ test('loadRunnerConfig rejects "prefer" naming an executor id that does not exis
     }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+// --- executor-id-consolidation Step 2.2: "prefer" as an ORDERED candidate
+// array (cascade, account-rotator-style), each entry a bare executor-id
+// string or {executor, invocation?} ----------------------------------------
+
+test('loadRunnerConfig accepts "prefer" as an array of bare executor-id strings', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-array-strings.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { agy: { kind: 'agent' }, claude2: { kind: 'agent' } },
+      capabilities: { advise: { prefer: ['agy', 'claude2'] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig accepts "prefer" as an array of {executor, invocation} objects when the invocation id is really declared', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-array-objects.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: {
+        claude: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
+        agy: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'agy', args: ['{prompt}'] }] },
+      },
+      capabilities: {
+        advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
+      },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.doesNotThrow(() => loadRunnerConfig(configPath));
+});
+
+test('loadRunnerConfig rejects a "prefer" array naming an invocation id that is not declared on that executor', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-array-bad-invocation.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { claude: { kind: 'agent', invocations: [{ id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}'] }] } },
+      capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(
+    () => loadRunnerConfig(configPath),
+    (err) => err instanceof RunnerConfigError && /invocation "cli-bwrap" on executor "claude" but no such invocation id is declared/.test(err.message),
+  );
+});
+
+test('loadRunnerConfig rejects an empty "prefer" array', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-empty-array.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { advise: { prefer: [] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "prefer" array entry object with an unknown key', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'prefer-array-bad-key.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: { claude: { kind: 'agent' } },
+      capabilities: { advise: { prefer: [{ executor: 'claude', model: 'sonnet' }] } },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+});
+
+test('resolveExecutorAndOverrides picks candidates[0] and threads its invocation as invocationId when "prefer" is an array', () => {
+  const cfg = {
+    executors: {
+      claude: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}'] }] },
+      agy: { kind: 'agent', invocations: [{ id: 'cli-bwrap', via: 'cli', command: 'agy', args: ['{prompt}'] }] },
+    },
+    capabilities: {
+      advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
+    },
+  };
+  const result = resolveExecutorAndOverrides(cfg, 'advise');
+  assert.equal(result.executorId, 'claude');
+  assert.equal(result.invocationId, 'cli-bwrap');
+  assert.equal(result.bindingSource, 'capability.prefer');
+  assert.deepEqual(result.candidates, [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }]);
+});
+
+test('resolveExecutorAndOverrides leaves invocationId undefined for a legacy bare-string "prefer" -- byte-identical to before Step 2.2', () => {
+  const cfg = {
+    executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
+  };
+  const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
+  assert.equal(result.executorId, 'agy');
+  assert.equal(result.invocationId, undefined);
+  assert.deepEqual(result.candidates, [{ executor: 'agy', invocation: undefined }]);
+});
+
+test('resolveExecutorConfig resolves the confined invocation end-to-end through a capability with an array "prefer"', () => {
+  const cfg = {
+    executor: { command: 'node', args: ['{prompt}'] },
+    executors: {
+      claude: {
+        kind: 'agent',
+        invocations: [
+          { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+          { id: 'cli-bwrap', via: 'cli', command: 'claude', args: ['{prompt}', '--bwrap'] },
+        ],
+      },
+    },
+    capabilities: { advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }] } },
+  };
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'advise');
+  assert.deepEqual(resolved.args, ['{prompt}', '--bwrap']);
 });
 
 // --- End-to-end: spawnWorker/executeExecutorCli/decideExecutorCli all

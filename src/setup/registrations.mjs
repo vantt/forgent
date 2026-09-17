@@ -713,13 +713,15 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   const knownExecutors = new Set([
     ...Object.keys(sharedConfig?.runner?.executors || {}),
     ...Object.keys(DEFAULT_RUNNER_CONFIG?.executors || {}),
+    // executor-id-consolidation Step 2: agy-cli/agy-herdr/codex-herdr no
+    // longer exist as separate ids (merged into claude/codex/agy's own
+    // invocations) -- 'agy' was missing from this baseline list even
+    // before consolidation.
     'claude',
-    'agy-cli',
-    'agy-herdr',
+    'agy',
     'codex',
     'pi',
     'glm',
-    'codex-herdr',
     'gitnexus',
     'herdr',
   ]);

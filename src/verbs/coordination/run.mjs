@@ -93,8 +93,14 @@ function actorPolicyFields(actorEntry, { globalExecutor, globalTier } = {}) {
   const preferExecutor = actorEntry?.executor ?? globalExecutor;
   const minTier = actorEntry?.tier ?? globalTier;
   const preferPersona = actorEntry?.persona;
+  // `preferInvocation` (executor-id-consolidation Step 2): only ever comes
+  // from the actor entry itself (schema.mjs's `invocation` field, checked
+  // there to require `executor` alongside it) -- there is no global/CLI
+  // equivalent to `globalExecutor`/`globalTier` for it.
+  const preferInvocation = actorEntry?.invocation;
   return {
     ...(preferExecutor !== undefined ? { preferExecutor } : {}),
+    ...(preferInvocation !== undefined ? { preferInvocation } : {}),
     ...(minTier !== undefined ? { minTier } : {}),
     ...(preferPersona !== undefined ? { preferPersona } : {}),
   };

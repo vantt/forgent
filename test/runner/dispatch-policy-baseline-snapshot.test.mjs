@@ -53,8 +53,18 @@ export function summarizeResourceBindings(bindings) {
 
 /**
  * Executes the real production resolver chain and returns one normalized snapshot row.
+ *
+ * `invocationId` (executor-id-consolidation Step 2, optional): pins a
+ * specific `executors.<executorId>.invocations[].id` -- required for a
+ * selector whose old separate executor id (e.g. "claude-reviewer") is now
+ * one of several invocations consolidated under a single executor id
+ * (e.g. "claude"). `label`, when given, is what the row's own `selector`
+ * field records instead of the raw `executorId` -- preserves this
+ * fixture's historic per-role row identity across the consolidation
+ * (readers of the fixture, and the "fact" tests below, still key off the
+ * pre-consolidation name) even though `executorId` alone is now ambiguous.
  */
-export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawayDir) {
+export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawayDir, { invocationId, label } = {}) {
   // 1. Resolve executor entry and overrides
   const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
 
@@ -72,12 +82,13 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
     executorId,
     fgosDir: throwawayDir,
     contentCarries: 'repo-content',
+    invocationId,
   });
 
   const normalizedArgs = resolvedCmd.args.map((arg) => (arg === '<prompt>' ? '<prompt>' : arg));
 
   return {
-    selector: executorId,
+    selector: label ?? executorId,
     workTier,
     bindingSource,
     provider: resolvedCmd.governance?.providerFamily ?? resolvedCmd.provider,
@@ -94,6 +105,49 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
 }
 
 /**
+ * The 12 canonical (label, executorId, invocationId?) triples this
+ * fixture/matrix covers. `label` is the historic, pre-consolidation name
+ * (what a reader of the fixture, or a "fact" test, still keys off) --
+ * `executorId`/`invocationId` are what actually gets resolved post
+ * executor-id-consolidation Step 2. A descriptor with no `invocationId`
+ * either predates consolidation (pi/codex-pi/glm-cli/claude's own default)
+ * or is a CAPABILITY name (fgos-coding-implement) that resolves its own
+ * invocation internally via capabilities.<name>.prefer (Step 2.2) --
+ * nothing here needs to pin one explicitly for that case.
+ */
+export const CANONICAL_EXECUTOR_DESCRIPTORS = [
+  { label: 'claude', executorId: 'claude' },
+  { label: 'claude-reviewer', executorId: 'claude', invocationId: 'cli-readonly' },
+  { label: 'claude-reviewer-herdr', executorId: 'claude', invocationId: 'herdr-readonly' },
+  { label: 'agy-cli', executorId: 'agy', invocationId: 'cli' },
+  { label: 'agy-herdr', executorId: 'agy', invocationId: 'herdr' },
+  { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
+  { label: 'codex-cli', executorId: 'codex', invocationId: 'cli-bypass' },
+  { label: 'codex-bwrap', executorId: 'codex', invocationId: 'cli-bwrap' },
+  { label: 'codex-readonly', executorId: 'codex', invocationId: 'cli-readonly' },
+  { label: 'pi', executorId: 'pi' },
+  { label: 'codex-pi', executorId: 'codex-pi' },
+  { label: 'glm-cli', executorId: 'glm-cli' },
+];
+
+function descriptorForLabel(label) {
+  const descriptor = CANONICAL_EXECUTOR_DESCRIPTORS.find((d) => d.label === label);
+  if (!descriptor) throw new Error(`no canonical descriptor for label "${label}"`);
+  return descriptor;
+}
+
+/**
+ * Same as `resolveNormalizedSnapshotRow`, but keyed by the historic
+ * `label` (looked up in `CANONICAL_EXECUTOR_DESCRIPTORS` above) instead of
+ * requiring every call site to know the post-consolidation
+ * executorId/invocationId pair itself.
+ */
+export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
+  const { executorId, invocationId } = descriptorForLabel(label);
+  return resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawayDir, { invocationId, label });
+}
+
+/**
  * Golden fixture captured from current production resolvers and .fgos/config.json.
  * Note on matrix coverage: All 36 (executorId × workTier) pairs for the 12 executors
  * in [claude, claude-reviewer, claude-reviewer-herdr, agy-cli, agy-herdr, fgos-coding-implement,
@@ -104,6 +158,9 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  * (plans/260917-executor-profile-schema-migration/plan.md Phase A):
  * genuinely dormant, self-described as never wired to any capability, zero
  * other reference anywhere in src/ or test/ before removal.
+ * executor-id-consolidation Step 2: each of these 12 canonical LABELS
+ * (not necessarily a real, distinct executor id any more -- see
+ * CANONICAL_EXECUTOR_DESCRIPTORS above) still resolves successfully.
  */
 export const BASELINE_SNAPSHOT_FIXTURE = [
   {
@@ -1080,7 +1137,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   describe('configuration environment isolation', () => {
     test('loads project config from cwd while HOME global overlay is neutralized', () => {
       assert.ok(cfg.executors, 'loaded config must contain executors');
-      assert.ok(cfg.executors['codex-bwrap'], 'loaded config must contain codex-bwrap from project config');
+      assert.ok(cfg.executors.codex, 'loaded config must contain the consolidated codex executor from project config');
+      assert.ok(cfg.executors.codex.invocations.some((inv) => inv.id === 'cli-bwrap'), 'codex must declare its cli-bwrap invocation');
       assert.ok(cfg.capabilities?.['fgos-coding-implement'], 'loaded config must contain fgos-coding-implement capability');
       assert.equal(process.env.HOME, tempHomeDir, 'process.env.HOME must match isolated temp directory');
     });
@@ -1121,7 +1179,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   describe('matrix regression snapshot assertions (36 pairs)', () => {
     for (const expected of BASELINE_SNAPSHOT_FIXTURE) {
       test(`snapshot: ${expected.selector} [${expected.workTier}] matches baseline fixture`, () => {
-        const actual = resolveNormalizedSnapshotRow(cfg, expected.selector, expected.workTier, throwawayDir);
+        const actual = resolveSnapshotRowByLabel(cfg, expected.selector, expected.workTier, throwawayDir);
         assert.deepEqual(actual, expected);
       });
     }
@@ -1130,8 +1188,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   describe('named explicit baseline facts', () => {
     // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.8-flash-high (policy tier creative)
     test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.8-flash-high (policy tier creative)', () => {
-      const agyCliHeavy = resolveNormalizedSnapshotRow(cfg, 'agy-cli', 'heavy', throwawayDir);
-      const agyHerdrHeavy = resolveNormalizedSnapshotRow(cfg, 'agy-herdr', 'heavy', throwawayDir);
+      const agyCliHeavy = resolveSnapshotRowByLabel(cfg, 'agy-cli', 'heavy', throwawayDir);
+      const agyHerdrHeavy = resolveSnapshotRowByLabel(cfg, 'agy-herdr', 'heavy', throwawayDir);
 
       assert.equal(agyCliHeavy.model, 'gemini-3.8-flash-high', 'agy-cli heavy model must be gemini-3.8-flash-high');
       assert.equal(agyHerdrHeavy.model, 'gemini-3.8-flash-high', 'agy-herdr heavy model must be gemini-3.8-flash-high');
@@ -1143,11 +1201,12 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     // Note: fgos-coding-implement is a capability id resolved via resolveExecutorAndOverrides's capability.prefer path;
     // its resolvedExecutorId will differ from 'fgos-coding-implement' itself. Assert on resolved model not executor identity.
     test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium via capability override', () => {
-      const { executorId: resolvedExecutorId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
+      const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
-      assert.equal(resolvedExecutorId, 'agy-herdr', 'resolvedExecutorId resolves to agy-herdr');
+      assert.equal(resolvedExecutorId, 'agy', 'resolvedExecutorId resolves to agy (executor-id-consolidation Step 2 -- was agy-herdr)');
+      assert.equal(resolvedInvocationId, 'herdr', 'resolvedInvocationId pins agy\'s herdr invocation');
 
-      const fgosImplementHeavy = resolveNormalizedSnapshotRow(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
+      const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
       assert.equal(fgosImplementHeavy.model, 'gemini-3.8-flash-medium', 'fgos-coding-implement heavy model must be gemini-3.8-flash-medium');
       assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
       assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
@@ -1160,7 +1219,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
 
       for (const selector of reviewerSelectors) {
         for (const tier of tiers) {
-          const row = resolveNormalizedSnapshotRow(cfg, selector, tier, throwawayDir);
+          const row = resolveSnapshotRowByLabel(cfg, selector, tier, throwawayDir);
           const effortIdx = row.args.indexOf('--effort');
           assert.notEqual(effortIdx, -1, `${selector} [${tier}] must contain '--effort' in args`);
           assert.equal(row.args[effortIdx + 1], 'high', `${selector} [${tier}] '--effort' must be followed by 'high'`);
@@ -1172,7 +1231,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     test('fact (d): readOnlyMechanism distinguishes provider-native-read-only from tool-allowlist-not-read-only-enforced', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
-        const codexReadOnly = resolveNormalizedSnapshotRow(cfg, 'codex-readonly', tier, throwawayDir);
+        const codexReadOnly = resolveSnapshotRowByLabel(cfg, 'codex-readonly', tier, throwawayDir);
         assert.equal(
           codexReadOnly.readOnlyMechanism,
           'provider-native-read-only',
@@ -1180,7 +1239,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
         );
 
         for (const toolGated of ['claude', 'claude-reviewer', 'claude-reviewer-herdr', 'glm-cli']) {
-          const row = resolveNormalizedSnapshotRow(cfg, toolGated, tier, throwawayDir);
+          const row = resolveSnapshotRowByLabel(cfg, toolGated, tier, throwawayDir);
           assert.equal(
             row.readOnlyMechanism,
             'tool-allowlist-not-read-only-enforced',
@@ -1188,7 +1247,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           );
         }
 
-        const unGated = resolveNormalizedSnapshotRow(cfg, 'agy-cli', tier, throwawayDir);
+        const unGated = resolveSnapshotRowByLabel(cfg, 'agy-cli', tier, throwawayDir);
         assert.equal(
           unGated.readOnlyMechanism,
           'none',
@@ -1201,7 +1260,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     test('fact (e): resourceBindings captures codex-bwrap CODEX_HOME binding', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
-        const bwrapRow = resolveNormalizedSnapshotRow(cfg, 'codex-bwrap', tier, throwawayDir);
+        const bwrapRow = resolveSnapshotRowByLabel(cfg, 'codex-bwrap', tier, throwawayDir);
         assert.deepEqual(
           bwrapRow.resourceBindings,
           [
@@ -1216,7 +1275,7 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           `codex-bwrap [${tier}] must declare resourceBindings with private-home CODEX_HOME env target`
         );
 
-        const cliRow = resolveNormalizedSnapshotRow(cfg, 'codex-cli', tier, throwawayDir);
+        const cliRow = resolveSnapshotRowByLabel(cfg, 'codex-cli', tier, throwawayDir);
         assert.deepEqual(
           cliRow.resourceBindings,
           [],

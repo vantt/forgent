@@ -24,7 +24,29 @@ import assert from 'node:assert/strict';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorAndOverrides, modelForTier } from '../../src/runner/dispatch/resolve.mjs';
 import { buildPlacementPolicyCandidate, resolveVerifiedPlacementModel } from '../../src/runner/dispatch/placement-policy.mjs';
-import { BASELINE_SNAPSHOT_FIXTURE } from './dispatch-policy-baseline-snapshot.test.mjs';
+import { BASELINE_SNAPSHOT_FIXTURE, CANONICAL_EXECUTOR_DESCRIPTORS } from './dispatch-policy-baseline-snapshot.test.mjs';
+
+// executor-id-consolidation Step 2: PlacementPolicy's own scope is
+// provider/model/executor ranking only (never invocation-level, per this
+// file's own header comment) -- so every BASELINE_SNAPSHOT_FIXTURE row's
+// `selector` (a historic LABEL, e.g. "claude-reviewer", possibly no longer
+// a real registered id) is mapped back to its real `executorId` before
+// being handed to any PlacementPolicy function here. Model/provider
+// resolution depends only on executor-level fields (providerModel/
+// rigorOverrides), never on which invocation was pinned, so this
+// substitution changes nothing PlacementPolicy actually computes.
+function realExecutorIdForLabel(label) {
+  const descriptor = CANONICAL_EXECUTOR_DESCRIPTORS.find((d) => d.label === label);
+  return descriptor ? descriptor.executorId : label;
+}
+
+// The "invocation class" test (visible/headless/bwrap) below DOES care
+// which invocation, unlike model/provider -- returns the descriptor's own
+// invocationId (possibly undefined, meaning "no pin, legacy default").
+function realInvocationIdForLabel(label) {
+  const descriptor = CANONICAL_EXECUTOR_DESCRIPTORS.find((d) => d.label === label);
+  return descriptor?.invocationId;
+}
 
 let cfg;
 
@@ -39,7 +61,7 @@ test('Phase 07 matrix coverage: every one of Phase 00\'s 12 canonical executors 
   for (const row of BASELINE_SNAPSHOT_FIXTURE) {
     let candidate;
     try {
-      candidate = buildPlacementPolicyCandidate({ cfg, capabilityId: row.selector, workTier: row.workTier });
+      candidate = buildPlacementPolicyCandidate({ cfg, capabilityId: realExecutorIdForLabel(row.selector), workTier: row.workTier });
     } catch (err) {
       divergences.push({ selector: row.selector, workTier: row.workTier, reason: `threw: ${err.message}` });
       continue;
@@ -65,7 +87,8 @@ test('Phase 07 PRODUCTION BINDER proof: resolveVerifiedPlacementModel (the exact
     // Reproduce spawnWorker's own real legacyModel computation exactly
     // (resolve.mjs's resolveExecutorAndOverrides + modelForTier), never a
     // separately-authored approximation of it.
-    const { executor, overrides } = resolveExecutorAndOverrides(cfg, row.selector);
+    const realExecutorId = realExecutorIdForLabel(row.selector);
+    const { executor, overrides } = resolveExecutorAndOverrides(cfg, realExecutorId);
     const legacyModel = modelForTier(cfg, row.workTier, {
       providerModel: overrides?.providerModel ?? executor?.providerModel,
       rigorOverrides: overrides?.rigorOverrides ?? executor?.rigorOverrides,
@@ -75,7 +98,7 @@ test('Phase 07 PRODUCTION BINDER proof: resolveVerifiedPlacementModel (the exact
     // a formula that has ALREADY drifted from truth).
     assert.equal(legacyModel, row.model, `legacy modelForTier itself diverged from the golden fixture for ${row.selector}/${row.workTier} -- fix the fixture assumption before trusting this proof`);
 
-    const result = resolveVerifiedPlacementModel({ cfg, executorId: row.selector, workTier: row.workTier, legacyModel });
+    const result = resolveVerifiedPlacementModel({ cfg, executorId: realExecutorId, workTier: row.workTier, legacyModel });
     results.push({ selector: row.selector, workTier: row.workTier, ...result });
   }
 
@@ -104,15 +127,15 @@ test('Phase 07 PRODUCTION BINDER proof: a genuine divergence (synthetic) falls b
     ...cfg,
     executors: {
       ...cfg.executors,
-      'agy-cli': { ...cfg.executors['agy-cli'], rigorOverrides: { light: 'lightweight', standard: 'standard', heavy: 'analytical' } },
+      agy: { ...cfg.executors.agy, rigorOverrides: { light: 'lightweight', standard: 'standard', heavy: 'analytical' } },
     },
   };
-  // agy-cli heavy now resolves to a DIFFERENT policy tier than the config
+  // agy heavy now resolves to a DIFFERENT policy tier than the config
   // resolveVerifiedPlacementModel's own internal buildPlacementPolicyCandidate
   // call sees vs. whatever the caller's legacyModel actually was computed
   // against -- simulate the caller having computed against the OLD config.
   const staleLegacyModel = 'gemini-3.8-flash-high'; // the OLD (creative-tier) value
-  const result = resolveVerifiedPlacementModel({ cfg: cfgWithMismatch, executorId: 'agy-cli', workTier: 'heavy', legacyModel: staleLegacyModel });
+  const result = resolveVerifiedPlacementModel({ cfg: cfgWithMismatch, executorId: 'agy', workTier: 'heavy', legacyModel: staleLegacyModel });
   assert.equal(result.model, staleLegacyModel, 'a real divergence must fall back to the caller-supplied legacy value, never the unverified PlacementPolicy one');
   assert.equal(result.source, 'legacy');
   assert.ok(result.divergence);
@@ -123,7 +146,7 @@ test('Phase 07 PRODUCTION BINDER proof: a genuine divergence (synthetic) falls b
 test('Phase 07 matrix coverage: invocation class (visible vs headless) agrees with the legacy adapter for every pair, confirming confinement/visibility is unaffected by this shadow module', () => {
   const mismatches = [];
   for (const row of BASELINE_SNAPSHOT_FIXTURE) {
-    const candidate = buildPlacementPolicyCandidate({ cfg, capabilityId: row.selector, workTier: row.workTier });
+    const candidate = buildPlacementPolicyCandidate({ cfg, capabilityId: realExecutorIdForLabel(row.selector), workTier: row.workTier, invocationId: realInvocationIdForLabel(row.selector) });
     if (!candidate) continue;
     const legacyVisible = row.adapter === 'herdr-spawn';
     const placementVisible = candidate.invocation === 'visible';

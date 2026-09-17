@@ -79,24 +79,17 @@ const REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR = Object.freeze({
   critical: 'max',
 });
 
-// Phase 03 compatibility alias seam (design.md §5.1, phase-03-effort-and-alias-seam.md).
-// A legacy executor id expands to a patch APPLIED AT THE SAME SCOPE the id
-// itself was supplied from, recorded with `viaAlias` -- never a new `alias`
-// precedence scope of its own. Alias patches never carry permission
-// contracts (design invariant 3): `codex-readonly`'s real distinguishing
-// behavior IS a permission/confinement flag (`-s read-only`,
-// transport.mjs), so its patch is deliberately empty here -- it is
-// recognized as a legacy id (for explain/deprecation tooling) without this
-// resolver inventing a permission-carrying compatibility field for it.
-// `claude-reviewer`/`claude-reviewer-herdr` facts (persona default,
-// reasoningEffort) are read directly off the Phase 00 baseline snapshot
-// fixture (`--effort high` unconditionally at every work tier; herdr
-// variant is the same executor via the visible/herdr-spawn invocation).
-export const LEGACY_EXECUTOR_ALIASES = Object.freeze({
-  'claude-reviewer': Object.freeze({ preferPersona: 'code-reviewer', reasoningEffort: 'high' }),
-  'claude-reviewer-herdr': Object.freeze({ preferPersona: 'code-reviewer', reasoningEffort: 'high', visibility: 'visible' }),
-  'codex-readonly': Object.freeze({}),
-});
+// Phase 03's compatibility alias seam (design.md §5.1) is retired
+// (executor-id-consolidation Step 2): every id it keyed off
+// (claude-reviewer/claude-reviewer-herdr/codex-readonly) no longer exists
+// as a registered executor at all, so `primaryExecutor` can never equal
+// one -- the seam had already become permanently unreachable dead code
+// (step 3 below's own registration throw fires first, always). The same
+// personas/reasoningEffort/visibility it used to compatibility-patch are
+// now expressed directly via `actors[].invocation` (a specific
+// `claude`/`codex` invocation already carries `--effort high`/confinement
+// in its own declared args) or capabilities.<name>.prefer's invocation pin
+// -- no resolver-side patching needed any more.
 
 /**
  * Return the stronger of two tiers based on rigor hierarchy.
@@ -191,13 +184,7 @@ export function resolveAssignmentDispatchPolicy({
   }
 
   // 1a. Executor preference (hoisted ahead of quality/persona resolution,
-  // Phase 03): alias expansion needs to know `primaryExecutor` before
-  // quality's reasoningEffort and persona defaults, so a legacy alias id
-  // (e.g. `claude-reviewer`) can supply compatibility defaults the same way
-  // the pre-existing role-based persona default already does. Registry
-  // validation/governance stay in step 3 below, unchanged -- only this
-  // precedence computation moved earlier, byte-identical to what step 3
-  // computed in place before this phase.
+  // Phase 03).
   const primaryExecutor =
     cliOverride.preferExecutor ??
     opPolicy.preferExecutor ??
@@ -208,8 +195,6 @@ export function resolveAssignmentDispatchPolicy({
     : opPolicy.preferExecutor
       ? { scope: 'opPolicy', id: opId }
       : { scope: 'default' };
-  const aliasPatch = LEGACY_EXECUTOR_ALIASES[primaryExecutor];
-  const viaAlias = aliasPatch ? primaryExecutor : null;
 
   // 1b. Quality bridge (Phase 04, executor-policy-dispatch-seams).
   //
@@ -292,9 +277,6 @@ export function resolveAssignmentDispatchPolicy({
     }
     reasoningEffort = explicitReasoningEffort;
     reasoningEffortSource = cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
-  } else if (aliasPatch?.reasoningEffort) {
-    reasoningEffort = aliasPatch.reasoningEffort;
-    reasoningEffortSource = { ...executorSource, viaAlias };
   } else {
     reasoningEffort = REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR[minRigor];
     reasoningEffortSource = { scope: 'derived', id: `quality.minRigor.${minRigor}` };
@@ -304,15 +286,12 @@ export function resolveAssignmentDispatchPolicy({
   const resolvedPersona =
     cliOverride.preferPersona ??
     opPolicy.preferPersona ??
-    aliasPatch?.preferPersona ??
     (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
   const personaSource = cliOverride.preferPersona
     ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
     : opPolicy.preferPersona
       ? { scope: 'opPolicy', id: opId }
-      : aliasPatch?.preferPersona
-        ? { ...executorSource, viaAlias }
-        : resolvedPersona
+      : resolvedPersona
           ? { scope: 'default', id: assignment.role }
           // Phase 00 R7/F4: still `{ scope: 'default' }` (no id) rather than
           // `undefined` when no persona resolves at all -- provenance.persona.source
@@ -476,14 +455,12 @@ export function resolveAssignmentDispatchPolicy({
   }
 
   // 5. Visibility Resolution
-  const resolvedVisibility = cliOverride.visibility ?? opPolicy.visibility ?? aliasPatch?.visibility ?? 'headless';
+  const resolvedVisibility = cliOverride.visibility ?? opPolicy.visibility ?? 'headless';
   const visibilitySource = cliOverride.visibility
     ? (cliOverride.policyProvenance?.visibility ?? { scope: 'cliOverride' })
     : opPolicy.visibility
       ? { scope: 'opPolicy', id: opId }
-      : aliasPatch?.visibility
-        ? { ...executorSource, viaAlias }
-        : { scope: 'default' };
+      : { scope: 'default' };
 
   // 5b. RepeatMode Resolution (Step 09/P03 fallback-and-effect-boundary
   // contract): declared explicitly on the operation/protocol YAML
@@ -564,18 +541,6 @@ export function resolveAssignmentDispatchPolicy({
       quality,
       lookupPolicyTier: Object.freeze({ value: lookupPolicyTier, source: Object.freeze(lookupPolicyTierSource) }),
       reasoningEffort: Object.freeze({ value: reasoningEffort, source: Object.freeze(reasoningEffortSource) }),
-      // Phase 03: one evidence entry naming which legacy executor id (if
-      // any) expanded a compatibility patch, at which scope, and which
-      // fields it actually supplied -- design.md §5.1's
-      // `{scope, viaAlias}` shape, plus the patch's own field names so a
-      // stranger does not have to cross-reference LEGACY_EXECUTOR_ALIASES
-      // to know what changed. `null` value when `primaryExecutor` is not a
-      // registered alias (every pre-Phase-03 caller).
-      executorAlias: Object.freeze({
-        value: viaAlias,
-        source: viaAlias ? Object.freeze({ ...executorSource, viaAlias }) : Object.freeze({ scope: 'default' }),
-        patchFields: viaAlias ? Object.freeze(Object.keys(aliasPatch)) : Object.freeze([]),
-      }),
       persona: Object.freeze({ value: resolvedPersona, source: personaSource ? Object.freeze(personaSource) : undefined }),
       visibility: Object.freeze({ value: resolvedVisibility, source: Object.freeze(visibilitySource) }),
       repeatMode: Object.freeze({ value: resolvedRepeatMode ?? null, source: Object.freeze(repeatModeSource) }),

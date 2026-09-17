@@ -48,11 +48,21 @@ function policyTierForWorkTier(workTier, rigorOverrides) {
   return rigorOverrides?.[tier] ?? DEFAULT_TIER_TO_POLICY[tier] ?? (MODEL_POLICY_TIERS.includes(tier) ? tier : undefined);
 }
 
-function candidateInvocation(executorEntry) {
-  const cliInvocation = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations.find((inv) => inv.via === 'cli') : undefined;
+// executor-id-consolidation Step 2: mirrors resolve.mjs's own Gate B2 fix
+// exactly -- an executor can declare several via:"cli" invocations that
+// differ in adapter/confinement (e.g. claude's own herdr-readonly vs cli),
+// so "the first via:cli entry" is no longer a safe stand-in for "the one
+// actually being dispatched". `invocationId`, when given, selects by name;
+// omitted keeps the legacy "first via:cli" default (byte-identical for
+// every caller that predates this fix).
+function candidateInvocation(executorEntry, invocationId) {
+  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : undefined;
+  const cliInvocation = invocationId
+    ? invocations?.find((inv) => inv.id === invocationId && inv.via === 'cli')
+    : invocations?.find((inv) => inv.via === 'cli');
   const adapter = executorEntry?.adapter ?? cliInvocation?.adapter;
   if (adapter === 'herdr-spawn') return 'visible';
-  if (executorEntry?.confinement?.backend === 'bwrap') return 'bwrap';
+  if ((cliInvocation?.confinement ?? executorEntry?.confinement)?.backend === 'bwrap') return 'bwrap';
   return 'headless';
 }
 
@@ -67,12 +77,20 @@ function candidateInvocation(executorEntry) {
  * @param {object} cfg
  * @param {string} capabilityId capability name or bare executor id
  * @param {string} [workTier] light|standard|heavy (D9's work-size vocabulary)
+ * @param {string} [invocationId] executor-id-consolidation Step 2: pins a
+ *   specific `invocations[].id` for the `invocation` field's own
+ *   visible/headless/bwrap classification (`candidateInvocation`) --
+ *   defaults to `resolved.invocationId` (already auto-derived when
+ *   `capabilityId` resolved via `capabilities.<name>.prefer`), which
+ *   itself defaults to `undefined` (legacy "first via:cli" pick) when
+ *   resolved via a literal executor id.
  * @returns {{executorId: string, provider: string, model: string, lookupPolicyTier: string, invocation: string, reasonCodes: string[]}|null}
  */
-export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier }) {
+export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier, invocationId }) {
   const resolved = resolveExecutorAndOverrides(cfg, capabilityId);
   if (!resolved.configured) return null;
   const { executorId, executor, overrides, bindingSource } = resolved;
+  const effectiveInvocationId = invocationId ?? resolved.invocationId;
 
   // `resolveExecutorAndOverrides` only ever populates `overrides` for a
   // CAPABILITY-prefer binding (`capabilities.<name>.overrides`) -- a bare
@@ -111,7 +129,7 @@ export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier }) {
     provider,
     model,
     lookupPolicyTier,
-    invocation: candidateInvocation(executor),
+    invocation: candidateInvocation(executor, effectiveInvocationId),
     reasonCodes: Object.freeze([
       bindingSource === 'capability.prefer' ? 'capabilities.prefer' : bindingSource === 'capability.for' ? 'capabilities.for' : 'executor-id',
       ...(overrides?.rigorOverrides ? ['calibration.rigorOverrides'] : executor?.rigorOverrides ? ['calibration.executor.rigorOverrides'] : []),
@@ -308,9 +326,26 @@ export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legac
 // declaration IS that proof, not merely self-verified selection over an
 // opaque pool someone else handed it.
 export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
+  // executor-id-consolidation Step 2: a pool entry may be `{executor,
+  // invocation?}` (config.mjs's `normalizePreferCandidates` shape) as well
+  // as a bare string -- this function's own OUTPUT stays exactly the array
+  // of executor-id strings it always returned (a tested, public contract:
+  // `selectPlacementPolicyRedirectExecutor`'s hash-based DISTRIBUTION
+  // selection keys off those strings, unchanged). An object entry's own
+  // `invocation` pin, when present, is recovered separately by
+  // `readOnlyRedirectInvocationFor` below, once the executor id has
+  // already been chosen -- never folded into this array's own shape.
   const normalize = (value) => {
     if (typeof value === 'string' && value.trim()) return [value.trim()];
-    if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+    if (Array.isArray(value)) {
+      return value
+        .map((entry) => {
+          if (typeof entry === 'string') return entry.trim();
+          if (entry && typeof entry === 'object' && !Array.isArray(entry) && typeof entry.executor === 'string') return entry.executor.trim();
+          return undefined;
+        })
+        .filter((id) => typeof id === 'string' && id);
+    }
     return [];
   };
   const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
@@ -324,6 +359,29 @@ export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
     return normalize(configured.operations?.[operation] ?? configured.default);
   }
   return normalize(configured);
+}
+
+/**
+ * executor-id-consolidation Step 2: the invocation pin (if any) declared
+ * for `executorId` within the SAME raw `readOnlyRedirects` pool
+ * `readOnlyRedirectPool` above already read for this exact
+ * (sourceExecutorId, operation) pair -- a bare-string pool entry, or no
+ * matching entry at all, both mean "no pin" (`undefined`, Gate B2's own
+ * default applies). Deliberately a SEPARATE lookup rather than folded into
+ * `readOnlyRedirectPool`'s own return value: that array's shape (string[])
+ * is a tested, public contract this function does not disturb.
+ */
+export function readOnlyRedirectInvocationFor(cfg, sourceExecutorId, operation, executorId) {
+  const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
+  const raw = configured && typeof configured === 'object' && !Array.isArray(configured)
+    ? (configured.operations?.[operation] ?? configured.default)
+    : configured;
+  const rawArray = Array.isArray(raw) ? raw : (raw !== undefined ? [raw] : []);
+  const match = rawArray.find((entry) => {
+    if (typeof entry === 'string') return entry.trim() === executorId;
+    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.executor === executorId;
+  });
+  return match && typeof match === 'object' ? match.invocation : undefined;
 }
 
 /**

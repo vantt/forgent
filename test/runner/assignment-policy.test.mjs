@@ -685,7 +685,6 @@ import {
   MIN_RIGOR_VALUES,
   QUALITY_MODE_VALUES,
   REASONING_EFFORT_VALUES,
-  LEGACY_EXECUTOR_ALIASES,
 } from '../../src/runner/dispatch/assignment-policy.mjs';
 
 test('Phase 04: legacy tier bridge maps every MODEL_POLICY_TIERS value to its canonical quality', () => {
@@ -900,106 +899,16 @@ test('Phase 03: explicit reasoningEffort is most-specific-wins, never raise-only
   );
 });
 
-test('Phase 03: preferExecutor "claude-reviewer" at CLI scope expands the alias patch at CLI scope with viaAlias', () => {
-  // A raw (non-declared-operation) assignment on purpose: `validate-plan`'s
-  // own taskSpec already stamps a default `policy.preferPersona:
-  // "code-reviewer"` (opPolicy), which correctly outranks the alias
-  // (opPolicy is more specific than a compatibility bridge default) -- this
-  // test isolates the alias's OWN contribution with no such opPolicy
-  // default in the way, same raw-object pattern other tests in this file
-  // already use for inline assignments.
-  const assignment = {
-    assignmentId: 'asgn_alias_test_001',
-    role: 'implementer',
-    stage: 'executing',
-    operation: 'ad-hoc',
-    objective: 'test',
-    policy: {},
-    skills: [],
-  };
+// Phase 03's compatibility alias seam (LEGACY_EXECUTOR_ALIASES,
+// claude-reviewer/claude-reviewer-herdr/codex-readonly expanding a persona/
+// reasoningEffort/visibility patch) is retired (executor-id-consolidation
+// Step 2): those ids no longer exist as registered executors at all, so
+// the seam had already become permanently unreachable dead code -- removed
+// along with its own tests above. The same effects are now expressed
+// directly via a specific invocation's own declared args (e.g. claude's
+// cli-readonly already carries --effort high) or actors[].invocation.
 
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    cliOverride: { preferExecutor: 'claude-reviewer' },
-  });
-
-  assert.equal(effective.persona, 'code-reviewer');
-  assert.equal(effective.reasoningEffort, 'high');
-  assert.deepEqual(effective.provenance.executorAlias.source, { scope: 'cliOverride', viaAlias: 'claude-reviewer' });
-  assert.equal(effective.provenance.executorAlias.value, 'claude-reviewer');
-  assert.deepEqual([...effective.provenance.executorAlias.patchFields].sort(), ['preferPersona', 'reasoningEffort']);
-  assert.deepEqual(effective.provenance.persona.source, { scope: 'cliOverride', viaAlias: 'claude-reviewer' });
-  assert.deepEqual(effective.provenance.reasoningEffort.source, { scope: 'cliOverride', viaAlias: 'claude-reviewer' });
-});
-
-test('Phase 03: for a declared operation whose own opPolicy already sets preferPersona, that opPolicy value still wins over the alias -- alias is not a new precedence scope', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    cliOverride: { preferExecutor: 'claude-reviewer' },
-  });
-
-  assert.equal(effective.persona, 'code-reviewer');
-  assert.deepEqual(effective.provenance.persona.source, { scope: 'opPolicy', id: 'validate-plan' });
-  // reasoningEffort has no such opPolicy default, so the alias DOES supply it here.
-  assert.equal(effective.reasoningEffort, 'high');
-  assert.deepEqual(effective.provenance.reasoningEffort.source, { scope: 'cliOverride', viaAlias: 'claude-reviewer' });
-});
-
-test('Phase 03: preferExecutor "claude-reviewer-herdr" at actor/opPolicy scope expands persona + reasoningEffort + visibility with viaAlias at that same scope', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'claude-reviewer-herdr' },
-  });
-
-  const effective = resolveAssignmentDispatchPolicy({ assignment });
-
-  assert.equal(effective.persona, 'code-reviewer');
-  assert.equal(effective.reasoningEffort, 'high');
-  assert.equal(effective.visibility, 'visible');
-  assert.deepEqual(effective.provenance.executorAlias.source, { scope: 'opPolicy', id: 'validate-plan', viaAlias: 'claude-reviewer-herdr' });
-});
-
-test('Phase 03: an explicit same-scope value always wins over the alias patch (alias never adds a new precedence scope)', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    cliOverride: { preferExecutor: 'claude-reviewer', preferPersona: 'custom-reviewer', reasoningEffort: 'low' },
-  });
-
-  assert.equal(effective.persona, 'custom-reviewer');
-  assert.equal(effective.reasoningEffort, 'low');
-  assert.deepEqual(effective.provenance.persona.source, { scope: 'cliOverride' });
-});
-
-test('Phase 03: "codex-readonly" is recognized as a legacy alias with an empty patch -- it never carries a permission contract', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-
-  const effective = resolveAssignmentDispatchPolicy({
-    assignment,
-    cliOverride: { preferExecutor: 'codex-readonly' },
-  });
-
-  assert.equal(effective.provenance.executorAlias.value, 'codex-readonly');
-  assert.deepEqual(effective.provenance.executorAlias.patchFields, []);
-  // No permission/visibility field was smuggled in through the alias.
-  assert.equal(effective.visibility, 'headless');
-});
-
-test('Phase 03: an unaliased executor leaves executorAlias.value null and does not change persona/reasoningEffort defaults', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-  const effective = resolveAssignmentDispatchPolicy({ assignment });
-
-  assert.equal(effective.provenance.executorAlias.value, null);
-  assert.deepEqual(effective.provenance.executorAlias.source, { scope: 'default' });
-  assert.deepEqual(effective.provenance.executorAlias.patchFields, []);
-});
-
-test('Phase 03: LEGACY_EXECUTOR_ALIASES/REASONING_EFFORT_VALUES are the exact declared vocabularies', () => {
+test('Phase 03: REASONING_EFFORT_VALUES is the exact declared vocabulary', () => {
   assert.deepEqual(REASONING_EFFORT_VALUES, ['low', 'medium', 'high', 'max']);
-  assert.deepEqual(Object.keys(LEGACY_EXECUTOR_ALIASES).sort(), ['claude-reviewer', 'claude-reviewer-herdr', 'codex-readonly']);
 });
 

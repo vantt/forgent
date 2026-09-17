@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
-import { readOnlyRedirectPool } from '../../src/runner/dispatch/placement-policy.mjs';
+import { readOnlyRedirectPool, readOnlyRedirectInvocationFor } from '../../src/runner/dispatch/placement-policy.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
 // is allowed to declare about itself, and the one combination that must be refused
@@ -397,17 +397,91 @@ test('Phase D: placementPolicy.readOnlyRedirects refuses a malformed pool -- emp
   );
 });
 
-test('Phase D: the real repository config declares placementPolicy.readOnlyRedirects.claude, no top-level readOnlyExecutorRedirects survives and nothing lives on executors.claude, and it resolves end to end via PlacementPolicy', () => {
+test('Phase D: the real repository config declares placementPolicy.readOnlyRedirects.claude, no top-level readOnlyExecutorRedirects survives and nothing lives on executors.claude, and it resolves end to end via PlacementPolicy (executor-id-consolidation Step 2: pool entries now pin an invocation, since "codex-bwrap" no longer exists as a separate executor id)', () => {
   const cfg = loadRunnerConfigFromDir(process.cwd());
   assert.equal(cfg.readOnlyExecutorRedirects, undefined, 'the retired top-level field must not exist in the live repository config');
   assert.equal(cfg.executors.claude.readOnlyRedirect, undefined, 'the field must not have moved back onto the executor entry');
+  const codexBwrapPin = { executor: 'codex', invocation: 'cli-bwrap' };
   assert.deepEqual(cfg.placementPolicy.readOnlyRedirects.claude, {
-    default: ['codex-bwrap'],
+    default: [codexBwrapPin],
     operations: {
-      'review-candidate': ['codex-bwrap'],
-      'red-team-candidate': ['codex-bwrap'],
+      'review-candidate': [codexBwrapPin],
+      'red-team-candidate': [codexBwrapPin],
     },
   });
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['codex-bwrap']);
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['codex-bwrap'], 'falls back to "default" for an operation with no specific override');
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['codex']);
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['codex'], 'falls back to "default" for an operation with no specific override');
+  assert.equal(readOnlyRedirectInvocationFor(cfg, 'claude', 'review-candidate', 'codex'), 'cli-bwrap');
+});
+
+// executor-id-consolidation Step 2.1: an invocation can name itself with
+// "id" so a caller can select one specific `via:"cli"` entry among several,
+// instead of always getting Gate B2's legacy "first cli match".
+
+function multiInvocationConfig(invocations) {
+  return loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    executors: {
+      multi: { kind: 'agent', invocations },
+    },
+  });
+}
+
+test('Step 2.1: an invocation "id" must be a non-empty string when present', () => {
+  assert.throws(
+    () => multiInvocationConfig([{ id: '', via: 'cli', command: 'claude', args: ['{prompt}'] }]),
+    (err) => err instanceof RunnerConfigError && /"id" must be a non-empty string/.test(err.message),
+  );
+  assert.throws(
+    () => multiInvocationConfig([{ id: 42, via: 'cli', command: 'claude', args: ['{prompt}'] }]),
+    (err) => err instanceof RunnerConfigError && /"id" must be a non-empty string/.test(err.message),
+  );
+});
+
+test('Step 2.1: two invocations on the same executor cannot declare the same "id"', () => {
+  assert.throws(
+    () => multiInvocationConfig([
+      { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+      { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+    ]),
+    (err) => err instanceof RunnerConfigError && /"id": "cli" more than once/.test(err.message),
+  );
+});
+
+test('Step 2.1: invocations without an "id" still load fine (id is optional)', () => {
+  const cfg = multiInvocationConfig([
+    { via: 'cli', command: 'claude', args: ['{prompt}'] },
+    { via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  assert.equal(cfg.executors.multi.invocations.length, 2);
+});
+
+test('Step 2.1: resolveExecutorConfig defaults to the first "via:cli" invocation when no invocationId is passed -- byte-identical to before this field existed', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+    { id: 'cli-readonly', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'multi');
+  assert.deepEqual(resolved.args, ['{prompt}', '--full']);
+});
+
+test('Step 2.1: resolveExecutorConfig selects the named invocation when invocationId is passed', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+    { id: 'cli-readonly', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'multi', undefined, undefined, undefined, 'cli-readonly');
+  assert.deepEqual(resolved.args, ['{prompt}', '--readonly']);
+});
+
+test('Step 2.1: resolveExecutorConfig throws by name when invocationId names an invocation that does not exist', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}'] },
+  ]);
+  assert.throws(
+    () => resolveExecutorConfig(cfg, 'standard', 'multi', undefined, undefined, undefined, 'cli-bwrap'),
+    (err) => err instanceof RunnerConfigError && /no "invocations" entry with "id": "cli-bwrap"/.test(err.message),
+  );
 });

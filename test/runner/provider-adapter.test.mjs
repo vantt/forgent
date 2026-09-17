@@ -34,6 +34,8 @@ import {
 import {
   BASELINE_SNAPSHOT_FIXTURE,
   resolveNormalizedSnapshotRow,
+  resolveSnapshotRowByLabel,
+  CANONICAL_EXECUTOR_DESCRIPTORS,
 } from './dispatch-policy-baseline-snapshot.test.mjs';
 
 /**
@@ -192,7 +194,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('claude-reviewer: applies effort high and readOnly via allowedTools', () => {
-        const template = cfg.executors['claude-reviewer'].invocations[0].args;
+        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'cli-readonly').args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -231,7 +233,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('claude-bwrap: enforced-by-sandbox via bwrap confinement', () => {
-        const template = cfg.executors['claude-bwrap'].invocations[0].args;
+        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -247,7 +249,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('Codex CLI family', () => {
       test('codex-cli: detects dangerous bypass flag and model', () => {
-        const template = cfg.executors['codex-cli'].invocations[0].args;
+        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-bypass').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -264,7 +266,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-readonly: detects -s read-only and sandbox enforcement', () => {
-        const template = cfg.executors['codex-readonly'].invocations[0].args;
+        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-readonly').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -280,7 +282,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-bwrap: detects -s danger-full-access, --skip-git-repo-check, and bwrap sandbox', () => {
-        const template = cfg.executors['codex-bwrap'].invocations[0].args;
+        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -316,7 +318,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('AGY/Gemini CLI family', () => {
       test('agy-cli: detects --mode and --model, excludes timeout/project mechanics', () => {
-        const template = cfg.executors['agy-cli'].invocations[0].args;
+        const template = cfg.executors.agy.invocations.find((inv) => inv.id === 'cli').args;
         const res = renderProviderInvocation({
           providerFamily: 'gemini',
           command: 'agy',
@@ -429,27 +431,13 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
   });
 
   describe('shadow-vs-legacy equivalence matrix (12 executors × 3 tiers = 36 pairs)', () => {
-    const expectedExecutors = [
-      'claude',
-      'claude-reviewer',
-      'claude-reviewer-herdr',
-      'agy-cli',
-      'agy-herdr',
-      'fgos-coding-implement',
-      'codex-cli',
-      'codex-bwrap',
-      'codex-readonly',
-      'pi',
-      'codex-pi',
-      'glm-cli',
-    ];
     const tiers = ['light', 'standard', 'heavy'];
 
-    for (const executorId of expectedExecutors) {
+    for (const { label, executorId, invocationId } of CANONICAL_EXECUTOR_DESCRIPTORS) {
       for (const tier of tiers) {
-        test(`equivalence: ${executorId} [${tier}] shadow argv matches legacy argv`, () => {
+        test(`equivalence: ${label} [${tier}] shadow argv matches legacy argv`, () => {
           // 1. Resolve via legacy production resolver chain (same as Phase 00 harness)
-          const legacyRow = resolveNormalizedSnapshotRow(cfg, executorId, tier, throwawayDir);
+          const legacyRow = resolveSnapshotRowByLabel(cfg, label, tier, throwawayDir);
 
           // 2. Resolve executor entry and overrides to supply canonical inputs to shadow adapter
           const { executorId: resolvedId, executor, overrides } = resolveExecutorAndOverrides(cfg, executorId);
@@ -460,6 +448,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
             executorId,
             fgosDir: throwawayDir,
             contentCarries: 'repo-content',
+            invocationId,
           });
 
           // 3. Render via shadow ProviderAdapter
@@ -485,7 +474,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           assert.equal(
             shadow.command,
             legacyRow.command,
-            `${executorId} [${tier}] command must match legacy`
+            `${label} [${tier}] command must match legacy`
           );
 
           // 5. Assert argv equivalence:
@@ -494,7 +483,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           assert.deepEqual(
             shadow.args,
             legacyRow.args,
-            `${executorId} [${tier}] argv must match legacy element-for-element`
+            `${label} [${tier}] argv must match legacy element-for-element`
           );
 
           // 6. Assert normalized argv equivalence (order-insensitive flag comparison):
@@ -502,7 +491,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           assert.deepEqual(
             normalizeArgv(shadow.args),
             normalizeArgv(legacyRow.args),
-            `${executorId} [${tier}] normalized argv must be identical`
+            `${label} [${tier}] normalized argv must be identical`
           );
 
           // 7. Assert model is applied
@@ -510,10 +499,10 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
           // 8. Assert policyShapedFlags are captured
           assert.ok(Array.isArray(shadow.policyShapedFlags));
-          assert.ok(shadow.policyShapedFlags.length > 0, `${executorId} [${tier}] must have policyShapedFlags`);
+          assert.ok(shadow.policyShapedFlags.length > 0, `${label} [${tier}] must have policyShapedFlags`);
           assert.ok(
             shadow.policyShapedFlags.includes('--model'),
-            `${executorId} [${tier}] policyShapedFlags must include --model`
+            `${label} [${tier}] policyShapedFlags must include --model`
           );
         });
       }

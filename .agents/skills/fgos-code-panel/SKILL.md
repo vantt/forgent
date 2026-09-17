@@ -450,18 +450,27 @@ both limits are stated, not silently assumed away.
 
 ## Default actor roster
 
-Executor/tier/effort mapping already decided for this product line
-(doer/fixer -> `agy-cli`, reviewer -> `claude-reviewer`, red-team ->
-`codex-cli`), personas tuned for reading/writing/attacking real code.
-`claude-reviewer` resolves to Claude Opus at `analytical` tier and passes
-`--effort high`: high is the quality-first default for code review; reserve
-`xhigh`/`max` for a deliberately exceptional, long-running audit:
+Executor/invocation/tier/effort mapping already decided for this product
+line (doer/fixer -> `agy`'s `cli` invocation, reviewer -> `claude`'s
+`cli-readonly` invocation, red-team -> `codex`'s `cli-bypass` invocation),
+personas tuned for reading/writing/attacking real code. `claude`'s
+`cli-readonly` invocation resolves to Claude Opus at `analytical` tier and
+passes `--effort high`: high is the quality-first default for code review;
+reserve `xhigh`/`max` for a deliberately exceptional, long-running audit.
+
+`executor-id-consolidation` retired the former separate
+`agy-cli`/`agy-herdr`/`claude-reviewer`/`claude-reviewer-herdr`/
+`codex-cli`/`codex-herdr` ids -- what used to be a distinct executor id per
+role is now one `invocation` on a shared `claude`/`codex`/`agy` executor.
+`invocation` (`actors[].invocation`, alongside `executor`) names which one;
+omitting it (as `doer`/`fixer` do below, since `agy`'s own default
+invocation IS its `cli` one) falls back to the executor's own default:
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-  { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
-  { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+  { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
+  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
+  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
 ]
 ```
 
@@ -469,9 +478,9 @@ Fix-round roster:
 
 ```json
 "actors": [
-  { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "surgical-fixer" },
-  { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-rechecker" },
-  { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-code-attacker" }
+  { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer" },
+  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-rechecker" },
+  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "relentless-code-attacker" }
 ]
 ```
 
@@ -481,14 +490,14 @@ diff/test/sha256 report, red-team `xxd` check -- all three settled):
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy-herdr", "tier": "standard", "persona": "focused-code-implementer" },
-  { "id": "reviewer", "executor": "claude-reviewer-herdr", "tier": "analytical", "persona": "code-quality-reviewer" },
-  { "id": "red-team", "executor": "codex-herdr", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+  { "id": "doer", "executor": "agy", "invocation": "herdr", "tier": "standard", "persona": "focused-code-implementer" },
+  { "id": "reviewer", "executor": "claude", "invocation": "herdr-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
+  { "id": "red-team", "executor": "codex", "invocation": "herdr", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
 ]
 ```
 
-`claude-reviewer-herdr` uses the same Claude Opus analytical tier and
-`--effort high` setting as `claude-reviewer`.
+`claude`'s `herdr-readonly` invocation uses the same Claude Opus analytical
+tier and `--effort high` setting as `cli-readonly`.
 
 Same protocol, same request shape, same `--cwd` rule; each role runs in its
 own herdr pane in the `fgos-worker` session, so a person can watch it and a
@@ -496,15 +505,16 @@ failed round leaves its pane open with the reason on screen. Two things the
 herdr transport does that cli-spawn does not: herdr types the bare agent word
 from `--kind` (an executor's `command` path is not what gets typed), and the
 pane is the operator's own interactive shell, so shell aliases apply --
-`codex-herdr` relies on that (see its config description). Model resolution
-is unchanged: `actors[].model` has no channel for declared-protocol
-requests, so tier x the executor's `rigorOverrides` decides the model.
+`codex`'s `herdr` invocation relies on that (see its config description).
+Model resolution is unchanged: `actors[].model` has no channel for
+declared-protocol requests, so tier x the executor's `rigorOverrides`
+decides the model.
 
 `persona` is free-form prose the executor receives as framing, not a
 closed vocabulary (`schema.mjs:133` `ACTOR_ALLOWED_KEYS`) -- sharpen any
 of these for a specific change (a security-sensitive diff wants an even
 sharper red-team persona), but keep the roster shape and the
-executor/tier mapping unless there is a real reason to diverge.
+executor/invocation/tier mapping unless there is a real reason to diverge.
 
 ## 0. Private branch and worktree — always, before anything else
 
@@ -551,9 +561,9 @@ the worker's summary.
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
-    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
   ],
   "steps": [
     {
@@ -641,9 +651,9 @@ step per position, all resuming the same `coordinationId`:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "surgical-fixer" },
-    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-rechecker" },
-    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-code-attacker" }
+    { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer" },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-rechecker" },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "relentless-code-attacker" }
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
@@ -696,9 +706,9 @@ states why `AFFECTED_TESTS` already covered the blast radius without it:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude-reviewer", "tier": "analytical", "persona": "code-quality-reviewer" },
-    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
   ],
   "steps": [
     {

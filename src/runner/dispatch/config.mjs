@@ -580,9 +580,74 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
 // dispatches (gate B2/B3), but `mcp`/`task` invocations still get their own
 // real shape check, not a free pass — an empty/malformed `mcp` identifier
 // is still a config bug worth catching at load time.
+/**
+ * `capabilities.<name>.prefer` (executor-id-consolidation Step 2.2): accepts
+ * either the legacy single executor-id string, or a non-empty array naming
+ * an ORDERED candidate pool (account-rotator-style cascade: try the first,
+ * fall to the next only when the first is not usable — never a "spread
+ * load evenly" distribution, that is placementPolicy.readOnlyRedirects's
+ * own, deliberately different, semantics). Each array element is either a
+ * bare executor-id string (no invocation pin — Gate B2's legacy default
+ * applies) or `{executor, invocation?}` — `invocation` names a specific
+ * `invocations[].id` on that executor (Step 2.1), e.g. to require the
+ * confined variant specifically. Always returns a normalized array, even
+ * for the single-string legacy case (a 1-element array), so every caller
+ * has exactly one shape to handle. Throws on any malformed entry; does
+ * NOT check that a named executor/invocation actually exists — that
+ * cross-check needs the already-validated `cfg.executors` block, done by
+ * the caller once every entry's OWN shape is confirmed sane.
+ */
+export function normalizePreferCandidates(prefer, label) {
+  if (typeof prefer === 'string') {
+    if (!prefer.trim()) {
+      throw new RunnerConfigError(`runner config (${label}) must be a non-empty string or a non-empty array when present.`);
+    }
+    return [{ executor: prefer, invocation: undefined }];
+  }
+  if (Array.isArray(prefer)) {
+    if (prefer.length === 0) {
+      throw new RunnerConfigError(`runner config (${label}) array must not be empty.`);
+    }
+    return prefer.map((entry, index) => {
+      const entryLabel = `${label}[${index}]`;
+      if (typeof entry === 'string') {
+        if (!entry.trim()) {
+          throw new RunnerConfigError(`runner config (${entryLabel}) must be a non-empty string.`);
+        }
+        return { executor: entry, invocation: undefined };
+      }
+      if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+        if (typeof entry.executor !== 'string' || !entry.executor.trim()) {
+          throw new RunnerConfigError(`runner config (${entryLabel}) "executor" must be a non-empty string.`);
+        }
+        if (entry.invocation !== undefined && (typeof entry.invocation !== 'string' || !entry.invocation.trim())) {
+          throw new RunnerConfigError(`runner config (${entryLabel}) "invocation" must be a non-empty string when present.`);
+        }
+        const ALLOWED_PREFER_ENTRY_KEYS = ['executor', 'invocation'];
+        for (const key of Object.keys(entry)) {
+          if (!ALLOWED_PREFER_ENTRY_KEYS.includes(key)) {
+            throw new RunnerConfigError(`runner config (${entryLabel}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PREFER_ENTRY_KEYS.join(', ')}.`);
+          }
+        }
+        return { executor: entry.executor, invocation: entry.invocation };
+      }
+      throw new RunnerConfigError(`runner config (${entryLabel}) must be a non-empty string or an object {executor, invocation?}.`);
+    });
+  }
+  throw new RunnerConfigError(`runner config (${label}) must be a non-empty string (a executor id) or a non-empty array of candidates when present.`);
+}
+
 function validateInvocationShape(invocation, label, capabilityNames) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     throw new RunnerConfigError(`runner config (${label}) must be an object.`);
+  }
+  // `id` names this invocation within its own executor's `invocations[]` array
+  // so a caller can ask for a SPECIFIC one (executor-id-consolidation, Step
+  // 2.1) instead of always getting Gate B2's legacy "first via:cli" pick.
+  // Optional: an executor with a single invocation, or one relying on the
+  // legacy default, never needs to name any.
+  if (invocation.id !== undefined && (typeof invocation.id !== 'string' || !invocation.id.trim())) {
+    throw new RunnerConfigError(`runner config (${label}) "id" must be a non-empty string when present.`);
   }
   if (typeof invocation.via !== 'string' || !INVOCATION_VIA.includes(invocation.via)) {
     throw new RunnerConfigError(
@@ -948,6 +1013,14 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
     executor.invocations.forEach((invocation, index) => {
       validateInvocationShape(invocation, `${label} invocations[${index}]`, capabilityNames);
     });
+    const seenInvocationIds = new Set();
+    for (const invocation of executor.invocations) {
+      if (invocation.id === undefined) continue;
+      if (seenInvocationIds.has(invocation.id)) {
+        throw new RunnerConfigError(`runner config (${label}) "invocations" declares "id": "${invocation.id}" more than once — each invocation id must be unique within one executor.`);
+      }
+      seenInvocationIds.add(invocation.id);
+    }
   }
   // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
   // this executor's tier resolution reads from (absent defaults to
@@ -1037,21 +1110,16 @@ function validateExecutorSupportsShape(supports, label) {
 /**
  * Shape-check ONE `placementPolicy.readOnlyRedirects.<sourceExecutorId>`
  * entry: a bare candidate id, an array of candidate ids, or an object with
- * a `default` pool plus a per-operation `operations` override.
+ * a `default` pool plus a per-operation `operations` override. Each
+ * candidate may also be `{executor, invocation?}` (executor-id-
+ * consolidation Step 2), reusing `normalizePreferCandidates`'s own shape
+ * rule -- this validator only checks shape; `readOnlyRedirectPool` is
+ * still the one place that reads it, extracting `.executor` for its
+ * existing string-keyed selection algorithm.
  */
 function validateReadOnlyRedirectPoolShape(value, label) {
   const validatePool = (pool, poolLabel) => {
-    if (typeof pool === 'string') {
-      if (!pool.trim()) throw new RunnerConfigError(`runner config (${poolLabel}) must be a non-empty string when a bare string.`);
-      return;
-    }
-    if (Array.isArray(pool)) {
-      if (!pool.every((entry) => typeof entry === 'string' && entry.trim())) {
-        throw new RunnerConfigError(`runner config (${poolLabel}) must be an array of non-empty strings.`);
-      }
-      return;
-    }
-    throw new RunnerConfigError(`runner config (${poolLabel}) must be a string or an array of strings.`);
+    normalizePreferCandidates(pool, poolLabel);
   };
   if (typeof value === 'string' || Array.isArray(value)) {
     validatePool(value, label);
@@ -1178,8 +1246,8 @@ function validateCapabilitiesShape(capabilities, label) {
         throw new RunnerConfigError(`runner config (${entryLabel}) "aliases" must be an array of non-empty strings when present.`);
       }
     }
-    if (entry.prefer !== undefined && (typeof entry.prefer !== 'string' || !entry.prefer.trim())) {
-      throw new RunnerConfigError(`runner config (${entryLabel}) "prefer" must be a non-empty string (a executor id) when present.`);
+    if (entry.prefer !== undefined) {
+      normalizePreferCandidates(entry.prefer, `${entryLabel} "prefer"`);
     }
     if (entry.overrides !== undefined) {
       if (!entry.overrides || typeof entry.overrides !== 'object' || Array.isArray(entry.overrides)) {
@@ -1334,10 +1402,22 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (cfg.capabilities !== undefined) {
     for (const [name, entry] of Object.entries(cfg.capabilities)) {
       if (entry.prefer === undefined) continue;
-      if (!cfg.executors?.[entry.prefer]) {
-        throw new RunnerConfigError(
-          `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${entry.prefer}" but no such executor is registered.`,
-        );
+      const preferCandidates = normalizePreferCandidates(entry.prefer, `${sourceLabel} capabilities.${name} "prefer"`);
+      for (const candidate of preferCandidates) {
+        const candidateExecutor = cfg.executors?.[candidate.executor];
+        if (!candidateExecutor) {
+          throw new RunnerConfigError(
+            `runner config (${sourceLabel} capabilities.${name}) "prefer" names "${candidate.executor}" but no such executor is registered.`,
+          );
+        }
+        if (candidate.invocation !== undefined) {
+          const invocations = Array.isArray(candidateExecutor.invocations) ? candidateExecutor.invocations : [];
+          if (!invocations.some((inv) => inv.id === candidate.invocation)) {
+            throw new RunnerConfigError(
+              `runner config (${sourceLabel} capabilities.${name}) "prefer" names invocation "${candidate.invocation}" on executor "${candidate.executor}" but no such invocation id is declared on it.`,
+            );
+          }
+        }
       }
     }
   }

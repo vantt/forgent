@@ -117,7 +117,12 @@ const CONTRIBUTION_TYPE_VALUES = Object.freeze(['proposal', 'objection', 'respon
 // optional PolicyPatch.
 const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 
-const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility', 'repeatMode']);
+// `preferInvocation` (executor-id-consolidation Step 2): names a specific
+// `executors.<preferExecutor>.invocations[].id` alongside `preferExecutor`
+// -- optional, only meaningful together with it. See ACTOR_ALLOWED_KEYS's
+// own `invocation` field (src/verbs/coordination/schema.mjs), the trusted
+// request field this PolicyPatch value is threaded in from.
+const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode']);
 
 const WORKFLOW_PROFILE_FIELDS = new Set(['kind', 'work']);
 const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
@@ -263,6 +268,11 @@ function validatePolicyPatch(policy, label) {
   if (policy.preferExecutor !== undefined) {
     if (!isNonEmptyString(policy.preferExecutor)) fail(`${label}.preferExecutor must be a non-empty string when provided`);
     result.preferExecutor = policy.preferExecutor;
+  }
+  if (policy.preferInvocation !== undefined) {
+    if (!isNonEmptyString(policy.preferInvocation)) fail(`${label}.preferInvocation must be a non-empty string when provided`);
+    if (policy.preferExecutor === undefined) fail(`${label}.preferInvocation is present but "preferExecutor" is not -- an invocation pin only means something alongside an explicit executor`);
+    result.preferInvocation = policy.preferInvocation;
   }
   if (policy.fallbackExecutors !== undefined) {
     // `reserved-not-executed` in V1 (contract): parseable, never a flag
