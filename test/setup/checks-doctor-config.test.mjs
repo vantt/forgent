@@ -228,7 +228,7 @@ test('config-not-stale passes when the existing config already has every default
       runner: {
         ...DEFAULT_RUNNER_CONFIG,
         capabilities: DEFAULT_CAPABILITY_SLOTS,
-        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+        modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { nano: 'gpt-5.5' } },
         executors: { pi: PI_EXECUTOR_DEFAULT },
       },
       gateBypass: { level: 'off' },
