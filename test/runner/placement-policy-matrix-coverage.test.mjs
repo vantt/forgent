@@ -8,7 +8,7 @@
 // ONLY -- read-only/mutating classification, confinement, and governance
 // live in other modules this shadow module never touches or reads. So the
 // matrix this file proves is exactly PlacementPolicy's own scope: every one
-// of Phase 00's 13 canonical executors × 3 work tiers (39 pairs, the same
+// of Phase 00's 12 canonical executors × 3 work tiers (36 pairs, the same
 // matrix dispatch-policy-baseline-snapshot.test.mjs already locks) must
 // agree with the real legacy resolution BEFORE any production binding
 // changes. The read-only/confined/governance dimensions Phase 07's exit
@@ -32,8 +32,8 @@ before(() => {
   cfg = loadRunnerConfigFromDir(process.cwd());
 });
 
-test('Phase 07 matrix coverage: every one of Phase 00\'s 13 canonical executors × 3 work tiers (39 pairs) agrees between PlacementPolicy\'s shadow candidate and the real legacy resolution -- no unexplained divergence', () => {
-  assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 39, 'the baseline matrix itself must still be the full 13×3 = 39 pairs this proof depends on');
+test('Phase 07 matrix coverage: every one of Phase 00\'s 12 canonical executors × 3 work tiers (36 pairs) agrees between PlacementPolicy\'s shadow candidate and the real legacy resolution -- no unexplained divergence', () => {
+  assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 36, 'the baseline matrix itself must still be the full 12×3 = 36 pairs this proof depends on');
 
   const divergences = [];
   for (const row of BASELINE_SNAPSHOT_FIXTURE) {
@@ -56,10 +56,10 @@ test('Phase 07 matrix coverage: every one of Phase 00\'s 13 canonical executors 
     }
   }
 
-  assert.deepEqual(divergences, [], `PlacementPolicy diverges from legacy for ${divergences.length}/39 pairs -- not ready for Phase 07 promotion until this is empty`);
+  assert.deepEqual(divergences, [], `PlacementPolicy diverges from legacy for ${divergences.length}/36 pairs -- not ready for Phase 07 promotion until this is empty`);
 });
 
-test('Phase 07 PRODUCTION BINDER proof: resolveVerifiedPlacementModel (the exact function spawnWorker/executeExecutorCli now call for real) never regresses AND is actually PlacementPolicy-sourced for all 39 real pairs', () => {
+test('Phase 07 PRODUCTION BINDER proof: resolveVerifiedPlacementModel (the exact function spawnWorker/executeExecutorCli now call for real) never regresses AND is actually PlacementPolicy-sourced for all 36 real pairs', () => {
   const results = [];
   for (const row of BASELINE_SNAPSHOT_FIXTURE) {
     // Reproduce spawnWorker's own real legacyModel computation exactly
@@ -84,10 +84,10 @@ test('Phase 07 PRODUCTION BINDER proof: resolveVerifiedPlacementModel (the exact
   assert.deepEqual(wrongModel, [], 'resolveVerifiedPlacementModel must never produce a model different from the legacy golden fixture');
 
   // Production-binder property: PlacementPolicy is actually TRUSTED (not
-  // silently falling back) for every one of the 39 real canonical pairs --
+  // silently falling back) for every one of the 36 real canonical pairs --
   // otherwise "promoted to production" would be true in name only.
   const fellBackToLegacy = results.filter((r) => r.source !== 'placement-policy');
-  assert.deepEqual(fellBackToLegacy, [], `expected PlacementPolicy to be trusted for all 39 pairs; fell back for: ${JSON.stringify(fellBackToLegacy)}`);
+  assert.deepEqual(fellBackToLegacy, [], `expected PlacementPolicy to be trusted for all 36 pairs; fell back for: ${JSON.stringify(fellBackToLegacy)}`);
   assert.equal(results.every((r) => r.divergence === null), true);
 });
 

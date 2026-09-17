@@ -95,11 +95,15 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
 
 /**
  * Golden fixture captured from current production resolvers and .fgos/config.json.
- * Note on matrix coverage: All 39 (executorId × workTier) pairs for the 13 executors
+ * Note on matrix coverage: All 36 (executorId × workTier) pairs for the 12 executors
  * in [claude, claude-reviewer, claude-reviewer-herdr, agy-cli, agy-herdr, fgos-coding-implement,
- * codex-cli, codex-bwrap, codex-readonly, pi, pi-herdr, codex-pi, glm-cli] across tiers
+ * codex-cli, codex-bwrap, codex-readonly, pi, codex-pi, glm-cli] across tiers
  * [light, standard, heavy] resolve successfully in the legacy config without errors.
  * None are skipped.
+ * `claude-herdr`/`pi-herdr` were removed from both config and this matrix
+ * (plans/260917-executor-profile-schema-migration/plan.md Phase A):
+ * genuinely dormant, self-described as never wired to any capability, zero
+ * other reference anywhere in src/ or test/ before removal.
  */
 export const BASELINE_SNAPSHOT_FIXTURE = [
   {
@@ -868,78 +872,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     "readOnlyMechanism": "none"
   },
   {
-    "selector": "pi-herdr",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--approve",
-      "<prompt>"
-    ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
-  },
-  {
-    "selector": "pi-herdr",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--approve",
-      "<prompt>"
-    ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
-  },
-  {
-    "selector": "pi-herdr",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--approve",
-      "<prompt>"
-    ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
-  },
-  {
     "selector": "codex-pi",
     "workTier": "light",
     "bindingSource": "executor-id",
@@ -1155,8 +1087,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('matrix fixture completeness', () => {
-    test('matrix fixture contains exactly 39 expected (executorId, workTier) pairs', () => {
-      assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 39, 'baseline snapshot fixture must have exactly 39 rows');
+    test('matrix fixture contains exactly 36 expected (executorId, workTier) pairs', () => {
+      assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 36, 'baseline snapshot fixture must have exactly 36 rows');
       const expectedExecutors = [
         'claude',
         'claude-reviewer',
@@ -1168,7 +1100,6 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
         'codex-bwrap',
         'codex-readonly',
         'pi',
-        'pi-herdr',
         'codex-pi',
         'glm-cli',
       ];
@@ -1179,15 +1110,15 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
           expectedPairKeys.add(`${exec}:${tier}`);
         }
       }
-      assert.equal(expectedPairKeys.size, 39);
+      assert.equal(expectedPairKeys.size, 36);
 
       const actualPairKeys = new Set(BASELINE_SNAPSHOT_FIXTURE.map((row) => `${row.selector}:${row.workTier}`));
-      assert.equal(actualPairKeys.size, 39, 'fixture must not contain duplicate executor × tier pairs');
+      assert.equal(actualPairKeys.size, 36, 'fixture must not contain duplicate executor × tier pairs');
       assert.deepEqual(actualPairKeys, expectedPairKeys, 'fixture must match full set of expected executor × tier pairs');
     });
   });
 
-  describe('matrix regression snapshot assertions (39 pairs)', () => {
+  describe('matrix regression snapshot assertions (36 pairs)', () => {
     for (const expected of BASELINE_SNAPSHOT_FIXTURE) {
       test(`snapshot: ${expected.selector} [${expected.workTier}] matches baseline fixture`, () => {
         const actual = resolveNormalizedSnapshotRow(cfg, expected.selector, expected.workTier, throwawayDir);
