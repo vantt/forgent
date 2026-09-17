@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
@@ -1260,6 +1261,239 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   assert.equal(runMeta.status, 'settled');
   assert.notEqual(runMeta.status, 'running', 'run.json must never be left "running" after a provider-capacity refusal');
   assert.equal(fs.existsSync(codex.argvCapturePath), false, 'a refused account must never let the worker actually spawn');
+});
+
+// Phase B (plans/260917-executor-profile-schema-migration/plan.md): real
+// cross-provider PlacementPolicy fallback in production dispatch, wired
+// via dispatch/recovery.mjs's `resolveFallback` into the exact
+// provider-capacity-refused branch the H2 test above proves settles
+// cleanly. Each test below shares that same two-provider fixture shape
+// (`claude` primary / `codex-bwrap` fallback, each its own provider),
+// varying only which accounts are pre-quarantined and which
+// `fallbackExecutors` are declared.
+function buildFallbackFixture(tempDir, { primaryQuarantined, fallbackQuarantined, secondFallbackQuarantined = null } = {}) {
+  const claudeExecutor = writeArgvRecordingExecutor(tempDir, 'claude-fallback-primary');
+  const codexExecutor = writeArgvRecordingExecutor(tempDir, 'codex-fallback-candidate');
+  const runnerConfig = {
+    executors: {
+      claude: { command: process.execPath, args: [claudeExecutor.scriptPath, '{prompt}'], allowCrossProvider: true },
+      'codex-bwrap': {
+        command: process.execPath,
+        args: [codexExecutor.scriptPath, '{prompt}', '--model', '{model}'],
+        providerModel: 'openai-codex',
+        kind: 'agent',
+        allowCrossProvider: true,
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+    providers: {
+      claude: {
+        accounts: {
+          'claude-acct': { label: 'claude/primary', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'claude-home') } },
+        },
+      },
+      'openai-codex': {
+        accounts: {
+          'codex-acct': { label: 'codex/fallback', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-home') } },
+        },
+      },
+    },
+  };
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  const accounts = {};
+  if (primaryQuarantined) accounts.claude = { accounts: { 'claude-acct': { quarantine: { kind: 'manual-clear', reasonCode: 'auth-token', quarantinedAt: new Date().toISOString() } } } };
+  if (fallbackQuarantined) accounts['openai-codex'] = { accounts: { 'codex-acct': { quarantine: { kind: 'manual-clear', reasonCode: 'auth-token', quarantinedAt: new Date().toISOString() } } } };
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: PROVIDER_CAPACITY_STATE_CONTRACT,
+    providers: accounts,
+    assignments: {},
+    audit: [],
+  }));
+  return { claudeExecutor, codexExecutor, runnerConfig, runtimeDir };
+}
+
+test('Phase B: no fallbackExecutors declared -> byte-identical terminal provider-capacity-refused settlement (regression guard)', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+
+  const work = { id: 'tsk-fallback-none-declared', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    // No cliOverride.fallbackExecutors at all.
+  });
+
+  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.executorId, 'claude', 'executorId must stay the primary -- no fallback was ever declared');
+  assert.equal(runMeta.fallback, undefined, 'run.json must carry no fallback field at all when nothing was declared');
+  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidence.fallback, undefined, 'evidence.json must carry no fallback field at all when nothing was declared');
+});
+
+test('Phase B: a declared fallback with real capacity is actually dispatched, evidenced, and the primary account is untouched', async () => {
+  const tempDir = mkTempDir();
+  const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+
+  const work = { id: 'tsk-fallback-selected', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+  });
+
+  // Dispatch proceeded -- this is NOT a provider-capacity-refused terminal
+  // settlement, the worker actually ran against the fallback.
+  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
+  assert.equal(fs.existsSync(codexExecutor.argvCapturePath), true, 'the fallback worker must actually have spawned');
+  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the refused primary must never spawn');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.executorId, 'codex-bwrap');
+  assert.equal(runMeta.fallback.declaredPrimary, 'claude');
+  assert.equal(runMeta.fallback.resolved, 'codex-bwrap');
+  assert.equal(runMeta.fallback.reasonCode, 'provider-capacity-refused');
+
+  const dispatchPlan = JSON.parse(fs.readFileSync(path.join(runDir, 'dispatch-plan.json'), 'utf8'));
+  assert.equal(dispatchPlan.executorId, 'codex-bwrap');
+  assert.equal(dispatchPlan.provenance?.executor?.source?.scope, 'fallback', 'the scoped plan must honestly record it was resolved via the fallback path, not cliOverride');
+
+  const computedDigest = `sha256:${crypto.createHash('sha256').update(fs.readFileSync(path.join(runDir, 'dispatch-plan.json'), 'utf8').trimEnd()).digest('hex')}`;
+  // run.json's dispatchPlanDigest must agree with the SAME formula the
+  // runner itself used (JSON.stringify of the in-memory plan object, not a
+  // digest of the file bytes -- re-derive via the object to avoid a
+  // whitespace-sensitive false failure).
+  const rederivedDigest = `sha256:${crypto.createHash('sha256').update(JSON.stringify(dispatchPlan)).digest('hex')}`;
+  assert.equal(runMeta.dispatchPlanDigest, rederivedDigest, 'run.json.dispatchPlanDigest must match the persisted dispatch-plan.json -- confinement prep cross-checks this and throws on any mismatch');
+
+  const capacity = inspectProviderCapacity({ runnerConfig, runtimeDir });
+  assert.deepEqual(capacity.providers.claude.accounts['claude-acct'].openLeases, [], 'the refused primary account must never receive a lease');
+  assert.deepEqual(capacity.providers['openai-codex'].accounts['codex-acct'].openLeases, [], 'the fallback lease must be released after settlement (finally-block release keyed by the CURRENT providerCapacitySelection)');
+});
+
+test('Phase B: every declared candidate governance-refused or unresolvable -> falls through to terminal settlement, never a bare throw', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+
+  const work = { id: 'tsk-fallback-all-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+    options: { disallowedExecutors: ['codex-bwrap'] },
+  });
+
+  assert.equal(result.classification.failure.code, 'provider-capacity-refused', 'must still settle as terminal, never throw');
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.executorId, 'claude', 'executorId stays the primary -- the fallback was never adopted');
+  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidence.fallback.declaredPrimary, 'claude');
+  assert.equal(evidence.fallback.skippedCandidates.length, 1);
+  assert.equal(evidence.fallback.skippedCandidates[0].executorId, 'codex-bwrap');
+  // 'compiler-mismatch', not 'candidate-not-governed': the candidate IS a
+  // declared executorPreference entry (resolveFallback's own
+  // "never-declared" bucket), it is the disallowedExecutors governance
+  // check INSIDE the real compileDispatchPlan() recompilation that refuses
+  // it -- proving the exact same governance re-admission this phase's own
+  // design argument (recovery.mjs's resolveFallback is a strict superset
+  // of placement-policy.mjs's disallowed-provider/executor checks) relies on.
+  assert.equal(evidence.fallback.skippedCandidates[0].reasonCode, 'compiler-mismatch');
+});
+
+test('Phase B: bounded to exactly one capacity attempt -- a second declared candidate with real capacity is never tried', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: true });
+  const thirdExecutor = writeArgvRecordingExecutor(tempDir, 'third-fallback-candidate');
+  runnerConfig.executors['pi-fallback'] = {
+    command: process.execPath,
+    args: [thirdExecutor.scriptPath, '{prompt}', '--model', '{model}'],
+    providerModel: 'test-provider-c',
+    kind: 'agent',
+    allowCrossProvider: true,
+  };
+  runnerConfig.modelPolicies['test-provider-c'] = { standard: 'model-c-standard' };
+  runnerConfig.providers['test-provider-c'] = {
+    accounts: { 'pi-acct': { label: 'pi/third', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'pi-home') } } },
+  };
+
+  const work = { id: 'tsk-fallback-bounded', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    // Both declared fallback candidates are governed and compile clean;
+    // the FIRST (codex-bwrap) has its account quarantined too, the SECOND
+    // (pi-fallback) has real capacity -- but only the first is ever
+    // attempted; the second must never be leased.
+    cliOverride: { fallbackExecutors: ['codex-bwrap', 'pi-fallback'] },
+  });
+
+  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(fs.existsSync(thirdExecutor.argvCapturePath), false, 'the never-attempted second fallback candidate must never spawn');
+  const capacity = inspectProviderCapacity({ runnerConfig, runtimeDir });
+  assert.deepEqual(capacity.providers['test-provider-c'].accounts['pi-acct'].openLeases, [], 'the never-attempted candidate must never receive a lease');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const evidence = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.equal(evidence.fallback.attempted, 'codex-bwrap', 'exactly the first candidate must be the one whose capacity was attempted');
+  assert.equal(evidence.fallback.skippedCandidates.length, 0, 'the second candidate is never reached at all -- it is bounded-out, not skipped-for-cause');
+});
+
+test('Phase B: a resumed Run that already committed a fallback rehydrates the fallback, never recompiles the refused primary', async () => {
+  const tempDir = mkTempDir();
+  const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+
+  const work = { id: 'tsk-fallback-resume', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const first = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+  });
+  assert.equal(first.executorId, 'codex-bwrap');
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  // Simulate a crash-then-resume: same runId/attempt, result.json/commands
+  // wiped as if the worker never got to settle, run.json (with its
+  // committed `fallback` field) and dispatch-plan.json survive untouched.
+  fs.rmSync(path.join(runDir, 'result.json'), { force: true });
+  fs.rmSync(path.join(runDir, 'controller'), { recursive: true, force: true });
+  fs.writeFileSync(path.join(runDir, 'agent-result.json'), '');
+  fs.rmSync(path.join(runDir, 'agent-result.json'), { force: true });
+
+  const resumed = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+  });
+
+  assert.equal(resumed.executorId, 'codex-bwrap', 'resume must rehydrate the fallback, never recompile/re-dispatch the refused primary');
+  const runMeta = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+  assert.equal(runMeta.executorId, 'codex-bwrap');
 });
 
 test('tool executors bypass provider capacity selection even with matching provider accounts configured', async () => {

@@ -58,6 +58,7 @@ import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveConte
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
+import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
 import { resolveVerifiedRedirectExecutor } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
@@ -1185,6 +1186,154 @@ function admitRunAttempt(
 }
 
 /**
+ * Phase B (plans/260917-executor-profile-schema-migration/plan.md): when
+ * the primary executor's provider-capacity lease is refused, attempt ONE
+ * real dispatch against a declared fallback executor instead of settling
+ * the Run as failed immediately. assignment-policy.mjs's own
+ * `fallbackExecutors`/`executorPreference` field has been
+ * "reserved-not-executed" (Phase 00 R10) until now; this closes that gap.
+ *
+ * Reuses dispatch/recovery.mjs's `resolveFallback` (built by an earlier,
+ * unrelated track, never wired to a real caller) for the governance/
+ * compile check: it re-runs the exact same `compileDispatchPlan()`
+ * resolution with `cliOverride.preferExecutor` forced to the candidate,
+ * verifies the scoped plan's governance verdict reads "allowed" and its
+ * tier/visibility provenance agrees with the original plan, and never
+ * silently downgrades a governance floor. `placement-policy.mjs`'s own
+ * `fallbackCandidates`/`admitFallbackCandidate` machinery (unexported,
+ * provider/model-ranking only) is NOT used here -- `resolveFallback` is a
+ * strict superset: same disallowed-provider/executor checks (they run
+ * inside `resolveAssignmentDispatchPolicy`), plus a full, correctly
+ * recompiled invocation/confinement-policy for the candidate, "for free".
+ *
+ * This function only picks a candidate and (at most once) attempts its
+ * provider-capacity lease -- design.md's own "no retry loop owned by the
+ * rotator": the FIRST scoped, out-of-process, non-tool candidate is the
+ * only one whose capacity is ever checked; every candidate before it that
+ * fails governance/compile/mechanism is recorded in `skippedCandidates`
+ * and passed over, never retried. It never writes to disk or mutates the
+ * caller's in-scope variables -- the caller commits (or discards) the
+ * result.
+ *
+ * @returns {{adopted: false, evidence: object|null} | {adopted: true, plan: object, executorId: string, lease: object|null, evidence: object}}
+ */
+function attemptProviderCapacityFallback({
+  cfg,
+  compiledPlan,
+  resolvedExecutorId,
+  primaryRefusalReason,
+  effectiveAssignment,
+  runId,
+  cliOverride,
+  options,
+  work,
+  hasLiveTaskAccess,
+  providerCapacityRuntimeDir,
+  providerCapacityRunIsDead,
+}) {
+  const declaredCandidates = Array.isArray(compiledPlan.policy?.executorPreference)
+    ? compiledPlan.policy.executorPreference.slice(1)
+    : [];
+  const skippedCandidates = [];
+
+  for (const candidateId of declaredCandidates) {
+    if (candidateId === resolvedExecutorId) continue; // not a fallback from itself
+
+    let fallbackResolution;
+    try {
+      fallbackResolution = resolveFallback(compiledPlan, candidateId, {
+        compilePlan: (id) => compileDispatchPlan(cfg, {
+          assignment: effectiveAssignment.assignmentId,
+          assignmentItem: effectiveAssignment,
+          work: effectiveAssignment.workId,
+          workItem: work,
+          stage: effectiveAssignment.stage,
+          hasLiveTaskAccess: hasLiveTaskAccess ?? false,
+          cliOverride: {
+            ...(cliOverride || {}),
+            preferExecutor: id,
+            policyProvenance: {
+              ...(cliOverride?.policyProvenance || {}),
+              executor: { scope: 'fallback', from: resolvedExecutorId, reasonCode: 'provider-capacity-refused' },
+            },
+          },
+          options,
+        }),
+      });
+    } catch (err) {
+      skippedCandidates.push({ executorId: candidateId, reasonCode: 'compiler-error', reason: err.message });
+      continue;
+    }
+
+    if (fallbackResolution.status !== 'scoped') {
+      skippedCandidates.push({ executorId: candidateId, reasonCode: fallbackResolution.status, reason: fallbackResolution.reason ?? null });
+      continue;
+    }
+
+    const plan = fallbackResolution.plan;
+    // Same three guards the primary's own `shouldSelectProviderAccount`
+    // applies (executeAssignment, above) -- resolveFallback proves
+    // governance/tier/visibility, never mechanism.
+    if (plan.dispatch === 'human-only' || plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
+      skippedCandidates.push({ executorId: candidateId, reasonCode: 'unsupported-mechanism' });
+      continue;
+    }
+
+    // Found the one candidate to attempt -- bounded to exactly this one,
+    // regardless of how many more are declared after it.
+    const provider = plan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[candidateId] ?? cfg.executor);
+    const switchedAt = new Date().toISOString();
+    const baseEvidence = { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates };
+
+    if (!hasProviderAccounts(cfg, provider)) {
+      // Not managed by the rotator at all -- the same rule the primary
+      // already follows (`shouldSelectProviderAccount`): nothing to lease,
+      // proceed unconditionally.
+      return {
+        adopted: true,
+        plan,
+        executorId: candidateId,
+        lease: null,
+        evidence: { ...baseEvidence, resolved: candidateId, resolvedCapacity: 'not-managed', switchedAt },
+      };
+    }
+
+    const lease = acquireProviderAccountLease({
+      runnerConfig: cfg,
+      provider,
+      assignmentId: effectiveAssignment.assignmentId,
+      runId,
+      seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
+      runtimeDir: providerCapacityRuntimeDir,
+      runIsDead: providerCapacityRunIsDead,
+    });
+    if (lease?.status === 'selected') {
+      return {
+        adopted: true,
+        plan,
+        executorId: candidateId,
+        lease,
+        evidence: { ...baseEvidence, resolved: candidateId, resolvedCapacity: 'selected', switchedAt },
+      };
+    }
+    return {
+      adopted: false,
+      evidence: { ...baseEvidence, attempted: candidateId, attemptedRefusalReason: lease?.reason ?? 'provider-capacity.exhausted-or-quarantined' },
+    };
+  }
+
+  return {
+    adopted: false,
+    // No fallback declared at all (declaredCandidates.length === 0) must
+    // stay `null` -- the caller's terminal settlement only adds an
+    // `evidence.json`/`stderr.log` fallback trace when non-null, so an
+    // assignment with no fallbackExecutors dispatches byte-identically to
+    // before this phase.
+    evidence: declaredCandidates.length ? { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates } : null,
+  };
+}
+
+/**
  * Execute an assignment by dispatching a worker and recording the Run & RunResult (Step 03 §5).
  *
  * @param {object} assignment Assignment object
@@ -1279,7 +1428,12 @@ export async function executeAssignment(assignment, opts = {}) {
   // threaded through so the merged policy resolution sees the real Work
   // object for tier monotonicity (work.tier/work.risk), the same object
   // the removed direct call used to pass as `work`.
-  const compiledPlan = compileDispatchPlan(cfg, {
+  // `let`, not `const`: a provider-capacity refusal below (Phase B,
+  // plans/260917-executor-profile-schema-migration/plan.md) may replace
+  // this with a governance-scoped fallback candidate's own compiled plan,
+  // via `attemptProviderCapacityFallback`. Every reassignment site is
+  // marked with that same phase reference.
+  let compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
     work: effectiveAssignment.workId,
@@ -1307,7 +1461,11 @@ export async function executeAssignment(assignment, opts = {}) {
   // under runner.readOnlyExecutorRedirects without changing the higher-level
   // operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
-  const resolvedExecutorId =
+  // `let`: see the Phase B note on `compiledPlan` above -- a fallback
+  // candidate is never read-only-redirected (only ever a DECLARED
+  // executorPreference entry), so this reassignment happens strictly
+  // after the redirect/governance logic immediately below, never inside it.
+  let resolvedExecutorId =
     isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude'
       ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
@@ -1341,9 +1499,10 @@ export async function executeAssignment(assignment, opts = {}) {
   // persisted record instead of leaving an auditor to infer it by comparing
   // the two fields themselves.
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
-  const resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  // `let`: see the Phase B note on `compiledPlan` above.
+  let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
 
-  const effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
@@ -1408,6 +1567,37 @@ export async function executeAssignment(assignment, opts = {}) {
   const effectiveContractPath = path.join(runDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
   let providerCapacitySelection = null;
   let providerCapacityEvidence = null;
+  let fallbackEvidence = null;
+
+  // Phase B resume rehydration: a prior attempt at this exact Run already
+  // switched to a fallback executor and persisted that switch (see the
+  // `fallback` commit below) before crashing/restarting -- a resume must
+  // pick up that SAME executor, never recompile the primary. Getting this
+  // wrong throws later, at confinement prep
+  // (confinement/request.mjs's crossCheckAssignmentLaunchContext compares
+  // the in-memory plan's digest against the ALREADY-PERSISTED
+  // run.json.dispatchPlanDigest and refuses on any mismatch).
+  if (admitted.resumed) {
+    try {
+      const runJson = JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8'));
+      if (runJson.fallback?.resolved && fs.existsSync(dispatchPlanPath)) {
+        const persistedPlan = JSON.parse(fs.readFileSync(dispatchPlanPath, 'utf8'));
+        if (persistedPlan.executorId === runJson.fallback.resolved) {
+          compiledPlan = persistedPlan;
+          effectivePolicy = persistedPlan.policy;
+          resolvedExecutorId = runJson.fallback.resolved;
+          resolvedAdapter = persistedPlan.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+          effectiveCwd = persistedPlan.invocation?.cwd ?? persistedPlan.cwd ?? cwd;
+          fallbackEvidence = runJson.fallback;
+        }
+      }
+    } catch {
+      // No readable run.json/dispatch-plan.json yet, or no fallback ever
+      // committed for this Run -- resume proceeds against the primary
+      // exactly as before this phase.
+    }
+  }
+
   const providerCapacityProvider = effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor);
   const shouldSelectProviderAccount =
     !admitted.resumed &&
@@ -1443,51 +1633,133 @@ export async function executeAssignment(assignment, opts = {}) {
       // supersedes this settled attempt through the same path every other
       // retry already uses -- this settlement does not need its own retry
       // loop, only to stop being unsettled.
-      const settledAt = new Date().toISOString();
-      const stderrText = `provider capacity refused for "${providerCapacityProvider}": ${providerCapacitySelection.reason}`;
-      fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
-      fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-      const evidenceData = {
-        operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
-        gitBefore: null,
-        gitAfter: null,
-        gitBeforeSource: 'pre-launch',
-        dirtyBefore: [],
-        dirtyAfter: [],
-        mutatedDirtyBeforeFiles: [],
-        changedFiles: [],
-        changedFileReasons: {},
-        attribution: [],
-        artifacts: [],
-        tests: [],
-      };
-      fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-      const refusedRunResult = normalizeRunResultV2({
+      //
+      // Phase B (plans/260917-executor-profile-schema-migration/plan.md):
+      // before settling as terminal, attempt ONE real dispatch against a
+      // declared fallback executor. An assignment with no declared
+      // fallbackExecutors takes this exact branch and falls straight
+      // through unchanged (`fallbackOutcome.evidence` stays `null`), so
+      // that case remains byte-identical to before this phase.
+      const primaryRefusalReason = providerCapacitySelection.reason;
+      const fallbackOutcome = attemptProviderCapacityFallback({
+        cfg,
+        compiledPlan,
+        resolvedExecutorId,
+        primaryRefusalReason,
+        effectiveAssignment,
         runId,
-        assignmentId: effectiveAssignment.assignmentId,
-        workId: effectiveAssignment.workId,
-        executorId: resolvedExecutorId,
-        policy: effectivePolicy,
-        settledAt,
-        role: effectiveAssignment.role,
-        operation: effectiveAssignment.operation,
-        isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
-        runtime: {
-          exitCode: null,
-          executionError: { code: 'provider-capacity-refused', message: stderrText },
-          stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-          stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-        },
-        evidence: evidenceData,
+        cliOverride: opts.cliOverride,
+        options: opts.options,
+        work: opts.work,
+        hasLiveTaskAccess: opts.hasLiveTaskAccess,
+        providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir,
+        providerCapacityRunIsDead: opts.providerCapacityRunIsDead,
       });
-      fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(refusedRunResult, null, 2)}\n`);
-      // Same convention as the normal completion path below: markRunSettled
-      // is the sole writer of run.json's own `status` field (default
-      // "settled" -- "reached its end and produced a RunResult", distinct
-      // from result.json's own success/failure verdict). No separate manual
-      // run.json write here.
-      markRunSettled(runDir);
-      return Object.freeze(refusedRunResult);
+
+      let fallbackAdopted = false;
+      if (fallbackOutcome.adopted) {
+        // Commit the switch to disk BEFORE reassigning any in-memory
+        // variable, so a crash between the two leaves disk and memory
+        // consistent with EITHER the primary or the fallback, never a mix.
+        // `dispatchPlanDigest` must move together with `dispatch-plan.json`
+        // -- confinement/request.mjs's crossCheckAssignmentLaunchContext
+        // throws on any disagreement between them.
+        const newDigest = `sha256:${crypto.createHash('sha256').update(JSON.stringify(fallbackOutcome.plan)).digest('hex')}`;
+        try {
+          fs.writeFileSync(dispatchPlanPath, `${JSON.stringify(fallbackOutcome.plan, null, 2)}\n`);
+          fsyncFileBestEffort(dispatchPlanPath);
+          const runJsonPath = path.join(runDir, 'run.json');
+          const runJson = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          fs.writeFileSync(
+            runJsonPath,
+            `${JSON.stringify({ ...runJson, executorId: fallbackOutcome.executorId, dispatchPlanDigest: newDigest, fallback: fallbackOutcome.evidence }, null, 2)}\n`,
+          );
+          fsyncFileBestEffort(runJsonPath);
+          fallbackAdopted = true;
+        } catch (err) {
+          // The patch itself failed -- never run with a half-switched state
+          // (dispatch-plan.json/run.json disagreeing with what actually
+          // executes). Release any lease the fallback acquired and fall
+          // through to the terminal settlement below, as if the fallback
+          // had never been attempted.
+          if (fallbackOutcome.lease?.status === 'selected') {
+            try {
+              releaseProviderAccountLease({
+                provider: fallbackOutcome.lease.provider,
+                accountId: fallbackOutcome.lease.accountId,
+                runId,
+                runtimeDir: opts.providerCapacityRuntimeDir,
+              });
+            } catch {}
+          }
+          fallbackOutcome.evidence = { ...fallbackOutcome.evidence, resolved: null, commitError: err.message };
+        }
+      }
+
+      if (fallbackAdopted) {
+        compiledPlan = fallbackOutcome.plan;
+        effectivePolicy = fallbackOutcome.plan.policy;
+        resolvedExecutorId = fallbackOutcome.executorId;
+        resolvedAdapter = fallbackOutcome.plan.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+        effectiveCwd = fallbackOutcome.plan.invocation?.cwd ?? fallbackOutcome.plan.cwd ?? cwd;
+        providerCapacitySelection = fallbackOutcome.lease;
+        fallbackEvidence = fallbackOutcome.evidence;
+        // Fall through: the rest of executeAssignment now dispatches
+        // against the fallback exactly as it would have against the
+        // primary. The `status === 'selected'` block right below picks up
+        // `providerCapacitySelection` (now the fallback's own lease, or
+        // `null` for an unmanaged fallback provider) and runs once for
+        // whichever selection won -- never duplicated.
+      } else {
+        const settledAt = new Date().toISOString();
+        const stderrText = fallbackOutcome.evidence
+          ? `provider capacity refused for "${providerCapacityProvider}": ${primaryRefusalReason} (fallback attempt also failed: ${JSON.stringify(fallbackOutcome.evidence)})`
+          : `provider capacity refused for "${providerCapacityProvider}": ${primaryRefusalReason}`;
+        fs.writeFileSync(path.join(runDir, 'stdout.log'), '');
+        fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
+        const evidenceData = {
+          operationMutability: isReadOnlyAssignment(effectiveAssignment) ? 'read-only' : 'mutates-repo',
+          gitBefore: null,
+          gitAfter: null,
+          gitBeforeSource: 'pre-launch',
+          dirtyBefore: [],
+          dirtyAfter: [],
+          mutatedDirtyBeforeFiles: [],
+          changedFiles: [],
+          changedFileReasons: {},
+          attribution: [],
+          artifacts: [],
+          tests: [],
+          ...(fallbackOutcome.evidence ? { fallback: fallbackOutcome.evidence } : {}),
+        };
+        fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+        const refusedRunResult = normalizeRunResultV2({
+          runId,
+          assignmentId: effectiveAssignment.assignmentId,
+          workId: effectiveAssignment.workId,
+          executorId: resolvedExecutorId,
+          policy: effectivePolicy,
+          settledAt,
+          role: effectiveAssignment.role,
+          operation: effectiveAssignment.operation,
+          isReadOnlyOperation: evidenceData.operationMutability === 'read-only',
+          runtime: {
+            exitCode: null,
+            executionError: { code: 'provider-capacity-refused', message: stderrText },
+            stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
+            stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
+          },
+          evidence: evidenceData,
+        });
+        fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(refusedRunResult, null, 2)}\n`);
+        // Same convention as the normal completion path below: markRunSettled
+        // is the sole writer of run.json's own `status` field (default
+        // "settled" -- "reached its end and produced a RunResult", distinct
+        // from result.json's own success/failure verdict). No separate manual
+        // run.json write here.
+        markRunSettled(runDir);
+        return Object.freeze(refusedRunResult);
+      }
     }
     if (providerCapacitySelection?.status === 'selected') {
       providerCapacityEvidence = {
@@ -2307,6 +2579,7 @@ export async function executeAssignment(assignment, opts = {}) {
     artifacts: workerArtifacts,
     tests: [],
     ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
+    ...(fallbackEvidence ? { fallback: fallbackEvidence } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
 
