@@ -121,17 +121,21 @@ function fakeCrossProviderRedirectConfig(tempDir) {
   return {
     captures: { claude, reviewer, codex },
     runnerConfig: {
-      executors: {
-        claude: {
-          command: process.execPath,
-          args: [claude.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-          allowCrossProvider: true,
-          readOnlyRedirect: {
+      placementPolicy: {
+        readOnlyRedirects: {
+          claude: {
             default: ['codex-bwrap'],
             operations: {
               'red-team-candidate': ['codex-bwrap'],
             },
           },
+        },
+      },
+      executors: {
+        claude: {
+          command: process.execPath,
+          args: [claude.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+          allowCrossProvider: true,
         },
         'claude-reviewer': {
           command: process.execPath,

@@ -60,7 +60,7 @@ test('Phase 08: stablePoolIndex handles the degenerate size<=0 case the same way
 
 test('Phase 08: selectPlacementPolicyRedirectExecutor reproduces the REAL live config\'s single-candidate redirect (claude -> codex-bwrap) exactly', () => {
   const cfg = runnerConfig();
-  // Matches the live .fgos/config.json shape verbatim: executors.claude.readOnlyRedirect.default = ["codex-bwrap"].
+  // Matches the live .fgos/config.json shape verbatim: placementPolicy.readOnlyRedirects.claude.default = ["codex-bwrap"].
   const result = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId: 'claude', candidatePool: ['codex-bwrap'], seed: 'review-candidate:asgn_real_001' });
   assert.equal(result, 'codex-bwrap');
 });

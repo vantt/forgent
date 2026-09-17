@@ -60,7 +60,7 @@ import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
-import { resolveVerifiedRedirectExecutor } from './placement-policy.mjs';
+import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -232,32 +232,13 @@ function stableIndex(seed, size) {
   return hash.readUInt32BE(0) % size;
 }
 
-function normalizeRedirectCandidates(value) {
-  if (typeof value === 'string' && value.trim()) return [value.trim()];
-  if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
-  return [];
-}
-
-function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
-  // Phase D (executor-profile-schema-migration): reads
-  // `executors.<sourceExecutorId>.readOnlyRedirect` -- relocated from the
-  // retired top-level `runner.readOnlyExecutorRedirects.<sourceExecutorId>`
-  // map, same value shape (validated by config.mjs's
-  // `validateReadOnlyRedirectShape`).
-  const configured = cfg?.executors?.[sourceExecutorId]?.readOnlyRedirect;
-  if (configured === undefined) {
-    return sourceExecutorId === 'claude' && cfg?.executors?.['claude-reviewer'] ? ['claude-reviewer'] : [];
-  }
-  const operation = assignment?.operation;
-  if (configured && typeof configured === 'object' && !Array.isArray(configured)) {
-    return normalizeRedirectCandidates(configured.operations?.[operation] ?? configured.default);
-  }
-  return normalizeRedirectCandidates(configured);
-}
-
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  const rawPool = readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment);
+  // Phase D correction (executor-profile-schema-migration): PlacementPolicy
+  // itself now owns reading the declared candidate pool
+  // (`readOnlyRedirectPool`, `placement-policy.mjs`) -- see that function's
+  // own doc comment for why this moved off `executors.<id>` a second time.
+  const rawPool = readOnlyRedirectPool(cfg, sourceExecutorId, assignment?.operation);
   const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
   const legacyExecutorId = candidates.length === 0
     ? sourceExecutorId
@@ -1463,10 +1444,10 @@ export async function executeAssignment(assignment, opts = {}) {
   // kept the write-safety fix but also concentrated every read-only Claude
   // role onto one executor/account. The default remains byte-identical when no
   // config is present; projects can now declare per-operation/pool redirects
-  // under the source executor's own executors.<id>.readOnlyRedirect (Phase D,
-  // executor-profile-schema-migration; relocated from the retired top-level
-  // runner.readOnlyExecutorRedirects) without changing the higher-level
-  // operation policy.
+  // under runner.placementPolicy.readOnlyRedirects.<sourceExecutorId> (Phase D,
+  // executor-profile-schema-migration -- PlacementPolicy-owned, per
+  // design.md §3.6/§7 step 9, not nested on any executors.<id> entry)
+  // without changing the higher-level operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
   // `let`: see the Phase B note on `compiledPlan` above -- a fallback
   // candidate is never read-only-redirected (only ever a DECLARED
