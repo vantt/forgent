@@ -4,10 +4,12 @@ Status: Phase A, B, C merged to main. Phase D merged, then self-caught and
 corrected (user found a real architecture mistake during Phase E scoping --
 see Phase D's own "First-pass mistake" section). Phase E scope also
 revised in light of the same correction (see Phase E's own "Why the
-original scope was also wrong" section) -- not started, needs its own
-dedicated implementation pass and explicit go-ahead before touching the
-real spawn argv path or removing an executor id anything still
-references.
+original scope was also wrong" section); step 1 (ProviderAdapter argv
+production binder) is done and merged. Step 2 (retiring
+`claude-reviewer`/`claude-reviewer-herdr` as separate ids) is not started
+-- needs its own explicit go-ahead, a new toolIntent-from-persona policy
+feature, and a migration-contract decision before touching any executor id
+anything still references.
 
 This is the deferred "later track" design.md §9 of
 `plans/260915-executor-policy-dispatch-seams/` named but never scoped:
@@ -49,7 +51,7 @@ explicitly instead of inheriting one.
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
 | D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto PlacementPolicy's own config surface | Done (corrected) | commit `41532099` (first pass, wrong location), corrected commit `3baddb14` (branch `executor-placement-policy-readonly-redirect`), merged `20a4e85d` |
-| E | Step 1: ProviderAdapter argv-rendering production binder for `claude` family | Step 1 done | commit `<pending>` (branch `executor-provider-adapter-argv-binder`) |
+| E | Step 1: ProviderAdapter argv-rendering production binder for `claude` family | Step 1 done | commit `cc14bfc4` (branch `executor-provider-adapter-argv-binder`), merged `81a64e72` |
 | E | Step 2: consolidate `claude`+`claude-reviewer`+`claude-reviewer-herdr` etc., retire flat `executors.<id>` shape | Not started, largest blast radius | -- |
 
 ## Phase A — remove genuinely dormant executor ids
@@ -479,8 +481,11 @@ byte-identical to the pre-correction baseline.
 ## Phase E — consolidate remaining executor ids
 
 Status: Step 1 done. Implemented in worktree/branch
-`executor-provider-adapter-argv-binder`, commit `<pending>`. Step 2 (id
-consolidation) not started, needs its own explicit go-ahead.
+`executor-provider-adapter-argv-binder`, commit `cc14bfc4`, merged to main
+as `81a64e72`. Full `npm test` gate on main post-merge: 7058 tests, 4
+pre-existing failures byte-identical to the pre-merge baseline. Zero new
+regressions. Step 2 (id consolidation) not started, needs its own
+explicit go-ahead.
 
 ### Why the original Phase E scope was also wrong
 
@@ -593,5 +598,8 @@ original Phase E scope was also wrong" above.
   declaration (`runner.placementPolicy.readOnlyRedirects.<id>`) and the
   selection algorithm (Phase 08, unchanged) -- design.md §7 step 9's actual
   condition. Met (corrected).
-- Phase E: a real migration contract exists and is followed; no
-  currently-referenced executor id disappears without one.
+- Phase E step 1: ProviderAdapter's rendering is the production argv
+  source for the `claude` provider family, self-verified against legacy,
+  zero behavior change for every currently-configured executor. Met.
+- Phase E step 2: a real migration contract exists and is followed; no
+  currently-referenced executor id disappears without one. Not started.
