@@ -3,7 +3,7 @@
 // Proves:
 // 1. ProviderAdapter is a pure rendering layer: no spawn, no fs writes, no config mutation.
 // 2. Accurately reports `applied` statuses and extracts `policyShapedFlags` per provider family.
-// 3. Produces equivalent argv to legacy resolveExecutorCommand across the full 13-executor × 3-tier matrix.
+// 3. Produces equivalent argv to legacy resolveExecutorCommand across the full 12-executor × 3-tier matrix.
 
 import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
@@ -427,7 +427,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     });
   });
 
-  describe('shadow-vs-legacy equivalence matrix (13 executors × 3 tiers = 39 pairs)', () => {
+  describe('shadow-vs-legacy equivalence matrix (12 executors × 3 tiers = 36 pairs)', () => {
     const expectedExecutors = [
       'claude',
       'claude-reviewer',
@@ -439,7 +439,6 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       'codex-bwrap',
       'codex-readonly',
       'pi',
-      'pi-herdr',
       'codex-pi',
       'glm-cli',
     ];

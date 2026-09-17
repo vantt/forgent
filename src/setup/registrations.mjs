@@ -719,8 +719,6 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
     'codex',
     'pi',
     'glm',
-    'claude-herdr',
-    'pi-herdr',
     'codex-herdr',
     'gitnexus',
     'herdr',
