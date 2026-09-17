@@ -130,7 +130,7 @@ function assertMutationAllowed(value, pathLabel, { allowMutating = false } = {})
   );
 }
 
-const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier']);
+const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier', 'invocation']);
 
 // R2's trust boundary for `actors[]`: a trusted request may bind a declared
 // SessionActor to Persona/executor/model/tier POLICY only -- it may never
@@ -140,6 +140,14 @@ const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier'
 // declared by the session being opened) is checked by the caller (run.mjs),
 // since that depends on which protocol/kind was requested -- this function
 // only validates SHAPE.
+//
+// `invocation` (executor-id-consolidation Step 2): names a specific
+// `executors.<executor>.invocations[].id` -- required once `executor` names
+// a consolidated multi-invocation executor and the actor needs a
+// NON-DEFAULT one (e.g. a reviewer needing the read-only invocation, not
+// whichever one Gate B2's own "first via:cli" default would pick).
+// Optional; omitted means "Gate B2's default for whatever executor
+// resolves", byte-identical to before this field existed.
 function validateActorsShape(actors) {
   if (actors === undefined) return [];
   if (!Array.isArray(actors)) fail('"actors" must be an array');
@@ -155,10 +163,13 @@ function validateActorsShape(actors) {
       fail(`actors[${i}].id "${actor.id}" is bound more than once -- undeclared actor multiplicity rejected`);
     }
     seenIds.add(actor.id);
-    for (const key of ['persona', 'executor', 'model', 'tier']) {
+    for (const key of ['persona', 'executor', 'model', 'tier', 'invocation']) {
       if (actor[key] !== undefined && !isNonEmptyString(actor[key])) {
         fail(`actors[${i}].${key} must be a non-empty string when present`);
       }
+    }
+    if (actor.invocation !== undefined && actor.executor === undefined) {
+      fail(`actors[${i}].invocation is present but "executor" is not -- an invocation pin only means something alongside an explicit executor`);
     }
   }
   return actors;

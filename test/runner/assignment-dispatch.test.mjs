@@ -2997,18 +2997,18 @@ test('executeAssignment: an unfenced caller (no retryId, every pre-existing call
   assert.deepEqual([first.runId, second.runId, third.runId].map((id) => id.split('_').pop()), ['01', '02', '03']);
 });
 
-test('committed config pins code-review Claude profiles to high effort only on reviewer executors', () => {
+test('committed config pins code-review Claude profiles to high effort only on reviewer invocations (executor-id-consolidation Step 2: reviewer/herdr-reviewer are now claude\'s own cli-readonly/herdr-readonly invocations, not separate executor ids)', () => {
   const repoRoot = path.resolve(import.meta.dirname, '..', '..');
   const cfg = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8')).runner;
 
-  const argsFor = (executorId) => cfg.executors[executorId].invocations[0].args;
+  const argsForInvocation = (executorId, invocationId) => cfg.executors[executorId].invocations.find((inv) => inv.id === invocationId).args;
   const hasHighEffort = (args) => {
     const effortIndex = args.indexOf('--effort');
     return effortIndex >= 0 && args[effortIndex + 1] === 'high';
   };
 
-  assert.equal(hasHighEffort(argsFor('claude-reviewer')), true);
-  assert.equal(hasHighEffort(argsFor('claude-reviewer-herdr')), true);
-  assert.equal(argsFor('claude').includes('--effort'), false);
-  assert.equal(argsFor('glm-cli').includes('--effort'), false);
+  assert.equal(hasHighEffort(argsForInvocation('claude', 'cli-readonly')), true);
+  assert.equal(hasHighEffort(argsForInvocation('claude', 'herdr-readonly')), true);
+  assert.equal(argsForInvocation('claude', 'cli').includes('--effort'), false);
+  assert.equal(cfg.executors['glm-cli'].invocations[0].args.includes('--effort'), false);
 });

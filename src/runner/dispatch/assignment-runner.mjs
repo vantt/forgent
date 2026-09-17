@@ -1464,8 +1464,19 @@ export async function executeAssignment(assignment, opts = {}) {
   // candidate is never read-only-redirected (only ever a DECLARED
   // executorPreference entry), so this reassignment happens strictly
   // after the redirect/governance logic immediately below, never inside it.
+  //
+  // executor-id-consolidation Step 2: a caller that already pinned a
+  // specific invocation (`opts.cliOverride?.preferInvocation` -- e.g. a
+  // code-panel actor explicitly declaring `{executor:"claude",
+  // invocation:"cli-readonly"}`) has already made ITS OWN deliberate
+  // read-only-safe choice; the redirect exists to supply a safe default
+  // when nobody made one, never to override one that was already made.
+  // Without this guard, an explicit pin to claude's own read-only
+  // invocation would still get silently substituted away to the
+  // redirect's target executor entirely, discarding the caller's choice.
+  const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
   let resolvedExecutorId =
-    isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude'
+    isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude' && !hasExplicitInvocationPin
       ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
   // executor-id-consolidation Step 2: the pool entry that named
@@ -2095,14 +2106,17 @@ export async function executeAssignment(assignment, opts = {}) {
           executorId: resolvedExecutorId,
           fgosDir,
           attestRoot: effectiveCwd,
-          // Two independent, mutually-exclusive-in-practice substitution
-          // sources can each pin an invocation: the provider-capacity
-          // fallback's own confinement-preservation pick (above) always
-          // wins when both somehow apply; the read-only-redirect's own
-          // declared pin (computed earlier, at redirect time) is the
-          // fallback source; neither pins anything for the unsubstituted
+          // Three sources, most-specific-wins: an EXPLICIT caller pin
+          // (`opts.cliOverride.preferInvocation` -- a code-panel actor's
+          // own deliberate choice, already guarded above so the redirect
+          // never overrides it) always wins first; the provider-capacity
+          // fallback's own confinement-preservation pick is next (it only
+          // ever applies to a fallback-substituted executor, never the
+          // unsubstituted primary the explicit pin would target); the
+          // read-only-redirect's own declared pin is the last fallback
+          // source; neither pins anything for the unsubstituted
           // primary, leaving Gate B2's "first via:cli" default untouched.
-          invocationId: fallbackInvocationId ?? readOnlyRedirectInvocationId,
+          invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId ?? readOnlyRedirectInvocationId,
         });
       } catch (err) {
         const commandOutcome = {

@@ -48,11 +48,21 @@ function policyTierForWorkTier(workTier, rigorOverrides) {
   return rigorOverrides?.[tier] ?? DEFAULT_TIER_TO_POLICY[tier] ?? (MODEL_POLICY_TIERS.includes(tier) ? tier : undefined);
 }
 
-function candidateInvocation(executorEntry) {
-  const cliInvocation = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations.find((inv) => inv.via === 'cli') : undefined;
+// executor-id-consolidation Step 2: mirrors resolve.mjs's own Gate B2 fix
+// exactly -- an executor can declare several via:"cli" invocations that
+// differ in adapter/confinement (e.g. claude's own herdr-readonly vs cli),
+// so "the first via:cli entry" is no longer a safe stand-in for "the one
+// actually being dispatched". `invocationId`, when given, selects by name;
+// omitted keeps the legacy "first via:cli" default (byte-identical for
+// every caller that predates this fix).
+function candidateInvocation(executorEntry, invocationId) {
+  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : undefined;
+  const cliInvocation = invocationId
+    ? invocations?.find((inv) => inv.id === invocationId && inv.via === 'cli')
+    : invocations?.find((inv) => inv.via === 'cli');
   const adapter = executorEntry?.adapter ?? cliInvocation?.adapter;
   if (adapter === 'herdr-spawn') return 'visible';
-  if (executorEntry?.confinement?.backend === 'bwrap') return 'bwrap';
+  if ((cliInvocation?.confinement ?? executorEntry?.confinement)?.backend === 'bwrap') return 'bwrap';
   return 'headless';
 }
 
@@ -67,12 +77,20 @@ function candidateInvocation(executorEntry) {
  * @param {object} cfg
  * @param {string} capabilityId capability name or bare executor id
  * @param {string} [workTier] light|standard|heavy (D9's work-size vocabulary)
+ * @param {string} [invocationId] executor-id-consolidation Step 2: pins a
+ *   specific `invocations[].id` for the `invocation` field's own
+ *   visible/headless/bwrap classification (`candidateInvocation`) --
+ *   defaults to `resolved.invocationId` (already auto-derived when
+ *   `capabilityId` resolved via `capabilities.<name>.prefer`), which
+ *   itself defaults to `undefined` (legacy "first via:cli" pick) when
+ *   resolved via a literal executor id.
  * @returns {{executorId: string, provider: string, model: string, lookupPolicyTier: string, invocation: string, reasonCodes: string[]}|null}
  */
-export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier }) {
+export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier, invocationId }) {
   const resolved = resolveExecutorAndOverrides(cfg, capabilityId);
   if (!resolved.configured) return null;
   const { executorId, executor, overrides, bindingSource } = resolved;
+  const effectiveInvocationId = invocationId ?? resolved.invocationId;
 
   // `resolveExecutorAndOverrides` only ever populates `overrides` for a
   // CAPABILITY-prefer binding (`capabilities.<name>.overrides`) -- a bare
@@ -111,7 +129,7 @@ export function buildPlacementPolicyCandidate({ cfg, capabilityId, workTier }) {
     provider,
     model,
     lookupPolicyTier,
-    invocation: candidateInvocation(executor),
+    invocation: candidateInvocation(executor, effectiveInvocationId),
     reasonCodes: Object.freeze([
       bindingSource === 'capability.prefer' ? 'capabilities.prefer' : bindingSource === 'capability.for' ? 'capabilities.for' : 'executor-id',
       ...(overrides?.rigorOverrides ? ['calibration.rigorOverrides'] : executor?.rigorOverrides ? ['calibration.executor.rigorOverrides'] : []),
