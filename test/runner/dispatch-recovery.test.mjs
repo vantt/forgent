@@ -14,11 +14,11 @@ function buildCfg() {
   return {
     modelPolicies: {
       claude: {
-        lightweight: 'claude-haiku',
+        nano: 'claude-haiku',
         standard: 'claude-sonnet',
-        creative: 'claude-sonnet',
-        analytical: 'claude-opus',
-        critical: 'claude-opus',
+        advanced: 'claude-sonnet',
+        flagship: 'claude-opus',
+        frontier: 'claude-opus',
       },
     },
     executors: {
@@ -140,7 +140,7 @@ test('a candidate that compiles to a different governance-relevant tier/visibili
   const compilePlan = () => ({
     ...originalPlan,
     executorId: 'claude-b',
-    tier: 'critical', // a different governance floor than the original plan
+    tier: 'frontier', // a different governance floor than the original plan
   });
 
   const result = resolveFallback(originalPlan, 'claude-b', { compilePlan });

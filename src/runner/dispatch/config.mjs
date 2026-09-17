@@ -184,21 +184,21 @@ export const DEFAULT_RUNNER_CONFIG = {
     ],
   },
   // tsk-5tm-5 D9: modelPolicies replaces the old flat `models` map --
-  // provider-keyed, each provider's own 5-tier vocab (MODEL_POLICY_TIERS
+  // provider-keyed, each provider's own 6-tier vocab (MODEL_POLICY_TIERS
   // below). Default here stays Claude-only (matching the default
   // `executor.command: 'claude'` above); a project adds its own
   // `modelPolicies.<providerModel>` block when it configures a
   // non-Claude executor (this repo's own committed config does, for
-  // `agy`/gemini). `creative`/`analytical` default to `sonnet` (no real
-  // consumer differentiates them from `standard` yet); `critical`
+  // `agy`/gemini). `advanced`/`flagship` default to `sonnet` (no real
+  // consumer differentiates them from `standard` yet); `frontier`
   // defaults to `opus`, matching `heavy`'s pre-D9 model unchanged.
   modelPolicies: {
     claude: {
-      lightweight: 'haiku',
+      nano: 'haiku',
       standard: 'sonnet',
-      creative: 'sonnet',
-      analytical: 'sonnet',
-      critical: 'opus',
+      advanced: 'sonnet',
+      flagship: 'sonnet',
+      frontier: 'opus',
     },
   },
   timeoutMs: 900000,
@@ -455,27 +455,29 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
 
 /**
  * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
- * matching marketing-cockpit's `tier_policy_path`) — deliberately its OWN
- * 5-value vocab, distinct from `work.mjs`'s `TIERS` (`light/standard/
- * heavy`, D9's own pinned scope boundary: that export stays untouched,
- * shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is the default
- * mapping from a work item's own tier onto one of these five, used
- * whenever a executor names no `rigorOverrides` entry for that tier —
- * `light`/`standard` map onto their same-named policy tier directly;
- * `heavy` maps to `critical`, the highest-rigor policy tier, matching
- * `heavy`'s own framing elsewhere (`HEAVY_RISK`) as the most
- * scrutiny-demanding classification. `creative`/`analytical` have no
- * default work-tier mapped onto them yet — they exist for a executor's
- * own `rigorOverrides` to select explicitly (e.g. a executor whose work
- * is better served by a creative-leaning model even at `standard` rigor),
- * not because this item invents a use for them.
+ * model-tier vocabulary migration 2026-09-17) — deliberately its OWN
+ * 6-value cross-provider equivalence vocab (`plans/260916-account-rotator/
+ * design.md`'s "Tier vocabulary"), distinct from `work.mjs`'s `TIERS`
+ * (`light/standard/heavy`, D9's own pinned scope boundary: that export
+ * stays untouched, shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is
+ * the default mapping from a work item's own tier onto one of these six,
+ * used whenever a executor names no `rigorOverrides` entry for that tier —
+ * `light` maps to `nano` (the floor tier), `standard` maps onto its
+ * same-named policy tier directly; `heavy` maps to `frontier`, the
+ * highest-rigor policy tier, matching `heavy`'s own framing elsewhere
+ * (`HEAVY_RISK`) as the most scrutiny-demanding classification.
+ * `mini`/`advanced`/`flagship` have no default work-tier mapped onto them
+ * yet — they exist for a executor's own `rigorOverrides` to select
+ * explicitly (e.g. a executor whose work is better served by a
+ * flagship-leaning model even at `standard` rigor), not because this item
+ * invents a use for them.
  */
-export const MODEL_POLICY_TIERS = Object.freeze(['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+export const MODEL_POLICY_TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
 // Exported (additive, D7 module split): `dispatch/resolve.mjs`'s
 // `modelForTier` needs this default map too, now that it lives in a sibling
 // module — was a bare same-file `const` before the split (byte-identical
 // value/behavior, only newly reachable from outside this file).
-export const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'lightweight', standard: 'standard', heavy: 'critical' });
+export const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'nano', standard: 'standard', heavy: 'frontier' });
 
 /**
  * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
@@ -1295,7 +1297,7 @@ function validateCapabilitiesShape(capabilities, label) {
  * arbitrary provider name (`"claude"`, `"gemini"`, ...) to a tier map,
  * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
  * non-empty model-name strings. Partial coverage (a provider naming fewer
- * than all 5 tiers) is valid at load time, same lenient-at-load/strict-
+ * than all 6 tiers) is valid at load time, same lenient-at-load/strict-
  * at-resolve philosophy the old flat `models` map already used (per
  * `modelForTier`'s own doc comment) — a missing tier only throws once
  * something actually asks for it.
@@ -1421,7 +1423,7 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       }
     }
   }
-  // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 5-tier) is the new
+  // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 6-tier) is the new
   // preferred shape -- when present, it satisfies this requirement on its
   // own; the legacy flat `models` map is only required when a project
   // hasn't migrated. Both may coexist (modelForTier prefers modelPolicies

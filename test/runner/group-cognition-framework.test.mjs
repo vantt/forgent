@@ -154,21 +154,21 @@ test('R1: no operation declares result.kind other than "advisory" -- never gate-
   }
 });
 
-// ─── R2: cognitive policy -- creative/analytical/critical tier floors ──────
+// ─── R2: cognitive policy -- advanced/flagship/frontier tier floors ──────
 
-test('R2: activity-level tier floors are declared via policy.minTier and exercise all three named tiers (creative, analytical, critical) across distinct activities', () => {
+test('R2: activity-level tier floors are declared via policy.minTier and exercise all three named tiers (advanced, flagship, frontier) across distinct activities', () => {
   const definition = loadDefinition();
   const tierByOp = Object.fromEntries(definition.spec.operations.map((op) => [op.id, op.policy?.minTier]));
 
-  assert.equal(tierByOp['divergent-exploration'], 'creative');
-  assert.equal(tierByOp['cluster-deduplicate'], 'analytical');
-  assert.equal(tierByOp['critical-challenge'], 'critical');
-  assert.equal(tierByOp['evidence-review'], 'analytical');
-  assert.equal(tierByOp['convergent-synthesis'], 'analytical');
-  assert.equal(tierByOp['recommend-with-dissent'], 'critical');
+  assert.equal(tierByOp['divergent-exploration'], 'advanced');
+  assert.equal(tierByOp['cluster-deduplicate'], 'flagship');
+  assert.equal(tierByOp['critical-challenge'], 'frontier');
+  assert.equal(tierByOp['evidence-review'], 'flagship');
+  assert.equal(tierByOp['convergent-synthesis'], 'flagship');
+  assert.equal(tierByOp['recommend-with-dissent'], 'frontier');
 
   const declaredTiers = new Set(Object.values(tierByOp).filter(Boolean));
-  assert.ok(declaredTiers.has('creative') && declaredTiers.has('analytical') && declaredTiers.has('critical'));
+  assert.ok(declaredTiers.has('advanced') && declaredTiers.has('flagship') && declaredTiers.has('frontier'));
 
   // Every declared tier is drawn from the SAME real vocabulary
   // dispatch/config.mjs's MODEL_POLICY_TIERS defines -- never a
@@ -202,7 +202,7 @@ test('R2: activity tier floors remain monotonic through the actor policy scope s
     { scope: 'actor', source: criticActor.id, policy: criticActor.policy ?? {} },
   ];
   const merged = mergePolicyStack(legalStack);
-  assert.equal(merged.minTier, 'critical');
+  assert.equal(merged.minTier, 'frontier');
 
   // An actor-scope attempt to LOWER the operation-declared floor is
   // rejected, not silently clamped -- proves this fixture's own operation/
@@ -211,8 +211,8 @@ test('R2: activity tier floors remain monotonic through the actor policy scope s
   assert.throws(
     () =>
       mergePolicyStack([
-        { scope: 'operation', source: criticalChallengeOp.id, policy: { minTier: 'critical' } },
-        { scope: 'actor', source: criticActor.id, policy: { minTier: 'lightweight' } },
+        { scope: 'operation', source: criticalChallengeOp.id, policy: { minTier: 'frontier' } },
+        { scope: 'actor', source: criticActor.id, policy: { minTier: 'nano' } },
       ]),
     (err) => err instanceof FlowDefinitionError && /monotonic/.test(err.message),
   );

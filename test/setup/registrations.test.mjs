@@ -20,7 +20,7 @@ import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-gu
 const EXPECTED_RUNNER_DEFAULT = {
   ...DEFAULT_RUNNER_CONFIG,
   capabilities: DEFAULT_CAPABILITY_SLOTS,
-  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { lightweight: 'gpt-5.5' } },
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { nano: 'gpt-5.5' } },
   executors: { pi: PI_EXECUTOR_DEFAULT },
 };
 

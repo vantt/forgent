@@ -16,12 +16,12 @@
 #   old `count: 2` made planCohort hard-fail immediately on load. `count`
 #   is optional; omitting it plans every declared actor with no count
 #   assertion, which is what this fixture actually needs.
-# - `independent-research`'s `policy.minTier` lowered from `analytical` to
-#   `lightweight`: `analytical` is only configured for the `claude`
+# - `independent-research`'s `policy.minTier` lowered from `flagship` to
+#   `nano`: `flagship` is only configured for the `claude`
 #   provider family in this repo's real .fgos/config.json, which would
 #   silently defeat the whole point of an independent, diverse-provider
 #   research cohort (every non-claude candidate would hard-fail the tier
-#   check). `lightweight` is the one tier genuinely configured for every
+#   check). `nano` is the one tier genuinely configured for every
 #   real provider family this repo registers (claude/gemini/openai-codex/
 #   z-ai), matching this track's own P03.2-discovered "unspecified tier
 #   silently defaults higher" trap -- specified explicitly here, never left
@@ -91,7 +91,7 @@ spec:
     - id: independent-research
       role: researcher
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: independent-research-brief
       result:

@@ -166,7 +166,7 @@ spec:
     - id: divergent-exploration
       role: explorer
       policy:
-        minTier: creative
+        minTier: advanced
       task:
         contractTemplate: divergent-exploration-brief
       result:
@@ -183,7 +183,7 @@ spec:
     - id: cluster-deduplicate
       role: clusterer
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: cluster-deduplicate-candidates
       result:
@@ -196,7 +196,7 @@ spec:
     - id: critical-challenge
       role: critic
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: critical-challenge-review
       result:
@@ -217,7 +217,7 @@ spec:
     - id: evidence-review
       role: evidence-reviewer
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: evidence-review-assessment
       result:
@@ -231,7 +231,7 @@ spec:
     - id: convergent-synthesis
       role: synthesizer
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: convergent-synthesis-draft
       result:
@@ -271,7 +271,7 @@ spec:
     - id: recommend-with-dissent
       role: synthesizer
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: recommendation-with-dissent-report
       result:

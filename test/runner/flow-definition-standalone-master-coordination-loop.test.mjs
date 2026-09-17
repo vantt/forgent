@@ -121,25 +121,25 @@ test('standalone-master-coordination-loop rejects a mutated copy that injects ba
 
 // ─── Phase 03 (Step 09 P03.1) R2/R3/R4: role execution policy readiness ───
 
-test('standalone-master-coordination-loop declares the intended cheap-by-default / analytical-by-default policy.minTier per role operation', () => {
+test('standalone-master-coordination-loop declares the intended cheap-by-default / flagship-by-default policy.minTier per role operation', () => {
   const def = loadCoordinationProtocol(FIXTURE_ID, { cwd: mkTempDir('flow-definition-master-loop-policy-') });
   const minTierByOp = Object.fromEntries(def.spec.operations.map((op) => [op.id, op.policy?.minTier]));
 
   // Doer/Fixer: cheap-by-default (R4).
   assert.equal(minTierByOp['produce-candidate'], 'standard');
   assert.equal(minTierByOp['revise-candidate'], 'standard');
-  // Reviewer/Recheck: analytical read-only default (R4/R5).
-  assert.equal(minTierByOp['review-candidate'], 'analytical');
-  assert.equal(minTierByOp['reviewer-recheck'], 'analytical');
-  // Red-Team/Recheck: analytical default, escalated to critical only via a
+  // Reviewer/Recheck: flagship read-only default (R4/R5).
+  assert.equal(minTierByOp['review-candidate'], 'flagship');
+  assert.equal(minTierByOp['reviewer-recheck'], 'flagship');
+  // Red-Team/Recheck: flagship default, escalated to frontier only via a
   // caller-supplied assignment/cli-scope PolicyPatch at dispatch time (see
   // test/runner/dispatch-coordination-role-tiers.test.mjs for the live
   // escalation proof) -- a portable operation/role/actor/definition scope
-  // can never pin `critical` unconditionally without also raising the
+  // can never pin `frontier` unconditionally without also raising the
   // floor for every OTHER round this operation dispatches, defeating "cheap
   // by default" (R6).
-  assert.equal(minTierByOp['red-team-candidate'], 'analytical');
-  assert.equal(minTierByOp['red-team-recheck'], 'analytical');
+  assert.equal(minTierByOp['red-team-candidate'], 'flagship');
+  assert.equal(minTierByOp['red-team-recheck'], 'flagship');
 
   // No operation declares `capabilities[]` (R1 audit finding: inert for
   // this fixture's non-cohort dispatch path -- see P03.1.md).

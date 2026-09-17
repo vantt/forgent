@@ -71,7 +71,7 @@ function fakeRunnerConfig(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', critical: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', frontier: 'test-model' } },
     timeoutMs: 8000,
   };
 }
@@ -274,6 +274,6 @@ test('RFC-Review-Lite: the objector role\'s real, worked actor-scope PolicyPatch
   );
 
   const provenance = dispatched.runResult.policy.provenance;
-  assert.equal(provenance.tier.value, 'critical', 'objector-a-actor\'s own spec.actors[].policy.minTier must genuinely raise the resolved tier');
+  assert.equal(provenance.tier.value, 'frontier', 'objector-a-actor\'s own spec.actors[].policy.minTier must genuinely raise the resolved tier');
   assert.deepEqual(provenance.tier.source, { scope: 'actor', id: 'objector-a-actor' }, 'the resolved tier must be attributed to the REAL declaring scope, not a synthetic default');
 });

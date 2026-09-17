@@ -119,7 +119,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', lightweight: 'test-model', creative: 'test-model', analytical: 'test-model', critical: 'test-model' },
+    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
     timeoutMs: 5000,
   };
 }

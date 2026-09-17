@@ -61,7 +61,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', lightweight: 'test-model', creative: 'test-model', analytical: 'test-model', critical: 'test-model' },
+    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
     timeoutMs: 5000,
   };
 }
@@ -347,17 +347,17 @@ test('R3: the full precedence chain composes, and the resolved tier/persona/exec
   const runnerConfig = fakeExecutor(tempDir);
 
   // provide-consult's own declared operation policy sets minTier: standard.
-  // Layer runner (lightweight, ignored -- lower), then cli (critical, the
-  // most specific scope) on top of it -- final tier must be "critical",
+  // Layer runner (nano, ignored -- lower), then cli (frontier, the
+  // most specific scope) on top of it -- final tier must be "frontier",
   // sourced to "cli", not silently defaulted or misattributed to "cliOverride".
   const request = await dispatchRequest('coord_declared_r3_chain', tempDir, runnerConfig);
   const provide = await dispatchProvide('coord_declared_r3_chain', tempDir, runnerConfig, request.assignment.assignmentId, {
-    runnerPolicy: { minTier: 'lightweight' },
-    cliPolicy: { minTier: 'critical', preferPersona: 'trusted-reviewer' },
+    runnerPolicy: { minTier: 'nano' },
+    cliPolicy: { minTier: 'frontier', preferPersona: 'trusted-reviewer' },
   });
 
   const provenance = provide.runResult.policy.provenance;
-  assert.equal(provenance.tier.value, 'critical');
+  assert.equal(provenance.tier.value, 'frontier');
   assert.deepEqual(provenance.tier.source, { scope: 'cli', id: 'cli' });
   assert.equal(provenance.persona.value, 'trusted-reviewer');
   assert.deepEqual(provenance.persona.source, { scope: 'cli', id: 'cli' });
@@ -410,7 +410,7 @@ test('R3: minTier is monotonic -- an assignment-scope attempt to LOWER the opera
 
   await assert.rejects(
     dispatchProvide('coord_declared_r3_monotonic', tempDir, runnerConfig, request.assignment.assignmentId, {
-      assignmentPolicy: { minTier: 'lightweight' },
+      assignmentPolicy: { minTier: 'nano' },
     }),
     (err) => err instanceof FlowDefinitionError && /minTier is monotonic/.test(err.message),
   );

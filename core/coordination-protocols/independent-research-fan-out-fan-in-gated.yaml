@@ -24,7 +24,7 @@
 # `activation`/`contextAccess` on the `synthesize-findings` binding, and
 # `metadata.id` is byte-identical in meaning to the ungated fixture --
 # including the two P04.2 fixes recorded there (no `cohort.count`, no
-# `capabilities:` on any operation, `lightweight` minTier on
+# `capabilities:` on any operation, `nano` minTier on
 # `independent-research`), which apply here for exactly the same reasons.
 
 apiVersion: fgos.dev/v1alpha1
@@ -91,7 +91,7 @@ spec:
     - id: independent-research
       role: researcher
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: independent-research-brief
       result:

@@ -300,7 +300,7 @@ spec:
     - id: interpret-request
       role: lead-advisor
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: architecture-advisory-panel-v1-interpretation
       result:
@@ -318,7 +318,7 @@ spec:
     - id: shape-system-proposal
       role: system-shaper
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-system-proposal
       result:
@@ -329,7 +329,7 @@ spec:
     - id: shape-alternative-proposal
       role: alternative-shaper
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-alternative-proposal
       result:
@@ -340,7 +340,7 @@ spec:
     - id: shape-constraint-proposal
       role: constraint-advocate
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-constraint-proposal
       result:
@@ -351,7 +351,7 @@ spec:
     - id: critique-proposals
       role: architecture-critic
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-critique
       result:
@@ -362,7 +362,7 @@ spec:
     - id: assess-constraints
       role: constraint-advocate
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-constraint-findings
       result:
@@ -380,7 +380,7 @@ spec:
     - id: synthesize-recommendation
       role: synthesizer
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: architecture-advisory-panel-v1-synthesis
       result:
@@ -391,7 +391,7 @@ spec:
     - id: red-team-packet
       role: red-team
       policy:
-        minTier: analytical
+        minTier: flagship
       task:
         contractTemplate: architecture-advisory-panel-v1-redteam
       result:
@@ -400,7 +400,7 @@ spec:
     - id: explain-recommendation
       role: lead-advisor
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: architecture-advisory-panel-v1-explanation
       result:
@@ -409,7 +409,7 @@ spec:
     - id: revise-synthesis
       role: synthesizer
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: architecture-advisory-panel-v1-synthesis
       result:
@@ -420,7 +420,7 @@ spec:
     - id: revise-explanation
       role: lead-advisor
       policy:
-        minTier: critical
+        minTier: frontier
       task:
         contractTemplate: architecture-advisory-panel-v1-explanation
       result:

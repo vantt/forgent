@@ -409,9 +409,9 @@
           }
         ],
         "rigorOverrides": {
-          "light": "lightweight",
+          "light": "nano",
           "standard": "standard",
-          "heavy": "creative"
+          "heavy": "advanced"
         }
       },
       "codex-pi": {
@@ -440,9 +440,9 @@
         ],
         "providerModel": "openai-codex",
         "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "light": "nano",
+          "standard": "nano",
+          "heavy": "nano"
         }
       },
       "glm-cli": {
@@ -477,9 +477,9 @@
         ],
         "providerModel": "z-ai",
         "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "light": "nano",
+          "standard": "nano",
+          "heavy": "nano"
         }
       },
       "gitnexus": {
@@ -541,9 +541,9 @@
         ],
         "providerModel": "openai-codex",
         "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "light": "nano",
+          "standard": "nano",
+          "heavy": "nano"
         }
       }
     },
@@ -554,32 +554,32 @@
     },
     "modelPolicies": {
       "claude": {
-        "lightweight": "haiku",
+        "nano": "haiku",
         "standard": "sonnet",
-        "creative": "sonnet",
-        "analytical": "opus",
-        "critical": "opus"
+        "advanced": "sonnet",
+        "flagship": "opus",
+        "frontier": "opus"
       },
       "gemini": {
-        "lightweight": "gemini-3.8-flash-low",
+        "nano": "gemini-3.8-flash-low",
         "standard": "gemini-3.8-flash-medium",
-        "creative": "gemini-3.8-flash-high",
-        "analytical": "gemini-3.1-pro-low",
-        "critical": "gemini-3.1-pro-high"
+        "advanced": "gemini-3.8-flash-high",
+        "flagship": "gemini-3.1-pro-low",
+        "frontier": "gemini-3.1-pro-high"
       },
       "openai-codex": {
-        "lightweight": "gpt-5.6-luna",
+        "nano": "gpt-5.6-luna",
         "standard": "gpt-5.6-terra",
-        "creative": "gpt-5.6-terra",
-        "analytical": "gpt-5.6-terra",
-        "critical": "gpt-5.6-sol"
+        "advanced": "gpt-5.6-terra",
+        "flagship": "gpt-5.6-terra",
+        "frontier": "gpt-5.6-sol"
       },
       "z-ai": {
-        "lightweight": "z-ai/glm-5.2",
+        "nano": "z-ai/glm-5.2",
         "standard": "z-ai/glm-5.2",
-        "creative": "z-ai/glm-5.2",
-        "analytical": "z-ai/glm-5.2",
-        "critical": "z-ai/glm-5.2"
+        "advanced": "z-ai/glm-5.2",
+        "flagship": "z-ai/glm-5.2",
+        "frontier": "z-ai/glm-5.2"
       }
     },
     "models": {

@@ -182,7 +182,7 @@ operations:
       taskSpec: <optional-declared-taskspec-id>
       contractTemplate: <optional-inline-template-id>
     policy:
-      minTier: lightweight | standard | creative | analytical | critical
+      minTier: nano | mini | standard | advanced | flagship | frontier
     result:
       kind: advisory | gate-verdict | work-product
       evidenceRequired: reported | verified
@@ -566,7 +566,7 @@ role, actor, Assignment, human/CLI, governance):
 
 ```yaml
 policy:
-  minTier: lightweight | standard | creative | analytical | critical
+  minTier: nano | mini | standard | advanced | flagship | frontier
   preferPersona: <persona-id>
   preferExecutor: <executor-id>
   fallbackExecutors:

@@ -29,17 +29,18 @@ import { resolveVerifiedAssignmentModel } from './placement-policy.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 
 export const TIER_STRENGTH = Object.freeze({
-  lightweight: 1,
-  standard: 2,
-  creative: 3,
-  analytical: 4,
-  critical: 5,
+  nano: 1,
+  mini: 2,
+  standard: 3,
+  advanced: 4,
+  flagship: 5,
+  frontier: 6,
 });
 
 // Phase 04 (executor-policy-dispatch-seams) — canonical quality axes.
 // `minRigor` is ordinal (raise-only applies here, nowhere else); `mode` is
 // nominal (design.md §3.2/§4). These are separate from `TIER_STRENGTH`'s
-// legacy 5-tier vocabulary above, which stays the compatibility key for the
+// legacy 6-tier vocabulary above, which stays the compatibility key for the
 // live `modelPolicies` catalog until PlacementPolicy/model calibration has
 // enough shadow proof to re-key safely (design.md §5.1/§8, phase-04.md
 // "Catalog decision").
@@ -54,13 +55,22 @@ export const QUALITY_MODE_VALUES = Object.freeze(['balanced', 'creative', 'analy
 // `explicit > implied-by-persona > implied-by-tier-bridge` precedence
 // (design.md §3.2). `implied-by-persona` has no producer yet (persona ->
 // mode is a later-phase PromptEnvelope/persona-registry concern) and is
-// intentionally never selected by this resolver today.
+// intentionally never selected by this resolver today. `mini` bridges to
+// the same `{minRigor: 'low', mode: 'balanced'}` as `nano` — `MIN_RIGOR_VALUES`
+// only has 4 discrete rungs (low/standard/high/critical) for 6 model tiers,
+// and `mini` sits closer to `nano` (small/cheap model class) than to
+// `standard` on every provider's own mapping (design.md's provider table).
+// Every one of the 6 `MODEL_POLICY_TIERS` MUST resolve here: `resolveAssignmentDispatchPolicy`
+// reads `derivedQuality.mode`/`derivedQuality.minRigor` unconditionally below,
+// so a missing key here would throw a raw TypeError instead of a clean
+// RunnerConfigError.
 export const QUALITY_TIER_BRIDGE = Object.freeze({
-  lightweight: Object.freeze({ minRigor: 'low', mode: 'balanced' }),
+  nano: Object.freeze({ minRigor: 'low', mode: 'balanced' }),
+  mini: Object.freeze({ minRigor: 'low', mode: 'balanced' }),
   standard: Object.freeze({ minRigor: 'standard', mode: 'balanced' }),
-  creative: Object.freeze({ minRigor: 'standard', mode: 'creative' }),
-  analytical: Object.freeze({ minRigor: 'high', mode: 'analytical' }),
-  critical: Object.freeze({ minRigor: 'critical', mode: 'analytical' }),
+  advanced: Object.freeze({ minRigor: 'standard', mode: 'creative' }),
+  flagship: Object.freeze({ minRigor: 'high', mode: 'analytical' }),
+  frontier: Object.freeze({ minRigor: 'critical', mode: 'analytical' }),
 });
 
 // Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort
@@ -155,9 +165,9 @@ export function resolveAssignmentDispatchPolicy({
       if (strength(work.tier) > strength(effectiveTier)) tierSource = { scope: 'work', id: work.id };
       effectiveTier = resolveStrongerTier(effectiveTier, work.tier);
     } else if (work.risk === 'heavy') {
-      // High-risk work raises floor to at least standard or analytical
-      if (strength('analytical') > strength(effectiveTier)) tierSource = { scope: 'work', id: work.id };
-      effectiveTier = resolveStrongerTier(effectiveTier, 'analytical');
+      // High-risk work raises floor to at least standard or flagship
+      if (strength('flagship') > strength(effectiveTier)) tierSource = { scope: 'work', id: work.id };
+      effectiveTier = resolveStrongerTier(effectiveTier, 'flagship');
     }
   }
 

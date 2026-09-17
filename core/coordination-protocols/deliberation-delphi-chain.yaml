@@ -66,7 +66,7 @@ spec:
     - id: propose-round1
       role: panelist
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: delphi-propose-round1
       result:
@@ -84,7 +84,7 @@ spec:
     - id: propose-round2
       role: panelist
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: delphi-propose-round2
       result:

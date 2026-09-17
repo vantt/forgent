@@ -79,7 +79,7 @@ function fakeRunnerConfig(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', analytical: 'test-model', critical: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'test-model', frontier: 'test-model' } },
     timeoutMs: 8000,
   };
 }
@@ -120,16 +120,16 @@ test('Delphi-Feedback-Lite: convene -> two round-1 private proposals -> mediated
   assert.equal(round1B.resumed, false);
 
   // Actor-scope minTier proof: panelist-a's dispatch resolves tier
-  // "analytical", sourced to scope "actor" (id "panelist-a") -- the
+  // "flagship", sourced to scope "actor" (id "panelist-a") -- the
   // definition's own `propose-round1` operation template declares no
   // policy of its own, so this value can only have come from
-  // spec.actors[].policy. ("analytical", not "standard": a tier exactly
+  // spec.actors[].policy. ("flagship", not "standard": a tier exactly
   // equal to resolveAssignmentDispatchPolicy's own hardcoded default floor
   // ties its strict `>` provenance-update check and never attributes to
   // "actor", even though the VALUE still resolves correctly -- see the
   // fixture's own header comment.)
   const round1AProvenance = round1A.runResult.policy.provenance.tier;
-  assert.equal(round1AProvenance.value, 'analytical');
+  assert.equal(round1AProvenance.value, 'flagship');
   assert.deepEqual(round1AProvenance.source, { scope: 'actor', id: 'panelist-a' });
 
   const round1LinkA = link(coordinationId, ctx, { contributionId: 'delphi_lite_r1_a', type: 'proposal', assignmentId: round1A.assignment.assignmentId, roundKey: 'round-1' });
@@ -139,14 +139,14 @@ test('Delphi-Feedback-Lite: convene -> two round-1 private proposals -> mediated
 
   // "aggregate" is a plain declared operation -- it produces the mediated,
   // non-contribution artifact this protocol is named for. Its own dispatch
-  // resolves tier "critical", sourced to actor "facilitator-actor".
+  // resolves tier "frontier", sourced to actor "facilitator-actor".
   const aggregate = await dispatchDeclaredOperation(
     coordinationId,
     { operationId: 'aggregate', targetActorId: 'facilitator-actor', objective: 'Produce the mediated aggregate artifact.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'coordinator-1' },
     { ...ctx.opts, runnerConfig: ctx.runnerConfig },
   );
   const aggregateId = aggregate.assignment.assignmentId;
-  assert.equal(aggregate.runResult.policy.provenance.tier.value, 'critical');
+  assert.equal(aggregate.runResult.policy.provenance.tier.value, 'frontier');
   assert.deepEqual(aggregate.runResult.policy.provenance.tier.source, { scope: 'actor', id: 'facilitator-actor' });
 
   const round2A = await dispatchDeclaredOperation(

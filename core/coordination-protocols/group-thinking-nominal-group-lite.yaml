@@ -47,7 +47,7 @@
 #     clarified, never by a raw, unmediated read of the other proposals.
 #
 # Per-actor policy: `spec.actors[].policy.minTier` differs by role
-# (facilitator: standard, participant: lightweight) -- a real per-actor
+# (facilitator: standard, participant: nano) -- a real per-actor
 # REQUIREMENT declared in this portable definition. A literal
 # `preferExecutor` pin is deliberately NOT declared here:
 # `assertNoPortableExecutorPin` (session-engine.mjs) rejects a concrete
@@ -116,21 +116,21 @@ spec:
     - id: participant-a
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
     - id: participant-b
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
     - id: participant-c
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
 
   operations:
     - id: private-propose
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: nominal-group-lite-private-propose
       result:
@@ -161,7 +161,7 @@ spec:
     - id: private-rank
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: nominal-group-lite-private-rank
       result:

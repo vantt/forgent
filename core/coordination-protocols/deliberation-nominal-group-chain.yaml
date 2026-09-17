@@ -73,7 +73,7 @@ spec:
     - id: private-propose
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: nominal-group-private-propose
       result:
@@ -93,7 +93,7 @@ spec:
     - id: private-rank
       role: participant
       policy:
-        minTier: lightweight
+        minTier: nano
       task:
         contractTemplate: nominal-group-private-rank
       result:

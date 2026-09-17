@@ -130,7 +130,7 @@ function assertMutationAllowed(value, pathLabel, { allowMutating = false } = {})
   );
 }
 
-const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier', 'invocation']);
+const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier', 'invocation', 'fallbackExecutors']);
 
 // R2's trust boundary for `actors[]`: a trusted request may bind a declared
 // SessionActor to Persona/executor/model/tier POLICY only -- it may never
@@ -148,6 +148,17 @@ const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier'
 // whichever one Gate B2's own "first via:cli" default would pick).
 // Optional; omitted means "Gate B2's default for whatever executor
 // resolves", byte-identical to before this field existed.
+//
+// `fallbackExecutors` (model-tier-vocabulary-and-coordination-fallback,
+// 2026-09-17): an array of executor ids, same shape and same "SHAPE only,
+// legality checked downstream" contract as `preferExecutor`/`invocation`
+// above -- nests into the per-request `cliPolicy` scope
+// (`actorPolicyFields`, run.mjs) exactly like the already-real
+// `opPolicy.fallbackExecutors` mechanism (`assignment-policy.mjs`,
+// `attemptProviderCapacityFallback`/Provider Capacity Rotator,
+// `assignment-runner.mjs`) — this field does not invent a new fallback
+// mechanism, it is the missing plumbing that lets a per-request actor
+// override reach the one that already exists end to end.
 function validateActorsShape(actors) {
   if (actors === undefined) return [];
   if (!Array.isArray(actors)) fail('"actors" must be an array');
@@ -170,6 +181,11 @@ function validateActorsShape(actors) {
     }
     if (actor.invocation !== undefined && actor.executor === undefined) {
       fail(`actors[${i}].invocation is present but "executor" is not -- an invocation pin only means something alongside an explicit executor`);
+    }
+    if (actor.fallbackExecutors !== undefined) {
+      if (!Array.isArray(actor.fallbackExecutors) || actor.fallbackExecutors.some((e) => !isNonEmptyString(e))) {
+        fail(`actors[${i}].fallbackExecutors must be an array of non-empty strings when present`);
+      }
     }
   }
   return actors;

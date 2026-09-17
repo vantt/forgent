@@ -26,7 +26,7 @@ export const PROFILE_KINDS = Object.freeze(['Workflow', 'CoordinationProtocol'])
 // may raise the floor, never lower it below a less specific scope's
 // requirement") -- ascending strictness, left to right, matching the
 // contract's own enum listing order verbatim.
-export const MIN_TIER_VALUES = Object.freeze(['lightweight', 'standard', 'creative', 'analytical', 'critical']);
+export const MIN_TIER_VALUES = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
 const MIN_TIER_RANK = new Map(MIN_TIER_VALUES.map((tier, index) => [tier, index]));
 
 // repeatMode (Step 09/P03 fallback-and-effect-boundary contract): declared

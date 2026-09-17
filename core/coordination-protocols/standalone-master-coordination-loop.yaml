@@ -97,7 +97,7 @@ spec:
       # loop's own doer/fixer round has delivered anything to an external
       # sink, so a repeat of it is always pre-delivery.
       policy:
-        minTier: analytical
+        minTier: flagship
         repeatMode: pre-delivery
       result:
         kind: advisory
@@ -105,7 +105,7 @@ spec:
     - id: red-team-candidate
       role: red-team
       policy:
-        minTier: analytical
+        minTier: flagship
         repeatMode: pre-delivery
       result:
         kind: advisory
@@ -120,14 +120,14 @@ spec:
     - id: reviewer-recheck
       role: reviewer
       policy:
-        minTier: analytical
+        minTier: flagship
       result:
         kind: advisory
         evidenceRequired: reported
     - id: red-team-recheck
       role: red-team
       policy:
-        minTier: analytical
+        minTier: flagship
       result:
         kind: advisory
         evidenceRequired: reported

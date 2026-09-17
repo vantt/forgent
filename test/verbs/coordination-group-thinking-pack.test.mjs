@@ -282,7 +282,7 @@ function fakeExecutor(tempDir) {
       {
         runner: {
           executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-          models: { standard: 'test-model', lightweight: 'test-model', creative: 'test-model', analytical: 'test-model', critical: 'test-model' },
+          models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
           timeoutMs: 20000,
         },
       },
@@ -589,9 +589,9 @@ function writeMultiExecutorConfig(tempDir) {
             },
           },
           modelPolicies: {
-            claude: { lightweight: 'test-model', standard: 'test-model' },
-            'family-a': { lightweight: 'test-model', standard: 'test-model' },
-            'family-b': { lightweight: 'test-model', standard: 'test-model' },
+            claude: { nano: 'test-model', standard: 'test-model' },
+            'family-a': { nano: 'test-model', standard: 'test-model' },
+            'family-b': { nano: 'test-model', standard: 'test-model' },
           },
           timeoutMs: 20000,
         },

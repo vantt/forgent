@@ -1795,9 +1795,9 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
   ],
   providerModel: 'openai-codex',
   rigorOverrides: {
-    light: 'lightweight',
-    standard: 'lightweight',
-    heavy: 'lightweight',
+    light: 'nano',
+    standard: 'nano',
+    heavy: 'nano',
   },
 });
 
@@ -1809,7 +1809,7 @@ registerConfigDefault({
     capabilities: DEFAULT_CAPABILITY_SLOTS,
     modelPolicies: {
       ...DEFAULT_RUNNER_CONFIG.modelPolicies,
-      'openai-codex': { lightweight: 'gpt-5.5' },
+      'openai-codex': { nano: 'gpt-5.5' },
     },
     executors: { pi: PI_EXECUTOR_DEFAULT },
   },

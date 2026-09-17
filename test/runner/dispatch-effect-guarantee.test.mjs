@@ -94,7 +94,7 @@ test('a resolveFallback result that never reached "scoped" always parks as effec
   // Same proof against a REAL compiler-mismatch, chaining the actual
   // compiler's refusal through resolveFallback and into assess.
   const cfg = {
-    modelPolicies: { claude: { lightweight: 'claude-haiku', standard: 'claude-sonnet', creative: 'claude-sonnet', analytical: 'claude-opus', critical: 'claude-opus' } },
+    modelPolicies: { claude: { nano: 'claude-haiku', standard: 'claude-sonnet', advanced: 'claude-sonnet', flagship: 'claude-opus', frontier: 'claude-opus' } },
     executors: { claude: { command: 'claude', args: [] } },
   };
   const assignment = {

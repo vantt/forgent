@@ -103,7 +103,7 @@ function fakeRunnerConfig(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model', analytical: 'test-model', critical: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'test-model', frontier: 'test-model' } },
     timeoutMs: 8000,
   };
 }
@@ -167,9 +167,9 @@ test('Delphi-Feedback-Lite: convene -> two round-1 proposals -> mediated aggrega
   // Actor-scope minTier provenance, real, through the pack -- mirrors
   // P10.4.md's own direct-call assertion, now proved reachable via the
   // public request/response shape rather than a raw dispatch return value.
-  assert.equal(result.steps[0].tier, 'critical', 'convene, facilitator-actor');
-  assert.equal(result.steps[1].tier, 'analytical', 'round-1 propose, panelist-a');
-  assert.equal(result.steps[3].tier, 'critical', 'aggregate, facilitator-actor');
+  assert.equal(result.steps[0].tier, 'frontier', 'convene, facilitator-actor');
+  assert.equal(result.steps[1].tier, 'flagship', 'round-1 propose, panelist-a');
+  assert.equal(result.steps[3].tier, 'frontier', 'aggregate, facilitator-actor');
 
   // ── Chat-history-free replay reconstruction of the DISPATCH lineage
   //    (assignments), read from replaySession's own projection alone.

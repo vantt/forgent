@@ -134,7 +134,7 @@ function fakeRunnerConfig(tempDir) {
   );
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'test-model', standard: 'test-model' } },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model' } },
     timeoutMs: 8000,
   };
 }

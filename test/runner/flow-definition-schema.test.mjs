@@ -174,21 +174,21 @@ test('rejects a graph.nodes[].operations[].actor not present in spec.actors', ()
 
 test('rejects a more-specific-scope minTier that lowers a less-specific scope floor (operation-scope monotonicity)', () => {
   const def = minimalWorkflowDefinition();
-  def.spec.policy = { minTier: 'critical' };
+  def.spec.policy = { minTier: 'frontier' };
   def.spec.operations[0].policy = { minTier: 'standard' };
   assert.throws(
     () => validateFlowDefinition(def),
-    throwsFlowDefinitionError(/spec\.operations\[0\]\.policy\.minTier \("standard"\) would lower the floor already set by a less specific scope \("critical"\)/),
+    throwsFlowDefinitionError(/spec\.operations\[0\]\.policy\.minTier \("standard"\) would lower the floor already set by a less specific scope \("frontier"\)/),
   );
 });
 
 test('rejects a more-specific-scope minTier that lowers a less-specific scope floor (actor-scope monotonicity)', () => {
   const def = minimalProtocolDefinition();
-  def.spec.policy = { minTier: 'analytical' };
-  def.spec.actors[0].policy = { minTier: 'lightweight' };
+  def.spec.policy = { minTier: 'flagship' };
+  def.spec.actors[0].policy = { minTier: 'nano' };
   assert.throws(
     () => validateFlowDefinition(def),
-    throwsFlowDefinitionError(/spec\.actors\[0\]\.policy\.minTier \("lightweight"\) would lower the floor already set by a less specific scope \("analytical"\)/),
+    throwsFlowDefinitionError(/spec\.actors\[0\]\.policy\.minTier \("nano"\) would lower the floor already set by a less specific scope \("flagship"\)/),
   );
 });
 
@@ -959,9 +959,9 @@ test('validating the same input twice produces deep-equal output and does not mu
 test('mergePolicyStack resolves most-specific-wins for non-minTier fields and allows minTier to rise', () => {
   const resolved = mergePolicyStack([
     { scope: 'definition', source: 'def-1', policy: { minTier: 'standard', visibility: 'headless' } },
-    { scope: 'operation', source: 'op-1', policy: { minTier: 'critical', preferExecutor: 'codex-cli' } },
+    { scope: 'operation', source: 'op-1', policy: { minTier: 'frontier', preferExecutor: 'codex-cli' } },
   ]);
-  assert.equal(resolved.minTier, 'critical');
+  assert.equal(resolved.minTier, 'frontier');
   assert.equal(resolved.visibility, 'headless');
   assert.equal(resolved.preferExecutor, 'codex-cli');
 });
@@ -969,9 +969,9 @@ test('mergePolicyStack resolves most-specific-wins for non-minTier fields and al
 test('mergePolicyStack rejects a stack entry that lowers the already-resolved minTier floor', () => {
   assert.throws(
     () => mergePolicyStack([
-      { scope: 'definition', source: 'def-1', policy: { minTier: 'critical' } },
+      { scope: 'definition', source: 'def-1', policy: { minTier: 'frontier' } },
       { scope: 'actor', source: 'actor-1', policy: { minTier: 'standard' } },
     ]),
-    throwsFlowDefinitionError(/sets minTier "standard", lower than the floor "critical" already set by/),
+    throwsFlowDefinitionError(/sets minTier "standard", lower than the floor "frontier" already set by/),
   );
 });
