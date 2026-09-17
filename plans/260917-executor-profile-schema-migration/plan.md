@@ -1,15 +1,13 @@
 # Executor profile schema migration — plan
 
-Status: Phase A, B, C merged to main. Phase D merged, then self-caught and
-corrected (user found a real architecture mistake during Phase E scoping --
-see Phase D's own "First-pass mistake" section). Phase E scope also
-revised in light of the same correction (see Phase E's own "Why the
-original scope was also wrong" section); step 1 (ProviderAdapter argv
-production binder) is done and merged. Step 2 (retiring
-`claude-reviewer`/`claude-reviewer-herdr` as separate ids) is not started
--- needs its own explicit go-ahead, a new toolIntent-from-persona policy
-feature, and a migration-contract decision before touching any executor id
-anything still references.
+Status: Phase A, B, C, D, E (steps 1 and 2) all merged to main (D
+self-caught and corrected -- see Phase D's own "First-pass mistake"
+section). Phase E step 2 -- "executor-id-consolidation" -- replaced the
+originally-planned
+toolIntent-from-persona policy feature with a simpler, real mechanism
+(an explicit per-invocation `id` a caller can pin) after the user caught
+a second architecture mistake mid-scoping (see step 2's own "Why the
+original scope was also wrong, twice" section below).
 
 This is the deferred "later track" design.md §9 of
 `plans/260915-executor-policy-dispatch-seams/` named but never scoped:
@@ -51,8 +49,8 @@ explicitly instead of inheriting one.
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
 | D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto PlacementPolicy's own config surface | Done (corrected) | commit `41532099` (first pass, wrong location), corrected commit `3baddb14` (branch `executor-placement-policy-readonly-redirect`), merged `20a4e85d` |
-| E | Step 1: ProviderAdapter argv-rendering production binder for `claude` family | Step 1 done | commit `cc14bfc4` (branch `executor-provider-adapter-argv-binder`), merged `81a64e72` |
-| E | Step 2: consolidate `claude`+`claude-reviewer`+`claude-reviewer-herdr` etc., retire flat `executors.<id>` shape | Not started, largest blast radius | -- |
+| E | Step 1: ProviderAdapter argv-rendering production binder for `claude` family | Done | commit `cc14bfc4` (branch `executor-provider-adapter-argv-binder`), merged `81a64e72` |
+| E | Step 2: consolidate `claude`/`codex`/`agy` families into 3 multi-invocation executors; retire the flat separate-id shape; dispatch-path unification (`execute --for` removal) | Done, merged | 10 commits on branch `executor-id-consolidation` (`672bf405`..`69d462be`), merge commit on main, see step 2's own section below |
 
 ## Phase A — remove genuinely dormant executor ids
 
@@ -480,12 +478,13 @@ byte-identical to the pre-correction baseline.
 
 ## Phase E — consolidate remaining executor ids
 
-Status: Step 1 done. Implemented in worktree/branch
-`executor-provider-adapter-argv-binder`, commit `cc14bfc4`, merged to main
-as `81a64e72`. Full `npm test` gate on main post-merge: 7058 tests, 4
-pre-existing failures byte-identical to the pre-merge baseline. Zero new
-regressions. Step 2 (id consolidation) not started, needs its own
-explicit go-ahead.
+Status: Step 1 done, merged (`81a64e72`). Step 2 ("executor-id-
+consolidation") done and merged (10 commits, `672bf405`..`69d462be`,
+merged to main via a merge commit). Full suite (342 non-rust-host test
+files) triaged to zero real failures before merge -- `test/rust-host/*`
+confirmed environmentally broken on this machine independent of this
+branch (missing compiled `fgctl` binary, one fixture hangs reading
+closed stdin).
 
 ### Why the original Phase E scope was also wrong
 
@@ -548,26 +547,155 @@ production call site produces zero divergence for every claude-family
 executor in the live config; a non-claude provider family is completely
 untouched (zero stderr output at all).
 
-### Step 2 — consolidate ids (proposed, not started)
+### Step 2 — consolidate ids (done)
 
-With `claude`/`claude-reviewer`/`claude-reviewer-herdr`'s tool-gating
-difference eventually expressible as `claude` + policy-driven toolIntent
-(once that policy feature is actually built -- NOT part of step 1, see
-above), retire the separate ids: `claude`'s `invocations[]` narrows to
-genuinely infra-only variants (visibility × confinement -- e.g.
-headless/cli, cli-bwrap, herdr, herdr-bwrap), each still carrying its own
-`identity`/`supports` from Phase C. Retire the separate flat ids only
-after every consumer reads the consolidated entry exclusively and a real
-deprecation window has passed for anything outside this repo that
-references the old flat ids by name (unverifiable from inside this
-repo -- a real, accepted residual risk, not something this phase can
-close alone). Needs: (a) the toolIntent-from-persona policy feature itself
-(a real product decision, e.g. what tools does "code-reviewer" get --
-mechanically derivable from the CURRENT live `claude-reviewer`/
-`claude-reviewer-herdr` `--allowedTools` values, not fresh judgment, but
-still a new computation nothing does today), (b) its own migration-contract
-decision (design.md's own non-goal: "deleting legacy executor ids
-wholesale" without one) before any destructive step.
+### Why the original Phase E step 2 scope was also wrong, twice
+
+First correction (above): tool-gating is an infra axis (`via`/adapter/
+confinement/tools), not persona -- `invocations[]` already supports it
+structurally. But a SECOND, independent gap remained even after that
+correction: `resolveExecutorConfig`'s Gate B2 selects "the first
+`via:"cli"` entry" unconditionally -- an executor with several `via:"cli"`
+invocations (exactly what consolidation produces) had no way to name
+WHICH one. This was not a policy-feature gap (no `toolIntent`-from-
+persona computation was ever needed) -- it was a missing SELECTOR. Step
+2 built that selector (Step 2.1 below) instead of the originally-planned
+policy feature, which turned out to be unnecessary: every tool-grant
+difference between what used to be separate ids is already fully
+expressed as static `args` on each invocation, exactly as it always was.
+
+### Step 2.1 — additive invocation-selector
+
+`resolveExecutorConfig`'s Gate B2 gains an optional `invocationId` last
+parameter (and each `invocations[]` entry gains an optional `id` field):
+when given, selects the invocation with that `id` among the entry's
+`via:"cli"` ones; omitted, falls back to the original "first `via:"cli"`"
+default byte-identically. Threaded through `resolveExecutorCommand`
+(`transport.mjs`) as the same new optional param. Zero pre-existing
+caller passes it, so this is purely additive.
+
+### Step 2.2 — `capabilities.<name>.prefer` as an ordered candidate array
+
+`prefer` now accepts either the legacy bare executor-id string (unchanged)
+or a non-empty array of `string | {executor, invocation?}` entries
+(`normalizePreferCandidates`, `config.mjs`) -- reused, not re-invented,
+for `placementPolicy.readOnlyRedirects`' own pool entries (Step 2.4) and
+`actors[].invocation` validation (Step 2.6). `resolveExecutorAndOverrides`
+picks `candidates[0]` as the primary and threads its `invocation` into
+Gate B2 automatically. NOTE (honestly scoped, not glossed over): only the
+PRIMARY candidate's invocation is wired end-to-end this way -- a real
+cascade EXECUTION across `candidates[1:]` for the purpose/decide door does
+not exist yet (only the Assignment door's separate `opPolicy.fallbackExecutors`
+mechanism, Step 2.3, actually executes a fallback today). Every
+`capabilities.<name>.prefer` in the live config today declares exactly one
+candidate, so this gap has no live consequence yet, but it is a real,
+named gap, not a solved one -- future work if a capability ever needs a
+real multi-candidate cascade through the purpose/decide door specifically.
+
+### Step 2.3 — fallback confinement preservation (the actual "no fallback" fix)
+
+The pre-existing, real Assignment-door fallback mechanism
+(`opPolicy.fallbackExecutors` -> `attemptProviderCapacityFallback`,
+executor-policy-dispatch-seams Phase B) picked a fallback candidate's
+DEFAULT invocation blindly. Once one executor can carry several
+invocations differing in confinement, that default pick could silently
+downgrade a confined primary to an unconfined fallback. New
+`selectConfinedInvocationId` (`resolve.mjs`) is a purely STRUCTURAL check
+("does this candidate have ANY invocation with confinement declared") --
+never a semantic policy check, which stays Confinement Authority's own
+job (`confinement/authority.mjs`, not touched). Scoped strictly to the
+provider-capacity-fallback substitution path (a new `fallbackSubstituted`
+flag) -- the separate, pre-existing read-only-redirect substitution is
+untouched by this specific check. `fallbackExecutors` itself was
+deliberately left as an unchanged `string[]` -- extending IT to carry
+invocation pins would have meant touching 8+ files in the Workflow/
+Operation declaration layer (`schema.mjs`, `setup/registrations.mjs`,
+`workflow-adapter.mjs`, ...) for no real gain once the structural check
+above exists.
+
+### Step 2.4 — `placementPolicy.readOnlyRedirects` pool entries can pin an invocation
+
+Mechanically required once a redirect target (e.g. `codex`) is itself a
+multi-invocation executor: naming it by bare id alone would silently
+resolve to whichever invocation Gate B2's default picks, which could be
+the WRONG (unconfined) one. Pool entries may now be `{executor,
+invocation?}` (same shape/validator as Step 2.2). `readOnlyRedirectPool`'s
+own return shape is unchanged (still `string[]`, a tested public
+contract) -- a new `readOnlyRedirectInvocationFor` looks up the pin
+separately, once the pool's own hash-distribution selection (unchanged
+semantics -- this is a load-spreading pool, never a preference cascade,
+see Q2's own resolved discussion) has already picked the executor id.
+
+### Step 2.5 — same-shaped bug fix in `placement-policy.mjs`
+
+`candidateInvocation()` (the PlacementPolicy shadow module's own
+visible/headless/bwrap classifier) had the exact same "first `via:"cli"`
+unconditionally" bug Gate B2 had before Step 2.1, PLUS read confinement
+only at the executor level -- both now silently wrong for any
+consolidated executor. Fixed the identical way: optional `invocationId`
+param, legacy default when omitted.
+
+### Step 2.6 — `actors[].invocation` (coordination request's own pin channel)
+
+`fgos-code-panel`'s reviewer/red-team/doer roles used to pin a PERSONA by
+naming a separate executor id (`"executor": "claude-reviewer"`). After
+consolidation that channel no longer exists. New optional `invocation`
+key on a trusted coordination request's `actors[]` entry (`schema.mjs`'s
+`ACTOR_ALLOWED_KEYS`, requires `executor` alongside it) threads through
+`run.mjs`'s `actorPolicyFields` as `cliOverride.preferInvocation` into
+`assignment-runner.mjs`, which merges it in as the highest-precedence
+invocation-pin source (explicit caller choice always wins over the
+automatic fallback/redirect picks from steps 2.3/2.4) -- and is guarded
+so an explicit pin is never silently overridden by the (unrelated)
+read-only-redirect substitution. `docs/knowledge/.../fgos-code-panel/SKILL.md`
+updated to the new shape throughout.
+
+### Step 2.7 — dead-code removal (no compatibility shim kept, by explicit instruction)
+
+- `LEGACY_EXECUTOR_ALIASES` (`assignment-policy.mjs`, Phase 03's
+  compatibility alias seam): every id it keyed off
+  (`claude-reviewer`/`claude-reviewer-herdr`/`codex-readonly`) no longer
+  exists as a registered executor, so `primaryExecutor` can never equal
+  one -- step 3's own registration throw fires first, unconditionally.
+  Removed entirely (declaration, `aliasPatch`/`viaAlias` derivation, every
+  consuming branch, the `executorAlias` provenance field, and the tests
+  that only existed to prove the now-deleted mechanism).
+- `execute --for <purpose>` (the CLI-level "purpose door" entry point,
+  `cli.mjs`): confirmed zero live callers
+  (`docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-by-name/`'s
+  own "Status: pattern proven, no live consumer today", now deleted along
+  with the doc). Refuses outright now, naming the real two-phase pattern
+  every live caller already follows (`decide --for` resolves the purpose
+  to a real executorId; `execute <that id>` dispatches it positionally).
+  `decide --for` and `executeExecutorCli`'s own `for` parameter (used by
+  `spawnWorker` and other programmatic, non-CLI callers) are both
+  unaffected.
+- `src/setup/registrations.mjs`'s `knownExecutors` baseline list and
+  `fgos-code-panel/SKILL.md`'s actor roster examples updated to the new
+  ids/shape.
+
+### Dispatch-path unification -- explicitly scoped down, on purpose (2026-09-17 decision)
+
+Two dispatch layers exist: the Assignment door (`executeAssignment`, real
+provider-capacity lease + fallback) and the purpose door
+(`executeExecutorCli`/`spawnWorker`, no lease, no fallback).
+`execute --for`'s removal (step 2.7) closed the one CLI/human-facing entry
+into the purpose door that had no fallback concept at all -- that was the
+real, live safety gap. It did NOT merge `spawnWorker`'s own internal
+dispatch (work-item-driven, still purpose-door-shaped) into
+`executeAssignment`'s lease/fallback machinery -- that remains a
+genuinely separate, large undertaking (rebuilding `spawnWorker` to
+synthesize a real Assignment for every work-item dispatch), deliberately
+out of this phase's scope.
+
+This is a **deliberate architecture decision, not deferred debt**: the
+purpose door is meant to be a dispatch primitive that does NOT depend on
+a Work item existing at all. Work items are, going forward, primarily a
+LIFECYCLE-MANAGEMENT concept (tracked on a board) layered on top of
+dispatch, not a prerequisite for it. When Work-item lifecycle integration
+is actually built, THAT is the point to fold `spawnWorker`'s dispatch into
+`executeAssignment` -- not before. Tracking this as its own future track
+rather than scope-creeping it into executor-id-consolidation.
 
 ### Original scope (superseded, kept for the record)
 
@@ -601,5 +729,15 @@ original Phase E scope was also wrong" above.
 - Phase E step 1: ProviderAdapter's rendering is the production argv
   source for the `claude` provider family, self-verified against legacy,
   zero behavior change for every currently-configured executor. Met.
-- Phase E step 2: a real migration contract exists and is followed; no
-  currently-referenced executor id disappears without one. Not started.
+- Phase E step 2: `claude`/`codex`/`agy` are 3 multi-invocation executors;
+  `claude-reviewer`/`claude-reviewer-herdr`/`agy-cli`/`agy-herdr`/
+  `codex-cli`/`codex-bwrap`/`codex-readonly`/`codex-herdr`/`claude-bwrap`/
+  `agy-bwrap` no longer exist as separate ids. Every real capability/
+  redirect/actor consumer verified to resolve byte-identically against
+  the new shape (direct resolver calls, not just config-load validation).
+  `execute --for` removed (confirmed zero live callers). No migration-
+  contract/deprecation-window mechanism was built for callers OUTSIDE this
+  repo that might still reference an old id by name -- explicitly accepted
+  as a residual risk (unverifiable from inside this repo), per the user's
+  explicit "no compatibility shim needed" instruction (single-maintainer
+  repo state at the time of this change). Met, merged to main.
