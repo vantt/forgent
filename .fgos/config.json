@@ -536,7 +536,56 @@
               "--approve",
               "-p",
               "{prompt}"
-            ]
+            ],
+            "id": "default"
+          },
+          {
+            "id": "codex-tetnu",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/tetnu"
+            }
+          },
+          {
+            "id": "codex-fgovn",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "openai-codex",
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/fgovn"
+            }
           }
         ],
         "providerModel": "openai-codex",
@@ -545,6 +594,38 @@
           "standard": "nano",
           "heavy": "nano"
         }
+      },
+      "pi-grok": {
+        "kind": "agent",
+        "description": "pi coding agent (xai/grok) -- grok-vantt account, sibling of the pi/openai-codex executor (separate executor because providerModel is executor-scoped, not per-invocation)",
+        "allowCrossProvider": true,
+        "providerModel": "xai",
+        "invocations": [
+          {
+            "id": "grok-vantt",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "xai",
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
+            }
+          }
+        ]
       }
     },
     "timeoutMs": 2100000,
@@ -580,6 +661,12 @@
         "advanced": "z-ai/glm-5.2",
         "flagship": "z-ai/glm-5.2",
         "frontier": "z-ai/glm-5.2"
+      },
+      "xai": {
+        "standard": "grok-4.3",
+        "advanced": "grok-4.5",
+        "flagship": "grok-4.6",
+        "frontier": "grok-4.6"
       }
     },
     "models": {
