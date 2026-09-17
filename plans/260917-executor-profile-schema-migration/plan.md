@@ -43,7 +43,7 @@ explicitly instead of inheriting one.
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
-| D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto `executors.<id>.readOnlyRedirect` | Done | commit `<pending>` (branch `executor-profile-redirect-retirement`) |
+| D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto `executors.<id>.readOnlyRedirect` | Done | commit `41532099` (branch `executor-profile-redirect-retirement`), merged `3322edc9` |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
 
 ## Phase A — remove genuinely dormant executor ids
@@ -379,7 +379,13 @@ have been redundant, not safer. See "Scope" above.
 ## Phase D — retire `readOnlyExecutorRedirects`
 
 Status: Done. Implemented in worktree/branch
-`executor-profile-redirect-retirement`, commit `<pending>`.
+`executor-profile-redirect-retirement`, commit `41532099`, merged to main
+as `3322edc9`. Full `npm test` gate on main post-merge: 7052 tests, 4
+pre-existing failures byte-identical to the pre-Phase-D baseline, plus one
+independently-confirmed pre-existing concurrency-timing flake
+(`R5 concurrency: dispatchResearchFanOut...`, documented in the original
+seams track's own baseline note as "environmental-transient" -- reran
+green in isolation, 14/14). Zero new regressions.
 
 ### Scope (as actually implemented)
 
