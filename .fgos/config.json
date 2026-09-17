@@ -33,7 +33,12 @@
       },
       "advise": {
         "description": "Async product-decision consult -- value comes from disagreement and never changes project state.",
-        "prefer": "claude-bwrap",
+        "prefer": [
+          {
+            "executor": "claude",
+            "invocation": "cli-bwrap"
+          }
+        ],
         "confinement": {
           "mode": "required",
           "policy": "host-write-denied"
@@ -45,7 +50,12 @@
       },
       "fgos-coding-implement": {
         "description": "code-implement work for the coding domain's executing stage -- pinned to gemini-3.6-flash-medium via this capability's own providerModel/rigorOverrides (agy/gemini, lightweight policy tier; see modelPolicies.gemini.lightweight for the literal model string).\n\nFlipped to executors.agy-herdr on 2026-09-07, which is the condition the previous description set: \"do not flip prefer back to agy-herdr until this is fixed and re-verified live\". Both halves of the old failure are gone, and gone structurally rather than by tuning.\n\nThe prompt no longer travels on a command line at all -- it is written to brief-<round>.md and only a one-line pointer is submitted -- so the multi-line corruption that used to destroy every real implement prompt has nowhere left to happen. Completion is now the worker's own outbox/result-<round>.json appearing; agent_status is never read as completion, which is what produced the silent false successes (idle before the agent had started; an idle-looking gap mid-turn).\n\nEvidence: 10/10 settled with ack and result (P1, 2026-09-07), plus 2/2 again driven from this very config entry after the -i flag was removed from its args -- that flag made agy take the NEXT flag as its prompt value and never reach ready. Logs: docs/architect/agent-coordination/verification/visibility-herdr/proofs/2026-09-07-v0/.\n\nBounded honestly: every one of those rounds ran a trivial task with a six-line prompt. What is proven is contract conformance -- agy reads the pointer, finds the brief, writes ack/report/result -- not that agy does hard implementation work well. The first real fgos-coding-implement dispatch is the real test.\n\nReverting is one field: set prefer back to \"agy-cli\". A failure now leaves a named outcome (agent_not_ready, agent_prompt_stalled, agent_blocked, died, timed-out-idle, timed-out-ceiling, paused-limit), an open pane with the reason still on screen, and a run.json that says settled/died/unknown instead of sitting at running forever -- so a bad flip is visible within one dispatch rather than silently burning a timeout window.",
-        "prefer": "agy-herdr",
+        "prefer": [
+          {
+            "executor": "agy",
+            "invocation": "herdr"
+          }
+        ],
         "overrides": {
           "providerModel": "gemini",
           "rigorOverrides": {
@@ -57,11 +67,21 @@
       },
       "code:implement": {
         "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
-        "prefer": "agy-cli"
+        "prefer": [
+          {
+            "executor": "agy",
+            "invocation": "cli"
+          }
+        ]
       },
       "code:review": {
         "description": "Canonical coding review capability -- independent read-only review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "codex-bwrap",
+        "prefer": [
+          {
+            "executor": "codex",
+            "invocation": "cli-bwrap"
+          }
+        ],
         "confinement": {
           "mode": "required",
           "policy": "host-write-denied"
@@ -73,7 +93,12 @@
       },
       "code:debug": {
         "description": "Canonical coding debug capability -- read-only root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
-        "prefer": "codex-bwrap",
+        "prefer": [
+          {
+            "executor": "codex",
+            "invocation": "cli-bwrap"
+          }
+        ],
         "confinement": {
           "mode": "required",
           "policy": "host-write-denied"
@@ -88,14 +113,23 @@
       "readOnlyRedirects": {
         "claude": {
           "default": [
-            "codex-bwrap"
+            {
+              "executor": "codex",
+              "invocation": "cli-bwrap"
+            }
           ],
           "operations": {
             "review-candidate": [
-              "codex-bwrap"
+              {
+                "executor": "codex",
+                "invocation": "cli-bwrap"
+              }
             ],
             "red-team-candidate": [
-              "codex-bwrap"
+              {
+                "executor": "codex",
+                "invocation": "cli-bwrap"
+              }
             ]
           }
         }
@@ -104,7 +138,7 @@
     "executors": {
       "claude": {
         "kind": "agent",
-        "description": "Claude Code CLI (headless dispatch)",
+        "description": "Claude Code CLI -- consolidated executor (executor-id-consolidation Step 2): cli/cli-readonly/herdr-readonly/cli-bwrap invocations, replacing the former separate claude-reviewer/claude-reviewer-herdr/claude-bwrap ids.",
         "identity": {
           "principalRef": "principal://claude",
           "runtimeBackendRef": "backend://claude-cli",
@@ -112,13 +146,20 @@
           "egressClass": "unrestricted"
         },
         "supports": {
-          "providerFamilies": ["claude"],
-          "reasoningEffort": ["low", "medium", "high"],
+          "providerFamilies": [
+            "claude"
+          ],
+          "reasoningEffort": [
+            "low",
+            "medium",
+            "high"
+          ],
           "systemPrompt": false,
           "toolGating": "allowedTools"
         },
         "invocations": [
           {
+            "id": "cli",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "claude",
@@ -132,14 +173,9 @@
               "--allowedTools",
               "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
             ]
-          }
-        ]
-      },
-      "claude-reviewer": {
-        "kind": "agent",
-        "description": "Claude Code CLI, scoped for a READ_ONLY_ROLES (reviewer/researcher/advisor) Assignment (Cell 6.3 Fix Round 1, Red-team finding): identical to executors.claude except it drops the git-write grant (Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)) and the --allowedTools flag entirely -- a reviewer never had a legitimate need for any Bash grant, and dropping the flag leaves only the CLI's own built-in read-only Bash allowlist (git status/diff/log-class commands), never write-capable ones. --permission-mode acceptEdits is kept so the reviewer can still Write its own agent-result.json/agent-report.md into its own run dir (proven live in Cell 6.3) -- this is a tool-family gate (no git-write for ANY path), not real path-scoping: Claude Code only consults path rules written as Edit(path)/Read(path) (a Write(path) rule is accepted but never consulted -- code.claude.com/docs/en/permissions), and this executor's args are a static config-time template with no per-run runDir substitution today, so an Edit(<runDir>/**) rule cannot be wired without adding a new templating dimension -- out of this fix round's scope (see docs/architect/agent-coordination/trace/step-06-cell-3-validate-plan-live-smoke.md's Fix Round 1 section for the accepted residual).",
-        "invocations": [
+          },
           {
+            "id": "cli-readonly",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "claude",
@@ -155,15 +191,165 @@
               "--allowedTools",
               "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
             ]
+          },
+          {
+            "id": "herdr-readonly",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "{prompt}",
+              "--model",
+              "{model}",
+              "--effort",
+              "high",
+              "--permission-mode",
+              "acceptEdits",
+              "--allowedTools",
+              "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)"
+            ],
+            "liveOutput": {
+              "streamFlags": [
+                "--output-format",
+                "stream-json",
+                "--verbose",
+                "--include-partial-messages"
+              ],
+              "renderer": "src/runner/dispatch/live-renderers/claude-stream-json.mjs"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            }
+          },
+          {
+            "id": "cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "claude",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            }
+          }
+        ],
+        "for": [
+          "advise"
+        ]
+      },
+      "codex": {
+        "kind": "agent",
+        "description": "OpenAI Codex CLI -- consolidated executor (executor-id-consolidation Step 2): cli-bypass/cli-bwrap/cli-readonly/herdr invocations, replacing the former separate codex-cli/codex-bwrap/codex-readonly/codex-herdr ids. \"cli-readonly\" stays RETIRED FOR DISPATCH -- \"-s read-only\" has no writable-exception mechanism, so a dispatched agent can never write its own agent-result.json; kept only so existing references resolve. Use \"cli-bwrap\" for confined dispatch instead. \"herdr\" stays unconfined by decision until the confinement track lands for herdr-spawn.",
+        "providerModel": "openai-codex",
+        "allowCrossProvider": true,
+        "for": [
+          "code:review",
+          "code:debug"
+        ],
+        "invocations": [
+          {
+            "id": "cli-bypass",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--dangerously-bypass-approvals-and-sandbox",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ],
+            "env": {
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            }
+          },
+          {
+            "id": "cli-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "--skip-git-repo-check",
+              "-s",
+              "danger-full-access",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "CODEX_HOME"
+                }
+              }
+            ]
+          },
+          {
+            "id": "cli-readonly",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "codex",
+            "args": [
+              "exec",
+              "-s",
+              "read-only",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ],
+            "env": {
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            }
+          },
+          {
+            "id": "herdr",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "codex",
+            "args": [
+              "--dangerously-bypass-approvals-and-sandbox",
+              "--model",
+              "{model}",
+              "{prompt}"
+            ],
+            "env": {
+              "CODEX_HOME": "${HOME}/.codex-fgovn"
+            },
+            "interactiveMode": {
+              "exitCommand": "/quit",
+              "kind": "codex",
+              "trustStore": {
+                "kind": "codex-toml"
+              }
+            }
           }
         ]
       },
-      "agy-cli": {
+      "agy": {
         "kind": "agent",
-        "description": "Antigravity Cli (headless, invisible cli-spawn subprocess -- renamed from executors.agy, tsk-5jl, so the name distinguishes it from executors.agy-herdr's real-pane dispatch)",
+        "description": "Antigravity CLI -- consolidated executor (executor-id-consolidation Step 2): cli/herdr/cli-bwrap invocations, replacing the former separate agy-cli/agy-herdr/agy-bwrap ids.",
         "allowCrossProvider": true,
+        "providerModel": "gemini",
+        "for": [
+          "advise"
+        ],
         "invocations": [
           {
+            "id": "cli",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "agy",
@@ -181,21 +367,9 @@
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
             }
-          }
-        ],
-        "providerModel": "gemini",
-        "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "standard",
-          "heavy": "creative"
-        }
-      },
-      "agy-herdr": {
-        "kind": "agent",
-        "description": "Antigravity CLI, dispatched via adapter:\"herdr-spawn\" with interactiveMode (real Herdr pane, -i real TUI) -- ACTIVE (tsk-10j): flipped from the -p headless invocation (tsk-5jl) to agy's real interactive TUI so a person watching the pane sees the actual agent, not a headless text stream; the adapter polls agent_status until idle/done, types the exitCommand, waits for real termination, then extracts the exit code via a completion sentinel and auto-closes the pane. stdout is best-effort only for this path (docs/history/herdr-spawn-agy-interactive-mode/iron-law-evidence.md) -- only the real exit code and pane auto-close are guaranteed.",
-        "allowCrossProvider": true,
-        "invocations": [
+          },
           {
+            "id": "herdr",
             "via": "cli",
             "adapter": "herdr-spawn",
             "command": "agy",
@@ -214,53 +388,9 @@
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
             }
-          }
-        ],
-        "providerModel": "gemini",
-        "rigorOverrides": {
-          "light": "lightweight",
-          "standard": "standard",
-          "heavy": "creative"
-        }
-      },
-      "claude-bwrap": {
-        "kind": "agent",
-        "description": "Claude Code CLI under an OS-level read-only mount (bwrap) via Confinement Authority.",
-        "providerModel": "claude",
-        "allowCrossProvider": true,
-        "confinement": {
-          "backend": "bwrap"
-        },
-        "for": [
-          "advise"
-        ],
-        "invocations": [
+          },
           {
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "claude",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--model",
-              "{model}"
-            ]
-          }
-        ]
-      },
-      "agy-bwrap": {
-        "kind": "agent",
-        "description": "Antigravity CLI under an OS-level read-only mount (bwrap) via Confinement Authority.",
-        "providerModel": "gemini",
-        "allowCrossProvider": true,
-        "confinement": {
-          "backend": "bwrap"
-        },
-        "for": [
-          "advise"
-        ],
-        "invocations": [
-          {
+            "id": "cli-bwrap",
             "via": "cli",
             "adapter": "cli-spawn",
             "command": "agy",
@@ -270,6 +400,9 @@
               "--model",
               "{model}"
             ],
+            "confinement": {
+              "backend": "bwrap"
+            },
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
             }
@@ -277,56 +410,9 @@
         ],
         "rigorOverrides": {
           "light": "lightweight",
-          "standard": "lightweight",
-          "heavy": "lightweight"
+          "standard": "standard",
+          "heavy": "creative"
         }
-      },
-      "codex-readonly": {
-        "kind": "agent",
-        "description": "RETIRED FOR DISPATCH -- do not bind this executor to any role. `-s read-only` has no writable-exception mechanism, so a dispatched agent can never write the agent-result.json that assignment-runner.mjs requires; every dispatch settles `no-evidence` regardless of how good the agent's actual findings were. Confirmed live (a real advisory panel dispatch failed this way and had to be retried on another executor) and by probe: `-s read-only --add-dir <dir>` still grants no write, which matches the CLI's documented design (--add-dir is meaningful only under workspace-write). Use codex-bwrap instead -- same provider family, OS-level confinement, and a real write path for its own result. Kept registered only so existing references resolve and this explanation stays discoverable. OpenAI Codex CLI under its own provider-native read-only sandbox (-s read-only) -- the read-only-confined pair for architecture-advisory-panel dispatch (tsk-1o4; live-proven safe P00.1: this flag blocked the same attack codex-cli's --dangerously-bypass-approvals-and-sandbox let through, admitted to the allowlist; codex-bwrap, the OS-mount alternative, was excluded for a non-runnable startup crash, not a safety failure).",
-        "providerModel": "openai-codex",
-        "allowCrossProvider": true,
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "codex",
-            "args": [
-              "exec",
-              "-s",
-              "read-only",
-              "--model",
-              "{model}",
-              "{prompt}"
-            ],
-            "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
-            }
-          }
-        ]
-      },
-      "codex-cli": {
-        "kind": "agent",
-        "description": "OpenAI Codex CLI (bypass-all -- no sandbox boundary, see docs/history/codex-bypass-executor/)",
-        "providerModel": "openai-codex",
-        "allowCrossProvider": true,
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "codex",
-            "args": [
-              "exec",
-              "--dangerously-bypass-approvals-and-sandbox",
-              "--model",
-              "{model}",
-              "{prompt}"
-            ],
-            "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
-            }
-          }
-        ]
       },
       "codex-pi": {
         "kind": "agent",
@@ -396,35 +482,6 @@
           "heavy": "lightweight"
         }
       },
-      "codex-herdr": {
-        "kind": "agent",
-        "description": "Red-team/review seat via herdr-spawn: codex interactive in a visible pane. herdr types the bare `codex` word from --kind, so the pane shell's `codex` function (~/.zshrc account switcher) runs; that function honours the CODEX_HOME this env exports and skips its own bypass flag when the args already carry one, so this entry -- not the shell -- decides account and approval posture. All codex executors share one account (CODEX_HOME=~/.codex-fgovn). Unconfined by decision until the confinement track lands.",
-        "allowCrossProvider": true,
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "command": "codex",
-            "args": [
-              "--dangerously-bypass-approvals-and-sandbox",
-              "--model",
-              "{model}",
-              "{prompt}"
-            ],
-            "env": {
-              "CODEX_HOME": "${HOME}/.codex-fgovn"
-            },
-            "interactiveMode": {
-              "exitCommand": "/quit",
-              "kind": "codex",
-              "trustStore": {
-                "kind": "codex-toml"
-              }
-            }
-          }
-        ],
-        "providerModel": "openai-codex"
-      },
       "gitnexus": {
         "kind": "tool",
         "description": "Code-graph blast radius",
@@ -488,82 +545,6 @@
           "standard": "lightweight",
           "heavy": "lightweight"
         }
-      },
-      "codex-bwrap": {
-        "kind": "agent",
-        "description": "OpenAI Codex CLI under an OS-level read-only mount (bwrap) via Confinement Authority.",
-        "providerModel": "openai-codex",
-        "allowCrossProvider": true,
-        "confinement": {
-          "backend": "bwrap"
-        },
-        "for": [
-          "code:review",
-          "code:debug"
-        ],
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "codex",
-            "args": [
-              "exec",
-              "--skip-git-repo-check",
-              "-s",
-              "danger-full-access",
-              "--model",
-              "{model}",
-              "{prompt}"
-            ],
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "CODEX_HOME"
-                }
-              }
-            ]
-          }
-        ]
-      },
-      "claude-reviewer-herdr": {
-        "kind": "agent",
-        "invocations": [
-          {
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "command": "claude",
-            "args": [
-              "{prompt}",
-              "--model",
-              "{model}",
-              "--effort",
-              "high",
-              "--permission-mode",
-              "acceptEdits",
-              "--allowedTools",
-              "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)"
-            ],
-            "liveOutput": {
-              "streamFlags": [
-                "--output-format",
-                "stream-json",
-                "--verbose",
-                "--include-partial-messages"
-              ],
-              "renderer": "src/runner/dispatch/live-renderers/claude-stream-json.mjs"
-            },
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "claude",
-              "trustStore": {
-                "kind": "claude-json"
-              }
-            }
-          }
-        ],
-        "description": "Reviewer/red-team seat via herdr-spawn: claude in a visible pane with read-only Bash (git diff/log/show/status, node --test, npm test; rtk-rewritten forms listed because the RTK hook rewrites argv). Mirrors claude-reviewer for the herdr transport."
       }
     },
     "timeoutMs": 2100000,
