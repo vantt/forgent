@@ -433,6 +433,16 @@ export const EXECUTOR_KINDS = Object.freeze(['agent', 'tool']);
  */
 export const EXECUTOR_CARRIES = Object.freeze(['user-text', 'repo-content']);
 
+// Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort
+// (design.md §3.3). Defined here (moved from assignment-policy.mjs, Phase C
+// of executor-profile-schema-migration) so this file's own
+// `validateExecutorEntryShape` can validate `supports.reasoningEffort`
+// against the exact same vocabulary `resolveAssignmentDispatchPolicy`
+// enforces at dispatch time, without a config.mjs -> assignment-policy.mjs
+// -> config.mjs import cycle. `assignment-policy.mjs` re-exports this name
+// unchanged for its own existing callers.
+export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', 'max']);
+
 /**
  * CLI commands recognized as staying within the Claude ecosystem for
  * cross-provider governance (D2, tsk-32n). Deliberately NOT
@@ -953,6 +963,73 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   // resolves through the default mapping unchanged.
   if (executor.rigorOverrides !== undefined) {
     validateRigorOverridesShape(executor.rigorOverrides, `${label} "rigorOverrides"`);
+  }
+  // Phase C (executor-profile-schema-migration): `identity`/`supports` are
+  // the ExecutorProfile target vocabulary (design.md §3.7, previously
+  // documented-only in docs/specs/runner.md's "target vocabulary" section)
+  // made real, additive config fields. Both optional -- a executor naming
+  // neither resolves exactly as it did before this phase existed. No
+  // resolution/dispatch code reads either field yet (this phase proves the
+  // shape is expressible/resolvable, not that anything consumes it); adding
+  // them is inert metadata for any executor that declares them.
+  if (executor.identity !== undefined) {
+    validateExecutorIdentityShape(executor.identity, `${label} "identity"`);
+  }
+  if (executor.supports !== undefined) {
+    validateExecutorSupportsShape(executor.supports, `${label} "supports"`);
+  }
+}
+
+/**
+ * Shape-check `executors.<id>.identity` (Phase C, executor-profile-schema-
+ * migration; design.md §3.7): "which principal/backend/trust boundary is
+ * this?" -- a stable runtime boundary, never a policy choice. Unlike
+ * `supports` below, `identity` is all-or-nothing when declared at all: a
+ * partial identity (e.g. a `principalRef` with no `trustDomain`) does not
+ * answer the question it exists to answer, so all four fields are required
+ * together. None of the four is validated against a closed enum --
+ * design.md's own worked example is the only vocabulary this track has
+ * ever specified, not an exhaustive list -- each is checked only for
+ * "non-empty string", the same floor `providerModel`/`agentType`/etc.
+ * already apply elsewhere in this function.
+ */
+function validateExecutorIdentityShape(identity, label) {
+  if (!identity || typeof identity !== 'object' || Array.isArray(identity)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object.`);
+  }
+  for (const field of ['principalRef', 'runtimeBackendRef', 'trustDomain', 'egressClass']) {
+    if (typeof identity[field] !== 'string' || !identity[field].trim()) {
+      throw new RunnerConfigError(`runner config (${label}) "${field}" must be a non-empty string.`);
+    }
+  }
+}
+
+/**
+ * Shape-check `executors.<id>.supports` (Phase C, executor-profile-schema-
+ * migration; design.md §3.7): "what can one invocation of this profile
+ * actually do?" -- a capability manifest, not identity. Every field is
+ * independently optional (unlike `identity` above): a executor may declare
+ * only the subset it has real evidence for.
+ */
+function validateExecutorSupportsShape(supports, label) {
+  if (!supports || typeof supports !== 'object' || Array.isArray(supports)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object.`);
+  }
+  if (supports.providerFamilies !== undefined) {
+    if (!Array.isArray(supports.providerFamilies) || supports.providerFamilies.length === 0 || !supports.providerFamilies.every((p) => typeof p === 'string' && p.trim())) {
+      throw new RunnerConfigError(`runner config (${label}) "providerFamilies" must be a non-empty array of non-empty strings when present.`);
+    }
+  }
+  if (supports.reasoningEffort !== undefined) {
+    if (!Array.isArray(supports.reasoningEffort) || supports.reasoningEffort.length === 0 || !supports.reasoningEffort.every((e) => REASONING_EFFORT_VALUES.includes(e))) {
+      throw new RunnerConfigError(`runner config (${label}) "reasoningEffort" must be a non-empty array whose entries are each one of ${REASONING_EFFORT_VALUES.join('/')} when present.`);
+    }
+  }
+  if (supports.systemPrompt !== undefined && typeof supports.systemPrompt !== 'boolean') {
+    throw new RunnerConfigError(`runner config (${label}) "systemPrompt" must be a boolean when present.`);
+  }
+  if (supports.toolGating !== undefined && (typeof supports.toolGating !== 'string' || !supports.toolGating.trim())) {
+    throw new RunnerConfigError(`runner config (${label}) "toolGating" must be a non-empty string when present.`);
   }
 }
 

@@ -23,7 +23,7 @@
 // so their persisted provenance is byte-identical to before this field was
 // added.
 
-import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
 import { resolveVerifiedAssignmentModel } from './placement-policy.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
@@ -65,8 +65,13 @@ export const QUALITY_TIER_BRIDGE = Object.freeze({
 
 // Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort
 // (design.md §3.3). Most-specific-wins, unlike minRigor's raise-only rule
-// (design.md §4 field rules table).
-export const REASONING_EFFORT_VALUES = Object.freeze(['low', 'medium', 'high', 'max']);
+// (design.md §4 field rules table). Definition moved to config.mjs (Phase C,
+// executor-profile-schema-migration) so `validateExecutorEntryShape`'s new
+// `supports.reasoningEffort` check can reuse the exact same vocabulary
+// without a config.mjs -> assignment-policy.mjs -> config.mjs import cycle;
+// re-exported here unchanged so every existing caller of this module keeps
+// working byte-identically.
+export { REASONING_EFFORT_VALUES };
 const REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR = Object.freeze({
   low: 'low',
   standard: 'medium',

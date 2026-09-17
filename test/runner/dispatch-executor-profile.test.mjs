@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
+import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
 // is allowed to declare about itself, and the one combination that must be refused
@@ -184,4 +184,129 @@ test('the real repository config still loads -- every existing executor stays va
   // under a `runner` key, which is what loadRunnerConfigFromDir unwraps.
   const cfg = loadRunnerConfigFromDir(process.cwd());
   assert.ok(Object.keys(cfg.executors).length > 0, 'the repository config declares executors');
+});
+
+// Phase C (executor-profile-schema-migration): `identity`/`supports` are
+// design.md §3.7's ExecutorProfile target vocabulary, made real additive
+// config fields on `executors.<id>` -- the same shape/dual-vocabulary
+// pattern `invocations[]` already established for the Invocation half of
+// §3.7. Neither field is read by any resolution/dispatch code yet; this
+// phase only proves the shape is expressible, validated, and resolvable.
+
+test('Phase C: an executor declaring neither identity nor supports still loads unchanged (regression guard)', () => {
+  const cfg = loadWith({ command: 'agy', args: ['-p', '{prompt}'] });
+  assert.equal(cfg.executors.sample.identity, undefined);
+  assert.equal(cfg.executors.sample.supports, undefined);
+});
+
+test('Phase C: a full identity + supports block survives the load intact', () => {
+  const cfg = loadWith({
+    command: 'claude',
+    args: ['{prompt}'],
+    identity: {
+      principalRef: 'principal://sample',
+      runtimeBackendRef: 'backend://sample-cli',
+      trustDomain: 'local-operator',
+      egressClass: 'unrestricted',
+    },
+    supports: {
+      providerFamilies: ['claude'],
+      reasoningEffort: ['low', 'medium'],
+      systemPrompt: true,
+      toolGating: 'allowedTools',
+    },
+  });
+  const e = cfg.executors.sample;
+  assert.deepEqual(e.identity, {
+    principalRef: 'principal://sample',
+    runtimeBackendRef: 'backend://sample-cli',
+    trustDomain: 'local-operator',
+    egressClass: 'unrestricted',
+  });
+  assert.deepEqual(e.supports, {
+    providerFamilies: ['claude'],
+    reasoningEffort: ['low', 'medium'],
+    systemPrompt: true,
+    toolGating: 'allowedTools',
+  });
+});
+
+test('Phase C: identity is all-or-nothing -- each of the four fields is refused by name when missing', () => {
+  const fullIdentity = {
+    principalRef: 'principal://sample',
+    runtimeBackendRef: 'backend://sample-cli',
+    trustDomain: 'local-operator',
+    egressClass: 'unrestricted',
+  };
+  for (const field of Object.keys(fullIdentity)) {
+    const identity = { ...fullIdentity };
+    delete identity[field];
+    assert.throws(
+      () => loadWith({ command: 'claude', args: ['{prompt}'], identity }),
+      (err) => err instanceof RunnerConfigError && err.message.includes(field),
+      `expected refusal naming "${field}" when it is missing`,
+    );
+  }
+});
+
+test('Phase C: identity fields must be non-empty strings, not just present', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], identity: { principalRef: '', runtimeBackendRef: 'b', trustDomain: 't', egressClass: 'e' } }),
+    (err) => err instanceof RunnerConfigError && err.message.includes('principalRef'),
+  );
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], identity: 'not-an-object' }),
+    (err) => err instanceof RunnerConfigError && /identity/.test(err.message),
+  );
+});
+
+test('Phase C: supports fields are each independently optional -- a partial declaration loads', () => {
+  const cfg = loadWith({ command: 'claude', args: ['{prompt}'], supports: { toolGating: 'allowedTools' } });
+  assert.deepEqual(cfg.executors.sample.supports, { toolGating: 'allowedTools' });
+});
+
+test('Phase C: supports.reasoningEffort must be entries from REASONING_EFFORT_VALUES, not free strings', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { reasoningEffort: ['low', 'extreme'] } }),
+    (err) => err instanceof RunnerConfigError && REASONING_EFFORT_VALUES.every((v) => err.message.includes(v)),
+  );
+  const cfg = loadWith({ command: 'claude', args: ['{prompt}'], supports: { reasoningEffort: [...REASONING_EFFORT_VALUES] } });
+  assert.deepEqual(cfg.executors.sample.supports.reasoningEffort, REASONING_EFFORT_VALUES);
+});
+
+test('Phase C: supports.providerFamilies must be a non-empty array of non-empty strings', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { providerFamilies: [] } }),
+    (err) => err instanceof RunnerConfigError && /providerFamilies/.test(err.message),
+  );
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { providerFamilies: ['claude', ''] } }),
+    (err) => err instanceof RunnerConfigError && /providerFamilies/.test(err.message),
+  );
+});
+
+test('Phase C: supports.systemPrompt must be a boolean, not a truthy string', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { systemPrompt: 'yes' } }),
+    (err) => err instanceof RunnerConfigError && /systemPrompt/.test(err.message),
+  );
+});
+
+test('Phase C: supports.toolGating must be a non-empty string', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], supports: { toolGating: '' } }),
+    (err) => err instanceof RunnerConfigError && /toolGating/.test(err.message),
+  );
+});
+
+test('Phase C: the real repository config declares identity/supports on "claude" and it survives resolveExecutorAndOverrides end to end', () => {
+  // The phase's own close criterion: "resolvable end-to-end for at least
+  // one real executor" -- a synthetic fixture alone would not prove this,
+  // only the actual live config declaring it for real does.
+  const cfg = loadRunnerConfigFromDir(process.cwd());
+  const { executor } = resolveExecutorAndOverrides(cfg, 'claude');
+  assert.ok(executor.identity, '"claude" must declare a real identity block');
+  assert.equal(executor.identity.trustDomain, 'local-operator');
+  assert.ok(executor.supports, '"claude" must declare a real supports block');
+  assert.ok(executor.supports.providerFamilies.includes('claude'));
 });
