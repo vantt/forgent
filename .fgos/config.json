@@ -103,6 +103,18 @@
       "claude": {
         "kind": "agent",
         "description": "Claude Code CLI (headless dispatch)",
+        "identity": {
+          "principalRef": "principal://claude",
+          "runtimeBackendRef": "backend://claude-cli",
+          "trustDomain": "local-operator",
+          "egressClass": "unrestricted"
+        },
+        "supports": {
+          "providerFamilies": ["claude"],
+          "reasoningEffort": ["low", "medium", "high"],
+          "systemPrompt": false,
+          "toolGating": "allowedTools"
+        },
         "invocations": [
           {
             "via": "cli",
