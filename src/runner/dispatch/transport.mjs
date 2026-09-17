@@ -47,6 +47,7 @@ import os from 'node:os';
 import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
+import { resolveVerifiedProviderArgs } from './provider-adapter.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
@@ -157,12 +158,38 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
       `runner config declares unknown executor adapter "${adapter}" (known: ${Object.keys(EXECUTOR_ADAPTERS).join(', ')}).`,
     );
   }
-  const args = executor.args.map((arg) => {
+  const legacyArgs = executor.args.map((arg) => {
     if (typeof arg !== 'string') {
       throw new RunnerConfigError('runner config "executor.args" entries must all be strings.');
     }
     return arg.split('{prompt}').join(prompt).split('{model}').join(model);
   });
+  // Phase E step 1 (executor-profile-schema-migration): ProviderAdapter
+  // argv-rendering production binder, self-verifying -- same safety
+  // posture as Phase 07/08. `legacyArgs` above is UNCHANGED, always
+  // computed first; ProviderAdapter's rendering is used ONLY when it
+  // agrees byte-for-byte, so real dispatch can never regress. Scoped to
+  // the "claude" provider family only (this phase's own stated scope,
+  // plans/260917-executor-profile-schema-migration/plan.md) -- every
+  // other provider family's argv stays 100% legacy, this binder never
+  // even attempts them.
+  let args = legacyArgs;
+  if (executor.governance?.providerFamily === 'claude') {
+    const { args: verifiedArgs, divergence } = resolveVerifiedProviderArgs({
+      providerFamily: executor.governance.providerFamily,
+      command: executor.command,
+      baseArgs: executor.args,
+      promptPlaceholder: prompt,
+      model,
+      legacyArgs,
+    });
+    args = verifiedArgs;
+    if (divergence) {
+      process.stderr.write(
+        `fgos: ProviderAdapter argv divergence (falling back to legacy) executor=${executorId ?? ''} legacyArgs=${JSON.stringify(divergence.legacyArgs)} renderedArgs=${JSON.stringify(divergence.renderedArgs)}\n`,
+      );
+    }
+  }
   return {
     command: executor.command,
     args,
