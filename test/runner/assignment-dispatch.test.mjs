@@ -952,19 +952,17 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
   const codex = writeArgvRecordingExecutor(tempDir, 'codex');
 
   const runnerConfig = {
-    readOnlyExecutorRedirects: {
-      claude: {
-        default: ['claude-reviewer'],
-        operations: {
-          'shape-plan': ['codex-bwrap'],
-        },
-      },
-    },
     executors: {
       claude: {
         command: process.execPath,
         args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
         allowCrossProvider: true,
+        readOnlyRedirect: {
+          default: ['claude-reviewer'],
+          operations: {
+            'shape-plan': ['codex-bwrap'],
+          },
+        },
       },
       'claude-reviewer': {
         command: process.execPath,
@@ -1022,22 +1020,20 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
 });
 
 // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
-// readOnlyExecutorRedirects must never bypass disallowedProviders/
+// The read-only redirect target must never bypass disallowedProviders/
 // disallowedExecutors governance for the executor it retargets to.
-test('H5: a readOnlyExecutorRedirects target cannot bypass disallowedProviders governance', async () => {
+test('H5: a readOnlyRedirect target cannot bypass disallowedProviders governance', async () => {
   const tempDir = mkTempDir();
   const worker = writeArgvRecordingExecutor(tempDir, 'h5-worker');
   const codex = writeArgvRecordingExecutor(tempDir, 'h5-codex');
 
   const runnerConfig = {
-    readOnlyExecutorRedirects: {
-      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
-    },
     executors: {
       claude: {
         command: process.execPath,
         args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
         allowCrossProvider: true,
+        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
       },
       'codex-bwrap': {
         command: process.execPath,
@@ -1068,7 +1064,7 @@ test('H5: a readOnlyExecutorRedirects target cannot bypass disallowedProviders g
       runnerConfig,
       options: { disallowedProviders: ['openai-codex'] },
     }),
-    (err) => /governance gate rejected provider "openai-codex"/.test(err.message) && /readOnlyExecutorRedirects/.test(err.message),
+    (err) => /governance gate rejected provider "openai-codex"/.test(err.message) && /readOnlyRedirect/.test(err.message),
   );
   assert.equal(fs.existsSync(codex.argvCapturePath), false, 'the disallowed redirect target must never actually spawn');
 
@@ -1087,8 +1083,8 @@ test('H5: a readOnlyExecutorRedirects target cannot bypass disallowedProviders g
 
   // Control: the SAME governance options do not spuriously refuse an
   // UNREDIRECTED dispatch (a mutating operation, never routed through
-  // readOnlyExecutorRedirects at all) -- this fix must be a no-op when
-  // nothing was actually redirected.
+  // readOnlyRedirect at all) -- this fix must be a no-op when nothing was
+  // actually redirected.
   const mutatingAssignment = buildAssignment({
     work: { ...work, id: 'tsk-h5-control' },
     stage: 'executing',
@@ -1110,11 +1106,13 @@ test('provider capacity selection happens after Run admission, records redacted 
   const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity');
 
   const runnerConfig = {
-    readOnlyExecutorRedirects: {
-      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
-    },
     executors: {
-      claude: { command: process.execPath, args: [codex.scriptPath, '{prompt}'], allowCrossProvider: true },
+      claude: {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}'],
+        allowCrossProvider: true,
+        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
+      },
       'codex-bwrap': {
         command: process.execPath,
         args: [codex.scriptPath, '{prompt}', '--model', '{model}'],
@@ -1182,11 +1180,13 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity-refused');
 
   const runnerConfig = {
-    readOnlyExecutorRedirects: {
-      claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
-    },
     executors: {
-      claude: { command: process.execPath, args: [codex.scriptPath, '{prompt}'], allowCrossProvider: true },
+      claude: {
+        command: process.execPath,
+        args: [codex.scriptPath, '{prompt}'],
+        allowCrossProvider: true,
+        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
+      },
       'codex-bwrap': {
         command: process.execPath,
         args: [codex.scriptPath, '{prompt}', '--model', '{model}'],

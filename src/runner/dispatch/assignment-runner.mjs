@@ -239,7 +239,12 @@ function normalizeRedirectCandidates(value) {
 }
 
 function readOnlyRedirectCandidates(cfg, sourceExecutorId, assignment) {
-  const configured = cfg?.readOnlyExecutorRedirects?.[sourceExecutorId];
+  // Phase D (executor-profile-schema-migration): reads
+  // `executors.<sourceExecutorId>.readOnlyRedirect` -- relocated from the
+  // retired top-level `runner.readOnlyExecutorRedirects.<sourceExecutorId>`
+  // map, same value shape (validated by config.mjs's
+  // `validateReadOnlyRedirectShape`).
+  const configured = cfg?.executors?.[sourceExecutorId]?.readOnlyRedirect;
   if (configured === undefined) {
     return sourceExecutorId === 'claude' && cfg?.executors?.['claude-reviewer'] ? ['claude-reviewer'] : [];
   }
@@ -1458,7 +1463,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // kept the write-safety fix but also concentrated every read-only Claude
   // role onto one executor/account. The default remains byte-identical when no
   // config is present; projects can now declare per-operation/pool redirects
-  // under runner.readOnlyExecutorRedirects without changing the higher-level
+  // under the source executor's own executors.<id>.readOnlyRedirect (Phase D,
+  // executor-profile-schema-migration; relocated from the retired top-level
+  // runner.readOnlyExecutorRedirects) without changing the higher-level
   // operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
   // `let`: see the Phase B note on `compiledPlan` above -- a fallback
@@ -1473,21 +1480,21 @@ export async function executeAssignment(assignment, opts = {}) {
   // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
   // resolveAssignmentDispatchPolicy (inside compileDispatchPlan above) already
   // checked opts.options.disallowedProviders/disallowedExecutors against the
-  // DECLARED executor -- but a readOnlyExecutorRedirects redirect (right
-  // above) can retarget to a DIFFERENT executor/provider that was never
-  // checked at all. A project that disallows a provider while also
-  // configuring a redirect pool containing an executor of that same
-  // provider would have the redirect silently bypass governance. Re-run the
-  // exact same two checks resolveAssignmentDispatchPolicy uses, against the
-  // resolved (post-redirect) executor/provider, only when the redirect
-  // actually changed anything -- a value-preserving no-op for every
-  // unredirected dispatch.
+  // DECLARED executor -- but a readOnlyRedirect redirect (right above) can
+  // retarget to a DIFFERENT executor/provider that was never checked at
+  // all. A project that disallows a provider while also configuring a
+  // redirect pool containing an executor of that same provider would have
+  // the redirect silently bypass governance. Re-run the exact same two
+  // checks resolveAssignmentDispatchPolicy uses, against the resolved
+  // (post-redirect) executor/provider, only when the redirect actually
+  // changed anything -- a value-preserving no-op for every unredirected
+  // dispatch.
   if (resolvedExecutorId !== defaultExecutorId) {
     if (opts.options?.disallowedProviders?.includes(effectivePolicy.providerModel)) {
-      throw new RunnerConfigError(`governance gate rejected provider "${effectivePolicy.providerModel}": disallowed egress (via readOnlyExecutorRedirects "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+      throw new RunnerConfigError(`governance gate rejected provider "${effectivePolicy.providerModel}": disallowed egress (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
     }
     if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
-      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyExecutorRedirects "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
     }
   }
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
