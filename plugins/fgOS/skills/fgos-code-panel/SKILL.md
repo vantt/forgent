@@ -493,10 +493,11 @@ confirmed real via `pi --list-models`). `--provider` is omitted from the
 `pi-cli-vantt` invocation's args -- confirmed via a real invocation that
 `pi` correctly infers the provider from its single-provider
 `~/.pi/accounts/grok-vantt` account dir, no flag needed. The `xai`
-executor has no `herdr` invocation today, so the herdr-spawn roster
-variant below keeps red-team on `openai`'s `codex-herdr-fgovn` invocation
-(the `codex` binary) instead -- a known, explicit gap for `xai`'s herdr
-coverage, not an oversight.
+executor now has its own `herdr` invocation (`pi-herdr-vantt`, the `pi`
+binary), so the herdr-spawn roster variant below keeps red-team on `xai`
+too, same as every other roster variant -- see the herdr-spawn section
+below for how this superseded the old `openai`/`codex-herdr-fgovn`
+fallback.
 
 Both role swaps kept the previous primary as the new `fallbackExecutors`
 entry (reviewer: `claude`; red-team: `openai`), so equivalent-tier
