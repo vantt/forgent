@@ -411,3 +411,56 @@ export function renderProviderInvocation(inputs = {}) {
   const adapter = getProviderAdapter(inputs.providerFamily, inputs.command);
   return adapter.render(inputs);
 }
+
+/**
+ * Phase E step 1 (executor-profile-schema-migration): production binder for
+ * argv rendering, self-verifying -- same safety posture as Phase 07's
+ * `resolveVerifiedPlacementModel`/Phase 08's `resolveVerifiedRedirectExecutor`.
+ * `legacyArgs` is the caller's own UNCHANGED template-substitution result
+ * (`transport.mjs`'s `resolveExecutorCommand`), always computed first and
+ * never recomputed here. This module's own rendering
+ * (`renderProviderInvocation`, design.md's "ProviderAdapter renders
+ * canonical runtime options; transport only spawns" invariant -- shadow-only
+ * since Phase 01, never the real spawn path until now) is used ONLY when it
+ * produces the EXACT SAME argv array, element-for-element -- the strictest
+ * verification this track's binders use anywhere, appropriate for the
+ * first production flip of the actual spawn argv. No `runtimeOptions` is
+ * passed at this call site (no policy-computed toolIntent/effort exists
+ * yet to inject) -- this phase proves the RENDERING MECHANISM is
+ * production-trustworthy for the executors already configured today,
+ * before any later phase builds policy-driven runtime options on top of
+ * it. A caller that never reaches 'scoped'/agreement always gets
+ * `legacyArgs` back unchanged, with the divergence reported, never
+ * silently applied.
+ *
+ * @param {object} params
+ * @param {string} params.providerFamily
+ * @param {string} params.command
+ * @param {string[]} params.baseArgs the executor's own RAW (pre-substitution) args template
+ * @param {string} params.promptPlaceholder the real prompt string to substitute for `{prompt}`
+ * @param {string} params.model the real model string to substitute for `{model}`
+ * @param {string[]} params.legacyArgs what `resolveExecutorCommand`'s own
+ *   unchanged `{prompt}`/`{model}` substitution already produced for this
+ *   exact input
+ * @returns {{args: string[], source: 'provider-adapter'|'legacy', divergence: null|{legacyArgs: string[], renderedArgs: string[]}}}
+ */
+export function resolveVerifiedProviderArgs({ providerFamily, command, baseArgs, promptPlaceholder, model, legacyArgs }) {
+  let rendered;
+  try {
+    rendered = renderProviderInvocation({ providerFamily, command, baseArgs, promptPlaceholder, model });
+  } catch {
+    return { args: legacyArgs, source: 'legacy', divergence: null };
+  }
+  const renderedArgs = Array.isArray(rendered?.args) ? rendered.args : null;
+  const agrees = Array.isArray(renderedArgs)
+    && renderedArgs.length === legacyArgs.length
+    && renderedArgs.every((arg, i) => arg === legacyArgs[i]);
+  if (!agrees) {
+    return {
+      args: legacyArgs,
+      source: 'legacy',
+      divergence: { legacyArgs, renderedArgs: renderedArgs ?? [] },
+    };
+  }
+  return { args: renderedArgs, source: 'provider-adapter', divergence: null };
+}

@@ -22,6 +22,7 @@ import {
   normalizeProviderFamily,
   extractPolicyShapedFlags,
   resolveEnvPatch,
+  resolveVerifiedProviderArgs,
   KNOWN_POLICY_SHAPED_FLAGS,
   ClaudeProviderAdapter,
   CodexProviderAdapter,
@@ -517,5 +518,108 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
         });
       }
     }
+  });
+});
+
+// Phase E step 1 (executor-profile-schema-migration): resolveVerifiedProviderArgs
+// is the production binder transport.mjs's resolveExecutorCommand now calls
+// for the "claude" provider family -- same self-verifying safety posture as
+// Phase 07's resolveVerifiedPlacementModel / Phase 08's
+// resolveVerifiedRedirectExecutor. No runtimeOptions are threaded through at
+// this call site (no policy-computed toolIntent/effort exists yet) -- this
+// phase proves the RENDERING MECHANISM (ProviderAdapter, shadow-only since
+// Phase 01) is production-trustworthy for every executor already
+// configured today, before any later phase builds policy-driven runtime
+// options on top of it.
+describe('Phase E step 1: resolveVerifiedProviderArgs production binder', () => {
+  test('agrees with (and is sourced from) ProviderAdapter for a real claude-family executor -- args come back byte-identical', () => {
+    const legacyArgs = ['-p', 'hello', '--model', 'sonnet', '--permission-mode', 'acceptEdits', '--allowedTools', 'Bash(git add:*)'];
+    const baseArgs = ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits', '--allowedTools', 'Bash(git add:*)'];
+    const result = resolveVerifiedProviderArgs({
+      providerFamily: 'claude',
+      command: 'claude',
+      baseArgs,
+      promptPlaceholder: 'hello',
+      model: 'sonnet',
+      legacyArgs,
+    });
+    assert.equal(result.source, 'provider-adapter');
+    assert.deepEqual(result.args, legacyArgs);
+    assert.equal(result.divergence, null);
+  });
+
+  test('falls back to legacyArgs, reporting the divergence, when ProviderAdapter genuinely disagrees -- never silently applied', () => {
+    const legacyArgs = ['-p', 'hello', '--model', 'wrong-model-that-will-never-match'];
+    const baseArgs = ['-p', '{prompt}', '--model', '{model}'];
+    const result = resolveVerifiedProviderArgs({
+      providerFamily: 'claude',
+      command: 'claude',
+      baseArgs,
+      promptPlaceholder: 'hello',
+      model: 'sonnet',
+      legacyArgs,
+    });
+    assert.equal(result.source, 'legacy');
+    assert.deepEqual(result.args, legacyArgs);
+    assert.ok(result.divergence);
+    assert.deepEqual(result.divergence.legacyArgs, legacyArgs);
+    assert.deepEqual(result.divergence.renderedArgs, ['-p', 'hello', '--model', 'sonnet']);
+  });
+
+  test('never throws for a malformed baseArgs entry -- falls back to legacyArgs, reporting the mismatch as an ordinary divergence', () => {
+    const legacyArgs = ['-p', 'hello'];
+    const result = resolveVerifiedProviderArgs({
+      providerFamily: 'claude',
+      command: 'claude',
+      baseArgs: [42], // malformed -- not a string; ProviderAdapter.render() coerces rather than throwing, producing a mismatch
+      promptPlaceholder: 'hello',
+      model: 'sonnet',
+      legacyArgs,
+    });
+    assert.equal(result.source, 'legacy');
+    assert.deepEqual(result.args, legacyArgs);
+    assert.ok(result.divergence);
+  });
+
+  test('the real production call site (resolveExecutorCommand) uses ProviderAdapter for every claude-family executor in the live repository config, with zero divergence', () => {
+    const cfg = loadRunnerConfigFromDir(process.cwd());
+    const originalWrite = process.stderr.write;
+    const captured = [];
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    try {
+      for (const executorId of ['claude', 'claude-reviewer', 'claude-reviewer-herdr']) {
+        const result = resolveExecutorCommand(cfg, {
+          prompt: '<prompt>',
+          model: 'sonnet',
+          tier: 'standard',
+          executorId,
+          fgosDir: path.join(process.cwd(), '.fgos'),
+        });
+        assert.ok(Array.isArray(result.args) && result.args.length > 0, `${executorId} must still produce real args`);
+      }
+    } finally {
+      process.stderr.write = originalWrite;
+    }
+    const divergenceLines = captured.filter((line) => line.includes('ProviderAdapter argv divergence'));
+    assert.deepEqual(divergenceLines, [], 'no claude-family executor in the live repository config may diverge from legacy argv');
+  });
+
+  test('a non-claude provider family (e.g. openai-codex) never even attempts ProviderAdapter rendering at the resolveExecutorCommand call site', () => {
+    const cfg = loadRunnerConfigFromDir(process.cwd());
+    const originalWrite = process.stderr.write;
+    const captured = [];
+    process.stderr.write = (chunk) => { captured.push(String(chunk)); return true; };
+    try {
+      resolveExecutorCommand(cfg, {
+        prompt: '<prompt>',
+        model: 'gpt-test-standard',
+        tier: 'standard',
+        executorId: 'codex-bwrap',
+        fgosDir: path.join(process.cwd(), '.fgos'),
+      });
+    } finally {
+      process.stderr.write = originalWrite;
+    }
+    assert.deepEqual(captured, [], 'non-claude provider families must be completely untouched by this phase');
   });
 });
