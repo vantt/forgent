@@ -675,6 +675,61 @@
             }
           }
         ]
+      },
+      "deepseek": {
+        "kind": "agent",
+        "description": "DeepSeek provider via pi CLI, OpenRouter gateway account. --provider omitted -- account dir has a single provider (openrouter). Same account dir also serves other OpenRouter-hosted models (e.g. glm-cli's z-ai route uses a different account/mechanism); --model alone selects deepseek/* here.",
+        "allowCrossProvider": true,
+        "providerModel": "deepseek",
+        "invocations": [
+          {
+            "id": "pi-cli-openrouter",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter"
+            }
+          },
+          {
+            "id": "pi-cli-bwrap-openrouter",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter"
+            }
+          }
+        ]
       }
     },
     "timeoutMs": 2100000,
@@ -716,6 +771,13 @@
         "advanced": "grok-4.5",
         "flagship": "grok-4.6",
         "frontier": "grok-4.6"
+      },
+      "deepseek": {
+        "nano": "deepseek/deepseek-v4-flash",
+        "standard": "deepseek/deepseek-v4-flash",
+        "advanced": "deepseek/deepseek-v4-pro",
+        "flagship": "deepseek/deepseek-v4-pro",
+        "frontier": "deepseek/deepseek-v4-pro"
       }
     },
     "models": {
