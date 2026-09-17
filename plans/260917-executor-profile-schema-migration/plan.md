@@ -42,7 +42,7 @@ explicitly instead of inheriting one.
 | Phase | Scope | Status | Evidence |
 |---|---|---|---|
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
-| B | Real cross-provider PlacementPolicy fallback in production dispatch | Not started | -- |
+| B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile JSON Schema + additive dual-shape config support | Not started | -- |
 | D | Migrate `readOnlyExecutorRedirects`' one live pool onto the new surface, retire the field | Not started, depends on C | -- |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
