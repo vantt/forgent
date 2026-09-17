@@ -952,17 +952,21 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
   const codex = writeArgvRecordingExecutor(tempDir, 'codex');
 
   const runnerConfig = {
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-        allowCrossProvider: true,
-        readOnlyRedirect: {
+    placementPolicy: {
+      readOnlyRedirects: {
+        claude: {
           default: ['claude-reviewer'],
           operations: {
             'shape-plan': ['codex-bwrap'],
           },
         },
+      },
+    },
+    executors: {
+      claude: {
+        command: process.execPath,
+        args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+        allowCrossProvider: true,
       },
       'claude-reviewer': {
         command: process.execPath,
@@ -1028,12 +1032,16 @@ test('H5: a readOnlyRedirect target cannot bypass disallowedProviders governance
   const codex = writeArgvRecordingExecutor(tempDir, 'h5-codex');
 
   const runnerConfig = {
+    placementPolicy: {
+      readOnlyRedirects: {
+        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+      },
+    },
     executors: {
       claude: {
         command: process.execPath,
         args: [worker.scriptPath, '{prompt}', '--model', '{model}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
         allowCrossProvider: true,
-        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
       },
       'codex-bwrap': {
         command: process.execPath,
@@ -1106,12 +1114,16 @@ test('provider capacity selection happens after Run admission, records redacted 
   const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity');
 
   const runnerConfig = {
+    placementPolicy: {
+      readOnlyRedirects: {
+        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+      },
+    },
     executors: {
       claude: {
         command: process.execPath,
         args: [codex.scriptPath, '{prompt}'],
         allowCrossProvider: true,
-        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
       },
       'codex-bwrap': {
         command: process.execPath,
@@ -1180,12 +1192,16 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   const codex = writeArgvRecordingExecutor(tempDir, 'codex-capacity-refused');
 
   const runnerConfig = {
+    placementPolicy: {
+      readOnlyRedirects: {
+        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+      },
+    },
     executors: {
       claude: {
         command: process.execPath,
         args: [codex.scriptPath, '{prompt}'],
         allowCrossProvider: true,
-        readOnlyRedirect: { operations: { 'shape-plan': ['codex-bwrap'] } },
       },
       'codex-bwrap': {
         command: process.execPath,

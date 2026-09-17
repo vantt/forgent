@@ -780,6 +780,7 @@ const PROMPT_DELIVERIES = ['file-pointer', 'inline'];
 const REMOVED_EXECUTOR_FIELDS = Object.freeze({
   receipt: 'It had one legal value and no reader anywhere in the repo. The rule it stood for -- a round concludes only from a file the receiver wrote -- is not configurable and never was; it is what the herdr round does unconditionally.',
   trustStore: 'Declare it on "interactiveMode" instead, which is where the adapter reads it. It used to be declared at the executor level and read from interactiveMode, so its one validated kind guarded a field nothing consulted.',
+  readOnlyRedirect: 'Declare it under "placementPolicy.readOnlyRedirects.<thisExecutorId>" instead (top-level, not on any executor entry). "Which executor to substitute for a read-only operation" is a PlacementPolicy ranking decision (design.md §3.6), not a fact about this executor\'s own identity -- putting it here was itself a corrected mistake (executor-profile-schema-migration Phase D).',
 });
 
 /** Both are real: claude keeps trust in `~/.claude.json`, codex in a
@@ -978,14 +979,6 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   if (executor.supports !== undefined) {
     validateExecutorSupportsShape(executor.supports, `${label} "supports"`);
   }
-  // Phase D (executor-profile-schema-migration): the read-only redirect
-  // candidate-pool declaration, relocated from the retired top-level
-  // `runner.readOnlyExecutorRedirects.<id>` map onto this executor's own
-  // entry. Optional -- an executor declaring none keeps resolving exactly
-  // as before (no redirect pool for read-only Assignments resolving to it).
-  if (executor.readOnlyRedirect !== undefined) {
-    validateReadOnlyRedirectShape(executor.readOnlyRedirect, `${label} "readOnlyRedirect"`);
-  }
 }
 
 /**
@@ -1042,22 +1035,11 @@ function validateExecutorSupportsShape(supports, label) {
 }
 
 /**
- * Shape-check `executors.<id>.readOnlyRedirect` (Phase D, executor-profile-
- * schema-migration): the declared candidate-pool source
- * `readOnlyRedirectCandidates` (`assignment-runner.mjs`) reads for a
- * read-only Assignment that would otherwise resolve to THIS executor id.
- * Relocated from the retired top-level `runner.readOnlyExecutorRedirects.<id>`
- * map onto the source executor's own entry -- same value shape as before
- * (a bare candidate id, an array of candidate ids, or an object with a
- * `default` pool plus a per-operation `operations` override), just declared
- * where the seam it configures now lives (Phase C's own precedent:
- * `identity`/`supports` moved onto `executors.<id>` rather than a separate
- * namespace). PlacementPolicy's own selection algorithm
- * (`resolveVerifiedRedirectExecutor`, Phase 08) is unaffected -- it always
- * took the resolved candidate pool as an opaque parameter, never read this
- * config field itself.
+ * Shape-check ONE `placementPolicy.readOnlyRedirects.<sourceExecutorId>`
+ * entry: a bare candidate id, an array of candidate ids, or an object with
+ * a `default` pool plus a per-operation `operations` override.
  */
-function validateReadOnlyRedirectShape(value, label) {
+function validateReadOnlyRedirectPoolShape(value, label) {
   const validatePool = (pool, poolLabel) => {
     if (typeof pool === 'string') {
       if (!pool.trim()) throw new RunnerConfigError(`runner config (${poolLabel}) must be a non-empty string when a bare string.`);
@@ -1087,6 +1069,51 @@ function validateReadOnlyRedirectShape(value, label) {
     }
     for (const [opId, pool] of Object.entries(value.operations)) {
       validatePool(pool, `${label} "operations.${opId}"`);
+    }
+  }
+}
+
+/**
+ * Shape-check `runner.placementPolicy` (Phase D correction,
+ * executor-profile-schema-migration): PlacementPolicy's own declarative
+ * config surface, deliberately NOT nested on any `executors.<id>` entry.
+ *
+ * The first-round Phase D relocated the retired top-level
+ * `runner.readOnlyExecutorRedirects.<sourceExecutorId>` map onto
+ * `executors.<sourceExecutorId>.readOnlyRedirect` -- self-verified safe (zero
+ * behavior change, full test gate green) but architecturally wrong: "for a
+ * read-only OPERATION, which executor to substitute" is a POLICY/ranking
+ * decision (design.md §3.6: "PlacementPolicy owns provider/model/executor
+ * ranking"), not a fact about the source executor's own identity --
+ * the exact same category of mistake as baking a persona
+ * ("claude-reviewer") into an executor id, just one layer removed. Design.md
+ * §7 step 9 is explicit: "Retire readOnlyExecutorRedirects only after
+ * production PlacementPolicy proof" -- meaning PlacementPolicy itself must
+ * own the declaration, not merely the selection algorithm among an opaque
+ * pool handed to it (which Phase 08's `resolveVerifiedRedirectExecutor`
+ * already did, unchanged by this correction).
+ *
+ * `readOnlyRedirects.<sourceExecutorId>` keeps the identical value shape the
+ * field has always had -- only WHERE it lives changes twice now (top-level
+ * `readOnlyExecutorRedirects` -> `executors.<id>.readOnlyRedirect` ->
+ * `placementPolicy.readOnlyRedirects.<id>`). `placement-policy.mjs` itself
+ * now reads this config directly (`readOnlyRedirectPool`), rather than
+ * `assignment-runner.mjs` computing the pool and handing it in as an opaque
+ * parameter -- PlacementPolicy owns both the declaration read and the
+ * selection, not one module doing the reading and a different one doing
+ * the ranking.
+ */
+function validatePlacementPolicyShape(placementPolicy, label) {
+  if (!placementPolicy || typeof placementPolicy !== 'object' || Array.isArray(placementPolicy)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object.`);
+  }
+  if (placementPolicy.readOnlyRedirects !== undefined) {
+    const pools = placementPolicy.readOnlyRedirects;
+    if (!pools || typeof pools !== 'object' || Array.isArray(pools)) {
+      throw new RunnerConfigError(`runner config (${label} "readOnlyRedirects") must be an object mapping source executor id -> candidate pool.`);
+    }
+    for (const [sourceExecutorId, pool] of Object.entries(pools)) {
+      validateReadOnlyRedirectPoolShape(pool, `${label} "readOnlyRedirects.${sourceExecutorId}"`);
     }
   }
 }
@@ -1248,12 +1275,18 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   // a config still carrying this top-level field is told so, rather than
   // having it quietly do nothing (same discipline REMOVED_EXECUTOR_FIELDS
   // already applies per-executor, below). Declare the SAME pool shape
-  // (bare id/array, or {default, operations}) as `readOnlyRedirect` on the
-  // source executor's own `executors.<id>` entry instead.
+  // (bare id/array, or {default, operations}) under
+  // `placementPolicy.readOnlyRedirects.<sourceExecutorId>` instead -- a
+  // POLICY-owned surface, never nested on any executor's own identity
+  // (see `validatePlacementPolicyShape`'s own doc comment for why this
+  // moved twice).
   if (cfg.readOnlyExecutorRedirects !== undefined) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) "readOnlyExecutorRedirects" was removed. Declare "readOnlyRedirect" on the source executor's own executors.<id> entry instead (e.g. executors.claude.readOnlyRedirect), same value shape as before.`,
+      `runner config (${sourceLabel}) "readOnlyExecutorRedirects" was removed. Declare "readOnlyRedirects.<sourceExecutorId>" under "placementPolicy" instead (e.g. placementPolicy.readOnlyRedirects.claude), same value shape as before.`,
     );
+  }
+  if (cfg.placementPolicy !== undefined) {
+    validatePlacementPolicyShape(cfg.placementPolicy, `${sourceLabel} placementPolicy`);
   }
   validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
   // OPTIONAL cfg.capabilities catalog (D4/D14, tsk-in1-3): additive, same

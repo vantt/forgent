@@ -285,22 +285,46 @@ export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legac
 // ─── Phase 08 (executor-policy-dispatch-seams): read-only redirect executor
 // ranking/selection ────────────────────────────────────────────────────────
 //
-// The read-only redirect candidate pool (`executors.<id>.readOnlyRedirect`,
-// assignment-runner.mjs's `readOnlyRedirectCandidates` -- relocated by
-// Phase D of executor-profile-schema-migration from the retired top-level
-// `runner.readOnlyExecutorRedirects`) is a different job than
-// buildPlacementPolicyCandidate's model/provider ranking above: EXECUTOR
-// selection among a declared pool. Its selection algorithm is a
-// deterministic, assignment-seeded stable-hash distribution across the
-// pool (never a "prefer the best one" ranking), so PlacementPolicy's
-// equivalent here is its own dedicated function, not a reuse of
-// buildPlacementPolicyCandidate.
+// EXECUTOR selection among a declared candidate pool is a different job
+// than buildPlacementPolicyCandidate's model/provider ranking above: its
+// selection algorithm is a deterministic, assignment-seeded stable-hash
+// distribution across the pool (never a "prefer the best one" ranking), so
+// PlacementPolicy's equivalent here is its own dedicated function, not a
+// reuse of buildPlacementPolicyCandidate.
 //
-// This module still does not own the candidate POOL declaration itself --
-// `executors.<id>.readOnlyRedirect` config remains the source of which
-// executors are even eligible. What moves to PlacementPolicy is the
-// SELECTION algorithm among that pool, self-verified against the legacy
-// formula exactly like Phase 07's resolveVerifiedPlacementModel.
+// Phase D correction (executor-profile-schema-migration): this module now
+// owns the candidate POOL DECLARATION too, not just the selection
+// algorithm -- `readOnlyRedirectPool` below reads
+// `runner.placementPolicy.readOnlyRedirects.<sourceExecutorId>` directly.
+// The field moved twice: originally a top-level `runner.readOnlyExecutorRedirects`
+// map (pre-track); a first Phase D pass relocated it onto
+// `executors.<id>.readOnlyRedirect` (self-verified safe, but architecturally
+// wrong -- "which executor substitutes for a read-only operation" is a
+// PlacementPolicy ranking decision, design.md §3.6, not a fact about the
+// source executor's own identity, the same category of mistake as baking a
+// persona into an executor id); this corrected placement matches design.md
+// §7 step 9 literally ("Retire readOnlyExecutorRedirects only after
+// production PlacementPolicy proof") -- PlacementPolicy owning the
+// declaration IS that proof, not merely self-verified selection over an
+// opaque pool someone else handed it.
+export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
+  const normalize = (value) => {
+    if (typeof value === 'string' && value.trim()) return [value.trim()];
+    if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+    return [];
+  };
+  const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
+  if (configured === undefined) {
+    // Default-safety fallback, unchanged since before this field existed at
+    // all: an unconfigured "claude" still redirects to "claude-reviewer"
+    // when that executor is registered.
+    return sourceExecutorId === 'claude' && cfg?.executors?.['claude-reviewer'] ? ['claude-reviewer'] : [];
+  }
+  if (configured && typeof configured === 'object' && !Array.isArray(configured)) {
+    return normalize(configured.operations?.[operation] ?? configured.default);
+  }
+  return normalize(configured);
+}
 
 /**
  * Deterministic index into a size-`size` pool from `seed`. BYTE-IDENTICAL

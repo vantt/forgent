@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
+import { readOnlyRedirectPool } from '../../src/runner/dispatch/placement-policy.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
 // is allowed to declare about itself, and the one combination that must be refused
@@ -312,10 +313,14 @@ test('Phase C: the real repository config declares identity/supports on "claude"
 });
 
 // Phase D (executor-profile-schema-migration): retires the top-level
-// `runner.readOnlyExecutorRedirects` map -- the same candidate-pool shape
-// now lives on `executors.<id>.readOnlyRedirect`, the source executor's own
-// entry (same seam Phase C's identity/supports already established, not a
-// new namespace).
+// `runner.readOnlyExecutorRedirects` map. A first pass relocated the same
+// shape onto `executors.<id>.readOnlyRedirect` -- self-verified safe but
+// architecturally wrong (a POLICY/ranking decision nested inside an
+// executor's own identity block, the same category of mistake as baking a
+// persona into an executor id). Corrected: the pool now lives under
+// `runner.placementPolicy.readOnlyRedirects.<sourceExecutorId>` --
+// PlacementPolicy's own declarative surface (design.md §3.6, §7 step 9),
+// never nested on any executor.
 
 function loadRunnerConfigObject(cfgObject) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
@@ -336,50 +341,73 @@ test('Phase D: the retired top-level "readOnlyExecutorRedirects" field is refuse
       timeoutMs: 60000,
       readOnlyExecutorRedirects: { claude: ['claude-reviewer'] },
     }),
-    (err) => err instanceof RunnerConfigError && /readOnlyExecutorRedirects/.test(err.message) && /removed/.test(err.message) && /readOnlyRedirect/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /readOnlyExecutorRedirects/.test(err.message) && /removed/.test(err.message) && /placementPolicy/.test(err.message),
   );
 });
 
-test('Phase D: an executor declaring no readOnlyRedirect still loads unchanged (regression guard)', () => {
+test('Phase D correction: declaring readOnlyRedirect ON an executor entry (the first, architecturally-wrong Phase D location) is refused at load, by name', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 'claude-reviewer' }),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message) && /removed/.test(err.message) && /placementPolicy/.test(err.message),
+  );
+});
+
+test('Phase D: a config declaring no placementPolicy at all still loads unchanged (regression guard)', () => {
   const cfg = loadWith({ command: 'claude', args: ['{prompt}'] });
-  assert.equal(cfg.executors.sample.readOnlyRedirect, undefined);
+  assert.equal(cfg.placementPolicy, undefined);
 });
 
-test('Phase D: readOnlyRedirect accepts a bare string, an array of strings, or {default, operations}', () => {
-  assert.equal(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 'claude-reviewer' }).executors.sample.readOnlyRedirect, 'claude-reviewer');
-  assert.deepEqual(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: ['claude-reviewer', 'codex-bwrap'] }).executors.sample.readOnlyRedirect, ['claude-reviewer', 'codex-bwrap']);
+test('Phase D: placementPolicy.readOnlyRedirects.<id> accepts a bare string, an array of strings, or {default, operations}', () => {
+  assert.equal(loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    placementPolicy: { readOnlyRedirects: { claude: 'claude-reviewer' } },
+  }).placementPolicy.readOnlyRedirects.claude, 'claude-reviewer');
+
+  assert.deepEqual(loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    placementPolicy: { readOnlyRedirects: { claude: ['claude-reviewer', 'codex-bwrap'] } },
+  }).placementPolicy.readOnlyRedirects.claude, ['claude-reviewer', 'codex-bwrap']);
+
   const full = { default: ['codex-bwrap'], operations: { 'review-candidate': ['codex-bwrap'] } };
-  assert.deepEqual(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: full }).executors.sample.readOnlyRedirect, full);
+  assert.deepEqual(loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    placementPolicy: { readOnlyRedirects: { claude: full } },
+  }).placementPolicy.readOnlyRedirects.claude, full);
 });
 
-test('Phase D: readOnlyRedirect refuses a malformed pool -- empty string, non-string entries, or an unrecognized shape', () => {
+test('Phase D: placementPolicy.readOnlyRedirects refuses a malformed pool -- empty string, non-string entries, or an unrecognized shape', () => {
+  const withPool = (pool) => loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    placementPolicy: { readOnlyRedirects: { claude: pool } },
+  });
+  assert.throws(() => withPool(''), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
+  assert.throws(() => withPool(['ok', 42]), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
+  assert.throws(() => withPool(42), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
   assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: '' }),
-    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
-  );
-  assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: ['ok', 42] }),
-    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
-  );
-  assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 42 }),
-    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
-  );
-  assert.throws(
-    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: { operations: { 'review-candidate': [42] } } }),
-    (err) => err instanceof RunnerConfigError && /operations\.review-candidate/.test(err.message),
+    () => withPool({ operations: { 'review-candidate': [42] } }),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude" "operations\.review-candidate"/.test(err.message),
   );
 });
 
-test('Phase D: the real repository config declares readOnlyRedirect on "claude", no top-level readOnlyExecutorRedirects survives, and it resolves end to end', () => {
+test('Phase D: the real repository config declares placementPolicy.readOnlyRedirects.claude, no top-level readOnlyExecutorRedirects survives and nothing lives on executors.claude, and it resolves end to end via PlacementPolicy', () => {
   const cfg = loadRunnerConfigFromDir(process.cwd());
   assert.equal(cfg.readOnlyExecutorRedirects, undefined, 'the retired top-level field must not exist in the live repository config');
-  const { executor } = resolveExecutorAndOverrides(cfg, 'claude');
-  assert.deepEqual(executor.readOnlyRedirect, {
+  assert.equal(cfg.executors.claude.readOnlyRedirect, undefined, 'the field must not have moved back onto the executor entry');
+  assert.deepEqual(cfg.placementPolicy.readOnlyRedirects.claude, {
     default: ['codex-bwrap'],
     operations: {
       'review-candidate': ['codex-bwrap'],
       'red-team-candidate': ['codex-bwrap'],
     },
   });
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['codex-bwrap']);
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['codex-bwrap'], 'falls back to "default" for an operation with no specific override');
 });
