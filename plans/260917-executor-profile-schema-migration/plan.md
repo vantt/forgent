@@ -1,9 +1,8 @@
 # Executor profile schema migration — plan
 
-Status: Phase A, B, and C merged to main. Phase D/E designed below, not
-started -- each needs its own dedicated implementation pass and explicit
-go-ahead before touching live `.fgos/config.json` schema or removing an
-executor id anything still references.
+Status: Phase A, B, C, and D merged to main. Phase E designed below, not
+started -- needs its own dedicated implementation pass and explicit
+go-ahead before removing an executor id anything still references.
 
 This is the deferred "later track" design.md §9 of
 `plans/260915-executor-policy-dispatch-seams/` named but never scoped:
@@ -44,7 +43,7 @@ explicitly instead of inheriting one.
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
-| D | Migrate `readOnlyExecutorRedirects`' one live pool onto the new surface, retire the field | Not started, depends on C | -- |
+| D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto `executors.<id>.readOnlyRedirect` | Done | commit `<pending>` (branch `executor-profile-redirect-retirement`) |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
 
 ## Phase A — remove genuinely dormant executor ids
@@ -379,21 +378,71 @@ have been redundant, not safer. See "Scope" above.
 
 ## Phase D — retire `readOnlyExecutorRedirects`
 
-### Scope
+Status: Done. Implemented in worktree/branch
+`executor-profile-redirect-retirement`, commit `<pending>`.
 
-Note (post-Phase-C revision): there is no separate "ExecutorProfile config
-surface" to move the redirect pool onto -- Phase C put `identity`/`supports`
-directly on the existing `executors.<id>` shape, and `invocations[]` already
-lived there. Express the one live redirect pool (`claude ->
-default:[codex-bwrap], operations:{review-candidate:[...],
-red-team-candidate:[...]}`) as real `executors.<id>` entries/metadata (or a
-PlacementPolicy-owned declaration -- exact shape is this phase's own design
-decision, not pre-committed here), prove `resolveVerifiedRedirectExecutor`
-(Phase 08) resolves identically from the new source, then delete the
-`runner.readOnlyExecutorRedirects` field and
-`readOnlyRedirectCandidates`'s legacy-config-reading branch.
+### Scope (as actually implemented)
 
-Not started -- depends on C (done).
+`resolveVerifiedRedirectExecutor` (Phase 08) always took its candidate
+pool as an opaque `candidatePool` array parameter -- it never read
+`runner.readOnlyExecutorRedirects` itself. The ONLY real read site was
+`assignment-runner.mjs`'s `readOnlyRedirectCandidates`. Phase D therefore
+reduced to relocating one config value, not redesigning any selection
+algorithm:
+
+- `config.mjs`: new `validateReadOnlyRedirectShape` validates
+  `executors.<id>.readOnlyRedirect` (same value shape as the old field: a
+  bare candidate id, an array of ids, or `{default, operations}`), wired
+  into `validateExecutorEntryShape` -- the same seam Phase C's
+  `identity`/`supports` already occupy, not a new namespace or a
+  PlacementPolicy-owned declaration.
+- `validateRunnerConfigShape` now refuses the top-level
+  `readOnlyExecutorRedirects` field outright at load time, by name, naming
+  its replacement -- the same "removed, not silently ignored" discipline
+  `REMOVED_EXECUTOR_FIELDS` already applies per-executor (e.g. `receipt`).
+- `readOnlyRedirectCandidates` (`assignment-runner.mjs`) now reads
+  `cfg.executors?.[sourceExecutorId]?.readOnlyRedirect` instead of
+  `cfg.readOnlyExecutorRedirects?.[sourceExecutorId]` -- the one-line
+  change that is this phase's real payload. Every downstream consumer
+  (`selectReadOnlyRedirectExecutor`, `resolveVerifiedRedirectExecutor`,
+  the H5 governance re-check) needed zero changes beyond comment/error-text
+  wording, since none of them read the config field directly.
+- `.fgos/config.json`: `readOnlyExecutorRedirects.claude` relocated
+  verbatim to `executors.claude.readOnlyRedirect` (identical value); the
+  top-level field deleted entirely.
+- Test fixtures across `assignment-dispatch.test.mjs` (4 sites, including
+  the H5 governance regression test),
+  `dispatch-coordination-role-tiers.test.mjs`, and
+  `placement-policy-redirect-selection.test.mjs`'s own comment updated to
+  the new shape/field name.
+
+### Safety argument
+
+The relocation is value-preserving by construction: `readOnlyRedirectCandidates`
+returns the exact same candidate-pool array for the exact same underlying
+config data, only read from a different path. `resolveVerifiedRedirectExecutor`
+never knew or cared where its `candidatePool` parameter came from, so its
+own self-verifying proof (Phase 08) needed no re-verification -- confirmed
+empirically: `placement-policy-redirect-selection.test.mjs`'s "reproduces
+the REAL live config's single-candidate redirect (claude -> codex-bwrap)
+exactly" test passes unchanged against the relocated config. The Phase 00
+baseline snapshot matrix (36/36) and full `npm test` gate's failing-name
+set stayed byte-identical to the pre-Phase-D baseline.
+
+### Required tests (all implemented, `test/runner/dispatch-executor-profile.test.mjs`)
+
+- The retired top-level `readOnlyExecutorRedirects` field is refused at
+  load, by name, naming its replacement.
+- An executor declaring no `readOnlyRedirect` loads unchanged (regression
+  guard).
+- `readOnlyRedirect` accepts a bare string, an array of strings, or
+  `{default, operations}` -- the exact same three shapes the old field
+  accepted.
+- Each malformed shape (empty string, non-string array entry, wrong type,
+  malformed nested `operations` pool) is refused, naming the field.
+- The real repository config: `readOnlyExecutorRedirects` is gone from the
+  loaded config, `executors.claude.readOnlyRedirect` carries the real
+  relocated value, resolved end to end.
 
 ## Phase E — consolidate remaining executor ids
 
@@ -424,6 +473,9 @@ executor ids wholesale" without one) before any destructive step.
   executor (`claude`), zero behavior change for every executor not
   declaring them. Met.
 - Phase D: `readOnlyExecutorRedirects` field no longer exists in code or
-  config; PlacementPolicy is the only redirect-pool source.
+  config; the candidate pool lives on `executors.<id>.readOnlyRedirect`,
+  PlacementPolicy remains the only SELECTION-algorithm source (Phase 08 --
+  it was never the pool-declaration source, config always was and still
+  is, just relocated). Met.
 - Phase E: a real migration contract exists and is followed; no
   currently-referenced executor id disappears without one.
