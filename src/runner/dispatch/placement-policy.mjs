@@ -285,21 +285,22 @@ export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legac
 // ─── Phase 08 (executor-policy-dispatch-seams): read-only redirect executor
 // ranking/selection ────────────────────────────────────────────────────────
 //
-// `readOnlyExecutorRedirects` (assignment-runner.mjs) does EXECUTOR
-// selection among a declared candidate pool -- a different job than
-// buildPlacementPolicyCandidate's model/provider ranking above. Its
-// selection algorithm is a deterministic, assignment-seeded stable-hash
-// distribution across the pool (never a "prefer the best one" ranking),
-// so PlacementPolicy's equivalent here is its own dedicated function, not
-// a reuse of buildPlacementPolicyCandidate.
+// The read-only redirect candidate pool (`executors.<id>.readOnlyRedirect`,
+// assignment-runner.mjs's `readOnlyRedirectCandidates` -- relocated by
+// Phase D of executor-profile-schema-migration from the retired top-level
+// `runner.readOnlyExecutorRedirects`) is a different job than
+// buildPlacementPolicyCandidate's model/provider ranking above: EXECUTOR
+// selection among a declared pool. Its selection algorithm is a
+// deterministic, assignment-seeded stable-hash distribution across the
+// pool (never a "prefer the best one" ranking), so PlacementPolicy's
+// equivalent here is its own dedicated function, not a reuse of
+// buildPlacementPolicyCandidate.
 //
 // This module still does not own the candidate POOL declaration itself --
-// `readOnlyExecutorRedirects` config remains the source of which executors
-// are even eligible (design.md §9: rewriting `.fgos/config.json` to a final
-// ExecutorProfile schema is out of scope for this whole track, not just
-// this phase). What moves to PlacementPolicy is the SELECTION algorithm
-// among that pool, self-verified against the legacy formula exactly like
-// Phase 07's resolveVerifiedPlacementModel.
+// `executors.<id>.readOnlyRedirect` config remains the source of which
+// executors are even eligible. What moves to PlacementPolicy is the
+// SELECTION algorithm among that pool, self-verified against the legacy
+// formula exactly like Phase 07's resolveVerifiedPlacementModel.
 
 /**
  * Deterministic index into a size-`size` pool from `seed`. BYTE-IDENTICAL

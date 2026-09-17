@@ -84,25 +84,23 @@
         "prefer": "claude"
       }
     },
-    "readOnlyExecutorRedirects": {
-      "claude": {
-        "default": [
-          "codex-bwrap"
-        ],
-        "operations": {
-          "review-candidate": [
-            "codex-bwrap"
-          ],
-          "red-team-candidate": [
-            "codex-bwrap"
-          ]
-        }
-      }
-    },
     "executors": {
       "claude": {
         "kind": "agent",
         "description": "Claude Code CLI (headless dispatch)",
+        "readOnlyRedirect": {
+          "default": [
+            "codex-bwrap"
+          ],
+          "operations": {
+            "review-candidate": [
+              "codex-bwrap"
+            ],
+            "red-team-candidate": [
+              "codex-bwrap"
+            ]
+          }
+        },
         "identity": {
           "principalRef": "principal://claude",
           "runtimeBackendRef": "backend://claude-cli",

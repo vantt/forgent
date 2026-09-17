@@ -310,3 +310,76 @@ test('Phase C: the real repository config declares identity/supports on "claude"
   assert.ok(executor.supports, '"claude" must declare a real supports block');
   assert.ok(executor.supports.providerFamilies.includes('claude'));
 });
+
+// Phase D (executor-profile-schema-migration): retires the top-level
+// `runner.readOnlyExecutorRedirects` map -- the same candidate-pool shape
+// now lives on `executors.<id>.readOnlyRedirect`, the source executor's own
+// entry (same seam Phase C's identity/supports already established, not a
+// new namespace).
+
+function loadRunnerConfigObject(cfgObject) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
+  const file = path.join(dir, 'config.json');
+  fs.writeFileSync(file, JSON.stringify(cfgObject, null, 2));
+  try {
+    return loadRunnerConfig(file);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+test('Phase D: the retired top-level "readOnlyExecutorRedirects" field is refused at load, by name, naming its replacement', () => {
+  assert.throws(
+    () => loadRunnerConfigObject({
+      executor: { command: 'node', args: ['{prompt}'] },
+      models: { standard: 'sonnet' },
+      timeoutMs: 60000,
+      readOnlyExecutorRedirects: { claude: ['claude-reviewer'] },
+    }),
+    (err) => err instanceof RunnerConfigError && /readOnlyExecutorRedirects/.test(err.message) && /removed/.test(err.message) && /readOnlyRedirect/.test(err.message),
+  );
+});
+
+test('Phase D: an executor declaring no readOnlyRedirect still loads unchanged (regression guard)', () => {
+  const cfg = loadWith({ command: 'claude', args: ['{prompt}'] });
+  assert.equal(cfg.executors.sample.readOnlyRedirect, undefined);
+});
+
+test('Phase D: readOnlyRedirect accepts a bare string, an array of strings, or {default, operations}', () => {
+  assert.equal(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 'claude-reviewer' }).executors.sample.readOnlyRedirect, 'claude-reviewer');
+  assert.deepEqual(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: ['claude-reviewer', 'codex-bwrap'] }).executors.sample.readOnlyRedirect, ['claude-reviewer', 'codex-bwrap']);
+  const full = { default: ['codex-bwrap'], operations: { 'review-candidate': ['codex-bwrap'] } };
+  assert.deepEqual(loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: full }).executors.sample.readOnlyRedirect, full);
+});
+
+test('Phase D: readOnlyRedirect refuses a malformed pool -- empty string, non-string entries, or an unrecognized shape', () => {
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: '' }),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
+  );
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: ['ok', 42] }),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
+  );
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 42 }),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message),
+  );
+  assert.throws(
+    () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: { operations: { 'review-candidate': [42] } } }),
+    (err) => err instanceof RunnerConfigError && /operations\.review-candidate/.test(err.message),
+  );
+});
+
+test('Phase D: the real repository config declares readOnlyRedirect on "claude", no top-level readOnlyExecutorRedirects survives, and it resolves end to end', () => {
+  const cfg = loadRunnerConfigFromDir(process.cwd());
+  assert.equal(cfg.readOnlyExecutorRedirects, undefined, 'the retired top-level field must not exist in the live repository config');
+  const { executor } = resolveExecutorAndOverrides(cfg, 'claude');
+  assert.deepEqual(executor.readOnlyRedirect, {
+    default: ['codex-bwrap'],
+    operations: {
+      'review-candidate': ['codex-bwrap'],
+      'red-team-candidate': ['codex-bwrap'],
+    },
+  });
+});

@@ -978,6 +978,14 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
   if (executor.supports !== undefined) {
     validateExecutorSupportsShape(executor.supports, `${label} "supports"`);
   }
+  // Phase D (executor-profile-schema-migration): the read-only redirect
+  // candidate-pool declaration, relocated from the retired top-level
+  // `runner.readOnlyExecutorRedirects.<id>` map onto this executor's own
+  // entry. Optional -- an executor declaring none keeps resolving exactly
+  // as before (no redirect pool for read-only Assignments resolving to it).
+  if (executor.readOnlyRedirect !== undefined) {
+    validateReadOnlyRedirectShape(executor.readOnlyRedirect, `${label} "readOnlyRedirect"`);
+  }
 }
 
 /**
@@ -1030,6 +1038,56 @@ function validateExecutorSupportsShape(supports, label) {
   }
   if (supports.toolGating !== undefined && (typeof supports.toolGating !== 'string' || !supports.toolGating.trim())) {
     throw new RunnerConfigError(`runner config (${label}) "toolGating" must be a non-empty string when present.`);
+  }
+}
+
+/**
+ * Shape-check `executors.<id>.readOnlyRedirect` (Phase D, executor-profile-
+ * schema-migration): the declared candidate-pool source
+ * `readOnlyRedirectCandidates` (`assignment-runner.mjs`) reads for a
+ * read-only Assignment that would otherwise resolve to THIS executor id.
+ * Relocated from the retired top-level `runner.readOnlyExecutorRedirects.<id>`
+ * map onto the source executor's own entry -- same value shape as before
+ * (a bare candidate id, an array of candidate ids, or an object with a
+ * `default` pool plus a per-operation `operations` override), just declared
+ * where the seam it configures now lives (Phase C's own precedent:
+ * `identity`/`supports` moved onto `executors.<id>` rather than a separate
+ * namespace). PlacementPolicy's own selection algorithm
+ * (`resolveVerifiedRedirectExecutor`, Phase 08) is unaffected -- it always
+ * took the resolved candidate pool as an opaque parameter, never read this
+ * config field itself.
+ */
+function validateReadOnlyRedirectShape(value, label) {
+  const validatePool = (pool, poolLabel) => {
+    if (typeof pool === 'string') {
+      if (!pool.trim()) throw new RunnerConfigError(`runner config (${poolLabel}) must be a non-empty string when a bare string.`);
+      return;
+    }
+    if (Array.isArray(pool)) {
+      if (!pool.every((entry) => typeof entry === 'string' && entry.trim())) {
+        throw new RunnerConfigError(`runner config (${poolLabel}) must be an array of non-empty strings.`);
+      }
+      return;
+    }
+    throw new RunnerConfigError(`runner config (${poolLabel}) must be a string or an array of strings.`);
+  };
+  if (typeof value === 'string' || Array.isArray(value)) {
+    validatePool(value, label);
+    return;
+  }
+  if (!value || typeof value !== 'object') {
+    throw new RunnerConfigError(`runner config (${label}) must be a string, an array of strings, or an object with "default"/"operations".`);
+  }
+  if (value.default !== undefined) {
+    validatePool(value.default, `${label} "default"`);
+  }
+  if (value.operations !== undefined) {
+    if (!value.operations || typeof value.operations !== 'object' || Array.isArray(value.operations)) {
+      throw new RunnerConfigError(`runner config (${label}) "operations" must be an object mapping operation id -> candidate pool when present.`);
+    }
+    for (const [opId, pool] of Object.entries(value.operations)) {
+      validatePool(pool, `${label} "operations.${opId}"`);
+    }
   }
 }
 
@@ -1185,6 +1243,17 @@ export function supportsPolicyTier(cfg, providerModel, policyTier) {
 function validateRunnerConfigShape(cfg, sourceLabel) {
   if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
+  }
+  // Phase D (executor-profile-schema-migration): removed, not deprecated --
+  // a config still carrying this top-level field is told so, rather than
+  // having it quietly do nothing (same discipline REMOVED_EXECUTOR_FIELDS
+  // already applies per-executor, below). Declare the SAME pool shape
+  // (bare id/array, or {default, operations}) as `readOnlyRedirect` on the
+  // source executor's own `executors.<id>` entry instead.
+  if (cfg.readOnlyExecutorRedirects !== undefined) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) "readOnlyExecutorRedirects" was removed. Declare "readOnlyRedirect" on the source executor's own executors.<id> entry instead (e.g. executors.claude.readOnlyRedirect), same value shape as before.`,
+    );
   }
   validateExecutorShape(cfg.executor, `${sourceLabel} executor`);
   // OPTIONAL cfg.capabilities catalog (D4/D14, tsk-in1-3): additive, same
