@@ -59,7 +59,7 @@ import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim 
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
-import { deriveProviderFamily, resolvePolicyTierModel } from './resolve.mjs';
+import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
@@ -1437,6 +1437,17 @@ export async function executeAssignment(assignment, opts = {}) {
 
   let effectivePolicy = compiledPlan.policy;
 
+  // executor-id-consolidation Step 2 (fallback confinement preservation):
+  // captured HERE, before any read-only-redirect or provider-capacity
+  // fallback substitution below can reassign `effectivePolicy`/
+  // `resolvedExecutorId` -- this is "the declared primary candidate" every
+  // later substitution gets compared against, never recomputed from an
+  // already-substituted policy (resume rehydration, below, overwrites
+  // `effectivePolicy` with a fallback-scoped recompilation whose own
+  // `executorPreference[0]` is the FALLBACK id, not the true original
+  // primary).
+  const declaredPrimaryExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
+
   // Reviewer/researcher/advisor executor scoping. A read-only Assignment must
   // never resolve to the same executor profile as a worker (acceptEdits +
   // Bash(git add/commit)) when the resolved family is the default "claude".
@@ -1556,6 +1567,13 @@ export async function executeAssignment(assignment, opts = {}) {
   let providerCapacitySelection = null;
   let providerCapacityEvidence = null;
   let fallbackEvidence = null;
+  // executor-id-consolidation Step 2: true once `resolvedExecutorId` has
+  // been substituted away from `declaredPrimaryExecutorId` by the
+  // provider-capacity fallback mechanism specifically (resume rehydration
+  // below, or a live fallback adoption further down) -- deliberately NEVER
+  // set by the read-only-redirect substitution above, which is a separate,
+  // already-existing mechanism this step does not touch.
+  let fallbackSubstituted = false;
 
   // Phase B resume rehydration: a prior attempt at this exact Run already
   // switched to a fallback executor and persisted that switch (see the
@@ -1577,6 +1595,7 @@ export async function executeAssignment(assignment, opts = {}) {
           resolvedAdapter = persistedPlan.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
           effectiveCwd = persistedPlan.invocation?.cwd ?? persistedPlan.cwd ?? cwd;
           fallbackEvidence = runJson.fallback;
+          fallbackSubstituted = true;
         }
       }
     } catch {
@@ -1692,6 +1711,7 @@ export async function executeAssignment(assignment, opts = {}) {
         effectiveCwd = fallbackOutcome.plan.invocation?.cwd ?? fallbackOutcome.plan.cwd ?? cwd;
         providerCapacitySelection = fallbackOutcome.lease;
         fallbackEvidence = fallbackOutcome.evidence;
+        fallbackSubstituted = true;
         // Fall through: the rest of executeAssignment now dispatches
         // against the fallback exactly as it would have against the
         // primary. The `status === 'selected'` block right below picks up
@@ -2028,6 +2048,37 @@ export async function executeAssignment(assignment, opts = {}) {
       // 4. Resolve executor command params
       let resolvedCmd;
       try {
+        // executor-id-consolidation Step 2 (fallback confinement
+        // preservation): only relevant when `resolvedExecutorId` was
+        // substituted by the provider-capacity fallback mechanism
+        // specifically (never for the unsubstituted primary, and never
+        // for the separate, already-existing read-only-redirect
+        // substitution -- see `fallbackSubstituted`'s own doc comment
+        // above). A confined primary (`declaredPrimaryExecutorId`) whose
+        // fallback candidate has no confined invocation available refuses
+        // outright -- caught by the same catch block below that already
+        // turns a resolveExecutorCommand failure into a structured
+        // "submission-refused" outcome -- rather than silently
+        // dispatching the fallback unconfined.
+        let fallbackInvocationId;
+        if (fallbackSubstituted) {
+          let primaryConfinement;
+          try {
+            primaryConfinement = resolveExecutorConfig(cfg, undefined, declaredPrimaryExecutorId).confinement;
+          } catch {
+            primaryConfinement = undefined;
+          }
+          const primaryWasConfined = primaryConfinement && typeof primaryConfinement === 'object' && Object.keys(primaryConfinement).length > 0;
+          if (primaryWasConfined) {
+            fallbackInvocationId = selectConfinedInvocationId(cfg.executors?.[resolvedExecutorId]);
+            if (!fallbackInvocationId) {
+              throw new RunnerConfigError(
+                `fallback executor "${resolvedExecutorId}" has no confined invocation available -- refusing to silently downgrade from primary "${declaredPrimaryExecutorId}"'s required confinement.`,
+              );
+            }
+          }
+        }
+
         resolvedCmd = resolveExecutorCommand(cfg, {
           prompt,
           model: effectivePolicy.model,
@@ -2035,6 +2086,7 @@ export async function executeAssignment(assignment, opts = {}) {
           executorId: resolvedExecutorId,
           fgosDir,
           attestRoot: effectiveCwd,
+          invocationId: fallbackInvocationId,
         });
       } catch (err) {
         const commandOutcome = {

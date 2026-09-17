@@ -1475,6 +1475,114 @@ test('Phase B: bounded to exactly one capacity attempt -- a second declared cand
   assert.equal(evidence.fallback.skippedCandidates.length, 0, 'the second candidate is never reached at all -- it is bounded-out, not skipped-for-cause');
 });
 
+// --- executor-id-consolidation Step 2: fallback confinement preservation --
+// a provider-capacity fallback substitution must never silently trade a
+// confined primary for an unconfined substitute.
+
+function buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation }) {
+  const claudeExecutor = writeArgvRecordingExecutor(tempDir, 'claude-confined-primary');
+  const codexUnconfinedExecutor = writeArgvRecordingExecutor(tempDir, 'codex-fallback-unconfined');
+  const codexConfinedExecutor = writeArgvRecordingExecutor(tempDir, 'codex-fallback-confined');
+  const runnerConfig = {
+    executors: {
+      claude: {
+        kind: 'agent',
+        providerModel: 'claude',
+        allowCrossProvider: true,
+        invocations: [
+          { id: 'cli-bwrap', via: 'cli', command: process.execPath, args: [claudeExecutor.scriptPath, '{prompt}'], confinement: { backend: 'bwrap' } },
+        ],
+      },
+      'codex-bwrap': {
+        kind: 'agent',
+        providerModel: 'openai-codex',
+        allowCrossProvider: true,
+        invocations: fallbackHasConfinedInvocation
+          ? [
+              { id: 'cli', via: 'cli', command: process.execPath, args: [codexUnconfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'] },
+              { id: 'cli-bwrap', via: 'cli', command: process.execPath, args: [codexConfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'], confinement: { backend: 'bwrap' } },
+            ]
+          : [
+              { id: 'cli', via: 'cli', command: process.execPath, args: [codexUnconfinedExecutor.scriptPath, '{prompt}', '--model', '{model}'] },
+            ],
+      },
+    },
+    modelPolicies: {
+      claude: { standard: 'sonnet' },
+      'openai-codex': { standard: 'gpt-test-standard' },
+    },
+    timeoutMs: 5000,
+    providers: {
+      claude: {
+        accounts: {
+          'claude-acct': { label: 'claude/primary', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'claude-home') } },
+        },
+      },
+      'openai-codex': {
+        accounts: {
+          'codex-acct': { label: 'codex/fallback', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'codex-home') } },
+        },
+      },
+    },
+  };
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: PROVIDER_CAPACITY_STATE_CONTRACT,
+    providers: {
+      claude: { accounts: { 'claude-acct': { quarantine: { kind: 'manual-clear', reasonCode: 'auth-token', quarantinedAt: new Date().toISOString() } } } },
+    },
+    assignments: {},
+    audit: [],
+  }));
+  return { claudeExecutor, codexUnconfinedExecutor, codexConfinedExecutor, runnerConfig, runtimeDir };
+}
+
+test('Step 2: a fallback candidate with NO confined invocation at all is refused, never silently dispatched unconfined, when the primary was confined', async () => {
+  const tempDir = mkTempDir();
+  const { claudeExecutor, codexUnconfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: false });
+
+  const work = { id: 'tsk-confinement-fallback-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  await assert.rejects(
+    () => executeAssignment(assignment, {
+      cwd: tempDir,
+      repoRoot: tempDir,
+      runnerConfig,
+      providerCapacityRuntimeDir: runtimeDir,
+      cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+    }),
+    (err) => {
+      assert.match(err.message, /fallback executor "codex-bwrap" has no confined invocation available/);
+      assert.match(err.message, /primary "claude"/);
+      return true;
+    },
+  );
+  assert.equal(fs.existsSync(codexUnconfinedExecutor.argvCapturePath), false, 'the unconfined fallback invocation must never spawn');
+  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn either');
+});
+
+test('Step 2: a fallback candidate WITH a confined invocation is dispatched through that confined invocation specifically, not its unconfined default', async () => {
+  const tempDir = mkTempDir();
+  const { claudeExecutor, codexUnconfinedExecutor, codexConfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
+
+  const work = { id: 'tsk-confinement-fallback-selected', status: 'todo', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    cliOverride: { fallbackExecutors: ['codex-bwrap'] },
+  });
+
+  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
+  assert.equal(fs.existsSync(codexConfinedExecutor.argvCapturePath), true, 'the CONFINED invocation must be the one that actually spawned');
+  assert.equal(fs.existsSync(codexUnconfinedExecutor.argvCapturePath), false, 'the unconfined default invocation on the same executor must never spawn once confinement is required');
+  assert.equal(fs.existsSync(claudeExecutor.argvCapturePath), false, 'the quarantined primary must never spawn');
+});
+
 test('Phase B: a resumed Run that already committed a fallback rehydrates the fallback, never recompiles the refused primary', async () => {
   const tempDir = mkTempDir();
   const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
