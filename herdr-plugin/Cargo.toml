@@ -79,6 +79,8 @@ axum-embed = "0.1"
 jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
 base64 = "0.23"
+fgos-host-runtime = { path = "../packages/host-runtime/rust" }
+fgos-distribution = { path = "../packages/distribution/rust" }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }

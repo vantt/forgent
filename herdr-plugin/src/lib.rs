@@ -7,5 +7,6 @@ pub mod mcp;
 pub mod pane_scan;
 pub mod pick;
 pub mod ports;
+pub mod remote_invocation;
 pub mod settings;
 pub mod ui;
