@@ -36,7 +36,7 @@
 #
 # Real per-actor PolicyPatch example (user-driven requirement, session-
 # recorded in P10.2.md): objector-a-actor/objector-b-actor declare
-# `policy.minTier: critical`, a genuine, legal, worked elevation over the
+# `policy.minTier: frontier`, a genuine, legal, worked elevation over the
 # runtime default ('standard') -- proven end to end by
 # test/runner/coordination-group-thinking-rfc-review-lite.test.mjs's
 # provenance assertion. `policy.preferExecutor` is deliberately NOT declared
@@ -99,11 +99,11 @@ spec:
     - id: objector-a-actor
       role: objector
       policy:
-        minTier: critical
+        minTier: frontier
     - id: objector-b-actor
       role: objector
       policy:
-        minTier: critical
+        minTier: frontier
 
   operations:
     - id: convene

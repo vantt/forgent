@@ -475,7 +475,7 @@ test('loadRunnerConfig rejects a config missing models', () => {
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig accepts a modelPolicies provider table declaring only some of the 5 policy tiers (Phase 00 R8)', () => {
+test('loadRunnerConfig accepts a modelPolicies provider table declaring only some of the 6 policy tiers (Phase 00 R8)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'partial-model-policies.json');
   fs.writeFileSync(
@@ -485,15 +485,15 @@ test('loadRunnerConfig accepts a modelPolicies provider table declaring only som
       models: {},
       modelPolicies: {
         claude: { standard: 'sonnet' },
-        'z-ai': { standard: 'glm-4.6', critical: 'glm-4.6-max' },
+        'z-ai': { standard: 'glm-4.6', frontier: 'glm-4.6-max' },
       },
       timeoutMs: 1000,
     }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
-  assert.equal(cfg.modelPolicies['z-ai'].critical, 'glm-4.6-max');
-  assert.equal(cfg.modelPolicies.claude.analytical, undefined);
+  assert.equal(cfg.modelPolicies['z-ai'].frontier, 'glm-4.6-max');
+  assert.equal(cfg.modelPolicies.claude.flagship, undefined);
 });
 
 test('loadRunnerConfig rejects a modelPolicies tier key not in MODEL_POLICY_TIERS', () => {
@@ -1345,14 +1345,14 @@ function committedRunnerConfig() {
 
 test('the committed .fgos/config.json runner section loads and is well-formed', () => {
   const cfg = committedRunnerConfig();
-  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['analytical', 'creative', 'critical', 'lightweight', 'standard']);
+  assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['flagship', 'advanced', 'frontier', 'nano', 'standard'].sort());
 });
 
 test('the committed .fgos/config.json runner section wires the consolidated agy executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece originally fixed)', () => {
   const cfg = committedRunnerConfig();
   assert.equal(cfg.executors?.agy?.providerModel, 'gemini');
-  assert.equal(typeof cfg.modelPolicies?.gemini?.lightweight, 'string');
-  assert.ok(cfg.modelPolicies.gemini.lightweight.length > 0);
+  assert.equal(typeof cfg.modelPolicies?.gemini?.nano, 'string');
+  assert.ok(cfg.modelPolicies.gemini.nano.length > 0);
 });
 
 test('the committed .fgos/config.json runner section grants the worker exactly acceptEdits + git add/commit (bare and rtk-wrapped) — no wider (per spike B, doubled tsk-1dsr)', () => {
@@ -1591,8 +1591,8 @@ function modelPoliciesConfig() {
   return {
     executor: { command: process.execPath, args: ['{prompt}'] },
     modelPolicies: {
-      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
-      gemini: { lightweight: 'gemini-flash', standard: 'gemini-pro', creative: 'gemini-pro', analytical: 'gemini-pro', critical: 'gemini-ultra' },
+      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+      gemini: { nano: 'gemini-flash', standard: 'gemini-pro', advanced: 'gemini-pro', flagship: 'gemini-pro', frontier: 'gemini-ultra' },
     },
     timeoutMs: 5000,
   };
@@ -1625,8 +1625,8 @@ test('modelForTier honors rigorOverrides, routing a work tier to a different mod
   const cfg = modelPoliciesConfig();
   // Default: 'standard' work-tier -> 'standard' policy tier -> sonnet.
   assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
-  // Override routes 'standard' work-tier -> 'critical' policy tier -> opus.
-  assert.equal(modelForTier(cfg, 'standard', { rigorOverrides: { standard: 'critical' } }), 'opus');
+  // Override routes 'standard' work-tier -> 'frontier' policy tier -> opus.
+  assert.equal(modelForTier(cfg, 'standard', { rigorOverrides: { standard: 'frontier' } }), 'opus');
 });
 
 test('modelForTier prefers modelPolicies over a legacy flat models map when both are present', () => {
@@ -1848,7 +1848,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose rigorOverrides key
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], rigorOverrides: { 'not-a-tier': 'critical' } } },
+      executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], rigorOverrides: { 'not-a-tier': 'frontier' } } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
@@ -1948,7 +1948,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     operation: 'validate-plan',
     policy: {
       preferExecutor: 'codex',
-      minTier: 'analytical',
+      minTier: 'flagship',
     },
   });
 
@@ -1958,7 +1958,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   });
 
   assert.equal(effectivePolicy.providerModel, 'openai-codex');
-  assert.equal(effectivePolicy.tier, 'analytical');
+  assert.equal(effectivePolicy.tier, 'flagship');
   assert.equal(effectivePolicy.model, 'gpt-5.6-terra');
 
   const prompt = 'Analyze system architecture for potential failure modes';
@@ -3615,11 +3615,11 @@ test('the "execute" CLI entry point honors --tier, changing which configured mod
   const scriptPath = writeEchoExecutor(dir);
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'] },
-    modelPolicies: { claude: { lightweight: 'haiku', standard: 'sonnet' } },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // tsk-5tm-5 D9: the flat cfg.models map was replaced by cfg.modelPolicies
-  // -- 'light' work-tier maps to the default provider's 'lightweight'
+  // -- 'light' work-tier maps to the default provider's 'nano'
   // policy tier (DEFAULT_TIER_TO_POLICY, dispatch.mjs) -- 'haiku' here,
   // named explicitly in the fixture above rather than read back from it,
   // since this test now owns its own isolated config.
@@ -4556,10 +4556,10 @@ test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when t
 test('resolveExecutorAndOverrides carries capabilities.<name>.overrides through, unapplied, for the caller to merge itself', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
   };
   const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'creative' } });
+  assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'advanced' } });
 });
 
 test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
@@ -4666,7 +4666,7 @@ test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/override
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
+      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
@@ -4854,8 +4854,8 @@ test('spawnWorker resolves model via capabilities.<name>.prefer + overrides -- t
     executors: {
       agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true },
     },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'lightweight' } } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { lightweight: 'gemini-flash' } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'nano' } } } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { nano: 'gemini-flash' } },
     timeoutMs: 5000,
   };
 
@@ -4891,8 +4891,8 @@ test('executeExecutorCli applies capabilities.<name>.overrides identically wheth
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'creative' } } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash', creative: 'flash-creative' } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash', advanced: 'flash-creative' } },
     timeoutMs: 5000,
   });
 
@@ -4914,7 +4914,7 @@ test('executeExecutorCli honors capabilities.<name>.overrides.tier/model directl
     // only pass if capabilityOverrides genuinely wins -- executor.tier/
     // .model alone would resolve to 'standard'/'agy-standard-model'.
     capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'heavy', model: 'agy-override-model' } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'agy-standard-model', critical: 'agy-heavy-model' } },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'agy-standard-model', frontier: 'agy-heavy-model' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' });
@@ -6226,7 +6226,7 @@ test('compileDispatchPlan mcp-handback (in-process) never attempts cli resolutio
 // These tests pin the merged behavior: one resolution, additive fields,
 // same mismatch guarantee, now enforced inside compileDispatchPlan itself.
 
-const SLICE_D_MODELS = Object.freeze({ lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' });
+const SLICE_D_MODELS = Object.freeze({ nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' });
 
 test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for an executor-id selector (Slice D)', () => {
   const cfg = {
@@ -6277,12 +6277,12 @@ test('compileDispatchPlan applies capability overrides when synthesizing policy 
         prefer: 'agy-herdr',
         overrides: {
           providerModel: 'gemini',
-          rigorOverrides: { standard: 'lightweight' },
+          rigorOverrides: { standard: 'nano' },
         },
       },
     },
     modelPolicies: {
-      gemini: { lightweight: 'gemini-flash-medium', standard: 'gemini-flash-high' },
+      gemini: { nano: 'gemini-flash-medium', standard: 'gemini-flash-high' },
     },
   };
 
@@ -6290,7 +6290,7 @@ test('compileDispatchPlan applies capability overrides when synthesizing policy 
   assert.equal(plan.executorId, 'agy-herdr');
   assert.equal(plan.bindingSource, 'capability.prefer');
   assert.equal(plan.providerModel, 'gemini');
-  assert.equal(plan.tier, 'lightweight');
+  assert.equal(plan.tier, 'nano');
   assert.equal(plan.model, 'gemini-flash-medium');
   assert.equal(plan.provenance.provider.value, 'gemini');
 });
@@ -6315,12 +6315,12 @@ test('compileDispatchPlan merges policy fields from a real Assignment (assignmen
     assignmentId: 'test-assignment-1',
     operation: 'implement-item',
     role: 'implementer',
-    policy: { preferExecutor: 'agy', minTier: 'critical' },
+    policy: { preferExecutor: 'agy', minTier: 'frontier' },
     skills: [],
   };
   const plan = compileDispatchPlan(cfg, { assignment: assignmentItem.assignmentId, assignmentItem });
   assert.equal(plan.executorId, 'agy');
-  assert.equal(plan.tier, 'critical');
+  assert.equal(plan.tier, 'frontier');
   assert.equal(plan.model, 'opus');
   assert.equal(plan.provenance.tier.source.scope, 'opPolicy');
   assert.equal(plan.provenance.tier.source.id, 'implement-item');

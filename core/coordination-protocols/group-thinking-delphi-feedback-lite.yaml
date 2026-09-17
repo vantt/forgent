@@ -114,7 +114,7 @@ spec:
     # `minTier: standard` would resolve the CORRECT value but get
     # misattributed provenance (`{scope: 'default'}` instead of
     # `{scope: 'actor', ...}`), confirmed empirically while building this
-    # definition's own proof test. "analytical"/"critical" both sit above
+    # definition's own proof test. "flagship"/"frontier" both sit above
     # that default floor, so the real actor-scope source is provably
     # attributed, not merely coincidentally correct in value.
     #
@@ -133,15 +133,15 @@ spec:
     - id: facilitator-actor
       role: facilitator
       policy:
-        minTier: critical
+        minTier: frontier
     - id: panelist-a
       role: panelist
       policy:
-        minTier: analytical
+        minTier: flagship
     - id: panelist-b
       role: panelist
       policy:
-        minTier: analytical
+        minTier: flagship
 
   operations:
     - id: convene

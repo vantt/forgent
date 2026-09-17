@@ -25,7 +25,7 @@ test('Phase 06: collectExecutorProfileWarnings names executor-level rigorOverrid
       'agy-cli': {
         invocations: [{ via: 'cli', command: 'agy', args: [] }],
         providerModel: 'gemini',
-        rigorOverrides: { heavy: 'creative' },
+        rigorOverrides: { heavy: 'advanced' },
       },
     },
   };
@@ -92,7 +92,7 @@ test('Phase 06: a clean executor/capability config with no legacy policy-shaped 
 test('Phase 06: legacy executor ids remain fully accepted -- collectExecutorProfileWarnings never throws for any of them, only reports', () => {
   const cfg = {
     executors: {
-      'claude-reviewer': { invocations: [{ via: 'cli', command: 'claude', args: ['--effort', 'high'] }], rigorOverrides: { heavy: 'critical' } },
+      'claude-reviewer': { invocations: [{ via: 'cli', command: 'claude', args: ['--effort', 'high'] }], rigorOverrides: { heavy: 'frontier' } },
     },
   };
   assert.doesNotThrow(() => collectExecutorProfileWarnings(cfg));

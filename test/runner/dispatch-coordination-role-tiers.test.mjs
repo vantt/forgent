@@ -59,28 +59,28 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
     // so a resolved `runResult.policy.model` unambiguously proves WHICH
     // tier actually won, the same real `modelPolicies` shape this repo's
     // own committed .fgos/config.json uses (tsk-5tm-5 D9) -- deliberately
-    // missing "critical" for the fail-closed test below.
+    // missing "frontier" for the fail-closed test below.
     modelPolicies: {
       claude: {
-        lightweight: 'test-model-lightweight',
+        nano: 'test-model-nano',
         standard: 'test-model-standard',
-        creative: 'test-model-creative',
-        analytical: 'test-model-analytical',
-        critical: 'test-model-critical',
+        advanced: 'test-model-advanced',
+        flagship: 'test-model-flagship',
+        frontier: 'test-model-frontier',
       },
     },
     timeoutMs: 5000,
   };
 }
 
-// A runnerConfig whose "claude" provider table declares no "critical" tier
+// A runnerConfig whose "claude" provider table declares no "frontier" tier
 // at all -- mirrors this repo's own real, committed `.fgos/config.json`
-// "z-ai" provider entry (genuinely partial coverage, `lightweight` only),
-// used here to prove a missing-critical-tier scenario fails closed rather
+// "z-ai" provider entry (genuinely partial coverage, `nano` only),
+// used here to prove a missing-frontier-tier scenario fails closed rather
 // than silently resolving a weaker model.
-function fakeExecutorMissingCriticalTier(tempDir) {
+function fakeExecutorMissingFrontierTier(tempDir) {
   const cfg = fakeExecutor(tempDir);
-  const { critical, ...restTiers } = cfg.modelPolicies.claude;
+  const { frontier, ...restTiers } = cfg.modelPolicies.claude;
   return { ...cfg, modelPolicies: { claude: restTiers } };
 }
 
@@ -151,18 +151,18 @@ function fakeCrossProviderRedirectConfig(tempDir) {
       },
       modelPolicies: {
         claude: {
-          lightweight: 'haiku',
+          nano: 'haiku',
           standard: 'sonnet',
-          creative: 'sonnet',
-          analytical: 'opus',
-          critical: 'opus',
+          advanced: 'sonnet',
+          flagship: 'opus',
+          frontier: 'opus',
         },
         'openai-codex': {
-          lightweight: 'gpt-test-low',
+          nano: 'gpt-test-nano',
           standard: 'gpt-test-standard',
-          creative: 'gpt-test-standard',
-          analytical: 'gpt-test-analytical',
-          critical: 'gpt-test-critical',
+          advanced: 'gpt-test-standard',
+          flagship: 'gpt-test-flagship',
+          frontier: 'gpt-test-frontier',
         },
       },
       timeoutMs: 5000,
@@ -215,7 +215,7 @@ async function dispatchFirstPass(coordinationId, tempDir, runnerConfig, operatio
 
 // ─── R2-R6: role-tier separation actually resolves through real dispatch ──
 
-test('R8: produce-candidate (Doer) resolves the fixture-declared "standard" minTier through a real dispatch, not "analytical"/"critical"', async () => {
+test('R8: produce-candidate (Doer) resolves the fixture-declared "standard" minTier through a real dispatch, not "flagship"/"frontier"', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_doer', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -226,7 +226,7 @@ test('R8: produce-candidate (Doer) resolves the fixture-declared "standard" minT
   assert.equal(runResult.policy.model, 'test-model-standard');
 });
 
-test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve the fixture-declared "analytical" minTier through a real dispatch', async () => {
+test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve the fixture-declared "flagship" minTier through a real dispatch', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_first_pass', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -235,10 +235,10 @@ test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve th
   const review = await dispatchFirstPass('coord_role_tiers_first_pass', tempDir, runnerConfig, 'review-candidate', produce.assignment.assignmentId);
   const redTeam = await dispatchFirstPass('coord_role_tiers_first_pass', tempDir, runnerConfig, 'red-team-candidate', produce.assignment.assignmentId);
 
-  assert.equal(review.runResult.policy.tier, 'analytical');
-  assert.equal(review.runResult.policy.model, 'test-model-analytical');
-  assert.equal(redTeam.runResult.policy.tier, 'analytical');
-  assert.equal(redTeam.runResult.policy.model, 'test-model-analytical');
+  assert.equal(review.runResult.policy.tier, 'flagship');
+  assert.equal(review.runResult.policy.model, 'test-model-flagship');
+  assert.equal(redTeam.runResult.policy.tier, 'flagship');
+  assert.equal(redTeam.runResult.policy.model, 'test-model-flagship');
 
   // Reviewer/Red-Team/Recheck "prefer a read-only-capable executor" (R5) is
   // already structurally satisfied at the session-engine layer, for every
@@ -271,15 +271,15 @@ test('read-only red-team-candidate pinned to claude can redirect to codex-bwrap 
   assert.equal(redTeam.runResult.executorRedirected, true);
   assert.equal(redTeam.runResult.policy.executorPreference[0], 'claude');
   assert.equal(redTeam.runResult.policy.providerModel, 'openai-codex');
-  assert.equal(redTeam.runResult.policy.model, 'gpt-test-analytical');
+  assert.equal(redTeam.runResult.policy.model, 'gpt-test-flagship');
   assert.equal(fs.existsSync(captures.reviewer.argvCapturePath), false, 'red-team override must not fall through to claude-reviewer');
 
   const codexArgs = JSON.parse(fs.readFileSync(captures.codex.argvCapturePath, 'utf8'));
-  assert.ok(codexArgs.includes('gpt-test-analytical'), 'red-team argv must use the target provider model');
+  assert.ok(codexArgs.includes('gpt-test-flagship'), 'red-team argv must use the target provider model');
   assert.ok(!codexArgs.includes('opus'), 'Claude model literals must not leak into the redirected red-team executor');
 });
 
-test('R8: Red-Team escalation to "critical" for a named high-risk round resolves via a caller-supplied assignment-scope PolicyPatch, raising above the fixture\'s own "analytical" floor', async () => {
+test('R8: Red-Team escalation to "frontier" for a named high-risk round resolves via a caller-supplied assignment-scope PolicyPatch, raising above the fixture\'s own "flagship" floor', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_escalation', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -294,18 +294,18 @@ test('R8: Red-Team escalation to "critical" for a named high-risk round resolves
     // The coordinator's own per-round judgment call (R4/R6): this round
     // touches a named high-risk category (e.g. a concurrency/dispatch-
     // resolution invariant), so it escalates THIS dispatch only -- the
-    // fixture itself stays at "analytical" for every other round.
-    { assignmentPolicy: { minTier: 'critical' } },
+    // fixture itself stays at "flagship" for every other round.
+    { assignmentPolicy: { minTier: 'frontier' } },
   );
 
-  assert.equal(redTeam.runResult.policy.tier, 'critical');
-  assert.equal(redTeam.runResult.policy.model, 'test-model-critical');
+  assert.equal(redTeam.runResult.policy.tier, 'frontier');
+  assert.equal(redTeam.runResult.policy.model, 'test-model-frontier');
 });
 
-test('R8: a missing critical-tier provider fails closed (RunnerConfigError) rather than silently resolving a weaker model, and records no completed Assignment', async () => {
+test('R8: a missing frontier-tier provider fails closed (RunnerConfigError) rather than silently resolving a weaker model, and records no completed Assignment', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_fail_closed', tempDir);
-  const runnerConfig = fakeExecutorMissingCriticalTier(tempDir);
+  const runnerConfig = fakeExecutorMissingFrontierTier(tempDir);
 
   const produce = await dispatchProduce('coord_role_tiers_fail_closed', tempDir, runnerConfig);
 
@@ -316,9 +316,9 @@ test('R8: a missing critical-tier provider fails closed (RunnerConfigError) rath
       runnerConfig,
       'red-team-candidate',
       produce.assignment.assignmentId,
-      { assignmentPolicy: { minTier: 'critical' } },
+      { assignmentPolicy: { minTier: 'frontier' } },
     ),
-    (err) => err instanceof RunnerConfigError && /no model configured for policy tier "critical"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /no model configured for policy tier "frontier"/.test(err.message),
   );
 
   // Fail-closed, not silently downgraded: no result.json exists for the
@@ -332,5 +332,5 @@ test('R8: a missing critical-tier provider fails closed (RunnerConfigError) rath
       const runsDir = path.join(assignmentsDir, id, 'runs');
       return fs.existsSync(runsDir) ? fs.readdirSync(runsDir) : [];
     });
-  assert.equal(redTeamRuns.length, 0, 'a fail-closed missing-critical-tier dispatch must never produce a settled run');
+  assert.equal(redTeamRuns.length, 0, 'a fail-closed missing-frontier-tier dispatch must never produce a settled run');
 });

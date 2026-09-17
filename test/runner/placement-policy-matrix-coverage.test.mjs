@@ -127,7 +127,7 @@ test('Phase 07 PRODUCTION BINDER proof: a genuine divergence (synthetic) falls b
     ...cfg,
     executors: {
       ...cfg.executors,
-      agy: { ...cfg.executors.agy, rigorOverrides: { light: 'lightweight', standard: 'standard', heavy: 'analytical' } },
+      agy: { ...cfg.executors.agy, rigorOverrides: { light: 'nano', standard: 'standard', heavy: 'flagship' } },
     },
   };
   // agy heavy now resolves to a DIFFERENT policy tier than the config

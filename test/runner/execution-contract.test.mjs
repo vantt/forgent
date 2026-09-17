@@ -238,14 +238,14 @@ test('validateExecutionContract accepts a contract with no "policy" field at all
   assert.doesNotThrow(() => validateExecutionContract({ contract, caller: validCaller() }));
 });
 
-test('validateExecutionContract accepts contract.policy = {minTier: "lightweight"} (the exact shape this cell exists to legalize)', () => {
+test('validateExecutionContract accepts contract.policy = {minTier: "nano"} (the exact shape this cell exists to legalize)', () => {
   assert.doesNotThrow(() =>
-    validateExecutionContract({ contract: validContract({ policy: { minTier: 'lightweight' } }), caller: validCaller() }),
+    validateExecutionContract({ contract: validContract({ policy: { minTier: 'nano' } }), caller: validCaller() }),
   );
 });
 
 test('validateExecutionContract accepts every legal MODEL_POLICY_TIERS value for contract.policy.minTier', () => {
-  for (const tier of ['lightweight', 'standard', 'creative', 'analytical', 'critical']) {
+  for (const tier of ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']) {
     assert.doesNotThrow(
       () => validateExecutionContract({ contract: validContract({ policy: { minTier: tier } }), caller: validCaller() }),
       `expected contract.policy.minTier "${tier}" to be accepted`,
@@ -255,7 +255,7 @@ test('validateExecutionContract accepts every legal MODEL_POLICY_TIERS value for
 
 test('validateExecutionContract rejects contract.policy that is not an object', () => {
   assert.throws(
-    () => validateExecutionContract({ contract: validContract({ policy: 'lightweight' }), caller: validCaller() }),
+    () => validateExecutionContract({ contract: validContract({ policy: 'nano' }), caller: validCaller() }),
     (err) => err instanceof RunnerConfigError && /contract\.policy must be an object/.test(err.message),
   );
 });
@@ -288,7 +288,7 @@ test('validateExecutionContract rejects any field on contract.policy other than 
     assert.throws(
       () =>
         validateExecutionContract({
-          contract: validContract({ policy: { minTier: 'lightweight', [field]: value } }),
+          contract: validContract({ policy: { minTier: 'nano', [field]: value } }),
           caller: validCaller(),
         }),
       (err) => err instanceof RunnerConfigError && new RegExp(`unknown field "${field}"`).test(err.message),

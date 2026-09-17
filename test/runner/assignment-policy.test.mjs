@@ -10,10 +10,10 @@ import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch
 import { resolvePolicyTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 
 test('resolveStrongerTier correctly orders tiers monotonically', () => {
-  assert.equal(resolveStrongerTier('standard', 'lightweight'), 'standard');
-  assert.equal(resolveStrongerTier('standard', 'analytical'), 'analytical');
-  assert.equal(resolveStrongerTier('standard', 'critical'), 'critical');
-  assert.equal(resolveStrongerTier('creative', 'analytical'), 'analytical');
+  assert.equal(resolveStrongerTier('standard', 'nano'), 'standard');
+  assert.equal(resolveStrongerTier('standard', 'flagship'), 'flagship');
+  assert.equal(resolveStrongerTier('standard', 'frontier'), 'frontier');
+  assert.equal(resolveStrongerTier('advanced', 'flagship'), 'flagship');
 });
 
 test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/code-reviewer/claude/standard', () => {
@@ -26,11 +26,11 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
     executor: { command: 'claude' },
     modelPolicies: {
       claude: {
-        lightweight: 'claude-3-5-haiku-20241022',
+        nano: 'claude-3-5-haiku-20241022',
         standard: 'claude-3-7-sonnet-20250219',
-        creative: 'claude-3-7-sonnet-20250219',
-        analytical: 'claude-3-7-sonnet-20250219',
-        critical: 'claude-3-7-sonnet-20250219',
+        advanced: 'claude-3-7-sonnet-20250219',
+        flagship: 'claude-3-7-sonnet-20250219',
+        frontier: 'claude-3-7-sonnet-20250219',
       },
     },
   };
@@ -53,7 +53,7 @@ test('resolveAssignmentDispatchPolicy resolves validate-plan defaults: reviewer/
   assert.ok(Object.isFrozen(effective.constraints));
 });
 
-test('high-risk work raises tier rigor to analytical or critical without downgrade', () => {
+test('high-risk work raises tier rigor to flagship or frontier without downgrade', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
@@ -69,7 +69,7 @@ test('high-risk work raises tier rigor to analytical or critical without downgra
     work: heavyWork,
   });
 
-  assert.equal(effective.tier, 'analytical');
+  assert.equal(effective.tier, 'flagship');
 });
 
 test('assignment explicit policy can narrow executor preference to pi over operation default', () => {
@@ -102,7 +102,7 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
 
   const cliOverride = {
     preferExecutor: 'claude',
-    tier: 'critical',
+    tier: 'frontier',
     preferPersona: 'custom-reviewer',
     visibility: 'visible',
   };
@@ -113,7 +113,7 @@ test('CLI/human explicit override wins over Assignment policy preference', () =>
   });
 
   assert.equal(effective.executorPreference[0], 'claude');
-  assert.equal(effective.tier, 'critical');
+  assert.equal(effective.tier, 'frontier');
   assert.equal(effective.persona, 'custom-reviewer');
   assert.equal(effective.visibility, 'visible');
 });
@@ -184,17 +184,17 @@ test('resolvePolicyTierModel resolves policy tiers above "standard" directly aga
   const cfg = {
     modelPolicies: {
       claude: {
-        lightweight: 'claude-3-5-haiku-20241022',
+        nano: 'claude-3-5-haiku-20241022',
         standard: 'claude-3-7-sonnet-20250219',
-        creative: 'claude-3-7-sonnet-20250219',
-        analytical: 'claude-opus-analytical',
-        critical: 'claude-opus-critical',
+        advanced: 'claude-3-7-sonnet-20250219',
+        flagship: 'claude-opus-analytical',
+        frontier: 'claude-opus-critical',
       },
     },
   };
 
-  assert.equal(resolvePolicyTierModel(cfg, 'analytical', 'claude'), 'claude-opus-analytical');
-  assert.equal(resolvePolicyTierModel(cfg, 'critical', 'claude'), 'claude-opus-critical');
+  assert.equal(resolvePolicyTierModel(cfg, 'flagship', 'claude'), 'claude-opus-analytical');
+  assert.equal(resolvePolicyTierModel(cfg, 'frontier', 'claude'), 'claude-opus-critical');
 });
 
 test('resolvePolicyTierModel fails closed with a named RunnerConfigError for an unsupported provider/tier pair', () => {
@@ -205,8 +205,8 @@ test('resolvePolicyTierModel fails closed with a named RunnerConfigError for an 
   };
 
   assert.throws(
-    () => resolvePolicyTierModel(cfg, 'analytical', 'claude'),
-    (err) => err instanceof RunnerConfigError && /analytical/.test(err.message) && /claude/.test(err.message),
+    () => resolvePolicyTierModel(cfg, 'flagship', 'claude'),
+    (err) => err instanceof RunnerConfigError && /flagship/.test(err.message) && /claude/.test(err.message),
   );
   assert.throws(
     () => resolvePolicyTierModel(cfg, 'standard', 'z-ai'),
@@ -214,14 +214,14 @@ test('resolvePolicyTierModel fails closed with a named RunnerConfigError for an 
   );
 });
 
-test('resolveAssignmentDispatchPolicy resolves an analytical-tier work item against a provider that declares it (B1 end-to-end)', () => {
+test('resolveAssignmentDispatchPolicy resolves an flagship-tier work item against a provider that declares it (B1 end-to-end)', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
   const runnerConfig = {
     executor: { command: 'claude' },
     modelPolicies: {
       claude: {
         standard: 'claude-3-7-sonnet-20250219',
-        analytical: 'claude-opus-analytical',
+        flagship: 'claude-opus-analytical',
       },
     },
   };
@@ -232,7 +232,7 @@ test('resolveAssignmentDispatchPolicy resolves an analytical-tier work item agai
     runnerConfig,
   });
 
-  assert.equal(effective.tier, 'analytical');
+  assert.equal(effective.tier, 'flagship');
   assert.equal(effective.model, 'claude-opus-analytical');
 });
 
@@ -241,7 +241,7 @@ test('resolveAssignmentDispatchPolicy fails closed (throws, never a silent null 
   const runnerConfig = {
     executor: { command: 'claude' },
     modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet-20250219' }, // no "analytical" entry
+      claude: { standard: 'claude-3-7-sonnet-20250219' }, // no "flagship" entry
     },
   };
 
@@ -252,7 +252,7 @@ test('resolveAssignmentDispatchPolicy fails closed (throws, never a silent null 
         work: { id: 'tsk-b1-2', risk: 'heavy' },
         runnerConfig,
       }),
-    (err) => err instanceof RunnerConfigError && /analytical/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /flagship/.test(err.message),
   );
 });
 
@@ -531,17 +531,17 @@ test('resolveAssignmentDispatchPolicy attaches field-level provenance additively
     operation: 'validate-plan',
     policy: { preferExecutor: 'pi' },
   });
-  const cliOverride = { tier: 'critical' };
+  const cliOverride = { tier: 'frontier' };
 
   const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride });
 
   // Flat fields still present, unchanged in shape.
   assert.equal(effective.role, 'reviewer');
-  assert.equal(effective.tier, 'critical');
+  assert.equal(effective.tier, 'frontier');
 
   // New provenance field, additive.
   assert.ok(effective.provenance);
-  assert.equal(effective.provenance.tier.value, 'critical');
+  assert.equal(effective.provenance.tier.value, 'frontier');
   assert.deepEqual(effective.provenance.tier.source, { scope: 'cliOverride' });
   assert.equal(effective.provenance.executor.value, 'pi');
   assert.deepEqual(effective.provenance.executor.source, { scope: 'opPolicy', id: 'validate-plan' });
@@ -580,7 +580,7 @@ test('supportsPolicyTier is a pure boolean query with no I/O -- true only for a 
   };
 
   assert.equal(supportsPolicyTier(cfg, 'claude', 'standard'), true);
-  assert.equal(supportsPolicyTier(cfg, 'claude', 'analytical'), false);
+  assert.equal(supportsPolicyTier(cfg, 'claude', 'flagship'), false);
   assert.equal(supportsPolicyTier(cfg, 'unknown-provider', 'standard'), false);
   assert.equal(supportsPolicyTier(undefined, 'claude', 'standard'), false);
   assert.equal(supportsPolicyTier({}, 'claude', 'standard'), false);
@@ -594,12 +594,12 @@ test('supportsPolicyTier is a pure boolean query with no I/O -- true only for a 
 // all (execution-contract.mjs's whitelist had no `policy` field), so every
 // inline dispatch's floor was always AT LEAST 'standard' -- and a real
 // `.fgos/config.json`-shaped runner config that only configures
-// `lightweight` for a non-claude provider family (this repo's own committed
+// `nano` for a non-claude provider family (this repo's own committed
 // config does, for gemini/openai-codex/z-ai) could never be dispatched
 // through this resolver at all. These tests exercise the REAL resolver end
 // to end, not a mock, against a realistic fixture matching that shape.
 
-function lightweightOnlyRunnerConfig() {
+function nanoOnlyRunnerConfig() {
   return {
     executor: { command: 'claude' },
     executors: {
@@ -610,15 +610,15 @@ function lightweightOnlyRunnerConfig() {
       },
     },
     // Matches the real committed .fgos/config.json shape: claude configures
-    // every tier, gemini configures ONLY lightweight.
+    // every tier, gemini configures ONLY nano.
     modelPolicies: {
-      claude: { lightweight: 'haiku', standard: 'sonnet', creative: 'sonnet', analytical: 'sonnet', critical: 'opus' },
-      gemini: { lightweight: 'gemini-3.6-flash-medium' },
+      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+      gemini: { nano: 'gemini-3.6-flash-medium' },
     },
   };
 }
 
-function lightweightOnlyInlineAssignment(overrides = {}) {
+function nanoOnlyInlineAssignment(overrides = {}) {
   return buildAssignment({
     provenance: {
       kind: 'inline',
@@ -638,35 +638,35 @@ function lightweightOnlyInlineAssignment(overrides = {}) {
   });
 }
 
-test('resolveAssignmentDispatchPolicy: WITHOUT contract.policy.minTier, an inline dispatch to a lightweight-only provider family fails closed at the default "standard" floor (proves the stop gate this cell closes was real)', () => {
-  const assignment = lightweightOnlyInlineAssignment();
+test('resolveAssignmentDispatchPolicy: WITHOUT contract.policy.minTier, an inline dispatch to a nano-only provider family fails closed at the default "standard" floor (proves the stop gate this cell closes was real)', () => {
+  const assignment = nanoOnlyInlineAssignment();
   assert.equal(assignment.policy, undefined);
 
   assert.throws(
     () =>
       resolveAssignmentDispatchPolicy({
         assignment,
-        runnerConfig: lightweightOnlyRunnerConfig(),
+        runnerConfig: nanoOnlyRunnerConfig(),
         cliOverride: { preferExecutor: 'agy-cli' },
       }),
     (err) => err instanceof RunnerConfigError,
   );
 });
 
-test('resolveAssignmentDispatchPolicy: contract.policy = {minTier: "lightweight"} resolves effectiveTier "lightweight" (not "standard") through the REAL resolver, for a provider family that only configures "lightweight"', () => {
-  const assignment = lightweightOnlyInlineAssignment({ policy: { minTier: 'lightweight' } });
-  assert.deepEqual(assignment.policy, { minTier: 'lightweight' });
+test('resolveAssignmentDispatchPolicy: contract.policy = {minTier: "nano"} resolves effectiveTier "nano" (not "standard") through the REAL resolver, for a provider family that only configures "nano"', () => {
+  const assignment = nanoOnlyInlineAssignment({ policy: { minTier: 'nano' } });
+  assert.deepEqual(assignment.policy, { minTier: 'nano' });
 
   const effective = resolveAssignmentDispatchPolicy({
     assignment,
-    runnerConfig: lightweightOnlyRunnerConfig(),
+    runnerConfig: nanoOnlyRunnerConfig(),
     cliOverride: { preferExecutor: 'agy-cli' },
   });
 
-  assert.equal(effective.tier, 'lightweight');
+  assert.equal(effective.tier, 'nano');
   assert.equal(effective.providerModel, 'gemini');
   assert.equal(effective.model, 'gemini-3.6-flash-medium');
-  assert.deepEqual(effective.provenance.tier, { value: 'lightweight', source: { scope: 'opPolicy', id: undefined } });
+  assert.deepEqual(effective.provenance.tier, { value: 'nano', source: { scope: 'opPolicy', id: undefined } });
 });
 
 // ─── Phase 04 (executor-policy-dispatch-seams): quality bridge ─────────────
@@ -688,11 +688,11 @@ import {
 } from '../../src/runner/dispatch/assignment-policy.mjs';
 
 test('Phase 04: legacy tier bridge maps every MODEL_POLICY_TIERS value to its canonical quality', () => {
-  assert.deepEqual(QUALITY_TIER_BRIDGE.lightweight, { minRigor: 'low', mode: 'balanced' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.nano, { minRigor: 'low', mode: 'balanced' });
   assert.deepEqual(QUALITY_TIER_BRIDGE.standard, { minRigor: 'standard', mode: 'balanced' });
-  assert.deepEqual(QUALITY_TIER_BRIDGE.creative, { minRigor: 'standard', mode: 'creative' });
-  assert.deepEqual(QUALITY_TIER_BRIDGE.analytical, { minRigor: 'high', mode: 'analytical' });
-  assert.deepEqual(QUALITY_TIER_BRIDGE.critical, { minRigor: 'critical', mode: 'analytical' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.advanced, { minRigor: 'standard', mode: 'creative' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.flagship, { minRigor: 'high', mode: 'analytical' });
+  assert.deepEqual(QUALITY_TIER_BRIDGE.frontier, { minRigor: 'critical', mode: 'analytical' });
 });
 
 test('Phase 04: quality.minRigor/mode are derived from the raise-only-composed semantic tier, sourceKind implied-by-tier-bridge', () => {
@@ -702,12 +702,12 @@ test('Phase 04: quality.minRigor/mode are derived from the raise-only-composed s
   const effective = resolveAssignmentDispatchPolicy({ assignment, work: heavyWork });
 
   // Unchanged pre-existing composition: work.risk === 'heavy' raises the
-  // floor to 'analytical' (pinned by the "high-risk work raises tier rigor"
+  // floor to 'flagship' (pinned by the "high-risk work raises tier rigor"
   // test above) -- the quality bridge must derive FROM that already-composed
   // value, never re-derive tier composition of its own.
-  assert.equal(effective.tier, 'analytical');
+  assert.equal(effective.tier, 'flagship');
   assert.equal(effective.quality.minRigor.value, 'high');
-  assert.deepEqual(effective.quality.minRigor.source, { scope: 'derived', id: 'analytical' });
+  assert.deepEqual(effective.quality.minRigor.source, { scope: 'derived', id: 'flagship' });
   assert.equal(effective.quality.mode.value, 'analytical');
   assert.equal(effective.quality.mode.sourceKind, 'implied-by-tier-bridge');
   assert.ok(Object.isFrozen(effective.quality));
@@ -718,7 +718,7 @@ test('Phase 04: mode source precedence -- explicit wins over implied-by-tier-bri
 
   const viaCliOverride = resolveAssignmentDispatchPolicy({
     assignment,
-    cliOverride: { tier: 'creative', mode: 'adversarial' },
+    cliOverride: { tier: 'advanced', mode: 'adversarial' },
   });
   assert.equal(viaCliOverride.quality.mode.value, 'adversarial');
   assert.equal(viaCliOverride.quality.mode.sourceKind, 'explicit');
@@ -730,7 +730,7 @@ test('Phase 04: mode source precedence -- explicit wins over implied-by-tier-bri
     assignment: buildAssignment({
       stage: 'planning',
       operation: 'validate-plan',
-      policy: { minTier: 'creative', mode: 'adversarial' },
+      policy: { minTier: 'advanced', mode: 'adversarial' },
     }),
   });
   assert.equal(viaOpPolicy.quality.mode.value, 'adversarial');
@@ -743,9 +743,9 @@ test('Phase 04: mode source precedence -- explicit wins over implied-by-tier-bri
 });
 
 test('Phase 04: explicit minRigor at or below the derived value is accepted; the effective value stays the derived one (read-only, not an independent raise channel)', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'analytical' } });
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'flagship' } });
 
-  // 'analytical' derives minRigor 'high'. An explicit 'standard' (weaker) or
+  // 'flagship' derives minRigor 'high'. An explicit 'standard' (weaker) or
   // 'high' (equal) must both be accepted without changing the effective
   // value away from the derived one.
   for (const explicit of ['standard', 'high']) {
@@ -767,29 +767,29 @@ test('Phase 04: explicit minRigor stronger than the semantic-tier-derived value 
   );
 });
 
-test('Phase 04: raw agy heavy work preserves lookupPolicyTier "creative" -> gemini-3.8-flash-high, while semanticTier/quality.minRigor stay "critical"', () => {
+test('Phase 04: raw agy heavy work preserves lookupPolicyTier "advanced" -> gemini-3.8-flash-high, while semanticTier stays "frontier"/quality.minRigor stays "critical"', () => {
   // Mirrors the real agy-cli/agy-herdr executor shape (rigorOverrides keyed
   // by this resolver's own policy-tier vocabulary): heavy work composes up
-  // to the 'critical' semantic tier (DEFAULT_TIER_TO_POLICY.heavy ===
-  // 'critical', dispatch/config.mjs), and agy's own rigorOverrides retarget
-  // ONLY the model-lookup key for 'critical' to 'creative' -- design.md
+  // to the 'frontier' semantic tier (DEFAULT_TIER_TO_POLICY.heavy ===
+  // 'frontier', dispatch/config.mjs), and agy's own rigorOverrides retarget
+  // ONLY the model-lookup key for 'frontier' to 'advanced' -- design.md
   // §5.3's "creative-column trap" this phase must not fall into.
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
-    policy: { minTier: 'critical', rigorOverrides: { critical: 'creative' } },
+    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'advanced' } },
   });
   const runnerConfig = {
     executor: { command: 'agy' },
-    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', creative: 'gemini-3.8-flash-high', critical: 'gemini-3.8-flash-critical-unused' } },
+    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', advanced: 'gemini-3.8-flash-high', frontier: 'gemini-3.8-flash-critical-unused' } },
   };
 
   const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
 
-  assert.equal(effective.tier, 'critical', 'legacy flat tier field unaffected');
-  assert.equal(effective.provenance.semanticTier.value, 'critical');
+  assert.equal(effective.tier, 'frontier', 'legacy flat tier field unaffected');
+  assert.equal(effective.provenance.semanticTier.value, 'frontier');
   assert.equal(effective.quality.minRigor.value, 'critical', 'canonical minRigor must not follow the calibration lookup tier');
-  assert.equal(effective.lookupPolicyTier, 'creative');
+  assert.equal(effective.lookupPolicyTier, 'advanced');
   assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'executor', kind: 'calibration' });
   assert.equal(effective.model, 'gemini-3.8-flash-high');
 });
@@ -798,28 +798,28 @@ test('Phase 04: fgos-coding-implement capability override retargets lookupPolicy
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
-    policy: { minTier: 'critical', rigorOverrides: { critical: 'standard' } },
+    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'standard' } },
   });
   const runnerConfig = {
     executor: { command: 'agy' },
-    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', creative: 'gemini-3.8-flash-high' } },
+    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', advanced: 'gemini-3.8-flash-high' } },
   };
 
   const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
 
-  assert.equal(effective.provenance.semanticTier.value, 'critical');
+  assert.equal(effective.provenance.semanticTier.value, 'frontier');
   assert.equal(effective.quality.minRigor.value, 'critical', 'the same heavy work item keeps the same semantic rigor regardless of which provider calibration it dispatches through');
   assert.equal(effective.lookupPolicyTier, 'standard');
   assert.equal(effective.model, 'gemini-3.8-flash-medium');
 });
 
 test('Phase 04: without rigorOverrides, lookupPolicyTier equals semanticTier/effectiveTier (value-preserving no-op for every pre-Phase-04 caller)', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'creative' } });
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'advanced' } });
 
   const effective = resolveAssignmentDispatchPolicy({ assignment });
 
-  assert.equal(effective.lookupPolicyTier, 'creative');
-  assert.equal(effective.provenance.semanticTier.value, 'creative');
+  assert.equal(effective.lookupPolicyTier, 'advanced');
+  assert.equal(effective.provenance.semanticTier.value, 'advanced');
   assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'opPolicy', id: 'validate-plan', kind: 'semantic' });
 });
 
@@ -827,7 +827,7 @@ test('Phase 04: rigorOverrides naming an unrecognized policy tier fails closed',
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
-    policy: { minTier: 'critical', rigorOverrides: { critical: 'not-a-real-tier' } },
+    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'not-a-real-tier' } },
   });
 
   assert.throws(
@@ -840,25 +840,25 @@ test('Phase 04: evidence separately exposes semanticTier, canonical quality, loo
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
-    policy: { minTier: 'critical', rigorOverrides: { critical: 'creative' } },
+    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'advanced' } },
   });
   const runnerConfig = {
     executor: { command: 'agy' },
-    modelPolicies: { gemini: { creative: 'gemini-3.8-flash-high' } },
+    modelPolicies: { gemini: { advanced: 'gemini-3.8-flash-high' } },
   };
 
   const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
 
   assert.notEqual(effective.provenance.semanticTier.value, effective.lookupPolicyTier, 'semanticTier and lookupPolicyTier must be independently inspectable, not the same collapsed value');
-  assert.equal(effective.provenance.semanticTier.value, 'critical');
-  assert.equal(effective.lookupPolicyTier, 'creative');
+  assert.equal(effective.provenance.semanticTier.value, 'frontier');
+  assert.equal(effective.lookupPolicyTier, 'advanced');
   assert.equal(effective.quality.minRigor.value, 'critical');
   assert.equal(effective.quality.mode.value, 'analytical');
   // Follow-up (post-Phase-08): model provenance is now PlacementPolicy-
   // attributed (resolveVerifiedAssignmentModel), not "runnerConfig" --
   // closes the track's own "no fourth hidden placement source" close
   // criterion for this resolver. The literal model VALUE is unchanged.
-  assert.deepEqual(effective.provenance.model.source, { scope: 'placement-policy', id: 'gemini.creative' });
+  assert.deepEqual(effective.provenance.model.source, { scope: 'placement-policy', id: 'gemini.advanced' });
   assert.equal(effective.model, 'gemini-3.8-flash-high');
 });
 
@@ -871,10 +871,10 @@ test('Phase 04: MIN_RIGOR_VALUES/QUALITY_MODE_VALUES are the exact contract voca
 
 test('Phase 03: reasoningEffort defaults from canonical minRigor (low/standard/high/critical -> low/medium/high/max)', () => {
   const cases = [
-    { minTier: 'lightweight', expectedEffort: 'low' },
+    { minTier: 'nano', expectedEffort: 'low' },
     { minTier: 'standard', expectedEffort: 'medium' },
-    { minTier: 'analytical', expectedEffort: 'high' },
-    { minTier: 'critical', expectedEffort: 'max' },
+    { minTier: 'flagship', expectedEffort: 'high' },
+    { minTier: 'frontier', expectedEffort: 'max' },
   ];
   for (const { minTier, expectedEffort } of cases) {
     const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier } });
@@ -885,9 +885,9 @@ test('Phase 03: reasoningEffort defaults from canonical minRigor (low/standard/h
 });
 
 test('Phase 03: explicit reasoningEffort is most-specific-wins, never raise-only like minRigor', () => {
-  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'critical' } });
+  const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'frontier' } });
 
-  // 'critical' derives reasoningEffort "max" -- an explicit weaker value must
+  // 'frontier' derives reasoningEffort "max" -- an explicit weaker value must
   // still be honored (no raise-only constraint on this field).
   const effective = resolveAssignmentDispatchPolicy({ assignment, cliOverride: { reasoningEffort: 'low' } });
   assert.equal(effective.reasoningEffort, 'low');

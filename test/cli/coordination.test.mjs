@@ -61,7 +61,7 @@ function writeFakeExecutorConfig(cwd) {
     runner: {
       ...(existing.runner ?? {}),
       executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-      models: { standard: 'test-model', lightweight: 'test-model' },
+      models: { standard: 'test-model', nano: 'test-model' },
       timeoutMs: 20000,
     },
   };
@@ -111,7 +111,7 @@ function writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot) {
     runner: {
       ...(existing.runner ?? {}),
       executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-      models: { standard: 'test-model', lightweight: 'test-model' },
+      models: { standard: 'test-model', nano: 'test-model' },
       timeoutMs: 20000,
     },
   };
@@ -157,8 +157,8 @@ test('validateCoordinationRequest: rejects a top-level executor/model/tier field
     (err) => err instanceof StoreError && /reserved for the CLI's own --executor flag/.test(err.message),
   );
   assert.throws(
-    () => validateCoordinationRequest({ ...agentLedRequest(), tier: 'standard' }, { tier: 'lightweight' }),
-    (err) => err instanceof StoreError && /conflicts with the CLI's own --tier flag \(value "lightweight"\)/.test(err.message),
+    () => validateCoordinationRequest({ ...agentLedRequest(), tier: 'standard' }, { tier: 'nano' }),
+    (err) => err instanceof StoreError && /conflicts with the CLI's own --tier flag \(value "nano"\)/.test(err.message),
   );
 });
 
