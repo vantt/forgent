@@ -49,7 +49,8 @@ explicitly instead of inheriting one.
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
 | D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto PlacementPolicy's own config surface | Done (corrected) | commit `41532099` (first pass, wrong location), corrected commit `3baddb14` (branch `executor-placement-policy-readonly-redirect`), merged `20a4e85d` |
-| E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
+| E | Step 1: ProviderAdapter argv-rendering production binder for `claude` family | Step 1 done | commit `<pending>` (branch `executor-provider-adapter-argv-binder`) |
+| E | Step 2: consolidate `claude`+`claude-reviewer`+`claude-reviewer-herdr` etc., retire flat `executors.<id>` shape | Not started, largest blast radius | -- |
 
 ## Phase A — remove genuinely dormant executor ids
 
@@ -477,11 +478,9 @@ byte-identical to the pre-correction baseline.
 
 ## Phase E — consolidate remaining executor ids
 
-Status: Not started. Scope below is a REVISED proposal reflecting a second
-user correction (2026-09-17, during Phase E scoping) -- the original plan
-text (kept below for the record) itself repeated Phase D's own
-policy-leaked-into-identity mistake and is superseded. Needs explicit
-go-ahead before implementation.
+Status: Step 1 done. Implemented in worktree/branch
+`executor-provider-adapter-argv-binder`, commit `<pending>`. Step 2 (id
+consolidation) not started, needs its own explicit go-ahead.
 
 ### Why the original Phase E scope was also wrong
 
@@ -498,37 +497,72 @@ vocabulary) one level deeper, and the existing invocation-selection rule
 (`resolveExecutorConfig`'s Gate B2, picks by `via` only) has no axis to
 even distinguish two `via:"cli"` entries that differ only in tool grant.
 
-### Revised scope (proposed, not yet implemented)
+### Step 1 — ProviderAdapter argv-rendering production binder (done)
 
-1. **Promote ProviderAdapter's tool-gating rendering from shadow to
-   production** for the `claude` family. `src/runner/dispatch/provider-adapter.mjs`
-   (Phase 01, shadow-only since it was built) already renders
-   `--allowedTools` from a canonical `runtimeOptions.toolIntent` array via
-   `ClaudeProviderAdapter.render()` -- proven equivalent to legacy argv in
-   shadow mode, never wired into the real spawn path. Flip it to production
-   using the SAME self-verifying binder pattern as Phase 07/08 (legacy argv
-   computed first and unchanged; ProviderAdapter's rendered argv used only
-   when it agrees). This makes tool-gating a POLICY OUTPUT computed per
-   dispatch (from persona/toolIntent resolution, Phase 02-04), not a static
-   string baked into a persona-named executor's config template.
-2. **Only then**, with `claude`/`claude-reviewer`/`claude-reviewer-herdr`'s
-   behavioral difference now fully expressible as `claude` + policy-driven
-   toolIntent, retire the separate ids: `claude`'s `invocations[]` narrows
-   to genuinely infra-only variants (visibility × confinement -- e.g.
-   headless/cli, cli-bwrap, herdr, herdr-bwrap), each still carrying its own
-   `identity`/`supports` from Phase C. Retire the separate flat ids only
-   after every consumer reads the consolidated entry exclusively and a real
-   deprecation window has passed for anything outside this repo that
-   references the old flat ids by name (unverifiable from inside this
-   repo -- a real, accepted residual risk, not something this phase can
-   close alone).
+**Scope discovery before implementing**: `runtimeOptions.toolIntent` --
+the canonical input the original scope assumed POLICY already computes,
+for ProviderAdapter to render into `--allowedTools` -- does not exist
+anywhere in this codebase. `grep -n "toolIntent" src/runner/dispatch/assignment-policy.mjs`
+returns nothing; `LEGACY_EXECUTOR_ALIASES` (Phase 03) carries only
+`preferPersona`/`reasoningEffort`/`visibility`, never `toolIntent`. Building
+real policy-driven tool grants is a genuine NEW feature (a product decision
+about which tools each persona gets), not a flip of an existing shadow
+renderer -- out of step 1's own scope, deferred to step 2 or later.
 
-Largest blast radius in the whole track -- step 1 touches the real spawn
-argv path for the first time in this follow-up track (Phase B touched
-argv only for a net-new, opt-in-only fallback path; this touches the
-EXISTING primary claude dispatch path), and step 2 needs its own
-migration-contract decision (design.md's own non-goal: "deleting legacy
-executor ids wholesale" without one) before any destructive step.
+**What step 1 actually does instead**: proves `renderProviderInvocation`
+(Phase 01's ProviderAdapter, shadow-only since it was built) can safely
+REPLACE the legacy `{prompt}`/`{model}` string-substitution in
+`transport.mjs`'s `resolveExecutorCommand` -- the ONE function every
+out-of-process dispatch (`spawnWorker`/`executeExecutorCli`) calls to
+build real spawn argv -- with ZERO behavior change, before any later step
+builds policy-driven runtime options on top of it. New
+`resolveVerifiedProviderArgs` (`provider-adapter.mjs`) is the self-verifying
+binder: legacy argv computed first and unchanged; ProviderAdapter's
+rendered argv used ONLY when byte-identical, element-for-element (the
+strictest verification criterion this whole track uses anywhere,
+appropriate for the first production flip of the real spawn argv path).
+Scoped to the `claude` provider family only (`executor.governance.providerFamily
+=== 'claude'`) -- every other provider family's argv stays 100% legacy,
+the binder is never even attempted for them. No `runtimeOptions` are
+passed at this call site at all (nothing to inject yet).
+
+Traced by hand and confirmed empirically (zero divergence warnings against
+the live repository config) that ProviderAdapter's rendering agrees
+byte-for-byte with legacy for all three currently-configured claude-family
+executors (`claude`, `claude-reviewer`, `claude-reviewer-herdr`) -- none of
+their static `--model`/`--effort`/`--allowedTools` values get overwritten
+when no runtime options override them, matching `ClaudeProviderAdapter
+.render()`'s own "apply only when the flag is absent from the template"
+logic exactly.
+
+Required tests (`test/runner/provider-adapter.test.mjs`, all implemented):
+agreement case (byte-identical, sourced from provider-adapter); genuine
+divergence falls back to legacy and reports it, never silently applied; a
+malformed `baseArgs` entry never throws, falls back safely; the real
+production call site produces zero divergence for every claude-family
+executor in the live config; a non-claude provider family is completely
+untouched (zero stderr output at all).
+
+### Step 2 — consolidate ids (proposed, not started)
+
+With `claude`/`claude-reviewer`/`claude-reviewer-herdr`'s tool-gating
+difference eventually expressible as `claude` + policy-driven toolIntent
+(once that policy feature is actually built -- NOT part of step 1, see
+above), retire the separate ids: `claude`'s `invocations[]` narrows to
+genuinely infra-only variants (visibility × confinement -- e.g.
+headless/cli, cli-bwrap, herdr, herdr-bwrap), each still carrying its own
+`identity`/`supports` from Phase C. Retire the separate flat ids only
+after every consumer reads the consolidated entry exclusively and a real
+deprecation window has passed for anything outside this repo that
+references the old flat ids by name (unverifiable from inside this
+repo -- a real, accepted residual risk, not something this phase can
+close alone). Needs: (a) the toolIntent-from-persona policy feature itself
+(a real product decision, e.g. what tools does "code-reviewer" get --
+mechanically derivable from the CURRENT live `claude-reviewer`/
+`claude-reviewer-herdr` `--allowedTools` values, not fresh judgment, but
+still a new computation nothing does today), (b) its own migration-contract
+decision (design.md's own non-goal: "deleting legacy executor ids
+wholesale" without one) before any destructive step.
 
 ### Original scope (superseded, kept for the record)
 
