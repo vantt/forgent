@@ -5,11 +5,11 @@ Document type: Implementation plan
 Audience: Code-panel coordinator, implementation agent, reviewer, red-team
 Purpose: Break R3 production remote peer proof into independently reviewable packets
 Design status: Draft
-Implementation status: Planned
+Implementation status: Planned (R3-P0 route/contract frozen; R3-P1+ not started)
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Derived from host-invocation R3 proof gate, host use cases, and gateway context scan
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-17
 Related:
 - docs/platform/host-invocation-routing/roadmap.md
 - docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md
@@ -48,6 +48,33 @@ The first R3 route should be production-shaped, not a test-only HTTP endpoint.
 It may still be hidden behind an internal/preview API status if that matches the
 gateway's existing contract posture.
 
+### 2.1 R3-P0 Decision (2026-09-17)
+
+Selected: option 2, `distribution.build.show`, exposed as `GET /v1/runtime`.
+
+- Option 1 (`work.gate-bypass.show`) is deferred: the gateway has no existing
+  status/debug read it already maps to, so freezing that route first would
+  mean inventing a new gateway concept instead of freezing a contract against
+  something already shaped.
+- `distribution.build.show`'s provider descriptor already declares
+  `allowed_hosts: &["cli", "remote"]` (`DISTRIBUTION_BUILD_SHOW_DESCRIPTOR`,
+  `packages/distribution/rust/src/lib.rs`) — the kernel-level descriptor
+  already anticipates a `remote` host for this exact operation, so R3-P0
+  freezes a contract the descriptor already expects rather than widening
+  host allowance as part of this packet.
+- `BuildShowProvider::invoke` (`packages/distribution/rust/src/lib.rs`)
+  always returns `ProviderOutcome::Completed` — it reads the embedded
+  `package.json` and, when `include_runtime` is set, local runtime-identity
+  fields; it performs no writes and calls no external process. That makes it
+  the safest available read for a first peer-host proof.
+- The same operation is the one the R1 Rust CLI host already routes natively
+  (`apps/fgos/src/main.rs`, `apps/fgos/src/cli_projector.rs`), so R3 proves
+  peer-host equivalence on an operation R1 has already proven for the CLI
+  host, instead of introducing a route neither host has exercised yet.
+
+Full frozen contract is recorded in [§5 R3-P0](#r3-p0-route-and-contract-freeze) below and in
+[verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md).
+
 ## 3. Non-Goals
 
 - Do not migrate the whole gateway.
@@ -75,6 +102,10 @@ Packets may be combined only when the review still has one clear behavioral
 claim. R3-P2 and R3-P3 are likely coupled; R3-P4 should stay explicit so R3
 does not overclaim gateway migration.
 
+**R3-P0 status (2026-09-17): closed.** Route and contract frozen (docs-only,
+see [§5 R3-P0](#r3-p0-route-and-contract-freeze)). R3-P1 through R3-P5 remain
+`not started`.
+
 ## 5. Packet Details
 
 ### R3-P0: Route And Contract Freeze
@@ -95,6 +126,23 @@ Proof:
 - R3 proof doc names the route.
 - Host use-cases doc states the route is the first remote peer proof.
 - No runtime code changes are required in this packet.
+
+#### Frozen Contract (2026-09-17, docs-only — no code changed)
+
+Rationale for picking this operation/route is in [§2.1](#21-r3-p0-decision-2026-09-17).
+
+| Field | Frozen value |
+| --- | --- |
+| Operation id | `distribution.build.show` (`DISTRIBUTION_BUILD_SHOW_DESCRIPTOR`, `packages/distribution/rust/src/lib.rs`) |
+| Gateway endpoint | `GET /v1/runtime`, added to the existing `authenticated` router in `herdr-plugin/src/gateway.rs` (same `/v1` nest every other route already sits under) |
+| Caller/auth context | Same `require_token` middleware every other `authenticated` route sits behind: `Authorization: Bearer <token>` checked against `~/.fgos/config.json`'s `gateway.token` (constant-time compare), or a valid `Cf-Access-Jwt-Assertion` when cf-access (D8) is configured. No new auth path. |
+| Request projection fields | None from the HTTP request. `GET /v1/runtime` takes no body and no query params in this freeze. The remote projector builds `BuildShowRequest { include_runtime: true }` unconditionally — this route exists specifically to surface runtime identity, so `include_runtime` is fixed, not caller-controlled. |
+| Response shape | Gateway/API JSON built from `ProviderOutcome::Completed`'s `output`, downcast to `BuildShowOutcome` (`packageVersion`, `gitCommit`, `verbs[]`, `runtime`). `runtime` is populated (`RuntimeIdentityInfo`) because `include_runtime` is always `true` for this route. `ProviderOutcome::Parked` is not a reachable outcome for `distribution.build.show` (`BuildShowProvider::invoke` only ever returns `Completed`), so the presenter does not need Parked-handling for this route. |
+| Error mapping | Policy only, not a final table: reuse the gateway's existing closed `ErrorCategory` enum (`Precondition`, `Conflict`, `Validation`, `CorruptLog`, `LockTimeout`, `SessionFail`, `MergeFail`, `Busy`, `Unexpected` — `herdr-plugin/src/gateway.rs`); add no new category (matches D7). Kernel-level `ProviderError` families that can surface for this operation are admission/routing errors (`NoBinding`, `AmbiguousBinding`, `IncompatibleContract`, `CallerAdmissionDenied`, `SelectedProviderCapabilityDenied`), since the provider's own `invoke` never fails. Exact per-variant → category mapping is decided in R3-P1/P2 when the presenter is written, not frozen here. |
+| Deadline/disconnect behavior | Not a driving concern for this route: `BuildShowProvider::invoke` is synchronous, local, and does not spawn a process (reads the embedded `package.json` and local runtime-identity fields only). Disconnect/cancellation follows whatever the existing axum handlers already do for other `authenticated` routes; R3-P1/P2 add no new deadline mechanism for this route. |
+| Why read-only/safe first proof | No state write, no external process, no CLI shelling, provider already declares `remote` as an allowed host, and the same operation is already proven for the CLI host in R1. See [§2.1](#21-r3-p0-decision-2026-09-17). |
+
+This is a documentation freeze only. `herdr-plugin/src/gateway.rs` has no `/runtime` route yet — R3-P1/P2 add the remote projector/presenter and wire the route to this frozen shape.
 
 ### R3-P1: Remote Projector And Presenter
 

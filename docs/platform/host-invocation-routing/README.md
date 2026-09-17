@@ -50,6 +50,7 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
 | Plan remaining work after R1 preview installed/default proof | [roadmap.md](roadmap.md) |
 | Plan R2 external process provider preview implementation | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
+| Plan R3 remote peer implementation | [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |
