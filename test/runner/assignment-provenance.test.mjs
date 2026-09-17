@@ -315,17 +315,17 @@ test('buildAssignment (inline) with no work attached at all never fires the harn
 
 // ─── Step 08 P04.2b: the narrow "contract.policy = {minTier}" exception ────
 
-test('buildAssignment (inline) with contract.policy = {minTier: "lightweight"} stamps assignment.policy = {minTier: "lightweight"}', () => {
+test('buildAssignment (inline) with contract.policy = {minTier: "nano"} stamps assignment.policy = {minTier: "nano"}', () => {
   const assignment = buildAssignment({
     provenance: {
       kind: 'inline',
-      contract: inlineContract({ policy: { minTier: 'lightweight' } }),
+      contract: inlineContract({ policy: { minTier: 'nano' } }),
       caller: inlineCaller(),
     },
   });
 
-  assert.deepEqual(assignment.policy, { minTier: 'lightweight' });
-  assert.deepEqual(assignment.provenance.inline.contract.policy, { minTier: 'lightweight' });
+  assert.deepEqual(assignment.policy, { minTier: 'nano' });
+  assert.deepEqual(assignment.provenance.inline.contract.policy, { minTier: 'nano' });
   assert.ok(Object.isFrozen(assignment.provenance.inline.contract.policy));
 });
 
@@ -357,28 +357,28 @@ test('buildAssignment (inline) merges contract.policy.minTier with a domain harn
   // harness seam (matchedOp.policy) -- confirmed by the pre-existing harness
   // test above ("fires the domain harness seam ... assignment.policy ...
   // minTier: 'standard'"). A caller-declared contract.policy.minTier BELOW
-  // that ('lightweight') must not weaken it below 'standard'.
+  // that ('nano') must not weaken it below 'standard'.
   const weakened = buildAssignment({
     provenance: {
       kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'lightweight' } }),
+      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'nano' } }),
       caller: inlineCaller(),
     },
     work: { id: 'tsk-harness-merge-weak', stage: 'planning', domain: 'coding', workflow: 'feature' },
   });
   assert.equal(weakened.policy.minTier, 'standard');
 
-  // A caller-declared minTier ABOVE the harness floor ('critical') must
+  // A caller-declared minTier ABOVE the harness floor ('frontier') must
   // raise it.
   const raised = buildAssignment({
     provenance: {
       kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'critical' } }),
+      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'frontier' } }),
       caller: inlineCaller(),
     },
     work: { id: 'tsk-harness-merge-raise', stage: 'planning', domain: 'coding', workflow: 'feature' },
   });
-  assert.equal(raised.policy.minTier, 'critical');
+  assert.equal(raised.policy.minTier, 'frontier');
   // Every other harnessPolicy field (persona/executor hints) still passes
   // through unchanged -- only minTier is resolved via the strength merge.
   assert.equal(raised.policy.preferPersona, 'code-reviewer');
