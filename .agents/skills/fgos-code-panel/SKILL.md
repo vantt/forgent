@@ -451,12 +451,38 @@ both limits are stated, not silently assumed away.
 ## Default actor roster
 
 Executor/invocation/tier/effort mapping already decided for this product
-line (doer/fixer -> `agy`'s `cli` invocation, reviewer -> `claude`'s
-`cli-readonly` invocation, red-team -> `codex`'s `cli-bypass` invocation),
-personas tuned for reading/writing/attacking real code. `claude`'s
-`cli-readonly` invocation resolves to Claude Opus at `flagship` tier and
-passes `--effort high`: high is the quality-first default for code review;
-reserve `xhigh`/`max` for a deliberately exceptional, long-running audit.
+line (doer/fixer -> `agy`'s `cli` invocation, reviewer -> `agy`'s `cli`
+invocation on the SAME account as doer but at `flagship` tier, red-team ->
+`pi-grok`'s `grok-vantt` invocation), personas tuned for reading/writing/
+attacking real code.
+
+**2026-09-17 model swap:** reviewer moved off `claude`/`cli-readonly` onto
+`agy`/`cli` at `flagship` tier, which resolves to `gemini-3.1-pro-low`
+(`modelPolicies.gemini.flagship`) -- picked over `gemini-3.1-pro-high`
+because it is already the tier's live default, no config change needed.
+No `--effort` flag: agy's own catalog bakes effort into the model name
+itself (`gemini-3.1-pro-low`/`-high`, no `-medium` variant exists for the
+`pro` family, only for `flash`) and REFUSES `--model gemini-3.1-pro-low
+--effort medium` outright as a conflicting pair -- confirmed by a real
+failed invocation, not assumed. Known gap: `claude`'s `cli-readonly`
+enforced read-only-ish behavior with a narrow `--allowedTools` allowlist
+(git diff/log/show/status + test commands only) as a belt-and-suspenders
+layer; `agy` has no equivalent per-invocation tool allowlist flag, so
+reviewer's read-only posture now rests solely on the structural backstop
+every declared-protocol dispatch already gets regardless of executor
+(`runExecutorAttempt` unconditionally passes `isReadOnlyMode: true`,
+session-engine.mjs) -- one fewer independent layer than before, not zero
+enforcement.
+
+red-team moved off `codex`/`cli-bypass` onto `pi-grok`/`grok-vantt` at
+`flagship` tier, which resolves to `grok-4.6` (`modelPolicies.xai.flagship`,
+confirmed real via `pi --list-models`). `pi-grok` has no `herdr` invocation
+today, so the herdr-spawn roster variant below keeps red-team on
+`codex`/`herdr` unchanged -- a known, explicit gap, not an oversight.
+
+Both swaps kept the previous primary as the new `fallbackExecutors` entry
+(reviewer: `claude`; red-team: `codex`), so equivalent-tier fallback still
+covers the account/provider that used to be primary.
 
 Model-tier vocabulary (`model-tier-vocabulary-and-coordination-fallback`,
 2026-09-17): tiers are `nano/mini/standard/advanced/flagship/frontier`
@@ -483,8 +509,8 @@ invocation IS its `cli` one) falls back to the executor's own default:
 ```json
 "actors": [
   { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
-  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
+  { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+  { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
 ]
 ```
 
@@ -493,8 +519,8 @@ Fix-round roster:
 ```json
 "actors": [
   { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["codex"] },
-  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["claude"] }
+  { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
+  { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["codex"] }
 ]
 ```
 
@@ -505,13 +531,16 @@ diff/test/sha256 report, red-team `xxd` check -- all three settled):
 ```json
 "actors": [
   { "id": "doer", "executor": "agy", "invocation": "herdr", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "claude", "invocation": "herdr-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
+  { "id": "reviewer", "executor": "agy", "invocation": "herdr", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
   { "id": "red-team", "executor": "codex", "invocation": "herdr", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
 ]
 ```
 
-`claude`'s `herdr-readonly` invocation uses the same Claude Opus flagship
-tier and `--effort high` setting as `cli-readonly`.
+`red-team`'s herdr-spawn invocation stays on `codex`/`herdr` -- `pi-grok`
+has no herdr-spawn invocation today (known gap, not an oversight; see the
+2026-09-17 model swap note above). `reviewer`'s herdr-spawn invocation
+follows the same swap as the headless roster: `agy`/`herdr` at `flagship`
+tier, same `gemini-3.1-pro-low` resolution as `agy`/`cli`.
 
 Same protocol, same request shape, same `--cwd` rule; each role runs in its
 own herdr pane in the `fgos-worker` session, so a person can watch it and a
@@ -519,7 +548,8 @@ failed round leaves its pane open with the reason on screen. Two things the
 herdr transport does that cli-spawn does not: herdr types the bare agent word
 from `--kind` (an executor's `command` path is not what gets typed), and the
 pane is the operator's own interactive shell, so shell aliases apply --
-`codex`'s `herdr` invocation relies on that (see its config description).
+`codex`'s `herdr` invocation (still red-team's herdr-variant executor,
+see the 2026-09-17 model swap note above) relies on that.
 Model resolution is unchanged: `actors[].model` has no channel for
 declared-protocol requests, so tier x the executor's `rigorOverrides`
 decides the model.
@@ -576,8 +606,8 @@ the worker's summary.
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
+    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
   ],
   "steps": [
     {
@@ -666,8 +696,8 @@ step per position, all resuming the same `coordinationId`:
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["codex"] },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["claude"] }
+    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["codex"] }
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
@@ -721,8 +751,8 @@ states why `AFFECTED_TESTS` already covered the blast radius without it:
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
     { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
+    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
   ],
   "steps": [
     {

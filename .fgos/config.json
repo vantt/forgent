@@ -624,6 +624,33 @@
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
             }
+          },
+          {
+            "id": "grok-vantt-bwrap",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--provider",
+              "xai",
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
+            }
           }
         ]
       }
