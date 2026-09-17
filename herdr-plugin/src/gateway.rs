@@ -268,7 +268,7 @@ impl GatewayError {
         }
     }
 
-    fn unexpected(message: impl Into<String>) -> Self {
+    pub(crate) fn unexpected(message: impl Into<String>) -> Self {
         GatewayError {
             category: ErrorCategory::Unexpected,
             message: message.into(),

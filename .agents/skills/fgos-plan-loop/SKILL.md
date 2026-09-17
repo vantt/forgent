@@ -442,6 +442,22 @@ reimplements — see the `fgos-group-thinking` skill's own "The gate, and
 why it holds" section for the same claim proven against a sibling
 protocol pack).
 
+**A first-pass finding is discharged only by disposition + a satisfied
+recheck, never by disposition alone.** `review-candidate`/
+`red-team-candidate` reporting `findings` fails that gating slot in
+`closeSessionByQuorum`'s quorum check; `reviewer-recheck`/
+`red-team-recheck` each declare `rechecks: review-candidate` /
+`rechecks: red-team-candidate` (`standalone-master-coordination-loop.yaml`)
+so a LATER, satisfied recheck of the same actor can discharge that slot —
+but only once the Lead has recorded a `driver-disposition-recorded` event
+against the specific failed assignment (any `disposition` step targeting
+it, any value — the disposition's own text is never parsed). A `rejected`
+finding still needs its own recheck: the independent confirmation, not the
+disposition, is what actually closes the gap. Do not hand-close a cell by
+skipping the recheck round once a finding is accepted — `close.json` will
+refuse with `missing required actor(s)` until a real, satisfied recheck
+Assignment exists for the failed slot.
+
 **Precedence & compatibility.** A phase file's own `## Verification` and
 plan.md's Product Gates govern over this skill's generic defaults; a
 mechanical isolation-breaking diff and a Lead-accepted escalation finding

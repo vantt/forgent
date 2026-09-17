@@ -46,6 +46,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   revise/recheck chain is less likely to be killed by the aggregate wall-time
   ceiling before all authorized steps can finish.
 
+### Fixed
+
+- Coordination sessions can now actually close after a fix round: a required
+  first-pass operation (`review-candidate`/`red-team-candidate`) that reports
+  `findings` used to fail its quorum slot permanently, even after an
+  accepted-and-fixed finding's recheck (`reviewer-recheck`/`red-team-recheck`)
+  came back clean -- `close.json` would refuse forever with
+  `missing required actor(s)`. A recheck operation can now declare `rechecks:
+  <operationId>` in its FlowDefinition binding so a later, satisfied recheck of
+  the same actor discharges the failed slot, but only once the driver has
+  recorded a disposition against the specific failed attempt.
+
 ### Added
 
 - `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
