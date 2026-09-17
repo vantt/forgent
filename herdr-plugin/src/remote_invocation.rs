@@ -401,4 +401,61 @@ mod tests {
         let runtime = &json_val["runtime"];
         assert_eq!(runtime["host"], "rust");
     }
+
+    #[test]
+    fn test_present_remote_outcome_downcast_failure() {
+        let invalid_outcome = ProviderOutcome::completed(
+            ContractRef::from_static("distribution.build.show.outcome", "1.0.0"),
+            Box::new(42i32),
+        );
+
+        let err = present_remote_outcome(invalid_outcome)
+            .expect_err("non-BuildShowOutcome payload must return Err");
+        assert_eq!(err.category, ErrorCategory::Unexpected);
+        assert!(err.message.contains("unsupported outcome payload type"));
+    }
+
+    #[test]
+    fn test_workspace_isolation_contract() {
+        let manifest_dir = env!("CARGO_MANIFEST_DIR");
+        let root_cargo_path = std::path::Path::new(manifest_dir).join("../Cargo.toml");
+        let content = std::fs::read_to_string(&root_cargo_path)
+            .or_else(|_| std::fs::read_to_string("../Cargo.toml"))
+            .expect("repo root Cargo.toml must be readable");
+
+        let workspace_part = content
+            .split("[workspace]")
+            .nth(1)
+            .expect("Cargo.toml must have [workspace] section");
+        let workspace_section = workspace_part
+            .split("\n[")
+            .next()
+            .unwrap_or(workspace_part);
+
+        let exclude_part = workspace_section
+            .split("exclude")
+            .nth(1)
+            .expect("[workspace] must declare exclude list");
+        let exclude_block = exclude_part
+            .split(']')
+            .next()
+            .expect("exclude block must have closing bracket");
+        assert!(
+            exclude_block.contains("herdr-plugin"),
+            "[workspace].exclude must declare herdr-plugin"
+        );
+
+        let members_part = workspace_section
+            .split("members")
+            .nth(1)
+            .expect("[workspace] must declare members list");
+        let members_block = members_part
+            .split(']')
+            .next()
+            .expect("members block must have closing bracket");
+        assert!(
+            !members_block.contains("herdr-plugin"),
+            "[workspace].members must not contain herdr-plugin"
+        );
+    }
 }
