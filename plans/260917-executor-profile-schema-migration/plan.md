@@ -48,7 +48,7 @@ explicitly instead of inheriting one.
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
 | C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
-| D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto PlacementPolicy's own config surface | Done (corrected) | commit `41532099` (first pass, wrong location), corrected commit `<pending>` (branch `executor-placement-policy-readonly-redirect`) |
+| D | Retire `readOnlyExecutorRedirects`, relocate the one live pool onto PlacementPolicy's own config surface | Done (corrected) | commit `41532099` (first pass, wrong location), corrected commit `3baddb14` (branch `executor-placement-policy-readonly-redirect`), merged `20a4e85d` |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
 
 ## Phase A — remove genuinely dormant executor ids
@@ -388,7 +388,9 @@ worktree/branch `executor-profile-redirect-retirement`, commit `41532099`,
 merged to main as `3322edc9` -- functionally safe (full test gate green,
 zero regressions) but placed the relocated field in the wrong layer.
 Corrected in worktree/branch `executor-placement-policy-readonly-redirect`,
-commit `<pending>`.
+commit `3baddb14`, merged to main as `20a4e85d`. Full `npm test` gate on
+main post-merge: 7053 tests, 4 pre-existing failures byte-identical to
+the pre-correction baseline. Zero new regressions.
 
 ### First-pass mistake (user-caught during Phase E scoping, kept for the record)
 
