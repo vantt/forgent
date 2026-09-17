@@ -208,12 +208,12 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     liveOutput: executor.liveOutput,
     interactiveMode: executor.interactiveMode,
     adapter,
-    // An explicit `executor.provider` display alias (e.g. "agy") still
+    // An explicit `executor.provider` display alias (e.g. "gemini") still
     // wins first — that is a deliberate, separately-tested concept distinct
-    // from the model-routing family (an executor can alias to "agy" while
+    // from the model-routing family (an executor can alias to "gemini" while
     // its `providerModel`/family is "gemini"). The fallback, though, used
     // to be the raw `executor.command` — ignoring `providerModel` entirely
-    // and showing e.g. "claude" for glm-cli (routed to z-ai via env
+    // and showing e.g. "claude" for glm (routed to z-ai via env
     // override) or the raw non-Claude command for any executor with no
     // alias of its own. `executor.governance.providerFamily` is
     // resolve.mjs's own deriveProviderFamily(executorEntry,

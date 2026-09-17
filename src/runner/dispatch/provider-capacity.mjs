@@ -432,7 +432,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
       until: new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString(),
     };
   }
-  if (provider === 'openai-codex' || provider === undefined) {
+  if (provider === 'openai' || provider === undefined) {
     if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
       const reset = /resets?\s+in\s+(\d+)\s*h/i.exec(text);
       // Missing/unparseable reset text falls back to the SAME conservative

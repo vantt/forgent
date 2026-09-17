@@ -3026,8 +3026,8 @@ test('committed config pins code-review Claude profiles to high effort only on r
     return effortIndex >= 0 && args[effortIndex + 1] === 'high';
   };
 
-  assert.equal(hasHighEffort(argsForInvocation('claude', 'cli-readonly')), true);
-  assert.equal(hasHighEffort(argsForInvocation('claude', 'herdr-readonly')), true);
-  assert.equal(argsForInvocation('claude', 'cli').includes('--effort'), false);
-  assert.equal(cfg.executors['glm-cli'].invocations[0].args.includes('--effort'), false);
+  assert.equal(hasHighEffort(argsForInvocation('claude', 'claude-cli-readonly')), true);
+  assert.equal(hasHighEffort(argsForInvocation('claude', 'claude-herdr-readonly')), true);
+  assert.equal(argsForInvocation('claude', 'claude-cli').includes('--effort'), false);
+  assert.equal(cfg.executors['glm'].invocations[0].args.includes('--effort'), false);
 });

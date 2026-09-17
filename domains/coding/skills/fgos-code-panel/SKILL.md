@@ -451,38 +451,56 @@ both limits are stated, not silently assumed away.
 ## Default actor roster
 
 Executor/invocation/tier/effort mapping already decided for this product
-line (doer/fixer -> `agy`'s `cli` invocation, reviewer -> `agy`'s `cli`
-invocation on the SAME account as doer but at `flagship` tier, red-team ->
-`pi-grok`'s `grok-vantt` invocation), personas tuned for reading/writing/
-attacking real code.
+line (doer/fixer -> `gemini` executor's `agy-cli-mucdong` invocation,
+reviewer -> `gemini`'s SAME `agy-cli-mucdong` invocation but at `flagship`
+tier, red-team -> `xai` executor's `pi-cli-vantt` invocation), personas
+tuned for reading/writing/attacking real code.
 
-**2026-09-17 model swap:** reviewer moved off `claude`/`cli-readonly` onto
-`agy`/`cli` at `flagship` tier, which resolves to `gemini-3.1-pro-low`
+**2026-09-17 executor-provider-naming:** executors are named by provider,
+not by CLI binary -- `agy` (executor id) is now `gemini`, `pi-grok` is now
+`xai`, and `codex`+`pi` (2 different bins that both happen to reach OpenAI)
+merged into one `openai` executor (invocation id already carries the bin:
+`codex-cli-bypass-fgovn` runs the `codex` binary, `pi-cli-tetnu` runs the
+`pi` binary, both inside the same `openai` executor entry). No `rigorOverrides`
+survived the merge -- `pi`'s old `{light/standard/heavy -> nano}` default
+was never a deliberate cost policy, just a historical D4 proof-test
+default, so it was dropped rather than silently overwriting `codex`'s own
+(different) tier behavior; see `docs/specs/runner.md` for the fuller
+reasoning on why merging two bins under one executor risks exactly that
+kind of silent overwrite when their `rigorOverrides`/`for` actually differ
+(they didn't here, so merging was safe).
+
+**Reviewer model (unchanged since the 2026-09-17 model swap that preceded
+this renaming pass):** resolves to `gemini-3.1-pro-low`
 (`modelPolicies.gemini.flagship`) -- picked over `gemini-3.1-pro-high`
 because it is already the tier's live default, no config change needed.
 No `--effort` flag: agy's own catalog bakes effort into the model name
 itself (`gemini-3.1-pro-low`/`-high`, no `-medium` variant exists for the
 `pro` family, only for `flash`) and REFUSES `--model gemini-3.1-pro-low
 --effort medium` outright as a conflicting pair -- confirmed by a real
-failed invocation, not assumed. Known gap: `claude`'s `cli-readonly`
-enforced read-only-ish behavior with a narrow `--allowedTools` allowlist
-(git diff/log/show/status + test commands only) as a belt-and-suspenders
-layer; `agy` has no equivalent per-invocation tool allowlist flag, so
-reviewer's read-only posture now rests solely on the structural backstop
-every declared-protocol dispatch already gets regardless of executor
-(`runExecutorAttempt` unconditionally passes `isReadOnlyMode: true`,
-session-engine.mjs) -- one fewer independent layer than before, not zero
-enforcement.
+failed invocation, not assumed. Known gap: `claude`'s (former reviewer
+executor) `cli-readonly` invocation enforced read-only-ish behavior with a
+narrow `--allowedTools` allowlist (git diff/log/show/status + test
+commands only) as a belt-and-suspenders layer; `agy` has no equivalent
+per-invocation tool allowlist flag, so reviewer's read-only posture now
+rests solely on the structural backstop every declared-protocol dispatch
+already gets regardless of executor (`runExecutorAttempt` unconditionally
+passes `isReadOnlyMode: true`, session-engine.mjs) -- one fewer
+independent layer than before, not zero enforcement.
 
-red-team moved off `codex`/`cli-bypass` onto `pi-grok`/`grok-vantt` at
-`flagship` tier, which resolves to `grok-4.6` (`modelPolicies.xai.flagship`,
-confirmed real via `pi --list-models`). `pi-grok` has no `herdr` invocation
-today, so the herdr-spawn roster variant below keeps red-team on
-`codex`/`herdr` unchanged -- a known, explicit gap, not an oversight.
+**Red-team model:** resolves to `grok-4.6` (`modelPolicies.xai.flagship`,
+confirmed real via `pi --list-models`). `--provider` is omitted from the
+`pi-cli-vantt` invocation's args -- confirmed via a real invocation that
+`pi` correctly infers the provider from its single-provider
+`~/.pi/accounts/grok-vantt` account dir, no flag needed. The `xai`
+executor has no `herdr` invocation today, so the herdr-spawn roster
+variant below keeps red-team on `openai`'s `codex-herdr-fgovn` invocation
+(the `codex` binary) instead -- a known, explicit gap for `xai`'s herdr
+coverage, not an oversight.
 
-Both swaps kept the previous primary as the new `fallbackExecutors` entry
-(reviewer: `claude`; red-team: `codex`), so equivalent-tier fallback still
-covers the account/provider that used to be primary.
+Both role swaps kept the previous primary as the new `fallbackExecutors`
+entry (reviewer: `claude`; red-team: `openai`), so equivalent-tier
+fallback still covers the account/provider that used to be primary.
 
 Model-tier vocabulary (`model-tier-vocabulary-and-coordination-fallback`,
 2026-09-17): tiers are `nano/mini/standard/advanced/flagship/frontier`
@@ -498,19 +516,22 @@ fallback (same limit `opPolicy.fallbackExecutors` already has; the
 fallback resolves through Gate B2's own default-invocation rule for
 whichever executor it lands on).
 
-`executor-id-consolidation` retired the former separate
-`agy-cli`/`agy-herdr`/`claude-reviewer`/`claude-reviewer-herdr`/
-`codex-cli`/`codex-herdr` ids -- what used to be a distinct executor id per
-role is now one `invocation` on a shared `claude`/`codex`/`agy` executor.
-`invocation` (`actors[].invocation`, alongside `executor`) names which one;
-omitting it (as `doer`/`fixer` do below, since `agy`'s own default
-invocation IS its `cli` one) falls back to the executor's own default:
+`executor-id-consolidation` (2026-09-17) and `executor-provider-naming`
+(same day, later pass) retired every former separate/bin-named executor
+id -- `agy-cli`/`agy-herdr`/`claude-reviewer`/`claude-reviewer-herdr`/
+`codex-cli`/`codex-herdr`/`agy`/`codex`/`pi`/`pi-grok`/`codex-pi` are all
+gone. What used to be a distinct executor id per role, then a distinct
+bin-named executor, is now one `invocation` on a shared
+provider-named executor (`claude`/`openai`/`gemini`/`xai`). `invocation`
+(`actors[].invocation`, alongside `executor`) names which one -- there is
+no bare/default invocation left to omit it in favor of any more, every
+role below names its invocation explicitly:
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
-  { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
+  { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["glm"] },
+  { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+  { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["openai"] }
 ]
 ```
 
@@ -518,9 +539,9 @@ Fix-round roster:
 
 ```json
 "actors": [
-  { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
-  { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["codex"] }
+  { "id": "fixer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["glm"] },
+  { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
+  { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["openai"] }
 ]
 ```
 
@@ -530,17 +551,22 @@ diff/test/sha256 report, red-team `xxd` check -- all three settled):
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy", "invocation": "herdr", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-  { "id": "reviewer", "executor": "agy", "invocation": "herdr", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
-  { "id": "red-team", "executor": "codex", "invocation": "herdr", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
+  { "id": "doer", "executor": "gemini", "invocation": "agy-herdr-mucdong", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["glm"] },
+  { "id": "reviewer", "executor": "gemini", "invocation": "agy-herdr-mucdong", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+  { "id": "red-team", "executor": "xai", "invocation": "pi-herdr-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["openai"] }
 ]
 ```
 
-`red-team`'s herdr-spawn invocation stays on `codex`/`herdr` -- `pi-grok`
-has no herdr-spawn invocation today (known gap, not an oversight; see the
-2026-09-17 model swap note above). `reviewer`'s herdr-spawn invocation
-follows the same swap as the headless roster: `agy`/`herdr` at `flagship`
-tier, same `gemini-3.1-pro-low` resolution as `agy`/`cli`.
+`red-team`'s herdr-spawn invocation now runs on `xai`'s own
+`pi-herdr-vantt` (the `pi` binary, `--kind pi` -- confirmed supported by
+this machine's real `herdr agent start --help` possible-values list, and
+proven live via a real self-identification round-trip resolving
+`provider":"xai","model":"grok-4.3"`), closing what used to be a known gap
+(`xai` previously had no herdr-spawn invocation at all, so this roster fell
+back to `openai`'s `codex-herdr-fgovn` here instead). `reviewer`'s
+herdr-spawn invocation follows the same swap as the headless roster:
+`gemini`'s `agy-herdr-mucdong` at `flagship` tier, same
+`gemini-3.1-pro-low` resolution as `agy-cli-mucdong`.
 
 Same protocol, same request shape, same `--cwd` rule; each role runs in its
 own herdr pane in the `fgos-worker` session, so a person can watch it and a
@@ -548,8 +574,8 @@ failed round leaves its pane open with the reason on screen. Two things the
 herdr transport does that cli-spawn does not: herdr types the bare agent word
 from `--kind` (an executor's `command` path is not what gets typed), and the
 pane is the operator's own interactive shell, so shell aliases apply --
-`codex`'s `herdr` invocation (still red-team's herdr-variant executor,
-see the 2026-09-17 model swap note above) relies on that.
+`xai`'s `pi-herdr-vantt` invocation (red-team's herdr-variant executor,
+see the executor-provider-naming note above) relies on that.
 Model resolution is unchanged: `actors[].model` has no channel for
 declared-protocol requests, so tier x the executor's `rigorOverrides`
 decides the model.
@@ -605,9 +631,9 @@ the worker's summary.
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
-    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
+    { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["openai"] },
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["openai"] }
   ],
   "steps": [
     {
@@ -695,9 +721,9 @@ step per position, all resuming the same `coordinationId`:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
-    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["codex"] }
+    { "id": "fixer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["openai"] },
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["openai"] }
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
@@ -750,9 +776,9 @@ states why `AFFECTED_TESTS` already covered the blast radius without it:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
-    { "id": "reviewer", "executor": "agy", "invocation": "cli", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
-    { "id": "red-team", "executor": "pi-grok", "invocation": "grok-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["codex"] }
+    { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["openai"] },
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["openai"] }
   ],
   "steps": [
     {

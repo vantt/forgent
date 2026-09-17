@@ -401,7 +401,7 @@ test('Phase D: the real repository config declares placementPolicy.readOnlyRedir
   const cfg = loadRunnerConfigFromDir(process.cwd());
   assert.equal(cfg.readOnlyExecutorRedirects, undefined, 'the retired top-level field must not exist in the live repository config');
   assert.equal(cfg.executors.claude.readOnlyRedirect, undefined, 'the field must not have moved back onto the executor entry');
-  const codexBwrapPin = { executor: 'codex', invocation: 'cli-bwrap' };
+  const codexBwrapPin = { executor: 'openai', invocation: 'codex-cli-bwrap' };
   assert.deepEqual(cfg.placementPolicy.readOnlyRedirects.claude, {
     default: [codexBwrapPin],
     operations: {
@@ -409,9 +409,9 @@ test('Phase D: the real repository config declares placementPolicy.readOnlyRedir
       'red-team-candidate': [codexBwrapPin],
     },
   });
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['codex']);
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['codex'], 'falls back to "default" for an operation with no specific override');
-  assert.equal(readOnlyRedirectInvocationFor(cfg, 'claude', 'review-candidate', 'codex'), 'cli-bwrap');
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['openai']);
+  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['openai'], 'falls back to "default" for an operation with no specific override');
+  assert.equal(readOnlyRedirectInvocationFor(cfg, 'claude', 'review-candidate', 'openai'), 'codex-cli-bwrap');
 });
 
 // executor-id-consolidation Step 2.1: an invocation can name itself with

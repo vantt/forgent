@@ -1006,15 +1006,15 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
   );
 });
 
-test('the committed .fgos/config.json runner section declares the consolidated agy executor (executor-id-consolidation Step 2, replacing the former separate agy-cli/agy-herdr/agy-bwrap ids): invocations[]-shaped, kind agent, allowCrossProvider true, its "cli" invocation resolves to the real installed agy binary', () => {
+test('the committed .fgos/config.json runner section declares the consolidated gemini executor (executor-provider-naming 2026-09-17, replacing the former "agy" executor id): invocations[]-shaped, kind agent, allowCrossProvider true, its "agy-cli-mucdong" invocation resolves to the real installed agy binary', () => {
   const cfg = committedRunnerConfig();
-  const executor = cfg.executors?.agy;
-  assert.ok(executor, 'executors.agy must exist');
+  const executor = cfg.executors?.gemini;
+  assert.ok(executor, 'executors.gemini must exist');
   assert.equal(executor.kind, 'agent');
   assert.equal(executor.allowCrossProvider, true);
-  assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 3);
-  const invocation = executor.invocations.find((inv) => inv.id === 'cli');
-  assert.ok(invocation, 'agy must declare a "cli" invocation');
+  assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 4);
+  const invocation = executor.invocations.find((inv) => inv.id === 'agy-cli-mucdong');
+  assert.ok(invocation, 'gemini must declare an "agy-cli-mucdong" invocation');
   assert.equal(invocation.via, 'cli');
   assert.equal(invocation.adapter, 'cli-spawn');
   assert.equal(invocation.command, 'agy');
@@ -1348,9 +1348,9 @@ test('the committed .fgos/config.json runner section loads and is well-formed', 
   assert.deepEqual(Object.keys(cfg.modelPolicies.claude).sort(), ['flagship', 'advanced', 'frontier', 'nano', 'standard'].sort());
 });
 
-test('the committed .fgos/config.json runner section wires the consolidated agy executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece originally fixed)', () => {
+test('the committed .fgos/config.json runner section wires the consolidated gemini executor to gemini\'s own modelPolicies, not claude\'s (D9, tsk-5tm-5 — the bug this piece originally fixed)', () => {
   const cfg = committedRunnerConfig();
-  assert.equal(cfg.executors?.agy?.providerModel, 'gemini');
+  assert.equal(cfg.executors?.gemini?.providerModel, 'gemini');
   assert.equal(typeof cfg.modelPolicies?.gemini?.nano, 'string');
   assert.ok(cfg.modelPolicies.gemini.nano.length > 0);
 });
@@ -1947,7 +1947,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     stage: 'planning',
     operation: 'validate-plan',
     policy: {
-      preferExecutor: 'codex',
+      preferExecutor: 'openai',
       minTier: 'flagship',
     },
   });
@@ -1957,7 +1957,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     runnerConfig: cfg,
   });
 
-  assert.equal(effectivePolicy.providerModel, 'openai-codex');
+  assert.equal(effectivePolicy.providerModel, 'openai');
   assert.equal(effectivePolicy.tier, 'flagship');
   assert.equal(effectivePolicy.model, 'gpt-5.6-terra');
 
@@ -1965,8 +1965,8 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   const resolved = resolveExecutorCommand(cfg, {
     prompt,
     model: effectivePolicy.model,
-    executorId: 'codex',
-    invocationId: 'cli-bypass',
+    executorId: 'openai',
+    invocationId: 'codex-cli-bypass-fgovn',
   });
 
   assert.equal(resolved.command, 'codex');

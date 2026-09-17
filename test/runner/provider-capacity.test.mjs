@@ -151,11 +151,11 @@ test('lease reclaim requires dead-run proof', () => {
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: "ERROR: You've hit your usage limit" }).reasonCode, 'quota-limit');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: 'No API key found for the selected model. Use /login.' }).reasonCode, 'auth-token');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'paused-limit' }).reasonCode, 'quota-limit');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', structuredAgent: { stopReason: 'paused-limit' } }).reasonCode, 'quota-limit');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai-codex', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: "ERROR: You've hit your usage limit" }).reasonCode, 'quota-limit');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found for the selected model. Use /login.' }).reasonCode, 'auth-token');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', adapterOutcome: 'paused-limit' }).reasonCode, 'quota-limit');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', structuredAgent: { stopReason: 'paused-limit' } }).reasonCode, 'quota-limit');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
 });
 
 // Pre-Phase-05 gate H1 (plans/260915-executor-policy-dispatch-seams/plan.md):
@@ -164,18 +164,18 @@ test('classifier quarantines only high-confidence stderr/provider outcomes', () 
 // selectable; missing reset text must not silently create an immediately
 // selectable account.
 test('H1: paused-limit adapter/structured-agent outcomes always carry a conservative until, never an expiry-less temporary quarantine', () => {
-  const byAdapter = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', adapterOutcome: 'paused-limit' });
+  const byAdapter = classifyProviderCapacityFault({ provider: 'openai', stderr: '', adapterOutcome: 'paused-limit' });
   assert.equal(byAdapter.quarantineKind, 'temporary');
   assert.ok(byAdapter.until, 'adapterOutcome: paused-limit must always produce a conservative until');
   assert.ok(Date.parse(byAdapter.until) > Date.now());
 
-  const byStructured = classifyProviderCapacityFault({ provider: 'openai-codex', stderr: '', structuredAgent: { stopReason: 'paused-limit' } });
+  const byStructured = classifyProviderCapacityFault({ provider: 'openai', stderr: '', structuredAgent: { stopReason: 'paused-limit' } });
   assert.ok(byStructured.until, 'structuredAgent.stopReason: paused-limit must always produce a conservative until');
 });
 
 test('H1: a quota message with no parseable reset window still gets a conservative until, not an expiry-less quarantine', () => {
   const withoutResetWindow = classifyProviderCapacityFault({
-    provider: 'openai-codex',
+    provider: 'openai',
     stderr: 'ERROR: usage limit has been reached.',
   });
   assert.equal(withoutResetWindow.reasonCode, 'quota-limit');
@@ -185,7 +185,7 @@ test('H1: a quota message with no parseable reset window still gets a conservati
 
   const now = Date.parse('2026-09-16T00:00:00.000Z');
   const withResetWindow = classifyProviderCapacityFault({
-    provider: 'openai-codex',
+    provider: 'openai',
     stderr: "You've hit your usage limit. It resets in 3h.",
     now,
   });

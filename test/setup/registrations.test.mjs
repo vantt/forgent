@@ -20,8 +20,8 @@ import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-gu
 const EXPECTED_RUNNER_DEFAULT = {
   ...DEFAULT_RUNNER_CONFIG,
   capabilities: DEFAULT_CAPABILITY_SLOTS,
-  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, 'openai-codex': { nano: 'gpt-5.5' } },
-  executors: { pi: PI_EXECUTOR_DEFAULT },
+  modelPolicies: { ...DEFAULT_RUNNER_CONFIG.modelPolicies, openai: { nano: 'gpt-5.5' } },
+  executors: { openai: PI_EXECUTOR_DEFAULT },
 };
 
 // tsk-4xg: runFixes() below invokes every registered fix, including the

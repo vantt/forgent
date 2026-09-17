@@ -484,12 +484,12 @@ test('buildCandidateInventory against the real committed .fgos/config.json: only
   assert.ok(!inventory.some((c) => c.executorId === 'herdr'));
 
   const byId = Object.fromEntries(inventory.map((c) => [c.executorId, c]));
-  assert.equal(byId.agy.providerFamily, 'gemini');
-  assert.deepEqual(byId.agy.supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
-  assert.equal(byId['codex-pi'].providerFamily, 'openai-codex');
-  assert.deepEqual(byId['codex-pi'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
-  assert.equal(byId['glm-cli'].providerFamily, 'z-ai');
-  assert.deepEqual(byId['glm-cli'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
+  assert.equal(byId.gemini.providerFamily, 'gemini');
+  assert.deepEqual(byId.gemini.supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
+  assert.equal(byId['openai'].providerFamily, 'openai');
+  assert.deepEqual(byId['openai'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
+  assert.equal(byId['glm'].providerFamily, 'z-ai');
+  assert.deepEqual(byId['glm'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
   assert.equal(byId['claude'].providerFamily, 'claude');
   assert.deepEqual(byId['claude'].supportedTiers, ['nano', 'standard', 'advanced', 'flagship', 'frontier']);
 

@@ -116,18 +116,25 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  * nothing here needs to pin one explicitly for that case.
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
-  { label: 'claude', executorId: 'claude' },
-  { label: 'claude-reviewer', executorId: 'claude', invocationId: 'cli-readonly' },
-  { label: 'claude-reviewer-herdr', executorId: 'claude', invocationId: 'herdr-readonly' },
-  { label: 'agy-cli', executorId: 'agy', invocationId: 'cli' },
-  { label: 'agy-herdr', executorId: 'agy', invocationId: 'herdr' },
+  { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
+  { label: 'claude-reviewer', executorId: 'claude', invocationId: 'claude-cli-readonly' },
+  { label: 'claude-reviewer-herdr', executorId: 'claude', invocationId: 'claude-herdr-readonly' },
+  { label: 'agy-cli', executorId: 'gemini', invocationId: 'agy-cli-mucdong' },
+  { label: 'agy-herdr', executorId: 'gemini', invocationId: 'agy-herdr-mucdong' },
   { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
-  { label: 'codex-cli', executorId: 'codex', invocationId: 'cli-bypass' },
-  { label: 'codex-bwrap', executorId: 'codex', invocationId: 'cli-bwrap' },
-  { label: 'codex-readonly', executorId: 'codex', invocationId: 'cli-readonly' },
-  { label: 'pi', executorId: 'pi' },
-  { label: 'codex-pi', executorId: 'codex-pi' },
-  { label: 'glm-cli', executorId: 'glm-cli' },
+  { label: 'codex-cli', executorId: 'openai', invocationId: 'codex-cli-bypass-fgovn' },
+  { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
+  { label: 'codex-readonly', executorId: 'openai', invocationId: 'codex-cli-readonly-fgovn' },
+  // `pi` and `codex-pi` were literal config duplicates of each other even
+  // before executor-provider-naming (2026-09-17) -- both were "pi coding
+  // agent (openai-codex/gpt-5.5)" with no account override. The merge
+  // (`codex`+`pi` -> one `openai` executor) makes that duplication
+  // explicit instead of hiding it: both historic labels now point at the
+  // same real invocation (pi-cli-fgovn, fgovn chosen as pi's first-wired
+  // shared account, same account `codex-cli-*` above already uses).
+  { label: 'pi', executorId: 'openai', invocationId: 'pi-cli-fgovn' },
+  { label: 'codex-pi', executorId: 'openai', invocationId: 'pi-cli-fgovn' },
+  { label: 'glm-cli', executorId: 'glm' },
 ];
 
 function descriptorForLabel(label) {
@@ -164,946 +171,958 @@ export function resolveSnapshotRowByLabel(cfg, label, workTier, throwawayDir) {
  */
 export const BASELINE_SNAPSHOT_FIXTURE = [
   {
-    "selector": "claude",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "haiku",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "haiku",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'claude',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'haiku',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'haiku',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "sonnet",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "sonnet",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'claude',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'sonnet',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'sonnet',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "opus",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "opus",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'claude',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'fable',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'fable',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "haiku",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "haiku",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+    selector: 'claude-reviewer',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'haiku',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'haiku',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "sonnet",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "sonnet",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+    selector: 'claude-reviewer',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'sonnet',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'sonnet',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "opus",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "opus",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+    selector: 'claude-reviewer',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'fable',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'fable',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer-herdr",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "haiku",
-    "command": "claude",
-    "args": [
-      "<prompt>",
-      "--model",
-      "haiku",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)"
+    selector: 'claude-reviewer-herdr',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'haiku',
+    command: 'claude',
+    args: [
+      '<prompt>',
+      '--model',
+      'haiku',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer-herdr",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "sonnet",
-    "command": "claude",
-    "args": [
-      "<prompt>",
-      "--model",
-      "sonnet",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)"
+    selector: 'claude-reviewer-herdr',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'sonnet',
+    command: 'claude',
+    args: [
+      '<prompt>',
+      '--model',
+      'sonnet',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "claude-reviewer-herdr",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "claude",
-    "model": "opus",
-    "command": "claude",
-    "args": [
-      "<prompt>",
-      "--model",
-      "opus",
-      "--effort",
-      "high",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)"
+    selector: 'claude-reviewer-herdr',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'claude',
+    model: 'fable',
+    command: 'claude',
+    args: [
+      '<prompt>',
+      '--model',
+      'fable',
+      '--effort',
+      'high',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*),Bash(cargo test:*),Bash(rtk cargo test:*),Bash(cargo clippy:*),Bash(rtk cargo clippy:*),Bash(cargo fmt:*),Bash(rtk cargo fmt:*),Bash(cargo build:*),Bash(rtk cargo build:*)'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    envKeys: [],
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "agy-cli",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-low",
-    "command": "agy",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--print-timeout",
-      "30m",
-      "--model",
-      "gemini-3.8-flash-low"
+    selector: 'agy-cli',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-low',
+    command: 'agy',
+    args: [
+      '-p',
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--print-timeout',
+      '30m',
+      '--model',
+      'gemini-3.8-flash-low'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "agy-cli",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-medium",
-    "command": "agy",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--print-timeout",
-      "30m",
-      "--model",
-      "gemini-3.8-flash-medium"
+    selector: 'agy-cli',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'agy',
+    args: [
+      '-p',
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--print-timeout',
+      '30m',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "agy-cli",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-high",
-    "command": "agy",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--print-timeout",
-      "30m",
-      "--model",
-      "gemini-3.8-flash-high"
+    selector: 'agy-cli',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-high',
+    command: 'agy',
+    args: [
+      '-p',
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--print-timeout',
+      '30m',
+      '--model',
+      'gemini-3.8-flash-high'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "agy-herdr",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-low",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-low"
+    selector: 'agy-herdr',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-low',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-low'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "agy-herdr",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-medium",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-medium"
+    selector: 'agy-herdr',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "agy-herdr",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-high",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-high"
+    selector: 'agy-herdr',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-high',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-high'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "fgos-coding-implement",
-    "workTier": "light",
-    "bindingSource": "capability.prefer",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-medium",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-medium"
+    selector: 'fgos-coding-implement',
+    workTier: 'light',
+    bindingSource: 'capability.prefer',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "fgos-coding-implement",
-    "workTier": "standard",
-    "bindingSource": "capability.prefer",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-medium",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-medium"
+    selector: 'fgos-coding-implement',
+    workTier: 'standard',
+    bindingSource: 'capability.prefer',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "fgos-coding-implement",
-    "workTier": "heavy",
-    "bindingSource": "capability.prefer",
-    "provider": "gemini",
-    "model": "gemini-3.8-flash-medium",
-    "command": "agy",
-    "args": [
-      "<prompt>",
-      "--mode",
-      "accept-edits",
-      "--new-project",
-      "--model",
-      "gemini-3.8-flash-medium"
+    selector: 'fgos-coding-implement',
+    workTier: 'heavy',
+    bindingSource: 'capability.prefer',
+    provider: 'gemini',
+    model: 'gemini-3.8-flash-medium',
+    command: 'agy',
+    args: [
+      '<prompt>',
+      '--mode',
+      'accept-edits',
+      '--new-project',
+      '--model',
+      'gemini-3.8-flash-medium'
     ],
-    "envKeys": [
-      "HOME"
+    envKeys: [
+      'HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "herdr-spawn",
-    "promptDelivery": "file-pointer",
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'herdr-spawn',
+    promptDelivery: 'file-pointer',
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-cli",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--dangerously-bypass-approvals-and-sandbox",
-      "--model",
-      "gpt-5.6-luna",
-      "<prompt>"
+    selector: 'codex-cli',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    command: 'codex',
+    args: [
+      'exec',
+      '--dangerously-bypass-approvals-and-sandbox',
+      '--model',
+      'gpt-5.6-luna',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-cli",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-terra",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--dangerously-bypass-approvals-and-sandbox",
-      "--model",
-      "gpt-5.6-terra",
-      "<prompt>"
+    selector: 'codex-cli',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    command: 'codex',
+    args: [
+      'exec',
+      '--dangerously-bypass-approvals-and-sandbox',
+      '--model',
+      'gpt-5.6-terra',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-cli",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--dangerously-bypass-approvals-and-sandbox",
-      "--model",
-      "gpt-5.6-sol",
-      "<prompt>"
+    selector: 'codex-cli',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-6-astra',
+    command: 'codex',
+    args: [
+      'exec',
+      '--dangerously-bypass-approvals-and-sandbox',
+      '--model',
+      'gpt-6-astra',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-bwrap",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--skip-git-repo-check",
-      "-s",
-      "danger-full-access",
-      "--model",
-      "gpt-5.6-luna",
-      "<prompt>"
+    selector: 'codex-bwrap',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    command: 'codex',
+    args: [
+      'exec',
+      '--skip-git-repo-check',
+      '-s',
+      'danger-full-access',
+      '--model',
+      'gpt-5.6-luna',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [
+    envKeys: [],
+    resourceBindings: [
       {
-        "resource": "private-home",
-        "target": {
-          "kind": "env",
-          "name": "CODEX_HOME"
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'CODEX_HOME'
         }
       }
     ],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "bwrap",
-    "readOnlyMechanism": "none"
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-bwrap",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-terra",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--skip-git-repo-check",
-      "-s",
-      "danger-full-access",
-      "--model",
-      "gpt-5.6-terra",
-      "<prompt>"
+    selector: 'codex-bwrap',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    command: 'codex',
+    args: [
+      'exec',
+      '--skip-git-repo-check',
+      '-s',
+      'danger-full-access',
+      '--model',
+      'gpt-5.6-terra',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [
+    envKeys: [],
+    resourceBindings: [
       {
-        "resource": "private-home",
-        "target": {
-          "kind": "env",
-          "name": "CODEX_HOME"
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'CODEX_HOME'
         }
       }
     ],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "bwrap",
-    "readOnlyMechanism": "none"
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-bwrap",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
-    "command": "codex",
-    "args": [
-      "exec",
-      "--skip-git-repo-check",
-      "-s",
-      "danger-full-access",
-      "--model",
-      "gpt-5.6-sol",
-      "<prompt>"
+    selector: 'codex-bwrap',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-6-astra',
+    command: 'codex',
+    args: [
+      'exec',
+      '--skip-git-repo-check',
+      '-s',
+      'danger-full-access',
+      '--model',
+      'gpt-6-astra',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [
+    envKeys: [],
+    resourceBindings: [
       {
-        "resource": "private-home",
-        "target": {
-          "kind": "env",
-          "name": "CODEX_HOME"
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'CODEX_HOME'
         }
       }
     ],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "bwrap",
-    "readOnlyMechanism": "none"
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'bwrap',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-readonly",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "codex",
-    "args": [
-      "exec",
-      "-s",
-      "read-only",
-      "--model",
-      "gpt-5.6-luna",
-      "<prompt>"
+    selector: 'codex-readonly',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    command: 'codex',
+    args: [
+      'exec',
+      '-s',
+      'read-only',
+      '--model',
+      'gpt-5.6-luna',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "provider-native-read-only"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'provider-native-read-only'
   },
   {
-    "selector": "codex-readonly",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-terra",
-    "command": "codex",
-    "args": [
-      "exec",
-      "-s",
-      "read-only",
-      "--model",
-      "gpt-5.6-terra",
-      "<prompt>"
+    selector: 'codex-readonly',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    command: 'codex',
+    args: [
+      'exec',
+      '-s',
+      'read-only',
+      '--model',
+      'gpt-5.6-terra',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "provider-native-read-only"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'provider-native-read-only'
   },
   {
-    "selector": "codex-readonly",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
-    "command": "codex",
-    "args": [
-      "exec",
-      "-s",
-      "read-only",
-      "--model",
-      "gpt-5.6-sol",
-      "<prompt>"
+    selector: 'codex-readonly',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-6-astra',
+    command: 'codex',
+    args: [
+      'exec',
+      '-s',
+      'read-only',
+      '--model',
+      'gpt-6-astra',
+      '<prompt>'
     ],
-    "envKeys": [
-      "CODEX_HOME"
+    envKeys: [
+      'CODEX_HOME'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "provider-native-read-only"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'provider-native-read-only'
   },
   {
-    "selector": "pi",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'pi',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-5.6-luna',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "pi",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'pi',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-5.6-terra',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "pi",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'pi',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-6-astra',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-6-astra',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-pi",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'codex-pi',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-5.6-luna',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-pi",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'codex-pi',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-5.6-terra',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "codex-pi",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "openai-codex",
-    "model": "gpt-5.6-luna",
-    "command": "pi",
-    "args": [
-      "--provider",
-      "openai-codex",
-      "--model",
-      "gpt-5.6-luna",
-      "--tools",
-      "read,write,edit,bash,grep,find,ls",
-      "--mode",
-      "json",
-      "--approve",
-      "-p",
-      "<prompt>"
+    selector: 'codex-pi',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'openai',
+    model: 'gpt-6-astra',
+    command: 'pi',
+    args: [
+      '--model',
+      'gpt-6-astra',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
-    "envKeys": [],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "none"
+    envKeys: [
+      'PI_CODING_AGENT_DIR'
+    ],
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'none'
   },
   {
-    "selector": "glm-cli",
-    "workTier": "light",
-    "bindingSource": "executor-id",
-    "provider": "z-ai",
-    "model": "z-ai/glm-5.2",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "z-ai/glm-5.2",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'glm-cli',
+    workTier: 'light',
+    bindingSource: 'executor-id',
+    provider: 'z-ai',
+    model: 'z-ai/glm-5.2',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'z-ai/glm-5.2',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [
-      "ANTHROPIC_BASE_URL",
-      "ANTHROPIC_AUTH_TOKEN",
-      "ANTHROPIC_MODEL",
-      "ANTHROPIC_API_KEY",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL"
+    envKeys: [
+      'ANTHROPIC_BASE_URL',
+      'ANTHROPIC_AUTH_TOKEN',
+      'ANTHROPIC_MODEL',
+      'ANTHROPIC_API_KEY',
+      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
+      'ANTHROPIC_DEFAULT_SONNET_MODEL',
+      'ANTHROPIC_DEFAULT_OPUS_MODEL'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "glm-cli",
-    "workTier": "standard",
-    "bindingSource": "executor-id",
-    "provider": "z-ai",
-    "model": "z-ai/glm-5.2",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "z-ai/glm-5.2",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'glm-cli',
+    workTier: 'standard',
+    bindingSource: 'executor-id',
+    provider: 'z-ai',
+    model: 'z-ai/glm-5.2',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'z-ai/glm-5.2',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [
-      "ANTHROPIC_BASE_URL",
-      "ANTHROPIC_AUTH_TOKEN",
-      "ANTHROPIC_MODEL",
-      "ANTHROPIC_API_KEY",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL"
+    envKeys: [
+      'ANTHROPIC_BASE_URL',
+      'ANTHROPIC_AUTH_TOKEN',
+      'ANTHROPIC_MODEL',
+      'ANTHROPIC_API_KEY',
+      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
+      'ANTHROPIC_DEFAULT_SONNET_MODEL',
+      'ANTHROPIC_DEFAULT_OPUS_MODEL'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   },
   {
-    "selector": "glm-cli",
-    "workTier": "heavy",
-    "bindingSource": "executor-id",
-    "provider": "z-ai",
-    "model": "z-ai/glm-5.2",
-    "command": "claude",
-    "args": [
-      "-p",
-      "<prompt>",
-      "--model",
-      "z-ai/glm-5.2",
-      "--permission-mode",
-      "acceptEdits",
-      "--allowedTools",
-      "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+    selector: 'glm-cli',
+    workTier: 'heavy',
+    bindingSource: 'executor-id',
+    provider: 'z-ai',
+    model: 'z-ai/glm-5.2',
+    command: 'claude',
+    args: [
+      '-p',
+      '<prompt>',
+      '--model',
+      'z-ai/glm-5.2',
+      '--permission-mode',
+      'acceptEdits',
+      '--allowedTools',
+      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
     ],
-    "envKeys": [
-      "ANTHROPIC_BASE_URL",
-      "ANTHROPIC_AUTH_TOKEN",
-      "ANTHROPIC_MODEL",
-      "ANTHROPIC_API_KEY",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL"
+    envKeys: [
+      'ANTHROPIC_BASE_URL',
+      'ANTHROPIC_AUTH_TOKEN',
+      'ANTHROPIC_MODEL',
+      'ANTHROPIC_API_KEY',
+      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
+      'ANTHROPIC_DEFAULT_SONNET_MODEL',
+      'ANTHROPIC_DEFAULT_OPUS_MODEL'
     ],
-    "resourceBindings": [],
-    "adapter": "cli-spawn",
-    "promptDelivery": undefined,
-    "confinement": "none",
-    "readOnlyMechanism": "tool-allowlist-not-read-only-enforced"
+    resourceBindings: [],
+    adapter: 'cli-spawn',
+    promptDelivery: undefined,
+    confinement: 'none',
+    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
   }
 ];
 
@@ -1137,8 +1156,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   describe('configuration environment isolation', () => {
     test('loads project config from cwd while HOME global overlay is neutralized', () => {
       assert.ok(cfg.executors, 'loaded config must contain executors');
-      assert.ok(cfg.executors.codex, 'loaded config must contain the consolidated codex executor from project config');
-      assert.ok(cfg.executors.codex.invocations.some((inv) => inv.id === 'cli-bwrap'), 'codex must declare its cli-bwrap invocation');
+      assert.ok(cfg.executors.openai, 'loaded config must contain the consolidated openai executor from project config');
+      assert.ok(cfg.executors.openai.invocations.some((inv) => inv.id === 'codex-cli-bwrap'), 'openai must declare its codex-cli-bwrap invocation');
       assert.ok(cfg.capabilities?.['fgos-coding-implement'], 'loaded config must contain fgos-coding-implement capability');
       assert.equal(process.env.HOME, tempHomeDir, 'process.env.HOME must match isolated temp directory');
     });
@@ -1203,8 +1222,8 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
     test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium via capability override', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
-      assert.equal(resolvedExecutorId, 'agy', 'resolvedExecutorId resolves to agy (executor-id-consolidation Step 2 -- was agy-herdr)');
-      assert.equal(resolvedInvocationId, 'herdr', 'resolvedInvocationId pins agy\'s herdr invocation');
+      assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
+      assert.equal(resolvedInvocationId, 'agy-herdr-mucdong', 'resolvedInvocationId pins agy\'s herdr-mucdong invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
       assert.equal(fgosImplementHeavy.model, 'gemini-3.8-flash-medium', 'fgos-coding-implement heavy model must be gemini-3.8-flash-medium');

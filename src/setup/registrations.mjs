@@ -713,14 +713,16 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   const knownExecutors = new Set([
     ...Object.keys(sharedConfig?.runner?.executors || {}),
     ...Object.keys(DEFAULT_RUNNER_CONFIG?.executors || {}),
-    // executor-id-consolidation Step 2: agy-cli/agy-herdr/codex-herdr no
-    // longer exist as separate ids (merged into claude/codex/agy's own
-    // invocations) -- 'agy' was missing from this baseline list even
-    // before consolidation.
+    // executor-provider-naming (2026-09-17): executors are now named by
+    // provider, not bin -- 'agy'/'codex'/'pi'/'pi-grok'/'codex-pi' no
+    // longer exist as separate ids ('agy' merged into 'gemini'; 'codex'
+    // and 'pi' merged into one 'openai' executor, since providerModel is
+    // executor-scoped, not per-bin; 'pi-grok' renamed to 'xai'; 'codex-pi'
+    // retired as a duplicate of 'pi').
     'claude',
-    'agy',
-    'codex',
-    'pi',
+    'gemini',
+    'openai',
+    'xai',
     'glm',
     'gitnexus',
     'herdr',
@@ -1755,23 +1757,32 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
 // `runner` config-default for the same reason `capabilities` above is (a
 // second `key: 'runner'` registration would silently overwrite this one,
-// never merge with it). `executors.pi` mirrors `executors.agy`'s live
-// shape exactly (`.fgos/config.json`, hand-authored, not itself sourced
-// from this registration) — `mergeConfigDefaults`'s fill-missing-only
-// recursion (`config-merge.mjs`) adds `runner.executors.pi` and
-// `runner.modelPolicies["openai-codex"]` on the next `fgos setup` run
-// without touching the live `executors.agy`/`modelPolicies.claude`/
-// `modelPolicies.gemini` entries. `--provider openai-codex --model
-// gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist are the
-// EXACT invocation a live D4 proof-test dispatch ran and confirmed GREEN
-// (worker contract followed: layered skill-pointer chain read natively,
-// footprint honored, correct `[BLOCKED]`/`[DONE]` two-token reporting) —
-// see docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
+// never merge with it). `mergeConfigDefaults`'s fill-missing-only
+// recursion (`config-merge.mjs`) adds `runner.executors.openai` and
+// `runner.modelPolicies.openai` on the next `fgos setup` run without
+// touching the live `executors.gemini`/`modelPolicies.claude`/
+// `modelPolicies.gemini` entries. `--provider openai-codex` in `args`
+// stays a literal string -- that is pi's OWN real `--provider` value
+// (confirmed via `pi --list-models`), independent of what this config
+// internally calls the provider (`openai`, executor-provider-naming
+// 2026-09-17 -- "openai-codex" was conflating the provider with "Codex",
+// which is just OpenAI's own CLI product name, not a distinct provider).
+// `--model gpt-5.5` and the `read,write,edit,bash,grep,find,ls` allowlist
+// are the EXACT invocation a live D4 proof-test dispatch ran and
+// confirmed GREEN (worker contract followed: layered skill-pointer chain
+// read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
+// two-token reporting) — see
+// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
+// `rigorOverrides`: the old `{light/standard/heavy -> nano}` default was
+// never a deliberate, endorsed cost policy -- just this seed's own
+// historical D4 proof-test default -- dropped so a fresh install's `pi`
+// behaves like every other executor (DEFAULT_TIER_TO_POLICY) unless an
+// operator deliberately opts in later.
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
 // tests assert this exact shape instead of duplicating the literal.
 export const PI_EXECUTOR_DEFAULT = Object.freeze({
   kind: 'agent',
-  description: 'pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
+  description: 'pi coding agent (openai/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)',
   allowCrossProvider: true,
   invocations: [
     {
@@ -1793,12 +1804,7 @@ export const PI_EXECUTOR_DEFAULT = Object.freeze({
       ],
     },
   ],
-  providerModel: 'openai-codex',
-  rigorOverrides: {
-    light: 'nano',
-    standard: 'nano',
-    heavy: 'nano',
-  },
+  providerModel: 'openai',
 });
 
 registerConfigDefault({
@@ -1809,9 +1815,9 @@ registerConfigDefault({
     capabilities: DEFAULT_CAPABILITY_SLOTS,
     modelPolicies: {
       ...DEFAULT_RUNNER_CONFIG.modelPolicies,
-      'openai-codex': { nano: 'gpt-5.5' },
+      openai: { nano: 'gpt-5.5' },
     },
-    executors: { pi: PI_EXECUTOR_DEFAULT },
+    executors: { openai: PI_EXECUTOR_DEFAULT },
   },
 });
 

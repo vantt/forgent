@@ -5,8 +5,9 @@ import path from 'node:path';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 
-// This repo's own `codex-cli` and `glm-cli` executors (`.fgos/config.json`)
-// had each been proven live exactly once before, via a one-off manual fgOS
+// This repo's own `openai` (formerly `codex-cli`) and `glm` (formerly
+// `glm-cli`) executors (`.fgos/config.json`) had each been proven live
+// exactly once before, via a one-off manual fgOS
 // work item (docs/history/codex-bypass-executor/plan.md tsk-3tkc;
 // docs/history/glm-executor-smoke-test/plan.md tsk-3gr), never as a
 // repeatable, automated test. Both tests below dispatch a real,
@@ -48,10 +49,10 @@ const GLM_BIN = findExecutableOnPath(['claude']);
 const GLM_SKIP =
   LIVE_EXECUTOR_TESTS_ENABLED && GLM_BIN && GLM_API_KEY
     ? false
-    : 'set FGOS_RUN_LIVE_EXECUTOR_TESTS=1 with claude and GLM_OPENROUTER_API_KEY (.fgos/secrets.local.env) to run the live glm-cli proof';
+    : 'set FGOS_RUN_LIVE_EXECUTOR_TESTS=1 with claude and GLM_OPENROUTER_API_KEY (.fgos/secrets.local.env) to run the live glm proof';
 
-test('codex-cli executor (LIVE): dispatches a real self-identification prompt through this repo\'s configured codex-cli executor', { skip: CODEX_SKIP }, async () => {
-  const res = await executeExecutorCli('codex-cli', {
+test('openai executor (LIVE): dispatches a real self-identification prompt through this repo\'s configured openai executor', { skip: CODEX_SKIP }, async () => {
+  const res = await executeExecutorCli('openai', {
     prompt: SELF_ID_PROMPT,
     repoRoot: REPO_ROOT,
     cwd: REPO_ROOT,
@@ -59,8 +60,8 @@ test('codex-cli executor (LIVE): dispatches a real self-identification prompt th
     timeoutMs: 120000,
   });
 
-  assert.equal(res.status, 0, `codex-cli exited non-zero: ${res.stderr}`);
-  assert.equal(res.headBefore, res.headAfter, 'codex-cli must not mutate the repo for a pure self-identification prompt');
+  assert.equal(res.status, 0, `openai executor exited non-zero: ${res.stderr}`);
+  assert.equal(res.headBefore, res.headAfter, 'openai executor must not mutate the repo for a pure self-identification prompt');
   assert.match(
     res.stdout,
     /gpt|codex/i,
@@ -68,8 +69,8 @@ test('codex-cli executor (LIVE): dispatches a real self-identification prompt th
   );
 });
 
-test('glm-cli executor (LIVE): dispatches a real self-identification prompt through this repo\'s configured glm-cli executor', { skip: GLM_SKIP }, async () => {
-  const res = await executeExecutorCli('glm-cli', {
+test('glm executor (LIVE): dispatches a real self-identification prompt through this repo\'s configured glm executor', { skip: GLM_SKIP }, async () => {
+  const res = await executeExecutorCli('glm', {
     prompt: SELF_ID_PROMPT,
     repoRoot: REPO_ROOT,
     cwd: REPO_ROOT,
@@ -77,8 +78,8 @@ test('glm-cli executor (LIVE): dispatches a real self-identification prompt thro
     timeoutMs: 90000,
   });
 
-  assert.equal(res.status, 0, `glm-cli exited non-zero: ${res.stderr}`);
-  assert.equal(res.headBefore, res.headAfter, 'glm-cli must not mutate the repo for a pure self-identification prompt');
+  assert.equal(res.status, 0, `glm executor exited non-zero: ${res.stderr}`);
+  assert.equal(res.headBefore, res.headAfter, 'glm executor must not mutate the repo for a pure self-identification prompt');
   assert.match(
     res.stdout,
     /z-ai|glm/i,

@@ -194,7 +194,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('claude-reviewer: applies effort high and readOnly via allowedTools', () => {
-        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'cli-readonly').args;
+        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'claude-cli-readonly').args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -233,7 +233,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('claude-bwrap: enforced-by-sandbox via bwrap confinement', () => {
-        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'cli-bwrap').args;
+        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'claude-cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -249,7 +249,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('Codex CLI family', () => {
       test('codex-cli: detects dangerous bypass flag and model', () => {
-        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-bypass').args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-bypass-fgovn').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -266,7 +266,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-readonly: detects -s read-only and sandbox enforcement', () => {
-        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-readonly').args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-readonly-fgovn').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -282,7 +282,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-bwrap: detects -s danger-full-access, --skip-git-repo-check, and bwrap sandbox', () => {
-        const template = cfg.executors.codex.invocations.find((inv) => inv.id === 'cli-bwrap').args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-bwrap').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -318,7 +318,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
     describe('AGY/Gemini CLI family', () => {
       test('agy-cli: detects --mode and --model, excludes timeout/project mechanics', () => {
-        const template = cfg.executors.agy.invocations.find((inv) => inv.id === 'cli').args;
+        const template = cfg.executors.gemini.invocations.find((inv) => inv.id === 'agy-cli-mucdong').args;
         const res = renderProviderInvocation({
           providerFamily: 'gemini',
           command: 'agy',
@@ -355,8 +355,8 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
     });
 
     describe('Pi CLI family', () => {
-      test('pi: detects --provider, --model, --tools, --mode, --approve', () => {
-        const template = cfg.executors.pi.invocations[0].args;
+      test('pi: detects --model, --tools, --mode, --approve (no --provider -- executor-provider-naming 2026-09-17 dropped it: confirmed via a real invocation that pi infers provider from its single-provider account dir)', () => {
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-fgovn').args;
         const res = renderProviderInvocation({
           providerFamily: 'pi',
           command: 'pi',
@@ -368,7 +368,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
         assert.equal(res.command, 'pi');
         assert.equal(res.applied.model, 'applied');
         assert.equal(res.applied.toolIntent, 'applied-via-tools');
-        assert.ok(res.policyShapedFlags.includes('--provider'));
+        assert.ok(!res.policyShapedFlags.includes('--provider'));
         assert.ok(res.policyShapedFlags.includes('--model'));
         assert.ok(res.policyShapedFlags.includes('--tools'));
         assert.ok(res.policyShapedFlags.includes('--mode'));
@@ -376,7 +376,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-pi resolves Pi CLI adapter by command', () => {
-        const template = cfg.executors['codex-pi'].invocations[0].args;
+        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'pi-cli-tetnu').args;
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'pi',
@@ -391,9 +391,9 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
     });
 
-    describe('glm-cli (z-ai via Claude route)', () => {
-      test('glm-cli: renders claude invocation with z-ai envPatch', () => {
-        const inv = cfg.executors['glm-cli'].invocations[0];
+    describe('glm (z-ai via Claude route)', () => {
+      test('glm: renders claude invocation with z-ai envPatch', () => {
+        const inv = cfg.executors['glm'].invocations[0];
         const res = renderProviderInvocation({
           providerFamily: 'z-ai',
           command: 'claude',

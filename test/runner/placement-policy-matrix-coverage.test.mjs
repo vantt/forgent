@@ -127,15 +127,15 @@ test('Phase 07 PRODUCTION BINDER proof: a genuine divergence (synthetic) falls b
     ...cfg,
     executors: {
       ...cfg.executors,
-      agy: { ...cfg.executors.agy, rigorOverrides: { light: 'nano', standard: 'standard', heavy: 'flagship' } },
+      gemini: { ...cfg.executors.gemini, rigorOverrides: { light: 'nano', standard: 'standard', heavy: 'flagship' } },
     },
   };
-  // agy heavy now resolves to a DIFFERENT policy tier than the config
+  // gemini heavy now resolves to a DIFFERENT policy tier than the config
   // resolveVerifiedPlacementModel's own internal buildPlacementPolicyCandidate
   // call sees vs. whatever the caller's legacyModel actually was computed
   // against -- simulate the caller having computed against the OLD config.
   const staleLegacyModel = 'gemini-3.8-flash-high'; // the OLD (creative-tier) value
-  const result = resolveVerifiedPlacementModel({ cfg: cfgWithMismatch, executorId: 'agy', workTier: 'heavy', legacyModel: staleLegacyModel });
+  const result = resolveVerifiedPlacementModel({ cfg: cfgWithMismatch, executorId: 'gemini', workTier: 'heavy', legacyModel: staleLegacyModel });
   assert.equal(result.model, staleLegacyModel, 'a real divergence must fall back to the caller-supplied legacy value, never the unverified PlacementPolicy one');
   assert.equal(result.source, 'legacy');
   assert.ok(result.divergence);

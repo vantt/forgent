@@ -803,7 +803,7 @@ export const COMMAND_REGISTRY = [
         ticks: { type: 'string', description: '"watch" only: stop after this many readings; omitted, watch until the run stops.' },
         intent: { type: 'string', description: '"recover" without --action only: the requested recovery intent, "resume" (default) or "reassign" (needs replacement-authority evidence in the run\'s own outbox, or the recommendation comes back "needs-input").' },
         action: { type: 'string', description: '"recover" only: JSON-encoded action object to apply, exactly as returned by a prior "recover" call\'s own `action` field. Presence of this flag is what selects the apply path over the observe path; giving it requires all four --expected-* fields and --action-key too. "reconcile plan" only (different meaning): the plain action-kind string to plan, one of "clear-cwd-lock" (default), "collect-result" (requires --run), "clear-assignment-claim" (requires --assignment), or "repair-projection" (requires --run).' },
-        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: provider id, e.g. openai-codex.' },
+        provider: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: provider id, e.g. openai.' },
         account: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: account id from ~/.fgos/config.json.' },
         reason: { type: 'string', description: '"reconcile provider-capacity clear-quarantine" only: operator reason, e.g. token refreshed.' },
         force: { type: 'boolean', description: '"reconcile provider-capacity clear-quarantine" only: permit clearing an account that is not currently quarantined.' },
