@@ -1,7 +1,31 @@
 # Model-tier vocabulary migration + code-panel equivalent-tier fallback
 
-Status: in progress
-Branch: dedicated worktree, merge to main on close
+Status: Phase 1-3 committed, full-suite verify in progress. Not yet merged to main.
+Branch: model-tier-vocabulary (worktree ~/projects/model-tier-vocabulary)
+
+## Progress (2026-09-17)
+
+- Phase 1 (vocab rename): done, commit `de9ca1cc` + follow-up fixture fixes
+  `15c98158` (blast radius wider than initial scan found — `core/coordination-protocols/*.yaml`
+  live protocol definitions and ~28 test files' shared `modelPolicies`/`models`
+  fixture boilerplate, both missed by the first pass). `docs/specs/runner.md`
+  RUL69 records the full finding, including the `MIN_RIGOR_VALUES`/
+  `QUALITY_MODE_VALUES` false-positive trap.
+- Phase 2 (`actors[].fallbackExecutors` plumbing): done, same commit as Phase 1
+  fixture fixes (`15c98158` bundled it in). New test in
+  `dispatch-coordination-role-tiers.test.mjs` proves the wire through
+  `runCoordinationUseCase`, not just `dispatchDeclaredOperation`'s own
+  lower-level `cliPolicy` param. Known limit (not fixed, out of scope):
+  `runCoordinationUseCase` doesn't forward `providerCapacityRuntimeDir`, so a
+  live refusal→fallback round can't be tested hermetically through the
+  coordination path today — proven via `executorPreference` instead (computed
+  unconditionally, doesn't need a real refusal).
+- Phase 3 (code-panel roster): done, commit `12198ad6`. All 6 actor
+  declarations (default/fix-round/herdr roster snippets + 3 worked request
+  examples) now carry `fallbackExecutors` at equivalent modelTier
+  cross-provider, plus finished the tier rename the worked examples had
+  missed.
+- Verify: full non-rust-host suite (342 files) run in progress.
 
 ## Outcome
 
