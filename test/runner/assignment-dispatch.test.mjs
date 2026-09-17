@@ -1843,7 +1843,7 @@ function inlineContractFileContent(overrides = {}) {
   };
 }
 
-test('dispatch CLI execute subcommand rejects --contract combined with --for before doing anything else', () => {
+test('dispatch CLI execute subcommand rejects --for outright (dispatch-path unification: the purpose door is retired), before doing anything else, even combined with --contract', () => {
   const tempDir = mkTempDir();
   const contractPath = path.join(tempDir, 'contract.json');
   fs.writeFileSync(contractPath, JSON.stringify(inlineContractFileContent()));
@@ -1858,7 +1858,7 @@ test('dispatch CLI execute subcommand rejects --contract combined with --for bef
       );
     },
     (err) => {
-      assert.match(String(err.stderr), /--contract cannot be combined with --for/);
+      assert.match(String(err.stderr), /execute --for is no longer supported/);
       return true;
     },
   );
@@ -1866,6 +1866,25 @@ test('dispatch CLI execute subcommand rejects --contract combined with --for bef
     fs.existsSync(path.join(tempDir, '.fgos', 'assignments')),
     false,
     'a rejected flag combination must never reach assignment building',
+  );
+});
+
+test('dispatch CLI execute subcommand rejects --for on its own, with no --contract/--assignment at all', () => {
+  const tempDir = mkTempDir();
+  const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  assert.throws(
+    () => {
+      execFileSync(
+        process.execPath,
+        [dispatchScript, 'execute', '--for', 'reviewer', '--cwd', tempDir],
+        { encoding: 'utf8', cwd: tempDir, stdio: ['ignore', 'pipe', 'pipe'] },
+      );
+    },
+    (err) => {
+      assert.match(String(err.stderr), /execute --for is no longer supported/);
+      assert.match(String(err.stderr), /decide --for/);
+      return true;
+    },
   );
 });
 

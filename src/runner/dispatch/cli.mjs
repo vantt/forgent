@@ -644,7 +644,7 @@ export async function executeExecutorCli(
   const purpose = purposeArg;
   if (!executorIdArg && !purpose) {
     throw new RunnerConfigError(
-      'usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...]',
+      'executeExecutorCli requires an executorIdArg or a `for` purpose (the CLI\'s own `execute` subcommand only ever supplies executorIdArg positionally -- `for` is a programmatic-caller-only parameter, e.g. spawnWorker\'s own work-item-derived purpose; usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access])',
     );
   }
   const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
@@ -1470,19 +1470,36 @@ export async function runDispatchCli() {
       // branch was the one caller that never passed it -- RESEARCH.md).
       // stdout is left untouched, still carrying only the single final JSON
       // line below, so a scripted caller's JSON.parse(stdout) sees no change.
+      // Dispatch-path unification: `execute --for <purpose>` is retired.
+      // It was the "purpose door" -- resolving a purpose straight to a
+      // spawn with zero provider-capacity lease and zero fallback (unlike
+      // every other real dispatch door here) -- and had zero live callers
+      // (docs/knowledge/how-to-wire-a-skill-to-an-executor-by-purpose-not-
+      // by-name/... 's own "Status: pattern proven, no live consumer
+      // today"). The correct, real pattern (already how every live caller
+      // works) is two-phase: `decide --for <purpose>` resolves the
+      // purpose to a real executorId first, then `execute <that id>`
+      // dispatches it positionally -- `decide --for` is unaffected by
+      // this, only `execute --for` is refused.
+      if (flagValue('--for')) {
+        process.stderr.write(
+          'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)\n',
+        );
+        process.exitCode = 1;
+        break;
+      }
       const assignmentId = flagValue('--assignment');
       const contractFile = flagValue('--contract');
       // ADR-007 R3: `--contract <file>` is its own dispatch door -- an
-      // inline, no-Work/no-Stage/no-`decide --for` Assignment built
-      // straight from a caller-authored execution contract file. Reject it
-      // combined with `--for` or `--assignment` up front, before anything
-      // else in this subcommand happens (parse, build, dispatch), mirroring
-      // how `--assignment` already short-circuits the rest of this branch
-      // on its own flag alone, immediately below.
-      if (contractFile && (assignmentId || flagValue('--for'))) {
-        const conflictingFlag = assignmentId ? '--assignment' : '--for';
+      // inline, no-Work/no-Stage Assignment built straight from a
+      // caller-authored execution contract file. Reject it combined with
+      // `--assignment` up front, before anything else in this subcommand
+      // happens (parse, build, dispatch), mirroring how `--assignment`
+      // already short-circuits the rest of this branch on its own flag
+      // alone, immediately below.
+      if (contractFile && assignmentId) {
         process.stderr.write(
-          `execute --contract cannot be combined with ${conflictingFlag} -- pick exactly one dispatch door\n`,
+          'execute --contract cannot be combined with --assignment -- pick exactly one dispatch door\n',
         );
         process.exitCode = 1;
         break;
@@ -1754,7 +1771,6 @@ export async function runDispatchCli() {
         model: flagValue('--model'),
         tier: flagValue('--tier'),
         carries: flagValue('--carries'),
-        for: flagValue('--for'),
         cwd: flagValue('--cwd') ?? flagValue('--dir'),
         repoRoot: flagValue('--repo-root'),
         hasLiveTaskAccess: rest.includes('--has-live-task-access'),
@@ -1873,7 +1889,7 @@ export async function runDispatchCli() {
     }
     default: {
       process.stderr.write(
-        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | execute --for <purpose> [...] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
+        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
       );
       process.exitCode = 1;
     }
