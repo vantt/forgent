@@ -411,3 +411,75 @@ test('Phase D: the real repository config declares placementPolicy.readOnlyRedir
   assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['codex-bwrap']);
   assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['codex-bwrap'], 'falls back to "default" for an operation with no specific override');
 });
+
+// executor-id-consolidation Step 2.1: an invocation can name itself with
+// "id" so a caller can select one specific `via:"cli"` entry among several,
+// instead of always getting Gate B2's legacy "first cli match".
+
+function multiInvocationConfig(invocations) {
+  return loadRunnerConfigObject({
+    executor: { command: 'node', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 60000,
+    executors: {
+      multi: { kind: 'agent', invocations },
+    },
+  });
+}
+
+test('Step 2.1: an invocation "id" must be a non-empty string when present', () => {
+  assert.throws(
+    () => multiInvocationConfig([{ id: '', via: 'cli', command: 'claude', args: ['{prompt}'] }]),
+    (err) => err instanceof RunnerConfigError && /"id" must be a non-empty string/.test(err.message),
+  );
+  assert.throws(
+    () => multiInvocationConfig([{ id: 42, via: 'cli', command: 'claude', args: ['{prompt}'] }]),
+    (err) => err instanceof RunnerConfigError && /"id" must be a non-empty string/.test(err.message),
+  );
+});
+
+test('Step 2.1: two invocations on the same executor cannot declare the same "id"', () => {
+  assert.throws(
+    () => multiInvocationConfig([
+      { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+      { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+    ]),
+    (err) => err instanceof RunnerConfigError && /"id": "cli" more than once/.test(err.message),
+  );
+});
+
+test('Step 2.1: invocations without an "id" still load fine (id is optional)', () => {
+  const cfg = multiInvocationConfig([
+    { via: 'cli', command: 'claude', args: ['{prompt}'] },
+    { via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  assert.equal(cfg.executors.multi.invocations.length, 2);
+});
+
+test('Step 2.1: resolveExecutorConfig defaults to the first "via:cli" invocation when no invocationId is passed -- byte-identical to before this field existed', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+    { id: 'cli-readonly', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'multi');
+  assert.deepEqual(resolved.args, ['{prompt}', '--full']);
+});
+
+test('Step 2.1: resolveExecutorConfig selects the named invocation when invocationId is passed', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}', '--full'] },
+    { id: 'cli-readonly', via: 'cli', command: 'claude', args: ['{prompt}', '--readonly'] },
+  ]);
+  const resolved = resolveExecutorConfig(cfg, 'standard', 'multi', undefined, undefined, undefined, 'cli-readonly');
+  assert.deepEqual(resolved.args, ['{prompt}', '--readonly']);
+});
+
+test('Step 2.1: resolveExecutorConfig throws by name when invocationId names an invocation that does not exist', () => {
+  const cfg = multiInvocationConfig([
+    { id: 'cli', via: 'cli', command: 'claude', args: ['{prompt}'] },
+  ]);
+  assert.throws(
+    () => resolveExecutorConfig(cfg, 'standard', 'multi', undefined, undefined, undefined, 'cli-bwrap'),
+    (err) => err instanceof RunnerConfigError && /no "invocations" entry with "id": "cli-bwrap"/.test(err.message),
+  );
+});

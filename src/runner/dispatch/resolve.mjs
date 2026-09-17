@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
 import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, skillForStage } from '../../state/workflow-stage-graphs.mjs';
 
 /**
@@ -289,15 +289,40 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     // {executorId, executor, overrides, configured} are unaffected.
     return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true, bindingSource: 'executor-id' };
   }
-  const preferred = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose]?.prefer : undefined;
-  if (preferred) {
-    const executor = executors[preferred];
+  const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
+  const preferred = capabilityEntry?.prefer;
+  if (preferred !== undefined) {
+    // executor-id-consolidation Step 2.2: `prefer` may now be a single
+    // string (legacy, unchanged) or an ORDERED candidate array (cascade,
+    // account-rotator-style — try candidates[0], fall to the next only
+    // when it is not usable). `normalizePreferCandidates` always returns
+    // an array; the single-string case becomes its own 1-element array,
+    // so `candidates[0]` is exactly the pre-existing `preferred` value for
+    // every config that has not adopted the array shape — zero behavior
+    // change for every currently-configured capability.
+    const candidates = normalizePreferCandidates(preferred, `capabilities.${executorIdOrPurpose}.prefer`);
+    const primary = candidates[0];
+    const executor = executors[primary.executor];
     if (!executor) {
       throw new RunnerConfigError(
-        `runner config capabilities.${executorIdOrPurpose}.prefer names "${preferred}" but no such executor is registered.`,
+        `runner config capabilities.${executorIdOrPurpose}.prefer names "${primary.executor}" but no such executor is registered.`,
       );
     }
-    return { executorId: preferred, executor, overrides: cfg.capabilities[executorIdOrPurpose].overrides, configured: true, bindingSource: 'capability.prefer' };
+    return {
+      executorId: primary.executor,
+      executor,
+      overrides: capabilityEntry.overrides,
+      configured: true,
+      bindingSource: 'capability.prefer',
+      // `invocationId`: consumed by resolveExecutorConfig's Gate B2 (Step
+      // 2.1) when set — `undefined` for every legacy bare-string
+      // candidate, so Gate B2's own "first via:cli" default is unchanged.
+      invocationId: primary.invocation,
+      // `candidates`: the FULL ordered pool, for a cascade-aware caller
+      // (e.g. a future fallback consumer) — `resolveExecutorConfig` itself
+      // never reads this; it only ever acts on the primary candidate above.
+      candidates,
+    };
   }
   const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
   if (found) {
@@ -311,7 +336,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
 // sibling file — was a bare same-file `function` before the split
 // (byte-identical value/behavior, only newly reachable from outside this
 // file).
-export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType) {
+export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType, invocationId) {
   const resolved = executorId ? resolveExecutorAndOverrides(cfg, executorId) : undefined;
   const executorEntry = resolved?.executor;
   // Self-review finding: `executorId` below is the CALLER's own requested
@@ -366,6 +391,20 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // executor declaring, say, `[{via:"mcp",...}, {via:"cli",...}]` must
   // still resolve the cli one regardless of array order.
   //
+  // executor-id-consolidation Step 2.1: an executor can declare MULTIPLE
+  // `via:"cli"` invocations (e.g. a full-write default alongside a
+  // read-only/confined variant) — Gate B2's original "first cli match"
+  // pick cannot distinguish between them at all. `invocationId`, when
+  // passed, names exactly which one; the explicit caller param (this
+  // function's own last argument, used by the read-only-redirect and
+  // capability.prefer callers, see resolveExecutorAndOverrides) always
+  // wins over `resolved.invocationId` (an id threaded through by
+  // resolveExecutorAndOverrides's own capability.prefer resolution below).
+  // Neither is ever passed by any pre-existing caller, so this is
+  // additive-only: every caller that never names an invocation id keeps
+  // the exact same "first via:cli" pick as before.
+  const requestedInvocationId = invocationId ?? resolved?.invocationId;
+  //
   // Gate B3 (D9, tsk-in1-4): when `invocations` IS present but none of
   // them is `via:"cli"` (e.g. `gitnexus`'s mcp-only entry), that is a
   // executor structurally incapable of being dispatched this way — throw
@@ -375,10 +414,14 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // caller mistake this gate exists to catch ("bẫy B1" from shaping:
   // an mcp identifier misread as a spawnable command).
   const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : undefined;
-  const cliInvocation = invocations?.find((inv) => inv.via === 'cli');
+  const cliInvocation = requestedInvocationId
+    ? invocations?.find((inv) => inv.id === requestedInvocationId && inv.via === 'cli')
+    : invocations?.find((inv) => inv.via === 'cli');
   if (invocations && !cliInvocation) {
     throw new RunnerConfigError(
-      `executor "${executorId}" declares "invocations" but none is dispatchable via "cli" (has: ${invocations.map((inv) => inv.via).join('/')}) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way.`,
+      requestedInvocationId
+        ? `executor "${executorId}" has no "invocations" entry with "id": "${requestedInvocationId}" dispatchable via "cli" (has: ${invocations.map((inv) => `${inv.id ?? '(no id)'}:${inv.via}`).join(', ')}).`
+        : `executor "${executorId}" declares "invocations" but none is dispatchable via "cli" (has: ${invocations.map((inv) => inv.via).join('/')}) — resolveExecutorConfig only ever spawns a cli invocation; this executor cannot be dispatched this way.`,
     );
   }
   // D15/D20/D22 (review finding H1, tsk-397): `executorEntry.agentType`

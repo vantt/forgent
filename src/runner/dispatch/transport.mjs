@@ -144,14 +144,18 @@ export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
   return resolved;
 }
 
-export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType } = {}) {
+export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
   // resolved executor turns out to be same-provider or cross-provider;
   // resolveExecutorConfig below is still the sole authority on which
   // executor actually gets used.
   const attestation = captureDispatchAttestation(fgosDir, attestRoot);
-  const executor = resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType);
+  // `invocationId` (executor-id-consolidation Step 2.1): optional, names a
+  // specific `invocations[]` entry by its own `id` — omitted by every
+  // pre-existing caller, so resolveExecutorConfig's own Gate B2 default
+  // ("first via:cli") is unchanged unless a caller opts in.
+  const executor = resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCarries, resolvedAgentType, invocationId);
   const adapter = executor.adapter ?? DEFAULT_ADAPTER;
   if (!(adapter in EXECUTOR_ADAPTERS)) {
     throw new RunnerConfigError(
