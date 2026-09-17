@@ -1,6 +1,6 @@
 # Executor profile schema migration — plan
 
-Status: Phase A and B merged to main. Phase C/D/E designed below, not
+Status: Phase A, B, and C merged to main. Phase D/E designed below, not
 started -- each needs its own dedicated implementation pass and explicit
 go-ahead before touching live `.fgos/config.json` schema or removing an
 executor id anything still references.
@@ -43,7 +43,7 @@ explicitly instead of inheriting one.
 |---|---|---|---|
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
-| C | ExecutorProfile JSON Schema + additive dual-shape config support | Not started | -- |
+| C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `<pending>` (branch `executor-profile-identity-supports`) |
 | D | Migrate `readOnlyExecutorRedirects`' one live pool onto the new surface, retire the field | Not started, depends on C | -- |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
 
@@ -251,39 +251,146 @@ provider/model-only re-derivation -- see "Scope" above.
 
 ## Phase C — ExecutorProfile JSON Schema + additive dual-shape support
 
-### Scope
+Status: Done. Implemented in worktree/branch
+`executor-profile-identity-supports`, commit `<pending>`.
+
+### Scope (as actually implemented -- revised from the original design below)
+
+The original design (kept below for the record) proposed a wholly new,
+parallel `runner.executorProfiles.<id>` config surface with its own
+`invocations[]`. Before implementing, reading `src/runner/dispatch/config.mjs`
+closely surfaced that the **Invocation** half of design.md §3.7 was already
+real, working config -- `executors.<id>.invocations[]`, each entry's own
+`via`/`command`/`args`/`adapter`, validated by the existing
+`validateInvocationShape` (tsk-5tm-4 D11 / tsk-in1-4 D9, predates this
+track). Building a second, parallel `invocations[]` shape under a new
+`executorProfiles` namespace would have duplicated a mechanism that already
+works, contradicting DRY for no safety benefit. What design.md §3.7 actually
+names that does NOT exist yet is the **ExecutorProfile** half:
+`identity.{principalRef,runtimeBackendRef,trustDomain,egressClass}` and
+`supports.{providerFamilies,reasoningEffort,systemPrompt,toolGating}`. Phase
+C adds exactly those two fields, additively, directly onto the EXISTING
+`executors.<id>` shape -- the same seam `invocations[]`/`rigorOverrides`/
+`carries`/etc. already occupy, not a new parallel namespace.
+
+Implementation, in `src/runner/dispatch/config.mjs`:
+
+- `validateExecutorIdentityShape(identity, label)`: `identity` is
+  all-or-nothing when declared -- all four fields required together as
+  non-empty strings (a partial identity does not answer the question it
+  exists to answer). None of the four is checked against a closed enum;
+  design.md's own worked example is the only vocabulary this track has ever
+  specified, not an exhaustive list.
+- `validateExecutorSupportsShape(supports, label)`: every field
+  independently optional. `reasoningEffort`, when present, must be entries
+  from `REASONING_EFFORT_VALUES` -- moved here from `assignment-policy.mjs`
+  (pure relocation, re-exported unchanged from there) so this validator can
+  reuse the exact vocabulary `resolveAssignmentDispatchPolicy` enforces at
+  dispatch time, without a `config.mjs` -> `assignment-policy.mjs` ->
+  `config.mjs` import cycle.
+- Both wired into `validateExecutorEntryShape` (the existing per-`executors.<id>`-entry
+  validator), called only when the corresponding field is present --
+  byte-identical validation for every executor declaring neither.
+- `resolveExecutorAndOverrides`/`resolveExecutorConfig` needed ZERO changes:
+  both already return/spread the whole executor object, so `identity`/
+  `supports` ride along automatically, the same "the resolver's blast
+  radius impact analysis reports as HIGH, but it did not have to be edited
+  at all" property `test/runner/dispatch-executor-profile.test.mjs`'s own
+  A1 test already proved for an earlier, unrelated additive field.
+- Neither field has a real consumer yet -- no resolution/dispatch/
+  PlacementPolicy code reads `identity`/`supports` for any decision. This
+  phase proves the shape is expressible, validated, and resolvable; wiring
+  a consumer is out of scope (not named by any close criterion here).
+- `claude`'s real `.fgos/config.json` entry now declares both fields for
+  real (`principalRef: "principal://claude"`, `runtimeBackendRef:
+  "backend://claude-cli"`, `trustDomain: "local-operator"`, `egressClass:
+  "unrestricted"` -- accurate: no confinement backend is declared for this
+  executor, so nothing bounds its network egress beyond the OS/Bash-tool
+  allowlist; `supports.providerFamilies: ["claude"]`,
+  `reasoningEffort: ["low","medium","high"]` (excludes `"max"` -- no
+  evidence this executor's invocation ever exercises it),
+  `systemPrompt: false` (this invocation uses a single combined `-p
+  {prompt}` argv slot, no separate system-prompt-level input),
+  `toolGating: "allowedTools"` (matches the real `--allowedTools` flag in
+  its own `invocations[0].args`)) -- satisfying "resolvable end-to-end for
+  at least one real executor" against the LIVE config, not only a synthetic
+  test fixture. Every other executor entry is untouched.
+
+### Safety argument
+
+Purely additive at every layer: two new optional fields, validated only
+when present, on a per-entry validator that already runs for every
+`executors.<id>` entry today. No resolution/dispatch function was edited
+(`resolveExecutorAndOverrides`/`resolveExecutorConfig` needed no change at
+all -- see above), so there is no new code path for an EXISTING executor
+(one that declares neither field) to traverse differently. `claude` gaining
+real `identity`/`supports` data is the one live-config change this phase
+makes; since nothing reads either field for any decision yet, it is
+provably inert metadata, not a behavior change -- confirmed by the Phase 00
+baseline snapshot matrix re-running green unchanged (43/43,
+`test/runner/dispatch-policy-baseline-snapshot.test.mjs`) and the full
+`npm test` gate's failing-test-name set staying byte-identical to the
+pre-Phase-C baseline.
+
+### Required tests (all implemented, `test/runner/dispatch-executor-profile.test.mjs`)
+
+- An executor declaring neither field loads unchanged (regression guard).
+- A full `identity`+`supports` block survives the load intact.
+- `identity` is refused, by name, when any one of the four required fields
+  is missing, or when a field is present but empty/non-string.
+- Each `supports` sub-field is independently optional; a partial
+  declaration loads.
+- `supports.reasoningEffort` is refused when it contains anything outside
+  `REASONING_EFFORT_VALUES`; accepted when every entry is one of them.
+- `supports.providerFamilies`/`systemPrompt`/`toolGating` each refused on
+  the wrong shape (empty array, non-boolean, empty string respectively).
+- The real repository config: `claude`'s `identity`/`supports` survive
+  `resolveExecutorAndOverrides(cfg, 'claude')` end to end, with real
+  asserted values (not just "is present").
+
+### Why this needed its own go-ahead before starting
+
+`validateExecutorEntryShape` is the one shape-check every `executors.<id>`
+entry in the config already passes through -- a mistake there could refuse
+every existing project's config, not just this repo's. In practice the
+change proved additive-only and needed no edit to the resolver blast-radius
+the original design worried about (`resolveExecutorAndOverrides`,
+`resolveExecutorConfig`, `resolveExecutorCommand`, confinement drivers,
+`buildPlacementPolicyCandidate` were all read, none edited) -- because the
+revised scope (fields on the existing shape) never touches the code that
+decides WHICH executor block resolves, only what one more field on an
+already-resolved block may contain.
+
+### Original design (superseded by the above, kept for the record)
 
 Write an actual machine-checkable schema (not just prose in design.md/
 runner.md) for the target `ExecutorProfile` shape (`identity.principalRef`/
 `runtimeBackendRef`/`trustDomain`/`egressClass`, `supports`, `invocations[]`
-per design.md §3.7). Add it as a NEW, additive config surface --
+per design.md §3.7). The original plan was a NEW, additive config surface --
 `runner.executorProfiles.<id>` or equivalent -- that `resolveExecutorAndOverrides`
 prefers when present, falling back to the existing flat `runner.executors.<id>`
-shape unchanged when absent. No existing executor entry is touched by this
-phase; it only makes the new shape expressible and resolvable.
-
-### Why this needs its own go-ahead before starting
-
-This touches the read path of every dispatch call site
-(`resolveExecutorAndOverrides`, `resolveExecutorConfig`,
-`resolveExecutorCommand`, the confinement drivers, PlacementPolicy's own
-`buildPlacementPolicyCandidate`) -- a much larger blast radius than any
-single phase in the seams track, and the first schema-shape decision here
-constrains every later phase (D, E). Not started.
+shape unchanged when absent. Superseded because `executors.<id>.invocations[]`
+(discovered during implementation) already IS design.md §3.7's Invocation
+half, real and working -- duplicating it under a second namespace would
+have been redundant, not safer. See "Scope" above.
 
 ## Phase D — retire `readOnlyExecutorRedirects`
 
 ### Scope
 
-Once C lands, express the one live redirect pool
-(`claude -> default:[codex-bwrap], operations:{review-candidate:[...],
-red-team-candidate:[...]}`) on the new ExecutorProfile/PlacementPolicy
-config surface, prove `resolveVerifiedRedirectExecutor` (Phase 08) resolves
-identically from the new source, then delete the
+Note (post-Phase-C revision): there is no separate "ExecutorProfile config
+surface" to move the redirect pool onto -- Phase C put `identity`/`supports`
+directly on the existing `executors.<id>` shape, and `invocations[]` already
+lived there. Express the one live redirect pool (`claude ->
+default:[codex-bwrap], operations:{review-candidate:[...],
+red-team-candidate:[...]}`) as real `executors.<id>` entries/metadata (or a
+PlacementPolicy-owned declaration -- exact shape is this phase's own design
+decision, not pre-committed here), prove `resolveVerifiedRedirectExecutor`
+(Phase 08) resolves identically from the new source, then delete the
 `runner.readOnlyExecutorRedirects` field and
 `readOnlyRedirectCandidates`'s legacy-config-reading branch.
 
-Not started -- depends on C.
+Not started -- depends on C (done).
 
 ## Phase E — consolidate remaining executor ids
 
@@ -291,14 +398,15 @@ Not started -- depends on C.
 
 Map `claude` + `claude-reviewer` + `claude-reviewer-herdr` (and similarly
 for `agy-cli`/`agy-herdr`, `codex-cli`/`codex-bwrap`/`codex-herdr`) into one
-ExecutorProfile each with multiple invocations, per design.md §3.7's own
-worked example. Retire the flat `runner.executors.<id>` shape only after
-every consumer reads the new surface exclusively and a real deprecation
-window has passed for anything outside this repo that references the old
-flat ids by name.
+`executors.<id>` entry each with multiple `invocations[]` (the real,
+already-working mechanism, not a new namespace -- see Phase C's own
+revision), each carrying its own `identity`/`supports` from Phase C. Retire
+the separate flat ids only after every consumer reads the consolidated
+entry exclusively and a real deprecation window has passed for anything
+outside this repo that references the old flat ids by name.
 
-Not started -- largest blast radius, depends on C and D, needs its own
-migration-contract decision (design.md's own non-goal: "deleting legacy
+Not started -- largest blast radius, depends on C (done) and D, needs its
+own migration-contract decision (design.md's own non-goal: "deleting legacy
 executor ids wholesale" without one) before any destructive step.
 
 ## Close criteria
@@ -308,9 +416,10 @@ executor ids wholesale" without one) before any destructive step.
 - Phase B: a real Provider Capacity Rotator refusal with a declared
   fallback pool results in a real dispatch attempt against an admitted
   fallback, evidenced; the no-fallback-declared case is unchanged.
-- Phase C: ExecutorProfile shape is schema-validated and resolvable
-  end-to-end for at least one real executor, dual-shape, zero behavior
-  change for every executor still on the flat shape.
+- Phase C: `identity`/`supports` are schema-validated, additive
+  `executors.<id>` fields, resolvable end-to-end for at least one real
+  executor (`claude`), zero behavior change for every executor not
+  declaring them. Met.
 - Phase D: `readOnlyExecutorRedirects` field no longer exists in code or
   config; PlacementPolicy is the only redirect-pool source.
 - Phase E: a real migration contract exists and is followed; no

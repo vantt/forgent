@@ -1193,16 +1193,30 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.
 - Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md).
 
-## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams)
+## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 
-Target vocabulary only (design.md §3.7 of
-`plans/260915-executor-policy-dispatch-seams/design.md`) — documented here so
+Target vocabulary from design.md §3.7 of
+`plans/260915-executor-policy-dispatch-seams/design.md` — documented here so
 config/doctor warnings (`executor-profile-warnings` check,
 `src/setup/executor-profile-warnings.mjs`) have a named migration target to
-point at. **No config migration has happened yet**: every currently
-registered `runner.executors.<id>` entry stays exactly as it is, and legacy
-executor ids remain fully accepted. This section describes where the
-vocabulary above (`executor`/`capability`) is headed, not what exists today.
+point at. The **Invocation** half of this vocabulary was already real config
+before this section existed (`executors.<id>.invocations[]`, each entry's
+own `via`/`command`/`args`/`adapter` — `src/runner/dispatch/config.mjs`'s
+`validateInvocationShape`). Phase C (`plans/260917-executor-profile-schema-migration/plan.md`)
+made the **ExecutorProfile** half real too: `executors.<id>.identity`
+(all four fields required together when declared) and `executors.<id>.supports`
+(each field independently optional) are now validated, additive config
+fields (`validateExecutorIdentityShape`/`validateExecutorSupportsShape`,
+same file) that survive `resolveExecutorAndOverrides` unchanged. Neither
+field has a real consumer yet — no resolution/dispatch/PlacementPolicy code
+reads `identity`/`supports` for any decision — this is metadata a later
+phase can build on, not a behavior change. `claude` is the one real
+executor declaring both today (`.fgos/config.json`), proving the shape end
+to end; every other `runner.executors.<id>` entry stays exactly as it was,
+and legacy executor ids remain fully accepted. **No executor-id
+consolidation or config-shape retirement has happened** (that is Phase E,
+not started) — this section still describes the fuller target the
+vocabulary is headed toward, not a completed migration.
 
 **ExecutorProfile** answers "which principal/backend/trust boundary is
 this?" — a stable runtime boundary, never a policy choice:
@@ -1223,8 +1237,11 @@ backend trust, or egress boundary materially (the same rule design.md's
 ProviderAdapter section already states for the shadow-mode Phase 01 module,
 `src/runner/dispatch/provider-adapter.mjs`).
 
-Migration targets a legacy config entry maps onto once this vocabulary is
-real config (Phase 07/08, not yet):
+Migration targets a legacy config entry maps onto once every executor
+consolidates onto this vocabulary (Phase D/E of
+`plans/260917-executor-profile-schema-migration/plan.md`, not yet — the
+`identity`/`supports` fields being real config, above, is not the same as
+this consolidation happening):
 
 | Legacy pattern | Target |
 |---|---|
@@ -1235,10 +1252,11 @@ real config (Phase 07/08, not yet):
 | bwrap/confinement encoded as a separate executor id | an invocation's confinement envelope, unless trust/egress genuinely differs |
 | account pool / credential home env on an executor (e.g. the retired `FGOS_CODEX_CREDENTIAL_HOMES`) | Provider Capacity Rotator's global `runner.providers.<provider>.accounts` inventory (`plans/260916-account-rotator/`) |
 
-A later migration can map `claude` + `claude-herdr` + reviewer aliases into
-one `ExecutorProfile` with multiple invocations, but Phase 06 does not
-perform that migration — it only makes the gap between current config and
-this target vocabulary machine-visible via `fgos doctor`.
+A later migration (Phase E) can map `claude` + `claude-reviewer` +
+`claude-reviewer-herdr` and similar id families into one `ExecutorProfile`
+with multiple invocations, but that consolidation has not happened —
+`fgos doctor`'s `executor-profile-warnings` check makes the gap between
+current config and this target vocabulary machine-visible in the meantime.
 
 ## CoordinationSession — điều phối agent Work-độc-lập (Step 08 Phase 00)
 
