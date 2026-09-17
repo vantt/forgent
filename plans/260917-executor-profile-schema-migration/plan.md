@@ -1,12 +1,9 @@
 # Executor profile schema migration — plan
 
-Status: Phase A merged to main (full `npm test` gate on main post-merge:
-7032 tests, 4 pre-existing failures, all independently confirmed present
-before this phase started -- zero new regressions). Phase B in progress.
-Phase C/D/E designed below, not started -- each needs its own dedicated
-implementation pass and explicit go-ahead before touching live
-`.fgos/config.json` schema or removing an executor id anything still
-references.
+Status: Phase A and B merged to main. Phase C/D/E designed below, not
+started -- each needs its own dedicated implementation pass and explicit
+go-ahead before touching live `.fgos/config.json` schema or removing an
+executor id anything still references.
 
 This is the deferred "later track" design.md §9 of
 `plans/260915-executor-policy-dispatch-seams/` named but never scoped:
@@ -102,7 +99,10 @@ explicit user instruction, same as that precedent.
 
 Status: Done. Implemented in worktree/branch
 `executor-profile-fallback-dispatch`, `src/runner/dispatch/assignment-runner.mjs`
-(+ new helper `attemptProviderCapacityFallback`), commit `<pending>`.
+(+ new helper `attemptProviderCapacityFallback`), commit `eb78cc0c`,
+merged to main as `7dd8ac3d`. Full `npm test` gate on main post-merge:
+7037 tests, 4 pre-existing failures (byte-identical to the pre-Phase-B
+baseline set), zero new regressions.
 
 ### Scope (as actually implemented -- revised from the original design below)
 
