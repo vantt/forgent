@@ -1110,21 +1110,16 @@ function validateExecutorSupportsShape(supports, label) {
 /**
  * Shape-check ONE `placementPolicy.readOnlyRedirects.<sourceExecutorId>`
  * entry: a bare candidate id, an array of candidate ids, or an object with
- * a `default` pool plus a per-operation `operations` override.
+ * a `default` pool plus a per-operation `operations` override. Each
+ * candidate may also be `{executor, invocation?}` (executor-id-
+ * consolidation Step 2), reusing `normalizePreferCandidates`'s own shape
+ * rule -- this validator only checks shape; `readOnlyRedirectPool` is
+ * still the one place that reads it, extracting `.executor` for its
+ * existing string-keyed selection algorithm.
  */
 function validateReadOnlyRedirectPoolShape(value, label) {
   const validatePool = (pool, poolLabel) => {
-    if (typeof pool === 'string') {
-      if (!pool.trim()) throw new RunnerConfigError(`runner config (${poolLabel}) must be a non-empty string when a bare string.`);
-      return;
-    }
-    if (Array.isArray(pool)) {
-      if (!pool.every((entry) => typeof entry === 'string' && entry.trim())) {
-        throw new RunnerConfigError(`runner config (${poolLabel}) must be an array of non-empty strings.`);
-      }
-      return;
-    }
-    throw new RunnerConfigError(`runner config (${poolLabel}) must be a string or an array of strings.`);
+    normalizePreferCandidates(pool, poolLabel);
   };
   if (typeof value === 'string' || Array.isArray(value)) {
     validatePool(value, label);

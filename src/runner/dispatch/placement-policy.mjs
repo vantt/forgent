@@ -308,9 +308,26 @@ export function resolveVerifiedPlacementModel({ cfg, executorId, workTier, legac
 // declaration IS that proof, not merely self-verified selection over an
 // opaque pool someone else handed it.
 export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
+  // executor-id-consolidation Step 2: a pool entry may be `{executor,
+  // invocation?}` (config.mjs's `normalizePreferCandidates` shape) as well
+  // as a bare string -- this function's own OUTPUT stays exactly the array
+  // of executor-id strings it always returned (a tested, public contract:
+  // `selectPlacementPolicyRedirectExecutor`'s hash-based DISTRIBUTION
+  // selection keys off those strings, unchanged). An object entry's own
+  // `invocation` pin, when present, is recovered separately by
+  // `readOnlyRedirectInvocationFor` below, once the executor id has
+  // already been chosen -- never folded into this array's own shape.
   const normalize = (value) => {
     if (typeof value === 'string' && value.trim()) return [value.trim()];
-    if (Array.isArray(value)) return value.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+    if (Array.isArray(value)) {
+      return value
+        .map((entry) => {
+          if (typeof entry === 'string') return entry.trim();
+          if (entry && typeof entry === 'object' && !Array.isArray(entry) && typeof entry.executor === 'string') return entry.executor.trim();
+          return undefined;
+        })
+        .filter((id) => typeof id === 'string' && id);
+    }
     return [];
   };
   const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
@@ -324,6 +341,29 @@ export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
     return normalize(configured.operations?.[operation] ?? configured.default);
   }
   return normalize(configured);
+}
+
+/**
+ * executor-id-consolidation Step 2: the invocation pin (if any) declared
+ * for `executorId` within the SAME raw `readOnlyRedirects` pool
+ * `readOnlyRedirectPool` above already read for this exact
+ * (sourceExecutorId, operation) pair -- a bare-string pool entry, or no
+ * matching entry at all, both mean "no pin" (`undefined`, Gate B2's own
+ * default applies). Deliberately a SEPARATE lookup rather than folded into
+ * `readOnlyRedirectPool`'s own return value: that array's shape (string[])
+ * is a tested, public contract this function does not disturb.
+ */
+export function readOnlyRedirectInvocationFor(cfg, sourceExecutorId, operation, executorId) {
+  const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
+  const raw = configured && typeof configured === 'object' && !Array.isArray(configured)
+    ? (configured.operations?.[operation] ?? configured.default)
+    : configured;
+  const rawArray = Array.isArray(raw) ? raw : (raw !== undefined ? [raw] : []);
+  const match = rawArray.find((entry) => {
+    if (typeof entry === 'string') return entry.trim() === executorId;
+    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.executor === executorId;
+  });
+  return match && typeof match === 'object' ? match.invocation : undefined;
 }
 
 /**

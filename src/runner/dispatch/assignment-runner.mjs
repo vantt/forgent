@@ -60,7 +60,7 @@ import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
-import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool } from './placement-policy.mjs';
+import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool, readOnlyRedirectInvocationFor } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -1468,6 +1468,15 @@ export async function executeAssignment(assignment, opts = {}) {
     isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude'
       ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
       : defaultExecutorId;
+  // executor-id-consolidation Step 2: the pool entry that named
+  // `resolvedExecutorId` may have pinned a specific invocation (Step 2.1's
+  // `id`) -- e.g. redirecting to a specific confined variant, not
+  // whichever invocation Gate B2's own "first via:cli" default happens to
+  // pick. `undefined` (no pin, or no redirect happened at all) leaves Gate
+  // B2's default completely unchanged.
+  const readOnlyRedirectInvocationId = resolvedExecutorId !== defaultExecutorId
+    ? readOnlyRedirectInvocationFor(cfg, defaultExecutorId, effectiveAssignment?.operation, resolvedExecutorId)
+    : undefined;
   effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
   // resolveAssignmentDispatchPolicy (inside compileDispatchPlan above) already
@@ -2086,7 +2095,14 @@ export async function executeAssignment(assignment, opts = {}) {
           executorId: resolvedExecutorId,
           fgosDir,
           attestRoot: effectiveCwd,
-          invocationId: fallbackInvocationId,
+          // Two independent, mutually-exclusive-in-practice substitution
+          // sources can each pin an invocation: the provider-capacity
+          // fallback's own confinement-preservation pick (above) always
+          // wins when both somehow apply; the read-only-redirect's own
+          // declared pin (computed earlier, at redirect time) is the
+          // fallback source; neither pins anything for the unsubstituted
+          // primary, leaving Gate B2's "first via:cli" default untouched.
+          invocationId: fallbackInvocationId ?? readOnlyRedirectInvocationId,
         });
       } catch (err) {
         const commandOutcome = {
