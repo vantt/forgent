@@ -454,9 +454,23 @@ Executor/invocation/tier/effort mapping already decided for this product
 line (doer/fixer -> `agy`'s `cli` invocation, reviewer -> `claude`'s
 `cli-readonly` invocation, red-team -> `codex`'s `cli-bypass` invocation),
 personas tuned for reading/writing/attacking real code. `claude`'s
-`cli-readonly` invocation resolves to Claude Opus at `analytical` tier and
+`cli-readonly` invocation resolves to Claude Opus at `flagship` tier and
 passes `--effort high`: high is the quality-first default for code review;
 reserve `xhigh`/`max` for a deliberately exceptional, long-running audit.
+
+Model-tier vocabulary (`model-tier-vocabulary-and-coordination-fallback`,
+2026-09-17): tiers are `nano/mini/standard/advanced/flagship/frontier`
+(cross-provider equivalence, `plans/260916-account-rotator/design.md`'s
+"Tier vocabulary"), not the old 5-value `lightweight/standard/creative/
+analytical/critical` vocab this section used before. Each role below also
+declares `fallbackExecutors`: an executor at the SAME modelTier on a
+different provider, so a real quota/auth refusal on the primary
+(Provider Capacity Rotator, account-rotator track) actually substitutes
+instead of dead-ending the round. `fallbackExecutors` is `string[]` of
+executor ids only -- it does not pin a specific invocation on the
+fallback (same limit `opPolicy.fallbackExecutors` already has; the
+fallback resolves through Gate B2's own default-invocation rule for
+whichever executor it lands on).
 
 `executor-id-consolidation` retired the former separate
 `agy-cli`/`agy-herdr`/`claude-reviewer`/`claude-reviewer-herdr`/
@@ -468,9 +482,9 @@ invocation IS its `cli` one) falls back to the executor's own default:
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
-  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
-  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+  { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
+  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
+  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
 ]
 ```
 
@@ -478,9 +492,9 @@ Fix-round roster:
 
 ```json
 "actors": [
-  { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer" },
-  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-rechecker" },
-  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "relentless-code-attacker" }
+  { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
+  { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["codex"] },
+  { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["claude"] }
 ]
 ```
 
@@ -490,13 +504,13 @@ diff/test/sha256 report, red-team `xxd` check -- all three settled):
 
 ```json
 "actors": [
-  { "id": "doer", "executor": "agy", "invocation": "herdr", "tier": "standard", "persona": "focused-code-implementer" },
-  { "id": "reviewer", "executor": "claude", "invocation": "herdr-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
-  { "id": "red-team", "executor": "codex", "invocation": "herdr", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+  { "id": "doer", "executor": "agy", "invocation": "herdr", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
+  { "id": "reviewer", "executor": "claude", "invocation": "herdr-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
+  { "id": "red-team", "executor": "codex", "invocation": "herdr", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
 ]
 ```
 
-`claude`'s `herdr-readonly` invocation uses the same Claude Opus analytical
+`claude`'s `herdr-readonly` invocation uses the same Claude Opus flagship
 tier and `--effort high` setting as `cli-readonly`.
 
 Same protocol, same request shape, same `--cwd` rule; each role runs in its
@@ -561,9 +575,9 @@ the worker's summary.
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
   ],
   "steps": [
     {
@@ -651,9 +665,9 @@ step per position, all resuming the same `coordinationId`:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer" },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-rechecker" },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "relentless-code-attacker" }
+    { "id": "fixer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "surgical-fixer", "fallbackExecutors": ["codex"] },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-rechecker", "fallbackExecutors": ["codex"] },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "relentless-code-attacker", "fallbackExecutors": ["claude"] }
   ],
   "steps": [
     { "type": "authorize", "as": "authRevise", "operationId": "revise-candidate", "targetActorId": "fixer", "authorizationId": "auth_codepanel_<change-slug>_fix1_revise", "invocationKey": "code-panel:<change-slug>:fix1:revise:1", "reason": "Reviewer HIGH-1 accepted; apply the fix." },
@@ -706,9 +720,9 @@ states why `AFFECTED_TESTS` already covered the blast radius without it:
   "coordinationId": "code-panel--<change-slug>",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer" },
-    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "analytical", "persona": "code-quality-reviewer" },
-    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "analytical", "persona": "edge-case-and-security-attacker" }
+    { "id": "doer", "executor": "agy", "invocation": "cli", "tier": "standard", "persona": "focused-code-implementer", "fallbackExecutors": ["codex"] },
+    { "id": "reviewer", "executor": "claude", "invocation": "cli-readonly", "tier": "flagship", "persona": "code-quality-reviewer", "fallbackExecutors": ["codex"] },
+    { "id": "red-team", "executor": "codex", "invocation": "cli-bypass", "tier": "flagship", "persona": "edge-case-and-security-attacker", "fallbackExecutors": ["claude"] }
   ],
   "steps": [
     {
