@@ -84,7 +84,7 @@ const NODE_FIELDS = new Set(['id', 'operations', 'transitions']);
 // at authorize/dispatch time (session-engine.mjs), never at definition-
 // validation time -- this module stays a pure, session-blind kernel and does
 // no actor-binding resolution of its own.
-const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'specialistSlotRef', 'activation', 'contextAccess']);
+const NODE_OPERATION_REF_FIELDS = new Set(['ref', 'actor', 'specialistSlotRef', 'activation', 'contextAccess', 'rechecks']);
 const ACTIVATION_FIELDS = new Set(['mode', 'maxInvocations']);
 
 // `activation` is scoped to the node-operation BINDING, never to the
@@ -948,6 +948,36 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileK
     }
     result.contextAccess = validateContextAccess(opRef.contextAccess, `${label}.contextAccess`, windowIds);
   }
+  // `rechecks` (session-engine quorum-close recheck-discharge fix): CoordinationProtocol-only,
+  // same structural reason as `contextAccess`/`specialistSlotRef` above -- the quorum-discharge
+  // mechanism this field feeds (`resolveRecheckDischarge`, session-engine.mjs) is a
+  // CoordinationSession-only concept. Cross-node/cross-actor/no-chain shape is validated in
+  // `validateGraph`'s post-pass below, once every node-operation-ref in the graph is available
+  // to check against -- this function only ever sees one binding at a time.
+  if (opRef.rechecks !== undefined) {
+    if (profileKind !== 'CoordinationProtocol') {
+      fail(`${label}.rechecks is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
+    }
+    if (!isNonEmptyString(opRef.rechecks)) fail(`${label}.rechecks must be a non-empty string when provided`);
+    if (!operationIds.has(opRef.rechecks)) {
+      fail(`${label}.rechecks "${opRef.rechecks}" does not reference a declared spec.operations[] id`);
+    }
+    if (opRef.rechecks === opRef.ref) {
+      fail(`${label}.rechecks "${opRef.rechecks}" must not name this same binding's own "ref" -- a recheck discharges a DIFFERENT, earlier gating operation, never itself`);
+    }
+    if (opRef.actor === undefined) {
+      fail(`${label}.rechecks requires a static "actor" binding -- a specialistSlotRef binding's occupant is not known until authorize time, so it cannot be declared as the fixed discharger of another binding's gating slot`);
+    }
+    // A recheck binding is, by definition, a LATER, conditional confirmation of an
+    // earlier required gating result -- it can never be `required` itself (that would
+    // make it gating on its own, defeating the whole "optional unless the driver
+    // authorizes a fix round" shape `activationModeOf`/`actorGatingOperationIds`
+    // already rely on for this exact fixture).
+    if ((result.activation?.mode ?? DEFAULT_ACTIVATION_MODE) !== 'driver-authorized') {
+      fail(`${label}.rechecks requires activation.mode "driver-authorized" -- a "required" binding cannot also be declared as a recheck of another gating operation`);
+    }
+    result.rechecks = opRef.rechecks;
+  }
   return Object.freeze(result);
 }
 
@@ -993,6 +1023,39 @@ function validateGraph(graph, operations, actors, profileKind, windowIds, slotsB
   nodes.forEach((node, i) => {
     node.transitions.forEach((target, j) => {
       if (!nodeIds.has(target)) fail(`spec.graph.nodes[${i}].transitions[${j}] "${target}" does not reference a declared node id`);
+    });
+  });
+
+  // `rechecks` cross-node/cross-actor/no-chain shape: each binding's own field shape
+  // (profile, non-empty string, references a declared operation, own activation mode)
+  // was already checked in `validateNodeOperationRef` above, one binding at a time --
+  // this pass needs the FULL graph (every node's every binding) to check that the
+  // named target binding genuinely exists elsewhere, for the SAME actor, and is not
+  // itself another recheck (no chains). `session-engine.mjs`'s `resolveRecheckDischarge`
+  // trusts this shape unconditionally at close time, so it is enforced here, once, at
+  // definition-validation time, rather than re-checked defensively at every close.
+  const bindingsByActorAndRef = new Map(); // `${actor} ${ref}` -> [{ nodeId, rechecks }]
+  nodes.forEach((node) => {
+    node.operations.forEach((opRef) => {
+      if (opRef.actor === undefined) return;
+      const key = `${opRef.actor} ${opRef.ref}`;
+      if (!bindingsByActorAndRef.has(key)) bindingsByActorAndRef.set(key, []);
+      bindingsByActorAndRef.get(key).push({ nodeId: node.id, rechecks: opRef.rechecks });
+    });
+  });
+  nodes.forEach((node, i) => {
+    node.operations.forEach((opRef, j) => {
+      if (opRef.rechecks === undefined) return;
+      const label = `spec.graph.nodes[${i}].operations[${j}]`;
+      const key = `${opRef.actor} ${opRef.rechecks}`;
+      const candidates = (bindingsByActorAndRef.get(key) ?? []).filter((c) => c.nodeId !== node.id);
+      if (candidates.length === 0) {
+        fail(`${label}.rechecks "${opRef.rechecks}" does not bind actor "${opRef.actor}" anywhere else in spec.graph.nodes -- a recheck must discharge a real, differently-positioned binding of the same actor, never itself or an unbound operation id`);
+      }
+      const chained = candidates.find((c) => c.rechecks !== undefined);
+      if (chained) {
+        fail(`${label}.rechecks "${opRef.rechecks}" targets a binding (node "${chained.nodeId}") that itself declares "rechecks" -- chained rechecks are not allowed, a recheck must target a genuine first-pass gating operation directly`);
+      }
     });
   });
 

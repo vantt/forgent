@@ -749,6 +749,22 @@ values each time) if a recheck itself surfaces a new accepted finding.
 
 ## 4. Close, then merge, then verify
 
+**A first-pass finding is discharged only by disposition + a satisfied
+recheck, never by disposition alone.** `review-candidate`/
+`red-team-candidate` reporting `findings` fails that gating slot in
+`closeSessionByQuorum`'s quorum check; `reviewer-recheck`/
+`red-team-recheck` each declare `rechecks: review-candidate` /
+`rechecks: red-team-candidate` (`standalone-master-coordination-loop.yaml`)
+so a LATER, satisfied recheck of the same actor can discharge that slot --
+but only once you have recorded a `driver-disposition-recorded` event
+against the specific failed assignment (any `disposition` step targeting
+it, any value -- the disposition's own text is never parsed). A `rejected`
+finding still needs its own recheck: the independent confirmation, not the
+disposition, is what actually closes the gap. Do not attempt `close.json`
+by skipping the recheck round once a finding is accepted -- it will refuse
+with `missing required actor(s)` until a real, satisfied recheck
+Assignment exists for the failed slot.
+
 **Close before merge, not after.** The target branch must never receive
 this cell's code before the close gate actually passed -- merging on an
 unclosed or failed session is not a supported door. `close.json` certifies

@@ -1395,6 +1395,15 @@ function declaredOperationBindingActors(definition, operationId) {
  * `respond` and Nominal-Group-Lite's `share`/`clarify` are ALL
  * `driver-authorized`, never `required`).
  *
+ * `reviewer-recheck`/`red-team-recheck`'s own `rechecks:` field (definitions/
+ * schema.mjs) plays NO role in this function's gating computation -- it stays
+ * excluded from the gating set exactly as above, ungated. `rechecks` is
+ * consumed only later, inside `classifySessionQuorum`'s own caller, by
+ * `resolveRecheckDischarge`, strictly to let a satisfied recheck DISCHARGE a
+ * different, already-gating operation's `failed` outcome -- it never makes the
+ * recheck binding itself gating, and a session with a clean first pass still
+ * closes with the recheck never dispatched, unchanged.
+ *
  * Returns `[]` when `actorId` has no gating binding anywhere in the graph
  * (every binding it has, if any, is an ungated driver-authorized one) --
  * `classifySessionQuorum`'s caller falls back to the pre-existing
@@ -1615,6 +1624,98 @@ function resolveBindingOutcome(definition, operationId, boundActorId, { events, 
     if (lastOutcome.satisfied) return { boundActorId, ...lastOutcome };
   }
   return { boundActorId, ...lastOutcome };
+}
+
+/**
+ * Discharges a FAILED required gating operation's slot via a driver-authorized
+ * recheck of the SAME actor -- but only when the driver has recorded an explicit
+ * disposition against the specific failed attempt AND a real, later,
+ * operation-stamped recheck Assignment for that SAME actor settled satisfied.
+ * Never inferred from role, graph adjacency, or naming -- only a `rechecks:`
+ * binding the protocol's own version-matched definition declares
+ * (`validateNodeOperationRef`/`validateGraph`, definitions/schema.mjs) may
+ * discharge another binding's gating slot at all. Called ONLY for
+ * `reason === 'failed'` outcomes (never `missing`/`late`) -- a driver can never
+ * skip the required first pass itself by authorizing rechecks alone.
+ *
+ * Anti-laundering invariants (each has its own case in
+ * coordination-recheck-discharge.test.mjs):
+ * - Only `assignmentServesOperation`-stamped assignments count, on the recheck
+ *   side checked here (the failed side is already true of the `failedOutcome`
+ *   the caller computed via `resolveBindingOutcome`) -- never a raw
+ *   event-payload operationId, taskKey, authorization reason, or
+ *   grantedContextRefs.
+ * - The recheck Assignment's own `assignment-created` event must be strictly
+ *   AFTER the failed attempt's LAST `result-linked` event in log order -- a
+ *   "recheck" that predates what it claims to recheck discharges nothing.
+ * - A `driver-disposition-recorded` event naming this EXACT failed assignmentId
+ *   as `targetRef` must exist (also after that same index) before any recheck
+ *   counts -- the disposition's own value/rationale is never parsed; recording
+ *   ANY disposition against the specific failed attempt is the auditable act
+ *   required, the same way `authorize`/`disposition` steps already are the
+ *   explicit driver acts everywhere else in this engine.
+ * - Same actor identity only, through the SAME `actor-replaced` lineage
+ *   `resolveBindingOutcome` already follows -- a different actor's satisfied
+ *   recheck never discharges this actor's slot.
+ * - Returns `null` (no discharge, caller falls back to `failed.push` exactly as
+ *   before) when no `rechecks` binding is declared for this actor+gating
+ *   operation, when no disposition was ever recorded against the failed
+ *   assignment, or when no recheck Assignment was ever dispatched at all --
+ *   only an actually-satisfied recheck attempt (or one that itself settled
+ *   `late`) changes the outcome.
+ */
+function resolveRecheckDischarge(definition, gatingOperationId, originalActorId, failedOutcome, { events, fgosDir, replacedBy }) {
+  let effectiveActorId = originalActorId;
+  const seen = new Set();
+  while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
+    seen.add(effectiveActorId);
+    effectiveActorId = replacedBy.get(effectiveActorId);
+  }
+
+  const recheckOperationIds = [];
+  for (const node of definition.spec.graph.nodes) {
+    for (const ref of node.operations) {
+      if (ref.actor === originalActorId && ref.rechecks === gatingOperationId && !recheckOperationIds.includes(ref.ref)) {
+        recheckOperationIds.push(ref.ref);
+      }
+    }
+  }
+  if (recheckOperationIds.length === 0) return null;
+
+  let lastFailedLinkedIndex = -1;
+  events.forEach((event, i) => {
+    if (event.type === 'result-linked' && event.payload.assignmentId === failedOutcome.assignmentId) {
+      lastFailedLinkedIndex = i;
+    }
+  });
+  // Should be unreachable (a `failed` outcome was itself classified from a
+  // `result-linked` event) -- fail closed (no discharge) rather than throw.
+  if (lastFailedLinkedIndex === -1) return null;
+
+  const hasDisposition = events.some(
+    (event, i) => i > lastFailedLinkedIndex && event.type === 'driver-disposition-recorded' && event.payload.targetRef === failedOutcome.assignmentId,
+  );
+  if (!hasDisposition) return null;
+
+  let lastOutcome = null;
+  for (const recheckOperationId of recheckOperationIds) {
+    const assignmentIds = events
+      .filter(
+        (event, i) =>
+          i > lastFailedLinkedIndex &&
+          event.type === 'assignment-created' &&
+          event.payload.actorId === effectiveActorId &&
+          assignmentServesOperation(definition, recheckOperationId, { assignmentId: event.payload.assignmentId, fgosDir }),
+      )
+      .map((event) => event.payload.assignmentId);
+    for (const assignmentId of assignmentIds) {
+      lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId);
+      if (lastOutcome.satisfied) {
+        return { ...lastOutcome, supersededAssignmentId: failedOutcome.assignmentId };
+      }
+    }
+  }
+  return lastOutcome;
 }
 
 /**
@@ -3503,16 +3604,32 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
       // failed/late/missing vocabulary this function's own fallback path
       // (below) uses, so both paths report through one shared vocabulary.
       const outcomes = gatingOperationIds.map((operationId) => resolveBindingOutcome(definition, operationId, originalActorId, { events, fgosDir, replacedBy }));
-      const unsatisfied = outcomes.find((outcome) => !outcome.satisfied);
-      if (!unsatisfied) {
+      const unsatisfiedIndex = outcomes.findIndex((outcome) => !outcome.satisfied);
+      if (unsatisfiedIndex === -1) {
         const last = outcomes[outcomes.length - 1];
         completed.push({ actorId: originalActorId, assignmentId: last.assignmentId, runId: last.runId });
-      } else if (unsatisfied.reason === 'missing') {
+        continue;
+      }
+      const unsatisfied = outcomes[unsatisfiedIndex];
+      if (unsatisfied.reason === 'missing') {
         missing.push({ actorId: originalActorId });
       } else if (unsatisfied.reason === 'late') {
         late.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId });
       } else {
-        failed.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId, runId: unsatisfied.runId });
+        // reason === 'failed': a declared `rechecks` binding may still discharge
+        // this slot -- see `resolveRecheckDischarge`'s own doc for every
+        // invariant checked before a later recheck ever stands in for a failed
+        // required first pass. Returns `null` (byte-identical fallback to
+        // `failed.push` below) whenever no such binding is declared.
+        const gatingOperationId = gatingOperationIds[unsatisfiedIndex];
+        const discharge = resolveRecheckDischarge(definition, gatingOperationId, originalActorId, unsatisfied, { events, fgosDir, replacedBy });
+        if (discharge && discharge.satisfied) {
+          completed.push({ actorId: originalActorId, assignmentId: discharge.assignmentId, runId: discharge.runId, supersededAssignmentId: discharge.supersededAssignmentId });
+        } else if (discharge && discharge.reason === 'late') {
+          late.push({ actorId: originalActorId, assignmentId: discharge.assignmentId });
+        } else {
+          failed.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId, runId: unsatisfied.runId });
+        }
       }
       continue;
     }

@@ -1314,6 +1314,24 @@ xem `docs/architect/agent-coordination/architecture/work-integration.md`).
 Chi tiết schema: `docs/architect/agent-coordination/contracts/coordination-session.md`;
 quyết định nền: `docs/architect/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`.
 
+**Recheck-discharge quorum fix (2026-09-18).** `closeSessionByQuorum`'s
+multi-operation-per-actor path (P10-KERNEL-FIX) trước đây chấm một gating
+operation bắt buộc (`review-candidate`/`red-team-candidate`) là `failed`
+VĨNH VIỄN một khi verdict là `findings` — dù fix-round sau đó
+(`reviewer-recheck`/`red-team-recheck`) đã pass sạch, vì hai operation id
+khác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `close.json`
+vì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù
+chỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần
+đầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:
+`FlowDefinition` binding thêm field `rechecks: <operationId>` (`definitions/
+schema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong
+`standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s
+`resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch
+SAU `result-linked` của attempt failed, VÀ đã có `driver-disposition-recorded`
+nhắm đúng assignment failed đó, mới được discharge slot — không suy luận
+theo role/graph-adjacency/naming, không parse nội dung disposition. Test:
+`test/runner/coordination-recheck-discharge.test.mjs`.
+
 ## Dispatch operability implementation slice (2026-09-16)
 
 Track `plans/260915-dispatch-operability-implementation/` implements the

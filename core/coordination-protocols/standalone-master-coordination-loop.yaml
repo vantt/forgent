@@ -29,6 +29,17 @@
 # (`produce-candidate`/`review-candidate`/`red-team-candidate`) stays
 # `required` -- it is what always runs, and it is what the driver reads
 # before deciding whether a revision round is warranted at all.
+#
+# `reviewer-recheck`/`red-team-recheck` each declare `rechecks:` naming the
+# first-pass gating operation they discharge (`review-candidate`/
+# `red-team-candidate`). A required first-pass operation that comes back
+# `findings` normally fails its gating slot permanently (`classifySessionQuorum`
+# only ever re-checks the SAME operation id for a retry) -- `rechecks` lets a
+# LATER, driver-authorized, satisfied recheck of the SAME actor discharge that
+# slot instead, but only once the driver has recorded a disposition against the
+# failed attempt (`resolveRecheckDischarge`, session-engine.mjs): the recheck
+# is evidence a real, independent worker looked again and found the accepted
+# fix sufficient, never a rubber stamp the driver could fabricate alone.
 
 apiVersion: fgos.dev/v1alpha1
 kind: FlowDefinition
@@ -160,8 +171,10 @@ spec:
             actor: reviewer
             activation:
               mode: driver-authorized
+            rechecks: review-candidate
           - ref: red-team-recheck
             actor: red-team
             activation:
               mode: driver-authorized
+            rechecks: red-team-candidate
         transitions: []
