@@ -43,7 +43,7 @@ explicitly instead of inheriting one.
 |---|---|---|---|
 | A | Remove genuinely dormant, zero-reference executor ids (`claude-herdr`, `pi-herdr`) | Done | commit `5bbd066c` (branch `executor-profile-schema-migration`) |
 | B | Real cross-provider PlacementPolicy fallback in production dispatch | Done | commit `eb78cc0c` (branch `executor-profile-fallback-dispatch`), merged `7dd8ac3d` |
-| C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `<pending>` (branch `executor-profile-identity-supports`) |
+| C | ExecutorProfile `identity`/`supports` made real, additive `executors.<id>` fields | Done | commit `69b95e38` (branch `executor-profile-identity-supports`), merged `daa85f7a` |
 | D | Migrate `readOnlyExecutorRedirects`' one live pool onto the new surface, retire the field | Not started, depends on C | -- |
 | E | Consolidate remaining executor ids into ExecutorProfiles (`claude`+`claude-reviewer`+`claude-reviewer-herdr` etc.), retire flat `executors.<id>` shape | Not started, depends on C/D, largest blast radius | -- |
 
@@ -252,7 +252,10 @@ provider/model-only re-derivation -- see "Scope" above.
 ## Phase C — ExecutorProfile JSON Schema + additive dual-shape support
 
 Status: Done. Implemented in worktree/branch
-`executor-profile-identity-supports`, commit `<pending>`.
+`executor-profile-identity-supports`, commit `69b95e38`, merged to main as
+`daa85f7a`. Full `npm test` gate on main post-merge: 7047 tests, 4
+pre-existing failures (byte-identical to the pre-Phase-C baseline set),
+zero new regressions.
 
 ### Scope (as actually implemented -- revised from the original design below)
 
