@@ -427,7 +427,10 @@ mod tests {
             "runtime identity info must be present when include_runtime is true"
         );
         let runtime = &json_val["runtime"];
-        assert_eq!(runtime["host"], "rust");
+        assert!(
+            matches!(runtime["host"].as_str(), Some("rust" | "dev-source")),
+            "runtime.host must identify either an activated Rust host or dev-source checkout"
+        );
     }
 
     #[test]

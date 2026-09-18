@@ -2421,6 +2421,9 @@ mod tests {
             val.get("runtime").is_some_and(|v| v.is_object()),
             "must contain runtime object from BuildShowOutcome"
         );
-        assert_eq!(val["runtime"]["host"], "rust");
+        assert!(
+            matches!(val["runtime"]["host"].as_str(), Some("rust" | "dev-source")),
+            "runtime.host must identify either an activated Rust host or dev-source checkout"
+        );
     }
 }

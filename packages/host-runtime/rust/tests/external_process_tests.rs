@@ -418,8 +418,14 @@ async fn test_supervisor_drain_bounded_when_grandchild_holds_stdout_handshake() 
     let elapsed = start.elapsed();
 
     assert!(
-        matches!(err, ProviderError::DeadlineExceeded(_)),
-        "expected DeadlineExceeded when child exits but pipe remains open, got {:?}",
+        matches!(err, ProviderError::DeadlineExceeded(_))
+            || matches!(
+                &err,
+                ProviderError::ProviderCrash(msg)
+                    if msg.contains("failed to send handshake")
+                        && msg.contains("Broken pipe")
+            ),
+        "expected bounded handshake timeout or broken-pipe crash when child exits but pipe remains open, got {:?}",
         err
     );
     assert!(

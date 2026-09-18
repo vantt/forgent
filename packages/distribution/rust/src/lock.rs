@@ -80,14 +80,13 @@ pub fn parse_lock_content(raw: &str) -> Option<LockRecord> {
         } else {
             return None;
         }
-    } else if let Some(s) = pid_val.as_str() {
+    } else {
+        let s = pid_val.as_str()?;
         if !s.is_empty() {
             LockHolderIdentity::String(s.to_string())
         } else {
             return None;
         }
-    } else {
-        return None;
     };
 
     let ts = match ts_val.as_u64() {
