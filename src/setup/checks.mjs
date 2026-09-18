@@ -20,4 +20,5 @@ export {
   mainCheckoutHookWired,
   ensureSharedConfigDefaults,
   checkConfinementHerdrMaturity,
+  checkAgySubHomesConfigured,
 } from './registrations.mjs';

@@ -285,3 +285,120 @@ export function removeCodexTrust(configPath, projectPath) {
   }
   return true;
 }
+
+// ---------------------------------------------------------------------------
+// The same policy, a third format: agy (Antigravity CLI).
+//
+// agy records trusted workspaces in `~/.gemini/antigravity-cli/settings.json`
+// (or under the directory pointed to by $HOME) in a `trustedWorkspaces` string
+// array of absolute paths. When agy launches in an untrusted directory (e.g. a
+// fresh worktree), it shows a blocking folder-trust dialog that causes herdr
+// to report `agent_not_ready`.
+//
+// Best-effort: reads settings.json (or starts fresh if missing), appends
+// projectPath and repoRoot to trustedWorkspaces, writes atomically, and never
+// throws.
+
+/** Read agy's settings.json to check whether a path is trusted. */
+export function readAgyTrust(settingsPath, projectPath) {
+  try {
+    if (typeof settingsPath !== 'string' || typeof projectPath !== 'string') return null;
+    if (!fs.existsSync(settingsPath)) return null;
+    const raw = fs.readFileSync(settingsPath, 'utf8');
+    const store = JSON.parse(raw);
+    if (!Array.isArray(store?.trustedWorkspaces)) return null;
+    return store.trustedWorkspaces.includes(path.resolve(projectPath));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Trust a workspace for agy by adding projectPath and repoRoot to agy's
+ * `trustedWorkspaces` list in settings.json.
+ *
+ * Best-effort and idempotent: writes atomically and never throws.
+ */
+export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
+  try {
+    if (typeof settingsPath !== 'string' || !settingsPath.trim()) return false;
+
+    const toAdd = [];
+    if (typeof projectPath === 'string' && projectPath.trim()) {
+      toAdd.push(path.resolve(projectPath));
+    }
+    if (typeof repoRoot === 'string' && repoRoot.trim()) {
+      toAdd.push(path.resolve(repoRoot));
+    }
+    if (toAdd.length === 0) return false;
+
+    let store = {};
+    if (fs.existsSync(settingsPath)) {
+      try {
+        const raw = fs.readFileSync(settingsPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          store = parsed;
+        }
+      } catch {
+        store = {};
+      }
+    }
+
+    const current = Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : [];
+    const set = new Set(current);
+    let changed = false;
+
+    for (const p of toAdd) {
+      if (!set.has(p)) {
+        set.add(p);
+        changed = true;
+      }
+    }
+
+    if (!changed) return false;
+
+    store.trustedWorkspaces = Array.from(set);
+
+    const dir = path.dirname(settingsPath);
+    fs.mkdirSync(dir, { recursive: true });
+    const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
+    try {
+      fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
+      fs.renameSync(tmp, settingsPath);
+    } catch {
+      try { fs.unlinkSync(tmp); } catch {}
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Drop one workspace's agy trust entry. Returns whether anything was there. */
+export function removeAgyTrust(settingsPath, projectPath) {
+  try {
+    if (typeof settingsPath !== 'string' || typeof projectPath !== 'string') return false;
+    if (!fs.existsSync(settingsPath)) return false;
+    const raw = fs.readFileSync(settingsPath, 'utf8');
+    const store = JSON.parse(raw);
+    if (!Array.isArray(store?.trustedWorkspaces)) return false;
+    const absPath = path.resolve(projectPath);
+    const idx = store.trustedWorkspaces.indexOf(absPath);
+    if (idx === -1) return false;
+    store.trustedWorkspaces.splice(idx, 1);
+    const dir = path.dirname(settingsPath);
+    const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
+    try {
+      fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
+      fs.renameSync(tmp, settingsPath);
+    } catch {
+      try { fs.unlinkSync(tmp); } catch {}
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}

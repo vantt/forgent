@@ -547,7 +547,10 @@
             ],
             "interactiveMode": {
               "exitCommand": "/exit",
-              "kind": "agy"
+              "kind": "agy",
+              "trustStore": {
+                "kind": "agy"
+              }
             },
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"

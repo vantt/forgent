@@ -105,6 +105,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'doc-role-underused',
       'doc-source-conservation',
       'agy-permissions-configured',
+      'agy-sub-homes-configured',
       'bwrap-available',
       'main-checkout-guard-warnings',
       'events-compaction-verified',

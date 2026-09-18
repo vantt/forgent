@@ -34,7 +34,7 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
-import { checkAgyPermissionsConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
+import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
   resolveMachineBackendRegistryPath,
@@ -86,6 +86,7 @@ import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
+export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
 
 const MIN_NODE_MAJOR = 18;
 
@@ -1068,6 +1069,12 @@ registerCheck({
 registerFix({
   id: 'agy-permissions-configured',
   fix: () => fixAgyPermissionsConfigured(),
+});
+
+registerCheck({
+  id: 'agy-sub-homes-configured',
+  description: 'agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed',
+  check: (cwd) => checkAgySubHomesConfigured(cwd),
 });
 
 let cachedBwrapResult = null;

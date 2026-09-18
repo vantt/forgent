@@ -28,6 +28,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { mergeConfigDefaults } from './config-merge.mjs';
+import { readSharedConfig } from '../config/shared-config-file.mjs';
 
 /**
  * Deny-rules chosen to mirror this repo's own already-documented incident
@@ -68,18 +69,19 @@ export const AGY_PERMISSIONS_DEFAULT = {
  * Round 1: confirmed the only agy settings file on this machine, shared
  * across every workspace/session, no per-project override exists).
  */
-export function agySettingsPath() {
-  return path.join(os.homedir(), '.gemini', 'antigravity-cli', 'settings.json');
+export function agySettingsPath(homeDir = os.homedir()) {
+  return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
 }
 
 /**
- * Reads and parses agy's settings.json. Never throws: a missing file
- * reads as `{}` (nothing configured yet), and an unparseable file also
- * reads as `{}` rather than crashing `doctor`/`setup` on a file this
- * module does not own the shape of.
+ * Reads and parses agy's settings.json for the given home directory
+ * (defaults to real $HOME). Never throws: a missing file reads as `{}`
+ * (nothing configured yet), and an unparseable file also reads as `{}`
+ * rather than crashing `doctor`/`setup` on a file this module does not
+ * own the shape of.
  */
-export function readAgySettings() {
-  const settingsPath = agySettingsPath();
+export function readAgySettings(homeDir = os.homedir()) {
+  const settingsPath = agySettingsPath(homeDir);
   if (!fs.existsSync(settingsPath)) {
     return {};
   }
@@ -102,8 +104,8 @@ export function readAgySettings() {
  * failure would fight the same "never touch a value the user already
  * has" contract the fix follows.
  */
-export function checkAgyPermissionsConfigured() {
-  const settings = readAgySettings();
+export function checkAgyPermissionsConfigured(homeDir = os.homedir()) {
+  const settings = readAgySettings(homeDir);
   const toolPermission = settings.toolPermission;
   const denyList = settings.permissions?.deny;
   const denyConfigured = Array.isArray(denyList) && denyList.length > 0;
@@ -129,9 +131,9 @@ export function checkAgyPermissionsConfigured() {
  * byte-identical. Idempotent: a second run makes no further change once
  * both keys are present.
  */
-export function fixAgyPermissionsConfigured() {
-  const settingsPath = agySettingsPath();
-  const existing = readAgySettings();
+export function fixAgyPermissionsConfigured(homeDir = os.homedir()) {
+  const settingsPath = agySettingsPath(homeDir);
+  const existing = readAgySettings(homeDir);
   const { merged, addedKeys } = mergeConfigDefaults(existing, AGY_PERMISSIONS_DEFAULT);
   if (addedKeys.length === 0) {
     return { changed: false, message: 'agy settings.json already has toolPermission + permissions.deny — nothing to fix' };
@@ -139,4 +141,171 @@ export function fixAgyPermissionsConfigured() {
   fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
   fs.writeFileSync(settingsPath, `${JSON.stringify(merged, null, 2)}\n`);
   return { changed: true, message: `agy settings.json: added ${addedKeys.join(', ')}` };
+}
+
+/**
+ * Resolves a raw HOME path (e.g. "${HOME}/.agy-homes/mucdong" or "~/.agy-homes/mucdong")
+ * using the provided home directory.
+ */
+export function resolveSubHomePath(rawPath, homeDir = process.env.HOME || os.homedir()) {
+  if (typeof rawPath !== 'string') return '';
+  return rawPath
+    .replace(/\$\{HOME\}/g, homeDir)
+    .replace(/\$HOME\b/g, homeDir)
+    .replace(/^~(?=\/|$)/, homeDir);
+}
+
+/**
+ * Finds all agy sub-HOMEs referenced in executor configs (from `.fgos/config.json` env.HOME fields).
+ *
+ * Scans `runner.executor` and `runner.executors.*` (including their `invocations`), looking for
+ * `env.HOME` declared on agy invocations or pointing to agy-homes directories.
+ *
+ * @param {string} [cwd] Working directory containing `.fgos/config.json`
+ * @param {object} [opts]
+ * @param {string} [opts.homeDir] Base home directory for expanding `${HOME}` (defaults to real $HOME)
+ * @param {object} [opts.config] Pre-loaded config object (if already read)
+ * @returns {Array<{ rawPath: string, resolvedPath: string, executorId?: string, invocationId?: string }>}
+ */
+export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOME || os.homedir(), config = null } = {}) {
+  let cfg = config;
+  if (!cfg) {
+    try {
+      cfg = readSharedConfig(cwd);
+    } catch {
+      return [];
+    }
+  }
+
+  const results = [];
+  const seenPaths = new Set();
+
+  function checkEnv(env, { executorId, invocationId, command }) {
+    if (!env || typeof env !== 'object' || typeof env.HOME !== 'string') return;
+    const rawPath = env.HOME.trim();
+    if (!rawPath) return;
+
+    const isAgy = command === 'agy' ||
+      executorId === 'agy' ||
+      (typeof invocationId === 'string' && invocationId.includes('agy')) ||
+      rawPath.includes('agy-homes');
+
+    if (!isAgy) return;
+
+    const resolved = path.resolve(resolveSubHomePath(rawPath, homeDir));
+    if (!seenPaths.has(resolved)) {
+      seenPaths.add(resolved);
+      results.push({
+        rawPath,
+        resolvedPath: resolved,
+        executorId,
+        invocationId,
+      });
+    }
+  }
+
+  const runner = cfg?.runner;
+  if (!runner) return results;
+
+  // Single executor format: runner.executor
+  if (runner.executor && typeof runner.executor === 'object') {
+    checkEnv(runner.executor.env, {
+      executorId: 'executor',
+      command: runner.executor.command,
+    });
+    if (Array.isArray(runner.executor.invocations)) {
+      for (const inv of runner.executor.invocations) {
+        if (inv && typeof inv === 'object') {
+          checkEnv(inv.env, {
+            executorId: 'executor',
+            invocationId: inv.id,
+            command: inv.command ?? runner.executor.command,
+          });
+        }
+      }
+    }
+  }
+
+  // Multi-executor format: runner.executors
+  if (runner.executors && typeof runner.executors === 'object') {
+    for (const [executorId, exec] of Object.entries(runner.executors)) {
+      if (!exec || typeof exec !== 'object') continue;
+      checkEnv(exec.env, {
+        executorId,
+        command: exec.command,
+      });
+      if (Array.isArray(exec.invocations)) {
+        for (const inv of exec.invocations) {
+          if (inv && typeof inv === 'object') {
+            checkEnv(inv.env, {
+              executorId,
+              invocationId: inv.id,
+              command: inv.command ?? exec.command,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Doctor check: verifies that each agy sub-HOME referenced in executor configs
+ * has its own settings.json with toolPermission: "always-proceed".
+ *
+ * @param {string} [cwd] Working directory containing `.fgos/config.json`
+ * @param {object} [opts]
+ * @param {string} [opts.homeDir] Base home directory for expanding `${HOME}`
+ * @param {object} [opts.config] Pre-loaded config object
+ * @returns {{ passed: boolean, message: string }}
+ */
+export function checkAgySubHomesConfigured(cwd = process.cwd(), { homeDir = process.env.HOME || os.homedir(), config = null } = {}) {
+  const subHomes = findAgySubHomes(cwd, { homeDir, config });
+  if (subHomes.length === 0) {
+    return {
+      passed: true,
+      message: 'no agy sub-HOMEs referenced in executor configs — nothing to check',
+    };
+  }
+
+  const missing = [];
+  const misconfigured = [];
+  const passed = [];
+
+  for (const { rawPath, resolvedPath } of subHomes) {
+    const settingsPath = agySettingsPath(resolvedPath);
+    if (!fs.existsSync(settingsPath)) {
+      missing.push(`${rawPath} (${settingsPath} not found)`);
+      continue;
+    }
+    const settings = readAgySettings(resolvedPath);
+    if (settings.toolPermission !== 'always-proceed') {
+      misconfigured.push(
+        `${rawPath} (${settingsPath}: toolPermission is "${settings.toolPermission ?? 'missing'}", must be "always-proceed")`,
+      );
+      continue;
+    }
+    passed.push(rawPath);
+  }
+
+  if (missing.length > 0 || misconfigured.length > 0) {
+    const problems = [];
+    if (missing.length > 0) {
+      problems.push(`missing settings.json: ${missing.join(', ')}`);
+    }
+    if (misconfigured.length > 0) {
+      problems.push(`misconfigured settings.json: ${misconfigured.join(', ')}`);
+    }
+    return {
+      passed: false,
+      message: `agy sub-HOME check failed (${problems.join('; ')}) — each sub-HOME must have .gemini/antigravity-cli/settings.json with toolPermission: "always-proceed"`,
+    };
+  }
+
+  return {
+    passed: true,
+    message: `all ${subHomes.length} agy sub-HOME(s) configured (${passed.join(', ')}) with toolPermission=always-proceed`,
+  };
 }
