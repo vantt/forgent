@@ -28242,6 +28242,29 @@
       },
       "claimRole": "session",
       "branchHeadAtTake": "3799b0f6fa2f6445446b7703f090c289b8219ba9"
+    },
+    "tsk-5db": {
+      "tier": "light",
+      "id": "tsk-5db",
+      "title": "Shape executor identity vs execution policy: distill the reviewer discussion, baseline snapshot,",
+      "description": "Shape executor identity vs execution policy: distill the reviewer discussion, baseline snapshot, and final invariants into docs/history/executor-identity-vs-execution-policy/DISCUSSION.md before ADR/spec work.",
+      "kind": "docs",
+      "status": "doing",
+      "deps": [],
+      "risk": "light",
+      "refs": [
+        "docs/history/executor-identity-vs-execution-policy/DISCUSSION.md#design"
+      ],
+      "verify": "chưa xác định — P15 bổ sung",
+      "mode": "sync",
+      "stage": "clarify",
+      "statusCategory": "in-progress",
+      "writer": {
+        "id": 2548,
+        "source": "pid"
+      },
+      "claimRole": "session",
+      "branchHeadAtTake": "8fa01e5d9d1e0fd8be719a0643c279202cde4178"
     }
   },
   "decisions": [
@@ -63059,6 +63082,97 @@
       "kind": "engine",
       "source": "session",
       "ts": "2026-08-24T00:30:50.443Z"
+    },
+    {
+      "text": "D-EXECPOL-01: ExecutorProfile defines stable execution boundary; ExecutionPolicy defines one-run semantic requirements.",
+      "rationale": "Separates account/backend/trust/invocation capability from persona/model/tier/effort/business behavior, preventing executor-as-role/model sprawl.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:27.699Z"
+    },
+    {
+      "text": "D-EXECPOL-02: Project-bound placement pins use placementPolicyRef or typed inlinePlacementPolicy, not generic semantic policy literals.",
+      "rationale": "Keeps portable FlowDefinitions portable and gives placement policy its own lifecycle/provenance.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:28.080Z"
+    },
+    {
+      "text": "D-EXECPOL-03: Executor identity only includes boundaries enforced outside child argv; argv flags do not create executor identity.",
+      "rationale": "Prevents read-only/model/effort flags from recreating claude-reviewer or codex-readonly under fingerprint vocabulary.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:28.475Z"
+    },
+    {
+      "text": "D-EXECPOL-04: Confinement is normally an invocation envelope, not executor identity.",
+      "rationale": "Avoids multiplying profiles by sandbox backend while still allowing placement to validate confinement guarantees.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:28.864Z"
+    },
+    {
+      "text": "D-EXECPOL-05: Permission/read-only is an operation or business-case contract checked at bind, not a normal merge field or alias payload.",
+      "rationale": "Prevents silent degradation of mutating work into read-only work and keeps compatibility aliases from changing task meaning.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:29.245Z"
+    },
+    {
+      "text": "D-EXECPOL-06: Quality splits into ordinal minRigor and nominal mode; raise-only applies only to minRigor.",
+      "rationale": "The current tier enum mixes strength with posture, making creative/analytical monotonic comparisons semantically wrong.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:29.632Z"
+    },
+    {
+      "text": "D-EXECPOL-07: Legacy tier bridge produces implied mode; explicit mode beats persona-implied mode, which beats tier-bridge-implied mode.",
+      "rationale": "Protects business-case/persona posture such as red-team adversarial from being overwritten by legacy tier compatibility flags.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:30.008Z"
+    },
+    {
+      "text": "D-EXECPOL-08: reasoningEffort defaults from minRigor, not mode.",
+      "rationale": "Mode is posture, while effort is runtime budget.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:30.390Z"
+    },
+    {
+      "text": "D-EXECPOL-09: BusinessCasePreset owns semantic defaults; PlacementPolicy owns provider/model/executor ranking and replaces legacy scattered placement sources.",
+      "rationale": "Prevents presets or capabilities from becoming another hidden placement-policy registry.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:30.759Z"
+    },
+    {
+      "text": "D-EXECPOL-10: ProviderAdapter renders canonical runtime options; transport only spawns rendered invocation.",
+      "rationale": "Ensures runtime flags have DispatchPlan provenance and transport does not choose policy.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:31.136Z"
+    },
+    {
+      "text": "D-EXECPOL-11: Resolved persona must be delivered through PromptEnvelope with delivery provenance.",
+      "rationale": "Policy provenance is misleading unless the worker receives the persona via system slot or prompt section.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:31.499Z"
+    },
+    {
+      "text": "D-EXECPOL-12: Governance may veto or require approval but must not lower rigor/permission and continue silently.",
+      "rationale": "Keeps governance from causing silent quality or safety downgrade.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:31.887Z"
+    },
+    {
+      "text": "D-EXECPOL-13: Migration starts with a golden baseline snapshot before claiming no behavior change.",
+      "rationale": "Catalog recalibration and alias equivalence cannot be proven by architecture reasoning alone.",
+      "source": "session",
+      "id": "tsk-5db",
+      "ts": "2026-09-15T07:57:32.264Z"
     }
   ],
   "discovery": {
@@ -103396,6 +103510,16 @@
         "priorVisits": 0,
         "role": "session",
         "branchHeadAtTake": "3799b0f6fa2f6445446b7703f090c289b8219ba9"
+      }
+    },
+    "tsk-5db": {
+      "id": "tsk-5db",
+      "predicted": {
+        "tier": "light",
+        "deps": 0,
+        "priorVisits": 0,
+        "role": "session",
+        "branchHeadAtTake": "8fa01e5d9d1e0fd8be719a0643c279202cde4178"
       }
     }
   },
@@ -146370,6 +146494,99 @@
         "rationale": "plan.md's Step 4: one honest piece -- a single additive CLI-level regression test, already written and verified green, no split warranted",
         "ts": "2026-08-24T00:30:40.437Z"
       }
+    ],
+    "tsk-5db": [
+      {
+        "text": "D-EXECPOL-01: ExecutorProfile defines stable execution boundary; ExecutionPolicy defines one-run semantic requirements.",
+        "rationale": "Separates account/backend/trust/invocation capability from persona/model/tier/effort/business behavior, preventing executor-as-role/model sprawl.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:27.699Z"
+      },
+      {
+        "text": "D-EXECPOL-02: Project-bound placement pins use placementPolicyRef or typed inlinePlacementPolicy, not generic semantic policy literals.",
+        "rationale": "Keeps portable FlowDefinitions portable and gives placement policy its own lifecycle/provenance.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:28.080Z"
+      },
+      {
+        "text": "D-EXECPOL-03: Executor identity only includes boundaries enforced outside child argv; argv flags do not create executor identity.",
+        "rationale": "Prevents read-only/model/effort flags from recreating claude-reviewer or codex-readonly under fingerprint vocabulary.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:28.475Z"
+      },
+      {
+        "text": "D-EXECPOL-04: Confinement is normally an invocation envelope, not executor identity.",
+        "rationale": "Avoids multiplying profiles by sandbox backend while still allowing placement to validate confinement guarantees.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:28.864Z"
+      },
+      {
+        "text": "D-EXECPOL-05: Permission/read-only is an operation or business-case contract checked at bind, not a normal merge field or alias payload.",
+        "rationale": "Prevents silent degradation of mutating work into read-only work and keeps compatibility aliases from changing task meaning.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:29.245Z"
+      },
+      {
+        "text": "D-EXECPOL-06: Quality splits into ordinal minRigor and nominal mode; raise-only applies only to minRigor.",
+        "rationale": "The current tier enum mixes strength with posture, making creative/analytical monotonic comparisons semantically wrong.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:29.632Z"
+      },
+      {
+        "text": "D-EXECPOL-07: Legacy tier bridge produces implied mode; explicit mode beats persona-implied mode, which beats tier-bridge-implied mode.",
+        "rationale": "Protects business-case/persona posture such as red-team adversarial from being overwritten by legacy tier compatibility flags.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:30.008Z"
+      },
+      {
+        "text": "D-EXECPOL-08: reasoningEffort defaults from minRigor, not mode.",
+        "rationale": "Mode is posture, while effort is runtime budget.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:30.390Z"
+      },
+      {
+        "text": "D-EXECPOL-09: BusinessCasePreset owns semantic defaults; PlacementPolicy owns provider/model/executor ranking and replaces legacy scattered placement sources.",
+        "rationale": "Prevents presets or capabilities from becoming another hidden placement-policy registry.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:30.759Z"
+      },
+      {
+        "text": "D-EXECPOL-10: ProviderAdapter renders canonical runtime options; transport only spawns rendered invocation.",
+        "rationale": "Ensures runtime flags have DispatchPlan provenance and transport does not choose policy.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:31.136Z"
+      },
+      {
+        "text": "D-EXECPOL-11: Resolved persona must be delivered through PromptEnvelope with delivery provenance.",
+        "rationale": "Policy provenance is misleading unless the worker receives the persona via system slot or prompt section.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:31.499Z"
+      },
+      {
+        "text": "D-EXECPOL-12: Governance may veto or require approval but must not lower rigor/permission and continue silently.",
+        "rationale": "Keeps governance from causing silent quality or safety downgrade.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:31.887Z"
+      },
+      {
+        "text": "D-EXECPOL-13: Migration starts with a golden baseline snapshot before claiming no behavior change.",
+        "rationale": "Catalog recalibration and alias equivalence cannot be proven by architecture reasoning alone.",
+        "source": "session",
+        "id": "tsk-5db",
+        "ts": "2026-09-15T07:57:32.264Z"
+      }
     ]
   },
   "tools": {
@@ -146391,5 +146608,5 @@
       "description": "herdr pane label writer (herdr pane rename) for /fgOS:terminal"
     }
   },
-  "revision": "bd7fe05372bab3c58e7f36d706c1d61aa9f13b1efb147b7610f3a0a1a02b3ef4"
+  "revision": "ba5bd1f2eff3701ca3cf5aa4c60a081dd24cc41673bee6d8270a25522c659aee"
 }

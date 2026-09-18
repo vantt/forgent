@@ -77,7 +77,10 @@ and the preview parts of Phase B/C are closed. Stable/default graduation still
 requires packaging-distribution or release-owner decisions. Phase F now has
 its precondition satisfied (Phase E delivered `fixture.echo.echo`, a semantic
 operation that is not only a built-in CLI route) and can proceed on its own
-rollout plan.
+rollout plan. As of the 2026-09-18 code scan, Phase F has started: the R3-P1
+remote projector/presenter adapter exists in `herdr-plugin/src/remote_invocation.rs`
+and its focused tests pass; the remaining work is R3-P2 through R3-P5 in
+[r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -207,6 +210,11 @@ Closed 2026-09-15 (all sub-tasks above done via R2-P0 through R2-P5). Done when:
 Goal: prove a project-local remote host is a peer of CLI for at least one native operation.
 
 Detailed rollout plan: [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
+
+Current status: R3-P0 route/contract freeze is closed and R3-P1 adapter proof
+is implemented preview. `GET /v1/runtime` is not wired in
+`herdr-plugin/src/gateway.rs` yet, so the next implementation frontier is
+R3-P2 gateway route wiring followed by R3-P3 no-shell/no-`fgos.v1` proof.
 
 Host-invocation tasks:
 

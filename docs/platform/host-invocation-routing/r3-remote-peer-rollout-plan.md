@@ -5,7 +5,7 @@ Document type: Implementation plan
 Audience: Code-panel coordinator, implementation agent, reviewer, red-team
 Purpose: Break R3 production remote peer proof into independently reviewable packets
 Design status: Draft
-Implementation status: Planned (R3-P0 route/contract frozen; R3-P1+ not started)
+Implementation status: In progress (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2+ not started)
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Derived from host-invocation R3 proof gate, host use cases, and gateway context scan
@@ -72,7 +72,7 @@ Selected: option 2, `distribution.build.show`, exposed as `GET /v1/runtime`.
   peer-host equivalence on an operation R1 has already proven for the CLI
   host, instead of introducing a route neither host has exercised yet.
 
-Full frozen contract is recorded in [§5 R3-P0](#r3-p0-route-and-contract-freeze) below and in
+Full frozen contract is recorded in [§6 R3-P0](#r3-p0-route-and-contract-freeze) below and in
 [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md).
 
 ## 3. Non-Goals
@@ -87,26 +87,45 @@ Full frozen contract is recorded in [§5 R3-P0](#r3-p0-route-and-contract-freeze
   owns runtime selection; R3 consumes the selected project-local runtime.
 - Do not implement chat host semantics.
 
-## 4. Packet Queue
+## 4. Current Code Scan
 
-| Packet | Goal | Likely surfaces | Depends on |
+Scan date: 2026-09-18.
+
+| Surface | Status | Evidence | Meaning for plan |
 | --- | --- | --- | --- |
-| R3-P0 | Select the first route and freeze remote contract shape | R3 proof doc, gateway API contract note, host-use-cases docs | R2 decision if using R2 fixture |
-| R3-P1 | Add remote projector/presenter adapter around `InvocationService` | host-runtime or gateway adapter module, unit tests | R3-P0 |
-| R3-P2 | Wire one gateway route to the adapter | `herdr-plugin/src/gateway.rs` or owning gateway route module, API tests | R3-P1 |
-| R3-P3 | Prove no CLI shelling or `fgos.v1` parsing for the selected route | gateway tests, spy/fake VerbGateway tests | R3-P2 |
-| R3-P4 | Document consumer list for remaining `VerbGateway` routes | R3 proof doc, compatibility harness, gateway docs | R3-P2 |
-| R3-P5 | Closeout and status update | implementation alignment, R3 proof, roadmap | R3-P3, R3-P4 |
+| Remote projector/presenter adapter | Implemented preview | `herdr-plugin/src/remote_invocation.rs`; `herdr-plugin/src/lib.rs` exports `remote_invocation`; `herdr-plugin/Cargo.toml` depends on `fgos-host-runtime` and `fgos-distribution`. | Treat R3-P1 as code-present and verify/adjust only; do not reimplement from scratch. |
+| R3-P1 focused tests | Passing | `cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet` passed 9 tests on 2026-09-18. | P1 has enough proof to be adopted as the base for P2. |
+| Gateway route wiring | Not implemented | `herdr-plugin/src/gateway.rs`'s authenticated router has no `/runtime` route. | R3-P2 is the next implementation packet. |
+| Gateway no-shell/no-parse proof | Not implemented for the route | No `GET /v1/runtime` route exists yet, so route-level proof cannot exist yet. | R3-P3 follows P2 and must harden the regression boundary. |
+| Remaining `VerbGateway` consumer inventory | Not closed | Existing gateway routes still route through `VerbGateway`; docs do not yet list the post-R3 consumer set. | R3-P4 stays explicit; R3 must not overclaim whole-gateway migration. |
+
+## 5. Full Execution Track
+
+Run R3 as one code-panel track, but keep the packets independently reviewable.
+The track should not stop after each packet unless a proof fails or a reviewer
+finds a boundary violation.
+
+| Packet | Goal | Required action | Required proof | Status |
+| --- | --- | --- | --- | --- |
+| R3-P0 | Select the first route and freeze remote contract shape | Keep `GET /v1/runtime` -> `distribution.build.show` as the selected route. Do not reopen unless code reality invalidates it. | Docs name endpoint, auth, request projection, response shape, error policy, and non-goals. | Closed docs-only. |
+| R3-P1 | Add remote projector/presenter adapter around `InvocationService` | Adopt existing `herdr-plugin/src/remote_invocation.rs`; adjust only if P2 exposes a real contract mismatch. | Focused adapter tests pass; success and error presenter tests prove typed `ProviderOutcome` presentation without `fgos.v1`. | Implemented preview; verified 2026-09-18. |
+| R3-P2 | Wire `GET /v1/runtime` to the adapter | Add a handler in `herdr-plugin/src/gateway.rs`; mount `/runtime` inside the existing authenticated `/v1` router; call `build_invocation_service`, `project_remote_build_show_invocation`, `InvocationService::invoke`, then `present_remote_outcome`. | Gateway route returns runtime JSON under valid auth; unauthenticated request is rejected; existing gateway tests still pass. | Next. |
+| R3-P3 | Harden no-shell/no-`fgos.v1` regression proof | Add a route-level test where `VerbGateway` panics or records calls and `GET /v1/runtime` still succeeds; assert the response has no CLI envelope keys such as `contract`, `data`, or `data_hash`. Add a process-spawn assertion only if the gateway test harness already has a cheap seam for it. | At least one hard no-`VerbGateway` proof and one hard no-`fgos.v1`-parse proof. | Planned after P2. |
+| R3-P4 | Inventory remaining legacy gateway consumers | List the routes still using `VerbGateway`, whether each is read/write, whether each shells to legacy Node through CLI, and migration preconditions. | R3 proof doc or linked generated/listed source has the consumer list; docs state R3 migrates only `/runtime`. | Planned after P2/P3. |
+| R3-P5 | Closeout and status update | Update R3 proof, host use cases, implementation alignment, roadmap, and this plan. Mark only `GET /v1/runtime` as implemented preview. | Tests named in §9 pass; docs no longer say P1+ not started; remaining gateway migration remains partial. | Final packet. |
 
 Packets may be combined only when the review still has one clear behavioral
 claim. R3-P2 and R3-P3 are likely coupled; R3-P4 should stay explicit so R3
 does not overclaim gateway migration.
 
 **R3-P0 status (2026-09-17): closed.** Route and contract frozen (docs-only,
-see [§5 R3-P0](#r3-p0-route-and-contract-freeze)). R3-P1 through R3-P5 remain
-`not started`.
+see [§6 R3-P0](#r3-p0-route-and-contract-freeze)).
 
-## 5. Packet Details
+**R3-P1 status (2026-09-18): implemented preview.** `remote_invocation.rs`
+exists, exports projector/presenter/service assembly, and focused tests pass.
+The remaining full-track work is R3-P2 through R3-P5.
+
+## 6. Packet Details
 
 ### R3-P0: Route And Contract Freeze
 
@@ -146,8 +165,8 @@ This is a documentation freeze only. `herdr-plugin/src/gateway.rs` has no `/runt
 
 ### R3-P1: Remote Projector And Presenter
 
-Create a remote-host adapter that can call `InvocationService` without going
-through CLI grammar or CLI presentation.
+Adopt the existing remote-host adapter that can call `InvocationService`
+without going through CLI grammar or CLI presentation.
 
 Rules:
 
@@ -157,12 +176,21 @@ Rules:
 - no `fgos.v1` envelope appears inside the gateway adapter;
 - remote host kind is visible in invocation metadata or lifecycle evidence if
   the current kernel supports it.
+- do not introduce a second composition root for the same selected operation
+  unless the gateway route wiring proves the current helper is insufficient.
 
 Proof:
 
 - unit test projects a remote request into the chosen operation id;
 - unit test presents success and at least one error family;
 - CLI projector/presenter tests still pass unchanged.
+- focused scan command:
+
+```sh
+cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet
+```
+
+Current evidence: the focused scan passed 9 tests on 2026-09-18.
 
 ### R3-P2: Gateway Route Wiring
 
@@ -171,6 +199,11 @@ Wire the selected gateway endpoint to the remote adapter.
 Rules:
 
 - preserve existing gateway auth and transport contract;
+- mount `GET /runtime` inside the existing authenticated router that is nested
+  under `/v1`, producing external endpoint `GET /v1/runtime`;
+- the handler takes no request body and no query params;
+- call the adapter path in this order: project remote invocation, invoke
+  `InvocationService`, present typed outcome;
 - do not shell through `fgos`;
 - do not call `VerbGateway` for the selected route;
 - do not parse `fgos.v1`;
@@ -181,6 +214,7 @@ Proof:
 - gateway route returns the expected response for the selected read operation;
 - existing gateway contract tests pass;
 - selected route still respects token/auth behavior.
+- no `VerbGateway` call is observed in a success path test.
 
 ### R3-P3: No-Shell / No-Parse Proof
 
@@ -195,6 +229,10 @@ Proof options:
   test asserts the remote response is built from `ProviderOutcome`.
 
 At least one no-shell proof and one no-`fgos.v1`-parse proof are required.
+Because the selected route uses `BuildShowProvider`, the strongest practical
+first proof is `VerbGateway` panic/spy plus response-shape assertions. A
+process-spawn spy is valuable but not required if adding it would require a
+larger gateway process abstraction unrelated to R3.
 
 ### R3-P4: Remaining `VerbGateway` Consumer List
 
@@ -226,11 +264,46 @@ Proof:
 - roadmap moves the next frontier to either another remote route, chat contract,
   or explicit legacy-route retirement.
 
-## 6. Suggested Test Commands
+## 7. Code-Panel Full-Track Prompt
+
+Use this prompt when handing R3 to code-panel:
+
+```text
+Run the full Host Invocation R3 track from docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md.
+
+Current state: R3-P0 is closed and selects GET /v1/runtime -> distribution.build.show. R3-P1 adapter code already exists in herdr-plugin/src/remote_invocation.rs and its focused tests passed; adopt it as the base unless implementation evidence shows a real mismatch.
+
+Complete R3-P2 through R3-P5 in order:
+- wire GET /v1/runtime into the existing authenticated /v1 gateway router;
+- call InvocationService directly through the remote_invocation adapter;
+- preserve the existing gateway bearer-token/Cf-Access auth boundary;
+- prove the route does not call VerbGateway, does not shell to fgos/Node, and does not parse CLI fgos.v1;
+- list remaining VerbGateway consumers and do not claim whole-gateway migration;
+- update R3 proof, host-use-cases, implementation-alignment, roadmap, and this rollout plan.
+
+Non-goals: do not migrate other gateway routes, do not delete VerbGateway, do not change gateway auth/CORS/transport policy, do not implement shared multi-project gateway behavior, and do not reopen the packaging runtime-selection boundary.
+```
+
+## 8. Reviewer Checklist
+
+- Does `GET /v1/runtime` live behind the same auth layer as the other
+  authenticated `/v1` routes?
+- Does the route call `InvocationService` directly rather than `VerbGateway`?
+- Does the response come from typed `BuildShowOutcome`/`ProviderOutcome`,
+  with no CLI `fgos.v1` envelope parsing?
+- Does the implementation keep `include_runtime: true` fixed and avoid adding
+  caller-controlled request fields?
+- Do docs say only `/runtime` migrated, with all other `VerbGateway` consumers
+  still visible?
+- Did tests include the focused adapter tests and the route-level gateway tests?
+
+## 9. Suggested Test Commands
 
 Exact commands depend on the selected gateway surface. Start with:
 
 ```sh
+cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet
+cargo test --manifest-path herdr-plugin/Cargo.toml runtime --quiet
 cargo test -p fgos-host-runtime --quiet
 cargo test -p fgos --quiet
 cargo test -p herdr-fgos --quiet
@@ -240,12 +313,12 @@ node --test test/rust-host/command-routes.test.mjs
 Add focused gateway tests for the selected route, no-shell behavior, no
 `fgos.v1` parsing, auth preservation, and error mapping.
 
-## 7. Close Criteria
+## 10. Close Criteria
 
 R3 is done when:
 
-- one production-shaped project-local gateway route calls `InvocationService`
-  directly;
+- `GET /v1/runtime` calls `InvocationService` directly through the remote
+  adapter;
 - the route does not call `VerbGateway`, shell to CLI, spawn Node, or parse
   `fgos.v1`;
 - gateway auth and transport contract stay intact;
@@ -253,8 +326,9 @@ R3 is done when:
 - remaining `VerbGateway` consumers are listed and not silently claimed done;
 - docs label R3 as partial/preview for one route, not whole-gateway migration.
 
-## 8. Handoff Note
+## 11. Handoff Note
 
-Use code-panel for implementation. Open R3-P0 first to select the route and
-freeze the gateway response contract. Do not start R3-P1/R3-P2 until the first
-route is named and the no-shell/no-parse proof strategy is written down.
+Use code-panel for implementation. Do not reopen R3-P0 unless code evidence
+invalidates the selected route. Do not reimplement R3-P1 from scratch; adopt
+the existing `remote_invocation.rs` adapter and continue with R3-P2 through
+R3-P5 as one full track with separate packet closeout evidence.
