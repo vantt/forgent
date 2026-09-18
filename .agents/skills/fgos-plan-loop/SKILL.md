@@ -366,7 +366,8 @@ resuming the SAME `coordinationId`:
       "targetActorId": "reviewer",
       "authorizationId": "auth_cell01_fix1_reviewer_recheck",
       "invocationKey": "cell01:fix1:reviewer-recheck:1",
-      "reason": "Revision landed; recheck against the original HIGH-1 finding."
+      "reason": "Revision landed; recheck against the original HIGH-1 finding.",
+      "grantedContextRefs": ["$ref:revise"]
     },
     {
       "type": "operation",
@@ -385,7 +386,8 @@ resuming the SAME `coordinationId`:
       "targetActorId": "red-team",
       "authorizationId": "auth_cell01_fix1_red_team_recheck",
       "invocationKey": "cell01:fix1:red-team-recheck:1",
-      "reason": "Revision landed; recheck for the same class of attack that found HIGH-1."
+      "reason": "Revision landed; recheck for the same class of attack that found HIGH-1.",
+      "grantedContextRefs": ["$ref:revise"]
     },
     {
       "type": "operation",
@@ -409,7 +411,16 @@ grantedContextRefs?[], targetArtifactRef?, mutation?}`
 verbatim into the driver-authorized dispatch's own default `taskKey`
 (`schema.mjs:326-329`); `invocationKey` required, <= 512 chars
 (`schema.mjs:302,330-332`); `reason` required, <= 20000 chars
-(`schema.mjs:303,333-335`). **An `authorize` step's own `mutation` field
+(`schema.mjs:303,333-335`). **`grantedContextRefs` must list every ref the
+paired `operation` step's own `contextRefs` names** (both examples above
+grant `["$ref:revise"]` because `reviewRecheck`/`redTeamRecheck` each read
+`contextRefs: ["$ref:revise"]`) -- a driver-authorized worker may read
+only the refs its own authorization explicitly grants, plus its always-legal
+base context (`dispatchDeclaredOperation`'s own `contextRefs`-vs-
+`grantedContextRefs` check, session-engine.mjs); an authorize step that
+omits it (`grantedContextRefs: []` by default) makes the very next
+`operation` step's `contextRefs` refusal-guaranteed, not merely optional.
+**An `authorize` step's own `mutation` field
 stays hard-refused for anything but `"read-only"`** — only a declared
 `operation` step may set `"mutating"`
 (`schema.mjs:122-131,319-322` `assertMutationAllowed` called without
