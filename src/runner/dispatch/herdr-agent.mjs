@@ -290,8 +290,11 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
     /** Starts the agent and returns only once herdr says the pane holds a
      * ready agent -- this is what absorbs the shell boot race that the old
      * `pane run` path had to guess at. Failure is named (`agent_not_ready`). */
-    agentStart(name, { kind, paneId, timeoutMs = 30000, agentArgs = [] } = {}) {
+    agentStart(name, { kind, paneId, executable, timeoutMs = 30000, agentArgs = [] } = {}) {
       const args = ['agent', 'start', name, '--kind', kind, '--pane', paneId, '--timeout', String(timeoutMs)];
+      if (executable) {
+        args.push('--executable', executable);
+      }
       if (agentArgs.length > 0) args.push('--', ...agentArgs);
       // The call itself blocks for up to `timeoutMs`; give the child a margin
       // over that so a herdr that is merely slow is not killed mid-answer and

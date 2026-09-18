@@ -14,7 +14,7 @@ import {
   createHerdrLaunchCommand,
   readHerdrLaunchCommand,
   HerdrLaunchCollisionError,
-  buildLauncherScriptContent,
+  shellEscapeArg,
   verifyForegroundProcessArgv,
   verifyProcessEnvironment,
 } from '../../src/runner/dispatch/herdr-round.mjs';
@@ -832,20 +832,8 @@ test('16. ad-hoc run preserves legacy naming while Assignment run uses determini
   assert.equal(cmd.herdrName, 'fgos-run-named-01-cmd-named-01');
 });
 
-// 17. Launcher script generation and foreground argv verification
-test('17. launcher script generation and foreground argv verification', async () => {
-  const scriptContent = buildLauncherScriptContent({
-    argv0: 'claude',
-    command: '/usr/bin/bwrap',
-    args: ['--ro-bind', '/', '/', 'echo', 'hi'],
-    env: { TEST_VAR: 'value with spaces & symbols' },
-    workerCommandDigest: 'sha256:abcd',
-  });
-
-  assert.ok(scriptContent.startsWith('#!/usr/bin/env bash'));
-  assert.ok(scriptContent.includes("export TEST_VAR='value with spaces & symbols'"));
-  assert.ok(scriptContent.includes("exec -a claude /usr/bin/bwrap --ro-bind / / echo hi"));
-
+// 17. Foreground argv verification
+test('17. foreground argv verification', async () => {
   const matched = verifyForegroundProcessArgv({
     foregroundProcesses: [
       { pid: 100, name: 'zsh', argv: ['zsh'] },
