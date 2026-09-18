@@ -79,7 +79,8 @@ fn main() -> io::Result<()> {
                     }
 
                     if let Some(ref params) = req.params {
-                        if let Some(proto) = params.get("protocol_version").and_then(|v| v.as_str()) {
+                        if let Some(proto) = params.get("protocol_version").and_then(|v| v.as_str())
+                        {
                             negotiated_protocol = proto.to_string();
                         }
                     }
@@ -156,8 +157,12 @@ fn main() -> io::Result<()> {
                         // Actually read and block on stdin for the cancellation notification
                         eprintln!("fixture echo_process cooperative_cancel: listening on stdin");
                         match codec.decode_from_reader(&mut reader) {
-                            Ok(Some(FrameMessage::Notification(notif))) if notif.method == "cancel" => {
-                                eprintln!("fixture echo_process received cancellation notification");
+                            Ok(Some(FrameMessage::Notification(notif)))
+                                if notif.method == "cancel" =>
+                            {
+                                eprintln!(
+                                    "fixture echo_process received cancellation notification"
+                                );
                                 if let Ok(path) = env::var("CANCEL_SENTINEL_FILE") {
                                     let _ = fs::write(path, "cancelled\n");
                                 }

@@ -543,7 +543,10 @@ fn verify_candidate_host_entry(
         )));
     }
 
-    let covered = manifest.files.iter().any(|f| f.path == SHIM_FGOS_ENTRY && f.kind == "file");
+    let covered = manifest
+        .files
+        .iter()
+        .any(|f| f.path == SHIM_FGOS_ENTRY && f.kind == "file");
     if !covered {
         return Err(InitError::Preflight(format!(
             "candidate {} is not covered by a digest-verified manifest files[] entry",
@@ -1647,7 +1650,11 @@ mod tests {
         }
 
         let legacy_body: &[u8] = b"console.log('legacy');\n";
-        let legacy_entry = root.join("libexec").join("legacy-node").join("bin").join("fgos.mjs");
+        let legacy_entry = root
+            .join("libexec")
+            .join("legacy-node")
+            .join("bin")
+            .join("fgos.mjs");
         std::fs::write(&legacy_entry, legacy_body).unwrap();
 
         let mut manifest = serde_json::json!({
@@ -1736,7 +1743,12 @@ mod tests {
             "preflight executed candidate bin/fgos: sentinel {} was written",
             sentinel.display()
         );
-        assert_eq!(before, after, "preflight must not write anywhere under {}", root.display());
+        assert_eq!(
+            before,
+            after,
+            "preflight must not write anywhere under {}",
+            root.display()
+        );
 
         let _ = std::fs::remove_dir_all(&root);
     }
@@ -1753,7 +1765,10 @@ mod tests {
         let err = preflight_candidate(&candidate, &manifest).unwrap_err();
         let msg = err.to_string();
         assert!(matches!(err, InitError::Preflight(_)), "{msg}");
-        assert!(msg.contains("not covered by a digest-verified manifest files[] entry"), "{msg}");
+        assert!(
+            msg.contains("not covered by a digest-verified manifest files[] entry"),
+            "{msg}"
+        );
 
         let _ = std::fs::remove_dir_all(&root);
     }

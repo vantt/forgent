@@ -271,11 +271,10 @@ impl FrameCodec {
         }
 
         let payload = &bytes[4..4 + len];
-        let s = std::str::from_utf8(payload)
-            .map_err(|e| CodecError::InvalidUtf8(e.to_string()))?;
+        let s = std::str::from_utf8(payload).map_err(|e| CodecError::InvalidUtf8(e.to_string()))?;
 
-        let val: serde_json::Value = serde_json::from_str(s)
-            .map_err(|e| CodecError::InvalidJson(e.to_string()))?;
+        let val: serde_json::Value =
+            serde_json::from_str(s).map_err(|e| CodecError::InvalidJson(e.to_string()))?;
 
         let msg = Self::validate_jsonrpc(&val)?;
         Ok((msg, 4 + len))
@@ -283,7 +282,10 @@ impl FrameCodec {
 
     /// Decodes a single frame from a reader.
     /// Returns `Ok(None)` on clean EOF before any bytes of the length header are read.
-    pub fn decode_from_reader<R: Read>(&self, reader: &mut R) -> Result<Option<FrameMessage>, CodecError> {
+    pub fn decode_from_reader<R: Read>(
+        &self,
+        reader: &mut R,
+    ) -> Result<Option<FrameMessage>, CodecError> {
         let mut len_buf = [0u8; 4];
         let mut total_read = 0;
         while total_read < 4 {
@@ -320,11 +322,11 @@ impl FrameCodec {
             }
         }
 
-        let s = std::str::from_utf8(&payload)
-            .map_err(|e| CodecError::InvalidUtf8(e.to_string()))?;
+        let s =
+            std::str::from_utf8(&payload).map_err(|e| CodecError::InvalidUtf8(e.to_string()))?;
 
-        let val: serde_json::Value = serde_json::from_str(s)
-            .map_err(|e| CodecError::InvalidJson(e.to_string()))?;
+        let val: serde_json::Value =
+            serde_json::from_str(s).map_err(|e| CodecError::InvalidJson(e.to_string()))?;
 
         let msg = Self::validate_jsonrpc(&val)?;
         Ok(Some(msg))
@@ -332,19 +334,16 @@ impl FrameCodec {
 
     /// Strictly validates JSON-RPC 2.0 semantics and returns the typed `FrameMessage`.
     pub fn validate_jsonrpc(val: &serde_json::Value) -> Result<FrameMessage, CodecError> {
-        let obj = val
-            .as_object()
-            .ok_or_else(|| CodecError::NonJsonRpcShape("message must be a JSON object".to_string()))?;
+        let obj = val.as_object().ok_or_else(|| {
+            CodecError::NonJsonRpcShape("message must be a JSON object".to_string())
+        })?;
 
         // jsonrpc field check: must equal "2.0"
-        let jsonrpc = obj
-            .get("jsonrpc")
-            .and_then(|v| v.as_str())
-            .ok_or_else(|| {
-                CodecError::NonJsonRpcShape(
-                    "missing or non-string 'jsonrpc' field, expected '2.0'".to_string(),
-                )
-            })?;
+        let jsonrpc = obj.get("jsonrpc").and_then(|v| v.as_str()).ok_or_else(|| {
+            CodecError::NonJsonRpcShape(
+                "missing or non-string 'jsonrpc' field, expected '2.0'".to_string(),
+            )
+        })?;
         if jsonrpc != "2.0" {
             return Err(CodecError::NonJsonRpcShape(format!(
                 "unsupported jsonrpc version '{jsonrpc}', expected '2.0'"
@@ -373,7 +372,9 @@ impl FrameCodec {
         if has_method {
             let method = obj["method"]
                 .as_str()
-                .ok_or_else(|| CodecError::NonJsonRpcShape("'method' field must be a string".to_string()))?
+                .ok_or_else(|| {
+                    CodecError::NonJsonRpcShape("'method' field must be a string".to_string())
+                })?
                 .to_string();
 
             let params = obj.get("params").cloned();
@@ -429,26 +430,22 @@ impl FrameCodec {
             };
 
             let error = if has_error {
-                let err_obj = obj["error"]
-                    .as_object()
-                    .ok_or_else(|| CodecError::NonJsonRpcShape("'error' field must be an object".to_string()))?;
+                let err_obj = obj["error"].as_object().ok_or_else(|| {
+                    CodecError::NonJsonRpcShape("'error' field must be an object".to_string())
+                })?;
 
                 let code = err_obj
                     .get("code")
                     .and_then(|c| c.as_i64())
                     .ok_or_else(|| {
-                        CodecError::NonJsonRpcShape(
-                            "error 'code' must be an integer".to_string(),
-                        )
+                        CodecError::NonJsonRpcShape("error 'code' must be an integer".to_string())
                     })?;
 
                 let message = err_obj
                     .get("message")
                     .and_then(|m| m.as_str())
                     .ok_or_else(|| {
-                        CodecError::NonJsonRpcShape(
-                            "error 'message' must be a string".to_string(),
-                        )
+                        CodecError::NonJsonRpcShape("error 'message' must be a string".to_string())
                     })?
                     .to_string();
 

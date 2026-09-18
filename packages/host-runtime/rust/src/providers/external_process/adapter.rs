@@ -8,18 +8,14 @@ use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 
+use super::frame_codec::RequestId;
+use super::supervisor::{ExternalProcessConfig, ExternalProcessRequest, ExternalProcessSupervisor};
+use super::{FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID};
 use crate::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
     ProviderLifecycle, ProviderOutcome,
 };
 use crate::invocation_service::{EventSink, InvocationControl, OperationProvider};
-use super::frame_codec::RequestId;
-use super::supervisor::{
-    ExternalProcessConfig, ExternalProcessRequest, ExternalProcessSupervisor,
-};
-use super::{
-    FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
-};
 
 /// Private representation of an encoded message used strictly within the adapter boundary.
 ///
@@ -69,13 +65,20 @@ impl EncodedMessage {
                 content_type: "application/octet-stream".to_string(),
                 bytes: b.clone(),
             })
-        } else if let Some(action) = request.input.downcast_ref::<crate::providers::builtin::EchoAction>() {
+        } else if let Some(action) = request
+            .input
+            .downcast_ref::<crate::providers::builtin::EchoAction>()
+        {
             let val = match action {
-                crate::providers::builtin::EchoAction::Echo(msg) => serde_json::json!({ "message": msg }),
-                crate::providers::builtin::EchoAction::Delay { duration, message } => serde_json::json!({
-                    "delay_ms": duration.as_millis(),
-                    "message": message,
-                }),
+                crate::providers::builtin::EchoAction::Echo(msg) => {
+                    serde_json::json!({ "message": msg })
+                }
+                crate::providers::builtin::EchoAction::Delay { duration, message } => {
+                    serde_json::json!({
+                        "delay_ms": duration.as_millis(),
+                        "message": message,
+                    })
+                }
                 crate::providers::builtin::EchoAction::Panic(msg) => serde_json::json!({
                     "crash": "before_response",
                     "message": msg,
@@ -111,7 +114,9 @@ impl EncodedMessage {
     fn to_json_payload(&self) -> Result<serde_json::Value, ProviderError> {
         if self.content_type == "application/json" {
             serde_json::from_slice(&self.bytes).map_err(|e| {
-                ProviderError::SemanticValidation(format!("failed to deserialize JSON payload: {e}"))
+                ProviderError::SemanticValidation(format!(
+                    "failed to deserialize JSON payload: {e}"
+                ))
             })
         } else if let Ok(s) = std::str::from_utf8(&self.bytes) {
             Ok(serde_json::json!({ "text": s }))

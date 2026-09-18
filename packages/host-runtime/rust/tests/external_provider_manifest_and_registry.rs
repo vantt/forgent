@@ -467,11 +467,25 @@ fn linker_refusal_contract_version_exact_match_regression() {
     let diff_major = ContractRef::from_static("fixture.echo.echo.request", "2.0.0");
     let diff_id = ContractRef::from_static("other.contract.id", "1.0.0");
 
-    assert!(ExternalProcessLinker::contracts_compatible(&exact_match, &expected));
-    assert!(!ExternalProcessLinker::contracts_compatible(&diff_minor, &expected));
-    assert!(!ExternalProcessLinker::contracts_compatible(&diff_patch, &expected));
-    assert!(!ExternalProcessLinker::contracts_compatible(&diff_major, &expected));
-    assert!(!ExternalProcessLinker::contracts_compatible(&diff_id, &expected));
+    assert!(ExternalProcessLinker::contracts_compatible(
+        &exact_match,
+        &expected
+    ));
+    assert!(!ExternalProcessLinker::contracts_compatible(
+        &diff_minor,
+        &expected
+    ));
+    assert!(!ExternalProcessLinker::contracts_compatible(
+        &diff_patch,
+        &expected
+    ));
+    assert!(!ExternalProcessLinker::contracts_compatible(
+        &diff_major,
+        &expected
+    ));
+    assert!(!ExternalProcessLinker::contracts_compatible(
+        &diff_id, &expected
+    ));
 }
 
 #[test]

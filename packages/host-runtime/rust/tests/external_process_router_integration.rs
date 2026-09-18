@@ -21,13 +21,10 @@ use fgos_host_runtime::invocation_service::{
     InMemoryEventSink, InvocationService, InvocationTerminalState,
 };
 use fgos_host_runtime::operation_provider_router::{select, RouterPolicy, SelectionInput};
-use fgos_host_runtime::providers::builtin::{
-    EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR,
-};
+use fgos_host_runtime::providers::builtin::{EchoAction, EchoProvider, ECHO_PROVIDER_DESCRIPTOR};
 use fgos_host_runtime::providers::external_process::{
-    ExternalManifest, ExternalProcessConfig, ExternalProcessLinker,
-    ExternalProcessProviderAdapter, LinkerError, COMPONENT_PROTOCOL_VERSION,
-    FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
+    ExternalManifest, ExternalProcessConfig, ExternalProcessLinker, ExternalProcessProviderAdapter,
+    LinkerError, COMPONENT_PROTOCOL_VERSION, FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID,
 };
 use fgos_host_runtime::registry::build_snapshot;
 use std::borrow::Cow;
@@ -106,9 +103,8 @@ fn derive_fixture_descriptor() -> ProviderDescriptor {
 
 fn build_test_snapshot() -> (RegistrySnapshot, ProviderDescriptor) {
     let derived_desc = derive_fixture_descriptor();
-    let combined_providers: &'static [ProviderDescriptor] = Box::leak(
-        vec![ECHO_PROVIDER_DESCRIPTOR, derived_desc.clone()].into_boxed_slice(),
-    );
+    let combined_providers: &'static [ProviderDescriptor] =
+        Box::leak(vec![ECHO_PROVIDER_DESCRIPTOR, derived_desc.clone()].into_boxed_slice());
     let snapshot = build_snapshot(test_catalog(), combined_providers, "test-snapshot-r2-p5");
     (snapshot, derived_desc)
 }

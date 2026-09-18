@@ -413,7 +413,6 @@ impl ExternalProcessLinker {
                     }
                 }
 
-
                 entries.push(ExternalProviderEntry {
                     provider_id: manifest.id.clone(),
                     operation_id: parsed_op_id,

@@ -21,9 +21,7 @@ use fgos_host_runtime::contracts::{
     ContractRef, OperationId, ProviderDescriptor, ProviderError, ProviderLifecycle,
 };
 use fgos_host_runtime::providers::external_process::{
-    frame_codec::{
-        CodecError, FrameCodec, FrameMessage, JsonRpcError, RequestId,
-    },
+    frame_codec::{CodecError, FrameCodec, FrameMessage, JsonRpcError, RequestId},
     supervisor::{ExternalProcessConfig, ExternalProcessRequest, ExternalProcessSupervisor},
     COMPONENT_PROTOCOL_VERSION, FIXTURE_OPERATION_ID, FIXTURE_OUTCOME_CONTRACT,
     FIXTURE_PROVIDER_ID, FIXTURE_REQUEST_CONTRACT,
@@ -114,10 +112,7 @@ fn test_frame_codec_round_trips_request_response_notification() {
     assert_eq!(decoded4, res2);
 
     // 5. Notification
-    let notif = FrameMessage::notification(
-        "cancel",
-        Some(serde_json::json!({ "id": 42 })),
-    );
+    let notif = FrameMessage::notification("cancel", Some(serde_json::json!({ "id": 42 })));
     let bytes5 = codec.encode(&notif).expect("encode notification");
     let (decoded5, len5) = codec.decode(&bytes5).expect("decode notification");
     assert_eq!(len5, bytes5.len());
@@ -130,9 +125,15 @@ fn test_frame_codec_round_trips_request_response_notification() {
     stream.extend_from_slice(&bytes5);
 
     let mut cursor = std::io::Cursor::new(stream);
-    let r1 = codec.decode_from_reader(&mut cursor).expect("stream decode 1");
-    let r2 = codec.decode_from_reader(&mut cursor).expect("stream decode 2");
-    let r3 = codec.decode_from_reader(&mut cursor).expect("stream decode 3");
+    let r1 = codec
+        .decode_from_reader(&mut cursor)
+        .expect("stream decode 1");
+    let r2 = codec
+        .decode_from_reader(&mut cursor)
+        .expect("stream decode 2");
+    let r3 = codec
+        .decode_from_reader(&mut cursor)
+        .expect("stream decode 3");
     let r4 = codec.decode_from_reader(&mut cursor).expect("stream EOF");
 
     assert_eq!(r1, Some(req1));
@@ -245,9 +246,13 @@ fn test_frame_codec_rejects_non_jsonrpc_shapes() {
     // Both method and result
     check_bad_shape(r#"{"jsonrpc": "2.0", "method": "test", "result": 42, "id": 1}"#);
     // Both method and error
-    check_bad_shape(r#"{"jsonrpc": "2.0", "method": "test", "error": {"code": 1, "message": "err"}, "id": 1}"#);
+    check_bad_shape(
+        r#"{"jsonrpc": "2.0", "method": "test", "error": {"code": 1, "message": "err"}, "id": 1}"#,
+    );
     // Both result and error
-    check_bad_shape(r#"{"jsonrpc": "2.0", "result": 42, "error": {"code": 1, "message": "err"}, "id": 1}"#);
+    check_bad_shape(
+        r#"{"jsonrpc": "2.0", "result": 42, "error": {"code": 1, "message": "err"}, "id": 1}"#,
+    );
     // Method is not a string
     check_bad_shape(r#"{"jsonrpc": "2.0", "method": 123, "id": 1}"#);
     // ID is an object/array (not string/number/null)
@@ -255,7 +260,9 @@ fn test_frame_codec_rejects_non_jsonrpc_shapes() {
     // Response error is not an object
     check_bad_shape(r#"{"jsonrpc": "2.0", "error": "error string", "id": 1}"#);
     // Response error missing integer code
-    check_bad_shape(r#"{"jsonrpc": "2.0", "error": {"code": "not_int", "message": "msg"}, "id": 1}"#);
+    check_bad_shape(
+        r#"{"jsonrpc": "2.0", "error": {"code": "not_int", "message": "msg"}, "id": 1}"#,
+    );
     // Response error missing message
     check_bad_shape(r#"{"jsonrpc": "2.0", "error": {"code": 1}, "id": 1}"#);
     // Neither method nor result/error
@@ -283,7 +290,10 @@ async fn test_supervisor_happy_path_fixture_invocation() {
     )
     .with_request_id(RequestId::Number(99));
 
-    let outcome = supervisor.invoke(&request).await.expect("happy path invoke");
+    let outcome = supervisor
+        .invoke(&request)
+        .await
+        .expect("happy path invoke");
 
     assert_eq!(outcome.provider_id, FIXTURE_PROVIDER_ID);
     assert_eq!(outcome.operation_id, FIXTURE_OPERATION_ID);
@@ -291,8 +301,13 @@ async fn test_supervisor_happy_path_fixture_invocation() {
     assert_eq!(outcome.protocol_version, COMPONENT_PROTOCOL_VERSION);
     assert_eq!(outcome.echo, payload);
 
-    let provider_outcome = outcome.to_provider_outcome().expect("to_provider_outcome succeeds");
-    assert_eq!(provider_outcome.contract().id(), "fixture.echo.echo.outcome");
+    let provider_outcome = outcome
+        .to_provider_outcome()
+        .expect("to_provider_outcome succeeds");
+    assert_eq!(
+        provider_outcome.contract().id(),
+        "fixture.echo.echo.outcome"
+    );
     assert_eq!(provider_outcome.contract().version(), "1.0.0");
 }
 
@@ -419,7 +434,11 @@ async fn test_supervisor_drain_bounded_when_grandchild_holds_stdout_dispatch() {
     // Scenario: Direct child completes handshake, but upon receiving invoke dispatch,
     // spawns a background grandchild holding stdout open and exits immediately.
     // The inner response-drain loop after dispatch must be bounded by request deadline.
-    if std::process::Command::new("python3").arg("--version").output().is_err() {
+    if std::process::Command::new("python3")
+        .arg("--version")
+        .output()
+        .is_err()
+    {
         return;
     }
 
@@ -657,8 +676,8 @@ async fn test_supervisor_cancellation_path() {
 #[tokio::test]
 async fn test_supervisor_flood_bounds_memory_and_terminates() {
     let bin = fixture_bin();
-    let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
-        .with_max_capture_bytes(64 * 1024); // 64 KB limit
+    let config =
+        ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin).with_max_capture_bytes(64 * 1024); // 64 KB limit
     let supervisor = ExternalProcessSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
@@ -676,19 +695,23 @@ async fn test_supervisor_flood_bounds_memory_and_terminates() {
                 "expected ProtocolViolation due to byte budget or queue capacity overflow, got: {msg}"
             );
         }
-        other => panic!("expected ProtocolViolation on flood overflow, got {:?}", other),
+        other => panic!(
+            "expected ProtocolViolation on flood overflow, got {:?}",
+            other
+        ),
     }
 }
 
 #[test]
 fn test_to_provider_outcome_rejects_missing_version_delimiter() {
-    let outcome = fgos_host_runtime::providers::external_process::supervisor::ExternalProcessOutcome {
-        provider_id: FIXTURE_PROVIDER_ID.to_string(),
-        operation_id: FIXTURE_OPERATION_ID.to_string(),
-        outcome_contract: "fixture.echo.echo.outcome".to_string(), // missing '@'
-        protocol_version: COMPONENT_PROTOCOL_VERSION.to_string(),
-        echo: serde_json::json!({}),
-    };
+    let outcome =
+        fgos_host_runtime::providers::external_process::supervisor::ExternalProcessOutcome {
+            provider_id: FIXTURE_PROVIDER_ID.to_string(),
+            operation_id: FIXTURE_OPERATION_ID.to_string(),
+            outcome_contract: "fixture.echo.echo.outcome".to_string(), // missing '@'
+            protocol_version: COMPONENT_PROTOCOL_VERSION.to_string(),
+            echo: serde_json::json!({}),
+        };
     let err = outcome.to_provider_outcome().unwrap_err();
     assert!(
         matches!(err, ProviderError::ProtocolViolation(_)),

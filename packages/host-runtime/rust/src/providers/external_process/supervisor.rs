@@ -46,8 +46,8 @@ impl ExternalProcessConfig {
             startup_timeout: Duration::from_millis(2000),
             request_timeout: Duration::from_millis(5000),
             cancellation_grace_period: Duration::from_millis(200),
-            max_capture_bytes: 1024 * 1024,      // 1 MB
-            max_frame_size: 4 * 1024 * 1024,     // 4 MB
+            max_capture_bytes: 1024 * 1024,  // 1 MB
+            max_frame_size: 4 * 1024 * 1024, // 4 MB
             protocol_version: "fgos.component.v1".to_string(),
         }
     }
@@ -190,7 +190,11 @@ impl ExternalProcessSupervisor {
         cancellation_rx: Option<tokio::sync::watch::Receiver<bool>>,
     ) -> Result<ExternalProcessOutcome, ProviderError> {
         // Step 1: Pre-spawn cancellation check
-        if cancellation_rx.as_ref().map(|rx| *rx.borrow()).unwrap_or(false) {
+        if cancellation_rx
+            .as_ref()
+            .map(|rx| *rx.borrow())
+            .unwrap_or(false)
+        {
             return Err(ProviderError::CallerCancelled(
                 "invocation cancelled before process spawned".to_string(),
             ));
@@ -346,7 +350,11 @@ impl ExternalProcessSupervisor {
                 )));
             }
 
-            if cancellation_rx.as_ref().map(|rx| *rx.borrow()).unwrap_or(false) {
+            if cancellation_rx
+                .as_ref()
+                .map(|rx| *rx.borrow())
+                .unwrap_or(false)
+            {
                 kill_child(&mut child);
                 return Err(ProviderError::CallerCancelled(
                     "invocation cancelled during handshake".to_string(),
@@ -535,7 +543,11 @@ impl ExternalProcessSupervisor {
             )));
         }
 
-        if cancellation_rx.as_ref().map(|rx| *rx.borrow()).unwrap_or(false) {
+        if cancellation_rx
+            .as_ref()
+            .map(|rx| *rx.borrow())
+            .unwrap_or(false)
+        {
             kill_child(&mut child);
             return Err(ProviderError::CallerCancelled(
                 "invocation cancelled before dispatch".to_string(),
@@ -544,10 +556,7 @@ impl ExternalProcessSupervisor {
 
         // Step 7: DISPATCH POINT
         // From this moment onward, any crash maps to CompletionUnknown
-        let req_id = request
-            .request_id
-            .clone()
-            .unwrap_or(RequestId::Number(2));
+        let req_id = request.request_id.clone().unwrap_or(RequestId::Number(2));
         let invoke_msg = FrameMessage::request(
             "invoke",
             Some(serde_json::json!({
@@ -570,7 +579,11 @@ impl ExternalProcessSupervisor {
         let request_deadline = Instant::now() + self.config.request_timeout;
         loop {
             // Check cancellation: notify, wait grace period, then hard terminate
-            if cancellation_rx.as_ref().map(|rx| *rx.borrow()).unwrap_or(false) {
+            if cancellation_rx
+                .as_ref()
+                .map(|rx| *rx.borrow())
+                .unwrap_or(false)
+            {
                 let cancel_msg = FrameMessage::notification(
                     "cancel",
                     Some(serde_json::json!({
@@ -634,15 +647,18 @@ impl ExternalProcessSupervisor {
 
                     let result = res.result.ok_or_else(|| {
                         kill_child(&mut child);
-                        ProviderError::ProtocolViolation(format!("response missing result{stderr_tail}"))
-                    })?;
-
-                    let outcome: ExternalProcessOutcome = serde_json::from_value(result).map_err(|e| {
-                        kill_child(&mut child);
                         ProviderError::ProtocolViolation(format!(
-                            "failed to parse outcome payload: {e}{stderr_tail}"
+                            "response missing result{stderr_tail}"
                         ))
                     })?;
+
+                    let outcome: ExternalProcessOutcome =
+                        serde_json::from_value(result).map_err(|e| {
+                            kill_child(&mut child);
+                            ProviderError::ProtocolViolation(format!(
+                                "failed to parse outcome payload: {e}{stderr_tail}"
+                            ))
+                        })?;
 
                     if outcome.outcome_contract.split_once('@').is_none() {
                         kill_child(&mut child);
@@ -732,14 +748,17 @@ impl ExternalProcessSupervisor {
                                     }
                                     let result = res.result.ok_or_else(|| {
                                         kill_child(&mut child);
-                                        ProviderError::ProtocolViolation(format!("response missing result{stderr_tail}"))
-                                    })?;
-                                    let outcome: ExternalProcessOutcome = serde_json::from_value(result).map_err(|e| {
-                                        kill_child(&mut child);
                                         ProviderError::ProtocolViolation(format!(
-                                            "failed to parse outcome payload: {e}{stderr_tail}"
+                                            "response missing result{stderr_tail}"
                                         ))
                                     })?;
+                                    let outcome: ExternalProcessOutcome =
+                                        serde_json::from_value(result).map_err(|e| {
+                                            kill_child(&mut child);
+                                            ProviderError::ProtocolViolation(format!(
+                                                "failed to parse outcome payload: {e}{stderr_tail}"
+                                            ))
+                                        })?;
                                     if outcome.outcome_contract.split_once('@').is_none() {
                                         kill_child(&mut child);
                                         return Err(ProviderError::ProtocolViolation(format!(
