@@ -1775,7 +1775,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
 // `rigorOverrides`: the old `{light/standard/heavy -> nano}` default was
 // never a deliberate, endorsed cost policy -- just this seed's own
-// historical D4 proof-test default -- dropped so a fresh install's `pi`
+// historical proof-test default -- dropped so a fresh install's `pi`
 // behaves like every other executor (DEFAULT_TIER_TO_POLICY) unless an
 // operator deliberately opts in later.
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple

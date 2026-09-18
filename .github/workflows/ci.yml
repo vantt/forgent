@@ -25,6 +25,10 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build Rust release binaries for npm tests
+        if: runner.os != 'Windows'
+        run: cargo build --release --workspace
+
       # Full suite (docs/distribution-vision.md tsk-49r D1): already
       # includes test/install-packaging.test.mjs (the pack -> install -g ->
       # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
@@ -116,4 +120,3 @@ jobs:
 
       - name: Run external consumer proof
         run: scripts/ci-external-consumer.sh --assets dist
-

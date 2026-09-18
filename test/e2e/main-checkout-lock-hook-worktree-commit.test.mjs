@@ -149,7 +149,7 @@ function forceMoveBranchForward(mainRoot, branch) {
   execFileSync('git', ['add', fileName], { cwd: mergeDir });
   execFileSync('git', ['commit', '-q', '-m', 'external change landed via force-move'], { cwd: mergeDir });
   const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: mergeDir, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: mainRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, newTip], { cwd: mainRoot });
   execFileSync('git', ['worktree', 'remove', '--force', mergeDir], { cwd: mainRoot });
   return newTip;
 }
@@ -191,7 +191,7 @@ test('tsk-1d7: a commit from a worktree whose branch was rewritten backward (not
   // Rewrite the branch back to BEFORE the worktree's own lastSynced commit
   // -- lastSynced is now a descendant, not an ancestor, of the new tip.
   const rootCommit = execFileSync('git', ['rev-list', '--max-parents=0', 'HEAD'], { cwd: mainRoot, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', 'fgw/tsk-sir-repro', rootCommit], { cwd: mainRoot });
+  execFileSync('git', ['update-ref', 'refs/heads/fgw/tsk-sir-repro', rootCommit], { cwd: mainRoot });
 
   const result = commitAsSession(worktreeRoot, {});
   assert.notEqual(result.status, 0, 'a commit against a diverged (rewritten) branch must be refused');
@@ -426,4 +426,3 @@ test('tsk-1i3: a brand-new .fgos/* file addition is not refused', () => {
 
   assert.equal(result.status, 0, `brand-new file addition must succeed -- got: ${result.stderr}`);
 });
-

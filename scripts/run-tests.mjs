@@ -18,6 +18,7 @@
 // invocation works unchanged on every OS's default shell.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -99,6 +100,17 @@ export function runTests({
 
   const relFiles = files.map((file) => path.relative(cwd, file));
   const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  if (process.platform === 'darwin') {
+    const tempRoot = env.TMPDIR || os.tmpdir();
+    try {
+      const realTempRoot = fs.realpathSync(tempRoot);
+      childEnv.TMPDIR = realTempRoot;
+      childEnv.TMP = realTempRoot;
+      childEnv.TEMP = realTempRoot;
+    } catch {
+      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
+    }
+  }
   const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
   return { status: result.status ?? 1, files: relFiles };
 }

@@ -698,6 +698,15 @@ test('dispatch CLI execute subcommand refuses a mutating inline Assignment (miss
   const asgnPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
   const tampered = { ...JSON.parse(fs.readFileSync(asgnPath, 'utf8')), mutation: 'mutating' };
   fs.writeFileSync(asgnPath, `${JSON.stringify(tampered, null, 2)}\n`);
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [writeEchoExecutor(tempDir), '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+  };
+  fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const dispatchScript = path.resolve('src/runner/dispatch.mjs');
   assert.throws(
