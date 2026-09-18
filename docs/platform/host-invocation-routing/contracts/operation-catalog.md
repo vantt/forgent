@@ -5,11 +5,11 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define operation identity, descriptors, catalog authorship, and version matching
 Design status: Draft
-Implementation status: Accepted-not-implemented
+Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/provider-routing.md
 - docs/platform/host-invocation-routing/verification/implementation-alignment.md
@@ -27,8 +27,8 @@ Related:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| R1 uses const catalog and snapshot at composition root. | `planned` | [source architecture §5](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts) | P3 implementation. |
-| First native operation is `distribution.build.show`. | `planned` | [source plan §10](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#10-p5-native-version) | Confirm descriptor and component owner. |
+| R1 uses const catalog and snapshot at composition root. | `current partial` | [../../../../packages/host-runtime/rust/src/catalog.rs](../../../../packages/host-runtime/rust/src/catalog.rs), [../../../../packages/host-runtime/rust/src/registry.rs](../../../../packages/host-runtime/rust/src/registry.rs), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Current Rust host and R2 fixture use authored catalog/snapshot; future operation owners must keep this path current. |
+| First native operation is `distribution.build.show`. | `implemented preview` | [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | Proven for CLI `version` and remote `GET /v1/runtime`; stable/default graduation remains release-owner decision. |
 
 ## 3. Related Files
 
@@ -37,4 +37,3 @@ Related:
 | provider routing | [../architecture/provider-routing.md](../architecture/provider-routing.md) |
 | operation provider | [operation-provider.md](operation-provider.md) |
 | source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
-

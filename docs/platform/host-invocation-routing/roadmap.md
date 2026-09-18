@@ -81,8 +81,8 @@ rollout plan. Phase F is now implemented preview: R3-P0 through R3-P5 are
 closed on 2026-09-18, proving native remote peer invocation for
 `distribution.build.show` (`GET /v1/runtime` in `herdr-plugin/src/gateway.rs`)
 without `VerbGateway`, CLI shelling, or `fgos.v1` envelope parsing. All other
-gateway routes remain on `VerbGateway` per
-[r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
+gateway routes remain on `VerbGateway` per the
+[R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md).
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -211,7 +211,7 @@ Closed 2026-09-15 (all sub-tasks above done via R2-P0 through R2-P5). Done when:
 
 Goal: prove a project-local remote host is a peer of CLI for at least one native operation.
 
-Detailed rollout plan: [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
+Detailed rollout plan: [R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md).
 
 Current status: Closed as implemented preview on 2026-09-18 (R3-P0 through
 R3-P5). `GET /v1/runtime` (`distribution.build.show`) is wired directly to
@@ -283,9 +283,9 @@ Done when:
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
 | 1 | Keep route-matrix and Rust-host targeted tests green for the current preview baseline: 73 selectors, 71 `legacy-cli`, two native. | Host invocation | No |
-| 2 | R2 external process provider preview closed 2026-09-15: all packets (R2-P0 through R2-P6) merged and verified per [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) and [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
+| 2 | R2 external process provider preview closed 2026-09-15: all packets (R2-P0 through R2-P6) merged and verified per the [R2 execution record](../../../plans/260915-host-invocation-r2-external-process/plan.md) and [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
-| 4 | R2 now proves at least one external provider operation through the common router (fixture.echo.echo, R2-P5) -- the condition this item was waiting on is met. R3 sequencing itself is [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md)'s own call, not restated here. | Host invocation | Light, for project runtime adapter selection |
+| 4 | R2 now proves at least one external provider operation through the common router (fixture.echo.echo, R2-P5) -- the condition this item was waiting on is met. R3 sequencing itself is the [R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md)'s own call, not restated here. | Host invocation | Light, for project runtime adapter selection |
 
 ## 13. Related Files
 
@@ -294,8 +294,8 @@ Done when:
 | area portal | [README.md](README.md) |
 | spec | [spec.md](spec.md) |
 | implementation alignment | [verification/implementation-alignment.md](verification/implementation-alignment.md) |
-| R2 rollout plan | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
-| R3 rollout plan | [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md) |
+| R2 execution record | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../plans/260915-host-invocation-r2-external-process/plan.md) |
+| R3 execution record | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | R1 proof | [verification/r1-rust-host-proof.md](verification/r1-rust-host-proof.md) |
 | R2 proof | [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
 | R3 proof | [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |

@@ -5,11 +5,11 @@ Document type: Area portal
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Route readers through fgOS host invocation, provider routing, legacy CLI transition, and external provider docs
 Design status: Draft
-Implementation status: Preview installed/default proof plus partial route migration
+Implementation status: R1/R2/R3 implemented preview plus partial route migration
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/architect/host-invocation-routing/**
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/vision.md
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
@@ -48,9 +48,9 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Understand the full direction | [vision.md](vision.md) |
 | Check preserved legacy intent and dispositions | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Understand current, legacy-current, planned, and unknown behavior | [spec.md](spec.md) |
-| Plan remaining work after R1 preview installed/default proof | [roadmap.md](roadmap.md) |
-| Plan R2 external process provider preview implementation | [r2-external-process-rollout-plan.md](r2-external-process-rollout-plan.md) |
-| Plan R3 remote peer implementation | [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md) |
+| Plan remaining work after R1/R2/R3 preview proofs | [roadmap.md](roadmap.md) |
+| Review R2 external process provider preview closeout | [../../../plans/260915-host-invocation-r2-external-process/plan.md](../../../plans/260915-host-invocation-r2-external-process/plan.md), [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md) |
+| Review R3 remote peer closeout | [../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../plans/260918-host-invocation-r3-remote-peer/plan.md), [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) |
 | Understand invocation kernel shape | [architecture/invocation-kernel.md](architecture/invocation-kernel.md) |
 | Understand CLI, remote, and chat peer hosts | [architecture/host-use-cases.md](architecture/host-use-cases.md) |
 | Understand provider selection and authority | [architecture/provider-routing.md](architecture/provider-routing.md) |
@@ -68,8 +68,8 @@ Do not use this area to decide how a runtime is installed, activated, upgraded, 
 | Existing Node CLI payload | `legacy-current` | `bin/fgos.mjs` and the current Node package still carry existing CLI behavior. The file remains unmoved and is the legacy payload during Rust host migration. |
 | Native invocation kernel | `current partial` | `OperationRequest` to `ProviderOutcome`, `InvocationService`, pure router, registry snapshot, and two-stage authority have implementation proof in the Rust host-runtime slice. Future provider mechanisms and replacement policy still need their own proof. |
 | R1 Rust CLI host | `implemented preview` | `apps/fgos` exists as a Rust CLI host, embeds the command route matrix, routes `version` natively to `distribution.build.show`, and sends unmigrated selectors through the `legacy-cli` lane. Packaging-Distribution preview proof shows external/default installed `fgos` enters the Rust host; stable/default graduation remains a release-owner decision, and legacy fallback uses the settled 30-day preview window. |
-| R2 external process preview | `planned` | Static manifest discovery, framed component protocol, and fail-closed process provider path are planned proof work. |
-| R3 production remote peer | `planned` | The project-local gateway should become a peer host for at least one native semantic route, without shelling through CLI or parsing `fgos.v1`. |
+| R2 external process preview | `implemented preview` | Static manifest discovery, framed component protocol, bounded supervision, and fail-closed external process provider path are proven with the `fixture.echo.echo` conformance fixture. Production WASM, marketplace/signatures, and persisted provider cache/lock remain future work. |
+| R3 production remote peer | `implemented preview` | `GET /v1/runtime` in the project-local gateway calls `InvocationService` directly for `distribution.build.show`, without `VerbGateway`, CLI shelling, Node spawn, or `fgos.v1` parsing. All other gateway routes remain legacy `VerbGateway` consumers. |
 | Chat host | `planned` | Chat is a future peer only after a real adapter and admission/interruption/presentation contracts exist. |
 
 ## 4. Ownership Boundary

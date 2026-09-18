@@ -5,11 +5,11 @@ Document type: Verification audit
 Audience: Human reviewer, architect, maintainer, documentation agent
 Purpose: Prove that old host-invocation source details were classified and preserved during migration
 Design status: Draft
-Implementation status: Current migration snapshot
+Implementation status: Historical migration snapshot plus R2/R3 status deltas
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Audit over docs/architect/host-invocation-routing/** and docs/platform/host-invocation-routing/**
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/intent-preservation-ledger.md
 - docs/platform/host-invocation-routing/history/source-inventory.md
@@ -44,10 +44,10 @@ No component-boundary change. This migration creates canonical platform document
 | `keep legacy` | Old docs remain under [../../../architect/host-invocation-routing/](../../../architect/host-invocation-routing/) with legacy/status notes while the transition remains active. |
 | `redirect` | Old docs now point readers to the promoted platform docs, and [../history/source-inventory.md](../history/source-inventory.md) records the destination set. |
 | `archive` | The standardization plan and agent-coordination references are retained as historical/pattern sources, not current host-invocation authority. |
-| `deferred` | R2/R3 protocol work, future chat host, marketplace/signature/WASM expansion, and open release-policy decisions stay deferred or planned. |
+| `deferred` | Future chat host, marketplace/signature/WASM expansion, persisted provider cache/lock, and open stable/default release-policy decisions stay deferred or planned. R2/R3 preview proof is now closed and tracked below. |
 | `superseded` | Rejected migration routes and old location authority are superseded by the promoted area structure and selected Rust-host-first sequence. |
 | `rejected` | Node-thinning-first, big-bang rewrite, semantic write dual-run, fake gate-policy component, and config-based replacement of built-ins are preserved as rejected choices in the ledger and migration docs. |
-| `unknown` | Stable/default graduation, first external provider set, and chat admission/interruption details remain unknown where the old sources left them open. Preview public posture and the 30-day legacy fallback escape-hatch window are now settled by packaging-distribution/release-owner decision. |
+| `unknown` | Stable/default graduation and chat admission/interruption details remain unknown where the old sources left them open. Preview public posture, the 30-day legacy fallback escape-hatch window, R2 fixture set, and R3 first route are now settled by proof/release-owner decisions. |
 
 ## 4. Alignment Rule Check
 
@@ -66,7 +66,8 @@ After the code scan, some former unknowns became code-verified current snapshots
 | Legacy compatibility support window. | Product / support decision | The support duration affects rollback and Node-removal policy, and was not settled in the source docs. | [compatibility-harness.md](compatibility-harness.md), [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 | Production native descriptors beyond `distribution.build.show`. | Code-verified current snapshot | `gate-bypass -> work.gate-bypass.show` is the second production native route; `test.fixture.echo` is a host-runtime test fixture. | [../spec.md](../spec.md#6-unknowns), [../contracts/command-route-descriptor.md](../contracts/command-route-descriptor.md) |
 | `gate-bypass` component ownership. | Code-verified local native proof | Code location is clear: read semantics live in `src/state/gate-bypass.mjs`, setup/doctor readiness lives in `src/setup/registrations.mjs`, and CLI grammar lives in `src/cli/command-registry.mjs`. Native migration uses existing work/state read ownership with no new component-boundary change. | [../roadmap.md](../roadmap.md#7-phase-d-add-the-next-native-read-route), [implementation-alignment.md](implementation-alignment.md) |
-| First external provider preview set and conformance fixture set. | Product / conformance decision | Scan found no current external process provider implementation or manifest set beyond planned protocol docs. | [r2-external-process-proof.md](r2-external-process-proof.md), [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
+| First external provider preview set and conformance fixture set. | Closed preview proof | R2 selected `fixture.echo.echo` and proved manifest, linker, frame codec, supervisor, and integration behavior. | [r2-external-process-proof.md](r2-external-process-proof.md), [../contracts/external-provider-manifest.md](../contracts/external-provider-manifest.md) |
+| First production remote peer route. | Closed preview proof | R3 selected `GET /v1/runtime` -> `distribution.build.show` and proved direct `InvocationService` invocation without `VerbGateway` or `fgos.v1` parsing. | [r3-remote-peer-proof.md](r3-remote-peer-proof.md), [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | Chat host admission, interruption, presentation, and lifecycle semantics. | Future host contract decision | Scan found no current chat host adapter implementation. | [../architecture/host-use-cases.md](../architecture/host-use-cases.md), [../intent-preservation-ledger.md](../intent-preservation-ledger.md) |
 
 ## 6. Code Scan Evidence
@@ -76,7 +77,8 @@ After the code scan, some former unknowns became code-verified current snapshots
 | Route matrix count | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json) | 73 selectors: 71 `legacy-cli`, two native. |
 | Native production operations | [../../../../apps/fgos/src/cli_projector.rs](../../../../apps/fgos/src/cli_projector.rs), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs) | `version` projects to `distribution.build.show`; `gate-bypass` projects to `work.gate-bypass.show`. |
 | Rust host/runtime proof | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../packages/host-runtime/rust/src/invocation_service.rs](../../../../packages/host-runtime/rust/src/invocation_service.rs) | Current partial code path exists. |
-| External provider implementation | `rg` over `src`, `bin`, `packages`, `apps`, `herdr-plugin` | No current external provider implementation/manifest set found. |
+| External provider implementation | [../../../../packages/host-runtime/rust/src/providers/external_process/](../../../../packages/host-runtime/rust/src/providers/external_process/), [r2-external-process-proof.md](r2-external-process-proof.md) | R2 preview path implemented with fixture proof; production ecosystem hardening remains future. |
+| Remote peer implementation | [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs), [../../../../herdr-plugin/src/gateway.rs](../../../../herdr-plugin/src/gateway.rs), [r3-remote-peer-proof.md](r3-remote-peer-proof.md) | `GET /v1/runtime` implemented preview; all other gateway routes remain legacy. |
 | Chat adapter implementation | `rg` over `src`, `bin`, `packages`, `apps`, `herdr-plugin` | No current chat host adapter found. |
 | Targeted tests | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14. |
 

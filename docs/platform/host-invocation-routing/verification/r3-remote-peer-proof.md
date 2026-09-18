@@ -11,7 +11,7 @@ Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md
 Last reviewed: 2026-09-18
 Related:
-- docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md
+- plans/260918-host-invocation-r3-remote-peer/plan.md
 - docs/platform/host-invocation-routing/architecture/host-use-cases.md
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
 ```
@@ -26,8 +26,8 @@ R3 proves at least one production gateway route as a true peer invocation: remot
 - **Operation id:** `distribution.build.show`
 - **Status:** Implemented preview (R3-P2 route wired, R3-P3 proof verified).
 - **Full frozen fields** (auth, request projection, response shape, error
-  mapping, deadline/disconnect, rationale): [r3-remote-peer-rollout-plan.md
-  §6 R3-P0](../r3-remote-peer-rollout-plan.md#r3-p0-route-and-contract-freeze).
+  mapping, deadline/disconnect, rationale): [R3 execution record
+  §6 R3-P0](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md#r3-p0-route-and-contract-freeze).
 
 ### 1.2 Adapter Status (R3-P1, 2026-09-18)
 
@@ -39,7 +39,7 @@ Focused proof passed:
 cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet
 ```
 
-The run passed 9 tests on 2026-09-18.
+The run passed 10 tests on 2026-09-18.
 
 ### 1.3 Route Wiring And Hard Regression Proof (R3-P2 / R3-P3, 2026-09-18)
 
@@ -102,7 +102,7 @@ Migrating any remaining routes is strictly out of R3 scope. Writes stay out of t
 
 | Relationship | File |
 | --- | --- |
-| rollout plan | [../r3-remote-peer-rollout-plan.md](../r3-remote-peer-rollout-plan.md) |
+| execution record | [../../../../plans/260918-host-invocation-r3-remote-peer/plan.md](../../../../plans/260918-host-invocation-r3-remote-peer/plan.md) |
 | host use cases | [../architecture/host-use-cases.md](../architecture/host-use-cases.md) |
 | release boundaries | [../architecture/release-boundaries.md](../architecture/release-boundaries.md) |
 | source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |

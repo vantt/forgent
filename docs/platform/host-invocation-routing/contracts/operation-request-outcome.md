@@ -5,11 +5,11 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define HostInvocation, OperationRequest, ContractRef, ProviderOutcome, ProviderError, and lifecycle outcomes
 Design status: Draft
-Implementation status: Accepted-not-implemented
+Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/invocation-kernel.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
@@ -39,8 +39,8 @@ Providers never block waiting for a person. If human input is required, the prov
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| `ProviderOutcome` is presentation-neutral. | `accepted-not-implemented` | [source architecture §5](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#5-core-contracts) | P3/P5 presenter proof. |
-| Legacy CLI bytes are not wrapped twice. | `accepted-not-implemented` | [legacy transition §4](../../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome) | Compatibility harness vectors. |
+| `ProviderOutcome` is presentation-neutral. | `current partial` | [../../../../packages/host-runtime/rust/src/contracts.rs](../../../../packages/host-runtime/rust/src/contracts.rs), [../../../../apps/fgos/src/cli_presenter.rs](../../../../apps/fgos/src/cli_presenter.rs), [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | CLI and remote presenters prove separate presentation for selected routes; future hosts/routes must keep this boundary. |
+| Legacy CLI bytes are not wrapped twice. | `implemented preview` | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs) | Compatibility vectors still protect future repairs, but preview legacy lane avoids double wrapping. |
 
 ## 6. Related Files
 
@@ -49,4 +49,3 @@ Providers never block waiting for a person. If human input is required, the prov
 | kernel architecture | [../architecture/invocation-kernel.md](../architecture/invocation-kernel.md) |
 | component protocol | [component-protocol.md](component-protocol.md) |
 | source architecture | [../../../architect/host-invocation-routing/host-invocation-provider-routing.md](../../../architect/host-invocation-routing/host-invocation-provider-routing.md) |
-

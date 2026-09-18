@@ -5,11 +5,11 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define per-selector native versus legacy CLI routing and repair ownership
 Design status: Draft
-Implementation status: Planned
+Implementation status: Current partial
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
 - docs/platform/host-invocation-routing/verification/compatibility-harness.md
@@ -41,8 +41,8 @@ Minimum fields:
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Descriptor exists for every selector. | `planned` | [source plan §6](../../../architect/host-invocation-routing/rust-cli-and-proof-components-plan.md#6-p1-compatibility-harness) | P1 generated artifact and drift tests. |
-| `legacy-cli` preserves provider-owned argv. | `planned` | [source transition §3](../../../architect/host-invocation-routing/legacy-cli-transition.md#3-command-metadata-and-parser-ownership) | P4 `args_os` tests. |
+| Descriptor exists for every selector. | `current partial` | [../../../../packages/host-runtime/contracts/command-routes.json](../../../../packages/host-runtime/contracts/command-routes.json), [../../../../test/rust-host/command-routes.test.mjs](../../../../test/rust-host/command-routes.test.mjs) | Current snapshot has 73 selectors: 71 `legacy-cli`, two native. Keep drift tests current as selectors move. |
+| `legacy-cli` preserves provider-owned argv. | `implemented preview` | [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Full compatibility-vector cleanup remains future, but manifest-owned legacy CLI lane is proven for preview. |
 
 ## 4. Related Files
 
@@ -51,4 +51,3 @@ Minimum fields:
 | legacy transition | [../architecture/legacy-cli-transition.md](../architecture/legacy-cli-transition.md) |
 | compatibility harness | [../verification/compatibility-harness.md](../verification/compatibility-harness.md) |
 | legacy payload | [legacy-payload.md](legacy-payload.md) |
-

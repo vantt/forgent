@@ -5,11 +5,11 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the planned Node/Rust compatibility harness requirements
 Design status: Draft
-Implementation status: Current harness plus planned R2/R3 extensions
+Implementation status: Current harness plus R2/R3 preview extensions
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/rust-cli-and-proof-components-plan.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
@@ -26,8 +26,9 @@ Coverage includes every selector, descriptor uniqueness, help/syntax passthrough
 ## 3. Status
 
 Current R1 preview proof covers Node/Rust CLI compatibility for the Rust host
-preview installed/default path. R2/R3 still need external process and remote
-peer extensions.
+preview installed/default path. R2 adds external process protocol/conformance
+proof, and R3 adds the first production remote peer route proof through
+`GET /v1/runtime`.
 
 Legacy Node fallback remains available only as a deprecated explicit escape
 hatch for 30 calendar days after preview release publication. For the

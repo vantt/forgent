@@ -5,11 +5,11 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define legacy Node payload identity, source location, release placement, and compatibility boundaries
 Design status: Draft
-Implementation status: Legacy-current plus accepted-not-implemented release manifest binding
+Implementation status: Legacy-current plus implemented-preview release manifest binding
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
@@ -41,7 +41,7 @@ Node payload tests may spawn `bin/fgos.mjs` directly because they test the paylo
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Source payload file remains unmoved. | `legacy-current` | [../../../../bin/fgos.mjs](../../../../bin/fgos.mjs) | Keep until zero legacy routes and removal gates pass. |
-| Release manifest locates payload. | `accepted-not-implemented` | [release manifest contract](../../packaging-distribution/contracts/release-manifest.md) | P6 staged release proof. |
+| Release manifest locates payload. | `implemented preview` | [release manifest contract](../../packaging-distribution/contracts/release-manifest.md), [../../packaging-distribution/reports/track-closeout.md](../../packaging-distribution/reports/track-closeout.md), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep manifest-owned legacy payload resolution until zero legacy routes and removal gates pass. |
 | `fgos-runner` remains public Node entry until migrated. | `legacy-current` | [../../../../package.json](../../../../package.json) | Include in R1 runtime inventory. |
 
 ## 5. Related Files
