@@ -1131,6 +1131,17 @@ async fn post_runner_tick(State(state): State<AppState>) -> Result<Json<Value>, 
     Ok(Json(result?))
 }
 
+/// `GET /v1/runtime`: native remote peer invocation for distribution.build.show (R3-P2).
+/// Calls `InvocationService` directly via `crate::remote_invocation` without shelling
+/// through `fgos` CLI or parsing `fgos.v1` envelopes.
+async fn get_runtime(State(_state): State<AppState>) -> Result<Json<Value>, GatewayError> {
+    let service = crate::remote_invocation::build_invocation_service();
+    let (invocation, request) = crate::remote_invocation::project_remote_build_show_invocation();
+    let outcome = service.invoke(invocation, request).await;
+    let value = crate::remote_invocation::present_remote_outcome(outcome)?;
+    Ok(Json(value))
+}
+
 /// `GET /v1/contract`: serves the gateway's own OpenAPI spec verbatim, so an
 /// agent can read it and self-implement a client without hand-tracking a
 /// separate doc (the whole point of D10's own "real, versioned, public
@@ -1200,6 +1211,7 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
         .route("/sessions/{sessionId}", delete(delete_session))
         .route("/sessions/{sessionId}/slots", get(get_session_slots))
         .route("/runner/tick", post(post_runner_tick))
+        .route("/runtime", get(get_runtime))
         .nest_service("/mcp", mcp_service)
         .route_layer(middleware::from_fn_with_state(state.clone(), require_token));
 
@@ -1382,6 +1394,16 @@ mod tests {
         fn run_verb(&self, args: &[String]) -> Result<Value, GatewayError> {
             self.captured.lock().unwrap().push(args.to_vec());
             Ok(self.response.clone())
+        }
+    }
+
+    /// R3-P3: fails loudly if any request hits VerbGateway, proving native routes
+    /// bypass the legacy CLI-shelling chokepoint completely.
+    struct PanicGateway;
+
+    impl VerbGateway for PanicGateway {
+        fn run_verb(&self, _args: &[String]) -> Result<Value, GatewayError> {
+            panic!("VerbGateway must not be called for /v1/runtime");
         }
     }
 
@@ -2250,5 +2272,131 @@ mod tests {
         let data = get_work_docs_request(app, "tsk-4id").await;
         assert_eq!(data["data"]["docsRef"], Value::Null);
         assert_eq!(data["data"]["contextMd"], Value::Null);
+    }
+
+    // -----------------------------------------------------------------------
+    // R3-P3: GET /v1/runtime regression and boundary proof
+    // -----------------------------------------------------------------------
+
+    #[tokio::test]
+    async fn get_runtime_does_not_call_verb_gateway_and_has_no_envelope_wrapping() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(PanicGateway);
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/runtime")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(
+            response.status(),
+            StatusCode::OK,
+            "GET /v1/runtime must return 200 without calling VerbGateway (PanicGateway)"
+        );
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let val: Value = serde_json::from_slice(&body).unwrap();
+
+        // Proves no fgos.v1 envelope wrapping (contract, data, data_hash)
+        assert!(val.get("contract").is_none(), "response must not have 'contract' key");
+        assert!(val.get("data").is_none(), "response must not have 'data' key");
+        assert!(val.get("data_hash").is_none(), "response must not have 'data_hash' key");
+    }
+
+    #[tokio::test]
+    async fn get_runtime_requires_authentication() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(PanicGateway);
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        // Unauthenticated (no token)
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/runtime")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::UNAUTHORIZED,
+            "unauthenticated /v1/runtime must be rejected with 401"
+        );
+
+        // Wrong token
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/runtime")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer wrong-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status(),
+            StatusCode::UNAUTHORIZED,
+            "wrong token on /v1/runtime must be rejected with 401"
+        );
+    }
+
+    #[tokio::test]
+    async fn get_runtime_happy_path_contains_build_show_outcome_fields() {
+        use axum::body::Body;
+        use axum::http::Request;
+        use tower::ServiceExt;
+
+        let gateway: Arc<dyn VerbGateway> = Arc::new(PanicGateway);
+        let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
+
+        let response = app
+            .oneshot(
+                Request::builder()
+                    .method("GET")
+                    .uri("/v1/runtime")
+                    .header(axum::http::header::AUTHORIZATION, "Bearer test-token")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let val: Value = serde_json::from_slice(&body).unwrap();
+
+        assert!(
+            val.get("packageVersion").is_some_and(|v| v.is_string()),
+            "must contain packageVersion string from BuildShowOutcome"
+        );
+        assert!(
+            val.get("verbs").is_some_and(|v| v.is_array()),
+            "must contain verbs array from BuildShowOutcome"
+        );
+        assert!(
+            val.get("runtime").is_some_and(|v| v.is_object()),
+            "must contain runtime object from BuildShowOutcome"
+        );
+        assert_eq!(val["runtime"]["host"], "rust");
     }
 }

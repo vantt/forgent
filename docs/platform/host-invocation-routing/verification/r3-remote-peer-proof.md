@@ -5,7 +5,7 @@ Document type: Verification
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the proof gate for production remote peer adoption
 Design status: Draft
-Implementation status: In progress (R3-P0 frozen; R3-P1 adapter implemented preview; route not wired)
+Implementation status: Implemented preview (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2/P3 route and proof closed; R3-P4 inventory recorded)
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md and rust-cli-and-proof-components-plan.md
@@ -24,9 +24,7 @@ R3 proves at least one production gateway route as a true peer invocation: remot
 
 - **Route:** `GET /v1/runtime`
 - **Operation id:** `distribution.build.show`
-- **Status:** contract frozen. R3-P1 adapter code exists in
-  `herdr-plugin/src/remote_invocation.rs`; `herdr-plugin/src/gateway.rs` still
-  has no `/runtime` route.
+- **Status:** Implemented preview (R3-P2 route wired, R3-P3 proof verified).
 - **Full frozen fields** (auth, request projection, response shape, error
   mapping, deadline/disconnect, rationale): [r3-remote-peer-rollout-plan.md
   §6 R3-P0](../r3-remote-peer-rollout-plan.md#r3-p0-route-and-contract-freeze).
@@ -41,31 +39,63 @@ Focused proof passed:
 cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet
 ```
 
-The run passed 9 tests on 2026-09-18. This proves the adapter surface exists,
-but not the production gateway route. R3 remains incomplete until R3-P2/R3-P3
-wire and harden `GET /v1/runtime`.
+The run passed 9 tests on 2026-09-18.
 
-## 2. No-Shell / No-`fgos.v1`-Parse Proof Strategy (frozen at R3-P0, proven at R3-P3)
+### 1.3 Route Wiring And Hard Regression Proof (R3-P2 / R3-P3, 2026-09-18)
 
-The route above must ship with, at minimum:
+`GET /v1/runtime` is wired into `herdr-plugin/src/gateway.rs`:
+- **Handler & Wiring:** Handler `get_runtime` calls `crate::remote_invocation::build_invocation_service()`, `project_remote_build_show_invocation()`, invokes `InvocationService`, and presents the outcome via `present_remote_outcome()`. Mounted as `.route("/runtime", get(get_runtime))` inside the existing `authenticated` router in `build_router`, nested under `/v1` (`GET /v1/runtime`).
+- **Auth Behavior:** Sits behind the same `require_token` middleware as every other authenticated route (`Authorization: Bearer <token>` / Cf-Access). Unauthenticated and wrong-token requests are rejected with 401 Unauthorized (proven by `get_runtime_requires_authentication`).
+- **Hard No-VerbGateway Proof:** `PanicGateway` regression test (`get_runtime_does_not_call_verb_gateway_and_has_no_envelope_wrapping`) implements `VerbGateway` with an unconditional panic (`panic!("VerbGateway must not be called for /v1/runtime")`). An authenticated request to `GET /v1/runtime` succeeds with HTTP 200 without calling `VerbGateway`.
+- **Hard No-`fgos.v1`-Envelope Proof:** The JSON response is verified to have no `contract`, `data`, or `data_hash` keys. The response contains direct `BuildShowOutcome` fields (`packageVersion`, `verbs`, `runtime`) from the typed provider outcome (proven by `get_runtime_happy_path_contains_build_show_outcome_fields`).
 
-- a fake-`VerbGateway` regression test that panics if `distribution.build.show`
-  ever reaches it through `GET /v1/runtime`, so the route is proven to bypass
-  the legacy `run_verb_blocking` chokepoint (`herdr-plugin/src/gateway.rs`)
-  rather than merely happening not to call it today; and
-- a fixture/assertion test proving the `GET /v1/runtime` JSON response is
-  built from `ProviderOutcome::Completed`'s typed `BuildShowOutcome` (via the
-  remote presenter added in R3-P1), not from parsing CLI `fgos.v1` stdout —
-  the two shapes are allowed to (and are expected to) differ so the assertion
-  cannot pass by accident.
+Focused proof passed:
 
-Both are R3-P3 work (see the rollout plan's packet queue); this section
-records the strategy so R3-P1/P2 build the route in a way R3-P3 can prove
-against, without re-deciding the strategy mid-implementation.
+```sh
+cargo test --manifest-path herdr-plugin/Cargo.toml --lib gateway --quiet
+```
 
-## 3. Remaining Legacy Routes
+All 47 tests passed on 2026-09-18.
 
-Untouched routes may stay on the old adapter during a named rollback window, but they must remain visible with a consumer list. Delete the `VerbGateway` chokepoint only after its consumer list is empty.
+## 2. No-Shell / No-`fgos.v1`-Parse Proof Strategy (Proven at R3-P3)
+
+The proof requirements frozen at R3-P0 are satisfied in `herdr-plugin/src/gateway.rs`:
+
+- `PanicGateway` regression test proves `distribution.build.show` never reaches `VerbGateway` / `run_verb_blocking` through `GET /v1/runtime`;
+- Assertion tests prove `GET /v1/runtime` returns the typed `BuildShowOutcome` structure rather than parsing CLI `fgos.v1` stdout (no `contract`, `data`, or `data_hash` envelope keys).
+
+## 3. Remaining VerbGateway Consumers (R3-P4 Inventory)
+
+R3 migrates only `GET /v1/runtime`. Every other existing route in the `authenticated` router's `.route(...)` list continues to call `run_verb_blocking` -> `VerbGateway::run_verb` -> (real implementation `FgosCliGateway`) `spawn_fgos_verb` -> shells the `fgos` CLI and parses its `fgos.v1` JSON envelope (`{contract, generated_at, data_hash, data}`). `/runner/tick` shells `node bin/fgos-runner.mjs --once` directly (not through `VerbGateway`, but still a CLI/Node shell).
+
+`/contract` (outside `authenticated`, serving OpenAPI YAML directly from disk) and the new `/runtime` are the only routes that do neither.
+
+| Route | Method | Nature | Current Execution Mechanism | Shelling / Envelope Details | Scope / Migration Preconditions |
+| --- | --- | --- | --- | --- | --- |
+| `/v1/work` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos list --json`, parses `fgos.v1` | Out of R3 scope; requires native Work/State read provider |
+| `/v1/work` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos submit`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos show`, parses `fgos.v1` | Out of R3 scope; requires native Work/State read provider |
+| `/v1/work/{id}` | PATCH | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos edit`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/docs` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos show`, parses `fgos.v1`, reads fs | Out of R3 scope; requires native Work/State read provider |
+| `/v1/work/{id}/move` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos move`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/ask` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos ask`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/answer` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos answer`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/take` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos take`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/return` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos return`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/approve` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos approve`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/work/{id}/reject` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos reject`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/ready` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos ready --json`, parses `fgos.v1` | Out of R3 scope; requires native ready provider |
+| `/v1/rollup/{id}` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos rollup`, parses `fgos.v1` | Out of R3 scope; requires native rollup provider |
+| `/v1/graph` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos graph --json`, parses `fgos.v1` | Out of R3 scope; requires native graph provider |
+| `/v1/state/digest` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos list --json`, parses `fgos.v1` (discards `data`) | Out of R3 scope; requires native state digest provider |
+| `/v1/sessions` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos session start`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/sessions/{sessionId}` | DELETE | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos session end`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
+| `/v1/sessions/{sessionId}/slots` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos slots --json`, parses `fgos.v1` | Out of R3 scope; requires native slots provider |
+| `/v1/runner/tick` | POST | Write | `tokio::task::spawn_blocking` spawning `node` | Shells `node bin/fgos-runner.mjs --once` directly | Out of R3 scope; writes/runner stay out of peer-host path |
+| `/v1/contract` | GET | Read | Static file read | Reads OpenAPI spec from disk directly | Outside `authenticated`; no VerbGateway, no CLI shell |
+| `/v1/runtime` | GET | Read | Native `InvocationService::invoke` via `remote_invocation.rs` | Direct provider outcome; no CLI shell, no `fgos.v1` | **Implemented preview (R3-P2/P3)** |
+
+Migrating any remaining routes is strictly out of R3 scope. Writes stay out of the peer-host path entirely per the plan's Non-Goals. The gateway as a whole has NOT migrated; only `GET /v1/runtime` has been converted to the native remote peer invocation path. Delete the `VerbGateway` chokepoint only after this entire consumer list is empty in future milestones.
 
 ## 4. Related Files
 

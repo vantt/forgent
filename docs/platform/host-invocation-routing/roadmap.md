@@ -77,9 +77,11 @@ and the preview parts of Phase B/C are closed. Stable/default graduation still
 requires packaging-distribution or release-owner decisions. Phase F now has
 its precondition satisfied (Phase E delivered `fixture.echo.echo`, a semantic
 operation that is not only a built-in CLI route) and can proceed on its own
-rollout plan. As of the 2026-09-18 code scan, Phase F has started: the R3-P1
-remote projector/presenter adapter exists in `herdr-plugin/src/remote_invocation.rs`
-and its focused tests pass; the remaining work is R3-P2 through R3-P5 in
+rollout plan. Phase F is now implemented preview: R3-P0 through R3-P5 are
+closed on 2026-09-18, proving native remote peer invocation for
+`distribution.build.show` (`GET /v1/runtime` in `herdr-plugin/src/gateway.rs`)
+without `VerbGateway`, CLI shelling, or `fgos.v1` envelope parsing. All other
+gateway routes remain on `VerbGateway` per
 [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
 
 ## 4. Phase A: Close Local R1 Host Proof
@@ -211,25 +213,28 @@ Goal: prove a project-local remote host is a peer of CLI for at least one native
 
 Detailed rollout plan: [r3-remote-peer-rollout-plan.md](r3-remote-peer-rollout-plan.md).
 
-Current status: R3-P0 route/contract freeze is closed and R3-P1 adapter proof
-is implemented preview. `GET /v1/runtime` is not wired in
-`herdr-plugin/src/gateway.rs` yet, so the next implementation frontier is
-R3-P2 gateway route wiring followed by R3-P3 no-shell/no-`fgos.v1` proof.
+Current status: Closed as implemented preview on 2026-09-18 (R3-P0 through
+R3-P5). `GET /v1/runtime` (`distribution.build.show`) is wired directly to
+`InvocationService` via `herdr-plugin/src/remote_invocation.rs` inside the
+`authenticated` router in `herdr-plugin/src/gateway.rs`. Hard regression
+tests prove no `VerbGateway` calls (`PanicGateway`) and no `fgos.v1` envelope
+parsing. All other gateway routes remain legacy `VerbGateway` / CLI-shelling
+consumers.
 
 Host-invocation tasks:
 
-- Add a gateway route that calls the same invocation service directly.
-- Prove it does not shell through CLI.
-- Prove it does not parse `fgos.v1` internally.
-- Keep CLI and remote projection differences host-local.
-- Keep lifecycle, authority, and provider outcome semantics aligned with the kernel.
+- Add a gateway route that calls the same invocation service directly. -- done (`GET /v1/runtime`).
+- Prove it does not shell through CLI. -- done (`PanicGateway` regression test).
+- Prove it does not parse `fgos.v1` internally. -- done (direct `BuildShowOutcome` shape assertion).
+- Keep CLI and remote projection differences host-local. -- done.
+- Keep lifecycle, authority, and provider outcome semantics aligned with the kernel. -- done.
 
 Packaging dependency: light. The remote host must use the selected project-local runtime adapter. Packaging-distribution owns that runtime selection; host-invocation owns the route once runtime is selected.
 
 Done when:
 
-- [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) has production route and test evidence.
-- Remote peer can be labelled `current` for that route only.
+- [verification/r3-remote-peer-proof.md](verification/r3-remote-peer-proof.md) has production route and test evidence. -- done, closed 2026-09-18.
+- Remote peer can be labelled `implemented preview` for that route only. -- done.
 
 ## 10. Phase G: Chat Host Contract
 

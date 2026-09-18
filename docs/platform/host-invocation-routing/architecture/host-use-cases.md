@@ -5,7 +5,7 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define CLI, remote, chat, and future hosts as peer invocation surfaces
 Design status: Draft
-Implementation status: Accepted; R3 adapter in progress
+Implementation status: Accepted; R3 remote peer implemented preview for distribution.build.show
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/host-invocation-provider-routing.md
@@ -25,15 +25,15 @@ Related:
 | Host use case | Owns | Never does | Status |
 | --- | --- | --- | --- |
 | CLI | CLI grammar, selector lookup, terminal stdio, `fgos.v1` and exit-code presentation. | Own operation implementation or plugin ABI. | `legacy-current` for Node payload; target peer model `accepted-not-implemented`. |
-| Remote | Remote caller context, REST/MCP projection, deadlines, disconnect, streaming, response projection. | Invoke CLI, parse argv, or treat `fgos.v1` as internal API. | `in progress` for R3; first route (`GET /v1/runtime`) contract frozen and adapter implemented preview, route not wired. |
+| Remote | Remote caller context, REST/MCP projection, deadlines, disconnect, streaming, response projection. | Invoke CLI, parse argv, or treat `fgos.v1` as internal API. | `implemented preview` for R3 (proven peer for `distribution.build.show` via `GET /v1/runtime`); all other routes stay legacy `VerbGateway`. |
 | Chat | Chat caller/session context, intent mapping, clarification, progress, interruption, response projection. | Invoke CLI/remote host or parse their public protocols. | `planned`. |
 
 ## 3. Implementation Alignment
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Remote peer is project-local gateway in R3. | `current partial` | Source: [old architecture §10](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries), [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs) | Adapter proof exists; prove one native gateway route in [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md). |
-| `GET /v1/runtime` (`distribution.build.show`) is the first remote-host-use-case proof for R3. | `current partial` (contract frozen; adapter implemented preview; route not wired) | [../r3-remote-peer-rollout-plan.md §2.1/§6 R3-P0](../r3-remote-peer-rollout-plan.md#21-r3-p0-decision-2026-09-17), [../verification/r3-remote-peer-proof.md §1.1](../verification/r3-remote-peer-proof.md#11-selected-route-r3-p0-2026-09-17), [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs) | Wire the route (R3-P2) and add no-shell/no-parse proof (R3-P3); `herdr-plugin/src/gateway.rs` has no `/runtime` route yet. |
+| Remote peer is project-local gateway in R3. | `current partial` | Source: [old architecture §10](../../../architect/host-invocation-routing/host-invocation-provider-routing.md#10-release-boundaries), [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs), [../../../../herdr-plugin/src/gateway.rs](../../../../herdr-plugin/src/gateway.rs) | Proven native gateway route for `distribution.build.show` in [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md); all other routes remain legacy `VerbGateway`. |
+| `GET /v1/runtime` (`distribution.build.show`) is the first remote-host-use-case proof for R3. | `implemented preview` | [../r3-remote-peer-rollout-plan.md §2.1/§6 R3-P0](../r3-remote-peer-rollout-plan.md#21-r3-p0-decision-2026-09-17), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md), [../../../../herdr-plugin/src/gateway.rs](../../../../herdr-plugin/src/gateway.rs), [../../../../herdr-plugin/src/remote_invocation.rs](../../../../herdr-plugin/src/remote_invocation.rs) | Route wired and verified with no-VerbGateway / no-fgos.v1 proof. Remote host is now a proven peer for `distribution.build.show` only. |
 | Future shared multi-project gateway is separate. | `planned` | [Packaging future constraints](../../packaging-distribution/architecture/future-constraints.md) | Keep separate from R3 project-local gateway. |
 
 ## 4. Related Files
