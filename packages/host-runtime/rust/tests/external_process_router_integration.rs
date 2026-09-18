@@ -71,7 +71,7 @@ fn fixture_manifest_path() -> PathBuf {
 fn test_catalog() -> OperationCatalog {
     static CATALOG_CELL: std::sync::OnceLock<&'static [OperationDescriptor]> =
         std::sync::OnceLock::new();
-    *CATALOG_CELL.get_or_init(|| {
+    CATALOG_CELL.get_or_init(|| {
         let mut entries = CATALOG.to_vec();
         entries.push(OperationDescriptor {
             operation_id: OperationId::from_static(FIXTURE_OPERATION_ID),
@@ -90,7 +90,7 @@ fn test_catalog() -> OperationCatalog {
 
 fn derive_fixture_descriptor() -> ProviderDescriptor {
     let linker = ExternalProcessLinker::new();
-    let manifest = ExternalManifest::load_from_file(&fixture_manifest_path())
+    let manifest = ExternalManifest::load_from_file(fixture_manifest_path())
         .expect("frozen fixture manifest.yaml must load and validate");
     let registry = linker
         .link(&[manifest])
@@ -116,7 +116,7 @@ fn build_test_snapshot() -> (RegistrySnapshot, ProviderDescriptor) {
 #[test]
 fn test_linker_accepts_and_derives_fixture_echo_entry() {
     let linker = ExternalProcessLinker::new();
-    let manifest = ExternalManifest::load_from_file(&fixture_manifest_path())
+    let manifest = ExternalManifest::load_from_file(fixture_manifest_path())
         .expect("frozen fixture manifest.yaml must load and validate");
     let registry = linker
         .link(&[manifest])
