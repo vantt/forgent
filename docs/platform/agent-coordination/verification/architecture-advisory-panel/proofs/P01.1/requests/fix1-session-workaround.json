@@ -1,0 +1,44 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix round 1 for cell P01.1, run as its OWN fresh session because architecture-advisory-panel--p01-1 auto-closed to a terminal 'partial' status before a fix round could be authorized on it (real product gap, filed as feedback). Reuses the produce/review/red-team graph slots -- NOT revise-candidate/*-recheck, which are unreachable in a brand-new session's own graph traversal. No partialPolicy declared this time, learning from the prior mistake: leave the session non-terminal/active so it stays usable if a further round is needed; the driver's own disposition:cell-closed event is the real closure record regardless of manifest.status, exactly as done for P00.1.",
+  "writerId": "p01-1-fix1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p01-1-fix1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "doer", "executor": "claude", "tier": "critical", "persona": "principal-architecture-writer-fixer" },
+    { "id": "reviewer", "executor": "codex-cli", "tier": "analytical", "persona": "detail-oriented-rechecker" },
+    { "id": "red-team", "executor": "agy-cli", "tier": "analytical", "persona": "relentless-attacker" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "produce",
+      "operationId": "produce-candidate",
+      "targetActorId": "doer",
+      "taskKey": "produce-candidate-doer-fix1",
+      "objective": "This is Fix Round 1 for cell P01.1 (architecture-advisory-panel--p01-1, closed worktree ../architecture-advisory-panel-p01-1) -- you are acting as Fixer here, dispatched through the produce-candidate slot only because the original session's own revise-candidate slot became unreachable (unrelated infra gap, not your concern). Read docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.1.md in full first (Review, Red-Team, and Driver Dispositions P1-P7 sections are the exact spec). Apply exactly these fixes to the 4 soul files under docs/architect/agent-coordination/playbooks/: (P1, HIGH) Add stable persisted paths AND real prose templates for: the Phase-8 human-facing explanation, each authorized panel dialogue-turn response, the independent red-team's own redteam.md output, and a standalone reviewer output -- update the coordinator prompt's PERSISTENT STATE tree to name all these paths explicitly, and add matching template sections to architecture-advisory-artifact-templates.md so a fresh coordinator never has to invent a filename or shape for any of the four Dialogue Turn Protocol layers or the red-team/reviewer outputs. (P2, MEDIUM) Fix the coordinator prompt's self-contradictory 'No git authority' bound: it currently forbids git authority then immediately permits committing the session's own evidence artifacts. Reword so the bound clearly reads as 'no git mutation inside PROJECT_ROOT (the system under advice)' while explicitly and separately stating that the session's own evidence commits (in its own track directory, never PROJECT_ROOT) are a distinct, always-permitted bookkeeping action. (P3, MEDIUM) For every STOP CONDITION in the coordinator prompt that currently has no concrete detection trigger (e.g. 'the case turns out to be already decided', 'the question is not actually an architecture question', 'proceeding would require inventing a fact about the person's obligations'), add at least one concrete, observable marker or worked example a coordinator could actually detect in a real session. (P4, MEDIUM) Clarify Phase 1 (Intake and Framing): PERSON is a session INPUT filled by the launcher at session start, never something the coordinator asks the person mid-conversation; state that any authority-verification detail beyond the input block must come from Phase 3's scouting, never a direct question. (P6, LOW) Sharpen the Lead Advisor's and Synthesizer's one-line Purpose statements to be visibly architecture-specific rather than generic-consulting-shaped. (P7, LOW) Sharpen the Constraint Advocate's Bad Example to a subtler, more realistic failure rather than an easy-to-spot caricature. Do NOT touch anything outside the panel-soul lease (the 4 playbook files plus this cell's own verification/report paths under docs/architect/agent-coordination/verification/architecture-advisory-panel/{P01.1.md,proofs/P01.1/**} and plans/260905-architecture-advisory-panel/reports/**). P5 (no enforcement mechanism against a fabricated human decision) is explicitly OUT of scope -- acknowledged as a Phase 03.1 concern; do not attempt to build any enforcement mechanism, that would itself be scope creep. Update P01.1.md's own Fix/Recheck History and Changed Paths sections, note this session-workaround explicitly. Commit on the ORIGINAL cell worktree branch (architecture-advisory-panel--p01-1, at ../architecture-advisory-panel-p01-1) -- this new coordinationId is only a dispatch-mechanism workaround, not a new cell or new worktree.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "the 4 soul files updated with P1-P4/P6-P7 fixes", "docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.1.md updated with Fix/Recheck History noting the session workaround", "a real git commit on architecture-advisory-panel--p01-1's own worktree branch"],
+      "mutation": "mutating"
+    },
+    {
+      "type": "operation",
+      "as": "review",
+      "operationId": "review-candidate",
+      "targetActorId": "reviewer",
+      "taskKey": "review-candidate-reviewer-fix1",
+      "objective": "This is a RECHECK of Fix Round 1 for cell P01.1, dispatched through the review-candidate slot only because the original session's own reviewer-recheck slot became unreachable (unrelated infra gap). Recheck the Fixer's revision against P01.1.md's Driver Dispositions P1-P4, P6-P7. Specifically verify: the persistent-state tree now names explicit paths for the Phase-8 explanation, dialogue-turn response, red-team output, and reviewer output, AND real prose templates for all four now exist in architecture-advisory-artifact-templates.md (not just path names); the 'No git authority' bound reads as genuinely non-contradictory; every previously-flagged stop condition has a concrete, observable trigger or worked example; Phase 1 no longer ambiguously invites asking the person for authority details directly. Flag anything still wrong or only partially fixed as a new finding, do not rubber-stamp. Do not re-litigate P5 (out of scope for this round by design).",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:produce"]
+    },
+    {
+      "type": "operation",
+      "as": "redTeam",
+      "operationId": "red-team-candidate",
+      "targetActorId": "red-team",
+      "taskKey": "red-team-candidate-red-team-fix1",
+      "objective": "This is a RECHECK of Fix Round 1 for cell P01.1, dispatched through the red-team-candidate slot only because the original session's own red-team-recheck slot became unreachable (unrelated infra gap). Re-attempt the same 4 attack classes that found real issues in your first pass (generic top-line role purpose statements; caricatured bad examples; un-detectable stop conditions; Phase 1 authority-intake ambiguity) against the Fixer's revision. IMPORTANT: write your findings into a real, structured agent-result.json with a findings array this time -- your first pass's agent-result.json was a useless one-line summary with no findings array, the substance was buried in a separate agent-report.md the Coordinator had to find manually; do not repeat that, put the real findings directly in agent-result.json's own findings field. Report any attack that still succeeds as a blocking finding.",
+      "expectedOutputs": ["agent-result.json (status, summary, findings array)"],
+      "contextRefs": ["$ref:produce"]
+    }
+  ]
+}

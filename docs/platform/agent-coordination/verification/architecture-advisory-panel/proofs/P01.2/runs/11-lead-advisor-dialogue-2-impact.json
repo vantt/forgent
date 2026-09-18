@@ -1,0 +1,12 @@
+{
+  "ordinal": 11,
+  "role": "lead-advisor-phase9-impact-turn2",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "lead-advisor" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "promptPath": "proofs/P01.2/prompts/lead-advisor-dialogue-2-impact.md",
+  "rawLogPath": "proofs/P01.2/runs/11-lead-advisor-dialogue-2-impact-raw.log",
+  "outputArtifact": "proofs/P01.2/dialogue/2-impact.md",
+  "exitCode": 0,
+  "doctrineCheck": "precisely distinguishes permission from instruction ('làm luôn cũng được' is consent, not a decision -- refuses to record it as 'the person decided to build'); reclassifies the four known defects against the stated audience without re-verifying the underlying scout reports from memory (explicitly flagged); finds a genuinely new, undetermined gap (Windows distribution/installation path for a non-technical user) rather than assuming one; gives a bounded, honest recommendation with explicit remaining gaps split by who needs to answer them"
+}

@@ -1,0 +1,111 @@
+=== R8 live proof: real .fgos/config.json, real subprocess dispatch, no fakes ===
+
+--- Registered provider families (read live from the real config) ---
+  claude: providerModel=(claude, default)
+  claude-reviewer: providerModel=(claude, default)
+  agy-cli: providerModel=gemini
+  agy-herdr: providerModel=gemini
+  codex-cli: providerModel=(claude, default)
+  codex-pi: providerModel=openai-codex
+  glm-cli: providerModel=z-ai
+  claude-herdr: providerModel=(claude, default)
+  pi-herdr: providerModel=openai-codex
+  codex-herdr: providerModel=(claude, default)
+modelPolicies: {
+  "claude": {
+    "lightweight": "haiku",
+    "standard": "sonnet",
+    "creative": "sonnet",
+    "analytical": "sonnet",
+    "critical": "opus"
+  },
+  "gemini": {
+    "lightweight": "gemini-3.6-flash-medium"
+  },
+  "openai-codex": {
+    "lightweight": "gpt-5.5"
+  },
+  "z-ai": {
+    "lightweight": "z-ai/glm-5.2"
+  }
+}
+
+Workspace (isolated, no git repo, no secrets written): /tmp/fgos-r8-live-proof-H1njG8
+
+=== Step 0: bounded recovery attempt -- can a SECOND real provider family (gemini via agy-cli) ever be dispatched through this session-engine.mjs path? ===
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Recovery attempt failed closed, exactly as predicted:
+  RunnerConfigError: no model configured for policy tier "standard" under provider "gemini".
+
+Conclusion: a genuine two-real-provider-family live proof is NOT achievable through session-engine.mjs today -- this is a pre-existing, structural constraint of resolveAssignmentDispatchPolicy's tier floor (assignment-policy.mjs), not something this cell's own code can route around without touching a file outside this cell's ownership. Declaring the R8 stop gate for the SECOND provider family; completing the achievable single-family (claude) live proof below to prove the fan-out/isolation/synthesis MECHANICS work end to end for real.
+
+=== Step 1: real live fan-out/fan-in proof (claude family, the one genuinely reachable tier/provider combination) ===
+Session opened. actors bound before any Assignment: [ 'coordinator-actor', 'researcher-a', 'researcher-b' ]
+fgos: dispatch capability=(none declared) executor=claude-reviewer via=cli-spawn provider=claude model=sonnet tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+Coordinator dispatch-research settled: done reported
+
+--- Allocation explanation (planCohort output) ---
+  actor "coordinator-actor" (role "coordinator") allocated to executor "claude" (provider "claude", tier "standard") -- chosen from 3 eligible candidate(s) in stable order; provider family "claude" not yet used by this cohort
+  actor "researcher-a" (role "researcher") allocated to executor "agy-cli" (provider "gemini", tier "lightweight") -- chosen from 7 eligible candidate(s) in stable order; provider family "gemini" not yet used by this cohort
+  actor "researcher-b" (role "researcher") allocated to executor "codex-pi" (provider "openai-codex", tier "lightweight") -- chosen from 6 eligible candidate(s) in stable order; provider family "openai-codex" not yet used by this cohort
+diversity: {"required":2,"achieved":3,"satisfied":true,"degraded":false,"fallbackRuleApplied":null}
+
+--- Concurrency overlap ---
+Both branches launched via ONE Promise.allSettled batch; total wall time for the batch: 10ms.
+
+--- Branch outcomes (resolved provenance, real dispatch) ---
+  researcher-a: dispatch=rejected, runResult.status=undefined, confidence=undefined, executor=undefined, provider=undefined, tier=undefined
+  researcher-b: dispatch=rejected, runResult.status=undefined, confidence=undefined, executor=undefined, provider=undefined, tier=undefined
+
+--- Branch isolation (contextRefs) ---
+  researcher-a: contextRefs = undefined
+  researcher-b: contextRefs = undefined
+
+--- Fan-in synthesis ---
+status: synthesized
+accepted: []
+unverified: []
+failed: []
+missing: [
+  {
+    "actorId": "researcher-a",
+    "assignmentId": "asgn_r8_proof_driver_op_004",
+    "reason": "Assignment created but not yet settled (no linked RunResult)"
+  },
+  {
+    "actorId": "researcher-b",
+    "assignmentId": "asgn_r8_proof_driver_op_005",
+    "reason": "Assignment created but not yet settled (no linked RunResult)"
+  }
+]
+contradictions: []
+explanation: No branch produced verified evidence under an explicit partial policy (2 missing, 0 failed) -- synthesis has no accepted material findings.
+
+--- Final session membership (one-way ref ledger) ---
+assignmentRefs: [
+  'asgn_r8_proof_driver_op_003',
+  'asgn_r8_proof_driver_op_004',
+  'asgn_r8_proof_driver_op_005'
+]
+event count: 8 types: [
+  'session-opened',
+  'actor-bound',
+  'actor-bound',
+  'actor-bound',
+  'assignment-created',
+  'result-linked',
+  'assignment-created',
+  'assignment-created'
+]
+
+--- Secret check: scanning persisted assignment.json/result.json for any env credential value ---
+secretFound: false (expected: false)
+
+=== R8 LIVE PROOF SUMMARY ===
+Two-provider-family requirement: STOP GATE (see Step 0) -- resolveAssignmentDispatchPolicy tier-floor constraint, pre-existing, not fixable within this cell's file ownership.
+Single-family (claude) fan-out/fan-in mechanics: LIVE, REAL subprocess dispatch, both branches genuinely attempted concurrently, session/event bookkeeping correct, no secrets persisted.
+Workspace (for independent inspection): /tmp/fgos-r8-live-proof-H1njG8

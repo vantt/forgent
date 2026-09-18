@@ -1,0 +1,65 @@
+{
+  "assignmentId": "asgn_tsk_44e_op_001",
+  "workId": "tsk-44e",
+  "role": "advisor",
+  "dispatch": "assignment",
+  "objective": "are plan.md's steps consistent with the locked decisions in CONTEXT.md",
+  "contextRefs": [
+    "docs/history/p03-3-proof2-work-lookup-proto-guard/",
+    "docs/history/p03-3-proof2-work-lookup-proto-guard/plan.md",
+    "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md"
+  ],
+  "expectedOutputs": [
+    "agent-report.md (advisor findings on plan.md/CONTEXT.md consistency)",
+    "agent-report.md (reviewer findings and evaluation)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T02:03:38.239Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema",
+      "domain-harness-seam"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "are plan.md's steps consistent with the locked decisions in CONTEXT.md",
+        "contextRefs": [
+          "docs/history/p03-3-proof2-work-lookup-proto-guard/",
+          "docs/history/p03-3-proof2-work-lookup-proto-guard/plan.md",
+          "docs/history/p03-3-proof2-work-lookup-proto-guard/CONTEXT.md"
+        ],
+        "constraints": [
+          "scope: repository (read-only)"
+        ],
+        "expectedOutputs": [
+          "agent-report.md (advisor findings on plan.md/CONTEXT.md consistency)",
+          "agent-report.md (reviewer findings and evaluation)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "advisor",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 900000,
+          "maxRuns": 1
+        },
+        "supports": "shape-plan"
+      },
+      "caller": {
+        "writerId": "ee2110a9-914f-4138-b75b-55779f988e6b"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

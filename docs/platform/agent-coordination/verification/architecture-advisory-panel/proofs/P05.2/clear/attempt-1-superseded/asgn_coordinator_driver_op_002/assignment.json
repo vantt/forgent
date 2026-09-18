@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_coordinator_driver_op_002",
+  "workId": null,
+  "role": "context-investigator",
+  "dispatch": "assignment",
+  "objective": "Scout the real herdr-gateway repository using ONLY absolute paths (do not rely on the current directory): /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's current signals and their evidence base, /home/vantt/projects/herdr-gateway/web/test/block-classify.test.ts's coverage, /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md's R21-R28 rules and Open Gaps section, and the two most recent commits (881fa33, 15b1203) that added the framing-rule/menu-cursor/summary-pair signals (run git show/git log with --git-dir=/home/vantt/projects/herdr-gateway/.git --work-tree=/home/vantt/projects/herdr-gateway if a plain relative git command does not work from your own working directory). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-07T01:25:15.666Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Scout the real herdr-gateway repository using ONLY absolute paths (do not rely on the current directory): /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's current signals and their evidence base, /home/vantt/projects/herdr-gateway/web/test/block-classify.test.ts's coverage, /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md's R21-R28 rules and Open Gaps section, and the two most recent commits (881fa33, 15b1203) that added the framing-rule/menu-cursor/summary-pair signals (run git show/git log with --git-dir=/home/vantt/projects/herdr-gateway/.git --work-tree=/home/vantt/projects/herdr-gateway if a plain relative git command does not work from your own working directory). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+        "contextRefs": [],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.architecture-advisory-panel-v1@1.0.0#investigate-context"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "context-investigator",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "coordinator-driver"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

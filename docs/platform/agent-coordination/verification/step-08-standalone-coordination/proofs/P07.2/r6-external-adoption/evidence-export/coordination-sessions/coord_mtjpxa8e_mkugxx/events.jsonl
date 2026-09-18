@@ -1,0 +1,4 @@
+{"seq":1,"ts":"2026-09-02T06:31:38.511Z","type":"session-opened","payload":{"coordinationId":"coord_mtjpxa8e_mkugxx","provenanceRoot":{"writerId":"p072-r6-external-adoption-mdview"}},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"b753a33d3d105bc7"}
+{"seq":2,"ts":"2026-09-02T06:31:38.511Z","type":"actor-bound","payload":{"actorId":"primary","role":"researcher"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"1b1ced24671630cb"}
+{"seq":3,"ts":"2026-09-02T06:31:38.513Z","type":"assignment-created","payload":{"assignmentId":"asgn_p072_r6_external_adoption_mdview_op_003","actorId":"primary"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"48a6d3d973b44d5a"}
+{"seq":4,"ts":"2026-09-02T06:31:59.080Z","type":"result-linked","payload":{"assignmentId":"asgn_p072_r6_external_adoption_mdview_op_003","runId":"run_asgn_p072_r6_external_adoption_mdview_op_003_01"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"83b8ad7c6c9c1901"}

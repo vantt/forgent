@@ -1,0 +1,67 @@
+{
+  "status": "done",
+  "summary": "Continuing to patch block-classify.ts reactively IS the right strategy — but the person's unease is pointing at a real, different problem than the one they named. Reactive patching is structurally safe here: `looksStructured` is an OR-chain of independent recognizers, and the locked fail-closed asymmetry (wrongly-wrapped structure = destructive; wrongly-panned prose = today's behaviour) means every added pan-clause can only move cases toward the safe direction. Proactively generalizing the heuristic means loosening it, which moves cases toward wrap — the destructive direction — against an operator decision locked 2026-08-11 ('fully automatic, no UI control, err toward pan when unsure'), and the file's own history already shows one generalization (the wide BOX_CHARS class) that had to be walked back for panning prose. The actual defect is that 3 of 6 recognizers (menu cursor, Q&A summary, framing rule) are Claude-Code TUI-chrome detectors wearing 'universal heuristic' clothing, and nothing measures the miss rate — phase 4's own Validation section required a corpus + confusion matrix and that was skipped, so 'is patching converging?' is currently unanswerable. Recommendation: keep patching, but (1) add the missing instrument before the next patch, (2) separate vendor-chrome recognizers from source-agnostic layout signals so future patches are obviously list-additions not heuristic redesigns, (3) build the already-scoped, never-built, button-free fit-by-shrink, which dissolves the most common irritation with no classification at all, and (4) decide PBI-060 note (6) — how many render paths the app feeds — since the PR #5 Log view solves Claude panes by source separation and would drop most of the pressure driving these patches.",
+  "verdict": "continue-reactive-patching-with-instrumentation",
+  "confidence": "high-on-strategy-medium-on-history",
+  "recommendation": {
+    "keep": "Reactive, one-shape-at-a-time patching of looksStructured. Cost per patch is ~10 lines plus 2 tests in a single 221-line module with one call site and a trivial rollback (force verdict to 'pan'). There is no accumulating design debt of the kind that would justify a rewrite.",
+    "reject": "Proactive generalization of the universal heuristic. Generalizing = loosening = more wrap = the unrecoverable failure direction, and it contradicts a locked operator decision. A more general heuristic is a higher-variance one.",
+    "reframe": "The problem is not patch-vs-generalize. It is that vendor-specific TUI-chrome recognizers are indistinguishable in the code from source-agnostic layout signals, and that no miss rate is being counted.",
+    "actions": [
+      {
+        "priority": 1,
+        "action": "Build the fixture corpus + confusion matrix that phase 4's Validation section already required. The metric that matters is structured-wrapped-as-prose, which must stay zero. The stated blocker (real captures contain live work content) has a stated solution (synthesise a clean set).",
+        "why": "Without it, the question 'is reactive patching converging or diverging?' has no answer, and the plan's own stop condition ('a miss rate the operator trusts') is untestable."
+      },
+      {
+        "priority": 2,
+        "action": "Split looksStructured's clauses into two clearly-labelled groups: source-agnostic layout signals (stable gutters, aligned pipes, box-drawing ratio, framing rule) and Claude-Code chrome recognizers (MENU_CURSOR_ITEM, countSummaryPairs). No behaviour change.",
+        "why": "Makes the next patch an obvious addition to a known vendor list rather than another decision about the universal heuristic. Also makes the growth rate of vendor recognizers visible, which is the real tripwire."
+      },
+      {
+        "priority": 3,
+        "action": "Build fit-by-shrink (phase-04 lines 118-123): scale a mildly-too-wide block's font down to fit. Scoped in phase 4, never built, button-free, requires no recognition step at all.",
+        "why": "Removes the most common real irritation without touching the classifier, and respects the no-UI-control constraint."
+      },
+      {
+        "priority": 4,
+        "action": "Decide PBI-060 note (6) once: how many render paths the app feeds (mirror renderer vs PR #5 Log view transcript tail).",
+        "why": "PR #5 solves Claude panes by source separation instead of heuristic. If it lands, most of the pressure driving these chrome patches disappears — which changes whether the classifier is even the right place to spend."
+      }
+    ],
+    "tripwires_to_reopen_the_decision": [
+      "Vendor-chrome recognizer count keeps growing every release once it is countable.",
+      "A patch ever has to LOOSEN a source-agnostic signal (as the BOX_CHARS walk-back did) rather than add a pan-clause.",
+      "Confusion matrix shows any structured-wrapped-as-prose case.",
+      "If reopened, two escapes are already priced and on the shelf: the pty soft-wrap signal (parked in phase-04 with the explicit trigger 'if the structure detector proves insufficient in use', arguably now met, cost = 2 backend reads per poll) and the manual toggle (ruled out by the operator, so reaching it means reopening WITH them, not shipping it)."
+    ]
+  },
+  "evidence": [
+    "/home/vantt/projects/herdr-gateway/web/src/block-classify.ts:9-16 — the fail-closed asymmetry, stated in the file header as the design.",
+    "/home/vantt/projects/herdr-gateway/web/src/block-classify.ts:131-176 — looksStructured is a pure OR-chain of 6 independent recognizers; adding a clause can only turn wrap into pan.",
+    "/home/vantt/projects/herdr-gateway/web/src/block-classify.ts:43-50 — the BOX_CHARS narrowing: a prior generalization walked back because one arrow in a 3-line paragraph panned prose.",
+    "/home/vantt/projects/herdr-gateway/web/src/block-classify.ts:55-67, 160-173 — isFramingRule, MENU_CURSOR_ITEM and countSummaryPairs each added because a prior signal (BOX_LINE_RATIO, stableGutters) failed on one specific Claude Code widget.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/plan.md:63-64 — operator locked 'fully automatic, no UI control of any kind, errs toward pan when unsure' on 2026-08-11.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/plan.md:97-99 and phase-04:173-175 — the stop condition is a miss rate the operator trusts; the only remaining fallback is a toggle the operator ruled out.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/phase-04-block-classifier-and-wrap-policy.md:160-169 — Validation required a corpus confusion matrix with structured-wrapped-as-prose == 0. Shipped tests are hand-written examples, not a corpus.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/phase-04-block-classifier-and-wrap-policy.md:12-23 — pty soft-wrap signal dropped, explicitly parked as 'a candidate refinement if the structure detector proves insufficient in use'.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/phase-04-block-classifier-and-wrap-policy.md:118-123 — fit-by-shrink, in scope, button-free, apparently never built.",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/phase-04-block-classifier-and-wrap-policy.md:176-180 — alt-screen Claude panes expose no soft-wrap signal; 'No mechanism fixes this; it is a property of the source.'",
+    "/home/vantt/projects/herdr-gateway/plans/260811-1426-terminal-dom-renderer-swap/plan.md:125-128 — two open questions never answered: which table-shaped output the operator actually reads, and whether any fixture can be committed.",
+    "/home/vantt/projects/herdr-gateway/docs/backlog.md PBI-060 note (6) — the real decision is how many render paths the app feeds, and it must be decided at once or it becomes three.",
+    "Session git snapshot — 15b1203 (bump 0.1.19, Q&A summary) and 881fa33 (bump 0.1.18, rules + choice menus): two consecutive releases each chasing a different Claude Code widget. This is the pattern prompting the question."
+  ],
+  "limitations": [
+    "The Bash tool was non-functional for this whole session (EROFS creating its temp dir, plus an unresolvable approval gate) in both the main session and a delegated read-only subagent. No git log, git show or git diff could be run.",
+    "Commit history for block-classify.ts is therefore inferred from three sources rather than read directly: the two commit subjects in the session's git-status snapshot, the file's own comments (which narrate each addition and the symptom that caused it), and the phase-04 'Departures from the plan' section. The direction and shape of the recent patches is well-supported; exact dates and the full commit list are not verified.",
+    "web/src/views/terminal.ts is modified in the working tree and could not be diffed, so any in-flight classifier-adjacent change there is unaccounted for."
+  ],
+  "open_questions": [
+    "Has the operator actually reported a miss since 0.1.19, or is this unease about the cadence of the last two releases rather than about a current defect? That changes whether priority 1 is urgent or merely due.",
+    "Is PR #5 (Log view) still live? Its status decides whether priority 4 is a real fork or already settled.",
+    "Phase 4 measured signal separation on a corpus at .bee/spikes/terminal-render-bench/ — does that corpus still exist after the .bee to .fgos migration (commits 395d21b, fa2f1b7)? If it was removed, priority 1 is more expensive than it looks."
+  ],
+  "artifacts": {
+    "report": "/home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_001/runs/01/agent-report.md"
+  }
+}

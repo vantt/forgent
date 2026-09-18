@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_mtjpy4yb_1zfb5k",
+  "objective": "Get a reviewer's second opinion on a reported package name/version string before trusting it.",
+  "status": "active",
+  "createdAt": "2026-09-02T06:32:18.323Z",
+  "provenanceRoot": {
+    "writerId": "p072-r6-external-adoption-mdview"
+  },
+  "definitionRef": {
+    "id": "core.coordination-protocol.declared-consult",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "requester-actor",
+      "role": "requester"
+    },
+    {
+      "id": "consultant-actor",
+      "role": "consultant"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p072_r6_external_adoption_mdview_op_004",
+    "asgn_p072_r6_external_adoption_mdview_op_005"
+  ],
+  "completedAt": null,
+  "partialPolicy": null
+}

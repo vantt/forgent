@@ -1,0 +1,98 @@
+## What We Think You Should Do
+
+Keep the two pipelines. Keep the shared runner (`AssetRunner`) they both already sit on. Don't build a new pluggable pipeline layer.
+
+Instead, close three specific seams between EOD and intraday — places where the two pipelines have an undeclared contract with each other, and where the contract is currently held together by a silent default rather than by anything written down.
+
+In order:
+
+1. **Make intraday's breadth policy explicit.** Right now the shared gate quietly bypasses itself when breadth is missing, and intraday never wires breadth in. Decide what intraday should do and state it at the boundary.
+2. **Port EOD's schema tolerance into intraday's loaders.** EOD already survives column-shape drift across parquet partitions; intraday's loaders don't have that fix.
+3. **Make intraday's read of EOD's output a declared, checked input** rather than an assumed one. (The panel agreed this seam should close; three advisors proposed three different mechanisms for it and nobody produced evidence separating them. Pick one when you get there — it's an implementation choice, not a direction choice, and it doesn't block items 1 and 2.)
+
+Three advisors landed on "don't restructure" by three different routes: one looked at what's actually shared and found the shared engine and shared domain logic already exist, so there's no pipeline-count boundary left to draw; one looked at blast radius and noted EOD's unattended overnight run with its dead-man-switch and 5-session catchup means a shared-engine change could touch six sessions at once; one looked at repo age — about a month — and concluded boundaries are still settling, so explicit data-safety beats code-level tidiness right now.
+
+## What This Means For Your System, Concretely
+
+**Seam 1 — the breadth gate.**
+`src/vnflow/domain/analytics/signal_rules.py:248`, `_gate_breadth`, emits `breadth=unavailable(bypassed)` when `pct_leading is None` and lets the rule through. EOD supplies that input — `signal_engine.py:433`, `_load_pct_sectors_leading`. Intraday's engine (`signal_engine_intraday.py`) has no reference to `pct_sectors_leading` at all. So every intraday evaluation currently passes a gate that EOD actually has to satisfy.
+
+This is the one claim in the whole session that was directly attacked and survived the attack, checked against the runner's own code. The reason it matters more than a normal gap: intraday alerts go out from `run_intraday_alert_dispatch` inside the `sig.alerts_intraday` asset, and `AssetRunner.run` executes an asset's function *first*, then runs that asset's checks (`asset_runner.py:81`, `_run_checks` at `:168`). A Telegram message can therefore already be on someone's phone before the runner's check on that asset ever evaluates. A check added later cannot un-send a notification.
+
+**Seam 2 — schema tolerance.**
+EOD reads use `pl.concat(..., how="diagonal_relaxed")` in a dozen places (`signal_engine.py:284-310`, `marts/market_regime.py:227-287`, `adapters/storage/parquet_lake_signals.py:115` where `setup_type` was added later and null-filled). Intraday's loaders don't: `signal_engine_intraday_loaders.py:35, 65, 83` use bare `pl.read_parquet` over an `rglob`, wrapped in a broad `except Exception` that logs a warning and returns `None`. So a column-shape change that EOD absorbs, intraday turns into a quiet `None` — and then, via seam 1, that `None` becomes a bypassed gate.
+
+**Seam 3 — the undeclared read.**
+`load_latest_eod_regime` and `load_latest_eod_sector_states` (`signal_engine_intraday_loaders.py:19, 49`) reach into `mart/market_regime_daily` and `mart/sector_rotation_daily` — EOD's persisted output — with a 7-day lookback, and treat absence as "no data" rather than as "the input I depend on isn't there." That's the contract between the two pipelines, and it currently exists only in the shape of those parquet paths.
+
+**One thing that got demoted, with evidence.** The shared alert daily-cap coupling: two advisors treated it as a live ongoing risk and one built their entire "do nothing" trigger around it. It was independently checked and it's a rare, fail-safe edge case — EOD and intraday don't run at overlapping times in normal operation, per the code's own documentation, and the only real overlap is a manual or backfill EOD run during market hours, which can only suppress extra alerts, never over-send. That means the "do nothing" path lost its trigger, and nobody in the panel proposed a replacement for it. So "do nothing" is currently a position without a stated condition, not a position that was refuted.
+
+## What Gets Easier
+
+- When intraday reads something shaped differently than it expects, you find out from intraday rather than from a signal that quietly went out without the breadth condition applied.
+- The EOD↔intraday contract becomes a thing you can read, change, and test on purpose, instead of a thing that lives in path strings and a `None` return.
+- The overnight EOD path — the one with the dead-man-switch and the 5-session catchup — doesn't get touched at all. Compatibility work goes at the consumer edges, so the run with the biggest blast radius stays where it is.
+- Boundaries stay soft. At about a month in, that's worth something: you haven't spent a redesign on a shape you might want to move in six weeks.
+
+## What Gets Harder
+
+**The real cost first, not last:** this recommendation does nothing about building the same feature twice.
+
+If what's actually making evolution difficult is that every new capability has to be ported into both pipelines, then these three seams don't reduce that cost by any amount, and you pay the porting cost again on the very next feature. This isn't hypothetical — there's a concrete instance already on record in this session: proposed new intraday trading-plan features that EOD already has. One advisor named this outright as their own stated condition for being wrong about the recommendation.
+
+So: if the porting cost is the pain, this plan spends your week on the wrong thing and the pain arrives again, unchanged, on the next feature.
+
+**Second cost — you're trading silence for visibility, and that's a behavior change.** Today intraday always runs, including on missing or oddly-shaped inputs. After these fixes it can refuse to run, or fail loudly. That's the *point* of the change, but it is not free: you will see failures you don't see today, and some of them will be at 10am on a trading day. Sessions where intraday currently produces something will become sessions where it produces nothing and says why.
+
+**Third — seam 3 stays open a little longer.** You'll be carrying an unresolved mechanism choice while seams 1 and 2 land. That's tolerable but it is real unfinished business, and the panel did not do the work of settling it.
+
+## The First Reversible Step
+
+Do seam 1 this week, and only seam 1: make intraday's breadth policy explicit at the boundary.
+
+Concretely — one decision written down, and the code changed so the shared gate can no longer default silently for intraday. Either intraday supplies breadth and the gate applies, or intraday declares an explicit exemption that the gate honors by name instead of by absence. Touch `signal_engine_intraday.py` and the gate's contract in `signal_rules.py`; leave `ingest_eod.py` and the overnight path alone.
+
+**Cost:** small in code, real in operations. Expect to spend the week after it watching what intraday now says no to. If intraday starts declining to run on days you expected output, that's the change working — but you're the one who has to sit with it.
+
+**What it validates or kills:** if closing this seam surfaces things you'd otherwise have discovered days later and after the fact, the rest of the plan is aimed correctly. If it lands cleanly and you find yourself thinking "fine, but the thing I actually dread is wiring the next feature into both pipelines" — the plan is aimed at the wrong pain, and you should stop before seams 2 and 3 and reopen the question toward something shared.
+
+## When You Should Reverse This
+
+Reverse when you next ship a feature that has to exist in both pipelines — the intraday trading-plan features are the case already in front of you — and the porting work is larger than closing all three seams was. That's an observation you'll make within one feature, not a metric you have to instrument.
+
+Two more you'll actually see:
+
+- Seams 1 and 2 are closed, and within a month you hit another surprise of the same kind — something the two pipelines disagreed about that nothing declared. That means the seam-by-seam approach isn't converging and the shared shape needs the attention instead.
+- The opposite signal: three months in, no seam-type surprises and no feature you had to write twice. Then the recommendation was right and there's nothing to reverse.
+
+## What We Are Not Sure About
+
+Two disagreements are live. Neither was resolved, and we're not picking a side on either.
+
+**1. Whether the near-unanimous "don't restructure" is real convergence or a shared blind spot.** All three advisors read the same investigation findings before answering. It's genuinely possible they converged independently on the right answer — the three routes they took are different from each other. It's also possible all three simply solved what those findings pointed at, and under-weighted the forward-looking reading of "evolution is difficult" — the porting cost in the section above. This was raised late in the session and no advisor revisited it. Nobody answered it. So the agreement you're seeing may be three views or it may be one view arrived at three times.
+
+**2. Whether the panel was answering your question.** Two advisors effectively answered "keep the pipelines separate and harden the seams." One answered "the pipeline-count framing was the wrong question in the first place." Their concrete recommended work overlaps heavily — which is why the recommendation above reads as unified — but overlapping work is not the same as agreeing on what was being asked. If the third advisor is right, the recommendation above is correct work performed under a question you may not have meant to ask.
+
+**3. Seam 3's mechanism.** Three advisors, three mechanisms, no evidence offered that separates them. Not blocking, but genuinely unsettled.
+
+## What Stays Yours
+
+Two judgments, and they are yours because no amount of code reading answers either.
+
+**First: whether breadth should be REQUIRED for intraday or DELIBERATELY EXEMPTED with a documented reason.**
+
+Both remove today's silent default. They differ in which failure mode becomes the visible one:
+
+- *Required* — intraday sometimes doesn't run, rather than run on an assumption that isn't checked. You lose sessions; you never get a signal whose breadth condition silently didn't apply.
+- *Deliberately exempted* — intraday keeps running, and the gap is written down as known and accepted. You keep coverage; you accept that intraday's signals are evaluated under a condition EOD's are not, on purpose.
+
+There is no correct answer here, because the two options fail in directions that only matter relative to which failure you'd rather be woken up by. You are the one on call for both. The panel can tell you the current state is neither of these — it's the third thing, where the gap exists and nothing says so. It can't tell you which of the two real options to take.
+
+**Second: what you meant by "evolution is becoming difficult."**
+
+This is the single fact that would most change the whole recommendation, and no code inspection can produce it.
+
+- If you meant *the things you keep discovering only after they've already gone wrong* — the gap you find out about downstream, after a signal already went out — this recommendation addresses that directly and you should run it.
+- If you meant *the cost of building the same new feature twice, once per pipeline* — this recommendation does not address that at all, and the honest move is to stop and reopen the question toward a shared abstraction rather than close three seams first.
+
+Only you know which one you were describing.

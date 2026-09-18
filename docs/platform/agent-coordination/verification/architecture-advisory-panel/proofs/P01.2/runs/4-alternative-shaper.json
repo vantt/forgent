@@ -1,0 +1,13 @@
+{
+  "ordinal": 4,
+  "role": "alternative-shaper",
+  "requested": { "executor": "agy-bwrap", "tier": "analytical", "persona": "alternative-shaper" },
+  "derived": { "provider": "gemini", "model": "gemini-3.1-pro-low", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "promptPath": "proofs/P01.2/prompts/alternative-shaper.md",
+  "rawLogPath": "proofs/P01.2/runs/4-alternative-shaper-raw.log",
+  "outputArtifact": "proofs/P01.2/proposals/alternative-shaper.md",
+  "exitCode": 0,
+  "note": "agy's own internal telemetry/EROFS-swallowed state-write log lines interleaved with real output mid-response; extracted content unaltered beyond removing interleaved noise lines (verified byte-for-byte against the real proposal text on either side of the noise)",
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content; produced a materially different primary candidate (delete the shell) than system-shaper's (keep thin, fix launcher) -- genuine divergence, not cosmetic"
+}

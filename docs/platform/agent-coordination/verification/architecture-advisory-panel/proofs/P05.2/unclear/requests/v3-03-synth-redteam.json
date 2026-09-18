@@ -1,0 +1,49 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-unclear-herdr-grammar-vs-heuristic-v3: Phase 7 (synthesize one recommendation, preserving live disagreement) and the independent red-team pass.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authSynth",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_uv3",
+      "invocationKey": "ik_synth_uv3",
+      "reason": "Phase 5/6 complete: three proposals, one critique, one constraint ranking are all in.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_032", "asgn_coordinator_driver_op_033", "asgn_coordinator_driver_op_034", "asgn_coordinator_driver_op_035", "asgn_coordinator_driver_op_036"]
+    },
+    {
+      "type": "operation",
+      "as": "synthesize",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "objective": "Recommend ONE architecture for herdr-gateway's terminal-detail classification (universal heuristic vs. per-agent grammar), keeping live disagreement visible rather than smoothing it into a footnote. The real ledger: Proposal A (system-shaper) -- stay in-system, evolve the universal classifier at /home/vantt/projects/herdr-gateway/web/src/block-classify.ts. Proposal B (alternative-shaper) -- a per-agent semantic grammar, HarnessAdapter-pattern inspired by /home/vantt/projects/herdr-gateway/upstreams/collie. Proposal C (constraint-advocate) -- keep the universal heuristic, patched reactively per counter-example. The critic's attack on B (the strongest-seeming alternative): importing collie's HarnessAdapter is massive over-engineering, because word-wrapping carries only a cosmetic risk profile, unlike collie's own motivating problem (keystroke injection / dialog-swallowing, incident #34, a safety-relevant failure mode). The constraint-advocate's own risk ranking, highest to lowest: C (reactive patching with no fixture corpus) > B (per-agent grammar, disproportionate engineering weight for a cosmetic-only failure mode) > A (in-system, genuinely lower risk than C only if paired with a real fixture/regression corpus commitment) -- noting block-classify.ts already secretly contains Claude-Code-specific special cases (menu cursor, Q&A pairs, arrow exclusion) inside a nominally-universal function, with undocumented blast radius on Codex/Agy panes (PBI-061, unresolved), and the repo's own prior-art log already scored collie's pattern as R3 E1 F3 (relevant but single-source, high build cost, no harness/ subsystem exists yet). Use absolute paths for anything you additionally read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authRedteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_uv3",
+      "invocationKey": "ik_redteam_uv3",
+      "reason": "Independent adversarial check of the panel's own conduct, not just the architecture.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_032", "asgn_coordinator_driver_op_033", "asgn_coordinator_driver_op_034", "asgn_coordinator_driver_op_035", "asgn_coordinator_driver_op_036"]
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "objective": "Independently attack the architecture-advisory-panel's own conduct on the universal-heuristic-vs-per-agent-grammar question for herdr-gateway's terminal-detail classification -- not just the architecture recommendation, but whether the panel itself stayed honest. Real ledger: three real proposals (A: stay in-system/universal; B: per-agent HarnessAdapter grammar; C: universal, reactive patching), a real critique dismissing B as over-engineering for a merely-cosmetic risk, and a real constraint ranking putting C (the status quo's own actual practice) as HIGHEST risk of all three -- higher than the alternative B it otherwise rejects. Check specifically: is it internally consistent to reject B for being disproportionate engineering weight while ranking C (the cheapest option) as the riskiest? Did anyone seriously evaluate a middle path (e.g. formalizing the already-existing but undocumented per-agent special cases inside block-classify.ts into an explicit, tested per-agent extension point, short of importing collie's full HarnessAdapter)? Is PBI-061's undocumented blast radius on Codex/Agy panes being taken seriously or waved past? Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+--- Confirming the real committed config genuinely has no critical-tier model for gemini ---
+modelPolicies.gemini = {"lightweight":"gemini-3.6-flash-medium"}
+executors["agy-cli"].providerModel = gemini
+
+--- Session opened, actors bound BEFORE any Assignment ---
+actors: [ 'coordinator-actor', 'researcher-a' ]
+assignmentRefs (must be empty): []
+
+--- Calling dispatchResearchFanOut against the impossible fixture ---
+
+--- Result ---
+status: planning-failed
+plan.status: hard-failed
+plan.failure: {
+  "actorId": "researcher-a",
+  "role": "researcher",
+  "field": "tier",
+  "reason": "actor \"researcher-a\" (role \"researcher\"): role \"researcher\" needs tier \"critical\"; candidate \"agy-cli\" (provider \"gemini\") only supports [lightweight]",
+  "availableSupport": "role \"researcher\" needs tier \"critical\"; only [claude] is configured for any candidate"
+}
+plan.explanation: Cohort planning aborted: actor "researcher-a" (role "researcher"): role "researcher" needs tier "critical"; candidate "agy-cli" (provider "gemini") only supports [lightweight]
+
+--- Final manifest.assignmentRefs (must be EXACTLY []) ---
+[]
+
+--- On-disk .fgos/assignments/ entry count (must be 0) ---
+0
+
+=== R9 PROOF: PASS ===

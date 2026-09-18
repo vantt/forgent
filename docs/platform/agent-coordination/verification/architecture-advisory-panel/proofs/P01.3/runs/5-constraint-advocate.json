@@ -1,0 +1,15 @@
+{
+  "ordinal": 5,
+  "role": "constraint-advocate",
+  "requested": { "executor": "codex-readonly", "tier": "analytical", "persona": "constraint-advocate" },
+  "derived": { "provider": "openai-codex", "model": "gpt-6-astra", "tierMaterial": false },
+  "mechanism": "direct codex CLI invocation, provider-native -s read-only sandbox (no bwrap needed)",
+  "command": "codex exec -s read-only -C /home/vantt/projects/vnflow \"<prompt from prompts/constraint-advocate.md>\"",
+  "promptPath": "proofs/P01.3/prompts/constraint-advocate.md",
+  "rawLogPath": "proofs/P01.3/runs/5-constraint-advocate-raw.log",
+  "outputArtifact": "proofs/P01.3/proposals/constraint-advocate.md",
+  "exitCode": 0,
+  "mutationCheck": "self-reported and consistent with -s read-only sandbox already live-proved mutation-negative in P00.1; ran only rg/sed reads against vnflow source",
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content; independently converges toward keeping the existing pipelines/runner and hardening 4 specific seams -- a third independent path to the same C-leaning conclusion as the other two shapers, via its own operational-risk-ranked reasoning (irreversible notification effects > EOD recovery blast radius > alert-cap contamination > EOD-context read failure), not derived from either sibling",
+  "note": "First real use of the constraint advocate role in Phase 5 (producing its own candidate, not yet critiquing others) -- did its own independent code reads (rg/sed against alert_dispatch.py, signal_engine_intraday.py, signal_rules.py) beyond the scout report's own citations, e.g. confirming the exact daily_cap accounting formula and the post-execution timing of AssetRunner's checks."
+}

@@ -1,0 +1,207 @@
+# P01.2 R8 live proof — codex-cli, session-engine.mjs (no CLI door, no dispatch.mjs)
+
+Driver script (not committed elsewhere; copied here verbatim as evidence):
+`p012-live-proof-driver-script.mjs`. It imports and calls ONLY
+`openStandaloneSession`, `dispatchPrimaryTask`, `proposeConsult`,
+`resumeSession` from `src/runner/coordination/session-engine.mjs` -- no
+`child_process`, no `dispatch.mjs` CLI door, no other spawn path. Every
+executor dispatch below went through
+`session-engine.mjs -> createSessionAssignment()/executeAssignment()`, the
+ONLY execution entry point this cell's engine ever calls.
+
+Repo root / cwd for every invocation: `/home/vantt/projects/forgentX` (the
+real repo, not a temp fixture -- this proof's objective genuinely reads this
+repo's real `package.json`).
+
+## Attempt 1 — config-tier stop (honest, not a dispatch/engine defect)
+
+```
+node p012-live-proof.mjs coord_p012_live_76055_codex codex-cli full
+```
+Full transcript: `codex-cli-attempt1-config-tier-stop.stdout.log` /
+`.stderr.log`.
+
+`openStandaloneSession` succeeded (manifest/events written). `dispatchPrimaryTask`
+threw before any executor spawned:
+```
+RunnerConfigError: no model configured for policy tier "standard" under provider "codex".
+    at resolvePolicyTierModel ... at resolveAssignmentDispatchPolicy ...
+    at compileDispatchPlan ... at executeAssignment ...
+    at createAndExecuteSessionTask (session-engine.mjs:199)
+    at dispatchPrimaryTask (session-engine.mjs:300)
+```
+Root cause (confirmed by reading `.fgos/config.json` and
+`src/runner/dispatch/resolve.mjs` directly, not guessed): the already-landed
+P00.4 fix (`assignment-policy.mjs` now passes `codex-cli`'s real resolved
+command `codex` into `deriveProviderFamily`, confirmed via
+`grep -n deriveProviderFamily src/runner/dispatch/{assignment-policy,resolve}.mjs`)
+correctly derives `providerModel: "codex"` for `codex-cli` (previously it
+silently fell back to `"claude"`, P00.3/P00.4's own documented bug). But
+`.fgos/config.json`'s `modelPolicies` table has no `codex` entry (only
+`openai-codex`, used by the sibling `codex-pi`/`pi-herdr` executors, which
+DO declare `providerModel: "openai-codex"` -- `codex-cli` itself declares
+neither `providerModel` nor `provider`). This is a real, pre-existing
+config-registration gap (same class P00.3/P00.4 already flagged, now
+actually surfaced because the P00.4 fix stopped masking it) -- out of this
+cell's scope to fix (`.fgos/config.json`/`resolve.mjs`/`assignment-policy.mjs`
+are outside P01.2's touchable surface). Worked around, not patched, using an
+existing caller-facing override already wired through this cell's own
+`opts.cliOverride` passthrough: `cliOverride.model` short-circuits
+`resolvePolicyTierModel` entirely (`assignment-policy.mjs`: `if
+(cliOverride.model) { resolvedModel = cliOverride.model; ... }`), and
+`codex-cli`'s own invocation template (`["exec",
+"--dangerously-bypass-approvals-and-sandbox", "{prompt}"]`) never
+substitutes a `{model}` token anyway (P00.3's own prior finding), so any
+non-empty model string is safe to pass.
+
+## Attempt 2 — genuine live dispatch, honest `no-evidence` partial (not fabricated)
+
+```
+node p012-live-proof.mjs coord_p012_live_76055_codex codex-cli resume gpt-5.5
+```
+Full transcript: `codex-cli-attempt2-no-evidence-partial.stdout.log` /
+`.stderr.log`.
+
+The real `codex` binary was genuinely invoked this time and answered
+correctly: `agentClaim: {"status":"done","summary":"Root package.json has
+name \"forgent\" and version \"0.1.0\"."}` -- but the RunResult classified
+as `status: "no-evidence", confidence: "no-evidence"`, not `"done"`.
+Traced the cause directly in `src/runner/dispatch/assignment.mjs`'s
+`renderAssignmentPrompt` (unmodified by this cell): for a read-only
+Assignment the prompt tells the worker `- Optional human-readable report:
+<path>/agent-report.md` -- "Optional", so codex, correctly following the
+literal prompt, wrote only `agent-result.json`. `assignment-runner.mjs`'s
+`classifyRunEvidence` (also unmodified) requires a companion worker-produced
+report artifact -- not just the self-attested JSON claim -- before a
+read-only Assignment can reach `confidence: "reported"` (anti-fabrication
+design: "Self-attested evidenceRefs strings never substitute for it"). This
+is a real, honestly-recorded partial result, not a bug in this cell's
+session engine or a fabricated pass -- fixed at the caller level (this
+cell's own driver script, the level this engine's contract-building
+functions leave under caller control) by explicitly naming
+`agent-report.md` in `expectedOutputs`, exactly the same signal
+`buildDeclaredAssignment` already auto-adds for declared read-only roles
+(ADR-006) but `buildInlineAssignment` deliberately leaves to the caller.
+
+## Attempt 3 — clean full pass: primary + one dynamic consult, both `done`/`reported`
+
+```
+node p012-live-proof.mjs coord_p012_live_76229_codex2 codex-cli full gpt-5.5
+```
+Fresh `coordinationId`. Exit code: 0. Full transcript:
+`codex-cli-run1-open-primary-consult.stdout.log` / `.stderr.log`. Raw
+on-disk artifacts this run produced: `session-artifacts/`.
+
+### Step 1 — openStandaloneSession
+
+`session-artifacts/session.json` (right after step 1, before any Assignment
+existed) had `assignmentRefs: []`, `actors: [{id:"primary",
+role:"researcher"}]`, `definitionRef: null`, `workRef: null` -- see
+`session-artifacts/events.jsonl` seq 1-2 (`session-opened`, `actor-bound`).
+
+### Step 2 — dispatchPrimaryTask (role: researcher) via codex-cli
+
+`session-artifacts/primary-assignment.json`: `provenance.kind: "inline"`,
+`mutation: "read-only"`, `workId: null` -- no `stage`/`workflow`/`operation`/
+`taskSpec` field anywhere on the object (inline Assignments never carry
+them, ADR-006 R8). `session-artifacts/primary-dispatch-plan.json`:
+`executorId: "codex-cli"`, `governance.providerFamily: "codex"` (correctly
+derived this time -- the P00.4 fix, confirmed live). `session-artifacts/primary-result.json`:
+```
+status: "done", confidence: "reported"
+provenance.executor.source.scope: "cliOverride"   <- --executor reached the resolver
+evidence.gitBefore === evidence.gitAfter (626e057b...)   <- zero mutation
+settleReports: [{"path": ".../agent-report.md", "sha256": "8635f6..."}]
+```
+Worker-produced artifacts, copied verbatim:
+`session-artifacts/primary-agent-report.md` ("`name`: `forgent`, `version`:
+`0.1.0`"), `session-artifacts/primary-agent-result.json`
+(`{"status":"done","summary":"Root package.json has name \"forgent\" and
+version \"0.1.0\"."}`) -- the real answer, matching the repo's actual
+`package.json` (`forgent`, `0.1.0`), proving a genuine live read, not a
+canned/mocked response.
+
+### Step 3 — proposeConsult (role: reviewer, specialist actor) via codex-cli
+
+`session-artifacts/consult-assignment.json`: `contextRefs:
+["asgn_...op_002"]` (the primary's own Assignment id -- the whole point of
+a consult, not leakage), `provenance.inline.caller.parentAssignmentId:
+"asgn_...op_002"` -- ADR-006's existing field, reused unchanged, proving the
+consult's `caller.parentAssignmentId` genuinely references the primary
+actor's real Assignment. `session-artifacts/consult-result.json`: `status:
+"done", confidence: "reported"`, `evidence.gitBefore === evidence.gitAfter`.
+`session-artifacts/consult-agent-report.md`: "Confirmed package name/version
+string: `forgent@0.1.0`." -- an independent second read that agrees with
+the primary, not an echo (different wording, same repo file).
+
+### Step 4 — resumeSession view (`replaySession`, not re-derived)
+
+Final `session-artifacts/session.json`: `actors: [{"id":"primary",...},
+{"id":"specialist","role":"reviewer"}]`, `assignmentRefs:
+["asgn_...op_002","asgn_...op_003"]`. `session-artifacts/events.jsonl`, in
+order: `session-opened, actor-bound(primary), assignment-created(primary),
+result-linked(primary), actor-bound(specialist),
+assignment-created(specialist), result-linked(specialist)` -- 7 events, no
+duplicates, no out-of-order refs (matches what `replaySession` itself would
+reject otherwise -- this session passed its own fail-closed reconstruction,
+confirmed live by `resumeSession` actually returning this view rather than
+throwing).
+
+### No forbidden concepts anywhere on disk (checked directly, not assumed)
+
+```
+grep -rniE "\"stage\"|\"workflow\"|\"taskSpec\"|missionId|\"definitionRef\": *\{|Work FSM|workRef\": *\"" \
+  .fgos/coordination/sessions/coord_p012_live_76229_codex2/ \
+  .fgos/assignments/asgn_p01_2_live_proof_coordinator_op_002/ \
+  .fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/
+```
+→ `NO MATCHES (clean)`. `session.json`'s `definitionRef: null`, `workRef:
+null` confirmed directly (no protocol, no Work reference of any kind).
+
+### No repository mutation
+
+```
+git rev-parse HEAD   # before and after every invocation in this proof: 626e057b181510558e69064570c1cc4ed9794bd9 (unchanged)
+git status --porcelain   # before and after: byte-identical (git-status-before.txt / git-status-after.txt, diff empty)
+```
+`.fgos/assignments/` and `.fgos/coordination/` are both confirmed gitignored
+(`git check-ignore -v` on real files inside each, both matched
+`.gitignore:24`/`:25`) -- their runtime state never appears in
+`git status` at all, before or after.
+
+## Attempt 4 — second invocation: resume/re-dispatch the SAME session, zero duplicate runs (R7 live proof)
+
+```
+node p012-live-proof.mjs coord_p012_live_76229_codex2 codex-cli resume gpt-5.5
+```
+Full transcript: `codex-cli-run2-resume.stdout.log` / `.stderr.log`.
+
+`dispatchPrimaryTask` returned `resumed: true`, the SAME `assignmentId`
+(`asgn_...op_002`), and a RunResult byte-identical (JSON round-trip) to
+attempt 3's -- read back off disk (`readLinkedRunResultFromDisk`), never
+re-executed. `proposeConsult` for the SAME `specialistActorId` ("specialist")
+also returned `resumed: true` and the SAME consult `assignmentId`
+(`asgn_...op_003`), not rejected as a disallowed "second round" (this exact
+scenario surfaced and was fixed during this proof -- see Gaps/Fix Evidence
+in P01.2.md: the engine's original one-round check did not yet distinguish
+"the same specialist actor resuming" from "a genuinely new specialist",
+this run is the corrected engine).
+
+Confirmed directly on disk after this second invocation:
+```
+ls .fgos/assignments/asgn_p01_2_live_proof_coordinator_op_002/runs/   -> 01   (only)
+ls .fgos/assignments/asgn_p01_2_live_proof_coordinator_op_003/runs/   -> 01   (only)
+```
+No `02` run directory was created for either Assignment. Exit code: 0.
+
+## Summary
+
+Both R8 and R7's live-proof requirement are met with codex-cli: primary AND
+consult both completed genuinely (`status: "done"`, `confidence:
+"reported"`, real correct answers, zero repository mutation), and a second
+full invocation against the same session produced zero duplicate
+Assignments and zero duplicate Runs. Attempts 1-2 above are kept as honest,
+non-fabricated evidence of two real config/prompt-shaping issues encountered
+and worked around within this cell's own scope (a caller-side `cliOverride.model`
+passthrough and caller-side `expectedOutputs` naming `agent-report.md`) --
+neither required touching any Do-Not-Touch file.

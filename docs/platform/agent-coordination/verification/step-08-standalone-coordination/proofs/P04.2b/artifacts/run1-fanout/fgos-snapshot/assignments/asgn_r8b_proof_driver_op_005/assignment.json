@@ -1,0 +1,64 @@
+{
+  "assignmentId": "asgn_r8b_proof_driver_op_005",
+  "workId": null,
+  "role": "researcher",
+  "dispatch": "assignment",
+  "objective": "Read-only, bounded: name one concrete, verifiable fact about how JavaScript Promise.allSettled differs from Promise.all. Answer in 2-3 sentences.",
+  "contextRefs": [
+    "asgn_r8b_proof_driver_op_003"
+  ],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T21:46:30.140Z",
+  "policy": {
+    "minTier": "lightweight"
+  },
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read-only, bounded: name one concrete, verifiable fact about how JavaScript Promise.allSettled differs from Promise.all. Answer in 2-3 sentences.",
+        "contextRefs": [
+          "asgn_r8b_proof_driver_op_003"
+        ],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.independent-research-fan-out-fan-in@1.0.0#independent-research"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "verified"
+        },
+        "role": "researcher",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 150000,
+          "maxRuns": 1
+        },
+        "policy": {
+          "minTier": "lightweight"
+        }
+      },
+      "caller": {
+        "writerId": "r8b-proof-driver",
+        "parentAssignmentId": "asgn_r8b_proof_driver_op_003"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "verified"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 verification call 3: synthesize-recommendation with real grantedContextRefs.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "exec-family-a", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "authorize", "as": "authSynth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor", "authorizationId": "auth_synth_1", "invocationKey": "ik_synth_1", "reason": "post-critique-open is open.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_001", "asgn_fix_round_1_driver_op_002", "asgn_fix_round_1_driver_op_003", "asgn_fix_round_1_driver_op_004", "asgn_fix_round_1_driver_op_005", "asgn_fix_round_1_driver_op_006", "asgn_fix_round_1_driver_op_007"] },
+    { "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor", "objective": "synth", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

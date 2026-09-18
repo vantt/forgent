@@ -1,0 +1,1 @@
+fgos: authorizeOperation: binding (node "phase-dialogue-reopen", operation "revise-synthesis", actor "synthesizer-actor") in session "aap_p051_main" already has 2 "operation-authorized" event(s), at or above its declared activation.maxInvocations cap of 2 -- refusing to authorize another invocation

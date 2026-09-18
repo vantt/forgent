@@ -1,0 +1,10 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+LIVE PROOF SCRIPT ERROR: RunnerConfigError: no model configured for policy tier "standard" under provider "z-ai".
+    at resolvePolicyTierModel (file:///home/vantt/projects/forgentX/src/runner/dispatch/resolve.mjs:110:13)
+    at resolveAssignmentDispatchPolicy (file:///home/vantt/projects/forgentX/src/runner/dispatch/assignment-policy.mjs:240:21)
+    at compileDispatchPlan (file:///home/vantt/projects/forgentX/src/runner/dispatch/plan.mjs:93:22)
+    at executeAssignment (file:///home/vantt/projects/forgentX/src/runner/dispatch/assignment-runner.mjs:625:24)
+    at createAndExecuteSessionTask (file:///home/vantt/projects/forgentX/src/runner/coordination/session-engine.mjs:199:27)
+    at dispatchPrimaryTask (file:///home/vantt/projects/forgentX/src/runner/coordination/session-engine.mjs:300:10)
+    at main (file:///tmp/claude-1000/-home-vantt-projects/5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf/scratchpad/p012-live-proof.mjs:49:25)
+    at file:///tmp/claude-1000/-home-vantt-projects/5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf/scratchpad/p012-live-proof.mjs:107:1

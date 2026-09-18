@@ -1,0 +1,15 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: Phase 6 critique + constraint findings.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authCritique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "authorizationId": "auth_critique_1", "invocationKey": "ik_critique_1", "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result (interpret/investigate/shapeSystem/shapeAlt/shapeConstraint all done).", "grantedContextRefs": ["asgn_aap_driver_op_002", "asgn_aap_driver_op_003", "asgn_aap_driver_op_004", "asgn_aap_driver_op_005", "asgn_aap_driver_op_006"] },
+    { "type": "operation", "as": "critique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "objective": "Critique both proposals, attack the stronger one hardest.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkCritique", "roundKey": "round-1", "contributionId": "p051_objection_critique", "contributionType": "objection", "assignmentId": "$ref:critique", "anchors": ["p051_proposal_system", "p051_proposal_alt", "p051_proposal_constraint"] },
+    { "type": "authorize", "as": "authAssess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor", "authorizationId": "auth_assess_1", "invocationKey": "ik_assess_1", "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.", "grantedContextRefs": ["asgn_aap_driver_op_004", "asgn_aap_driver_op_005", "asgn_aap_driver_op_006"] },
+    { "type": "operation", "as": "assess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor", "objective": "Assess operational/migration risk, rank which concern actually sinks a candidate.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkAssess", "roundKey": "round-1", "contributionId": "p051_objection_assess", "contributionType": "objection", "assignmentId": "$ref:assess", "anchors": ["p051_proposal_system", "p051_proposal_alt", "p051_proposal_constraint"] }
+  ]
+}

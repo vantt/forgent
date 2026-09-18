@@ -1,0 +1,11 @@
+Assignment complete. As constraint-advocate, I read `block-classify.ts`, its test suite, the render integration point, `terminal.ts`, and `docs/specs/terminal-detail.md` (R24/R25 plus surrounding rules and Open Gaps).
+
+**Recommendation:** keep the existing architecture — an ordered OR-chain of independent, pure, synchronous heuristics — because it's the only shape that satisfies all four constraints at once:
+- **Test coverage**: no DOM/mocks/async needed; each heuristic is unit-tested in isolation, matching the existing `block-classify.test.ts`.
+- **Release cadence**: the last two ships (0.1.18, 0.1.19) each added exactly one heuristic + test in response to one real-world miss — additive OR-composition is what makes that safe.
+- **R24 (no UI control)**: a boolean chain has no threshold or setting to expose; a scored/weighted model structurally invites one later.
+- **R25 (fail-closed asymmetry)**: OR is monotonic, so no heuristic's "pan" signal can be out-voted — a weighted/ML classifier could let it be, which would break the rule.
+
+I flagged three architecture directions to reject if proposed by other panel roles: scored/ML composition, any operator-facing override/threshold, and async/stateful/backend classification (breaks R26/R27 and reintroduces test costs this file currently avoids).
+
+Results written to `/home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_005/runs/01/agent-result.json` (status: `done`) and `agent-report.md`.

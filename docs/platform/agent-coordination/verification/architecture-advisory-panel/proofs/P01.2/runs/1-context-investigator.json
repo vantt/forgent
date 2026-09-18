@@ -1,0 +1,15 @@
+{
+  "ordinal": 1,
+  "role": "context-investigator",
+  "requested": { "executor": "codex-readonly", "tier": "analytical", "persona": "context-investigator" },
+  "derived": { "provider": "openai-codex", "model": "gpt-5.5", "tierMaterial": false },
+  "decideDoorResult": { "mechanism": "out-of-process", "configured": false, "note": "generic fallback -- claude-bwrap/codex-readonly/agy-bwrap are not registered executors, see intake.md's Real gap found section" },
+  "mechanism": "direct codex CLI invocation, provider-native -s read-only sandbox (no bwrap needed)",
+  "command": "codex exec -s read-only -C /home/vantt/projects/mdview \"<prompt from prompts/context-investigator.md>\"",
+  "promptPath": "proofs/P01.2/prompts/context-investigator.md",
+  "rawLogPath": "proofs/P01.2/runs/1-context-investigator-raw.log",
+  "outputArtifact": "proofs/P01.2/scout-report.md",
+  "exitCode": 0,
+  "mutationCheck": "self-reported by the agent: no files changed, no builds/tests/processes launched; consistent with -s read-only sandbox already live-proved mutation-negative in P00.1",
+  "tokensUsed": 67113
+}

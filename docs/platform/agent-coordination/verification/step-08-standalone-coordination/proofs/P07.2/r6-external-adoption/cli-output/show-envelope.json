@@ -1,0 +1,66 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-02T06:34:53.745Z",
+  "data_hash": "2cdef670251e299007b50693ce4ca1d754a8b2c821ecc80f9c11b4a39e5e7043",
+  "data": {
+    "coordinationId": "coord_mtjpy4yb_1zfb5k",
+    "status": "active",
+    "phase": "running",
+    "objective": "Get a reviewer's second opinion on a reported package name/version string before trusting it.",
+    "definitionRef": {
+      "id": "core.coordination-protocol.declared-consult",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "createdAt": "2026-09-02T06:32:18.323Z",
+    "completedAt": null,
+    "provenanceRoot": {
+      "writerId": "p072-r6-external-adoption-mdview"
+    },
+    "actors": [
+      {
+        "id": "requester-actor",
+        "role": "requester"
+      },
+      {
+        "id": "consultant-actor",
+        "role": "consultant"
+      }
+    ],
+    "assignmentRefs": [
+      "asgn_p072_r6_external_adoption_mdview_op_004",
+      "asgn_p072_r6_external_adoption_mdview_op_005"
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 3600000,
+      "maxAssignments": 20,
+      "maxConcurrency": 4,
+      "maxRounds": 10,
+      "maxTaskDepth": 3
+    },
+    "partialPolicy": null,
+    "quorum": {
+      "requiredActorIds": [
+        "requester-actor",
+        "consultant-actor"
+      ],
+      "completed": [],
+      "failed": [
+        {
+          "actorId": "requester-actor",
+          "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_004",
+          "runId": "run_asgn_p072_r6_external_adoption_mdview_op_004_01"
+        },
+        {
+          "actorId": "consultant-actor",
+          "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_005",
+          "runId": "run_asgn_p072_r6_external_adoption_mdview_op_005_01"
+        }
+      ],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "eventCount": 7
+  }
+}

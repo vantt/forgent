@@ -1,0 +1,58 @@
+{
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_003",
+  "workId": null,
+  "role": "reviewer",
+  "dispatch": "assignment",
+  "objective": "Independently re-read package.json and confirm or correct the primary investigator's reported name/version string.",
+  "contextRefs": [
+    "asgn_p01_2_live_proof_coordinator_op_002"
+  ],
+  "expectedOutputs": [
+    "agent-result.json with status:\"done\" and a summary confirming or correcting the version string",
+    "agent-report.md: a short human-readable report stating the confirmed/corrected version string"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T15:24:22.856Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Independently re-read package.json and confirm or correct the primary investigator's reported name/version string.",
+        "contextRefs": [
+          "asgn_p01_2_live_proof_coordinator_op_002"
+        ],
+        "constraints": [],
+        "expectedOutputs": [
+          "agent-result.json with status:\"done\" and a summary confirming or correcting the version string",
+          "agent-report.md: a short human-readable report stating the confirmed/corrected version string"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 180000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "p01-2-live-proof-coordinator",
+        "parentAssignmentId": "asgn_p01_2_live_proof_coordinator_op_002"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

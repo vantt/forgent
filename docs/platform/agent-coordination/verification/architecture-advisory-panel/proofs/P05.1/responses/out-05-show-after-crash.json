@@ -1,0 +1,191 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:16:40.225Z",
+  "data_hash": "bebd8cddda280f550954bdf127fe5e571a91e146b383a5270c1c28666e34d168",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "status": "active",
+    "phase": "running",
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "createdAt": "2026-09-06T15:15:23.858Z",
+    "completedAt": null,
+    "provenanceRoot": {
+      "writerId": "aap-driver"
+    },
+    "actors": [
+      {
+        "id": "lead-advisor-actor",
+        "role": "lead-advisor"
+      },
+      {
+        "id": "context-investigator-actor",
+        "role": "context-investigator"
+      },
+      {
+        "id": "system-shaper-actor",
+        "role": "system-shaper"
+      },
+      {
+        "id": "alternative-shaper-actor",
+        "role": "alternative-shaper"
+      },
+      {
+        "id": "constraint-advocate-actor",
+        "role": "constraint-advocate"
+      },
+      {
+        "id": "architecture-critic-actor",
+        "role": "architecture-critic"
+      },
+      {
+        "id": "synthesizer-actor",
+        "role": "synthesizer"
+      },
+      {
+        "id": "red-team-actor",
+        "role": "red-team"
+      }
+    ],
+    "assignmentRefs": [
+      "asgn_aap_driver_op_002",
+      "asgn_aap_driver_op_003",
+      "asgn_aap_driver_op_004",
+      "asgn_aap_driver_op_005",
+      "asgn_aap_driver_op_006",
+      "asgn_aap_driver_op_007",
+      "asgn_aap_driver_op_008",
+      "asgn_aap_driver_op_009"
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 3600000,
+      "maxAssignments": 30,
+      "maxConcurrency": 4,
+      "maxRounds": 20,
+      "maxTaskDepth": 3
+    },
+    "partialPolicy": null,
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_aap_driver_op_008",
+          "runId": "run_asgn_aap_driver_op_008_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_aap_driver_op_007",
+          "runId": "run_asgn_aap_driver_op_007_01"
+        }
+      ],
+      "failed": [],
+      "late": [
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_aap_driver_op_009"
+        }
+      ],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "eventCount": 32,
+    "authorizations": [
+      {
+        "authorizationId": "auth_critique_1",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "targetActorId": "architecture-critic-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_assess_1",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "targetActorId": "constraint-advocate-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_synth_1",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "targetActorId": "synthesizer-actor",
+        "consumed": true
+      }
+    ],
+    "ignoredAuthorizations": [],
+    "dispositions": [],
+    "pendingDriverAuthorizations": [
+      {
+        "nodeId": "phase-critique",
+        "operationId": "answer-specialist-question"
+      },
+      {
+        "nodeId": "phase-redteam",
+        "operationId": "red-team-packet",
+        "actorId": "red-team-actor"
+      },
+      {
+        "nodeId": "phase-explanation",
+        "operationId": "explain-recommendation",
+        "actorId": "lead-advisor-actor"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "revise-synthesis",
+        "actorId": "synthesizer-actor"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "revise-explanation",
+        "actorId": "lead-advisor-actor"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "close-dialogue",
+        "actorId": "lead-advisor-actor"
+      }
+    ],
+    "aggregations": [],
+    "ignoredAggregations": [],
+    "specialistAuthorizations": [],
+    "ignoredSpecialistAuthorizations": [],
+    "humanTurns": [],
+    "ignoredHumanTurns": []
+  }
+}

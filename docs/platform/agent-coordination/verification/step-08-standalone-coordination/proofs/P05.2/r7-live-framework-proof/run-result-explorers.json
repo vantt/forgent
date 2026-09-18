@@ -1,0 +1,318 @@
+[
+  {
+    "actorId": "explorer-a",
+    "status": "fulfilled",
+    "runResult": {
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_002_01",
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_002",
+      "workId": null,
+      "executorId": "claude-clone-2",
+      "policy": {
+        "role": "explorer",
+        "executorPreference": [
+          "claude-clone-2"
+        ],
+        "executorId": "claude-clone-2",
+        "providerModel": "claude",
+        "tier": "creative",
+        "model": "sonnet",
+        "visibility": "headless",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude-clone-2",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "claude-clone-2"
+            }
+          },
+          "model": {
+            "value": "sonnet",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "claude.creative"
+            }
+          },
+          "tier": {
+            "value": "creative",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "persona": {
+            "source": {
+              "scope": "default"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_p05_2_r7_proof_driver_op_002"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_002/runs/01/agent-report.md",
+          "sha256": "01f6eef39a83f1248040b0937d74a7876faf4686517cffe31b9e5406cf40e062"
+        }
+      ],
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_002/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_002/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "agent-result.json was present but failed schema validation"
+      },
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_002/runs/01/agent-report.md"
+        ],
+        "tests": []
+      }
+    }
+  },
+  {
+    "actorId": "explorer-b",
+    "status": "fulfilled",
+    "runResult": {
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_003_01",
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_003",
+      "workId": null,
+      "executorId": "claude-reviewer",
+      "policy": {
+        "role": "explorer",
+        "executorPreference": [
+          "claude-reviewer"
+        ],
+        "executorId": "claude-reviewer",
+        "providerModel": "claude",
+        "tier": "creative",
+        "model": "sonnet",
+        "visibility": "headless",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude-reviewer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "claude-reviewer"
+            }
+          },
+          "model": {
+            "value": "sonnet",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "claude.creative"
+            }
+          },
+          "tier": {
+            "value": "creative",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "persona": {
+            "source": {
+              "scope": "default"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_p05_2_r7_proof_driver_op_003"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "settleReports": [],
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_003/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_003/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "dispatch for cwd \"/tmp/fgos-p052-r7-live-proof-wsycE3\" is already in flight (held for 0s)."
+      },
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    }
+  },
+  {
+    "actorId": "explorer-c",
+    "status": "fulfilled",
+    "runResult": {
+      "runId": "run_asgn_p05_2_r7_proof_driver_op_004_01",
+      "assignmentId": "asgn_p05_2_r7_proof_driver_op_004",
+      "workId": null,
+      "executorId": "gemini-clone-1",
+      "policy": {
+        "role": "explorer",
+        "executorPreference": [
+          "gemini-clone-1"
+        ],
+        "executorId": "gemini-clone-1",
+        "providerModel": "gemini",
+        "tier": "creative",
+        "model": "gemini-3.6-flash-high",
+        "visibility": "headless",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini-clone-1",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini-clone-1"
+            }
+          },
+          "model": {
+            "value": "gemini-3.6-flash-high",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "gemini.creative"
+            }
+          },
+          "tier": {
+            "value": "creative",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "persona": {
+            "source": {
+              "scope": "default"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_p05_2_r7_proof_driver_op_004"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "settleReports": [],
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_004/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_004/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "dispatch for cwd \"/tmp/fgos-p052-r7-live-proof-wsycE3\" is already in flight (held for 0s)."
+      },
+      "evidence": {
+        "gitBefore": null,
+        "gitAfter": null,
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    }
+  }
+]

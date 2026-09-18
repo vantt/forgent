@@ -1,0 +1,25 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 live verification: full chain with aggregateBounds raised, real grantedContextRefs, and homogeneous-with-tier-differentiation roster.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "exec-family-a", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "exec-family-a", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "exec-family-a", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "interpret", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "investigate", "operationId": "investigate-context", "targetActorId": "context-investigator-actor", "objective": "investigate", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeSystem", "operationId": "shape-system-proposal", "targetActorId": "system-shaper-actor", "objective": "shape system", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeAlt", "operationId": "shape-alternative-proposal", "targetActorId": "alternative-shaper-actor", "objective": "shape alt", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "operation", "as": "shapeConstraint", "operationId": "shape-constraint-proposal", "targetActorId": "constraint-advocate-actor", "objective": "shape constraint", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

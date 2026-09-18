@@ -1,0 +1,16 @@
+{
+  "ordinal": 1,
+  "role": "context-investigator",
+  "requested": { "executor": "codex-readonly", "tier": "analytical", "persona": "context-investigator" },
+  "derived": { "provider": "openai-codex", "model": "gpt-6-astra", "tierMaterial": false },
+  "decideDoorResult": { "mechanism": "out-of-process", "configured": false, "note": "generic fallback -- claude-bwrap/codex-readonly/agy-bwrap are not registered executors, see intake.md's Roster Resolved At Intake section" },
+  "mechanism": "direct codex CLI invocation, provider-native -s read-only sandbox (no bwrap needed)",
+  "command": "codex exec -s read-only -C /home/vantt/projects/vnflow \"<prompt from prompts/context-investigator.md>\"",
+  "promptPath": "proofs/P01.3/prompts/context-investigator.md",
+  "rawLogPath": "proofs/P01.3/runs/1-context-investigator-raw.log",
+  "outputArtifact": "proofs/P01.3/scout-report.md",
+  "exitCode": 0,
+  "mutationCheck": "self-reported by the agent: no files changed, no builds/tests/processes launched, .env and backups/ excluded; consistent with -s read-only sandbox already live-proved mutation-negative in P00.1",
+  "tokensUsed": 54455,
+  "note": "A first attempt (log not preserved -- overwritten by this retry at the same path before being copied aside) failed: the prompt referenced the role doctrine by a forgentX-relative path, but codex's cwd was pinned to vnflow (-C /home/vantt/projects/vnflow) so it could not read it -- reproduces P01.2's already-documented gap #3 (see P01.2.md's Real Gaps Found #3). Fixed by embedding the doctrine section verbatim in prompts/context-investigator.md, with an explicit warning that the doctrine's own Good Example uses fabricated vnflow numbers for style illustration only, not real data. This retry is the one recorded above."
+}

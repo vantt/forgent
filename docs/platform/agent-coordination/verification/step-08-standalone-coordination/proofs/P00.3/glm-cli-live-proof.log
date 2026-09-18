@@ -1,0 +1,121 @@
+# P00.3 R11 live proof — glm-cli
+
+Two real, live `dispatch execute` attempts against the real
+`.fgos/config.json` in this repo. Same bounded read-only inline task as the
+codex-cli proof (read `package.json`, report the top-level `name` field, no
+mutation).
+
+## Attempt 0 — config-tier stop (expected, not a bug)
+
+Command:
+```
+node src/runner/dispatch.mjs execute --contract <contract-v2.json> --executor glm-cli --cwd /home/vantt/projects/forgentX
+```
+Exit code: 1. stderr:
+```
+no model configured for policy tier "standard" under provider "z-ai".
+```
+`.fgos/config.json`'s `runner.modelPolicies.z-ai` only maps `lightweight`
+(`"z-ai": {"lightweight": "z-ai/glm-5.2"}`). An inline `--contract` carries
+no `assignment.policy` at all (confirmed:
+`test/runner/assignment-provenance.test.mjs`'s inline-no-domain test asserts
+`assignment.policy === undefined`), so `resolveAssignmentDispatchPolicy`'s
+tier floor defaults to `'standard'` (`assignment-policy.mjs` line 81). Tier
+resolution is explicitly monotonic — `--tier lightweight` on the CLI cannot
+lower a `'standard'` floor (`assignment-policy.mjs` lines 96-104, "cannot be
+weakened" per the module's own docstring), confirmed by retrying with
+`--tier lightweight` and getting the identical error. This is R8's
+`supportsPolicyTier` gate working exactly as designed — a real, correct stop
+condition of the existing system, not an executor-availability failure and
+not a CLI-wiring defect.
+
+**Resolution used for the actual live attempt below:** switched to the
+`--assignment` door with a hand-built declared Assignment
+(`buildAssignment({..., policy: { minTier: 'lightweight' } })`) — `policy`
+is a documented, supported caller override on `buildAssignment` (see its
+JSDoc: "Optional caller-supplied policy overrides"), which sets the tier
+floor to `'lightweight'` from the Assignment's own declared policy (not a
+CLI override), letting `z-ai`'s only configured tier resolve legally.
+
+## Attempt 1 — real spawn, killed by outer harness timeout (inconclusive, not counted)
+
+```
+timeout 180 node src/runner/dispatch.mjs execute --assignment asgn_tsk_p003_glm_live_proof_validate_plan_001 --executor glm-cli --cwd /home/vantt/projects/forgentX
+```
+The surrounding shell tool itself enforced a 120s cap and killed the whole
+command before the inner `timeout 180` could fire on its own. Real stderr
+was captured up to the kill point:
+```
+fgos: dispatch capability=(none declared) executor=glm-cli via=cli-spawn provider=claude model=z-ai/glm-5.2 tier=lightweight
+"z-ai/glm-5.2" is not a model this version of Claude Code recognizes, so auto-compact will keep this session within 200k tokens ...
+[claude-code:unrecognized_model] {"model":"z-ai/glm-5.2","query_source":"sdk"}
+```
+Not counted as the real attempt (harness artifact, not the executor's own
+behavior) — retried with the shell tool given a longer outer budget.
+
+## Attempt 2 — real spawn, genuine timeout (the bounded retry; counted)
+
+```
+timeout 180 node src/runner/dispatch.mjs execute --assignment asgn_tsk_p003_glm_live_proof_validate_plan_001 --executor glm-cli --cwd /home/vantt/projects/forgentX
+```
+Exit code: 124 (the inner `timeout 180` itself fired). stderr, in full:
+```
+fgos: dispatch capability=(none declared) executor=glm-cli via=cli-spawn provider=claude model=z-ai/glm-5.2 tier=lightweight
+"z-ai/glm-5.2" is not a model this version of Claude Code recognizes, so auto-compact will keep this session within 200k tokens (the context window it assumes). If the model accepts more, append [1m] to the model name for 1M, or set CLAUDE_CODE_MAX_CONTEXT_TOKENS to its real window; to make it recognized, map it in the modelOverrides setting or update Claude Code; CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT=1 restores the previous wait-for-the-API behavior.
+[claude-code:unrecognized_model] {"model":"z-ai/glm-5.2","query_source":"sdk"}
+```
+No further stdout ever arrived — the underlying `claude -p` process (glm-cli
+is a Claude Code CLI invocation routed to OpenRouter via
+`ANTHROPIC_BASE_URL`/`ANTHROPIC_AUTH_TOKEN` env substitution, per
+`.fgos/config.json`'s glm-cli executor entry) genuinely hung past the 180s
+bound after printing the "unrecognized_model" warning, with no visible
+response from the OpenRouter-routed GLM model. `timeout 180` sent SIGTERM to
+its direct child (`node dispatch.mjs`); the grandchild `claude -p ...`
+process (PID 2227996, confirmed via `ps`) was NOT part of that process
+group and survived as an orphan — found and cleaned up manually
+(`kill -TERM 2227996`) after this attempt, confirmed gone.
+
+**This is a real, observed live-executor timeout for `glm-cli`** — the same
+category of failure the coordinator's brief pre-identified as a documented
+baseline pattern (index.md's Baseline table, item #8: codex-cli timing out
+at 120000ms is the precedent this failure mode was already known for; here
+it recurs for glm-cli specifically). Per the plan's Autonomous Execution
+Contract #4, this is a stop gate, not permission to fabricate a passing
+result.
+
+## What DID get proven for glm-cli despite the timeout
+
+The dispatch-plan for this attempt (both attempt 1 and attempt 2; identical)
+was written before the executor spawned and shows correct, accurate
+resolution — this is real evidence, not fabricated:
+```
+.fgos/assignments/asgn_tsk_p003_glm_live_proof_validate_plan_001/runs/02/dispatch-plan.json:
+{"selector":{"type":"assignment","value":"asgn_tsk_p003_glm_live_proof_validate_plan_001"},
+ "mechanism":"out-of-process","executorId":"glm-cli","capability":"glm-cli",
+ "invocation":{"via":"cli","adapter":"cli-spawn","protocol":"prompt-stdout-v1"},
+ "governance":{"providerFamily":"z-ai",
+   "egress":{"kind":"cross-provider","target":"https://openrouter.ai/api","content":"repo-content"}},
+ "reasonCodes":["native-first.0033.cli-spawn-shaped"],"configured":true}
+```
+`executorId: "glm-cli"` (from `--executor glm-cli` reaching
+`cliOverride.preferExecutor` correctly on the `--assignment` door),
+`governance.providerFamily: "z-ai"` and `egress.target:
+"https://openrouter.ai/api"` both match `.fgos/config.json`'s glm-cli entry
+exactly (`providerModel: "z-ai"`, `env.ANTHROPIC_BASE_URL:
+"https://openrouter.ai/api"`). The stderr banner line
+(`provider=claude model=z-ai/glm-5.2 tier=lightweight`) also confirms the
+resolved model string (`z-ai/glm-5.2`, from `modelPolicies.z-ai.lightweight`)
+was passed through correctly to the real `claude -p ... --model z-ai/glm-5.2`
+invocation. `.fgos/secrets.local.env`'s `GLM_OPENROUTER_API_KEY` was
+substituted internally by the existing `${VAR}` env-substitution convention
+in `transport.mjs` (never read or printed directly by this proof).
+
+**Verdict: R11's glm-cli half is BLOCKED by a genuine live-executor timeout,
+confirmed on one bounded retry (two real spawn attempts, one killed
+prematurely by the harness, one hit its own 180s bound with no response).**
+R9 (`--executor` CLI wiring on both doors) and R10 (`feature.yaml` fallback
+cleanup) are unaffected and fully proven — this dispatch-plan evidence alone
+already confirms `--executor glm-cli` correctly reached
+`cliOverride.preferExecutor` on the `--assignment` door and resolved
+accurate provider/governance provenance before the executor's own runtime
+hung.

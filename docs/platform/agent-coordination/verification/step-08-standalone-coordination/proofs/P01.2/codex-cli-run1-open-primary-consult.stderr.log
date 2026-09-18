@@ -1,0 +1,4 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=codex-cli via=cli-spawn provider=codex model=gpt-5.5 tier=standard
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=codex-cli via=cli-spawn provider=codex model=gpt-5.5 tier=standard

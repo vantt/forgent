@@ -1,0 +1,23 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Close cell P00.1: independent Reviewer + Red-Team review, red-team, one fix round, and one recheck round all converge on a corrected 3-pair safe executor/mechanism allowlist (claude-bwrap, codex-readonly, agy-bwrap) with real, committed, independently-reproduced evidence; baseline reconciled; lease violation reverted; doctor check registered; focused tests pass (791/791).",
+  "writerId": "p00-1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p00-1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "meticulous-implementer" },
+    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "detail-oriented-rechecker" },
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-attacker" },
+    { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "pragmatic-fixer" }
+  ],
+  "steps": [
+    {
+      "type": "disposition",
+      "as": "closeCell",
+      "targetRef": "asgn_p00_1_coordinator_op_004",
+      "disposition": "cell-closed",
+      "rationale": "Original 6-pair allowlist falsified/corrected via Reviewer+Red-Team independent review (D1-D9). Fix Round 1 (commit d37b9518) applied all accepted dispositions. Reviewer-recheck and Red-Team-recheck (asgn_...op_005/op_006) both re-verified the fix: Red-Team-recheck independently re-ran the full attack suite live against the corrected claude-bwrap/agy-bwrap invocations with real, verifiable results (all 6 attack classes EROFS-blocked). Reviewer-recheck's F1/F2 (evidence-citation gap, not a safety gap) corrected directly by the Coordinator (commit f680c141), copying Red-Team-recheck's own real evidence into the tracked proofs/P00.1/ directory. gap-D7 (package-lock.json revert) independently re-verified clean by the Coordinator. Focused suite 791/791 pass. Final corrected allowlist for Phase 01: claude-bwrap, codex-readonly, agy-bwrap (3 provider families: claude, openai-codex, gemini). One MEDIUM finding (agent runnability under the bwrap mount needs a writable scratch bind) carried forward to Phase 01 as a Known Limitation, not a blocker for this cell.",
+      "evidenceRefs": ["asgn_p00_1_coordinator_op_002", "asgn_p00_1_coordinator_op_003", "asgn_p00_1_coordinator_op_005", "asgn_p00_1_coordinator_op_006"]
+    }
+  ]
+}

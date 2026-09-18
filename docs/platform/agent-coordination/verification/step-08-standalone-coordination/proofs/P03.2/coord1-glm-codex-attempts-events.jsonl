@@ -1,0 +1,5 @@
+{"seq":1,"ts":"2026-09-01T19:08:13.705Z","type":"session-opened","payload":{"coordinationId":"coord_p032_live_1788289693_glm","provenanceRoot":{"writerId":"p03-2-live-proof-coordinator"}},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"2d02d4710c63a7c5"}
+{"seq":2,"ts":"2026-09-01T19:08:13.706Z","type":"actor-bound","payload":{"actorId":"requester-actor","role":"requester"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"1a8034c5cbdb6247"}
+{"seq":3,"ts":"2026-09-01T19:08:13.706Z","type":"actor-bound","payload":{"actorId":"consultant-actor","role":"consultant"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"369167981821ded0"}
+{"seq":4,"ts":"2026-09-01T19:08:18.919Z","type":"assignment-created","payload":{"assignmentId":"asgn_p03_2_live_proof_coordinator_op_001","actorId":"requester-actor"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"0722ca04453ff0fd"}
+{"seq":5,"ts":"2026-09-01T19:10:25.986Z","type":"result-linked","payload":{"assignmentId":"asgn_p03_2_live_proof_coordinator_op_001","runId":"run_asgn_p03_2_live_proof_coordinator_op_001_01"},"v":3,"src":"5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf","h":"4d29b73df9aa15b5"}

@@ -1,0 +1,29 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "asgn_coordinator_driver_op_004"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "agy-bwrap",
+  "capability": "agy-bwrap",
+  "invocation": {
+    "via": "cli",
+    "adapter": "cli-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "gemini",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "bwrap",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true
+}

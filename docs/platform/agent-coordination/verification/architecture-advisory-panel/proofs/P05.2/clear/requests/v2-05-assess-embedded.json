@@ -1,0 +1,30 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v2: retry assess-constraints a third time with the three real proposals' content embedded directly in the objective, avoiding the cross-project-read ambiguity that correctly made the prior two attempts pause instead of guessing.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authAssess5",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_5",
+      "invocationKey": "ik_assess_5",
+      "reason": "Third retry: the coordinator resolves the ref content directly into the objective instead of asking the confined role to chase cross-project refs itself -- the prior two attempts correctly declined that ambiguous instruction rather than fabricating a result.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"]
+    },
+    {
+      "type": "operation",
+      "as": "assess5",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of these three real Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification (read the actual file at that absolute path for grounding). Proposal A (system-shaper): keep the current OR-of-independent-hard-gate detector architecture (structural signals: gutters/box-chars/pipes; semantic signals: Claude-glyph menu/summary), rather than merging into a unified/scored classifier, grounded in docs/specs/terminal-detail.md's R21-R27/R25 pan-by-default fail-closed bias. Proposal B (alternative-shaper): a 'Structural Entropy and ANSI Rhythm Analysis' architecture using 2D spatial entropy on character classes and vertical alignment of ANSI color transitions to detect structural intentionality mathematically, without hardcoded regexes. Proposal C (constraint-advocate's own earlier proposal): the current pure, synchronous, stateless, additive rule-list classifier, extended only by adding more independent boolean heuristics, never by replacing the architecture, because that is what survives real test coverage, release-cadence, no-UI-control (R24), and fail-closed-asymmetry (R25) constraints. Use absolute paths for anything else you read. Also write a short human-readable agent-report.md alongside it summarizing the same ranking and reasoning in prose. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

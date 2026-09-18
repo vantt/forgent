@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="820" viewBox="0 0 1280 820" role="img" aria-labelledby="title desc">
+  <title id="title">Stage, Stage Operation, TaskSpec, and Skill Relationship</title>
+  <desc id="desc">Diagram showing Workflow to Stage to Stage Protocol to Stage Operations, with each operation referencing TaskSpec, Skill, role and policy hints, then flowing into Assignment, Dispatcher, Run, RunResult and Evidence.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .band { fill: #eef3f8; stroke: #ccd7e3; stroke-width: 1.5; }
+      .box { fill: #ffffff; stroke: #1f2d3d; stroke-width: 2; rx: 8; ry: 8; }
+      .phase { fill: #e8f1ff; stroke: #285d9f; }
+      .protocol { fill: #f0ecff; stroke: #6c4bb5; }
+      .operation { fill: #eaf7f0; stroke: #2e7d54; }
+      .contract { fill: #fff6df; stroke: #9b6b05; }
+      .skill { fill: #fdecec; stroke: #a23a3a; }
+      .runtime { fill: #edf7f7; stroke: #20777c; }
+      .title { font: 700 30px Arial, sans-serif; fill: #17202a; }
+      .subtitle { font: 400 17px Arial, sans-serif; fill: #4c5b68; }
+      .label { font: 700 18px Arial, sans-serif; fill: #17202a; }
+      .small { font: 400 14px Arial, sans-serif; fill: #394957; }
+      .tiny { font: 400 12px Arial, sans-serif; fill: #526170; }
+      .mono { font: 400 13px "SFMono-Regular", Consolas, monospace; fill: #25313b; }
+      .arrow { stroke: #34495e; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .softArrow { stroke: #6b7c8e; stroke-width: 1.8; stroke-dasharray: 5 5; fill: none; marker-end: url(#softArrow); }
+      .note { fill: #ffffff; stroke: #b9c5d0; stroke-width: 1.5; rx: 8; ry: 8; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#34495e"/>
+    </marker>
+    <marker id="softArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7c8e"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="820"/>
+
+  <text class="title" x="70" y="58">Stage, Stage Operation, TaskSpec, and Skill</text>
+  <text class="subtitle" x="70" y="88">Hierarchy, dependencies, and runtime usage inside one fgOS workflow stage</text>
+
+  <rect class="band" x="48" y="118" width="560" height="622" rx="10" ry="10"/>
+  <text class="label" x="78" y="154">Declaration Shape</text>
+  <text class="small" x="78" y="178">What the workflow/stage configuration declares</text>
+
+  <rect class="box phase" x="108" y="210" width="400" height="72"/>
+  <text class="label" x="132" y="242">Workflow</text>
+  <text class="small" x="132" y="265">Domain flow, stage graph, transitions</text>
+
+  <path class="arrow" d="M308 282 L308 324"/>
+  <rect class="box phase" x="108" y="324" width="400" height="82"/>
+  <text class="label" x="132" y="356">Stage</text>
+  <text class="small" x="132" y="379">Current phase of a work item</text>
+  <text class="mono" x="132" y="397">discovery / exploring / planning / executing</text>
+
+  <path class="arrow" d="M308 406 L308 448"/>
+  <rect class="box protocol" x="108" y="448" width="400" height="82"/>
+  <text class="label" x="132" y="480">Stage Protocol</text>
+  <text class="small" x="132" y="503">Legal operations, outcomes, and guardrails</text>
+  <text class="mono" x="132" y="521">allowed inside this stage</text>
+
+  <path class="arrow" d="M308 530 L308 570"/>
+  <rect class="box operation" x="82" y="570" width="135" height="88"/>
+  <text class="label" x="105" y="602">Operation</text>
+  <text class="mono" x="105" y="626">shape-plan</text>
+  <text class="tiny" x="105" y="646">primary</text>
+
+  <rect class="box operation" x="242" y="570" width="135" height="88"/>
+  <text class="label" x="265" y="602">Operation</text>
+  <text class="mono" x="265" y="626">validate-plan</text>
+  <text class="tiny" x="265" y="646">review</text>
+
+  <rect class="box operation" x="402" y="570" width="135" height="88"/>
+  <text class="label" x="425" y="602">Operation</text>
+  <text class="mono" x="425" y="624">resolve-</text>
+  <text class="mono" x="425" y="642">question</text>
+  <text class="tiny" x="425" y="656">consult</text>
+
+  <path class="arrow" d="M308 530 C308 552 149 548 149 570"/>
+  <path class="arrow" d="M308 530 L309 570"/>
+  <path class="arrow" d="M308 530 C308 552 469 548 469 570"/>
+
+  <rect class="note" x="76" y="685" width="472" height="38"/>
+  <text class="small" x="96" y="702">A stage may have many operations.</text>
+  <text class="small" x="96" y="719">Current skill/taskSpec fields are the primary compatibility path.</text>
+
+  <rect class="band" x="672" y="118" width="560" height="622" rx="10" ry="10"/>
+  <text class="label" x="702" y="154">Operation Dependencies And Runtime</text>
+  <text class="small" x="702" y="178">How one selected operation becomes executable work</text>
+
+  <rect class="box operation" x="752" y="210" width="400" height="76"/>
+  <text class="label" x="776" y="242">Selected Stage Operation</text>
+  <text class="small" x="776" y="265">One concrete action chosen by driver/skill</text>
+
+  <path class="arrow" d="M952 286 L952 326"/>
+  <rect class="box contract" x="700" y="326" width="180" height="104"/>
+  <text class="label" x="724" y="358">TaskSpec</text>
+  <text class="small" x="724" y="382">I/O contract</text>
+  <text class="small" x="724" y="404">gates, verify</text>
+
+  <rect class="box skill" x="912" y="326" width="180" height="104"/>
+  <text class="label" x="936" y="358">Skill(s)</text>
+  <text class="small" x="936" y="382">Know-how</text>
+  <text class="small" x="936" y="404">primary + helpers</text>
+
+  <rect class="box contract" x="1118" y="326" width="80" height="104"/>
+  <text class="label" x="1135" y="358">Role</text>
+  <text class="tiny" x="1134" y="383">policy</text>
+  <text class="tiny" x="1134" y="403">hints</text>
+
+  <path class="softArrow" d="M930 286 C905 315 842 315 806 326"/>
+  <path class="softArrow" d="M966 286 C973 315 991 315 1002 326"/>
+  <path class="softArrow" d="M1000 286 C1060 318 1128 306 1158 326"/>
+
+  <path class="arrow" d="M952 430 L952 472"/>
+  <rect class="box runtime" x="752" y="472" width="400" height="64"/>
+  <text class="label" x="776" y="507">Assignment</text>
+  <text class="small" x="776" y="529">Bounded semantic request to one actor</text>
+
+  <path class="arrow" d="M952 536 L952 574"/>
+  <rect class="box runtime" x="752" y="574" width="400" height="54"/>
+  <text class="label" x="776" y="608">Dispatcher selects executor</text>
+
+  <path class="arrow" d="M952 628 L952 666"/>
+  <rect class="box runtime" x="700" y="666" width="190" height="54"/>
+  <text class="label" x="724" y="700">Run executes</text>
+
+  <rect class="box runtime" x="922" y="666" width="230" height="54"/>
+  <text class="label" x="946" y="700">RunResult + Evidence</text>
+
+  <path class="arrow" d="M890 693 L922 693"/>
+
+  <path class="softArrow" d="M752 250 C642 260 590 606 537 614"/>
+  <text class="tiny" x="682" y="304">driver chooses one legal operation</text>
+
+  <rect class="note" x="92" y="760" width="1096" height="38"/>
+  <text class="small" x="112" y="784">Discovery is machine-alone: it may consult researcher helpers for evidence, but unresolved ambiguity routes to exploring for human-agent clarification.</text>
+</svg>

@@ -1,0 +1,59 @@
+{
+  "assignmentId": "asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001",
+  "workId": null,
+  "role": "reviewer",
+  "dispatch": "assignment",
+  "objective": "Read docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md's Decision section (all 4 points), then read domains/coding/harness/enrich-and-validate-contract.mjs in full. Does the seam's actual implementation match every guarantee ADR-007 makes for it -- specifically: (a) it is pure (no fs/network/store writes, confirmed by literally reading for any such call), (b) it never selects an executor/provider/tier or touches Work lifecycle, (c) it fail-closed rejects a contract.supports value that is not a legal operation for the Work's current stage, and (d) it only appends to (never replaces) any contextRefs/constraints/expectedOutputs the caller already supplied. Report any mismatch found between the ADR's prose and the code, or state plainly that all four hold.",
+  "contextRefs": [
+    "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+    "domains/coding/harness/enrich-and-validate-contract.mjs"
+  ],
+  "expectedOutputs": [
+    "agent-report.md (reviewer findings and evaluation)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T01:59:12.454Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md's Decision section (all 4 points), then read domains/coding/harness/enrich-and-validate-contract.mjs in full. Does the seam's actual implementation match every guarantee ADR-007 makes for it -- specifically: (a) it is pure (no fs/network/store writes, confirmed by literally reading for any such call), (b) it never selects an executor/provider/tier or touches Work lifecycle, (c) it fail-closed rejects a contract.supports value that is not a legal operation for the Work's current stage, and (d) it only appends to (never replaces) any contextRefs/constraints/expectedOutputs the caller already supplied. Report any mismatch found between the ADR's prose and the code, or state plainly that all four hold.",
+        "contextRefs": [
+          "docs/architect/agent-coordination/decisions/ADR-007-domain-harness-seam-and-non-driving-inline-evidence.md",
+          "domains/coding/harness/enrich-and-validate-contract.mjs"
+        ],
+        "constraints": [
+          "scope: repository (read-only)"
+        ],
+        "expectedOutputs": [
+          "agent-report.md (reviewer findings and evaluation)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "reviewer",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 900000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "ee2110a9-914f-4138-b75b-55779f988e6b"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

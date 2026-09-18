@@ -1,0 +1,327 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-02T06:29:25.350Z",
+  "data_hash": "d298ae272e46662ed933cbecbb9924f01bd51654a52f452bf509b4945bbb4185",
+  "data": {
+    "checks": [
+      {
+        "id": "node-version-and-git",
+        "description": "Node >=18 and git available",
+        "passed": true,
+        "message": "node v24.18.0, git available"
+      },
+      {
+        "id": "cli-version-visible",
+        "description": "this build's own package version/commit/verb-set resolve cleanly via `fgos version` (tsk-2ej)",
+        "passed": true,
+        "message": "fgos 0.1.0 (no git commit -- not a git checkout) — 72 verbs"
+      },
+      {
+        "id": "shell-integration-sourced",
+        "description": "shell-integration source line present in detected rc file(s)",
+        "passed": true,
+        "message": "not inside a git checkout — no rc sourcing needed; fgos resolved via tier 3 at /home/vantt/.local/share/pnpm/bin/fgos"
+      },
+      {
+        "id": "config-not-stale",
+        "description": ".fgos/config.json exists and has every current registered default key",
+        "passed": false,
+        "message": "stale config — missing keys: runner.modelPolicies, runner.capabilities, runner.executors, workerSlots, invariantChecks, checkpoint, ironLaw, gateway, herdrOrchestrator, herdrWebDashboard, docRegistry — run fgos setup"
+      },
+      {
+        "id": "task-specs-resolve",
+        "description": "every domain's taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file (tsk-2t9c D6/D9)",
+        "passed": false,
+        "message": "missing task-spec file(s): coding.taskSpecMap.discovery -> \"judge-ambiguity\" (domains/coding/task-specs/judge-ambiguity.md not found); coding.taskSpecMap.exploring -> \"lock-decisions\" (domains/coding/task-specs/lock-decisions.md not found); coding.taskSpecMap.planning -> \"shape-plan\" (domains/coding/task-specs/shape-plan.md not found); coding.taskSpecMap.executing -> \"implement-item\" (domains/coding/task-specs/implement-item.md not found); coding.taskSpecMap.retrospective -> \"compound-learn\" (domains/coding/task-specs/compound-learn.md not found); coding.operations.discovery[judge-ambiguity] -> \"judge-ambiguity\" (domains/coding/task-specs/judge-ambiguity.md not found); coding.operations.discovery[resolve-question] -> \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.operations.exploring[lock-decisions] -> \"lock-decisions\" (domains/coding/task-specs/lock-decisions.md not found); coding.operations.exploring[answer-question] -> \"answer-question\" (domains/coding/task-specs/answer-question.md not found); coding.operations.exploring[resolve-question] -> \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.operations.planning[shape-plan] -> \"shape-plan\" (domains/coding/task-specs/shape-plan.md not found); coding.operations.planning[validate-plan] -> \"validate-plan\" (domains/coding/task-specs/validate-plan.md not found); coding.operations.planning[scout-blast-radius] -> \"scout-blast-radius\" (domains/coding/task-specs/scout-blast-radius.md not found); coding.operations.planning[resolve-question] -> \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.operations.executing[implement-item] -> \"implement-item\" (domains/coding/task-specs/implement-item.md not found); coding.operations.executing[review-item] -> \"review-item\" (domains/coding/task-specs/review-item.md not found); coding.operations.executing[fix-verify-red] -> \"fix-verify-red\" (domains/coding/task-specs/fix-verify-red.md not found); coding.operations.executing[scoped-subtask] -> \"scoped-subtask\" (domains/coding/task-specs/scoped-subtask.md not found); coding.operations.executing[scout-blast-radius] -> \"scout-blast-radius\" (domains/coding/task-specs/scout-blast-radius.md not found); coding.operations.executing[resolve-question] -> \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); core.taskSpec -> \"fgos-routing\" (core/task-specs/fgos-routing.md not found); core.taskSpec -> \"fgos-clarifying\" (core/task-specs/fgos-clarifying.md not found); core.taskSpec -> \"fgos-researching\" (core/task-specs/fgos-researching.md not found); core.taskSpec -> \"fgos-unlock\" (core/task-specs/fgos-unlock.md not found); core.taskSpec -> \"fgos-fanout\" (core/task-specs/fgos-fanout.md not found); core.taskSpec -> \"fgos-indexing\" (core/task-specs/fgos-indexing.md not found); core.taskSpec -> \"distill\" (core/task-specs/distill.md not found) -- run fgos-coding-implement's own task-spec item, or docs/how-to/write-a-task-spec.md"
+      },
+      {
+        "id": "agent-claims-resolve",
+        "description": "every agent-type's claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)",
+        "passed": true,
+        "message": "every task-spec's requires-skill/agent eligibility declaration resolves to real agent skills"
+      },
+      {
+        "id": "agent-type-names-unique",
+        "description": "every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)",
+        "passed": true,
+        "message": "every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)"
+      },
+      {
+        "id": "main-checkout-hook-wired",
+        "description": "core.hooksPath wired to .githooks (str65 main-checkout lock guards every commit)",
+        "passed": true,
+        "message": "core.hooksPath = .githooks — main-checkout lock guards every commit here"
+      },
+      {
+        "id": "dispatch-decide-hook-wired",
+        "description": ".claude/settings.json PreToolUse hook enforces dispatch.mjs decide on every Agent/Task call",
+        "passed": false,
+        "message": ".claude/settings.json has no PreToolUse dispatch-decide hook wired — Agent/Task calls can bypass the decide-first enforcement — run fgos setup"
+      },
+      {
+        "id": "tool-registry-configured",
+        "description": "tool registry posture — inactive/degraded/full (tsk-1dj)",
+        "passed": true,
+        "message": "inactive — no tool-capable executors declared (add one to runner.executors in .fgos/config.json)"
+      },
+      {
+        "id": "agy-permissions-configured",
+        "description": "agy settings.json has a working command denylist instead of relying only on --dangerously-skip-permissions (tsk-1xm)",
+        "passed": false,
+        "message": "agy settings.json missing a working command denylist (toolPermission must be \"always-proceed\" with a non-empty permissions.deny — RESEARCH.md Round 4: \"strict\"/\"request-review\" blanket-deny every command in headless mode, and permissions.allow has no effect) — run fgos doctor --fix or fgos setup"
+      },
+      {
+        "id": "work-classification-vocabulary",
+        "description": "every open item's risk/kind matches its domain's declared classification vocabulary (tsk-6ax)",
+        "passed": true,
+        "message": "every open item's risk/kind matches its domain's classification vocabulary"
+      },
+      {
+        "id": "work-stage-vocabulary",
+        "description": "every open item sits at a stage its own domain still registers — no item stranded on a retired stage (tsk-64h)",
+        "passed": true,
+        "message": "every open item sits at a stage still registered by its domain"
+      },
+      {
+        "id": "domain-workflow-skillmap-coverage",
+        "description": "every stage name across all of a domain's registered workflows resolves to a real skillMap entry, explicit null allowed (tsk-ogx)",
+        "passed": true,
+        "message": "every stage across every domain's registered workflow(s) resolves to a real skillMap entry (explicit null allowed)"
+      },
+      {
+        "id": "domain-workflow-operations-coverage",
+        "description": "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges (tsk-team-dispatch-slice-1)",
+        "passed": false,
+        "message": "15 workflow stage operation problem(s): coding.feature.discovery.operations[judge-ambiguity] -> taskSpec \"judge-ambiguity\" (domains/coding/task-specs/judge-ambiguity.md not found); coding.feature.discovery.operations[resolve-question] -> taskSpec \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.feature.exploring.operations[lock-decisions] -> taskSpec \"lock-decisions\" (domains/coding/task-specs/lock-decisions.md not found); coding.feature.exploring.operations[answer-question] -> taskSpec \"answer-question\" (domains/coding/task-specs/answer-question.md not found); coding.feature.exploring.operations[resolve-question] -> taskSpec \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.feature.planning.operations[shape-plan] -> taskSpec \"shape-plan\" (domains/coding/task-specs/shape-plan.md not found); coding.feature.planning.operations[validate-plan] -> taskSpec \"validate-plan\" (domains/coding/task-specs/validate-plan.md not found); coding.feature.planning.operations[scout-blast-radius] -> taskSpec \"scout-blast-radius\" (domains/coding/task-specs/scout-blast-radius.md not found); coding.feature.planning.operations[resolve-question] -> taskSpec \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found); coding.feature.executing.operations[implement-item] -> taskSpec \"implement-item\" (domains/coding/task-specs/implement-item.md not found); coding.feature.executing.operations[review-item] -> taskSpec \"review-item\" (domains/coding/task-specs/review-item.md not found); coding.feature.executing.operations[fix-verify-red] -> taskSpec \"fix-verify-red\" (domains/coding/task-specs/fix-verify-red.md not found); coding.feature.executing.operations[scoped-subtask] -> taskSpec \"scoped-subtask\" (domains/coding/task-specs/scoped-subtask.md not found); coding.feature.executing.operations[scout-blast-radius] -> taskSpec \"scout-blast-radius\" (domains/coding/task-specs/scout-blast-radius.md not found); coding.feature.executing.operations[resolve-question] -> taskSpec \"resolve-question\" (domains/coding/task-specs/resolve-question.md not found)"
+      },
+      {
+        "id": "root-drift",
+        "description": "every fgw/<root> branch is in sync with its real target — no unsynced drift left over from a leaf merge (tsk-3bn)",
+        "passed": true,
+        "message": "no root branch is drifted ahead of its target"
+      },
+      {
+        "id": "leaf-notify-drift",
+        "description": "every live session branch has no post-land drift against its target (tsk-1el)",
+        "passed": true,
+        "message": "no live session branch has post-land drift against its target"
+      },
+      {
+        "id": "delivered-not-on-trunk",
+        "description": "every item whose status says its work was handed over has its fgw/<id> branch reachable from the trunk (tsk-1l9)",
+        "passed": true,
+        "message": "every handed-over item's content is on the trunk"
+      },
+      {
+        "id": "events-jsonl-not-truncated",
+        "description": "shared .fgos/events.jsonl has not been silently reverted by a git stash/checkout/reset/clean (tsk-cgg)",
+        "passed": true,
+        "message": "truncation guard holds across events.jsonl"
+      },
+      {
+        "id": "events-compaction-verified",
+        "description": "every past .fgos/events/ compaction (archive/*.manifest.json) still deep-equal/count/hash-set matches its archived originals (Tầng A/T6)",
+        "passed": true,
+        "message": "no compactions recorded yet — nothing to verify"
+      },
+      {
+        "id": "main-checkout-guard-warnings",
+        "description": "main checkout eventlog guard warnings log has no recorded regression or truncation warnings (D6)",
+        "passed": true,
+        "message": "no main checkout guard warnings recorded"
+      },
+      {
+        "id": "config-awareness",
+        "description": "which config level (global/project) is active, and whether the other is also present (tsk-2ta-2)",
+        "passed": true,
+        "message": "active: project (/home/vantt/projects/mdview/.fgos/config.json) — global config also present"
+      },
+      {
+        "id": "advise-execute-capabilities-configured",
+        "description": "runner.capabilities declares the \"advise\" and \"execute\" purpose slots decide --for resolves against (tsk-2uf-3)",
+        "passed": false,
+        "message": "runner.capabilities section missing -- run fgos setup (decide --for advise/execute cannot resolve until it exists)"
+      },
+      {
+        "id": "dependencies-installed",
+        "description": "package.json dependencies are present in node_modules (tsk-slq D6)",
+        "passed": true,
+        "message": "no package.json — nothing to check"
+      },
+      {
+        "id": "worker-slots-ceiling-usable",
+        "description": "workerSlots.ceiling is either a positive integer or explicitly null (a malformed value silently enforces nothing)",
+        "passed": false,
+        "message": "workerSlots section missing -- run fgos setup (no worker-slot ceiling is enforced until it exists)"
+      },
+      {
+        "id": "invariant-checks-configured",
+        "description": "invariantChecks.commands in the shared config file yields at least one runnable command",
+        "passed": false,
+        "message": "invariantChecks section missing -- run fgos setup (no invariant check runs at return/merge until it exists)"
+      },
+      {
+        "id": "gate-bypass-configured",
+        "description": "gateBypass.level in the shared config file is present and a recognized level",
+        "passed": true,
+        "message": "gateBypass.level = \"standard\""
+      },
+      {
+        "id": "iron-law-configured",
+        "description": "ironLaw.level in the shared config file is present and a recognized level",
+        "passed": false,
+        "message": "ironLaw.level missing or not a recognized level (ask/warn) -- run fgos doctor --fix"
+      },
+      {
+        "id": "gateway-token-configured",
+        "description": "gateway.token in ~/.fgos/config.json (home, not project) is present and non-empty",
+        "passed": false,
+        "message": "gateway.token missing from /tmp/claude-1000/-home-vantt-projects/5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf/scratchpad/r6/fake-home/.fgos/config.json -- run fgos doctor --fix"
+      },
+      {
+        "id": "claude-plugin-marketplace",
+        "description": "fgOS Claude Code plugin marketplace is registered and the fgOS plugin is installed/enabled",
+        "passed": false,
+        "message": "Claude Code marketplace \"fgos-plugins\" not configured — run fgos doctor --fix"
+      },
+      {
+        "id": "plugin-skill-cli-reachable",
+        "description": "a fgos CLI is reachable from this project (local bin/fgos.mjs, project-local install, or a global PATH install)",
+        "passed": true,
+        "message": "fgos resolved from PATH at /home/vantt/.local/share/pnpm/bin/fgos"
+      },
+      {
+        "id": "plugin-dev-skills-packaged",
+        "description": "every coding-domain dev-skill under .claude/skills/fgos-* is also packaged in plugins/fgOS/skills/, so a plugin-only consumer can dispatch into it",
+        "passed": true,
+        "message": "not a forgent checkout (no .claude/skills or plugins/fgOS/skills at this project) -- nothing to check"
+      },
+      {
+        "id": "changelog-unreleased-stale",
+        "description": "CHANGELOG.md ## [Unreleased] section has at least one pending entry (observe/remind only, never blocks merge -- tsk-3ip)",
+        "passed": true,
+        "message": "CHANGELOG.md not found -- nothing to check (project has not adopted a changelog yet)"
+      },
+      {
+        "id": "readme-install-tag-exists",
+        "description": "README.md's recommended install command pins a git tag that actually exists (tsk-2t8)",
+        "passed": true,
+        "message": "README.md has no pinned-tag install command -- nothing to check"
+      },
+      {
+        "id": "herdr-launcher-configured",
+        "description": "herdrOrchestrator toggles in the shared config file are present and boolean (tsk-2m5)",
+        "passed": false,
+        "message": "herdrOrchestrator section missing -- run fgos setup"
+      },
+      {
+        "id": "herdr-web-dashboard-configured",
+        "description": "herdrWebDashboard.staticServing in the shared config file is present and boolean (tsk-48w)",
+        "passed": false,
+        "message": "herdrWebDashboard section missing -- run fgos setup"
+      },
+      {
+        "id": "enduser-docs-index-stale",
+        "description": "docs/enduser-docs-index.json covers every on-disk end-user doc (tsk-1m0)",
+        "passed": true,
+        "message": "/home/vantt/projects/mdview/docs/enduser-docs-index.json not found -- nothing to check (project has not generated an end-user doc index yet)"
+      },
+      {
+        "id": "decision-index-stale",
+        "description": "docs/decisions/index.md matches every scope-carrying decision in state.decisions (tsk-1lv-2/tsk-1lv)",
+        "passed": true,
+        "message": "/home/vantt/projects/mdview/docs/decisions/index.md not found -- nothing to check (no platform-scoped decisions logged yet)"
+      },
+      {
+        "id": "doc-registry-enforce",
+        "description": "docRegistry.enforce in the shared config file is present and boolean",
+        "passed": false,
+        "message": "docRegistry section missing -- run fgos setup"
+      },
+      {
+        "id": "doc-registry-stale",
+        "description": "docs/doc-registry.md and doc-registry.json up to date",
+        "passed": false,
+        "message": "docs/doc-registry.md or docs/doc-registry.json is stale -- run fgos doc-registry"
+      },
+      {
+        "id": "doc-alias-broken",
+        "description": "doc aliases point to valid paths",
+        "passed": true,
+        "message": "no broken doc aliases"
+      },
+      {
+        "id": "doc-active-duplicate",
+        "description": "no duplicate active docs for same topic and role",
+        "passed": true,
+        "message": "no duplicate active docs"
+      },
+      {
+        "id": "doc-current-path-missing",
+        "description": "doc currentPath absent at HEAD",
+        "passed": true,
+        "message": "every live doc currentPath exists at HEAD"
+      },
+      {
+        "id": "doc-source-unreachable",
+        "description": "source capture linkage reachable through current or alias paths",
+        "passed": true,
+        "message": "every path-shaped source capture is reachable"
+      },
+      {
+        "id": "doc-near-duplicate",
+        "description": "near-duplicate authoritative claims check",
+        "passed": true,
+        "message": "no near-duplicate authoritative claims"
+      },
+      {
+        "id": "doc-provisional-aged",
+        "description": "provisional docs age check",
+        "passed": true,
+        "message": "no aged provisional docs"
+      },
+      {
+        "id": "doc-topic-oversized",
+        "description": "topic size check against ceiling",
+        "passed": true,
+        "message": "no oversized topics"
+      },
+      {
+        "id": "doc-role-underused",
+        "description": "role usage frequency check",
+        "passed": true,
+        "message": "no underused roles"
+      },
+      {
+        "id": "doc-source-conservation",
+        "description": "source captures conservation check",
+        "passed": false,
+        "message": "17 outcome source capture(s) unresolvable"
+      },
+      {
+        "id": "no-stuck-merge-abort",
+        "description": "main checkout has no lingering MERGE_HEAD from an in-progress or stuck merge abort (tsk-40a)",
+        "passed": true,
+        "message": "no merge in progress or stuck MERGE_HEAD"
+      },
+      {
+        "id": "coordination-protocol-fixtures-valid",
+        "description": "every discoverable CoordinationProtocol definition (project/domain/core tiers) normalizes through validateFlowDefinition (Phase 02 R6/R7)",
+        "passed": true,
+        "message": "3 CoordinationProtocol definition(s) discovered and normalized cleanly (project/domain/core tiers)"
+      },
+      {
+        "id": "workflow-flow-definition-projects-cleanly",
+        "description": "every domain-declared workflow projects cleanly into a Workflow-profile FlowDefinition via the additive adapter (Phase 02 R5)",
+        "passed": true,
+        "message": "1 domain workflow(s) project cleanly into a Workflow-profile FlowDefinition"
+      },
+      {
+        "id": "coordination-example-requests-valid",
+        "description": "published `fgos coordination run` example request files validate against the same schema boundary the CLI itself enforces, and resolve every referenced protocolRef (Step 08 Phase 07 R3)",
+        "passed": false,
+        "message": "no example request files found at docs/how-to/coordination-examples -- Phase 07 R3 requires publishing one agent-led request, declared consult, research protocol, and Group Cognition framework example"
+      }
+    ]
+  }
+}

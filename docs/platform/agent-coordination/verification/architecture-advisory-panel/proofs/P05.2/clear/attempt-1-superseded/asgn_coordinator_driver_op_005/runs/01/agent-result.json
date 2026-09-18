@@ -1,0 +1,19 @@
+{
+  "status": "done",
+  "summary": "Recommend keeping block-classify.ts's current architecture: an ordered OR-chain of independent, pure, synchronous heuristics. This is the only shape that satisfies all four constraints simultaneously: it is trivially unit-testable with no DOM/mocks (test coverage), it lets each real-world false-negative ship as one small additive function+test (matches the observed 0.1.18/0.1.19 release cadence), it has no threshold or setting to expose (R24, no UI control), and OR-composition is monotonic so no heuristic's positive signal can be cancelled by others (R25, fail-closed to pan). Reject any move toward a scored/weighted/ML classifier (breaks R25's monotonic guarantee, requires an evaluation corpus this project doesn't have per the spec's own Open Gaps), any operator-facing override or confidence knob (direct R24 violation), and any async/stateful/backend classification (breaks R26/R27 content-only stability and reintroduces DOM/timing test costs).",
+  "verdict": "keep-current-heuristic-chain-architecture",
+  "constraints_evaluated": ["test-coverage", "release-cadence", "R24-no-ui-control", "R25-fail-closed-asymmetry"],
+  "rejected_alternatives": [
+    "scored/weighted/ML composition of heuristics",
+    "operator-facing override, toggle, or confidence threshold",
+    "async/stateful/backend/cross-poll classification"
+  ],
+  "sources_read": [
+    "/home/vantt/projects/herdr-gateway/web/src/block-classify.ts",
+    "/home/vantt/projects/herdr-gateway/web/test/block-classify.test.ts",
+    "/home/vantt/projects/herdr-gateway/web/src/terminal-render.ts",
+    "/home/vantt/projects/herdr-gateway/web/src/views/terminal.ts",
+    "/home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md"
+  ],
+  "report": "/home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_005/runs/01/agent-report.md"
+}

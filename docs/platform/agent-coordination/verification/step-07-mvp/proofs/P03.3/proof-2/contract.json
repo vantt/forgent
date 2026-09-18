@@ -1,0 +1,13 @@
+{
+  "objective": "are plan.md's steps consistent with the locked decisions in CONTEXT.md",
+  "supports": "shape-plan",
+  "contextRefs": [],
+  "constraints": [],
+  "expectedOutputs": [
+    "agent-report.md (advisor findings on plan.md/CONTEXT.md consistency)"
+  ],
+  "mutation": "read-only",
+  "evidence": { "required": "reported" },
+  "role": "advisor",
+  "budget": { "timeoutMs": 900000, "maxRuns": 1 }
+}

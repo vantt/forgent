@@ -1,0 +1,23 @@
+{
+  "status": "done",
+  "summary": "Fanned out two independent, bounded research questions (no Work/contextRefs content was supplied, so both were self-selected general software-engineering topics) to two parallel researcher subagents and collected both results.",
+  "protocol": "core.coordination-protocol.independent-research-fan-out-fan-in@1.0.0#dispatch-research",
+  "mutation": "read-only",
+  "fanOut": [
+    {
+      "question": "What are the key architectural differences between monolithic and microservices application architectures, and under what circumstances is each typically preferred?",
+      "agentId": "a655096f2885a7843",
+      "status": "DONE",
+      "findings": "Monoliths package logic/data/UI into one deployed process; microservices decompose into independently owned, API/event-connected services. Tradeoffs: (1) deployment/ops - monolith is simpler to release as a unit but forces coordinated releases, microservices deploy independently but need distributed tracing/orchestration; (2) scaling - monolith scales as a whole (wasteful), microservices scale per-service but add network latency; (3) team autonomy - monolith needs shared codebase ownership, microservices let small teams own services end-to-end but require clear contracts. Rule of thumb: start monolithic for small teams/young projects/tight latency needs; adopt microservices once independent team scaling or deployment conflicts become the bottleneck and operational maturity exists. Modular monoliths are a middle ground worth evaluating first."
+    },
+    {
+      "question": "What are the main security best practices for storing and handling user passwords in a web application (hashing algorithms, salting, and related guidance)?",
+      "agentId": "a883c8b1c222ce55b",
+      "status": "DONE",
+      "findings": "Use memory-hard, adaptive hashing algorithms - Argon2 (OWASP-preferred), bcrypt, or scrypt - never fast general-purpose hashes like MD5/SHA-1, which are cryptographically broken and cheaply brute-forced. Every password needs a unique, random salt (16+ bytes) to defeat rainbow tables and ensure identical passwords hash differently per user; bcrypt/Argon2 handle this internally. Additional practices: an optional server-side pepper for defense-in-depth, rate limiting/account lockout to throttle brute-force attempts, and never logging plaintext passwords."
+    }
+  ],
+  "unresolvedQuestions": [
+    "No concrete research questions were provided via Work or contextRefs; the two questions above were self-selected general-knowledge topics purely to exercise the fan-out/fan-in mechanism. If specific research content was intended, please supply it and re-dispatch."
+  ]
+}

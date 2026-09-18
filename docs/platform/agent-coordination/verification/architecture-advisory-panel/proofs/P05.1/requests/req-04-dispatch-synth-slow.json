@@ -1,0 +1,13 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 crash-resume proof: dispatch synthesis via the deliberately slow executor, to be killed mid-flight.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "exec-slow" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor", "objective": "Synthesize one recommendation from the whole ledger.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

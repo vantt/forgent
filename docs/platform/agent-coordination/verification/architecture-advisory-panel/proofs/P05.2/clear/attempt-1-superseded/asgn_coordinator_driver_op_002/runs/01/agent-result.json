@@ -1,0 +1,4 @@
+{
+  "status": "done",
+  "summary": "Scouted the herdr-gateway repo's block classification mechanisms. 1. block-classify.ts uses regex/logic to identify framing rules, choice menus, and summary pairs to decide if a block is structured (pan) or prose (wrap). 2. block-classify.test.ts provides robust coverage, verifying true positives (menus, footers) and rejecting false positives (stray bullets/arrows in prose). 3. terminal-detail.md (R21-R28) dictates splitting by blank lines, prioritizing panning for structured data, and defaulting to pan when uncertain (R25) to avoid irreversible layout destruction, a risk noted in Open Gaps. Inspection of commits 881fa33 and 15b1203 was blocked by a host read-only filesystem error preventing git execution, but the current state of the signals in the source files is fully evident."
+}

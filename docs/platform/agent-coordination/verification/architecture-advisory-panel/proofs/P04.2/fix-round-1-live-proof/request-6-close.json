@@ -1,0 +1,14 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 verification call 6: close-dialogue with real grantedContextRefs, round 12, past the default round cap.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "exec-family-a", "tier": "critical" }
+  ],
+  "steps": [
+    { "type": "authorize", "as": "authClose", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor", "authorizationId": "auth_close_1", "invocationKey": "ik_close_1", "reason": "post-explanation-open is open and no further reopen is needed.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_010", "asgn_fix_round_1_driver_op_011"] },
+    { "type": "operation", "as": "closeDialogue", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor", "objective": "close", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

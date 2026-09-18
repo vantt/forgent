@@ -1,0 +1,69 @@
+{
+  "startedAt": "2026-09-07T02:12:19.754Z",
+  "cases": {
+    "sessionBootstrap": {
+      "rootPane": "w1:p1",
+      "note": "pane split requires an existing pane; a fresh session has none"
+    },
+    "trustSeed": {
+      "ok": true
+    },
+    "A_settled": {
+      "outcome": "settled",
+      "paneId": "w1:p2",
+      "ms": 39124,
+      "briefCarriedPromptVerbatim": true,
+      "ackWritten": true,
+      "resultWritten": true,
+      "reportWritten": true,
+      "taskFileWritten": true,
+      "taskFileContent": "v0-live-proof",
+      "visibility": {
+        "status": "reconciled",
+        "agentName": "fgos-v0-proof-a-mtqlv2t4",
+        "round": 1,
+        "lastSeenAt": "2026-09-07T02:12:59.465Z",
+        "paneId": "w1:p2",
+        "agentSession": {
+          "agent": "claude",
+          "kind": "id",
+          "source": "herdr:claude",
+          "value": "c835bb2d-6edc-4378-8407-bedcd80d5b21"
+        },
+        "stateChangeSeq": 1,
+        "outcome": "settled"
+      }
+    },
+    "D_observer": {
+      "readingsWhileAnotherProcessDrove": 0,
+      "distinctStates": [],
+      "neededNoPermission": true
+    },
+    "C_descendant": {
+      "paneId": "w1:p3",
+      "descendantPid": 1997998,
+      "survivedPaneClose": true
+    }
+  },
+  "finishedAt": "2026-09-07T02:13:07.506Z",
+  "operatorSessionsAfter": [
+    {
+      "name": "default",
+      "running": true
+    }
+  ],
+  "log": [
+    "[02:12:19] workspace /home/vantt/projects/fgos-v0-proof-mtqlv2cq",
+    "[02:12:19] starting isolated herdr session \"fgos-v0-proof\" (never the operator's default)",
+    "[02:12:20] socket up after ~0.5s",
+    "[02:12:20] root pane w1:p1 created in the isolated session",
+    "[02:12:20] trust pre-seeded for /home/vantt/projects/fgos-v0-proof-mtqlv2cq: true",
+    "[02:12:20] CASE A: real claude dispatch with a real multi-line prompt",
+    "[02:12:59] CASE A: outcome=settled ack=true result=true proofFile=true in 39124ms",
+    "[02:12:59] CASE D: observer took 0 readings while the driver ran; states seen: ",
+    "[02:12:59] CASE C: descendant survival across pane close",
+    "[02:13:07] CASE C: descendant pid=1997998 survived pane close = true",
+    "[02:13:07] cleanup",
+    "[02:13:07] sessions left: default(running)"
+  ]
+}

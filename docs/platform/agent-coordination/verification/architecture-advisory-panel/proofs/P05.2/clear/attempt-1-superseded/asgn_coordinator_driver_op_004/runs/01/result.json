@@ -1,0 +1,114 @@
+{
+  "runId": "run_asgn_coordinator_driver_op_004_01",
+  "assignmentId": "asgn_coordinator_driver_op_004",
+  "workId": null,
+  "executorId": "agy-bwrap",
+  "policy": {
+    "role": "alternative-shaper",
+    "executorPreference": [
+      "agy-bwrap"
+    ],
+    "executorId": "agy-bwrap",
+    "providerModel": "gemini",
+    "tier": "analytical",
+    "model": "gemini-3.1-pro-low",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "agy-bwrap",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "agy-bwrap"
+        }
+      },
+      "model": {
+        "value": "gemini-3.1-pro-low",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.analytical"
+        }
+      },
+      "tier": {
+        "value": "analytical",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_coordinator_driver_op_004"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "9e76d2c2d0e32f8dd2f559dc0efa498a9c2b2d66d0552f410b5ce21c1bc59403",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/agent-report.md",
+      "sha256": "22d705f225c9d7aacf2d6de0e63f8fbd58d9782771f378dc40459ef7a75f84f4"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Proposed an Emitter-Aware Grammar Parsing architecture to replace the heuristic regex matching.",
+    "architecture": "Emitter-Aware Grammar Parsing",
+    "key_components": [
+      "Out-of-Band Emitter Context injection",
+      "Declarative Grammar Registry",
+      "Structural AST (Abstract Syntax Tree) generation"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitAfter": "15b1203233cd97dccfcd62829fa3e81e15712363",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

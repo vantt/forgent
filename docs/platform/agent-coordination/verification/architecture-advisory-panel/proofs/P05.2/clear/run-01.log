@@ -1,0 +1,93 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=opus tier=critical
+fgos: dispatch capability=(none declared) executor=agy-bwrap via=cli-spawn provider=gemini model=gemini-3.1-pro-low tier=analytical
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-07T01:26:26.607Z",
+  "data_hash": "f0ccc30a61528c0cdf1b44ae8afb0ad20ff622842e46fda14b0addbd788a6265",
+  "data": {
+    "coordinationId": "aap-p052-clear-herdr-heuristic-direction",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Given the block-classify.ts fix just shipped in herdr-gateway (commits 881fa33, 15b1203: three narrow, evidence-scoped signals added reactively as real Claude Code CLI screens were found misclassified), is continuing to extend this universal visual-heuristic classifier with narrow, evidence-scoped signals the right ongoing strategy for terminal-detail's R21-R27 block classification, or should the project proactively invest in a more general primitive or refactor now, before shipping more one-off patches?",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap-p052-clear-herdr-heuristic-direction\" is missing required actor(s) [lead-advisor-actor, system-shaper-actor, alternative-shaper-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_coordinator_driver_op_002",
+          "runId": "run_asgn_coordinator_driver_op_002_01"
+        }
+      ],
+      "failed": [
+        {
+          "actorId": "lead-advisor-actor",
+          "assignmentId": "asgn_coordinator_driver_op_001",
+          "runId": "run_asgn_coordinator_driver_op_001_01"
+        }
+      ],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "system-shaper-actor"
+        },
+        {
+          "actorId": "alternative-shaper-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "interpret",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_coordinator_driver_op_001",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude-bwrap",
+        "provider": "claude",
+        "tier": "critical"
+      },
+      {
+        "as": "investigate",
+        "type": "operation",
+        "actorId": "context-investigator-actor",
+        "assignmentId": "asgn_coordinator_driver_op_002",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "agy-bwrap",
+        "provider": "gemini",
+        "tier": "analytical"
+      }
+    ]
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T14:40:19.450Z",
+  "data_hash": "3c81d4a6cebb3a49c4a7001e649930a673c7465cf0ca06d8a6682a7a318a228e",
+  "data": {
+    "coordinationId": "aap_fixround1_full",
+    "status": "completed",
+    "phase": "completed",
+    "objective": "Fix-round-1 live verification: full chain with aggregateBounds raised, real grantedContextRefs, and homogeneous-with-tier-differentiation roster.",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "createdAt": "2026-09-06T14:38:28.217Z",
+    "completedAt": "2026-09-06T14:40:06.453Z",
+    "provenanceRoot": {
+      "writerId": "fix-round-1-driver"
+    },
+    "actors": [
+      {
+        "id": "lead-advisor-actor",
+        "role": "lead-advisor"
+      },
+      {
+        "id": "context-investigator-actor",
+        "role": "context-investigator"
+      },
+      {
+        "id": "system-shaper-actor",
+        "role": "system-shaper"
+      },
+      {
+        "id": "alternative-shaper-actor",
+        "role": "alternative-shaper"
+      },
+      {
+        "id": "constraint-advocate-actor",
+        "role": "constraint-advocate"
+      },
+      {
+        "id": "architecture-critic-actor",
+        "role": "architecture-critic"
+      },
+      {
+        "id": "synthesizer-actor",
+        "role": "synthesizer"
+      },
+      {
+        "id": "red-team-actor",
+        "role": "red-team"
+      }
+    ],
+    "assignmentRefs": [
+      "asgn_fix_round_1_driver_op_001",
+      "asgn_fix_round_1_driver_op_002",
+      "asgn_fix_round_1_driver_op_003",
+      "asgn_fix_round_1_driver_op_004",
+      "asgn_fix_round_1_driver_op_005",
+      "asgn_fix_round_1_driver_op_006",
+      "asgn_fix_round_1_driver_op_007",
+      "asgn_fix_round_1_driver_op_008",
+      "asgn_fix_round_1_driver_op_009",
+      "asgn_fix_round_1_driver_op_010",
+      "asgn_fix_round_1_driver_op_011",
+      "asgn_fix_round_1_driver_op_012"
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 3600000,
+      "maxAssignments": 30,
+      "maxConcurrency": 4,
+      "maxRounds": 20,
+      "maxTaskDepth": 3
+    },
+    "partialPolicy": null,
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "lead-advisor-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_012",
+          "runId": "run_asgn_fix_round_1_driver_op_012_01"
+        },
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_002",
+          "runId": "run_asgn_fix_round_1_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_003",
+          "runId": "run_asgn_fix_round_1_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_004",
+          "runId": "run_asgn_fix_round_1_driver_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_007",
+          "runId": "run_asgn_fix_round_1_driver_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_006",
+          "runId": "run_asgn_fix_round_1_driver_op_006_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_008",
+          "runId": "run_asgn_fix_round_1_driver_op_008_01"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_fix_round_1_driver_op_009",
+          "runId": "run_asgn_fix_round_1_driver_op_009_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "eventCount": 42,
+    "authorizations": [
+      {
+        "authorizationId": "auth_critique_1",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "targetActorId": "architecture-critic-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_assess_1",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "targetActorId": "constraint-advocate-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_synth_1",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "targetActorId": "synthesizer-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_redteam_1",
+        "operationId": "red-team-packet",
+        "nodeId": "phase-redteam",
+        "targetActorId": "red-team-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_explain_1",
+        "operationId": "explain-recommendation",
+        "nodeId": "phase-explanation",
+        "targetActorId": "lead-advisor-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_revise_1",
+        "operationId": "revise-synthesis",
+        "nodeId": "phase-dialogue-reopen",
+        "targetActorId": "synthesizer-actor",
+        "consumed": true
+      },
+      {
+        "authorizationId": "auth_close_1",
+        "operationId": "close-dialogue",
+        "nodeId": "phase-dialogue-reopen",
+        "targetActorId": "lead-advisor-actor",
+        "consumed": true
+      }
+    ],
+    "ignoredAuthorizations": [],
+    "dispositions": [],
+    "pendingDriverAuthorizations": [
+      {
+        "nodeId": "phase-critique",
+        "operationId": "answer-specialist-question"
+      },
+      {
+        "nodeId": "phase-dialogue-reopen",
+        "operationId": "revise-explanation",
+        "actorId": "lead-advisor-actor"
+      }
+    ],
+    "aggregations": [],
+    "ignoredAggregations": [],
+    "specialistAuthorizations": [],
+    "ignoredSpecialistAuthorizations": [],
+    "humanTurns": [
+      {
+        "turnId": "turn_1",
+        "turnOrdinal": 1,
+        "channel": "claude-code-chat",
+        "artifactRef": "human/1-person.md",
+        "revision": "sha256:d43e28af7af0b7920404a2ffb702440d1b2483bbeefb5a8dc8b67ee85de6995a",
+        "externalRef": "claude-code-transcript:sess-1:uuid-1",
+        "attributedTo": {
+          "type": "person",
+          "id": "the-user"
+        },
+        "recordedBy": {
+          "type": "driver",
+          "id": "fix-round-1-driver"
+        },
+        "respondsToRefs": [],
+        "ts": "2026-09-06T14:39:51.634Z"
+      }
+    ],
+    "ignoredHumanTurns": []
+  }
+}

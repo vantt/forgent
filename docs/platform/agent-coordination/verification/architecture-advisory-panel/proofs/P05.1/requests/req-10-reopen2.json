@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: second (final legal) bounded reopen of the synthesis.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authRevise2", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "authorizationId": "auth_revise_2", "invocationKey": "ik_revise_2", "reason": "Second bounded reopen -- testing the maxInvocations:2 cap through the real CLI.", "grantedContextRefs": ["asgn_aap_driver_op_012"] },
+    { "type": "operation", "as": "revise2", "operationId": "revise-synthesis", "targetActorId": "synthesizer-actor", "objective": "Second revision pass.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

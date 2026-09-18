@@ -1,0 +1,64 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-02T06:20:47.662Z",
+  "data_hash": "f7cd82f9ae55610699037b16dce7a80511d17cbd29c1dd8bf09b530607192816",
+  "data": {
+    "coordinationId": "p072r5cli",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.declared-consult",
+      "version": "1.0.0"
+    },
+    "objective": "Get a reviewer's second opinion on a reported version string before trusting it.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"p072r5cli\" is missing required actor(s) [requester-actor, consultant-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "requester-actor",
+        "consultant-actor"
+      ],
+      "completed": [],
+      "failed": [
+        {
+          "actorId": "requester-actor",
+          "assignmentId": "asgn_p072_r5_parity_proof_op_001",
+          "runId": "run_asgn_p072_r5_parity_proof_op_001_01"
+        },
+        {
+          "actorId": "consultant-actor",
+          "assignmentId": "asgn_p072_r5_parity_proof_op_002",
+          "runId": "run_asgn_p072_r5_parity_proof_op_002_01"
+        }
+      ],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "request",
+        "type": "operation",
+        "actorId": null,
+        "assignmentId": "asgn_p072_r5_parity_proof_op_001",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard"
+      },
+      {
+        "as": "response",
+        "type": "operation",
+        "actorId": null,
+        "assignmentId": "asgn_p072_r5_parity_proof_op_002",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard"
+      }
+    ]
+  }
+}

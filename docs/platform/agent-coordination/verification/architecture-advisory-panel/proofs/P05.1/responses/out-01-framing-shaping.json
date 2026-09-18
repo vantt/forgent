@@ -1,0 +1,157 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:15:24.257Z",
+  "data_hash": "d653a53e620822fd82d54de694db48ebcb1b4fa4956abf58cb7dd9b315ca03f2",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_main\" is missing required actor(s) [lead-advisor-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "interpret",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_aap_driver_op_002",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "critical"
+      },
+      {
+        "as": "investigate",
+        "type": "operation",
+        "actorId": "context-investigator-actor",
+        "assignmentId": "asgn_aap_driver_op_003",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "standard"
+      },
+      {
+        "as": "shapeSystem",
+        "type": "operation",
+        "actorId": "system-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_004",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "exec-family-a",
+        "provider": "family-a",
+        "tier": "analytical"
+      },
+      {
+        "as": "linkSystem",
+        "type": "contribution",
+        "contributionId": "p051_proposal_system",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_aap_driver_op_004",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "shapeAlt",
+        "type": "operation",
+        "actorId": "alternative-shaper-actor",
+        "assignmentId": "asgn_aap_driver_op_005",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "exec-family-b",
+        "provider": "family-b",
+        "tier": "analytical"
+      },
+      {
+        "as": "linkAlt",
+        "type": "contribution",
+        "contributionId": "p051_proposal_alt",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_aap_driver_op_005",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "shapeConstraint",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_aap_driver_op_006",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "analytical"
+      },
+      {
+        "as": "linkConstraint",
+        "type": "contribution",
+        "contributionId": "p051_proposal_constraint",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_aap_driver_op_006",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      }
+    ]
+  }
+}

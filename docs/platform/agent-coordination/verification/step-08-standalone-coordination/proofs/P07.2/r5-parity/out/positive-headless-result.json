@@ -1,0 +1,59 @@
+{
+  "coordinationId": "p072r5headless",
+  "kind": "declared-protocol",
+  "definitionRef": {
+    "id": "core.coordination-protocol.declared-consult",
+    "version": "1.0.0"
+  },
+  "objective": "Get a reviewer's second opinion on a reported version string before trusting it.",
+  "status": "running",
+  "closed": false,
+  "closeAttempted": true,
+  "closeRefusalReason": "closeSessionByQuorum: session \"p072r5headless\" is missing required actor(s) [requester-actor, consultant-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+  "quorum": {
+    "requiredActorIds": [
+      "requester-actor",
+      "consultant-actor"
+    ],
+    "completed": [],
+    "failed": [
+      {
+        "actorId": "requester-actor",
+        "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+        "runId": "run_asgn_p072_r5_parity_proof_op_003_01"
+      },
+      {
+        "actorId": "consultant-actor",
+        "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+        "runId": "run_asgn_p072_r5_parity_proof_op_004_01"
+      }
+    ],
+    "late": [],
+    "missing": [],
+    "replaced": []
+  },
+  "steps": [
+    {
+      "as": "request",
+      "type": "operation",
+      "actorId": null,
+      "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+      "status": "failed",
+      "confidence": "failed",
+      "executor": "claude",
+      "provider": "claude",
+      "tier": "standard"
+    },
+    {
+      "as": "response",
+      "type": "operation",
+      "actorId": null,
+      "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+      "status": "failed",
+      "confidence": "failed",
+      "executor": "claude",
+      "provider": "claude",
+      "tier": "standard"
+    }
+  ]
+}

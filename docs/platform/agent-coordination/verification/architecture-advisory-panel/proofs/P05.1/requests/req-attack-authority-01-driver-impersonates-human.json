@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 authority ATTACK #1: a driver-authored artifact claims to be a human decision -- must be refused through the real CLI door.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_authority_attack1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor", "objective": "Interpret.", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "human-turn", "as": "fakeHumanTurn", "turnId": "turn_1", "turnOrdinal": 1, "channel": "claude-code-chat", "artifactRef": "human/attack-2-person.md", "externalRef": "claude-code-session:p05-1-doer:attack-1", "attributedTo": { "type": "driver", "id": "aap-driver" } }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_005",
+  "workId": null,
+  "role": "consultant",
+  "dispatch": "assignment",
+  "objective": "Independently re-read Cargo.toml and confirm or correct the requester's reported name/version.",
+  "contextRefs": [
+    "asgn_p072_r6_external_adoption_mdview_op_004"
+  ],
+  "expectedOutputs": [
+    "agent-result.json (status, summary) confirming or correcting the requester's finding",
+    "agent-report.md: a short human-readable report confirming or correcting the requester's finding"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-02T06:33:15.147Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Independently re-read Cargo.toml and confirm or correct the requester's reported name/version.",
+        "contextRefs": [
+          "asgn_p072_r6_external_adoption_mdview_op_004"
+        ],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.declared-consult@1.0.0#provide-consult"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary) confirming or correcting the requester's finding",
+          "agent-report.md: a short human-readable report confirming or correcting the requester's finding"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "consultant",
+        "capabilities": [
+          "consult"
+        ],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "p072-r6-external-adoption-mdview",
+        "parentAssignmentId": "asgn_p072_r6_external_adoption_mdview_op_004"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

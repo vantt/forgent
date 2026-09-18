@@ -1,0 +1,17 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Fix-round-1 verification call 2: critique + assess-constraints.",
+  "writerId": "fix-round-1-driver",
+  "coordinationId": "aap_fixround1_full",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "exec-family-a", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "exec-family-a", "tier": "analytical" }
+  ],
+  "steps": [
+    { "type": "authorize", "as": "authCritique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "authorizationId": "auth_critique_1", "invocationKey": "ik_critique_1", "reason": "post-shaping-open is open.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_003", "asgn_fix_round_1_driver_op_004", "asgn_fix_round_1_driver_op_005"] },
+    { "type": "operation", "as": "critique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "objective": "critique", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "authorize", "as": "authAssess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor", "authorizationId": "auth_assess_1", "invocationKey": "ik_assess_1", "reason": "post-shaping-open is open.", "grantedContextRefs": ["asgn_fix_round_1_driver_op_003", "asgn_fix_round_1_driver_op_004", "asgn_fix_round_1_driver_op_005"] },
+    { "type": "operation", "as": "assess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor", "objective": "assess", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

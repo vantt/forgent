@@ -1,0 +1,14 @@
+{
+  "runner": {
+    "executor": {
+      "command": "__R072_FAKE_GLOBAL_NONEXISTENT_EXECUTOR__",
+      "args": ["{prompt}"]
+    },
+    "models": {
+      "light": "fake-global-light",
+      "standard": "fake-global-standard",
+      "heavy": "fake-global-heavy"
+    },
+    "timeoutMs": 111111
+  }
+}

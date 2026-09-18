@@ -1,0 +1,3 @@
+fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_mtjf5l0q_jq9y72",
+  "objective": "P05.2 R7: live 6-phase group-cognition-framework proof against the frozen mdview editor-screen case.",
+  "status": "active",
+  "createdAt": "2026-09-02T01:30:09.962Z",
+  "provenanceRoot": {
+    "writerId": "p05.2-r7-proof-driver"
+  },
+  "definitionRef": {
+    "id": "core.coordination-protocol.group-cognition-framework",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "facilitator-actor",
+      "role": "facilitator",
+      "persona": "group-cognition-facilitator"
+    },
+    {
+      "id": "explorer-a",
+      "role": "explorer",
+      "persona": "lateral-thinker"
+    },
+    {
+      "id": "explorer-b",
+      "role": "explorer",
+      "persona": "domain-specialist"
+    },
+    {
+      "id": "explorer-c",
+      "role": "explorer",
+      "persona": "contrarian"
+    },
+    {
+      "id": "clusterer-actor",
+      "role": "clusterer",
+      "persona": "taxonomist"
+    },
+    {
+      "id": "critic-actor",
+      "role": "critic",
+      "persona": "red-team-critic"
+    },
+    {
+      "id": "evidence-reviewer-actor",
+      "role": "evidence-reviewer",
+      "persona": "evidence-auditor"
+    },
+    {
+      "id": "synthesizer-actor",
+      "role": "synthesizer",
+      "persona": "neutral-synthesizer"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p05_2_r7_proof_driver_op_001",
+    "asgn_p05_2_r7_proof_driver_op_002",
+    "asgn_p05_2_r7_proof_driver_op_003",
+    "asgn_p05_2_r7_proof_driver_op_004",
+    "asgn_p05_2_r7_proof_driver_op_005",
+    "asgn_p05_2_r7_proof_driver_op_006",
+    "asgn_p05_2_r7_proof_driver_op_007",
+    "asgn_p05_2_r7_proof_driver_op_008",
+    "asgn_p05_2_r7_proof_driver_op_009"
+  ],
+  "completedAt": null
+}

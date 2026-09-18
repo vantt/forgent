@@ -1,0 +1,102 @@
+{
+  "runner": {
+    "executor": {
+      "allowCrossProvider": true,
+      "command": "node",
+      "args": [
+        "exec-family-a.mjs",
+        "{prompt}"
+      ]
+    },
+    "executors": {
+      "exec-family-a": {
+        "kind": "agent",
+        "providerModel": "family-a",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "node",
+            "args": [
+              "exec-family-a.mjs",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
+      "exec-family-b": {
+        "kind": "agent",
+        "providerModel": "family-b",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "node",
+            "args": [
+              "exec-family-b.mjs",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
+      "exec-slow": {
+        "kind": "agent",
+        "providerModel": "family-a",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "node",
+            "args": [
+              "exec-slow.mjs",
+              "{prompt}"
+            ]
+          }
+        ]
+      },
+      "exec-fast-resume": {
+        "kind": "agent",
+        "providerModel": "family-a",
+        "allowCrossProvider": true,
+        "invocations": [
+          {
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "node",
+            "args": [
+              "exec-fast-resume.mjs",
+              "{prompt}"
+            ]
+          }
+        ]
+      }
+    },
+    "modelPolicies": {
+      "claude": {
+        "standard": "test-model",
+        "analytical": "test-model",
+        "critical": "test-model",
+        "lightweight": "haiku",
+        "creative": "sonnet"
+      },
+      "family-a": {
+        "standard": "model-a-standard",
+        "analytical": "model-a-analytical",
+        "critical": "model-a-critical"
+      },
+      "family-b": {
+        "standard": "model-b-standard",
+        "analytical": "model-b-analytical",
+        "critical": "model-b-critical"
+      }
+    },
+    "timeoutMs": 60000,
+    "parallel": {
+      "maxRoots": 4,
+      "maxLeavesPerRoot": 4
+    }
+  }
+}

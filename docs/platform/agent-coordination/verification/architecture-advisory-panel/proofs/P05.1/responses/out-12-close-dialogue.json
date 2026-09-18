@@ -1,0 +1,103 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:19:21.601Z",
+  "data_hash": "d808e5ef5dbd853f11a25b6a77322f3fdd467a55da6732d665eb0b8f8c82bfd1",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "status": "completed",
+    "closed": true,
+    "closeAttempted": true,
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "lead-advisor-actor",
+          "assignmentId": "asgn_aap_driver_op_014",
+          "runId": "run_asgn_aap_driver_op_014_01"
+        },
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_aap_driver_op_008",
+          "runId": "run_asgn_aap_driver_op_008_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_aap_driver_op_007",
+          "runId": "run_asgn_aap_driver_op_007_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_aap_driver_op_009",
+          "runId": "run_asgn_aap_driver_op_009_02"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_aap_driver_op_010",
+          "runId": "run_asgn_aap_driver_op_010_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authClose",
+        "type": "authorize",
+        "operationId": "close-dialogue",
+        "nodeId": "phase-dialogue-reopen",
+        "actorId": "lead-advisor-actor",
+        "authorizationId": "auth_close_1",
+        "invocationKey": "ik_close_1",
+        "grantedContextRefs": [
+          "asgn_aap_driver_op_011",
+          "asgn_aap_driver_op_013"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "closeDialogue",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "assignmentId": "asgn_aap_driver_op_014",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "node",
+        "provider": "claude",
+        "tier": "standard"
+      }
+    ]
+  }
+}

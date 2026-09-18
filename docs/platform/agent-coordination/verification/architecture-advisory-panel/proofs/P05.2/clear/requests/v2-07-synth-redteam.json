@@ -1,0 +1,49 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v2: Phase 7 (synthesize one recommendation, preserving live disagreement) and the independent red-team pass.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authSynthRetry2",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_3",
+      "invocationKey": "ik_synth_3",
+      "reason": "Phase 5/6 complete: three proposals, one critique, one constraint ranking are all in.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010", "asgn_coordinator_driver_op_011", "asgn_coordinator_driver_op_016"]
+    },
+    {
+      "type": "operation",
+      "as": "synthesizeRetry2",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "objective": "Recommend ONE architecture for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification, keeping live disagreement visible rather than smoothing it into a footnote. The real ledger: Proposal A (system-shaper) -- keep the current OR-of-independent-hard-gate architecture. Proposal B (alternative-shaper) -- replace it with a 'Structural Entropy and ANSI Rhythm Analysis' statistical classifier (2D spatial entropy + ANSI-transition alignment, no hardcoded regexes). Proposal C (constraint-advocate) -- same conclusion as A, plus an explicit governance rule (extend only via more boolean gates, never replace the architecture). Constraint-advocate's own risk ranking of the three: C < A < B (B is highest risk: cannot provably preserve R25's fail-closed asymmetry, cannot represent the two semantic Claude-glyph detectors without secretly reintroducing hardcoded rules, has no test corpus). The critic's attack on A/C (the strongest proposals): their real flaw is ecosystem scalability -- hardcoded, tool-specific regexes (Claude's cursor/summary glyphs) mean the classifier only recognizes 'known upstream tools,' not structure in general, condemning the project to perpetual reactive patching as new coding agents with novel TUI conventions appear; every new tool defaults to the destructive wrap direction until a human manually patches it. Also weigh the real prior operator decision locked 2026-08-11 in herdr-gateway's own plan.md (fully automatic, no UI control, err toward pan when unsure) and the real prior finding that phase-04's own required corpus + confusion matrix was never built. Use absolute paths for anything you additionally read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). Also write a short human-readable agent-report.md alongside it explaining your recommendation in prose. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authRedteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_1",
+      "invocationKey": "ik_redteam_1",
+      "reason": "Independent adversarial check of the panel's own conduct, not just the architecture -- attack both the recommendation and whether the panel stayed honest.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010", "asgn_coordinator_driver_op_011", "asgn_coordinator_driver_op_016"]
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "objective": "Independently attack the architecture-advisory-panel's own conduct on the question of /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification strategy -- not just the architecture recommendation, but whether the panel itself stayed honest. Real ledger: three real proposals (A: keep current OR-gate architecture; B: replace with a statistical entropy/ANSI-rhythm classifier; C: keep current architecture plus a governance rule), a real critique attacking A/C's ecosystem-scalability limits (hardcoded per-tool regexes, perpetual reactive patching as new CLIs appear), and a real constraint ranking (C < A < B on operational risk, B rejected for being unable to provably preserve the fail-closed asymmetry and having no test corpus). Check specifically: did the critic's strongest attack (ecosystem scalability) get seriously engaged with or quietly dropped? Is proposal B a real, serious alternative or a strawman the panel can safely reject? Is there a legitimate hybrid or option nobody proposed? Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

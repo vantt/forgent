@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_coordinator_driver_op_004_01",
+  "assignmentId": "asgn_coordinator_driver_op_004",
+  "attempt": 1,
+  "executorId": "agy-bwrap",
+  "dispatchPlanPath": ".fgos/assignments/asgn_coordinator_driver_op_004/runs/01/dispatch-plan.json",
+  "cwd": "/home/vantt/projects/herdr-gateway",
+  "startedAt": "2026-09-07T02:14:12.996Z",
+  "timeoutMs": 2100000,
+  "status": "running"
+}

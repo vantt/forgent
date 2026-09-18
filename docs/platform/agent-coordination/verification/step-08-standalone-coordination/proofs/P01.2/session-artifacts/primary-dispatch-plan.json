@@ -1,0 +1,29 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "asgn_p01_2_live_proof_coordinator_op_002"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "codex-cli",
+  "capability": "codex-cli",
+  "invocation": {
+    "via": "cli",
+    "adapter": "cli-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "codex",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "codex",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true
+}

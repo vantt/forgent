@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_p012_live_76229_codex2",
+  "objective": "Read this repo's package.json and report its name and version.",
+  "status": "active",
+  "createdAt": "2026-09-01T15:23:49.212Z",
+  "provenanceRoot": {
+    "writerId": "p01-2-live-proof-coordinator"
+  },
+  "definitionRef": null,
+  "workRef": null,
+  "actors": [
+    {
+      "id": "primary",
+      "role": "researcher"
+    },
+    {
+      "id": "specialist",
+      "role": "reviewer"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p01_2_live_proof_coordinator_op_002",
+    "asgn_p01_2_live_proof_coordinator_op_003"
+  ],
+  "completedAt": null
+}

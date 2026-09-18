@@ -1,0 +1,3 @@
+fgos: dispatch capability=(none declared) executor=exec-fast-resume via=cli-spawn provider=family-a model=model-a-critical tier=critical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git

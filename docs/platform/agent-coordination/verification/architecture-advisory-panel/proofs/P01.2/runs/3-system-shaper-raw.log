@@ -1,0 +1,63 @@
+# proposals/system-shaper.md
+
+## Frame I worked from
+
+The CASE is a boundary question, not a feature request: should `mdview-desktop` stay a thin client of the daemon, or acquire local ownership of registry/render/search? Per Phase 4 defaults, "local ownership" is undefined by the panel and is mine to define; I define it as: *the shell independently implements one or more of {registry access, rendering, search/indexing} without going through the daemon's HTTP API*, and per the scout, this means genuine reimplementation — there is no existing shell-side library to relocate. I take the CASE's word "authority" seriously: the daemon is being asked to remain the place truth lives, not merely a service the shell happens to call today.
+
+I am not resolving whether "experimental" means product bet or spike — out of scope for me — but I size my proposal so it doesn't require that answer to be true first.
+
+## Proposal
+
+**Keep the desktop shell a thin client. Do not begin local ownership work now.** Instead, spend the reversible step on the four concrete launcher-coordination defects the scout actually found, because those are the only real, evidenced strain in the system today.
+
+The scout's central finding is decisive: `mdview-desktop/src/main.rs` (144 lines) has zero domain logic — no `Engine`, `SqliteStore`, renderer, indexer, search, document cache, or command bridge. It is a native window around `WebviewUrl::External(url)`. Every piece of daemon capability growth in the last week (background indexing, short-link resolution, in-place editing with conflict detection — Sept 3-5 commits) landed for the shell automatically, for free, with zero shell-side changes, *because* it stayed thin. That is not incidental — it is the mechanism by which "authority" stays coherent: one writer, one place editing conflicts get resolved, one place the SQLite schema can change without a second consumer to keep in sync.
+
+The scout also corrects the CASE's own framing: "single-daemon authority" doesn't fully hold today — CLI and MCP already open the SQLite registry directly and construct their own `Engine`, bypassing the daemon. So the daemon is not, in fact, the sole authority right now; it's the sole authority *for the desktop shell specifically*. That narrows the real decision: don't ask "should there be one authority in the system" (already no), ask "should the desktop shell join CLI/MCP in bypassing it." I say no, for a reason CLI/MCP don't share: CLI and MCP are short-lived, single-operation processes reading/writing SQLite in brief bursts. A desktop shell is long-running, holds state across a session, and would need a live cache, invalidation, and conflict-resolution strategy the moment it touches SQLite directly alongside a daemon that's also mutating it (the in-place-editing conflict detection landed Sept 3-5 exists precisely because concurrent writers are a real hazard). Reimplementing that in a second process is not "relocating" existing logic — the scout confirms there's nothing to relocate — it's building a second copy of the daemon's hardest problem.
+
+## Load-bearing constraint
+
+**One maintainer bears every ongoing cost of whatever is chosen, indefinitely.** This is the fact that makes the answer "thin" rather than "it depends on latency." If this were a team with dedicated desktop-platform ownership, a second implementation surface would be a normal cost of a differentiated product. With one maintainer, a duplicated Engine/renderer/search stack means every daemon-side change (which is happening weekly per the Sept 3-5 commits) becomes a two-sided change forever, or the two silently drift and the shell becomes stale in exactly the way "authority" was meant to prevent. Change this constraint (add a second maintainer with standing ownership of the desktop surface) and the proposal changes — local ownership becomes a legitimate investment rather than a standing tax on one person.
+
+## What this makes harder
+
+- **Any future desktop-only capability** (offline editing, an in-shell command palette hitting local data, working without the daemon running) is blocked until someone pays the reimplementation cost this proposal defers. That deferral is the whole cost of the proposal — I'm not hiding it.
+- **True offline use** is impossible as long as the shell is thin — if the daemon isn't running, the shell has nothing to show. If "experimental" turns out to mean "must work offline," this proposal is wrong on day one, not eventually.
+- **Perceived responsiveness** for anything the daemon does slowly (cold start, a slow query) is inherited by the shell with no local mitigation available. The scout found no benchmarks and no traces — so I don't know if this cost is currently zero or already biting someone. I'm treating it as zero because nobody has reported it, not because it's been measured.
+
+## First reversible step (one week)
+
+Fix the four launcher-coordination defects the scout found, in the existing thin-client shape — no ownership boundary changes:
+
+1. Give desktop the same atomic spawn gate CLI has (commit `5887583`) to close the concurrent-start race.
+2. Replace desktop's silent-fallback-on-failure with CLI's reported-failure behavior (bring its 30×150ms poll in line with CLI's 20×100ms + reporting).
+3. Port CLI's lock-preferred bound-port fallback (`7e697fe`) so desktop can't end up pointed at the wrong port.
+4. Fix the bind-address bug at `config.rs:81` — desktop's URL construction uses the raw bind host (default `0.0.0.0`) without CLI's loopback substitution.
+
+This is cheap, uses only patterns CLI already proves work, and directly addresses the only concrete strain the scout found. It validates nothing about "should the shell own more" — it's not a probe toward local ownership, it's the fix for the actual bugs, done instead of a boundary change that has no evidenced problem to solve.
+
+## Evidence vs. assumption
+
+**Rests on scout evidence:**
+- Desktop shell has zero domain logic (file read, line count, code inspection).
+- CLI/MCP already bypass the daemon directly (source-confirmed).
+- The four launcher defects and their CLI-side fixes (commit hashes cited).
+- Daemon capability growth in the last week required zero shell changes (commit history).
+- No existing shell-side library code to relocate — reimplementation, not relocation (scout-confirmed per Phase 4 default #2).
+
+**Rests on assumption — flagged, not smuggled in:**
+- That the concurrent-start race is real, not just plausible (scout: "plausible from source, not reproduced").
+- That current user-felt latency/capability gaps are absent — no traces or benchmarks exist to confirm this either way. I am assuming "no evidence of a gap" means "no gap," which is a real leap, not a proven one.
+- That one maintainer will remain the sole owner going forward (a present fact I'm projecting forward, not something the CASE stated).
+- That "experimental" doesn't already mean a committed offline/local-first product bet — explicitly out of scope for me, so my sizing assumes it doesn't, and that assumption is the single biggest risk to this proposal.
+
+## Falsification criteria (stated before any critique)
+
+This proposal is wrong, specifically, if any of the following turn out true:
+
+1. **Traces or user reports show real latency/responsiveness pain** attributable to the daemon round-trip that a local cache would fix — not hypothetical, measured. (Scout found none exist yet; this would be new evidence.)
+2. **"Experimental" is confirmed to mean the shell must work offline or without the daemon running** — a thin client structurally cannot do this, full stop, no amount of launcher-bug-fixing changes that.
+3. **A second maintainer takes standing ownership of the desktop surface** — this removes the load-bearing constraint the whole proposal is sized against.
+4. **The concurrent-start race reproduces in practice** (not just "plausible from source") and the atomic-gate fix doesn't fully close it — that would mean the launcher-coordination layer needs more than a port-CLI's-fix, which would call the whole "just fix the four bugs" sizing into question, though not necessarily the thin-client boundary itself.
+
+If none of these hold, the daemon-as-authority framing the CASE proposed is sound for the desktop shell specifically, the launcher bugs are the real and only debt, and reimplementing registry/render/search locally would be manufacturing a second hard problem to solve a problem nobody has shown exists.
+EXIT:0

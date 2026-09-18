@@ -1,0 +1,30 @@
+=== STEP 1: openStandaloneSession ===
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_p012_live_76518_glm",
+  "objective": "Read this repo's package.json and report its name and version.",
+  "status": "active",
+  "createdAt": "2026-09-01T15:28:38.667Z",
+  "provenanceRoot": {
+    "writerId": "p01-2-live-proof-coordinator"
+  },
+  "definitionRef": null,
+  "workRef": null,
+  "actors": [
+    {
+      "id": "primary",
+      "role": "researcher"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [],
+  "completedAt": null
+}
+
+=== STEP 2: dispatchPrimaryTask via glm-cli ===

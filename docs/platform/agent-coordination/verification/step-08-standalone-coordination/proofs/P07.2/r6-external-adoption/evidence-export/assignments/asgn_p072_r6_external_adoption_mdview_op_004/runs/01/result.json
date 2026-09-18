@@ -1,0 +1,105 @@
+{
+  "runId": "run_asgn_p072_r6_external_adoption_mdview_op_004_01",
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_004",
+  "workId": null,
+  "executorId": "claude",
+  "policy": {
+    "role": "requester",
+    "executorPreference": [
+      "claude"
+    ],
+    "executorId": "claude",
+    "providerModel": "claude",
+    "tier": "standard",
+    "model": "sonnet",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "claude.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p072_r6_external_adoption_mdview_op_004"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/agent-report.md",
+      "sha256": "5bdb2c8169962c65c17ff265fdb980e9aa43fce9710fc6b32da08752ccddc4ec"
+    }
+  ],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "agent-result.json was present but failed schema validation"
+  },
+  "evidence": {
+    "gitBefore": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+    "gitAfter": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_004/runs/01/agent-report.md"
+    ],
+    "tests": []
+  }
+}

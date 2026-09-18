@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 visibility: complete the third shaper, then confirm the SAME critique authorization now legally succeeds.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_visibility",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "operation", "as": "shapeConstraint", "operationId": "shape-constraint-proposal", "targetActorId": "constraint-advocate-actor", "objective": "Shape the constraint proposal (the missing third of the trio).", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "authorize", "as": "authCritiqueLate", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "authorizationId": "auth_critique_late", "invocationKey": "ik_critique_late", "reason": "All three Phase-5 shapers have now settled -- post-shaping-open is legally open, through the real CLI.", "grantedContextRefs": ["asgn_aap_driver_op_016", "asgn_aap_driver_op_017", "$ref:shapeConstraint"] }
+  ]
+}

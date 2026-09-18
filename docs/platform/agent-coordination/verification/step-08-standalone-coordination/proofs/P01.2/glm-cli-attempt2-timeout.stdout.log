@@ -1,0 +1,104 @@
+=== STEP 1 (resume mode): session already open, skipping openStandaloneSession ===
+
+=== STEP 2: dispatchPrimaryTask via glm-cli ===
+primary.assignment.assignmentId = asgn_p01_2_live_proof_coordinator_op_004
+primary.resumed = false
+primary.runResult.status = failed confidence = failed
+{
+  "runId": "run_asgn_p01_2_live_proof_coordinator_op_004_01",
+  "assignmentId": "asgn_p01_2_live_proof_coordinator_op_004",
+  "workId": null,
+  "executorId": "glm-cli",
+  "policy": {
+    "role": "researcher",
+    "executorPreference": [
+      "glm-cli"
+    ],
+    "executorId": "glm-cli",
+    "providerModel": "z-ai",
+    "tier": "standard",
+    "model": "z-ai/glm-5.2",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "glm-cli",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "z-ai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "glm-cli"
+        }
+      },
+      "model": {
+        "value": "z-ai/glm-5.2",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p01_2_live_proof_coordinator_op_004"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "z-ai"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 124,
+    "stdoutLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_004/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p01_2_live_proof_coordinator_op_004/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "executor timed out after 180000ms for work \"glm-cli\"."
+  },
+  "evidence": {
+    "gitBefore": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitAfter": "626e057b181510558e69064570c1cc4ed9794bd9",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}
+
+PRIMARY DID NOT COMPLETE -- stopping before consult (honest partial, not proceeding).

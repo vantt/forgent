@@ -1,0 +1,97 @@
+{
+  "runId": "run_asgn_p072_r6_external_adoption_mdview_op_001_01",
+  "assignmentId": "asgn_p072_r6_external_adoption_mdview_op_001",
+  "workId": null,
+  "executorId": "claude",
+  "policy": {
+    "role": "researcher",
+    "executorPreference": [
+      "claude"
+    ],
+    "executorId": "claude",
+    "providerModel": "claude",
+    "tier": "standard",
+    "model": "sonnet",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "claude.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p072_r6_external_adoption_mdview_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p072_r6_external_adoption_mdview_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+    "gitAfter": "84a6710ad2970d2702e6ff2814314fe39f9392b8",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

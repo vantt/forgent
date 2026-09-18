@@ -1,0 +1,44 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Establish a hard, live-proven read-only confinement envelope for advisory-panel executor dispatch before any real proof project is touched. Follow plans/260905-architecture-advisory-panel/phase-00-read-only-dispatch-readiness.md's Requirements exactly (also mirrored in docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md). Then get independent review + red-team on the result.",
+  "writerId": "p00-1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p00-1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "meticulous-implementer" },
+    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "skeptical-reviewer" },
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "adversarial-tester" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "produce",
+      "operationId": "produce-candidate",
+      "targetActorId": "doer",
+      "taskKey": "produce-candidate-doer",
+      "objective": "Read plans/260905-architecture-advisory-panel/phase-00-read-only-dispatch-readiness.md and docs/architect/agent-coordination/verification/architecture-advisory-panel/current-cell.md in full first. Then: (1) read active project/global executor config (.fgos/config.json runner.executors) and run real --help output for claude, codex, agy CLIs; (2) compare provider-native sandbox flags, executor variants, and OS/filesystem read-only mounts/sandboxing for each; select the smallest general mechanism that enforces read-only confinement, never assume an executor variant is the answer before probing; (3) re-prove claude-reviewer's mutation-negative behavior before reusing it; (4) do not admit current codex-cli (bypass-all, no sandbox per its own .fgos/config.json description) unless you independently prove an outer OS/filesystem envelope contains it; (5) probe agy for a real read-only mode and evaluate outer confinement, exclude if unsafe or absent; (6) for every candidate executor/mechanism pair, run it against a disposable git checkout (create one under a temp dir, never this repo) with a prompt that explicitly attempts to modify and commit a sentinel file, and confirm the process cannot change tracked/untracked source outside its own evidence-output boundary; (7) record executor id, command/args with secrets removed, providerModel, tier mapping, resolved model, exit result, before/after git status/hash, and refusal/containment evidence for every pair in the Proof Matrix table of docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md; (8) if a new config default, executor variant, or confinement dependency becomes a real product dependency, register it into fgos setup's config-merge and doctor's check registry (src/setup/checks.mjs) per AGENTS.md's install/setup/doctor gate -- do not leave it undiscoverable; (9) capture the current full-suite baseline (FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1 npm test) and compare against the plan's recorded four known failures (legacy durable-doing ask/answer, missing-quadrant docs-index, live codex usage-limit, invalid placeholder characters in two resume examples), name any drift. Stay strictly inside the readonly-dispatch lease (see current-cell.md's Files section) -- no protocol/skill files, no Work items. Write your findings into P00.1.md's Proof Matrix and Commands sections (append, do not remove the skeleton headings) and produce a track index allowlist entry naming every admitted safe executor/mechanism pair, its supported mechanism (in-process/out-of-process), and meaningful tier mappings. Commit your work on this cell's own worktree branch when done.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md updated with real Proof Matrix rows and Commands", "a real git commit on this worktree's branch"],
+      "mutation": "mutating"
+    },
+    {
+      "type": "operation",
+      "as": "review",
+      "operationId": "review-candidate",
+      "targetActorId": "reviewer",
+      "taskKey": "review-candidate-reviewer",
+      "objective": "Independently review the Doer's P00.1 read-only dispatch readiness work against plans/260905-architecture-advisory-panel/phase-00-read-only-dispatch-readiness.md's exact Requirements and Exit section. For each admitted executor/mechanism pair, verify the claimed mutation-attack evidence is real (check the actual before/after git status/hash the Doer recorded, do not trust the summary alone). Flag any pair admitted without genuine live-proven confinement, any codex-cli admission without an independently proven outer envelope, any scope creep outside the readonly-dispatch lease, and any config/doctor registration gap. Classify findings HIGH/MEDIUM/LOW.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:produce"]
+    },
+    {
+      "type": "operation",
+      "as": "redTeam",
+      "operationId": "red-team-candidate",
+      "targetActorId": "red-team",
+      "taskKey": "red-team-candidate-red-team",
+      "objective": "Attempt to falsify the Doer's read-only confinement claims for every admitted executor/mechanism pair in P00.1's Proof Matrix. Look specifically for: a mutation path the Doer's own probe prompt did not try (e.g. writing outside the working tree, modifying git config/hooks, escaping via a symlink or absolute path, using a tool the probe prompt never exercised); a pair marked safe based on prompt discipline alone rather than real subprocess/OS confinement; and whether the disposable checkout itself was ever mistaken for confinement. Name any named bug/invariant attack you actually tried and its real result, not a hypothetical.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:produce"]
+    }
+  ]
+}

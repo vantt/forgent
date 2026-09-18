@@ -1,0 +1,15 @@
+fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=critical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=standard
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=exec-family-a via=cli-spawn provider=family-a model=model-a-analytical tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=exec-family-b via=cli-spawn provider=family-b model=model-b-analytical tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fgos: dispatch capability=(none declared) executor=node via=cli-spawn provider=node model=test-model tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git

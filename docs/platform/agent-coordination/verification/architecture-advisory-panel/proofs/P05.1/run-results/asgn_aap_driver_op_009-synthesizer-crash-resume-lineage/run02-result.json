@@ -1,0 +1,108 @@
+{
+  "runId": "run_asgn_aap_driver_op_009_02",
+  "assignmentId": "asgn_aap_driver_op_009",
+  "workId": null,
+  "executorId": "exec-fast-resume",
+  "policy": {
+    "role": "synthesizer",
+    "executorPreference": [
+      "exec-fast-resume"
+    ],
+    "executorId": "exec-fast-resume",
+    "providerModel": "family-a",
+    "tier": "critical",
+    "model": "model-a-critical",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "exec-fast-resume",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "family-a",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "exec-fast-resume"
+        }
+      },
+      "model": {
+        "value": "model-a-critical",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "family-a.critical"
+        }
+      },
+      "tier": {
+        "value": "critical",
+        "source": {
+          "scope": "operation",
+          "id": "synthesize-recommendation"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_aap_driver_op_009"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "family-a"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "c5b5f6d00649749282918ec2953c3b9870cf1d6f940daf65cb4f7a3fc6962784",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_aap_driver_op_009/runs/02/agent-report.md",
+      "sha256": "5e0d3ab0df0515c9f635db0844069d970263a0e0287db49bd27e18dadbc6d00f"
+    }
+  ],
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_aap_driver_op_009/runs/02/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_aap_driver_op_009/runs/02/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Settled by exec-fast-resume after crash recovery."
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_aap_driver_op_009/runs/02/agent-report.md",
+      ".fgos/assignments/asgn_aap_driver_op_009/runs/02/agent-result.json"
+    ],
+    "tests": []
+  }
+}

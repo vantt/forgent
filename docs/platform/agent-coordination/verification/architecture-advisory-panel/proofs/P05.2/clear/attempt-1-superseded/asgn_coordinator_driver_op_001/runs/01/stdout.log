@@ -1,0 +1,24 @@
+Both artifacts written. `status: "done"`.
+
+## Verdict: keep patching reactively — don't generalize
+
+**Why patching is right here, not just tolerable.** Three properties make this file an unusually good fit for symptom-driven fixes:
+
+- The failure modes are asymmetric and that asymmetry is a *locked operator decision* (2026-08-11, `plan.md:63-64`): wrongly-wrapped structure is unrecoverable; wrongly-panned prose is the pre-feature behaviour — an invisible non-event.
+- `looksStructured` is a pure OR-chain of six independent recognizers (`block-classify.ts:131-176`). Adding a clause can only move cases wrap→pan, toward the safe direction. Blast radius is bounded by construction.
+- Cost per patch: ~10 lines + 2 tests, one module, one call site, rollback = force `pan`.
+
+**Why generalizing is actively wrong.** Generalizing a fail-closed detector means loosening it, which moves cases toward the destructive direction and contradicts the locked decision. This isn't hypothetical — the file already contains a walked-back generalization: `BOX_CHARS` originally included arrows, so one `→` in a three-line paragraph (33% > the 30% threshold) panned ordinary prose. The broader heuristic was the worse one.
+
+**What the unease is actually detecting.** Two things, neither of which is "the heuristic is too narrow":
+
+1. **Vendor chrome disguised as universal layout.** Three of six recognizers (`isFramingRule`, `MENU_CURSOR_ITEM`, `countSummaryPairs`) detect one vendor's TUI chrome; three are source-agnostic. The code doesn't distinguish them, so each vendor addition *reads* as drift in a universal heuristic. It's a lookup table that hasn't been named as one.
+2. **Nothing counts the misses.** Phase 4's own Validation required a corpus confusion matrix with `structured-wrapped-as-prose == 0` (`phase-04:160-169`); what shipped is 19 hand-written examples. The plan's stop condition is "a miss rate the operator trusts" — currently untestable. That's why the question feels unresolved.
+
+**Recommended order:** (1) build the corpus + confusion matrix; (2) split the clause list into layout-signals vs. Claude-chrome, no behaviour change; (3) build fit-by-shrink — scoped in phase 4, never built, button-free, no recognition step, kills the most common irritation without touching the classifier; (4) decide PBI-060 note (6), how many render paths the app feeds, since PR #5's Log view solves Claude panes by source separation and would drop most of the pressure driving these patches.
+
+Two escapes are already priced and parked: the pty soft-wrap signal (trigger "if the structure detector proves insufficient in use" — arguably now met) and the manual toggle (operator ruled it out, so reaching it means reopening *with* them).
+
+**One caveat on my evidence:** Bash was non-functional the whole session — EROFS on its temp dir plus an approval gate, in both this session and a delegated read-only subagent. No `git log`/`show`/`diff` ran. Commit history is inferred from the session's git-status snapshot, the file's own narrating comments, and phase-04's "Departures from the plan" section. The direction and shape of recent patches is well-supported; exact dates and the full commit list are not verified. `web/src/views/terminal.ts` is dirty in the tree and couldn't be diffed.
+
+Three open questions are recorded in both artifacts — notably whether the phase-4 measurement corpus at `.bee/spikes/terminal-render-bench/` survived the `.bee`→`.fgos` migration, since that changes the cost of action 1.

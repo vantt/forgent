@@ -1,0 +1,40 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-unclear-herdr-grammar-vs-heuristic-v3: record the person's real decide turn, then close the dialogue.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "human-turn",
+      "as": "personTurn1",
+      "turnId": "turn_1",
+      "turnOrdinal": 1,
+      "channel": "claude-code-chat",
+      "artifactRef": "/home/vantt/projects/forgentX/docs/architect/agent-coordination/verification/architecture-advisory-panel/proofs/P05.2/unclear/human/1-person.md",
+      "externalRef": "claude-code-transcript:P05.2-live-session:coordinator-driver",
+      "attributedTo": { "type": "person", "id": "the-user" }
+    },
+    {
+      "type": "authorize",
+      "as": "authClose",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_close_unclear_v3",
+      "invocationKey": "ik_close_unclear_v3",
+      "reason": "The person's turn_1 stated a real decide: follow the recommendation. No reopen needed.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_039"]
+    },
+    {
+      "type": "operation",
+      "as": "closeDialogue",
+      "operationId": "close-dialogue",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "The person has decided: follow the recommendation (stay in-system, evolve block-classify.ts under the two stated binding conditions -- real fixture corpus, named Claude-specific rules -- and capture real Codex/Agy panes to settle the glyph question). Close the dialogue. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 visibility ATTACK: authorize critique-proposals with only 2 of 3 Phase-5 shapers settled -- must be refused.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_visibility",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authCritiqueEarly", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor", "authorizationId": "auth_critique_early", "invocationKey": "ik_critique_early", "reason": "ATTACK: attempt to reveal the shaping trio with only two of three settled, through the real CLI door.", "grantedContextRefs": ["asgn_aap_driver_op_016", "asgn_aap_driver_op_017"] }
+  ]
+}

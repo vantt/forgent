@@ -1,0 +1,31 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v2: retry assess-constraints with explicit contextRefs on the operation step itself (grantedContextRefs on the prior authorize step alone did not propagate -- confirmed live, filed).",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v2",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authAssess2",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_2",
+      "invocationKey": "ik_assess_2",
+      "reason": "Retry: the first assess-constraints attempt correctly reported no-evidence because it received no context refs at all (authorize's own grantedContextRefs did not propagate to the operation step's contextRefs -- a real usage gap, not this actor's fault). Retrying with contextRefs declared directly on the operation step.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"]
+    },
+    {
+      "type": "operation",
+      "as": "assess2",
+      "operationId": "assess-constraints",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the real operational risk of each of the three Phase 5 proposals for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. The three proposals were reported by system-shaper, alternative-shaper and constraint-advocate in this same session -- read them via absolute path at /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_008/runs/01/agent-result.json (system), /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_009/runs/01/agent-result.json (alternative), and /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_010/runs/01/agent-result.json (your own earlier constraint proposal). Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "contextRefs": ["asgn_coordinator_driver_op_008", "asgn_coordinator_driver_op_009", "asgn_coordinator_driver_op_010"],
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

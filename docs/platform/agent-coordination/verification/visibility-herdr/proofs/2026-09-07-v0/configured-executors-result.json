@@ -1,0 +1,116 @@
+{
+  "startedAt": "2026-09-07T04:11:59.006Z",
+  "executors": {
+    "agy-herdr": {
+      "note": "corrected: -i removed (it swallows the next flag as its prompt value)",
+      "argsTemplate": [
+        "{prompt}",
+        "--mode",
+        "accept-edits",
+        "--new-project",
+        "--model",
+        "{model}"
+      ],
+      "effectiveArgs": [
+        "--mode",
+        "accept-edits",
+        "--new-project",
+        "--model",
+        "gemini-3.6-flash-medium"
+      ],
+      "kind": "agy",
+      "exitCommand": "/exit",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": "settled",
+          "ms": 27140,
+          "ack": true,
+          "result": true
+        },
+        {
+          "round": 2,
+          "outcome": "settled",
+          "ms": 24079,
+          "ack": true,
+          "result": true
+        },
+        {
+          "round": 3,
+          "outcome": "settled",
+          "ms": 21347,
+          "ack": true,
+          "result": true
+        }
+      ],
+      "settled": 3,
+      "of": 3,
+      "verdict": "works as configured"
+    },
+    "codex-herdr": {
+      "note": "corrected: bare interactive codex; the shell alias already supplies the bypass flag",
+      "argsTemplate": [
+        "{prompt}"
+      ],
+      "effectiveArgs": [],
+      "kind": "codex",
+      "exitCommand": "/quit",
+      "rounds": [
+        {
+          "round": 1,
+          "outcome": null,
+          "reason": "agent_not_ready",
+          "message": "executor failed to start for work \"codex-herdr-1\": herdr could not bring a \"codex\" agent to ready in pane w1:p5 (agent_not_ready): agent fgos-codex-herdr-1-mtqq6ic4 is blocked during startup and is not ready for prompts",
+          "ms": 3913,
+          "ack": false,
+          "result": false
+        },
+        {
+          "round": 2,
+          "outcome": null,
+          "reason": "agent_not_ready",
+          "message": "executor failed to start for work \"codex-herdr-2\": herdr could not bring a \"codex\" agent to ready in pane w1:p6 (agent_not_ready): agent fgos-codex-herdr-2-mtqq6lct is blocked during startup and is not ready for prompts",
+          "ms": 3938,
+          "ack": false,
+          "result": false
+        },
+        {
+          "round": 3,
+          "outcome": null,
+          "reason": "agent_not_ready",
+          "message": "executor failed to start for work \"codex-herdr-3\": herdr could not bring a \"codex\" agent to ready in pane w1:p7 (agent_not_ready): agent fgos-codex-herdr-3-mtqq6oe7 is blocked during startup and is not ready for prompts",
+          "ms": 3897,
+          "ack": false,
+          "result": false
+        }
+      ],
+      "settled": 0,
+      "of": 3,
+      "verdict": "does not work"
+    }
+  },
+  "finishedAt": "2026-09-07T04:13:23.896Z",
+  "operatorSessionsAfter": [
+    "default(running)"
+  ],
+  "log": [
+    "[04:11:59] isolated session up; 2 executors x 3 rounds",
+    "[04:11:59] --- agy-herdr: corrected: -i removed (it swallows the next flag as its prompt value)",
+    "[04:11:59]     agent receives: --mode accept-edits --new-project --model gemini-3.6-flash-medium",
+    "[04:12:26]     round 1/3: outcome=settled ack=true result=true (27140ms)",
+    "[04:12:50]     round 2/3: outcome=settled ack=true result=true (24079ms)",
+    "[04:13:12]     round 3/3: outcome=settled ack=true result=true (21347ms)",
+    "[04:13:12]     => agy-herdr: 3/3 settled",
+    "[04:13:12] --- codex-herdr: corrected: bare interactive codex; the shell alias already supplies the bypass flag",
+    "[04:13:12]     agent receives: ",
+    "[04:13:16]     round 1/3: outcome=agent_not_ready ack=false result=false (3913ms)",
+    "[04:13:16]       executor failed to start for work \"codex-herdr-1\": herdr could not bring a \"codex\" agent to ready in pane w1:p5 (agent_not_ready): agent fgos-codex-herdr-1-mtqq6ic4 is blocked during startup and is not ready for prompts",
+    "[04:13:19]     round 2/3: outcome=agent_not_ready ack=false result=false (3938ms)",
+    "[04:13:19]       executor failed to start for work \"codex-herdr-2\": herdr could not bring a \"codex\" agent to ready in pane w1:p6 (agent_not_ready): agent fgos-codex-herdr-2-mtqq6lct is blocked during startup and is not ready for prompts",
+    "[04:13:23]     round 3/3: outcome=agent_not_ready ack=false result=false (3897ms)",
+    "[04:13:23]       executor failed to start for work \"codex-herdr-3\": herdr could not bring a \"codex\" agent to ready in pane w1:p7 (agent_not_ready): agent fgos-codex-herdr-3-mtqq6oe7 is blocked during startup and is not ready for prompts",
+    "[04:13:23]     => codex-herdr: 0/3 settled",
+    "[04:13:23] cleanup",
+    "[04:13:24] sessions left: default(running)"
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "runId": "run_asgn_p05_2_r7_proof_driver_op_001_01",
+  "assignmentId": "asgn_p05_2_r7_proof_driver_op_001",
+  "workId": null,
+  "executorId": "gemini-clone-2",
+  "policy": {
+    "role": "facilitator",
+    "executorPreference": [
+      "gemini-clone-2"
+    ],
+    "executorId": "gemini-clone-2",
+    "providerModel": "gemini",
+    "tier": "standard",
+    "model": "gemini-3.6-flash-high",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini-clone-2",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini-clone-2"
+        }
+      },
+      "model": {
+        "value": "gemini-3.6-flash-high",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_p05_2_r7_proof_driver_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_p05_2_r7_proof_driver_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": null,
+    "gitAfter": null,
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

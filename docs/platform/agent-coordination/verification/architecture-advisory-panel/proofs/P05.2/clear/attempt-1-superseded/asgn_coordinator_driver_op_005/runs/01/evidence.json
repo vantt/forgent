@@ -1,0 +1,34 @@
+{
+  "operationMutability": "read-only",
+  "gitBefore": "15b1203233cd97dccfcd62829fa3e81e15712363",
+  "gitAfter": "15b1203233cd97dccfcd62829fa3e81e15712363",
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [
+    "web/src/views/terminal.ts",
+    "web/test/terminal.test.ts",
+    "node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709/results.json",
+    "plans/reports/home-cards-260809.png"
+  ],
+  "dirtyAfter": [
+    "web/src/views/terminal.ts",
+    "web/test/terminal.test.ts",
+    "node_modules/.vite/vitest/da39a3ee5e6b4b0d3255bfef95601890afd80709/results.json",
+    "plans/reports/home-cards-260809.png"
+  ],
+  "mutatedDirtyBeforeFiles": [],
+  "changedFiles": [],
+  "changedFileReasons": {},
+  "artifacts": [
+    {
+      "path": ".fgos/assignments/asgn_coordinator_driver_op_005/runs/01/agent-report.md",
+      "kind": "agent-report",
+      "valid": true
+    },
+    {
+      "path": ".fgos/assignments/asgn_coordinator_driver_op_005/runs/01/agent-result.json",
+      "kind": "agent-result",
+      "valid": true
+    }
+  ],
+  "tests": []
+}

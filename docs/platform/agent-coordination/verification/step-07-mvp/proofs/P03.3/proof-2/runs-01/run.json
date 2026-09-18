@@ -1,0 +1,11 @@
+{
+  "runId": "run_asgn_tsk_44e_op_001_01",
+  "assignmentId": "asgn_tsk_44e_op_001",
+  "attempt": 1,
+  "executorId": "claude-reviewer",
+  "dispatchPlanPath": ".fgos/assignments/asgn_tsk_44e_op_001/runs/01/dispatch-plan.json",
+  "cwd": "/home/vantt/projects/forgentX",
+  "startedAt": "2026-09-01T02:03:38.242Z",
+  "timeoutMs": 2100000,
+  "status": "running"
+}

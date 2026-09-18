@@ -1,0 +1,122 @@
+# P00.3 R11 live proof — codex-cli
+
+Two real, live `dispatch execute --contract` runs against the real
+`.fgos/config.json` in this repo (no fake/mocked config). Both used the same
+bounded read-only inline contract: read `package.json` and report the exact
+value of its top-level `name` field. Neither run modified any file
+(`evidence.gitBefore === evidence.gitAfter` in both RunResults).
+
+## Attempt 1 — schema-format finding (not a dispatch defect)
+
+Command:
+```
+node src/runner/dispatch.mjs execute --contract <contract-v1.json> --executor codex-cli --cwd /home/vantt/projects/forgentX
+```
+
+Contract v1's `expectedOutputs` asked in prose for "a written report" and did
+not spell out the required `agent-result.json` JSON shape
+(`{status, summary, ...}`, per `src/runner/dispatch/assignment.mjs`'s
+`validateAgentResultClaim`). codex-cli genuinely read `package.json`,
+answered correctly ("forgent"), and wrote a JSON result, but used its own
+field names (`verdict`, not `status`), so the claim failed schema validation.
+
+Exit code: 0. RunResult excerpt (stdout):
+```
+{"runId":"run_asgn_..._op_001_01","assignmentId":"asgn_..._op_001","executorId":"codex-cli",
+ "policy":{"role":"reviewer","persona":"code-reviewer","executorPreference":["codex-cli"],
+   "executorId":"codex-cli","providerModel":"claude","tier":"standard","model":"sonnet",
+   "visibility":"headless","constraints":{"requiresSkills":[]},
+   "provenance":{
+     "executor":{"value":"codex-cli","source":{"scope":"cliOverride"}},
+     "provider":{"value":"claude","source":{"scope":"registeredExecutor","id":"codex-cli"}},
+     "model":{"value":"sonnet","source":{"scope":"runnerConfig","id":"claude.standard"}},
+     "tier":{"value":"standard","source":{"scope":"default"}},
+     "persona":{"value":"code-reviewer","source":{"scope":"default","id":"reviewer"}},
+     "visibility":{"value":"headless","source":{"scope":"default"}},
+     "governance":{"value":"allowed","source":{"scope":"governance","id":"claude"}}}},
+ "status":"failed","confidence":"failed",
+ "runtime":{"exitCode":0, "stdoutLog":".fgos/assignments/.../runs/01/stdout.log", ...},
+ "agentClaim":{"status":"failed","summary":"agent-result.json was present but failed schema validation"},
+ "evidence":{"gitBefore":"7957f6f350b94d2d653dfc938691af3830308db9",
+             "gitAfter":"7957f6f350b94d2d653dfc938691af3830308db9",
+             "changedFiles":[],"mutatedDirtyBeforeFiles":[]}}
+```
+Codex's own stderr transcript (via `--allowedTools`-less bypass invocation)
+confirmed the real answer: `The exact top-level "name" value is "forgent".`
+— matching `package.json`'s real content, proving a genuine live read, not a
+fabricated/mocked result.
+
+**This confirms `--executor codex-cli` correctly reached
+`cliOverride.preferExecutor` (`provenance.executor.source.scope ===
+"cliOverride"`) and that provider/model/tier/governance provenance is
+accurate for the executor actually resolved.** The `status:"failed"` outcome
+is a fixture-authoring gap (the inline contract's `expectedOutputs` did not
+spell out the required agent-result.json schema), not a dispatch/CLI-wiring
+defect — see the note under "renderAssignmentPrompt" in
+`src/runner/dispatch/assignment.mjs`: the real prompt only says "Write
+structured JSON to <path>", it never states the required field names.
+
+## Attempt 2 — clean pass, corrected contract
+
+Fixed the contract's `expectedOutputs` to spell out the exact required
+`agent-result.json` shape (`status: "done"`, `summary`, `evidenceRefs`,
+`name`). Same command, contract v2, same `--executor codex-cli`.
+
+Exit code: 0. RunResult excerpt (stdout):
+```
+{"runId":"run_asgn_..._op_002_01","assignmentId":"asgn_..._op_002","executorId":"codex-cli",
+ "policy":{"role":"reviewer","persona":"code-reviewer","executorPreference":["codex-cli"],
+   "executorId":"codex-cli","providerModel":"claude","tier":"standard","model":"sonnet",
+   "visibility":"headless","constraints":{"requiresSkills":[]},
+   "provenance":{
+     "executor":{"value":"codex-cli","source":{"scope":"cliOverride"}},
+     "provider":{"value":"claude","source":{"scope":"registeredExecutor","id":"codex-cli"}},
+     "model":{"value":"sonnet","source":{"scope":"runnerConfig","id":"claude.standard"}},
+     "tier":{"value":"standard","source":{"scope":"default"}},
+     "governance":{"value":"allowed","source":{"scope":"governance","id":"claude"}}}},
+ "claimSha256":"ae9261f549b428b1b0902ca9e3291e6d682e6b7c059eabfac186c0e26728f4e4",
+ "status":"no-evidence","confidence":"no-evidence",
+ "agentClaim":{"status":"done","summary":"The top-level package name is forgent.",
+               "evidenceRefs":["package.json"],"name":"forgent"},
+ "evidence":{"gitBefore":"7957f6f350b94d2d653dfc938691af3830308db9",
+             "gitAfter":"7957f6f350b94d2d653dfc938691af3830308db9",
+             "changedFiles":[],"mutatedDirtyBeforeFiles":[],
+             "artifacts":[".fgos/assignments/.../runs/01/agent-result.json"]}}
+```
+`agentClaim` now validates (`status:"done"`, non-empty `summary`) and the
+answer is correct ("forgent"). Overall `status`/`confidence` still reads
+`"no-evidence"` — the run wrote no `agent-report.md` alongside
+`agent-result.json`, and this classifier requires both for a `reported`
+confidence level. This is a real, observed nuance of
+`classifyDispatchConfidence`, not a dispatch/CLI-wiring defect, and is
+outside R9-R11 scope to change.
+
+## Finding: governance.providerFamily vs policy.providerModel disagree for codex-cli
+
+`dispatch-plan.json` for both runs records `governance.providerFamily:
+"codex"`:
+```
+{"selector":{"type":"assignment","value":"asgn_..._op_002"},
+ "mechanism":"out-of-process","executorId":"codex-cli","capability":"codex-cli",
+ "invocation":{"via":"cli","adapter":"cli-spawn","protocol":"prompt-stdout-v1"},
+ "governance":{"providerFamily":"codex",
+   "egress":{"kind":"cross-provider","target":"codex","content":"repo-content"}},
+ "reasonCodes":["native-first.0033.cli-spawn-shaped"],"configured":true}
+```
+while the RunResult's `policy.providerModel` (from
+`resolveAssignmentDispatchPolicy`) says `"claude"` for the same executor and
+the same run. Root cause (read, not modified): `codex-cli` has no
+`providerModel` field in `.fgos/config.json`. `resolve.mjs`'s
+`deriveProviderFamily` returns `'claude'` when its `resolvedCommand`
+argument is omitted (defaults to `'claude'`) and returns the executor's real
+CLI command string (`'codex'`) when that argument is passed explicitly.
+`assignment-policy.mjs` (line ~201) calls
+`deriveProviderFamily(registeredExecutorEntry)` — one argument, defaulting
+to `'claude'` — while `resolve.mjs` (line ~429) calls
+`deriveProviderFamily(executorEntry, executor.command)` — two arguments,
+yielding `'codex'`. Two call sites derive a different provider family for
+the identical unregistered-`providerModel` executor. Pre-existing in
+already-landed P00.1/P00.2 code (the `assignment-policy.mjs` call site
+carries its own "Phase 00 R6 fix F1" comment), not introduced by this cell,
+and out of R9-R11's scope to fix — recorded here as a genuine, live-observed
+governance-provenance discrepancy for the Reviewer/Red-Team to weigh.

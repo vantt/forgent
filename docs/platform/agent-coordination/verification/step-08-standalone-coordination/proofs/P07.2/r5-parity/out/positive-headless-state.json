@@ -1,0 +1,909 @@
+{
+  "manifest": {
+    "schemaVersion": "1",
+    "coordinationId": "p072r5headless",
+    "objective": "Get a reviewer's second opinion on a reported version string before trusting it.",
+    "status": "active",
+    "createdAt": "2026-09-02T06:20:47.733Z",
+    "provenanceRoot": {
+      "writerId": "p072-r5-parity-proof"
+    },
+    "definitionRef": {
+      "id": "core.coordination-protocol.declared-consult",
+      "version": "1.0.0"
+    },
+    "workRef": null,
+    "actors": [
+      {
+        "id": "requester-actor",
+        "role": "requester"
+      },
+      {
+        "id": "consultant-actor",
+        "role": "consultant"
+      }
+    ],
+    "aggregateBounds": {
+      "wallTimeMs": 3600000,
+      "maxAssignments": 20,
+      "maxConcurrency": 4,
+      "maxRounds": 10,
+      "maxTaskDepth": 3
+    },
+    "assignmentRefs": [
+      "asgn_p072_r5_parity_proof_op_003",
+      "asgn_p072_r5_parity_proof_op_004"
+    ],
+    "completedAt": null,
+    "partialPolicy": null
+  },
+  "events": [
+    {
+      "seq": 1,
+      "ts": "2026-09-02T06:20:47.734Z",
+      "type": "session-opened",
+      "payload": {
+        "coordinationId": "p072r5headless",
+        "provenanceRoot": {
+          "writerId": "p072-r5-parity-proof"
+        }
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "69fd1b3a690dd96e"
+    },
+    {
+      "seq": 2,
+      "ts": "2026-09-02T06:20:47.734Z",
+      "type": "actor-bound",
+      "payload": {
+        "actorId": "requester-actor",
+        "role": "requester"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "75177a9c7e660cf6"
+    },
+    {
+      "seq": 3,
+      "ts": "2026-09-02T06:20:47.734Z",
+      "type": "actor-bound",
+      "payload": {
+        "actorId": "consultant-actor",
+        "role": "consultant"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "4e0942d5f8c37115"
+    },
+    {
+      "seq": 4,
+      "ts": "2026-09-02T06:20:47.741Z",
+      "type": "assignment-created",
+      "payload": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+        "actorId": "requester-actor"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "198d9340ca640566"
+    },
+    {
+      "seq": 5,
+      "ts": "2026-09-02T06:22:23.691Z",
+      "type": "result-linked",
+      "payload": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+        "runId": "run_asgn_p072_r5_parity_proof_op_003_01"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "2a0dc7ffa1254e34"
+    },
+    {
+      "seq": 6,
+      "ts": "2026-09-02T06:22:23.699Z",
+      "type": "assignment-created",
+      "payload": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+        "actorId": "consultant-actor"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "fa6ac5887a8fbad0"
+    },
+    {
+      "seq": 7,
+      "ts": "2026-09-02T06:22:57.844Z",
+      "type": "result-linked",
+      "payload": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+        "runId": "run_asgn_p072_r5_parity_proof_op_004_01"
+      },
+      "v": 3,
+      "src": "5439cfc7-9ffa-45b0-8997-4d5c34fe8fbf",
+      "h": "eae30c5c9591816b"
+    }
+  ],
+  "assignments": {
+    "asgn_p072_r5_parity_proof_op_003": {
+      "assignment": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+        "workId": null,
+        "role": "requester",
+        "dispatch": "assignment",
+        "objective": "Read package.json and report the name/version you find, then ask the consultant to double-check it.",
+        "contextRefs": [],
+        "expectedOutputs": [
+          "agent-result.json (status, summary) naming the package's name and version",
+          "agent-report.md: a short human-readable report stating the name and version you found"
+        ],
+        "expectedFiles": [],
+        "createdAt": "2026-09-02T06:20:47.741Z",
+        "provenance": {
+          "kind": "inline",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "execution-contract-schema"
+          ],
+          "inline": {
+            "contract": {
+              "objective": "Read package.json and report the name/version you find, then ask the consultant to double-check it.",
+              "contextRefs": [],
+              "constraints": [
+                "protocol-operation:core.coordination-protocol.declared-consult@1.0.0#request-consult"
+              ],
+              "expectedOutputs": [
+                "agent-result.json (status, summary) naming the package's name and version",
+                "agent-report.md: a short human-readable report stating the name and version you found"
+              ],
+              "mutation": "read-only",
+              "evidence": {
+                "required": "reported"
+              },
+              "role": "requester",
+              "capabilities": [
+                "consult"
+              ],
+              "budget": {
+                "timeoutMs": 300000,
+                "maxRuns": 1
+              }
+            },
+            "caller": {
+              "writerId": "p072-r5-parity-proof"
+            }
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "dispatchedRuns": [
+          "01"
+        ]
+      },
+      "runs": {
+        "01": {
+          "run": {
+            "runId": "run_asgn_p072_r5_parity_proof_op_003_01",
+            "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+            "attempt": 1,
+            "executorId": "claude-reviewer",
+            "dispatchPlanPath": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/dispatch-plan.json",
+            "cwd": "/home/vantt/projects/forgentX",
+            "startedAt": "2026-09-02T06:20:47.743Z",
+            "timeoutMs": 2100000,
+            "status": "running"
+          },
+          "result": {
+            "runId": "run_asgn_p072_r5_parity_proof_op_003_01",
+            "assignmentId": "asgn_p072_r5_parity_proof_op_003",
+            "workId": null,
+            "executorId": "claude-reviewer",
+            "policy": {
+              "role": "requester",
+              "executorPreference": [
+                "claude"
+              ],
+              "executorId": "claude",
+              "providerModel": "claude",
+              "tier": "standard",
+              "model": "sonnet",
+              "visibility": "headless",
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "cli",
+                    "id": "cli"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "sonnet",
+                  "source": {
+                    "scope": "runnerConfig",
+                    "id": "claude.standard"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_p072_r5_parity_proof_op_003"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "executorRedirected": true,
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/agent-report.md",
+                "sha256": "604657c9a8e77f5d3ce68588ff026fb1fecd834aa9a0dc101c8af902a4213ee8"
+              }
+            ],
+            "status": "failed",
+            "confidence": "failed",
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "status": "failed",
+              "summary": "agent-result.json was present but failed schema validation"
+            },
+            "evidence": {
+              "gitBefore": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+              "gitAfter": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [],
+              "mutatedDirtyBeforeFiles": [],
+              "artifacts": [
+                ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/agent-report.md"
+              ],
+              "tests": []
+            }
+          },
+          "evidence": {
+            "operationMutability": "read-only",
+            "gitBefore": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+            "gitAfter": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+            "gitBeforeSource": "pre-launch",
+            "dirtyBefore": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/agent-coordination/README.md",
+              "docs/architect/agent-coordination/proposals/README.md",
+              "docs/architect/agent-coordination/roadmap/README.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+              "docs/architect/agent-coordination/vision.md",
+              "docs/architect/component-boundary/README.md",
+              ".agentkit/.gitignore",
+              ".agentkit/config.yaml",
+              ".claude/agents/advisor.md",
+              ".claude/agents/brainstormer.md",
+              ".claude/agents/code-reviewer.md",
+              ".claude/agents/code-simplifier.md",
+              ".claude/agents/debugger.md",
+              ".claude/agents/docs-manager.md",
+              ".claude/agents/explore.md",
+              ".claude/agents/fullstack-developer.md",
+              ".claude/agents/git-manager.md",
+              ".claude/agents/journal-writer.md",
+              ".claude/agents/kongming.md",
+              ".claude/agents/planner.md",
+              ".claude/agents/project-manager.md",
+              ".claude/agents/researcher.md",
+              ".claude/agents/tester.md",
+              ".claude/agents/ui-ux-designer.md",
+              "docs/architect/agent-coordination/proposals/step-09-coding-domain-adoption.md",
+              "docs/architect/agent-coordination/proposals/step-09-component-authority-layout-map.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-envelope.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-request.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-state.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+              "docs/architect/component-boundary/node-to-rust-component-migration.md",
+              "docs/architect/component-boundary/tmp/CONTEXT.md",
+              "docs/architect/component-boundary/tmp/DISCUSSION.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-1-260831-1702-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-2-260831-1750-g5-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-1-260831-1935-adr006-provenance-normalizer-inline-validator-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-2-260831-2020-adr006-interpretation-dispatch-key-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-3-260831-2115-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-4-260831-2145-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-5-260831-2300-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-2-260901-0809-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-3-260901-0225-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-1-260831-1740-rt1-vacuous-test-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1840-rv1-narrow-split-regex-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1900-rv1-regression-false-positive-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1910-redteam-findings-1-2-3-combined-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1925-finding4-heading-format-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2000-medium1-medium2-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2015-rt-medium1-whitelist-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-2-260831-2050-medium1-confidence-gate-coverage-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2205-mutation-backfill-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2225-high-medium-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2250-executeassignment-root-cause-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260831-2345-medium1-medium2-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260901-0010-assignment-id-toctou-race-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-0900-assignmentid-collision-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-1000-concurrent-assignmentid-claim-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-1-260831-1731-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1900-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1920-final-pass-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-1-260831-2005-adr006-provenance-normalizer-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-2-260831-2100-adr006-interpretation-dispatch-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-3-260831-2140-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-4-260831-2235-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-5-260901-0000-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-2-260901-0930-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-3-260901-0937-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-1-260831-1720-g1-layering-g6-crash-timing-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1830-g5-plan-verdict-derivation-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1850-rv1-recheck-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-1-260831-1950-adr006-provenance-normalizer-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-2-260831-2045-adr006-interpretation-dispatch-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-3-260831-2130-g3-dirty-before-persistence-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-4-260831-2210-r7-heuristic-removal-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-5-260831-2330-r8-mission-lite-inline-migration-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-2-260901-0818-r3-cli-contract-door-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-3-260901-0931-r4-r6-live-proofs-review-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md",
+              "plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md",
+              "plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md",
+              "plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md",
+              "plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md",
+              "plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md",
+              "plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md",
+              "plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md"
+            ],
+            "dirtyAfter": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/agent-coordination/README.md",
+              "docs/architect/agent-coordination/proposals/README.md",
+              "docs/architect/agent-coordination/roadmap/README.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+              "docs/architect/agent-coordination/vision.md",
+              "docs/architect/component-boundary/README.md",
+              ".agentkit/.gitignore",
+              ".agentkit/config.yaml",
+              ".claude/agents/advisor.md",
+              ".claude/agents/brainstormer.md",
+              ".claude/agents/code-reviewer.md",
+              ".claude/agents/code-simplifier.md",
+              ".claude/agents/debugger.md",
+              ".claude/agents/docs-manager.md",
+              ".claude/agents/explore.md",
+              ".claude/agents/fullstack-developer.md",
+              ".claude/agents/git-manager.md",
+              ".claude/agents/journal-writer.md",
+              ".claude/agents/kongming.md",
+              ".claude/agents/planner.md",
+              ".claude/agents/project-manager.md",
+              ".claude/agents/researcher.md",
+              ".claude/agents/tester.md",
+              ".claude/agents/ui-ux-designer.md",
+              "docs/architect/agent-coordination/proposals/step-09-coding-domain-adoption.md",
+              "docs/architect/agent-coordination/proposals/step-09-component-authority-layout-map.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-envelope.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-request.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-state.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+              "docs/architect/component-boundary/node-to-rust-component-migration.md",
+              "docs/architect/component-boundary/tmp/CONTEXT.md",
+              "docs/architect/component-boundary/tmp/DISCUSSION.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-1-260831-1702-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-2-260831-1750-g5-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-1-260831-1935-adr006-provenance-normalizer-inline-validator-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-2-260831-2020-adr006-interpretation-dispatch-key-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-3-260831-2115-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-4-260831-2145-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-5-260831-2300-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-2-260901-0809-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-3-260901-0225-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-1-260831-1740-rt1-vacuous-test-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1840-rv1-narrow-split-regex-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1900-rv1-regression-false-positive-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1910-redteam-findings-1-2-3-combined-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1925-finding4-heading-format-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2000-medium1-medium2-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2015-rt-medium1-whitelist-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-2-260831-2050-medium1-confidence-gate-coverage-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2205-mutation-backfill-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2225-high-medium-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2250-executeassignment-root-cause-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260831-2345-medium1-medium2-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260901-0010-assignment-id-toctou-race-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-0900-assignmentid-collision-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-1000-concurrent-assignmentid-claim-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-1-260831-1731-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1900-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1920-final-pass-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-1-260831-2005-adr006-provenance-normalizer-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-2-260831-2100-adr006-interpretation-dispatch-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-3-260831-2140-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-4-260831-2235-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-5-260901-0000-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-2-260901-0930-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-3-260901-0937-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-1-260831-1720-g1-layering-g6-crash-timing-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1830-g5-plan-verdict-derivation-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1850-rv1-recheck-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-1-260831-1950-adr006-provenance-normalizer-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-2-260831-2045-adr006-interpretation-dispatch-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-3-260831-2130-g3-dirty-before-persistence-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-4-260831-2210-r7-heuristic-removal-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-5-260831-2330-r8-mission-lite-inline-migration-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-2-260901-0818-r3-cli-contract-door-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-3-260901-0931-r4-r6-live-proofs-review-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md",
+              "plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md",
+              "plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md",
+              "plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md",
+              "plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md",
+              "plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md",
+              "plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md",
+              "plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md"
+            ],
+            "mutatedDirtyBeforeFiles": [],
+            "changedFiles": [],
+            "changedFileReasons": {},
+            "artifacts": [
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/agent-report.md",
+                "kind": "agent-report",
+                "valid": true
+              },
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_003/runs/01/agent-result.json",
+                "kind": "agent-result",
+                "valid": false
+              }
+            ],
+            "tests": []
+          }
+        }
+      }
+    },
+    "asgn_p072_r5_parity_proof_op_004": {
+      "assignment": {
+        "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+        "workId": null,
+        "role": "consultant",
+        "dispatch": "assignment",
+        "objective": "Independently re-read package.json and confirm or correct the requester's reported name/version.",
+        "contextRefs": [
+          "asgn_p072_r5_parity_proof_op_003"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary) confirming or correcting the requester's finding",
+          "agent-report.md: a short human-readable report confirming or correcting the requester's finding"
+        ],
+        "expectedFiles": [],
+        "createdAt": "2026-09-02T06:22:23.699Z",
+        "provenance": {
+          "kind": "inline",
+          "contractPolicyVersion": "1",
+          "normalizerVersion": "1",
+          "validators": [
+            "execution-contract-schema"
+          ],
+          "inline": {
+            "contract": {
+              "objective": "Independently re-read package.json and confirm or correct the requester's reported name/version.",
+              "contextRefs": [
+                "asgn_p072_r5_parity_proof_op_003"
+              ],
+              "constraints": [
+                "protocol-operation:core.coordination-protocol.declared-consult@1.0.0#provide-consult"
+              ],
+              "expectedOutputs": [
+                "agent-result.json (status, summary) confirming or correcting the requester's finding",
+                "agent-report.md: a short human-readable report confirming or correcting the requester's finding"
+              ],
+              "mutation": "read-only",
+              "evidence": {
+                "required": "reported"
+              },
+              "role": "consultant",
+              "capabilities": [
+                "consult"
+              ],
+              "budget": {
+                "timeoutMs": 300000,
+                "maxRuns": 1
+              }
+            },
+            "caller": {
+              "writerId": "p072-r5-parity-proof",
+              "parentAssignmentId": "asgn_p072_r5_parity_proof_op_003"
+            }
+          }
+        },
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "dispatchedRuns": [
+          "01"
+        ]
+      },
+      "runs": {
+        "01": {
+          "run": {
+            "runId": "run_asgn_p072_r5_parity_proof_op_004_01",
+            "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+            "attempt": 1,
+            "executorId": "claude-reviewer",
+            "dispatchPlanPath": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/dispatch-plan.json",
+            "cwd": "/home/vantt/projects/forgentX",
+            "startedAt": "2026-09-02T06:22:23.699Z",
+            "timeoutMs": 2100000,
+            "status": "running"
+          },
+          "result": {
+            "runId": "run_asgn_p072_r5_parity_proof_op_004_01",
+            "assignmentId": "asgn_p072_r5_parity_proof_op_004",
+            "workId": null,
+            "executorId": "claude-reviewer",
+            "policy": {
+              "role": "consultant",
+              "executorPreference": [
+                "claude"
+              ],
+              "executorId": "claude",
+              "providerModel": "claude",
+              "tier": "standard",
+              "model": "sonnet",
+              "visibility": "headless",
+              "constraints": {
+                "requiresSkills": []
+              },
+              "provenance": {
+                "executor": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "cli",
+                    "id": "cli"
+                  }
+                },
+                "provider": {
+                  "value": "claude",
+                  "source": {
+                    "scope": "registeredExecutor",
+                    "id": "claude"
+                  }
+                },
+                "model": {
+                  "value": "sonnet",
+                  "source": {
+                    "scope": "runnerConfig",
+                    "id": "claude.standard"
+                  }
+                },
+                "tier": {
+                  "value": "standard",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "persona": {
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "visibility": {
+                  "value": "headless",
+                  "source": {
+                    "scope": "default"
+                  }
+                },
+                "constraints": {
+                  "value": {
+                    "requiresSkills": []
+                  },
+                  "source": {
+                    "scope": "assignment",
+                    "id": "asgn_p072_r5_parity_proof_op_004"
+                  }
+                },
+                "governance": {
+                  "value": "allowed",
+                  "source": {
+                    "scope": "governance",
+                    "id": "claude"
+                  }
+                }
+              }
+            },
+            "executorRedirected": true,
+            "settleReports": [
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/agent-report.md",
+                "sha256": "5e335dcbca4451b72bc57c8780a7404795c5cadb51a3ea7252508b7606d730ba"
+              }
+            ],
+            "status": "failed",
+            "confidence": "failed",
+            "runtime": {
+              "exitCode": 0,
+              "stdoutLog": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/stdout.log",
+              "stderrLog": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/stderr.log"
+            },
+            "agentClaim": {
+              "status": "failed",
+              "summary": "agent-result.json was present but failed schema validation"
+            },
+            "evidence": {
+              "gitBefore": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+              "gitAfter": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+              "gitBeforeSource": "pre-launch",
+              "changedFiles": [],
+              "mutatedDirtyBeforeFiles": [],
+              "artifacts": [
+                ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/agent-report.md"
+              ],
+              "tests": []
+            }
+          },
+          "evidence": {
+            "operationMutability": "read-only",
+            "gitBefore": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+            "gitAfter": "4a4d3d67fc32ff78080cdf8f1c5f310d9bd72cf7",
+            "gitBeforeSource": "pre-launch",
+            "dirtyBefore": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/agent-coordination/README.md",
+              "docs/architect/agent-coordination/proposals/README.md",
+              "docs/architect/agent-coordination/roadmap/README.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+              "docs/architect/agent-coordination/vision.md",
+              "docs/architect/component-boundary/README.md",
+              ".agentkit/.gitignore",
+              ".agentkit/config.yaml",
+              ".claude/agents/advisor.md",
+              ".claude/agents/brainstormer.md",
+              ".claude/agents/code-reviewer.md",
+              ".claude/agents/code-simplifier.md",
+              ".claude/agents/debugger.md",
+              ".claude/agents/docs-manager.md",
+              ".claude/agents/explore.md",
+              ".claude/agents/fullstack-developer.md",
+              ".claude/agents/git-manager.md",
+              ".claude/agents/journal-writer.md",
+              ".claude/agents/kongming.md",
+              ".claude/agents/planner.md",
+              ".claude/agents/project-manager.md",
+              ".claude/agents/researcher.md",
+              ".claude/agents/tester.md",
+              ".claude/agents/ui-ux-designer.md",
+              "docs/architect/agent-coordination/proposals/step-09-coding-domain-adoption.md",
+              "docs/architect/agent-coordination/proposals/step-09-component-authority-layout-map.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-envelope.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-request.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-state.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+              "docs/architect/component-boundary/node-to-rust-component-migration.md",
+              "docs/architect/component-boundary/tmp/CONTEXT.md",
+              "docs/architect/component-boundary/tmp/DISCUSSION.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-1-260831-1702-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-2-260831-1750-g5-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-1-260831-1935-adr006-provenance-normalizer-inline-validator-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-2-260831-2020-adr006-interpretation-dispatch-key-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-3-260831-2115-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-4-260831-2145-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-5-260831-2300-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-2-260901-0809-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-3-260901-0225-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-1-260831-1740-rt1-vacuous-test-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1840-rv1-narrow-split-regex-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1900-rv1-regression-false-positive-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1910-redteam-findings-1-2-3-combined-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1925-finding4-heading-format-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2000-medium1-medium2-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2015-rt-medium1-whitelist-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-2-260831-2050-medium1-confidence-gate-coverage-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2205-mutation-backfill-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2225-high-medium-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2250-executeassignment-root-cause-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260831-2345-medium1-medium2-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260901-0010-assignment-id-toctou-race-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-0900-assignmentid-collision-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-1000-concurrent-assignmentid-claim-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-1-260831-1731-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1900-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1920-final-pass-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-1-260831-2005-adr006-provenance-normalizer-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-2-260831-2100-adr006-interpretation-dispatch-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-3-260831-2140-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-4-260831-2235-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-5-260901-0000-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-2-260901-0930-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-3-260901-0937-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-1-260831-1720-g1-layering-g6-crash-timing-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1830-g5-plan-verdict-derivation-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1850-rv1-recheck-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-1-260831-1950-adr006-provenance-normalizer-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-2-260831-2045-adr006-interpretation-dispatch-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-3-260831-2130-g3-dirty-before-persistence-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-4-260831-2210-r7-heuristic-removal-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-5-260831-2330-r8-mission-lite-inline-migration-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-2-260901-0818-r3-cli-contract-door-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-3-260901-0931-r4-r6-live-proofs-review-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md",
+              "plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md",
+              "plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md",
+              "plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md",
+              "plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md",
+              "plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md",
+              "plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md",
+              "plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md"
+            ],
+            "dirtyAfter": [
+              "AGENTS.md",
+              "CLAUDE.md",
+              "docs/architect/agent-coordination/README.md",
+              "docs/architect/agent-coordination/proposals/README.md",
+              "docs/architect/agent-coordination/roadmap/README.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/current-cell.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/index.md",
+              "docs/architect/agent-coordination/vision.md",
+              "docs/architect/component-boundary/README.md",
+              ".agentkit/.gitignore",
+              ".agentkit/config.yaml",
+              ".claude/agents/advisor.md",
+              ".claude/agents/brainstormer.md",
+              ".claude/agents/code-reviewer.md",
+              ".claude/agents/code-simplifier.md",
+              ".claude/agents/debugger.md",
+              ".claude/agents/docs-manager.md",
+              ".claude/agents/explore.md",
+              ".claude/agents/fullstack-developer.md",
+              ".claude/agents/git-manager.md",
+              ".claude/agents/journal-writer.md",
+              ".claude/agents/kongming.md",
+              ".claude/agents/planner.md",
+              ".claude/agents/project-manager.md",
+              ".claude/agents/researcher.md",
+              ".claude/agents/tester.md",
+              ".claude/agents/ui-ux-designer.md",
+              "docs/architect/agent-coordination/proposals/step-09-coding-domain-adoption.md",
+              "docs/architect/agent-coordination/proposals/step-09-component-authority-layout-map.md",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-envelope.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-request.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/out/positive-cli-state.json",
+              "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+              "docs/architect/component-boundary/node-to-rust-component-migration.md",
+              "docs/architect/component-boundary/tmp/CONTEXT.md",
+              "docs/architect/component-boundary/tmp/DISCUSSION.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-1-260831-1702-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p01-2-260831-1750-g5-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-1-260831-1935-adr006-provenance-normalizer-inline-validator-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-2-260831-2020-adr006-interpretation-dispatch-key-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-3-260831-2115-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-4-260831-2145-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p02-5-260831-2300-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-2-260901-0809-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/doer-cell-p03-3-260901-0225-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-1-260831-1740-rt1-vacuous-test-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1840-rv1-narrow-split-regex-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1900-rv1-regression-false-positive-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1910-redteam-findings-1-2-3-combined-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p01-2-260831-1925-finding4-heading-format-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2000-medium1-medium2-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-1-260831-2015-rt-medium1-whitelist-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-2-260831-2050-medium1-confidence-gate-coverage-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2205-mutation-backfill-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2225-high-medium-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-4-260831-2250-executeassignment-root-cause-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260831-2345-medium1-medium2-mission-lite-cli-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p02-5-260901-0010-assignment-id-toctou-race-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-0900-assignmentid-collision-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/fixer-cell-p03-2-260901-1000-concurrent-assignmentid-claim-fix-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-1-260831-1731-g1-layering-g6-crash-timing-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1900-plan-verdict-derivation-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p01-2-260831-1920-final-pass-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-1-260831-2005-adr006-provenance-normalizer-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-2-260831-2100-adr006-interpretation-dispatch-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-3-260831-2140-g3-dirty-before-persistence-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-4-260831-2235-r7-heuristic-removal-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p02-5-260901-0000-r8-mission-lite-inline-migration-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-2-260901-0930-r3-cli-contract-door-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/redteam-cell-p03-3-260901-0937-r4-r6-live-proofs-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-1-260831-1720-g1-layering-g6-crash-timing-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1830-g5-plan-verdict-derivation-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p01-2-260831-1850-rv1-recheck-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-1-260831-1950-adr006-provenance-normalizer-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-2-260831-2045-adr006-interpretation-dispatch-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-3-260831-2130-g3-dirty-before-persistence-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-4-260831-2210-r7-heuristic-removal-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p02-5-260831-2330-r8-mission-lite-inline-migration-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-2-260901-0818-r3-cli-contract-door-review-report.md",
+              "plans/260831-1637-step07-inline-assignment-mvp/reports/reviewer-cell-p03-3-260901-0931-r4-r6-live-proofs-review-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/doer-260901-2210-GH-08-P01.2-session-engine-live-proof-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2320-GH-08-P01.2-session-engine-redteam-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-2340-GH-08-P01.2-round2-fix-recheck-report.md",
+              "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-2255-GH-08-P01.2-session-engine-review-report.md",
+              "plans/reports/handoff-260901-1011-GH-07-dispatch-executor-selection-fable-brainstorm-prompt.md",
+              "plans/reports/handoff-260901-1123-GH-07-step08-standalone-coordination-protocols-design-prompt.md",
+              "plans/reports/handoff-260901-1403-GH-07-step08-pre-plan-architecture-review-prompt.md",
+              "plans/reports/researcher-260901-1049-GH-07-executor-provider-selection-architecture.md",
+              "plans/reports/researcher2_260901-1120-step08-executor-provider-selection-architecture.md",
+              "plans/reports/reviewer-260901-1403-GH-07-step08-pre-plan-architecture-review.md",
+              "plans/reports/reviewer-cell-6-6-260831-0813-scoped-subtask-red-team-report.md"
+            ],
+            "mutatedDirtyBeforeFiles": [],
+            "changedFiles": [],
+            "changedFileReasons": {},
+            "artifacts": [
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/agent-report.md",
+                "kind": "agent-report",
+                "valid": true
+              },
+              {
+                "path": ".fgos/assignments/asgn_p072_r5_parity_proof_op_004/runs/01/agent-result.json",
+                "kind": "agent-result",
+                "valid": false
+              }
+            ],
+            "tests": []
+          }
+        }
+      }
+    }
+  }
+}

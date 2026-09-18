@@ -1,0 +1,4 @@
+{
+  "status": 4,
+  "stderr": "fgos: executor \"gitnexus\" declares no \"providerModel\"/\"provider\" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare \"providerModel\" explicitly.\nfgos: coordination request: unknown field \"unknownField\" in request (allowed: kind, objective, writerId, coordinationId, workRef, aggregateBounds, partialPolicy, primaryRole, task, protocolRef, steps, actors)"
+}

@@ -1,0 +1,13 @@
+{
+  "operationMutability": "read-only",
+  "gitBefore": null,
+  "gitAfter": null,
+  "gitBeforeSource": "pre-launch",
+  "dirtyBefore": [],
+  "dirtyAfter": [],
+  "mutatedDirtyBeforeFiles": [],
+  "changedFiles": [],
+  "changedFileReasons": {},
+  "artifacts": [],
+  "tests": []
+}

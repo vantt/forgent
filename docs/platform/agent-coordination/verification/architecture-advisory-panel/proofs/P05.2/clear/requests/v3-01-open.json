@@ -1,0 +1,60 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Given the block-classify.ts fix just shipped in herdr-gateway (commits 881fa33, 15b1203: three narrow, evidence-scoped signals added reactively as real Claude Code CLI screens were found misclassified), is continuing to extend this universal visual-heuristic classifier with narrow, evidence-scoped signals the right ongoing strategy for terminal-detail's R21-R27 block classification, or should the project proactively invest in a more general primitive or refactor now, before shipping more one-off patches?",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "aggregateBounds": { "maxRounds": 20, "maxAssignments": 30, "wallTimeMs": 14400000 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "context-investigator-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "system-shaper-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "alternative-shaper-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "constraint-advocate-actor", "executor": "claude-bwrap", "tier": "analytical" },
+    { "id": "architecture-critic-actor", "executor": "agy-bwrap", "tier": "analytical" },
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret the person's intent: validate whether continuing to reactively patch /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's universal heuristic (vs. proactively generalizing it) is the right strategy going forward. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Scout the real herdr-gateway repository using ONLY absolute paths (do not rely on your own current directory): /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's current signals and their evidence base, /home/vantt/projects/herdr-gateway/web/test/block-classify.test.ts's coverage, /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md's R21-R28 rules and Open Gaps section, and the two most recent commits (881fa33, 15b1203) that added the framing-rule/menu-cursor/summary-pair signals. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-system",
+      "operationId": "shape-system-proposal",
+      "targetActorId": "system-shaper-actor",
+      "objective": "Propose the strongest 'stay within the current system' architecture for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification, given the reactive-patching-vs-generalize question. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-alternative",
+      "operationId": "shape-alternative-proposal",
+      "targetActorId": "alternative-shaper-actor",
+      "objective": "Propose a genuinely different architecture for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification -- not a strawman, a real candidate that solves the same problem differently (e.g. a per-agent grammar, a different signal composition, or something else entirely). Use ONLY absolute paths for everything you read (do not rely on your own current directory). Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shape-constraint",
+      "operationId": "shape-constraint-proposal",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Propose the architecture that best respects real operational constraints (test coverage, release cadence, no-UI-control per /home/vantt/projects/herdr-gateway/docs/specs/terminal-detail.md R24, the fail-closed asymmetry per R25) for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification. Use absolute paths for everything you read. Also write a short human-readable agent-report.md alongside it. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "assignmentId": "asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001",
+  "role": "reviewer",
+  "objective": "Check ADR-007 Decision (4 points) against domains/coding/harness/enrich-and-validate-contract.mjs",
+  "verdict": "match",
+  "findings": [
+    {
+      "point": "a",
+      "claim": "pure function: no fs, no store writes, no network",
+      "result": "confirmed",
+      "evidence": "File imports only node:path, RunnerConfigError (src/runner/dispatch/config.mjs), operationsForStage (src/state/workflow-stage-graphs.mjs). No fs/http/store-write call in the file. operationsForStage/bundleForStage/resolveWorkflow (workflow-stage-graphs.mjs lines 662-686, 635-647, 576-580) are pure in-memory lookups against the DOMAINS table; the module's own fs reads (loadDomainsFromDisk, line 367) run once at module-load time, not per call.",
+      "note": "Documented nuance, not a mismatch: purity of enrichAndValidateContract's own call behavior holds even though a statically-imported dependency does one-time load-time fs reads."
+    },
+    {
+      "point": "b",
+      "claim": "never selects executor/provider/tier or touches Work lifecycle; compileDispatchPlan remains sole execution chooser",
+      "result": "confirmed",
+      "evidence": "No call to compileDispatchPlan or any dispatch/executor-selection function; no Work-mutation import (no store.mjs/work.mjs write call). Only output beyond the enriched contract is `policy` from mergeHarnessPolicy(matchedOp.policy, undefined) -- the matched operation's own statically declared policy, forwarded as a separate top-level field, matching the ADR's allowed 'policy hints' carve-out distinct from live executor/tier selection. Code comment states explicitly this module never sets an executor id."
+    },
+    {
+      "point": "c",
+      "claim": "fail-closed reject when contract.supports is not a legal operation for the Work's current stage",
+      "result": "confirmed",
+      "evidence": "Lines 113-121: stageOps = operationsForStage(domain, work.stage, {kind: resolvedWorkflow}); matchedOp = stageOps.find(o => o.id === contract.supports); if (!matchedOp) fail(...) throws RunnerConfigError. Hard reject, no silent fallback."
+    },
+    {
+      "point": "d",
+      "claim": "only appends to (never replaces) contextRefs/constraints/expectedOutputs already supplied by the caller",
+      "result": "confirmed",
+      "evidence": "contextRefs (lines 127-132), constraints (lines 137-140), expectedOutputs (lines 146-149) all copy the caller's existing array first, then conditionally push new entries de-duplicated by exact string match. No wholesale overwrite of any of the three fields."
+    }
+  ],
+  "mismatchesFound": false,
+  "unresolvedQuestions": [],
+  "reportPath": ".fgos/assignments/asgn_ee2110a9_914f_4138_b75b_55779f988e6b_op_001/runs/01/agent-report.md"
+}

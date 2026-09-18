@@ -1,0 +1,130 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=agy-bwrap via=cli-spawn provider=gemini model=gemini-3.1-pro-low tier=analytical
+fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=sonnet tier=analytical
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-07T05:54:54.549Z",
+  "data_hash": "8f7d3629216596618d1097e025c49f9b9786abae367b50670df533c2478fa97f",
+  "data": {
+    "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "herdr-gateway's terminal-detail screen reads every coding-agent TUI through one universal visual-shape heuristic (/home/vantt/projects/herdr-gateway/web/src/block-classify.ts) rather than per-agent knowledge. Two independent symptoms point at the same open architecture question: block-classify.ts keeps needing a new narrow signal for each newly-observed UI shape (three signals added across two recent releases, 0.1.18/0.1.19), and the terminal-detail spec's own Open Gaps section says the display-scroll fallback has only ever been verified live against one coding agent, with no fallback designed if a future agent reacts differently. A separate real project (upstreams/collie, vendored under herdr-gateway at /home/vantt/projects/herdr-gateway/upstreams/collie) already built a per-agent semantic grammar for Claude Code specifically instead of a universal heuristic. Should herdr-gateway continue with, and keep extending, the universal heuristic approach, or move toward a per-agent grammar system -- and if the latter, when and how, given the terminal surface must also work for agents herdr-gateway has not yet encountered?",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap-p052-unclear-herdr-grammar-vs-heuristic-v3\" is missing required actor(s) [lead-advisor-actor, synthesizer-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_coordinator_driver_op_031",
+          "runId": "run_asgn_coordinator_driver_op_031_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_032",
+          "runId": "run_asgn_coordinator_driver_op_032_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_033",
+          "runId": "run_asgn_coordinator_driver_op_033_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_coordinator_driver_op_036",
+          "runId": "run_asgn_coordinator_driver_op_036_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_coordinator_driver_op_035",
+          "runId": "run_asgn_coordinator_driver_op_035_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authCritique",
+        "type": "authorize",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique_uv3",
+        "invocationKey": "ik_critique_uv3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_032",
+          "asgn_coordinator_driver_op_033",
+          "asgn_coordinator_driver_op_034"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "critique",
+        "type": "operation",
+        "actorId": "architecture-critic-actor",
+        "assignmentId": "asgn_coordinator_driver_op_035",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "agy-bwrap",
+        "provider": "gemini",
+        "tier": "analytical"
+      },
+      {
+        "as": "authAssess",
+        "type": "authorize",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "actorId": "constraint-advocate-actor",
+        "authorizationId": "auth_assess_uv3",
+        "invocationKey": "ik_assess_uv3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_032",
+          "asgn_coordinator_driver_op_033",
+          "asgn_coordinator_driver_op_034"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "assess",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "assignmentId": "asgn_coordinator_driver_op_036",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude-bwrap",
+        "provider": "claude",
+        "tier": "analytical"
+      }
+    ]
+  }
+}

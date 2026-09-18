@@ -850,11 +850,12 @@ const REMOVED_EXECUTOR_FIELDS = Object.freeze({
   readOnlyRedirect: 'Declare it under "placementPolicy.readOnlyRedirects.<thisExecutorId>" instead (top-level, not on any executor entry). "Which executor to substitute for a read-only operation" is a PlacementPolicy ranking decision (design.md §3.6), not a fact about this executor\'s own identity -- putting it here was itself a corrected mistake (executor-profile-schema-migration Phase D).',
 });
 
-/** Both are real: claude keeps trust in `~/.claude.json`, codex in a
- * `[projects."<abs>"]` block of its `config.toml`. `codex-toml` was live in
- * this repo's own config while this list still refused it -- because the list
- * guarded a field the adapter did not read. */
-const TRUST_STORE_KINDS = ['claude-json', 'codex-toml'];
+/** All are real: claude keeps trust in `~/.claude.json`, codex in a
+ * `[projects."<abs>"]` block of its `config.toml`, and agy in `settings.json`'s
+ * `trustedWorkspaces`. `codex-toml` was live in this repo's own config while
+ * this list still refused it -- because the list guarded a field the adapter
+ * did not read. */
+const TRUST_STORE_KINDS = ['claude-json', 'codex-toml', 'agy', 'agy-json'];
 const CONFINEMENT_FLAGS = ['privateHome', 'isolatedSession', 'ownWorktree'];
 
 /**

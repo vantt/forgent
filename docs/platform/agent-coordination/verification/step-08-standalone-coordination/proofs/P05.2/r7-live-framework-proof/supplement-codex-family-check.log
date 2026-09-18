@@ -1,0 +1,90 @@
+=== P05.2 R7 supplement: single real dispatch, codex-pi (openai-codex family), same session ===
+
+Reusing session: coord_mtjf5l0q_jq9y72 workspace: /tmp/fgos-p052-r7-live-proof-wsycE3
+Session status: active assignmentRefs so far: 9
+
+R4 verification (codex-pi, analytical): {
+  "ok": true,
+  "abort": false,
+  "resolvedPolicy": {
+    "role": "clusterer",
+    "executorPreference": [
+      "codex-pi"
+    ],
+    "executorId": "codex-pi",
+    "providerModel": "openai-codex",
+    "tier": "analytical",
+    "model": "gpt-5.5",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-pi",
+        "source": {
+          "scope": "opPolicy",
+          "id": "cluster-deduplicate"
+        }
+      },
+      "provider": {
+        "value": "openai-codex",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-pi"
+        }
+      },
+      "model": {
+        "value": "gpt-5.5",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "openai-codex.analytical"
+        }
+      },
+      "tier": {
+        "value": "analytical",
+        "source": {
+          "scope": "opPolicy",
+          "id": "cluster-deduplicate"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "cohort-plan-verify:clusterer-actor"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "openai-codex"
+        }
+      }
+    }
+  }
+}
+fgos: dispatch capability=(none declared) executor=codex-pi via=cli-spawn provider=openai-codex model=gpt-5.5 tier=analytical
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+
+Wall time: 90495 ms
+settled: failed failed executor=codex-pi provider=openai-codex tier=analytical
+agentClaim.summary: agent-result.json was present but failed schema validation
+
+=== SUPPLEMENT SUMMARY ===
+openai-codex (codex-pi) genuinely completing dispatch: dispatch completed (real subprocess ran) but RunResult.status=failed -- see agentClaim.summary above

@@ -1,0 +1,11 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: Phase red-team.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authRedteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor", "authorizationId": "auth_redteam_1", "invocationKey": "ik_redteam_1", "reason": "post-synthesis-open is open: synthesize-recommendation has settled (resumed after the real crash).", "grantedContextRefs": ["asgn_aap_driver_op_009"] },
+    { "type": "operation", "as": "redteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor", "objective": "Attack the packet and the panel's own process/authority, not the architecture.", "expectedOutputs": ["agent-result.json (status, summary)"] }
+  ]
+}

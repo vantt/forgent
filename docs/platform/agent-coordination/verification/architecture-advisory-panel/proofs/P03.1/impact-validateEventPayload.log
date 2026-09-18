@@ -1,0 +1,1076 @@
+{
+  "target": {
+    "id": "Function:src/runner/coordination/schema.mjs:validateEventPayload",
+    "name": "validateEventPayload",
+    "type": "Function",
+    "filePath": "src/runner/coordination/schema.mjs"
+  },
+  "direction": "upstream",
+  "impactedCount": 54,
+  "risk": "CRITICAL",
+  "epistemic": "exact",
+  "summary": {
+    "direct": 13,
+    "processes_affected": 10,
+    "modules_affected": 3
+  },
+  "byDepthCounts": {
+    "1": 13,
+    "2": 23,
+    "3": 18
+  },
+  "affected_processes": [
+    {
+      "name": "recordConsultDisposition",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 6,
+      "total_hits": 12,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "replaceSessionActor",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 6,
+      "total_hits": 12,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "linkSessionContribution",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 8,
+      "total_hits": 8,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "cancelSession",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 7,
+      "total_hits": 8,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordContributionLink",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordAggregationValidation",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordSpecialistAuthorization",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "recordActorReplacement",
+      "type": "Function",
+      "filePath": "src/runner/coordination/store.mjs",
+      "affected_process_count": 7,
+      "total_hits": 7,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "authorizeSpecialistSlot",
+      "type": "Function",
+      "filePath": "src/runner/coordination/session-engine.mjs",
+      "affected_process_count": 6,
+      "total_hits": 6,
+      "earliest_broken_step": 1
+    },
+    {
+      "name": "runCoordinationUseCase",
+      "type": "Function",
+      "filePath": "src/verbs/coordination/run.mjs",
+      "affected_process_count": 1,
+      "total_hits": 1,
+      "earliest_broken_step": 1
+    }
+  ],
+  "affected_modules": [
+    {
+      "name": "Coordination",
+      "hits": 42,
+      "impact": "direct"
+    },
+    {
+      "name": "Runner",
+      "hits": 4,
+      "impact": "indirect"
+    },
+    {
+      "name": "R5-parity",
+      "hits": 1,
+      "impact": "indirect"
+    }
+  ],
+  "byDepth": {
+    "1": [
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/replay.mjs:replaySession",
+        "name": "replaySession",
+        "filePath": "src/runner/coordination/replay.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_122_recordconsultdisposi",
+            "label": "RecordConsultDisposition → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_176_replacesessionactor",
+            "label": "ReplaceSessionActor → EventLogError",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_121_recordconsultdisposi",
+            "label": "RecordConsultDisposition → CoordinationError",
+            "processType": "intra_community",
+            "step": 2
+          },
+          {
+            "id": "proc_126_recordconsultdisposi",
+            "label": "RecordConsultDisposition → IsPlainObject",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_172_replacesessionactor",
+            "label": "ReplaceSessionActor → CoordinationError",
+            "processType": "intra_community",
+            "step": 2
+          },
+          {
+            "id": "proc_173_replacesessionactor",
+            "label": "ReplaceSessionActor → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_277_cancelsession",
+            "label": "CancelSession → IsPlainObject",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_79_replacesessionactor",
+            "label": "ReplaceSessionActor → IsPlainObject",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_123_recordconsultdisposi",
+            "label": "RecordConsultDisposition → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_174_replacesessionactor",
+            "label": "ReplaceSessionActor → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_175_replacesessionactor",
+            "label": "ReplaceSessionActor → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_124_recordconsultdisposi",
+            "label": "RecordConsultDisposition → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 2
+          },
+          {
+            "id": "proc_125_recordconsultdisposi",
+            "label": "RecordConsultDisposition → EventLogError",
+            "processType": "cross_community",
+            "step": 2
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:openSession",
+        "name": "openSession",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:bindActor",
+        "name": "bindActor",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:completeAssignmentRegistration",
+        "name": "completeAssignmentRegistration",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:authorizeOperation",
+        "name": "authorizeOperation",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordSpecialistAuthorization",
+        "name": "recordSpecialistAuthorization",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_256_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_258_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_253_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_254_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_115_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_255_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_257_recordspecialistauth",
+            "label": "RecordSpecialistAuthorization → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordDriverDisposition",
+        "name": "recordDriverDisposition",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordContributionLink",
+        "name": "recordContributionLink",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_239_recordcontributionli",
+            "label": "RecordContributionLink → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_236_recordcontributionli",
+            "label": "RecordContributionLink → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_240_recordcontributionli",
+            "label": "RecordContributionLink → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_110_recordcontributionli",
+            "label": "RecordContributionLink → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_237_recordcontributionli",
+            "label": "RecordContributionLink → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_238_recordcontributionli",
+            "label": "RecordContributionLink → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_235_recordcontributionli",
+            "label": "RecordContributionLink → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordAggregationValidation",
+        "name": "recordAggregationValidation",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_127_recordaggregationval",
+            "label": "RecordAggregationValidation → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_271_recordaggregationval",
+            "label": "RecordAggregationValidation → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_266_recordaggregationval",
+            "label": "RecordAggregationValidation → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_267_recordaggregationval",
+            "label": "RecordAggregationValidation → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_269_recordaggregationval",
+            "label": "RecordAggregationValidation → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_270_recordaggregationval",
+            "label": "RecordAggregationValidation → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_268_recordaggregationval",
+            "label": "RecordAggregationValidation → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:linkResult",
+        "name": "linkResult",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordRunRetry",
+        "name": "recordRunRetry",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:recordActorReplacement",
+        "name": "recordActorReplacement",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_283_recordactorreplaceme",
+            "label": "RecordActorReplacement → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_281_recordactorreplaceme",
+            "label": "RecordActorReplacement → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_280_recordactorreplaceme",
+            "label": "RecordActorReplacement → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_278_recordactorreplaceme",
+            "label": "RecordActorReplacement → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_149_recordactorreplaceme",
+            "label": "RecordActorReplacement → CoordinationError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_279_recordactorreplaceme",
+            "label": "RecordActorReplacement → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_282_recordactorreplaceme",
+            "label": "RecordActorReplacement → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/store.mjs:transitionSessionStatusLocked",
+        "name": "transitionSessionStatusLocked",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ],
+    "2": [
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:createAndExecuteSessionTask",
+        "name": "createAndExecuteSessionTask",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:openStandaloneSession",
+        "name": "openStandaloneSession",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:resumeSession",
+        "name": "resumeSession",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:validateConsultProposal",
+        "name": "validateConsultProposal",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:proposeConsult",
+        "name": "proposeConsult",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:authorizeSpecialistSlot",
+        "name": "authorizeSpecialistSlot",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_138_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_137_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_141_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_142_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → FlowDefinitionError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_140_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_139_authorizespecialists",
+            "label": "AuthorizeSpecialistSlot → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:authorizeDeclaredOperation",
+        "name": "authorizeDeclaredOperation",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:openDeclaredProtocolSession",
+        "name": "openDeclaredProtocolSession",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:replayOnce",
+        "name": "replayOnce",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:recordConsultDisposition",
+        "name": "recordConsultDisposition",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_121_recordconsultdisposi",
+            "label": "RecordConsultDisposition → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_122_recordconsultdisposi",
+            "label": "RecordConsultDisposition → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_126_recordconsultdisposi",
+            "label": "RecordConsultDisposition → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_124_recordconsultdisposi",
+            "label": "RecordConsultDisposition → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_125_recordconsultdisposi",
+            "label": "RecordConsultDisposition → EventLogError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_123_recordconsultdisposi",
+            "label": "RecordConsultDisposition → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:synthesizeResearchFanIn",
+        "name": "synthesizeResearchFanIn",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:evaluateSessionQuorum",
+        "name": "evaluateSessionQuorum",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:closeSessionByQuorum",
+        "name": "closeSessionByQuorum",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:validateSessionAggregation",
+        "name": "validateSessionAggregation",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:linkSessionContribution",
+        "name": "linkSessionContribution",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_164_linksessioncontribut",
+            "label": "LinkSessionContribution → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_166_linksessioncontribut",
+            "label": "LinkSessionContribution → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_163_linksessioncontribut",
+            "label": "LinkSessionContribution → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_165_linksessioncontribut",
+            "label": "LinkSessionContribution → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_167_linksessioncontribut",
+            "label": "LinkSessionContribution → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_168_linksessioncontribut",
+            "label": "LinkSessionContribution → FlowDefinitionError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_169_linksessioncontribut",
+            "label": "LinkSessionContribution → RelativeToPackageRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_170_linksessioncontribut",
+            "label": "LinkSessionContribution → ReadDefinitionFile",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:retrySessionTask",
+        "name": "retrySessionTask",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:replaceSessionActor",
+        "name": "replaceSessionActor",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_176_replacesessionactor",
+            "label": "ReplaceSessionActor → EventLogError",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_172_replacesessionactor",
+            "label": "ReplaceSessionActor → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_173_replacesessionactor",
+            "label": "ReplaceSessionActor → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_79_replacesessionactor",
+            "label": "ReplaceSessionActor → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_174_replacesessionactor",
+            "label": "ReplaceSessionActor → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_175_replacesessionactor",
+            "label": "ReplaceSessionActor → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:cancelSession",
+        "name": "cancelSession",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_146_cancelsession",
+            "label": "CancelSession → FgosDirFromRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_145_cancelsession",
+            "label": "CancelSession → ResolveRepoRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_277_cancelsession",
+            "label": "CancelSession → IsPlainObject",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_143_cancelsession",
+            "label": "CancelSession → CoordinationError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_144_cancelsession",
+            "label": "CancelSession → ResolveMainCheckoutRoot",
+            "processType": "cross_community",
+            "step": 1
+          },
+          {
+            "id": "proc_147_cancelsession",
+            "label": "CancelSession → EventLogError",
+            "processType": "intra_community",
+            "step": 1
+          },
+          {
+            "id": "proc_148_cancelsession",
+            "label": "CancelSession → SleepSync",
+            "processType": "intra_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/session-engine.mjs:deriveSessionPhase",
+        "name": "deriveSessionPhase",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/store.mjs:createSessionAssignment",
+        "name": "createSessionAssignment",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/runner/coordination/store.mjs:transitionSessionStatus",
+        "name": "transitionSessionStatus",
+        "filePath": "src/runner/coordination/store.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/verbs/coordination/run.mjs:runCoordinationUseCase",
+        "name": "runCoordinationUseCase",
+        "filePath": "src/verbs/coordination/run.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": [
+          {
+            "id": "proc_177_runcoordinationuseca",
+            "label": "RunCoordinationUseCase → StoreError",
+            "processType": "cross_community",
+            "step": 1
+          }
+        ]
+      },
+      {
+        "depth": 2,
+        "id": "Function:src/verbs/coordination/show.mjs:showCoordinationUseCase",
+        "name": "showCoordinationUseCase",
+        "filePath": "src/verbs/coordination/show.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ],
+    "3": [
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r9-impossible-fixture-driver.mjs",
+        "name": "r9-impossible-fixture-driver.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r9-impossible-fixture-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-step2-single-family.mjs",
+        "name": "r8-live-proof-step2-single-family.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-step2-single-family.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-driver.mjs",
+        "name": "r8-live-proof-driver.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2/r8-live-proof-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-followup-serial.mjs",
+        "name": "r8-live-proof-followup-serial.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-followup-serial.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs",
+        "name": "r8-live-proof-driver.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P04.2b/r8-live-proof-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/driver.mjs",
+        "name": "driver.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r7-live-framework-proof/driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "File:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/driver.mjs",
+        "name": "driver.mjs",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/p012-live-proof-driver-script.mjs:main",
+        "name": "main",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P01.2/p012-live-proof-driver-script.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/p032-live-proof-driver-script.mjs:main",
+        "name": "main",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P03.2/p032-live-proof-driver-script.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/runner/coordination/headless-adapter.mjs:runCoordinationHeadless",
+        "name": "runCoordinationHeadless",
+        "filePath": "src/runner/coordination/headless-adapter.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/runner/coordination/session-engine.mjs:dispatchPrimaryTask",
+        "name": "dispatchPrimaryTask",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/runner/coordination/session-engine.mjs:dispatchDeclaredOperation",
+        "name": "dispatchDeclaredOperation",
+        "filePath": "src/runner/coordination/session-engine.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/chain.mjs:renderCell",
+        "name": "renderCell",
+        "filePath": "src/verbs/coordination/chain.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/chain.mjs:chainCoordinationUseCase",
+        "name": "chainCoordinationUseCase",
+        "filePath": "src/verbs/coordination/chain.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/group-thinking-pack.mjs:runGroupThinkingRequest",
+        "name": "runGroupThinkingRequest",
+        "filePath": "src/verbs/coordination/group-thinking-pack.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/launch-master-loop.mjs:launchMasterLoopUseCase",
+        "name": "launchMasterLoopUseCase",
+        "filePath": "src/verbs/coordination/launch-master-loop.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/run.mjs:findExistingManifest",
+        "name": "findExistingManifest",
+        "filePath": "src/verbs/coordination/run.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:src/verbs/coordination/run.mjs:aggregationCloseParams",
+        "name": "aggregationCloseParams",
+        "filePath": "src/verbs/coordination/run.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ]
+  }
+}

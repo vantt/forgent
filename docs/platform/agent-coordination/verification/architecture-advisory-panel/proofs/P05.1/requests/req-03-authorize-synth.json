@@ -1,0 +1,10 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 main chain: authorize Phase 7 synthesis.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "steps": [
+    { "type": "authorize", "as": "authSynth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor", "authorizationId": "auth_synth_1", "invocationKey": "ik_synth_1", "reason": "post-critique-open is open: both critique-proposals and assess-constraints have settled.", "grantedContextRefs": ["asgn_aap_driver_op_002", "asgn_aap_driver_op_003", "asgn_aap_driver_op_004", "asgn_aap_driver_op_005", "asgn_aap_driver_op_006", "asgn_aap_driver_op_007", "asgn_aap_driver_op_008"] }
+  ]
+}

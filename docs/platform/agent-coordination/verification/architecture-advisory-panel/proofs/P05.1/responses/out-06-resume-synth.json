@@ -1,0 +1,100 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-06T15:18:03.907Z",
+  "data_hash": "0665214199add145227103bafa35692878ae1ab41c0a2e1b636d698b70d10355",
+  "data": {
+    "coordinationId": "aap_p051_main",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "P05.1 hard conformance and recovery proof: real architecture-advisory-panel-v1 session, main chain.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap_p051_main\" is missing required actor(s) [lead-advisor-actor, red-team-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_aap_driver_op_003",
+          "runId": "run_asgn_aap_driver_op_003_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_004",
+          "runId": "run_asgn_aap_driver_op_004_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_aap_driver_op_005",
+          "runId": "run_asgn_aap_driver_op_005_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_aap_driver_op_008",
+          "runId": "run_asgn_aap_driver_op_008_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_aap_driver_op_007",
+          "runId": "run_asgn_aap_driver_op_007_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_aap_driver_op_009",
+          "runId": "run_asgn_aap_driver_op_009_02"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "red-team-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "synth",
+        "type": "operation",
+        "actorId": "synthesizer-actor",
+        "assignmentId": "asgn_aap_driver_op_009",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "exec-fast-resume",
+        "provider": "family-a",
+        "tier": "critical"
+      },
+      {
+        "as": "linkSynth",
+        "type": "contribution",
+        "contributionId": "p051_response_synth",
+        "contributionType": "response",
+        "assignmentId": "asgn_aap_driver_op_009",
+        "roundKey": "round-1",
+        "anchors": [
+          "p051_objection_critique",
+          "p051_objection_assess"
+        ],
+        "respondsTo": "p051_objection_critique",
+        "appended": true
+      }
+    ]
+  }
+}

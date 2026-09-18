@@ -1,0 +1,14 @@
+{
+  "kind": "declared-protocol",
+  "objective": "P05.1 crash-resume proof: resume the interrupted synthesis from a FRESH process, no chat history, using only fgos coordination show plus the session id.",
+  "writerId": "aap-driver",
+  "coordinationId": "aap_p051_main",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "exec-fast-resume" }
+  ],
+  "steps": [
+    { "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor", "objective": "Synthesize one recommendation from the whole ledger (resumed after the real crash).", "expectedOutputs": ["agent-result.json (status, summary)"] },
+    { "type": "contribution", "as": "linkSynth", "roundKey": "round-1", "contributionId": "p051_response_synth", "contributionType": "response", "assignmentId": "$ref:synth", "respondsTo": "p051_objection_critique", "anchors": ["p051_objection_critique", "p051_objection_assess"] }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "ordinal": 4,
+  "role": "alternative-shaper",
+  "requested": { "executor": "agy-bwrap", "tier": "analytical", "persona": "alternative-shaper" },
+  "derived": { "provider": "gemini", "model": "gemini-3.1-pro-low", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "command": "bwrap --ro-bind / / --dev /dev --proc /proc --tmpfs /tmp --ro-bind /home/vantt/projects/vnflow /home/vantt/projects/vnflow --bind <evidenceDir> <evidenceDir> --chdir /home/vantt/projects/vnflow -- agy -p \"<prompt>\" --mode accept-edits --new-project --model gemini-3.1-pro-low",
+  "promptPath": "proofs/P01.3/prompts/alternative-shaper.md",
+  "rawLogPath": "proofs/P01.3/runs/4-alternative-shaper-raw.log",
+  "outputArtifact": "proofs/P01.3/proposals/alternative-shaper.md",
+  "exitCode": 0,
+  "note": "Raw log interleaves agy's own internal telemetry/read-only-filesystem-swallowed state-write errors (expected under the bwrap read-only mount, same pattern seen in P01.2) with the real response; extracted content is the final contiguous response block, unaltered.",
+  "isolationCheck": "prompt embedded only CASE/interpretation/scout-report/Phase-4-defaults, no sibling proposal content; produced a materially different primary candidate (formalize runtime data/state contracts, leave pipeline structure alone) than what the system-shaper prompt was steered toward -- genuine divergence, not cosmetic"
+}

@@ -1,0 +1,58 @@
+Baseline: npm test (CLAUDE_CODE_*/CLAUDECODE env vars unset), commit f60cae1b
+51 unique known-failing tests. Environmental-precondition: all require a
+compiled target/release/{fgctl,fgos} binary this worktree shape has never
+built (cargo build --release --workspace never run). Confirmed identical
+on pristine main HEAD at the time of recording (same worktree shape, same
+missing precondition) -- not new to this track.
+
+✖ Item 1: A live-pid, within-ttl activation.lock is genuinely held, not reclaimed
+✖ Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)
+✖ Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever
+✖ Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin
+✖ Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)
+✖ Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free
+✖ Item 5: Staged release whose manifest.json digest mismatches pin is refused
+✖ Item 5 (widened): a tampered staged release is refused on the pin+matching --from NoOp arm too, not just the pin-only arm
+✖ Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init
+✖ L1: ./bin/fgos and bin/fgos are treated as a collision, not two different digests
+✖ P6 HIGH regression: staging a candidate with an in-root directory symlink triggers quarantine and puts nothing in releases/
+✖ P6 HIGH regression: staging a candidate with an unlisted payload symlink triggers quarantine and puts nothing in releases/
+✖ P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts
+✖ P7: Candidate preflight failure refuses init before publishing activation and writes no host-visible projections or activation.json
+✖ P7: Local runtime tail failure leaves workspace in diagnosable state with ready-degraded transaction record
+✖ P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree
+✖ P7: Repair failure when no runtime is active refuses with clear message
+✖ P7: Repair failure when rollback previous release is missing refuses with clear message
+✖ P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+✖ P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+✖ P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched
+✖ P7: Upgrade failure when no runtime is active refuses with clear message
+✖ Proof gap closure: staging a candidate with mismatched components.legacyNode.digest triggers quarantine and puts nothing in releases/
+✖ R10: version --runtime-json outside activated workspace reports host: "dev-source" and null fields
+✖ R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail
+✖ R1: CLI recognizes valid subcommands; refuses unrecognized subcommands
+✖ R1 & R11: Non-git directory refuses init with clear error and no .fgos/installation created
+✖ R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest with zero work-state changes
+✖ R1 & R2: Release tree builder stages release tree and produces canonical manifest with reproducible artifactDigest
+✖ R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current schema is refused before publish
+✖ R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish
+✖ R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule
+✖ R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH
+✖ R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true
+✖ R5: Ambiguous (unparseable) main-checkout.lock refuses init writing nothing
+✖ R5 drift guard: DEFAULT_TTL_MS in src/runner/main-checkout-lock.mjs:110 is 3 * 60 * 1000 ms
+✖ R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing nothing
+✖ R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init writing nothing
+✖ R6 & R9: Concurrent stage invocations observe lock refusal (exactly one winner)
+✖ R6 & R9: Corrupting one byte before staging triggers quarantine and puts nothing in releases/
+✖ R6 & R9: Re-staging an already-staged digest is a no-op (manifest mtime unchanged)
+✖ R6 & R9: Staging a valid release tree verifies digests and creates releases/<digest>
+✖ R7: A .tar.gz with a path-traversing member alongside a valid release is refused, nothing published, no leftover temp dir
+✖ R7: A .tar.gz with a symlink member alongside a valid release is refused, nothing published
+✖ R7: Staging from a .tar.gz archive extracts with pure Rust and stages successfully
+✖ R8: status --json on empty store reports empty array, not an error
+✖ Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)
+✖ Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from
+✖ Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses
+✖ Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready
+✖ Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest

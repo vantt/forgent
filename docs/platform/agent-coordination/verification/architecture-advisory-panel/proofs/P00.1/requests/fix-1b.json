@@ -1,0 +1,40 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Resume cell P00.1 fix round 1 after a request-authoring error (contextRefs declared without a matching grantedContextRefs grant) aborted the first attempt right after the Fixer's real, already-landed revise-candidate commit. Dispatch the still-pending reviewer-recheck (already authorized, unconsumed) and a freshly authorized red-team-recheck, neither needing contextRefs -- both actors inspect the shared worktree's real files directly via their own --cwd.",
+  "writerId": "p00-1-coordinator",
+  "coordinationId": "architecture-advisory-panel--p00-1",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "detail-oriented-rechecker" },
+    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-attacker" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "reviewRecheck",
+      "operationId": "reviewer-recheck",
+      "targetActorId": "reviewer",
+      "taskKey": "reviewer-recheck-reviewer",
+      "objective": "Recheck the Fixer's revision (commit d37b9518 on this worktree branch) against Driver Dispositions D1-D9 in docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md. Specifically verify: claude-reviewer and agy-plan are actually removed from both the Proof Matrix 'Admitted?' status and the Admitted Safe Executor/Mechanism Allowlist table (not just relabeled); the corrected claude-bwrap/agy-bwrap invocations genuinely include --chdir to a fresh checkout and do not shadow it with --tmpfs /tmp, with real before/after evidence for an outside-path sentinel this time, not just the checkout hash (check claude-bwrap.log and agy-bwrap.log directly); the baseline section now cites exactly 5614 tests/5604 pass/4 fail/6 skip with no conflicting number left anywhere in P00.1.md; package-lock.json is genuinely reverted (git diff d3b2271b..HEAD -- package-lock.json is empty); the bwrap-available doctor check is real (resolves the binary, runs a real smoke test via execFileSync, registered in src/setup/registrations.mjs, has a passing test in test/setup/bwrap-check.test.mjs) and test/setup/checks.test.mjs's own registry-snapshot list was updated to include it. Flag anything still wrong as a new finding, do not rubber-stamp.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authRedTeamRecheck",
+      "operationId": "red-team-recheck",
+      "targetActorId": "red-team",
+      "authorizationId": "auth_p00_1_fix1_red_team_recheck",
+      "invocationKey": "p00-1:fix1:red-team-recheck:1",
+      "reason": "Revision landed (commit d37b9518); recheck the corrected bwrap invocations with the same attack classes that falsified claude-reviewer/agy-plan and exposed the original masking defect."
+    },
+    {
+      "type": "operation",
+      "as": "redTeamRecheck",
+      "operationId": "red-team-recheck",
+      "targetActorId": "red-team",
+      "taskKey": "red-team-recheck-red-team",
+      "objective": "Re-attempt the same attack classes from your first pass (in-tree write, absolute-path outside write, in-tree symlink to outside target, .git/config mutation, .git/hooks/post-commit creation, redirected global git config) against the Fixer's corrected claude-bwrap and agy-bwrap invocations specifically (see docs/architect/agent-coordination/verification/architecture-advisory-panel/P00.1.md's Proof Matrix rows for the exact corrected command lines, and proofs/P00.1/claude-bwrap.log / agy-bwrap.log for the Fixer's own re-run evidence) -- confirm the --chdir fix genuinely exposes the real checkout to the sandboxed process this time (not masked again by a --tmpfs /tmp regression) and that every attack still fails read-only, including the outside-path sentinel. Also confirm claude-reviewer and agy-plan are genuinely gone from the allowlist, not just relabeled. Report any attack that succeeds as a blocking finding.",
+      "expectedOutputs": ["agent-result.json (status, summary)"]
+    }
+  ]
+}

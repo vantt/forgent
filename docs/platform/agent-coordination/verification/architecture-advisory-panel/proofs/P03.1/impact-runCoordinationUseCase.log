@@ -1,0 +1,97 @@
+{
+  "target": {
+    "id": "Function:src/verbs/coordination/run.mjs:runCoordinationUseCase",
+    "name": "runCoordinationUseCase",
+    "type": "Function",
+    "filePath": "src/verbs/coordination/run.mjs"
+  },
+  "direction": "upstream",
+  "impactedCount": 6,
+  "risk": "LOW",
+  "epistemic": "exact",
+  "summary": {
+    "direct": 3,
+    "processes_affected": 0,
+    "modules_affected": 2
+  },
+  "byDepthCounts": {
+    "1": 3,
+    "2": 1,
+    "3": 2
+  },
+  "affected_processes": [],
+  "affected_modules": [
+    {
+      "name": "R5-parity",
+      "hits": 4,
+      "impact": "direct"
+    },
+    {
+      "name": "Coordination",
+      "hits": 2,
+      "impact": "direct"
+    }
+  ],
+  "byDepth": {
+    "1": [
+      {
+        "depth": 1,
+        "id": "Function:src/runner/coordination/headless-adapter.mjs:runCoordinationHeadless",
+        "name": "runCoordinationHeadless",
+        "filePath": "src/runner/coordination/headless-adapter.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/verbs/coordination/group-thinking-pack.mjs:runGroupThinkingRequest",
+        "name": "runGroupThinkingRequest",
+        "filePath": "src/verbs/coordination/group-thinking-pack.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 1,
+        "id": "Function:src/verbs/coordination/launch-master-loop.mjs:launchMasterLoopUseCase",
+        "name": "launchMasterLoopUseCase",
+        "filePath": "src/verbs/coordination/launch-master-loop.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ],
+    "2": [
+      {
+        "depth": 2,
+        "id": "Function:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs:runHeadless",
+        "name": "runHeadless",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ],
+    "3": [
+      {
+        "depth": 3,
+        "id": "Function:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs:positiveCase",
+        "name": "positiveCase",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      },
+      {
+        "depth": 3,
+        "id": "Function:docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs:negativeCase",
+        "name": "negativeCase",
+        "filePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P07.2/r5-parity/r5-driver.mjs",
+        "relationType": "CALLS",
+        "confidence": 0.85,
+        "processes": []
+      }
+    ]
+  }
+}

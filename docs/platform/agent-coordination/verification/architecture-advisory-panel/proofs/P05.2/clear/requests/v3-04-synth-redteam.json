@@ -1,0 +1,49 @@
+{
+  "kind": "declared-protocol",
+  "objective": "Continue aap-p052-clear-herdr-heuristic-direction-v3: Phase 7 (synthesize one recommendation, preserving live disagreement) and the independent red-team pass.",
+  "writerId": "coordinator-driver",
+  "coordinationId": "aap-p052-clear-herdr-heuristic-direction-v3",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude-bwrap", "tier": "critical" },
+    { "id": "red-team-actor", "executor": "agy-bwrap", "tier": "critical" }
+  ],
+  "steps": [
+    {
+      "type": "authorize",
+      "as": "authSynth",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_v3",
+      "invocationKey": "ik_synth_v3",
+      "reason": "Phase 5/6 complete: three proposals, one critique, one constraint ranking are all in.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023", "asgn_coordinator_driver_op_024", "asgn_coordinator_driver_op_026"]
+    },
+    {
+      "type": "operation",
+      "as": "synthesize",
+      "operationId": "synthesize-recommendation",
+      "targetActorId": "synthesizer-actor",
+      "objective": "Recommend ONE architecture for /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification, keeping live disagreement visible rather than smoothing it into a footnote. The real ledger: Proposal A (system-shaper) -- keep looksStructured() as a flat, ordered OR-chain of small named detectors, not a pluggable registry; the only consumer (terminal-render.ts) reads just block.mode, never detector reasoning. Proposal B (alternative-shaper) -- a 'Pluggable Output Grammar' architecture: a registry of layout signatures replacing the monolithic heuristics. Proposal C (constraint-advocate) -- keep the current architecture, the only shape that stays cheaply unit-testable without a browser/corpus. The critic's attack on A (the strongest proposal): its reliance on consumer output shape ignores internal maintainability and producer-side scaling. The constraint-advocate's own risk ranking: B is HIGHEST risk (unmotivated abstraction over 6 hand-tuned interdependent heuristics with documented false-positive exclusions -- arrows excluded from BOX_CHARS, menu-cursor+sibling-count combo, summary Q&A adjacency -- migration/regression risk, weaker debuggability in an asymmetric-cost domain, a YAGNI violation with no evidence of a real pluggability requirement); A and C are near-zero risk, functionally identical to what is already deployed. Also weigh the real prior operator decision locked 2026-08-11 in herdr-gateway's own plan.md (fully automatic, no UI control, err toward pan when unsure) and the real prior finding that phase-04's own required corpus + confusion matrix was never built. Use absolute paths for anything you additionally read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts there: /home/vantt/projects/forgentX/.fgos/assignments/asgn_coordinator_driver_op_027/runs/01/agent-result.json for the structured JSON, and .../agent-report.md for the human-readable report (the exact assignment id will be confirmed in this operation's own dispatch context; if it differs from op_027, use the runDir this dispatch actually tells you). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize",
+      "as": "authRedteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_v3",
+      "invocationKey": "ik_redteam_v3",
+      "reason": "Independent adversarial check of the panel's own conduct, not just the architecture.",
+      "grantedContextRefs": ["asgn_coordinator_driver_op_021", "asgn_coordinator_driver_op_022", "asgn_coordinator_driver_op_023", "asgn_coordinator_driver_op_024", "asgn_coordinator_driver_op_026"]
+    },
+    {
+      "type": "operation",
+      "as": "redteam",
+      "operationId": "red-team-packet",
+      "targetActorId": "red-team-actor",
+      "objective": "Independently attack the architecture-advisory-panel's own conduct on the question of /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's terminal-detail block classification strategy -- not just the architecture recommendation, but whether the panel itself stayed honest. Real ledger: three real proposals (A: keep current flat OR-chain; B: replace with a Pluggable Output Grammar registry; C: keep current architecture, testability rationale), a real critique of A (ignores internal maintainability/producer-side scaling by leaning on consumer output shape), and a real constraint ranking (B highest risk -- unmotivated abstraction, YAGNI violation, no evidence of a real pluggability requirement; A and C near-zero risk, already deployed). Check specifically: did the critic's attack on A get seriously weighed, or was it dismissed because the constraint-advocate's ranking agreed with A anyway? Is proposal B a real, serious alternative or a strawman the panel can safely reject? Is there a legitimate hybrid or option nobody proposed? Use absolute paths for anything you read (e.g. /home/vantt/projects/herdr-gateway/web/src/block-classify.ts). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "coord_mtjf0ycr_a633uk",
+  "objective": "P05.2 R6: single-agent baseline against the frozen mdview editor-screen case.",
+  "status": "active",
+  "createdAt": "2026-09-02T01:26:33.964Z",
+  "provenanceRoot": {
+    "writerId": "p05.2-r6-baseline-driver"
+  },
+  "definitionRef": null,
+  "workRef": null,
+  "actors": [
+    {
+      "id": "primary",
+      "role": "advisor"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 3600000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "assignmentRefs": [
+    "asgn_p05_2_r6_baseline_driver_op_001"
+  ],
+  "completedAt": null
+}

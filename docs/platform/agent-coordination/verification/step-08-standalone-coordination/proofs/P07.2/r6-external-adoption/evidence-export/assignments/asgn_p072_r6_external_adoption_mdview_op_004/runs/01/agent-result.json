@@ -1,0 +1,6 @@
+{
+  "status": "completed",
+  "summary": "Read /home/vantt/projects/mdview/Cargo.toml (workspace root) and crates/mdview/Cargo.toml. Package name: mdview. Version: 0.7.5 (set via [workspace.package] version = \"0.7.5\", inherited by crates/mdview and crates/mdview-core via version.workspace = true). Could not identify a peer session or agent named 'consultant' to hand this off to for double-checking; no such addressable agent exists in the current session list, so no double-check request was sent.",
+  "package_name": "mdview",
+  "package_version": "0.7.5"
+}

@@ -1,0 +1,138 @@
+fgos: executor "gitnexus" declares no "providerModel"/"provider" and its command (none resolvable from its config) is not a recognized Claude CLI command — its resolved provider family may be unreliable/inconsistent across dispatch code paths. Declare "providerModel" explicitly.
+fgos: dispatch capability=(none declared) executor=claude-bwrap via=cli-spawn provider=claude model=opus tier=critical
+fgos: dispatch capability=(none declared) executor=agy-bwrap via=cli-spawn provider=gemini model=gemini-3.1-pro-high tier=critical
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-07T06:02:16.170Z",
+  "data_hash": "d31fd56ef78fbad8e9bd31f7934ed0aa5039596375447cdce67f6dc00e0243d7",
+  "data": {
+    "coordinationId": "aap-p052-unclear-herdr-grammar-vs-heuristic-v3",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "herdr-gateway's terminal-detail screen reads every coding-agent TUI through one universal visual-shape heuristic (/home/vantt/projects/herdr-gateway/web/src/block-classify.ts) rather than per-agent knowledge. Two independent symptoms point at the same open architecture question: block-classify.ts keeps needing a new narrow signal for each newly-observed UI shape (three signals added across two recent releases, 0.1.18/0.1.19), and the terminal-detail spec's own Open Gaps section says the display-scroll fallback has only ever been verified live against one coding agent, with no fallback designed if a future agent reacts differently. A separate real project (upstreams/collie, vendored under herdr-gateway at /home/vantt/projects/herdr-gateway/upstreams/collie) already built a per-agent semantic grammar for Claude Code specifically instead of a universal heuristic. Should herdr-gateway continue with, and keep extending, the universal heuristic approach, or move toward a per-agent grammar system -- and if the latter, when and how, given the terminal surface must also work for agents herdr-gateway has not yet encountered?",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"aap-p052-unclear-herdr-grammar-vs-heuristic-v3\" is missing required actor(s) [lead-advisor-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_coordinator_driver_op_031",
+          "runId": "run_asgn_coordinator_driver_op_031_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_032",
+          "runId": "run_asgn_coordinator_driver_op_032_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_coordinator_driver_op_033",
+          "runId": "run_asgn_coordinator_driver_op_033_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_coordinator_driver_op_036",
+          "runId": "run_asgn_coordinator_driver_op_036_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_coordinator_driver_op_035",
+          "runId": "run_asgn_coordinator_driver_op_035_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_coordinator_driver_op_037",
+          "runId": "run_asgn_coordinator_driver_op_037_01"
+        },
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_coordinator_driver_op_038",
+          "runId": "run_asgn_coordinator_driver_op_038_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authSynth",
+        "type": "authorize",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "actorId": "synthesizer-actor",
+        "authorizationId": "auth_synth_uv3",
+        "invocationKey": "ik_synth_uv3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_032",
+          "asgn_coordinator_driver_op_033",
+          "asgn_coordinator_driver_op_034",
+          "asgn_coordinator_driver_op_035",
+          "asgn_coordinator_driver_op_036"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "synthesize",
+        "type": "operation",
+        "actorId": "synthesizer-actor",
+        "assignmentId": "asgn_coordinator_driver_op_037",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude-bwrap",
+        "provider": "claude",
+        "tier": "critical"
+      },
+      {
+        "as": "authRedteam",
+        "type": "authorize",
+        "operationId": "red-team-packet",
+        "nodeId": "phase-redteam",
+        "actorId": "red-team-actor",
+        "authorizationId": "auth_redteam_uv3",
+        "invocationKey": "ik_redteam_uv3",
+        "grantedContextRefs": [
+          "asgn_coordinator_driver_op_032",
+          "asgn_coordinator_driver_op_033",
+          "asgn_coordinator_driver_op_034",
+          "asgn_coordinator_driver_op_035",
+          "asgn_coordinator_driver_op_036"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "redteam",
+        "type": "operation",
+        "actorId": "red-team-actor",
+        "assignmentId": "asgn_coordinator_driver_op_038",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "agy-bwrap",
+        "provider": "gemini",
+        "tier": "critical"
+      }
+    ]
+  }
+}

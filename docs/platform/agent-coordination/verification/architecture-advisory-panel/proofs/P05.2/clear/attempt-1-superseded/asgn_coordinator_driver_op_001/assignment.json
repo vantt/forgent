@@ -1,0 +1,53 @@
+{
+  "assignmentId": "asgn_coordinator_driver_op_001",
+  "workId": null,
+  "role": "lead-advisor",
+  "dispatch": "assignment",
+  "objective": "Interpret the person's intent: validate whether continuing to reactively patch /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's universal heuristic (vs. proactively generalizing it) is the right strategy going forward. Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+  "contextRefs": [],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-07T01:21:26.979Z",
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Interpret the person's intent: validate whether continuing to reactively patch /home/vantt/projects/herdr-gateway/web/src/block-classify.ts's universal heuristic (vs. proactively generalizing it) is the right strategy going forward. Use absolute paths for everything you read. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+        "contextRefs": [],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.architecture-advisory-panel-v1@1.0.0#interpret-request"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "reported"
+        },
+        "role": "lead-advisor",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 300000,
+          "maxRuns": 1
+        }
+      },
+      "caller": {
+        "writerId": "coordinator-driver"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "reported"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}

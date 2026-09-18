@@ -1,0 +1,13 @@
+{
+  "ordinal": 7,
+  "role": "synthesizer",
+  "requested": { "executor": "claude-bwrap", "tier": "critical", "persona": "synthesizer" },
+  "derived": { "provider": "claude", "model": "opus", "tierMaterial": true },
+  "mechanism": "direct bwrap invocation, kongming-verified scratch-bind pattern",
+  "promptPath": "proofs/P01.2/prompts/synthesizer.md",
+  "rawLogPath": "proofs/P01.2/runs/7-synthesizer-raw.log",
+  "outputArtifact": "proofs/P01.2/synthesis.md",
+  "exitCode": 0,
+  "doctrineCheck": "ONE named recommendation (not a menu); 14 individually-calibrated claims, not uniform confidence; explicit costs named including a self-critical one (steps 1-3 may be wasted depending on step 5's answer); both HIGH-impact live attacks (1 and 3) preserved as unresolved with attribution, resolution conditions, and an explicit refusal to pick a side; all falsification criteria listed as unchecked, none marked satisfied; caught and flagged a real gap in its own briefing (investigator/lead-advisor/critic derived models were omitted from the prompt) rather than guessing -- filled in by the Coordinator from real run json files, not asserted by the synthesizer",
+  "coordinatorCorrection": "Actor provenance table's investigator/lead-advisor/critic model cells were 'not recorded in the ledger' in the synthesizer's own output (a real prompt-authoring gap on the Coordinator's part); filled in verbatim from runs/{1-context-investigator,2-lead-advisor-interpretation,6-architecture-critic}.json before committing, with an explicit note distinguishing this Coordinator addition from the synthesizer's own claims"
+}

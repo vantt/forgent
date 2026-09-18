@@ -1,0 +1,64 @@
+{
+  "assignmentId": "asgn_r8b_followup_driver_op_002",
+  "workId": null,
+  "role": "researcher",
+  "dispatch": "assignment",
+  "objective": "Read-only, bounded: name one concrete, verifiable fact about how Python generators differ from lists. Answer in 1-2 sentences.",
+  "contextRefs": [
+    "asgn_r8b_followup_driver_op_001"
+  ],
+  "expectedOutputs": [
+    "agent-result.json (status, summary)"
+  ],
+  "expectedFiles": [],
+  "createdAt": "2026-09-01T21:55:16.662Z",
+  "policy": {
+    "minTier": "lightweight"
+  },
+  "provenance": {
+    "kind": "inline",
+    "contractPolicyVersion": "1",
+    "normalizerVersion": "1",
+    "validators": [
+      "execution-contract-schema"
+    ],
+    "inline": {
+      "contract": {
+        "objective": "Read-only, bounded: name one concrete, verifiable fact about how Python generators differ from lists. Answer in 1-2 sentences.",
+        "contextRefs": [
+          "asgn_r8b_followup_driver_op_001"
+        ],
+        "constraints": [
+          "protocol-operation:core.coordination-protocol.independent-research-fan-out-fan-in@1.0.0#independent-research"
+        ],
+        "expectedOutputs": [
+          "agent-result.json (status, summary)"
+        ],
+        "mutation": "read-only",
+        "evidence": {
+          "required": "verified"
+        },
+        "role": "researcher",
+        "capabilities": [],
+        "budget": {
+          "timeoutMs": 150000,
+          "maxRuns": 1
+        },
+        "policy": {
+          "minTier": "lightweight"
+        }
+      },
+      "caller": {
+        "writerId": "r8b-followup-driver",
+        "parentAssignmentId": "asgn_r8b_followup_driver_op_001"
+      }
+    }
+  },
+  "mutation": "read-only",
+  "evidence": {
+    "required": "verified"
+  },
+  "dispatchedRuns": [
+    "01"
+  ]
+}
