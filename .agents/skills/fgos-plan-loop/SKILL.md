@@ -164,9 +164,9 @@ filename.
      "coordinationId": "<track>--cell-01",
      "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
      "actors": [
-       { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "meticulous-implementer" },
-       { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "skeptical-reviewer" },
-       { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "adversarial-tester" }
+       { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "meticulous-implementer", "fallbackExecutors": ["glm"] },
+       { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "skeptical-reviewer", "fallbackExecutors": ["claude"] },
+       { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "adversarial-tester", "fallbackExecutors": ["openai"] }
      ],
      "steps": [
        {
@@ -335,9 +335,9 @@ resuming the SAME `coordinationId`:
   "coordinationId": "<track>--cell-01",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "fixer", "executor": "agy-cli", "tier": "standard", "persona": "pragmatic-fixer" },
-    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "detail-oriented-rechecker" },
-    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "relentless-attacker" }
+    { "id": "fixer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "pragmatic-fixer", "fallbackExecutors": ["glm"] },
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "detail-oriented-rechecker", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "relentless-attacker", "fallbackExecutors": ["openai"] }
   ],
   "steps": [
     {
@@ -558,9 +558,9 @@ CELL`):
   "coordinationId": "<track>--cell-01",
   "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
   "actors": [
-    { "id": "doer", "executor": "agy-cli", "tier": "standard", "persona": "delivery-focused-closer" },
-    { "id": "reviewer", "executor": "claude", "tier": "analytical", "persona": "final-sign-off-reviewer" },
-    { "id": "red-team", "executor": "codex-cli", "tier": "analytical", "persona": "closing-adversary" }
+    { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "delivery-focused-closer", "fallbackExecutors": ["glm"] },
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "final-sign-off-reviewer", "fallbackExecutors": ["claude"] },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "closing-adversary", "fallbackExecutors": ["openai"] }
   ],
   "steps": [
     {
