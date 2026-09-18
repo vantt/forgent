@@ -5,11 +5,11 @@ Document type: Implementation plan
 Audience: Code-panel coordinator, implementation agent, reviewer, red-team
 Purpose: Break R3 production remote peer proof into independently reviewable packets
 Design status: Draft
-Implementation status: In progress (R3-P0 frozen; R3-P1 adapter implemented preview; R3-P2+ not started)
+Implementation status: Implemented preview (R3-P0 through R3-P5 closed; GET /v1/runtime proven; other routes remain legacy VerbGateway)
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Derived from host-invocation R3 proof gate, host use cases, and gateway context scan
-Last reviewed: 2026-09-17
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/roadmap.md
 - docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md
@@ -95,9 +95,9 @@ Scan date: 2026-09-18.
 | --- | --- | --- | --- |
 | Remote projector/presenter adapter | Implemented preview | `herdr-plugin/src/remote_invocation.rs`; `herdr-plugin/src/lib.rs` exports `remote_invocation`; `herdr-plugin/Cargo.toml` depends on `fgos-host-runtime` and `fgos-distribution`. | Treat R3-P1 as code-present and verify/adjust only; do not reimplement from scratch. |
 | R3-P1 focused tests | Passing | `cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet` passed 9 tests on 2026-09-18. | P1 has enough proof to be adopted as the base for P2. |
-| Gateway route wiring | Not implemented | `herdr-plugin/src/gateway.rs`'s authenticated router has no `/runtime` route. | R3-P2 is the next implementation packet. |
-| Gateway no-shell/no-parse proof | Not implemented for the route | No `GET /v1/runtime` route exists yet, so route-level proof cannot exist yet. | R3-P3 follows P2 and must harden the regression boundary. |
-| Remaining `VerbGateway` consumer inventory | Not closed | Existing gateway routes still route through `VerbGateway`; docs do not yet list the post-R3 consumer set. | R3-P4 stays explicit; R3 must not overclaim whole-gateway migration. |
+| Gateway route wiring | Implemented preview | `herdr-plugin/src/gateway.rs` wires `GET /runtime` in `authenticated` router nested under `/v1`. | Closed in R3-P2. |
+| Gateway no-shell/no-parse proof | Implemented preview | `PanicGateway` regression test + envelope assertions in `gateway.rs`; 47 tests pass. | Closed in R3-P3. |
+| Remaining `VerbGateway` consumer inventory | Closed | Consumer inventory table recorded in `r3-remote-peer-proof.md` §3. | Closed in R3-P4; only `/runtime` migrated. |
 
 ## 5. Full Execution Track
 
@@ -109,10 +109,10 @@ finds a boundary violation.
 | --- | --- | --- | --- | --- |
 | R3-P0 | Select the first route and freeze remote contract shape | Keep `GET /v1/runtime` -> `distribution.build.show` as the selected route. Do not reopen unless code reality invalidates it. | Docs name endpoint, auth, request projection, response shape, error policy, and non-goals. | Closed docs-only. |
 | R3-P1 | Add remote projector/presenter adapter around `InvocationService` | Adopt existing `herdr-plugin/src/remote_invocation.rs`; adjust only if P2 exposes a real contract mismatch. | Focused adapter tests pass; success and error presenter tests prove typed `ProviderOutcome` presentation without `fgos.v1`. | Implemented preview; verified 2026-09-18. |
-| R3-P2 | Wire `GET /v1/runtime` to the adapter | Add a handler in `herdr-plugin/src/gateway.rs`; mount `/runtime` inside the existing authenticated `/v1` router; call `build_invocation_service`, `project_remote_build_show_invocation`, `InvocationService::invoke`, then `present_remote_outcome`. | Gateway route returns runtime JSON under valid auth; unauthenticated request is rejected; existing gateway tests still pass. | Next. |
-| R3-P3 | Harden no-shell/no-`fgos.v1` regression proof | Add a route-level test where `VerbGateway` panics or records calls and `GET /v1/runtime` still succeeds; assert the response has no CLI envelope keys such as `contract`, `data`, or `data_hash`. Add a process-spawn assertion only if the gateway test harness already has a cheap seam for it. | At least one hard no-`VerbGateway` proof and one hard no-`fgos.v1`-parse proof. | Planned after P2. |
-| R3-P4 | Inventory remaining legacy gateway consumers | List the routes still using `VerbGateway`, whether each is read/write, whether each shells to legacy Node through CLI, and migration preconditions. | R3 proof doc or linked generated/listed source has the consumer list; docs state R3 migrates only `/runtime`. | Planned after P2/P3. |
-| R3-P5 | Closeout and status update | Update R3 proof, host use cases, implementation alignment, roadmap, and this plan. Mark only `GET /v1/runtime` as implemented preview. | Tests named in §9 pass; docs no longer say P1+ not started; remaining gateway migration remains partial. | Final packet. |
+| R3-P2 | Wire `GET /v1/runtime` to the adapter | Add a handler in `herdr-plugin/src/gateway.rs`; mount `/runtime` inside the existing authenticated `/v1` router; call `build_invocation_service`, `project_remote_build_show_invocation`, `InvocationService::invoke`, then `present_remote_outcome`. | Gateway route returns runtime JSON under valid auth; unauthenticated request is rejected; existing gateway tests still pass. | Implemented preview; verified 2026-09-18. |
+| R3-P3 | Harden no-shell/no-`fgos.v1` regression proof | Add a route-level test where `VerbGateway` panics or records calls and `GET /v1/runtime` still succeeds; assert the response has no CLI envelope keys such as `contract`, `data`, or `data_hash`. Add a process-spawn assertion only if the gateway test harness already has a cheap seam for it. | At least one hard no-`VerbGateway` proof and one hard no-`fgos.v1`-parse proof. | Implemented preview; verified 2026-09-18. |
+| R3-P4 | Inventory remaining legacy gateway consumers | List the routes still using `VerbGateway`, whether each is read/write, whether each shells to legacy Node through CLI, and migration preconditions. | R3 proof doc or linked generated/listed source has the consumer list; docs state R3 migrates only `/runtime`. | Closed docs-only 2026-09-18. |
+| R3-P5 | Closeout and status update | Update R3 proof, host use cases, implementation alignment, roadmap, and this plan. Mark only `GET /v1/runtime` as implemented preview. | Tests named in §9 pass; docs no longer say P1+ not started; remaining gateway migration remains partial. | Closed 2026-09-18. |
 
 Packets may be combined only when the review still has one clear behavioral
 claim. R3-P2 and R3-P3 are likely coupled; R3-P4 should stay explicit so R3
@@ -123,7 +123,16 @@ see [§6 R3-P0](#r3-p0-route-and-contract-freeze)).
 
 **R3-P1 status (2026-09-18): implemented preview.** `remote_invocation.rs`
 exists, exports projector/presenter/service assembly, and focused tests pass.
-The remaining full-track work is R3-P2 through R3-P5.
+
+**R3-P2 / R3-P3 status (2026-09-18): implemented preview.** `herdr-plugin/src/gateway.rs`
+wires `GET /v1/runtime` inside the `authenticated` router, invoking `InvocationService`
+directly without `VerbGateway` or `fgos.v1` parsing. Hard regression proof verified via
+`PanicGateway` and typed response assertions; 47 gateway tests pass.
+
+**R3-P4 / R3-P5 status (2026-09-18): closed.** Remaining `VerbGateway` consumers
+inventoried in `verification/r3-remote-peer-proof.md`; closeout docs updated across
+the platform area. Only `GET /v1/runtime` is migrated; all other routes remain on
+legacy `VerbGateway`.
 
 ## 6. Packet Details
 
