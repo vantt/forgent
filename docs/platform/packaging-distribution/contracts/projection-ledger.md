@@ -9,7 +9,7 @@ Implementation status: Partial: instruction projections have a ledger entry and 
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Architecture discussion
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 - docs/platform/packaging-distribution/verification/implementation-alignment.md

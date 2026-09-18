@@ -5,11 +5,11 @@ Document type: Area portal
 Audience: Human reviewer, maintainer, architecture collaborator, implementation agent
 Purpose: Route readers through fgOS packaging, install, runtime activation, doctor/repair, and release docs
 Design status: Draft
-Implementation status: Partial
+Implementation status: Implemented preview plus tracked partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/specs/distribution.md, docs/distribution-vision.md, and docs/architect/packaging-distribution/**
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/vision.md
 - docs/platform/packaging-distribution/spec.md
@@ -77,7 +77,7 @@ Example: current Node `fgos setup` still exists, but the target architecture rou
 
 ## 4. Current Position
 
-The area has two live layers:
+The area has two live runtime layers:
 
 | Layer | Status | Meaning |
 | --- | --- | --- |
@@ -85,6 +85,20 @@ The area has two live layers:
 | Native `fgctl` + project-local runtime | Implemented preview | Release tree, install script, fgctl stage/init/upgrade/repair, and `.fgos/installation` activation have real implementation and tests. The preview public posture says external installs default `fgos` through the Rust host, and public docs may state Rust host is the default installed runtime. Stable/default graduation remains a release-owner decision. |
 
 The old `docs/specs/distribution.md` remains a useful source for implemented legacy setup, doctor, and npm compatibility details. It is not the final human navigation shape.
+
+### 4.1 Status Tracker
+
+| Front | Status | What is done | What remains |
+| --- | --- | --- | --- |
+| Code-panel rollout | `done` | P1-P9 merged to `main`; whole-track proof is recorded in [reports/track-closeout.md](reports/track-closeout.md). | No active packet remains; use the closeout's remaining partial claims as the next tracker. |
+| Release tree and Rust packaging records | `implemented` | Native `bin/fgos`, runner shim, `libexec/legacy-node`, manifest schemas, `artifactDigest`, activation binding, distribution pin, and topology root binding have tests and V1 contract docs. | Keep golden/schema tests current when manifest fields evolve. |
+| `fgctl` stage/init/upgrade/repair | `implemented preview` | Staging, verification, activation publish, local runtime tail, no-op upgrade, repair, and external-consumer asset proof are recorded. | Stable/default release graduation remains a release-owner decision; current GitHub release asset path still gates calling the whole public channel fully implemented. |
+| Legacy Node/npm compatibility | `implemented legacy deprecated` | Legacy npm install and `fgos setup` remain reachable as compatibility surfaces with deprecation guidance. | Retire only after the preview fallback window and release-owner policy permit it. |
+| Doctor/fix registry | `implemented` | Checks, fixes, config defaults, and legacy setup compatibility use the shared registry. | Keep new infra/config assumptions registered here instead of ad hoc checks. |
+| Instruction composition/projection | `implemented for current portable path` | Canonical source registry, effective-set composition, portable `AGENTS.md` managed block, effective-set JSON, projection ledger entry, and doctor/fix repair exist. | Host-specific adapter expansion remains demand-driven; wider projection ledger coverage is partial. |
+| Skill packaging | `implemented partial` | Canonical skill source discovery, Codex/OpenAI and Claude projections, plugin dev-skill mirroring, duplicate/collision checks, and Gemini package prototype exist. | Public intent alias metadata, full Gemini release/install/doctor integration, and skill projection ledger coverage remain open. |
+| Repository/runtime layout | `partial` | Release tree, activation, root binding, and distribution pin are frozen/proven. | Worker capsule behavior and full projection ledger coverage still need focused proof. |
+| Shared gateway/runtime adapter | `planned` | Future constraints are documented. | Revisit when gateway owns a project runtime adapter. |
 
 ## 5. Ownership Boundary
 

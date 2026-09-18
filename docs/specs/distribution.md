@@ -80,10 +80,14 @@ of it).
   project-local, per the installer's own install flags), both immediately
   executable. The install resolves against whatever ref the installer's own
   command names: a tagged release commit when the command names a tag
-  (`README.md`'s recommended path, `docs/how-to/cut-a-fgos-release-tag.md`),
+  (`README.md`'s recommended path,
+  `docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`),
   or the source repository's default branch when it doesn't (the
-  bleeding-edge path README also documents) — tag-cutting itself stays a
-  manual, repo-owner-judgment act (per tsk-jtb), never CI-automated. The
+  bleeding-edge path README also documents) — preparing release metadata is
+  scripted by `npm run release:prepare -- <tag>`, but tag-cutting itself stays
+  a manual, repo-owner-judgment act (per tsk-jtb). Pushing a `v*` tag then
+  triggers the release workflow that builds assets, verifies the external
+  consumer path, and publishes the GitHub Release. The
   install runs
   no lifecycle script of its own — there is nothing for a package manager's
   build-script policy (e.g. pnpm's `allowBuilds`) to approve or block, so the

@@ -5,11 +5,11 @@ Document type: Architecture
 Audience: Architect, maintainer, implementation agent
 Purpose: Explain the target runtime identity and activation model for packaging-distribution
 Design status: Draft
-Implementation status: Partial
+Implementation status: Implemented preview plus projection/worker-capsule partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/architect/packaging-distribution/runtime-identity-and-activation.md
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/architect/workspace-topology.md
 - docs/platform/packaging-distribution/spec.md
@@ -69,7 +69,10 @@ The activation binding is workspace-local:
 
 The binding selects a ready runtime for that workspace. Multiple worktrees may share release content while using different activation bindings.
 
-Implementation status is partial: tests and scripts exercise activation files, but exact canonical schema extraction should happen before freezing contract docs.
+Implementation status is implemented preview: activation files are exercised by
+Rust tests, external-consumer proof, and frozen V1 contract docs. The remaining
+partial work in this architecture is not activation itself; it is wider
+projection-ledger coverage and worker-capsule layout proof.
 
 ## 5. Stable Command Surface
 
@@ -99,7 +102,11 @@ The Rust host can execute the native `bin/fgos`, while the legacy Node payload r
 
 `fgctl` should not directly write host-visible generated projections such as `.agents/skills`, `.claude/skills`, or managed instruction blocks.
 
-Those writes belong to the active local `fgos` after activation. This design claim still needs a dedicated implementation scan before it is marked `implemented`.
+Those writes belong to the active local `fgos` after activation. P7 proves
+`fgctl` does not write host-visible projections directly. P5 proves the current
+portable instruction projection path through local setup/doctor registry code;
+skill projections and future host adapters still need their own ledger coverage
+before the projection boundary is fully implemented.
 
 ## 8. Repair And Upgrade
 
@@ -113,4 +120,6 @@ A future shared gateway/dashboard may manage many projects, but it should call p
 
 ## 10. Implementation Alignment
 
-See `../verification/implementation-alignment.md`. Do not promote this architecture from `partial` to `implemented` without updating that table.
+See `../verification/implementation-alignment.md`. Do not promote the remaining
+projection-ledger, worker-capsule, or future gateway constraints without
+updating that table.

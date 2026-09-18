@@ -60,6 +60,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `npm run release:check` and `npm run release:prepare`, a repo-owner release
+  preparation door that validates a target tag, updates `package.json`,
+  `package-lock.json`, and `CHANGELOG.md`, and prints the exact commit/tag/push
+  commands while leaving tag creation and publishing authority with the owner.
 - `fgos dispatch reconcile plan|apply`, a narrow CAS-guarded local cwd-lock
   repair door. It only removes a lock after proving its exact PID/start-time
   incarnation is dead; it never performs semantic recovery or execution control.

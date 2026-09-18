@@ -5,11 +5,11 @@ Document type: Area spec
 Audience: Human reviewer, maintainer, implementation agent
 Purpose: State the user-visible and maintainer-visible behavior of fgOS packaging/distribution
 Design status: Draft
-Implementation status: Partial
+Implementation status: Implemented preview plus tracked partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/specs/distribution.md, README.md, code/test scan
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/README.md
 - docs/platform/packaging-distribution/verification/implementation-alignment.md

@@ -30,7 +30,8 @@ from — use it only if you specifically need the Node-hosted `fgos` CLI
 instead of the native `fgctl`/`fgos` binaries above.
 
 Replace `v0.1.0` with the [latest release tag](https://github.com/vantt/forgent/tags).
-See `docs/how-to/cut-a-fgos-release-tag.md` for how tags get cut.
+See `docs/knowledge/how-to-cut-a-fgos-release-tag/cut-a-fgos-release-tag.md`
+for how tags get cut.
 
 Bleeding-edge (always resolves to whatever commit is currently on `main`,
 useful for contributors/early-adopters who want it):

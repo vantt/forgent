@@ -5,11 +5,11 @@ Document type: Architecture
 Audience: Architect, maintainer, implementation agent
 Purpose: Define the ownership split between fgctl and the project-local fgos runtime
 Design status: Draft
-Implementation status: Partial
+Implementation status: Implemented preview plus projection partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from packaging-distribution architecture discussion and code scan
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 - docs/platform/packaging-distribution/contracts/activation-binding.md
@@ -46,7 +46,7 @@ Collapsing those roles makes it hard to reason about upgrades, rollback, state c
 | Project workflow commands | `bin/fgos.mjs`, `apps/fgos/src/main.rs` |
 | Legacy Node compatibility behavior | `libexec/legacy-node` release payload, `bin/fgos.mjs` |
 | Doctor/fix checks and legacy setup compatibility under active runtime | `src/setup/**`, `bin/fgos.mjs` |
-| Projection materialization after activation | Architecture target; needs focused implementation scan |
+| Projection materialization after activation | Portable instruction projection is implemented in `src/setup/instruction-projections.mjs`; skill and wider host projection ledger coverage remain partial. |
 
 ## 5. Boundary Rules
 
@@ -64,4 +64,7 @@ If doctor/fix paths find environment drift, they should report or fix the drift 
 
 ## 7. Open Scan
 
-Before marking projection ownership implemented, scan current projection writers and verify they all run through active local `fgos`, not `fgctl`.
+Before marking projection ownership fully implemented, scan every projection
+writer and verify each runs through active local `fgos`/doctor-fix paths, not
+`fgctl`. Current proof covers the portable instruction projection path and
+proves `fgctl` writes activation/shims rather than host-visible projections.

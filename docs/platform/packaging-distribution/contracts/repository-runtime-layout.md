@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Promoted from docs/architect/packaging-distribution/runtime-identity-and-activation.md and scope-map.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
 - docs/platform/packaging-distribution/contracts/release-manifest.md
@@ -172,5 +172,5 @@ The schema is frozen at `schemaVersion: 1`. Rust serde definition lives in `pack
 | Release tree has `manifest.json`, `bin/`, and `libexec/legacy-node/`. | implemented | `scripts/build-rust-distribution.mjs`, `test/rust-host/release-tree.test.mjs` | Keep exact fields in sync with `contracts/release-manifest.md`. |
 | Workspace activation lives under `.fgos/installation/activation.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs`, `test/rust-host/fgctl-upgrade.test.mjs` | Schema frozen at V1 with golden test coverage. |
 | Topology root binding snapshot lives under `.fgos/installation/root.json`. | implemented | `packages/distribution/rust/src/init.rs`, `packages/distribution/rust/tests/schema_golden.rs`, `test/rust-host/fgctl-init.test.mjs` | Schema frozen at V1 with golden test coverage. |
-| Projection ledger path is `.fgos/installation/projections/ledger.json`. | planned/unknown | `contracts/projection-ledger.md` | Implement or verify ledger before claiming projection repair is complete. |
+| Projection ledger path is `.fgos/installation/projections/ledger.json`. | partial | `contracts/projection-ledger.md`, `src/setup/instruction-projections.mjs`, `test/setup/instruction-projections.test.mjs` | Instruction projections write ledger evidence; skill and wider host projections still need ledger coverage before claiming projection repair is complete. |
 | Worker workspace capsule avoids copying the whole shared `.fgos` tree. | planned/unknown | Architecture source only | Scan worker/worktree implementation before marking implemented. |

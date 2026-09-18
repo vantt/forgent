@@ -13,23 +13,17 @@ enough to become the next pinned release users install against.
 
 ## Before you start
 
-This repo has no automated release process by design (tsk-jtb D1/D2): no
-scheduled cadence, no per-merge auto-tag, no CI job that cuts a tag for
-you. Cutting a tag is always a deliberate, manual act — this doc is the
-repeatable procedure for that act, not an automation to trigger.
-
-There is no existing precedent to follow either: before this doc, the
-repo had exactly one tag (`pre-tsk-3ce`, unrelated to a release) and
-`package.json`'s `version` had never moved past its bootstrap value.
+This repo has a tag-triggered publish workflow, but it still does not
+decide when a release should be cut. The repo owner deliberately prepares
+release metadata, creates the tag, and pushes it; `.github/workflows/release.yml`
+then builds assets, verifies the external-consumer install path, and
+publishes the GitHub Release.
 
 ## Steps
 
 1. **Confirm `main` is green.** Check the latest commit on `main` passed
-   CI (`.github/workflows/ci.yml`'s `test` matrix job). This repo
-   deliberately has no tag-triggered CI job of its own (`docs/history/
-   tsk-jtb-pin-fgos-install-to-semver-release/CONTEXT.md` D4) — the
-   push-triggered run on `main` is the only proof required, so only tag a
-   commit you've already seen pass there.
+   CI (`.github/workflows/ci.yml`'s `test` matrix job). Only tag a commit
+   you've already seen pass there.
 
 2. **Decide the version number.** Follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html):
    bump the patch version for fixes, minor for backward-compatible
@@ -37,25 +31,29 @@ repo had exactly one tag (`pre-tsk-3ce`, unrelated to a release) and
    previous release tag, or `package.json`'s current `version` field if
    this is the first real release.
 
-3. **Bump `package.json`'s `version` field**, in the same commit that
-   gets tagged (D2) — not a separate release-prep commit:
+3. **Prepare the release metadata.** This updates `package.json`,
+   `package-lock.json`, and `CHANGELOG.md`; it refuses a dirty working
+   tree by default:
 
    ```bash
-   git commit -am "chore: bump version to vX.Y.Z"
+   npm run release:check -- vX.Y.Z
+   npm run release:prepare -- vX.Y.Z
    ```
 
-4. **Tag that commit and push the tag:**
+4. **Commit, tag, and push exactly what the script printed:**
 
    ```bash
+   git add package.json package-lock.json CHANGELOG.md
+   git commit -m "chore: prepare vX.Y.Z"
    git tag vX.Y.Z
-   git push origin vX.Y.Z
+   git push origin HEAD vX.Y.Z
    ```
 
-5. **Move `CHANGELOG.md`'s `## [Unreleased]` entries** into a new
-   `## [vX.Y.Z]` heading, dated today — the one step
-   `docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md`
-   explicitly leaves out of scope for a routine entry, and the step that
-   belongs here instead.
+5. **Watch the release workflow.** The `v*` tag push runs
+   `.github/workflows/release.yml`, which validates the tag/package
+   version match, builds `fgos-*` and `fgctl-*` tarballs, writes
+   `SHA256SUMS`, runs `scripts/ci-external-consumer.sh --assets dist`, and
+   publishes the GitHub Release.
 
 ## After you're done
 
@@ -71,6 +69,5 @@ goes stale between releases.
   procedure feeds.
 - `docs/specs/distribution.md` — the install mechanism spec (Install
   Behaviors section).
-- `docs/how-to/add-a-changelog-entry-for-a-user-visible-change.md` — the
-  routine per-change entry this procedure's step 5 finalizes into a
-  version heading.
+- `scripts/prepare-release.mjs` — the release metadata preparation script.
+- `.github/workflows/release.yml` — the tag-triggered publish workflow.

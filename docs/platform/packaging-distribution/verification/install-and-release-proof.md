@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Code/test scan
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md

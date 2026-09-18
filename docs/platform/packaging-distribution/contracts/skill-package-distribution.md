@@ -9,7 +9,7 @@ Implementation status: Partial
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Code/test scan plus cross-host trigger design discussion
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/contracts/projection-ledger.md

@@ -5,11 +5,11 @@ Document type: Vision
 Audience: Human reviewer, maintainer, architect, implementation agent
 Purpose: State the living direction for fgOS packaging, install, doctor/fix readiness, and runtime activation
 Design status: Draft
-Implementation status: Partial
+Implementation status: Implemented preview plus tracked partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted and reconciled from docs/distribution-vision.md
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/packaging-distribution/README.md
 - docs/platform/packaging-distribution/spec.md
@@ -38,13 +38,13 @@ without cloning or understanding the fgOS source repo internals.
 | Pillar | Direction | Current status |
 | --- | --- | --- |
 | Install without cloning | Users should obtain `fgctl`/`fgos` without manually cloning the source repo. | Partial: `install.sh`, release assets, and legacy npm/git install paths exist. |
-| Project-local runtime safety | A workspace should use its selected runtime, not an accidental global `PATH` binary. | Partial: workspace activation and tier-zero resolution exist; schema/contracts still need hardening. |
+| Project-local runtime safety | A workspace should use its selected runtime, not an accidental global `PATH` binary. | Implemented preview: activation, tier-zero resolution, V1 schemas, and external-consumer Rust-host proof exist; stable/default graduation remains release-owned. |
 | Global/project/dev contexts coexist | Global install, project-local install, and dev-checkout self-hosting must not break each other. | Implemented/partial: resolver tiers and config precedence exist; continue guarding drift. |
 | Doctor/fix self-repair | Environment readiness should be repairable through named fixes, not just reported. | Implemented for the current registry model. |
 | Extensible readiness/config registry | New modules should register checks, fixes, and config defaults through the shared registry. | Implemented; avoid ad hoc setup logic. |
 | Composable agent instructions | Rules should originate under the authority that owns them, compose into an effective instruction set, and render to `AGENTS.md` or host adapters without semantic drift. | Implemented for canonical sources, composition, portable `AGENTS.md` managed-block rendering, and instruction projection health checks; host-specific adapter expansion remains demand-driven. |
 | Portable skill distribution | A skill should be authored once under the owning component/domain and rendered into host-native adapter surfaces. | Partial: Codex/OpenAI, Claude wrapper, and plugin skill projections exist; Gemini extension target is planned. |
-| CI as install/readiness confidence | CI/release proof should catch install/distribution failures before users do. | Partial: CI/release workflows and external-consumer proof exist; keep expanding with release promises. |
+| CI as install/readiness confidence | CI/release proof should catch install/distribution failures before users do. | Implemented preview for the current release-shaped external-consumer proof; keep expanding as release promises grow. |
 | Human-readable trust | Humans should be able to read docs and know what is implemented, partial, planned, or historical. | Implemented in the new docs through `Implementation Alignment`; must be maintained. |
 
 ## 4. Mission Boundary
