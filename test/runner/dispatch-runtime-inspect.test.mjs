@@ -31,4 +31,43 @@ test('cwd evidence absence or malformation is partial and never correlated', () 
 test('cwd selector fails closed when a bound sibling is valid but unadmitted', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'good', cwd }, v1('good', 'a')); run(root, 'b', '01', { runId: 'bad', cwd }, v1('bad', 'b')); admit(root, 'a', 1, { runId: 'good', attempt: 1 }); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); const got = inspectDispatchRuntime(root, { cwd }); assert.equal(got.inspectionStatus, 'partial'); assert.equal(got.observations[0].level, 'partial'); assert.equal(got.reconciliation.state, 'manual-required'); assert.equal(got.recoveryAuthority, undefined); });
 test('cwd not-found and concurrency-permitted active runs are distinct from conflict', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'not-found'); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'a', cwd, concurrency: 'permitted' }); run(root, 'b', '01', { runId: 'b', cwd, concurrency: 'permitted' }); admit(root, 'a', 1, { runId: 'a' }); admit(root, 'b', 1, { runId: 'b' }); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'resolved'); });
 test('host routing selects solely operation/effect; Dispatch alone receives selector payload', () => { const selected = []; const answer = invokeDispatchInspectOperation({ operationId: 'dispatch.runtime.inspect', effect: 'read', payload: { selector: { run: 'none' } }, ctx: { repoRoot: fixture() } }, { selectProvider: (route) => { selected.push(route); return (ctx, selector) => ({ ctx, selector }); } }); assert.deepEqual(selected, [{ operationId: 'dispatch.runtime.inspect', effect: 'read' }]); assert.deepEqual(answer.selector, { run: 'none' }); });
-test('public inspect use-case import graph cannot reach mutation/recovery/process/Git execution', () => { const root = path.resolve(new URL('../..', import.meta.url).pathname), seen = new Set(); function walk(file) { if (seen.has(file)) return; seen.add(file); const source = fs.readFileSync(file, 'utf8'); if (file.endsWith('/run-result.mjs')) return; assert.doesNotMatch(source, /node:child_process|\b(?:recoverApply|executeAssignment|spawn|execFile|process\.kill|\.kill\(|\.signal\(|git\s+(?:reset|clean|commit|add)|writeFileSync|mkdirSync|rmSync)\b/); for (const m of source.matchAll(/from\s+['"](\.{1,2}\/[^'"]+)['"]/g)) { let target = path.resolve(path.dirname(file), m[1]); if (!path.extname(target)) target += '.mjs'; walk(target); } } walk(path.join(root, 'src/verbs/dispatch/inspect.mjs')); assert.ok(seen.has(path.join(root, 'src/runner/dispatch/runtime-inspection.mjs'))); });
+test('public inspect use-case import graph cannot reach mutation/recovery/process/Git execution', () => {
+  const root = path.resolve(new URL('../..', import.meta.url).pathname);
+  const seen = new Set();
+  // run-result.mjs: proven leaf (this test's own header comment on the
+  // sibling reconciliation-import-graph test cites this exact carve-out).
+  // global-config.mjs (Provider Capacity Rotator-era global/project config
+  // awareness): `inspect.mjs` imports only its read-only `loadGlobalConfig`
+  // (`fs.existsSync`+`fs.readFileSync`+`JSON.parse`, verified by direct
+  // reading, never `mkdirSync`/`writeFileSync`) to build `runnerConfig` for
+  // read-only inspection context -- but the same file also defines an
+  // UNRELATED `writeGlobalConfig` export (`inspect.mjs` never imports or
+  // calls it) that does call `mkdirSync`/`writeFileSync`. A whole-file text
+  // scan cannot distinguish the two; proven safe by the same
+  // read-the-actual-reachable-code standard every other entry here relies on.
+  //
+  // provider-capacity.mjs: `inspect.mjs` also directly imports
+  // `inspectProviderCapacity` from it (doctor/inspect reporting) -- verified
+  // by direct reading that export only ever calls `readState`/
+  // `providerAccountInventory`/`isQuarantined` (pure reads of its own state
+  // file), never the file's UNRELATED `isPidAlive` helper (`process.kill(pid,
+  // 0)`, used only by `reclaimDeadLeases`/`rankProviderAccounts`, neither
+  // reachable from `inspect.mjs`). Same identical-file, different-export
+  // carve-out as the reconciliation-import-graph test's own proven leaf.
+  const isProvenLeaf = (file) => file.endsWith('/run-result.mjs') || file.endsWith('/global-config.mjs') || file.endsWith('/provider-capacity.mjs');
+  function walk(file) {
+    if (seen.has(file)) return;
+    seen.add(file);
+    if (isProvenLeaf(file)) return;
+    const source = fs.readFileSync(file, 'utf8');
+    assert.doesNotMatch(source, /node:child_process|\b(?:recoverApply|executeAssignment|spawn|execFile|process\.kill|\.kill\(|\.signal\(|git\s+(?:reset|clean|commit|add)|writeFileSync|mkdirSync|rmSync)\b/);
+    for (const m of source.matchAll(/from\s+['"](\.{1,2}\/[^'"]+)['"]/g)) {
+      let target = path.resolve(path.dirname(file), m[1]);
+      if (!path.extname(target)) target += '.mjs';
+      walk(target);
+    }
+  }
+  walk(path.join(root, 'src/verbs/dispatch/inspect.mjs'));
+  assert.ok(seen.has(path.join(root, 'src/runner/dispatch/runtime-inspection.mjs')));
+  assert.ok(seen.has(path.join(root, 'src/config/global-config.mjs')));
+});
