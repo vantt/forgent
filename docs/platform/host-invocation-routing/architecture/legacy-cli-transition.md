@@ -5,11 +5,11 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define the transitional Node CLI lane and semantic Node bridge boundary
 Design status: Draft
-Implementation status: Accepted-not-implemented with legacy-current payload behavior
+Implementation status: Implemented preview with legacy-current payload behavior
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/legacy-cli-transition.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/command-route-descriptor.md
 - docs/platform/host-invocation-routing/contracts/legacy-payload.md
@@ -33,8 +33,8 @@ Node transition uses two distinct adapters. `LegacyCliPassthroughProvider` is CL
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
 | Existing Node CLI remains legacy-current. | `legacy-current` | [../../../../bin/fgos.mjs](../../../../bin/fgos.mjs) and current tests | Keep valid during transition. |
-| `legacy-cli` route bypasses `InvocationService`. | `accepted-not-implemented` | [source transition §1](../../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters) | P4 CLI adapter proof. |
-| `fgos.v1` belongs to CLI presenter. | `accepted-not-implemented` | [source transition §4](../../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome) | Compatibility vectors. |
+| `legacy-cli` route bypasses `InvocationService`. | `implemented preview` | [source transition §1](../../../architect/host-invocation-routing/legacy-cli-transition.md#1-two-distinct-adapters), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs), [../../../../apps/fgos/src/legacy_exec.rs](../../../../apps/fgos/src/legacy_exec.rs), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) | Keep until each selector migrates from `legacy-cli` to `native`. |
+| `fgos.v1` belongs to CLI presenter. | `implemented preview` | [source transition §4](../../../architect/host-invocation-routing/legacy-cli-transition.md#4-public-presentation-versus-semantic-outcome), [../verification/compatibility-harness.md](../verification/compatibility-harness.md), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | R3 proves remote `/runtime` does not parse or emit the CLI `fgos.v1` envelope. Keep compatibility vectors current while legacy selectors remain. |
 
 ## 4. Related Files
 

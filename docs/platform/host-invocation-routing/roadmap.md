@@ -3,13 +3,13 @@
 ```txt
 Document type: Roadmap
 Audience: Human reviewer, architect, maintainer, implementation agent
-Purpose: Plan the remaining work after R1 preview installed/default runtime proof
+Purpose: Track completed host-invocation proofs and remaining migration fronts after R1/R2/R3 preview closeout
 Design status: Draft
-Implementation status: R1 preview installed/default proof recorded; stable/default graduation still planned
+Implementation status: R1/R2/R3 implemented preview; route migration and stable/default graduation still partial
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Created after 2026-09-14 code scan of host-runtime, apps/fgos, GitHub release state, and packaging-distribution links
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/spec.md
@@ -83,6 +83,18 @@ closed on 2026-09-18, proving native remote peer invocation for
 without `VerbGateway`, CLI shelling, or `fgos.v1` envelope parsing. All other
 gateway routes remain on `VerbGateway` per the
 [R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md).
+
+### 3.1 Status Tracker
+
+| Front | Status | What is done | What remains |
+| --- | --- | --- | --- |
+| R1 Rust CLI host | `implemented preview` | Installed/default preview proof shows external `fgos` enters the Rust host; `version` and `gate-bypass` are native routes. | Stable/default graduation remains a release-owner decision. |
+| Route matrix | `current partial` | 73 selectors are described: 71 `legacy-cli`, two native. | Migrate additional selectors only at complete operation/use-case boundaries. |
+| Invocation kernel | `current partial` | `OperationRequest`, `ProviderOutcome`, router, registry snapshot, two-stage authority, and `InvocationService` are proven for the current Rust slice. | Declared replacement resolution, broader native providers, and future host kinds still need proof. |
+| R2 external process provider | `implemented preview` | `fixture.echo.echo` proves manifest discovery, derived registry/linker, frame codec, supervisor, and router integration. | Production provider ecosystem work: marketplace/signatures, WASM, persisted cache/lock, non-fixture shipped providers. |
+| R3 remote peer | `implemented preview` | `GET /v1/runtime` invokes `distribution.build.show` through the shared kernel without `VerbGateway`, CLI shelling, or `fgos.v1` parsing. | Every other gateway route remains legacy; future remote-route migrations are separate work. |
+| Chat host | `planned` | No current adapter or contract is claimed. | Define admission, interruption, parking, presentation, and proof contract. |
+| Legacy Node retirement | `blocked by migration/release gates` | Node is still the compatibility payload for 71 selectors. | Requires zero `legacy-cli` routes, release policy closure, and packaging rollback/fallback agreement. |
 
 ## 4. Phase A: Close Local R1 Host Proof
 
@@ -282,10 +294,10 @@ Done when:
 
 | Order | Action | Owner | Packaging dependency |
 | --- | --- | --- | --- |
-| 1 | Keep route-matrix and Rust-host targeted tests green for the current preview baseline: 73 selectors, 71 `legacy-cli`, two native. | Host invocation | No |
-| 2 | R2 external process provider preview closed 2026-09-15: all packets (R2-P0 through R2-P6) merged and verified per the [R2 execution record](../../../plans/260915-host-invocation-r2-external-process/plan.md) and [verification/r2-external-process-proof.md](verification/r2-external-process-proof.md). | Host invocation | No, unless fixture providers are shipped as release artifacts |
+| 1 | Keep preview proof green: route matrix stays at 73 selectors / 71 `legacy-cli` / two native until a new migration intentionally changes it. | Host invocation | No |
+| 2 | Decide whether the next frontier is another native read route, another remote read route, or the chat-host contract. Do not treat R2/R3 closeout as whole-component migration. | Host invocation | No, unless the chosen route touches release/runtime selection. |
 | 3 | Keep stable/default graduation parked with the release owner; enforce the settled 30-day legacy fallback escape-hatch window for preview. | Packaging-distribution / release owner | Yes |
-| 4 | R2 now proves at least one external provider operation through the common router (fixture.echo.echo, R2-P5) -- the condition this item was waiting on is met. R3 sequencing itself is the [R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md)'s own call, not restated here. | Host invocation | Light, for project runtime adapter selection |
+| 4 | For external providers, choose whether to harden the preview mechanism (persisted cache/lock, shipped provider packaging, marketplace/signatures, WASM) before accepting non-fixture providers. | Host invocation plus Packaging-Distribution where artifacts ship | Maybe |
 
 ## 13. Related Files
 

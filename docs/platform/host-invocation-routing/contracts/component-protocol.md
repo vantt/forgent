@@ -3,13 +3,13 @@
 ```txt
 Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
-Purpose: Define the planned external provider wire boundary
+Purpose: Define the preview external process provider wire boundary and future component protocol rules
 Design status: Draft
-Implementation status: Planned
+Implementation status: Implemented preview
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/verification/r2-external-process-proof.md

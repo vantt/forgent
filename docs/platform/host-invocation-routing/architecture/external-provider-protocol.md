@@ -3,13 +3,13 @@
 ```txt
 Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
-Purpose: Define the planned architecture for external process and WASM providers
+Purpose: Define the preview architecture for external process providers and future WASM/provider-ecosystem work
 Design status: Draft
-Implementation status: Planned
+Implementation status: External process implemented preview; WASM/provider ecosystem planned
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
 - docs/platform/host-invocation-routing/contracts/external-provider-manifest.md
@@ -34,7 +34,7 @@ Component class and invocation mechanism are separate axes. Core component, pack
 | --- | --- | --- | --- |
 | Process protocol framing is length-prefixed JSON-RPC over stdio. | `implemented preview` | [source protocol §3](../../../architect/host-invocation-routing/external-provider-protocol.md#3-component-protocol), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P3 conformance tests closed 2026-09-15. |
 | Static manifest discovery does not execute provider code. | `implemented preview` | [source protocol §4](../../../architect/host-invocation-routing/external-provider-protocol.md#4-plugin-registry-linker), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | R2-P1 discovery proof closed 2026-09-15. |
-| Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md) | Still future ecosystem decision -- unaffected by R2 closing. |
+| Marketplace, signatures, and production WASM are out of R2. | `planned` | [release boundaries](release-boundaries.md), [../verification/r2-external-process-proof.md](../verification/r2-external-process-proof.md) | Still future ecosystem decision -- unaffected by R2 closing. |
 
 ## 4. Related Files
 

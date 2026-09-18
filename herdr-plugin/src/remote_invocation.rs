@@ -1,7 +1,7 @@
 //! Remote host invocation projector, presenter, and service assembly for `herdr-fgos`.
 //!
 //! Implements R3-P1 (Remote Projector And Presenter) from
-//! `docs/platform/host-invocation-routing/r3-remote-peer-rollout-plan.md` §5.
+//! `plans/260918-host-invocation-r3-remote-peer/plan.md` §5.
 //! Projects incoming remote host requests into kernel `HostInvocation` and
 //! `OperationRequest`, executes them through `InvocationService`, and presents
 //! the typed outcome as gateway API JSON without CLI shelling or `fgos.v1` parsing.

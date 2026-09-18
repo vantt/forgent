@@ -5,11 +5,11 @@ Document type: Architecture
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Preserve the selected Node-to-Rust migration sequence and constraints
 Design status: Draft
-Implementation status: Planned
+Implementation status: R1/R2/R3 implemented preview plus remaining component migrations
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/node-to-rust-component-migration.md
-Last reviewed: 2026-09-14
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/release-boundaries.md
 - docs/platform/host-invocation-routing/verification/r1-rust-host-proof.md
@@ -36,8 +36,8 @@ The old source's near-thin, partly-thin, and not-thin command lists are preserve
 
 | Design claim | Implementation status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| Rust host first is selected. | `accepted-not-implemented` | [source migration §2](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered) | Execute P0-P6. |
-| Read models before writers. | `planned` | [source migration §10](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers) | Future work-read proof. |
+| Rust host first is selected. | `implemented preview` | [source migration §2](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#2-options-considered), [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md), [../../../../apps/fgos/src/main.rs](../../../../apps/fgos/src/main.rs) | Preview Rust host exists and is the installed/default preview entry. Stable/default graduation remains a release-owner decision. |
+| Read models before writers. | `current partial` | [source migration §10](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#10-migrate-read-models-before-writers), [../../../../packages/distribution/rust/src/lib.rs](../../../../packages/distribution/rust/src/lib.rs), [../../../../packages/work-state/rust/src/lib.rs](../../../../packages/work-state/rust/src/lib.rs), [../verification/r3-remote-peer-proof.md](../verification/r3-remote-peer-proof.md) | `version`, `gate-bypass`, and remote `/runtime` are read proofs. Future read routes should migrate before writes. |
 | Writer migration has atomicity/replay/mutual-exclusion gates. | `planned` | [source migration §11](../../../architect/host-invocation-routing/node-to-rust-component-migration.md#11-migrate-state-writing-components) | Future writer proof. |
 
 ## 5. Related Files
@@ -47,4 +47,3 @@ The old source's near-thin, partly-thin, and not-thin command lists are preserve
 | release boundaries | [release-boundaries.md](release-boundaries.md) |
 | R1 proof | [../verification/r1-rust-host-proof.md](../verification/r1-rust-host-proof.md) |
 | source migration | [../../../architect/host-invocation-routing/node-to-rust-component-migration.md](../../../architect/host-invocation-routing/node-to-rust-component-migration.md) |
-

@@ -5,11 +5,11 @@ Document type: Contract
 Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Define static provider manifest discovery, namespace rules, and replacement policy
 Design status: Draft
-Implementation status: Planned
+Implementation status: Implemented preview
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Promoted from docs/architect/host-invocation-routing/external-provider-protocol.md
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-18
 Related:
 - docs/platform/host-invocation-routing/architecture/external-provider-protocol.md
 - docs/platform/host-invocation-routing/contracts/component-protocol.md
