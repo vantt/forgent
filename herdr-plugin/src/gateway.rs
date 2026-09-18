@@ -1407,6 +1407,21 @@ mod tests {
         }
     }
 
+    /// R3-P3 / RT-2: call-counting gateway that proves no VerbGateway call happened
+    /// regardless of whether a regression surfaces as a panic, an HTTP 500, or a
+    /// silently-discarded Result.
+    #[derive(Default)]
+    struct CountingGateway {
+        calls: std::sync::atomic::AtomicUsize,
+    }
+
+    impl VerbGateway for CountingGateway {
+        fn run_verb(&self, _args: &[String]) -> Result<Value, GatewayError> {
+            self.calls.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+            Ok(json!({}))
+        }
+    }
+
     fn test_config() -> GatewayConfig {
         GatewayConfig {
             port: 0,
@@ -2284,7 +2299,8 @@ mod tests {
         use axum::http::Request;
         use tower::ServiceExt;
 
-        let gateway: Arc<dyn VerbGateway> = Arc::new(PanicGateway);
+        let counting_gateway = Arc::new(CountingGateway::default());
+        let gateway: Arc<dyn VerbGateway> = counting_gateway.clone();
         let app = build_router(gateway, test_config(), PathBuf::from("/tmp"));
 
         let response = app
@@ -2302,7 +2318,15 @@ mod tests {
         assert_eq!(
             response.status(),
             StatusCode::OK,
-            "GET /v1/runtime must return 200 without calling VerbGateway (PanicGateway)"
+            "GET /v1/runtime must return 200 without calling VerbGateway"
+        );
+
+        // RT-2: call-counting proof guarantees no VerbGateway invocation occurred,
+        // even if a future regression would have surfaced as an HTTP 500 or discarded Result.
+        assert_eq!(
+            counting_gateway.calls.load(std::sync::atomic::Ordering::SeqCst),
+            0,
+            "VerbGateway::run_verb must not be called for /v1/runtime"
         );
 
         let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();

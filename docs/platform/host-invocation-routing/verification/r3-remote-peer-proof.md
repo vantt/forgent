@@ -46,7 +46,7 @@ The run passed 9 tests on 2026-09-18.
 `GET /v1/runtime` is wired into `herdr-plugin/src/gateway.rs`:
 - **Handler & Wiring:** Handler `get_runtime` calls `crate::remote_invocation::build_invocation_service()`, `project_remote_build_show_invocation()`, invokes `InvocationService`, and presents the outcome via `present_remote_outcome()`. Mounted as `.route("/runtime", get(get_runtime))` inside the existing `authenticated` router in `build_router`, nested under `/v1` (`GET /v1/runtime`).
 - **Auth Behavior:** Sits behind the same `require_token` middleware as every other authenticated route (`Authorization: Bearer <token>` / Cf-Access). Unauthenticated and wrong-token requests are rejected with 401 Unauthorized (proven by `get_runtime_requires_authentication`).
-- **Hard No-VerbGateway Proof:** `PanicGateway` regression test (`get_runtime_does_not_call_verb_gateway_and_has_no_envelope_wrapping`) implements `VerbGateway` with an unconditional panic (`panic!("VerbGateway must not be called for /v1/runtime")`). An authenticated request to `GET /v1/runtime` succeeds with HTTP 200 without calling `VerbGateway`.
+- **Hard No-VerbGateway Proof:** `CountingGateway` regression test (`get_runtime_does_not_call_verb_gateway_and_has_no_envelope_wrapping`) implements `VerbGateway` with an atomic counter and asserts zero calls after `GET /v1/runtime` succeeds with HTTP 200, proving no `VerbGateway` call happened regardless of whether a regression would surface as an HTTP 500 or discarded Result.
 - **Hard No-`fgos.v1`-Envelope Proof:** The JSON response is verified to have no `contract`, `data`, or `data_hash` keys. The response contains direct `BuildShowOutcome` fields (`packageVersion`, `verbs`, `runtime`) from the typed provider outcome (proven by `get_runtime_happy_path_contains_build_show_outcome_fields`).
 
 Focused proof passed:
@@ -61,12 +61,12 @@ All 47 tests passed on 2026-09-18.
 
 The proof requirements frozen at R3-P0 are satisfied in `herdr-plugin/src/gateway.rs`:
 
-- `PanicGateway` regression test proves `distribution.build.show` never reaches `VerbGateway` / `run_verb_blocking` through `GET /v1/runtime`;
+- `CountingGateway` call-counting regression test proves `distribution.build.show` never reaches `VerbGateway` / `run_verb_blocking` through `GET /v1/runtime`;
 - Assertion tests prove `GET /v1/runtime` returns the typed `BuildShowOutcome` structure rather than parsing CLI `fgos.v1` stdout (no `contract`, `data`, or `data_hash` envelope keys).
 
 ## 3. Remaining VerbGateway Consumers (R3-P4 Inventory)
 
-R3 migrates only `GET /v1/runtime`. Every other existing route in the `authenticated` router's `.route(...)` list continues to call `run_verb_blocking` -> `VerbGateway::run_verb` -> (real implementation `FgosCliGateway`) `spawn_fgos_verb` -> shells the `fgos` CLI and parses its `fgos.v1` JSON envelope (`{contract, generated_at, data_hash, data}`). `/runner/tick` shells `node bin/fgos-runner.mjs --once` directly (not through `VerbGateway`, but still a CLI/Node shell).
+R3 migrates only `GET /v1/runtime`. Every other existing route in the `authenticated` router's `.route(...)` list continues to call `run_verb_blocking` -> `VerbGateway::run_verb` -> (real implementation `FgosCliGateway`) `spawn_fgos_verb` -> shells the `fgos` CLI and parses its `fgos.v1` JSON envelope (`{contract, generated_at, data_hash, data}`). The authenticated router also nests `/mcp` (`.nest_service("/mcp", mcp_service)`), whose execute path calls `VerbGateway::run_verb` directly and reaches write verbs. `/runner/tick` shells `node bin/fgos-runner.mjs --once` directly (not through `VerbGateway`, but still a CLI/Node shell).
 
 `/contract` (outside `authenticated`, serving OpenAPI YAML directly from disk) and the new `/runtime` are the only routes that do neither.
 
@@ -91,11 +91,12 @@ R3 migrates only `GET /v1/runtime`. Every other existing route in the `authentic
 | `/v1/sessions` | POST | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos session start`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
 | `/v1/sessions/{sessionId}` | DELETE | Write | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos session end`, parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path |
 | `/v1/sessions/{sessionId}/slots` | GET | Read | `run_verb_blocking` -> `VerbGateway::run_verb` | Shells `fgos slots --json`, parses `fgos.v1` | Out of R3 scope; requires native slots provider |
+| `/v1/mcp` | POST / GET | Write-capable | Direct `VerbGateway::run_verb` | Dispatches Rhai execute script to `VerbGateway::run_verb` (can reach write verbs like approve/take/reject/...), parses `fgos.v1` | Out of R3 scope; writes stay out of peer-host path; live `VerbGateway` consumer |
 | `/v1/runner/tick` | POST | Write | `tokio::task::spawn_blocking` spawning `node` | Shells `node bin/fgos-runner.mjs --once` directly | Out of R3 scope; writes/runner stay out of peer-host path |
 | `/v1/contract` | GET | Read | Static file read | Reads OpenAPI spec from disk directly | Outside `authenticated`; no VerbGateway, no CLI shell |
 | `/v1/runtime` | GET | Read | Native `InvocationService::invoke` via `remote_invocation.rs` | Direct provider outcome; no CLI shell, no `fgos.v1` | **Implemented preview (R3-P2/P3)** |
 
-Migrating any remaining routes is strictly out of R3 scope. Writes stay out of the peer-host path entirely per the plan's Non-Goals. The gateway as a whole has NOT migrated; only `GET /v1/runtime` has been converted to the native remote peer invocation path. Delete the `VerbGateway` chokepoint only after this entire consumer list is empty in future milestones.
+Migrating any remaining routes is strictly out of R3 scope. Writes stay out of the peer-host path entirely per the plan's Non-Goals. The gateway as a whole has NOT migrated; only `GET /v1/runtime` has been converted to the native remote peer invocation path. Do not claim the table is exhaustive of every possible VerbGateway path without `/v1/mcp`, and do not claim `VerbGateway` can be deleted once the `.route(...)` list alone is empty — `/v1/mcp` must stay listed as a live consumer too until all consumers are retired in future milestones.
 
 ## 4. Related Files
 

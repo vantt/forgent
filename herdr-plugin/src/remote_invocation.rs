@@ -383,6 +383,34 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_present_remote_outcome_error_response_has_no_envelope_wrapping() {
+        use axum::response::IntoResponse;
+
+        // RT-3: call present_remote_outcome with Err(ProviderError::SemanticValidation(...)),
+        // call .into_response() on the resulting GatewayError, extract JSON body,
+        // and assert it has no 'contract', 'data', or 'data_hash' keys.
+        let err = ProviderError::SemanticValidation("invalid semantic input".to_string());
+        let outcome_result: Result<ProviderOutcome, ProviderError> = Err(err);
+        let gw_err = present_remote_outcome(outcome_result).expect_err("must produce GatewayError");
+
+        let response = gw_err.into_response();
+        assert_eq!(response.status(), axum::http::StatusCode::BAD_REQUEST);
+
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX).await.unwrap();
+        let val: Value = serde_json::from_slice(&body).unwrap();
+
+        // Proves error path never leaks a CLI fgos.v1 envelope shape
+        assert!(val.get("contract").is_none(), "error response must not have 'contract' key");
+        assert!(val.get("data").is_none(), "error response must not have 'data' key");
+        assert!(val.get("data_hash").is_none(), "error response must not have 'data_hash' key");
+
+        // Asserts valid ErrorEnvelope fields
+        assert_eq!(val["category"], "validation");
+        assert_eq!(val["exitCode"], 4);
+        assert!(val["message"].as_str().unwrap().contains("invalid semantic input"));
+    }
+
+    #[tokio::test]
     async fn test_invocation_service_end_to_end() {
         let service = build_invocation_service();
         let (invocation, request) = project_remote_invocation("distribution.build.show")
