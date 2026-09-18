@@ -111,7 +111,7 @@ function isDefinitionFileName(name) {
  * module.
  */
 function assertContained(rootDir, filePath) {
-  const resolvedRoot = path.resolve(rootDir);
+  const resolvedRoot = fs.existsSync(rootDir) ? fs.realpathSync(rootDir) : path.resolve(rootDir);
   const resolvedTarget = fs.existsSync(filePath) ? fs.realpathSync(filePath) : path.resolve(filePath);
   const rel = path.relative(resolvedRoot, resolvedTarget);
   if (rel === '' || rel.startsWith(`..${path.sep}`) || rel === '..' || path.isAbsolute(rel)) {

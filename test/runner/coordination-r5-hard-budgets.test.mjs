@@ -93,6 +93,13 @@ function openSoloSession(coordinationId, tempDir, aggregateBounds) {
   );
 }
 
+function forceSessionCreatedAt(coordinationId, tempDir, createdAt) {
+  const manifestPath = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.createdAt = createdAt;
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+}
+
 // ─── Schema-level: zero/negative/overflow/non-integer/unknown-field, every
 // one of the 5 aggregateBounds fields, table-driven ─────────────────────────
 
@@ -419,7 +426,7 @@ test('retrySessionTask enforces aggregateBounds.wallTimeMs before dispatching a 
 
 test('retrySessionTask self-heal (linking an already-settled disk result) is NEVER blocked by wall-time -- only a genuinely NEW dispatch launch is gated', async () => {
   const tempDir = mkTempDir();
-  openSoloSession('coord_r5_retry_walltime_selfheal', tempDir, { wallTimeMs: 200 });
+  openSoloSession('coord_r5_retry_walltime_selfheal', tempDir, { wallTimeMs: 1000 });
   const first = await dispatchPrimaryTask(
     'coord_r5_retry_walltime_selfheal',
     { objective: 'first', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1' },
@@ -438,8 +445,9 @@ test('retrySessionTask self-heal (linking an already-settled disk result) is NEV
   const runId = `run_${assignmentId}_02`;
   fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId, assignmentId, status: 'done', confidence: 'reported' }, null, 2));
 
-  // Wall time has now elapsed well past the 200ms budget.
-  await new Promise((resolve) => setTimeout(resolve, 250));
+  // Wall time is deterministically past the budget without depending on
+  // full-suite scheduler timing before the initial dispatch can even start.
+  forceSessionCreatedAt('coord_r5_retry_walltime_selfheal', tempDir, new Date(Date.now() - 1500).toISOString());
 
   const resumed = await retrySessionTask(
     'coord_r5_retry_walltime_selfheal',

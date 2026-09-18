@@ -463,7 +463,7 @@ merged into one `openai` executor (invocation id already carries the bin:
 `codex-cli-bypass-fgovn` runs the `codex` binary, `pi-cli-tetnu` runs the
 `pi` binary, both inside the same `openai` executor entry). No `rigorOverrides`
 survived the merge -- `pi`'s old `{light/standard/heavy -> nano}` default
-was never a deliberate cost policy, just a historical D4 proof-test
+was never a deliberate cost policy, just a historical proof-test
 default, so it was dropped rather than silently overwriting `codex`'s own
 (different) tier behavior; see `docs/specs/runner.md` for the fuller
 reasoning on why merging two bins under one executor risks exactly that
