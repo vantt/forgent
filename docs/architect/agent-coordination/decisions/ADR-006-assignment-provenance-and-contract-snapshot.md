@@ -1,5 +1,9 @@
 # ADR-006: Assignment Provenance And Normalized Execution-Contract Snapshot
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-006-assignment-provenance-and-contract-snapshot.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented

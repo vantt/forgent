@@ -1,5 +1,9 @@
 # ADR-008: CoordinationSession As V1 Recovery Root, One-Way Assignment Membership, And Mission Deferral
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-008-coordination-session-and-mission-deferral.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented (`src/runner/coordination/{schema,store,replay,session-engine}.mjs`,

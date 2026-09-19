@@ -616,14 +616,15 @@ function validateSteps(steps) {
     if (step.type === 'disposition') return validateDispositionStep(step, i);
     if (step.type === 'contribution') return validateContributionStep(step, i);
     if (step.type === 'human-turn') return validateHumanTurnStep(step, i);
-    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"`);
+    if (step.type === 'close') return { type: 'close', as: step.as };
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"`);
     return undefined; // unreachable, keeps linters happy
   });
 }
 
 const TOP_LEVEL_ALLOWED_KEYS = new Set([
   'kind', 'objective', 'writerId', 'coordinationId', 'workRef',
-  'aggregateBounds', 'partialPolicy', 'primaryRole', 'task', 'protocolRef', 'steps', 'actors',
+  'aggregateBounds', 'partialPolicy', 'primaryRole', 'task', 'protocolRef', 'steps', 'actors', 'close',
 ]);
 
 const OBJECTIVE_MAX_LENGTH = 20000;
@@ -677,11 +678,16 @@ export function validateCoordinationRequest(raw, cliFlags = {}) {
   const aggregateBounds = validateAggregateBounds(raw.aggregateBounds);
   const partialPolicy = validatePartialPolicy(raw.partialPolicy);
   const actors = validateActorsShape(raw.actors);
+  const close = raw.close === true;
+  if (raw.close !== undefined && typeof raw.close !== 'boolean') {
+    fail('"close" must be a boolean');
+  }
 
   const normalized = {
     kind: raw.kind,
     objective: raw.objective,
     writerId: raw.writerId,
+    close,
     coordinationId: raw.coordinationId,
     workRef: raw.workRef ?? null,
     aggregateBounds,
@@ -714,6 +720,19 @@ export function validateCoordinationRequest(raw, cliFlags = {}) {
   }
 
   return normalized;
+}
+
+export function validateCoordinationCloseRequest(raw) {
+  if (!isPlainObject(raw)) fail('request must be a JSON object');
+  if (raw.kind !== 'close') fail('"kind" must be "close"');
+  if (raw.coordinationId === undefined) fail('"coordinationId" is required');
+  assertSafeId(raw.coordinationId, '"coordinationId"');
+  if (raw.authorizedBy === undefined) fail('"authorizedBy" is required');
+  return {
+    kind: raw.kind,
+    coordinationId: raw.coordinationId,
+    authorizedBy: validateIdentityRef(raw.authorizedBy, '"authorizedBy"'),
+  };
 }
 
 export { SAFE_ID_RE, READ_ONLY_ROLES };

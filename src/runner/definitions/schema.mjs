@@ -958,25 +958,60 @@ function validateNodeOperationRef(opRef, label, operationIds, actorIds, profileK
     if (profileKind !== 'CoordinationProtocol') {
       fail(`${label}.rechecks is legal only under the CoordinationProtocol profile (profile is "${profileKind}")`);
     }
-    if (!isNonEmptyString(opRef.rechecks)) fail(`${label}.rechecks must be a non-empty string when provided`);
-    if (!operationIds.has(opRef.rechecks)) {
-      fail(`${label}.rechecks "${opRef.rechecks}" does not reference a declared spec.operations[] id`);
+    let rechecksStr;
+    if (isNonEmptyString(opRef.rechecks)) {
+      rechecksStr = opRef.rechecks;
+    } else if (isPlainObject(opRef.rechecks)) {
+      if (!isNonEmptyString(opRef.rechecks.operation)) fail(`${label}.rechecks.operation must be a non-empty string`);
+      rechecksStr = opRef.rechecks.operation;
+
+      if (opRef.rechecks.dispositionValues !== undefined) {
+        if (!Array.isArray(opRef.rechecks.dispositionValues) || !opRef.rechecks.dispositionValues.every(isNonEmptyString)) {
+           fail(`${label}.rechecks.dispositionValues must be an array of non-empty strings if provided`);
+        }
+        result.dispositionValues = Object.freeze([...opRef.rechecks.dispositionValues]);
+      }
+
+      if (opRef.rechecks.dischargeOn !== undefined) {
+        if (!Array.isArray(opRef.rechecks.dischargeOn) || !opRef.rechecks.dischargeOn.every(isNonEmptyString)) {
+           fail(`${label}.rechecks.dischargeOn must be an array of non-empty strings if provided`);
+        }
+        result.dischargeOn = Object.freeze([...opRef.rechecks.dischargeOn]);
+        if (result.dispositionValues) {
+           for (const val of result.dischargeOn) {
+             if (!result.dispositionValues.includes(val)) {
+                fail(`${label}.rechecks.dischargeOn contains "${val}" which is not in dispositionValues`);
+             }
+           }
+        }
+      }
+    } else {
+      fail(`${label}.rechecks must be a non-empty string or an object when provided`);
     }
-    if (opRef.rechecks === opRef.ref) {
-      fail(`${label}.rechecks "${opRef.rechecks}" must not name this same binding's own "ref" -- a recheck discharges a DIFFERENT, earlier gating operation, never itself`);
+
+    if (!operationIds.has(rechecksStr)) {
+      fail(`${label}.rechecks "${rechecksStr}" does not reference a declared spec.operations[] id`);
+    }
+    if (rechecksStr === opRef.ref) {
+      fail(`${label}.rechecks "${rechecksStr}" must not name this same binding's own "ref" -- a recheck discharges a DIFFERENT, earlier gating operation, never itself`);
     }
     if (opRef.actor === undefined) {
       fail(`${label}.rechecks requires a static "actor" binding -- a specialistSlotRef binding's occupant is not known until authorize time, so it cannot be declared as the fixed discharger of another binding's gating slot`);
     }
-    // A recheck binding is, by definition, a LATER, conditional confirmation of an
-    // earlier required gating result -- it can never be `required` itself (that would
-    // make it gating on its own, defeating the whole "optional unless the driver
-    // authorizes a fix round" shape `activationModeOf`/`actorGatingOperationIds`
-    // already rely on for this exact fixture).
     if ((result.activation?.mode ?? DEFAULT_ACTIVATION_MODE) !== 'driver-authorized') {
       fail(`${label}.rechecks requires activation.mode "driver-authorized" -- a "required" binding cannot also be declared as a recheck of another gating operation`);
     }
-    result.rechecks = opRef.rechecks;
+    if (isNonEmptyString(opRef.rechecks)) {
+      result.rechecks = opRef.rechecks;
+    } else {
+      result.rechecks = Object.freeze({
+        operation: opRef.rechecks.operation,
+        dispositionValues: result.dispositionValues,
+        dischargeOn: result.dischargeOn,
+      });
+      delete result.dispositionValues;
+      delete result.dischargeOn;
+    }
   }
   return Object.freeze(result);
 }
@@ -1034,27 +1069,29 @@ function validateGraph(graph, operations, actors, profileKind, windowIds, slotsB
   // itself another recheck (no chains). `session-engine.mjs`'s `resolveRecheckDischarge`
   // trusts this shape unconditionally at close time, so it is enforced here, once, at
   // definition-validation time, rather than re-checked defensively at every close.
-  const bindingsByActorAndRef = new Map(); // `${actor} ${ref}` -> [{ nodeId, rechecks }]
+  const bindingsByActorAndRef = new Map(); // `${actor} ${ref}` -> [{ nodeId, rechecks }]
   nodes.forEach((node) => {
     node.operations.forEach((opRef) => {
       if (opRef.actor === undefined) return;
-      const key = `${opRef.actor} ${opRef.ref}`;
+      const key = `${opRef.actor} ${opRef.ref}`;
       if (!bindingsByActorAndRef.has(key)) bindingsByActorAndRef.set(key, []);
-      bindingsByActorAndRef.get(key).push({ nodeId: node.id, rechecks: opRef.rechecks });
+      const rechecksOp = opRef.rechecks?.operation ?? opRef.rechecks;
+      bindingsByActorAndRef.get(key).push({ nodeId: node.id, rechecks: rechecksOp });
     });
   });
   nodes.forEach((node, i) => {
     node.operations.forEach((opRef, j) => {
       if (opRef.rechecks === undefined) return;
+      const rechecksOp = opRef.rechecks?.operation ?? opRef.rechecks;
       const label = `spec.graph.nodes[${i}].operations[${j}]`;
-      const key = `${opRef.actor} ${opRef.rechecks}`;
+      const key = `${opRef.actor} ${rechecksOp}`;
       const candidates = (bindingsByActorAndRef.get(key) ?? []).filter((c) => c.nodeId !== node.id);
       if (candidates.length === 0) {
-        fail(`${label}.rechecks "${opRef.rechecks}" does not bind actor "${opRef.actor}" anywhere else in spec.graph.nodes -- a recheck must discharge a real, differently-positioned binding of the same actor, never itself or an unbound operation id`);
+        fail(`${label}.rechecks "${rechecksOp}" does not bind actor "${opRef.actor}" anywhere else in spec.graph.nodes -- a recheck must discharge a real, differently-positioned binding of the same actor, never itself or an unbound operation id`);
       }
       const chained = candidates.find((c) => c.rechecks !== undefined);
       if (chained) {
-        fail(`${label}.rechecks "${opRef.rechecks}" targets a binding (node "${chained.nodeId}") that itself declares "rechecks" -- chained rechecks are not allowed, a recheck must target a genuine first-pass gating operation directly`);
+        fail(`${label}.rechecks "${rechecksOp}" targets a binding (node "${chained.nodeId}") that itself declares "rechecks" -- chained rechecks are not allowed, a recheck must target a genuine first-pass gating operation directly`);
       }
     });
   });

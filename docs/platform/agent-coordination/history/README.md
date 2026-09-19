@@ -6,6 +6,13 @@ Implementation: N/A
 Last reviewed: 2026-08-31
 Canonical for: nothing
 
+## Migration Status
+
+This target directory preserves historical material from
+`docs/architect/agent-coordination/history/` and the temporary migration
+ledgers. It is retained for context and evidence, never as current runtime or
+contract authority.
+
 ## Contents
 
 - `brainstorms/` retains exploratory synthesis and early architecture framing.

@@ -1,5 +1,9 @@
 # Step 08 - Standalone Coordination And Optional Protocols
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/step-08-standalone-coordination-protocols.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Proposal history
 Design status: Promoted history / superseded by accepted architecture and contracts
 Implementation: Delivered by `plans/260901-1542-step08-standalone-coordination/plan.md`

@@ -17,6 +17,40 @@ domain-neutral foundation. Work, a predeclared Workflow, and a predeclared
 Coordination Protocol are optional integration or augmentation layers, not
 prerequisites for coordination.
 
+## Component And Runtime Flow
+
+```mermaid
+flowchart TB
+  Intent[Objective or selected Work operation]
+  Structure[Optional Workflow or CoordinationProtocol]
+  Domain[Optional domain policy and evidence harness]
+  Session[CoordinationSession or agent-led planner]
+  Assignment[Validated Assignment]
+  Dispatch[Governed DispatchPlan]
+  Run[Run attempt]
+  Worker[Provider, model, executor, or CLI]
+  Result[Immutable RunResult]
+  Evidence[Artifacts and normalized evidence]
+  Work[Work Lifecycle Engine]
+  Herdr[Herdr process visibility]
+
+  Intent --> Session
+  Structure -.->|constrains legal operations when selected| Session
+  Domain -.->|augments policy and proof| Session
+  Session --> Assignment --> Dispatch --> Run --> Worker
+  Worker -->|claims and artifacts| Result
+  Result --> Evidence
+  Result -->|recommendation or evidence| Work
+  Work -.->|optional integration context| Session
+  Herdr -.->|observation only| Run
+  Herdr -.->|observation only| Worker
+```
+
+The diagram separates execution from delivery lifecycle: a result can inform a
+Work driver, but cannot move Work lifecycle state by itself. Dashed paths are
+optional structure, augmentation, integration context, or visibility; they do
+not create execution authority or terminal truth.
+
 ## Context
 
 ```txt

@@ -1,5 +1,9 @@
 # Step 04 - Assignment RunResult Evidence Hardening
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-04-assignment-runresult-hardening.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Roadmap
 Design status: Superseded
 Superseded by: `../../architecture/evidence-and-results.md` and `../../contracts/assignment-run-runresult.md`

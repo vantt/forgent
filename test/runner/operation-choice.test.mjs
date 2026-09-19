@@ -539,7 +539,7 @@ test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded co
       },
       feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
     },
-    evidence: { 
+    evidence: {
       artifacts: [reportPath],
     },
   };
@@ -601,7 +601,7 @@ test('Step 06 planning.validate-plan bare done claim without verdict cannot adva
         },
         feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
       },
-      evidence: { 
+      evidence: {
         artifacts: [reportPath],
       },
     },
@@ -1795,7 +1795,7 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
   const docsDir = path.join(tempDir, 'docs', 'history', 'feat-resume-constraints');
   fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: tiny\nPlan.\n\n## Constraints\n- Scope limited to 1 file\n');
-  
+
   const runDir = path.join(tempDir, '.fgos', 'assignments', 'asgn_val_constraints', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(

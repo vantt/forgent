@@ -178,7 +178,7 @@ async function run(ctx, coordinationId, writerId, steps, extra = {}) {
       objective: 'Architecture Advisory Panel V1 conformance.',
       writerId,
       coordinationId,
-      protocolRef: { id: PANEL_ID },
+      close: true, protocolRef: { id: PANEL_ID },
       steps,
       ...extra,
     },
@@ -994,7 +994,7 @@ test('CLI/headless parity: the pack gate and a direct runCoordinationUseCase cal
       objective: 'Architecture Advisory Panel V1 conformance (direct runCoordinationUseCase call).',
       writerId,
       coordinationId: 'aap_parity_direct',
-      protocolRef: { id: PANEL_ID },
+      close: true, protocolRef: { id: PANEL_ID },
       steps: [opStep('interpret', 'interpret-request', 'lead-advisor-actor')],
     },
   });

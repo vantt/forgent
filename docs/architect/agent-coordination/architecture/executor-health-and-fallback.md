@@ -6,6 +6,10 @@ coverage: proposed
 
 # Executor Fallback And Effect Eligibility
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/executor-health-and-fallback.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Design status: PROPOSED detailed contract. Implementation: not implemented.
 Read [Runtime Recovery Design](runtime-recovery-design.md) first.
 This activates existing fallbackExecutors through the existing recovery matrix,

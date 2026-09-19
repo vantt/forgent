@@ -1,5 +1,9 @@
 # Step 07 Design Discussion Handoff Prompt
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/playbooks/prompts/step-07-design-discussion-handoff.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Playbook
 Design status: N/A
 Implementation: Active

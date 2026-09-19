@@ -1,5 +1,9 @@
 # CoordinationSession Persistence And Recovery Contract
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/contracts/coordination-session.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Contract
 Design status: Accepted
 Implementation: Implemented (Phase 01 R1-R8: manifest/event store, direct

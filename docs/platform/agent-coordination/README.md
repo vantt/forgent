@@ -27,6 +27,42 @@ Agent Coordination is the domain-neutral foundation for governed, evidence-aware
 agent activity across agents, capabilities, providers, models, tiers, execution
 mechanisms, and optional Work integration.
 
+## Component Relationship
+
+```mermaid
+flowchart LR
+  Human[Human or operator]
+  Work[Work Lifecycle Engine]
+  Domain[Domain components and extensions]
+  Coordination[Agent Coordination Engine]
+  Flow[Workflow or CoordinationProtocol]
+  Assignment[Assignment]
+  Dispatch[Dispatch and Execution Engine]
+  Run[Run]
+  Result[RunResult and evidence]
+  Executor[Provider, model, executor]
+  Herdr[Herdr visibility]
+  Host[Host and surface layer]
+  Package[Packaging and distribution]
+
+  Human --> Work
+  Human --> Coordination
+  Work -->|optional operation context| Coordination
+  Coordination -->|recommendations and evidence only| Work
+  Domain -.->|policy, doctrine, and harnesses| Coordination
+  Flow -.->|optional declared structure| Coordination
+  Coordination --> Assignment --> Dispatch --> Run --> Result
+  Dispatch --> Executor
+  Herdr -.->|observes, never settles| Run
+  Host -->|invokes approved public doors| Coordination
+  Host --> Dispatch
+  Package -.->|installs and activates| Host
+```
+
+Solid arrows show a control or data path. Dashed arrows show optional
+augmentation, activation, or observation. In particular, Work remains the only
+delivery-lifecycle authority, and Herdr never establishes Run truth.
+
 ## Read First
 
 | Order | Read | Why |
@@ -58,13 +94,13 @@ until later migration phases promote the detailed docs:
 |---|---|---|
 | Vision and intent ledger | promoted | [vision.md](vision.md), [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 | Spec | promoted summary / partial | [spec.md](spec.md), [verification/implementation-alignment.md](verification/implementation-alignment.md), [../../specs/runner.md](../../specs/runner.md) plus accepted legacy contracts |
-| Architecture | legacy-current | [../../architect/agent-coordination/architecture/](../../architect/agent-coordination/architecture/) |
-| Contracts | legacy-current | [../../architect/agent-coordination/contracts/](../../architect/agent-coordination/contracts/) |
-| Decisions | legacy-current | [../../architect/agent-coordination/decisions/](../../architect/agent-coordination/decisions/) |
-| Verification | legacy-current evidence | [../../architect/agent-coordination/verification/](../../architect/agent-coordination/verification/) |
-| Proposals | non-canonical legacy-current | [../../architect/agent-coordination/proposals/](../../architect/agent-coordination/proposals/) |
-| Playbooks | operational/bootstrap only | [../../architect/agent-coordination/playbooks/](../../architect/agent-coordination/playbooks/) |
-| Roadmap | implementation sequence only | [../../architect/agent-coordination/roadmap/](../../architect/agent-coordination/roadmap/) |
+| Architecture | promoted target; legacy documents carry redirect notes | [architecture/README.md](architecture/README.md) |
+| Contracts | promoted target; legacy documents carry redirect notes | [contracts/README.md](contracts/README.md) |
+| Decisions | promoted target; legacy documents carry redirect notes | [decisions/README.md](decisions/README.md) |
+| Verification | target index; legacy proof artifacts retained link-only | [verification/README.md](verification/README.md) |
+| Proposals | non-canonical target; legacy documents carry redirect notes | [proposals/README.md](proposals/README.md) |
+| Playbooks | operational/bootstrap target; legacy documents carry redirect notes | [playbooks/README.md](playbooks/README.md) |
+| Roadmap | implementation-sequence target; legacy documents carry redirect notes | [roadmap/README.md](roadmap/README.md) |
 
 ## Cross-Area Boundaries
 
@@ -72,7 +108,7 @@ until later migration phases promote the detailed docs:
 |---|---|---|
 | Host invocation and provider process routing | [host-invocation-routing](../host-invocation-routing/README.md) | Link-only authority; Agent Coordination consumes this boundary through dispatch/executor integration. |
 | Packaging, install, activation, release manifest, setup/doctor, runtime identity | [packaging-distribution](../packaging-distribution/README.md) | Link-only authority; do not duplicate setup or runtime activation rules here. |
-| Platform component boundary | [component-boundary.md](../component-boundary.md) | No component-boundary change in this Phase 0/1 migration. |
+| Platform component boundary | [component-boundary.md](../component-boundary.md) | No component-boundary change: these diagrams expose existing ownership and flows only. |
 
 ## Related Files
 

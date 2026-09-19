@@ -147,7 +147,7 @@ graph:
 ### Activation (Phase 00, Step 09 MVP1/MVP2)
 
 Accepted contract text, scoped to MVP1/MVP2 of the Step 09 group-thinking
-substrate ([Step 09 Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
+substrate ([Step 09 Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
 remains a Discussion-status document; only `activation` as described here is
 promoted out of it). This does not accept deliberation memory, richer
 aggregation modes, or `addSessionEdge` — those stay deferred/discussion.

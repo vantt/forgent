@@ -1,5 +1,9 @@
 # Agent Coordination Proposals
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/README.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Index
 Design status: Discussion
 Implementation: Partial

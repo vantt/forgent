@@ -182,7 +182,7 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
       objective: 'Open one RFC-Review-Lite round entirely through the pack gate.',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [opStep('convene', 'convene', 'coordinator-actor'), opStep('propose', 'propose', 'proposer-actor'), opStep('objectA', 'object', 'objector-a-actor')],
     },
   });
@@ -205,7 +205,7 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
           objective: 'Attempt the reveal-gated authorization with only one objector settled.',
           writerId,
           coordinationId,
-          protocolRef: { id: RFC_REVIEW_LITE_ID },
+          close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
           steps: [
             {
               type: 'authorize',
@@ -239,7 +239,7 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
           objective: 'Attempt to resume a real, in-progress RFC-Review-Lite session under a different, also-registered protocol.',
           writerId,
           coordinationId,
-          protocolRef: { id: NOMINAL_GROUP_LITE_ID },
+          close: true, protocolRef: { id: NOMINAL_GROUP_LITE_ID },
           steps: [{ type: 'disposition', as: 'd', targetRef: coordinationId, disposition: 'noted', rationale: 'P10.6 protocol-specific cross-protocol resume refusal check.' }],
         },
       }),
@@ -270,7 +270,7 @@ test('RFC-Review-Lite through the real pack gate: interrupt-then-resume across F
       objective: 'Resume the same session under its own real protocol and complete the round.',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [
         opStep('objectB', 'object', 'objector-b-actor'),
         {
@@ -359,7 +359,7 @@ test('P10.10: RFC-Review-Lite\'s full proposal/objection/response contribution l
       objective: 'Settle both objectors and their contribution lineage through the pack gate; stop before authorizing or dispatching "respond".',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [
         opStep('convene', 'convene', 'coordinator-actor'),
         opStep('propose', 'propose', 'proposer-actor'),
@@ -400,7 +400,7 @@ test('P10.10: RFC-Review-Lite\'s full proposal/objection/response contribution l
       objective: 'Repeat the identical proposal contribution link in a genuinely separate later call.',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [{ type: 'contribution', as: 'linkProposalRepeat', contributionId: 'p10_10_proposal', contributionType: 'proposal', assignmentId: linkProposal.assignmentId, roundKey: 'round-1' }],
     },
   });
@@ -415,7 +415,7 @@ test('P10.10: RFC-Review-Lite\'s full proposal/objection/response contribution l
           objective: 'Attempt to smuggle a caller-declared linkedBy identity.',
           writerId,
           coordinationId,
-          protocolRef: { id: RFC_REVIEW_LITE_ID },
+          close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
           steps: [{ type: 'contribution', as: 'linkForged', contributionId: 'p10_10_forged', contributionType: 'proposal', assignmentId: linkProposal.assignmentId, roundKey: 'round-1', linkedBy: { type: 'driver', id: 'someone-else' } }],
         },
       }),
@@ -435,7 +435,7 @@ test('P10.10: RFC-Review-Lite\'s full proposal/objection/response contribution l
       objective: 'Finish the round: authorize+dispatch respond, link its response contribution, and dispose it.',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [
         {
           type: 'authorize',
@@ -514,7 +514,7 @@ test('P10-KERNEL-FIX: a genuinely SEPARATE later runGroupThinkingRequest call re
       objective: 'Settle both objectors through the pack gate; stop before authorizing or dispatching "respond".',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [
         opStep('convene', 'convene', 'coordinator-actor'),
         opStep('propose', 'propose', 'proposer-actor'),
@@ -560,7 +560,7 @@ test('P10-KERNEL-FIX: a genuinely SEPARATE later runGroupThinkingRequest call re
       objective: 'Resume the same session, authorize (twice) and dispatch "respond", then record the driver\'s disposition.',
       writerId,
       coordinationId,
-      protocolRef: { id: RFC_REVIEW_LITE_ID },
+      close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
       steps: [
         authorizeStep,
         // Same authorizationId + invocationKey, repeated within THIS
@@ -607,7 +607,7 @@ test('P10-KERNEL-FIX: a genuinely SEPARATE later runGroupThinkingRequest call re
           objective: 'Attempt to re-authorize the identical, already-settled step after the session has naturally closed.',
           writerId,
           coordinationId,
-          protocolRef: { id: RFC_REVIEW_LITE_ID },
+          close: true, protocolRef: { id: RFC_REVIEW_LITE_ID },
           steps: [{ ...authorizeStep, as: 'authRespondFirst' }],
         },
       }),

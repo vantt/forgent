@@ -6,6 +6,10 @@ coverage: substantially-implemented
 
 # Runtime Recovery And Work Continuity
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/runtime-recovery-design.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Design status: PROPOSED detailed design; Slices S0-S4 and the session-recovery
 half of S5 are now IMPLEMENTED (runtime-recovery track, closed 2026-09-14 —
 see `plans/260911-2305-runtime-recovery/plan.md`'s Product Gates table and the

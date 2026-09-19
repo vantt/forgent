@@ -128,7 +128,7 @@ function agentLedRequest(overrides = {}) {
   return {
     kind: 'agent-led',
     objective: 'Investigate package.json.',
-    writerId: 'coordination-cli-test',
+    close: true, writerId: 'coordination-cli-test',
     primaryRole: 'researcher',
     task: {
       expectedOutputs: ['agent-result.json (status, summary)'],
@@ -627,7 +627,7 @@ test('fgos coordination run --file <declared operation step, mutation:"mutating"
   const req = {
     kind: 'declared-protocol',
     objective: 'Prove a request step\'s mutation field reaches the engine through the CLI run door.',
-    writerId: 'coordination-cli-test',
+    close: true, writerId: 'coordination-cli-test',
     protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
     steps: [
       {
@@ -672,7 +672,7 @@ test('fgos coordination run --file <declared operation step, mutation:"mutating"
   const req = {
     kind: 'declared-protocol',
     objective: 'Prove an advisory operation cannot be dispatched as mutating through the CLI run door.',
-    writerId: 'coordination-cli-test',
+    close: true, writerId: 'coordination-cli-test',
     protocolRef: { id: 'core.coordination-protocol.standalone-master-coordination-loop' },
     steps: [
       {

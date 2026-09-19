@@ -6,6 +6,13 @@ Implementation: Partial
 Last reviewed: 2026-09-02
 Canonical for: nothing; proposals must be promoted into architecture/contracts/ADRs
 
+## Migration Status
+
+This target directory preserves the proposal frontier from
+`docs/architect/agent-coordination/proposals/`. A target-path copy does not
+promote its design: the status of every frontier source remains governed by
+[Proposal Status](../history/documentation-migration/proposal-status.md).
+
 All proposals are subordinate to the
 [Agent Coordination Foundation Vision](../vision.md). They resolve open design
 shape and may not reopen its accepted foundation boundaries implicitly.
@@ -38,20 +45,20 @@ parts remain explicitly deferred.
 
 ## Related Architect-Level Intentions
 
-- [Architecture Intent](../../architecture-intent.md) preserves the wider
+- [Architecture Intent](../../../architect/architecture-intent.md) preserves the wider
   design intent behind deferred architecture capabilities. Its first active
   thread covers group-thinking/problem-solving capability and sits at
   `docs/architect/` because the concern spans Agent Coordination, Work Driver,
   Dispatch/Run, Run Result Evaluation, and the Coding Domain adoption track.
-- [Step 09: Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md)
+- [Step 09: Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md)
   discusses the standalone, no-Work group-thinking substrate expansion. The
   first useful proof fixture is a Master Coordination style loop with external
   driver authority, bounded optional rounds, recheck, and disposition.
-- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../proposals/step-10-coding-domain-adoption.md)
+- [Step 10: Coding Domain Adoption Of The Coordination Foundation](../../../architect/proposals/step-10-coding-domain-adoption.md)
   discusses bringing the existing coding domain onto the Step 08 foundation:
   duplicate-mechanism inventory, seams, the foundation capabilities coding
   still needs, and a candidate step sequence gated on ADR-010 §5's proof.
-- [Component Authority Boundary Map](../../proposals/component-authority-boundary-map.md)
+- [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
   is the parallel architect-level authority/layout draft for cross-component
   placement and forbidden dependencies.
 

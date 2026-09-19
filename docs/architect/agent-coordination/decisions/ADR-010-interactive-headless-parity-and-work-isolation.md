@@ -1,5 +1,9 @@
 # ADR-010: Interactive/Headless Capability Parity As An Intended Future Property, And Domain-Owned Work Isolation
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-010-interactive-headless-parity-and-work-isolation.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented (`src/verbs/coordination/{schema,run,show}.mjs`,

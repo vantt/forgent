@@ -132,6 +132,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-herdr-maturity',
       'confinement-probe-freshness',
       'confinement-strict-readiness',
+      'coordination-abandoned-claims',
+      'runner-coordination-orgPolicy-shape',
     ].sort(),
   );
 });

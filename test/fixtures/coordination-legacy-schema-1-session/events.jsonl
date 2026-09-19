@@ -1,0 +1,4 @@
+{"type":"operation-authorized","payload":{"authorizationId":"auth-123","operationId":"produce","nodeId":"node-1","targetActorId":"doer","invocationKey":"inv-123","authorizedBy":{"type":"driver","id":"tester-1"},"reason":"started","grantedContextRefs":[]}}
+{"type":"assignment-created","payload":{"assignmentId":"asg-123","authorizationId":"auth-123","actorId":"doer","runId":"run-1"}}
+{"type":"result-linked","payload":{"assignmentId":"asg-123","runId":"run-1"}}
+{"type":"driver-disposition-recorded","payload":{"targetRef":"asg-123","disposition":"accepted","rationale":"I agree","evidenceRefs":[],"authorizedBy":{"type":"driver","id":"tester-1"}}}

@@ -1,5 +1,9 @@
 # Step 07 - CoordinationSession, AdhocTask, And Planning Boundary
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/step-07-coordination-session-adhoc-task.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Proposal
 Design status: Promoted history / partially superseded
 Implementation: Accepted portions implemented through Step 08; deferred portions remain unaccepted

@@ -1,5 +1,9 @@
 # Assignment, Run, And RunResult Contract
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/contracts/assignment-run-runresult.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Contract
 Design status: Accepted
 Implementation: Partial (RunResult v2 and Dispatch runtime inspection implemented)

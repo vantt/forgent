@@ -1,11 +1,15 @@
 # DAG Request Scheduler For Coordination Runs
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/dag-request-scheduler.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Proposal
 Design status: Discussion
 Implementation: Partial
 Last reviewed: 2026-09-17
 Canonical for: nothing; the accepted contracts remain [FlowDefinition](../contracts/flow-definition.md) and [CoordinationSession](../contracts/coordination-session.md).
-Related: [Step 07 CoordinationSession / AdhocTask](step-07-coordination-session-adhoc-task.md), [Runtime Model](../architecture/runtime-model.md), [Standalone Master Coordination Protocol](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
+Related: [Step 07 CoordinationSession / AdhocTask](step-07-coordination-session-adhoc-task.md), [Runtime Model](../architecture/runtime-model.md), [Standalone Master Coordination Protocol](../../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
 
 ## Problem
 

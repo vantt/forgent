@@ -14,7 +14,7 @@ Related: [Coordination Operating Harness](coordination-operating-harness.md),
 [Thin Launcher Surface Readiness](../verification/step-09-group-thinking-mvp1-mvp2/thin-launcher-surface-readiness.md),
 [Step 09 MVP3-MVP5 verification index](../verification/step-09-mvp3-to-mvp5/index.md),
 [`docs/how-to/run-a-coordination-session.md`](../../../how-to/run-a-coordination-session.md),
-[Step 09 Group Thinking Substrate proposal](../../proposals/step-09-group-thinking-substrate.md)
+[Step 09 Group Thinking Substrate proposal](../../../architect/proposals/step-09-group-thinking-substrate.md)
 
 ## Purpose
 

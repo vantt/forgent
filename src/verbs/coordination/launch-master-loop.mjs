@@ -124,6 +124,7 @@ export function buildMasterLoopRequest(ctx, params = {}) {
     writerId,
     ...(coordinationId !== undefined ? { coordinationId } : {}),
     ...(aggregateBounds !== undefined ? { aggregateBounds } : {}),
+    close: true,
     protocolRef: { id: MASTER_LOOP_PROTOCOL_ID },
     steps: [
       {

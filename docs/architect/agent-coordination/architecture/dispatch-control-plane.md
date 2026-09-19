@@ -1,5 +1,9 @@
 # Dispatch Control Plane
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/dispatch-control-plane.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Architecture
 Design status: Accepted
 Implementation: Partial

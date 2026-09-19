@@ -51,6 +51,7 @@ function agentLedRequest(coordinationId, overrides = {}) {
     kind: 'agent-led',
     objective: `Close cell ${coordinationId} cleanly.`,
     writerId: 'chain-test-driver',
+    close: true,
     coordinationId,
     primaryRole: 'researcher',
     task: {
@@ -84,6 +85,7 @@ async function openClosedCellWithDisposition(tempDir, coordinationId) {
     kind: 'declared-protocol',
     objective: `Close cell ${coordinationId} with a recorded disposition.`,
     writerId: 'chain-test-driver',
+    close: true,
     coordinationId,
     protocolRef: { id: 'core.coordination-protocol.declared-consult' },
     steps: [

@@ -7,8 +7,8 @@ Last reviewed: 2026-09-09
 Canonical for: dispatch responsibility and governance boundaries; the
 DispatchRequest, PolicyPatch, and DispatchPlan contracts; component-internal
 ownership and forbidden dependencies for the Dispatch And Execution Engine.
-Related: [Component Boundary Advisory](../../component-boundary/component-boundary-advisory.md)
-(discussion-only), [Component Authority Boundary Map](../../proposals/component-authority-boundary-map.md)
+Related: [Component Boundary Advisory](../../../architect/component-boundary/component-boundary-advisory.md)
+(discussion-only), [Component Authority Boundary Map](../../../architect/proposals/component-authority-boundary-map.md)
 (draft), [FlowDefinition Contract](../contracts/flow-definition.md),
 [Workflow Stage Operation Contract](../contracts/workflow-stage-operation.md),
 [Assignment/Run/RunResult Contract](../contracts/assignment-run-runresult.md),

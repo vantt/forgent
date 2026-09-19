@@ -169,7 +169,10 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
  * default is provably identical to what already works in this repo's own
  * dogfood loop.
  */
+export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
+
 export const DEFAULT_RUNNER_CONFIG = {
+  coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
   executor: {
     command: 'claude',
     args: [

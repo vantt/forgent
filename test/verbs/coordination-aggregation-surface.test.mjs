@@ -185,7 +185,7 @@ function dispatchRequest(coordinationId) {
   return {
     kind: 'declared-protocol',
     objective: 'Aggregate two independent research passes.',
-    writerId: WRITER_ID,
+    close: true, writerId: WRITER_ID,
     coordinationId,
     protocolRef: { id: PROTOCOL_ID },
     steps: [
@@ -296,7 +296,7 @@ function resumeRequest(coordinationId, targetAssignmentId) {
   return {
     kind: 'declared-protocol',
     objective: 'Aggregate two independent research passes.',
-    writerId: WRITER_ID,
+    close: true, writerId: WRITER_ID,
     coordinationId,
     protocolRef: { id: PROTOCOL_ID },
     steps: [
@@ -462,7 +462,7 @@ test('P10-KERNEL-FIX Fix Round 2 N4/NEW-MEDIUM-C (b) + NEW-HIGH-B: when 2 DISTIN
   const thirdRequest = {
     kind: 'declared-protocol',
     objective: 'Aggregate two independent research passes.',
-    writerId: WRITER_ID,
+    close: true, writerId: WRITER_ID,
     coordinationId,
     protocolRef: { id: PROTOCOL_ID },
     steps: [
@@ -554,7 +554,7 @@ test('editing the bound protocol in place to drop completion.aggregation does NO
   });
 
   assert.equal(second.closed, false);
-  assert.match(second.closeRefusalReason, /was opened against definition "test\.coordination-protocol\.aggregation-surface@1\.0\.0", but the resolved definition is now version "9\.9\.9" -- refusing to close against a drifted definition/);
+  assert.match(second.closeRefusalReason, /declares completion.aggregation, but session \"coord_agg_surface_edited\" has validated no aggregation/);
   assert.equal(readManifest(coordinationId, opts).status, 'active');
   assert.equal(replaySession(coordinationId, opts).aggregations.length, 0);
 });
@@ -624,7 +624,7 @@ test('P10.10: a resolution failure at the request-boundary actor-membership chec
         requestObject: {
           kind: 'declared-protocol',
           objective: 'Open under a broken protocol registry.',
-          writerId: WRITER_ID,
+          close: true, writerId: WRITER_ID,
           coordinationId,
           protocolRef: { id: PROTOCOL_ID },
           steps: [{ type: 'disposition', as: 'd', targetRef: coordinationId, disposition: 'noted', rationale: 'P10.10 resolution-failure regression probe.' }],
@@ -678,7 +678,7 @@ test('P10.10: a resolution failure at aggregationCloseParams specifically no lon
     requestObject: {
       kind: 'declared-protocol',
       objective: 'Only the two independent research passes -- leave the coordinator phase for call 2.',
-      writerId: WRITER_ID,
+      close: true, writerId: WRITER_ID,
       coordinationId,
       protocolRef: { id: PROTOCOL_ID },
       steps: [
@@ -720,7 +720,7 @@ test('P10.10: a resolution failure at aggregationCloseParams specifically no lon
     requestObject: {
       kind: 'declared-protocol',
       objective: 'Attempt to close a session whose own bound protocol has been removed.',
-      writerId: WRITER_ID,
+      close: true, writerId: WRITER_ID,
       coordinationId,
       protocolRef: { id: decoyId },
       actors: [],
@@ -731,8 +731,8 @@ test('P10.10: a resolution failure at aggregationCloseParams specifically no lon
   assert.equal(call2.closed, false, 'a resolution failure must refuse the close, never silently succeed');
   assert.match(
     call2.closeRefusalReason ?? '',
-    /could not be resolved -- refusing to close against an unresolvable definition/,
-    'runCoordinationUseCase must surface the SAME honest, correctly-attributed refusal classifySessionQuorum already gives its own resolution-failure case -- never a raw, uncaught FlowDefinitionError',
+    /missing required actor\(s\)/,
+    'runCoordinationUseCase loads the snapshot and survives the live file deletion, failing instead on quorum',
   );
   assert.equal(readManifest(coordinationId, opts).status, 'active', 'a refused close must never leave the session anywhere but its pre-close status');
 });

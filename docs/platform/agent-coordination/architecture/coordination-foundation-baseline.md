@@ -116,7 +116,7 @@ These Step 07/08 topics remain deferred or unaccepted:
 - richer group-cognitive methods beyond the hardened V1 fixtures.
 
 Deferring these does not mean they are rejected. The active architecture-wide
-intent is tracked in [Architecture Intent](../../architecture-intent.md), the
+intent is tracked in [Architecture Intent](../../../architect/architecture-intent.md), the
 group-thinking substrate expansion is tracked in Step 09, and coding-domain
 adoption is tracked in Step 10.
 

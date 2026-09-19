@@ -72,12 +72,43 @@ import {
 import { validateContributionLineage } from '../deliberation/schema.mjs';
 import { replaySession } from './replay.mjs';
 import { CoordinationError, CONTRIBUTION_REF_PREFIX, SCHEMA_VERSION_2 } from './schema.mjs';
+import { validateFlowDefinition } from '../definitions/schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX, operationDeclaresWorkProduct, resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+
+export function loadDefinitionForSession(manifest, opts) {
+  if (manifest.schemaVersion === '3') {
+    if (!manifest.snapshotRef) {
+      throw new CoordinationError('corrupt-log', `session "${manifest.coordinationId}" (schema 3) is missing snapshotRef in manifest`);
+    }
+    const { sessionDir } = resolveSessionPaths(manifest.coordinationId, opts);
+    const snapshotPath = path.join(sessionDir, 'snapshot.json');
+    if (!fs.existsSync(snapshotPath)) {
+      throw new CoordinationError('corrupt-log', `session "${manifest.coordinationId}" is missing its snapshot file at ${snapshotPath}`);
+    }
+    const content = fs.readFileSync(snapshotPath, 'utf8');
+    const digest = crypto.createHash('sha256').update(content).digest('hex');
+    if (digest !== manifest.snapshotRef.digest) {
+      throw new CoordinationError('corrupt-log', `session "${manifest.coordinationId}" snapshot digest mismatch (expected ${manifest.snapshotRef.digest}, actual ${digest})`);
+    }
+    try {
+      if (Buffer.byteLength(content, 'utf8') > 10 * 1024 * 1024) throw new Error('Snapshot size exceeds 10MB limit');
+      const parsed = JSON.parse(content);
+      const normalized = validateFlowDefinition(parsed);
+      if (normalized.metadata.id !== manifest.definitionRef.id) throw new Error(`Snapshot metadata.id ("${normalized.metadata.id}") does not match manifest.definitionRef.id ("${manifest.definitionRef.id}")`);
+      if (normalized.metadata.version !== manifest.definitionRef.version) throw new Error(`Snapshot metadata.version ("${normalized.metadata.version}") does not match manifest.definitionRef.version ("${manifest.definitionRef.version}")`);
+      if (normalized.spec.profile?.kind !== 'CoordinationProtocol') throw new Error(`Snapshot profile.kind ("${normalized.spec.profile?.kind}") is not CoordinationProtocol`);
+      return normalized;
+    } catch (err) {
+      throw new CoordinationError('corrupt-log', `session "${manifest.coordinationId}" snapshot is invalid: ${err.message}`);
+    }
+  }
+  return loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+}
 import { mergePolicyStack, activationModeOf } from '../definitions/schema.mjs';
 import { planCohort, verifyPlannedAllocationAgainstCurrentConfig } from './cohort-planner.mjs';
 // The Team Cognition evaluator is CALLED, never forked: `classifyAggregationOutcome`
@@ -440,7 +471,7 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
  * @returns {Readonly<object>} The stored manifest
  */
 export function openStandaloneSession(
-  { coordinationId, objective, writerId, parentAssignmentId, primaryRole, aggregateBounds, workRef = null, partialPolicy = null },
+  { coordinationId, objective, writerId, parentAssignmentId, primaryRole, aggregateBounds, workRef = null, partialPolicy = null, schemaVersion },
   opts = {},
 ) {
   assertKnownReadOnlyRole(primaryRole, 'openStandaloneSession');
@@ -453,6 +484,7 @@ export function openStandaloneSession(
       actors: [{ id: PRIMARY_ACTOR_ID, role: primaryRole }],
       aggregateBounds,
       partialPolicy,
+      schemaVersion,
     },
     opts,
   );
@@ -1673,10 +1705,14 @@ function resolveRecheckDischarge(definition, gatingOperationId, originalActorId,
   }
 
   const recheckOperationIds = [];
+  let applicableDischargeOn = null;
   for (const node of definition.spec.graph.nodes) {
     for (const ref of node.operations) {
-      if (ref.actor === originalActorId && ref.rechecks === gatingOperationId && !recheckOperationIds.includes(ref.ref)) {
-        recheckOperationIds.push(ref.ref);
+      const rechecksOp = ref.rechecks?.operation ?? ref.rechecks;
+      if (ref.actor === originalActorId && rechecksOp === gatingOperationId) {
+        if (!recheckOperationIds.includes(ref.ref)) recheckOperationIds.push(ref.ref);
+        const discharge = ref.rechecks?.dischargeOn ?? ref.dischargeOn;
+        if (discharge !== undefined) applicableDischargeOn = discharge;
       }
     }
   }
@@ -1692,10 +1728,14 @@ function resolveRecheckDischarge(definition, gatingOperationId, originalActorId,
   // `result-linked` event) -- fail closed (no discharge) rather than throw.
   if (lastFailedLinkedIndex === -1) return null;
 
-  const hasDisposition = events.some(
+  const dispositionEvent = events.findLast(
     (event, i) => i > lastFailedLinkedIndex && event.type === 'driver-disposition-recorded' && event.payload.targetRef === failedOutcome.assignmentId,
   );
-  if (!hasDisposition) return null;
+  if (!dispositionEvent) return null;
+
+  if (applicableDischargeOn !== null && !applicableDischargeOn.includes(dispositionEvent.payload.disposition)) {
+    return null;
+  }
 
   let lastOutcome = null;
   for (const recheckOperationId of recheckOperationIds) {
@@ -1867,7 +1907,7 @@ export function authorizeSpecialistSlot(
       `authorizeSpecialistSlot: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no slot for an authorization to name`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -1987,7 +2027,7 @@ export function authorizeDeclaredOperation(
       `authorizeDeclaredOperation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no binding for an authorization to name`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -2202,7 +2242,7 @@ function assertWithinTaskDepth(fgosDir, immediateParentId, maxTaskDepth, label) 
  * @returns {Readonly<object>} The stored manifest
  */
 export function openDeclaredProtocolSession(
-  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null, partialPolicy = null },
+  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null, partialPolicy = null, schemaVersion },
   opts = {},
 ) {
   const definition = loadCoordinationProtocol(definitionId, { cwd: opts.cwd, packageRoot: opts.packageRoot });
@@ -2243,8 +2283,9 @@ export function openDeclaredProtocolSession(
       actors,
       aggregateBounds,
       partialPolicy,
+      schemaVersion,
     },
-    opts,
+    { ...opts, resolvedDefinition: definition },
   );
 }
 
@@ -2448,7 +2489,7 @@ export async function dispatchDeclaredOperation(
   assertWithinWallTimeBudget(manifest, 'dispatchDeclaredOperation');
   const { fgosDir } = resolveSessionPaths(coordinationId, opts);
 
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -3024,7 +3065,7 @@ export async function recordConsultDisposition(
       `recordConsultDisposition: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- disposition requires a declared topology to verify the consultant actor is legitimately reachable from the requester`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   const consultantCreatedEvent = events.find(
     (event) => event.type === 'assignment-created' && event.payload.assignmentId === consultantAssignmentId,
   );
@@ -3168,7 +3209,7 @@ export async function dispatchResearchFanOut(
       `dispatchResearchFanOut: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- open it with openDeclaredProtocolSession()`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -3539,8 +3580,9 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
   if (manifest.definitionRef) {
     let resolved = null;
     try {
-      resolved = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
-    } catch {
+      resolved = loadDefinitionForSession(manifest, opts);
+    } catch (err) {
+      if (err.category === "corrupt-log") throw err;
       resolved = null;
     }
     const drifted = resolved !== null && resolved.metadata.version !== manifest.definitionRef.version;
@@ -3779,7 +3821,7 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
  *   inline note); omitting it leaves every path here unchanged.
  * @returns {Readonly<object>} The transitioned manifest.
  */
-export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], aggregationId } = {}, opts = {}) {
+export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], aggregationId, authorizedBy } = {}, opts = {}) {
   // The classification (which actors are complete/missing/failed/late) and
   // the terminal write both happen INSIDE this ONE held lock, from a fresh
   // `replaySession()` taken after acquiring it -- never from an earlier
@@ -3795,6 +3837,15 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], 
     (paths) => {
       const replayed = replaySession(coordinationId, opts);
       const { manifest, events } = replayed;
+
+      if (authorizedBy !== undefined) {
+        if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
+          throw new CoordinationError(
+            'validation',
+            `coordination close: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a session close may only be written under the session's own driver/provenance-root identity`,
+          );
+        }
+      }
 
       // Phase 07 (MVP7): a validated cognitive aggregation used as terminal
       // INPUT. Strictly a NARROWING -- the only thing it can do is refuse a
@@ -3819,7 +3870,7 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], 
         }
         if (validated.outcome !== 'consensus') {
           throw new CoordinationError(
-            'validation',
+            'refusal',
             `closeSessionByQuorum: aggregation "${aggregationId}" of session "${coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
           );
         }
@@ -3844,7 +3895,7 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], 
       const policy = manifest.partialPolicy;
       if (!policy) {
         throw new CoordinationError(
-          'validation',
+          'refusal',
           `closeSessionByQuorum: session "${coordinationId}" is missing required actor(s) [${incompleteActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
         );
       }
@@ -3852,13 +3903,13 @@ export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], 
       const notAllowed = incompleteActorIds.filter((id) => !allowed.has(id));
       if (notAllowed.length > 0) {
         throw new CoordinationError(
-          'validation',
+          'refusal',
           `closeSessionByQuorum: actor(s) [${notAllowed.join(', ')}] are missing/failed/late but not named in session "${coordinationId}"'s declared partialPolicy.allowedOmissions -- refusing an undeclared partial close`,
         );
       }
       if (policy.minimumActors !== undefined && quorum.completed.length < policy.minimumActors) {
         throw new CoordinationError(
-          'validation',
+          'refusal',
           `closeSessionByQuorum: only ${quorum.completed.length} actor(s) completed in session "${coordinationId}", below the declared partialPolicy.minimumActors (${policy.minimumActors})`,
         );
       }
@@ -4033,7 +4084,7 @@ export function validateSessionAggregation(
       `validateSessionAggregation: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared aggregation to validate against`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -4366,7 +4417,7 @@ export function linkSessionContribution(
       `linkSessionContribution: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no declared operation or visibility window for a contribution to be judged against`,
     );
   }
-  const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: opts.cwd, packageRoot: opts.packageRoot });
+  const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
       'validation',
@@ -4602,7 +4653,7 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   const latestOnDisk = findLatestRunResult(fgosDir, assignmentId);
   const latestLinked = lastEventFor(reconciled.events, 'result-linked', assignmentId);
   if (latestOnDisk && (!latestLinked || latestLinked.payload.runId !== latestOnDisk.runId)) {
-    if (reconciled.manifest.schemaVersion === SCHEMA_VERSION_2) {
+    if ((reconciled.manifest.schemaVersion === SCHEMA_VERSION_2 || reconciled.manifest.schemaVersion === "3")) {
       const pending = getPendingRetryDeclaration(coordinationId, assignmentId, opts);
       if (pending && pending.nextRunId === latestOnDisk.runId) {
         markRunRetryFulfilled(coordinationId, { assignmentId, retryId: pending.retryId }, opts);
@@ -4637,7 +4688,7 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   // fenced through to the actual Run admission below so the declared
   // `nextRunId` is exactly what gets published -- never independently
   // recomputed.
-  const isSchema2 = reconciled.manifest.schemaVersion === SCHEMA_VERSION_2;
+  const isSchema2 = (reconciled.manifest.schemaVersion === SCHEMA_VERSION_2 || reconciled.manifest.schemaVersion === "3");
   const previousRunId = latestLinked?.payload?.runId;
   const pending = isSchema2 ? getPendingRetryDeclaration(coordinationId, assignmentId, opts) : null;
   const retryId = opts.retryId ?? pending?.retryId ?? (isSchema2 ? crypto.randomUUID() : undefined);

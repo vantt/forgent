@@ -1,5 +1,9 @@
 # Step 01 - Team Dispatch V1 Rollout
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Roadmap
 Design status: Superseded
 Superseded by: `../../architecture/` and `../../contracts/`

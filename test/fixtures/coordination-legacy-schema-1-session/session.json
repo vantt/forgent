@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "1",
+  "coordinationId": "legacy-session-123",
+  "objective": "A legacy session test",
+  "status": "active",
+  "createdAt": "2024-01-01T12:00:00Z",
+  "provenanceRoot": {
+    "writerId": "tester-1"
+  },
+  "definitionRef": {
+    "id": "legacy-protocol",
+    "version": "1.0.0"
+  },
+  "workRef": null,
+  "actors": [
+    {
+      "id": "doer",
+      "role": "doer"
+    }
+  ],
+  "aggregateBounds": {
+    "wallTimeMs": 10800000,
+    "maxAssignments": 20,
+    "maxConcurrency": 4,
+    "maxRounds": 10,
+    "maxTaskDepth": 3
+  },
+  "partialPolicy": null,
+  "assignmentRefs": ["asg-123"],
+  "completedAt": null
+}

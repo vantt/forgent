@@ -5,7 +5,7 @@ Design status: Discussion
 Implementation: Partial
 Last reviewed: 2026-09-17
 Canonical for: nothing; the accepted contracts remain [FlowDefinition](../contracts/flow-definition.md) and [CoordinationSession](../contracts/coordination-session.md).
-Related: [Step 07 CoordinationSession / AdhocTask](step-07-coordination-session-adhoc-task.md), [Runtime Model](../architecture/runtime-model.md), [Standalone Master Coordination Protocol](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
+Related: [Step 07 CoordinationSession / AdhocTask](step-07-coordination-session-adhoc-task.md), [Runtime Model](../architecture/runtime-model.md), [Standalone Master Coordination Protocol](../../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
 
 ## Problem
 

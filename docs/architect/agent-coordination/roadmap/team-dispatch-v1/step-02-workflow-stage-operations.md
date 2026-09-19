@@ -1,5 +1,9 @@
 # Step 02 - Workflow Stage Operations
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-02-workflow-stage-operations.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Roadmap
 Design status: Superseded
 Superseded by: `../../contracts/workflow-stage-operation.md`

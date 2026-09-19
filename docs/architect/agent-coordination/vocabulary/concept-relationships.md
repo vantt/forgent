@@ -1,5 +1,9 @@
 # Agent Coordination Concept Relationships
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/vocabulary/concept-relationships.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Vocabulary
 Design status: Accepted
 Implementation: Partial

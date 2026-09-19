@@ -6,6 +6,10 @@ coverage: proposed
 
 # Coordination Recovery Planning And Session Continuation
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/coordination-continuation-recovery.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Design status: PROPOSED detailed contract. Implementation: not implemented.
 Read [Runtime Recovery Design](runtime-recovery-design.md) for identity, ownership,
 versioning and proof. This file owns next-action planning and legal cross-session

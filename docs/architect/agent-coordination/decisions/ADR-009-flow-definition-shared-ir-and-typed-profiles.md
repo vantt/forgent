@@ -1,5 +1,9 @@
 # ADR-009: Versioned FlowDefinition As Shared Graph/Operation/Policy IR With Typed Profiles
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented (`src/runner/definitions/{schema,workflow-adapter,protocol-loader}.mjs`,

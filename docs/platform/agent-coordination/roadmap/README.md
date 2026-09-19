@@ -6,6 +6,12 @@ Implementation: Partial
 Last reviewed: 2026-09-01
 Canonical for: implementation sequence only
 
+## Migration Status
+
+This target directory preserves rollout and implementation sequencing from
+`docs/architect/agent-coordination/roadmap/`. It remains non-normative: a
+roadmap cannot establish current architecture, contracts, or decisions.
+
 ## Tracks
 
 - [Team Dispatch V1](team-dispatch-v1/README.md) records Steps 00-06 from baseline
@@ -15,9 +21,9 @@ Canonical for: implementation sequence only
   [Coordination Foundation Baseline](../architecture/coordination-foundation-baseline.md),
   with exact schemas in `contracts/`, rollout history in this roadmap, and
   evidence in `verification/`.
-- [Step 09](../../proposals/step-09-group-thinking-substrate.md)
+- [Step 09](../../../architect/proposals/step-09-group-thinking-substrate.md)
   (group-thinking substrate) and
-  [Step 10](../../proposals/step-10-coding-domain-adoption.md)
+  [Step 10](../../../architect/proposals/step-10-coding-domain-adoption.md)
   (coding-domain adoption) are discussion drafts. Step 10's mutating half
   remains gated on coding-domain adoption proof and ADR-010 §5's
   work-isolation boundary.

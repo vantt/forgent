@@ -1,5 +1,9 @@
 # Agent Coordination Documentation
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/README.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Portal
 Design status: Accepted
 Implementation: Partial

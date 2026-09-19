@@ -1,5 +1,9 @@
 # Dispatch Control Plane Redesign
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Proposal
 Design status: Proposed
 Implementation: Partial

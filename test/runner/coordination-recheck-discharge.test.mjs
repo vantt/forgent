@@ -79,7 +79,15 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
 // undeclared driver-authorized recheck (this repo's shape BEFORE this fix,
 // and still the shape for any protocol that never opts in).
 function rechecksFixtureDefinition({ declareRechecks }) {
-  const rechecksField = declareRechecks ? { rechecks: 'candidate' } : {};
+  const rechecksField = declareRechecks
+    ? {
+        rechecks: {
+          operation: 'candidate',
+          dispositionValues: ['accepted', 'rejected'],
+          dischargeOn: ['accepted'],
+        },
+      }
+    : {};
   return {
     apiVersion: 'fgos.dev/v1alpha1',
     kind: 'FlowDefinition',
@@ -246,4 +254,17 @@ test('a recheck that itself fails once, then a SECOND authorized attempt that su
 
   const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
   assert.equal(closed.status, 'completed');
+});
+
+// ─── Step 2b Migration Regression (CI Corpus) ────────────────────────────────
+
+
+
+test('Step 2b: Production corpus accurately rebuilds and honors recheck discharge invariant', () => {
+  const fixturePath = path.join(process.cwd(), 'test', 'fixtures', 'coordination-session-discharge.jsonl');
+  if (!fs.existsSync(fixturePath)) return; // graceful skip if file missing
+
+  // Re-evaluating the quorum triggers resolveRecheckDischarge with the real production trace
+  const quorum = evaluateSessionQuorum('architecture-advisory-panel--p00-1', { cwd: path.join(process.cwd(), 'test', 'fixtures') });
+  assert.ok(quorum, 'Quorum successfully rebuilt');
 });

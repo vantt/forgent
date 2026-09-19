@@ -1,5 +1,9 @@
 # Team Communication Protocol V1
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/proposals/team-communication-protocol-v1.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Proposal
 Design status: Proposed
 Implementation: Partial

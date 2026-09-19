@@ -6,6 +6,13 @@ Implementation: Active
 Last reviewed: 2026-08-31
 Canonical for: engineering bootstrap and manual fallback procedures only
 
+## Migration Status
+
+This target directory preserves operational and bootstrap material from
+`docs/architect/agent-coordination/playbooks/`. It is navigationally promoted,
+but remains non-normative: contracts, architecture, decisions, and runtime
+code own their respective claims.
+
 ## Playbooks
 
 - [Coordination Operating Harness](coordination-operating-harness.md) defines

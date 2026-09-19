@@ -1,5 +1,9 @@
 # Architecture Advisory Evaluation Rubric
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/playbooks/architecture-advisory-evaluation-rubric.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Playbook
 Design status: N/A
 Implementation: Active (manual)

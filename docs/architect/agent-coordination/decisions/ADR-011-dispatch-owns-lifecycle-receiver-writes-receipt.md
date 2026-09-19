@@ -1,5 +1,9 @@
 # ADR-011: Dispatch Owns Lifecycle, Herdr Is Transport, The Receiver Writes The Receipt
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-011-dispatch-owns-lifecycle-receiver-writes-receipt.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Partial

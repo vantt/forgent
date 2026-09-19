@@ -1,5 +1,9 @@
 # ADR-003: Separate Assignment, Run, And RunResult
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/decisions/ADR-003-assignment-run-runresult-separation.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: ADR
 Design status: Accepted
 Implementation: Implemented

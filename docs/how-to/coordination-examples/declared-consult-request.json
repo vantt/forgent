@@ -1,6 +1,7 @@
 {
   "kind": "declared-protocol",
   "objective": "Get a reviewer's second opinion on a reported version string before trusting it.",
+  "close": true,
   "writerId": "coordination-example-declared-consult",
   "protocolRef": { "id": "core.coordination-protocol.declared-consult" },
   "steps": [

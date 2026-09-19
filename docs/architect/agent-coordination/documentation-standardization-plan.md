@@ -5,7 +5,7 @@ Document type: Migration plan
 Audience: Human reviewer, architect, maintainer, documentation agent
 Purpose: Plan the migration of agent-coordination docs into the new platform documentation system without losing accepted intent, contracts, ADRs, or proof trees
 Design status: Draft
-Implementation: Not started
+Implementation: Complete; Phase 0-7 completed, with legacy proof artifacts retained as link-only evidence
 Provenance: Created from documentation-system discussion and scan of existing agent-coordination docs
 Writer type: Human + agent coauthor
 Canonical for: Planning the agent-coordination documentation migration only

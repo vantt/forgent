@@ -1,5 +1,9 @@
 # MVP6+ Dogfood Handoff
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/playbooks/mvp6-dogfood-handoff.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Playbook
 Design status: N/A (records a real, already-proven runtime path; invents nothing)
 Implementation: Active for MVP3-MVP5 (produce/review/red-team/revise/recheck/close, resume); visibility windows/aggregation rules/deliberation memory/dynamic specialist pull-in are NOT implemented (see "Future Expansion" below)

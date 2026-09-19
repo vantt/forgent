@@ -173,7 +173,9 @@ test('one live `fgos coordination run` drives the whole Master Coordination loop
   writeFakeExecutorConfig(cwd);
   const workEventsBefore = eventLines(cwd);
   const workStateBefore = stateView(cwd);
-  const reqPath = writeRequest(cwd, 'master-loop.json', masterLoopRequest());
+  const req = masterLoopRequest();
+  req.close = true;
+  const reqPath = writeRequest(cwd, 'master-loop.json', req);
 
   const result = run(cwd, ['coordination', 'run', '--file', reqPath]);
   assert.equal(result.status, 0, result.stderr);
@@ -336,7 +338,9 @@ test('R4: a real SECOND `fgos coordination run` invocation against the SAME coor
   assert.equal(manifestAfterFirst.status, 'active', 'the session must genuinely still be active when Call 2 starts -- not already closed');
 
   const secondSteps = substituteAcrossCallBoundary(secondStepsTemplate, labelToAssignmentId);
-  const secondPath = writeRequest(cwd, 'master-loop-part2.json', { ...full, steps: secondSteps });
+  const secondReq = { ...full, steps: secondSteps };
+  secondReq.close = true;
+  const secondPath = writeRequest(cwd, 'master-loop-part2.json', secondReq);
   const secondResult = run(cwd, ['coordination', 'run', '--file', secondPath]);
   assert.equal(secondResult.status, 0, secondResult.stderr);
   const secondData = envelopeData(secondResult.stdout);
@@ -409,7 +413,9 @@ test('R4: a real SECOND `fgos coordination run` invocation against the SAME coor
 test('R5 (resume-specific): once a session reaches a terminal status, a further CLI invocation naming the SAME coordinationId is refused -- terminal statuses stay absorbing across the resume door too, not just at open', () => {
   const cwd = tmpCwd();
   writeFakeExecutorConfig(cwd);
-  const reqPath = writeRequest(cwd, 'master-loop.json', masterLoopRequest());
+  const req = masterLoopRequest();
+  req.close = true;
+  const reqPath = writeRequest(cwd, 'master-loop.json', req);
 
   assert.equal(run(cwd, ['coordination', 'run', '--file', reqPath]).status, 0);
   const sessionDir = path.join(cwd, '.fgos', 'coordination', 'sessions', COORDINATION_ID);

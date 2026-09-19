@@ -59,12 +59,14 @@ import {
   authorizeDeclaredOperation,
   linkSessionContribution,
   evaluateSessionQuorum,
-  closeSessionByQuorum,
   deriveSessionPhase,
+  closeSessionByQuorum,
 } from '../../runner/coordination/session-engine.mjs';
 import { recordDriverDisposition, recordHumanTurn, readSessionEvents } from '../../runner/coordination/store.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
+import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
 import { validateCoordinationRequest } from './schema.mjs';
+import { recordCoordinationSchemaFault } from './schema-fault-log.mjs';
 
 function readRequestFile(requestPath) {
   let raw;
@@ -269,25 +271,25 @@ function aggregationCloseParams(coordinationId, engineOpts) {
   // version already does two lines down, instead of crashing.
   let definition;
   try {
-    definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: engineOpts.cwd, packageRoot: engineOpts.packageRoot });
+    definition = loadDefinitionForSession(manifest, { cwd: engineOpts.cwd, packageRoot: engineOpts.packageRoot });
   } catch (err) {
     const wrapped = new CoordinationError(
-      'validation',
+      'refusal',
       `coordination run: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition: ${err.message}`,
     );
     wrapped.cause = err;
     throw wrapped;
   }
-  if (definition.metadata.version !== manifest.definitionRef.version) {
+  if (manifest.schemaVersion === '1' && definition.metadata.version !== manifest.definitionRef.version) {
     throw new CoordinationError(
-      'validation',
+      'refusal',
       `coordination run: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to close against a drifted definition`,
     );
   }
   if (definition?.spec?.profile?.completion?.aggregation === undefined) return {};
   if (aggregations.length === 0) {
     throw new CoordinationError(
-      'validation',
+      'refusal',
       `coordination run: protocol "${definition.metadata.id}" declares completion.aggregation, but session "${coordinationId}" has validated no aggregation -- refusing to close a declared-aggregation protocol on quorum alone (validate one through validateSessionAggregation, then resume this session to close it)`,
     );
   }
@@ -340,8 +342,16 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     throw new StoreError('validation', 'coordination run: exactly one of requestPath or requestObject must be given');
   }
   const raw = requestObject !== undefined ? requestObject : readRequestFile(requestPath);
-  const request = validateCoordinationRequest(raw, { executor: cliExecutor, model: cliModel, tier: cliTier });
-  assertModelSupportedForKind(request.kind, { globalModel: cliModel, actors: request.actors });
+  let request;
+  try {
+    request = validateCoordinationRequest(raw, { executor: cliExecutor, model: cliModel, tier: cliTier });
+    assertModelSupportedForKind(request.kind, { globalModel: cliModel, actors: request.actors });
+  } catch (err) {
+    if (err.category === 'validation') {
+      recordCoordinationSchemaFault(ctx.cwd, err, raw);
+    }
+    throw err;
+  }
 
   const engineOpts = {
     cwd: ctx.cwd, repoRoot: ctx.repoRoot, packageRoot: ctx.packageRoot, runnerConfig: ctx.runnerConfig, timeoutMs: ctx.timeoutMs,
@@ -368,7 +378,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
   if (request.kind === 'agent-led') {
     manifest =
       findExistingManifest(request.coordinationId, request.writerId, engineOpts) ??
-      openStandaloneSession({ ...openParams, primaryRole: request.primaryRole }, engineOpts);
+      openStandaloneSession({ ...openParams, schemaVersion: "3", primaryRole: request.primaryRole }, engineOpts);
     const primaryActor = findActor(request.actors, 'primary');
     const cliOverride = {
       ...actorPolicyFields(primaryActor, { globalExecutor: cliExecutor, globalTier: cliTier }),
@@ -405,16 +415,30 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     // never a soft close-time refusal (unlike `aggregationCloseParams`,
     // this runs before any step dispatches, so there is nothing yet to
     // "refuse to close").
+    manifest = findExistingManifest(request.coordinationId, request.writerId, engineOpts);
     let definition;
-    try {
-      definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
-    } catch (err) {
+    if (manifest) {
+      // Resume path: use the snapshot loader to avoid live YAML drift
+      try {
+        definition = loadDefinitionForSession(manifest, engineOpts);
+      } catch (err) {
+        if (err.category === 'corrupt-log') throw err; // High 10: preserve corrupt-log
+        const wrapped = new StoreError('validation', `coordination request: protocol "${request.protocolRef.id}" could not be resolved from session snapshot -- refusing the request: ${err.message}`);
+        wrapped.cause = err;
+        throw wrapped;
+      }
+    } else {
+      // Open path: use live YAML
+      try {
+        definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+      } catch (err) {
       const wrapped = new StoreError(
         'validation',
         `coordination request: protocol "${request.protocolRef.id}" could not be resolved -- refusing the request rather than crashing with an unresolvable-definition error: ${err.message}`,
       );
       wrapped.cause = err;
       throw wrapped;
+    }
     }
     const declaredActorIds = new Set((definition.spec.actors ?? []).map((a) => a.id));
     for (const actorEntry of request.actors) {
@@ -443,9 +467,9 @@ export async function runCoordinationUseCase(ctx, options = {}) {
         );
       }
     }
-    manifest =
-      findExistingManifest(request.coordinationId, request.writerId, engineOpts) ??
-      openDeclaredProtocolSession({ ...openParams, definitionId: request.protocolRef.id }, engineOpts);
+    if (!manifest) {
+      manifest = openDeclaredProtocolSession({ ...openParams, schemaVersion: "3", definitionId: request.protocolRef.id }, engineOpts);
+    }
 
     // The driver whose authority an "authorize"/"disposition" step writes
     // under. There is exactly one legal value: the engine pins both events
@@ -756,20 +780,26 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     }
   }
 
-  const quorumBeforeClose = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;
-  try {
-    closeSessionByQuorum(manifest.coordinationId, aggregationCloseParams(manifest.coordinationId, engineOpts), engineOpts);
-    closed = true;
-  } catch (err) {
-    if (err instanceof CoordinationError) {
-      closeRefusalReason = err.message;
-    } else {
-      throw err;
+  const explicitCloseRequested = request.close === true || (request.steps ?? []).some((s) => s.type === 'close');
+
+  if (explicitCloseRequested) {
+    try {
+      const closeParams = aggregationCloseParams(manifest.coordinationId, engineOpts);
+      closeParams.authorizedBy = request.writerId ? { type: 'operator', id: request.writerId } : undefined;
+      closeSessionByQuorum(manifest.coordinationId, closeParams, engineOpts);
+      closed = true;
+    } catch (err) {
+      if (err instanceof CoordinationError && err.category === 'refusal') {
+        closeRefusalReason = err.message;
+      } else {
+        throw err;
+      }
     }
   }
-  const finalQuorum = closed ? evaluateSessionQuorum(manifest.coordinationId, engineOpts) : quorumBeforeClose;
+
+  const finalQuorum = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   const phase = deriveSessionPhase(manifest.coordinationId, engineOpts);
 
   return {
@@ -779,7 +809,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     objective: manifest.objective,
     status: phase,
     closed,
-    closeAttempted: true,
+    ...(request.close ? { closeAttempted: true } : {}),
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     ...(fanOutFailure !== null ? { fanOutFailure } : {}),
     quorum: finalQuorum,

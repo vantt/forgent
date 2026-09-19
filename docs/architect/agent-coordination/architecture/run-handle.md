@@ -6,6 +6,10 @@ coverage: substantially-implemented
 
 # RunHandle And Recovery Material
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/run-handle.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Design status: PROPOSED detailed contract; the runtime-recovery track
 (closed 2026-09-14) implemented the recoverable-observation/control
 contract this file proposes — `run-lock.mjs` (control-epoch fencing),

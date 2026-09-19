@@ -1,5 +1,9 @@
 # Coordination Foundation Baseline
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/architecture/coordination-foundation-baseline.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Architecture
 Design status: Accepted
 Implementation: Implemented for Steps 00-08 delivered surface; deferred items named below

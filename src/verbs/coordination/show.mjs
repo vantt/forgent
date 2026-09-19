@@ -42,7 +42,7 @@ import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX } fro
 import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
-import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
+import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
 
 // Same four terminal event kinds `replay.mjs`'s own (unexported)
 // `TERMINAL_EVENT_TYPES` uses (`transitionSessionStatus`'s TERMINAL_EVENT_TYPE
@@ -311,11 +311,12 @@ export function showCoordinationUseCase(ctx, { id }) {
     // FlowDefinition to check" from "checked, nothing pending".
     if (manifest.definitionRef) {
       try {
-        const definition = loadCoordinationProtocol(manifest.definitionRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
+        const definition = loadDefinitionForSession(manifest, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
         const declaredBindings = collectDriverAuthorizedBindings(definition);
         const authorizedKeys = new Set(authorizations.map((a) => `${a.nodeId}::${a.operationId}`));
         pendingDriverAuthorizations = declaredBindings.filter((b) => !authorizedKeys.has(`${b.nodeId}::${b.operationId}`));
-      } catch {
+      } catch (err) {
+        if (err.category === 'corrupt-log') throw err;
         // Definition file removed/renamed since the session opened, or
         // registered at a different version -- degrade this one field
         // rather than crash the rest of `show`.

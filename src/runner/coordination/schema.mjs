@@ -29,7 +29,16 @@ export const SCHEMA_VERSION = '1';
 // caller specifies none, so no pre-existing caller changes behavior merely
 // because this constant now has a sibling.
 export const SCHEMA_VERSION_2 = '2';
-export const SUPPORTED_SCHEMA_VERSIONS = new Set([SCHEMA_VERSION, SCHEMA_VERSION_2]);
+
+// Phase Architecture Rollout: Idempotency, Immutable Snapshot, and Semantic Upgrades
+// A session opts into schema-3 by being OPENED with `schemaVersion: SCHEMA_VERSION_3`.
+// Schema-3 mandates:
+// 1. Snapshot Canonical Definition (`snapshotRef`, `definitionDigest`).
+// 2. Exact command idempotency (`commandId` in dispositions).
+// 3. Amendment vs Revision separation.
+// Legacy sessions (schema-1 and schema-2) keep their existing path (no snapshot, full-payload dedupe).
+export const SCHEMA_VERSION_3 = '3';
+export const SUPPORTED_SCHEMA_VERSIONS = new Set([SCHEMA_VERSION, SCHEMA_VERSION_2, SCHEMA_VERSION_3]);
 
 export const STATUS_VALUES = new Set(['active', 'completed', 'partial', 'failed', 'cancelled']);
 
@@ -45,6 +54,7 @@ const MANIFEST_FIELDS = new Set([
   'createdAt',
   'provenanceRoot',
   'definitionRef',
+  'snapshotRef',
   'workRef',
   'actors',
   'aggregateBounds',
@@ -238,6 +248,11 @@ export function validateManifest(manifest) {
     if (!isNonEmptyString(ref.version)) fail('validation', 'manifest.definitionRef.version must be a non-empty string');
   }
 
+  if (manifest.schemaVersion === SCHEMA_VERSION_3 && manifest.definitionRef !== null && manifest.definitionRef !== undefined) {
+    if (!isPlainObject(manifest.snapshotRef)) fail('validation', 'manifest.snapshotRef must be an object for Schema 3 declared protocols');
+    if (!isNonEmptyString(manifest.snapshotRef?.digest) || !/^[a-f0-9]{64}$/.test(manifest.snapshotRef.digest)) fail('validation', 'manifest.snapshotRef.digest must be a 64-character hex string');
+    assertOnlyAcceptedFields(manifest.snapshotRef, new Set(['digest']), 'manifest.snapshotRef');
+  }
   if (manifest.workRef !== undefined && manifest.workRef !== null && !isNonEmptyString(manifest.workRef)) {
     fail('validation', 'manifest.workRef must be a non-empty string or null');
   }
@@ -297,7 +312,8 @@ const EVENT_SPECS = {
   // `{assignmentId, actorId?}` -- these fields are accepted, never required.
   'assignment-created': {
     required: ['assignmentId'],
-    accepted: ['assignmentId', 'actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'contextGrant'],
+    // 'runId' is accepted for legacy schema-1 backwards compatibility
+    accepted: ['assignmentId', 'actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'contextGrant', 'runId'],
   },
   // A driver authorizes ONE `activation.mode: driver-authorized` node-
   // operation binding for dispatch. The binding is identified by the full

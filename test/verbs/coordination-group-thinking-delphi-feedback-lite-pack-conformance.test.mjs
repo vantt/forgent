@@ -139,6 +139,7 @@ function baseRequest({ coordinationId, writerId, steps }) {
     writerId,
     coordinationId,
     protocolRef: { id: DELPHI_ID },
+    close: true,
     steps,
   };
 }

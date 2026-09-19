@@ -206,7 +206,7 @@ time.
 ## Driver-Authorized Optional Operations And Recheck (MVP1/MVP2, Step 09)
 
 Accepted contract text, scoped to MVP1/MVP2 of the Step 09 group-thinking
-substrate ([Step 09 Group Thinking Substrate](../../proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
+substrate ([Step 09 Group Thinking Substrate](../../../architect/proposals/step-09-group-thinking-substrate.md#7-mvp2---driver-authorization-primitive)
 remains a Discussion-status document; only the primitives below are promoted
 out of it). This section does NOT accept deliberation memory, visibility
 windows, richer aggregation modes, or `addSessionEdge` (Step 09 MVP6-9)

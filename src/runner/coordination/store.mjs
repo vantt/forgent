@@ -216,6 +216,28 @@ function writeManifestRaw(manifestPath, manifest) {
  * @param {object} [opts] Workspace options ({ cwd, repoRoot })
  * @returns {Readonly<object>} The stored manifest
  */
+
+function buildEffectiveDefinitionSnapshot(rawDefinition, orgDischargeOn) {
+  const definition = JSON.parse(JSON.stringify(rawDefinition));
+  if (Array.isArray(orgDischargeOn)) {
+    for (const node of definition.spec.graph.nodes) {
+      for (const op of node.operations) {
+        if (op.rechecks) {
+          const protocolDischargeOn = op.rechecks.dischargeOn || ['accepted'];
+          const intersection = protocolDischargeOn.filter((d) => orgDischargeOn.includes(d));
+          if (intersection.length === 0) {
+            throw new CoordinationError('validation', `openSession: orgPolicy.dischargeOn (${JSON.stringify(orgDischargeOn)}) has no intersection with protocol's dischargeOn (${JSON.stringify(protocolDischargeOn)}) for operation "${op.ref}" -- refusing to open session with empty effectiveDischargeOn`);
+          }
+          op.rechecks.dischargeOn = intersection;
+        }
+      }
+    }
+  }
+  const snapshotStr = JSON.stringify(definition, null, 2);
+  const digest = createHash('sha256').update(snapshotStr).digest('hex');
+  return { snapshotStr, digest };
+}
+
 export function openSession(
   { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null, schemaVersion = SCHEMA_VERSION },
   opts = {},
@@ -229,77 +251,134 @@ export function openSession(
   const { sessionsDir } = resolveCoordinationPaths(opts);
   fs.mkdirSync(sessionsDir, { recursive: true });
 
-  let id = coordinationId;
+  const stagingDir = path.join(sessionsDir, `.staging-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
+  fs.mkdirSync(stagingDir, { recursive: true });
+
+  let claimDir;
   let sessionDir;
-  if (id) {
-    // R6 path-traversal guard (see assertSafeCoordinationId's own doc
-    // comment, below `resolveSessionPaths`): this explicit-id branch builds
-    // `sessionDir` directly, before any OTHER store.mjs door's own
-    // `resolveSessionPaths` call would ever see this id -- validated here
-    // too so a caller-supplied `coordinationId` can never escape
-    // `sessionsDir` on the very FIRST write.
-    assertSafeCoordinationId(id);
-    sessionDir = path.join(sessionsDir, id);
-    try {
-      fs.mkdirSync(sessionDir);
-    } catch (err) {
-      if (err.code === 'EEXIST') throw new CoordinationError('validation', `coordination session "${id}" already exists`);
-      throw err;
-    }
-  } else {
-    // Auto-generated id: claim atomically with a bounded retry, the same
-    // exclusive-create-and-retry-on-collision shape mission-lite's own
-    // MAX_ASSIGNMENT_CLAIM_ATTEMPTS loop uses for assignmentId.
-    let claimed = false;
-    for (let attempt = 0; attempt < MAX_SESSION_ID_CLAIM_ATTEMPTS && !claimed; attempt += 1) {
-      id = `coord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-      sessionDir = path.join(sessionsDir, id);
-      try {
-        fs.mkdirSync(sessionDir);
-        claimed = true;
-      } catch (err) {
-        if (err.code !== 'EEXIST') throw err;
+  let id = coordinationId;
+  let token;
+  try {
+    const resolvedActors = Array.isArray(actors)
+      ? actors.map((actor) => ({
+          id: actor.id,
+          role: actor.role,
+          ...(actor.persona !== undefined ? { persona: actor.persona } : {}),
+          ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
+        }))
+      : undefined;
+
+    let snapshotRef = undefined;
+    if (schemaVersion === "3" && definitionRef) {
+      let rawDefinition;
+      if (opts.resolvedDefinition) {
+        rawDefinition = opts.resolvedDefinition;
+      } else if (typeof definitionRef.id === 'string') {
+        rawDefinition = loadCoordinationProtocol(definitionRef.id, opts);
+      }
+
+      if (rawDefinition) {
+        const orgDischargeOn = opts.runnerConfig?.coordination?.orgPolicy?.dischargeOn;
+        const { snapshotStr, digest } = buildEffectiveDefinitionSnapshot(rawDefinition, orgDischargeOn);
+
+        const snapshotPath = path.join(stagingDir, 'snapshot.json');
+        fs.writeFileSync(snapshotPath, snapshotStr);
+        snapshotRef = { digest };
       }
     }
-    if (!claimed) {
-      throw new CoordinationError('validation', `openSession could not claim a unique coordinationId after ${MAX_SESSION_ID_CLAIM_ATTEMPTS} attempts`);
+
+    token = randomUUID();
+  let processStartTime = Date.now();
+  try { processStartTime = fs.statSync('/proc/' + process.pid).mtimeMs; } catch(e) {}
+
+    if (id) {
+      assertSafeCoordinationId(id);
+      sessionDir = path.join(sessionsDir, id);
+      claimDir = sessionDir + '.claim';
+      try {
+        fs.mkdirSync(claimDir);
+      } catch(err) {
+        if (err.code === 'EEXIST') throw new CoordinationError('validation', `coordination session "${id}" already exists (claim held)`);
+        throw err;
+      }
+      try {
+        const claimPath = path.join(claimDir, 'claim.json');
+        fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
+        const fd = fs.openSync(claimPath, 'r');
+        fs.fsyncSync(fd);
+        fs.closeSync(fd);
+        const fdDir = fs.openSync(claimDir, 'r');
+        fs.fsyncSync(fdDir);
+        fs.closeSync(fdDir);
+      } catch (err) {
+        fs.rmSync(claimDir, { recursive: true, force: true });
+        throw err;
+      }
+      if (fs.existsSync(sessionDir)) {
+        throw new CoordinationError('validation', `coordination session "${id}" already exists`);
+      }
+    } else {
+      let claimed = false;
+      for (let attempt = 0; attempt < MAX_SESSION_ID_CLAIM_ATTEMPTS && !claimed; attempt += 1) {
+        id = `coord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+        sessionDir = path.join(sessionsDir, id);
+        claimDir = sessionDir + '.claim';
+        try {
+          fs.mkdirSync(claimDir);
+        } catch (e) {
+          if (e.code !== 'EEXIST') throw e;
+          continue;
+        }
+        try {
+          const claimPath = path.join(claimDir, 'claim.json');
+          fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
+          const fd = fs.openSync(claimPath, 'r');
+          fs.fsyncSync(fd);
+          fs.closeSync(fd);
+          const fdDir = fs.openSync(claimDir, 'r');
+          fs.fsyncSync(fdDir);
+          fs.closeSync(fdDir);
+
+          if (!fs.existsSync(sessionDir)) {
+            claimed = true;
+          } else {
+            fs.rmSync(claimDir, { recursive: true, force: true });
+          }
+        } catch(e) {
+          fs.rmSync(claimDir, { recursive: true, force: true });
+          throw e;
+        }
+      }
+      if (!claimed) throw new CoordinationError('validation', `openSession could not claim a unique coordinationId after ${MAX_SESSION_ID_CLAIM_ATTEMPTS} attempts`);
     }
-  }
 
-  const resolvedActors = Array.isArray(actors)
-    ? actors.map((actor) => ({
-        id: actor.id,
-        role: actor.role,
-        ...(actor.persona !== undefined ? { persona: actor.persona } : {}),
-        ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
-      }))
-    : undefined;
+    const manifest = {
+      schemaVersion,
+      coordinationId: id,
+      objective,
+      status: 'active',
+      createdAt: new Date().toISOString(),
+      provenanceRoot,
+      definitionRef,
+      ...(snapshotRef ? { snapshotRef } : {}),
+      workRef,
+      ...(resolvedActors ? { actors: resolvedActors } : {}),
+      aggregateBounds: applyAggregateBoundDefaults(aggregateBounds),
+      partialPolicy,
+      assignmentRefs: [],
+      completedAt: null,
+    };
 
-  const manifest = {
-    schemaVersion,
-    coordinationId: id,
-    objective,
-    status: 'active',
-    createdAt: new Date().toISOString(),
-    provenanceRoot,
-    definitionRef,
-    workRef,
-    ...(resolvedActors ? { actors: resolvedActors } : {}),
-    aggregateBounds: applyAggregateBoundDefaults(aggregateBounds),
-    assignmentRefs: [],
-    completedAt: null,
-    partialPolicy,
-  };
-  validateManifest(manifest);
+    validateManifest(manifest);
+    fs.writeFileSync(path.join(stagingDir, 'session.json'), JSON.stringify(manifest, null, 2) + '\n');
 
-  const manifestPath = path.join(sessionDir, 'session.json');
-  writeManifestRaw(manifestPath, manifest);
+    const eventsPath = path.join(stagingDir, 'events.jsonl');
+    fs.writeFileSync(eventsPath, '');
 
-  const eventsPath = path.join(sessionDir, 'events.jsonl');
-  const openedPayload = { coordinationId: id, provenanceRoot };
-  validateEventPayload('session-opened', openedPayload);
-  withEventsLock(eventsPath, () => {
-    appendSessionEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, sessionDir, manifest);
+    const openedPayload = { coordinationId: id, provenanceRoot };
+    validateEventPayload('session-opened', openedPayload);
+    appendSessionEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, stagingDir, manifest);
+
     if (resolvedActors) {
       for (const actor of resolvedActors) {
         const payload = {
@@ -309,12 +388,57 @@ export function openSession(
           ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
         };
         validateEventPayload('actor-bound', payload);
-        appendSessionEventLocked(eventsPath, { type: 'actor-bound', payload }, sessionDir, manifest);
+        appendSessionEventLocked(eventsPath, { type: 'actor-bound', payload }, stagingDir, manifest);
       }
     }
-  });
 
-  return Object.freeze(manifest);
+    // Fsync files and staging directory for crash durability
+    if (snapshotRef) {
+      const fdSnap = fs.openSync(path.join(stagingDir, 'snapshot.json'), 'r');
+      fs.fsyncSync(fdSnap);
+      fs.closeSync(fdSnap);
+    }
+    const fdSess = fs.openSync(path.join(stagingDir, 'session.json'), 'r');
+    fs.fsyncSync(fdSess);
+    fs.closeSync(fdSess);
+    const fdEv = fs.openSync(eventsPath, 'r');
+    fs.fsyncSync(fdEv);
+    fs.closeSync(fdEv);
+    const fdStaging = fs.openSync(stagingDir, 'r');
+    fs.fsyncSync(fdStaging);
+    fs.closeSync(fdStaging);
+
+    try {
+      fs.renameSync(stagingDir, sessionDir);
+      const fdParent = fs.openSync(sessionsDir, 'r');
+      fs.fsyncSync(fdParent);
+      fs.closeSync(fdParent);
+    } catch (err) {
+      if (err.code === 'EEXIST' || err.code === 'ENOTEMPTY' || err.code === 'EPERM') {
+        throw new CoordinationError('validation', `coordination session "${id}" already exists`);
+      }
+      throw err;
+    }
+
+    return Object.freeze(manifest);
+  } finally {
+    if (claimDir) {
+      try {
+        const claimJsonPath = path.join(claimDir, 'claim.json');
+        if (fs.existsSync(claimJsonPath)) {
+          const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));
+          if (claimData.token === token) {
+            fs.rmSync(claimDir, { recursive: true, force: true });
+          }
+        } else {
+           fs.rmSync(claimDir, { recursive: true, force: true });
+        }
+      } catch (e) {}
+    }
+    try {
+      fs.rmSync(stagingDir, { recursive: true, force: true });
+    } catch (e) {}
+  }
 }
 
 /**
@@ -914,7 +1038,7 @@ export function createSessionAssignment(
 // door that writes a driver-authored event (`authorizeOperation`,
 // `recordDriverDisposition`), so the two can never drift apart. Always called
 // on a manifest read INSIDE the caller's held events lock.
-function assertDriverIdentity(manifest, authorizedBy, { coordinationId, label, subject, fieldName = 'authorizedBy' }) {
+export function assertDriverIdentity(manifest, authorizedBy, { coordinationId, label, subject, fieldName = 'authorizedBy' }) {
   if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
     throw new CoordinationError(
       'validation',

@@ -1,5 +1,9 @@
 # Agent Coordination Contracts
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/contracts/README.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: Index
 Design status: Accepted
 Implementation: Partial

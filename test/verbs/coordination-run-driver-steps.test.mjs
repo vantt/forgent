@@ -188,7 +188,7 @@ function request(overrides = {}) {
     kind: 'declared-protocol',
     objective: 'Prove the driver-authority request steps reach the real engine doors.',
     writerId: WRITER_ID,
-    protocolRef: { id: DEFINITION_ID },
+    close: true, protocolRef: { id: DEFINITION_ID },
     steps: [produceStep(), reviewStep()],
     ...overrides,
   };
@@ -372,12 +372,12 @@ test('validateCoordinationRequest: a "disposition" step missing targetRef/dispos
   }
 });
 
-test('validateCoordinationRequest: the unknown-step-type message names all six supported types', () => {
+test('validateCoordinationRequest: the unknown-step-type message names all seven supported types', () => {
   assert.throws(
     () => validateCoordinationRequest(request({ steps: [{ type: 'authorise', as: 'typo' }] })),
     (err) =>
       err instanceof StoreError &&
-      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"/.test(err.message),
+      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"/.test(err.message),
   );
 });
 

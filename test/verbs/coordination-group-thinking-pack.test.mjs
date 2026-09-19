@@ -201,7 +201,7 @@ test('runGroupThinkingRequest refuses when protocolId is unset, even before the 
     () =>
       runGroupThinkingRequest(
         { cwd: tempDir, repoRoot: tempDir },
-        { packPath, requestObject: { kind: 'declared-protocol', protocolRef: { id: DECLARED_CONSULT_ID } } },
+        { packPath, requestObject: { kind: 'declared-protocol', close: true, protocolRef: { id: DECLARED_CONSULT_ID } } },
       ),
     (err) => err instanceof StoreError && /must be explicitly given/.test(err.message),
   );
@@ -227,7 +227,7 @@ test('runGroupThinkingRequest refuses when the request body\'s protocolRef.id di
     () =>
       runGroupThinkingRequest(
         { cwd: tempDir, repoRoot: tempDir },
-        { packPath, protocolId: DECLARED_CONSULT_ID, requestObject: { kind: 'declared-protocol', protocolRef: { id: 'core.coordination-protocol.something-else' } } },
+        { packPath, protocolId: DECLARED_CONSULT_ID, requestObject: { kind: 'declared-protocol', close: true, protocolRef: { id: 'core.coordination-protocol.something-else' } } },
       ),
     (err) => err instanceof StoreError && /does not match the explicitly selected protocolId/.test(err.message),
   );
@@ -304,7 +304,7 @@ test('a pack-registered request runs end-to-end through the real runCoordination
     objective: 'Prove the group-thinking pack gate dispatches through the real door, not a second one.',
     writerId: 'group-thinking-pack-test',
     coordinationId: 'coord_group_thinking_pack_test',
-    protocolRef: { id: DECLARED_CONSULT_ID },
+    close: true, protocolRef: { id: DECLARED_CONSULT_ID },
     steps: [
       { type: 'operation', as: 'req', operationId: 'request-consult', objective: 'Should the pack gate be this thin?', expectedOutputs: OUTPUTS },
       {
@@ -353,7 +353,7 @@ test('resuming through the pack gate reaches the SAME session runGroupThinkingRe
         objective: 'Open, first step only.',
         writerId,
         coordinationId,
-        protocolRef: { id: DECLARED_CONSULT_ID },
+        close: true, protocolRef: { id: DECLARED_CONSULT_ID },
         steps: [{ type: 'operation', as: 'req', operationId: 'request-consult', objective: 'First step.', expectedOutputs: OUTPUTS }],
       },
     },
@@ -370,7 +370,7 @@ test('resuming through the pack gate reaches the SAME session runGroupThinkingRe
         objective: 'Resume, second step.',
         writerId,
         coordinationId,
-        protocolRef: { id: DECLARED_CONSULT_ID },
+        close: true, protocolRef: { id: DECLARED_CONSULT_ID },
         // A resumed request opens a NEW `labels` scope inside `run.mjs`
         // (per-call, never carried across requests) -- `$ref:req` from the
         // first call has nothing to resolve here, so the first call's own
@@ -449,7 +449,7 @@ test('runGroupThinkingRequest refuses to resume a session that was really opened
             objective: 'Attempt to dispatch a pack-claimed protocol against a session really bound to a different one.',
             writerId,
             coordinationId,
-            protocolRef: { id: DECLARED_CONSULT_ID },
+            close: true, protocolRef: { id: DECLARED_CONSULT_ID },
             steps: [{ type: 'disposition', as: 'd', targetRef: coordinationId, disposition: 'noted', rationale: 'PoC repro.' }],
           },
         },
@@ -488,7 +488,7 @@ test('runGroupThinkingRequest resuming an existing session under the SAME protoc
         objective: 'Open under declared-consult.',
         writerId,
         coordinationId,
-        protocolRef: { id: DECLARED_CONSULT_ID },
+        close: true, protocolRef: { id: DECLARED_CONSULT_ID },
         steps: [{ type: 'operation', as: 'req', operationId: 'request-consult', objective: 'First step.', expectedOutputs: OUTPUTS }],
       },
     },
@@ -508,7 +508,7 @@ test('runGroupThinkingRequest resuming an existing session under the SAME protoc
         objective: 'Resume under the same protocol.',
         writerId,
         coordinationId,
-        protocolRef: { id: DECLARED_CONSULT_ID },
+        close: true, protocolRef: { id: DECLARED_CONSULT_ID },
         steps: [
           {
             type: 'operation',
@@ -612,7 +612,7 @@ test('a request naming a DIFFERENT executor per actor reaches run.mjs\'s real pe
     objective: 'Prove per-actor executor selection survives the group-thinking pack gate unchanged.',
     writerId: 'group-thinking-pack-multi-executor-test',
     coordinationId: 'coord_group_thinking_multi_executor_test',
-    protocolRef: { id: DECLARED_CONSULT_ID },
+    close: true, protocolRef: { id: DECLARED_CONSULT_ID },
     // The per-actor override channel this addendum requires: each actor
     // names its OWN registered executor. group-thinking-pack.mjs never
     // reads or touches this array -- it forwards the request object as-is.
@@ -683,7 +683,7 @@ test('a request that names targetActorId but omits actors[] says so out loud -- 
     objective: 'Prove an omitted actors[] roster is reported rather than silently defaulted.',
     writerId: 'group-thinking-pack-missing-roster-test',
     coordinationId: 'coord_group_thinking_missing_roster_test',
-    protocolRef: { id: DECLARED_CONSULT_ID },
+    close: true, protocolRef: { id: DECLARED_CONSULT_ID },
     // actors[] deliberately ABSENT -- the whole point of this test.
     steps: [
       { type: 'operation', as: 'req', operationId: 'request-consult', targetActorId: 'requester-actor', objective: 'Ask.', expectedOutputs: OUTPUTS },

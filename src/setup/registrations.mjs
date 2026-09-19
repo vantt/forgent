@@ -45,7 +45,7 @@ import {
 import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON } from '../runner/dispatch/config.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -4417,4 +4417,196 @@ registerCheck({
   id: 'confinement-herdr-maturity',
   description: 'herdr confinement convergence maturity status (partial: pre-adapter checks under Authority, session/home lifecycle adapter-managed)',
   check: (cwd) => checkConfinementHerdrMaturity(cwd),
+});
+
+// --- coordination session abandoned claims check ---
+function getAbandonedClaims(cwd) {
+  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');
+  if (!fs.existsSync(sessionsDir)) return { deadClaims: [], unknownStale: [], sessionsDir };
+
+  const entries = fs.readdirSync(sessionsDir, { withFileTypes: true });
+  const deadClaims = [];
+  const unknownStale = [];
+  const now = Date.now();
+  const ABANDONED_MS = 10 * 60 * 1000;
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    if (entry.name.endsWith('.claim') || entry.name.startsWith('.staging-')) {
+      const fullPath = path.join(sessionsDir, entry.name);
+      try {
+        const stats = fs.statSync(fullPath);
+        let isDead = false;
+        let isAlive = false;
+        let fingerprint = { name: entry.name };
+
+        if (entry.name.endsWith('.claim')) {
+          const claimJsonPath = path.join(fullPath, 'claim.json');
+          if (fs.existsSync(claimJsonPath)) {
+            try {
+              const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));
+              fingerprint.pid = claimData.pid;
+              fingerprint.token = claimData.token;
+              fingerprint.processStartTime = claimData.processStartTime;
+              if (claimData.pid) {
+                try {
+                  process.kill(claimData.pid, 0);
+                  let isSameProcess = true;
+                  if (claimData.processStartTime) {
+                    try {
+                      const currentStartTime = fs.statSync('/proc/' + claimData.pid).mtimeMs;
+                      if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
+                        isSameProcess = false; // PID reused
+                      }
+                    } catch (e) {}
+                  }
+                  if (isSameProcess) {
+                    isAlive = true;
+                  } else {
+                    isDead = true;
+                  }
+                } catch (err) {
+                  if (err.code === 'ESRCH') {
+                    isDead = true;
+                  }
+                }
+              }
+            } catch (err) {}
+          }
+        }
+
+        if (isDead) {
+          deadClaims.push(fingerprint);
+        } else if (!isAlive && now - stats.mtimeMs > ABANDONED_MS) {
+          unknownStale.push(entry.name);
+        }
+      } catch (e) {}
+    }
+  }
+  return { deadClaims, unknownStale, sessionsDir };
+}
+
+registerCheck({
+  id: 'coordination-abandoned-claims',
+  description: 'coordination session directories do not contain abandoned claims (.claim or .staging-*)',
+  check: (cwd) => {
+    const { deadClaims, unknownStale } = getAbandonedClaims(cwd);
+    if (deadClaims.length === 0 && unknownStale.length === 0) return { passed: true };
+
+    if (deadClaims.length > 0) {
+      return {
+        passed: false,
+        message: `Found ${deadClaims.length} demonstrably dead claims and ${unknownStale.length} stale unknown items. Run fgos doctor --fix to remove the dead ones.`
+      };
+    } else if (unknownStale.length > 0) {
+      return {
+        passed: false,
+        message: `Found ${unknownStale.length} stale claim/staging items with unknown ownership (e.g. ${unknownStale[0]}). Leaving them intact (no auto-fix).`
+      };
+    }
+    return { passed: true };
+  }
+});
+
+registerFix({
+  id: 'coordination-abandoned-claims',
+  fix: (cwd) => {
+    const { deadClaims, unknownStale, sessionsDir } = getAbandonedClaims(cwd);
+    if (deadClaims.length === 0) {
+      return { changed: false, message: 'No dead claims found to remove.' };
+    }
+    let removed = 0;
+    for (const claim of deadClaims) {
+      try {
+        const fullPath = path.join(sessionsDir, claim.name);
+        if (claim.name.endsWith('.claim')) {
+          const claimJsonPath = path.join(fullPath, 'claim.json');
+          if (fs.existsSync(claimJsonPath)) {
+            const claimData = JSON.parse(fs.readFileSync(claimJsonPath, 'utf8'));
+            // Re-validate against the original fingerprint to avoid TOCTOU on filesystem replace
+            if (claimData.token !== claim.token || claimData.pid !== claim.pid || claimData.processStartTime !== claim.processStartTime) {
+              continue; // Fingerprint mismatch, someone else took the claim
+            }
+            if (claimData.pid) {
+              try {
+                process.kill(claimData.pid, 0);
+                let isSameProcess = true;
+                if (claimData.processStartTime) {
+                  try {
+                    const currentStartTime = fs.statSync('/proc/' + claimData.pid).mtimeMs;
+                    if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
+                      isSameProcess = false;
+                    }
+                  } catch (e) {}
+                }
+                if (isSameProcess) {
+                  continue; // The process is actually alive now, abort deletion
+                }
+              } catch (err) {
+                // ESRCH: confirmed dead
+              }
+            }
+          }
+        }
+        fs.rmSync(fullPath, { recursive: true, force: true });
+        removed++;
+      } catch (e) {}
+    }
+    const msg = unknownStale.length > 0
+      ? `Removed ${removed} dead claims. Note: ${unknownStale.length} stale unknown items remain.`
+      : `Removed ${removed} dead claims`;
+    return { changed: removed > 0, message: msg };
+  }
+});
+
+// --- runner.coordination shape check ---
+registerCheck({
+  id: 'runner-coordination-orgPolicy-shape',
+  description: 'runner.coordination.orgPolicy.dischargeOn is a valid array of strings if present',
+  check: (cwd) => {
+    const configPath = path.join(cwd, '.fgos', 'config.json');
+    if (!fs.existsSync(configPath)) return { passed: true };
+
+    let config;
+    try {
+      config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } catch {
+      return { passed: true }; // Handled by other checks
+    }
+
+    const orgPolicy = config.runner?.coordination?.orgPolicy;
+    if (orgPolicy && 'dischargeOn' in orgPolicy) {
+      const orgDischargeOn = orgPolicy.dischargeOn;
+      if (!Array.isArray(orgDischargeOn) || !orgDischargeOn.every(d => typeof d === 'string' && d.length > 0)) {
+        return { passed: false, message: `runner.coordination.orgPolicy.dischargeOn must be an array of non-empty strings. Run fgos doctor --fix to reset to ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}.` };
+      }
+    }
+    return { passed: true };
+  }
+});
+
+registerFix({
+  id: 'runner-coordination-orgPolicy-shape',
+  fix: (cwd) => {
+    const configPath = path.join(cwd, '.fgos', 'config.json');
+    if (!fs.existsSync(configPath)) return { changed: false };
+
+    let config;
+    try {
+      config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } catch {
+      return { changed: false };
+    }
+
+    const orgPolicy = config.runner?.coordination?.orgPolicy;
+    if (orgPolicy && 'dischargeOn' in orgPolicy) {
+      const orgDischargeOn = orgPolicy.dischargeOn;
+      if (!Array.isArray(orgDischargeOn) || !orgDischargeOn.every(d => typeof d === 'string' && d.length > 0)) {
+        config.runner.coordination.orgPolicy.dischargeOn = [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON];
+        fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
+        return { changed: true, message: `Reset runner.coordination.orgPolicy.dischargeOn to default ${JSON.stringify([...DEFAULT_COORDINATION_ORG_DISCHARGE_ON])}` };
+      }
+    }
+    return { changed: false };
+  }
 });

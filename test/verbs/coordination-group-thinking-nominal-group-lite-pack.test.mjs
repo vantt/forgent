@@ -170,6 +170,7 @@ function baseRequest({ coordinationId, writerId, steps }) {
     writerId,
     coordinationId,
     protocolRef: { id: NOMINAL_GROUP_LITE_ID },
+    close: true,
     steps,
   };
 }
@@ -448,7 +449,7 @@ test('runGroupThinkingRequest refuses a "link" step (an unknown step-type spelli
     (err) =>
       err instanceof StoreError &&
       err.category === 'validation' &&
-      /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", or "human-turn"/.test(err.message),
+      /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"/.test(err.message),
   );
 });
 

@@ -1,5 +1,9 @@
 # Orchestration Vocabulary Map
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/history/implementation-records/orchestration-vocabulary-map-2026-08-27.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: History
 Design status: Superseded
 Implementation: N/A

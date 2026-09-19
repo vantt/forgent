@@ -1,5 +1,9 @@
 # Agent Coordination Documentation Migration - 2026-08-31
 
+> Migration status: This document is a legacy/current source for
+> `docs/platform/agent-coordination/history/implementation-records/documentation-migration-2026-08-31.md`. Do not edit divergent design
+> claims here without also updating the target doc or migration inventory.
+
 Document type: History
 Design status: Accepted
 Implementation: Verified

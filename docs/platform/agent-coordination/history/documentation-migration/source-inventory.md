@@ -21,6 +21,26 @@ This ledger is a temporary migration aid. It intentionally classifies source fil
 
 No component-boundary change in this Phase 0/1 migration.
 
+## Phase 7 Disposition
+
+The legacy-to-target structure is now explicit without rewriting evidence:
+
+- 63 legacy narrative or index documents under `architecture/`, `contracts/`,
+  `decisions/`, `history/`, `playbooks/`, `proposals/`, `roadmap/`, and
+  `vocabulary/` have a matching target path and the standard migration note.
+- Verification artifacts remain `link-only` evidence. They are intentionally
+  unchanged so their recorded proof content, dates, and environments remain
+  intact; [the target verification index](../../verification/README.md)
+  routes readers to their retained legacy roots.
+- `documentation-governance.md` and
+  `documentation-standardization-plan.md` remain local migration/governance
+  sources rather than target-area claims, so neither receives a redirect.
+
+No component-boundary change in Phase 7.
+
+See [Phase 7 completion](phase-7-completion.md) for the final counts and
+validation record.
+
 | Source path | Existing type | Authority | Implementation status | Target path | Disposition | Notes |
 |---|---|---|---|---|---|---|
 | `docs/architect/agent-coordination/README.md` | portal | navigation | partial | `docs/platform/agent-coordination/README.md` | promote | Phase 0 classification; verify detailed claims before promotion. |
