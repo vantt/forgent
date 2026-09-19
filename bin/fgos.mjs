@@ -87,6 +87,7 @@ import { editUseCase } from '../src/verbs/state/edit.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
+import { closeCoordinationUseCase } from '../src/verbs/coordination/close.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
@@ -3055,6 +3056,18 @@ async function runVerb(verb, flags, positional, dir) {
             cliModel: flags.model,
             cliTier: flags.tier,
           },
+        );
+      }
+      if (sub === 'close') {
+        const filePath = requireField(flags.file, 'coordination close requires --file <request-path>: fgos coordination close --file <request.json>');
+        const requestObject = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), filePath), 'utf8'));
+        return await closeCoordinationUseCase(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            packageRoot: PACKAGE_ROOT,
+          },
+          { requestObject }
         );
       }
       if (sub === 'show') {

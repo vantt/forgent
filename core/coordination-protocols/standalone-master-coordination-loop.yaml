@@ -171,10 +171,16 @@ spec:
             actor: reviewer
             activation:
               mode: driver-authorized
-            rechecks: review-candidate
+            rechecks:
+              operation: review-candidate
+              dispositionValues: [accepted, rejected, cell-closed, deferred]
+              dischargeOn: [accepted]
           - ref: red-team-recheck
             actor: red-team
             activation:
               mode: driver-authorized
-            rechecks: red-team-candidate
+            rechecks:
+              operation: red-team-candidate
+              dispositionValues: [accepted, rejected, cell-closed, deferred]
+              dischargeOn: [accepted]
         transitions: []

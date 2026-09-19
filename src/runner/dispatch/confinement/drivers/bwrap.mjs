@@ -10,7 +10,6 @@
 //   - closes inherited file descriptors to fix MED-1 and ensure no host file tampering
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import { cleanupConfinementResource, writeOwnershipMarker } from '../cleanup.mjs';
 import { resolveConfinementResources } from '../resources.mjs';
@@ -49,162 +48,6 @@ function provisionSelectedCodexCredential(privateHomeTarget, request) {
     throw err;
   }
   return true;
-}
-
-function isAgyRequest(request) {
-  const source = request?.providerCapacity?.credentialSource;
-  if (source?.kind === 'agy-home' || source?.kind === 'gemini-home') return true;
-  if (source?.kind && source.kind !== 'agy-home' && source.kind !== 'gemini-home') return false;
-
-  const provider = request?.providerCapacity?.provider;
-  if (provider === 'gemini' || provider === 'agy') return true;
-
-  const command = request?.invocation?.command;
-  if (typeof command === 'string' && (command === 'agy' || command.endsWith('/agy'))) return true;
-
-  const execId = request?.executorId;
-  if (typeof execId === 'string' && (execId.startsWith('agy') || execId.includes('agy') || execId.includes('gemini'))) return true;
-
-  return false;
-}
-
-export function provisionAgyCredential(privateHomeTarget, request) {
-  try {
-    if (!isAgyRequest(request)) return false;
-
-    const source = request?.providerCapacity?.credentialSource;
-    const candidates = [];
-    if (source?.home) {
-      candidates.push(expandCredentialHome(source.home));
-    }
-    if (request?.invocation?.env?.HOME) {
-      candidates.push(expandCredentialHome(request.invocation.env.HOME));
-    }
-    if (process.env.HOME) {
-      candidates.push(process.env.HOME);
-    }
-    const homeDir = os.homedir?.() || process.env.HOME;
-    if (homeDir && !candidates.includes(homeDir)) {
-      candidates.push(homeDir);
-    }
-
-    let sourceAgyDir = null;
-    for (const cand of candidates) {
-      if (!cand) continue;
-      const agySubdir = path.join(cand, '.gemini', 'antigravity-cli');
-      if (fs.existsSync(agySubdir)) {
-        sourceAgyDir = agySubdir;
-        break;
-      }
-      if (fs.existsSync(path.join(cand, 'settings.json')) || fs.existsSync(path.join(cand, 'antigravity-oauth-token'))) {
-        sourceAgyDir = cand;
-        break;
-      }
-      const directAgy = path.join(cand, 'antigravity-cli');
-      if (fs.existsSync(directAgy)) {
-        sourceAgyDir = directAgy;
-        break;
-      }
-    }
-
-    const targetAgyDir = path.join(privateHomeTarget, '.gemini', 'antigravity-cli');
-    fs.mkdirSync(targetAgyDir, { recursive: true });
-
-    const sessionDirs = [
-      'log',
-      'crashes',
-      'conversations',
-      'brain',
-      'presence',
-      'cache',
-      'annotations',
-      'scratch',
-      'mcp',
-    ];
-    for (const dir of sessionDirs) {
-      try {
-        fs.mkdirSync(path.join(targetAgyDir, dir), { recursive: true });
-      } catch {}
-    }
-
-    let provisioned = false;
-
-    if (sourceAgyDir && fs.existsSync(sourceAgyDir)) {
-      const knownFiles = [
-        'settings.json',
-        'antigravity-oauth-token',
-        'installation_id',
-        'jetski_state.pbtxt',
-        'oauth_credentials.json',
-        'google-oauth-token',
-        'token.json',
-        'auth.json',
-      ];
-      try {
-        const entries = fs.readdirSync(sourceAgyDir, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.isFile()) {
-            const name = entry.name;
-            if (knownFiles.includes(name) || /token|auth|cred|key/i.test(name)) {
-              try {
-                fs.copyFileSync(path.join(sourceAgyDir, name), path.join(targetAgyDir, name));
-                provisioned = true;
-              } catch {}
-            }
-          }
-        }
-      } catch {}
-
-      const sourceMcp = path.join(sourceAgyDir, 'mcp');
-      if (fs.existsSync(sourceMcp)) {
-        try {
-          fs.cpSync(sourceMcp, path.join(targetAgyDir, 'mcp'), { recursive: true });
-        } catch {}
-      }
-    }
-
-    // Ensure settings.json permissions and workspace trust
-    try {
-      const settingsFile = path.join(targetAgyDir, 'settings.json');
-      let settings = {};
-      if (fs.existsSync(settingsFile)) {
-        try {
-          settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8')) || {};
-        } catch {}
-      } else {
-        settings = {
-          toolPermission: 'always-proceed',
-          permissions: {
-            deny: [
-              'command(regex:^rm .*-rf)',
-              'command(regex:^sudo )',
-              'command(regex:^git push .*(--force|-f\\b))',
-              'command(regex:^git reset .*--hard)',
-              'command(regex:^git stash)',
-              'command(regex:^curl )',
-              'command(regex:^wget )',
-            ],
-          },
-        };
-      }
-      if (!settings.toolPermission) {
-        settings.toolPermission = 'always-proceed';
-      }
-      const trusted = Array.isArray(settings.trustedWorkspaces) ? [...settings.trustedWorkspaces] : [];
-      for (const ws of [request.context?.repoRoot, request.context?.cwd]) {
-        if (ws && typeof ws === 'string' && !trusted.includes(ws)) {
-          trusted.push(ws);
-        }
-      }
-      settings.trustedWorkspaces = trusted;
-      fs.writeFileSync(settingsFile, `${JSON.stringify(settings, null, 2)}\n`);
-      provisioned = true;
-    } catch {}
-
-    return provisioned;
-  } catch {
-    return false;
-  }
 }
 
 const ALLOWED_BWRAP_CONFIG_KEYS = Object.freeze([
@@ -525,13 +368,7 @@ export async function prepareBwrap(plan, request, backend) {
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
-          const credKind = request?.providerCapacity?.credentialSource?.kind;
-          if (credKind === 'agy-home' || credKind === 'gemini-home') {
-            credentialProvisioned = provisionAgyCredential(res.hostTarget, request) || credentialProvisioned;
-          } else {
-            credentialProvisioned = provisionSelectedCodexCredential(res.hostTarget, request) || credentialProvisioned;
-            credentialProvisioned = provisionAgyCredential(res.hostTarget, request) || credentialProvisioned;
-          }
+          credentialProvisioned = provisionSelectedCodexCredential(res.hostTarget, request) || credentialProvisioned;
         }
       }
 
@@ -564,14 +401,6 @@ export async function prepareBwrap(plan, request, backend) {
     const fdCloserScript = 'for f in $(ls /proc/$$/fd 2>/dev/null); do if [ "$f" -ge 3 ] 2>/dev/null; then eval "exec $f>&-" 2>/dev/null || true; fi; done; exec "$@"';
 
     const originalCmd = request.invocation.command;
-    
-    // Inject environment variables directly into bwrap so we don't rely on the launcher script
-    if (resolvedEnv) {
-      for (const [k, v] of Object.entries(resolvedEnv)) {
-        bwrapArgs.push('--setenv', k, v);
-      }
-    }
-
     bwrapArgs.push(
       '--',
       'bash',

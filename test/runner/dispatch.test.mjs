@@ -5704,7 +5704,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     import fs from 'node:fs';
 
     const start = Date.now();
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1200);
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000);
     execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
     const end = Date.now();
 
