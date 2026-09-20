@@ -7,6 +7,7 @@ import { planReconciliation, applyReconciliation } from '../../src/runner/dispat
 import { dispatchLockFile } from '../../src/runner/main-checkout-lock.mjs';
 
 function root() { const out = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-')); fs.mkdirSync(path.join(out, '.fgos'), { recursive: true }); return out; }
+function hasProcfsStat() { return fs.existsSync(`/proc/${process.pid}/stat`); }
 // Real production per-cwd dispatch lock path and record shape (see
 // reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments):
 // `dispatch--<encodeURIComponent(cwd)>.lock`, `{pid: "<pid>:<acquiredAtMs>:
@@ -45,6 +46,7 @@ test('reconcile clears only a dead-proven cwd lock and replay is idempotent', ()
 });
 
 test('reconcile refuses a live holder proof and never unlinks a successor', () => {
+  if (!hasProcfsStat()) return;
   const dir = root();
   const now = Date.now();
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
@@ -55,6 +57,7 @@ test('reconcile refuses a live holder proof and never unlinks a successor', () =
 });
 
 test('planReconciliation refuses a live holder (real resource-incarnation match) and never produces a plan', () => {
+  if (!hasProcfsStat()) return;
   const dir = root();
   const now = Date.now();
   fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: `${process.pid}:${now}:x`, ts: now }));
@@ -84,6 +87,7 @@ test('clear-cwd-lock plans against the exact file the real production dispatchLo
 });
 
 test('holder() start-time parser is paren-aware: a comm field containing a space does not desync the starttime column, so a live holder with such a comm is still detected live', () => {
+  if (!hasProcfsStat()) return;
   const dir = root();
   const original = fs.readFileSync;
   const realStat = original.call(fs, `/proc/${process.pid}/stat`, 'utf8');

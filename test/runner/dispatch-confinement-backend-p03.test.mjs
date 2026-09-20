@@ -1039,7 +1039,7 @@ test('Cleanup: prepare failure triggers immediate cleanup of allocated resources
 });
 
 test('Cleanup: adapter failure and timeout/cancel clean up temporary resources in finally block', async () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adapt-fail-'));
   try {

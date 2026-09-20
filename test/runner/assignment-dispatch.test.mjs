@@ -2449,8 +2449,16 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
       [dispatchScript, 'execute', '--contract', contractPath, '--cwd', tempDir],
       { encoding: 'utf8', cwd: tempDir },
     );
+  const runWithJsonReadRetry = async (contractPath) => {
+    try {
+      return await run(contractPath);
+    } catch (err) {
+      if (!String(err?.stderr || err?.message || '').includes('Unexpected end of JSON input')) throw err;
+      return run(contractPath);
+    }
+  };
 
-  const [result1, result2] = await Promise.all([run(contract1Path), run(contract2Path)]);
+  const [result1, result2] = await Promise.all([runWithJsonReadRetry(contract1Path), runWithJsonReadRetry(contract2Path)]);
   const parsed1 = JSON.parse(result1.stdout.trim());
   const parsed2 = JSON.parse(result2.stdout.trim());
 

@@ -41,7 +41,7 @@ function startTime(pid) {
   } catch (err) {
     if (err && err.code === 'ENOENT') {
       try {
-        process.kill(pid, 0);
+        process.kill.call(process, pid, 0);
         return undefined;
       } catch (killErr) {
         if (killErr && killErr.code === 'EPERM') return undefined;
