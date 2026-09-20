@@ -61,7 +61,8 @@ function minimalSystemPath() {
   const bashDir = path.dirname(execFileSync('which', ['bash']).toString().trim());
   const gitDir = path.dirname(execFileSync('which', ['git']).toString().trim());
   const nodeDir = path.dirname(process.execPath);
-  return [...new Set([bashDir, gitDir, nodeDir])].join(':');
+  const dirnameDir = path.dirname(execFileSync('which', ['dirname']).toString().trim());
+  return [...new Set([bashDir, gitDir, nodeDir, dirnameDir])].join(':');
 }
 
 function writePathStub(dir, name, marker) {
@@ -439,5 +440,4 @@ test('fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos is a syml
   fs.rmSync(repoRoot, { recursive: true, force: true });
   fs.rmSync(outsideDir, { recursive: true, force: true });
 });
-
 

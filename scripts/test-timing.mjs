@@ -43,8 +43,10 @@ export function gitHead(cwd = REPO_ROOT, exec = execFileSync) {
   return exec('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim();
 }
 
-export function hasGnuTimeV(binary = '/usr/bin/time', exists = fs.existsSync) {
-  return exists(binary);
+export function hasGnuTimeV(binary = '/usr/bin/time', exists = fs.existsSync, spawn = spawnSync) {
+  if (!exists(binary)) return false;
+  const result = spawn(binary, ['-v', 'true'], { encoding: 'utf8' });
+  return result.status === 0 && /Maximum resident set size/.test(result.stderr ?? '');
 }
 
 export function gatherEnvironment({ cwd = REPO_ROOT, loadavg = os.loadavg, cpus = os.cpus, exec = execFileSync } = {}) {

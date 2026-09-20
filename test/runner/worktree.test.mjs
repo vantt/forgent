@@ -52,7 +52,7 @@ function commitOnWorktree(worktreePath, filename, contents) {
 /**
  * Advances `branch` the same way `withMergeEphemeralWorktree` lands a merge
  * in production (tsk-2cd): a DETACHED checkout at the branch's current tip,
- * a real commit made there, then a plain `git branch -f` ref update — never
+ * a real commit made there, then a plain ref update — never
  * a checkout of `branch` itself, so this never collides with any existing
  * non-detached checkout of it (e.g. a claim worktree already reattached to
  * it). Returns the new tip commit.
@@ -65,7 +65,7 @@ function advanceBranchExternally(repoRoot, branch, filename, contents) {
   execFileSync('git', ['add', filename], { cwd: detachedPath });
   execFileSync('git', ['commit', '-q', '-m', `external advance: ${filename}`], { cwd: detachedPath });
   const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, newTip], { cwd: repoRoot });
   execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
   return newTip;
 }
@@ -780,7 +780,7 @@ test('createClaimWorktree refuses to resync a reattach whose last-synced commit 
   // descendant of lastSynced itself -- simulates a history rewrite, not an
   // ordinary forward merge
   const parentTip = execFileSync('git', ['rev-parse', `${lastSynced}^`], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, parentTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, parentTip], { cwd: repoRoot });
   advanceBranchExternally(repoRoot, branch, 'sibling.md', '# sibling\n');
 
   assert.throws(
@@ -829,7 +829,7 @@ test('resyncClaimWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 b
   execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: detachedPath });
   execFileSync('git', ['commit', '-q', '-m', 'external advance: tracked .fgos/'], { cwd: detachedPath });
   const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, newTip], { cwd: repoRoot });
   execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
 
   const result = resyncClaimWorktree(repoRoot, first.path, branch);
@@ -871,7 +871,7 @@ test('resyncWorktree refuses a diverged (rewritten) branch, same as resyncClaimW
   commitOnWorktree(wt.path, 'context.md', '# decisions\n');
   const lastSynced = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: wt.path, encoding: 'utf8' }).trim();
   const parentTip = execFileSync('git', ['rev-parse', `${lastSynced}^`], { cwd: repoRoot, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, parentTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, parentTip], { cwd: repoRoot });
   advanceBranchExternally(repoRoot, branch, 'sibling.md', '# sibling\n');
 
   assert.throws(() => resyncWorktree(repoRoot, wt.path, branch), WorktreeError);
@@ -957,7 +957,7 @@ test('resyncWorktree refuses on a real conflict, preserving the patch file for m
   execFileSync('git', ['add', 'seed.txt'], { cwd: detachedPath });
   execFileSync('git', ['commit', '-q', '-m', 'external conflicting edit'], { cwd: detachedPath });
   const conflictTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, conflictTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, conflictTip], { cwd: repoRoot });
   execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
 
   const gitCommonDir = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], { cwd: repoRoot, encoding: 'utf8' }).trim();
@@ -1012,7 +1012,7 @@ test('resyncWorktree re-strips .fgos/ after its own reset --hard (tsk-1d7 bundle
   execFileSync('git', ['add', '.fgos/events.jsonl'], { cwd: detachedPath });
   execFileSync('git', ['commit', '-q', '-m', 'external advance: tracked .fgos/'], { cwd: detachedPath });
   const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: detachedPath, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: repoRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, newTip], { cwd: repoRoot });
   execFileSync('git', ['worktree', 'remove', '--force', detachedPath], { cwd: repoRoot });
 
   const result = resyncWorktree(repoRoot, wt.path, branch);
@@ -1434,4 +1434,3 @@ test('checkoutDirtyPaths returns empty array on invalid directory or git error',
   const tmpDir = mkWorktreeDir();
   assert.deepEqual(checkoutDirtyPaths(tmpDir, tmpDir), []);
 });
-

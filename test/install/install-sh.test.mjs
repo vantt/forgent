@@ -128,6 +128,7 @@ describe('install.sh e2e installer suite', () => {
         FGCTL_INSTALL_DIR: tempInstallDir,
         FGCTL_ASSET_BASE_URL: baseUrl,
         FGCTL_VERSION: version,
+        FGCTL_TARGET: target,
         FGCTL_ALLOW_ROOT: '1',
       });
 
@@ -155,6 +156,7 @@ describe('install.sh e2e installer suite', () => {
         HOME: tempHome,
         FGCTL_INSTALL_DIR: tempInstallDir,
         FGCTL_ASSET_BASE_URL: baseUrl,
+        FGCTL_TARGET: target,
         FGCTL_ALLOW_ROOT: '1',
       });
 
@@ -183,6 +185,7 @@ describe('install.sh e2e installer suite', () => {
         FGCTL_INSTALL_DIR: tempInstallDir,
         FGCTL_ASSET_BASE_URL: baseUrl,
         FGCTL_VERSION: version,
+        FGCTL_TARGET: target,
         FGCTL_ALLOW_ROOT: '1',
       });
 
@@ -310,6 +313,7 @@ describe('install.sh e2e installer suite', () => {
           FGCTL_INSTALL_DIR: tempInstallDir,
           FGCTL_ASSET_BASE_URL: evilBaseUrl,
           FGCTL_VERSION: version,
+          FGCTL_TARGET: target,
           FGCTL_ALLOW_ROOT: '1',
         });
 
@@ -351,6 +355,7 @@ describe('install.sh e2e installer suite', () => {
         FGCTL_INSTALL_DIR: tempInstallDir,
         FGCTL_ASSET_BASE_URL: baseUrl,
         FGCTL_VERSION: version,
+        FGCTL_TARGET: target,
       });
       assert.notEqual(refused.status, 0, 'install.sh must refuse to run as root by default');
       assert.match(refused.stderr, /root/i, 'refusal message should mention root');
@@ -362,6 +367,7 @@ describe('install.sh e2e installer suite', () => {
         FGCTL_INSTALL_DIR: tempInstallDir,
         FGCTL_ASSET_BASE_URL: baseUrl,
         FGCTL_VERSION: version,
+        FGCTL_TARGET: target,
         FGCTL_ALLOW_ROOT: '1',
       });
       assert.equal(allowed.status, 0, `install.sh with FGCTL_ALLOW_ROOT=1 must succeed: ${allowed.stderr}`);

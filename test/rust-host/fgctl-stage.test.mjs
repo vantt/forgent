@@ -33,6 +33,26 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   });
 }
 
+function createTraversalTarGz({ archivePath, payloadDir }) {
+  const python = spawnSync('python3', [
+    '-c',
+    `
+import sys, tarfile
+archive, payload = sys.argv[1], sys.argv[2]
+with tarfile.open(archive, 'w:gz') as tar:
+    tar.add(payload, arcname='.')
+    info = tarfile.TarInfo('../../archive-traversal-sentinel')
+    data = b'evil'
+    info.size = len(data)
+    import io
+    tar.addfile(info, io.BytesIO(data))
+`,
+    archivePath,
+    payloadDir,
+  ], { encoding: 'utf8' });
+  assert.equal(python.status, 0, `python3 tar fixture failed: ${python.stderr}`);
+}
+
 before(() => {
   assert.ok(fs.existsSync(FGCTL_BIN), `fgctl binary must exist at ${FGCTL_BIN}`);
   fixtureReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-test-fixture-'));
@@ -236,15 +256,7 @@ test('R7: A .tar.gz with a path-traversing member alongside a valid release is r
     cpSyncRecursive(fixtureReleaseDir, payloadDir);
     fs.writeFileSync(path.join(payloadDir, '__extra_sentinel__.txt'), 'evil');
 
-    execFileSync('tar', [
-      '-czf',
-      archivePath,
-      '--transform',
-      's,^\\./__extra_sentinel__\\.txt$,../../archive-traversal-sentinel,',
-      '-C',
-      payloadDir,
-      '.',
-    ]);
+    createTraversalTarGz({ archivePath, payloadDir });
     assert.ok(fs.existsSync(archivePath));
 
     const res = runFgctl(['stage', '--from', archivePath], { stateHome });

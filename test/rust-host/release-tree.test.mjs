@@ -212,7 +212,7 @@ test('R3: Staged release tree runs P02 harness from outside checkout with cleane
   }
 });
 
-test('R4: Doctor checks rust-host-binary-present, rust-host-target-supported, legacy-node-payload-present, command-routes-drift are registered and pass', () => {
+test('R4: Doctor checks rust host packaging checks are registered and report the current target posture', () => {
   const checkIds = [
     'rust-host-binary-present',
     'rust-host-target-supported',
@@ -224,6 +224,15 @@ test('R4: Doctor checks rust-host-binary-present, rust-host-target-supported, le
     const entry = DOCTOR_CHECKS.find((c) => c.id === id);
     assert.ok(entry, `Doctor check "${id}" must be registered in DOCTOR_CHECKS`);
     const result = entry.check(REPO_ROOT);
+    if (id === 'rust-host-target-supported' && !(process.platform === 'linux' && process.arch === 'x64')) {
+      assert.equal(
+        result.passed,
+        false,
+        `Doctor check "${id}" should remain unsupported off the approved target, got: ${result.message}`
+      );
+      assert.match(result.message, /not an approved rust host target/);
+      continue;
+    }
     assert.equal(
       result.passed,
       true,

@@ -73,7 +73,7 @@ function commitInWorktree(worktreeRoot) {
 }
 
 /** Force-moves `branch` forward from OUTSIDE the worktree (a detached
- * ephemeral checkout, then `git branch -f`) without ever touching the
+ * ephemeral checkout, then a plain ref update) without ever touching the
  * worktree's own files/index -- same shape as an `approve` leaf->root
  * merge, and the same helper shape the sibling tsk-1d7 e2e tests use. */
 function forceMoveBranchForward(mainRoot, branch) {
@@ -84,7 +84,7 @@ function forceMoveBranchForward(mainRoot, branch) {
   execFileSync('git', ['add', fileName], { cwd: mergeDir });
   execFileSync('git', ['commit', '-q', '-m', 'external change landed via force-move'], { cwd: mergeDir });
   const newTip = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: mergeDir, encoding: 'utf8' }).trim();
-  execFileSync('git', ['branch', '-f', branch, newTip], { cwd: mainRoot });
+  execFileSync('git', ['update-ref', `refs/heads/${branch}`, newTip], { cwd: mainRoot });
   execFileSync('git', ['worktree', 'remove', '--force', mergeDir], { cwd: mainRoot });
   return newTip;
 }

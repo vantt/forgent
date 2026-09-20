@@ -84,9 +84,12 @@ test('minMax reports the extremes regardless of input order', () => {
 
 // --- hasGnuTimeV -------------------------------------------------------------
 
-test('hasGnuTimeV reflects the injected existence check, never touches the real filesystem when overridden', () => {
-  assert.equal(hasGnuTimeV('/usr/bin/time', () => true), true);
-  assert.equal(hasGnuTimeV('/usr/bin/time', () => false), false);
+test('hasGnuTimeV reflects injected checks, never touching the real filesystem when overridden', () => {
+  const gnuTime = () => ({ status: 0, stderr: 'Maximum resident set size (kbytes): 123\n' });
+  const bsdTime = () => ({ status: 1, stderr: 'time: illegal option -- v\n' });
+  assert.equal(hasGnuTimeV('/usr/bin/time', () => true, gnuTime), true);
+  assert.equal(hasGnuTimeV('/usr/bin/time', () => true, bsdTime), false);
+  assert.equal(hasGnuTimeV('/usr/bin/time', () => false, gnuTime), false);
 });
 
 // --- isGitClean: symlinked build-artifact directories don't count as dirty ---
