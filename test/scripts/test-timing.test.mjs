@@ -408,7 +408,7 @@ test('isGitClean ignores untracked paths matching allowedPrefixes', () => {
 
 test('runOneSample permits internal logDir artifacts without marking the sample invalid', () => {
   const fakeCwd = '/repo';
-  let afterChecked = false;
+  const checks = [];
   const sample = runOneSample({
     cwd: fakeCwd,
     hasTime: false,
@@ -416,12 +416,7 @@ test('runOneSample permits internal logDir artifacts without marking the sample 
     spawn: () => ({ status: 0 }),
     environment: () => ({}),
     checkClean: (opts) => {
-      if (!afterChecked) {
-        afterChecked = true;
-        // before check: must be strictly clean
-        return (opts.allowedPrefixes ?? []).length === 0;
-      }
-      // after check: receives logDir prefix
+      checks.push(opts.allowedPrefixes);
       return (opts.allowedPrefixes ?? []).includes('plans/reports/artifacts/sample-1');
     },
   });
@@ -429,4 +424,7 @@ test('runOneSample permits internal logDir artifacts without marking the sample 
   assert.equal(sample.before.clean, true);
   assert.equal(sample.after.clean, true);
   assert.equal(sample.valid, true);
+  assert.equal(checks.length, 2);
+  assert.ok(checks[0].includes('plans/reports/artifacts/sample-1'));
+  assert.ok(checks[1].includes('plans/reports/artifacts/sample-1'));
 });

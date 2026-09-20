@@ -179,12 +179,13 @@ export function runOneSample({
 } = {}) {
   const relLogDir = logDir ? path.relative(cwd, path.resolve(cwd, logDir)) : null;
   const isInternalLogDir = relLogDir && !relLogDir.startsWith('..') && !path.isAbsolute(relLogDir);
-  const logDirPrefixes = isInternalLogDir ? [relLogDir] : [];
+  const parentArtifactsDir = isInternalLogDir ? path.dirname(relLogDir) : null;
+  const logDirPrefixes = isInternalLogDir ? [relLogDir, parentArtifactsDir].filter(Boolean) : [];
 
   const defaultCheck = (opts = {}) => isGitClean(cwd, execFileSync, opts);
   const checkSnapshot = checkClean ?? defaultCheck;
 
-  const before = { clean: checkSnapshot({ allowedPrefixes: [] }), env: environment() };
+  const before = { clean: checkSnapshot({ allowedPrefixes: logDirPrefixes }), env: environment() };
   const startNs = process.hrtime.bigint();
 
   let result;
