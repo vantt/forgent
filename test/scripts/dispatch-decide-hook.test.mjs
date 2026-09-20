@@ -15,6 +15,8 @@ const hookPath = fileURLToPath(new URL('../../scripts/dispatch-decide-hook.mjs',
 function mkTempGitRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-decide-hook-'));
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['commit', '-q', '--allow-empty', '-m', 'init'], { cwd: repoRoot });
   return repoRoot;
 }

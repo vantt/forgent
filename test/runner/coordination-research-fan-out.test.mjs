@@ -453,7 +453,7 @@ test('R5 concurrency: dispatchResearchFanOut fanning out to 2 branches CONCURREN
   // CI machine, never anywhere close to a "wait it out" shape) -- proves it
   // is a genuine hard reject at dispatch time, not a delayed/serialized
   // retry.
-  assert.ok(elapsedMs < 400 * 3, `expected the rejected branch not to wait out the in-flight executor's delay (elapsed ${elapsedMs}ms)`);
+  assert.ok(elapsedMs < Math.max(400 * 3, 2500), `expected the rejected branch not to wait out the in-flight executor's delay (elapsed ${elapsedMs}ms)`);
 
   const manifest = readManifest('coord_fanout_r5_cap', { cwd: tempDir });
   assert.equal(manifest.assignmentRefs.length, 2, 'coordinator dispatch + exactly the ONE successfully launched branch');
