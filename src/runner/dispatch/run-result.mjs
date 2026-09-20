@@ -409,6 +409,14 @@ export function normalizeRunResultV2({
   } else if (execStatus === 'failed') {
     confLvl = 'failed';
     basis.push('failed-exit');
+  } else if (claimInvalid) {
+    // A malformed/schema-invalid worker claim is a fail-closed signal on its
+    // own, independent of whether the process itself exited 0 (Step 04 §5.2
+    // "fails closed on malformed/invalid agent-result.json"). `basis` already
+    // records 'invalid-agent-result-claim' above; this makes the compat
+    // confidence projection agree with it instead of silently falling
+    // through to a 'reported'/'verified' guess from process exit alone.
+    confLvl = 'failed';
   } else if (!confLvl) {
     if (agentClaim?.status === 'done') {
       confLvl = isReadOnlyOperation ? 'reported' : (evidence.changedFiles?.length > 0 ? 'verified' : 'reported');
@@ -504,7 +512,19 @@ export function normalizeRunResultV2({
       ...(runtime.stderrLog ? { stderrLog: runtime.stderrLog } : {}),
       ...(runtime.settledAt ? { settledAt: runtime.settledAt } : {}),
     },
-    agentClaim: agentClaim ?? {
+    // M4 (dispatch-execution-engine architecture review 260920): a
+    // synthesized {status,summary} object here used to be indistinguishable
+    // from a real worker-written claim to every downstream reader -- the
+    // Addendum's own rule is "agent-result.json ... never independent
+    // proof", and a normalizer that manufactures one violates that on the
+    // worker's behalf. `agentClaim` is emitted only when a real claim was
+    // parsed; `runnerNote` (below) carries the same human-readable text
+    // under a name that cannot be mistaken for worker attestation, so no
+    // information is lost, and the confidence `basis` (computed above from
+    // the real input `agentClaim` parameter, not this projection) already
+    // omits `'valid-agent-result-claim'` whenever there was none.
+    ...(agentClaim ? { agentClaim } : {}),
+    runnerNote: {
       status: projectedStatus,
       summary: claimInvalid
         ? 'agent-result.json was present but failed schema validation'

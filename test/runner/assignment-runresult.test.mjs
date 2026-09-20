@@ -535,7 +535,12 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
 
   assert.equal(result.status, 'failed', 'malformed agent-result.json must produce status: failed');
   assert.equal(result.confidence, 'failed', 'malformed agent-result.json must produce confidence: failed');
-  assert.match(result.agentClaim.summary, /schema validation/i);
+  // M4 (dispatch-execution-engine architecture review 260920): the worker
+  // never wrote a valid claim, so `agentClaim` must be absent -- a runner-
+  // authored explanation of WHY is not a worker claim and must never be
+  // reported as one. The same text now lives under `runnerNote`.
+  assert.equal(result.agentClaim, undefined, 'no real worker claim exists -- agentClaim must not be fabricated');
+  assert.match(result.runnerNote.summary, /schema validation/i);
 });
 
 test('executeAssignment fails closed on invalid agent-result.json schema (Step 04 §5.2)', async () => {
