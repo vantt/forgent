@@ -72,6 +72,14 @@ import { executeThroughConfinement, buildConfinementAttestation } from '../../sr
 import { buildConfinementRequest } from '../../src/runner/dispatch/confinement/request.mjs';
 import { DispatchError } from '../../src/runner/dispatch/transport.mjs';
 
+function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
+  if (os.platform() !== 'linux') return false;
+  const res = cp.spawnSync(binary, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+  return res.status === 0;
+}
+
+const HAS_WORKING_BWRAP = hasWorkingBwrap();
+
 // =========================================================================
 // R1: Backend driver allowlist + bwrap driver config validation
 // =========================================================================
@@ -746,7 +754,7 @@ test('R6: saveAttestationRecord persists records outside write grants and create
 // =========================================================================
 
 test('R7: probe 1 (run-output writable) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p1-'));
   try {
     const runDir = path.join(tmp, 'run');
@@ -765,7 +773,7 @@ test('R7: probe 1 (run-output writable) passes on valid sandbox and fails on red
 });
 
 test('R7: probe 2 (host-write denied) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p2-'));
   try {
     const hostDir = path.join(tmp, 'host');
@@ -784,7 +792,7 @@ test('R7: probe 2 (host-write denied) passes on valid sandbox and fails on red f
 });
 
 test('R7: probe 3 (workspace writable ONLY) passes on valid sandbox and fails on red falsifiers', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p3-'));
   try {
     const wsDir = path.join(tmp, 'ws');
@@ -809,7 +817,7 @@ test('R7: probe 3 (workspace writable ONLY) passes on valid sandbox and fails on
 });
 
 test('R7: probe 4 (other runDir denied) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p4-'));
   try {
     const ownRunDir = path.join(tmp, 'disp1', 'run');
@@ -830,7 +838,7 @@ test('R7: probe 4 (other runDir denied) passes on valid sandbox and fails on red
 });
 
 test('R7: probe 5 (private home isolated) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p5-'));
   try {
     const hostHome = path.join(tmp, 'host-home');
@@ -851,7 +859,7 @@ test('R7: probe 5 (private home isolated) passes on valid sandbox and fails on r
 });
 
 test('R7: probe 6 (no inherited writable fd / MED-1 fix) passes with fd closer and fails without it', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p6-'));
   try {
     const hostFile = path.join(tmp, 'target-fd.txt');
@@ -869,7 +877,7 @@ test('R7: probe 6 (no inherited writable fd / MED-1 fix) passes with fd closer a
 });
 
 test('R7: probe 7 (executor credentials read-only) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-p7-'));
   try {
     const credsDir = path.join(tmp, 'creds');
@@ -888,7 +896,7 @@ test('R7: probe 7 (executor credentials read-only) passes on valid sandbox and f
 });
 
 test('R7: probe 8 (host read and network not overclaimed) passes on valid sandbox and fails on red falsifier', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
 
   // Normal configuration: read and network available
   const normal = probeHostReadAndNetworkNotOverclaimed();
@@ -900,7 +908,7 @@ test('R7: probe 8 (host read and network not overclaimed) passes on valid sandbo
 });
 
 test('R7: runAllConfinementProbes runs all 8 probes and succeeds on Linux', () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
   const result = runAllConfinementProbes();
   assert.equal(result.passed, true);
   assert.equal(result.results.length, 8);
@@ -914,6 +922,7 @@ test('R7: runAllConfinementProbes runs all 8 probes and succeeds on Linux', () =
 // =========================================================================
 
 test('R8: checkConfinementProbeFreshness in doctor passes on Linux with working bwrap', () => {
+  if (!HAS_WORKING_BWRAP) return;
   const check = checkConfinementProbeFreshness();
   assert.equal(check.passed, true);
   if (os.platform() === 'linux') {
@@ -926,7 +935,7 @@ test('R8: checkConfinementProbeFreshness in doctor passes on Linux with working 
 // =========================================================================
 
 test('Authority Door: required mode with bwrap backend assesses, prepares, executes, cleans up, and records attestation', async () => {
-  if (os.platform() !== 'linux') return;
+  if (!HAS_WORKING_BWRAP) return;
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-door-test-'));
   try {

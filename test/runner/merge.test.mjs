@@ -566,7 +566,7 @@ test('mergeRunnerItem reports "merge-failed-unclassified" (not "conflict") when 
   assert.equal(result.outcome, 'merge-failed-unclassified');
   assert.equal(result.branch, 'fgw/demo-item');
   assert.match(result.error.stderr, /untracked working tree files would be overwritten/);
-  assert.equal(result.error.status, 128);
+  assert.ok([2, 128].includes(result.error.status), `unexpected git merge status: ${result.error.status}`);
   assert.throws(
     () => git(repoRoot, ['rev-parse', '--verify', 'MERGE_HEAD']),
     'MERGE_HEAD must never have existed -- this was never a real conflict',

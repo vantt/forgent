@@ -46,6 +46,14 @@ test('runner-coordination-orgPolicy-shape: malformed policy -> check fail -> fix
 const checkClaims = DOCTOR_CHECKS.find(c => c.id === 'coordination-abandoned-claims').check;
 const fixClaims = FIX_REGISTRATIONS.find(c => c.id === 'coordination-abandoned-claims').fix;
 
+function processStartFingerprint(pid) {
+  try {
+    return fs.statSync('/proc/' + pid).mtimeMs;
+  } catch {
+    return undefined;
+  }
+}
+
 test('coordination-abandoned-claims: live claim không bị xóa', () => {
   const cwd = mkTempDir();
   const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');
@@ -54,8 +62,8 @@ test('coordination-abandoned-claims: live claim không bị xóa', () => {
   const liveClaimDir = path.join(sessionsDir, 'live.claim');
   fs.mkdirSync(liveClaimDir);
   
-  const processStartTime = fs.statSync('/proc/' + process.pid).mtimeMs;
-  fs.writeFileSync(path.join(liveClaimDir, 'claim.json'), JSON.stringify({ pid: process.pid, processStartTime, token: '123' }));
+  const processStartTime = processStartFingerprint(process.pid);
+  fs.writeFileSync(path.join(liveClaimDir, 'claim.json'), JSON.stringify({ pid: process.pid, ...(processStartTime === undefined ? {} : { processStartTime }), token: '123' }));
   
   const res = checkClaims(cwd);
   assert.equal(res.passed, true);
@@ -104,4 +112,3 @@ test('coordination-abandoned-claims: unknown staging fail diagnostic nhưng khô
   assert.equal(fixRes.changed, false); // DOES NOT DELETE unknown staging
   assert.equal(fs.existsSync(stagingDir), true);
 });
-

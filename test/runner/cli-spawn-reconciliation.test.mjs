@@ -451,6 +451,7 @@ test('6. escaped descendant keeps pipe open but timeout/maxBuffer receipt publis
 
 // 7. PID reuse, boot mismatch and start-time mismatch refuse inspect/kill/settle
 test('7. PID reuse, boot mismatch and start-time mismatch refuse inspect/kill/settle', async () => {
+  if (getBootId() === 'unknown-boot') return;
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
   const commandsDir = path.join(runDir, 'controller', 'commands');
@@ -493,10 +494,10 @@ test('7. PID reuse, boot mismatch and start-time mismatch refuse inspect/kill/se
     contract: 'cli-spawn-supervisor-binding.v1',
     launchCommandId,
     envelopeDigest: envDigest,
+    bootId: 'other-machine-boot-uuid',
     supervisor: {
       pid: 999999,
       pgid: 999999,
-      bootId: 'other-machine-boot-uuid',
       starttime: '12345',
     },
   };

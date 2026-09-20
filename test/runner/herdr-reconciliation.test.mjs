@@ -42,6 +42,18 @@ function mkTempDir(prefix = 'fgos-herdr-recon-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
+function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
+  if (os.platform() !== 'linux') return false;
+  try {
+    execFileSync(binary, ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const HAS_WORKING_BWRAP = hasWorkingBwrap();
+
 function createMockHerdr(tmpDir, scenario = {}) {
   fs.mkdirSync(tmpDir, { recursive: true });
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
@@ -148,6 +160,7 @@ ok({});
 
 // 1. Confinement Authority prepares herdr-spawn launch under required bwrap confinement
 test('1. Confinement Authority prepares herdr-spawn launch under required bwrap confinement when workerCommandSeam is true', async () => {
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = mkTempDir();
   const fgosDir = path.join(tmp, '.fgos');
   const runDir = path.join(fgosDir, 'runs', 'run-01');
@@ -209,6 +222,7 @@ test('1. Confinement Authority prepares herdr-spawn launch under required bwrap 
 
 // 2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false
 test('2. Confinement Authority refuses herdr-spawn when providerKindOnly or workerCommandSeam is false', async () => {
+  if (!HAS_WORKING_BWRAP) return;
   const tmp = mkTempDir();
   const fgosDir = path.join(tmp, '.fgos');
   const runDir = path.join(fgosDir, 'runs', 'run-02');
@@ -932,6 +946,7 @@ test('18. fail-closed triggers when backend is unsupported or foreground argv mi
 
 // 19. Confined execution under required bwrap executes via launcher script and produces receipt
 test('19. confined execution under required bwrap executes via launcher script and produces receipt', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
 
@@ -1051,7 +1066,7 @@ test('20. live Herdr gateway executes confined launch end-to-end when gateway is
     return t.skip('herdr status check failed');
   }
   const bwrapBin = findExecutableOnPath(['bwrap']) || (fs.existsSync('/usr/bin/bwrap') ? '/usr/bin/bwrap' : null);
-  if (!bwrapBin) return t.skip('bwrap binary not found');
+  if (!bwrapBin || !hasWorkingBwrap(bwrapBin)) return t.skip('working bwrap backend not available');
 
   const tmp = mkTempDir('fgos-live-herdr-');
   const runDir = path.join(tmp, 'run');
@@ -1251,4 +1266,3 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
     child.kill('SIGKILL');
   }
 });
-

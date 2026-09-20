@@ -4453,12 +4453,12 @@ function getAbandonedClaims(cwd) {
                   process.kill(claimData.pid, 0);
                   let isSameProcess = true;
                   if (claimData.processStartTime) {
-                    try {
-                      const currentStartTime = fs.statSync('/proc/' + claimData.pid).mtimeMs;
+                    const currentStartTime = processStartFingerprint(claimData.pid);
+                    if (currentStartTime !== undefined) {
                       if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
                         isSameProcess = false; // PID reused
                       }
-                    } catch (e) {}
+                    }
                   }
                   if (isSameProcess) {
                     isAlive = true;
@@ -4484,6 +4484,22 @@ function getAbandonedClaims(cwd) {
     }
   }
   return { deadClaims, unknownStale, sessionsDir };
+}
+
+function processStartFingerprint(pid) {
+  try {
+    return fs.statSync(`/proc/${pid}`).mtimeMs;
+  } catch (err) {
+    if (err && err.code === 'ENOENT') {
+      try {
+        process.kill(pid, 0);
+        return undefined;
+      } catch (killErr) {
+        if (killErr && killErr.code === 'EPERM') return undefined;
+      }
+    }
+    return undefined;
+  }
 }
 
 registerCheck({
@@ -4532,12 +4548,12 @@ registerFix({
                 process.kill(claimData.pid, 0);
                 let isSameProcess = true;
                 if (claimData.processStartTime) {
-                  try {
-                    const currentStartTime = fs.statSync('/proc/' + claimData.pid).mtimeMs;
+                  const currentStartTime = processStartFingerprint(claimData.pid);
+                  if (currentStartTime !== undefined) {
                     if (Math.abs(currentStartTime - claimData.processStartTime) > 1000) {
                       isSameProcess = false;
                     }
-                  } catch (e) {}
+                  }
                 }
                 if (isSameProcess) {
                   continue; // The process is actually alive now, abort deletion

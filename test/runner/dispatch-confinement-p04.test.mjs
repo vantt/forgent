@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import cp from "node:child_process";
 import { executeThroughConfinement, buildConfinementAttestation } from "../../src/runner/dispatch/confinement/authority.mjs";
 import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
 import {
@@ -30,6 +31,14 @@ import { resolveCapabilityIdentityDetails } from "../../src/runner/dispatch/reso
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
+
+function hasWorkingBwrap(binary = "/usr/bin/bwrap") {
+  if (os.platform() !== "linux") return false;
+  const res = cp.spawnSync(binary, ["--ro-bind", "/", "/", "--", "true"], { stdio: "ignore" });
+  return res.status === 0;
+}
+
+const HAS_WORKING_BWRAP = hasWorkingBwrap();
 
 // ─── R1: Required Policy Refusal Before Spawn (0 Adapter Calls) ────────────────
 
@@ -424,6 +433,7 @@ test("R1 Case 7: unsatisfied need refuses with confinement-need-unsatisfied and 
 });
 
 test("R1 Case 8: prepared claims mismatch plan refuses with confinement-plan-mismatch and 0 adapter calls", async () => {
+  if (!HAS_WORKING_BWRAP) return;
   const tmpDir = mkTemp("p04-r1-c8-");
   const regPath = path.join(tmpDir, "confinement-backends.json");
   fs.writeFileSync(

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import http from 'node:http';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { startGateway, stopGateway, gatewayStatus, acquireGatewayLock, GatewayControlError } from '../../src/runner/gateway-control.mjs';
 
@@ -55,6 +55,23 @@ function isAlive(pid) {
  * live: an orphaned process dies within ~50ms under the exact same
  * blocking poll). Returns `{ pid, kill(signal) }`. */
 function spawnThrowaway() {
+  if (os.platform() !== 'linux') {
+    const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
+      detached: true,
+      stdio: 'ignore',
+    });
+    child.unref();
+    return {
+      pid: child.pid,
+      kill(signal) {
+        try {
+          process.kill(child.pid, signal);
+        } catch (err) {
+          if (err.code !== 'ESRCH') throw err;
+        }
+      },
+    };
+  }
   const out = execFileSync('sh', [
     '-c',
     `setsid "$0" -e "$1" </dev/null >/dev/null 2>&1 & echo $!`,
@@ -178,6 +195,7 @@ test('stopGateway: a dead-pid registry entry is cleared and reports alreadyStopp
 });
 
 test('stopGateway: a live pid is genuinely SIGTERM-ed and the registry is cleared', async () => {
+  if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   const child = spawnThrowaway();
   try {
@@ -194,6 +212,7 @@ test('stopGateway: a live pid is genuinely SIGTERM-ed and the registry is cleare
 });
 
 test('stopGateway: escalates to SIGKILL when the process ignores SIGTERM, and still clears the registry', async () => {
+  if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   // A process with a real SIGTERM handler that swallows the signal --
   // proves the escalation path fires for a genuine "won't die" process,
@@ -268,6 +287,7 @@ test('startGateway: a repo with no herdr-plugin/ directory is refused with a rea
 // process attempts to acquire the SAME lock, proving the exclusion is
 // real, not just an in-process illusion.
 test('acquireGatewayLock: a live holder in ANOTHER process blocks this process from acquiring, and names the real holder pid', async () => {
+  if (os.platform() !== 'linux') return;
   const { repoRoot, fgosDir } = mkFgosDir();
   fs.mkdirSync(fgosDir, { recursive: true });
   const holderReadyPath = path.join(fgosDir, 'holder-ready');

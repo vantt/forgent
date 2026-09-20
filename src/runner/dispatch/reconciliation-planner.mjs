@@ -39,12 +39,17 @@ function startTime(pid) {
   try {
     stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
   } catch (err) {
-    // ENOENT (or ESRCH-shaped absence) proves the incarnation is gone -- the
-    // caller's holder() below is entitled to read that as dead. Anything
-    // else (EACCES, EIO, ...) is a read failure that proves nothing about
-    // whether the process exists, so it must propagate as "we could not
-    // read this" (return undefined), never be folded into the same `null`
-    // "confirmed absent" signal absence-by-ENOENT uses.
+    if (err && err.code === 'ENOENT') {
+      try {
+        process.kill(pid, 0);
+        return undefined;
+      } catch (killErr) {
+        if (killErr && killErr.code === 'EPERM') return undefined;
+      }
+    }
+    // ENOENT on a procfs-capable host proves the incarnation is gone; on
+    // hosts without /proc (macOS), a live `kill(pid, 0)` result means the
+    // stat path is unsupported, not dead proof.
     return err && err.code === 'ENOENT' ? null : undefined;
   }
   const lastParen = stat.lastIndexOf(')');
