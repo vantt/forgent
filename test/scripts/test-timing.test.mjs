@@ -372,3 +372,61 @@ test('summarizeSamples throws rather than averaging when any sample is invalid',
     /invalid/,
   );
 });
+
+test('isGitClean ignores untracked paths matching allowedPrefixes', () => {
+  assert.equal(
+    isGitClean('/fake/cwd', () => '?? plans/reports/artifacts/sample-1/\n', {
+      allowedPrefixes: ['plans/reports/artifacts/sample-1'],
+    }),
+    true,
+  );
+  assert.equal(
+    isGitClean('/fake/cwd', () => '?? plans/reports/\n', {
+      allowedPrefixes: ['plans/reports/artifacts/sample-1'],
+    }),
+    true,
+  );
+  assert.equal(
+    isGitClean('/fake/cwd', () => '?? plans/reports/artifacts/sample-1/stdout.log\n', {
+      allowedPrefixes: ['plans/reports/artifacts/sample-1'],
+    }),
+    true,
+  );
+  assert.equal(
+    isGitClean('/fake/cwd', () => '?? other/untracked.txt\n', {
+      allowedPrefixes: ['plans/reports/artifacts/sample-1'],
+    }),
+    false,
+  );
+  assert.equal(
+    isGitClean('/fake/cwd', () => ' M src/foo.mjs\n?? plans/reports/artifacts/sample-1/\n', {
+      allowedPrefixes: ['plans/reports/artifacts/sample-1'],
+    }),
+    false,
+  );
+});
+
+test('runOneSample permits internal logDir artifacts without marking the sample invalid', () => {
+  const fakeCwd = '/repo';
+  let afterChecked = false;
+  const sample = runOneSample({
+    cwd: fakeCwd,
+    hasTime: false,
+    logDir: '/repo/plans/reports/artifacts/sample-1',
+    spawn: () => ({ status: 0 }),
+    environment: () => ({}),
+    checkClean: (opts) => {
+      if (!afterChecked) {
+        afterChecked = true;
+        // before check: must be strictly clean
+        return (opts.allowedPrefixes ?? []).length === 0;
+      }
+      // after check: receives logDir prefix
+      return (opts.allowedPrefixes ?? []).includes('plans/reports/artifacts/sample-1');
+    },
+  });
+  assert.equal(sample.status, 0);
+  assert.equal(sample.before.clean, true);
+  assert.equal(sample.after.clean, true);
+  assert.equal(sample.valid, true);
+});

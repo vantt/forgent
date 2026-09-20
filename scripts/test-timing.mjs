@@ -32,10 +32,25 @@ import { REPO_ROOT } from './run-tests.mjs';
 // fails the clean check.
 const SYMLINKED_BUILD_ARTIFACT_ENTRIES = new Set(['?? node_modules', '?? target']);
 
-export function isGitClean(cwd = REPO_ROOT, exec = execFileSync) {
+export function isGitClean(cwd = REPO_ROOT, exec = execFileSync, { allowedPrefixes = [] } = {}) {
   const lines = exec('git', ['status', '--porcelain'], { cwd, encoding: 'utf8' })
     .split('\n')
-    .filter((line) => line.trim() !== '' && !SYMLINKED_BUILD_ARTIFACT_ENTRIES.has(line.trim()));
+    .filter((line) => {
+      const trimmed = line.trim();
+      if (trimmed === '') return false;
+      if (SYMLINKED_BUILD_ARTIFACT_ENTRIES.has(trimmed)) return false;
+      if (trimmed.startsWith('?? ')) {
+        const untracked = trimmed.slice(3).trim();
+        const cleanUntracked = untracked.replace(/\/+$/, '');
+        for (const prefix of allowedPrefixes) {
+          const cleanPrefix = prefix.replace(/\/+$/, '');
+          if (cleanPrefix === cleanUntracked || cleanPrefix.startsWith(cleanUntracked + '/') || cleanUntracked.startsWith(cleanPrefix + '/')) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
   return lines.length === 0;
 }
 
@@ -158,11 +173,18 @@ export function runOneSample({
   hasTime = hasGnuTimeV(),
   timeBinary = '/usr/bin/time',
   env = process.env,
-  checkClean = () => isGitClean(cwd),
+  checkClean,
   environment = () => gatherEnvironment({ cwd }),
   logDir,
 } = {}) {
-  const before = { clean: checkClean(), env: environment() };
+  const relLogDir = logDir ? path.relative(cwd, path.resolve(cwd, logDir)) : null;
+  const isInternalLogDir = relLogDir && !relLogDir.startsWith('..') && !path.isAbsolute(relLogDir);
+  const logDirPrefixes = isInternalLogDir ? [relLogDir] : [];
+
+  const defaultCheck = (opts = {}) => isGitClean(cwd, execFileSync, opts);
+  const checkSnapshot = checkClean ?? defaultCheck;
+
+  const before = { clean: checkSnapshot({ allowedPrefixes: [] }), env: environment() };
   const startNs = process.hrtime.bigint();
 
   let result;
@@ -183,7 +205,7 @@ export function runOneSample({
   }
 
   const wallSeconds = Number(process.hrtime.bigint() - startNs) / 1e9;
-  const after = { clean: checkClean() };
+  const after = { clean: checkSnapshot({ allowedPrefixes: logDirPrefixes }) };
 
   return {
     status: result.status ?? 1,
@@ -308,12 +330,16 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(JSON.stringify(sample, null, 2));
     process.exitCode = sample.valid ? 0 : 1;
   } else if (mode === 'profile') {
-    const rest = process.argv.slice(3);
+    let rest = process.argv.slice(3);
     const logDirIdx = rest.indexOf('--log-dir');
     const logDir = logDirIdx === -1 ? undefined : rest[logDirIdx + 1];
-    const forwardedArgs = logDirIdx === -1 ? rest : [...rest.slice(0, logDirIdx), ...rest.slice(logDirIdx + 2)];
+    if (logDirIdx !== -1) rest = [...rest.slice(0, logDirIdx), ...rest.slice(logDirIdx + 2)];
+    const topIdx = rest.indexOf('--top');
+    const topN = topIdx !== -1 ? Number(rest[topIdx + 1]) : 30;
+    if (topIdx !== -1) rest = [...rest.slice(0, topIdx), ...rest.slice(topIdx + 2)];
+    const forwardedArgs = rest;
     const profile = runProfile({ logDir, forwardedArgs });
-    const summary = summarizeProfile(profile.testcases);
+    const summary = summarizeProfile(profile.testcases, { topN });
     console.log(JSON.stringify({ ...profile, testcases: undefined, summary }, null, 2));
     process.exitCode = profile.valid ? 0 : 1;
   } else if (mode === 'env') {
