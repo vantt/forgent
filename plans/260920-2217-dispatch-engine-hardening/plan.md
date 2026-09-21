@@ -24,13 +24,19 @@ Hai nguyên tắc:
 Quy trình mỗi phase (nhóm 1 — mặc định):
 1. `git worktree add .claude/worktrees/dispatch-hardening-phaseNN-<slug> -b dispatch-hardening-phaseNN-<slug> <main HEAD hiện tại>`.
 2. Symlink `node_modules` từ checkout chính vào worktree mới trước khi chạy test (hook `.ckignore` chặn Bash gọi thẳng tên `node_modules` trong lệnh — nhờ user chạy một dòng `ln -s` qua `!` prefix).
-3. Làm việc, test, commit toàn bộ trong worktree đó.
-4. Test xanh → merge thẳng về `main` ngay (không đợi gì thêm), cập nhật phase file + `plan.md`.
+3. Làm việc, test, commit toàn bộ trong worktree đó — **bao gồm cả cập nhật phase file và `plan.md` của track này**: sửa ngay trong worktree, commit cùng đợt với code, không sửa `plan.md`/phase file trực tiếp trên `main` bao giờ (kể cả chỉ là ghi trạng thái — xem sự cố dưới).
+4. Test xanh → merge nhánh đó vào `main` ngay (không đợi gì thêm). **Trước khi merge**: chạy `git status` đầy đủ trên `main` (không giới hạn path), không giả định HEAD chưa đổi — checkout dùng chung, track khác có thể đã commit lên `main` trong lúc mình làm.
 5. `git worktree remove` + xoá nhánh.
 
 Quy trình nhóm 2 (chuỗi `session-engine.mjs`): rẽ nhánh mới từ nhánh trước đó trong chuỗi (không rẽ từ `main`), làm việc/test/commit như trên, nhưng KHÔNG merge riêng lẻ — giữ nguyên trên nhánh chờ tới khi track ngoài resolve, rồi merge một lần cho cả chuỗi.
 
 Nhánh Phase 01 R2/R3 là ngoại lệ đã xảy ra trước quyết định này (làm thẳng trên `main`, đã merge sẵn vì lúc đó file sạch) — không hồi tố, chỉ áp dụng từ Phase 02 trở đi.
+
+### Sự cố 2026-09-21 (suýt mất dữ liệu, đã khôi phục — bài học, không phải work item)
+
+Lúc ghi bản "tinh chỉnh 2 nguyên tắc" ở trên, em sửa `plan.md` **trực tiếp trên `main`** (đúng loại thao tác quy tắc này giờ cấm) và chỉ chạy `git status --short -- plans/260920-2217-dispatch-engine-hardening/plan.md` (giới hạn đúng path đó) trước khi commit — không thấy được rằng một track khác (`immediate-test-feedback-reduction`) đang commit trực tiếp lên `main` cùng lúc, đẩy HEAD tiến từ `a74a265a` lên `852171c2`. `git commit` build trên đúng HEAD mới đó nhưng index đã lẫn trạng thái xoá 44 file của track kia — commit bị lộn thành "xoá 45 file không liên quan". Phát hiện ngay, khôi phục bằng `git checkout 852171c2 -- .` + lấy lại đúng diff `plan.md` từ commit lỗi + `git commit --amend`, xác minh diff cuối cùng chỉ còn đúng 1 file. Không có gì mất; track kia không bị ảnh hưởng.
+
+Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) mọi sửa `plan.md`/phase file của track này đi qua worktree như code, không còn ngoại lệ "chỉ là doc thì sửa thẳng"; (b) `git status` trước khi git-write trên `main` luôn đầy đủ, không giới hạn path.
 
 ## Phases
 
