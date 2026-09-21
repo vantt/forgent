@@ -159,9 +159,17 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
   assert.equal(baseline.contract, 'evaluator-baseline.v1');
   assert.ok(baseline.gitBefore);
 
-  // Verify envelope
+  // Verify envelope (H11: v2 -- env redacted, secretsRef added)
   const envelope = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'launch-envelope.json'), 'utf8'));
-  assert.equal(envelope.contract, 'cli-spawn-launch-envelope.v1');
+  assert.equal(envelope.contract, 'cli-spawn-launch-envelope.v2');
+  assert.ok(envelope.invocation.secretsRef, 'v2 envelope must name the secrets side file');
+  assert.equal(envelope.invocation.env.PATH, process.env.PATH, 'allow-listed keys still appear');
+  assert.ok(!('ANTHROPIC_API_KEY' in envelope.invocation.env), 'the persisted envelope must never carry a credential-shaped key');
+  // H11: the real supervisor process reads this side file once to spawn the
+  // real worker (proven by the run having genuinely settled above, using
+  // real process.env.PATH etc. it could only have gotten from there) and
+  // unlinks it immediately after -- it must not survive a settled run.
+  assert.equal(fs.existsSync(path.join(runDir, envelope.invocation.secretsRef)), false, 'the secrets side file must be consumed and deleted by the supervisor, never left behind');
 
   // Verify supervisor binding
   const supBinding = readSupervisorBinding(runDir, cmdState.launchCommandId);

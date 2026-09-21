@@ -43,6 +43,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
+import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON } from '../runner/dispatch/config.mjs';
@@ -4177,6 +4178,109 @@ registerCheck({
 registerFix({
   id: 'confinement-backend-registry-readable',
   fix: () => fixConfinementBackendRegistryReadable(),
+});
+
+// ─── Confinement orphan reaper (Phase 04 M8) ───────────────────────────────
+// `reapOrphanedConfinementResources` (confinement/cleanup.mjs) existed but
+// was never called from any production path -- only a test called it
+// directly, so a temporary confinement resource whose owning process died
+// (or timed out, see finalizeConfinementResources's own `retained` outcome)
+// stayed on disk forever. Wiring it in here (checked/fixed via `doctor
+// --fix`) and at runner start (loop.mjs) is what actually reclaims it.
+
+export function defaultConfinementTempRoots() {
+  const roots = new Set([path.join(os.tmpdir(), 'fgos-confinement')]);
+  try {
+    const registry = loadMachineBackendRegistry();
+    for (const instance of Object.values(registry?.confinementBackends || {})) {
+      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
+    }
+  } catch {
+    // An unreadable/malformed registry is its own check (above); fall back
+    // to the one default root rather than failing this check too.
+  }
+  return [...roots];
+}
+
+export function checkConfinementOrphanedResourcesReaped() {
+  // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
+  // own (it deletes), so this counts dead-owned markers itself instead of
+  // calling it -- a `check` must never mutate.
+  const roots = defaultConfinementTempRoots();
+  const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
+  if (markedDeadOwnerDirs === 0) {
+    return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
+  }
+  return {
+    passed: false,
+    message: `${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')} -- run "fgos doctor --fix"`,
+  };
+}
+
+function countDeadOwnedConfinementDirs(roots) {
+  let count = 0;
+  for (const tempRoot of roots) {
+    if (!fs.existsSync(tempRoot)) continue;
+    let entries = [];
+    try {
+      entries = fs.readdirSync(tempRoot, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const dispatchDir = path.join(tempRoot, entry.name);
+      const candidates = [dispatchDir];
+      try {
+        for (const sub of fs.readdirSync(dispatchDir, { withFileTypes: true })) {
+          if (sub.isDirectory()) candidates.push(path.join(dispatchDir, sub.name));
+        }
+      } catch {}
+      for (const cand of candidates) {
+        const markerPath = path.join(cand, OWNERSHIP_MARKER_FILE);
+        if (!fs.existsSync(markerPath)) continue;
+        try {
+          const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
+            try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
+          })();
+          if (!alive) count += 1;
+        } catch {
+          // Unreadable marker: not this check's concern (ownership itself
+          // is what reapOrphanedConfinementResources trusts or refuses).
+        }
+      }
+    }
+  }
+  return count;
+}
+
+export function fixConfinementOrphanedResourcesReaped() {
+  const roots = defaultConfinementTempRoots();
+  let totalReaped = 0;
+  const messages = [];
+  for (const tempRoot of roots) {
+    const { reaped } = reapOrphanedConfinementResources({ tempRoot });
+    totalReaped += reaped.length;
+    if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
+  }
+  return {
+    changed: totalReaped > 0,
+    message: totalReaped > 0
+      ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
+      : 'no orphaned confinement resources to reap',
+  };
+}
+
+registerCheck({
+  id: 'confinement-orphaned-resources-reaped',
+  description: 'no confinement temp resources are left behind by a dead owning process',
+  check: () => checkConfinementOrphanedResourcesReaped(),
+});
+
+registerFix({
+  id: 'confinement-orphaned-resources-reaped',
+  fix: () => fixConfinementOrphanedResourcesReaped(),
 });
 
 export function checkConfinementBwrapPlatform() {

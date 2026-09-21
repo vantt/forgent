@@ -24,6 +24,7 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
+  publishSecretSideFile,
   updateCommandEnvelope,
   commitCommandOutcome,
 } from "../cli-spawn-supervisor.mjs";
@@ -37,6 +38,44 @@ export {
   updateCommandEnvelope,
   commitCommandOutcome,
 };
+
+// H11: the persisted prepared-invocation/launch-envelope records keep the
+// worker's real spawn environment's keys visible for audit (which env vars
+// this dispatch actually set) without ever persisting values that could be
+// credentials -- `envDigest` (computed separately, over the FULL real env)
+// is the cryptographic commitment a verifier checks the real env against;
+// this allow-list is deliberately short and standard-shell-only, never
+// provider/executor-specific, so nothing here has to guess which var names
+// look secret-shaped.
+const SAFE_ENV_ALLOWLIST = ['PATH', 'HOME', 'LANG', 'LC_ALL', 'TERM', 'SHELL', 'USER', 'LOGNAME', 'PWD', 'TZ', 'NODE_ENV', DISPATCH_DEPTH_ENV];
+
+function redactEnvForPersistence(env) {
+  const redacted = {};
+  for (const key of SAFE_ENV_ALLOWLIST) {
+    if (env && env[key] !== undefined) redacted[key] = env[key];
+  }
+  return redacted;
+}
+
+// L9: `saveAttestationRecord` can itself throw (disk write failure, a
+// concurrent isolation-violation check) -- every refusal site in this file
+// calls it right before throwing its own typed DispatchError, and if the
+// save throws first, that typed refusal (the reason the caller actually
+// needs) never gets thrown at all; the raw attestation-store error escapes
+// in its place instead. This wraps that pattern: the save failure is never
+// silently dropped (it's attached as `cause`) and never masks the intended
+// refusal either. New refusal sites should use this instead of the bare
+// `saveAttestationRecord(...); throw ...` pattern still used by most
+// existing call sites in this file (a full retrofit is a separate,
+// deliberately-scoped-out follow-up, not part of this Low-severity fix).
+function saveAttestationRecordThenThrow(attestation, context, error) {
+  try {
+    saveAttestationRecord(attestation, context);
+  } catch (saveErr) {
+    error.cause = saveErr;
+  }
+  throw error;
+}
 
 function applyBackendPlanToAttestation(attestation, backendPlan) {
   if (!backendPlan) return attestation;
@@ -414,6 +453,11 @@ export function buildConfinementAttestation({
     dispatchId: request.dispatchId,
     phase,
     outcome: determinedOutcome,
+    // M8: the bypass-pairing decision (evaluateBypassPairing) already gates
+    // dispatch on this exact value -- recording it here means an auditor
+    // reading the attestation later never has to reconstruct it from the
+    // raw invocation shape.
+    permissionMode: request.invocation?.permissionMode ?? null,
     requested: {
       mode: reqMode,
       policyId: request.requirement?.policyId ?? null,
@@ -586,10 +630,20 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   let preparedConfinement = null;
   const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
 
+  // H10/D2: one shared defaulting rule for both doors -- the assignment/
+  // Run-owned launch path (prepareConfinementForLaunch) already defaults a
+  // missing backendId to 'bwrap'; this direct door used to require the
+  // caller to supply one explicitly and simply had none of the backend
+  // instance resolved at all otherwise, which meant every direct
+  // `required`-mode dispatch with no backendId (the production case for
+  // capabilities like advise/code:review/code:debug, whose executor
+  // config never sets confinement.backend) refused outright below instead
+  // of resolving the same default the assignment door already gets.
+  const effectiveBackendId = request.backendId ?? 'bwrap';
+
   if (!request.assignmentLaunchContext) {
-    if (request.backendId) {
     const registryDoc = loadMachineBackendRegistry();
-    const rawInstance = registryDoc?.confinementBackends?.[request.backendId];
+    const rawInstance = registryDoc?.confinementBackends?.[effectiveBackendId];
     if (rawInstance && rawInstance.enabled === false) {
       const refusedAttestation = buildConfinementAttestation({
         request,
@@ -599,7 +653,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
         "confinement-backend-disabled",
-        `confinement backend instance "${request.backendId}" is disabled in machine registry.`,
+        `confinement backend instance "${effectiveBackendId}" is disabled in machine registry.`,
         {
           contract: "confinement-execution.v1",
           status: "refused",
@@ -611,7 +665,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       );
     }
     const snapshot = createBackendRegistrySnapshot(registryDoc);
-    backendInstance = snapshot.resolve(request.backendId);
+    backendInstance = snapshot.resolve(effectiveBackendId);
     if (!backendInstance) {
       const refusedAttestation = buildConfinementAttestation({
         request,
@@ -621,7 +675,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
         "confinement-backend-missing",
-        `confinement backend instance "${request.backendId}" not found in machine registry.`,
+        `confinement backend instance "${effectiveBackendId}" not found in machine registry.`,
         {
           contract: "confinement-execution.v1",
           status: "refused",
@@ -632,31 +686,28 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         },
       );
     }
-    driver = getBackendDriver(backendInstance.type);
-  }
-
-  if (request.requirement?.mode === "required") {
-    if (!request.backendId) {
-      const refusedAttestation = buildConfinementAttestation({
-        request,
-        phase: "refused",
-        outcome: "refused",
-      });
-      saveAttestationRecord(refusedAttestation, request.context);
-      throw new DispatchError(
-        "confinement-backend-missing",
-        `required confinement refused for capability "${request.capability}": no confinement backend specified.`,
-        {
-          contract: "confinement-execution.v1",
-          status: "refused",
-          dispatchId: request.dispatchId,
-          capability: request.capability,
-          requirement: request.requirement,
-          attestation: refusedAttestation,
-        },
-      );
+    // L9: getBackendDriver throws an untyped ConfinementBackendRegistryError
+    // (a data-integrity edge case: the registry names a type not in
+    // ALLOWED_DRIVER_TYPES) -- wrap it the same way prepareConfinementForLaunch's
+    // own identical call already does, so this door's contract ("every
+    // refusal is a DispatchError with an attached attestation") holds here
+    // too, instead of leaking a raw untyped error past this door.
+    try {
+      driver = getBackendDriver(backendInstance.type);
+    } catch (err) {
+      const refusedAttestation = buildConfinementAttestation({ request, phase: "refused", outcome: "refused" });
+      refusedAttestation.mismatches.push({ code: "confinement-backend-missing", detail: err.message });
+      saveAttestationRecordThenThrow(refusedAttestation, request.context, new DispatchError("confinement-backend-missing", err.message, {
+        contract: "confinement-execution.v1", status: "refused", dispatchId: request.dispatchId,
+        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
+      }));
     }
 
+    if (request.requirement?.mode === "required") {
+    // H10/D2: no separate "no backendId at all" refusal -- effectiveBackendId
+    // above always has a value (explicit, or the shared 'bwrap' default).
+    // The genuine refuse case, the resolved backend not actually being
+    // available in the machine registry, is still caught here.
     if (!backendInstance || !driver) {
       const refusedAttestation = buildConfinementAttestation({
         request,
@@ -666,7 +717,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
         "confinement-backend-missing",
-        `required confinement refused for capability "${request.capability}": backend "${request.backendId}" unavailable.`,
+        `required confinement refused for capability "${request.capability}": backend "${effectiveBackendId}" unavailable.`,
         {
           contract: "confinement-execution.v1",
           status: "refused",
@@ -817,8 +868,8 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     });
     applyBackendPlanToAttestation(prepAttestation, backendPlan);
     saveAttestationRecord(prepAttestation, request.context);
+    }
   }
-}
 
   // R3: Resolve adapter function through Authority
   let adapterFn = null;
@@ -945,7 +996,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     // (mode/policyId/policy) -- the same object every refusal path above
     // already reads from, so this is not a new concept, only a missing wire.
     requirement: request.requirement,
-    backendId: request.backendId,
+    backendId: effectiveBackendId,
   };
 
   if (preparedLaunch) {
@@ -1056,7 +1107,11 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       outcome: "unknown",
       error: err,
     });
-    applyBackendPlanToAttestation(failedAttestation, backendPlan);
+    // H9: prepareConfinementForLaunch (assignment/Run-owned launch path) has
+    // its own backendPlan, never written back to this function's outer
+    // variable -- use it when present so a failure after a real prepare
+    // still attests the plan that was actually enforced, not an empty one.
+    applyBackendPlanToAttestation(failedAttestation, preparedLaunch?.backendPlan ?? backendPlan);
     saveAttestationRecord(failedAttestation, request.context);
     if (err instanceof DispatchError) {
       err.contract = "confinement-execution.v1";
@@ -1092,18 +1147,26 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     }
   }
 
+  // H9: same substitution as the failed-attestation branch above -- the
+  // assignment/Run-owned launch path's real plan/prepared-confinement live
+  // on preparedLaunch, never on this function's own outer backendPlan/
+  // preparedConfinement (which prepareConfinementForLaunch never writes
+  // back to). Without this, every such dispatch attested outcome:'unknown'
+  // even when confinement was genuinely enforced (P06 evidence regression).
+  const finalBackendPlan = preparedLaunch?.backendPlan ?? backendPlan;
+  const finalPreparedConfinement = preparedLaunch?.preparedConfinement ?? preparedConfinement;
   const attestation = buildConfinementAttestation({
     request,
     phase: "completed",
-    outcome: preparedConfinement ? "enforced" : undefined,
+    outcome: finalPreparedConfinement ? "enforced" : undefined,
   });
-  applyBackendPlanToAttestation(attestation, backendPlan);
-  if (backendPlan?.probe?.fingerprint) {
+  applyBackendPlanToAttestation(attestation, finalBackendPlan);
+  if (finalBackendPlan?.probe?.fingerprint) {
     attestation.evidence.push({
       kind: "falsification-probe",
       ref: "local-bwrap-v1:pre-spawn",
       freshness: "current",
-      fingerprint: backendPlan.probe.fingerprint,
+      fingerprint: finalBackendPlan.probe.fingerprint,
     });
   }
   saveAttestationRecord(attestation, request.context);
@@ -1145,6 +1208,13 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       { contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId },
     );
   }
+  // H11: 0700 at first creation -- everything this function publishes under
+  // here (prepared-invocation, launch-envelope, the secrets side file) is
+  // host-private evidence, never meant to be world/group-readable. A
+  // subsequent mkdirSync(..., {recursive:true}) by the generic publish
+  // helpers below is a no-op on an already-existing directory and never
+  // widens this back.
+  try { fs.mkdirSync(path.join(runDir, 'protected'), { recursive: true, mode: 0o700 }); } catch {}
 
   const launchCommandId = launchContext.command?.launchCommandId;
   if (!launchCommandId) {
@@ -1165,7 +1235,11 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
 
   if (reqMode !== 'unconfined') {
     const backendRegistry = loadMachineBackendRegistry();
-    const backendId = request.backendId || backendRegistry.defaultBackend || 'bwrap';
+    // H10/D2: same shared default as executeThroughConfinement's direct
+    // door. `backendRegistry.defaultBackend` was dead code -- the registry
+    // schema (backend-registry.mjs ALLOWED_DOC_KEYS) forbids that key at
+    // the document level, so it could never be truthy.
+    const backendId = request.backendId || 'bwrap';
     const rawInstance = backendRegistry.confinementBackends?.[backendId];
 
     if (!rawInstance || rawInstance.enabled === false) {
@@ -1201,11 +1275,10 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     } catch (err) {
       const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
       refusedAttestation.mismatches.push({ code: 'confinement-backend-missing', detail: err.message });
-      saveAttestationRecord(refusedAttestation, request.context);
-      throw new DispatchError('confinement-backend-missing', err.message, {
+      saveAttestationRecordThenThrow(refusedAttestation, request.context, new DispatchError('confinement-backend-missing', err.message, {
         contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
         capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-      });
+      }));
     }
 
     const assessment = driver.assess(request, backendInstance);
@@ -1359,6 +1432,15 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const attestationPlanDigest = computeSha256Digest(backendPlan);
   const launchContextDigest = computeSha256Digest(launchContext);
 
+  // H11: the real env (with secrets) goes ONLY into this 0600 side file,
+  // never into a persisted record. Both records below carry `redactedEnv`
+  // (allow-list only) plus `envDigest` (already computed above, over the
+  // FULL real env) as the verifiable commitment to what the real env was.
+  const redactedEnv = redactEnvForPersistence(workerEnv);
+  const secretsRefRelative = path.join('protected', 'secrets', `${launchCommandId}.env.json`);
+  const secretsPath = path.join(runDir, secretsRefRelative);
+  publishSecretSideFile(secretsPath, workerEnv);
+
   // Resource bindings with ownership marker digests
   const resourceBindingsList = [];
   const finalizationResources = [];
@@ -1430,6 +1512,12 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       command: workerCommand,
       args: workerArgs,
       cwd: workerCwd,
+      // H11: real env stays in-memory only -- this in-process return value
+      // (never itself written to disk) is what herdr-spawn's adapter reads
+      // to actually deliver a working env to its launcher script. cli-spawn
+      // never reads this object for its real spawn at all (see below); its
+      // supervisor process reads the redacted on-disk envelope plus the
+      // secrets side file instead.
       env: workerEnv,
       envDigest,
       workerCommandDigest,
@@ -1464,7 +1552,20 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   // digest, never a freshly recomputed one, or `reconcileHerdrSpawnRun`
   // refuses a live, healthy worker as `confinement-mismatch` purely because
   // this function ran twice.
-  let preparedInvocationDigest = computeSha256Digest(preparedInvocationRecord);
+  // H11: the digest (and the on-disk record) are computed over a REDACTED
+  // clone -- the same shape as `preparedInvocationRecord` but with
+  // `workerInvocation.env` swapped for `redactedEnv` -- never over the
+  // real-env object. Every downstream consumer of `preparedInvocationDigest`
+  // (the herdr-launch-command.v1 write, cli-spawn-launch-envelope.v1,
+  // confinement-finalization.v1) only ever needs a stable digest a reader
+  // can recompute from the ACTUAL bytes on disk; it was never a digest OF
+  // the secrets themselves.
+  const preparedInvocationDiskRecord = {
+    ...preparedInvocationRecord,
+    workerInvocation: { ...preparedInvocationRecord.workerInvocation, env: redactedEnv },
+  };
+  let preparedInvocationDigest = computeSha256Digest(preparedInvocationDiskRecord);
+  preparedInvocationDiskRecord.digest = preparedInvocationDigest;
   preparedInvocationRecord.digest = preparedInvocationDigest;
 
   if (fs.existsSync(preparedInvocationPath)) {
@@ -1472,6 +1573,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       const existingPreparedInvocation = JSON.parse(fs.readFileSync(preparedInvocationPath, 'utf8'));
       if (existingPreparedInvocation?.digest) {
         preparedInvocationDigest = existingPreparedInvocation.digest;
+        preparedInvocationRecord.digest = preparedInvocationDigest;
       }
     } catch {
       // Corrupt on-disk record: fall through and attempt the normal
@@ -1479,7 +1581,7 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       // through publishImmutableProof's own collision handling elsewhere.
     }
   } else {
-    publishImmutableProof(preparedInvocationPath, preparedInvocationRecord);
+    publishImmutableProof(preparedInvocationPath, preparedInvocationDiskRecord);
   }
 
   // 2. Publish confinement-finalization.v1
@@ -1583,12 +1685,24 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       providerCapacity: preparedConfinement?.providerCapacity || null,
       finalizationPath,
       finalizationDescriptor: finalizationDescBody,
+      // H9: the caller's own completed/failed attestation must reflect what
+      // THIS call actually prepared -- these are this function's own local
+      // backendPlan/preparedConfinement, never the caller's same-named outer
+      // variables (which the assignment/Run-owned launch path never sets).
+      backendPlan,
+      preparedConfinement,
     };
   }
 
-  // 3. Publish cli-spawn-launch-envelope.v1
+  // 3. Publish cli-spawn-launch-envelope.v2 (H11: v1 -> v2, `env` redacted,
+  // `envDigest` + `secretsRef` added -- the real env moved to the 0600
+  // side file above). The supervisor process (a separate process that
+  // reads this file, not the in-process caller) resolves the real spawn
+  // env by reading+unlinking `secretsRef`; it still accepts a v1 envelope
+  // for one release (a resumed Run whose envelope was published before
+  // this change), falling back to its own inline `env`.
   const envelopeBody = {
-    contract: 'cli-spawn-launch-envelope.v1',
+    contract: 'cli-spawn-launch-envelope.v2',
     run: {
       runId: launchContext.run.runId,
       assignmentId: launchContext.run.assignmentId,
@@ -1607,7 +1721,9 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
       command: workerCommand,
       args: workerArgs,
       cwd: workerCwd,
-      env: workerEnv,
+      env: redactedEnv,
+      envDigest,
+      secretsRef: secretsRefRelative,
       stdin: 'ignore',
       encoding: 'utf8',
       dispatchDepth: depth + 1,
@@ -1653,6 +1769,9 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
     providerCapacity: preparedConfinement?.providerCapacity || null,
     finalizationPath,
     finalizationDescriptor: finalizationDescBody,
+    // H9: see the herdr-spawn return above for why these are returned.
+    backendPlan,
+    preparedConfinement,
   };
 }
 
