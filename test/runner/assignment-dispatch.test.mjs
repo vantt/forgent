@@ -2691,7 +2691,7 @@ function spawnExecuteAssignment(tempDir, assignment, runnerConfig, extraOpts = {
     `    });`,
     `    process.stdout.write(JSON.stringify({ ok: true, result }));`,
     `  } catch (err) {`,
-    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message }));`,
+    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message, code: err.code }));`,
     `  }`,
     `  process.exit(0);`,
     `});`,
@@ -2740,6 +2740,25 @@ test('executeAssignment: the same (retryId, destination, payloadDigest) tuple re
   assert.equal(fs.readFileSync(counterPath, 'utf8'), '1', 'the executor must only ever be dispatched once for a duplicate admission tuple');
 });
 
+test('executeAssignment: resuming a Run whose result.json exists but fails to parse REFUSES (result-corrupt), never silently relaunches a worker over it (H3)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-resume-corrupt', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const tuple = { retryId: 'retry-corrupt-1', destination: 'fixed-destination', payloadDigest: 'fixed-payload-digest' };
+  const first = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple });
+
+  const resultJsonPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'result.json');
+  assert.equal(fs.existsSync(resultJsonPath), true);
+  fs.writeFileSync(resultJsonPath, '{ not valid json');
+
+  await assert.rejects(
+    () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, ...tuple }),
+    (err) => err instanceof RunnerConfigError && err.code === 'result-corrupt' && err.message.includes(first.runId),
+  );
+});
+
 test('executeAssignment: reusing a retryId with a CHANGED destination/payload is refused as duplicate-retry', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
@@ -2750,8 +2769,39 @@ test('executeAssignment: reusing a retryId with a CHANGED destination/payload is
 
   await assert.rejects(
     () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId: 'retry-a', destination: 'dest-1', payloadDigest: 'digest-2' }),
-    (err) => err instanceof RunnerConfigError && /duplicate-retry/.test(err.message),
+    (err) => err instanceof RunnerConfigError && err.code === 'admission-duplicate-retry' && err.phase === 'pre-admission',
   );
+});
+
+test('executeAssignment: an expectedRunId ahead of the naturally-computed next attempt is REFUSED, never silently adopted as the new attempt number (L1)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-admit-expected-ahead', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const initial = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, retryId: 'retry-1', destination: 'dest', payloadDigest: 'digest-1' });
+  assert.equal(initial.runId, `run_${assignment.assignmentId}_01`);
+
+  // The real next attempt is 02; declaring 05 must refuse, not make this
+  // ledger jump forward to match the caller's (wrong) declaration.
+  await assert.rejects(
+    () =>
+      executeAssignment(assignment, {
+        cwd: tempDir,
+        repoRoot: tempDir,
+        runnerConfig,
+        retryId: 'retry-2',
+        predecessorRunId: initial.runId,
+        destination: 'dest',
+        payloadDigest: 'digest-2',
+        expectedRunId: `run_${assignment.assignmentId}_05`,
+      }),
+    (err) => err instanceof RunnerConfigError && err.code === 'admission-invalid-predecessor',
+  );
+
+  const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
+  const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
+  assert.deepEqual(attemptDirs, ['01'], 'the refused call must never materialize attempt 05 (or any other) on disk');
 });
 
 test('executeAssignment: a predecessorRunId that does not name the current committed Run is refused as invalid-predecessor', async () => {
@@ -2774,7 +2824,7 @@ test('executeAssignment: a predecessorRunId that does not name the current commi
         destination: 'dest',
         payloadDigest: 'digest-2',
       }),
-    (err) => err instanceof RunnerConfigError && /invalid-predecessor/.test(err.message),
+    (err) => err instanceof RunnerConfigError && err.code === 'admission-invalid-predecessor' && err.phase === 'pre-admission',
   );
 });
 
@@ -2804,7 +2854,7 @@ test('executeAssignment: concurrent identical admission (same retryId/tuple, two
   const runIds = new Set(succeeded.map((o) => o.result.runId));
   assert.equal(runIds.size, 1, `every successful call must report the SAME Run identity, got ${JSON.stringify(outcomes)}`);
   for (const o of outcomes) {
-    if (!o.ok) assert.match(o.message, /could not acquire control|invalid-predecessor|duplicate-retry/, `an unsuccessful call must fail for an expected admission/control reason, got: ${o.message}`);
+    if (!o.ok) assert.ok(['run-control-held', 'admission-invalid-predecessor', 'admission-duplicate-retry'].includes(o.code), `an unsuccessful call must fail for an expected admission/control reason, got code: ${o.code} (${o.message})`);
   }
 
   const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
@@ -2829,7 +2879,7 @@ test('executeAssignment: concurrent DIFFERENT retry tuples racing for the same (
   const losers = outcomes.filter((o) => !o.ok);
   assert.equal(winners.length, 1, `expected exactly one winner, got ${JSON.stringify(outcomes)}`);
   assert.equal(losers.length, 1, `expected exactly one loser, got ${JSON.stringify(outcomes)}`);
-  assert.match(losers[0].message, /invalid-predecessor/);
+  assert.equal(losers[0].code, 'admission-invalid-predecessor');
 
   const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
   const attemptDirs = fs.readdirSync(runsDir).filter((d) => /^\d+$/.test(d));
@@ -3017,13 +3067,13 @@ test('executeAssignment: a control token that is superseded mid-flight (a freshe
   const [outcome] = await Promise.all([
     executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }).then(
       (result) => ({ ok: true, result }),
-      (err) => ({ ok: false, message: err.message }),
+      (err) => ({ ok: false, message: err.message, code: err.code }),
     ),
     interject(),
   ]);
 
   assert.equal(outcome.ok, false, 'a superseded controller must never successfully append a settlement');
-  assert.match(outcome.message, /no longer current/);
+  assert.equal(outcome.code, 'run-control-superseded');
   assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false, 'no settlement (result.json) may be appended by a controller that lost its token mid-flight');
 });
 

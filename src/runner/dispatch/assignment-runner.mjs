@@ -75,6 +75,7 @@ import {
   publishMarkerOnce,
   fsyncFileBestEffort,
   fsyncDirBestEffort,
+  buildRunControlHolder,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
 import { reconcileHerdrSpawnRun } from './herdr-round.mjs';
@@ -1016,16 +1017,10 @@ function admitRunAttempt(
       attempt += 1;
     }
 
-    if (expectedRunId !== undefined) {
-      const match = /^run_.+_(\d+)$/.exec(expectedRunId);
-      if (match) {
-        const declaredAttempt = parseInt(match[1], 10);
-        if (!Number.isNaN(declaredAttempt) && declaredAttempt > attempt) {
-          attempt = declaredAttempt;
-        }
-      }
-    }
-
+    // L1: expectedRunId is checked below against the naturally-computed
+    // attempt, never used to bump it -- a caller declaring an attempt ahead
+    // of what this ledger would assign gets refused (invalid-predecessor),
+    // never silently adopted as the new attempt number.
     const attemptStr = String(attempt).padStart(2, '0');
     const runId = `run_${assignmentId}_${attemptStr}`;
     if (expectedRunId !== undefined && runId !== expectedRunId) {
@@ -1070,11 +1065,13 @@ function admitRunAttempt(
   if (admission.status === 'duplicate-retry') {
     throw new RunnerConfigError(
       `executeAssignment: retryId "${retryId}" for assignment "${assignmentId}" was already admitted with a different destination/payload digest -- refusing (duplicate-retry)`,
+      { code: 'admission-duplicate-retry', phase: 'pre-admission' },
     );
   }
   if (admission.status === 'invalid-predecessor') {
     throw new RunnerConfigError(
       `executeAssignment: predecessorRunId "${predecessorRunId}" for assignment "${assignmentId}" does not match the current committed Run "${admission.currentRunId}" -- refusing (invalid-predecessor)`,
+      { code: 'admission-invalid-predecessor', phase: 'pre-admission' },
     );
   }
 
@@ -1150,8 +1147,7 @@ function admitRunAttempt(
     const effectiveContract = buildEffectiveContractOpt(record);
     if (effectiveContract) {
       const contractPath = path.join(stagingDir, EFFECTIVE_EXECUTION_CONTRACT_FILE);
-      fs.writeFileSync(contractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
-      fsyncFileBestEffort(contractPath);
+      publishMutableProjection(contractPath, effectiveContract);
     }
   }
   fsyncDirBestEffort(stagingDir);
@@ -1779,7 +1775,7 @@ export async function executeAssignment(assignment, opts = {}) {
           },
           evidence: evidenceData,
         });
-        fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(refusedRunResult, null, 2)}\n`);
+        publishMutableProjection(path.join(runDir, 'result.json'), refusedRunResult);
         // Same convention as the normal completion path below: markRunSettled
         // is the sole writer of run.json's own `status` field (default
         // "settled" -- "reached its end and produced a RunResult", distinct
@@ -1843,7 +1839,18 @@ export async function executeAssignment(assignment, opts = {}) {
       try {
         const settledResult = interpretRunResult(resultJsonPath);
         return Object.freeze(settledResult);
-      } catch {}
+      } catch (err) {
+        // H3: result.json EXISTS (checked above) but failed to read/parse --
+        // a torn or corrupt write, not "no result yet". Falling through here
+        // used to silently continue toward launching a brand-new worker over
+        // a Run slot that already has terminal evidence, just unreadable
+        // evidence. Refuse instead; a human/recovery door decides next, this
+        // path never guesses by relaunching over it.
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" resume found an existing result.json that failed to parse (${err.message}) -- refusing to relaunch over unreadable settlement evidence`,
+          { code: 'result-corrupt', phase: 'post-admission' },
+        );
+      }
     }
     const commandsDir = path.join(runDir, 'controller', 'commands');
     if (fs.existsSync(commandsDir)) {
@@ -1875,19 +1882,17 @@ export async function executeAssignment(assignment, opts = {}) {
   }
 
   // Dispatched-run membership: record every run attempt THIS runner actually
-  // dispatched, appended to assignment.json right after the run dir exists.
-  // assignment.json's assignment fields stay the immutable input per Step 03
-  // §2 — this one key is runner-owned append-only bookkeeping, so cross-pass
-  // consumption can refuse run dirs no runner ever dispatched (a planted
-  // runs/NN directory must never look like evidence of a real run).
+  // dispatched, so cross-pass consumption can refuse run dirs no runner ever
+  // dispatched (a planted runs/NN directory must never look like evidence of
+  // a real run). H3: a one-file-per-attempt marker under dispatched/<NN>
+  // instead of a full assignment.json rewrite -- a torn write here can only
+  // ever cost this ONE marker, never corrupt the whole manifest (assignment
+  // fields stay the immutable input per Step 03 §2, untouched by this write
+  // either way). operation-choice.mjs reads this marker first, falling back
+  // to the legacy dispatchedRuns array for one release.
   try {
-    const manifestRaw = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
-    const prevDispatched = Array.isArray(manifestRaw.dispatchedRuns) ? manifestRaw.dispatchedRuns : [];
-    const nextDispatched = prevDispatched.includes(attemptStr) ? prevDispatched : [...prevDispatched, attemptStr];
-    fs.writeFileSync(
-      assignmentJsonPath,
-      `${JSON.stringify({ ...manifestRaw, dispatchedRuns: nextDispatched }, null, 2)}\n`,
-    );
+    const dispatchedDir = path.join(assignmentDir, 'dispatched');
+    publishMarkerOnce(path.join(dispatchedDir, attemptStr), { attemptStr, dispatchedAt: new Date().toISOString() });
   } catch {
     // Bookkeeping must never abort a dispatch that already started; a missing
     // entry only costs this run its cross-pass consumability (fail closed).
@@ -1941,7 +1946,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // heartbeat/TTL alone (see run-lock.mjs). Failure to acquire here means a
   // different controller already holds this exact Run -- refuse outright
   // rather than race it for the same subprocess/files.
-  const controlHolder = { id: `${runId}:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+  const controlHolder = buildRunControlHolder(`${runId}:${process.pid}:${crypto.randomUUID()}`);
   const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
   if (control.status !== 'acquired') {
     if (providerCapacitySelection?.status === 'selected') {
@@ -1956,6 +1961,7 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     throw new RunnerConfigError(
       `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
+      { code: 'run-control-held', phase: 'post-admission' },
     );
   }
   const { controlEpoch, controlToken } = control;
@@ -2236,8 +2242,7 @@ export async function executeAssignment(assignment, opts = {}) {
           backend: prepResult.preparedInvocation.backend,
         },
       });
-      fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
-      fsyncFileBestEffort(effectiveContractPath);
+      publishMutableProjection(effectiveContractPath, effectiveContract);
 
       // 6. Guarded update of pending command with envelopeDigest
       commandState.envelopeDigest = prepResult.envelope.digest;
@@ -2292,6 +2297,7 @@ export async function executeAssignment(assignment, opts = {}) {
       if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
         throw new RunnerConfigError(
           `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+          { code: 'run-control-superseded', phase: 'post-admission' },
         );
       }
 
@@ -2358,8 +2364,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // guarantee. cli-spawn writes later, immediately after Authority
       // preparation, so its persisted posture reflects that preparation.
       if (!fs.existsSync(effectiveContractPath)) {
-        fs.writeFileSync(effectiveContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
-        fsyncFileBestEffort(effectiveContractPath);
+        publishMutableProjection(effectiveContractPath, effectiveContract);
       }
       try {
         rawResult = await executeExecutorCli(executorId, {
@@ -2410,6 +2415,7 @@ export async function executeAssignment(assignment, opts = {}) {
       if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
         throw new RunnerConfigError(
           `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+          { code: 'run-control-superseded', phase: 'post-admission' },
         );
       }
     }
@@ -2723,10 +2729,11 @@ export async function executeAssignment(assignment, opts = {}) {
   if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
     throw new RunnerConfigError(
       `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
     );
   }
 
-  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
 
   // Close the sentence run.json started. It was written `running` before the
   // worker launched and, until now, was never written again -- so a run that
@@ -2842,13 +2849,13 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
     },
   });
 
-  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
   const runJsonPath = path.join(runDir, 'run.json');
   let runJsonMeta = runMeta || {};
   if (fs.existsSync(runJsonPath)) {
     try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
   }
-  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'failed', settledAt }, null, 2)}\n`);
+  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'failed', settledAt });
   await finalizeConfinementResources({ runDir, launchCommandId: command.launchCommandId });
 
   return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
@@ -3070,13 +3077,13 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     },
   });
 
-  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(runResult, null, 2)}\n`);
+  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
   const runJsonPath = path.join(runDir, 'run.json');
   let runJsonMeta = runMeta || {};
   if (fs.existsSync(runJsonPath)) {
     try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
   }
-  fs.writeFileSync(runJsonPath, `${JSON.stringify({ ...runJsonMeta, status: 'settled', settledAt }, null, 2)}\n`);
+  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'settled', settledAt });
   await finalizeConfinementResources({ runDir, launchCommandId, receipt });
 
   return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
@@ -3133,7 +3140,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
 
   let acquiredControl = null;
   if (opts.controlToken === undefined) {
-    const holder = opts.holder || { id: `reconciler:${process.pid}:${crypto.randomUUID()}`, pid: process.pid };
+    const holder = opts.holder || buildRunControlHolder(`reconciler:${process.pid}:${crypto.randomUUID()}`);
     try {
       const control = acquireRunControl(runDir, { holder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
       if (control.status === 'held') {

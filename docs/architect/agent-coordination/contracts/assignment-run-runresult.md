@@ -91,10 +91,14 @@ Admission rules:
 
 Three guarantees, kept distinct:
 
-- **Control fencing** — one controller per un-settled Run. To be implemented with
-  the repository's existing exclusive-create lock pattern (holder identity,
-  expiry, stale-by-pid). Observers hold no lock. A controller that lost the
-  lock may not deliver input, terminate, or write Run/RunHandle state.
+- **Control fencing** — one controller per un-settled Run, implemented via
+  `run-lock.mjs`'s exclusive-create generation ledger (`acquireRunControl`/
+  `releaseRunControl`). Holder identity is `{id, pid, bootId, processStartTime,
+  host}` (`buildRunControlHolder`); reclaim requires proven-dead identity
+  (`resolveHolderLiveness`) — a live PID, a PID whose liveness cannot be
+  disproven, or a PID reused after a host reboot is never mistaken for a dead
+  holder's slot. Observers hold no lock. A controller that lost the lock may
+  not deliver input, terminate, or write Run/RunHandle state.
 - **Result fencing** — a superseded Run loses the right to publish the
   Assignment's authoritative result (`result-linked` after `run-retried`).
   Its late result is still stored and validated: it may prove an effect
@@ -105,13 +109,21 @@ Three guarantees, kept distinct:
   are absent.
 
 Implementation status: deterministic `runId`, pre-spawn `run.json` metadata,
-and `run-retried` declaration/event-order supersession are implemented
-(`src/runner/dispatch/assignment-runner.mjs`, CoordinationSession store/replay).
-Strict fencing against the exact superseded Run is not yet implemented: current
-link/replay checks authorize a later link by intervening retry count/order, not
-by the exact eligible destination Run. Atomic admission and crash durability, the
-`bound`/`delivered` phases, the standalone supersession event, and the
-per-Run controller lock are not implemented; they are specified here so
+`run-retried` declaration/event-order supersession, the per-Run controller
+lock (holder identity above), and a caller-declared `expectedRunId` that
+disagrees with the naturally-computed next attempt refusing rather than being
+silently adopted are implemented (`src/runner/dispatch/assignment-runner.mjs`,
+`src/runner/dispatch/run-lock.mjs`, CoordinationSession store/replay). Atomic
+admission durability is partially implemented: `result.json`/`run.json`/the
+effective-execution-contract projection and the per-attempt dispatch-bookkeeping
+marker are all published via a fsynced-temp-then-rename primitive
+(`publishMutableProjection`/`publishMarkerOnce`), and a resume that finds an
+existing `result.json` which fails to parse refuses (`result-corrupt`) instead
+of relaunching a worker over unreadable settlement evidence. Strict fencing
+against the exact superseded Run is not yet implemented: current link/replay
+checks authorize a later link by intervening retry count/order, not by the
+exact eligible destination Run. The `bound`/`delivered` phases and the
+standalone supersession event are not implemented; they are specified here so
 [RunHandle](../architecture/run-handle.md),
 [Continuation Planner](../architecture/coordination-continuation-recovery.md),
 and [Executor Fallback](../architecture/executor-health-and-fallback.md) share

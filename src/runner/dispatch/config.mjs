@@ -71,12 +71,20 @@ export {
 /** Raised for malformed runner config or an unresolvable tier -> model
  * lookup. `category` follows the same CLI-facing vocabulary as
  * WorkValidationError/StoreError (R4) — this is an input-shape problem, not
- * a runtime dispatch failure. */
+ * a runtime dispatch failure. Also reused (Phase 02 H1) for admission/
+ * control-fencing refusals that need a stable `code` a caller can branch
+ * on instead of regex-matching `message` — `code`/`phase` are optional so
+ * every pre-existing throw site with neither keeps working unchanged.
+ * `phase` is `'pre-admission'` (refused before any Run identity was
+ * committed) or `'post-admission'` (refused after commit, e.g. control
+ * fencing on an already-admitted Run). */
 export class RunnerConfigError extends Error {
-  constructor(message) {
+  constructor(message, { code, phase } = {}) {
     super(message);
     this.name = 'RunnerConfigError';
     this.category = 'validation';
+    if (code !== undefined) this.code = code;
+    if (phase !== undefined) this.phase = phase;
   }
 }
 

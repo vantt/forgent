@@ -2,6 +2,19 @@
 
 Wave 1 · Gate: none · Findings: M2, H1, H3, L1. Context: review §H1/H3/M2, Phụ lục 4. Tiền đề cho Phase 03.
 
+## Status — 2026-09-21
+
+**R1, R2, R3, R4 xong trên nhánh `dispatch-hardening-phase02-admission-lock`** (worktree `.claude/worktrees/dispatch-hardening-phase02-admission-lock`, rẽ từ `main`@`0a97332b`). `npm test` ngoài session: 7216 test, chỉ fail 51 — toàn bộ thuộc `rust-host`/`fgctl`/`main-checkout-lock`, do worktree này chưa `cargo build --release --workspace` (binary không track trong git, main checkout có sẵn, worktree mới thì không) — không liên quan gì tới diff phase này, xác nhận qua `node -e` check binary tồn tại trên main. Không có test dispatch/coordination/run-lock/operation-choice nào fail.
+
+Deviation nhỏ so với kế hoạch ban đầu:
+- R3 không cần viết helper `writeRunArtifactAtomic` mới — `publishMutableProjection`/`publishMarkerOnce` đã có sẵn trong `cli-spawn-supervisor.mjs`/`run-lock.mjs` từ trước, dùng thẳng.
+- "resume: result.json corrupt → parked: result-corrupt" hiện ở `executeAssignment` (không phải `reconcileCliSpawnRun`, nơi vocab `status:'parked'` thuộc về) nên implement bằng `throw RunnerConfigError({code:'result-corrupt', phase:'post-admission'})` — cùng cơ chế refuse với R1, không phải trả object `{status:'parked'}`.
+- R1's line-range trong Files section trôi khá xa so với thực tế (file đã đổi nhiều từ lúc viết phase file) — thực tế throw site cho `run-control-superseded` có **3 chỗ** (không phải 2 như phỏng đoán ban đầu từ review), cả 3 đã gắn code/phase.
+
+Bug tìm thấy giữa chừng, ngoài phạm vi ban đầu nhưng bắt buộc phải sửa: hoist `getBootId`/`getProcessStartTime` sang `process-identity.mjs` bằng `export {...} from './process-identity.mjs'` — re-export syntax này KHÔNG tạo local binding, nên mọi lời gọi `getProcessStartTime(...)` ngay trong chính `cli-spawn-supervisor.mjs` (dùng cho worker/supervisor liveness) throw `ReferenceError` ngay khi supervisor con tự spawn lại chính nó. Hậu quả thực tế: mọi test `executeAssignment` chạm tới cli-spawn thật đều fail với "supervisor exited before adapter receipt was published" — bị lầm tưởng ban đầu là do thiếu `node_modules`, sau đó lầm tưởng là do worktree/git môi trường, cuối cùng bisect bằng cách tự chạy `cli-spawn-supervisor.mjs` trực tiếp mới lộ ra đúng nguyên nhân. Fix: `import {...} from './process-identity.mjs'; export {...};` — tách import (cho local dùng) và export (cho consumer ngoài) riêng.
+
+Cũng tìm thấy: file mới `process-identity.mjs` thiếu row trong `docs/architecture-manifest.json` làm 2 test trong `test/architecture.test.mjs` fail ("đủ sổ" + "import một chiều") — đã thêm row `"infra"` cạnh `run-lock.mjs`.
+
 ## Requirements
 
 - R1 (M2) `RunnerConfigError` mang `code` + `phase` (`pre-admission` | `post-admission`): `admission-duplicate-retry`, `admission-invalid-predecessor`, `run-control-held`, `run-control-superseded`. Tests assert `code`, không regex message.

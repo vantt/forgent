@@ -159,6 +159,16 @@ Holder identity is `{hostId, bootId, pid, processStartTime}` of the process doin
 control, not a guessed Rust parent. Unknown liveness is not dead. A dead holder
 may leave a remotely queued command: successor first reconciles pending control.
 
+Implemented (Phase 02 H1, `src/runner/dispatch/run-lock.mjs`): holder identity
+is `{id, pid, bootId, processStartTime, host}` (`buildRunControlHolder`,
+`host` in place of this section's `hostId`), and `resolveHolderLiveness`
+encodes the reclaim decision above as a table — a live pid, a pid whose
+liveness cannot be disproven (unreadable `/proc/<pid>/stat`), or a pre-H1
+holder record with no `processStartTime` to cross-check all resolve to
+`held`, never `dead`; only a genuinely dead pid, a pid reused by a different
+process (`processStartTime` mismatch), or a `bootId` predating the current
+boot resolve to `dead`.
+
 Recommended local implementation for safe reclaim without unlink races:
 one per-scope lock directory containing immutable generation records and
 token-specific release markers. Contenders publish generation `g+1` only after
@@ -174,8 +184,13 @@ followed by atomic non-overwriting publication (local filesystem hard-link on
 the initial Linux adapter), then directory fsync. State replacement uses
 temp+rename+directory fsync under the owning lock. This retains exclusive-create
 semantics while avoiding empty-lock and conditional-unlink races seen in P12.
-This refinement is not a claim that today's lock helper already implements it.
-Unsupported filesystem guarantees refuse mutation with a named diagnostic;
+Implemented (Phase 02 H3) for the mutable Run/Assignment artifacts named in
+the contract doc (`result.json`, `run.json`, the effective-execution-contract
+projection, and the per-attempt dispatch-bookkeeping marker) via
+`publishMutableProjection`/`publishMarkerOnce`; a resume that finds an
+existing `result.json` which fails to parse refuses rather than relaunching
+over unreadable evidence. Unsupported filesystem guarantees refuse mutation
+with a named diagnostic;
 doctor must probe them before this writer profile is enabled. No distributed
 lease, background renew service or TTL-only takeover is required by default.
 
