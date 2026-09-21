@@ -116,6 +116,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'herdr-available',
       'trust-store-readable',
+      // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
+      // no doctor coverage at all -- only claude-json's default path did.
+      'non-claude-trust-stores-readable',
       'executor-confinement',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped

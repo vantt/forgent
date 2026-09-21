@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { readTrust, seedTrust, removeTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
+import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
 // ~/.claude.json -- the module takes the store path as an argument precisely so a
@@ -169,5 +169,78 @@ test('B4: the write is atomic -- no partial file is observable and no stray temp
     const leftovers = fs.readdirSync(f.dir).filter((n) => n !== 'claude.json');
     assert.deepEqual(leftovers, [], `atomic write must leave no temp file, found: ${leftovers.join(', ')}`);
     JSON.parse(fs.readFileSync(f.file, 'utf8')); // parses => never left half-written
+  } finally { f.cleanup(); }
+});
+
+// --- Phase 07 R1: agy's own store format, same B1 rule -----------------
+
+function agyFixture(contents) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agy-trust-fixture-'));
+  const file = path.join(dir, 'settings.json');
+  if (contents !== undefined) fs.writeFileSync(file, JSON.stringify(contents, null, 2));
+  return { dir, file, cleanup: () => fs.rmSync(dir, { recursive: true, force: true }) };
+}
+
+test('L11-R1 B1: seedAgyTrust refuses when the repo root is not itself in trustedWorkspaces', () => {
+  const f = agyFixture({ trustedWorkspaces: ['/home/someone/projects/other-repo'] });
+  try {
+    assert.throws(
+      () => seedAgyTrust(f.file, { projectPath: '/tmp/wt-1', repoRoot: '/home/someone/projects/repo' }),
+      (err) => err instanceof TrustStoreError && err.code === 'untrusted-root',
+    );
+    const after = JSON.parse(fs.readFileSync(f.file, 'utf8'));
+    assert.deepEqual(after.trustedWorkspaces, ['/home/someone/projects/other-repo'], 'a refused seed writes nothing');
+  } finally { f.cleanup(); }
+});
+
+test('L11-R1 B1: seedAgyTrust refuses when settings.json does not exist yet -- nothing is trusted there at all', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agy-trust-missing-'));
+  const file = path.join(dir, 'settings.json');
+  try {
+    assert.throws(
+      () => seedAgyTrust(file, { projectPath: '/tmp/wt-2', repoRoot: '/home/someone/projects/repo' }),
+      (err) => err instanceof TrustStoreError && err.code === 'untrusted-root',
+    );
+    assert.equal(fs.existsSync(file), false, 'a refused seed must not create the file');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('L11-R1: seedAgyTrust writes the entry when the root is trusted, and is idempotent', () => {
+  const repoRoot = '/home/someone/projects/repo';
+  const f = agyFixture({ trustedWorkspaces: [repoRoot] });
+  try {
+    assert.equal(seedAgyTrust(f.file, { projectPath: '/tmp/wt-3', repoRoot }), true);
+    const after = JSON.parse(fs.readFileSync(f.file, 'utf8'));
+    assert.ok(after.trustedWorkspaces.includes('/tmp/wt-3'));
+    assert.ok(after.trustedWorkspaces.includes(repoRoot), 'existing entries survive');
+    assert.equal(readAgyTrust(f.file, '/tmp/wt-3'), true);
+
+    assert.equal(seedAgyTrust(f.file, { projectPath: '/tmp/wt-3', repoRoot }), false, 'idempotent: already seeded');
+  } finally { f.cleanup(); }
+});
+
+test('L11-R1: a corrupt agy settings.json is refused, never silently reset to an empty store', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-agy-trust-corrupt-'));
+  const file = path.join(dir, 'settings.json');
+  fs.writeFileSync(file, '{ not json at all');
+  try {
+    assert.throws(
+      () => seedAgyTrust(file, { projectPath: '/tmp/wt-4', repoRoot: '/home/someone/projects/repo' }),
+      (err) => err instanceof TrustStoreError && err.code === 'unreadable-store',
+    );
+    assert.equal(fs.readFileSync(file, 'utf8'), '{ not json at all', 'the corrupt file is left byte-identical, not overwritten with {}');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('L11-R1: removeAgyTrust deletes only its own entry and reports whether there was one', () => {
+  const repoRoot = '/home/someone/projects/repo';
+  const f = agyFixture({ trustedWorkspaces: [repoRoot] });
+  try {
+    seedAgyTrust(f.file, { projectPath: '/tmp/wt-5', repoRoot });
+    assert.equal(removeAgyTrust(f.file, '/tmp/wt-5'), true);
+    const after = JSON.parse(fs.readFileSync(f.file, 'utf8'));
+    assert.equal(after.trustedWorkspaces.includes('/tmp/wt-5'), false);
+    assert.ok(after.trustedWorkspaces.includes(repoRoot), 'the operator root is untouched');
+    assert.equal(removeAgyTrust(f.file, '/tmp/wt-5'), false, 'removing an absent entry is false, not an error');
   } finally { f.cleanup(); }
 });

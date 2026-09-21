@@ -352,10 +352,24 @@ test('a long work id loses its middle, never the suffix that makes it unique', (
   // Truncating the tail would take the timestamp with it, and herdr addresses
   // agents by name -- two rounds of one item would then be the same agent.
   assert.notEqual(first, second, 'two rounds of the same item are two agents');
-  // Half the budget is head, half is the tail that makes it unique, so at
-  // herdr's 32 the recognisable prefix is 16 characters.
+  // 24 of the 32-character budget is head, so the recognisable prefix is
+  // enough to identify the item; the remaining 8 are a hash of the FULL
+  // cleaned string, not a literal tail slice.
   assert.ok(first.startsWith('fgos-tsk-a-very-'), `enough head to recognise the item, got ${first}`);
-  assert.ok(first.endsWith((1700000000000).toString(36)), 'and all of the suffix that distinguishes the round');
+  assert.match(first.slice(-8), /^[a-f0-9]{8}$/, 'suffix is a hash, not a literal tail slice');
+  assert.notEqual(first.slice(-8), second.slice(-8), 'different inputs produce different hash suffixes');
+});
+
+test('L11: a literal tail slice would have collided; the hash suffix does not', () => {
+  // Two inputs engineered to share the same 16-char head AND the same
+  // 16-char tail that the OLD head+tail middle-trim used to keep verbatim --
+  // under that scheme both truncated to the exact same 32-character name.
+  // Only the middle differs, which a literal slice throws away entirely.
+  const head = 'a'.repeat(24);
+  const tail = 'b'.repeat(16);
+  const first = normalizeAgentName(`${head}1${tail}`);
+  const second = normalizeAgentName(`${head}2${tail}`);
+  assert.notEqual(first, second, 'a hash of the full string must not collide the way a literal tail slice did');
 });
 
 test('a name that already fits is untouched', () => {
