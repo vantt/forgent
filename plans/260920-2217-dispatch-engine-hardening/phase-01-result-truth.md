@@ -6,16 +6,18 @@ Nhỏ nhất, giá trị cao nhất: hai consumer quyết "thành công" hôm na
 
 ## Status — 2026-09-21
 
-**R2, R3 xong** (commit `26f53318`, 868 test qua mọi file chạm `buildDispatchResult`/`normalizeRunResultV2`/`agentClaim`/reconcile/recovery). **R1, R4 BLOCKED** — cả hai nằm trong `session-engine.mjs`, file đang có diff 953 dòng (171 thêm/782 xoá) chưa commit từ track `coordination-skill-harness-simplification` (phase-02-semantic-request-composers). Sửa đè lên refactor 782-dòng-xoá đang dở là rủi ro thật (mất trắng nếu track kia reset/rebase, không cứu được vì chưa ai commit). **Chờ track đó commit/đóng, hoặc anh quyết cách khác** (xem cuối file). R5/R6 chưa làm (R5 phụ thuộc D3 đã quyết nhưng chưa triển khai; R6 dời sang Phase 04 cùng attestation).
+**R2, R3 xong trên `main`** (commit `26f53318`, 868 test). **R1, R4 xong nhưng CHƯA MERGE** — `session-engine.mjs` ở `main` vẫn còn diff 953 dòng chưa commit từ track `coordination-skill-harness-simplification`, nên thay vì sửa đè lên đó, việc được làm trong một **worktree cô lập**: `.claude/worktrees/dispatch-hardening-phase01-r1r4` (nhánh `dispatch-hardening-phase01-r1r4`, rẽ từ `main`@`3d65657f`, commit `9049e611`, 476 test coordination xanh). Track kia hoàn toàn không bị đụng tới. **Merge vào `main` là bước riêng, chờ track kia commit/đóng** (xem cuối file) — git sẽ tự chặn an toàn nếu merge lúc `session-engine.mjs` vẫn còn uncommitted ở checkout chính, không có rủi ro mất dữ liệu ở bước merge. R5/R6 chưa làm (R5 phụ thuộc D3 đã quyết nhưng chưa triển khai; R6 dời sang Phase 04 cùng attestation).
 
 Khi sửa R3 (M4), phát hiện một gap tiền tồn tại ngoài phạm vi review gốc: `claimInvalid` được tính ở cả hai settle call site nhưng **chưa bao giờ được truyền vào** `normalizeRunResultV2` — "fails closed on malformed/invalid agent-result.json" (Step 04 §5.2) trước đây chỉ đúng *tình cờ*, qua field `.status` của claim giả mạo. Đã vá cùng lúc (nằm trong commit `26f53318`): truyền `claimInvalid` ở cả hai call site + thêm nhánh confidence-classification cho `claimInvalid` trong `run-result.mjs`.
 
+Khi sửa R1, hai test có fixture tự mâu thuẫn bị lộ ra (không phải bug của fix): `coordination-session-engine.test.mjs` giả định `readLinkedRunResultFromDisk` trả nguyên văn byte một `result.json` v1 thô, và `coordination-research-fan-out.test.mjs` có 3 fixture chỉ patch field `confidence` top-level thành `'verified'` mà không patch `classification.confidence.level` theo — đúng dạng bất nhất `contract-corrupt` được thiết kế để bắt. Cả hai đã sửa lại fixture cho đúng, chi tiết trong message commit `9049e611`.
+
 ## Requirements
 
-- R1 **[BLOCKED — session-engine.mjs in-flight]** Evaluator (session-engine) chỉ chấp nhận RunResult đã qua `interpretRunResult`; `contractCorrupt === true` → failed.
-- R2 **[DONE]** `verifiedSha` chỉ khi `status === 0` và outcome không `timeout/failed`.
-- R3 **[DONE]** Không synthesize worker claim; basis `valid-agent-result-claim` chỉ khi có file claim thật. (Mở rộng: `claimInvalid` nay được truyền đúng vào `normalizeRunResultV2` ở cả hai call site — xem Status ở trên.)
-- R4 **[BLOCKED — session-engine.mjs in-flight]** Evaluator resolve report path qua `resolveWorkerArtifactPath`, không hardcode `agent-report.md`.
+- R1 **[DONE — nhánh `dispatch-hardening-phase01-r1r4`, chưa merge]** Evaluator (session-engine) chỉ chấp nhận RunResult đã qua `interpretRunResult`; `contractCorrupt === true` → failed.
+- R2 **[DONE trên main]** `verifiedSha` chỉ khi `status === 0` và outcome không `timeout/failed`.
+- R3 **[DONE trên main]** Không synthesize worker claim; basis `valid-agent-result-claim` chỉ khi có file claim thật. (Mở rộng: `claimInvalid` nay được truyền đúng vào `normalizeRunResultV2` ở cả hai call site — xem Status ở trên.)
+- R4 **[DONE — nhánh `dispatch-hardening-phase01-r1r4`, chưa merge]** Evaluator resolve report path qua `resolveWorkerArtifactPath`, không hardcode `agent-report.md`.
 - R5 **[chưa làm]** (sau D3, đã quyết: ghi `result.superseded.json`) superseded controller's late result ghi file thay vì refuse thẳng.
 - R6 **[dời sang Phase 04]** Attribution: khai `attributionVersion:'correlation-only'` trong RunResult tới khi attestation được nối.
 
@@ -44,10 +46,11 @@ Khi sửa R3 (M4), phát hiện một gap tiền tồn tại ngoài phạm vi re
 
 R1 có thể làm một số session cũ có `result.json` v1 → `legacy-derived` (đã hỗ trợ). R2 có thể làm `fgos return` chạy verify nhiều hơn (đúng ý). Rollback từng R độc lập.
 
-## R1/R4 blocked — cần anh quyết
+## R1/R4 — chờ merge vào main
 
-Ba lựa chọn, không tự chọn thay anh vì đây là git-write trên file người khác đang sửa dở:
+R1/R4 đã xong và test xanh, nằm cô lập trên nhánh `dispatch-hardening-phase01-r1r4` (worktree `.claude/worktrees/dispatch-hardening-phase01-r1r4`, commit `9049e611`), không đụng gì tới track `coordination-skill-harness-simplification`. Merge vào `main` cần một trong hai điều kiện, anh chọn:
 
-1. **Chờ** track `coordination-skill-harness-simplification` commit/đóng phase-02, rồi mở lại R1/R4.
-2. **Hỏi trực tiếp** ai đang giữ track đó (nếu là phiên khác của anh) để họ commit checkpoint, hoặc cho phép em sửa trên đúng bản họ đang có (`git stash`/coordinate qua họ, không tự ý).
-3. Nếu track đó đã **bỏ dở/không còn hiệu lực**, anh xác nhận để em `git checkout -- src/runner/coordination/session-engine.mjs` khôi phục về bản sạch trước khi sửa R1/R4 — **destructive, cần anh xác nhận rõ ràng trước khi em chạy**.
+1. **Chờ** track kia commit/đóng phase-02 trước — sau đó merge nhánh này vào `main` là thao tác bình thường, xung đột (nếu có, vì cả hai đụng `session-engine.mjs`) resolve qua git 3-way merge thật, không phải đoán ý người khác trên working tree thô.
+2. Nếu track kia đã **bỏ dở/không còn hiệu lực**, anh xác nhận để em `git checkout -- src/runner/coordination/session-engine.mjs` khôi phục checkout chính về sạch, rồi merge nhánh này vào `main` ngay — **bước khôi phục là destructive trên checkout chính, cần anh xác nhận rõ ràng trước khi em chạy**.
+
+Dọn dẹp sau merge: `git worktree remove .claude/worktrees/dispatch-hardening-phase01-r1r4` và xoá nhánh `dispatch-hardening-phase01-r1r4`.
