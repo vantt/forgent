@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -93,7 +93,7 @@ import {
 
 
 test('edit --verify-from-children with no children found throws a validation error instead of writing a vacuous verify, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'lonely-parent').status, 0);
   const before = stateView(cwd).work['lonely-parent'].verify;
   const result = run(cwd, ['edit', 'lonely-parent', '--verify-from-children']);
@@ -104,7 +104,7 @@ test('edit --verify-from-children with no children found throws a validation err
 
 
 test('edit --verify-from-targets with empty targets throws a validation error instead of writing a vacuous verify, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(run(cwd, ['add', 'targetless-mvp', '--title', 'MVP', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--goal-tier', 'mvp', '--description', 'tsk-535 fixture description.']).status, 0);
   const before = stateView(cwd).work['targetless-mvp'].verify;
   const result = run(cwd, ['edit', 'targetless-mvp', '--verify-from-targets']);
@@ -120,7 +120,7 @@ test('edit --verify-from-targets with empty targets throws a validation error in
 // this link. ---
 
 test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-docs-ref-new');
   const result = run(cwd, ['edit', 'edit-docs-ref-new', '--docs-ref', 'docs/history/edit-docs-ref-new/']);
   assert.equal(result.status, 0);
@@ -129,7 +129,7 @@ test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
 
 
 test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/', '--description', 'tsk-535 fixture description.']);
   const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
   assert.equal(result.status, 0);
@@ -141,7 +141,7 @@ test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () =>
 //     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
 
 test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-target');
   addOk(cwd, 'merge-after-item');
   const result = run(cwd, ['edit', 'merge-after-item', '--merge-after', 'merge-after-target']);
@@ -151,7 +151,7 @@ test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () =
 
 
 test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-clear-target');
   addOk(cwd, 'merge-after-clear-item');
   run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', 'merge-after-clear-target']);
@@ -162,7 +162,7 @@ test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
 
 
 test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-ghost-item');
   const result = run(cwd, ['edit', 'merge-after-ghost-item', '--merge-after', 'no-such-item']);
   assert.equal(result.status, 4);
@@ -172,7 +172,7 @@ test('edit --merge-after rejects a target id that does not exist, exit 4, item u
 
 
 test('edit --merge-after rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-self-item');
   const result = run(cwd, ['edit', 'merge-after-self-item', '--merge-after', 'merge-after-self-item']);
   assert.equal(result.status, 4);
@@ -181,7 +181,7 @@ test('edit --merge-after rejects an item listing itself, exit 4', () => {
 
 
 test('edit --merge-after rejects a mergeAfter that would close a cycle mixed with deps, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-cycle-a');
   addOk(cwd, 'merge-after-cycle-b');
   run(cwd, ['edit', 'merge-after-cycle-b', '--deps', 'merge-after-cycle-a']);
@@ -194,7 +194,7 @@ test('edit --merge-after rejects a mergeAfter that would close a cycle mixed wit
 
 
 test('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'merge-after-independent-target');
   addOk(cwd, 'merge-after-independent-item');
   const result = run(cwd, ['edit', 'merge-after-independent-item', '--merge-after', 'merge-after-independent-target']);
@@ -207,7 +207,7 @@ test('edit --merge-after does not require the deps field to have been touched (b
 //     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
 
 test('edit --superseded-by sets supersededBy on an item that had none, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'superseded-by-target');
   addOk(cwd, 'superseded-by-item');
   const result = run(cwd, ['edit', 'superseded-by-item', '--superseded-by', 'superseded-by-target']);
@@ -217,7 +217,7 @@ test('edit --superseded-by sets supersededBy on an item that had none, exit 0', 
 
 
 test('edit --superseded-by "" clears an existing supersededBy, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'superseded-by-clear-target');
   addOk(cwd, 'superseded-by-clear-item');
   run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', 'superseded-by-clear-target']);
@@ -228,7 +228,7 @@ test('edit --superseded-by "" clears an existing supersededBy, exit 0', () => {
 
 
 test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'superseded-by-ghost-item');
   const result = run(cwd, ['edit', 'superseded-by-ghost-item', '--superseded-by', 'no-such-item']);
   assert.equal(result.status, 4);
@@ -238,7 +238,7 @@ test('edit --superseded-by rejects a target id that does not exist, exit 4, item
 
 
 test('edit --superseded-by rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'superseded-by-self-item');
   const result = run(cwd, ['edit', 'superseded-by-self-item', '--superseded-by', 'superseded-by-self-item']);
   assert.equal(result.status, 4);
@@ -247,7 +247,7 @@ test('edit --superseded-by rejects an item listing itself, exit 4', () => {
 
 
 test('edit --superseded-by with no value is a validation error, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'superseded-by-noval-item');
   const result = run(cwd, ['edit', 'superseded-by-noval-item', '--superseded-by']);
   assert.equal(result.status, 4);
@@ -256,7 +256,7 @@ test('edit --superseded-by with no value is a validation error, exit 4', () => {
 
 
 test('edit --duplicates sets duplicates on an item that had none, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'duplicates-target');
   addOk(cwd, 'duplicates-item');
   const result = run(cwd, ['edit', 'duplicates-item', '--duplicates', 'duplicates-target']);
@@ -266,7 +266,7 @@ test('edit --duplicates sets duplicates on an item that had none, exit 0', () =>
 
 
 test('edit --duplicates "" clears an existing duplicates, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'duplicates-clear-target');
   addOk(cwd, 'duplicates-clear-item');
   run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', 'duplicates-clear-target']);
@@ -277,7 +277,7 @@ test('edit --duplicates "" clears an existing duplicates, exit 0', () => {
 
 
 test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'duplicates-ghost-item');
   const result = run(cwd, ['edit', 'duplicates-ghost-item', '--duplicates', 'no-such-item']);
   assert.equal(result.status, 4);
@@ -287,7 +287,7 @@ test('edit --duplicates rejects a target id that does not exist, exit 4, item un
 
 
 test('edit --duplicates rejects an item listing itself, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'duplicates-self-item');
   const result = run(cwd, ['edit', 'duplicates-self-item', '--duplicates', 'duplicates-self-item']);
   assert.equal(result.status, 4);

@@ -74,7 +74,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -94,7 +94,7 @@ import {
 
 
 test('edit use case changes only the targeted field, every other field unchanged', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-risk', { risk: 'light' });
   const before = eventLines(cwd).length;
   const result = editUseCase({ dir: path.join(cwd, '.fgos') }, { id: 'edit-risk', patch: { risk: 'heavy' } });
@@ -120,9 +120,9 @@ test('edit use case changes only the targeted field, every other field unchanged
 // byte across add/edit/move/edit again: every event this whole sequence
 // produces belongs under `.fgos/events/` instead.
 test('a full add -> edit -> move -> edit CLI lifecycle never appends to the frozen events.jsonl baseline -- every event lands under .fgos/events/', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const baselineBefore = fs.readFileSync(logPath(cwd), 'utf8');
-  assert.equal(baselineBefore, '', 'tmpCwd(): baseline should start empty (init writes no events, just an empty file)');
+  assert.equal(baselineBefore, '', 'tmpCwdFromTemplate(): baseline should start empty (init writes no events, just an empty file)');
 
   assert.equal(addOk(cwd, 'tsk-write-path-guard').status, 0);
   assert.equal(run(cwd, ['edit', 'tsk-write-path-guard', '--verify', 'echo first']).status, 0);
@@ -144,7 +144,7 @@ test('a full add -> edit -> move -> edit CLI lifecycle never appends to the froz
 });
 
 test('edit on an unknown id is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['edit', 'never-added', '--risk', 'heavy']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
@@ -152,7 +152,7 @@ test('edit on an unknown id is rejected as validation, exit 4, no event written'
 
 
 test('edit with zero field flags is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-no-flags');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['edit', 'edit-no-flags']);
@@ -162,7 +162,7 @@ test('edit with zero field flags is rejected as validation, exit 4, no event wri
 
 
 test('edit --deps pointing at an unknown id is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-bad-dep');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['edit', 'edit-bad-dep', '--deps', 'ghost-dep']);
@@ -172,7 +172,7 @@ test('edit --deps pointing at an unknown id is rejected as validation, exit 4, n
 
 
 test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-locked-fields');
   const before = eventLines(cwd).length;
   for (const field of ['status', 'stage', 'domain']) {
@@ -185,9 +185,9 @@ test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event wr
 
 
 test('edit succeeds identically regardless of the item current status', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-any-status');
-  // tsk-40m: tmpCwd() has no real git repo, so `take` (which computes a
+  // tsk-40m: tmpCwdFromTemplate() has no real git repo, so `take` (which computes a
   // real HEAD) can't be used here -- raw-inject the durable 'doing' status
   // this test actually asserts against instead.
   moveToDurableDoingForTest(cwd, 'edit-any-status');
@@ -200,7 +200,7 @@ test('edit succeeds identically regardless of the item current status', () => {
 
 
 test('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'edit-refs', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--refs', 'a,b', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
 
@@ -215,7 +215,7 @@ test('edit omitting --refs/--deps leaves the field untouched; an explicit empty 
 
 
 test('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-edit-root').status, 0);
   assert.equal(addOk(cwd, 'parent-edit-child').status, 0);
   assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
@@ -235,7 +235,7 @@ test('edit omitting --parent leaves it untouched; an explicit --parent sets it; 
 
 
 test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-edit-bad').status, 0);
   const result = run(cwd, ['edit', 'parent-edit-bad', '--parent']);
   assert.notEqual(result.status, 0);
@@ -244,7 +244,7 @@ test('edit --parent (bare, no value) is rejected as a valueless flag, distinct f
 
 
 test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" message as the store-layer test', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-cycle-a').status, 0);
   const withParent = run(cwd, ['add', 'parent-cycle-b', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-cycle-a', '--description', 'tsk-535 fixture description.']);
   assert.equal(withParent.status, 0);
@@ -257,7 +257,7 @@ test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" m
 
 
 test('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-store-locked');
   const dir = path.join(cwd, '.fgos');
   const before = eventLines(cwd).length;
@@ -273,7 +273,7 @@ test('editWork rejects a patch containing id/status/stage/domain as validation, 
 
 
 test('edit reports the real event seq in its envelope data, not undefined', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-seq-check'); // event #1
   const result = run(cwd, ['edit', 'edit-seq-check', '--risk', 'heavy']);
   assert.equal(result.status, 0);
@@ -293,7 +293,7 @@ test('edit reports the real event seq in its envelope data, not undefined', () =
 // the flags simply don't appear in its parser wiring at all).
 
 test('edit --priority sets the item priority field to the given integer, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-priority');
   const result = run(cwd, ['edit', 'edit-priority', '--priority', '3']);
   assert.equal(result.status, 0);
@@ -302,7 +302,7 @@ test('edit --priority sets the item priority field to the given integer, exit 0'
 
 
 test('edit --intent accepts a negative value (no sign constraint), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-intent-neg');
   const result = run(cwd, ['edit', 'edit-intent-neg', '--intent', '-1']);
   assert.equal(result.status, 0);
@@ -312,7 +312,7 @@ test('edit --intent accepts a negative value (no sign constraint), exit 0', () =
 
 for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     addOk(cwd, 'edit-bad-flag-item');
     const before = eventLines(cwd).length;
     const result = run(cwd, ['edit', 'edit-bad-flag-item', ...badFlagArgs]);
@@ -323,7 +323,7 @@ for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
 }
 
 test('edit --urgent/--impact/--effort set the item fields to the given values, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'edit-priority-matrix');
   const result = run(cwd, ['edit', 'edit-priority-matrix', '--urgent', 'critical', '--impact', '12.5', '--effort', '3']);
   assert.equal(result.status, 0);
@@ -336,7 +336,7 @@ test('edit --urgent/--impact/--effort set the item fields to the given values, e
 
 for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {
   test(`edit with ${label} is rejected as validation, exit 4, no event written, field left unset`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     addOk(cwd, 'edit-priority-matrix-bad-flag');
     const before = eventLines(cwd).length;
     const result = run(cwd, ['edit', 'edit-priority-matrix-bad-flag', ...badFlagArgs]);

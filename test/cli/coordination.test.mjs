@@ -19,7 +19,7 @@ import {
   os,
   path,
   run,
-  tmpCwd,
+  tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
@@ -305,7 +305,7 @@ test('validateCoordinationRequest: accepts a real, well-formed agent-led request
 // ─── CLI subprocess: manifest/envelope/exit-code ───────────────────────────
 
 test('fgos --help --json manifest includes the "coordination" verb with run/show sub-verb parameters', () => {
-  const result = run(tmpCwd(), ['--help', '--json']);
+  const result = run(tmpCwdFromTemplate(), ['--help', '--json']);
   assert.equal(result.status, 0);
   const manifest = JSON.parse(result.stdout);
   const entry = manifest.commands.find((c) => c.name === 'coordination');
@@ -320,26 +320,26 @@ test('fgos --help --json manifest includes the "coordination" verb with run/show
 });
 
 test('fgos coordination --help prints verb help text (reasoned exception, not an envelope) and exits 0', () => {
-  const result = run(tmpCwd(), ['coordination', '--help']);
+  const result = run(tmpCwdFromTemplate(), ['coordination', '--help']);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /coordination/);
   assert.throws(() => JSON.parse(result.stdout), 'help text is prose, never a parsed fgos.v1 envelope');
 });
 
 test('fgos coordination: unknown sub-verb is a validation error (exit 4)', () => {
-  const result = run(tmpCwd(), ['coordination', 'bogus']);
+  const result = run(tmpCwdFromTemplate(), ['coordination', 'bogus']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /unknown sub-verb "bogus"/);
 });
 
 test('fgos coordination run: missing --file is a validation error (exit 4)', () => {
-  const result = run(tmpCwd(), ['coordination', 'run']);
+  const result = run(tmpCwdFromTemplate(), ['coordination', 'run']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--file/);
 });
 
 test('fgos coordination run: a request file that is not valid JSON is a validation error (exit 4)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const reqPath = path.join(cwd, 'bad.json');
   fs.writeFileSync(reqPath, '{ not valid json');
   const result = run(cwd, ['coordination', 'run', '--file', reqPath]);
@@ -348,14 +348,14 @@ test('fgos coordination run: a request file that is not valid JSON is a validati
 });
 
 test('fgos coordination run: a request file that does not exist is a validation error (exit 4)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['coordination', 'run', '--file', path.join(cwd, 'does-not-exist.json')]);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /request file not found/);
 });
 
 test('fgos coordination run: a request file violating R2 (top-level executor field) is a validation error (exit 4) end to end through the real CLI', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const reqPath = writeRequest(cwd, 'bad-executor.json', { ...agentLedRequest(), executor: 'claude' });
   const result = run(cwd, ['coordination', 'run', '--file', reqPath]);
   assert.equal(result.status, 4);
@@ -363,7 +363,7 @@ test('fgos coordination run: a request file violating R2 (top-level executor fie
 });
 
 test('fgos coordination run: --model with a declared-protocol request is refused (no engine channel today)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const reqPath = writeRequest(cwd, 'declared.json', {
     kind: 'declared-protocol',
     objective: 'x',
@@ -377,7 +377,7 @@ test('fgos coordination run: --model with a declared-protocol request is refused
 });
 
 test('fgos coordination run: a declared-protocol request with an actors[] id not declared by the protocol is a validation error (exit 4, unregistered actor override rejected)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const reqPath = writeRequest(cwd, 'undeclared-actor.json', {
     kind: 'declared-protocol',
     objective: 'x',
@@ -396,7 +396,7 @@ test('fgos coordination run: a declared-protocol request with an actors[] id not
 });
 
 test('fgos coordination run: a fan-out branch actorId also carrying a top-level actors[] policy override is a validation error (exit 4, no per-branch policy-override channel)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const reqPath = writeRequest(cwd, 'fanout-actor-policy-collision.json', {
     kind: 'declared-protocol',
     objective: 'x',
@@ -422,14 +422,14 @@ test('fgos coordination run: a fan-out branch actorId also carrying a top-level 
 });
 
 test('fgos coordination show: unknown id is a validation error naming "no session" (missing session diagnostic, exit 4)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['coordination', 'show', 'coord_never_existed']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /no session "coord_never_existed" found/);
 });
 
 test('fgos coordination show: a corrupt session.json is a diagnosed, categorized failure (missing/corrupt session diagnostic)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const sessionDir = path.join(cwd, '.fgos', 'coordination', 'sessions', 'coord_corrupt');
   fs.mkdirSync(sessionDir, { recursive: true });
   fs.writeFileSync(path.join(sessionDir, 'session.json'), '{ this is not json');
@@ -442,7 +442,7 @@ test('fgos coordination show: a corrupt session.json is a diagnosed, categorized
 // ─── CLI subprocess: real end-to-end run/show against a fake-but-real executor ─
 
 test('fgos coordination run --file <agent-led> genuinely dispatches through the real engine and closes the session; fgos coordination show reports it, read-only', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
   const reqPath = writeRequest(cwd, 'agent-led.json', agentLedRequest());
 
@@ -480,7 +480,7 @@ test('fgos coordination run --file <agent-led> genuinely dispatches through the 
 });
 
 test('fgos coordination run --file <declared consult>: dispatches both declared operations through the real engine and closes the session', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
   const examplePath = path.resolve(FGOS, '../../docs/how-to/coordination-examples/declared-consult-request.json');
   const raw = JSON.parse(fs.readFileSync(examplePath, 'utf8'));
@@ -596,7 +596,7 @@ test('fgos coordination show --cwd <anything>: repoRoot (--dir), never --cwd, go
 });
 
 test('fgos coordination run --file <request> with --cwd OMITTED behaves byte-identically to today: the session lands under the repo root\'s own .fgos/', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
   const reqPath = writeRequest(cwd, 'agent-led-no-cwd.json', agentLedRequest());
 
@@ -668,7 +668,7 @@ test('fgos coordination run --file <declared operation step, mutation:"mutating"
 });
 
 test('fgos coordination run --file <declared operation step, mutation:"mutating", on an advisory operation>: refused by name through the CLI door -- an operation must declare result.kind:"work-product" before it may opt into a real, mutating dispatch', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const req = {
     kind: 'declared-protocol',
     objective: 'Prove an advisory operation cannot be dispatched as mutating through the CLI run door.',
@@ -697,7 +697,7 @@ test('fgos coordination run --file <declared operation step, mutation:"mutating"
 // ─── R2-R5: `fgos coordination chain <track>` ──────────────────────────────
 
 test('fgos coordination chain <track>: lists cells reconstructed from real sessions, names activeCell and nextAction for the still-open one', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
   const reqPath = writeRequest(cwd, 'agent-led-chain.json', agentLedRequest({ coordinationId: 'cli-chain--cellA' }));
 
@@ -715,7 +715,7 @@ test('fgos coordination chain <track>: lists cells reconstructed from real sessi
 });
 
 test('fgos coordination chain <track> on a track with zero matching sessions is a validation-free empty result, not an error', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const chainResult = run(cwd, ['coordination', 'chain', 'never-opened-track']);
   assert.equal(chainResult.status, 0, chainResult.stderr);
   const chainData = envelopeData(chainResult.stdout);
@@ -723,7 +723,7 @@ test('fgos coordination chain <track> on a track with zero matching sessions is 
 });
 
 test('fgos coordination chain requires a track argument', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['coordination', 'chain']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /coordination chain requires a track/);
@@ -751,7 +751,7 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
   assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
 
-  const unknownSubResult = run(tmpCwd(), ['coordination', 'bogus-sub-verb']);
+  const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
   assert.match(unknownSubResult.stderr, /known: run, show, launch-master-loop, chain/);
 });

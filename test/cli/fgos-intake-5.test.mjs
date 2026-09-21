@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -121,7 +121,7 @@ The chosen mechanism determines security requirements and user authentication fl
 // addWork door, and prints the fgos.v1 envelope.
 
 test('submit prints a well-formed fgos.v1 envelope: contract + generated_at + data_hash + data, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const envelope = JSON.parse(result.stdout);
@@ -135,7 +135,7 @@ test('submit prints a well-formed fgos.v1 envelope: contract + generated_at + da
 
 
 test('submit persists the full text as description, separate from the (possibly truncated) title (P30)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const text = 'Investigate the sluggish overview page and figure out why it takes so long to render for large accounts';
   const result = run(cwd, ['submit', text]);
   assert.equal(result.status, 0);
@@ -148,7 +148,7 @@ test('submit persists the full text as description, separate from the (possibly 
 
 
 test('submit without a mode flag records mode:"sync"; --async records mode:"async" — both visible via list', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
 
   const syncSubmit = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(syncSubmit.status, 0);
@@ -165,7 +165,7 @@ test('submit without a mode flag records mode:"sync"; --async records mode:"asyn
 
 
 test('submit with --unattended is treated the same as --async: mode:"async"', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -180,7 +180,7 @@ test('submit with --unattended is treated the same as --async: mode:"async"', ()
 // change. D3 gives backlog its own statusCategory, which is what keeps a
 // backlog item out of the ready frontier with no frontier-side code change.
 test('submit --backlog creates the item at status:"backlog" with its own category and out of ready; a flagless submit still creates status:"todo"', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
 
   const backlogSubmit = run(cwd, ['submit', 'Maybe rethink the settings navigation someday', '--backlog']);
   assert.equal(backlogSubmit.status, 0);
@@ -202,7 +202,7 @@ test('submit --backlog creates the item at status:"backlog" with its own categor
 
 
 test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const item = JSON.parse(result.stdout).data;
@@ -212,7 +212,7 @@ test('submit of text matching no keyword falls back to tier:"standard" and persi
 
 
 test('submit with no text at all is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
@@ -220,7 +220,7 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
 
 
 test("submit tags the new item with stage:'discovery', visible via list", () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -229,7 +229,7 @@ test("submit tags the new item with stage:'discovery', visible via list", () => 
 
 
 test('add stamps stage "discovery" by default (D1/D2, add-stage-default-gap; tsk-qod D1/D2: clarify retired, discovery is stages[0] now) — parity with submit, no longer the old implicit "executing"', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
@@ -242,7 +242,7 @@ test('add stamps stage "discovery" by default (D1/D2, add-stage-default-gap; tsk
 // --- base-workflow-model S2: --domain on `submit` (D1-D4, E3) ---
 
 test('submit without --domain is byte-identical to before: domain unset, stage "discovery" (coding\'s own entry stage, stages[0] — tsk-qod D1/D2: clarify retired), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -253,7 +253,7 @@ test('submit without --domain is byte-identical to before: domain unset, stage "
 
 
 test('submit --domain coding is explicit and still resolves stage to "discovery", exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--domain', 'coding']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -264,7 +264,7 @@ test('submit --domain coding is explicit and still resolves stage to "discovery"
 
 
 test('submit --domain synthetic persists work.domain and resolves stage to its own first stage ("assembling", no Clarify-mapped stage), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Try the synthetic domain', '--domain', 'synthetic']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -276,7 +276,7 @@ test('submit --domain synthetic persists work.domain and resolves stage to its o
 
 for (const [label, badFlagArgs] of SUBMIT_BAD_FLAG_CASES) {
   test(`submit with ${label} is rejected as validation, exit 4, no event written`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     const before = eventLines(cwd).length;
     const result = run(cwd, ['submit', 'Try a bad flag value', ...badFlagArgs]);
     assert.equal(result.status, 4);
@@ -285,7 +285,7 @@ for (const [label, badFlagArgs] of SUBMIT_BAD_FLAG_CASES) {
 }
 
 test('submit --domain <bad> produces exactly one stderr line (the validation error), no stray "folding to coding" warning — parity with add (review-20260717-self-improve-base-workflow f3)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Try a bad domain again', '--domain', 'bogus']);
   assert.equal(result.status, 4);
   assert.doesNotMatch(result.stderr, /folding to "coding"/);
@@ -297,7 +297,7 @@ test('submit --domain <bad> produces exactly one stderr line (the validation err
 // --- work-graph-intelligence S2b: --discovered-from on `submit` (producer A, two-hop) ---
 
 test('submit without --discovered-from leaves discoveredFrom unset, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;

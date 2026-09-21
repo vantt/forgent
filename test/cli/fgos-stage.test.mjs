@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -110,7 +110,7 @@ test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr in
 // destination from `executing` to `decompose` for exactly that reason (per
 // D2, an intentional contract change, not a test nerf).
 test('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   // tsk-1x3 D1/D9/D16: the judge subprocess this test used to configure via
@@ -135,7 +135,7 @@ test('discover on a clear verdict moves the submitted item to stage planning wit
 // calls plus two new wrong-stage-error tests proving the split actually
 // removed the old dynamic-dispatch fallback, not just renamed it.
 test("plan on an item sitting at stage planning dispatches to resolvePlan and pass-throughs it on to executing (sync/async parity)", () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
@@ -159,7 +159,7 @@ test("plan on an item sitting at stage planning dispatches to resolvePlan and pa
 
 
 test('fgos plan with --verdict and plan.md present directly processes caller verdict without running validate-plan assignment (Finding 2 fix)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Feature split test']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
@@ -186,7 +186,7 @@ test('fgos plan with --verdict and plan.md present directly processes caller ver
 });
 
 test('fgos plan on a standard plan without caller verdict advances Work to executing after READY validation', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Standard plan validation adoption test']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
@@ -275,7 +275,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
 
 
 test('discover on a planning-stage item errors instead of silently dispatching to resolvePlan (tsk-2b0 D1: hard split, no fallback)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
@@ -290,7 +290,7 @@ test('discover on a planning-stage item errors instead of silently dispatching t
 
 
 test('plan on a discovery-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
 
@@ -303,14 +303,14 @@ test('plan on a discovery-stage item errors instead of silently dispatching to r
 
 
 test('plan with no id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['plan']);
   assert.equal(result.status, 4);
 });
 
 
 test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?']);
@@ -325,7 +325,7 @@ test('discover on an unclear verdict parks the submitted item in awaiting-human 
 
 
 test('discover with no id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['discover']);
   assert.equal(result.status, 4);
 });
@@ -341,7 +341,7 @@ test('discover with no id is rejected as validation, exit 4', () => {
 // loudly instead. PATH is still neutralized here to prove the bootstrap
 // path is exercised the same way (no live agent invoked either way).
 test('discover on a fresh cwd with no runner config bootstraps the default config into the shared file instead of crashing on ENOENT, then still refuses without --verdict (D16)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const configPath = path.join(cwd, '.fgos', 'config.json');
   assert.equal(fs.existsSync(configPath), false);
 
@@ -360,7 +360,7 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
 
 
 test('discover --config pointing at a missing path still throws RunnerConfigError unchanged, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing with an explicit missing config']).stdout).data.id;
   const missingConfigPath = path.join(cwd, 'no-such-runner-config.json');
 
@@ -378,7 +378,7 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
 // actually bypassed the judge, not just that a real judge happened to agree.
 
 test('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
@@ -394,7 +394,7 @@ test('discover --verdict clear --verify moves the item to planning with that exa
 
 
 test('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
@@ -410,7 +410,7 @@ test('discover --verdict unclear --question parks in awaiting-human with that ex
 
 
 test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   const result = run(cwd, ['discover', id, '--verdict', 'clear']);
   assert.equal(result.status, 4);
@@ -419,7 +419,7 @@ test('discover --verdict clear with no --verify is rejected as validation, exit 
 
 
 test('discover --verdict with an unrecognized value is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   const result = run(cwd, ['discover', id, '--verdict', 'maybe']);
   assert.equal(result.status, 4);
@@ -434,7 +434,7 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
 // it. Decided at discovery on real evidence, never guessed from submit text.
 
 test('discover --verdict clear with --tier/--kind/--risk applies the classification to the item', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- classified', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
@@ -450,7 +450,7 @@ test('discover --verdict clear with --tier/--kind/--risk applies the classificat
 
 
 test('discover applies only the classification fields actually passed, leaving the rest untouched', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   const before = envelopeData(run(cwd, ['list']).stdout).work[id];
 
@@ -465,7 +465,7 @@ test('discover applies only the classification fields actually passed, leaving t
 
 
 test('discover --verdict unclear never applies classification — the same guard the headless path uses', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   const before = envelopeData(run(cwd, ['list']).stdout).work[id];
 

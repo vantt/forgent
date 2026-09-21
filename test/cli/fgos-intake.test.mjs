@@ -73,7 +73,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -123,7 +123,7 @@ test('submit on a directory with no .fgos/ at all is refused, exit 4, writes not
 
 
 test('add creates exactly one work.add event and the view reflects the new item, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const before = eventLines(cwd).length;
   const result = addOk(cwd, 'build-cli', { title: 'Build CLI', kind: 'feature', risk: 'standard', verify: "node --test 'test/cli/*.test.mjs'" });
   assert.equal(result.status, 0);
@@ -138,7 +138,7 @@ test('add creates exactly one work.add event and the view reflects the new item,
 
 
 test('add with a missing required field (--verify) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'no-verify', '--title', 'X', '--kind', 'task', '--risk', 'light', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
@@ -149,7 +149,7 @@ test('add with a missing required field (--verify) is rejected as validation, ex
 // --title/--kind/--risk/--verify above -- no default fallback (e.g.
 // silently reusing --title), per plan.md's rejected-alternative.
 test('add with a missing required field (--description) is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'no-description', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'x']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--description/);
@@ -158,7 +158,7 @@ test('add with a missing required field (--description) is rejected as validatio
 
 
 test('add --description persists the given description on the new item, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'add', 'with-description',
     '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'x',
@@ -170,7 +170,7 @@ test('add --description persists the given description on the new item, exit 0',
 
 
 test('add with an invalid (non kebab-case) id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'Not_Kebab');
   assert.equal(result.status, 4);
   assert.equal(eventLines(cwd).length, 0);
@@ -178,7 +178,7 @@ test('add with an invalid (non kebab-case) id is rejected as validation, exit 4'
 
 
 test('add with a duplicate id is rejected as validation, exit 4, no extra event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'dup-id');
   const before = eventLines(cwd).length;
   const result = addOk(cwd, 'dup-id');
@@ -188,14 +188,14 @@ test('add with a duplicate id is rejected as validation, exit 4, no extra event 
 
 
 test('add with an unknown dep id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'has-bad-dep', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'ghost-dep', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
 
 
 test('move applies a legal transition, appends one event, and updates the view, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'movable');
   const before = eventLines(cwd).length;
   // tsk-40m: todo -> doing is retired -- todo -> blocked stands in as the
@@ -212,7 +212,7 @@ test('move applies a legal transition, appends one event, and updates the view, 
 // generic move verb — no dedicated CLI verb needed.
 for (const from of ['blocked', 'todo', 'doing']) {
   test(`move applies ${from} -> wontfix through the generic verb, exit 0`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     addOk(cwd, `wontfix-from-${from}`);
     // tsk-40m: todo -> doing is retired -- a durably-'doing' entry status
     // still needs a raw injection (doing -> wontfix itself stays a real,
@@ -226,7 +226,7 @@ for (const from of ['blocked', 'todo', 'doing']) {
 }
 
 test('move rejects an illegal transition as precondition, exit 2, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'stuck-todo');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'stuck-todo', '--to', 'done']);
@@ -236,7 +236,7 @@ test('move rejects an illegal transition as precondition, exit 2, no event writt
 
 
 test('move rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'cas-item');
   moveToDurableDoingForTest(cwd, 'cas-item');
   const before = eventLines(cwd).length;
@@ -248,7 +248,7 @@ test('move rejects a CAS expected-status mismatch as conflict, exit 3, no event 
 
 
 test('move on a nonexistent id is rejected as validation (not-found), exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['move', 'never-added', '--to', 'doing']);
   assert.equal(result.status, 4);
 });
@@ -256,7 +256,7 @@ test('move on a nonexistent id is rejected as validation (not-found), exit 4', (
 
 for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
   test(`move with ${label} is rejected as validation, exit 4, no event written`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     addOk(cwd, 'move-bad-flag-item');
     const before = eventLines(cwd).length;
     const result = run(cwd, ['move', 'move-bad-flag-item', ...badFlagArgs]);
@@ -266,7 +266,7 @@ for (const [label, badFlagArgs] of MOVE_BAD_FLAG_CASES) {
 }
 
 test('move reports the real event seq in its envelope data, not undefined', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seq-check'); // event #1
   // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
   // "some legal move" example this test actually needs.
@@ -286,7 +286,7 @@ test('move reports the real event seq in its envelope data, not undefined', () =
 // SKILL.md step 5 assumed this door already existed.
 
 test('add --parent sets lineage; omitting --parent leaves it unset', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(addOk(cwd, 'parent-root').status, 0);
 
   const withParent = run(cwd, ['add', 'parent-child', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', 'parent-root', '--description', 'tsk-535 fixture description.']);

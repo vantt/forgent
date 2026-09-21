@@ -16,11 +16,11 @@ import { test } from 'node:test';
 import {
   assert,
   run,
-  tmpCwd,
+  tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
 
 test('decision with no --text, only positional args, refuses with a validation error (exit 4) instead of silently storing corrupted text', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'decision',
     'write',

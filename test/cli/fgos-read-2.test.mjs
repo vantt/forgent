@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -101,7 +101,7 @@ import {
 // a named property set on an array).
 
 test('list default on a store with only done items returns an empty work map, not an error', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
 
@@ -112,7 +112,7 @@ test('list default on a store with only done items returns an empty work map, no
 
 
 test('list prints the current view as parseable envelope data, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'listed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
@@ -122,7 +122,7 @@ test('list prints the current view as parseable envelope data, exit 0', () => {
 
 
 test('goal set on a real goal item succeeds, exit 0, and a following goal show reflects it', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addGoalItem(cwd, 'goal-target-1');
   const setResult = run(cwd, ['goal', 'set', 'goal-target-1']);
   assert.equal(setResult.status, 0);
@@ -135,7 +135,7 @@ test('goal set on a real goal item succeeds, exit 0, and a following goal show r
 
 
 test('goal set on a non-existent id is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['goal', 'set', 'does-not-exist']);
   assert.equal(result.status, 4);
@@ -144,7 +144,7 @@ test('goal set on a non-existent id is rejected as validation, exit 4, no event 
 
 
 test('goal set on an existing item without goalTier is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'non-goal-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['goal', 'set', 'non-goal-item']);
@@ -154,7 +154,7 @@ test('goal set on an existing item without goalTier is rejected as validation, e
 
 
 test('goal show with no focus ever set returns focus: null, exit 0, not an error', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['goal', 'show']);
   assert.equal(result.status, 0);
   assert.equal(envelopeData(result.stdout).focus, null);
@@ -162,7 +162,7 @@ test('goal show with no focus ever set returns focus: null, exit 0, not an error
 
 
 test('goal show after a successful set returns the focus id plus goal-scoped ranking data', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addGoalItem(cwd, 'goal-target-2');
   run(cwd, ['goal', 'set', 'goal-target-2']);
   const data = envelopeData(run(cwd, ['goal', 'show']).stdout);
@@ -173,7 +173,7 @@ test('goal show after a successful set returns the focus id plus goal-scoped ran
 
 
 test('goal focus is not auto-cleared when the focused item reaches status done', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addGoalItem(cwd, 'goal-target-done');
   run(cwd, ['goal', 'set', 'goal-target-done']);
   run(cwd, ['move', 'goal-target-done', '--to', 'doing']);
@@ -188,7 +188,7 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
 
 
 test('list shows tier and the proposed status for the real CLI view, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'listed-proposed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
@@ -201,7 +201,7 @@ test('list shows tier and the proposed status for the real CLI view, exit 0', ()
 // --- `fgos ready` (phase-2-routing-5) ---
 
 test('ready prints the frontier as parseable, machine-readable envelope data, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'freestanding');
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
@@ -213,7 +213,7 @@ test('ready prints the frontier as parseable, machine-readable envelope data, ex
 
 
 test('ready excludes a todo item whose dep sits at proposed (proposed is not done): dep at proposed does NOT open dependent work', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'dep-in-proposed');
   const result = run(cwd, ['add', 'blocked-on-proposed', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'dep-in-proposed', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
@@ -225,7 +225,7 @@ test('ready excludes a todo item whose dep sits at proposed (proposed is not don
 
 
 test('ready opens a todo item once its dep reaches done (approved, not merely proposed)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'dep-approved');
   assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
@@ -248,7 +248,7 @@ test('ready on a directory with no log at all returns an empty result, exit 0 (a
 
 
 test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'before-corruption-ready');
   fs.appendFileSync(logPath(cwd), 'not valid json\n', 'utf8');
 
@@ -262,7 +262,7 @@ test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
 // D9 but was silently swallowed by the CLI/store layer until now ---------
 
 test('ready --step Divide returns only planning-stage items, not the default Execute frontier (tsk-qod D1/D2: Clarify no longer maps to any coding stage, so Divide is the demonstration step now)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'atplanning', { stage: 'planning' });
   addOk(cwd, 'atexecuting', { stage: 'executing' });
 
@@ -278,7 +278,7 @@ test('ready --step Divide returns only planning-stage items, not the default Exe
 
 
 test('ready with no --step defaults to Execute, byte-identical to before --step wiring existed', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'atdiscovery', { stage: 'discovery' });
   addOk(cwd, 'atexecuting', { stage: 'executing' });
 
@@ -297,7 +297,7 @@ test('ready with no --step defaults to Execute, byte-identical to before --step 
 // paginated shape through the real CLI binary.
 
 test('ready --limit paginates through the real CLI binary: envelope data carries items+nextCursor, and the cursor round-trips into the remaining items', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'page-a');
   addOk(cwd, 'page-b');
   addOk(cwd, 'page-c');
@@ -326,7 +326,7 @@ test('ready --limit paginates through the real CLI binary: envelope data carries
 
 
 test('ready with no --cursor/--limit still returns the bare frontier array, not the paginated shape (byte-identical default)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'unpaginated-item');
   const result = run(cwd, ['ready']);
   assert.equal(result.status, 0);
@@ -336,7 +336,7 @@ test('ready with no --cursor/--limit still returns the bare frontier array, not 
 
 
 test('ready --cursor rejects a stale cursor (id no longer in the current frontier) as validation, exit 4, message states the restart remedy', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'only-item');
   const staleCursor = Buffer.from(JSON.stringify({ order: 'ready-v1', lastId: 'never-existed' }), 'utf8').toString('base64');
   const result = run(cwd, ['ready', '--cursor', staleCursor]);
@@ -346,7 +346,7 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
 
 
 test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'list-page-a');
   addOk(cwd, 'list-page-b');
   const result = run(cwd, ['list', '--limit', '1']);
@@ -369,7 +369,7 @@ test('list --limit paginates only the work map: view.work becomes {items, nextCu
 // exercise the real `check` binary.
 
 test('check on an item with no recorded outcome returns a null predicted/actual entry for that id, exit 0, no throw', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'unchecked-item');
   const result = run(cwd, ['check', 'unchecked-item']);
   assert.equal(result.status, 0);

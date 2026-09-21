@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -114,7 +114,7 @@ The chosen mechanism determines security requirements and user authentication fl
 
 for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
   test(`add with ${label} is rejected as validation, exit 4, no event written`, () => {
-    const cwd = tmpCwd();
+    const cwd = tmpCwdFromTemplate();
     const before = eventLines(cwd).length;
     const result = run(cwd, ['add', 'bad-flag-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', ...badFlagArgs, '--description', 'tsk-535 fixture description.']);
     assert.equal(result.status, 4);
@@ -125,7 +125,7 @@ for (const [label, badFlagArgs] of ADD_BAD_FLAG_CASES) {
 // --- base-workflow-model S2: --domain on `add` (D1-D4) ---
 
 test('add without --domain leaves domain unset — the view still reads "coding" behavior unchanged, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'default-domain-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['default-domain-item'].domain, undefined);
@@ -133,7 +133,7 @@ test('add without --domain leaves domain unset — the view still reads "coding"
 
 
 test('add --domain synthetic persists work.domain and stamps stage "assembling" (no --stage flag needed), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'add', 'synthetic-item',
     '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x',
@@ -148,7 +148,7 @@ test('add --domain synthetic persists work.domain and stamps stage "assembling" 
 
 
 test('add --domain coding is explicit and behaves identically to omitting --domain, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'add', 'explicit-coding-item',
     '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x',
@@ -164,7 +164,7 @@ test('add --domain coding is explicit and behaves identically to omitting --doma
 // D1/D2, 'clarify' before it), same door submit has always had ---
 
 test('add without --stage or --domain now defaults to stage "discovery" (was implicit "executing"), and is NOT frontier-ready, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // Raw run(), not addOk() -- addOk defaults its own --stage to 'executing'
   // for its many other callers' sake (see its own comment); this test is
   // specifically about the CLI's bare, flagless default.
@@ -176,7 +176,7 @@ test('add without --stage or --domain now defaults to stage "discovery" (was imp
 
 
 test('add --stage decompose explicitly persists that stage, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--stage', 'decompose', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['stage-flag-decompose'].stage, 'decompose');
@@ -184,7 +184,7 @@ test('add --stage decompose explicitly persists that stage, exit 0', () => {
 
 
 test('add --stage executing explicitly persists that stage and IS frontier-ready (opts back into pre-fix behavior), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--stage', 'executing', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['stage-flag-executing'].stage, 'executing');
@@ -195,7 +195,7 @@ test('add --stage executing explicitly persists that stage and IS frontier-ready
 // --- work-graph-intelligence S2b: --discovered-from on `add` (producer A) ---
 
 test('add without --discovered-from leaves discoveredFrom unset, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'no-discovered-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-discovered-item'].discoveredFrom, undefined);
@@ -203,7 +203,7 @@ test('add without --discovered-from leaves discoveredFrom unset, exit 0', () => 
 
 
 test('add --discovered-from persists discoveredFrom on the new item, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'origin-item');
   const result = run(cwd, [
     'add', 'discovered-item',
@@ -218,7 +218,7 @@ test('add --discovered-from persists discoveredFrom on the new item, exit 0', ()
 // --- str67-goal-directed-planning D1/D2: --goal-tier and --targets on `add` ---
 
 test('add without --goal-tier/--targets leaves both fields unset, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'no-goal-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-goal-item'].goalTier, undefined);
@@ -227,7 +227,7 @@ test('add without --goal-tier/--targets leaves both fields unset, exit 0', () =>
 
 
 test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'add', 'goal-item',
     '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x',
@@ -241,7 +241,7 @@ test('add --goal-tier mvp --targets a,b persists both fields, exit 0', () => {
 
 
 test('add --targets "" parses to [] explicitly, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'empty-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--targets', '', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['empty-targets-item'].targets, []);
@@ -249,7 +249,7 @@ test('add --targets "" parses to [] explicitly, exit 0', () => {
 
 
 test('add with a bare --targets (no value) also parses to [], exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'bare-targets-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--targets', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.deepEqual(stateView(cwd).work['bare-targets-item'].targets, []);
@@ -259,7 +259,7 @@ test('add with a bare --targets (no value) also parses to [], exit 0', () => {
 // --- p50-workflow-induct D7: --docs-ref on `add` (ceremony decision-doc pointer) ---
 
 test('add without --docs-ref leaves docsRef unset, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'no-docs-ref-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['no-docs-ref-item'].docsRef, undefined);
@@ -267,7 +267,7 @@ test('add without --docs-ref leaves docsRef unset, exit 0', () => {
 
 
 test('add --docs-ref persists docsRef and round-trips unchanged through fgos list, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, [
     'add', 'docs-ref-item',
     '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x',

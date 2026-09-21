@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -113,7 +113,7 @@ test('check on a directory with no log at all returns an empty outcomes list, ex
 
 
 test('check returns BOTH predicted and actual values for an item with real outcome data, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'checked-item');
   const dir = path.join(cwd, '.fgos');
   addOutcome(dir, { id: 'checked-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
@@ -134,7 +134,7 @@ test('check returns BOTH predicted and actual values for an item with real outco
 
 
 test('check with no id given reports every item that has outcome data, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-a');
   addOk(cwd, 'item-b');
   const dir = path.join(cwd, '.fgos');
@@ -158,7 +158,7 @@ test('check with no id given reports every item that has outcome data, exit 0', 
 // beyond the store validation these tests prove separately.
 
 test('check surfaces docType for a tagged outcome; an untagged outcome nulls it, output shape otherwise unchanged', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'tagged-outcome-item');
   addOk(cwd, 'untagged-outcome-item');
   const dir = path.join(cwd, '.fgos');
@@ -194,7 +194,7 @@ test('check surfaces docType for a tagged outcome; an untagged outcome nulls it,
 // addWork directly, the same way decompose.mjs writes one in production.
 
 test('rollup on a root with n children, k done, prints k/n and lists every child with its own status, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -218,7 +218,7 @@ test('rollup on a root with n children, k done, prints k/n and lists every child
 
 
 test('rollup renders stageEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', stage: 'discovery' });
@@ -238,7 +238,7 @@ test('rollup renders stageEffective on the root and on each child independently,
 
 
 test('rollup on an item with no children returns 0/0 and an empty children list, exit 0, no throw', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'lonely-item');
 
   const result = run(cwd, ['rollup', 'lonely-item']);
@@ -251,7 +251,7 @@ test('rollup on an item with no children returns 0/0 and an empty children list,
 
 
 test('rollup on a nonexistent id is rejected as validation (not-found), exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item');
 
   const result = run(cwd, ['rollup', 'no-such-item']);
@@ -261,14 +261,14 @@ test('rollup on a nonexistent id is rejected as validation (not-found), exit 4',
 
 
 test('rollup with no id at all is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['rollup']);
   assert.equal(result.status, 4);
 });
 
 
 test('rollup never mutates state: no event is appended and no children of an unrelated item are counted', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -294,7 +294,7 @@ test('rollup never mutates state: no event is appended and no children of an unr
 // `doneCount`/`totalCount` meaning exactly what they always meant.
 
 test('rollup on a milestone counts its targets in targetDoneCount/targetTotalCount and leaves the children counts at 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seed-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -320,7 +320,7 @@ test('rollup on a milestone counts its targets in targetDoneCount/targetTotalCou
 
 
 test('rollup on an item with no targets reports an empty targets array and 0/0, leaving the children counts untouched', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -337,7 +337,7 @@ test('rollup on an item with no targets reports an empty targets array and 0/0, 
 
 
 test('rollup reports a target id that matches no work item as a null-title/null-status row, counted as not done, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seed-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -356,7 +356,7 @@ test('rollup reports a target id that matches no work item as a null-title/null-
 
 
 test('rollup on an item carrying both children and targets keeps the two count pairs independent', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seed-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -376,7 +376,7 @@ test('rollup on an item carrying both children and targets keeps the two count p
 
 
 test('rollup reading targets never mutates state: no event is appended', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seed-item');
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'target-a', title: 'Target A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -396,7 +396,7 @@ test('rollup reading targets never mutates state: no event is appended', () => {
 // docs/history/fgos-show-scoped-detail/CONTEXT.md D1/D2.
 
 test('show returns the work record plus every per-item log scoped to just that id, leaving a second item\'s data out entirely, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'show-detail-item', { title: 'Show Detail Item' });
   addOk(cwd, 'other-item', { title: 'Other Item' });
   const dir = path.join(cwd, '.fgos');
@@ -442,7 +442,7 @@ test('show returns the work record plus every per-item log scoped to just that i
 
 
 test('show on a fresh item with no logs yet returns every key present but empty/null, not omitted, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'bare-item');
 
   const result = run(cwd, ['show', 'bare-item']);
@@ -461,7 +461,7 @@ test('show on a fresh item with no logs yet returns every key present but empty/
 
 
 test('show on an unknown id is rejected as validation (not-found), exit 4, same shape as list --id\'s miss', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'some-item');
 
   const result = run(cwd, ['show', 'no-such-item']);
@@ -471,14 +471,14 @@ test('show on an unknown id is rejected as validation (not-found), exit 4, same 
 
 
 test('show with no id at all is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['show']);
   assert.equal(result.status, 4);
 });
 
 
 test('show --json is a byte-identical no-op: output matches show without --json exactly, except generated_at', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'json-noop-item');
 
   const withoutJson = run(cwd, ['show', 'json-noop-item']).stdout;
@@ -490,7 +490,7 @@ test('show --json is a byte-identical no-op: output matches show without --json 
 
 
 test('show never mutates state: no event is appended', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'read-only-item');
 
   const before = eventLines(cwd);

@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -140,7 +140,7 @@ test('list on a fresh non-worktree dir with no store at all: exit 0, empty view,
 // --- list open-only default + --all (tsk-5oa D1/D2) -----------------------
 
 test('list by default excludes a done item, but keeps a todo item', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item', { title: 'Open Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -152,7 +152,7 @@ test('list by default excludes a done item, but keeps a todo item', () => {
 
 
 test('list --all restores the done item alongside the open one', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item', { title: 'Open Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -168,7 +168,7 @@ test('list --all restores the done item alongside the open one', () => {
 // wontfix -- a wontfix item is resolved (nothing further will ever happen
 // to it) the same as a done one.
 test('list by default excludes a wontfix item, but keeps a todo item', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item', { title: 'Open Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'closed-item', title: 'Closed Item', kind: 'task', status: 'wontfix', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -180,7 +180,7 @@ test('list by default excludes a wontfix item, but keeps a todo item', () => {
 
 
 test('list --all restores the wontfix item alongside the open one', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item', { title: 'Open Item' });
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'closed-item', title: 'Closed Item', kind: 'task', status: 'wontfix', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -197,7 +197,7 @@ test('list --all restores the wontfix item alongside the open one', () => {
 // uses (proven live against this repo's own tsk-19y/tsk-5lr mixed set
 // during fgos-validating). `--all` stays byte-identical/raw (D1).
 test('list by default drops a child whose parent is visible, and badges the parent with childProgress', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addOk(cwd, 'root-item', { title: 'Root Item' });
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -219,7 +219,7 @@ test('list by default drops a child whose parent is visible, and badges the pare
 // `parent`. Proven live against tsk-19y (done) and its still-open children
 // tsk-5lr/tsk-3v2/tsk-4n7 during this item's own fgos-validating pass.
 test('list by default falls back to showing a child as a top-level row when its parent is resolved and hidden', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'root-item', title: 'Root Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   addWork(dir, { id: 'orphan-child', title: 'Orphan Child', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -235,7 +235,7 @@ test('list by default falls back to showing a child as a top-level row when its 
 // str61's own parent-anchored `awaitingContext` reporting depends on it
 // still being present in the default view's `work` map.
 test('list by default never hides an awaiting-human child, even when its parent is visible', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addOk(cwd, 'root-item', { title: 'Root Item' });
   addWork(dir, { id: 'parked-child', title: 'Parked Child', kind: 'task', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -251,7 +251,7 @@ test('list by default never hides an awaiting-human child, even when its parent 
 // child dropped, no childProgress badge added. This is the one flagged
 // public-contract risk (herdr-plugin parses `list --all --json` literally).
 test('list --all is untouched by the child-view gate: no rows dropped, no childProgress added', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addOk(cwd, 'root-item', { title: 'Root Item' });
   addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
@@ -271,7 +271,7 @@ test('list --all is untouched by the child-view gate: no rows dropped, no childP
 // park state apart from active work without reading coding's own literal
 // status strings.
 test('list --json exposes parkReason on a blocked item, and omits it on a doing item', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'parked-item', title: 'Parked Item', kind: 'task', status: 'blocked', deps: [], risk: 'light', refs: [], verify: 'npm test' });
   addWork(dir, { id: 'active-item', title: 'Active Item', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test' });
@@ -283,7 +283,7 @@ test('list --json exposes parkReason on a blocked item, and omits it on a doing 
 
 
 test('list --id returns only that item, ignoring the open-only default and --all entirely (tsk-42m D2)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item', { title: 'Open Item' });
   addOk(cwd, 'other-item', { title: 'Other Item' });
 
@@ -294,7 +294,7 @@ test('list --id returns only that item, ignoring the open-only default and --all
 
 
 test('list --id on a done item returns it without needing --all (tsk-42m D2: --id bypasses the open-only default entirely)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
 
@@ -304,7 +304,7 @@ test('list --id on a done item returns it without needing --all (tsk-42m D2: --i
 
 
 test('list --id on an unknown id is rejected as validation (not-found), exit 4 (tsk-42m D2)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'open-item');
 
   const result = run(cwd, ['list', '--id', 'no-such-item']);
@@ -314,7 +314,7 @@ test('list --id on an unknown id is rejected as validation (not-found), exit 4 (
 
 
 test('list --id scopes every id-keyed view section to just the requested item, excluding another item\'s data (tsk-2u9 D1/D2)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-a', { title: 'Item A' });
   addOk(cwd, 'item-b', { title: 'Item B' });
 
@@ -355,7 +355,7 @@ test('list --id scopes every id-keyed view section to just the requested item, e
 
 
 test('list --id --fields returns only named fields and omits all history side-log keys (tsk-4zr)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-fields', { title: 'Item Fields' });
   run(cwd, ['decision', '--id', 'item-fields', '--text', 'decision text', '--rationale', 'rat', '--relation', 'none']);
 
@@ -370,7 +370,7 @@ test('list --id --fields returns only named fields and omits all history side-lo
 
 
 test('list --id without --fields is unchanged from today behavior (tsk-4zr)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-unflagged', { title: 'Item Unflagged' });
   run(cwd, ['decision', '--id', 'item-unflagged', '--text', 'dec text', '--rationale', 'rat', '--relation', 'none']);
 
@@ -390,7 +390,7 @@ test('list --id without --fields is unchanged from today behavior (tsk-4zr)', ()
 
 
 test('list --id --fields with an invalid field name is rejected as validation error, exit 4 (tsk-4zr)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-invalid');
 
   const result = run(cwd, ['list', '--id', 'item-invalid', '--fields', 'stage,invalidField']);
@@ -400,7 +400,7 @@ test('list --id --fields with an invalid field name is rejected as validation er
 
 
 test('list default keeps an awaiting-human item visible (D2: excludes only the two terminal statuses done/wontfix, per wontfix-terminal-status-filter-consistency D2 -- never a broader ad-hoc closed/parked set like awaiting-human)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'parked-item', { title: 'Parked Item' });
   run(cwd, ['ask', 'parked-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: need a decision']);
 

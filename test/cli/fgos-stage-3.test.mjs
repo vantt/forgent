@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -96,7 +96,7 @@ import {
 // silently returns `[]` instead of the real candidate list.
 
 test('evolve never touches git (no branch/worktree operation) — succeeds on a directory that is not even a git repo', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'no-git-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'no-git-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
@@ -118,7 +118,7 @@ test('evolve never touches git (no branch/worktree operation) — succeeds on a 
 // test above).
 
 test("evolve --submit <id> with a matching candidate creates exactly one new work item via submitWork, described from the candidate's fields", () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'submit-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'submit-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
@@ -146,7 +146,7 @@ test("evolve --submit <id> with a matching candidate creates exactly one new wor
 
 
 test('evolve --submit <id> with no matching candidate creates no work item, prints a clean error, exits non-zero', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'exists-item-2');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'exists-item-2', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
@@ -160,7 +160,7 @@ test('evolve --submit <id> with no matching candidate creates no work item, prin
 
 
 test('evolve --submit with a bare flag (no value) is refused as validation, not a re-prompt', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'bare-submit-item');
   const result = run(cwd, ['evolve', '--submit']);
   assert.notEqual(result.status, 0);
@@ -169,7 +169,7 @@ test('evolve --submit with a bare flag (no value) is refused as validation, not 
 
 
 test('evolve --submit composes its description gracefully around missing candidate fields, never printing the literal "undefined"', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'sparse-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'sparse-item', disposition: 'blocked', attempts: 1 });
@@ -185,7 +185,7 @@ test('evolve --submit composes its description gracefully around missing candida
 
 
 test('evolve (no flag) and evolve --pick remain unaffected by the new --submit path: same output, no event appended', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'unaffected-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'unaffected-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
@@ -211,14 +211,14 @@ test('evolve (no flag) and evolve --pick remain unaffected by the new --submit p
 // `compound-learn` stage move) ------------------------------------------
 
 test('compound on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['compound', 'ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('compound on an item not at status retrospective is rejected as validation, exit 4, no events written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'compound-wrong-status');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['compound', 'compound-wrong-status', '--doc-type', 'how-to']);
@@ -229,7 +229,7 @@ test('compound on an item not at status retrospective is rejected as validation,
 
 
 test('compound with an invalid --doc-type is rejected as validation, exit 4, before any write', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'compound-bad-doctype');
   run(cwd, ['move', 'compound-bad-doctype', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-bad-doctype', '--to', 'delivered']);
@@ -243,7 +243,7 @@ test('compound with an invalid --doc-type is rejected as validation, exit 4, bef
 
 
 test('compound with no --doc-type is a no-op: exit 0, docType null, no events written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'compound-noop');
   run(cwd, ['move', 'compound-noop', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-noop', '--to', 'delivered']);
@@ -259,7 +259,7 @@ test('compound with no --doc-type is a no-op: exit 0, docType null, no events wr
 
 
 test('compound with --doc-type tags the outcome, surfaced by `show`; item stays at status retrospective (no stage/status move)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'compound-tag-only');
   run(cwd, ['move', 'compound-tag-only', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'compound-tag-only', '--to', 'delivered']);
@@ -285,7 +285,7 @@ test('compound with --doc-type tags the outcome, surfaced by `show`; item stays 
 // documents, 2026-08-05) impossible to reproduce rather than detected
 // later. These four tests are git-backed (`initGitCwdMain()`), unlike the
 // rest of this suite's `compound` tests, because the check itself is
-// git-based and has nothing to observe in a non-git `tmpCwd()`.
+// git-based and has nothing to observe in a non-git `tmpCwdFromTemplate()`.
 
 test('compound with --doc-type and --doc-path tags both when the file is committed at HEAD, surfaced by `show`', () => {
   const cwd = initGitCwdMain();

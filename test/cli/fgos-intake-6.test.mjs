@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -113,7 +113,7 @@ The chosen mechanism determines security requirements and user authentication fl
 
 
 test('submit --discovered-from persists discoveredFrom (two-hop: opts -> submitWork work object), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'origin-item');
   const result = run(cwd, ['submit', 'Follow up on the origin item', '--discovered-from', 'origin-item']);
   assert.equal(result.status, 0);
@@ -128,7 +128,7 @@ test('submit --discovered-from persists discoveredFrom (two-hop: opts -> submitW
 // addWork write-gate, cycle-checked)
 
 test('submit without --deps stays byte-identical to today: deps: [], exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const item = JSON.parse(result.stdout).data;
@@ -139,7 +139,7 @@ test('submit without --deps stays byte-identical to today: deps: [], exit 0', ()
 
 
 test('submit --deps <id1,id2> persists those deps, validated through the same write-gate add uses, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'dep-one');
   addOk(cwd, 'dep-two');
   const result = run(cwd, ['submit', 'Follow up on two prior items', '--deps', 'dep-one,dep-two']);
@@ -155,7 +155,7 @@ test('submit --deps <id1,id2> persists those deps, validated through the same wr
 // an omitted flag stays byte-identical to classify()'s own derived value)
 
 test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (regression proof)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -167,7 +167,7 @@ test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature
 
 
 test('submit --tier heavy --kind bug --risk heavy overrides all three fields regardless of classify(text)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -179,7 +179,7 @@ test('submit --tier heavy --kind bug --risk heavy overrides all three fields reg
 
 
 test('submit with only --kind overrides just that field; tier and risk still come from classify(text)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--kind', 'bug']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -191,7 +191,7 @@ test('submit with only --kind overrides just that field; tier and risk still com
 
 
 test('submit --tier override alone does not change risk -- risk still mirrors classify()\'s own tier, not the override', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -207,7 +207,7 @@ test('submit --tier override alone does not change risk -- risk still mirrors cl
 // through `fgos edit --verify` after the fact).
 
 test('submit --verify "npm test" sets the item\'s own verify to that command, not the sentinel', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page. Verify: npm test', '--verify', 'npm test']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -217,7 +217,7 @@ test('submit --verify "npm test" sets the item\'s own verify to that command, no
 
 
 test('submit without --verify leaves verify at the sentinel, byte-identical to pre-feature behavior', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -227,7 +227,7 @@ test('submit without --verify leaves verify at the sentinel, byte-identical to p
 
 
 test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'A task with no docs link']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -236,7 +236,7 @@ test('submit without --docs-ref leaves docsRef unset, exit 0', () => {
 
 
 test('submit --docs-ref persists docsRef, exit 0 -- an item created through the public door can now carry this link from the start', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'A task with a docs link', '--docs-ref', 'docs/history/some-feature/']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
@@ -251,7 +251,7 @@ test('submit --docs-ref persists docsRef, exit 0 -- an item created through the 
 // covered at the runner unit-test layer). ---------------------------------
 
 test('answer via the real CLI stamps role "human" on the event payload and folds into an "answer" settlement', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'answer-actor-item');
   run(cwd, ['move', 'answer-actor-item', '--to', 'doing']);
   run(cwd, ['ask', 'answer-actor-item', '--text', VALID_ASK_TEXT]);
@@ -271,7 +271,7 @@ test('answer via the real CLI stamps role "human" on the event payload and folds
 
 
 test('move to done via the real CLI stamps role "human" on the event payload and folds into a "close" settlement', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'close-actor-item');
 
   const result = toDoneViaChain(cwd, 'close-actor-item');
@@ -297,7 +297,7 @@ test('move to done via the real CLI stamps role "human" on the event payload and
 // requires.
 
 test('submit stays byte-identical after the submitWork extraction: a plain call and a call combining --async + --domain', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
 
   const plain = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(plain.status, 0);

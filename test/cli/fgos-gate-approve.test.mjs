@@ -8,10 +8,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { addOk, eventLines, run, stateView, tmpCwd } from './helpers/fgos-cli-harness.mjs';
+import { addOk, eventLines, run, stateView, tmpCwdFromTemplate } from './helpers/fgos-cli-harness.mjs';
 
 test('gate-approve rejects the retired "planApprove" gate name, exit 4 (validation), no event written (tsk-4vz)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-approve-plan-retired');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['gate-approve', 'gate-approve-plan-retired', '--gate', 'planApprove', '--actor', 'human', '--verify', 'npm test']);
@@ -21,7 +21,7 @@ test('gate-approve rejects the retired "planApprove" gate name, exit 4 (validati
 });
 
 test('gate-approve still accepts "validateApprove", the live merged gate, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-approve-validate-ok');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['gate-approve', 'gate-approve-validate-ok', '--gate', 'validateApprove', '--actor', 'bypass', '--verify', 'npm test']);
@@ -32,7 +32,7 @@ test('gate-approve still accepts "validateApprove", the live merged gate, exit 0
 });
 
 test('gate-approve still accepts "contextApprove", the live exploring gate, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-approve-context-ok');
   const result = run(cwd, ['gate-approve', 'gate-approve-context-ok', '--gate', 'contextApprove', '--actor', 'human', '--verify', 'npm test']);
   assert.equal(result.status, 0);
@@ -54,7 +54,7 @@ test('gate-approve still accepts "contextApprove", the live exploring gate, exit
 // gate-bypass.mjs resolved correctly from that cwd.
 
 test('gate-check --gate contextApprove: false at the default level "off" (no gate-bypass.json), no crash from a cwd with no local checkout (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-context-off');
   const artifactPath = path.join(cwd, 'CONTEXT.md');
   fs.writeFileSync(artifactPath, '## Outstanding questions\nNone\n');
@@ -65,7 +65,7 @@ test('gate-check --gate contextApprove: false at the default level "off" (no gat
 });
 
 test('gate-check --gate contextApprove: true once gate-bypass level covers the item\'s tier and the artifact has no open items (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-context-true');
   fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));
   const artifactPath = path.join(cwd, 'CONTEXT.md');
@@ -77,7 +77,7 @@ test('gate-check --gate contextApprove: true once gate-bypass level covers the i
 });
 
 test('gate-check --gate contextApprove: false when the artifact still has an open "## Outstanding questions" item, even at a covering level (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-context-open');
   fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'heavy' }));
   const artifactPath = path.join(cwd, 'CONTEXT.md');
@@ -89,7 +89,7 @@ test('gate-check --gate contextApprove: false when the artifact still has an ope
 });
 
 test('gate-check --gate validateApprove: true once gate-bypass level covers, plan has no open items, cost is REVERSIBLE, no crash from a cwd with no local checkout (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-validate-true');
   fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));
   const planPath = path.join(cwd, 'plan.md');
@@ -101,7 +101,7 @@ test('gate-check --gate validateApprove: true once gate-bypass level covers, pla
 });
 
 test('gate-check --gate validateApprove: false when the cost verdict is not REVERSIBLE, even at a covering level (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-validate-cost');
   fs.writeFileSync(path.join(cwd, '.fgos', 'gate-bypass.json'), JSON.stringify({ level: 'heavy' }));
   const planPath = path.join(cwd, 'plan.md');
@@ -113,7 +113,7 @@ test('gate-check --gate validateApprove: false when the cost verdict is not REVE
 });
 
 test('gate-check rejects an unknown --gate value, exit 4 (validation) (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'gate-check-bad-gate');
   const result = run(cwd, ['gate-check', 'gate-check-bad-gate', '--gate', 'planApprove']);
   assert.equal(result.status, 4);
@@ -121,7 +121,7 @@ test('gate-check rejects an unknown --gate value, exit 4 (validation) (tsk-65q)'
 });
 
 test('gate-check requires an id, exit 4 (validation) (tsk-65q)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['gate-check', '--gate', 'contextApprove']);
   assert.equal(result.status, 4);
 });

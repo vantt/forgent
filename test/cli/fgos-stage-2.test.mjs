@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -96,7 +96,7 @@ import {
 // silently returns `[]` instead of the real candidate list.
 
 test('discover with an out-of-vocabulary --kind is rejected as validation (exit 4) before the item moves at all', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-kind', '--kind', 'bogus']);
@@ -110,7 +110,7 @@ test('discover with an out-of-vocabulary --kind is rejected as validation (exit 
 
 
 test('discover with an out-of-vocabulary --tier is rejected as validation (exit 4) before the item moves at all', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
@@ -121,7 +121,7 @@ test('discover with an out-of-vocabulary --tier is rejected as validation (exit 
 
 
 test('discover with a bare --risk (no value) is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bare-risk', '--risk']);
@@ -132,7 +132,7 @@ test('discover with a bare --risk (no value) is rejected as validation, exit 4',
 
 
 test('plan --verdict pass-through moves the item to executing', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   advanceThroughDiscoveryToPlanning(cwd, id);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
@@ -148,7 +148,7 @@ test('plan --verdict pass-through moves the item to executing', () => {
 
 
 test('plan --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   advanceThroughDiscoveryToPlanning(cwd, id);
 
@@ -163,7 +163,7 @@ test('plan --verdict need-human --reason parks in awaiting-human with that exact
 
 
 test('plan --verdict decompose --children writes real children', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
   advanceThroughDiscoveryToPlanning(cwd, id);
 
@@ -193,7 +193,7 @@ test('plan --verdict decompose --children writes real children', () => {
 
 
 test('plan --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
   // a model verdict (D3 — gates apply regardless of verdict origin) — this
@@ -209,7 +209,7 @@ test('plan --verdict decompose with malformed --children JSON is rejected as val
 
 
 test('plan --verdict decompose with no --children at all is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
   // a model verdict (D3 — gates apply regardless of verdict origin) — this
@@ -225,7 +225,7 @@ test('plan --verdict decompose with no --children at all is rejected as validati
 
 
 test('plan --verdict with an unrecognized value is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // tsk-5q5-1: a clear caller-supplied verdict with a real `verify` still
   // triggers judgeVerifySemanticCorrectness's own second-pass call, same as
   // a model verdict (D3 — gates apply regardless of verdict origin) — this
@@ -241,7 +241,7 @@ test('plan --verdict with an unrecognized value is rejected as validation, exit 
 
 
 test('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
@@ -269,7 +269,7 @@ test('discover (sync verb) on a clear verdict stamps role "session" on the work.
 // the friction-section tests for `check` above.
 
 test('evolve with zero open friction returns an empty candidate list and exits 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'clean-item');
   const result = run(cwd, ['evolve']);
   assert.equal(result.status, 0);
@@ -287,7 +287,7 @@ test('evolve on a directory with no log at all returns an empty candidate list, 
 
 
 test('evolve with candidates returns the ranked list with every field id/disposition/errorClass/layer/detail/attempts/score', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'rank-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'rank-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
@@ -307,7 +307,7 @@ test('evolve with candidates returns the ranked list with every field id/disposi
 
 
 test('evolve with a candidate missing disposition/errorClass/layer/attempts carries those fields as null/undefined, never the literal string "null"', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'sparse-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'sparse-item' });
@@ -319,7 +319,7 @@ test('evolve with a candidate missing disposition/errorClass/layer/attempts carr
 
 
 test('evolve --pick <valid-id> returns that candidate\'s full friction record, no state change', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'pick-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'pick-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
@@ -336,7 +336,7 @@ test('evolve --pick <valid-id> returns that candidate\'s full friction record, n
 
 
 test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with no state change', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'exists-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'exists-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
@@ -354,7 +354,7 @@ test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with n
 
 
 test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'bare-pick-item');
   const result = run(cwd, ['evolve', '--pick']);
   assert.notEqual(result.status, 0);
