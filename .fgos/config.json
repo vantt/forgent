@@ -790,6 +790,13 @@
     },
     "confinement": {
       "strict": false
+    },
+    "coordination": {
+      "orgPolicy": {
+        "dischargeOn": [
+          "accepted"
+        ]
+      }
     }
   },
   "gateBypass": {
