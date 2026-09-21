@@ -145,13 +145,12 @@ test('dispatch reconcile provider-capacity clear-quarantine validates global inv
   assert.equal(notQuarantined.reasonCode, 'not-quarantined');
 
   quarantineProviderAccount({
-    runnerConfig,
     provider: 'openai-codex',
     accountId: 'tetnu',
     reasonCode: 'auth-token-expired',
-    manualClear: true,
+    quarantineKind: 'manual-clear',
     runtimeDir,
-    evidence: { runId: 'run_provider_capacity_clear_test' },
+    detail: { runId: 'run_provider_capacity_clear_test' },
   });
 
   const cleared = invokeDispatchReconcileOperation({

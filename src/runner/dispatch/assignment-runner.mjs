@@ -60,6 +60,7 @@ import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
+import { normalizeProviderFamily } from './provider-adapter.mjs';
 import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool, readOnlyRedirectInvocationFor } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
@@ -1217,6 +1218,10 @@ function attemptProviderCapacityFallback({
     ? compiledPlan.policy.executorPreference.slice(1)
     : [];
   const skippedCandidates = [];
+  // M6: same normalized derivation as the primary's own providerCapacityProvider,
+  // recorded once here so every candidate's evidence below can name the
+  // provider family this fallback is actually switching FROM.
+  const fromProvider = normalizeProviderFamily(compiledPlan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
 
   for (const candidateId of declaredCandidates) {
     if (candidateId === resolvedExecutorId) continue; // not a fallback from itself
@@ -1263,9 +1268,24 @@ function attemptProviderCapacityFallback({
 
     // Found the one candidate to attempt -- bounded to exactly this one,
     // regardless of how many more are declared after it.
-    const provider = plan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[candidateId] ?? cfg.executor);
+    // M6: normalized so a fallback candidate's provider-capacity lookup
+    // uses the same canonical key ('openai' ≡ 'openai-codex') as inventory
+    // validation and the fault classifier, never a raw config-declared spelling.
+    const provider = normalizeProviderFamily(plan.policy?.providerModel || deriveProviderFamily(cfg.executors?.[candidateId] ?? cfg.executor));
     const switchedAt = new Date().toISOString();
-    const baseEvidence = { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates };
+    // M6: fromProvider/toProvider make a cross-provider-family fallback
+    // switch explicit in the persisted evidence (e.g. an openai-codex
+    // primary exhausted, falling back to a claude candidate), instead of
+    // an auditor having to re-derive both providers from the executor
+    // config themselves to notice the switch happened at all.
+    const baseEvidence = {
+      declaredPrimary: resolvedExecutorId,
+      reasonCode: 'provider-capacity-refused',
+      primaryRefusalReason,
+      skippedCandidates,
+      fromProvider,
+      toProvider: provider,
+    };
 
     if (!hasProviderAccounts(cfg, provider)) {
       // Not managed by the rotator at all -- the same rule the primary
@@ -1280,15 +1300,26 @@ function attemptProviderCapacityFallback({
       };
     }
 
-    const lease = acquireProviderAccountLease({
-      runnerConfig: cfg,
-      provider,
-      assignmentId: effectiveAssignment.assignmentId,
-      runId,
-      seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
-      runtimeDir: providerCapacityRuntimeDir,
-      runIsDead: providerCapacityRunIsDead,
-    });
+    // C2c: same reasoning as the primary lease acquisition above -- a
+    // throw (lock-stale timeout, corrupt state) must never escape this
+    // candidate loop uncaught; it is exactly as valid a "this candidate
+    // isn't usable" outcome as a normal `status: 'refused'` return, so the
+    // loop can try the next declared candidate instead of the whole
+    // fallback attempt aborting unclassified.
+    let lease;
+    try {
+      lease = acquireProviderAccountLease({
+        runnerConfig: cfg,
+        provider,
+        assignmentId: effectiveAssignment.assignmentId,
+        runId,
+        seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
+        runtimeDir: providerCapacityRuntimeDir,
+        runIsDead: providerCapacityRunIsDead,
+      });
+    } catch (err) {
+      lease = { status: 'refused', reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed' };
+    }
     if (lease?.status === 'selected') {
       return {
         adopted: true,
@@ -1621,22 +1652,89 @@ export async function executeAssignment(assignment, opts = {}) {
     }
   }
 
-  const providerCapacityProvider = effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor);
+  // M6: normalized ('openai' ≡ 'openai-codex') so leases, quarantine, and
+  // the fault classifier all key the same provider inventory bucket
+  // regardless of which spelling a config or resolved command happened to use.
+  const providerCapacityProvider = normalizeProviderFamily(effectivePolicy.providerModel || deriveProviderFamily(cfg.executors?.[resolvedExecutorId] ?? cfg.executor));
+  // H8 (resume re-acquire): control only reaches this point on a resumed
+  // Run when reconcile already proved there is no live or settled worker
+  // to reattach to (both cases return earlier, well above this line) --
+  // i.e. a genuinely new worker process is about to be relaunched, which
+  // needs its own lease exactly like a fresh dispatch does. The excluded
+  // `!admitted.resumed` used to skip leasing here unconditionally, leaving
+  // a relaunched resumed Run to run with no provider-capacity account at
+  // all instead of re-acquiring (rankProviderAccounts' own sticky lookup,
+  // keyed by state.assignments[provider:assignmentId], already prefers the
+  // SAME account the original attempt held, once reclaimDeadLeases frees
+  // its now-dead lease).
   const shouldSelectProviderAccount =
-    !admitted.resumed &&
     compiledPlan.mechanism === 'out-of-process' &&
     cfg.executors?.[resolvedExecutorId]?.kind !== 'tool' &&
     hasProviderAccounts(cfg, providerCapacityProvider);
   if (shouldSelectProviderAccount) {
-    providerCapacitySelection = acquireProviderAccountLease({
-      runnerConfig: cfg,
-      provider: providerCapacityProvider,
-      assignmentId: effectiveAssignment.assignmentId,
-      runId,
-      seed: `${effectiveAssignment.assignmentId}:${runId}`,
-      runtimeDir: opts.providerCapacityRuntimeDir,
-      runIsDead: opts.providerCapacityRunIsDead,
-    });
+    // C2c: this call happens AFTER admitRunAttempt already committed
+    // run.json status:"running" -- exactly the same post-admission window
+    // H2's comment below already documents for a `status:'refused'`
+    // RETURN value. A THROW here (e.g. ProviderCapacityLockError on lock
+    // contention timeout, or a corrupt state.json) used to escape this
+    // function entirely instead, leaving that same Run permanently
+    // "running"/unsettled with no orphan marker. Route it through the
+    // exact same status:'refused' settle path below instead of inventing
+    // a second one.
+    try {
+      providerCapacitySelection = acquireProviderAccountLease({
+        runnerConfig: cfg,
+        provider: providerCapacityProvider,
+        assignmentId: effectiveAssignment.assignmentId,
+        runId,
+        seed: `${effectiveAssignment.assignmentId}:${runId}`,
+        runtimeDir: opts.providerCapacityRuntimeDir,
+        runIsDead: opts.providerCapacityRunIsDead,
+      });
+    } catch (err) {
+      providerCapacitySelection = {
+        status: 'refused',
+        provider: providerCapacityProvider,
+        reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed',
+        cause: err.message,
+      };
+    }
+    // H8: a lease can be selected (an account/credentialSource chosen) for
+    // a dispatch shape nothing can actually provision that credential
+    // into -- today only the confined bwrap driver's own prepare() copies
+    // credentialSource into the worker's home (confinement/drivers/
+    // bwrap.mjs's provisionSelectedCodexCredential). Narrowly scoped to
+    // `confinement.mode: 'required'`: that is the one case where the
+    // CALLER explicitly declared it needs confinement, so silently
+    // running with no credential provisioned (and no sandbox either) is a
+    // real, undisclosed contract violation, not the accepted interim gap.
+    // An unconfined (or confinement-unspecified) dispatch keeps today's
+    // existing, already-honest behavior unchanged: it proceeds and
+    // records `credentialProvisioned: false` in its evidence (below) --
+    // choosing between "refuse this too" and "provision via env for
+    // cli-spawn" for THAT broader case belongs to account-rotator's own
+    // plan owner (the review names both as valid fixes), not this phase.
+    if (providerCapacitySelection?.status === 'selected') {
+      const confinementMode = compiledPlan?.policy?.confinement?.mode;
+      const requiresConfinement = confinementMode === 'required';
+      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn';
+      if (requiresConfinement && !canProvisionCredential) {
+        try {
+          releaseProviderAccountLease({
+            provider: providerCapacitySelection.provider,
+            accountId: providerCapacitySelection.accountId,
+            runId,
+            runtimeDir: opts.providerCapacityRuntimeDir,
+          });
+        } catch {}
+        providerCapacitySelection = {
+          status: 'refused',
+          provider: providerCapacityProvider,
+          reason: 'credential-provisioning-unsupported',
+          cause: `confinement mode "required" was declared but adapter "${resolvedAdapter}" has no path to provision the selected account's credential into a confined worker`,
+        };
+      }
+    }
     if (providerCapacitySelection?.status === 'refused') {
       // Pre-Phase-05 gate H2 (executor-policy-dispatch-seams plan.md): this
       // refusal happens AFTER admitRunAttempt already created runId/runDir
@@ -2591,6 +2689,7 @@ export async function executeAssignment(assignment, opts = {}) {
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {
     const fault = classifyProviderCapacityFault({
+      provider: providerCapacitySelection.provider,
       stderr: stderrText,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
       structuredAgent: agentClaim,
@@ -2601,28 +2700,33 @@ export async function executeAssignment(assignment, opts = {}) {
         accountId: providerCapacitySelection.accountId,
         action: fault.action,
         reasonCode: fault.reasonCode,
-        confidence: fault.confidence,
-        manualClear: Boolean(fault.manualClear),
+        quarantineKind: fault.quarantineKind,
       };
       if (fault.action === 'quarantine') {
+        // C2a: quarantineProviderAccount's real signature is
+        // {provider, accountId, reasonCode, quarantineKind, until,
+        // runtimeDir, detail} -- the previous call site passed
+        // {runnerConfig, manualClear, evidence}, none of which that
+        // function reads, so `quarantineKind` silently defaulted to
+        // 'temporary' even for a manual-clear-required auth fault, and
+        // `until` was always undefined -- which isQuarantined() reads as
+        // "quarantined forever" (it fails closed on a missing `until`).
+        // The very first quota fault therefore permanently exhausted that
+        // account instead of the classifier's own computed reset window.
         const quarantine = quarantineProviderAccount({
-          runnerConfig: cfg,
           provider: providerCapacitySelection.provider,
           accountId: providerCapacitySelection.accountId,
           reasonCode: fault.reasonCode,
-          manualClear: fault.manualClear,
+          quarantineKind: fault.quarantineKind,
+          until: fault.until,
           runtimeDir: opts.providerCapacityRuntimeDir,
-          evidence: {
+          detail: {
             kind: 'provider-stderr-classifier',
             runId,
             assignmentId: effectiveAssignment.assignmentId,
           },
         });
-        providerCapacityFault.quarantine = {
-          state: quarantine?.status || 'quarantined',
-          manualClear: Boolean(quarantine?.manualClear),
-          quarantinedAt: quarantine?.quarantinedAt || null,
-        };
+        providerCapacityFault.quarantine = quarantine;
       }
       if (providerCapacityEvidence) {
         providerCapacityEvidence = {

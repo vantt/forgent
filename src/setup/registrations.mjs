@@ -60,7 +60,7 @@ import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecP
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
   sharedConfigFilePath,
@@ -1689,8 +1689,12 @@ function checkProviderCapacityState() {
   if (!quarantined.length) {
     return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };
   }
+  // C2a: inspectProviderCapacity's account shape names the field
+  // `accountId`, not `id` (always undefined here before this fix), and a
+  // quarantine record's own field is `kind` ('temporary' | 'manual-clear'
+  // | 'manual-clear' evidence), never a `manualClear` boolean.
   const summary = quarantined
-    .map((account) => `${account.id}:${account.quarantine.reasonCode || account.quarantine.kind || 'quarantined'}${account.quarantine.manualClear ? ':manual-clear' : ''}`)
+    .map((account) => `${account.accountId}:${account.quarantine.reasonCode || 'quarantined'}${account.quarantine.kind === 'manual-clear' ? ':manual-clear' : ''}${account.quarantine.until ? `:until=${account.quarantine.until}` : ''}`)
     .join(', ');
   return {
     passed: false,
@@ -1702,6 +1706,41 @@ registerCheck({
   id: 'provider-capacity-state',
   description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',
   check: () => checkProviderCapacityState(),
+});
+
+// C2c: withFileLock's own runtime reclaim handles a dead-holder lock the
+// moment the NEXT lease/release/quarantine call contends for it, but doctor
+// gets a passive, standalone signal so an operator sees a stuck lock (a
+// SIGKILL between openSync and unlinkSync leaves every future provider-
+// capacity call blocked for waitMs until the next contender happens to
+// reclaim it) without needing to wait for that next real call. Read-only;
+// never reclaims the lock itself -- pure inspection.
+export function checkProviderCapacityLockStale() {
+  let lock;
+  try {
+    lock = inspectProviderCapacityLock(defaultProviderCapacityRuntimeDir());
+  } catch (err) {
+    return { passed: false, message: `provider-capacity lock unreadable: ${err.message}` };
+  }
+  if (!lock.present) {
+    return { passed: true, message: 'no provider-capacity lock file present' };
+  }
+  if (lock.holderAlive === false) {
+    return {
+      passed: false,
+      message: `provider-capacity lock at ${lock.lockPath} is held by dead pid ${lock.holderPid} -- will self-heal on the next lease/release/quarantine call, or remove the file manually`,
+    };
+  }
+  if (lock.holderAlive === null) {
+    return { passed: true, message: `provider-capacity lock present but unreadable/unattributed at ${lock.lockPath} -- treated as live, not stale` };
+  }
+  return { passed: true, message: `provider-capacity lock held by live pid ${lock.holderPid} -- expected under real contention` };
+}
+
+registerCheck({
+  id: 'provider-capacity-lock-stale',
+  description: 'provider-capacity lock file (if any) is not held by a dead process',
+  check: () => checkProviderCapacityLockStale(),
 });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/

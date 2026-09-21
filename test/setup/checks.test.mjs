@@ -63,6 +63,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'tool-registry-configured',
       'config-awareness',
       'provider-capacity-state',
+      'provider-capacity-lock-stale',
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',
@@ -1521,7 +1522,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
       'openai-codex': {
         accounts: {
           tetnu: {
-            quarantine: { reasonCode: 'auth-token', manualClear: true, quarantinedAt: '2026-09-16T00:00:00.000Z' },
+            quarantine: { reasonCode: 'auth-token', kind: 'manual-clear', quarantinedAt: '2026-09-16T00:00:00.000Z' },
             leases: {},
           },
         },
