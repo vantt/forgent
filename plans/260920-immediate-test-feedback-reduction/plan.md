@@ -968,3 +968,24 @@ At no point should rollback require changing product runtime behavior. If shared
 ## Outstanding questions
 
 None
+
+## Known deferred bug (found during P05, not fixed by this track)
+
+`~/.fgos/config.json`'s setup config-merge is additive-only and never prunes
+stale keys: it keeps old-schema tier-policy keys (e.g.
+`lightweight`/`creative`/`analytical`/`critical` under
+`runner.modelPolicies.*`) that a newer schema no longer defines, instead of
+removing them. Confirmed real during the P05 selector-shadow-evaluation phase
+(2026-09-20/21): historical-commit checkouts additively merged stale tier
+keys into this real, machine-level config file outside any repo, poisoning
+every subsequent fresh test fixture's default config on that machine and
+causing 200+ unrelated test failures until fixed by hand (backup + surgical
+key removal). Full incident writeup:
+`plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`.
+
+Fix belongs in the setup/config-merge subsystem (`src/setup/checks.mjs` or
+wherever config-merge is implemented): prune keys no longer present in the
+current schema's defaults instead of only adding missing ones, or validate/
+reject unknown keys on read. Out of this track's scope; left here as a
+pointer rather than filed as a separate work item, per the user's explicit
+instruction (2026-09-21).
