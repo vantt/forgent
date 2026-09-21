@@ -73,7 +73,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -108,7 +108,7 @@ import {
 // it), highest first.
 
 test('triage on an empty backlog returns an empty ranked list, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['triage']);
   assert.equal(result.status, 0);
   assert.deepEqual(envelopeData(result.stdout), []);
@@ -116,7 +116,7 @@ test('triage on an empty backlog returns an empty ranked list, exit 0', () => {
 
 
 test('triage ranks a base item above the items that depend on it', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'base');
   run(cwd, ['add', 'dep1', '--title', 'Dep1', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--deps', 'base', '--description', 'tsk-535 fixture description.']);
   run(cwd, ['add', 'dep2', '--title', 'Dep2', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--deps', 'base', '--description', 'tsk-535 fixture description.']);
@@ -135,7 +135,7 @@ test('triage ranks a base item above the items that depend on it', () => {
 
 
 test('triage excludes a done item from ranking, and a done dependent never counts as blocked', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addOk(cwd, 'base');
   addWork(dir, { id: 'finished-dependent', title: 'Finished Dependent', kind: 'task', status: 'done', deps: ['base'], risk: 'light', refs: [], verify: 'npm test' });
@@ -152,7 +152,7 @@ test('triage excludes a done item from ranking, and a done dependent never count
 
 
 test('triage --all appends done items after the ranked open rows, each with blocks:0 (tsk-5oa D1)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const dir = path.join(cwd, '.fgos');
   addOk(cwd, 'base');
   addWork(dir, { id: 'done-item', title: 'Done Item', kind: 'task', status: 'done', deps: ['base'], risk: 'light', refs: [], verify: 'npm test' });
@@ -170,7 +170,7 @@ test('triage --all appends done items after the ranked open rows, each with bloc
 
 
 test('triage never mutates state: no event is appended', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'base');
 
   const before = eventLines(cwd);
@@ -181,7 +181,7 @@ test('triage never mutates state: no event is appended', () => {
 
 
 test('triage rows carry stage, goalTier, and component membership; declared goals sort ahead of ungrouped work', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'plain');
   run(cwd, ['add', 'goal-item', '--title', 'Goal Item', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--goal-tier', 'mvp', '--description', 'tsk-535 fixture description.']);
 
@@ -206,7 +206,7 @@ test('triage rows carry stage, goalTier, and component membership; declared goal
 // addFriction and exercise the real `check` binary read-side.
 
 test('check returns the friction data — per-layer counts + recent records — when friction data exists', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'fric-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'fric-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
@@ -230,7 +230,7 @@ test('check returns the friction data — per-layer counts + recent records — 
 
 
 test('check surfaces docType for a tagged friction via the existing recent spread — no collectFrictionData change needed', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'fric-doctype-item');
   const dir = path.join(cwd, '.fgos');
   addFriction(dir, { id: 'fric-doctype-item', docType: 'explanation', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
@@ -244,7 +244,7 @@ test('check surfaces docType for a tagged friction via the existing recent sprea
 
 
 test('check nags items sitting in a final status without their actual half (porting-outcome-lifecycle: no silent record)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'nag-item');
   toProposed(cwd, 'nag-item');
 
@@ -263,7 +263,7 @@ test('check nags items sitting in a final status without their actual half (port
 // doing->awaiting-approval addOutcome stamp) still nags, unchanged by the
 // refactor from a local Set to a shared import.
 test('check still nags an item sitting at "delivered" (a tail-segment status) without its actual half, after the FINAL_STATUSES local-Set-to-shared-import refactor', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'nag-item-delivered');
   toProposed(cwd, 'nag-item-delivered');
   run(cwd, ['move', 'nag-item-delivered', '--to', 'delivered']);
@@ -276,7 +276,7 @@ test('check still nags an item sitting at "delivered" (a tail-segment status) wi
 
 
 test('check output on a log with no friction and no final-status gaps is unchanged — no friction data, no nag', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'clean-item');
   const dir = path.join(cwd, '.fgos');
   addOutcome(dir, { id: 'clean-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
@@ -290,7 +290,7 @@ test('check output on a log with no friction and no final-status gaps is unchang
 
 
 test('check never mutates state: events.jsonl and state.json are byte-identical before/after', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'read-only-item');
   const dir = path.join(cwd, '.fgos');
   addOutcome(dir, { id: 'read-only-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
@@ -307,7 +307,7 @@ test('check never mutates state: events.jsonl and state.json are byte-identical 
 
 
 test('check returns the settlement data — per-kind/role counts + recent records — when settlement data exists', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'settle-item');
   toDoneViaChain(cwd, 'settle-item');
 
@@ -323,7 +323,7 @@ test('check returns the settlement data — per-kind/role counts + recent record
 
 
 test('check output on a log with no settling transitions is unchanged — no settlement data', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'no-settlement-item');
 
   const result = run(cwd, ['check']);
@@ -340,7 +340,7 @@ test('check output on a log with no settling transitions is unchanged — no set
 // events.jsonl) is genuinely written and read back across two runs. ------
 
 test('check reports a nonzero baseline entropy score with an explainable part for a real event-backed store with a stale-doing item', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'entropy-item');
   moveToDurableDoingForTest(cwd, 'entropy-item');
 
@@ -356,7 +356,7 @@ test('check reports a nonzero baseline entropy score with an explainable part fo
 
 
 test('check reports a seal-digest delta only meaningfully for channels with real compound data, and every channel is always present (per this cell action (3))', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'seal-digest-item');
   const dir = path.join(cwd, '.fgos');
   addOutcome(dir, { id: 'seal-digest-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
@@ -382,7 +382,7 @@ test('check reports a seal-digest delta only meaningfully for channels with real
 
 
 test('check on a second consecutive run over the same store prints a real trend delta against the first run (not baseline again)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'entropy-trend-item');
   moveToDurableDoingForTest(cwd, 'entropy-trend-item');
 
@@ -404,7 +404,7 @@ test('check on a second consecutive run over the same store prints a real trend 
 
 
 test('check tolerates a torn final entropy-history line — folds trend against the last COMPLETE checkpoint instead of throwing', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'torn-history-item');
   moveToDurableDoingForTest(cwd, 'torn-history-item');
 
@@ -444,7 +444,7 @@ test('check on a directory with no log at all still never initializes .fgos/ (en
 // `fgos check` binary. ------------------------------------------------------
 
 test('check returns the learning data — outcome/friction/settlement summary — for an item that reached done with real outcome+friction data', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'learning-item');
   const dir = path.join(cwd, '.fgos');
   moveToDurableDoingForTest(cwd, 'learning-item');
@@ -484,7 +484,7 @@ test('check returns the learning data — outcome/friction/settlement summary �
 
 
 test('check on a log with no item ever reaching done is unchanged — no learning data', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'no-learning-item');
   moveToDurableDoingForTest(cwd, 'no-learning-item');
 
