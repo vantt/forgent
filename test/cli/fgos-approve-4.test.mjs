@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -123,7 +123,7 @@ test('approve of a milestone with no drift on any target succeeds normally, unaf
 
 
 test('approve of an ordinary item with no targets is completely unaffected by the close-out guard (regression)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'closeout-no-targets-item', { verify: 'true' });
   run(cwd, ['move', 'closeout-no-targets-item', '--to', 'doing']);
   run(cwd, ['move', 'closeout-no-targets-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);

@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -93,12 +93,12 @@ import {
 
 
 test('an item with acceptance absent, or an empty array, closes via move --to delivered completely unaffected (no-op)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'cli-cos-absent'); // no --acceptance ever set
   assert.equal(run(cwd, ['move', 'cli-cos-absent', '--to', 'delivered']).status, 0);
   assert.equal(stateView(cwd).work['cli-cos-absent'].status, 'delivered');
 
-  const cwd2 = tmpCwdFromTemplate();
+  const cwd2 = tmpCwd();
   toProposed(cwd2, 'cli-cos-empty');
   run(cwd2, ['edit', 'cli-cos-empty', '--acceptance', JSON.stringify([])]);
   assert.equal(run(cwd2, ['move', 'cli-cos-empty', '--to', 'delivered']).status, 0);
@@ -107,7 +107,7 @@ test('an item with acceptance absent, or an empty array, closes via move --to de
 
 
 test('retrospective sweeps every delivered item to retrospective, in one pass, leaving non-delivered items untouched', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'retro-todo-item'); // stays todo
   addOk(cwd, 'retro-delivered-a');
   run(cwd, ['move', 'retro-delivered-a', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
@@ -130,7 +130,7 @@ test('retrospective sweeps every delivered item to retrospective, in one pass, l
 
 
 test('retrospective on a store with no delivered items is a clean no-op, exit 0, empty sweep', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'nothing-delivered');
   const result = run(cwd, ['retrospective']);
   assert.equal(result.status, 0);
@@ -139,14 +139,14 @@ test('retrospective on a store with no delivered items is a clean no-op, exit 0,
 
 
 test('cleanup on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   const result = run(cwd, ['cleanup', 'ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('cleanup on an item not at status cleanup is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'cleanup-wrong-status');
   const result = run(cwd, ['cleanup', 'cleanup-wrong-status']);
   assert.equal(result.status, 2);
@@ -154,7 +154,7 @@ test('cleanup on an item not at status cleanup is rejected as precondition, exit
 
 
 test('cleanup parks cleanup -> blocked, with every failing reason joined, when the TTL has not elapsed and no retrospective content exists', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'cleanup-not-ready');
   run(cwd, ['move', 'cleanup-not-ready', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'cleanup-not-ready', '--to', 'delivered']);
@@ -174,7 +174,7 @@ test('cleanup parks cleanup -> blocked, with every failing reason joined, when t
 
 
 test('cleanup is a no-op — writes zero work.move events and stays at cleanup — when only TTL has not elapsed and the D8 checks pass', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'cleanup-ttl-only');
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'blocked']); // tsk-40m: blocked stands in for the retired todo->doing edge
   run(cwd, ['move', 'cleanup-ttl-only', '--to', 'delivered']);

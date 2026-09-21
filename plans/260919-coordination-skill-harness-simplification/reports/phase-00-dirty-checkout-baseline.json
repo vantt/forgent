@@ -1,0 +1,421 @@
+{
+  "contractVersion": "coordination-baseline.v1",
+  "outcome": "baseline-stable",
+  "source": {
+    "commit": "81437ffffd81d2cf9c81720b646d2a6271d96099",
+    "branch": "main",
+    "node": "v24.18.0",
+    "lockfileDigest": "b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc"
+  },
+  "fingerprint": {
+    "algorithm": "SHA-256 of byte-sorted porcelain-v2 status, staged/unstaged diffs, environment identity, and untracked content digests; excludes the two self-referential reports",
+    "version": "dirty-checkout-fingerprint.v2"
+  },
+  "run1Digest": "b3ab4df0c5c43ede2b08ee9ab1acb43a7494ea0d3013569d33ac52d3004fcdbf",
+  "run2Digest": "b3ab4df0c5c43ede2b08ee9ab1acb43a7494ea0d3013569d33ac52d3004fcdbf",
+  "run3Digest": "b3ab4df0c5c43ede2b08ee9ab1acb43a7494ea0d3013569d33ac52d3004fcdbf",
+  "inventory": [
+    {
+      "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+      "status": "Tracked modified",
+      "purpose": "Generated projection cần đối chiếu canonical source",
+      "evidence": "Đường dẫn file thuộc loại projection",
+      "action": "preserve"
+    },
+    {
+      "path": ".fgos/config.json",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "AGENTS.md",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "CLAUDE.md",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "core/skills/fgos-plan-loop/SKILL.md",
+      "status": "Tracked modified",
+      "purpose": "Thay đổi thuộc coordination close/recheck đang làm dở",
+      "evidence": "Thuộc scope close/recheck",
+      "action": "preserve"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "status": "Tracked modified",
+      "purpose": "Thay đổi thuộc coordination close/recheck đang làm dở",
+      "evidence": "Thuộc scope close/recheck",
+      "action": "preserve"
+    },
+    {
+      "path": "docs/platform/agent-coordination/README.md",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "status": "Tracked modified",
+      "purpose": "Thay đổi thuộc coordination close/recheck đang làm dở",
+      "evidence": "Thuộc scope close/recheck",
+      "action": "preserve"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "status": "Tracked modified",
+      "purpose": "Pre-existing product change cần giữ nguyên",
+      "evidence": "Không thuộc scope sửa đổi track này",
+      "action": "preserve"
+    },
+    {
+      "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+      "status": "Tracked modified",
+      "purpose": "Generated projection cần đối chiếu canonical source",
+      "evidence": "Đường dẫn file thuộc loại projection",
+      "action": "preserve"
+    },
+    {
+      "path": "src/runner/coordination/session-engine.mjs",
+      "status": "Tracked modified",
+      "purpose": "Thay đổi thuộc coordination close/recheck đang làm dở",
+      "evidence": "Thuộc scope close/recheck",
+      "action": "preserve"
+    },
+    {
+      "path": "test/runner/coordination-recheck-discharge.test.mjs",
+      "status": "Tracked modified",
+      "purpose": "Thay đổi thuộc coordination close/recheck đang làm dở",
+      "evidence": "Thuộc scope close/recheck",
+      "action": "preserve"
+    },
+    {
+      "path": ".fgos/instructions/effective/repo.json",
+      "status": "Untracked",
+      "purpose": "Generated projection cần đối chiếu canonical source",
+      "evidence": "Đường dẫn file thuộc loại projection",
+      "action": "preserve"
+    },
+    {
+      "path": "count.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "debug_args.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "debug_spec.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "dump.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_assignment.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_herdr.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_herdr2.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession2.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession3.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession4.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession5.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession6.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_openSession_safe.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_test_legacy.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "fix_tests.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "openSession.txt",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "original.txt",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "patch_cli.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "patch_dispatch_test.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "plans/260919-coordination-skill-harness-simplification/phase-00-baseline-and-action-contract.md",
+      "status": "Untracked",
+      "purpose": "Documentation của track hiện tại",
+      "evidence": "Đường dẫn thư mục track hiện tại",
+      "action": "preserve"
+    },
+    {
+      "path": "plans/260919-coordination-skill-harness-simplification/plan.md",
+      "status": "Untracked",
+      "purpose": "Documentation của track hiện tại",
+      "evidence": "Đường dẫn thư mục track hiện tại",
+      "action": "preserve"
+    },
+    {
+      "path": "plans/reports/coordination-skill-harness-architecture-audit-260919-report.md",
+      "status": "Untracked",
+      "purpose": "Documentation của track hiện tại",
+      "evidence": "Đường dẫn thư mục track hiện tại",
+      "action": "preserve"
+    },
+    {
+      "path": "reverse.patch",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "rewrite_store.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "scripts/migration-proof-2a.mjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "store_refactor.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_atomics.mjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_concurrency.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_concurrency.log",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_concurrency2.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_concurrency2.log",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_herdr.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "test_regex.cjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "timed-executor.mjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    },
+    {
+      "path": "timed-executor2.mjs",
+      "status": "Untracked",
+      "purpose": "Debug/reproduction artifact / Log tạm",
+      "evidence": "Extension .cjs, .log, .mjs, script tự do",
+      "action": "exclude-from-track"
+    }
+  ],
+  "stagedDiffDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "unstagedDiffDigest": "9907d6b8d97c868ea801a7f95befa9a39c697b9bd3610d75e648587dc9d5b378",
+  "untrackedDigests": {
+    ".fgos/instructions/effective/repo.json": "7c44d79c0b37007171e46a716775d6138f6586f546f98abd7f65323a5b03314d",
+    "count.cjs": "b3c94e423454f402ec3256ae87834d5f547fbeece65b608671dfba7b2a9b87f5",
+    "debug_args.cjs": "12f664a82f351607a0e280698d2453c9d3d8b94e404a610bb82e1dbf53fb644e",
+    "debug_spec.cjs": "9528272a1447bec34d11df4fa82b99ba39a47b06cda8d33d6e98490445ecda38",
+    "dump.cjs": "995ae8619b6b0bacb9e4bf90551597ae61789d10f990db9153f1714c051da9ef",
+    "fix_assignment.cjs": "080f8b4530b0f3d4f4ab7d012754baad96b59c891a9bc89dff6ab3818f0eac38",
+    "fix_herdr.cjs": "dae3502bb7fddf7abb265a0fae728dfd65116d0c5f1759d1991d7f407a97db72",
+    "fix_herdr2.cjs": "f22fda2806abf6bb37798fb2d33ec09196a37fd5a5fb9f0191bdd86c991a8880",
+    "fix_openSession.cjs": "f518216c049012ce7b2061588fe2e2bb3c5bce55e13434fb123c42e7fabb8c4a",
+    "fix_openSession2.cjs": "0016ea8bd755e3ed500433e92c7e238592cddcabce27448563fe9178e194e4f1",
+    "fix_openSession3.cjs": "9131f49e5c69a398dc40460adddaed769bda9b61a3f5a6cf81c32cbc06d02ccf",
+    "fix_openSession4.cjs": "7e22d4c3ffa784a5a9597187ac91c78348d0693b7dd8fe698b0f8f3acb44023c",
+    "fix_openSession5.cjs": "adf69e7d62720d12942bf2e313fb9a0a0df0cea223d22de2742b7986740afb18",
+    "fix_openSession6.cjs": "753b9ad69577d6e2fa26ac43548d7969fc1064edc713c4e6e0ece49e1eea0e9d",
+    "fix_openSession_safe.cjs": "3d7fd72f9d51858d1d72dcd7c50644ad7663612b5711b6ab5ba9c8a9b8ba3979",
+    "fix_test_legacy.cjs": "15d9214734e565b7eb937369bb452fdde2dda1ae8c799eee5ae9e1cd09aefdbd",
+    "fix_tests.cjs": "597839828f119ff0ab334bb091a20ea3f259daad6a7d5c388c444ebe34388918",
+    "openSession.txt": "2f5866cac94977dadc9a516f32763662151102b34dd8872c2b99c34eae6c1276",
+    "original.txt": "a689f85db636d58e2f6a7118e493536c6e71f352036fada551dd3818298d28d0",
+    "patch_cli.cjs": "7f8ca3bce690dd2493b8592fc12d85f59511cd5c63f5de11ece296159c855646",
+    "patch_dispatch_test.cjs": "b692bddf3b680caed6a86908d09ebf0f3a28eeb2f3399101baac09dfd78d1ff4",
+    "plans/260919-coordination-skill-harness-simplification/phase-00-baseline-and-action-contract.md": "8eb9eee2f57a8169067a0e8bcc79ebf5bf434d96cad7582db3543d34f7ce4e99",
+    "plans/260919-coordination-skill-harness-simplification/plan.md": "251d0a5bb02615ac77d0aae254908c24f1a3e0e4af762b1efd9e597387fee368",
+    "plans/reports/coordination-skill-harness-architecture-audit-260919-report.md": "f68ecb8f9ac9e9a658046d115c9a6076f698d50ffeb1c75e9ce9af783c04ada9",
+    "reverse.patch": "eb3c82dffcc346782217bf70a58bb5a2dcc09002b3bcad7d8773a4826a640271",
+    "rewrite_store.cjs": "0225f66387bdf5f516532697e4ae4fe26a8fae8766ae314050d401505188d9ac",
+    "scripts/migration-proof-2a.mjs": "c8097ce5bb23d816e31280eaafdb56a2b8ccc3fc3e13c763375255ef46705c80",
+    "store_refactor.cjs": "adfd0d372a240504b5987f811daf047a43679974f0437d96feccb94cf4d1c97b",
+    "test_atomics.mjs": "5c6ea3df7278951d043bc442610e9110ef3d32075d940849e9f585f47da04689",
+    "test_concurrency.cjs": "6b22db35653223b530558351c6d13abd472abae34001ce0e8fd8382d7cc0a56a",
+    "test_concurrency.log": "2f24f0becb028033d78d0e3231812ca088bd8654b42eed13628b4bcb6d28e654",
+    "test_concurrency2.cjs": "9804a0820899d4b4761416709cb92214eed8a949975815e45793be8062237a20",
+    "test_concurrency2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "test_herdr.cjs": "d446ad241afbe3cc98078204be5d60d69ea80bad34a3486460fd015b7e32ff10",
+    "test_regex.cjs": "b388faf04a320b9e6029b10f643985e6b40df91f840207696cd430279b5404c2",
+    "timed-executor.mjs": "de545ddf7a63a14be0d0ca8d6982544979048c013f3deb25ade5bc50a23b6a74",
+    "timed-executor2.mjs": "077924cb70737b877f9c0619846dabc4265703beb6fc8214de8bdee15a95fd99"
+  },
+  "exclusions": [
+    "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.md",
+    "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.json"
+  ],
+  "exclusionReason": "Tránh semantic loop tự tham chiếu digest",
+  "lockAssessment": {
+    "status": "stale",
+    "evidence": "PID 1378496 (zsh) tồn tại nhưng lockAgeMs > DEFAULT_TTL_MS theo contract inspectMainCheckoutLock. Đã gọi hàm inspectMainCheckoutLock('/home/vantt/projects/forgentX/.fgos', {ttlMs: 180000}) và nhận được outcome 'stale'."
+  },
+  "blockers": [],
+  "unit0BReady": true
+}

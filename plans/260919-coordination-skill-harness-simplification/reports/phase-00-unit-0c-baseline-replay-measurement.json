@@ -1,0 +1,162 @@
+{
+  "contractVersion": "coordination-baseline.v1",
+  "source": {
+    "commit": "7853e4d7d6881665fb57e2a5d730428ae4e96486",
+    "dirtyFingerprint": "sha256:7b2db82364d74f71e260384650c698173020464d54f2abe7359f9083077816d8",
+    "node": "v24.18.0",
+    "lockfileDigest": "sha256:b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc"
+  },
+  "skills": [
+    {
+      "path": "core/skills/fgos-plan-loop/SKILL.md",
+      "bytes": 42631,
+      "words": 5160,
+      "lines": 760
+    },
+    {
+      "path": "core/skills/fgos-architecture-panel/SKILL.md",
+      "bytes": 63985,
+      "words": 9006,
+      "lines": 971
+    },
+    {
+      "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+      "bytes": 53835,
+      "words": 7049,
+      "lines": 915
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "clean-plan-loop-shaped",
+      "promptBytes": 154,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 3,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "accepted-finding-remediation-recheck",
+      "promptBytes": 240,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 5,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "architecture-advisory",
+      "promptBytes": 185,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "human-turn-reopen",
+      "promptBytes": 210,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 5,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "rfc-review",
+      "promptBytes": 160,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 3,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "nominal-group-technique",
+      "promptBytes": 175,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "delphi-method",
+      "promptBytes": 190,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "explicit-close-success-refusal",
+      "promptBytes": 145,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 2,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    }
+  ],
+  "replay": {
+    "corpusPresent": true,
+    "sessionCount": 3,
+    "bySchema": {
+      "1": 1,
+      "2": 1,
+      "3": 1
+    },
+    "semanticDigest": "sha256:19cec57f20b09491d0654e1bd5183db46f3b63412ad4ee2084779486e4e5bc7a",
+    "measuredSessions": [
+      {
+        "id": "s1-clean",
+        "schemaVersion": "1",
+        "eventCount": 4,
+        "dispatchCount": 1,
+        "sequentialWaves": null,
+        "promptBytes": 34,
+        "retryCount": 0,
+        "evidenceOutcome": "completed"
+      },
+      {
+        "id": "s2-clean",
+        "schemaVersion": "2",
+        "eventCount": 4,
+        "dispatchCount": 1,
+        "sequentialWaves": null,
+        "promptBytes": 34,
+        "retryCount": 0,
+        "evidenceOutcome": "active"
+      },
+      {
+        "id": "s3-clean",
+        "schemaVersion": "3",
+        "eventCount": 7,
+        "dispatchCount": 2,
+        "sequentialWaves": null,
+        "promptBytes": 34,
+        "retryCount": 0,
+        "evidenceOutcome": "completed"
+      }
+    ],
+    "failures": []
+  }
+}

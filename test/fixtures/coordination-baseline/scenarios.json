@@ -1,0 +1,90 @@
+[
+  {
+    "id": "clean-plan-loop-shaped",
+    "promptBytes": 154,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 3,
+    "sequentialWaves": 2,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "accepted-finding-remediation-recheck",
+    "promptBytes": 240,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 5,
+    "sequentialWaves": 3,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "architecture-advisory",
+    "promptBytes": 185,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 4,
+    "sequentialWaves": 2,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "human-turn-reopen",
+    "promptBytes": 210,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 5,
+    "sequentialWaves": 3,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "rfc-review",
+    "promptBytes": 160,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 3,
+    "sequentialWaves": 2,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "nominal-group-technique",
+    "promptBytes": 175,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 4,
+    "sequentialWaves": 2,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "delphi-method",
+    "promptBytes": 190,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 4,
+    "sequentialWaves": 3,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  },
+  {
+    "id": "explicit-close-success-refusal",
+    "promptBytes": 145,
+    "inputTokens": null,
+    "outputTokens": null,
+    "dispatchCount": 2,
+    "sequentialWaves": 2,
+    "durationMs": 0,
+    "retryCount": 0,
+    "evidenceOutcome": "verified"
+  }
+]

@@ -1,0 +1,201 @@
+219:export function openSession(
+220-  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null, schemaVersion = SCHEMA_VERSION },
+221-  opts = {},
+222-) {
+223-  if (!SUPPORTED_SCHEMA_VERSIONS.has(schemaVersion)) {
+224-    throw new CoordinationError(
+225-      'validation',
+226-      `openSession: schemaVersion "${schemaVersion}" is not one of the supported versions (${[...SUPPORTED_SCHEMA_VERSIONS].join(' | ')})`,
+227-    );
+228-  }
+229-  const { sessionsDir } = resolveCoordinationPaths(opts);
+230-  fs.mkdirSync(sessionsDir, { recursive: true });
+231-
+232-  const stagingDir = path.join(sessionsDir, `.staging-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
+233-  fs.mkdirSync(stagingDir, { recursive: true });
+234-
+235-  let id = coordinationId;
+236-  let sessionDir;
+237-  
+238-  try {
+239-    const resolvedActors = Array.isArray(actors)
+240-      ? actors.map((actor) => ({
+241-          id: actor.id,
+242-          role: actor.role,
+243-          ...(actor.persona !== undefined ? { persona: actor.persona } : {}),
+244-          ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
+245-        }))
+246-      : undefined;
+247-
+248-    let snapshotRef = undefined; 
+249-    if (schemaVersion === "3" && definitionRef && opts.resolvedDefinition) {
+250-      const definition = JSON.parse(JSON.stringify(opts.resolvedDefinition));
+251-      
+252-      const orgDischargeOn = opts.runnerConfig?.coordination?.orgPolicy?.dischargeOn;
+253-      if (Array.isArray(orgDischargeOn)) {
+254-        for (const node of definition.spec.graph.nodes) {
+255-          for (const op of node.operations) {
+256-            if (op.rechecks) {
+257-              const protocolDischargeOn = op.rechecks.dischargeOn || ['fulfilled'];
+258-              const intersection = protocolDischargeOn.filter((d) => orgDischargeOn.includes(d));
+259-              if (intersection.length === 0) {
+260-                throw new CoordinationError('validation', `openSession: orgPolicy.dischargeOn (${JSON.stringify(orgDischargeOn)}) has no intersection with protocol's dischargeOn (${JSON.stringify(protocolDischargeOn)}) for operation "${op.ref}" -- refusing to open session with empty effectiveDischargeOn`);
+261-              }
+262-              op.rechecks.dischargeOn = intersection;
+263-            }
+264-          }
+265-        }
+266-      }
+267-      
+268-      const snapshotStr = JSON.stringify(definition, null, 2);
+269-      const digest = createHash('sha256').update(snapshotStr).digest('hex');
+270-      
+271-      const snapshotPath = path.join(stagingDir, 'snapshot.json');
+272-      fs.writeFileSync(snapshotPath, snapshotStr);
+273-      
+274-      snapshotRef = { digest };
+275-    } else if (schemaVersion === "3" && definitionRef && typeof definitionRef.id === 'string') {
+276-      const rawDefinition = loadCoordinationProtocol(definitionRef.id, opts);
+277-      const definition = JSON.parse(JSON.stringify(rawDefinition));
+278-      
+279-      const orgDischargeOn = opts.runnerConfig?.coordination?.orgPolicy?.dischargeOn;
+280-      if (Array.isArray(orgDischargeOn)) {
+281-        for (const node of definition.spec.graph.nodes) {
+282-          for (const op of node.operations) {
+283-            if (op.rechecks) {
+284-              const protocolDischargeOn = op.rechecks.dischargeOn || ['fulfilled'];
+285-              const intersection = protocolDischargeOn.filter((d) => orgDischargeOn.includes(d));
+286-              if (intersection.length === 0) {
+287-                throw new CoordinationError('validation', `openSession: orgPolicy.dischargeOn (${JSON.stringify(orgDischargeOn)}) has no intersection with protocol's dischargeOn (${JSON.stringify(protocolDischargeOn)}) for operation "${op.ref}" -- refusing to open session with empty effectiveDischargeOn`);
+288-              }
+289-              op.rechecks.dischargeOn = intersection;
+290-            }
+291-          }
+292-        }
+293-      }
+294-      
+295-      const snapshotStr = JSON.stringify(definition, null, 2);
+296-      const digest = createHash('sha256').update(snapshotStr).digest('hex');
+297-      
+298-      const snapshotPath = path.join(stagingDir, 'snapshot.json');
+299-      fs.writeFileSync(snapshotPath, snapshotStr);
+300-      
+301-      snapshotRef = { digest };
+302-    }
+303-
+304-    let claimDir;
+305-    if (id) {
+306-      assertSafeCoordinationId(id);
+307-      sessionDir = path.join(sessionsDir, id);
+308-      claimDir = sessionDir + '.claim';
+309-      try { 
+310-        fs.mkdirSync(claimDir); 
+311-        try {
+312-          fs.writeFileSync(path.join(claimDir, 'claim.json'), JSON.stringify({
+313-            pid: process.pid,
+314-            createdAt: Date.now()
+315-          }));
+316-        } catch(e) {}
+317-      } catch(err) {
+318-        if (err.code === 'EEXIST') throw new CoordinationError('validation', `coordination session "${id}" already exists (claim held)`);
+319-        throw err;
+320-      }
+321-      if (fs.existsSync(sessionDir)) {
+322-        fs.rmSync(claimDir, { recursive: true });
+323-        throw new CoordinationError('validation', `coordination session "${id}" already exists`);
+324-      }
+325-    } else {
+326-      let claimed = false;
+327-      for (let attempt = 0; attempt < MAX_SESSION_ID_CLAIM_ATTEMPTS && !claimed; attempt += 1) {
+328-        id = `coord_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+329-        sessionDir = path.join(sessionsDir, id);
+330-        claimDir = sessionDir + '.claim';
+331-        try { 
+332-          fs.mkdirSync(claimDir); 
+333-          try {
+334-            fs.writeFileSync(path.join(claimDir, 'claim.json'), JSON.stringify({
+335-              pid: process.pid,
+336-              createdAt: Date.now()
+337-            }));
+338-          } catch(e) {}
+339-          if (!fs.existsSync(sessionDir)) {
+340-            claimed = true; 
+341-          } else {
+342-            fs.rmSync(claimDir, { recursive: true });
+343-          }
+344-        } catch (e) {
+345-          if (e.code !== 'EEXIST') throw e;
+346-        }
+347-      }
+348-      if (!claimed) throw new CoordinationError('validation', `openSession could not claim a unique coordinationId after ${MAX_SESSION_ID_CLAIM_ATTEMPTS} attempts`);
+349-    }
+350-
+351-    const manifest = {
+352-      schemaVersion,
+353-      coordinationId: id,
+354-      objective,
+355-      status: 'active',
+356-      createdAt: new Date().toISOString(),
+357-      provenanceRoot,
+358-      definitionRef,
+359-      ...(snapshotRef ? { snapshotRef } : {}),
+360-      workRef,
+361-      ...(resolvedActors ? { actors: resolvedActors } : {}),
+362-      aggregateBounds: applyAggregateBoundDefaults(aggregateBounds),
+363-      partialPolicy,
+364-      assignmentRefs: [],
+365-      completedAt: null,
+366-    };
+367-
+368-    validateManifest(manifest);
+369-    const sessionPath = path.join(stagingDir, 'session.json');
+370-    fs.writeFileSync(sessionPath, JSON.stringify(manifest, null, 2) + '\n');
+371-    const eventsPath = path.join(stagingDir, 'events.jsonl');
+372-    fs.writeFileSync(eventsPath, '');
+373-    
+374-    const openedPayload = { coordinationId: id, provenanceRoot };
+375-    validateEventPayload('session-opened', openedPayload);
+376-    appendSessionEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, stagingDir, manifest);
+377-    
+378-    if (resolvedActors) {
+379-      for (const actor of resolvedActors) {
+380-        const payload = {
+381-          actorId: actor.id,
+382-          role: actor.role,
+383-          ...(actor.persona !== undefined ? { persona: actor.persona } : {}),
+384-          ...(actor.policy !== undefined ? { policy: actor.policy } : {}),
+385-        };
+386-        validateEventPayload('actor-bound', payload);
+387-        appendSessionEventLocked(eventsPath, { type: 'actor-bound', payload }, stagingDir, manifest);
+388-      }
+389-    }
+390-
+391-    // Fsync files and staging directory for crash durability
+392-    if (fs.existsSync(path.join(stagingDir, 'snapshot.json'))) {
+393-      const fdSnap = fs.openSync(path.join(stagingDir, 'snapshot.json'), 'r');
+394-      fs.fsyncSync(fdSnap);
+395-      fs.closeSync(fdSnap);
+396-    }
+397-    const fdSess = fs.openSync(sessionPath, 'r');
+398-    fs.fsyncSync(fdSess);
+399-    fs.closeSync(fdSess);
+400-    const fdEv = fs.openSync(eventsPath, 'r');
+401-    fs.fsyncSync(fdEv);
+402-    fs.closeSync(fdEv);
+403-    const fdStaging = fs.openSync(stagingDir, 'r');
+404-    fs.fsyncSync(fdStaging);
+405-    fs.closeSync(fdStaging);
+406-
+407-    try {
+408-      fs.renameSync(stagingDir, sessionDir);
+409-      const fdParent = fs.openSync(sessionsDir, 'r');
+410-      fs.fsyncSync(fdParent);
+411-      fs.closeSync(fdParent);
+412-    } catch (err) {
+413-      if (err.code === 'EEXIST' || err.code === 'ENOTEMPTY' || err.code === 'EPERM') {
+414-        throw new CoordinationError('validation', `coordination session "${id}" already exists`);
+415-      }
+416-      throw err;
+417-    } finally {
+418-      try {
+419-        if (typeof claimDir !== 'undefined' && claimDir && fs.existsSync(claimDir)) {

@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "3",
+  "coordinationId": "s3-clean",
+  "objective": "Portable schema 3 baseline session",
+  "status": "completed",
+  "createdAt": "2026-09-03T00:00:00.000Z",
+  "provenanceRoot": { "writerId": "tester-s3" },
+  "definitionRef": { "id": "core.coordination-protocol.declared-consult", "version": "1.0.0" },
+  "snapshotRef": { "digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" },
+  "workRef": null,
+  "actors": [{ "id": "requester-actor", "role": "requester" }, { "id": "consultant-actor", "role": "consultant" }],
+  "aggregateBounds": { "wallTimeMs": 10000, "maxAssignments": 10, "maxConcurrency": 2, "maxRounds": 5, "maxTaskDepth": 2 },
+  "assignmentRefs": ["asg-s3-1", "asg-s3-2"],
+  "completedAt": "2026-09-03T00:02:00.000Z"
+}

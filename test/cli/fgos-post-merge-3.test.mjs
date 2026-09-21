@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -317,7 +317,7 @@ test('catchup on an already-caught-up branch whose verify is RED stays blocked a
 
 
 test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-visits) is rejected with a validation error naming the actual reason, before any git operation runs', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'catchup-unrelated-reason');
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'doing']);
   run(cwd, ['move', 'catchup-unrelated-reason', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -334,7 +334,7 @@ test('catchup on an item blocked for an unrelated reason (e.g. anti-loop-max-vis
 // (resolveVerifyTimeoutMs), wired into `catchup` too — must reject the same
 // way, before any git operation runs.
 test('catchup --timeout and --no-timeout together are rejected as validation, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'catchup-timeout-conflict');
   run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'doing']);
   run(cwd, ['move', 'catchup-timeout-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -348,14 +348,14 @@ test('catchup --timeout and --no-timeout together are rejected as validation, ex
 
 
 test('catchup on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   const result = run(cwd, ['catchup', 'ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('catchup on a status other than blocked is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'catchup-not-blocked');
   const result = run(cwd, ['catchup', 'catchup-not-blocked']);
   assert.equal(result.status, 2);
@@ -363,7 +363,7 @@ test('catchup on a status other than blocked is rejected as precondition, exit 2
 
 
 test('the CLI usage message for an unknown verb lists catchup in the surface', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   const result = run(cwd, ['bogus-verb']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /catchup/);
@@ -371,7 +371,7 @@ test('the CLI usage message for an unknown verb lists catchup in the surface', (
 
 
 test('an item added with no --acceptance flag has work.acceptance absent (undefined), not an empty array', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   const result = addOk(cwd, 'no-acceptance-item');
   assert.equal(result.status, 0);
   const view = stateView(cwd);

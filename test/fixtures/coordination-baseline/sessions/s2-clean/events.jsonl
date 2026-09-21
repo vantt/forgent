@@ -1,0 +1,4 @@
+{"type":"operation-authorized","payload":{"authorizationId":"auth-s2-1","operationId":"examine","nodeId":"node-1","targetActorId":"agent","invocationKey":"inv-s2-1","authorizedBy":{"type":"driver","id":"tester-s2"},"reason":"started","grantedContextRefs":[]}}
+{"type":"assignment-created","payload":{"assignmentId":"asg-s2-1","authorizationId":"auth-s2-1","actorId":"agent","runId":"run-s2-1"}}
+{"type":"result-linked","payload":{"assignmentId":"asg-s2-1","runId":"run-s2-1"}}
+{"type":"driver-disposition-recorded","payload":{"targetRef":"asg-s2-1","disposition":"accepted","rationale":"Valid investigation","evidenceRefs":[],"authorizedBy":{"type":"driver","id":"tester-s2"}}}

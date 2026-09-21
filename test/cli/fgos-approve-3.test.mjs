@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -106,7 +106,7 @@ function moveRootToResolved(cwd, rootId, finalStatus) {
 // (resolveVerifyTimeoutMs), wired into `approve` too — must reject the same
 // way, before any verify runs.
 test('approve --timeout and --no-timeout together are rejected as validation, exit 4', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'approve-timeout-conflict', { verify: 'true' });
   run(cwd, ['move', 'approve-timeout-conflict', '--to', 'doing']);
   run(cwd, ['move', 'approve-timeout-conflict', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -119,7 +119,7 @@ test('approve --timeout and --no-timeout together are rejected as validation, ex
 
 
 test('approve twice: the second approve on an already-done item is rejected as precondition, exit 2 (done is terminal)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'approve-twice-item', { verify: 'true' });
   run(cwd, ['move', 'approve-twice-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-twice-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);

@@ -1,0 +1,115 @@
+--- src/runner/dispatch/herdr-round.mjs
++++ src/runner/dispatch/herdr-round.mjs
+@@ -1240,11 +1240,32 @@
+   let herdrStartArgv;
+   let resourceIncarnation = null;
+-  // LOW-11: No longer generating launcher script for confined rounds.
+-  let launcherScriptPath = null;
++  let launcherScriptPath = scriptPath;
+ 
+   if (isConfined) {
+-    herdrStartArgv = ['agent', 'start', round.agentName, '--kind', agentKindToUse, '--pane', round.paneId, '--executable', preparedCommand, '--timeout', String(deadlines.startup.readyMs), ...(preparedArgs.length ? ['--', ...preparedArgs] : [])];
++    const scriptContent = buildLauncherScriptContent({
++      argv0: agentKindToUse,
++      command: preparedCommand,
++      args: preparedArgs,
++      env: preparedEnv,
++      workerCommandDigest,
++    });
++    try {
++      fs.mkdirSync(launcherDir, { recursive: true });
++      fs.writeFileSync(scriptPath, scriptContent, { mode: 0o700 });
++      const readBack = fs.readFileSync(scriptPath, 'utf8');
++      if (readBack !== scriptContent) {
++        throw Object.assign(new Error('launcher script content did not read back as written'), { code: 'launcher-script-corrupt' });
++      }
++    } catch (err) {
++      try { client.paneClose(round.paneId); } catch { /* best effort */ }
++      throw round.fail('worker-spawn-fail', err.code ?? 'launcher-script-write-failed',
++        `executor for work "${round.workId}" could not prepare its launcher script at ${scriptPath}: ${err.message}`);
++    }
++
++    herdrStartArgv = ['pane', 'run', round.paneId, 'bash', scriptPath];
+ 
+     // F1: bind this pane to the launch-command record BEFORE calling
+@@ -1288,14 +1309,23 @@
+     if (!existingCmd?.resourceIncarnation && !verifiedProc) {
+-      // LOW-8: the script path is generated (`launcherDir/<launchCommandId
+-      // or generated id>.sh`), never user input, so this was never an
+-      // injection vector -- quoted anyway for defense in depth, the same
+-      // way every other argument this module hands to a shell already is.
+-      // LOW-8: Launch the confined agent using startAgent and --executable
+-      startAgent({ client, round, agentKind: agentKindToUse, agentArgs: preparedArgs, executable: preparedCommand, readyMs: deadlines.startup.readyMs });
++      client.paneRun(round.paneId, `bash ${shellEscapeArg(scriptPath)}`);
++
++      let scriptMismatch = false;
++      try {
++        const postLaunchScript = fs.readFileSync(scriptPath, 'utf8');
++        if (postLaunchScript !== scriptContent) scriptMismatch = true;
++      } catch {
++        scriptMismatch = true;
++      }
+ 
+       let exeIdentityMismatch = false;
+       let envMismatch = false;
+       let cwdMismatch = false;
+-      const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
+-      while (Date.now() < verifyDeadline) {
+-        try {
+-          pInfo = client.paneProcessInfo(round.paneId);
+-            verifiedProc = verifyForegroundProcessArgv({
+-              foregroundProcesses: pInfo?.foregroundProcesses,
+-              shellPid: pInfo?.shellPid,
+@@ -1306,12 +1336,12 @@
+-              args: preparedArgs,
+-            });
+-        } catch {}
+-        if (verifiedProc) break;
+-        await sleep(100);
+-      }
+-      
++      if (!scriptMismatch) {
++        const verifyDeadline = Date.now() + Math.min(deadlines.startup.readyMs || 10000, 5000);
++        while (Date.now() < verifyDeadline) {
++          try {
++            pInfo = client.paneProcessInfo(round.paneId);
++            verifiedProc = verifyForegroundProcessArgv({
++              foregroundProcesses: pInfo?.foregroundProcesses,
++              shellPid: pInfo?.shellPid,
++              argv0: agentKindToUse,
++              command: preparedCommand,
++              args: preparedArgs,
++            });
++          } catch {}
++          if (verifiedProc) break;
++          await sleep(100);
++        }
++      }
+ 
+       if (!verifiedProc) {
+-        // F3: a caught tamper (argv mismatch, a
+-        // detected binary swap, or a detected env mismatch) must never
++        // F3: a caught tamper (script-content mismatch, argv mismatch, a
++        // detected binary swap, or a detected env mismatch) must never
+         // leave a live unaccounted process running, nor the pane open for
+@@ -1321,11 +1351,13 @@
+         killPaneForegroundAndClose(client, round.paneId, pInfo);
+         throw round.fail('worker-spawn-fail', 'confinement-mismatch',
+-          exeIdentityMismatch
+-            ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
+-            : envMismatch
+-              ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
+-              : cwdMismatch
+-                ? `foreground process in pane "${round.paneId}" matched prepared argv, executable, and environment but its real working directory (/proc/<pid>/cwd) does not match the prepared invocation's cwd "${preparedCwd}" -- possible cwd-injection tamper (e.g. an injected "cd" in the launcher script), or /proc/<pid>/cwd was unreadable; process killed and pane closed.`
+-                : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
++          scriptMismatch
++            ? `launcher script at "${scriptPath}" no longer matches what this round wrote and read back before launching it in pane "${round.paneId}" -- possible script-content tamper (e.g. an injected command); process killed and pane closed.`
++            : exeIdentityMismatch
++              ? `foreground process in pane "${round.paneId}" matched prepared argv but its real executable (/proc/<pid>/exe) does not resolve to "${preparedCommand}" -- possible binary swap; process killed and pane closed.`
++              : envMismatch
++                ? `foreground process in pane "${round.paneId}" matched prepared argv and executable but its real environment (/proc/<pid>/environ) does not match the prepared invocation's env -- possible env-injection tamper (e.g. LD_PRELOAD or an overridden prepared variable); process killed and pane closed.`
++                : cwdMismatch
++                  ? `foreground process in pane "${round.paneId}" matched prepared argv, executable, and environment but its real working directory (/proc/<pid>/cwd) does not match the prepared invocation's cwd "${preparedCwd}" -- possible cwd-injection tamper (e.g. an injected "cd" in the launcher script), or /proc/<pid>/cwd was unreadable; process killed and pane closed.`
++                  : `foreground process in pane "${round.paneId}" does not match prepared command argv; process killed and pane closed.`);
+       }
+     }

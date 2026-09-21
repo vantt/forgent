@@ -73,7 +73,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -167,7 +167,7 @@ test('--dir pointed at a path with no .fgos/ at all gives the same clean refusal
 
 
 test('--dir pointed at the main checkout itself (from main\'s own cwd) is a no-op, identical to omitting it', () => {
-  const main = tmpCwdFromTemplate();
+  const main = tmpCwd();
   const before = eventLines(main).length;
   const result = run(main, ['submit', 'reached with redundant --dir', '--dir', main]);
   assert.equal(result.status, 0);
@@ -192,7 +192,7 @@ test('docs-index run from a .fgos/-less worktree cwd with --dir writes the share
 
 
 test('docs-index re-run with no doc changes does not rewrite the manifest file (tsk-1wn D3 write-only-if-changed guard)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'sample.md'), '# Sample Doc\n');
 
@@ -207,7 +207,7 @@ test('docs-index re-run with no doc changes does not rewrite the manifest file (
 
 
 test('docs-index re-run after a real doc change DOES rewrite the manifest (tsk-1wn D3 guard does not mask real updates)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'sample.md'), '# Sample Doc\n');
   assert.equal(run(cwd, ['docs-index']).status, 0);
@@ -220,7 +220,7 @@ test('docs-index re-run after a real doc change DOES rewrite the manifest (tsk-1
 
 
 test('docs-index manifest entries come out in deterministic order regardless of directory-read order (tsk-1wn D3 sort)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   fs.mkdirSync(path.join(cwd, 'docs', 'how-to'), { recursive: true });
   // Written deliberately out of alphabetical order.
   fs.writeFileSync(path.join(cwd, 'docs', 'how-to', 'b-doc.md'), '# B Doc\n');
@@ -235,7 +235,7 @@ test('docs-index manifest entries come out in deterministic order regardless of 
 
 
 test('two sequential edits both land — the second patch does not undo the first', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'edit-twice');
   run(cwd, ['edit', 'edit-twice', '--risk', 'heavy']);
   const result = run(cwd, ['edit', 'edit-twice', '--verify', 'npm run check']);
@@ -247,7 +247,7 @@ test('two sequential edits both land — the second patch does not undo the firs
 
 
 test('a pre-existing event log with no work.edit events replays byte-identical', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'no-edit-here');
   const before = stateView(cwd);
   run(cwd, ['rebuild']);
@@ -256,7 +256,7 @@ test('a pre-existing event log with no work.edit events replays byte-identical',
 
 
 test('done is terminal via the real CLI: moving out of done is refused as precondition, exit 2, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'terminal-item');
   toDoneViaChain(cwd, 'terminal-item');
   const before = eventLines(cwd).length;
@@ -268,7 +268,7 @@ test('done is terminal via the real CLI: moving out of done is refused as precon
 });
 
 test('cleanup (to blocked branch) releases main-checkout lock held by caller session (tsk-5zv)', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'cleanup-lock-blocked');
   // tsk-40m: blocked stands in for the retired todo->doing edge.
   run(cwd, ['move', 'cleanup-lock-blocked', '--to', 'blocked']);

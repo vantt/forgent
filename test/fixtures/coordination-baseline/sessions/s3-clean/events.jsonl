@@ -1,0 +1,7 @@
+{"type":"operation-authorized","payload":{"authorizationId":"auth-s3-1","operationId":"request-consult","nodeId":"request","targetActorId":"requester-actor","invocationKey":"inv-s3-1","authorizedBy":{"type":"driver","id":"tester-s3"},"reason":"started","grantedContextRefs":[]}}
+{"type":"assignment-created","payload":{"assignmentId":"asg-s3-1","authorizationId":"auth-s3-1","actorId":"requester-actor","runId":"run-s3-1"}}
+{"type":"result-linked","payload":{"assignmentId":"asg-s3-1","runId":"run-s3-1"}}
+{"type":"operation-authorized","payload":{"authorizationId":"auth-s3-2","operationId":"provide-consult","nodeId":"response","targetActorId":"consultant-actor","invocationKey":"inv-s3-2","authorizedBy":{"type":"driver","id":"tester-s3"},"reason":"started","grantedContextRefs":["asg-s3-1"]}}
+{"type":"assignment-created","payload":{"assignmentId":"asg-s3-2","authorizationId":"auth-s3-2","actorId":"consultant-actor","runId":"run-s3-2"}}
+{"type":"result-linked","payload":{"assignmentId":"asg-s3-2","runId":"run-s3-2"}}
+{"type":"session-completed","payload":{}}

@@ -73,7 +73,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwdFromTemplate,
+  tmpCwd,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -114,7 +114,7 @@ The chosen mechanism determines security requirements and user authentication fl
 
 
 test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   const result = toProposed(cwd, 'goal-checked');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['goal-checked'].status, 'awaiting-approval');
@@ -122,7 +122,7 @@ test('move doing -> awaiting-approval applies via the real CLI, exit 0', () => {
 
 
 test('move awaiting-approval -> delivered (approval) applies via the real CLI, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'approved-item');
   const result = run(cwd, ['move', 'approved-item', '--to', 'delivered']);
   assert.equal(result.status, 0);
@@ -131,7 +131,7 @@ test('move awaiting-approval -> delivered (approval) applies via the real CLI, e
 
 
 test('move awaiting-approval -> todo (rejection) without --reason is refused as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'no-reason-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'no-reason-item', '--to', 'todo']);
@@ -142,7 +142,7 @@ test('move awaiting-approval -> todo (rejection) without --reason is refused as 
 
 
 test('move awaiting-approval -> todo with an empty --reason "" is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'empty-reason-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'empty-reason-item', '--to', 'todo', '--reason', '']);
@@ -152,7 +152,7 @@ test('move awaiting-approval -> todo with an empty --reason "" is rejected as va
 
 
 test('move awaiting-approval -> todo (rejection) with --reason carries the reason into the event payload, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'rejected-item');
   const result = run(cwd, ['move', 'rejected-item', '--to', 'todo', '--reason', 'flaky test coverage']);
   assert.equal(result.status, 0);
@@ -166,7 +166,7 @@ test('move awaiting-approval -> todo (rejection) with --reason carries the reaso
 
 
 test('move awaiting-approval -> doing is a forbidden edge (proposed is never a re-entry point for doing), exit 2, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'no-reentry-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'no-reentry-item', '--to', 'doing']);
@@ -176,7 +176,7 @@ test('move awaiting-approval -> doing is a forbidden edge (proposed is never a r
 
 
 test('move awaiting-approval -> done rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   toProposed(cwd, 'cas-proposed-item');
   const before = eventLines(cwd).length;
   const result = run(cwd, ['move', 'cas-proposed-item', '--to', 'done', '--expect', 'todo']);
@@ -187,7 +187,7 @@ test('move awaiting-approval -> done rejects a CAS expected-status mismatch as c
 
 
 test('move --reason on a non-rejection edge is accepted but ignored, not embedded in the payload', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'reason-ignored-item');
   // tsk-40m: todo -> doing is retired -- blocked stands in as the generic
   // "some non-rejection edge" example this test actually needs.
@@ -201,7 +201,7 @@ test('move --reason on a non-rejection edge is accepted but ignored, not embedde
 
 
 test('ask/answer round-trip on a todo item: park removes from ready and surfaces the ask via list, answer resumes to todo and reopens ready', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'gated-item');
 
   const askResult = run(cwd, ['ask', 'gated-item', '--text', VALID_ASK_TEXT]);
@@ -238,7 +238,7 @@ test('ask/answer round-trip on a todo item: park removes from ready and surfaces
 // live in SEPARATE gates[id] fields -- neither overwrites the other, unlike
 // rationale/alternatives/source before this item (answer-only fields).
 test('ask --rationale and answer --rationale both persist on gates[id], neither overwriting the other', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'checkpoint-item');
 
   run(cwd, [
@@ -316,7 +316,7 @@ test('ask/answer round-trip on a CLAIMED item: ask releases the claim and settle
 // involved, durable status really was 'doing') still resumes to `todo`,
 // never `doing`, since that edge no longer exists at all.
 test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim): answer clamps to todo — awaiting-human -> doing no longer exists', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'gated-legacy-doing-item');
   moveToDurableDoingForTest(cwd, 'gated-legacy-doing-item');
 
@@ -339,7 +339,7 @@ test('ask/answer round-trip on a genuinely legacy durable-doing item (no claim):
 
 
 test('ask without --text is rejected as validation, exit 4, no event written, item stays in its prior status', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'no-text-ask');
   moveToDurableDoingForTest(cwd, 'no-text-ask');
   const before = eventLines(cwd).length;
@@ -352,7 +352,7 @@ test('ask without --text is rejected as validation, exit 4, no event written, it
 
 
 test('answer on an item that is not awaiting-human is rejected as precondition, exit 2, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'never-parked');
   const before = eventLines(cwd).length;
 
@@ -364,7 +364,7 @@ test('answer on an item that is not awaiting-human is rejected as precondition, 
 
 
 test('ask rejects a CAS expected-status mismatch as conflict, exit 3, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
+  const cwd = tmpCwd();
   addOk(cwd, 'cas-ask-item');
   moveToDurableDoingForTest(cwd, 'cas-ask-item');
   const before = eventLines(cwd).length;

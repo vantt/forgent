@@ -1,0 +1,4 @@
+{"type":"operation-authorized","payload":{"authorizationId":"auth-s1-1","operationId":"produce","nodeId":"node-1","targetActorId":"doer","invocationKey":"inv-s1-1","authorizedBy":{"type":"driver","id":"tester-s1"},"reason":"started","grantedContextRefs":[]}}
+{"type":"assignment-created","payload":{"assignmentId":"asg-s1-1","authorizationId":"auth-s1-1","actorId":"doer","runId":"run-s1-1"}}
+{"type":"result-linked","payload":{"assignmentId":"asg-s1-1","runId":"run-s1-1"}}
+{"type":"session-completed","payload":{}}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "2",
+  "coordinationId": "s2-clean",
+  "objective": "Portable schema 2 baseline session",
+  "status": "active",
+  "createdAt": "2026-09-02T00:00:00.000Z",
+  "provenanceRoot": { "writerId": "tester-s2" },
+  "definitionRef": null,
+  "workRef": null,
+  "actors": [],
+  "aggregateBounds": { "wallTimeMs": 10000, "maxAssignments": 10, "maxConcurrency": 2, "maxRounds": 5, "maxTaskDepth": 2 },
+  "assignmentRefs": ["asg-s2-1"],
+  "completedAt": null
+}
