@@ -100,7 +100,10 @@ export { STATUSES };
 // the merge no longer resolves on main, or retrospective never actually
 // produced real content); `blocked -> delivered` above is how a
 // mechanical retry re-enters this chain.
-const TRANSITIONS = Object.freeze([
+// Exported (additive) so a conformance sweep can derive its expected legal
+// edges from this table directly instead of hand-duplicating them into a
+// second, driftable list -- the two can no longer silently disagree.
+export const TRANSITIONS = Object.freeze([
   // work-item-backlog-status D1: `backlog` (an idea not yet committed to
   // work) has exactly one door out, to `todo`, and zero doors in — an item
   // is created at `backlog` or never reaches it. Plain edge, no

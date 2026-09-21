@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { transitionWork, FsmError, STATUSES } from '../../src/state/status-fsm.mjs';
+import { transitionWork, FsmError, STATUSES, TRANSITIONS } from '../../src/state/status-fsm.mjs';
 
 function work(status, overrides = {}) {
   return { id: 'w1', status, ...overrides };
@@ -198,11 +198,17 @@ test('reason is ignored (never appears in payload) for every edge other than awa
 // durable-doing item's resume is clamped to `todo` by answerAwaiting itself
 // rather than attempting this edge — nothing durably writes INTO `doing`
 // ever, not even for old data.
-test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
-  const legalEdges = new Set([
-    // work-item-backlog-status D1: one door out, zero doors in. The sweep
-    // below is what proves the "zero doors in" half — every other X->backlog
-    // pair must still come back precondition.
+// Model-based conformance pilot: the sweep below re-declares TRANSITIONS as
+// a hand-written `legalEdges` Set so its own comments can narrate each
+// edge's history inline -- but that duplication can drift from the real
+// table (a table edit with no matching edit here would silently pass, the
+// exact hazard the sweep exists to catch, just moved one level up). This
+// test derives the expected edge set FROM `TRANSITIONS` itself and checks
+// it against the hand-written one below, so a drift between them fails
+// loudly here instead of silently weakening the sweep.
+test('the hand-written legalEdges sweep set matches TRANSITIONS exactly (no drift)', () => {
+  const derived = new Set(TRANSITIONS.map((edge) => `${edge.from}->${edge.to}`));
+  const handWritten = new Set([
     'backlog->todo',
     'todo->awaiting-approval',
     'todo->blocked',
@@ -228,6 +234,11 @@ test('every legal edge is exactly the declared table; every other status pair is
     'doing->wontfix',
     'awaiting-human->wontfix',
   ]);
+  assert.deepEqual([...derived].sort(), [...handWritten].sort());
+});
+
+test('every legal edge is exactly the declared table; every other status pair is precondition', () => {
+  const legalEdges = new Set(TRANSITIONS.map((edge) => `${edge.from}->${edge.to}`));
 
   for (const from of STATUSES) {
     for (const to of STATUSES) {
