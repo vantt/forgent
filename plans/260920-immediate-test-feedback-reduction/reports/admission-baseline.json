@@ -1,0 +1,37 @@
+[
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-return-2.test.mjs",
+    "line": 148
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-return-2.test.mjs",
+    "line": 167
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-return-2.test.mjs",
+    "line": 187
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-approve-5.test.mjs",
+    "line": 112
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-approve-5.test.mjs",
+    "line": 125
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-approve-5.test.mjs",
+    "line": 187
+  },
+  {
+    "ruleId": "new-fixture-only-init-without-reason",
+    "file": "test/cli/fgos-approve-5.test.mjs",
+    "line": 195
+  }
+]
