@@ -123,6 +123,41 @@ export function publishMutableProjection(targetPath, record) {
   fsyncDirBestEffort(dir);
 }
 
+// H11: secrets (a worker's real spawn environment) never belong in an
+// envelope/prepared-invocation record persisted alongside evidence -- those
+// records are kept indefinitely and are readable by any tool that can read
+// the run directory. This side file holds the one thing that legitimately
+// needs the real values: the actual env a real spawn requires. Mode 0600,
+// parent dir 0700 (best-effort on platforms without POSIX modes), and the
+// caller (the supervisor, immediately after it reads this to spawn) is
+// responsible for unlinking it -- it is never linked to via a digest the
+// way `publishImmutableProof`'s targets are, and it is never meant to
+// outlive the spawn it was written for.
+export function publishSecretSideFile(targetPath, record) {
+  const dir = path.dirname(targetPath);
+  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  try { fs.chmodSync(dir, 0o700); } catch {}
+  const content = typeof record === 'string' ? record : JSON.stringify(record);
+  fs.writeFileSync(targetPath, content, { mode: 0o600 });
+  try { fs.chmodSync(targetPath, 0o600); } catch {}
+}
+
+/** Read then immediately delete a secret side file -- "the supervisor reads
+ * it then unlinks it". Returns `null` (never throws) when the file is
+ * already gone or unreadable, so a caller can fall back to whatever env the
+ * envelope itself carries. */
+export function consumeSecretSideFile(targetPath) {
+  let parsed = null;
+  try {
+    parsed = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
+  } catch {
+    return null;
+  } finally {
+    try { fs.unlinkSync(targetPath); } catch {}
+  }
+  return parsed;
+}
+
 // --- Immutable Proof Publication and Collision Errors ---------------------
 
 export class ReceiptPathCollisionError extends Error {
@@ -336,7 +371,11 @@ export async function runSupervisor(envelopePath, opts = {}) {
   const envelopeRaw = fs.readFileSync(envelopePath, 'utf8');
   const envelope = JSON.parse(envelopeRaw);
 
-  if (envelope.contract !== 'cli-spawn-launch-envelope.v1') {
+  // H11: v2 redacts `invocation.env` and adds `invocation.secretsRef` (the
+  // real env moved to a 0600 side file, read+unlinked below). v1 stays
+  // accepted for one release -- a resumed Run whose envelope was published
+  // before this change still carries its real env inline.
+  if (envelope.contract !== 'cli-spawn-launch-envelope.v1' && envelope.contract !== 'cli-spawn-launch-envelope.v2') {
     throw new Error(`supervisor: invalid launch envelope contract: ${envelope.contract}`);
   }
 
@@ -400,7 +439,15 @@ export async function runSupervisor(envelopePath, opts = {}) {
   const command = invocation.command || envelope.command;
   const args = invocation.args || envelope.args || [];
   const cwd = invocation.cwd || envelope.cwd || runDir;
-  const env = invocation.env || envelope.env || {};
+  // H11: `invocation.secretsRef` (v2) names the 0600 side file holding the
+  // real env -- read it once, unlink it immediately (never left for a
+  // second reader), and use it for the real spawn. Falls back to whatever
+  // `invocation.env` carries (the full real env on a v1 envelope; the
+  // redacted allow-list on a v2 envelope whose side file is already gone,
+  // e.g. a prior supervisor attempt already consumed it) rather than
+  // crashing, since a missing side file must never block recovery/resume.
+  const secretEnv = invocation.secretsRef ? consumeSecretSideFile(path.join(runDir, invocation.secretsRef)) : null;
+  const env = secretEnv || invocation.env || envelope.env || {};
   const timeoutMs = invocation.timeoutMs || envelope.limits?.timeoutMs || 900000;
   const idleTimeoutMs = invocation.idleTimeoutMs || envelope.limits?.idleTimeoutMs || null;
   const maxBuffer = invocation.maxBuffer || envelope.limits?.maxBuffer || 10485760;

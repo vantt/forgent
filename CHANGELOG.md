@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `confinement-orphaned-resources-reaped` doctor check + `fgos doctor --fix`
+  repair: reclaims confined worker temp resources (private homes etc.)
+  whose owning process died without their being cleaned up, and reaps the
+  same on every `fgos-runner` startup. Existing `reapOrphanedConfinementResources`
+  was previously never called from any production path.
 - `npm run test:canary -- <file...>` — an additive, non-authoritative
   fast-feedback door: runs explicit canary files first, stops before the
   full suite on a red canary, and invokes the unchanged `npm test` exactly
@@ -38,6 +43,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Packaging-distribution and host-invocation verification docs now record the
   published `v0.1.0` preview release proof, post-release CI/external-consumer
   proof, and the preview Node-fallback earliest removal date of 2026-10-18.
+
+### Security
+
+- A dispatched worker's full spawn environment (every credential resolvable
+  from it, including provider API keys/tokens) is no longer written into the
+  persisted `prepared-invocation`/`launch-envelope` evidence records under
+  `.fgos/assignments/**/protected/` -- those now carry only a short,
+  standard-shell allow-list plus a digest. The real environment lives only
+  in a 0600 side file the supervisor process reads once, uses to spawn the
+  worker, and deletes immediately after.
 
 ## [v0.1.0] - 2026-09-18
 
