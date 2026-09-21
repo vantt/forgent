@@ -73,6 +73,40 @@ export function buildTestArgv(files, forwardedArgs = []) {
 }
 
 /**
+ * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
+ * the shared seam between the full-suite door and the canary runner).
+ * Applies the exact same env/argv construction `runTests()` always has
+ * (FGOS_DISABLE_OPPORTUNISTIC_CHECKS, the darwin TMPDIR realpath fix, argv
+ * as a literal array -- never a shell string) so a canary run and the full
+ * run are byte-for-byte identical in every way except which files are
+ * selected. Returns `{ status, files }`, same shape as `runTests()`.
+ */
+export function runSelectedTests(files, {
+  cwd = REPO_ROOT,
+  forwardedArgs = [],
+  execPath = process.execPath,
+  spawn = spawnSync,
+  env = process.env,
+  stdio = 'inherit',
+} = {}) {
+  const relFiles = files.map((file) => path.relative(cwd, file));
+  const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  if (process.platform === 'darwin') {
+    const tempRoot = env.TMPDIR || os.tmpdir();
+    try {
+      const realTempRoot = fs.realpathSync(tempRoot);
+      childEnv.TMPDIR = realTempRoot;
+      childEnv.TMP = realTempRoot;
+      childEnv.TEMP = realTempRoot;
+    } catch {
+      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
+    }
+  }
+  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+  return { status: result.status ?? 1, files: relFiles };
+}
+
+/**
  * Runs the full suite. Returns `{ status, files }` without touching
  * `process.exitCode` itself, so callers (the CLI entrypoint below, or a
  * test) can decide what to do with the result. Refuses (status 1, no
@@ -98,21 +132,7 @@ export function runTests({
     };
   }
 
-  const relFiles = files.map((file) => path.relative(cwd, file));
-  const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
-  if (process.platform === 'darwin') {
-    const tempRoot = env.TMPDIR || os.tmpdir();
-    try {
-      const realTempRoot = fs.realpathSync(tempRoot);
-      childEnv.TMPDIR = realTempRoot;
-      childEnv.TMP = realTempRoot;
-      childEnv.TEMP = realTempRoot;
-    } catch {
-      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
-    }
-  }
-  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-  return { status: result.status ?? 1, files: relFiles };
+  return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio });
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
