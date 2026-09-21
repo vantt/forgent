@@ -22,8 +22,10 @@
 // proof (`isProcessAlive` returns false), never elapsed time alone.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { getBootId, getProcessStartTime } from './process-identity.mjs';
 
 // --- PID liveness --------------------------------------------------------
 
@@ -37,6 +39,49 @@ export function isProcessAlive(pid) {
   } catch (err) {
     return err.code === 'EPERM';
   }
+}
+
+// --- Control holder identity (H1) -----------------------------------------
+
+/** Build a control holder identity for the CURRENT process: `{id, pid,
+ * bootId, processStartTime, host}`. Centralizes the shape so every
+ * acquireRunControl caller records the same cross-checkable identity --
+ * `id` alone (the pre-H1 shape) let a PID reused by an unrelated process
+ * after the real holder died be mistaken for the same holder. */
+export function buildRunControlHolder(id) {
+  return {
+    id,
+    pid: process.pid,
+    bootId: getBootId(),
+    processStartTime: getProcessStartTime(process.pid),
+    host: os.hostname(),
+  };
+}
+
+/** Whether a recorded control holder is still the live process that
+ * acquired the lock, fails closed toward 'held' whenever that cannot be
+ * disproven:
+ *  - bootId recorded and differs from the current boot -> 'dead' (the host
+ *    rebooted since acquisition; that pid cannot still be this holder).
+ *  - pid not alive (ESRCH) -> 'dead'.
+ *  - pid alive but no recorded processStartTime (pre-H1 holder record) ->
+ *    'held' (nothing to cross-check against; stay conservative).
+ *  - pid alive but /proc/<pid>/stat unreadable -> 'held' (unknown is not
+ *    dead).
+ *  - pid alive and processStartTime matches -> 'held' (same process).
+ *  - pid alive but processStartTime differs -> 'dead' (pid was reused by a
+ *    different process). */
+export function resolveHolderLiveness(holder) {
+  if (!holder || !Number.isInteger(holder.pid)) return 'dead';
+  const currentBootId = getBootId();
+  if (holder.bootId && currentBootId && currentBootId !== 'unknown-boot' && holder.bootId !== currentBootId) {
+    return 'dead';
+  }
+  if (!isProcessAlive(holder.pid)) return 'dead';
+  if (!holder.processStartTime) return 'held';
+  const liveStartTime = getProcessStartTime(holder.pid);
+  if (liveStartTime === null) return 'held';
+  return liveStartTime === holder.processStartTime ? 'held' : 'dead';
 }
 
 // --- Fsynced atomic publication -------------------------------------------
@@ -291,10 +336,11 @@ export function acquireRunControl(runDir, { holder, purpose, expectedControlEpoc
           return { stop: true, status: 'held', controlEpoch: current.epoch, holder: current.record.holder };
         }
         // Heartbeat expired (or no ttlMs given, meaning always attempt):
-        // permitted to ATTEMPT reclaim. Only PID-dead proof actually
-        // authorizes it -- a live PID remains HELD, full stop, no matter
-        // how stale this generation looks.
-        if (isProcessAlive(current.record.holder?.pid)) {
+        // permitted to ATTEMPT reclaim. Only proven-dead identity actually
+        // authorizes it (resolveHolderLiveness, H1) -- a live PID, or one
+        // whose liveness cannot be disproven, remains HELD, full stop, no
+        // matter how stale this generation looks.
+        if (resolveHolderLiveness(current.record.holder) === 'held') {
           return { stop: true, status: 'held', controlEpoch: current.epoch, holder: current.record.holder };
         }
       }

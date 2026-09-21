@@ -34,26 +34,13 @@ export function computeSha256Digest(value) {
 
 // --- Host, Boot, Process Info --------------------------------------------
 
-export function getBootId() {
-  try {
-    return fs.readFileSync('/proc/sys/kernel/random/boot_id', 'utf8').trim();
-  } catch {
-    return 'unknown-boot';
-  }
-}
-
-export function getProcessStartTime(pid) {
-  if (!Number.isInteger(pid) || pid <= 0) return null;
-  try {
-    const stat = fs.readFileSync(`/proc/${pid}/stat`, 'utf8');
-    const lastParen = stat.lastIndexOf(')');
-    if (lastParen !== -1) {
-      const rest = stat.slice(lastParen + 2).split(' ');
-      return rest[19] || null;
-    }
-  } catch {}
-  return null;
-}
+// Hoisted to process-identity.mjs (Phase 02 H1): a pure fs-only leaf so
+// run-lock.mjs (banned from reaching any process-control adapter, per
+// test/runner/dispatch-reconciliation-import-graph.test.mjs) can use the
+// same identity check without importing this file's child_process/spawn
+// surface. Re-exported here unchanged for this file's own existing callers.
+import { getBootId, getProcessStartTime } from './process-identity.mjs';
+export { getBootId, getProcessStartTime };
 
 export function getProcessPgid(pid) {
   if (!Number.isInteger(pid) || pid <= 0) return pid;

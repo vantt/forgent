@@ -20,7 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { findRunDir, readRunSnapshot } from './show-run.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
-import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive } from '../../runner/dispatch/run-lock.mjs';
+import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 
 export class RecoveryError extends Error {
@@ -277,7 +277,7 @@ export function recoverApplyUseCase(ctx, params = {}) {
     // acquire before its own write, so F5's fresh settled re-check (below)
     // is deliberately sequenced AFTER this, not before it.
     const controlResult = acquireRunControl(runDir, {
-      holder: { id: 'dispatch-recover', pid: process.pid },
+      holder: buildRunControlHolder('dispatch-recover'),
       purpose: `recovery-apply:${params.action?.type ?? 'unknown'}`,
       expectedControlEpoch: toRunLockExpectedEpoch(params.expectedControlEpoch),
       now: Date.now(),

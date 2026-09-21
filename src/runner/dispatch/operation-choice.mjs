@@ -133,12 +133,19 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
         if (asgn.provenance?.kind === 'inline') continue;
 
         // Dispatched-run membership: only run dirs the runner itself
-        // dispatched (recorded in assignment.json at dispatch time) count as
-        // evidence. A run dir planted in the tree without a dispatch — no
-        // matter how self-consistent its result.json — is skipped, and an
-        // assignment without the manifest fails closed.
-        const dispatchedRuns = Array.isArray(asgn.dispatchedRuns) ? asgn.dispatchedRuns : null;
-        if (!dispatchedRuns) continue;
+        // dispatched count as evidence. A run dir planted in the tree
+        // without a dispatch — no matter how self-consistent its
+        // result.json — is skipped, and an assignment without any dispatch
+        // record at all fails closed. H3: dispatch bookkeeping moved from a
+        // full assignment.json rewrite to a one-marker-per-attempt file
+        // under dispatched/<NN> (a torn write there can only cost that one
+        // marker, never the whole manifest) — read the marker first, fall
+        // back to the legacy dispatchedRuns array for one release so an
+        // assignment.json written before this change still works.
+        const dispatchedDir = path.join(asgnDir, 'dispatched');
+        const dispatchedMarkers = fs.existsSync(dispatchedDir) ? new Set(fs.readdirSync(dispatchedDir)) : null;
+        const dispatchedRunsLegacy = Array.isArray(asgn.dispatchedRuns) ? asgn.dispatchedRuns : null;
+        if (!dispatchedMarkers && !dispatchedRunsLegacy) continue;
         const asgnId = path.basename(asgnDir);
 
         const runsDir = path.join(asgnDir, 'runs');
@@ -146,7 +153,8 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
 
         const runSubdirs = fs.readdirSync(runsDir);
         for (const runSub of runSubdirs) {
-          if (!dispatchedRuns.includes(runSub)) continue;
+          const isDispatched = (dispatchedMarkers && dispatchedMarkers.has(runSub)) || (dispatchedRunsLegacy && dispatchedRunsLegacy.includes(runSub));
+          if (!isDispatched) continue;
           const resultJsonPath = path.join(runsDir, runSub, 'result.json');
           if (!fs.existsSync(resultJsonPath)) continue;
 
