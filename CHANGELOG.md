@@ -33,6 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   for continued agreement evidence-gathering without trusting the narrow
   result alone.
 
+### Changed
+
+- Packaging-distribution and host-invocation verification docs now record the
+  published `v0.1.0` preview release proof, post-release CI/external-consumer
+  proof, and the preview Node-fallback earliest removal date of 2026-10-18.
+
 ## [v0.1.0] - 2026-09-18
 
 ### Changed

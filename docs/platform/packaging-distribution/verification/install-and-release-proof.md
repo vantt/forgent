@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Code/test scan
-Last reviewed: 2026-09-18
+Last reviewed: 2026-09-21
 Related:
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
 - docs/platform/packaging-distribution/contracts/skill-package-distribution.md
@@ -58,6 +58,27 @@ npm test -- test/skills/fgos-mirror.test.mjs
 Run broader suites when implementation changes, release paths change, or a doc claim becomes a release promise.
 
 ## 4. Latest Preview Release Proof
+
+### 4.1 Published Preview Release
+
+GitHub release `v0.1.0` is the first published preview release proof:
+
+| Item | Evidence |
+| --- | --- |
+| Release tag | `v0.1.0` |
+| Release URL | `https://github.com/vantt/forgent/releases/tag/v0.1.0` |
+| Published | 2026-09-18 07:07:51 UTC |
+| Release workflow | GitHub Actions run `35317876419`, conclusion `success`, commit `40fd80ef73092be1af96410211e770f20546a836` |
+| Published assets | `fgctl-v0.1.0-x86_64-unknown-linux-gnu.tar.gz`, `fgos-v0.1.0-x86_64-unknown-linux-gnu.tar.gz`, `SHA256SUMS`, `install.sh` |
+| Post-release CI proof | GitHub Actions run `35498322149`, conclusion `success`, commit `7853e4d7d6881665fb57e2a5d730428ae4e96486` |
+| Post-release external consumer proof | Job `external consumer proof` in run `35498322149`, conclusion `success` |
+
+This proves the preview release channel exists as published assets, not only
+as local release-shaped files. The preview claim remains deliberately narrower
+than stable/default graduation: release-owner approval is still required before
+this status becomes stable/default.
+
+### 4.2 Local Release-Shaped Proof
 
 The preview installed/default runtime claim was locally re-proven on
 2026-09-15 with release-shaped assets:
@@ -118,9 +139,9 @@ The compatibility posture is now settled as:
 - Any escape-hatch invocation must emit a warning, log entry, or proof marker
   that distinguishes deliberate legacy fallback use from default Rust-host use.
 - The escape hatch remains supported for 30 calendar days after the preview
-  release publication date. For the 2026-09-15 preview proof/public-posture
-  decision, the earliest removal date is 2026-10-15; if the public preview tag
-  is published later, use that publication date plus 30 calendar days.
+  release publication date. The public preview tag `v0.1.0` was published on
+  2026-09-18, so the earliest removal date for this preview release is
+  2026-10-18 unless a later release decision replaces that support promise.
 
 This policy does not mean every component has moved to Rust. It means the
 user-facing default entrypoint is Rust-host-owned; the Rust host may still

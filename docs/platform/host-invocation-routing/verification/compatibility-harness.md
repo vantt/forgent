@@ -31,11 +31,11 @@ proof, and R3 adds the first production remote peer route proof through
 `GET /v1/runtime`.
 
 Legacy Node fallback remains available only as a deprecated explicit escape
-hatch for 30 calendar days after preview release publication. For the
-2026-09-15 preview proof/public-posture decision, earliest removal is
-2026-10-15 unless the public preview tag is published later. The compatibility
-harness must keep distinguishing default Rust-host use from intentional legacy
-fallback use until that window closes.
+hatch for 30 calendar days after preview release publication. Public preview
+tag `v0.1.0` was published on 2026-09-18, so earliest removal for this preview
+release is 2026-10-18 unless a later release decision replaces that support
+promise. The compatibility harness must keep distinguishing default Rust-host
+use from intentional legacy fallback use until that window closes.
 
 ## 4. Related Files
 

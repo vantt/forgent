@@ -61,8 +61,8 @@ No packet may silently delete a legacy/history detail. If a detail moves, update
 Coordinator note, 2026-09-14:
 Recent host-invocation R1 handoff proof edits in this plan and the packaging-distribution verification docs are accepted for the active track. Apply them by packet boundary: P6 owns the Rust manifest/release handoff fields and manifest-based Rust host fallback proof; P7 owns the workspace activation end-to-end proof where `.fgos/installation/bin/fgos version --runtime-json` reports `host: "rust"` and the activated `artifactDigest`.
 
-Coordinator note, 2026-09-15:
-Public/default posture is settled for preview: this release posture is preview, external installs default `fgos` through the Rust host, public docs may state Rust host is the default installed runtime, and Rust-host failure support follows the explicit deprecated Node fallback escape-hatch policy. The escape hatch is supported for 30 calendar days after preview release publication; for the 2026-09-15 preview proof/public-posture decision, the earliest removal date is 2026-10-15 unless the public preview tag is published later.
+Coordinator note, 2026-09-15; updated after `v0.1.0` publication on 2026-09-18:
+Public/default posture is settled for preview: this release posture is preview, external installs default `fgos` through the Rust host, public docs may state Rust host is the default installed runtime, and Rust-host failure support follows the explicit deprecated Node fallback escape-hatch policy. The escape hatch is supported for 30 calendar days after preview release publication; for published preview tag `v0.1.0`, the earliest removal date is 2026-10-18 unless a later release decision replaces that support promise.
 
 ## 3. Packet Queue
 

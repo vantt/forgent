@@ -9,7 +9,7 @@ Implementation status: Implemented preview plus tracked partials
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Promoted from docs/specs/distribution.md, README.md, code/test scan
-Last reviewed: 2026-09-18
+Last reviewed: 2026-09-21
 Related:
 - docs/platform/packaging-distribution/README.md
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
@@ -41,7 +41,7 @@ The spec is written for current behavior and near-term accepted target behavior.
 
 ## 3. Install Channels
 
-**Release posture (coordinator decision, 2026-09-15):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for 30 calendar days after the preview release publication date; for the 2026-09-15 preview proof/public-posture decision, the earliest removal date is 2026-10-15, unless the public preview tag is published later.
+**Release posture (coordinator decision, preview published 2026-09-18):** preview. External installs default `fgos` through the Rust host (3.1), and public docs may state the Rust host as the default installed runtime. The legacy Node channel (3.2) remains only as the settled, explicit deprecated escape hatch for 30 calendar days after the preview release publication date. Public preview tag `v0.1.0` was published on 2026-09-18, so the earliest removal date for this preview release is 2026-10-18 unless a later release decision replaces that support promise.
 
 ## 3.1 Recommended Native Channel
 

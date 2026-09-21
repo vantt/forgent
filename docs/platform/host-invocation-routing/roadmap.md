@@ -9,7 +9,7 @@ Implementation status: R1/R2/R3 implemented preview; route migration and stable/
 Canonical: Yes, after review
 Owner: Host invocation
 Source type: Created after 2026-09-14 code scan of host-runtime, apps/fgos, GitHub release state, and packaging-distribution links
-Last reviewed: 2026-09-18
+Last reviewed: 2026-09-21
 Related:
 - docs/platform/host-invocation-routing/README.md
 - docs/platform/host-invocation-routing/spec.md
@@ -36,7 +36,7 @@ release-owner decision.
 | `cargo test -p fgos-host-runtime -p fgos --quiet` | Passed on 2026-09-14 during code scan and local Phase A proof refresh. |
 | `node --test test/rust-host/command-routes.test.mjs` | Passed on 2026-09-14 during local Phase A proof refresh. |
 | [package.json](../../../package.json) | npm `bin.fgos` still points to `bin/fgos.mjs`, the legacy Node compatibility entry. |
-| Preview release proof | Local release-shaped assets passed `scripts/ci-external-consumer.sh --assets <dir>` on 2026-09-15, including `install.sh`, `fgctl init`, Rust-host `version --runtime-json`, ready, no-op upgrade, and repair. |
+| Preview release proof | Published GitHub release `v0.1.0` on 2026-09-18 includes `fgctl`, `fgos`, `SHA256SUMS`, and `install.sh` assets; release workflow `35317876419` passed, and post-release CI run `35498322149` passed including external-consumer proof. Local release-shaped assets also passed `scripts/ci-external-consumer.sh --assets <dir>` on 2026-09-15. |
 
 This means host-invocation has R1 preview installed/default proof, while
 stable/default graduation remains a packaging-distribution and release-owner

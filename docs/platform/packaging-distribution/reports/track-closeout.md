@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Packaging-distribution
 Source type: Code-panel packet reports, panel branch verification, and packaging-distribution verification docs
-Last reviewed: 2026-09-15
+Last reviewed: 2026-09-21
 Related:
 - docs/platform/packaging-distribution/code-panel-rollout-plan.md
 - docs/platform/packaging-distribution/verification/implementation-alignment.md
@@ -206,7 +206,6 @@ promoted by packet proof:
 
 | Claim | Current status | Why it remains open |
 | --- | --- | --- |
-| `fgctl` is the recommended install/bootstrap entry. | partial | Needs a current GitHub release asset path before the whole install channel can be called fully implemented. |
 | Repository/workspace/release-store layout boundaries are explicit. | partial | Worker capsule and projection ledger implementation still need focused scan/proof. |
 | Host-neutral skill intent ids map to host-native triggers. | partial | Existing direct mapping is implemented, but public intent metadata or explicit alias contract remains open. |
 | Gemini receives a native extension/package target for fgOS skills. | partial | Prototype generator exists; full build/release packaging, install pipeline, and doctor integration are later work. |
@@ -220,9 +219,10 @@ default runtime path for activated workspace installs; legacy Node fallback is
 deprecated immediately and may remain only as an explicit escape hatch with a
 warning/log/proof marker during a short compatibility window. The escape hatch
 must not silently catch Rust-host failures. The escape hatch is supported for
-30 calendar days after the preview release publication date; for the 2026-09-15
-preview proof/public-posture decision, the earliest removal date is 2026-10-15,
-unless the public preview tag is published later.
+30 calendar days after the preview release publication date. Public preview tag
+`v0.1.0` was published on 2026-09-18, so the earliest removal date for this
+preview release is 2026-10-18 unless a later release decision replaces the
+support promise.
 
 Public/default release posture means the official stance for users outside the
 source checkout: which release channel is published or recommended, which
@@ -232,15 +232,16 @@ P6/P7 local proof that an activated workspace path enters the Rust host.
 
 The installed/default runtime claim is now implemented for preview public
 posture: external-installed/default `fgos` enters the Rust host, and fallback
-follows the explicit deprecated Node escape-hatch policy. The latest
-release-shaped external-consumer proof is recorded in
-`verification/install-and-release-proof.md`.
+follows the explicit deprecated Node escape-hatch policy. The first published
+preview release proof is `v0.1.0`, published by release workflow `35317876419`
+with `fgctl`, `fgos`, `SHA256SUMS`, and `install.sh` assets; post-release CI
+run `35498322149` passed, including external-consumer proof. The evidence is
+recorded in `verification/install-and-release-proof.md`.
 
 The code-panel track still does not decide these product/release questions:
 
 - whether this preview posture graduates to stable/default release;
-- whether any public preview tag published after 2026-09-15 shifts the
-  30-day fallback removal date later.
+- whether stable graduation changes the fallback promise before 2026-10-18.
 
 The coordinator/user approved and completed the merge to `main` after the
 panel-branch proof and main-merge preview proof passed.

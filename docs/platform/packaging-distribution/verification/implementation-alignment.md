@@ -9,7 +9,7 @@ Implementation status: Current evidence snapshot
 Canonical: Yes, after review
 Owner: Platform documentation
 Source type: Code/test/doc scan
-Last reviewed: 2026-09-18
+Last reviewed: 2026-09-21
 Related:
 - docs/platform/packaging-distribution/spec.md
 - docs/platform/packaging-distribution/architecture/runtime-identity-and-activation.md
@@ -39,7 +39,7 @@ Every important packaging-distribution design claim should appear here with stat
 
 | Design claim | Status | Evidence | Gap / next action |
 | --- | --- | --- | --- |
-| `fgctl` is the recommended install/bootstrap entry. | partial | `README.md`, `install.sh`, `test/install/install-sh.test.mjs`, `scripts/ci-external-consumer.sh`, `.github/workflows/release.yml` | Verify a current GitHub release asset path before calling the whole channel fully implemented. |
+| `fgctl` is the recommended install/bootstrap entry. | implemented preview | `README.md`, `install.sh`, `test/install/install-sh.test.mjs`, `scripts/ci-external-consumer.sh`, `.github/workflows/release.yml`, GitHub release `v0.1.0` published 2026-09-18 with `fgctl-v0.1.0-x86_64-unknown-linux-gnu.tar.gz`, `fgos-v0.1.0-x86_64-unknown-linux-gnu.tar.gz`, `SHA256SUMS`, and `install.sh` | Stable/default graduation remains a release-owner decision; preview install channel is proven by release workflow 35317876419 and post-release CI/external-consumer proof 35498322149. |
 | Release tree includes native `bin/fgos`, runner shim, legacy Node payload, and manifest. | implemented | `scripts/build-rust-distribution.mjs`, `test/rust-host/release-tree.test.mjs`, `packages/distribution/rust/src/manifest.rs`, `packages/distribution/rust/tests/schema_golden.rs` | Frozen V1 schema in `contracts/release-manifest.md` with legacyNode locator invariant and golden tests. |
 | `artifactDigest` is manifest/tree identity, not archive checksum. | implemented | `scripts/build-rust-distribution.mjs`, `test/rust-host/release-tree.test.mjs`, `scripts/ci-external-consumer.sh` | Extract exact digest contract into a schema doc if needed. |
 | Repository/workspace/release-store layout boundaries are explicit. | partial | `docs/platform/packaging-distribution/contracts/repository-runtime-layout.md`, `docs/architect/packaging-distribution/runtime-identity-and-activation.md`, `docs/architect/packaging-distribution/scope-map.md` | Verify worker capsule and projection ledger implementation before marking full. |
