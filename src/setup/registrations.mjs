@@ -61,6 +61,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
   sharedConfigFilePath,
@@ -3599,6 +3600,51 @@ export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.cl
   }
 }
 
+/** `checkTrustStoreWritable` only ever reads the default claude-json path --
+ * an executor declaring `interactiveMode.trustStore.kind: 'codex-toml'` or
+ * `'agy'`/`'agy-json'` had no doctor coverage at all before this, so an
+ * unreadable codex config.toml or agy settings.json surfaced for the first
+ * time as a live dispatch failure instead of a doctor line. Reuses the same
+ * readers `seedCodexTrust`/`seedAgyTrust` use, so a "readable" verdict here
+ * means the exact same read the real dispatch will do also succeeds. */
+export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
+  const problems = [];
+  const notes = [];
+  const seen = new Set();
+
+  function checkOne(trustStore, env, label) {
+    if (!trustStore || (trustStore.kind !== 'codex-toml' && trustStore.kind !== 'agy' && trustStore.kind !== 'agy-json')) return;
+    const storePath = trustStore.kind === 'codex-toml'
+      ? (trustStore.path ?? path.join(env?.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'))
+      : (trustStore.path ?? defaultAgySettingsPath(env?.HOME ?? os.homedir()));
+    const dedupeKey = `${trustStore.kind}:${storePath}`;
+    if (seen.has(dedupeKey)) return;
+    seen.add(dedupeKey);
+    try {
+      if (trustStore.kind === 'codex-toml') {
+        readCodexTrust(storePath, path.resolve(cwd));
+      } else {
+        readAgyStore(storePath);
+      }
+      notes.push(`${label}: ${trustStore.kind} trust store at ${storePath} is readable`);
+    } catch (err) {
+      problems.push(`${label}: ${trustStore.kind} trust store at ${storePath} is unreadable (${err.message})`);
+    }
+  }
+
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    checkOne(executor?.interactiveMode?.trustStore, executor?.env, `executor "${id}"`);
+    for (const inv of executor?.invocations ?? []) {
+      checkOne(inv?.interactiveMode?.trustStore, inv?.env ?? executor?.env, `executor "${id}" invocation "${inv?.id ?? '?'}"`);
+    }
+  }
+
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
+}
+
 /** Second reading of the config door's own C5 invariant. Names the executor and
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
@@ -3766,6 +3812,18 @@ registerCheck({
   id: 'trust-store-readable',
   description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
   check: () => checkTrustStoreWritable(),
+});
+
+registerCheck({
+  id: 'non-claude-trust-stores-readable',
+  description: 'every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do',
+  check: (cwd) => {
+    try {
+      return checkTrustStoresReadable(cwd, loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };
+    }
+  },
 });
 
 registerCheck({

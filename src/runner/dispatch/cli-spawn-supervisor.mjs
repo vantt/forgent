@@ -66,6 +66,19 @@ export function isProcessAlive(pid) {
   }
 }
 
+/** `isProcessAlive` by itself only confirms a pid is occupied -- after that
+ * pid's real owner exits, the OS can recycle it for an unrelated process,
+ * which would read as "still alive" here. A `processStartTime` on the
+ * binding lets this tell the two cases apart, the same identity guard
+ * already applied to the incarnation checks in `reconcileCliSpawnRun`:
+ * alive AND (no recorded start time to compare, or the live one matches). */
+function isBoundProcessAlive(bound) {
+  if (!bound?.pid || !isProcessAlive(bound.pid)) return false;
+  if (!bound.processStartTime) return true;
+  const liveStartTime = getProcessStartTime(bound.pid);
+  return !liveStartTime || liveStartTime === bound.processStartTime;
+}
+
 // --- Fsynced Publication Helpers ------------------------------------------
 
 function fsyncDirBestEffort(dir) {
@@ -467,7 +480,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
   function deliverLiveChunk(chunk, stream) {
     if (opts.onChunk) {
       try {
-        opts.onChunk(chunk, stream);
+        opts.onChunk(stream, chunk);
       } catch {}
     }
     if (process.send) {
@@ -738,6 +751,11 @@ export async function runSupervisor(envelopePath, opts = {}) {
 
     // Setup Timeout
     if (timeoutMs) {
+      // A first timer was already armed before the worker binding existed
+      // (guarding the spawn phase itself); clear it before re-arming so only
+      // one timeoutTimer is ever live -- an unclearred first timer is not
+      // reachable from this point on to be cleared later on a normal exit.
+      if (timeoutTimer) clearTimeout(timeoutTimer);
       timeoutTimer = setTimeout(() => {
         if (captureFrozen) return;
         const durationMs = Date.now() - startTime;
@@ -878,23 +896,17 @@ export function startSupervisorProcess({ envelopePath, detached = true, onChunk 
   });
 
   if (onChunk) {
+    // IPC is the one subscription: the supervisor's own deliverLiveChunk
+    // already tees every chunk onto its stdio pipes as well as the IPC
+    // channel, so also listening on proc.stdout/proc.stderr would deliver
+    // each chunk twice.
     proc.on('message', (msg) => {
       if (msg && msg.type === 'chunk') {
         try {
-          onChunk(Buffer.from(msg.chunk, 'utf8'), msg.stream);
+          onChunk(msg.stream, Buffer.from(msg.chunk, 'utf8'));
         } catch {}
       }
     });
-    if (proc.stdout) {
-      proc.stdout.on('data', (chunk) => {
-        try { onChunk(chunk, 'stdout'); } catch {}
-      });
-    }
-    if (proc.stderr) {
-      proc.stderr.on('data', (chunk) => {
-        try { onChunk(chunk, 'stderr'); } catch {}
-      });
-    }
   }
 
   return proc;
@@ -1174,7 +1186,7 @@ export async function reconcileCliSpawnRun({
     const workerBindingPath = path.join(runDir, 'protected', 'supervisor-binding', `${launchCommandId}.worker.json`);
     let workerBinding = null;
     if (!fs.existsSync(workerBindingPath)) {
-      const supAlive = isProcessAlive(supBinding.supervisor?.pid);
+      const supAlive = isBoundProcessAlive(supBinding.supervisor);
       if (!supAlive) {
         return { status: 'parked', reason: 'worker-binding-unknown' };
       }
@@ -1210,7 +1222,7 @@ export async function reconcileCliSpawnRun({
     // 4. Check adapter receipt
     const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
     if (!fs.existsSync(receiptPath)) {
-      const supAlive = isProcessAlive(supBinding.supervisor?.pid);
+      const supAlive = isBoundProcessAlive(supBinding.supervisor);
       if (supAlive) {
         return { status: 'running', phase: 'worker-running' };
       }

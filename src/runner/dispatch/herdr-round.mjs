@@ -37,7 +37,10 @@ import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import { evaluateLadder, paneFateFor } from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
-import { seedTrust, seedCodexTrust } from './trust-store.mjs';
+import {
+  seedTrust, seedCodexTrust, seedAgyTrust, defaultAgySettingsPath,
+  removeTrust, removeCodexTrust, removeAgyTrust,
+} from './trust-store.mjs';
 import { ensureWorkerSession, DEFAULT_WORKER_SESSION } from './worker-session-boot.mjs';
 import { normalizeLegacyConfinement } from './confinement/policies.mjs';
 import { evaluateBypassPairing } from './confinement/bypass-pairing.mjs';
@@ -567,9 +570,13 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
 /**
  * Pre-trust the workspace, or the agent stops at a folder-trust dialog with
  * nobody there to answer it and herdr reports `agent_not_ready`. Measured for
- * both claude and codex; agy shows no such dialog, which is why this is
- * DECLARED per executor rather than done for everyone -- an agent kind that
- * does not ask is not given an entry it never needed.
+ * claude and codex; agy shows the same dialog under its own private HOME
+ * (`~/.agy-homes/<x>/settings.json`, never the operator's own
+ * `~/.gemini/...`), which is why the HOME to seed is resolved from the
+ * executor's own env rather than the machine default -- seeding the wrong
+ * HOME leaves agy's dialog exactly where it was. `trustStore` is still
+ * DECLARED per executor, not assumed for everyone: an agent kind fgOS has
+ * not measured a dialog for is not given an entry it may never have needed.
  *
  * Never throws. Refusing here would be worse than trying: the agent may
  * already be trusted by some other route, and the dialog it might still hit
@@ -584,6 +591,11 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
         trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
         { projectPath, repoRoot: repoRootForTrust },
       );
+    } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+      seedAgyTrust(
+        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
+        { projectPath, repoRoot: repoRootForTrust },
+      );
     } else {
       seedTrust(
         trustStore.path ?? path.join(os.homedir(), '.claude.json'),
@@ -593,6 +605,41 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
     round.note({ trustSeeded: trustStore.kind });
   } catch (err) {
     round.note({ trustSeedFailed: err.message });
+  }
+}
+
+/**
+ * The other half of B3 (trust-store.mjs): remove the entry seeded above, or
+ * the store grows one entry per dispatch forever. Runs on every settle path,
+ * including failure -- a round that never got past briefing still seeded
+ * trust before it failed.
+ *
+ * Never throws, for the same reason `seedWorkspaceTrust` does not: teardown
+ * must never be the thing that turns a settled round into a crash.
+ */
+function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
+  if (!trustStore) return;
+  const projectPath = path.resolve(cwd);
+  try {
+    if (trustStore.kind === 'codex-toml') {
+      removeCodexTrust(
+        trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
+        projectPath,
+      );
+    } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+      removeAgyTrust(
+        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
+        projectPath,
+      );
+    } else {
+      removeTrust(
+        trustStore.path ?? path.join(os.homedir(), '.claude.json'),
+        projectPath,
+      );
+    }
+    round.note({ trustRemoved: trustStore.kind });
+  } catch (err) {
+    round.note({ trustRemoveFailed: err.message });
   }
 }
 
@@ -693,6 +740,18 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
   // timeout, here exactly as it does everywhere else.
   if (err.code === 'timeout' && resultPath && fs.existsSync(resultPath)) {
     round.note({ status: 'briefed', briefTimeoutWithResultOnDisk: true });
+    return;
+  }
+  // A bare submit timeout, with no result on disk yet either, is not proof
+  // the brief never reached the agent -- herdr's own `--until working` wait
+  // not observing the transition in time is a transport ambiguity, the same
+  // kind the branch above already gives the benefit of the doubt to when a
+  // result exists. Typed `unknown` rather than failed here (first field of a
+  // tri-state, nothing else) so the poll loop below -- the only place a
+  // result file actually settles a round -- gets the chance to observe the
+  // real outcome instead of a submit-side guess ending the round early.
+  if (err.code === 'timeout') {
+    round.note({ status: 'briefed', delivery: 'unknown' });
     return;
   }
   let screen = null;
@@ -811,6 +870,12 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     if (agentState === 'working') {
       lastProgressAt = tickAt;
       blindMs = 0;
+      // For resend purposes only: an agent herdr itself reports as `working`
+      // has the brief and is acting on it, whether or not the worker's own
+      // ack file happened to land (or race the read) by this tick. Without
+      // this, a worker that never writes an ack file at all gets re-briefed
+      // on a timer indefinitely, up to MAX_RESENDS, while it is already mid-turn.
+      ackSeen = true;
     }
 
     const decision = decide({
@@ -892,7 +957,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath }) {
+async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv }) {
   const target = round.targetName ?? round.agentName;
   let stdout = '';
   try {
@@ -927,6 +992,12 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
   // `removeWorkerHome` refuses any directory without the marker it wrote.
   if (workerHomePath) {
     try { removeWorkerHome(workerHomePath); } catch { /* a leftover home is not worth failing a settled round */ }
+  } else if (trustStore) {
+    // Unconfined: the entry `seedWorkspaceTrust` wrote to the operator's own
+    // store is the other half of B3 -- without removing it here the store
+    // grows one entry per settled round, forever, same as an unremoved
+    // failed-round entry would.
+    removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
   }
 
   // LOW-11: the launcher script persists the full prepared env, including
@@ -1079,6 +1150,14 @@ export async function runHerdrRound(ctx) {
   } catch (err) {
     if (workerHomePath) {
       try { redactWorkerHome(workerHomePath); } catch { /* nothing further to do about a home we cannot read */ }
+    } else if (ctx.trustStore) {
+      // Unconfined: `driveRound` may have already seeded the operator's own
+      // trust store (`seedWorkspaceTrust`) before failing later. This is the
+      // one place every non-settled exit from a round converges, so it is
+      // also the one place the entry seeded for it is guaranteed to be
+      // removed -- without it the store grows one entry per failed round,
+      // forever.
+      removeWorkspaceTrust({ trustStore: ctx.trustStore, round, cwd, repoRoot, fullEnv });
     }
     throw err;
   }
@@ -1630,6 +1709,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const stdout = await settleRound({
     client, round, paths, exitCommand,
     promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
+    trustStore, cwd, repoRoot, fullEnv,
   });
 
   if (isAssignmentRun) {
