@@ -12,6 +12,20 @@ Review liệt kê finding theo severity; plan này sắp xếp lại theo **nguy
 
 Mỗi phase = một ứng viên `fgos submit` độc lập; kết quả chấp nhận = test còn thiếu trong review §Test Gaps trở thành xanh + docs sửa đúng trạng thái.
 
+## Quy tắc worktree (bắt buộc, mọi phase — quyết định 2026-09-21)
+
+`main` là checkout dùng chung, đang có nhiều track khác chạy song song (đã va chạm thật ít nhất một lần: `session-engine.mjs` có 953 dòng chưa commit từ track `coordination-skill-harness-simplification` khi Phase 01 chạm tới). Không đoán được track khác có merge/commit giữa chừng hay không, nên **mọi phase của track này làm trong worktree riêng, dù file mục tiêu đang sạch hay không** — không còn ngoại lệ "file sạch thì sửa thẳng trên main".
+
+Quy trình mỗi phase:
+1. `git worktree add .claude/worktrees/dispatch-hardening-phaseNN-<slug> -b dispatch-hardening-phaseNN-<slug> <base>` — `<base>` mặc định là `main` HEAD hiện tại, trừ khi phase phụ thuộc trực tiếp một phase khác chưa merge (theo bảng Dependencies) thì rẽ từ nhánh của phase đó.
+2. Symlink `node_modules` từ checkout chính vào worktree mới trước khi chạy test (hook `.ckignore` chặn Bash gọi thẳng tên `node_modules` trong lệnh — nhờ user chạy một dòng `ln -s` qua `!` prefix).
+3. Làm việc, test, commit toàn bộ trong worktree đó.
+4. Cập nhật phase file + `plan.md` ghi rõ: đã xong, tên nhánh/commit, **chưa merge**.
+5. Merge vào `main` là bước riêng, làm khi: (a) không phase nào khác đang cần base từ nó nữa, và (b) không có rủi ro xung đột với track ngoài phạm vi track này đang chạy trên cùng file — kiểm bằng `git status --short` trên các file mục tiêu trước khi merge, không giả định.
+6. Sau merge: `git worktree remove` + xoá nhánh.
+
+Nhánh Phase 01 R2/R3 là ngoại lệ đã xảy ra trước quyết định này (làm thẳng trên `main`, đã merge sẵn vì lúc đó file sạch) — không hồi tố, chỉ áp dụng từ Phase 02 trở đi.
+
 ## Phases
 
 | # | Phase | Wave | Findings | Gate | Owning track / plan |
