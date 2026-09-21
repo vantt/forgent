@@ -17,6 +17,17 @@ import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
 
 const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing']);
 
+// Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
+// already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
+// that symlinks in node_modules/target for fast dependency reuse reports
+// them via `git ls-files --others` as a bare untracked path (no trailing
+// slash, unlike a genuinely untracked real directory) -- without this
+// exclusion, EVERY selector run in ANY such worktree would see a spurious
+// "unknown" changed path and escalate to full every single time, silently
+// defeating the selector's whole purpose in exactly the worktree setup
+// this repo's own tooling encourages. Found via P05 shadow evaluation.
+const SYMLINKED_BUILD_ARTIFACT_PATHS = new Set(['node_modules', 'target']);
+
 // -- git plumbing -------------------------------------------------------
 
 /**
@@ -50,7 +61,7 @@ export function parseNameStatusZ(raw) {
 export function parsePathListZ(raw) {
   return raw
     .split('\0')
-    .filter((p) => p !== '')
+    .filter((p) => p !== '' && !SYMLINKED_BUILD_ARTIFACT_PATHS.has(p))
     .map((p) => ({ status: 'A', path: p }));
 }
 

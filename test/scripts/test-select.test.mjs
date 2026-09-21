@@ -70,6 +70,14 @@ test('parsePathListZ tags every entry as untracked-shaped status A', () => {
   ]);
 });
 
+test('parsePathListZ excludes the bare node_modules/target worktree-symlink entries (P05 finding): a real repo change alongside them is still reported', () => {
+  assert.deepEqual(parsePathListZ('node_modules\0target\0src/real.mjs\0'), [{ status: 'A', path: 'src/real.mjs' }]);
+});
+
+test('parsePathListZ does NOT exclude a real untracked path that merely CONTAINS "node_modules" as a substring (exact bare-name match only)', () => {
+  assert.deepEqual(parsePathListZ('vendor/node_modules-shim.mjs\0'), [{ status: 'A', path: 'vendor/node_modules-shim.mjs' }]);
+});
+
 // -- collectChangedPaths: real git integration ---------------------------
 
 test('committed-only: a file changed only in a commit past merge-base is reported with source "committed"', () => {
