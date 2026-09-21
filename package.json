@@ -26,6 +26,7 @@
   "scripts": {
     "test": "node scripts/run-tests.mjs",
     "test:canary": "node scripts/run-test-canary.mjs",
+    "test:related:shadow": "node scripts/test-select.mjs --shadow",
     "release:check": "node scripts/prepare-release.mjs --dry-run",
     "release:prepare": "node scripts/prepare-release.mjs",
     "setup:hooks": "node scripts/install-git-hooks.mjs",

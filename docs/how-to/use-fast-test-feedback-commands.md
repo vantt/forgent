@@ -1,0 +1,40 @@
+# Use The Fast Test-Feedback Commands
+
+`npm test` remains the full-suite Definition-of-Done command — nothing below replaces it.
+
+## `npm run test:canary -- <file...>`
+
+Runs an explicit list of test files first. If any fail, it stops there and
+`npm test` never runs — useful for a fast first signal while iterating on a
+known area. If the canary is green, it invokes the unchanged `npm test`
+exactly once. A green canary is **never** completion proof by itself; only
+the full-suite result that follows it is.
+
+```sh
+npm run test:canary -- test/state/store.test.mjs test/intake/plan.test.mjs
+npm run test:canary -- --from-file /tmp/my-list.txt   # one path per line
+```
+
+Any flag-shaped argument (e.g. a reporter) applies only to the canary
+sub-run, never to the full suite that follows.
+
+## `npm run test:related:shadow -- --explain`
+
+Computes which tests a small, auditable ownership manifest
+(`test/test-ownership.mjs`) says are related to your current changes
+(committed since `main`, staged, unstaged, and untracked), runs that
+related subset, then **always** runs the unchanged full suite as well, and
+prints a comparison. The full-suite result is always the authoritative
+exit status — the related result is recorded for evaluation only.
+
+```sh
+npm run test:related:shadow -- --explain
+```
+
+This is shadow mode only. There is no `test:related` command yet — the
+manifest currently covers a narrow, reality-checked pilot area
+(`src/intake/**`, most of `src/report/**`, and a handful of low-fan-in
+leaf modules under `src/state/**`); anything else escalates to a full-suite
+run. Promotion to an adopted inner-loop command requires the evidence
+thresholds in `plans/260920-immediate-test-feedback-reduction/plan.md`'s
+P05 phase, not just green shadow runs.

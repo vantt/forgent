@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `npm run test:canary -- <file...>` — an additive, non-authoritative
+  fast-feedback door: runs explicit canary files first, stops before the
+  full suite on a red canary, and invokes the unchanged `npm test` exactly
+  once on a green canary. `npm test` semantics are unchanged.
+- `npm run test:related:shadow -- --explain` — shadow-mode-only related-test
+  selection: a small, auditable, reality-checked ownership manifest
+  (`test/test-ownership.mjs`, currently `src/intake/**`, most of
+  `src/report/**`, and a handful of low-fan-in `src/state/**` leaf modules)
+  maps changed source paths to their direct/boundary tests; any unknown,
+  unsafe, or declared full-trigger path (bin/, scripts/, package.json,
+  shared state core, etc.) escalates the whole run to the full suite. Always
+  runs the full suite afterward regardless of the related result and
+  reports the full-suite status as authoritative. There is no `test:related`
+  command yet — promotion requires the evidence thresholds in
+  `plans/260920-immediate-test-feedback-reduction/plan.md`'s P05 phase.
+
 ## [v0.1.0] - 2026-09-18
 
 ### Changed
