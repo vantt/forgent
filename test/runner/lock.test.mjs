@@ -3,9 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { initStore, addWork, listWork, readRawEvents, EXIT_CODES } from '../../src/state/store.mjs';
 import { acquireRunnerLock, runOnce, EXIT_BUSY, LOCK_FILE } from '../../src/runner/loop.mjs';
+
+const LOOP_MOD_PATH = fileURLToPath(new URL('../../src/runner/loop.mjs', import.meta.url));
 
 // Inter-process exclusivity for the runner: `.fgos/runner.lock`. Every test
 // builds its own disposable git repo (git init in mkdtemp) with its own
@@ -174,6 +177,105 @@ test('reclaim never acquires in the deleting call: two racers over a stale lock 
 });
 
 // --- acquire/release primitive --------------------------------------------
+
+// Regression: acquireRunnerLock's own create step used to be
+// `fs.openSync(lockPath, 'wx')` + a separate `fs.writeSync` -- the same
+// TOCTOU already fixed in the two modules that mirror this function's shape
+// (events.mjs tsk-3ld, session.mjs tsk-1u7), never ported back here. Real
+// separate OS processes with a shared start barrier is the reproduction
+// technique those two fixes' own tests use (tsk-1u7, mirroring
+// events.test.mjs's own technique).
+//
+// The winner deliberately HOLDS the lock (sleeps) past every loser's own
+// attempt before releasing -- a loser that reported a dead/stale holder
+// while the real winner is still alive and unreleased is exactly the
+// TOCTOU failure shape (a live holder's lock misread as a crash leftover
+// and reclaimed out from under it). Without this hold, a winner that
+// acquires-then-immediately-exits is legitimately indistinguishable from a
+// crash to a later loser, which is a different (correct) code path, not
+// this bug.
+//
+// Honest caveat (found while writing this test): the actual vulnerable
+// window is the two syscalls between `openSync` and `writeSync` --
+// microseconds -- so even with the hold, this test reproduces the bug on
+// the pre-fix code only some of the time, not on every run (spot-checked
+// manually: failed roughly half of ~15 manual repetitions against the
+// unfixed code, passed consistently across an equal number of repetitions
+// against the fix). It is a real, working regression check, just not a
+// deterministic one -- `node --test`'s own single default run can pass by
+// luck against a reintroduced bug. The fix's correctness does not rest on
+// this test alone: it is the identical, already twice-proven
+// temp-file-then-`fs.linkSync` pattern, which POSIX guarantees never
+// exposes a partially-written target.
+test('concurrent acquireRunnerLock from real separate OS processes: every loser sees a real winner as holder, never a null/corrupted/misattributed one', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));
+  const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-out-'));
+  const N = 50;
+  const startAt = Date.now() + 300;
+  const childScript = `
+    const fs = require('node:fs');
+    const { pathToFileURL } = require('node:url');
+    const startAt = Number(process.argv[3]);
+    const outFile = process.argv[4];
+    const waitMs = startAt - Date.now();
+    if (waitMs > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, waitMs);
+    import(pathToFileURL(process.argv[1]).href)
+      .then((m) => {
+        const result = m.acquireRunnerLock(process.argv[2]);
+        if (result.acquired) {
+          // hold the lock well past every other racer's own attempt window
+          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 800);
+          result.release();
+        }
+        fs.writeFileSync(outFile, JSON.stringify({ acquired: result.acquired, holderPid: result.holderPid ?? null, pid: process.pid }));
+        process.exitCode = 0;
+      })
+      .catch((e) => { fs.writeFileSync(outFile, JSON.stringify({ error: String(e && e.stack || e) })); process.exitCode = 1; });
+  `;
+  function forkAcquire(i) {
+    const outFile = path.join(outDir, `r${i}.json`);
+    return new Promise((resolve, reject) => {
+      const child = spawn(process.execPath, ['-e', childScript, LOOP_MOD_PATH, dir, String(startAt), outFile], {
+        stdio: ['ignore', 'ignore', 'pipe'],
+      });
+      let stderr = '';
+      child.stderr.on('data', (d) => {
+        stderr += d;
+      });
+      child.on('error', reject);
+      child.on('exit', (code) => (code === 0 ? resolve(JSON.parse(fs.readFileSync(outFile, 'utf8'))) : reject(new Error(`child exited ${code}: ${stderr}`))));
+    });
+  }
+
+  const results = await Promise.all(Array.from({ length: N }, (_, i) => forkAcquire(i)));
+  const winners = results.filter((r) => r.acquired === true);
+  assert.ok(winners.length >= 1, `expected at least one winner among ${N} racers, got 0`);
+  // Real system scheduling under 50-way process contention can legitimately
+  // stagger a straggler's actual attempt past an earlier winner's hold --
+  // more than one NON-OVERLAPPING winner is not itself a bug, so this does
+  // not assert winners.length === 1. The precise, timing-independent
+  // invariant: as long as `acquireRunnerLock`'s create step fails EEXIST at
+  // all (i.e. a lock file existed to fail against), the immediate very next
+  // read of it must always resolve to a real, live pid -- `acquireRunnerLock`
+  // returns `holderPid: null` from exactly two places: the final "lost the
+  // wx create twice in a row" fallback, and the ENOENT branch when a read
+  // finds the file already gone. Neither should ever fire here: every
+  // holder in this test stays alive and unreleased for the whole race
+  // window, so a loser can only ever legitimately see EITHER its own
+  // successful create (a winner) OR that live holder's real pid on its very
+  // first read -- never null. Pre-fix, the TOCTOU let a loser's read land in
+  // the create-vs-write gap, see empty/unparseable content, misjudge a live
+  // holder as a dead one, and reclaim it -- producing exactly this null.
+  const losers = results.filter((r) => r.acquired === false);
+  assert.ok(losers.length > 0, 'expected at least one loser to actually contend');
+  for (const loser of losers) {
+    assert.notEqual(
+      loser.holderPid,
+      null,
+      `every loser must see a live holder's real pid, never null (a live lock misread as absent/dead/corrupted) -- got ${JSON.stringify(loser)}`,
+    );
+  }
+});
 
 test('acquireRunnerLock: wx create wins once, refuses a live holder, release removes the file', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-lock-test-dir-'));

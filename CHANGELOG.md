@@ -50,6 +50,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   vocabulary from the global config before merging — a stale key can no
   longer fill a gap in a project config and then fail validation. Filters in
   memory on every read; does not rewrite `~/.fgos/config.json` itself.
+- `acquireRunnerLock` (`src/runner/loop.mjs`, the runner drain-loop's
+  exclusive `.fgos/runner.lock`) created its lock with `fs.openSync(path,
+  'wx')` followed by a separate `fs.writeSync` — a window where the lock
+  file existed but was still empty, so a concurrent process reading it
+  mid-write could misjudge a live holder as a dead crash leftover and
+  reclaim (delete) a lock another process still held. The identical bug was
+  already found and fixed twice elsewhere in this repo (`events.mjs`,
+  `session.mjs`) via the same remedy, but never ported back to this,
+  the original the other two mirror. Now writes the pid to a temp file and
+  atomically `fs.linkSync`s it onto the lock path, closing the window by
+  construction.
 
 ## [v0.1.0] - 2026-09-18
 

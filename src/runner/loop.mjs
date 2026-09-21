@@ -128,6 +128,8 @@ export const EXIT_BUSY = 6;
 
 export const LOCK_FILE = 'runner.lock';
 
+let lockTmpCounter = 0;
+
 /** Two-tier parallelism defaults (D10), applied when the runner config
  * declares no `parallel` block at all — every existing config keeps working
  * with zero changes. `maxRoots` caps concurrent ROOTS in flight; the wave a
@@ -208,9 +210,25 @@ function isPidAlive(pid) {
 }
 
 /**
- * Take the exclusive inter-process lock: `.fgos/runner.lock`, created with
- * `wx` (atomic fail-if-exists — the one primitive that makes two racing
- * runners impossible on a local fs), holding this process's pid.
+ * Take the exclusive inter-process lock: `.fgos/runner.lock`, holding this
+ * process's pid.
+ *
+ * Creation writes the pid to a per-attempt temp file THEN `fs.linkSync`s it
+ * onto `lockPath` — this module's own original `fs.openSync(lockPath, 'wx')`
+ * + separate `fs.writeSync` created a window where the lock file existed but
+ * was still empty, so a competing process reading it mid-write could see
+ * unparseable (NaN) content, fall through to the "dead/garbage holder"
+ * branch, and unlink a lock a live process legitimately held — letting two
+ * processes both believe they held it. This exact TOCTOU was found and
+ * fixed twice in the two modules that mirror this function's shape
+ * (`src/state/events.mjs`'s `tryAcquireEventsLockOnce`, tsk-3ld;
+ * `src/runner/session.mjs`'s `tryAcquireOnce`, tsk-1u7 — see
+ * `docs/history/tsk-1u7-session-lock-contention-flake/plan.md`, which named
+ * this function itself as the one sibling still carrying the bug and out of
+ * that item's scope) but never ported back to this, the original. `link()`
+ * only ever exposes `lockPath` fully-written or not-yet-existing — never
+ * partially written — so the window is closed structurally, not papered
+ * over with a retry.
  *
  * When the file already exists, the pid inside decides: a live pid means a
  * runner is genuinely working this repo — back off (`acquired: false`,
@@ -221,7 +239,7 @@ function isPidAlive(pid) {
  * the content changed, a fresh holder took the path and nothing is
  * deleted), remove it, and return busy with `reclaimedStale: true`. The
  * reclaimer NEVER creates its own lock in the same call that deleted one:
- * every acquisition is a bare `wx` create on an empty path, so two
+ * every acquisition is a bare atomic create on an empty path, so two
  * processes racing the same stale lock can each at worst clean-and-yield —
  * neither can steal a lock the other just created (delete-then-create in
  * one call was the TOCTOU the review flagged). The next invocation
@@ -233,13 +251,23 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
   fs.mkdirSync(dir, { recursive: true });
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
+    lockTmpCounter += 1;
+    const tmpPath = path.join(dir, `.runner.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
+    fs.writeFileSync(tmpPath, String(pid), 'utf8');
+    let created = false;
     try {
-      const fd = fs.openSync(lockPath, 'wx');
+      fs.linkSync(tmpPath, lockPath);
+      created = true;
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+    } finally {
       try {
-        fs.writeSync(fd, String(pid));
-      } finally {
-        fs.closeSync(fd);
+        fs.unlinkSync(tmpPath);
+      } catch (err) {
+        if (err.code !== 'ENOENT') throw err;
       }
+    }
+    if (created) {
       return {
         acquired: true,
         lockPath,
@@ -251,8 +279,6 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
           }
         },
       };
-    } catch (err) {
-      if (err.code !== 'EEXIST') throw err;
     }
 
     let raw;
