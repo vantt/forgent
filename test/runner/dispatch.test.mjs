@@ -1482,6 +1482,66 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
   assert.equal(cfg.retries, 3);
 });
 
+// Regression: a global config carrying a modelPolicies tier key retired by a
+// later migration (real incident, 2026-09-20/21 -- a machine's real
+// ~/.fgos/config.json still had pre-D9 tier names) must never reach
+// validation. Before the fix, this stale global key filled the gap in a
+// project config missing that same tier, then validateModelPoliciesShape
+// rejected the unknown tier key and broke every config load on that
+// machine -- not a silent wrong value, a total load failure.
+test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instead of throwing', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } } } }),
+  );
+  const homeDir = mkTempDir();
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(homeDir, '.fgos', 'config.json'),
+    // Pre-tsk-5tm-5 tier names ('lightweight'/'creative'/'analytical'/'critical'),
+    // no longer in MODEL_POLICY_TIERS, still present in a real global file.
+    JSON.stringify({ runner: { modelPolicies: { claude: { lightweight: 'haiku', critical: 'opus' } } } }),
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let cfg;
+  try {
+    cfg = loadRunnerConfigFromDir(dir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
+  assert.equal(cfg.modelPolicies.claude.lightweight, undefined);
+  assert.equal(cfg.modelPolicies.claude.critical, undefined);
+});
+
+test('loadRunnerConfigFromDir still lets a global modelPolicies tier key fill a gap when the tier is valid', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } } } }),
+  );
+  const homeDir = mkTempDir();
+  fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(homeDir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { modelPolicies: { claude: { frontier: 'opus' } } } }),
+  );
+  const prevHome = process.env.HOME;
+  process.env.HOME = homeDir;
+  let cfg;
+  try {
+    cfg = loadRunnerConfigFromDir(dir);
+  } finally {
+    process.env.HOME = prevHome;
+  }
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
+  assert.equal(cfg.modelPolicies.claude.frontier, 'opus');
+});
+
 test('ensureRunnerConfigForDir bootstraps straight into the shared file on a true first run', () => {
   withKnownCliOnPath(['claude'], () => {
     const dir = mkTempDir();

@@ -257,6 +257,44 @@ function dropModelPoliciesInjectedOverModels(preRunner, mergedRunner) {
 }
 
 /**
+ * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
+ * schema: drops any `runner.modelPolicies.<provider>` tier key not in
+ * `MODEL_POLICY_TIERS`. A stale key here is not a project-level
+ * customization — `validateModelPoliciesShape` already rejects any tier key
+ * outside this vocabulary, so leaving a retired one in the global config
+ * would silently fill the gap in every project missing that same key, then
+ * break config load everywhere once validation runs. This filters the
+ * global config in memory on every read; it never rewrites
+ * `~/.fgos/config.json` itself, so a stale key already on disk stays there
+ * (harmless once filtered) until something else cleans the file.
+ */
+function sanitizeGlobalModelPolicies(globalConfig) {
+  const modelPolicies = globalConfig?.runner?.modelPolicies;
+  if (!modelPolicies || typeof modelPolicies !== 'object' || Array.isArray(modelPolicies)) {
+    return globalConfig;
+  }
+  let changed = false;
+  const sanitized = {};
+  for (const [providerModel, tierMap] of Object.entries(modelPolicies)) {
+    if (!tierMap || typeof tierMap !== 'object' || Array.isArray(tierMap)) {
+      sanitized[providerModel] = tierMap;
+      continue;
+    }
+    const sanitizedTierMap = {};
+    for (const [policyTier, model] of Object.entries(tierMap)) {
+      if (MODEL_POLICY_TIERS.includes(policyTier)) {
+        sanitizedTierMap[policyTier] = model;
+      } else {
+        changed = true;
+      }
+    }
+    sanitized[providerModel] = sanitizedTierMap;
+  }
+  if (!changed) return globalConfig;
+  return { ...globalConfig, runner: { ...globalConfig.runner, modelPolicies: sanitized } };
+}
+
+/**
  * Resolve+validate the runner section of the shared project config file at
  * `dir` (`.fgos/config.json`'s `runner` key, the sole config source since
  * tsk-5hv D1 retired the legacy fallback). Its content is merged against
@@ -280,7 +318,7 @@ export function loadRunnerConfigFromDir(dir) {
     throw new RunnerConfigError(`shared config at "${sharedPath}" is not valid JSON: ${err.message}`);
   }
   rejectProjectProviderAccountInventory(parsed, sharedPath);
-  const withGlobal = mergeWithGlobalConfig(parsed);
+  const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
   const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   normalizeConfigConfinement(runnerCfg);
@@ -348,7 +386,7 @@ export function ensureRunnerConfigForDir(dir) {
         `fgos: added missing default config keys to ${sharedPath}#runner: ${addedKeys.join(', ')}\n`,
       );
     }
-    const withGlobal = mergeWithGlobalConfig(projectShared);
+    const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
     const runnerCfg = dropModelPoliciesInjectedOverModels(projectShared.runner, withGlobal.runner ?? {});
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     normalizeConfigConfinement(runnerCfg);

@@ -39,6 +39,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   published `v0.1.0` preview release proof, post-release CI/external-consumer
   proof, and the preview Node-fallback earliest removal date of 2026-10-18.
 
+### Fixed
+
+- A global `~/.fgos/config.json` carrying a `runner.modelPolicies.<provider>`
+  tier key retired by an earlier migration (e.g. a pre-`MODEL_POLICY_TIERS`
+  tier name) no longer breaks every project's config load on that machine.
+  `mergeWithGlobalConfig` now takes an optional `sanitizeGlobal` hook, and
+  `ensureRunnerConfigForDir`/`loadRunnerConfigFromDir` use it to drop any
+  `modelPolicies` tier key outside the current `MODEL_POLICY_TIERS`
+  vocabulary from the global config before merging — a stale key can no
+  longer fill a gap in a project config and then fail validation. Filters in
+  memory on every read; does not rewrite `~/.fgos/config.json` itself.
+
 ## [v0.1.0] - 2026-09-18
 
 ### Changed

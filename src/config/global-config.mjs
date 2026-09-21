@@ -47,9 +47,23 @@ export function loadGlobalConfig(globalConfigPath = defaultGlobalConfigPath()) {
 /**
  * `projectConfig` merged with the global config, project winning any key
  * present in both.
+ *
+ * `sanitizeGlobal`, when given, runs on the loaded global config before the
+ * merge — a caller-supplied, schema-aware filter for a global config file
+ * this module itself has no schema knowledge of (kept general-purpose per
+ * this file's header comment). Its purpose: a global config value that is
+ * no longer valid against the current schema (e.g. a tier name retired by a
+ * later migration) must never be allowed to fill a gap in a project config
+ * that is missing that same key. `mergeConfigDefaults`'s fill-missing-only
+ * contract has no way to know a key is stale rather than a legitimate
+ * project-level customization, so the caller filters before merging, not
+ * after: a stale key left in place would silently propagate into every
+ * project's merged config and, once validation rejects the unknown key,
+ * break every config load on that machine rather than just one project.
  */
-export function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultGlobalConfigPath()) {
-  const globalConfig = loadGlobalConfig(globalConfigPath);
+export function mergeWithGlobalConfig(projectConfig, globalConfigPath = defaultGlobalConfigPath(), { sanitizeGlobal } = {}) {
+  const rawGlobalConfig = loadGlobalConfig(globalConfigPath);
+  const globalConfig = sanitizeGlobal ? sanitizeGlobal(rawGlobalConfig) : rawGlobalConfig;
   return mergeConfigDefaults(projectConfig ?? {}, globalConfig).merged;
 }
 
