@@ -91,7 +91,7 @@ function setupSessionFixture(coordinationId, { schemaVersion = '3', eventCount =
     coordinationId,
     status: 'active',
     objective: 'Test stale action binding',
-    createdAt: '2026-09-01T00:00:00.000Z',
+    createdAt: new Date().toISOString(),
     provenanceRoot: { writerId: 'driver-1' },
     actors: [{ id: 'worker-1', role: 'worker-1' }],
     aggregateBounds: { wallTimeMs: 10000, maxAssignments: 10, maxConcurrency: 2, maxRounds: 5, maxTaskDepth: 2 },
@@ -137,6 +137,61 @@ function setupSessionFixture(coordinationId, { schemaVersion = '3', eventCount =
   fs.writeFileSync(eventsPath, eventsContent);
 
   return { tempDir, sessionDir, eventsPath, manifest, def, defDigest };
+}
+
+function makeCohortRunnerConfig(tempDir, { summary = 'Research findings collected.' } = {}) {
+  const executorScript = path.join(tempDir, `fake-cohort-executor-${Math.random().toString(36).slice(2)}.mjs`);
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    function settle() {
+      const cwd = process.cwd();
+      const assignmentsRoot = path.join(cwd, '.fgos', 'assignments');
+      if (fs.existsSync(assignmentsRoot)) {
+        for (const asgn of fs.readdirSync(assignmentsRoot)) {
+          const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+          if (!fs.existsSync(runsDir)) continue;
+          for (const run of fs.readdirSync(runsDir)) {
+            const runDir = path.join(runsDir, run);
+            if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+              fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\n${summary}\\n');
+              fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: '${summary}' }));
+            }
+          }
+        }
+      }
+      process.stdout.write('${summary}\\n');
+      process.exit(0);
+    }
+    settle();
+    `,
+  );
+
+  return {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    executors: {
+      'exec-family-a': {
+        kind: 'agent',
+        providerModel: 'family-a',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [executorScript, '{prompt}'] }],
+      },
+      'exec-family-b': {
+        kind: 'agent',
+        providerModel: 'family-b',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [executorScript, '{prompt}'] }],
+      },
+    },
+    modelPolicies: {
+      claude: { nano: 'test-model', standard: 'test-model' },
+      'family-a': { nano: 'test-model', standard: 'test-model' },
+      'family-b': { nano: 'test-model', standard: 'test-model' },
+    },
+    timeoutMs: 5000,
+  };
 }
 
 
@@ -295,7 +350,7 @@ test('wrong target or action kind is refused', () => {
       () => {
         executeUnderActionPrecondition(
           coordinationId,
-          { ...action, kind: 'close', writerId: 'driver-1', inputPayload: { objective: 'Test' } },
+          { ...action, kind: 'close', authorizedBy: { type: 'driver', id: 'driver-1' }, inputPayload: { objective: 'Test' } },
           () => {},
           { cwd: tempDir, repoRoot: tempDir },
         );
@@ -592,6 +647,130 @@ test('concurrent two-OS-process race: exactly one process succeeds and second is
   }
 });
 
+test('concurrent two-OS-process same-key race: identical payload yields idempotent success for second worker, while conflicting payload yields payload-conflict', async () => {
+  const coordinationId = 'coord_multiprocess_samekey_race';
+  const { tempDir, manifest, def } = setupSessionFixture(coordinationId, { schemaVersion: '3', eventCount: 0 });
+
+  try {
+    const proj = projectCoordinationActions({ manifest, events: [], definition: def });
+    const action = proj.actions.find((a) => a.kind === 'record-human-turn');
+    assert.ok(action, 'record-human-turn must be projected');
+
+    const artifactFile = path.join(tempDir, 'human-feedback.md');
+    fs.writeFileSync(artifactFile, 'Human feedback content');
+
+    const makeWorkerScript = (scriptPath, cId, dir, act, payload) => {
+      fs.writeFileSync(
+        scriptPath,
+        `
+        import { executeCoordinationActionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+
+        const coordinationId = '${cId}';
+        const tempDir = '${dir}';
+        const action = ${JSON.stringify({
+          ...act,
+          coordinationId: cId,
+          writerId: 'driver-1',
+          inputPayload: payload,
+        })};
+
+        try {
+          const res = await executeCoordinationActionUseCase(
+            { cwd: tempDir, repoRoot: tempDir },
+            action,
+          );
+          if (res.idempotent) {
+            process.stdout.write('OUTCOME:SUCCESS:IDEMPOTENT\\n');
+          } else {
+            process.stdout.write('OUTCOME:SUCCESS:INITIAL\\n');
+          }
+        } catch (err) {
+          process.stdout.write('OUTCOME:REFUSED:' + err.category + '\\n');
+        }
+        `,
+        'utf8',
+      );
+    };
+
+    const { spawn } = await import('node:child_process');
+    const runWorker = (script) =>
+      new Promise((resolve) => {
+        const p = spawn(process.execPath, [script]);
+        let out = '';
+        p.stdout.on('data', (d) => (out += d.toString()));
+        p.on('close', () => resolve(out.trim()));
+      });
+
+    // 1. Same key, identical payload race: exactly one process performs initial mutation,
+    // and the concurrent sibling recovers the cached result idempotently. Both succeed!
+    const workerScript1 = path.join(tempDir, 'samekey-worker-1.mjs');
+    const workerScript2 = path.join(tempDir, 'samekey-worker-2.mjs');
+    const identicalPayload = {
+      turnId: 'turn-same-1',
+      turnOrdinal: 1,
+      channel: 'cli',
+      artifactRef: artifactFile,
+      externalRef: 'ext-same-1',
+      attributedTo: { type: 'person', id: 'human-driver' },
+    };
+    makeWorkerScript(workerScript1, coordinationId, tempDir, action, identicalPayload);
+    makeWorkerScript(workerScript2, coordinationId, tempDir, action, identicalPayload);
+
+    const [out1, out2] = await Promise.all([runWorker(workerScript1), runWorker(workerScript2)]);
+    const outcomesIdentical = [out1, out2].sort();
+
+    assert.deepEqual(
+      outcomesIdentical,
+      ['OUTCOME:SUCCESS:IDEMPOTENT', 'OUTCOME:SUCCESS:INITIAL'],
+      'Same-key race with identical payload must yield one initial success and one idempotent cached success',
+    );
+
+    // 2. Same key, conflicting payload race on fresh session:
+    // One process succeeds with initial mutation; the concurrent sibling with conflicting payload is refused with payload-conflict.
+    const conflictCoordinationId = 'coord_multiprocess_conflict_race';
+    const fixture2 = setupSessionFixture(conflictCoordinationId, { schemaVersion: '3', eventCount: 0 });
+    try {
+      const proj2 = projectCoordinationActions({ manifest: fixture2.manifest, events: [], definition: fixture2.def });
+      const actionConflict = proj2.actions.find((a) => a.kind === 'record-human-turn');
+
+      const artifactFile2 = path.join(fixture2.tempDir, 'human-feedback-2.md');
+      fs.writeFileSync(artifactFile2, 'Human feedback content 2');
+
+      const conflictScript1 = path.join(fixture2.tempDir, 'conflict-worker-1.mjs');
+      const conflictScript2 = path.join(fixture2.tempDir, 'conflict-worker-2.mjs');
+      makeWorkerScript(conflictScript1, conflictCoordinationId, fixture2.tempDir, actionConflict, {
+        turnId: 'turn-conflict-alpha',
+        turnOrdinal: 1,
+        channel: 'cli',
+        artifactRef: artifactFile2,
+        externalRef: 'ext-conflict-1',
+        attributedTo: { type: 'person', id: 'human-driver' },
+      });
+      makeWorkerScript(conflictScript2, conflictCoordinationId, fixture2.tempDir, actionConflict, {
+        turnId: 'turn-conflict-BETA',
+        turnOrdinal: 1,
+        channel: 'cli',
+        artifactRef: artifactFile2,
+        externalRef: 'ext-conflict-1',
+        attributedTo: { type: 'person', id: 'human-driver' },
+      });
+
+      const [cOut1, cOut2] = await Promise.all([runWorker(conflictScript1), runWorker(conflictScript2)]);
+      const outcomesConflict = [cOut1, cOut2].sort();
+
+      assert.deepEqual(
+        outcomesConflict,
+        ['OUTCOME:REFUSED:payload-conflict', 'OUTCOME:SUCCESS:INITIAL'],
+        'Same-key race with conflicting payload must yield one initial success and one payload-conflict refusal',
+      );
+    } finally {
+      fs.rmSync(fixture2.tempDir, { recursive: true, force: true });
+    }
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
 test('production write door integration: closeCoordinationUseCase executes via action precondition seam', async () => {
   const coordinationId = 'coord_close_use_case_precond';
   const { tempDir, manifest } = setupSessionFixture(coordinationId, { schemaVersion: '1', eventCount: 0, withDefinition: false, completed: true });
@@ -866,6 +1045,14 @@ test('production mutator integration: dispatch-operation executes under seam via
       inputPayload: {
         objective: 'Execute op-1',
         expectedOutputs: ['res.json'],
+        contextRefs: [],
+        constraints: ['caller-constraint'],
+        capabilities: ['capability-1'],
+        fromAssignmentId: 'root-assignment',
+        intent: 'caller-intent',
+        round: 1,
+        taskKey: 'action-task',
+        mutation: 'read-only',
       },
     };
 
@@ -883,16 +1070,46 @@ test('production mutator integration: dispatch-operation executes under seam via
     assert.equal(res2.cached, true);
     assert.equal(res2.assignmentId, res1.assignmentId);
 
-    // 3. Repeat call with same actionKey but conflicting payload fails with payload-conflict
-    await assert.rejects(
-      () =>
-        executeCoordinationActionUseCase(ctx, {
+    // 3. Every normalized request field is bound by the retry record. Both a
+    // changed value and an omitted previously-present optional value conflict
+    // before the production mutation door can run again.
+    const optionalFields = [
+      ['contextRefs', ['different-context'], false],
+      ['constraints', ['different-constraint'], true],
+      ['capabilities', ['different-capability'], true],
+      ['fromAssignmentId', 'different-parent', true],
+      ['intent', 'different-intent', true],
+      ['round', 2, true],
+      ['taskKey', 'different-task', true],
+      ['mutation', 'mutating', true],
+    ];
+    for (const [field, changedValue, omissionConflicts] of optionalFields) {
+      await assert.rejects(
+        () => executeCoordinationActionUseCase(ctx, {
           ...action,
-          inputPayload: {
-            objective: 'Different conflicting objective',
-            expectedOutputs: ['res.json'],
-          },
+          inputPayload: { ...action.inputPayload, [field]: changedValue },
         }),
+        (err) => err.category === 'payload-conflict',
+        `changed ${field} must conflict`,
+      );
+      const omitted = { ...action.inputPayload };
+      delete omitted[field];
+      if (omissionConflicts) {
+        await assert.rejects(
+          () => executeCoordinationActionUseCase(ctx, { ...action, inputPayload: omitted }),
+          (err) => err.category === 'payload-conflict',
+          `omitted ${field} must conflict`,
+        );
+      } else {
+        const omittedResult = await executeCoordinationActionUseCase(ctx, { ...action, inputPayload: omitted });
+        assert.equal(omittedResult.idempotent, true, `omitted ${field} is equivalent after production normalization`);
+      }
+    }
+    await assert.rejects(
+      () => executeCoordinationActionUseCase(ctx, {
+        ...action,
+        inputPayload: { ...action.inputPayload, objective: 'Different conflicting objective' },
+      }),
       (err) => err.category === 'payload-conflict',
     );
 
@@ -1075,7 +1292,7 @@ test('production mutator integration: authorize-and-dispatch executes under seam
     coordinationId,
     status: 'active',
     objective: 'Test authorize-and-dispatch',
-    createdAt: '2026-09-01T00:00:00.000Z',
+    createdAt: new Date().toISOString(),
     provenanceRoot: { writerId: 'driver-1' },
     actors: [{ id: 'worker-1', role: 'worker-1' }],
     aggregateBounds: { wallTimeMs: 10000, maxAssignments: 10, maxConcurrency: 2, maxRounds: 5, maxTaskDepth: 2 },
@@ -1102,6 +1319,11 @@ test('production mutator integration: authorize-and-dispatch executes under seam
         reason: 'Authorized for testing',
         objective: 'Execute authorized operation',
         expectedOutputs: ['auth-result.json'],
+        grantedContextRefs: [],
+        contextRefs: [],
+        constraints: ['auth-constraint'],
+        capabilities: ['auth-capability'],
+        mutation: 'read-only',
       },
     };
 
@@ -1121,18 +1343,46 @@ test('production mutator integration: authorize-and-dispatch executes under seam
     assert.equal(res2.authorizationId, 'auth-gate-1');
     assert.equal(res2.assignmentId, res1.assignmentId);
 
-    // 3. Conflicting objective throws payload-conflict
-    await assert.rejects(
-      () =>
-        executeCoordinationActionUseCase(ctx, {
+    const eventsAfterDispatch = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8');
+    const assignmentsDir = path.join(tempDir, '.fgos/assignments');
+    const assignmentsAfterDispatch = JSON.stringify(fs.readdirSync(assignmentsDir, { recursive: true }).sort());
+    const changedFields = [
+      ['authorizationId', 'auth-gate-2'],
+      ['invocationKey', 'inv-gate-2'],
+      ['reason', 'Different authorization reason'],
+      ['objective', 'Conflicting objective text'],
+      ['expectedOutputs', ['different-result.json']],
+      ['grantedContextRefs', ['assignment_foreign']],
+      ['contextRefs', ['assignment_foreign']],
+      ['constraints', ['different-constraint']],
+      ['capabilities', ['different-capability']],
+      ['mutation', 'mutating'],
+    ];
+    for (const [field, value] of changedFields) {
+      await assert.rejects(
+        () => executeCoordinationActionUseCase(ctx, {
           ...action,
-          inputPayload: {
-            ...action.inputPayload,
-            objective: 'Conflicting objective text',
-          },
+          inputPayload: { ...action.inputPayload, [field]: value },
         }),
-      (err) => err.category === 'payload-conflict',
-    );
+        (err) => err.category === 'payload-conflict',
+        `changed authorize-and-dispatch field ${field} must conflict`,
+      );
+      assert.equal(fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8'), eventsAfterDispatch);
+      assert.equal(JSON.stringify(fs.readdirSync(assignmentsDir, { recursive: true }).sort()), assignmentsAfterDispatch);
+    }
+
+    const omittedFields = ['constraints', 'capabilities'];
+    for (const field of omittedFields) {
+      const omitted = { ...action.inputPayload };
+      delete omitted[field];
+      await assert.rejects(
+        () => executeCoordinationActionUseCase(ctx, { ...action, inputPayload: omitted }),
+        (err) => err.category === 'payload-conflict',
+        `omitted authorize-and-dispatch field ${field} must conflict`,
+      );
+      assert.equal(fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8'), eventsAfterDispatch);
+      assert.equal(JSON.stringify(fs.readdirSync(assignmentsDir, { recursive: true }).sort()), assignmentsAfterDispatch);
+    }
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
@@ -1152,7 +1402,18 @@ test('production mutator integration: link-contribution executes under seam via 
     kind: 'FlowDefinition',
     metadata: { id: 'contrib-protocol', version: '1.0.0' },
     spec: {
-      profile: { kind: 'CoordinationProtocol' },
+      profile: {
+        kind: 'CoordinationProtocol',
+        topology: {
+          visibilityWindows: [
+            {
+              id: 'win-1',
+              opensAfter: { milestone: 'listed-results-linked', operationRefs: [] },
+              permits: { sourceOperationRefs: [], delivery: 'artifact-refs' },
+            },
+          ],
+        },
+      },
       roles: ['worker-1'],
       actors: [{ id: 'worker-1', role: 'worker-1' }],
       operations: [
@@ -1168,7 +1429,7 @@ test('production mutator integration: link-contribution executes under seam via 
         nodes: [
           {
             id: 'step-1',
-            operations: [{ ref: 'op-contrib', actor: 'worker-1' }],
+            operations: [{ ref: 'op-contrib', actor: 'worker-1', contextAccess: { visibilityWindowRef: 'win-1' } }],
           },
         ],
       },
@@ -1183,7 +1444,7 @@ test('production mutator integration: link-contribution executes under seam via 
     coordinationId,
     status: 'active',
     objective: 'Test link-contribution',
-    createdAt: '2026-09-01T00:00:00.000Z',
+    createdAt: new Date().toISOString(),
     provenanceRoot: { writerId: 'driver-1' },
     actors: [{ id: 'worker-1', role: 'worker-1' }],
     aggregateBounds: { wallTimeMs: 10000, maxAssignments: 10, maxConcurrency: 2, maxRounds: 5, maxTaskDepth: 2 },
@@ -1213,14 +1474,24 @@ test('production mutator integration: link-contribution executes under seam via 
 
   const runDir = path.join(asgnDir, 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
+  const reportPath = path.join(runDir, 'agent-report.md');
+  fs.writeFileSync(reportPath, 'Review notes');
+  const reportSha = crypto.createHash('sha256').update('Review notes').digest('hex');
   fs.writeFileSync(
     path.join(runDir, 'result.json'),
-    JSON.stringify({ assignmentId: 'asgn-1', runId: 'run_asgn-1_01', status: 'done', confidence: 'reported', outputRefs: [artifactFile] }),
+    JSON.stringify({
+      assignmentId: 'asgn-1',
+      runId: 'run_asgn-1_01',
+      status: 'done',
+      confidence: 'reported',
+      outputRefs: [reportPath],
+      settleReports: [{ path: reportPath, sha256: reportSha }],
+    }),
   );
 
   const events = [
-    { type: 'assignment-created', payload: { assignmentId: 'asgn-1', actorId: 'worker-1' } },
-    { type: 'result-linked', payload: { assignmentId: 'asgn-1', runId: 'run_asgn-1_01' } },
+    { type: 'assignment-created', seq: 1, payload: { assignmentId: 'asgn-1', actorId: 'worker-1' } },
+    { type: 'result-linked', seq: 2, payload: { assignmentId: 'asgn-1', runId: 'run_asgn-1_01' } },
   ];
   fs.writeFileSync(path.join(sessionDir, 'events.jsonl'), events.map((e) => JSON.stringify(e)).join('\n') + '\n');
 
@@ -1242,7 +1513,7 @@ test('production mutator integration: link-contribution executes under seam via 
         contributionId: 'contrib-link-1',
         contributionType: 'proposal',
         roundKey: 'round-1',
-        artifactRef: artifactFile,
+        artifactRef: reportPath,
         runId: 'run_asgn-1_01',
       },
     };
@@ -1273,6 +1544,223 @@ test('production mutator integration: link-contribution executes under seam via 
         }),
       (err) => err.category === 'payload-conflict',
     );
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('production mutator integration: fan-out executes under seam via executeCoordinationActionUseCase', async () => {
+  const coordinationId = 'coord_prod_fan_out';
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stale-proof-fanout-'));
+  const sessionDir = path.join(tempDir, '.fgos/coordination/sessions', coordinationId);
+  fs.mkdirSync(sessionDir, { recursive: true });
+
+  const def = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: 'fanout-protocol', version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        cohort: { independence: 'isolated-until-fan-in' },
+      },
+      roles: ['researcher'],
+      actors: [
+        { id: 'worker-1', role: 'researcher' },
+        { id: 'worker-2', role: 'researcher' },
+      ],
+      operations: [
+        { id: 'op-fan', role: 'researcher', task: { contractTemplate: 't' } },
+      ],
+      graph: {
+        entry: 'step-1',
+        nodes: [
+          {
+            id: 'step-1',
+            operations: [
+              { ref: 'op-fan', actor: 'worker-1' },
+              { ref: 'op-fan', actor: 'worker-2' },
+            ],
+          },
+        ],
+      },
+    },
+  };
+  const defContent = JSON.stringify(def);
+  const hexDigest = crypto.createHash('sha256').update(defContent).digest('hex');
+  fs.writeFileSync(path.join(sessionDir, 'snapshot.json'), defContent);
+
+  const manifest = {
+    schemaVersion: '3',
+    coordinationId,
+    status: 'active',
+    objective: 'Test fan-out',
+    createdAt: new Date().toISOString(),
+    provenanceRoot: { writerId: 'driver-1' },
+    actors: [
+      { id: 'worker-1', role: 'researcher' },
+      { id: 'worker-2', role: 'researcher' },
+    ],
+    aggregateBounds: { wallTimeMs: 10000, maxAssignments: 10, maxConcurrency: 2, maxRounds: 5, maxTaskDepth: 2 },
+    assignmentRefs: [],
+    completedAt: null,
+    definitionRef: { id: 'fanout-protocol', version: '1.0.0' },
+    snapshotRef: { digest: hexDigest },
+  };
+  fs.writeFileSync(path.join(sessionDir, 'session.json'), JSON.stringify(manifest));
+  fs.writeFileSync(path.join(sessionDir, 'events.jsonl'), '');
+
+  try {
+    const runnerConfig = makeCohortRunnerConfig(tempDir);
+    const proj = projectCoordinationActions({ manifest, events: [], definition: def });
+    const projectedAction = proj.actions.find((a) => a.kind === 'fan-out');
+    assert.ok(projectedAction, 'fan-out must be projected for unassigned isolated cohort');
+
+    const action = {
+      ...projectedAction,
+      coordinationId,
+      writerId: 'driver-1',
+      inputPayload: {
+        branches: [
+          { actorId: 'worker-1', objective: 'Branch 1', expectedOutputs: ['out-1.json'] },
+          { actorId: 'worker-2', objective: 'Branch 2', expectedOutputs: ['out-2.json'] },
+        ],
+      },
+    };
+
+    const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+
+    const cohortBranches = {
+      worker1: { actorId: 'worker-1', objective: 'Branch 1', expectedOutputs: ['out-1.json'] },
+      worker2: { actorId: 'worker-2', objective: 'Branch 2', expectedOutputs: ['out-2.json'] },
+    };
+    const rejectedCohorts = [
+      [cohortBranches.worker1],
+      [cohortBranches.worker1, cohortBranches.worker2, { actorId: 'worker-3', objective: 'Foreign' }],
+      [{ ...cohortBranches.worker1, actorId: 'worker-3' }, cohortBranches.worker2],
+      [cohortBranches.worker1, { ...cohortBranches.worker1 }],
+    ];
+    for (const branches of rejectedCohorts) {
+      await assert.rejects(
+        () => executeCoordinationActionUseCase(ctx, { ...action, inputPayload: { branches } }),
+        (err) => err.category === 'validation',
+        `fan-out cohort must reject ${branches.map((branch) => branch.actorId).join(',')}`,
+      );
+      assert.equal(fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8'), '', 'cohort refusal must append no event');
+      const assignmentsDir = path.join(tempDir, '.fgos/assignments');
+      assert.deepEqual(fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [], [], 'cohort refusal must create no assignment');
+    }
+
+    // Cohort equality is order-insensitive; the composer canonicalizes it
+    // before production validation and the shared step executor.
+    action.inputPayload = { branches: [cohortBranches.worker2, cohortBranches.worker1] };
+
+    // 1. Initial call executes dispatchResearchFanOutLocked under seam
+    const res1 = await executeCoordinationActionUseCase(ctx, action);
+    assert.equal(res1.kind, 'fan-out');
+    assert.equal(res1.status, 'dispatched');
+    assert.equal(res1.branches.length, 2);
+    assert.ok(res1.branches[0].assignmentId);
+    assert.ok(res1.branches[1].assignmentId);
+
+    const eventsAfterDispatch = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8');
+    const assignmentsAfterDispatch = fs.readdirSync(path.join(tempDir, '.fgos/assignments')).sort();
+    const retryConflictPayloads = [
+      [{ ...cohortBranches.worker1 }],
+      [cohortBranches.worker1, cohortBranches.worker2, { actorId: 'worker-3', objective: 'Foreign', expectedOutputs: ['foreign'] }],
+      [{ ...cohortBranches.worker1, actorId: 'worker-3' }, cohortBranches.worker2],
+      [cohortBranches.worker1, { ...cohortBranches.worker1 }],
+      [{ ...cohortBranches.worker1, expectedOutputs: ['changed-output'] }, cohortBranches.worker2],
+      [{ ...cohortBranches.worker1, constraints: ['changed-constraint'] }, cohortBranches.worker2],
+      [{ ...cohortBranches.worker1, capabilities: ['changed-capability'] }, cohortBranches.worker2],
+      [{ ...cohortBranches.worker1, fromAssignmentId: 'asgn_foreign' }, cohortBranches.worker2],
+      [{ ...cohortBranches.worker1, intent: 'changed-intent' }, cohortBranches.worker2],
+      [{ ...cohortBranches.worker1, taskKey: 'changed-task-key' }, cohortBranches.worker2],
+    ];
+    for (const branches of retryConflictPayloads) {
+      await assert.rejects(
+        () => executeCoordinationActionUseCase(ctx, { ...action, inputPayload: { branches } }),
+        (err) => err.category === 'payload-conflict',
+        `fan-out retry must conflict for ${branches.map((branch) => branch.actorId).join(',')}`,
+      );
+      assert.equal(fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8'), eventsAfterDispatch, 'retry conflict must append no event');
+      assert.deepEqual(fs.readdirSync(path.join(tempDir, '.fgos/assignments')).sort(), assignmentsAfterDispatch, 'retry conflict must create no assignment');
+    }
+
+    const reorderedRetry = await executeCoordinationActionUseCase(ctx, {
+      ...action,
+      inputPayload: { branches: [cohortBranches.worker1, cohortBranches.worker2] },
+    });
+    assert.equal(reorderedRetry.idempotent, true, 'same normalized fan-out payload in another branch order must be idempotent');
+    assert.equal(reorderedRetry.cached, true);
+
+    // 2. Repeat call is idempotent
+    const res2 = await executeCoordinationActionUseCase(ctx, action);
+    assert.equal(res2.idempotent, true);
+    assert.equal(res2.cached, true);
+    assert.equal(res2.branches.length, 2);
+    assert.equal(res2.branches[0].assignmentId, res1.branches[0].assignmentId);
+    assert.equal(res2.branches[1].assignmentId, res1.branches[1].assignmentId);
+
+    // 3. Conflicting payload throws payload-conflict
+    await assert.rejects(
+      () =>
+        executeCoordinationActionUseCase(ctx, {
+          ...action,
+          inputPayload: {
+            branches: [
+              { actorId: 'worker-1', objective: 'Conflicting objective', expectedOutputs: ['out-1.json'] },
+              { actorId: 'worker-2', objective: 'Branch 2', expectedOutputs: ['out-2.json'] },
+            ],
+          },
+        }),
+      (err) => err.category === 'payload-conflict',
+    );
+
+    // 4. Adversarial historical reconstruction: duplicate actor A plus actor
+    // B from a different action invocation is not a completed cohort for this
+    // action key. It must refuse before any additional mutation.
+    const originalEventLines = eventsAfterDispatch.trimEnd().split('\n').filter(Boolean);
+    const worker1AssignmentEvent = originalEventLines.find((line) => {
+      const parsed = JSON.parse(line);
+      return parsed.type === 'assignment-created' && parsed.payload?.actorId === 'worker-1';
+    });
+    const worker2AssignmentEvent = originalEventLines.find((line) => {
+      const parsed = JSON.parse(line);
+      return parsed.type === 'assignment-created' && parsed.payload?.actorId === 'worker-2';
+    });
+    assert.ok(worker1AssignmentEvent && worker2AssignmentEvent);
+    const worker2AssignmentId = JSON.parse(worker2AssignmentEvent).payload.assignmentId;
+    const worker2AssignmentPath = path.join(tempDir, '.fgos/assignments', worker2AssignmentId, 'assignment.json');
+    const foreignAssignment = JSON.parse(fs.readFileSync(worker2AssignmentPath, 'utf8'));
+    foreignAssignment.provenance.inline.caller.coordination.actionInvocation.actionKey = 'sha256:foreign-invocation';
+    fs.writeFileSync(worker2AssignmentPath, JSON.stringify(foreignAssignment));
+    const duplicateAssignmentId = 'asgn_foreign_duplicate';
+    const worker1AssignmentId = JSON.parse(worker1AssignmentEvent).payload.assignmentId;
+    const duplicateAssignment = JSON.parse(fs.readFileSync(path.join(tempDir, '.fgos/assignments', worker1AssignmentId, 'assignment.json'), 'utf8'));
+    duplicateAssignment.assignmentId = duplicateAssignmentId;
+    fs.mkdirSync(path.join(tempDir, '.fgos/assignments', duplicateAssignmentId), { recursive: true });
+    fs.writeFileSync(path.join(tempDir, '.fgos/assignments', duplicateAssignmentId, 'assignment.json'), JSON.stringify(duplicateAssignment));
+    const adversarialManifest = JSON.parse(fs.readFileSync(path.join(sessionDir, 'session.json'), 'utf8'));
+    adversarialManifest.assignmentRefs = [...(adversarialManifest.assignmentRefs ?? []), duplicateAssignmentId];
+    fs.writeFileSync(path.join(sessionDir, 'session.json'), JSON.stringify(adversarialManifest));
+    const duplicateEvent = JSON.parse(worker1AssignmentEvent);
+    duplicateEvent.payload.assignmentId = duplicateAssignmentId;
+    fs.writeFileSync(
+      path.join(sessionDir, 'events.jsonl'),
+      `${originalEventLines.join('\n')}\n${JSON.stringify(duplicateEvent)}\n`,
+    );
+    const adversarialEvents = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8');
+    await assert.rejects(
+      () => executeCoordinationActionUseCase(ctx, action),
+      (err) => err.category === 'stale-action-key',
+      'duplicate/foreign-invocation history must not reconstruct a completed fan-out',
+    );
+    assert.equal(fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8'), adversarialEvents);
+
+    // 5. Verify no .action-keys.json sidecar was created
+    const sidecarPath = path.join(sessionDir, '.action-keys.json');
+    assert.equal(fs.existsSync(sidecarPath), false);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
@@ -1313,8 +1801,85 @@ test('fail-loud: corrupt event log throws corrupt-log loudly instead of degradin
   }
 });
 
+test('durable retry after commit: production door recovers idempotently from authoritative log without sidecar across all action families', async () => {
+  const coordinationId = 'coord_durable_retry_recovery';
+  const { tempDir, manifest, def, sessionDir } = setupSessionFixture(coordinationId, { schemaVersion: '3', eventCount: 0 });
 
+  try {
+    const ctx = { cwd: tempDir, repoRoot: tempDir };
 
+    // 1. Dispatch an operation and verify crash-after-commit idempotent retry
+    const proj1 = projectCoordinationActions({ manifest, events: [], definition: def });
+    const actionDispatch = proj1.actions.find((a) => a.kind === 'dispatch-operation');
+    const dispatchPayload = { objective: 'Op 1', expectedOutputs: ['out.json'] };
+    const resDispatch1 = await executeCoordinationActionUseCase(ctx, {
+      ...actionDispatch,
+      coordinationId,
+      writerId: 'driver-1',
+      inputPayload: dispatchPayload,
+    });
+    assert.equal(resDispatch1.status, 'dispatched');
 
+    const eventsAfterDispatch = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8').trim().split('\n').filter(Boolean);
+    const eventCount1 = eventsAfterDispatch.length;
 
+    // Simulate crash after commit: client re-issues identical request
+    const resDispatch2 = await executeCoordinationActionUseCase(ctx, {
+      ...actionDispatch,
+      coordinationId,
+      writerId: 'driver-1',
+      inputPayload: dispatchPayload,
+    });
+    assert.equal(resDispatch2.idempotent, true);
+    assert.equal(resDispatch2.cached, true);
+    assert.equal(resDispatch2.assignmentId, resDispatch1.assignmentId);
 
+    // Assert zero duplicate events were appended
+    const eventsAfterRetry1 = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8').trim().split('\n').filter(Boolean);
+    assert.equal(eventsAfterRetry1.length, eventCount1, 'Event log length must not increase on retry');
+
+    // 2. Record human turn and verify crash-after-commit idempotent retry
+    const artifactFile = path.join(tempDir, 'human-note.md');
+    fs.writeFileSync(artifactFile, 'Human feedback notes');
+    const proj2 = projectCoordinationActions({ manifest, events: eventsAfterRetry1.map((l) => JSON.parse(l)), definition: def });
+    const actionHuman = proj2.actions.find((a) => a.kind === 'record-human-turn');
+    const humanPayload = {
+      turnId: 'turn-durable-1',
+      turnOrdinal: 1,
+      channel: 'cli',
+      artifactRef: artifactFile,
+      externalRef: 'ext-durable-1',
+      attributedTo: { type: 'person', id: 'human-driver' },
+    };
+    const resHuman1 = await executeCoordinationActionUseCase(ctx, {
+      ...actionHuman,
+      coordinationId,
+      writerId: 'driver-1',
+      inputPayload: humanPayload,
+    });
+    assert.equal(resHuman1.turnId, 'turn-durable-1');
+
+    const eventsAfterHuman = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8').trim().split('\n').filter(Boolean);
+    const eventCount2 = eventsAfterHuman.length;
+
+    // Simulate crash after commit: client re-issues identical request
+    const resHuman2 = await executeCoordinationActionUseCase(ctx, {
+      ...actionHuman,
+      coordinationId,
+      writerId: 'driver-1',
+      inputPayload: humanPayload,
+    });
+    assert.equal(resHuman2.idempotent, true);
+    assert.equal(resHuman2.cached, true);
+    assert.equal(resHuman2.turnId, 'turn-durable-1');
+
+    const eventsAfterRetry2 = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8').trim().split('\n').filter(Boolean);
+    assert.equal(eventsAfterRetry2.length, eventCount2, 'Event log length must not increase on retry');
+
+    // 3. Confirm sidecar file was never created across any retry
+    const sidecarPath = path.join(sessionDir, '.action-keys.json');
+    assert.equal(fs.existsSync(sidecarPath), false, 'Authoritative recovery must never use .action-keys.json sidecar');
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});

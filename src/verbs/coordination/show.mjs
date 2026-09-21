@@ -43,6 +43,7 @@ import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordina
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
+import { evaluateDriverAuthorizedBindings } from '../../runner/coordination/legality-facts.mjs';
 
 // Same four terminal event kinds `replay.mjs`'s own (unexported)
 // `TERMINAL_EVENT_TYPES` uses (`transitionSessionStatus`'s TERMINAL_EVENT_TYPE
@@ -91,18 +92,7 @@ function isRefOwnedBySession(ref, { coordinationId, assignmentRefs, fgosDir, con
 // FlowDefinition's graph -- read directly off the validated document
 // (never re-derived/guessed), matching the exact shape
 // `standalone-master-coordination-loop.yaml`'s own graph.nodes[].operations[]
-// uses (`ref`/`actor`/`activation`).
-function collectDriverAuthorizedBindings(definition) {
-  const bindings = [];
-  for (const node of definition?.spec?.graph?.nodes ?? []) {
-    for (const op of node.operations ?? []) {
-      if (op?.activation?.mode === 'driver-authorized') {
-        bindings.push({ nodeId: node.id, operationId: op.ref, actorId: op.actor });
-      }
-    }
-  }
-  return bindings;
-}
+// uses (`ref`/`actor`/`activation`) -- now evaluated via shared legality-facts.mjs.
 
 // Phase 07 (MVP7): one validated cognitive aggregation, rendered whole.
 //
@@ -312,9 +302,8 @@ export function showCoordinationUseCase(ctx, { id }) {
     if (manifest.definitionRef) {
       try {
         const definition = loadDefinitionForSession(manifest, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
-        const declaredBindings = collectDriverAuthorizedBindings(definition);
-        const authorizedKeys = new Set(authorizations.map((a) => `${a.nodeId}::${a.operationId}`));
-        pendingDriverAuthorizations = declaredBindings.filter((b) => !authorizedKeys.has(`${b.nodeId}::${b.operationId}`));
+        const { pending } = evaluateDriverAuthorizedBindings(definition, authorizations);
+        pendingDriverAuthorizations = pending;
       } catch (err) {
         if (err.category === 'corrupt-log') throw err;
         // Definition file removed/renamed since the session opened, or

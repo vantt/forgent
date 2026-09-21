@@ -513,4 +513,3 @@ test('mutation-sensitive negative test: deliberate rule perturbation fails parit
   assert.equal(state.open, false);
   assert.equal(state.sources[0].satisfied, false);
 });
-

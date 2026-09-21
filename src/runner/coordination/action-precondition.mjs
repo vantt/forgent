@@ -20,6 +20,11 @@ import {
 } from './actions-projector.mjs';
 import { assignmentServesOperation, protocolOperationStamp } from './legality-facts.mjs';
 import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
+import {
+  canonicalizeNormalizedSteps,
+  normalizeFanOutPayload,
+  normalizePersistedFanOutPayloadEntry,
+} from './fan-out-payload.mjs';
 
 function resolveDriverIdentity(currentPayload = {}, precondition = {}, expectedKind = null) {
   if (expectedKind && expectedKind !== 'close') {
@@ -31,11 +36,68 @@ function resolveDriverIdentity(currentPayload = {}, precondition = {}, expectedK
     }
     return precondition.writerId ?? currentPayload.writerId ?? null;
   }
-  const candidate = currentPayload.authorizedBy ?? precondition.authorizedBy ?? currentPayload.writerId ?? precondition.writerId;
+  const candidate = precondition.authorizedBy ?? currentPayload.authorizedBy;
   if (!candidate) return null;
   if (typeof candidate === 'string') return candidate;
-  if (typeof candidate === 'object') return candidate.id ?? candidate.writerId ?? null;
+  if (typeof candidate === 'object') return candidate.id ?? null;
   return null;
+}
+
+function assertExactFanOutActorCohort(currentPayload, matchedAction) {
+  if (matchedAction.kind !== 'fan-out') return;
+
+  const allowedActorIds = matchedAction.target?.allowedActorIds
+    ?? matchedAction.allowedValues?.['branches.actorId'];
+  if (!Array.isArray(allowedActorIds)) return;
+
+  const branches = currentPayload.branches;
+  if (!Array.isArray(branches)) return;
+
+  const actualActorIds = normalizeFanOutPayload({ branches }).map((branch) => branch.actorId);
+  const actualSet = new Set(actualActorIds);
+  const allowedSet = new Set(allowedActorIds);
+  const exactSet = actualActorIds.length === allowedActorIds.length
+    && actualSet.size === actualActorIds.length
+    && allowedSet.size === allowedActorIds.length
+    && actualActorIds.every((actorId) => allowedSet.has(actorId));
+
+  if (!exactSet) {
+    throw new CoordinationError(
+      'validation',
+      `action precondition failed: fan-out branches.actorId must be the exact action-bound actor cohort [${allowedActorIds.join(', ')}] with no duplicates`,
+    );
+  }
+}
+
+function fanOutDefaults(definition, operationId, actorId) {
+  const operation = definition?.spec?.operations?.find((candidate) => candidate.id === operationId);
+  const edge = definition?.spec?.profile?.topology?.edges?.find((candidate) => candidate.to === actorId);
+  return {
+    capabilities: operation?.capabilities,
+    intent: edge?.intents?.[0],
+    taskKey: `research-branch:${actorId}`,
+  };
+}
+
+function composeRetryActionSteps(manifest, precondition, composeActionRequest) {
+  if (typeof composeActionRequest !== 'function') {
+    throw new CoordinationError('validation', 'coordination action: canonical request composer is unavailable for retry reconstruction');
+  }
+  const composed = composeActionRequest({
+    manifest,
+    action: {
+      kind: precondition.kind,
+      target: precondition.target,
+      requiredInputs: precondition.requiredInputs,
+      optionalInputs: precondition.optionalInputs,
+      allowedValues: precondition.allowedValues,
+    },
+    precondition,
+  });
+  if (!Array.isArray(composed.steps) || composed.steps.length === 0) {
+    throw new CoordinationError('validation', 'coordination action: canonical request composer returned no steps');
+  }
+  return { steps: composed.steps, canonicalSteps: canonicalizeNormalizedSteps(composed.steps) };
 }
 
 /**
@@ -178,7 +240,7 @@ export function executeUnderActionPrecondition(
   mutationFn,
   opts = {},
 ) {
-  return withSessionLock(coordinationId, (paths) => {
+  return withSessionLock(coordinationId, (paths, releaseLock) => {
     const manifest = readManifestRaw(paths.manifestPath);
     const events = readEvents(paths.eventsPath);
 
@@ -200,9 +262,9 @@ export function executeUnderActionPrecondition(
 
     let authId;
     if (precondition.kind === 'close') {
-      const candidate = currentPayload.authorizedBy ?? precondition.authorizedBy ?? currentPayload.writerId ?? precondition.writerId;
+      const candidate = precondition.authorizedBy ?? currentPayload.authorizedBy;
       if (typeof candidate === 'string') authId = candidate;
-      else if (typeof candidate === 'object') authId = candidate?.id ?? candidate?.writerId ?? null;
+      else if (typeof candidate === 'object') authId = candidate?.id ?? null;
       if (!authId || authId !== expectedDriverId) {
         throw new CoordinationError(
           'unauthorized',
@@ -380,6 +442,7 @@ export function executeUnderActionPrecondition(
       }
       if (matchedAction.allowedValues && typeof matchedAction.allowedValues === 'object') {
         for (const [field, allowedList] of Object.entries(matchedAction.allowedValues)) {
+          if (field === 'branches.actorId') continue;
           if (currentPayload[field] !== undefined && Array.isArray(allowedList) && !allowedList.includes(currentPayload[field])) {
             throw new CoordinationError(
               'validation',
@@ -388,6 +451,7 @@ export function executeUnderActionPrecondition(
           }
         }
       }
+      assertExactFanOutActorCohort(currentPayload, matchedAction);
 
       // Execute mutation callback under lock
       if (typeof mutationFn !== 'function') {
@@ -403,7 +467,7 @@ export function executeUnderActionPrecondition(
         phase,
         projected,
         action: matchedAction,
-      });
+      }, releaseLock);
     }
 
     // 6. Action key was not in currently projected actions: check if it was ALREADY executed in this session
@@ -419,14 +483,13 @@ export function executeUnderActionPrecondition(
           const p = ev.payload || {};
           const matchesActor = targetActor ? p.actorId === targetActor : true;
           const asgnId = p.assignmentId || p.id;
-          let recordedContract = {};
+          let asgnData = null;
           let servesOp = false;
           if (asgnId && paths?.fgosDir) {
             const asgnPath = path.join(paths.fgosDir, 'assignments', asgnId, 'assignment.json');
             try {
               if (fs.existsSync(asgnPath)) {
-                const asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
-                recordedContract = asgnData?.provenance?.inline?.contract ?? asgnData?.provenance?.contract ?? asgnData?.contract ?? {};
+                asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
                 servesOp = targetOp ? (assignmentServesOperation(definition, targetOp, asgnData) || p.operationId === targetOp) : true;
               }
             } catch {}
@@ -448,16 +511,33 @@ export function executeUnderActionPrecondition(
               allowedValues: precondition.allowedValues ?? null,
             });
             if (candidateKey === precondition.actionKey) {
+              const actionInvocation = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation;
+              if (actionInvocation?.actionKey !== precondition.actionKey || actionInvocation.kind !== precondition.kind) {
+                // Keep the low-level precondition unit's legacy synthetic
+                // callback fixture readable. The production action door
+                // always supplies composeActionRequest and therefore requires
+                // the complete persisted invocation below.
+                if (typeof opts.composeActionRequest === 'function') continue;
+                priorExecution = {
+                  eventSeq: i,
+                  assignmentId: asgnId,
+                  recordedPayload: {
+                    objective: asgnData?.provenance?.inline?.contract?.objective
+                      ?? asgnData?.provenance?.contract?.objective
+                      ?? p.objective,
+                    expectedOutputs: asgnData?.provenance?.inline?.contract?.expectedOutputs
+                      ?? asgnData?.provenance?.contract?.expectedOutputs
+                      ?? p.expectedOutputs,
+                  },
+                  result: { status: 'dispatched', assignmentId: asgnId, actionKey: precondition.actionKey },
+                };
+                break;
+              }
               priorExecution = {
                 eventSeq: i,
                 assignmentId: asgnId,
                 recordedPayload: {
-                  objective: recordedContract.objective ?? p.objective,
-                  expectedOutputs: recordedContract.expectedOutputs ?? p.expectedOutputs,
-                  contextRefs: recordedContract.contextRefs,
-                  constraints: recordedContract.constraints,
-                  capabilities: recordedContract.capabilities,
-                  mutation: recordedContract.mutation,
+                  normalizedSteps: actionInvocation.normalizedSteps,
                 },
                 result: { status: 'dispatched', assignmentId: asgnId, actionKey: precondition.actionKey },
               };
@@ -500,14 +580,36 @@ export function executeUnderActionPrecondition(
               );
               const asgnId = matchingAsgn?.payload?.assignmentId;
               let recordedContract = {};
+              let persistedInvocation = null;
               if (asgnId && paths?.fgosDir) {
                 const asgnPath = path.join(paths.fgosDir, 'assignments', asgnId, 'assignment.json');
                 try {
                   if (fs.existsSync(asgnPath)) {
                     const asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
                     recordedContract = asgnData?.provenance?.inline?.contract ?? asgnData?.provenance?.contract ?? asgnData?.contract ?? {};
+                    persistedInvocation = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation ?? null;
                   }
                 } catch {}
+              }
+              if (typeof opts.composeActionRequest === 'function') {
+                if (
+                  persistedInvocation?.actionKey !== precondition.actionKey
+                  || persistedInvocation.kind !== precondition.kind
+                  || !Array.isArray(persistedInvocation.normalizedSteps)
+                ) continue;
+                priorExecution = {
+                  eventSeq: i,
+                  authorizationId: authId,
+                  assignmentId: asgnId,
+                  recordedPayload: { normalizedSteps: persistedInvocation.normalizedSteps },
+                  result: {
+                    status: 'dispatched',
+                    authorizationId: authId,
+                    assignmentId: asgnId,
+                    actionKey: precondition.actionKey,
+                  },
+                };
+                break;
               }
               priorExecution = {
                 eventSeq: i,
@@ -664,6 +766,21 @@ export function executeUnderActionPrecondition(
       }
     } else if (precondition.kind === 'fan-out') {
       const targetOp = precondition.target?.operationId;
+      const targetAction = {
+        kind: 'fan-out',
+        target: precondition.target,
+        allowedValues: precondition.allowedValues,
+      };
+      // The action key is payload-independent, so retries must re-enforce the
+      // exact bound cohort and classify a changed cohort as a payload conflict.
+      try {
+        assertExactFanOutActorCohort(currentPayload, targetAction);
+      } catch (err) {
+        if (err instanceof CoordinationError) {
+          throw new CoordinationError('payload-conflict', err.message);
+        }
+        throw err;
+      }
       for (let i = 0; i < events.length; i++) {
         const candidateKey = computeActionKey({
           contractVersion: ACTIONS_CONTRACT_VERSION,
@@ -678,21 +795,28 @@ export function executeUnderActionPrecondition(
           allowedValues: precondition.allowedValues ?? null,
         });
         if (candidateKey === precondition.actionKey) {
-          const reqBranches = Array.isArray(currentPayload.branches) ? currentPayload.branches : [];
+          composeRetryActionSteps(manifest, precondition, opts.composeActionRequest);
+          const reqBranches = normalizeFanOutPayload({
+            branches: currentPayload.branches,
+            fromAssignmentId: currentPayload.fromAssignmentId,
+            resolveDefaults: (branch) => fanOutDefaults(definition, targetOp, branch.actorId),
+          });
           const reqActorIds = new Set(reqBranches.map((b) => b.actorId));
           const matchedBranches = [];
+          const matchedActorIds = new Set();
           for (let j = i; j < events.length; j++) {
             const ev = events[j];
             if (ev.type === 'assignment-created') {
               const p = ev.payload || {};
               const asgnId = p.assignmentId || p.id;
+              let asgnData = null;
               let branchContract = {};
               let servesOp = false;
               if (asgnId && paths?.fgosDir) {
                 const asgnPath = path.join(paths.fgosDir, 'assignments', asgnId, 'assignment.json');
                 try {
                   if (fs.existsSync(asgnPath)) {
-                    const asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
+                    asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
                     branchContract = asgnData?.provenance?.inline?.contract ?? asgnData?.provenance?.contract ?? asgnData?.contract ?? {};
                     servesOp = targetOp ? (assignmentServesOperation(definition, targetOp, asgnData) || p.operationId === targetOp) : true;
                   }
@@ -702,25 +826,42 @@ export function executeUnderActionPrecondition(
                 servesOp = p.operationId === targetOp;
               }
               if (servesOp && reqActorIds.has(p.actorId)) {
+                const persistedFanOutPayload = asgnData?.provenance?.inline?.caller?.coordination?.fanOutPayload;
+                const actionInvocation = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation;
+                if (actionInvocation?.actionKey !== precondition.actionKey || actionInvocation.kind !== precondition.kind) continue;
+                if (matchedActorIds.has(p.actorId)) continue;
+                matchedActorIds.add(p.actorId);
                 matchedBranches.push({
                   actorId: p.actorId,
                   assignmentId: asgnId,
                   status: 'dispatched',
                   objective: branchContract.objective ?? p.objective,
                   expectedOutputs: branchContract.expectedOutputs ?? p.expectedOutputs,
+                  canonicalPayload: persistedFanOutPayload
+                    ? normalizePersistedFanOutPayloadEntry(persistedFanOutPayload)
+                    : null,
                 });
               }
             }
           }
-          if (matchedBranches.length >= reqBranches.length && reqBranches.length > 0) {
+          const exactActorCohort = matchedBranches.length === reqBranches.length
+            && matchedActorIds.size === reqBranches.length
+            && reqBranches.every((branch) => matchedActorIds.has(branch.actorId));
+          if (exactActorCohort && reqBranches.length > 0 && matchedBranches.every((branch) => branch.canonicalPayload)) {
+            const firstAsgnId = matchedBranches[0]?.assignmentId;
+            let persistedInvocation = null;
+            if (firstAsgnId && paths?.fgosDir) {
+              try {
+                const firstPath = path.join(paths.fgosDir, 'assignments', firstAsgnId, 'assignment.json');
+                const firstData = JSON.parse(fs.readFileSync(firstPath, 'utf8'));
+                persistedInvocation = firstData?.provenance?.inline?.caller?.coordination?.actionInvocation ?? null;
+              } catch {}
+            }
+            if (!persistedInvocation) continue;
             priorExecution = {
               eventSeq: i,
               recordedPayload: {
-                branches: matchedBranches.map((m) => ({
-                  actorId: m.actorId,
-                  objective: m.objective,
-                  expectedOutputs: m.expectedOutputs,
-                })),
+                normalizedSteps: persistedInvocation.normalizedSteps,
               },
               result: {
                 status: 'dispatched',
@@ -737,21 +878,25 @@ export function executeUnderActionPrecondition(
     if (priorExecution) {
       const recorded = priorExecution.recordedPayload || {};
       let hasConflict = false;
+      if (recorded.normalizedSteps) {
+        const { canonicalSteps: currentCanonicalSteps } = composeRetryActionSteps(manifest, precondition, opts.composeActionRequest);
+        hasConflict = stableStringify(currentCanonicalSteps) !== stableStringify(recorded.normalizedSteps);
+      }
       for (const [k, v] of Object.entries(recorded)) {
+        if (k === 'normalizedSteps') continue;
         if (v !== undefined && currentPayload[k] !== undefined) {
           if (k === 'branches' && Array.isArray(v) && Array.isArray(currentPayload.branches)) {
             if (v.length !== currentPayload.branches.length) {
               hasConflict = true;
               break;
             }
-            for (let idx = 0; idx < v.length; idx++) {
-              const rBranch = v[idx];
-              const cBranch = currentPayload.branches[idx];
-              if (rBranch.actorId !== cBranch.actorId || (rBranch.objective && cBranch.objective !== rBranch.objective)) {
-                hasConflict = true;
-                break;
-              }
-            }
+            const currentBranches = normalizeFanOutPayload({
+              branches: currentPayload.branches,
+              fromAssignmentId: currentPayload.fromAssignmentId,
+              resolveDefaults: (branch) => fanOutDefaults(definition, precondition.target?.operationId, branch.actorId),
+            });
+            hasConflict = v.some((branch) => !branch)
+              || stableStringify(currentBranches) !== stableStringify(v);
             if (hasConflict) break;
           } else if (typeof v === 'object' && v !== null) {
             if (stableStringify(currentPayload[k]) !== stableStringify(v)) {

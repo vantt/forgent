@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos coordination actions` now exposes deterministic, read-only semantic
+  actions backed by the production coordination validator and execution seam;
+  action keys bind authoritative session state and normalized requests so
+  stale or conflicting retries fail atomically while identical retries remain
+  idempotent.
 - `confinement-orphaned-resources-reaped` doctor check + `fgos doctor --fix`
   repair: reclaims confined worker temp resources (private homes etc.)
   whose owning process died without their being cleaned up, and reaps the

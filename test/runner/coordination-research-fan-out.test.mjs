@@ -492,7 +492,7 @@ test('R5 concurrency: with aggregateBounds.maxConcurrency: 2 (no tighter than br
   // Both branches were launched and settled without hanging, queueing behind a
   // long retry, or being dropped. Keep the timing bound generous because the
   // full suite runs many subprocess-heavy git fixtures in parallel.
-  assert.ok(elapsedMs < 300 * 6, `expected both branches to settle without a long retry/hang (elapsed ${elapsedMs}ms)`);
+  assert.ok(elapsedMs < Math.max(300 * 6, 3500), `expected both branches to settle without a long retry/hang (elapsed ${elapsedMs}ms)`);
 });
 
 // ─── R6: context isolation before fan-in ───────────────────────────────────

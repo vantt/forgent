@@ -589,7 +589,9 @@ test('fan-out and link-contribution projection and non-policy obligation 1 reque
     events: [],
     definition: def,
   });
-  const fanOutAction = projFresh.actions.find((a) => a.kind === 'fan-out');
+  const fanOutActions = projFresh.actions.filter((a) => a.kind === 'fan-out');
+  assert.equal(fanOutActions.length, 1, 'must project exactly one fan-out action for the operation template (F-R02)');
+  const fanOutAction = fanOutActions[0];
   assert.ok(fanOutAction, 'unassigned op with isolated-until-fan-in cohort must project fan-out');
   assert.deepEqual(fanOutAction.requiredInputs, ['branches']);
   assert.deepEqual(fanOutAction.optionalInputs, ['fromAssignmentId']);
@@ -686,6 +688,3 @@ test('fan-out and link-contribution projection and non-policy obligation 1 reque
   const validatedClose = validateCoordinationCloseRequest(closeRequest);
   assert.equal(validatedClose.authorizedBy.id, 'driver-1');
 });
-
-
-

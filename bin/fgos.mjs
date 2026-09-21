@@ -89,6 +89,7 @@ import { graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '.
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { closeCoordinationUseCase } from '../src/verbs/coordination/close.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
+import { showCoordinationActionsUseCase } from '../src/verbs/coordination/actions.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mjs';
@@ -3030,7 +3031,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'coordination': {
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|launch-master-loop|chain|recover> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|close|actions|launch-master-loop|chain|recover> ...');
       // Same repoRoot resolution `catchup`/`merge next` already use:
       // `--dir` names the main checkout's `.fgos/`, so its parent is the
       // repo root; omitted, the caller's own cwd is the repo root.
@@ -3055,7 +3056,7 @@ async function runVerb(verb, flags, positional, dir) {
             cliExecutor: flags.executor,
             cliModel: flags.model,
             cliTier: flags.tier,
-          },
+          }
         );
       }
       if (sub === 'close') {
@@ -3065,7 +3066,7 @@ async function runVerb(verb, flags, positional, dir) {
           {
             cwd: cwdForCoordination,
             repoRoot: repoRootForCoordination,
-            packageRoot: PACKAGE_ROOT,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
           },
           { requestObject }
         );
@@ -3076,6 +3077,10 @@ async function runVerb(verb, flags, positional, dir) {
         // `show` (work-item) verb already documents in the registry: the
         // envelope is always JSON, so the flag changes nothing.
         return showCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { id });
+      }
+      if (sub === 'actions') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination actions requires an id: fgos coordination actions <id> [--json]');
+        return showCoordinationActionsUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { id });
       }
       if (sub === 'launch-master-loop') {
         // MVP4 (Step 09, Phase 02) R1-R4: a thin, mechanical composer for
@@ -3133,7 +3138,7 @@ async function runVerb(verb, flags, positional, dir) {
           actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
         });
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, launch-master-loop, chain, recover).`);
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, close, actions, launch-master-loop, chain, recover).`);
     }
 
     case 'rebuild': {
@@ -4949,7 +4954,7 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   goal: (positional) => positional[0] === 'set',
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
   knowledge: (positional) => positional[0] === 'attest',
-  coordination: (positional, flags) => ['run', 'launch-master-loop'].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
+  coordination: (positional, flags) => ['run', 'close', 'launch-master-loop'].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,
   // `dispatch show-run`/`watch` never write; `dispatch recover` writes

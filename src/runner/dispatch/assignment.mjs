@@ -580,6 +580,48 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   const frozenCaller = Object.freeze({
     writerId: caller.writerId,
     ...(caller.parentAssignmentId ? { parentAssignmentId: caller.parentAssignmentId } : {}),
+    ...(caller.coordination?.fanOutPayload
+      ? {
+          coordination: Object.freeze({
+            fanOutPayload: Object.freeze({
+              ...caller.coordination.fanOutPayload,
+              expectedOutputs: Object.freeze([...(caller.coordination.fanOutPayload.expectedOutputs ?? [])]),
+              constraints: Object.freeze([...(caller.coordination.fanOutPayload.constraints ?? [])]),
+              ...(caller.coordination.fanOutPayload.capabilities !== undefined
+                ? { capabilities: Object.freeze([...caller.coordination.fanOutPayload.capabilities]) }
+                : {}),
+            }),
+          }),
+        }
+      : {}),
+    ...(caller.coordination?.actionInvocation
+      ? {
+          coordination: Object.freeze({
+            ...(caller.coordination.fanOutPayload
+              ? {
+                  fanOutPayload: Object.freeze({
+                    ...caller.coordination.fanOutPayload,
+                    expectedOutputs: Object.freeze([...(caller.coordination.fanOutPayload.expectedOutputs ?? [])]),
+                    constraints: Object.freeze([...(caller.coordination.fanOutPayload.constraints ?? [])]),
+                    ...(caller.coordination.fanOutPayload.capabilities !== undefined
+                      ? { capabilities: Object.freeze([...caller.coordination.fanOutPayload.capabilities]) }
+                      : {}),
+                  }),
+                }
+              : {}),
+            actionInvocation: Object.freeze({
+              actionKey: caller.coordination.actionInvocation.actionKey,
+              kind: caller.coordination.actionInvocation.kind,
+              normalizedSteps: Object.freeze(caller.coordination.actionInvocation.normalizedSteps.map((step) => Object.freeze({
+                ...step,
+                ...(step.omittedFields !== undefined
+                  ? { omittedFields: Object.freeze([...step.omittedFields]) }
+                  : {}),
+              }))),
+            }),
+          }),
+        }
+      : {}),
   });
 
   // Step 08 P04.2b: merge the domain harness's own `policy` (matchedOp.policy

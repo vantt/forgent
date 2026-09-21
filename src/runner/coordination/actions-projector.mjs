@@ -178,16 +178,23 @@ export function projectCoordinationActions({
       });
       const assignedBindings = matched.assignedBindings;
       assignmentToBinding = matched.assignmentToBinding;
+      const processedFanOutOps = new Set();
       for (const req of requiredBindings) {
         // Check if this required operation already has an assignment matched 1:1
         const hasAssignment = assignedBindings.has(req);
         if (!hasAssignment) {
-          // Kernel gate: fan-out is emitted ONLY when cohort independence is 'isolated-until-fan-in' (F-R04)
+          // Kernel gate: fan-out is emitted ONLY when cohort independence is 'isolated-until-fan-in' (F-R02)
           const isFanOut = definition?.spec?.profile?.cohort?.independence === 'isolated-until-fan-in';
 
           if (isFanOut) {
+            if (processedFanOutOps.has(req.operationId)) {
+              continue;
+            }
             const topologyEdges = definition?.spec?.profile?.topology?.edges ?? [];
             const candidateActors = (definition?.spec?.actors ?? []).filter((a) => {
+              // Actor must have an unassigned binding for this operation
+              const matchingBinding = requiredBindings.find((b) => b.operationId === req.operationId && b.actorId === a.id);
+              if (!matchingBinding || assignedBindings.has(matchingBinding)) return false;
               // Actor must be declared and legitimately paired with this operation in the graph
               try {
                 const resolved = resolveDeclaredOperationActor(definition, req.operationId, a.id);
@@ -204,6 +211,7 @@ export function projectCoordinationActions({
             });
             const allowedActorIds = candidateActors.map((a) => a.id);
             if (allowedActorIds.length >= 2) {
+              processedFanOutOps.add(req.operationId);
               rawActions.push({
                 kind: 'fan-out',
                 required: true,

@@ -18,6 +18,9 @@
 // Every one of R2's named reject categories below has its own dedicated
 // check function and its own dedicated negative test (test/cli/coordination.test.mjs).
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { StoreError } from '../../state/store.mjs';
 import { CONTRIBUTION_TYPES } from '../../runner/deliberation/schema.mjs';
 
@@ -282,7 +285,7 @@ const OPERATION_STEP_ALLOWED_KEYS = new Set([
   'contextRefs', 'constraints', 'capabilities', 'fromAssignmentId', 'intent', 'round', 'taskKey', 'mutation',
 ]);
 
-function validateOperationStep(step, i) {
+export function validateOperationStep(step, i = 0) {
   assertAllowedKeys(step, OPERATION_STEP_ALLOWED_KEYS, `steps[${i}] (type "operation")`);
   assertMutationAllowed(step.mutation, `steps[${i}].mutation`, { allowMutating: true });
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
@@ -343,7 +346,7 @@ function assertNoAuthorizedBy(step, label) {
   }
 }
 
-function validateAuthorizeStep(step, i) {
+export function validateAuthorizeStep(step, i = 0) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "authorize")`);
   assertAllowedKeys(step, AUTHORIZE_STEP_ALLOWED_KEYS, `steps[${i}] (type "authorize")`);
   assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
@@ -400,7 +403,7 @@ const DISPOSITION_STEP_ALLOWED_KEYS = new Set([
 
 const DISPOSITION_MAX_LENGTH = 200;
 
-function validateDispositionStep(step, i) {
+export function validateDispositionStep(step, i = 0) {
   assertNoAuthorizedBy(step, `steps[${i}] (type "disposition")`);
   assertAllowedKeys(step, DISPOSITION_STEP_ALLOWED_KEYS, `steps[${i}] (type "disposition")`);
   assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
@@ -455,7 +458,7 @@ function validateFanOutBranch(branch, i, j) {
 
 const FAN_OUT_STEP_ALLOWED_KEYS = new Set(['type', 'as', 'operationId', 'branches', 'fromAssignmentId', 'mutation']);
 
-function validateFanOutStep(step, i) {
+export function validateFanOutStep(step, i = 0) {
   assertAllowedKeys(step, FAN_OUT_STEP_ALLOWED_KEYS, `steps[${i}] (type "fan-out")`);
   assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
   if (!isNonEmptyString(step.operationId)) fail(`steps[${i}].operationId is required`);
@@ -499,7 +502,7 @@ function assertNoLinkedBy(step, label) {
   }
 }
 
-function validateContributionStep(step, i) {
+export function validateContributionStep(step, i = 0) {
   assertNoLinkedBy(step, `steps[${i}] (type "contribution")`);
   assertAllowedKeys(step, CONTRIBUTION_STEP_ALLOWED_KEYS, `steps[${i}] (type "contribution")`);
   assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
@@ -559,7 +562,7 @@ function validateHumanTurnAttributedTo(attributedTo, label) {
   return { type: 'person', id: attributedTo.id };
 }
 
-function validateHumanTurnStep(step, i) {
+export function validateHumanTurnStep(step, i = 0) {
   assertAllowedKeys(step, HUMAN_TURN_STEP_ALLOWED_KEYS, `steps[${i}] (type "human-turn")`);
   assertSafeId(step.turnId, `steps[${i}].turnId`);
   if (!Number.isInteger(step.turnOrdinal) || step.turnOrdinal < 1) {
@@ -600,6 +603,43 @@ function validateHumanTurnStep(step, i) {
     attributedTo,
     respondsToRefs,
   };
+}
+
+/**
+ * Shared helper to resolve and compute SHA-256 revision from real artifact file bytes.
+ * Used identically by run.mjs and actions.mjs to ensure single provenance authority (F-R03).
+ */
+export function computeHumanTurnArtifactRevision(cwd, artifactRef, stepAs = 'human-turn') {
+  const resolvedArtifactPath = path.resolve(cwd, artifactRef);
+  const missingArtifactError = () =>
+    new StoreError(
+      'validation',
+      `coordination request: steps[${stepAs}] (type "human-turn") artifactRef "${artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
+    );
+  let realArtifactPath;
+  try {
+    realArtifactPath = fs.realpathSync(resolvedArtifactPath);
+  } catch (err) {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') throw missingArtifactError();
+    throw err;
+  }
+  const realWorkspaceRoot = fs.realpathSync(cwd);
+  const relativeToWorkspace = path.relative(realWorkspaceRoot, realArtifactPath);
+  if (relativeToWorkspace.startsWith('..') || path.isAbsolute(relativeToWorkspace)) {
+    throw new StoreError(
+      'validation',
+      `coordination request: steps[${stepAs}] (type "human-turn") artifactRef "${artifactRef}" resolves to "${realArtifactPath}" (via "${resolvedArtifactPath}"), outside the working directory "${realWorkspaceRoot}" -- a human-turn artifact must live inside the workspace the session was opened against`,
+    );
+  }
+  let artifactBytes;
+  try {
+    artifactBytes = fs.readFileSync(realArtifactPath);
+  } catch (err) {
+    if (err.code === 'EISDIR') throw missingArtifactError();
+    throw err;
+  }
+  const revision = `sha256:${createHash('sha256').update(artifactBytes).digest('hex')}`;
+  return { revision, realArtifactPath, artifactBytes };
 }
 
 function validateSteps(steps) {
@@ -722,17 +762,48 @@ export function validateCoordinationRequest(raw, cliFlags = {}) {
   return normalized;
 }
 
+function validateIdentityRef(raw, label) {
+  if (typeof raw !== 'object' || raw === null) fail(`${label} must be an object`);
+  if (raw.type !== 'driver' && raw.type !== 'operator' && raw.type !== 'worker') {
+    fail(`${label}.type must be "driver", "operator", or "worker"`);
+  }
+  if (typeof raw.id !== 'string' || !raw.id.trim()) fail(`${label}.id must be a non-empty string`);
+  return { type: raw.type, id: raw.id };
+}
+
 export function validateCoordinationCloseRequest(raw) {
   if (!isPlainObject(raw)) fail('request must be a JSON object');
   if (raw.kind !== 'close') fail('"kind" must be "close"');
   if (raw.coordinationId === undefined) fail('"coordinationId" is required');
   assertSafeId(raw.coordinationId, '"coordinationId"');
   if (raw.authorizedBy === undefined) fail('"authorizedBy" is required');
-  return {
+  const normalized = {
     kind: raw.kind,
     coordinationId: raw.coordinationId,
     authorizedBy: validateIdentityRef(raw.authorizedBy, '"authorizedBy"'),
   };
+  if (raw.actionKey !== undefined) {
+    if (typeof raw.actionKey !== 'string' || !raw.actionKey.startsWith('sha256:')) {
+      fail('"actionKey" must be a valid sha256 action key');
+    }
+    normalized.actionKey = raw.actionKey;
+  }
+  if (raw.dissentingActorIds !== undefined) {
+    if (!Array.isArray(raw.dissentingActorIds) || raw.dissentingActorIds.some((v) => typeof v !== 'string' || !v.trim())) {
+      fail('"dissentingActorIds" must be an array of non-empty strings');
+    }
+    raw.dissentingActorIds.forEach((id, i) => assertSafeId(id, `"dissentingActorIds[${i}]"`));
+    normalized.dissentingActorIds = [...raw.dissentingActorIds];
+  }
+  if (raw.aggregationId !== undefined) {
+    if (typeof raw.aggregationId !== 'string' || !raw.aggregationId.trim()) {
+      fail('"aggregationId" must be a non-empty string');
+    }
+    assertSafeId(raw.aggregationId, '"aggregationId"');
+    normalized.aggregationId = raw.aggregationId;
+  }
+  return normalized;
 }
+
 
 export { SAFE_ID_RE, READ_ONLY_ROLES };

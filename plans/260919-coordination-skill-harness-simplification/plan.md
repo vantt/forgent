@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: proposed  
-Created: 2026-09-19  
-Mode: high-risk  
+Status: proposed
+Created: 2026-09-19
+Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
 

@@ -49,8 +49,12 @@ import {
   openSession,
   bindActor,
   createSessionAssignment,
+  createSessionAssignmentLocked,
   authorizeOperation,
+  authorizeOperationLocked,
+  recordContributionLinkLocked,
   linkResult,
+  linkResultLocked,
   recordRunRetry,
   markRunRetryFulfilled,
   recordActorReplacement,
@@ -58,6 +62,7 @@ import {
   transitionSessionStatusLocked,
   withSessionLock,
   readManifest,
+  readManifestRaw,
   resolveSessionPaths,
   hashTaskKey,
   assertSafeCoordinationId,
@@ -70,8 +75,9 @@ import {
   getPendingRetryDeclaration,
 } from './store.mjs';
 import { validateContributionLineage } from '../deliberation/schema.mjs';
+import { canonicalizeNormalizedSteps, normalizeFanOutPayloadEntry } from './fan-out-payload.mjs';
 import { replaySession } from './replay.mjs';
-import { CoordinationError, CONTRIBUTION_REF_PREFIX, SCHEMA_VERSION_2 } from './schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX, SCHEMA_VERSION_2, SCHEMA_VERSION_3 } from './schema.mjs';
 import { validateFlowDefinition } from '../definitions/schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
@@ -79,6 +85,21 @@ import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX, operationDeclaresWorkProduct, resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+import {
+  protocolOperationStamp,
+  declaredOperationBindingActors,
+  actorGatingOperationIds,
+  resolveDeclaredOperationActor,
+  buildActorReplacementMap,
+  assignmentServesOperation as pureAssignmentServesOperation,
+  hasAcceptedDispositionRemediation as pureHasAcceptedDispositionRemediation,
+  classifyOperationAssignment as pureClassifyOperationAssignment,
+  resolveBindingOutcome as pureResolveBindingOutcome,
+  resolveRecheckDischarge as pureResolveRecheckDischarge,
+  resolveOperationOutcome as pureResolveOperationOutcome,
+  evaluateVisibilityWindowState,
+  classifySessionQuorum as pureClassifySessionQuorum,
+} from './legality-facts.mjs';
 
 export function loadDefinitionForSession(manifest, opts) {
   if (manifest.schemaVersion === '3') {
@@ -191,10 +212,7 @@ function assertKnownReadOnlyRole(role, label) {
 // design and carries no such guarantee; see this cell's trace.) The SAME
 // stamp is also what lets a mutating inline contract past
 // `execution-contract.mjs`'s/`assignment-normalizer.mjs`'s own gates (R6a)
-// -- this module is the ONLY legal minter of it.
-function protocolOperationStamp(definition, operationId) {
-  return `${PROTOCOL_OPERATION_STAMP_PREFIX}${definition.metadata.id}@${definition.metadata.version}#${operationId}`;
-}
+// -- this module is the ONLY legal minter of it (imported from legality-facts.mjs).
 
 function assertNoReservedOperationStamp(constraints) {
   // Non-arrays pass through untouched so the contract validator downstream
@@ -401,11 +419,14 @@ async function runExecutorAttempt(assignment, opts) {
  * error is always rethrown unchanged either way; this only ever affects
  * whether the claim file survives the throw.
  */
-async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts = {}) {
+async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts = {}, paths = null) {
   const reconciled = replaySession(coordinationId, opts);
-  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const sessionPaths = paths ?? resolveSessionPaths(coordinationId, opts);
+  const { fgosDir } = sessionPaths;
 
-  const assignment = createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts);
+  const assignment = paths
+    ? createSessionAssignmentLocked({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, paths, opts)
+    : createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts);
 
   const priorLink = lastEventFor(reconciled.events, 'result-linked', assignment.assignmentId);
   if (priorLink) {
@@ -415,7 +436,11 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
 
   const unlinked = findLatestRunResult(fgosDir, assignment.assignmentId);
   if (unlinked) {
-    linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId: unlinked.runId }, opts);
+    if (paths) {
+      linkResultLocked(coordinationId, { assignmentId: assignment.assignmentId, runId: unlinked.runId }, paths, opts);
+    } else {
+      linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId: unlinked.runId }, opts);
+    }
     return { assignment, runResult: unlinked, resumed: true };
   }
 
@@ -432,6 +457,13 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
     throw err;
   }
 
+  let lockReleased = Boolean(opts.lockReleased || opts.lockState?.released);
+  if (typeof opts.releaseLock === 'function') {
+    lockReleased = true;
+    if (opts.lockState) opts.lockState.released = true;
+    opts.releaseLock();
+  }
+
   let runResult;
   try {
     runResult = await runExecutorAttempt(assignment, opts);
@@ -445,7 +477,12 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
     }
     throw err;
   }
-  linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId: runResult.runId }, opts);
+  const isLocked = paths && !lockReleased && !opts.lockState?.released;
+  if (isLocked) {
+    linkResultLocked(coordinationId, { assignmentId: assignment.assignmentId, runId: runResult.runId }, paths, opts);
+  } else {
+    linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId: runResult.runId }, opts);
+  }
   return { assignment, runResult, resumed: false };
 }
 
@@ -1040,107 +1077,7 @@ export function resolveLiveSpecialistBindings(replayed) {
  * is byte-for-byte identical to its pre-P09.2 behavior: no fixture without a
  * `specialistSlotRef` binding anywhere can observe any difference.
  */
-function resolveDeclaredOperationActor(definition, operationId, targetActorId, specialistBindings = new Map()) {
-  const operation = definition.spec.operations.find((op) => op.id === operationId);
-  if (!operation) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" is not declared in this protocol's spec.operations`,
-    );
-  }
-
-  const matches = [];
-  for (const node of definition.spec.graph.nodes) {
-    for (const ref of node.operations) {
-      if (ref.ref === operationId) matches.push({ node, ref });
-    }
-  }
-  // The effective actor id a binding currently resolves to -- a static
-  // `actor` resolves to itself; a `specialistSlotRef` resolves to whichever
-  // specialist is currently live for that slot (or `undefined`, if none is).
-  // Matching by this derived id, rather than by `ref.actor` alone, is what
-  // lets a caller find a specialist-filled binding by `targetActorId` the
-  // exact same way it already finds a statically-bound one.
-  const effectiveActorIdOf = (ref) =>
-    ref.actor !== undefined ? ref.actor : ref.specialistSlotRef !== undefined ? specialistBindings.get(ref.specialistSlotRef)?.specialistActorId : undefined;
-
-  const picked = targetActorId !== undefined ? matches.find((m) => effectiveActorIdOf(m.ref) === targetActorId) : matches[0];
-  if (!picked) {
-    // A `targetActorId` that names the specialist a slot-bound ref USED to
-    // (or will) resolve to, but does not RIGHT NOW (no live binding, or an
-    // expired one), gets its own more actionable refusal instead of the
-    // generic "not wired" message below -- the binding IS wired to that
-    // slot, it simply has no live occupant this round.
-    const unboundSlotMatch = matches.find((m) => m.ref.specialistSlotRef !== undefined && specialistBindings.get(m.ref.specialistSlotRef) === undefined);
-    if (targetActorId !== undefined && unboundSlotMatch) {
-      throw new CoordinationError(
-        'validation',
-        `dispatchDeclaredOperation: operation "${operationId}" at node "${unboundSlotMatch.node.id}" is bound to specialist slot "${unboundSlotMatch.ref.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
-      );
-    }
-    throw new CoordinationError(
-      'validation',
-      targetActorId !== undefined
-        ? `dispatchDeclaredOperation: operation "${operationId}" bound to actor "${targetActorId}" is not wired into this protocol's graph -- no node pairs this operation with that actor`
-        : `dispatchDeclaredOperation: operation "${operationId}" is not wired into this protocol's graph -- an operation must be reachable from a node to be materialized`,
-    );
-  }
-  const { node: matchedNode, ref: matchedRef } = picked;
-
-  let actorEntry;
-  if (matchedRef.specialistSlotRef !== undefined) {
-    const bound = specialistBindings.get(matchedRef.specialistSlotRef);
-    if (!bound) {
-      throw new CoordinationError(
-        'validation',
-        `dispatchDeclaredOperation: operation "${operationId}" at node "${matchedNode.id}" is bound to specialist slot "${matchedRef.specialistSlotRef}" -- no specialist is currently authorized for that slot in this session (or its authorization has expired), so this materialization requires an authorized specialist actor first`,
-      );
-    }
-    // Synthesized, not looked up in `spec.actors[]` -- a specialist is by
-    // definition a previously-unknown identity the static actor roster
-    // never declared. `id`/`role` are the only two fields any caller below
-    // reads off an `actorEntry` (`persona`/`policy` are never populated for
-    // a specialist; `dispatchDeclaredOperation`'s own policy stack reads
-    // `actorEntry.policy ?? {}`, which degrades cleanly to `{}`).
-    actorEntry = Object.freeze({ id: bound.specialistActorId, role: bound.role });
-  } else if (matchedRef.actor === undefined) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" is role-only (no actor binding at node "${matchedNode.id}") -- this materialization requires a bound SessionActor`,
-    );
-  } else {
-    actorEntry = (definition.spec.actors ?? []).find((a) => a.id === matchedRef.actor);
-    if (!actorEntry) {
-      throw new CoordinationError(
-        'validation',
-        `dispatchDeclaredOperation: operation "${operationId}" node "${matchedNode.id}" references actor "${matchedRef.actor}", which is not declared in spec.actors`,
-      );
-    }
-  }
-  if (actorEntry.role !== operation.role) {
-    throw new CoordinationError(
-      'validation',
-      `dispatchDeclaredOperation: operation "${operationId}" declares role "${operation.role}", but its bound actor "${actorEntry.id}" declares role "${actorEntry.role}" -- actor/operation role mismatch`,
-    );
-  }
-
-  // `binding` is the node-operation binding itself (`{ref, actor|
-  // specialistSlotRef, activation?}`) -- the ONLY scope `activation` is
-  // ever declared at, so every caller that needs the activation mode reads
-  // it from here rather than from the shared `operation` template, which
-  // can never carry one. `specialistAuthorization`, when present, is the
-  // live `specialist-authorized` record this resolution used -- callers
-  // that need the specialist's own `maxAssignments` cap (authorization
-  // gating) read it from here rather than re-resolving it a second time.
-  return {
-    operation,
-    actorId: actorEntry.id,
-    actorEntry,
-    node: matchedNode,
-    binding: matchedRef,
-    ...(matchedRef.specialistSlotRef !== undefined ? { specialistAuthorization: specialistBindings.get(matchedRef.specialistSlotRef) } : {}),
-  };
-}
+// resolveDeclaredOperationActor is imported from legality-facts.mjs.
 
 /**
  * Resolve the ONE `operation-authorized` record (if any) that legitimately
@@ -1341,13 +1278,7 @@ function assertRefsOwnedBySession(refs, { coordinationId, assignmentRefs, fgosDi
  * lineage-following semantics, independently built here so this module
  * stays a single self-contained read of the event log per call).
  */
-function buildActorReplacementMap(events) {
-  const map = new Map();
-  for (const event of events) {
-    if (event.type === 'actor-replaced') map.set(event.payload.oldActorId, event.payload.replacementActorId);
-  }
-  return map;
-}
+// buildActorReplacementMap is imported from legality-facts.mjs.
 
 /**
  * EVERY distinct actor the graph binds `operationId` to, in graph order.
@@ -1377,158 +1308,7 @@ function hasBoundActor(definition, operationId) {
   return definition.spec.graph.nodes.some((node) => node.operations.some((ref) => ref.ref === operationId && ref.actor));
 }
 
-function declaredOperationBindingActors(definition, operationId) {
-  const actorIds = [];
-  for (const node of definition.spec.graph.nodes) {
-    for (const ref of node.operations) {
-      if (ref.ref === operationId && ref.actor && !actorIds.includes(ref.actor)) actorIds.push(ref.actor);
-    }
-  }
-  if (actorIds.length === 0) return [resolveDeclaredOperationActor(definition, operationId).actorId];
-  return actorIds.map((actorId) => resolveDeclaredOperationActor(definition, operationId, actorId).actorId);
-}
-
-/**
- * P10-KERNEL-FIX (Step 09 MVP6-9, Phase 10 group-thinking-lite cross-cell
- * finding -- P10.6/P10.7/P10.8): the graph-declared operation ids that GATE
- * `actorId`'s own quorum completion for a declared-protocol session --
- * `classifySessionQuorum`'s multi-operation-aware path, below.
- *
- * Every `required` binding gates completion (this is `classifySessionQuorum`'s
- * pre-existing, always-correct semantics for the single-op-per-actor shape
- * this mechanism was originally built for -- unchanged). ADDITIONALLY, a
- * `driver-authorized` binding gates completion too, but ONLY when it ALSO
- * declares `contextAccess.visibilityWindowRef` -- a REAL, later phase of the
- * SAME actor's own work, gated by the MVP6 visibility-window mechanism
- * purely for ACCESS CONTROL (the driver must explicitly grant read access to
- * upstream context before this actor may act), never a genuinely optional
- * branch. RFC-Review-Lite's `respond`, Nominal-Group-Lite's `share`/`clarify`
- * are exactly this shape: each is `driver-authorized` (the driver must
- * `authorizeDeclaredOperation` it before it can dispatch), but the protocol's
- * own fixed 4-phase pipeline always reaches it -- there is no real usage
- * where the driver decides to skip it forever.
- *
- * A `driver-authorized` binding with NO `contextAccess.visibilityWindowRef`
- * is deliberately EXCLUDED from the gating set -- it is a free-standing
- * driver's-choice branch, not a graph-gated later phase of the same actor's
- * work. `standalone-master-coordination-loop.yaml`'s `revise-candidate`/
- * `reviewer-recheck`/`red-team-recheck` are exactly this shape (no
- * `spec.profile.topology`/visibility windows declared anywhere in that
- * fixture at all): the driver may legitimately never authorize a revision
- * round, and `coordination-launch-master-loop.test.mjs`'s own
- * `coord_launcher_live` case already proves and depends on the session
- * correctly staying open (actor "fixer" reported `missing`) when that
- * happens -- counting an ungated driver-authorized binding here would
- * regress that real, already-shipped test. See this file's own
- * P10-KERNEL-FIX.md Design Notes for the full investigation (including why
- * the simpler "count every required binding, ignore every driver-authorized
- * one" framing this cell started from is not sufficient on its own: it
- * reproduces P10.6/P10.7's own bug unchanged, since RFC-Review-Lite's
- * `respond` and Nominal-Group-Lite's `share`/`clarify` are ALL
- * `driver-authorized`, never `required`).
- *
- * `reviewer-recheck`/`red-team-recheck`'s own `rechecks:` field (definitions/
- * schema.mjs) plays NO role in this function's gating computation -- it stays
- * excluded from the gating set exactly as above, ungated. `rechecks` is
- * consumed only later, inside `classifySessionQuorum`'s own caller, by
- * `resolveRecheckDischarge`, strictly to let a satisfied recheck DISCHARGE a
- * different, already-gating operation's `failed` outcome -- it never makes the
- * recheck binding itself gating, and a session with a clean first pass still
- * closes with the recheck never dispatched, unchanged.
- *
- * Returns `[]` when `actorId` has no gating binding anywhere in the graph
- * (every binding it has, if any, is an ungated driver-authorized one) --
- * `classifySessionQuorum`'s caller falls back to the pre-existing
- * "first-assignment-ever, for this actor" rule for exactly that actor. That
- * fallback is NOT byte-identical behavior for a gating actor, only for a
- * NON-gating one (P10-KERNEL-FIX Fix Round 1, HIGH-3, redteam-report.md):
- * the fallback accepts ANY `assignment-created` event for the actor,
- * however it arrived, while the gating path above demands an
- * operation-stamped, settled Assignment (`resolveBindingOutcome` /
- * `assignmentServesOperation`). An actor with at least one gating binding
- * genuinely trades the loose fallback for the stricter stamped check --
- * this is what keeps `fixer`, above, `missing` until its own sole binding
- * actually dispatches, and what keeps every single-op-per-actor fixture
- * -- declared-consult, standalone sessions, research fan-out/fan-in, MVP7
- * aggregation-close, group-cognition-framework -- passing today, since
- * their own Assignments arrive stamped through `dispatchDeclaredOperation`.
- * A single-`required`-op actor whose Assignment instead arrives through a
- * non-stamping public door (`createSessionAssignment`/`dispatchPrimaryTask`/
- * `proposeConsult` -- `assertNoReservedOperationStamp` actively forbids a
- * caller-supplied stamp on those) can never satisfy a gating binding and
- * would be permanently unclosable. Confirmed currently LATENT: no
- * `runCoordinationUseCase` path reaches this today (the `agent-led` branch
- * uses `openStandaloneSession`, which has no `definitionRef`) -- named here,
- * and in P10-KERNEL-FIX.md's own Gaps, for whichever door reaches this path
- * next.
- */
-function actorGatingOperationIds(definition, actorId) {
-  // MVP7 (Phase 07): the protocol's own `completion.aggregation.
-  // outputOperationRef`, when declared, names the operation that the
-  // aggregation's OWN output represents -- but `validateSessionAggregation`
-  // never requires a dispatched Assignment for it (its own `assignmentId`/
-  // `runId`/`outputArtifactRef` params are all optional, and every real
-  // caller -- test/verbs/coordination-aggregation-surface.test.mjs,
-  // test/runner/coordination-aggregation.test.mjs -- validates without
-  // supplying any of them). Its completion is represented by the validated
-  // `aggregation-validated` event `closeSessionByQuorum`'s own `aggregationId`
-  // param consults, a SEPARATE narrowing gate on top of quorum, never by a
-  // literal operation-stamped Assignment -- so it is excluded from gating
-  // here, or it would permanently block the bound actor (confirmed
-  // empirically: without this exclusion, this fixture's own coordinator-actor,
-  // bound to both `review` [required] and `synthesize` [required,
-  // `outputOperationRef`], never settles `synthesize` as a real Assignment
-  // anywhere in either test file, and would stay "missing" forever).
-  //
-  // P10-KERNEL-FIX Fix Round 1 (MEDIUM-5, redteam-report.md): the exclusion
-  // is scoped to the actor the graph itself binds to the aggregation's
-  // `outputOperationRef` -- never to every actor who happens to share that
-  // operation id for an unrelated reason. A different actor bound to the
-  // same operation id keeps that binding as an ordinary gating operation,
-  // needing its own real settled Assignment like any other.
-  //
-  // P10-KERNEL-FIX Fix Round 2 (N4/NEW-MEDIUM-C, redteam-recheck-report.md):
-  // Fix Round 1 designated "the" aggregation actor as whichever binding came
-  // FIRST in graph order -- ambiguous and authoring-order-dependent when 2+
-  // actors legitimately bind the same `outputOperationRef` (a semantic no-op
-  // reordering of two sibling entries in one node's `operations[]` silently
-  // flipped who was excused and who deadlocked permanently, since
-  // `validateSessionAggregation` never materializes an Assignment for this
-  // operation for ANY actor). This is a kernel session-engine cell, not a
-  // schema cell, so no heuristic picks a "correct" designated actor: the
-  // exclusion applies ONLY when EXACTLY ONE actor's binding matches
-  // `outputOperationRef` anywhere in the graph. When 2+ distinct actors bind
-  // it, NO exclusion applies to any of them -- every such actor falls back
-  // to ordinary required-operation gating, the same conservative default
-  // this fix already uses elsewhere for ambiguous/unclear cases. See
-  // P10-KERNEL-FIX.md §5 Gaps for the 2+-actors shape (a future cell may
-  // want schema-level rejection instead -- not built here).
-  const aggregationOutputOperationRef = definition.spec.profile.completion?.aggregation?.outputOperationRef;
-  let aggregationActorId;
-  if (aggregationOutputOperationRef !== undefined) {
-    const boundActorIds = new Set();
-    for (const node of definition.spec.graph.nodes) {
-      for (const ref of node.operations) {
-        if (ref.ref === aggregationOutputOperationRef && ref.actor) boundActorIds.add(ref.actor);
-      }
-    }
-    if (boundActorIds.size === 1) {
-      [aggregationActorId] = boundActorIds;
-    }
-  }
-
-  const operationIds = [];
-  for (const node of definition.spec.graph.nodes) {
-    for (const ref of node.operations) {
-      if (ref.actor !== actorId) continue;
-      if (ref.ref === aggregationOutputOperationRef && actorId === aggregationActorId) continue;
-      const mode = activationModeOf(ref);
-      const gates = mode === 'required' || (mode === 'driver-authorized' && ref.contextAccess?.visibilityWindowRef !== undefined);
-      if (gates && !operationIds.includes(ref.ref)) operationIds.push(ref.ref);
-    }
-  }
-  return operationIds;
-}
+// declaredOperationBindingActors and actorGatingOperationIds are imported from legality-facts.mjs.
 
 /**
  * Does this Assignment carry the reserved engine stamp for EXACTLY this
@@ -1571,215 +1351,64 @@ function actorGatingOperationIds(definition, actorId) {
  * Assignments that satisfy NO window source, which is the safe answer by
  * construction rather than by enumeration.
  */
-function assignmentServesOperation(definition, operationId, { assignmentId, fgosDir }) {
+function readSessionAssignmentFromDisk(fgosDir, assignmentId) {
   const assignmentPath = path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
   if (!fs.existsSync(assignmentPath)) return false;
-  let assignment;
   try {
-    assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+    return JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
   } catch (err) {
     throw new CoordinationError('corrupt-log', `assignment.json at ${assignmentPath} is not valid JSON: ${err.message}`);
   }
-  const constraints = assignment?.provenance?.inline?.contract?.constraints;
-  // Exact equality, never a prefix/substring test: a leading space or a
-  // different casing dodges the writer's guard and fails this comparison too.
-  // A NON-STRING forgery (a boxed `String`, a `toJSON` object) is a different
-  // story and this reader is NOT what stops it -- such a value would
-  // JSON-round-trip into a plain string and match here. It never reaches disk
-  // because `validateExecutionContract`'s `isStringArray`
-  // (`../dispatch/execution-contract.mjs`) runs inside `buildAssignment`
-  // BEFORE persistence and rejects a `constraints` array that is not all
-  // primitive strings. That ordering is the load-bearing part: this reader
-  // alone would accept a boxed-String forgery.
-  return Array.isArray(constraints) && constraints.includes(protocolOperationStamp(definition, operationId));
 }
 
-/**
- * Classify ONE already-operation-verified Assignment exactly the way
- * `classifySessionQuorum`/`synthesizeResearchFanIn` already classify a
- * settled Assignment -- the SAME failed/late vocabulary, never a second one.
- */
-function classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId) {
-  const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
-  if (!linkedEvent) return { satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
-  const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
-  if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
-    return { satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId };
-  }
-  return { satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
+function assignmentServesOperation(definition, operationId, { assignmentId, fgosDir }) {
+  const assignment = readSessionAssignmentFromDisk(fgosDir, assignmentId);
+  return pureAssignmentServesOperation(definition, operationId, assignment);
 }
 
-/**
- * The outcome of ONE graph binding of a source operation: follow any accepted
- * `actor-replaced` lineage to the CURRENT effective actor (so "the
- * replacement's own result-linked counts toward the window; the original
- * failed/missing attempt's event stays in the log, untouched" holds without
- * rewriting or re-deriving anything from the original attempt), then classify
- * the Assignments that actor was given FOR THIS OPERATION
- * (`assignmentServesOperation` -- the lineage transfers the obligation, never
- * a licence for any work at all to answer it):
- * - no operation-verified `assignment-created` for the effective actor ->
- *   `'missing'`.
- * - created but no `result-linked` yet -> `'late'`.
- * - linked but `runResult.status === 'failed'` or `confidence` in
- *   `{failed, no-evidence}` -> `'failed'`.
- * - otherwise -> satisfied.
- *
- * With several attempts toward the same binding (a re-attempt after a failed
- * one), a satisfied attempt settles the binding and the unsatisfied
- * attempts' events stay on the log untouched; with none satisfied, the LAST
- * attempt in event order is the reported outcome.
- */
-function resolveBindingOutcome(definition, operationId, boundActorId, { events, fgosDir, replacedBy }) {
-  let effectiveActorId = boundActorId;
-  const seen = new Set();
-  while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
-    seen.add(effectiveActorId);
-    effectiveActorId = replacedBy.get(effectiveActorId);
-  }
-
-  const assignmentIds = events
-    .filter(
-      (event) =>
-        event.type === 'assignment-created' &&
-        event.payload.actorId === effectiveActorId &&
-        assignmentServesOperation(definition, operationId, { assignmentId: event.payload.assignmentId, fgosDir }),
-    )
-    .map((event) => event.payload.assignmentId);
-
-  if (assignmentIds.length === 0) {
-    return { boundActorId, satisfied: false, reason: 'missing', actorId: effectiveActorId, assignmentId: null };
-  }
-  let lastOutcome;
-  for (const assignmentId of assignmentIds) {
-    lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId);
-    if (lastOutcome.satisfied) return { boundActorId, ...lastOutcome };
-  }
-  return { boundActorId, ...lastOutcome };
-}
-
-/**
- * Discharges a FAILED required gating operation's slot via a driver-authorized
- * recheck of the SAME actor -- but only when the driver has recorded an explicit
- * disposition against the specific failed attempt AND a real, later,
- * operation-stamped recheck Assignment for that SAME actor settled satisfied.
- * Never inferred from role, graph adjacency, or naming -- only a `rechecks:`
- * binding the protocol's own version-matched definition declares
- * (`validateNodeOperationRef`/`validateGraph`, definitions/schema.mjs) may
- * discharge another binding's gating slot at all. Called ONLY for
- * `reason === 'failed'` outcomes (never `missing`/`late`) -- a driver can never
- * skip the required first pass itself by authorizing rechecks alone.
- *
- * Anti-laundering invariants (each has its own case in
- * coordination-recheck-discharge.test.mjs):
- * - Only `assignmentServesOperation`-stamped assignments count, on the recheck
- *   side checked here (the failed side is already true of the `failedOutcome`
- *   the caller computed via `resolveBindingOutcome`) -- never a raw
- *   event-payload operationId, taskKey, authorization reason, or
- *   grantedContextRefs.
- * - The recheck Assignment's own `assignment-created` event must be strictly
- *   AFTER the failed attempt's LAST `result-linked` event in log order -- a
- *   "recheck" that predates what it claims to recheck discharges nothing.
- * - A `driver-disposition-recorded` event naming this EXACT failed assignmentId
- *   as `targetRef` must exist (also after that same index) before any recheck
- *   counts -- the disposition's own value/rationale is never parsed; recording
- *   ANY disposition against the specific failed attempt is the auditable act
- *   required, the same way `authorize`/`disposition` steps already are the
- *   explicit driver acts everywhere else in this engine.
- * - Same actor identity only, through the SAME `actor-replaced` lineage
- *   `resolveBindingOutcome` already follows -- a different actor's satisfied
- *   recheck never discharges this actor's slot.
- * - Returns `null` (no discharge, caller falls back to `failed.push` exactly as
- *   before) when no `rechecks` binding is declared for this actor+gating
- *   operation, when no disposition was ever recorded against the failed
- *   assignment, or when no recheck Assignment was ever dispatched at all --
- *   only an actually-satisfied recheck attempt (or one that itself settled
- *   `late`) changes the outcome.
- */
-function resolveRecheckDischarge(definition, gatingOperationId, originalActorId, failedOutcome, { events, fgosDir, replacedBy }) {
-  let effectiveActorId = originalActorId;
-  const seen = new Set();
-  while (replacedBy.has(effectiveActorId) && !seen.has(effectiveActorId)) {
-    seen.add(effectiveActorId);
-    effectiveActorId = replacedBy.get(effectiveActorId);
-  }
-
-  const recheckOperationIds = [];
-  let applicableDischargeOn = null;
-  for (const node of definition.spec.graph.nodes) {
-    for (const ref of node.operations) {
-      const rechecksOp = ref.rechecks?.operation ?? ref.rechecks;
-      if (ref.actor === originalActorId && rechecksOp === gatingOperationId) {
-        if (!recheckOperationIds.includes(ref.ref)) recheckOperationIds.push(ref.ref);
-        const discharge = ref.rechecks?.dischargeOn ?? ref.dischargeOn;
-        if (discharge !== undefined) applicableDischargeOn = discharge;
-      }
-    }
-  }
-  if (recheckOperationIds.length === 0) return null;
-
-  let lastFailedLinkedIndex = -1;
-  events.forEach((event, i) => {
-    if (event.type === 'result-linked' && event.payload.assignmentId === failedOutcome.assignmentId) {
-      lastFailedLinkedIndex = i;
-    }
+function hasAcceptedDispositionRemediation(definition, failedAssignmentId, recheckAssignmentId, { events, fgosDir, lastFailedLinkedIndex }) {
+  return pureHasAcceptedDispositionRemediation(definition, failedAssignmentId, recheckAssignmentId, {
+    events,
+    getAssignment: (id) => readSessionAssignmentFromDisk(fgosDir, id),
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDir, asgnId, runId),
+    lastFailedLinkedIndex,
   });
-  // Should be unreachable (a `failed` outcome was itself classified from a
-  // `result-linked` event) -- fail closed (no discharge) rather than throw.
-  if (lastFailedLinkedIndex === -1) return null;
-
-  const dispositionEvent = events.findLast(
-    (event, i) => i > lastFailedLinkedIndex && event.type === 'driver-disposition-recorded' && event.payload.targetRef === failedOutcome.assignmentId,
-  );
-  if (!dispositionEvent) return null;
-
-  if (applicableDischargeOn !== null && !applicableDischargeOn.includes(dispositionEvent.payload.disposition)) {
-    return null;
-  }
-
-  let lastOutcome = null;
-  for (const recheckOperationId of recheckOperationIds) {
-    const assignmentIds = events
-      .filter(
-        (event, i) =>
-          i > lastFailedLinkedIndex &&
-          event.type === 'assignment-created' &&
-          event.payload.actorId === effectiveActorId &&
-          assignmentServesOperation(definition, recheckOperationId, { assignmentId: event.payload.assignmentId, fgosDir }),
-      )
-      .map((event) => event.payload.assignmentId);
-    for (const assignmentId of assignmentIds) {
-      lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId);
-      if (lastOutcome.satisfied) {
-        return { ...lastOutcome, supersededAssignmentId: failedOutcome.assignmentId };
-      }
-    }
-  }
-  return lastOutcome;
 }
 
-/**
- * The outcome of ONE `opensAfter.operationRefs[]` entry: satisfied only when
- * EVERY graph binding of that operation is satisfied. A source operation
- * wired to a fan-out cohort is the whole cohort's obligation, not the first
- * contributor's -- opening on one branch would be exactly the partial-window
- * bypass the all-of rule across `operationRefs[]` itself already refuses, one
- * level deeper.
- */
+function classifyOperationAssignment(events, fgosDir, effectiveActorId, assignmentId) {
+  return pureClassifyOperationAssignment(events, effectiveActorId, assignmentId, {
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDir, asgnId, runId),
+  });
+}
+
+function resolveBindingOutcome(definition, operationId, boundActorId, { events, fgosDir, replacedBy, schemaVersion = SCHEMA_VERSION_3 }) {
+  return pureResolveBindingOutcome(definition, operationId, boundActorId, {
+    events,
+    getAssignment: (id) => readSessionAssignmentFromDisk(fgosDir, id),
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDir, asgnId, runId),
+    replacedBy,
+    schemaVersion,
+  });
+}
+
+function resolveRecheckDischarge(definition, gatingOperationId, originalActorId, failedOutcome, { events, fgosDir, replacedBy, schemaVersion }) {
+  return pureResolveRecheckDischarge(definition, gatingOperationId, originalActorId, failedOutcome, {
+    events,
+    getAssignment: (id) => readSessionAssignmentFromDisk(fgosDir, id),
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDir, asgnId, runId),
+    replacedBy,
+    schemaVersion,
+  });
+}
+
 function resolveOperationOutcome(definition, operationId, ctx) {
-  const branches = declaredOperationBindingActors(definition, operationId).map((boundActorId) =>
-    resolveBindingOutcome(definition, operationId, boundActorId, ctx),
-  );
-  const reported = branches.find((branch) => !branch.satisfied) ?? branches[0];
-  return {
-    operationRef: operationId,
-    satisfied: branches.every((branch) => branch.satisfied),
-    reason: reported.reason,
-    actorId: reported.actorId,
-    assignmentId: reported.assignmentId,
-    ...(reported.runId !== undefined ? { runId: reported.runId } : {}),
-    branches: Object.freeze(branches.map((branch) => Object.freeze(branch))),
-  };
+  return pureResolveOperationOutcome(definition, operationId, {
+    events: ctx.events,
+    getAssignment: (id) => readSessionAssignmentFromDisk(ctx.fgosDir, id),
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(ctx.fgosDir, asgnId, runId),
+    replacedBy: ctx.replacedBy,
+    schemaVersion: ctx.schemaVersion ?? SCHEMA_VERSION_3,
+  });
 }
 
 /**
@@ -1799,19 +1428,12 @@ function resolveOperationOutcome(definition, operationId, ctx) {
  * @returns {Readonly<{window: object, open: boolean, sources: Readonly<object>[]}>}
  */
 export function deriveVisibilityWindowState(definition, windowId, replayed, fgosDir) {
-  const window = (definition.spec.profile.topology?.visibilityWindows ?? []).find((w) => w.id === windowId);
-  if (!window) {
-    throw new CoordinationError(
-      'dangling-ref',
-      `deriveVisibilityWindowState: visibility window "${windowId}" is not declared on protocol "${definition.metadata.id}@${definition.metadata.version}"`,
-    );
-  }
-  const replacedBy = buildActorReplacementMap(replayed.events);
-  const sources = window.opensAfter.operationRefs.map((operationRef) =>
-    resolveOperationOutcome(definition, operationRef, { events: replayed.events, fgosDir, replacedBy }),
-  );
-  const open = sources.every((source) => source.satisfied);
-  return Object.freeze({ window, open, sources: Object.freeze(sources.map((s) => Object.freeze(s))) });
+  return evaluateVisibilityWindowState(definition, windowId, {
+    events: replayed?.events ?? [],
+    getAssignment: (id) => readSessionAssignmentFromDisk(fgosDir, id),
+    getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDir, asgnId, runId),
+    schemaVersion: replayed?.manifest?.schemaVersion ?? '3',
+  });
 }
 
 /**
@@ -2015,12 +1637,13 @@ export function authorizeSpecialistSlot(
  * @param {string} [params.targetArtifactRef] The artifact revision being revised/rechecked.
  * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
  */
-export function authorizeDeclaredOperation(
+export function authorizeDeclaredOperationLocked(
   coordinationId,
   { operationId, targetActorId, nodeId, authorizationId, invocationKey, authorizedBy, reason, grantedContextRefs = [], targetArtifactRef },
+  paths,
   opts = {},
 ) {
-  const manifest = readManifest(coordinationId, opts);
+  const manifest = readManifestRaw(paths.manifestPath);
   if (!manifest.definitionRef) {
     throw new CoordinationError(
       'validation',
@@ -2063,7 +1686,7 @@ export function authorizeDeclaredOperation(
   // refusing an out-of-session ref before the authorization is ever written
   // keeps an illegal grant off the log entirely, rather than leaving a
   // permanently unusable authorization behind for the gate to refuse later.
-  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir } = paths;
   assertRefsOwnedBySession(grantedContextRefs, {
     coordinationId,
     assignmentRefs: manifest.assignmentRefs,
@@ -2104,7 +1727,7 @@ export function authorizeDeclaredOperation(
     }
   }
 
-  return authorizeOperation(
+  return authorizeOperationLocked(
     coordinationId,
     {
       authorizationId,
@@ -2117,6 +1740,7 @@ export function authorizeDeclaredOperation(
       grantedContextRefs,
       targetArtifactRef,
     },
+    paths,
     // `activation.maxInvocations` lives on the binding, and a specialist's
     // own `maxAssignments` cap lives on its live authorization -- both only
     // this definition-aware door can read; store.mjs enforces both
@@ -2128,6 +1752,15 @@ export function authorizeDeclaredOperation(
         ? { maxAssignmentsForSpecialist: { specialistActorId: actorId, cap: specialistAuthorization.maxAssignments } }
         : {}),
     },
+  );
+}
+
+export function authorizeDeclaredOperation(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withSessionLock(
+    coordinationId,
+    (p) => authorizeDeclaredOperationLocked(coordinationId, params, p, opts),
+    opts,
   );
 }
 
@@ -2444,7 +2077,7 @@ function assertMutatingDispatchAllowed(mutation, { operationId, operation, cwd }
  * @param {'read-only'|'mutating'} [params.mutation] Phase 01 mutation-unlock (R1). Default `'read-only'`, byte-identical to every pre-existing caller. `'mutating'` is refused unless the bound operation declares `result.kind: 'work-product'` (R2) AND `opts.cwd` resolves to a linked git worktree, never the main checkout (R3) -- see `assertMutatingDispatchAllowed`.
  * @param {object} [opts] Forwarded to `createAndExecuteSessionTask`/`executeAssignment` (cwd, repoRoot, packageRoot, runnerConfig, timeoutMs, options, ...)
  */
-export async function dispatchDeclaredOperation(
+export async function dispatchDeclaredOperationLocked(
   coordinationId,
   {
     operationId,
@@ -2465,6 +2098,8 @@ export async function dispatchDeclaredOperation(
     rolePolicy = {},
     assignmentPolicy = {},
     cliPolicy = {},
+    fanOutPayload,
+    actionInvocation,
     // Phase 01 mutation-unlock (R1/R4): default 'read-only' preserves every
     // pre-existing caller's behavior byte-for-byte -- only a caller that
     // explicitly passes 'mutating' ever reaches assertMutatingDispatchAllowed
@@ -2474,9 +2109,11 @@ export async function dispatchDeclaredOperation(
     // value into buildSessionContract.
     mutation = 'read-only',
   },
+  paths = null,
   opts = {},
 ) {
-  const manifest = readManifest(coordinationId, opts);
+  const resolvedPaths = paths ?? resolveSessionPaths(coordinationId, opts);
+  const manifest = readManifestRaw(resolvedPaths.manifestPath);
   if (!manifest.definitionRef) {
     throw new CoordinationError(
       'validation',
@@ -2487,7 +2124,7 @@ export async function dispatchDeclaredOperation(
   // not concurrency-sensitive (see the module-level comment above this
   // function) -- this pre-lock check is authoritative by itself.
   assertWithinWallTimeBudget(manifest, 'dispatchDeclaredOperation');
-  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir, sessionDir } = resolvedPaths;
 
   const definition = loadDefinitionForSession(manifest, opts);
   if (definition.metadata.version !== manifest.definitionRef.version) {
@@ -2889,6 +2526,37 @@ export async function dispatchDeclaredOperation(
       : parentAssignmentId !== undefined
         ? { parentAssignmentId }
         : {}),
+    ...(fanOutPayload
+      ? {
+          coordination: {
+            fanOutPayload: normalizeFanOutPayloadEntry(fanOutPayload, {
+              fromAssignmentId,
+              intent: resolvedIntent,
+              capabilities: capabilities ?? operation.capabilities,
+              taskKey,
+            }),
+            ...(actionInvocation
+              ? {
+                  actionInvocation: {
+                    actionKey: actionInvocation.actionKey,
+                    kind: actionInvocation.kind,
+                    normalizedSteps: canonicalizeNormalizedSteps(actionInvocation.normalizedSteps),
+                  },
+                }
+              : {}),
+          },
+        }
+      : actionInvocation
+        ? {
+            coordination: {
+              actionInvocation: {
+                actionKey: actionInvocation.actionKey,
+                kind: actionInvocation.kind,
+                normalizedSteps: canonicalizeNormalizedSteps(actionInvocation.normalizedSteps),
+              },
+            },
+          }
+        : {}),
   };
 
   // The pre-lock `roundsAlreadyUsed >= maxRounds` check above (inside the
@@ -2937,6 +2605,7 @@ export async function dispatchDeclaredOperation(
           }
         : {}),
     },
+    paths,
   );
 
   return {
@@ -2944,6 +2613,10 @@ export async function dispatchDeclaredOperation(
     definitionRef: manifest.definitionRef,
     edge: incomingEdge ? { from: incomingEdge.from, to: incomingEdge.to, intent: resolvedIntent } : null,
   };
+}
+
+export async function dispatchDeclaredOperation(coordinationId, { mutation = 'read-only', ...params } = {}, opts = {}) {
+  return dispatchDeclaredOperationLocked(coordinationId, { mutation, ...params }, null, opts);
 }
 
 const DISPOSITION_VALUES = new Set(['accepted', 'rejected', 'partially-accepted']);
@@ -3197,12 +2870,13 @@ export async function recordConsultDisposition(
  * @param {object} [opts] Forwarded to `dispatchDeclaredOperation`/`planCohort` (cwd, repoRoot, packageRoot, runnerConfig, timeoutMs, options, ...). `opts.runnerConfig` is read as the CURRENT runner config for both planning and the R4 re-verification.
  * @returns {Promise<Readonly<{status: 'planning-failed'|'aborted'|'dispatched', plan?: object, reason?: string, actorId?: string, branches?: Array<object>}>>}
  */
-export async function dispatchResearchFanOut(
+export async function dispatchResearchFanOutLocked(
   coordinationId,
-  { operationId, branches, writerId, fromAssignmentId, fallbackRules = [] },
+  { operationId, branches, writerId, fromAssignmentId, fallbackRules = [], actionInvocation },
+  paths,
   opts = {},
 ) {
-  const manifest = readManifest(coordinationId, opts);
+  const manifest = readManifestRaw(paths.manifestPath);
   if (!manifest.definitionRef) {
     throw new CoordinationError(
       'validation',
@@ -3292,29 +2966,38 @@ export async function dispatchResearchFanOut(
   // pin a literal executor (the trusted human/CLI scope,
   // `assertNoPortableExecutorPin` above) -- never written into a portable
   // definition/operation/role/actor scope.
-  const settled = await Promise.allSettled(
-    branches.map((branch) => {
-      const allocation = relevantAllocations.find((a) => a.actorId === branch.actorId);
-      return dispatchDeclaredOperation(
-        coordinationId,
-        {
-          operationId,
-          targetActorId: branch.actorId,
-          objective: branch.objective,
-          expectedOutputs: branch.expectedOutputs,
-          constraints: branch.constraints,
-          capabilities: branch.capabilities,
-          budget: branch.budget,
-          writerId: branch.writerId ?? writerId,
-          fromAssignmentId: branch.fromAssignmentId ?? fromAssignmentId,
-          intent: branch.intent,
-          taskKey: branch.taskKey ?? `research-branch:${branch.actorId}`,
-          cliPolicy: { preferExecutor: allocation.executorId, minTier: allocation.tier },
-        },
-        opts,
-      );
-    }),
-  );
+  const lockState = { released: false };
+  const branchPromises = branches.map((branch) => {
+    const allocation = relevantAllocations.find((a) => a.actorId === branch.actorId);
+    return dispatchDeclaredOperationLocked(
+      coordinationId,
+      {
+        operationId,
+        targetActorId: branch.actorId,
+        objective: branch.objective,
+        expectedOutputs: branch.expectedOutputs,
+        constraints: branch.constraints,
+        capabilities: branch.capabilities,
+        budget: branch.budget,
+        writerId: branch.writerId ?? writerId,
+        fromAssignmentId: branch.fromAssignmentId ?? fromAssignmentId,
+        intent: branch.intent,
+        taskKey: branch.taskKey ?? `research-branch:${branch.actorId}`,
+        fanOutPayload: branch,
+        actionInvocation,
+        cliPolicy: { preferExecutor: allocation.executorId, minTier: allocation.tier },
+      },
+      paths,
+      { ...opts, releaseLock: null, lockState },
+    );
+  });
+
+  if (typeof opts.releaseLock === 'function') {
+    lockState.released = true;
+    opts.releaseLock();
+  }
+
+  const settled = await Promise.allSettled(branchPromises);
 
   const dispatchedBranches = settled.map((outcome, i) => ({
     actorId: branches[i].actorId,
@@ -3324,6 +3007,15 @@ export async function dispatchResearchFanOut(
   }));
 
   return Object.freeze({ status: 'dispatched', plan, branches: Object.freeze(dispatchedBranches.map((b) => Object.freeze(b))) });
+}
+
+export async function dispatchResearchFanOut(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withSessionLock(
+    coordinationId,
+    (p) => dispatchResearchFanOutLocked(coordinationId, params, p, opts),
+    opts,
+  );
 }
 
 /**
@@ -3573,220 +3265,16 @@ export function evaluateSessionQuorum(coordinationId, opts = {}) {
 //   mutation door in this file (`authorizeDeclaredOperation`/
 //   `dispatchDeclaredOperation`/`validateSessionAggregation`/
 //   `linkSessionContribution`).
-function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts = {}) {
-  const requiredActorIds = (manifest.actors ?? []).map((actor) => actor.id);
-
-  let definition = null;
-  if (manifest.definitionRef) {
-    let resolved = null;
-    try {
-      resolved = loadDefinitionForSession(manifest, opts);
-    } catch (err) {
-      if (err.category === "corrupt-log") throw err;
-      resolved = null;
-    }
-    const drifted = resolved !== null && resolved.metadata.version !== manifest.definitionRef.version;
-
-    if (opts.enforceDefinitionVersion) {
-      if (resolved === null) {
-        throw new CoordinationError(
-          'validation',
-          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition`,
-        );
+function classifySessionQuorum(coordinationId, manifest, events, fgosDirOrCtx, opts = {}) {
+  const ctx = (typeof fgosDirOrCtx === 'string')
+    ? {
+        fgosDir: fgosDirOrCtx,
+        getAssignment: (id) => readSessionAssignmentFromDisk(fgosDirOrCtx, id),
+        getRunResult: (asgnId, runId) => readLinkedRunResultFromDisk(fgosDirOrCtx, asgnId, runId),
+        loadDefinition: (m, o) => loadDefinitionForSession(m, o),
       }
-      if (drifted) {
-        throw new CoordinationError(
-          'validation',
-          `classifySessionQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${resolved.metadata.version}" -- refusing to close against a drifted definition`,
-        );
-      }
-      definition = resolved;
-    } else {
-      definition = drifted ? null : resolved;
-    }
-  }
-
-  const replacedBy = new Map(); // oldActorId -> replacementActorId
-  const replacementTargets = new Set(); // every id that is SOMEONE's replacement (never evaluated as its own top-level slot)
-  for (const event of events) {
-    if (event.type === 'actor-replaced') {
-      replacedBy.set(event.payload.oldActorId, event.payload.replacementActorId);
-      replacementTargets.add(event.payload.replacementActorId);
-    }
-  }
-  function resolveEffectiveActor(id) {
-    let current = id;
-    const seen = new Set();
-    while (replacedBy.has(current) && !seen.has(current)) {
-      seen.add(current);
-      current = replacedBy.get(current);
-    }
-    return current;
-  }
-
-  const completed = [];
-  const failed = [];
-  const late = [];
-  const missing = [];
-  const replaced = [];
-
-  for (const originalActorId of requiredActorIds) {
-    if (replacementTargets.has(originalActorId)) continue; // covered via its predecessor's resolution below
-    const effectiveId = resolveEffectiveActor(originalActorId);
-    if (effectiveId !== originalActorId) {
-      replaced.push({ actorId: originalActorId, replacedBy: effectiveId });
-    }
-
-    const gatingOperationIds = definition ? actorGatingOperationIds(definition, originalActorId) : [];
-    if (gatingOperationIds.length > 0) {
-      // Multi-operation-aware path (P10-KERNEL-FIX): EVERY gating binding
-      // for this actor must resolve to a satisfied, operation-stamped
-      // Assignment -- `resolveBindingOutcome` already follows the SAME
-      // `actor-replaced` lineage (`replacedBy`, built above) and the SAME
-      // failed/late/missing vocabulary this function's own fallback path
-      // (below) uses, so both paths report through one shared vocabulary.
-      const outcomes = gatingOperationIds.map((operationId) => resolveBindingOutcome(definition, operationId, originalActorId, { events, fgosDir, replacedBy }));
-      const unsatisfiedIndex = outcomes.findIndex((outcome) => !outcome.satisfied);
-      if (unsatisfiedIndex === -1) {
-        const last = outcomes[outcomes.length - 1];
-        completed.push({ actorId: originalActorId, assignmentId: last.assignmentId, runId: last.runId });
-        continue;
-      }
-      const unsatisfied = outcomes[unsatisfiedIndex];
-      if (unsatisfied.reason === 'missing') {
-        missing.push({ actorId: originalActorId });
-      } else if (unsatisfied.reason === 'late') {
-        late.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId });
-      } else {
-        // reason === 'failed': a declared `rechecks` binding may still discharge
-        // this slot -- see `resolveRecheckDischarge`'s own doc for every
-        // invariant checked before a later recheck ever stands in for a failed
-        // required first pass. Returns `null` (byte-identical fallback to
-        // `failed.push` below) whenever no such binding is declared.
-        const gatingOperationId = gatingOperationIds[unsatisfiedIndex];
-        const discharge = resolveRecheckDischarge(definition, gatingOperationId, originalActorId, unsatisfied, { events, fgosDir, replacedBy });
-        if (discharge && discharge.satisfied) {
-          completed.push({ actorId: originalActorId, assignmentId: discharge.assignmentId, runId: discharge.runId, supersededAssignmentId: discharge.supersededAssignmentId });
-        } else if (discharge && discharge.reason === 'late') {
-          late.push({ actorId: originalActorId, assignmentId: discharge.assignmentId });
-        } else {
-          failed.push({ actorId: originalActorId, assignmentId: unsatisfied.assignmentId, runId: unsatisfied.runId });
-        }
-      }
-      continue;
-    }
-
-    // Fallback: no gating binding anywhere for this actor -- either this
-    // session has no declared protocol at all, or every binding this actor
-    // has is an ungated driver-authorized one (`actorGatingOperationIds`).
-    // "Missing until dispatched" (no `createdEvents` at all) is exactly
-    // correct for a session with no protocol (no graph to consult in the
-    // first place) and for the real shipped shape this fallback exists to
-    // preserve (`standalone-master-coordination-loop.yaml`'s "fixer", whose
-    // only binding, revise-candidate, is a single ungated driver-authorized
-    // operation -- `coordination-launch-master-loop.test.mjs`'s own
-    // `coord_launcher_live` proves and depends on that for exactly this
-    // shape, unaffected below since it never dispatches a second attempt).
-    //
-    // tsk-1bh fix: with TWO OR MORE assignments for this actor (a retry
-    // after a failed/no-evidence first attempt, dispatched under a fresh
-    // authorization for the SAME graph binding), this used to classify by
-    // the FIRST assignment-created event alone -- a later, genuinely
-    // successful re-attempt of that same binding could never un-stick a
-    // `failed` classification, so `closeSessionByQuorum` would refuse
-    // forever even after real, verified work landed (confirmed live:
-    // `fgos-plan-loop` cell `code-implementation-track-policy--p04`'s
-    // `fixer`, an ungated driver-authorized actor that genuinely reaches
-    // this fallback. `--p01`'s `reviewer-recheck` hit the SAME symptom for
-    // a DIFFERENT reason -- `reviewer` also binds `review-candidate`
-    // [required], so `actorGatingOperationIds` returns non-empty for it and
-    // it never reaches this fallback at all; that occurrence was purely
-    // `resolveBindingAuthorization`/`resolveTaskKeyAuthorization` (above)
-    // repeatedly handing dispatch back to a dead orphaned authorization, an
-    // upstream fix to a DIFFERENT bug in a DIFFERENT function -- cited here
-    // only to avoid re-attributing it to this fallback).
-    //
-    // This must NOT be read as "any later assignment for this actorId can
-    // supersede an earlier one" -- that is precisely the laundering attack
-    // `coordination-r6-security-adversarial.test.mjs`'s "partial-consensus
-    // false success" case exercises: a SECOND, unrelated ad-hoc dispatch
-    // (`dispatchPrimaryTask`, no operationId/nodeId stamp at all) under the
-    // same actorId must never be mistaken for a retry of the first,
-    // required task.
-    //
-    // tsk-1bh follow-up (red-team recheck on `aa328e70`, HIGH): an EARLIER
-    // version of this fix scoped same-binding retries by raw
-    // `assignment-created.payload.operationId`/`nodeId` equality alone,
-    // reasoning that "only `dispatchDeclaredOperation` ever writes them."
-    // That reasoning was wrong -- `createSessionAssignment` (store.mjs) is
-    // an exported RAW door that accepts a caller-supplied
-    // `authorizationProvenance` object directly, and only checks that its
-    // fields MATCH a real, already-issued authorization record, never that
-    // the call actually passed through `dispatchDeclaredOperation`'s own
-    // gate. A caller holding a genuine, freshly-authorized (nodeId,
-    // operationId) for this exact binding could spend it through the raw
-    // door with an entirely unrelated inline contract/task, complete it,
-    // and have THIS fallback credit that unrelated result as the retry --
-    // the raw payload fields alone proved nothing about provenance.
-    //
-    // Fixed to use `assignmentServesOperation` (the SAME reserved
-    // `protocol-operation:` contract-stamp predicate `resolveBindingOutcome`
-    // already uses above), not raw payload-field equality. That stamp is
-    // written unconditionally on `dispatchDeclaredOperation`'s own common
-    // path, before the activation-mode branch, into the Assignment's own
-    // persisted contract -- and `buildSessionContract`'s
-    // `assertNoReservedOperationStamp` refuses ANY caller-supplied entry in
-    // that reserved namespace, on every door, including the raw one. So the
-    // raw-door attack above can still forge the EVENT payload's
-    // `operationId`/`nodeId` fields, and can still legitimately consume a
-    // real authorization through the raw door -- but it can never produce
-    // an Assignment carrying the actual reserved stamp, and only a stamped
-    // Assignment counts as a same-binding attempt here. The first
-    // assignment-created event for this actor still decides the binding: an
-    // unstamped first event (no declared protocol at all, or a first
-    // attempt that itself never reached `dispatchDeclaredOperation`) means
-    // there is no reliable signal to compare later events against at all,
-    // so only that first event is ever considered -- byte-identical to the
-    // pre-fix behavior for every such actor, laundering included. With a
-    // stamped first event, only LATER events that themselves carry the
-    // genuine stamp for that SAME operationId count as further attempts;
-    // walk every such attempt in event order, the first SATISFIED one
-    // settles the actor, with none satisfied the LAST attempt's own outcome
-    // is reported, same as before for the single-attempt case.
-    const allCreatedEvents = events.filter((event) => event.type === 'assignment-created' && event.payload.actorId === effectiveId);
-    if (allCreatedEvents.length === 0) {
-      missing.push({ actorId: originalActorId });
-      continue;
-    }
-    const firstCreatedEvent = allCreatedEvents[0];
-    const firstOperationId = firstCreatedEvent.payload.operationId;
-    const stampedSameBinding =
-      definition && firstOperationId
-        ? allCreatedEvents.filter((event) => assignmentServesOperation(definition, firstOperationId, { assignmentId: event.payload.assignmentId, fgosDir }))
-        : [];
-    const createdEvents = stampedSameBinding.length > 0 ? stampedSameBinding : [firstCreatedEvent];
-    let lastOutcome;
-    for (const createdEvent of createdEvents) {
-      lastOutcome = classifyOperationAssignment(events, fgosDir, effectiveId, createdEvent.payload.assignmentId);
-      if (lastOutcome.satisfied) break;
-    }
-    if (lastOutcome.satisfied) {
-      completed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
-    } else if (lastOutcome.reason === 'late') {
-      late.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId });
-    } else {
-      failed.push({ actorId: originalActorId, assignmentId: lastOutcome.assignmentId, runId: lastOutcome.runId });
-    }
-  }
-
-  return Object.freeze({
-    requiredActorIds: Object.freeze(requiredActorIds),
-    completed: Object.freeze(completed.map((e) => Object.freeze(e))),
-    failed: Object.freeze(failed.map((e) => Object.freeze(e))),
-    late: Object.freeze(late.map((e) => Object.freeze(e))),
-    missing: Object.freeze(missing.map((e) => Object.freeze(e))),
-    replaced: Object.freeze(replaced.map((e) => Object.freeze(e))),
-  });
+    : (fgosDirOrCtx ?? {});
+  return pureClassifySessionQuorum(coordinationId, manifest, events, ctx, opts);
 }
 
 /**
@@ -3821,112 +3309,129 @@ function classifySessionQuorum(coordinationId, manifest, events, fgosDir, opts =
  *   inline note); omitting it leaves every path here unchanged.
  * @returns {Readonly<object>} The transitioned manifest.
  */
-export function closeSessionByQuorum(coordinationId, { dissentingActorIds = [], aggregationId, authorizedBy } = {}, opts = {}) {
+export function closeSessionByQuorumLocked(coordinationId, { dissentingActorIds = [], aggregationId, authorizedBy } = {}, paths, opts = {}) {
+  const replayed = replaySession(coordinationId, opts);
+  const { manifest, events } = replayed;
+
+  if (authorizedBy !== undefined) {
+    if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
+      throw new CoordinationError(
+        'validation',
+        `coordination close: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a session close may only be written under the session's own driver/provenance-root identity`,
+      );
+    }
+  }
+
+  let definition = null;
+  if (manifest.definitionRef) {
+    try {
+      definition = loadDefinitionForSession(manifest, opts);
+    } catch (err) {
+      if (err.category === 'corrupt-log') throw err;
+      const wrapped = new CoordinationError(
+        'refusal',
+        `closeSessionByQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the definition could not be resolved -- refusing to close against an unresolvable definition: ${err.message}`,
+      );
+      wrapped.cause = err;
+      throw wrapped;
+    }
+    if (manifest.schemaVersion === '1' && definition.metadata?.version !== manifest.definitionRef.version) {
+      throw new CoordinationError(
+        'refusal',
+        `closeSessionByQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata?.version}" -- refusing to close against a drifted definition`,
+      );
+    }
+  }
+
+  // Phase 07 (MVP7): a validated cognitive aggregation used as terminal
+  // INPUT. Strictly a NARROWING -- the only thing it can do is refuse a
+  // close that quorum would otherwise have allowed. It never selects a
+  // status, never relaxes the partialPolicy rules below, and never closes
+  // a session quorum would have refused, so terminal-transition authority
+  // stays entirely with this function. Omitting `aggregationId` leaves
+  // every path below byte-identical to what it was before aggregation
+  // existed.
+  //
+  // The outcome is read from `replayed.aggregations` -- the event log,
+  // inside this same held lock -- never from a caller-supplied verdict,
+  // and never from `ignoredAggregations` (a post-terminal event, which by
+  // definition cannot inform a close that already happened).
+  if (aggregationId !== undefined) {
+    const validated = replayed.aggregations.find((record) => record.aggregationId === aggregationId);
+    if (!validated) {
+      throw new CoordinationError(
+        'dangling-ref',
+        `closeSessionByQuorum: session "${coordinationId}" has no valid "aggregation-validated" event for aggregation "${aggregationId}" -- refusing to close against an aggregation this session never validated`,
+      );
+    }
+    if (validated.outcome !== 'consensus') {
+      throw new CoordinationError(
+        'refusal',
+        `closeSessionByQuorum: aggregation "${aggregationId}" of session "${coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
+      );
+    }
+  }
+
+  const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir, { ...opts, enforceDefinitionVersion: true });
+  const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
+  const incompleteActorIds = incomplete.map((entry) => entry.actorId);
+
+  if (incompleteActorIds.length === 0) {
+    return transitionSessionStatusLocked(
+      coordinationId,
+      'completed',
+      {
+        ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
+        ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
+      },
+      paths,
+    );
+  }
+
+  const policy = manifest.partialPolicy;
+  if (!policy) {
+    throw new CoordinationError(
+      'refusal',
+      `closeSessionByQuorum: session "${coordinationId}" is missing required actor(s) [${incompleteActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
+    );
+  }
+  const allowed = new Set(policy.allowedOmissions ?? []);
+  const notAllowed = incompleteActorIds.filter((id) => !allowed.has(id));
+  if (notAllowed.length > 0) {
+    throw new CoordinationError(
+      'refusal',
+      `closeSessionByQuorum: actor(s) [${notAllowed.join(', ')}] are missing/failed/late but not named in session "${coordinationId}"'s declared partialPolicy.allowedOmissions -- refusing an undeclared partial close`,
+    );
+  }
+  if (policy.minimumActors !== undefined && quorum.completed.length < policy.minimumActors) {
+    throw new CoordinationError(
+      'refusal',
+      `closeSessionByQuorum: only ${quorum.completed.length} actor(s) completed in session "${coordinationId}", below the declared partialPolicy.minimumActors (${policy.minimumActors})`,
+    );
+  }
+
+  return transitionSessionStatusLocked(
+    coordinationId,
+    'partial',
+    {
+      missingActors: incompleteActorIds,
+      ...(quorum.failed.length > 0 ? { failedActors: quorum.failed.map((f) => f.actorId) } : {}),
+      ...(quorum.late.length > 0 ? { lateActors: quorum.late.map((l) => l.actorId) } : {}),
+      ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
+      ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
+    },
+    paths,
+  );
+}
+
+export function closeSessionByQuorum(coordinationId, params = {}, opts = {}) {
   // The classification (which actors are complete/missing/failed/late) and
   // the terminal write both happen INSIDE this ONE held lock, from a fresh
   // `replaySession()` taken after acquiring it -- never from an earlier
-  // unlocked read. A result that genuinely lands between "we started
-  // closing" and "we actually write" is either (a) not yet durable when we
-  // acquire the lock, in which case it is correctly still missing/late, or
-  // (b) already durable (its own write went through this SAME lock first),
-  // in which case this fresh read sees it. There is no window where a
-  // genuinely-completed actor's result can be permanently, falsely recorded
-  // as missing in the absorbing terminal event.
+  // unlocked read.
   return withSessionLock(
     coordinationId,
-    (paths) => {
-      const replayed = replaySession(coordinationId, opts);
-      const { manifest, events } = replayed;
-
-      if (authorizedBy !== undefined) {
-        if (authorizedBy?.id !== manifest.provenanceRoot.writerId) {
-          throw new CoordinationError(
-            'validation',
-            `coordination close: authorizedBy.id "${authorizedBy?.id}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a session close may only be written under the session's own driver/provenance-root identity`,
-          );
-        }
-      }
-
-      // Phase 07 (MVP7): a validated cognitive aggregation used as terminal
-      // INPUT. Strictly a NARROWING -- the only thing it can do is refuse a
-      // close that quorum would otherwise have allowed. It never selects a
-      // status, never relaxes the partialPolicy rules below, and never closes
-      // a session quorum would have refused, so terminal-transition authority
-      // stays entirely with this function. Omitting `aggregationId` leaves
-      // every path below byte-identical to what it was before aggregation
-      // existed.
-      //
-      // The outcome is read from `replayed.aggregations` -- the event log,
-      // inside this same held lock -- never from a caller-supplied verdict,
-      // and never from `ignoredAggregations` (a post-terminal event, which by
-      // definition cannot inform a close that already happened).
-      if (aggregationId !== undefined) {
-        const validated = replayed.aggregations.find((record) => record.aggregationId === aggregationId);
-        if (!validated) {
-          throw new CoordinationError(
-            'dangling-ref',
-            `closeSessionByQuorum: session "${coordinationId}" has no valid "aggregation-validated" event for aggregation "${aggregationId}" -- refusing to close against an aggregation this session never validated`,
-          );
-        }
-        if (validated.outcome !== 'consensus') {
-          throw new CoordinationError(
-            'refusal',
-            `closeSessionByQuorum: aggregation "${aggregationId}" of session "${coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
-          );
-        }
-      }
-
-      const quorum = classifySessionQuorum(coordinationId, manifest, events, paths.fgosDir, { ...opts, enforceDefinitionVersion: true });
-      const incomplete = [...quorum.failed, ...quorum.late, ...quorum.missing];
-      const incompleteActorIds = incomplete.map((entry) => entry.actorId);
-
-      if (incompleteActorIds.length === 0) {
-        return transitionSessionStatusLocked(
-          coordinationId,
-          'completed',
-          {
-            ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
-            ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
-          },
-          paths,
-        );
-      }
-
-      const policy = manifest.partialPolicy;
-      if (!policy) {
-        throw new CoordinationError(
-          'refusal',
-          `closeSessionByQuorum: session "${coordinationId}" is missing required actor(s) [${incompleteActorIds.join(', ')}] and declares no partialPolicy -- default completion requires every required SessionActor (R1)`,
-        );
-      }
-      const allowed = new Set(policy.allowedOmissions ?? []);
-      const notAllowed = incompleteActorIds.filter((id) => !allowed.has(id));
-      if (notAllowed.length > 0) {
-        throw new CoordinationError(
-          'refusal',
-          `closeSessionByQuorum: actor(s) [${notAllowed.join(', ')}] are missing/failed/late but not named in session "${coordinationId}"'s declared partialPolicy.allowedOmissions -- refusing an undeclared partial close`,
-        );
-      }
-      if (policy.minimumActors !== undefined && quorum.completed.length < policy.minimumActors) {
-        throw new CoordinationError(
-          'refusal',
-          `closeSessionByQuorum: only ${quorum.completed.length} actor(s) completed in session "${coordinationId}", below the declared partialPolicy.minimumActors (${policy.minimumActors})`,
-        );
-      }
-
-      return transitionSessionStatusLocked(
-        coordinationId,
-        'partial',
-        {
-          missingActors: incompleteActorIds,
-          ...(quorum.failed.length > 0 ? { failedActors: quorum.failed.map((f) => f.actorId) } : {}),
-          ...(quorum.late.length > 0 ? { lateActors: quorum.late.map((l) => l.actorId) } : {}),
-          ...(quorum.replaced.length > 0 ? { replacedActors: quorum.replaced.map((r) => r.actorId) } : {}),
-          ...(dissentingActorIds.length > 0 ? { dissentingActors: dissentingActorIds } : {}),
-        },
-        paths,
-      );
-    },
+    (paths) => closeSessionByQuorumLocked(coordinationId, params, paths, opts),
     opts,
   );
 }
@@ -4389,9 +3894,10 @@ function knownStampedAssignments(definition, replayed, coordinationId, fgosDir) 
  * @param {string} [params.respondsTo]
  * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
  */
-export function linkSessionContribution(
+export function linkSessionContributionLocked(
   coordinationId,
   { contributionId, type, assignmentId, roundKey, linkedBy, anchors, respondsTo },
+  paths,
   opts = {},
 ) {
   if (!isNonEmptyString(contributionId) || contributionId.length > CONTRIBUTION_FIELD_MAX_LENGTH) {
@@ -4410,7 +3916,7 @@ export function linkSessionContribution(
     throw new CoordinationError('validation', 'linkSessionContribution: assignmentId is required');
   }
 
-  const manifest = readManifest(coordinationId, opts);
+  const manifest = readManifestRaw(paths.manifestPath);
   if (!manifest.definitionRef) {
     throw new CoordinationError(
       'validation',
@@ -4425,7 +3931,7 @@ export function linkSessionContribution(
     );
   }
 
-  const { fgosDir } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir } = paths;
   const replayed = replaySession(coordinationId, opts);
 
   const createdEvent = lastEventFor(replayed.events, 'assignment-created', assignmentId);
@@ -4574,7 +4080,7 @@ export function linkSessionContribution(
   // forbidden field (the log IS the session), the second is stamped on the
   // event envelope. Both were needed only to hand P08.1's validator a complete
   // contribution object.
-  return recordContributionLink(
+  return recordContributionLinkLocked(
     coordinationId,
     {
       contributionId,
@@ -4590,6 +4096,16 @@ export function linkSessionContribution(
       ...(anchors !== undefined ? { anchors } : {}),
       ...(respondsTo !== undefined ? { respondsTo } : {}),
     },
+    paths,
+    opts,
+  );
+}
+
+export function linkSessionContribution(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withSessionLock(
+    coordinationId,
+    (p) => linkSessionContributionLocked(coordinationId, params, p, opts),
     opts,
   );
 }

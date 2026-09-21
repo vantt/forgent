@@ -98,12 +98,18 @@ function rechecksFixtureDefinition({ declareRechecks }) {
       actors: [{ id: 'red-team', role: 'red-team' }],
       operations: [
         { id: 'candidate', role: 'red-team', result: { kind: 'advisory', evidenceRequired: 'reported' } },
+        { id: 'remediate', role: 'red-team', result: { kind: 'work-product', evidenceRequired: 'reported' } },
         { id: 'recheck', role: 'red-team', result: { kind: 'advisory', evidenceRequired: 'reported' } },
       ],
       graph: {
         entry: 'phase-first-pass',
         nodes: [
-          { id: 'phase-first-pass', operations: [{ ref: 'candidate', actor: 'red-team' }], transitions: ['phase-recheck'] },
+          { id: 'phase-first-pass', operations: [{ ref: 'candidate', actor: 'red-team' }], transitions: ['phase-remediation'] },
+          {
+            id: 'phase-remediation',
+            operations: [{ ref: 'remediate', actor: 'red-team', activation: { mode: 'driver-authorized' } }],
+            transitions: ['phase-recheck'],
+          },
           {
             id: 'phase-recheck',
             operations: [{ ref: 'recheck', actor: 'red-team', activation: { mode: 'driver-authorized' }, ...rechecksField }],
@@ -115,14 +121,14 @@ function rechecksFixtureDefinition({ declareRechecks }) {
   };
 }
 
-function setupFixture(coordinationId, { declareRechecks = true } = {}) {
+function setupFixture(coordinationId, { declareRechecks = true, schemaVersion } = {}) {
   const tempDir = mkTempDir();
   const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
   fs.mkdirSync(dir, { recursive: true });
   const definition = rechecksFixtureDefinition({ declareRechecks });
   fs.writeFileSync(path.join(dir, `recheck-discharge-${declareRechecks ? 'declared' : 'undeclared'}.json`), `${JSON.stringify(definition, null, 2)}\n`);
   openDeclaredProtocolSession(
-    { definitionId: definition.metadata.id, coordinationId, objective: 'Recheck-discharge quorum fixture.', writerId: 'writer-1' },
+    { definitionId: definition.metadata.id, coordinationId, objective: 'Recheck-discharge quorum fixture.', writerId: 'writer-1', schemaVersion },
     { cwd: tempDir },
   );
   return { tempDir, opts: { cwd: tempDir, repoRoot: tempDir } };
@@ -136,15 +142,44 @@ async function dispatchCandidate(coordinationId, ctx, { status }) {
   );
 }
 
-async function authorizeAndDispatchRecheck(coordinationId, ctx, { authorizationId, invocationKey, status }) {
+async function authorizeAndDispatchRemediation(coordinationId, ctx, { failedAssignmentId, status = 'done', contextRefs = [failedAssignmentId], key = failedAssignmentId }) {
   await authorizeDeclaredOperation(
     coordinationId,
-    { operationId: 'recheck', targetActorId: 'red-team', authorizationId, invocationKey, authorizedBy: { type: 'driver', id: 'writer-1' }, reason: 'Recheck the accepted finding.', grantedContextRefs: [] },
+    {
+      operationId: 'remediate',
+      targetActorId: 'red-team',
+      authorizationId: `auth_remediate_${key}`,
+      invocationKey: `remediate:${key}`,
+      authorizedBy: { type: 'driver', id: 'writer-1' },
+      reason: 'Remediate the accepted finding.',
+      grantedContextRefs: contextRefs,
+    },
     ctx.opts,
   );
   return dispatchDeclaredOperation(
     coordinationId,
-    { operationId: 'recheck', targetActorId: 'red-team', objective: 'The recheck.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'writer-1' },
+    {
+      operationId: 'remediate',
+      targetActorId: 'red-team',
+      objective: 'Remediate the accepted finding.',
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      contextRefs,
+      writerId: 'writer-1',
+    },
+    { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status }) },
+  );
+}
+
+async function authorizeAndDispatchRecheck(coordinationId, ctx, { authorizationId, invocationKey, status, remediationAssignmentId }) {
+  const contextRefs = remediationAssignmentId ? [remediationAssignmentId] : [];
+  await authorizeDeclaredOperation(
+    coordinationId,
+    { operationId: 'recheck', targetActorId: 'red-team', authorizationId, invocationKey, authorizedBy: { type: 'driver', id: 'writer-1' }, reason: 'Recheck the accepted finding.', grantedContextRefs: contextRefs },
+    ctx.opts,
+  );
+  return dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'recheck', targetActorId: 'red-team', objective: 'The recheck.', expectedOutputs: ['agent-result.json (status, summary)'], contextRefs, writerId: 'writer-1' },
     { ...ctx.opts, runnerConfig: fakeExecutor(ctx.tempDir, { status }) },
   );
 }
@@ -175,6 +210,71 @@ test('a failed required first pass, dispositioned then satisfied-recheck, discha
 
   const closed = closeSessionByQuorum(coordinationId, {}, ctx.opts);
   assert.equal(closed.status, 'completed');
+});
+
+test('schema-3 accepted disposition requires a causally linked successful remediation before a clean recheck can discharge', async () => {
+  const coordinationId = 'coord_recheck_discharge_schema3_remediation';
+  const ctx = setupFixture(coordinationId, { schemaVersion: '3' });
+
+  const candidate = await dispatchCandidate(coordinationId, ctx, { status: 'failed' });
+  recordDriverDisposition(
+    coordinationId,
+    {
+      targetRef: candidate.assignment.assignmentId,
+      disposition: 'accepted',
+      rationale: 'Finding accepted; remediation is required.',
+      evidenceRefs: [],
+      authorizedBy: { type: 'driver', id: 'writer-1' },
+    },
+    ctx.opts,
+  );
+
+  await authorizeAndDispatchRecheck(coordinationId, ctx, {
+    authorizationId: 'auth_recheck_without_remediation',
+    invocationKey: 'recheck:without-remediation',
+    status: 'done',
+  });
+  assert.deepEqual(
+    evaluateSessionQuorum(coordinationId, ctx.opts).failed,
+    [{ actorId: 'red-team', assignmentId: candidate.assignment.assignmentId, runId: candidate.runResult.runId }],
+    'a clean recheck with no durable remediation chain must not launder an accepted finding',
+  );
+
+  const unrelatedRemediation = await authorizeAndDispatchRemediation(coordinationId, ctx, {
+    failedAssignmentId: candidate.assignment.assignmentId,
+    contextRefs: [],
+    key: 'unrelated',
+  });
+  await authorizeAndDispatchRecheck(coordinationId, ctx, {
+    authorizationId: 'auth_recheck_with_unrelated_work',
+    invocationKey: 'recheck:with-unrelated-work',
+    status: 'done',
+    remediationAssignmentId: unrelatedRemediation.assignment.assignmentId,
+  });
+  assert.equal(
+    evaluateSessionQuorum(coordinationId, ctx.opts).completed.length,
+    0,
+    'an unrelated successful work-product must not satisfy the remediation link merely because the recheck cites it',
+  );
+
+  const remediation = await authorizeAndDispatchRemediation(coordinationId, ctx, {
+    failedAssignmentId: candidate.assignment.assignmentId,
+  });
+  const rechecked = await authorizeAndDispatchRecheck(coordinationId, ctx, {
+    authorizationId: 'auth_recheck_with_remediation',
+    invocationKey: 'recheck:with-remediation',
+    status: 'done',
+    remediationAssignmentId: remediation.assignment.assignmentId,
+  });
+
+  assert.deepEqual(evaluateSessionQuorum(coordinationId, ctx.opts).completed, [
+    {
+      actorId: 'red-team',
+      assignmentId: rechecked.assignment.assignmentId,
+      runId: rechecked.runResult.runId,
+      supersededAssignmentId: candidate.assignment.assignmentId,
+    },
+  ]);
 });
 
 // ─── No disposition -- a satisfied recheck alone never discharges anything ─

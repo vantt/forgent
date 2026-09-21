@@ -499,6 +499,129 @@ test('fgos coordination run --file <declared consult>: dispatches both declared 
   assert.equal(runData.steps[1].status, 'done');
 });
 
+test('fgos coordination run without close: true and without close step leaves the session active', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  const req = agentLedRequest();
+  delete req.close;
+  const reqPath = writeRequest(cwd, 'agent-led-no-close.json', req);
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, false, 'response closed is false');
+
+  const showResult = run(cwd, ['coordination', 'show', runData.coordinationId, '--json']);
+  const showData = envelopeData(showResult.stdout);
+  assert.equal(showData.status, 'active', 'show confirms session is active');
+});
+
+test('fgos coordination run with close: true explicitly closes the session', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  const req = agentLedRequest({ writerId: 'test' });
+  req.close = true;
+  const reqPath = writeRequest(cwd, 'req.json', req);
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, true, 'response closed is true due to top-level close');
+});
+
+test('fgos coordination run with {"type": "close", "as": "closeSession"} step explicitly closes the session without top-level close: true', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  const examplePath = path.resolve(FGOS, '../../docs/how-to/coordination-examples/declared-consult-request.json');
+  const raw = JSON.parse(fs.readFileSync(examplePath, 'utf8'));
+  delete raw.close;
+  raw.steps.push({ type: 'close', as: 'closeSession' });
+  const reqPath = writeRequest(cwd, 'declared-consult-close-step.json', raw);
+
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, true, 'response closed is true due to close step, not top-level flag');
+  assert.equal(runData.status, 'completed');
+});
+
+test('fgos coordination close --file closes session or refuses cleanly on quorum/identity', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const reqNoClose = agentLedRequest({ writerId: 'driver-1' });
+  delete reqNoClose.close;
+  const reqNoClosePath = writeRequest(cwd, 'req-no-close.json', reqNoClose);
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqNoClosePath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+
+  const closeReqWrongId = {
+    kind: 'close',
+    coordinationId: runData.coordinationId,
+    authorizedBy: { type: 'operator', id: 'driver-2' },
+  };
+  const closeReqWrongIdPath = writeRequest(cwd, 'close-wrong.json', closeReqWrongId);
+  const closeResWrong = run(cwd, ['coordination', 'close', '--file', closeReqWrongIdPath]);
+  assert.notEqual(closeResWrong.status, 0);
+  assert.match(closeResWrong.stderr, /identity|not the driver/i, 'refusal reason should mention identity');
+
+  const closeReq = {
+    kind: 'close',
+    coordinationId: runData.coordinationId,
+    authorizedBy: { type: 'operator', id: 'driver-1' },
+  };
+  const closeReqPath = writeRequest(cwd, 'close-req.json', closeReq);
+  const closeRes = run(cwd, ['coordination', 'close', '--file', closeReqPath]);
+  assert.equal(closeRes.status, 0, closeRes.stderr);
+  const closeData = envelopeData(closeRes.stdout);
+  assert.equal(closeData.closed, true, 'session closed via explicit close cli');
+});
+
+test('a disposition event like cell-closed does not self-close the session', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const req = {
+    kind: 'declared-protocol',
+    protocolRef: { id: 'core.coordination-protocol.declared-consult' },
+    objective: 'Test disp step',
+    actors: [{ id: 'consultant-actor' }],
+    writerId: 'test',
+    steps: [
+      { type: 'disposition', as: 'closeCell', targetRef: 'unknown', disposition: 'cell-closed', rationale: 'audit state' }
+    ]
+  };
+  const reqPath = writeRequest(cwd, 'req.json', req);
+  const runResult = run(cwd, ['coordination', 'run', '--file', reqPath]);
+  assert.equal(runResult.status, 0, runResult.stderr);
+  const runData = envelopeData(runResult.stdout);
+  assert.equal(runData.closed, false, 'session is NOT closed');
+
+  const showResult = run(cwd, ['coordination', 'show', runData.coordinationId, '--json']);
+  assert.equal(showResult.status, 0);
+  const showData = envelopeData(showResult.stdout);
+  assert.equal(showData.status, 'active');
+  assert.ok(
+    showData.dispositions?.some((d) => d.targetRef === 'unknown' && d.disposition === 'cell-closed'),
+    'show must report the persisted cell-closed disposition',
+  );
+
+  const eventsFile = path.join(cwd, '.fgos/coordination/sessions', runData.coordinationId, 'events.jsonl');
+  assert.ok(fs.existsSync(eventsFile), 'events.jsonl must exist');
+  const eventsContent = fs.readFileSync(eventsFile, 'utf8');
+  assert.match(
+    eventsContent,
+    /"type":"driver-disposition-recorded"/,
+    'events.jsonl must persist driver-disposition-recorded event',
+  );
+  assert.match(
+    eventsContent,
+    /"disposition":"cell-closed"/,
+    'persisted event must record disposition "cell-closed"',
+  );
+});
+
 // ─── R7: `--cwd <path>` ─────────────────────────────────────────────────
 //
 // CORRECTED (Wave 1 integration fix, group-thinking-plan-loop): the two
@@ -735,25 +858,32 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <run\|show\|launch-master-loop\|chain\|recover>/,
-    'requireField usage message must enumerate "chain"',
+    /coordination requires a sub-verb: fgos coordination <run\|show\|close\|actions\|launch-master-loop\|chain\|recover>/,
+    'requireField usage message must enumerate "close", "actions", and "chain"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, launch-master-loop, chain, recover\)/,
-    'unknown-sub-verb error message must enumerate "chain"',
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, close, actions, launch-master-loop, chain, recover\)/,
+    'unknown-sub-verb error message must enumerate "close", "actions", and "chain"',
   );
 
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
   assert.ok(entry, 'the "coordination" registry entry must exist');
+  assert.match(entry.invoke, /close/, 'registry invoke string must enumerate "close"');
   assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
+  assert.match(entry.invoke, /actions/, 'registry invoke string must enumerate "actions"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('close'), 'registry sub enum must include "close"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('actions'), 'registry sub enum must include "actions"');
   assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.match(entry.description, /"close"/, 'registry description must document "close"');
+  assert.match(entry.description, /"actions"/, 'registry description must document "actions"');
   assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
   assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
+  assert.ok(entry.examples.some((e) => e.includes('actions')), 'registry examples must include an "actions" example');
 
   const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
-  assert.match(unknownSubResult.stderr, /known: run, show, launch-master-loop, chain/);
+  assert.match(unknownSubResult.stderr, /known: run, show, close, actions, launch-master-loop, chain/);
 });
 
 // `execFileSync` re-export sanity: confirms the harness genuinely spawns a

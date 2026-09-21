@@ -1,7 +1,7 @@
 # Independent recheck 4 — Units 0D, 1A, 1B
 
-Date: 2026-09-21  
-Reviewer: independent review-only session  
+Date: 2026-09-21
+Reviewer: independent review-only session
 Final verdict: **BLOCKED**
 
 This report is additive. It does not modify or supersede
@@ -66,63 +66,63 @@ impact result is **partial**, not current proof.
 
 ### B-01
 
-ID: B-01  
-Severity: **CRITICAL**  
-Category: review evidence stability  
-Affected unit: 0D / 1A / 1B  
-Affected contract: stable checkout and reproducible test evidence  
+ID: B-01
+Severity: **CRITICAL**
+Category: review evidence stability
+Affected unit: 0D / 1A / 1B
+Affected contract: stable checkout and reproducible test evidence
 Source evidence: tracked diff fingerprint changed from `bfd3d3d5…` to
-`8dc718e4…`; new distillery paths appeared during this review.  
+`8dc718e4…`; new distillery paths appeared during this review.
 Test evidence: full `npm test` observed a transient plugin mirror file
 `scope-and-reclaim.md.tmp-446134-1789966177219-orirwk5qnq`, causing
 `test/skills/fgos-mirror.test.mjs` to fail while another process was writing.
-The temp file later disappeared, which itself confirms concurrent mutation.  
+The temp file later disappeared, which itself confirms concurrent mutation.
 Why current proof is insufficient: focused and full results were not produced
-from one stable fingerprint.  
+from one stable fingerprint.
 Required fix: stop/finish the writer, establish one stable checkout snapshot,
-then rerun the entire review and all test gates.  
+then rerun the entire review and all test gates.
 Blocks Phase 2 implementation: **yes**
 
 ### P-01 (provisional)
 
-ID: P-01  
-Severity: **CRITICAL**  
-Category: second mutation engine / production authority  
-Affected unit: 1B  
+ID: P-01
+Severity: **CRITICAL**
+Category: second mutation engine / production authority
+Affected unit: 1B
 Affected contract: action composer must use existing validated request and
-kernel mutation paths, not direct store mutators  
+kernel mutation paths, not direct store mutators
 Source evidence: `executeCoordinationActionUseCase` calls
 `createSessionAssignmentLocked`, `authorizeOperationLocked`,
 `recordHumanTurnLocked`, `recordContributionLinkLocked`, and
 `recordDriverDispositionLocked` directly. It does not call
 `validateCoordinationRequest`, `runCoordinationUseCase`,
 `dispatchDeclaredOperation`, or `dispatchResearchFanOut`. Dispatch actions
-create Assignment records but do not execute a Run.  
+create Assignment records but do not execute a Run.
 Test evidence: integration tests assert store/event creation; they do not prove
-executor execution or the existing run kernel path.  
+executor execution or the existing run kernel path.
 Why current proof is insufficient: direct store writes bypass current dispatch
-legality, execution, result-linking, and request validation.  
+legality, execution, result-linking, and request validation.
 Required fix: rewire the semantic door to lock-aware versions of the existing
-run/dispatch kernel paths and validate the current raw request shape.  
+run/dispatch kernel paths and validate the current raw request shape.
 Blocks Phase 2 implementation: **yes**, if reproduced on the stable snapshot
 
 ### P-02 (provisional)
 
-ID: P-02  
-Severity: **HIGH**  
-Category: fan-out / human-turn / authority compatibility  
-Affected unit: 1A / 1B  
-Affected contract: exact fan-out target, artifact provenance, single driver channel  
+ID: P-02
+Severity: **HIGH**
+Category: fan-out / human-turn / authority compatibility
+Affected unit: 1A / 1B
+Affected contract: exact fan-out target, artifact provenance, single driver channel
 Source evidence: fan-out loops raw `createSessionAssignmentLocked` calls and
 does not invoke the cohort planner; human-turn defaults revision to an all-zero
 SHA-256 instead of hashing artifact bytes; close synthesizes an identity from
-`writerId`; unkeyed public close still bypasses the action seam.  
+`writerId`; unkeyed public close still bypasses the action seam.
 Test evidence: two-process test races two different action kinds/keys; there is
-no same-key production fan-out or crash-after-commit proof.  
+no same-key production fan-out or crash-after-commit proof.
 Why current proof is insufficient: these paths do not establish current kernel
-target, provenance, authority, or durable retry semantics.  
+target, provenance, authority, or durable retry semantics.
 Required fix: use the existing kernel doors and add same-key two-process plus
-crash/retry tests through those production doors.  
+crash/retry tests through those production doors.
 Blocks Phase 2 implementation: **yes**, if reproduced on the stable snapshot
 
 ## 6. Tests run and exact results

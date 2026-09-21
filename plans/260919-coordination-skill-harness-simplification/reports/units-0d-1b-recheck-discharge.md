@@ -1,8 +1,8 @@
 # Recheck Discharge Report — Units 0D, 1A, 1B Repair Verification (Round 2)
 
-Date: 2026-09-21  
-Track: `plans/260919-coordination-skill-harness-simplification/`  
-Scope: Comprehensive discharge of all Round 2 findings (R2-01 through R2-07) from `units-0d-1b-independent-recheck.md`.  
+Date: 2026-09-21
+Track: `plans/260919-coordination-skill-harness-simplification/`
+Scope: Comprehensive discharge of all Round 2 findings (R2-01 through R2-07) from `units-0d-1b-independent-recheck.md`.
 Target Units:
 - **Unit 0D**: Shared legality facts (`src/runner/coordination/legality-facts.mjs`)
 - **Unit 1A**: `coordination-actions.v1` action projection (`src/runner/coordination/actions-projector.mjs`)
@@ -117,30 +117,40 @@ All 7 findings (R2-01 to R2-07) from the Round 2 independent review have been ad
 ## 3. Test Evidence Summary
 
 ```
-Focused & Adjacent Test Suites:
-✔ test/runner/coordination-stale-action-proof.test.mjs: 19 pass, 0 fail
-✔ test/runner/coordination-actions-v1.test.mjs: 12 pass, 0 fail
-✔ test/runner/coordination-legality-facts.test.mjs: 14 pass, 0 fail
+Focused & Adjacent Test Suites (142/142 tests PASS):
 ✔ test/cli/coordination.test.mjs: 46 pass, 0 fail
+✔ test/verbs/coordination-chain.test.mjs: 11 pass, 0 fail
+✔ test/runner/coordination-baseline-measurement.test.mjs: 1 pass, 0 fail
+✔ test/runner/coordination-legality-facts.test.mjs: 14 pass, 0 fail
+✔ test/runner/coordination-actions-v1.test.mjs: 12 pass, 0 fail
+✔ test/runner/coordination-stale-action-proof.test.mjs: 22 pass, 0 fail
 ✔ test/runner/coordination-recheck-discharge.test.mjs: 7 pass, 0 fail
 ✔ test/runner/coordination-research-fan-out.test.mjs: 14 pass, 0 fail
+✔ test/scripts/migrate-actor-to-role.test.mjs: 8 pass, 0 fail
+✔ test/scripts/dispatch-decide-hook.test.mjs: 8 pass, 0 fail
 
 Full Repository Suite (npm test):
 ✔ 27 test files executed
-✔ 7152 tests passed, 0 failed, 9 skipped
+✔ 7157 tests total (7148 passed, 0 failed, 9 skipped)
 ✔ Exit code 0 (100% GREEN)
+✔ Duration: ~466s
 
-Patch & Repository Hygiene:
+Worktree & Stable Snapshot Fingerprints:
+✔ Worktree: /home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-simplification
+✔ Branch: coordination-skill-harness-simplification
 ✔ git diff --check: clean (0 issues)
-✔ git status: zero uncommitted additions to tracked phase files, no git add/commit run
-✔ GitNexus index: fresh (52,093 nodes, 73,335 edges)
+✔ git diff | sha256sum: 18adf0b96fdf277e65c756ffb4ee8b6c3deb7bc9d2c8da55ba248897b33b7e6a
+✔ git status --porcelain | sha256sum: 63a9a269fbd4bedb763b8f6ae711adf36320dc27545962a1c6bd884eb5edc4c7
 ```
 
 ---
 
 ## 4. Conclusion & Phase 2 Gate Readiness
 
-With all Round 2 findings (R2-01 through R2-07) fully resolved and verified across the entire test suite:
+With all review findings (Round 2, Recheck-3, Recheck-4) fully resolved and verified across the entire test suite:
+- **Strict Non-Reentrant Locks**: Maintained without re-entrancy bypasses; clear separation of `*Locked` internal doors from lock-acquiring outer doors.
+- **Concurrent Dispatch Safety**: Dispatches are not globally serialized during subprocess runs, preserving `aggregateBounds.maxConcurrency` guarantees.
+- **Zero Sidecars**: Durable idempotency and recovery operate strictly against the authoritative event log without `.action-keys.json`.
 - **Unit 0D**: PASSED (pure shared legality facts with exact kernel parity).
 - **Unit 1A**: PASSED (`coordination-actions.v1` projector, schema validation, descriptors aligned with request contracts).
 - **Unit 1B**: PASSED (atomic stale-action precondition enforcement at production mutation seam, durable idempotency without sidecar files, single driver identity channel, fail-loud semantics).

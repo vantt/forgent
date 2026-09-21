@@ -842,8 +842,25 @@ export function evaluateClosePrerequisites({
     });
   }
 
-  if (definition?.spec?.profile?.completion?.aggregation) {
-    const aggList = Array.isArray(aggregations) ? aggregations : [];
+  const effectiveAggregationId = opts.aggregationId ?? ctx.aggregationId;
+  const aggList = Array.isArray(aggregations) ? aggregations : [];
+
+  if (effectiveAggregationId !== undefined) {
+    const validated = aggList.find((record) => record.aggregationId === effectiveAggregationId);
+    if (!validated) {
+      blockers.push({
+        kind: 'dangling-aggregation-ref',
+        blocking: true,
+        reason: `closeSessionByQuorum: session "${manifest.coordinationId}" has no valid "aggregation-validated" event for aggregation "${effectiveAggregationId}" -- refusing to close against an aggregation this session never validated`,
+      });
+    } else if (validated.outcome !== 'consensus') {
+      blockers.push({
+        kind: 'aggregation-no-consensus',
+        blocking: true,
+        reason: `closeSessionByQuorum: aggregation "${effectiveAggregationId}" of session "${manifest.coordinationId}" validated as "${validated.outcome}", not "consensus" -- refusing to close; resolve the aggregation and validate a new one, or close this session by another declared route`,
+      });
+    }
+  } else if (definition?.spec?.profile?.completion?.aggregation !== undefined) {
     if (aggList.length === 0) {
       blockers.push({
         kind: 'pending-aggregation',

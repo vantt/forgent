@@ -55,17 +55,29 @@ import {
   resumeSession,
   dispatchPrimaryTask,
   dispatchDeclaredOperation,
+  dispatchDeclaredOperationLocked,
   dispatchResearchFanOut,
+  dispatchResearchFanOutLocked,
   authorizeDeclaredOperation,
+  authorizeDeclaredOperationLocked,
   linkSessionContribution,
+  linkSessionContributionLocked,
   evaluateSessionQuorum,
   deriveSessionPhase,
   closeSessionByQuorum,
 } from '../../runner/coordination/session-engine.mjs';
-import { recordDriverDisposition, recordHumanTurn, readSessionEvents } from '../../runner/coordination/store.mjs';
+import {
+  recordDriverDisposition,
+  recordDriverDispositionLocked,
+  recordHumanTurn,
+  recordHumanTurnLocked,
+  readSessionEvents,
+} from '../../runner/coordination/store.mjs';
+import { executeUnderActionPrecondition } from '../../runner/coordination/action-precondition.mjs';
+import { canonicalizeNormalizedSteps } from '../../runner/coordination/fan-out-payload.mjs';
 import { loadCoordinationProtocol } from '../../runner/definitions/protocol-loader.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
-import { validateCoordinationRequest } from './schema.mjs';
+import { validateCoordinationRequest, computeHumanTurnArtifactRevision } from './schema.mjs';
 import { recordCoordinationSchemaFault } from './schema-fault-log.mjs';
 
 function readRequestFile(requestPath) {
@@ -217,6 +229,7 @@ function resolveRef(value, labels, fieldLabel) {
 }
 
 function resolveRefArray(values, labels, fieldLabel) {
+  if (!Array.isArray(values)) return [];
   return values.map((v, i) => resolveRef(v, labels, `${fieldLabel}[${i}]`));
 }
 
@@ -353,15 +366,192 @@ export async function runCoordinationUseCase(ctx, options = {}) {
     throw err;
   }
 
+  return executeCoordinationRunKernel(ctx, request, options);
+}
+
+/** Execute exactly one already-normalized declared-protocol step. */
+export async function executeValidatedCoordinationStep({ ctx, request, step, manifest, labels, engineOpts, lockContext }) {
+  const paths = lockContext?.paths;
+  const releaseLock = lockContext?.releaseLock;
+  const locked = Boolean(lockContext);
+  const driverIdentity = { type: 'driver', id: request.writerId };
+  const actorEntry = step.targetActorId ? findActor(request.actors, step.targetActorId) : undefined;
+  const cliPolicy = actorPolicyFields(actorEntry, { globalExecutor: engineOpts.cliExecutor, globalTier: engineOpts.cliTier });
+  const call = (publicFn, lockedFn, ...args) => locked ? lockedFn(...args, paths, engineOpts) : publicFn(...args, engineOpts);
+  if (step.type === 'operation') {
+    const contextRefs = resolveRefArray(step.contextRefs, labels, `steps[${step.as}].contextRefs`);
+    const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
+    const dispatch = await (locked
+      ? dispatchDeclaredOperationLocked(manifest.coordinationId, {
+          operationId: step.operationId, targetActorId: step.targetActorId, objective: step.objective,
+          expectedOutputs: step.expectedOutputs, contextRefs, constraints: step.constraints,
+          capabilities: step.capabilities, writerId: request.writerId, fromAssignmentId,
+          intent: step.intent, round: step.round, taskKey: step.taskKey,
+          ...(lockContext?.actionInvocation ? { actionInvocation: lockContext.actionInvocation } : {}),
+          ...(Object.keys(cliPolicy).length ? { cliPolicy } : {}),
+          ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
+        }, paths, { ...engineOpts, releaseLock })
+      : dispatchDeclaredOperation(manifest.coordinationId, {
+          operationId: step.operationId, targetActorId: step.targetActorId, objective: step.objective,
+          expectedOutputs: step.expectedOutputs, contextRefs, constraints: step.constraints,
+          capabilities: step.capabilities, writerId: request.writerId, fromAssignmentId,
+          intent: step.intent, round: step.round, taskKey: step.taskKey,
+          ...(Object.keys(cliPolicy).length ? { cliPolicy } : {}),
+          ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
+        }, engineOpts));
+    if (step.targetActorId && actorEntry === undefined) {
+      const landedOn = dispatch?.runResult?.policy?.provenance?.executor?.value;
+      process.stderr.write(
+        `fgos: coordination step "${step.as}" targets actor "${step.targetActorId}" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied` +
+          `${landedOn ? `, so it dispatched on "${landedOn}"` : ''}. The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.\n`,
+      );
+    }
+    labels[step.as] = dispatch.assignment.assignmentId;
+    return { as: step.as, type: 'operation', actorId: step.targetActorId ?? null, ...summarizeDispatch(dispatch) };
+  }
+  if (step.type === 'authorize') {
+    const grantedContextRefs = resolveRefArray(step.grantedContextRefs, labels, `steps[${step.as}].grantedContextRefs`);
+    const targetArtifactRef = resolveRef(step.targetArtifactRef, labels, `steps[${step.as}].targetArtifactRef`);
+    const params = {
+      operationId: step.operationId, targetActorId: step.targetActorId, nodeId: step.nodeId,
+      authorizationId: step.authorizationId, invocationKey: step.invocationKey, authorizedBy: driverIdentity,
+      reason: step.reason, grantedContextRefs, targetArtifactRef,
+    };
+    const authorization = locked
+      ? authorizeDeclaredOperationLocked(manifest.coordinationId, params, paths, engineOpts)
+      : authorizeDeclaredOperation(manifest.coordinationId, params, engineOpts);
+    const persisted = authorization.appended ? authorization : readSessionEvents(manifest.coordinationId, engineOpts)
+      .find((event) => event.type === 'operation-authorized' && event.payload.authorizationId === authorization.authorizationId)?.payload;
+    if (!persisted) throw new CoordinationError('corrupt-log', `authorization ${authorization.authorizationId} was not found after an idempotent authorize`);
+    return { as: step.as, type: 'authorize', operationId: persisted.operationId, nodeId: persisted.nodeId, actorId: persisted.targetActorId,
+      authorizationId: persisted.authorizationId, invocationKey: persisted.invocationKey, grantedContextRefs: persisted.grantedContextRefs,
+      targetArtifactRef: persisted.targetArtifactRef ?? null, appended: authorization.appended };
+  }
+  if (step.type === 'disposition') {
+    const params = { targetRef: resolveRef(step.targetRef, labels, `steps[${step.as}].targetRef`), disposition: step.disposition,
+      rationale: step.rationale, evidenceRefs: resolveRefArray(step.evidenceRefs, labels, `steps[${step.as}].evidenceRefs`), authorizedBy: driverIdentity };
+    const disposition = locked
+      ? recordDriverDispositionLocked(manifest.coordinationId, params, paths, engineOpts)
+      : recordDriverDisposition(manifest.coordinationId, params, engineOpts);
+    return { as: step.as, type: 'disposition', targetRef: disposition.targetRef, disposition: disposition.disposition,
+      evidenceRefs: disposition.evidenceRefs, appended: disposition.appended };
+  }
+  if (step.type === 'human-turn') {
+    const { revision } = computeHumanTurnArtifactRevision(ctx.cwd, step.artifactRef, step.as);
+    const respondsToRefs = step.respondsToRefs?.map((id) => `${HUMAN_TURN_REF_PREFIX}${id}`);
+    const params = { turnId: step.turnId, turnOrdinal: step.turnOrdinal, channel: step.channel, artifactRef: step.artifactRef,
+      revision, externalRef: step.externalRef, attributedTo: step.attributedTo, recordedBy: driverIdentity,
+      ...(respondsToRefs !== undefined ? { respondsToRefs } : {}) };
+    const humanTurn = locked
+      ? recordHumanTurnLocked(manifest.coordinationId, params, paths, engineOpts)
+      : recordHumanTurn(manifest.coordinationId, params, engineOpts);
+    return { as: step.as, type: 'human-turn', turnId: humanTurn.turnId, turnOrdinal: humanTurn.turnOrdinal, channel: humanTurn.channel,
+      artifactRef: humanTurn.artifactRef, revision: humanTurn.revision, externalRef: humanTurn.externalRef,
+      attributedTo: humanTurn.attributedTo, respondsToRefs: humanTurn.respondsToRefs ?? [], appended: humanTurn.appended };
+  }
+  if (step.type === 'contribution') {
+    const params = { contributionId: step.contributionId, type: step.contributionType,
+      assignmentId: resolveRef(step.assignmentId, labels, `steps[${step.as}].assignmentId`), roundKey: step.roundKey,
+      linkedBy: driverIdentity, anchors: step.anchors, respondsTo: step.respondsTo };
+    const contribution = locked
+      ? linkSessionContributionLocked(manifest.coordinationId, params, paths, engineOpts)
+      : linkSessionContribution(manifest.coordinationId, params, engineOpts);
+    return { as: step.as, type: 'contribution', contributionId: contribution.contributionId, contributionType: contribution.type,
+      assignmentId: contribution.assignmentId, roundKey: contribution.roundKey, anchors: contribution.anchors ?? [],
+      respondsTo: contribution.respondsTo ?? null, appended: contribution.appended };
+  }
+  if (step.type === 'fan-out') {
+    const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
+    const branches = step.branches.map((branch) => ({ ...branch,
+      fromAssignmentId: resolveRef(branch.fromAssignmentId, labels, `steps[${step.as}].branches[${branch.actorId}].fromAssignmentId`) ?? fromAssignmentId }));
+    const fanOut = await (locked
+      ? dispatchResearchFanOutLocked(manifest.coordinationId, { operationId: step.operationId, branches, writerId: request.writerId, fromAssignmentId, actionInvocation: lockContext?.actionInvocation }, paths, { ...engineOpts, releaseLock })
+      : dispatchResearchFanOut(manifest.coordinationId, { operationId: step.operationId, branches, writerId: request.writerId, fromAssignmentId }, engineOpts));
+    if (fanOut.status !== 'dispatched') return { as: step.as, type: 'fan-out', status: fanOut.status, reason: fanOut.reason ?? null, branches: [], fanOutFailure: { as: step.as, status: fanOut.status, reason: fanOut.reason ?? null } };
+    const branchAssignmentIds = {};
+    const branchSummaries = fanOut.branches.map((b) => {
+      if (b.status === 'fulfilled') branchAssignmentIds[b.actorId] = b.result.assignment.assignmentId;
+      return { actorId: b.actorId, status: b.status, ...(b.status === 'fulfilled' ? summarizeDispatch(b.result) : { error: b.error }) };
+    });
+    labels[step.as] = branchAssignmentIds;
+    return { as: step.as, type: 'fan-out', status: 'dispatched', branches: branchSummaries };
+  }
+  if (step.type === 'close') return { as: step.as, type: 'close', status: 'fulfilled' };
+  throw new CoordinationError('validation', `unsupported step type "${step.type}"`);
+}
+
+export async function executeCoordinationRunKernel(ctx, request, options = {}) {
+  const { cliExecutor, cliModel, cliTier } = options;
+  const actionPrecondition = options.actionPrecondition;
+
   const engineOpts = {
     cwd: ctx.cwd, repoRoot: ctx.repoRoot, packageRoot: ctx.packageRoot, runnerConfig: ctx.runnerConfig, timeoutMs: ctx.timeoutMs,
-    // Opaque here -- a plain string, never a herdr-shaped value. Only a
-    // herdr-family dispatch adapter (transport.mjs/herdr-round.mjs) ever
-    // looks this up to lazily open a batch tab; a request whose actors are
-    // all cli-spawn never touches herdr at all. This module has no reason to
-    // import anything herdr-specific to build it.
+    cliExecutor, cliModel, cliTier,
     dispatchBatchKey: request.coordinationId,
   };
+
+  if (actionPrecondition) {
+    return executeUnderActionPrecondition(
+      request.coordinationId,
+      actionPrecondition,
+      async (paths, sessionBundle, releaseLock) => {
+        const { manifest, action: matchedAction } = sessionBundle;
+        if (typeof options.composeActionRequest !== 'function') {
+          throw new CoordinationError('validation', 'coordination action: canonical request composer is unavailable');
+        }
+        const composed = options.composeActionRequest({ manifest, action: matchedAction, precondition: actionPrecondition });
+        const canonicalNormalizedSteps = canonicalizeNormalizedSteps(composed.steps);
+        const labels = Object.create(null);
+        const results = [];
+        for (const step of composed.steps) {
+          results.push(await executeValidatedCoordinationStep({
+            ctx,
+            request: composed,
+            step,
+            manifest,
+            labels,
+            engineOpts,
+            lockContext: {
+              paths,
+              releaseLock,
+              actionInvocation: {
+                actionKey: actionPrecondition.actionKey,
+                kind: actionPrecondition.kind,
+                normalizedSteps: canonicalNormalizedSteps,
+              },
+            },
+          }));
+        }
+        const last = results.at(-1) ?? {};
+        const actionResult = {
+          coordinationId: manifest.coordinationId,
+          kind: actionPrecondition.kind,
+          ...(last.type === 'human-turn' ? {
+            turnId: last.turnId, turnOrdinal: last.turnOrdinal, channel: last.channel, artifactRef: last.artifactRef,
+            revision: last.revision, externalRef: last.externalRef, attributedTo: last.attributedTo, respondsToRefs: last.respondsToRefs,
+          } : {}),
+          ...(last.type === 'disposition' ? { targetRef: last.targetRef, disposition: last.disposition, evidenceRefs: last.evidenceRefs, appended: last.appended } : {}),
+          ...(last.type === 'contribution' ? {
+            contributionId: last.contributionId, contributionType: last.contributionType, assignmentId: last.assignmentId,
+            roundKey: last.roundKey, anchors: last.anchors, respondsTo: last.respondsTo, appended: last.appended,
+          } : {}),
+          status: actionPrecondition.kind === 'dispatch-operation' || actionPrecondition.kind === 'authorize-and-dispatch' || actionPrecondition.kind === 'fan-out'
+            ? 'dispatched'
+            : actionPrecondition.kind === 'link-contribution' ? 'linked' : 'recorded',
+          actionKey: actionPrecondition.actionKey,
+          steps: results,
+          ...(last.assignmentId ? { assignmentId: last.assignmentId } : {}),
+          ...(last.turnId ? { turnId: last.turnId } : {}),
+          ...(last.disposition ? { disposition: last.disposition } : {}),
+          ...(last.contributionId ? { contributionId: last.contributionId } : {}),
+          ...(last.branches ? { branches: last.branches } : {}),
+          ...(actionPrecondition.kind === 'authorize-and-dispatch' ? { authorizationId: composed.steps[0].authorizationId } : {}),
+        };
+        return actionResult;
+      },
+      { ...engineOpts, composeActionRequest: options.composeActionRequest },
+    );
+  }
   const openParams = {
     coordinationId: request.coordinationId,
     objective: request.objective,
@@ -480,302 +670,18 @@ export async function runCoordinationUseCase(ctx, options = {}) {
 
     const labels = Object.create(null);
     for (const step of request.steps) {
-      if (step.type === 'operation') {
-        const actorEntry = step.targetActorId ? findActor(request.actors, step.targetActorId) : undefined;
-        const cliPolicy = actorPolicyFields(actorEntry, { globalExecutor: cliExecutor, globalTier: cliTier });
-        const contextRefs = resolveRefArray(step.contextRefs, labels, `steps[${step.as}].contextRefs`);
-        const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
-        // eslint-disable-next-line no-await-in-loop -- R1: steps run sequentially, by design.
-        const dispatch = await dispatchDeclaredOperation(
-          manifest.coordinationId,
-          {
-            operationId: step.operationId,
-            targetActorId: step.targetActorId,
-            objective: step.objective,
-            expectedOutputs: step.expectedOutputs,
-            contextRefs,
-            constraints: step.constraints,
-            capabilities: step.capabilities,
-            writerId: request.writerId,
-            fromAssignmentId,
-            intent: step.intent,
-            round: step.round,
-            taskKey: step.taskKey,
-            ...(Object.keys(cliPolicy).length > 0 ? { cliPolicy } : {}),
-            ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
-          },
-          engineOpts,
-        );
-        labels[step.as] = dispatch.assignment.assignmentId;
-        // The per-actor roster lives in the REQUEST BODY (`actors[]`), not in
-        // the session. A resume request that omits it therefore resolves every
-        // actor to the global default executor -- silently, because an absent
-        // entry is indistinguishable here from "no override wanted". Observed
-        // live: an advisory panel resumed without `actors[]` ran three roles
-        // that were bound to three different confined executors on the single
-        // default one instead, and nothing said so; it was found only by
-        // reading result metadata afterwards. Say it out loud instead. This
-        // warns rather than refuses because omitting `actors[]` is legal and
-        // is sometimes exactly what a caller means.
-        if (step.targetActorId && actorEntry === undefined) {
-          // Same provenance field summarizeDispatch reports as `executor`
-          // (below) -- the executor actually resolved for this dispatch, not
-          // the one a caller asked for. Naming it is the point: it tells the
-          // reader WHICH posture they got instead of the one they intended.
-          const landedOn = dispatch?.runResult?.policy?.provenance?.executor?.value;
-          process.stderr.write(
-            `fgos: coordination step "${step.as}" targets actor "${step.targetActorId}" but this request declares no ` +
-              `actors[] entry for it — no per-actor executor/tier/persona was applied` +
-              `${landedOn ? `, so it dispatched on "${landedOn}"` : ''}. ` +
-              `The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.\n`,
-          );
-        }
-        // `targetActorId` is reported as given; when the caller omits it
-        // (a single-actor-per-operation template), the engine's own
-        // resolveDeclaredOperationActor resolves it internally and does not
-        // return it on `dispatch` -- reported `null` rather than guessed.
-        stepResults.push({ as: step.as, type: 'operation', actorId: step.targetActorId ?? null, ...summarizeDispatch(dispatch) });
-      } else if (step.type === 'authorize') {
-        const grantedContextRefs = resolveRefArray(step.grantedContextRefs, labels, `steps[${step.as}].grantedContextRefs`);
-        const targetArtifactRef = resolveRef(step.targetArtifactRef, labels, `steps[${step.as}].targetArtifactRef`);
-        const authorization = authorizeDeclaredOperation(
-          manifest.coordinationId,
-          {
-            operationId: step.operationId,
-            targetActorId: step.targetActorId,
-            nodeId: step.nodeId,
-            authorizationId: step.authorizationId,
-            invocationKey: step.invocationKey,
-            authorizedBy: driverIdentity,
-            reason: step.reason,
-            grantedContextRefs,
-            targetArtifactRef,
-          },
-          engineOpts,
-        );
-        // On the idempotent (appended: false) path, `authorizeOperation`
-        // (store.mjs) returns THIS CALL's own payload, not the
-        // already-persisted event -- a repeat `authorize` step naming an
-        // `authorizationId` that already exists, with DIFFERENT fields
-        // (a different grant, key, or reason), would otherwise report
-        // those different fields back as if they were now in force, when
-        // the persisted event -- the one `dispatchDeclaredOperation`'s gate
-        // actually reads -- never changed. Read the real event back on this
-        // path so the step result is always truthful, never echoed intent.
-        const persistedAuthorization = authorization.appended
-          ? authorization
-          : readSessionEvents(manifest.coordinationId, engineOpts).find(
-              (event) => event.type === 'operation-authorized' && event.payload.authorizationId === authorization.authorizationId,
-            ).payload;
-        // No `labels[step.as]` entry: this step materializes no Assignment,
-        // so a later `$ref:<label>` pointing at it has nothing to resolve to
-        // and is refused by resolveRef's own unknown-label check.
-        stepResults.push({
-          as: step.as,
-          type: 'authorize',
-          operationId: persistedAuthorization.operationId,
-          nodeId: persistedAuthorization.nodeId,
-          actorId: persistedAuthorization.targetActorId,
-          authorizationId: persistedAuthorization.authorizationId,
-          invocationKey: persistedAuthorization.invocationKey,
-          grantedContextRefs: persistedAuthorization.grantedContextRefs,
-          targetArtifactRef: persistedAuthorization.targetArtifactRef ?? null,
-          appended: authorization.appended,
-        });
-      } else if (step.type === 'disposition') {
-        const targetRef = resolveRef(step.targetRef, labels, `steps[${step.as}].targetRef`);
-        const evidenceRefs = resolveRefArray(step.evidenceRefs, labels, `steps[${step.as}].evidenceRefs`);
-        const disposition = recordDriverDisposition(
-          manifest.coordinationId,
-          {
-            targetRef,
-            disposition: step.disposition,
-            rationale: step.rationale,
-            evidenceRefs,
-            authorizedBy: driverIdentity,
-          },
-          engineOpts,
-        );
-        stepResults.push({
-          as: step.as,
-          type: 'disposition',
-          targetRef: disposition.targetRef,
-          disposition: disposition.disposition,
-          evidenceRefs: disposition.evidenceRefs,
-          appended: disposition.appended,
-        });
-      } else if (step.type === 'contribution') {
-        // Forwards into `linkSessionContribution` (session-engine.mjs) --
-        // the already-existing, already-proven mediated door (P08.2/P08.3)
-        // -- exactly the way "authorize"/"disposition" already forward into
-        // their own mediated doors: the request supplies only what the
-        // engine cannot derive itself (contributionId/contributionType/
-        // assignmentId/roundKey/anchors/respondsTo); `linkedBy` is NEVER
-        // caller-supplied (schema.mjs's assertNoLinkedBy), always the same
-        // derived `driverIdentity` every other driver-authority step here
-        // uses. Every window/provenance/lineage check
-        // `linkSessionContribution` already performs runs unchanged -- this
-        // step adds no new trust, it only reaches an existing door.
-        const assignmentId = resolveRef(step.assignmentId, labels, `steps[${step.as}].assignmentId`);
-        const contribution = linkSessionContribution(
-          manifest.coordinationId,
-          {
-            contributionId: step.contributionId,
-            type: step.contributionType,
-            assignmentId,
-            roundKey: step.roundKey,
-            linkedBy: driverIdentity,
-            anchors: step.anchors,
-            respondsTo: step.respondsTo,
-          },
-          engineOpts,
-        );
-        // No `labels[step.as]` entry: a contribution step materializes no
-        // Assignment (matching "authorize", above) -- a later `$ref:<label>`
-        // pointing at it has nothing to resolve to and is refused by
-        // resolveRef's own unknown-label check.
-        stepResults.push({
-          as: step.as,
-          type: 'contribution',
-          contributionId: contribution.contributionId,
-          contributionType: contribution.type,
-          assignmentId: contribution.assignmentId,
-          roundKey: contribution.roundKey,
-          anchors: contribution.anchors ?? [],
-          respondsTo: contribution.respondsTo ?? null,
-          appended: contribution.appended,
-        });
-      } else if (step.type === 'human-turn') {
-        // Phase 03.1: the request supplies everything EXCEPT `revision` and
-        // `recordedBy` -- this door computes both itself so neither can be
-        // hand-typed. `artifactRef` is resolved against the working
-        // directory (no existing file-based-ref resolution helper exists in
-        // this module to reuse -- see this file's own header comment on
-        // what IS/ISN'T reused); the file must genuinely exist on disk at
-        // record time, or the step fails loudly rather than recording a
-        // provenance stamp for bytes nobody verified.
-        const resolvedArtifactPath = path.resolve(ctx.cwd, step.artifactRef);
-        const missingArtifactError = () =>
-          new StoreError(
-            'validation',
-            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" does not resolve to a real file at "${resolvedArtifactPath}" -- refusing to record a human-turn provenance stamp for bytes that were never verified to exist`,
-          );
-        // Fix round 2: workspace containment must run on SYMLINK-RESOLVED
-        // paths, not the lexical `path.resolve` above -- a lexical-only
-        // check (lexical candidate compared against lexical `ctx.cwd`) lets
-        // an IN-WORKSPACE symlink whose TARGET is outside the workspace
-        // pass containment and then have its outside bytes hashed as the
-        // `revision` (Red-Team's own live reproduction: a symlink at
-        // "human/1-person.md" pointing at "/etc/hostname"). `realpathSync`
-        // resolves every symlink in the path (including any in `ctx.cwd`
-        // itself, e.g. a symlinked worktree or a macOS `/tmp` ->
-        // `/private/tmp` mount) and also confirms the path genuinely
-        // exists -- so a missing artifact is caught HERE, before the
-        // containment check ever runs, replacing the plain `fs.readFileSync`
-        // ENOENT catch this used to rely on for that message.
-        let realArtifactPath;
-        try {
-          realArtifactPath = fs.realpathSync(resolvedArtifactPath);
-        } catch (err) {
-          if (err.code === 'ENOENT' || err.code === 'ENOTDIR') throw missingArtifactError();
-          throw err;
-        }
-        const realWorkspaceRoot = fs.realpathSync(ctx.cwd);
-        // A `../` traversal or an absolute path both resolve OUTSIDE
-        // `ctx.cwd`; `path.relative` starting with `..` (or itself
-        // absolute, the cross-drive/UNC edge Node's own path module can
-        // still produce) is the standard "escaped the root" test --
-        // applied to the REAL (symlink-resolved) paths on both sides, so a
-        // symlink escape is caught the identical way a lexical traversal
-        // already is.
-        const relativeToWorkspace = path.relative(realWorkspaceRoot, realArtifactPath);
-        if (relativeToWorkspace.startsWith('..') || path.isAbsolute(relativeToWorkspace)) {
-          throw new StoreError(
-            'validation',
-            `coordination request: steps[${step.as}] (type "human-turn") artifactRef "${step.artifactRef}" resolves to "${realArtifactPath}" (via "${resolvedArtifactPath}"), outside the working directory "${realWorkspaceRoot}" -- a human-turn artifact must live inside the workspace the session was opened against`,
-          );
-        }
-        let artifactBytes;
-        try {
-          artifactBytes = fs.readFileSync(realArtifactPath);
-        } catch (err) {
-          if (err.code === 'EISDIR') throw missingArtifactError();
-          throw err;
-        }
-        const revision = `sha256:${createHash('sha256').update(artifactBytes).digest('hex')}`;
-        // `step.respondsToRefs` carries bare turn ids of PRIOR human turns in
-        // THIS session (schema.mjs's own `assertSafeId`, not `assertSafeRefOrId`
-        // -- see its doc comment for why no `$ref:` resolution applies here);
-        // prefixed with the reserved namespace before reaching the engine,
-        // which is the shape `recordHumanTurn`/`assertDispositionRefOwnedBySession`
-        // (store.mjs) actually expect.
-        const respondsToRefs = step.respondsToRefs !== undefined ? step.respondsToRefs.map((turnId) => `${HUMAN_TURN_REF_PREFIX}${turnId}`) : undefined;
-        const humanTurn = recordHumanTurn(
-          manifest.coordinationId,
-          {
-            turnId: step.turnId,
-            turnOrdinal: step.turnOrdinal,
-            channel: step.channel,
-            artifactRef: step.artifactRef,
-            revision,
-            externalRef: step.externalRef,
-            attributedTo: step.attributedTo,
-            recordedBy: driverIdentity,
-            ...(respondsToRefs !== undefined ? { respondsToRefs } : {}),
-          },
-          engineOpts,
-        );
-        // No `labels[step.as]` entry: this step materializes no Assignment
-        // (matching "authorize"/"disposition"/"contribution", above) -- a
-        // later `$ref:<label>` pointing at it has nothing to resolve to and
-        // is refused by resolveRef's own unknown-label check.
-        stepResults.push({
-          as: step.as,
-          type: 'human-turn',
-          turnId: humanTurn.turnId,
-          turnOrdinal: humanTurn.turnOrdinal,
-          channel: humanTurn.channel,
-          artifactRef: humanTurn.artifactRef,
-          revision: humanTurn.revision,
-          externalRef: humanTurn.externalRef,
-          attributedTo: humanTurn.attributedTo,
-          respondsToRefs: humanTurn.respondsToRefs ?? [],
-          appended: humanTurn.appended,
-        });
-      } else {
-        const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
-        const branches = step.branches.map((branch) => ({
-          actorId: branch.actorId,
-          objective: branch.objective,
-          expectedOutputs: branch.expectedOutputs,
-          constraints: branch.constraints,
-          capabilities: branch.capabilities,
-          fromAssignmentId: resolveRef(branch.fromAssignmentId, labels, `steps[${step.as}].branches[${branch.actorId}].fromAssignmentId`) ?? fromAssignmentId,
-          intent: branch.intent,
-          taskKey: branch.taskKey,
-        }));
-        // eslint-disable-next-line no-await-in-loop -- R1: steps run sequentially; branches within a fan-out step dispatch concurrently inside the engine.
-        const fanOut = await dispatchResearchFanOut(
-          manifest.coordinationId,
-          { operationId: step.operationId, branches, writerId: request.writerId, fromAssignmentId },
-          engineOpts,
-        );
-        if (fanOut.status !== 'dispatched') {
-          fanOutFailure = { as: step.as, status: fanOut.status, reason: fanOut.reason ?? null };
-          stepResults.push({ as: step.as, type: 'fan-out', status: fanOut.status, reason: fanOut.reason ?? null, branches: [] });
-          break;
-        }
-        const branchAssignmentIds = {};
-        const branchSummaries = fanOut.branches.map((b) => {
-          if (b.status === 'fulfilled') branchAssignmentIds[b.actorId] = b.result.assignment.assignmentId;
-          return {
-            actorId: b.actorId,
-            status: b.status,
-            ...(b.status === 'fulfilled' ? summarizeDispatch(b.result) : { error: b.error }),
-          };
-        });
-        labels[step.as] = branchAssignmentIds;
-        stepResults.push({ as: step.as, type: 'fan-out', status: 'dispatched', branches: branchSummaries });
+      const stepResult = await executeValidatedCoordinationStep({
+        ctx,
+        request,
+        step,
+        manifest,
+        labels,
+        engineOpts,
+      });
+      stepResults.push(stepResult);
+      if (stepResult.fanOutFailure) {
+        fanOutFailure = stepResult.fanOutFailure;
+        break;
       }
     }
   }

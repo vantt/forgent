@@ -13,20 +13,140 @@ import {
   deriveSessionPhase,
   loadDefinitionForSession,
   deriveVisibilityWindowState,
-  closeSessionByQuorumLocked,
 } from '../../runner/coordination/session-engine.mjs';
-import {
-  recordDriverDispositionLocked,
-  recordHumanTurnLocked,
-  recordContributionLinkLocked,
-  authorizeOperationLocked,
-  createSessionAssignmentLocked,
-} from '../../runner/coordination/store.mjs';
 import { projectCoordinationActions } from '../../runner/coordination/actions-projector.mjs';
-import { executeUnderActionPrecondition } from '../../runner/coordination/action-precondition.mjs';
-import { protocolOperationStamp } from '../../runner/coordination/legality-facts.mjs';
+import {
+  validateCoordinationRequest,
+  validateCoordinationCloseRequest,
+} from './schema.mjs';
+import { executeCoordinationRunKernel } from './run.mjs';
+import { executeCoordinationCloseKernel } from './close.mjs';
+import { normalizeFanOutPayload } from '../../runner/coordination/fan-out-payload.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
+
+const ACTION_INPUT_RESERVED_FIELDS = new Set([
+  'coordinationId', 'actionKey', 'kind', 'target', 'writerId', 'authorizedBy',
+  'operationId', 'actorId', 'nodeId', 'assignmentId', 'targetRef',
+]);
+
+/**
+ * Compose the authoritative action descriptor into the production run schema.
+ * This is deliberately called only after executeUnderActionPrecondition has
+ * reloaded and matched the descriptor while holding the session lock.
+ */
+export function composeCoordinationActionRequest({ manifest, action, precondition }) {
+  const input = precondition.inputPayload ?? {};
+  for (const field of ACTION_INPUT_RESERVED_FIELDS) {
+    if (field in input) {
+      throw new CoordinationError('validation', `coordination action: input field "${field}" cannot override an authoritative action binding`);
+    }
+  }
+  const target = action.target ?? {};
+  const base = {
+    kind: 'declared-protocol',
+    coordinationId: manifest.coordinationId,
+    writerId: precondition.writerId,
+    objective: manifest.objective,
+    protocolRef: { id: manifest.definitionRef?.id },
+    actors: [],
+    close: false,
+  };
+  const common = { as: `action-${precondition.kind}` };
+  let steps;
+  switch (precondition.kind) {
+    case 'dispatch-operation':
+      steps = [{
+        ...common,
+        type: 'operation',
+        operationId: target.operationId,
+        targetActorId: target.actorId,
+        objective: input.objective,
+        expectedOutputs: input.expectedOutputs,
+        contextRefs: input.contextRefs,
+        constraints: input.constraints,
+        capabilities: input.capabilities,
+        fromAssignmentId: input.fromAssignmentId,
+        intent: input.intent,
+        round: input.round,
+        taskKey: input.taskKey,
+        mutation: input.mutation,
+      }];
+      break;
+    case 'authorize-and-dispatch':
+      steps = [
+        {
+          ...common,
+          as: 'action-authorize',
+          type: 'authorize',
+          operationId: target.operationId,
+          targetActorId: target.actorId,
+          nodeId: target.nodeId,
+          authorizationId: input.authorizationId,
+          invocationKey: input.invocationKey,
+          reason: input.reason,
+          grantedContextRefs: input.grantedContextRefs,
+          targetArtifactRef: input.targetArtifactRef,
+        },
+        {
+          ...common,
+          as: 'action-dispatch',
+          type: 'operation',
+          operationId: target.operationId,
+          targetActorId: target.actorId,
+          objective: input.objective,
+          expectedOutputs: input.expectedOutputs,
+          contextRefs: input.contextRefs ?? input.grantedContextRefs,
+          constraints: input.constraints,
+          capabilities: input.capabilities,
+          taskKey: input.taskKey,
+          mutation: input.mutation ?? 'read-only',
+        },
+      ];
+      break;
+    case 'record-disposition':
+      steps = [{
+        ...common,
+        type: 'disposition',
+        targetRef: target.targetRef,
+        disposition: input.disposition,
+        rationale: input.rationale,
+        evidenceRefs: input.evidenceRefs,
+      }];
+      break;
+    case 'record-human-turn':
+      steps = [{ ...common, type: 'human-turn', ...input }];
+      break;
+    case 'link-contribution':
+      steps = [{
+        ...common,
+        type: 'contribution',
+        contributionId: input.contributionId,
+        contributionType: input.contributionType,
+        assignmentId: target.assignmentId,
+        roundKey: input.roundKey,
+        anchors: input.anchors,
+        respondsTo: input.respondsTo,
+      }];
+      break;
+    case 'fan-out':
+      // The action descriptor binds the complete cohort. The precondition has
+      // already rejected subsets, supersets, replacements, and duplicates;
+      // sort the canonical request so an equivalent caller order has one
+      // normalized step shape before production validation/execution.
+      steps = [{
+        ...common,
+        type: 'fan-out',
+        operationId: target.operationId,
+        branches: normalizeFanOutPayload({ branches: input.branches, fromAssignmentId: input.fromAssignmentId }),
+        fromAssignmentId: input.fromAssignmentId,
+      }];
+      break;
+    default:
+      throw new CoordinationError('validation', `unsupported action kind "${precondition.kind}"`);
+  }
+  return validateCoordinationRequest({ ...base, steps });
+}
 
 /**
  * Use case: Read-only projection of session status and legal actions (coordination-actions.v1).
@@ -105,10 +225,11 @@ export function showCoordinationActionsUseCase(ctx, { id }) {
 }
 
 /**
- * Use case: Execute a single semantic coordination action under action precondition seam (coordination-actions.v1).
+ * Use case: Execute a single semantic coordination action as a request composer (coordination-actions.v1).
  *
- * Atomically validates precondition and driver identity, acquires the session lock,
- * and executes the corresponding *Locked engine mutator.
+ * Validates action input and composes a canonical request object, then delegates directly to
+ * executeCoordinationCloseKernel or executeCoordinationRunKernel under actionPrecondition.
+ * Contains ZERO low-level *Locked mutators and zero duplicate orchestration.
  *
  * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
  * @param {object} options `{ coordinationId, actionKey, kind, target, inputPayload, writerId, authorizedBy }` or `{ requestObject }`
@@ -141,271 +262,41 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
     throw new StoreError('validation', 'coordination execute action: "kind" is required');
   }
 
-  const engineOpts = {
-    cwd: ctx.cwd,
-    repoRoot: ctx.repoRoot,
-    packageRoot: ctx.packageRoot,
-  };
-
-  return executeUnderActionPrecondition(
-    coordinationId,
-    {
+  if (kind === 'close') {
+    const auth = authorizedBy ?? inputPayload.authorizedBy;
+    if (!auth || !auth.id) {
+      throw new CoordinationError('validation', 'coordination close: authorizedBy is required and must have an id');
+    }
+    const closeRequest = {
+      kind: 'coordination-close',
+      coordinationId,
       actionKey,
-      kind,
-      target,
-      inputPayload,
-      writerId,
-      authorizedBy,
-      requiredInputs,
-      optionalInputs,
-      allowedValues,
+      authorizedBy: auth,
+      ...(inputPayload.dissentingActorIds ? { dissentingActorIds: inputPayload.dissentingActorIds } : {}),
+      ...(inputPayload.aggregationId ? { aggregationId: inputPayload.aggregationId } : {}),
+    };
+    validateCoordinationCloseRequest(closeRequest);
+    return executeCoordinationCloseKernel(ctx, closeRequest, options);
+  }
+
+  return executeCoordinationRunKernel(
+    ctx,
+    { coordinationId, writerId },
+    {
+      ...options,
+      actionPrecondition: {
+        actionKey,
+        kind,
+        target,
+        inputPayload,
+        writerId,
+        authorizedBy,
+        requiredInputs,
+        optionalInputs,
+        allowedValues,
+      },
+      composeActionRequest: composeCoordinationActionRequest,
     },
-    async (paths, sessionBundle) => {
-      const { manifest, definition } = sessionBundle;
-      const effectiveWriterId = writerId ?? manifest.provenanceRoot?.writerId;
-
-      switch (kind) {
-        case 'close': {
-          const auth = authorizedBy ?? { type: 'human', id: effectiveWriterId };
-          const closeParams = {
-            authorizedBy: auth,
-            ...(inputPayload.dissentingActorIds ? { dissentingActorIds: inputPayload.dissentingActorIds } : {}),
-            ...(inputPayload.aggregationId ? { aggregationId: inputPayload.aggregationId } : {}),
-          };
-          closeSessionByQuorumLocked(coordinationId, closeParams, paths, engineOpts);
-          const finalQuorum = evaluateSessionQuorum(coordinationId, engineOpts);
-          const phase = deriveSessionPhase(coordinationId, engineOpts);
-          return {
-            coordinationId,
-            kind: 'close',
-            status: phase,
-            closed: true,
-            closeAttempted: true,
-            actionKey,
-            quorum: finalQuorum,
-          };
-        }
-
-        case 'record-disposition': {
-          const targetRef = target?.targetRef ?? inputPayload.targetRef;
-          const dispositionParams = {
-            targetRef,
-            disposition: inputPayload.disposition,
-            rationale: inputPayload.rationale,
-            evidenceRefs: inputPayload.evidenceRefs ?? [],
-            authorizedBy: { type: 'driver', id: effectiveWriterId },
-          };
-          const recorded = recordDriverDispositionLocked(coordinationId, dispositionParams, paths, engineOpts);
-          return {
-            coordinationId,
-            kind: 'record-disposition',
-            status: 'recorded',
-            actionKey,
-            ...recorded,
-          };
-        }
-
-        case 'record-human-turn': {
-          const turnParams = {
-            turnId: inputPayload.turnId,
-            turnOrdinal: inputPayload.turnOrdinal,
-            channel: inputPayload.channel,
-            artifactRef: inputPayload.artifactRef,
-            revision: inputPayload.revision ?? 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
-            externalRef: inputPayload.externalRef,
-            attributedTo: inputPayload.attributedTo,
-            recordedBy: { type: 'driver', id: effectiveWriterId },
-            ...(inputPayload.respondsToRefs !== undefined ? { respondsToRefs: inputPayload.respondsToRefs } : {}),
-          };
-          const recorded = recordHumanTurnLocked(coordinationId, turnParams, paths, engineOpts);
-          return {
-            coordinationId,
-            kind: 'record-human-turn',
-            status: 'recorded',
-            actionKey,
-            ...recorded,
-          };
-        }
-
-        case 'link-contribution': {
-          const linkParams = {
-            contributionId: inputPayload.contributionId,
-            operationRef: target?.operationId ?? inputPayload.operationRef,
-            type: inputPayload.contributionType ?? inputPayload.type,
-            assignmentId: inputPayload.assignmentId ?? target?.assignmentId,
-            runId: inputPayload.runId,
-            artifactRef: inputPayload.artifactRef,
-            revision: inputPayload.revision ?? '1',
-            roundKey: inputPayload.roundKey,
-            visibilityWindowRef: inputPayload.visibilityWindowRef ?? 'window-main',
-            anchors: inputPayload.anchors,
-            respondsTo: inputPayload.respondsTo,
-            linkedBy: { type: 'driver', id: effectiveWriterId },
-          };
-          const linked = recordContributionLinkLocked(coordinationId, linkParams, paths, engineOpts);
-          return {
-            coordinationId,
-            kind: 'link-contribution',
-            status: 'linked',
-            actionKey,
-            ...linked,
-          };
-        }
-
-        case 'authorize-and-dispatch': {
-          const operationId = target?.operationId;
-          const targetActorId = target?.actorId;
-          const nodeId = target?.nodeId;
-          const authParams = {
-            authorizationId: inputPayload.authorizationId,
-            operationId,
-            nodeId,
-            targetActorId,
-            invocationKey: inputPayload.invocationKey,
-            authorizedBy: { type: 'driver', id: effectiveWriterId },
-            reason: inputPayload.reason,
-            grantedContextRefs: inputPayload.grantedContextRefs ?? [],
-            targetArtifactRef: inputPayload.targetArtifactRef,
-          };
-          authorizeOperationLocked(coordinationId, authParams, paths, engineOpts);
-
-          const contract = {
-            objective: inputPayload.objective,
-            expectedOutputs: inputPayload.expectedOutputs,
-            contextRefs: inputPayload.contextRefs ?? (inputPayload.grantedContextRefs ?? []),
-            constraints: [
-              ...(inputPayload.constraints ?? []),
-              ...(definition && operationId ? [protocolOperationStamp(definition, operationId)] : []),
-            ],
-            capabilities: inputPayload.capabilities,
-            mutation: inputPayload.mutation ?? 'read-only',
-            evidence: inputPayload.evidence ?? { required: 'reported' },
-            role: inputPayload.role ?? targetActorId,
-            budget: inputPayload.budget ?? { timeoutMs: 60000, maxRuns: 1 },
-          };
-          const assignment = createSessionAssignmentLocked(
-            {
-              coordinationId,
-              taskKey: inputPayload.taskKey ?? `declared:${operationId}:auth:${inputPayload.authorizationId}`,
-              actorId: targetActorId,
-              contract,
-              caller: { writerId: effectiveWriterId },
-              authorizationProvenance: {
-                operationId,
-                nodeId,
-                authorizationId: inputPayload.authorizationId,
-                invocationKey: inputPayload.invocationKey,
-                contextGrant: { refs: [...(inputPayload.grantedContextRefs ?? [])] },
-              },
-            },
-            paths,
-            engineOpts,
-          );
-          return {
-            coordinationId,
-            kind: 'authorize-and-dispatch',
-            status: 'dispatched',
-            actionKey,
-            authorizationId: inputPayload.authorizationId,
-            assignmentId: assignment.assignmentId,
-            assignment,
-          };
-        }
-
-        case 'dispatch-operation': {
-          const operationId = target?.operationId;
-          const targetActorId = target?.actorId;
-          const contract = {
-            objective: inputPayload.objective,
-            expectedOutputs: inputPayload.expectedOutputs,
-            contextRefs: inputPayload.contextRefs ?? [],
-            constraints: [
-              ...(inputPayload.constraints ?? []),
-              ...(definition && operationId ? [protocolOperationStamp(definition, operationId)] : []),
-            ],
-            capabilities: inputPayload.capabilities,
-            mutation: inputPayload.mutation ?? 'read-only',
-            evidence: inputPayload.evidence ?? { required: 'reported' },
-            role: inputPayload.role ?? targetActorId,
-            budget: inputPayload.budget ?? { timeoutMs: 60000, maxRuns: 1 },
-          };
-          const assignment = createSessionAssignmentLocked(
-            {
-              coordinationId,
-              taskKey: inputPayload.taskKey ?? `declared:${operationId}:${targetActorId}`,
-              actorId: targetActorId,
-              contract,
-              caller: { writerId: effectiveWriterId },
-              ...(target?.authorizationId ? {
-                authorizationProvenance: {
-                  operationId,
-                  nodeId: target.nodeId,
-                  authorizationId: target.authorizationId,
-                  contextGrant: { refs: inputPayload.contextRefs ?? [] },
-                },
-              } : {}),
-            },
-            paths,
-            engineOpts,
-          );
-          return {
-            coordinationId,
-            kind: 'dispatch-operation',
-            status: 'dispatched',
-            actionKey,
-            assignmentId: assignment.assignmentId,
-            assignment,
-          };
-        }
-
-        case 'fan-out': {
-          const operationId = target?.operationId;
-          const branches = inputPayload.branches ?? [];
-          const dispatchedBranches = [];
-          for (const branch of branches) {
-            const contract = {
-              objective: branch.objective ?? inputPayload.objective ?? `Fan-out branch for ${branch.actorId}`,
-              expectedOutputs: branch.expectedOutputs ?? inputPayload.expectedOutputs ?? ['result.json'],
-              contextRefs: branch.contextRefs ?? [],
-              constraints: branch.constraints ?? [],
-              mutation: 'read-only',
-              evidence: branch.evidence ?? { required: 'reported' },
-              role: branch.role ?? branch.actorId,
-              budget: branch.budget ?? inputPayload.budget ?? { timeoutMs: 60000, maxRuns: 1 },
-            };
-            const assignment = createSessionAssignmentLocked(
-              {
-                coordinationId,
-                taskKey: branch.taskKey ?? `research-branch:${branch.actorId}`,
-                actorId: branch.actorId,
-                contract,
-                caller: { writerId: effectiveWriterId },
-              },
-              paths,
-              engineOpts,
-            );
-            dispatchedBranches.push({
-              actorId: branch.actorId,
-              assignmentId: assignment.assignmentId,
-              status: 'dispatched',
-              objective: contract.objective,
-              expectedOutputs: contract.expectedOutputs,
-            });
-          }
-          return {
-            coordinationId,
-            kind: 'fan-out',
-            status: 'dispatched',
-            actionKey,
-            branches: dispatchedBranches,
-          };
-        }
-
-        default:
-          throw new CoordinationError('validation', `executeCoordinationActionUseCase: unsupported action kind "${kind}"`);
-      }
-    },
-    engineOpts,
   );
 }
 

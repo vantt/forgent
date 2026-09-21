@@ -2,6 +2,7 @@ import { CoordinationError } from '../../runner/coordination/schema.mjs';
 import {
   resumeSession,
   closeSessionByQuorum,
+  closeSessionByQuorumLocked,
   evaluateSessionQuorum,
   deriveSessionPhase,
 } from '../../runner/coordination/session-engine.mjs';
@@ -9,6 +10,7 @@ import { loadDefinitionForSession } from '../../runner/coordination/session-engi
 import { validateCoordinationCloseRequest } from './schema.mjs';
 import { resolveMainCheckoutRoot } from '../../runner/paths.mjs';
 import { assertDriverIdentity } from '../../runner/coordination/store.mjs';
+import { executeUnderActionPrecondition } from '../../runner/coordination/action-precondition.mjs';
 
 function aggregationCloseParams(coordinationId, engineOpts, manifest, aggregations) {
   if (!manifest.definitionRef) return {};
@@ -40,13 +42,7 @@ function aggregationCloseParams(coordinationId, engineOpts, manifest, aggregatio
   return { aggregationId: aggregations[aggregations.length - 1].aggregationId };
 }
 
-export async function closeCoordinationUseCase(ctx, options = {}) {
-  const { requestObject } = options;
-  if (requestObject === undefined) {
-    throw new CoordinationError('validation', 'coordination close: requestObject must be given');
-  }
-  const request = validateCoordinationCloseRequest(requestObject);
-
+export async function executeCoordinationCloseKernel(ctx, request, options = {}) {
   const engineOpts = {
     cwd: ctx.cwd,
     repoRoot: ctx.repoRoot,
@@ -55,12 +51,69 @@ export async function closeCoordinationUseCase(ctx, options = {}) {
 
   const coordinationId = request.coordinationId;
 
+  if (request.actionKey) {
+    return executeUnderActionPrecondition(
+      coordinationId,
+      {
+        actionKey: request.actionKey,
+        kind: 'close',
+        target: { coordinationId },
+        inputPayload: {
+          authorizedBy: request.authorizedBy,
+          ...(request.dissentingActorIds ? { dissentingActorIds: request.dissentingActorIds } : {}),
+          ...(request.aggregationId ? { aggregationId: request.aggregationId } : {}),
+        },
+      },
+      (paths, { manifest: freshManifest, replayed }) => {
+        const aggregations = replayed?.aggregations ?? [];
+        let closed = false;
+        let closeRefusalReason = null;
+        try {
+          const closeParams = aggregationCloseParams(coordinationId, engineOpts, freshManifest, aggregations);
+          closeParams.authorizedBy = request.authorizedBy;
+          if (request.dissentingActorIds) closeParams.dissentingActorIds = request.dissentingActorIds;
+          if (request.aggregationId) closeParams.aggregationId = request.aggregationId;
+          closeSessionByQuorumLocked(coordinationId, closeParams, paths, engineOpts);
+          closed = true;
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'refusal') {
+            closeRefusalReason = err.message;
+          } else {
+            throw err;
+          }
+        }
+        const finalQuorum = evaluateSessionQuorum(coordinationId, engineOpts);
+        const phase = deriveSessionPhase(coordinationId, engineOpts);
+        return {
+          coordinationId,
+          kind: request.kind,
+          status: phase,
+          closed,
+          closeAttempted: true,
+          actionKey: request.actionKey,
+          ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
+          quorum: finalQuorum,
+        };
+      },
+      engineOpts,
+    );
+  }
+
+  // Backward-compatibility path: unkeyed close bypasses executeUnderActionPrecondition.
+  // Note (F11 contract boundary): Phase 2 composers and semantic mutating verbs MUST
+  // supply a valid actionKey to ensure atomic lock-held stale-precondition verification.
   const { manifest, aggregations } = resumeSession(coordinationId, engineOpts);
 
   const quorumBeforeClose = evaluateSessionQuorum(coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;
   
+  assertDriverIdentity(manifest, request.authorizedBy, {
+    coordinationId,
+    label: 'coordination close',
+    subject: 'a session close',
+  });
+
   try {
     const closeParams = aggregationCloseParams(coordinationId, engineOpts, manifest, aggregations);
     closeParams.authorizedBy = request.authorizedBy;
@@ -86,4 +139,13 @@ export async function closeCoordinationUseCase(ctx, options = {}) {
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     quorum: finalQuorum,
   };
+}
+
+export async function closeCoordinationUseCase(ctx, options = {}) {
+  const { requestObject } = options;
+  if (requestObject === undefined) {
+    throw new CoordinationError('validation', 'coordination close: requestObject must be given');
+  }
+  const request = validateCoordinationCloseRequest(requestObject);
+  return executeCoordinationCloseKernel(ctx, request, options);
 }

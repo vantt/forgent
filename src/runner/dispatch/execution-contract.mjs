@@ -190,7 +190,23 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   'policy',
 ]);
 
-const ACCEPTED_CALLER_FIELDS = new Set(['writerId', 'parentAssignmentId']);
+const ACCEPTED_CALLER_FIELDS = new Set(['writerId', 'parentAssignmentId', 'coordination']);
+const ACCEPTED_COORDINATION_CALLER_FIELDS = new Set(['fanOutPayload', 'actionInvocation']);
+const ACTION_INVOCATION_KINDS = new Set([
+  'dispatch-operation', 'authorize-and-dispatch', 'record-disposition',
+  'record-human-turn', 'link-contribution', 'fan-out',
+]);
+const NORMALIZED_STEP_FIELDS = new Set([
+  'type', 'as', 'operationId', 'targetActorId', 'nodeId', 'objective',
+  'expectedOutputs', 'contextRefs', 'constraints', 'capabilities',
+  'fromAssignmentId', 'intent', 'round', 'taskKey', 'mutation',
+  'authorizationId', 'invocationKey', 'reason', 'grantedContextRefs',
+  'targetArtifactRef', 'targetRef', 'disposition', 'rationale', 'evidenceRefs',
+  'turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef',
+  'attributedTo', 'respondsToRefs', 'contributionId', 'contributionType',
+  'assignmentId', 'roundKey', 'anchors', 'respondsTo', 'branches',
+  'fromAssignmentId', 'omittedFields',
+]);
 const ACCEPTED_BUDGET_FIELDS = new Set(['timeoutMs', 'maxRuns', 'tokens']);
 const ACCEPTED_EVIDENCE_FIELDS = new Set(['required']);
 // Step 08 P04.2b: see the `'policy'` entry in ACCEPTED_CONTRACT_FIELDS above
@@ -354,5 +370,43 @@ export function validateExecutionContract({ contract, caller } = {}) {
   }
   if (caller.parentAssignmentId !== undefined && !isNonEmptyString(caller.parentAssignmentId)) {
     fail('caller.parentAssignmentId must be a non-empty string when provided');
+  }
+  if (caller.coordination !== undefined) {
+    if (!isPlainObject(caller.coordination)) fail('caller.coordination must be an object when provided');
+    assertOnlyAcceptedFields(caller.coordination, ACCEPTED_COORDINATION_CALLER_FIELDS, 'caller.coordination');
+    if (caller.coordination.fanOutPayload !== undefined) {
+      if (!isPlainObject(caller.coordination.fanOutPayload)) fail('caller.coordination.fanOutPayload must be an object when provided');
+      const payload = caller.coordination.fanOutPayload;
+      for (const field of ['actorId', 'objective', 'taskKey']) {
+        if (!isNonEmptyString(payload[field])) fail(`caller.coordination.fanOutPayload.${field} must be a non-empty string`);
+      }
+      if (!isStringArray(payload.expectedOutputs) || payload.expectedOutputs.length === 0) fail('caller.coordination.fanOutPayload.expectedOutputs must be a non-empty array of strings');
+      if (!isStringArray(payload.constraints)) fail('caller.coordination.fanOutPayload.constraints must be an array of strings');
+      if (payload.capabilities !== undefined && !isStringArray(payload.capabilities)) fail('caller.coordination.fanOutPayload.capabilities must be an array of strings when provided');
+      for (const field of ['fromAssignmentId', 'intent']) {
+        if (payload[field] !== undefined && !isNonEmptyString(payload[field])) fail(`caller.coordination.fanOutPayload.${field} must be a non-empty string when provided`);
+      }
+    }
+    if (caller.coordination.actionInvocation !== undefined) {
+      const invocation = caller.coordination.actionInvocation;
+      if (!isPlainObject(invocation)) fail('caller.coordination.actionInvocation must be an object when provided');
+      assertOnlyAcceptedFields(invocation, new Set(['actionKey', 'kind', 'normalizedSteps']), 'caller.coordination.actionInvocation');
+      if (!isNonEmptyString(invocation.actionKey) || !invocation.actionKey.startsWith('sha256:')) {
+        fail('caller.coordination.actionInvocation.actionKey must be a sha256 action key');
+      }
+      if (!ACTION_INVOCATION_KINDS.has(invocation.kind)) {
+        fail('caller.coordination.actionInvocation.kind is not a supported coordination action kind');
+      }
+      if (!Array.isArray(invocation.normalizedSteps) || invocation.normalizedSteps.length === 0) {
+        fail('caller.coordination.actionInvocation.normalizedSteps must be a non-empty array');
+      }
+      for (const step of invocation.normalizedSteps) {
+        if (!isPlainObject(step)) fail('caller.coordination.actionInvocation.normalizedSteps entries must be objects');
+        assertOnlyAcceptedFields(step, NORMALIZED_STEP_FIELDS, 'caller.coordination.actionInvocation.normalizedSteps[]');
+        if (step.omittedFields !== undefined && !isStringArray(step.omittedFields)) {
+          fail('caller.coordination.actionInvocation.normalizedSteps[].omittedFields must be an array of strings when provided');
+        }
+      }
+    }
   }
 }

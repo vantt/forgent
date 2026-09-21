@@ -1,9 +1,9 @@
 # Independent recheck 3 — Units 0D, 1A, 1B
 
-Date: 2026-09-21  
-Reviewer: independent `code:review` (no source/test/config edits except this report)  
-Scope: claimed discharge of Round 2 findings in `units-0d-1b-recheck-discharge.md`  
-Prior independent: `units-0d-1b-independent-recheck.md` (round 2, REQUEST CHANGES)  
+Date: 2026-09-21
+Reviewer: independent `code:review` (no source/test/config edits except this report)
+Scope: claimed discharge of Round 2 findings in `units-0d-1b-recheck-discharge.md`
+Prior independent: `units-0d-1b-independent-recheck.md` (round 2, REQUEST CHANGES)
 **Final verdict: REQUEST CHANGES**
 
 Current source and executable tests are authority. The implementer discharge
@@ -58,10 +58,10 @@ Source authority:
 
 ## 3. Impact / blast radius and index freshness
 
-Repository: **forgent** (`/home/vantt/projects/forgentX`)  
-Worktree: same  
-Local `gitnexus status`: indexed commit `a74a265`, claims up-to-date with HEAD  
-Indexed: 2026-09-21 11:14  
+Repository: **forgent** (`/home/vantt/projects/forgentX`)
+Worktree: same
+Local `gitnexus status`: indexed commit `a74a265`, claims up-to-date with HEAD
+Indexed: 2026-09-21 11:14
 
 **Working-tree impact is still partial.** Repair files are untracked or dirty
 after that index. Do not treat empty or inflated caller sets as exact.
@@ -175,147 +175,147 @@ proof uses a stand-in.
 
 ### F-R01
 
-ID: F-R01  
-Severity: **CRITICAL**  
-Category: second mutation engine / not existing mutation path  
-Affected unit: 1B  
+ID: F-R01
+Severity: **CRITICAL**
+Category: second mutation engine / not existing mutation path
+Affected unit: 1B
 Affected contract: Phase 2 composer → `validateCoordinationRequest` →
 `runCoordinationUseCase` / `closeCoordinationUseCase`; “no direct store
-mutator”  
+mutator”
 Source evidence: `src/verbs/coordination/actions.mjs`
 `executeCoordinationActionUseCase` switch calls
 `createSessionAssignmentLocked`, `authorizeOperationLocked`,
 `recordHumanTurnLocked`, `recordContributionLinkLocked`,
 `recordDriverDispositionLocked`, `closeSessionByQuorumLocked`. Zero calls
 to `dispatchDeclaredOperation`, `dispatchResearchFanOut`, or
-`runCoordinationUseCase`. `run.mjs` has no seam import.  
+`runCoordinationUseCase`. `run.mjs` has no seam import.
 Test evidence: “production mutator integration” tests assert
 `status: 'dispatched'` after assignment create only; they never prove an
-executor ran or that `validateCoordinationRequest` ran.  
+executor ran or that `validateCoordinationRequest` ran.
 Why current proof is insufficient: a green store write is not the current
 kernel dispatch/legality path (role, specialist slot, visibility, mutation
-posture, result linking). Phase 2 composers must not grow on this door.  
+posture, result linking). Phase 2 composers must not grow on this door.
 Required fix: under the held lock, compose the **existing** request shape,
 validate it, and invoke lock-aware `run`/`close` kernel doors
 (`dispatchDeclaredOperationLocked` / `dispatchResearchFanOut` /
 `recordHumanTurn` as `run.mjs` does / `closeSessionByQuorumLocked`). Delete
-the parallel assignment factory.  
+the parallel assignment factory.
 Blocks Phase 2 implementation: **yes**
 
 ### F-R02
 
-ID: F-R02  
-Severity: **HIGH**  
-Category: fan-out invention / unsafe backing  
-Affected unit: 1A / 1B  
-Affected contract: `coordination-actions.v1`; `dispatchResearchFanOut`  
+ID: F-R02
+Severity: **HIGH**
+Category: fan-out invention / unsafe backing
+Affected unit: 1A / 1B
+Affected contract: `coordination-actions.v1`; `dispatchResearchFanOut`
 Source evidence: projector `isFanOut =
 definition.spec.profile.cohort.independence === 'isolated-until-fan-in'`
 inside **every** unassigned required binding. Executor fan-out loops
 `createSessionAssignmentLocked` with `taskKey: research-branch:${actorId}`
-and empty constraints (no protocol stamp).  
+and empty constraints (no protocol stamp).
 Test evidence: actions-v1 plants cohort independence and asserts one
 fan-out via `.find`; does not assert uniqueness; research-fan-out suite
-exercises the **old** kernel door, not this executor.  
+exercises the **old** kernel door, not this executor.
 Why current proof is insufficient: cohort independence is not a per-op
 fan-out declaration. Duplicate actions and unstamped assignments are not
-kernel fan-out.  
+kernel fan-out.
 Required fix: emit at most one fan-out, only for the operation
 `dispatchResearchFanOut` actually runs, with the exact actor cohort that
-door accepts; otherwise emit nothing. Executor must call that door.  
+door accepts; otherwise emit nothing. Executor must call that door.
 Blocks Phase 2 implementation: **yes**
 
 ### F-R03
 
-ID: F-R03  
-Severity: **HIGH**  
-Category: human-turn provenance bypass  
-Affected unit: 1B  
-Affected contract: `validateHumanTurnStep` / `run.mjs` revision-from-bytes  
+ID: F-R03
+Severity: **HIGH**
+Category: human-turn provenance bypass
+Affected unit: 1B
+Affected contract: `validateHumanTurnStep` / `run.mjs` revision-from-bytes
 Source evidence: `executeCoordinationActionUseCase` `record-human-turn`
 sets `revision: inputPayload.revision ?? 'sha256:' + 64 zeros`. Raw run
-path forbids caller `revision` and hashes the file.  
+path forbids caller `revision` and hashes the file.
 Test evidence: production human-turn test never checks revision against
 file bytes. Existing CLI tests still prove the real `run` door hashes
-bytes.  
+bytes.
 Why current proof is insufficient: semantic door records unverified
-provenance the kernel’s request path refuses.  
+provenance the kernel’s request path refuses.
 Required fix: compute revision from real bytes exactly as `run.mjs`; never
-accept or default a hash.  
+accept or default a hash.
 Blocks Phase 2 implementation: **yes**
 
 ### F-R04
 
-ID: F-R04  
-Severity: **HIGH**  
-Category: driver identity / bypass  
-Affected unit: 1B  
-Affected contract: single channel matching `provenanceRoot.writerId`  
+ID: F-R04
+Severity: **HIGH**
+Category: driver identity / bypass
+Affected unit: 1B
+Affected contract: single channel matching `provenanceRoot.writerId`
 Source evidence: close identity
 `currentPayload.authorizedBy ?? precondition.authorizedBy ??
 currentPayload.writerId ?? precondition.writerId`. Executor close:
 `authorizedBy ?? { type: 'human', id: effectiveWriterId }`. Unkeyed close
-path still in `close.mjs`.  
+path still in `close.mjs`.
 Test evidence: driver test covers seam missing/mismatch and non-close
 `authorizedBy` rejection; does not cover synthesized close identity or
-unkeyed close.  
+unkeyed close.
 Why current proof is insufficient: close can still ride `writerId`;
-unkeyed production close omits the seam.  
+unkeyed production close omits the seam.
 Required fix: close accepts only `authorizedBy.id`; refuse missing;
 remove unkeyed mutation for semantic/Phase-2 callers (compat raw close
-must stay explicit but still driver-checked).  
+must stay explicit but still driver-checked).
 Blocks Phase 2 implementation: **yes**
 
 ### F-R05
 
-ID: F-R05  
-Severity: **HIGH**  
-Category: close view vs kernel aggregation  
-Affected unit: 0D / 1A  
-Affected contract: explicit close  
+ID: F-R05
+Severity: **HIGH**
+Category: close view vs kernel aggregation
+Affected unit: 0D / 1A
+Affected contract: explicit close
 Source evidence: `evaluateClosePrerequisites` blocks whenever aggregation
 is declared and missing/non-consensus. `closeSessionByQuorumLocked` only
-narrows when `aggregationId` is provided.  
+narrows when `aggregationId` is provided.
 Test evidence: legality “parity” still feeds aggregations into
 `evaluateClosePrerequisites`; does not call `closeSessionByQuorumLocked`
-without `aggregationId`.  
+without `aggregationId`.
 Why current proof is insufficient: view-block / kernel-accept remains
 possible on the kernel function. Public close use case currently injects
 aggregation, so CLI may match; Phase 2 must not assume the functions are
-identical.  
+identical.
 Required fix: make close-readiness a projection of the **same** predicate
-`closeSessionByQuorumLocked` uses, including optional `aggregationId`.  
+`closeSessionByQuorumLocked` uses, including optional `aggregationId`.
 Blocks Phase 2 implementation: **yes**
 
 ### F-R06
 
-ID: F-R06  
-Severity: **MEDIUM**  
-Category: concurrency / recovery proof quality  
-Affected unit: 1B  
-Affected contract: two-OS-process production doors; crash-before-response  
+ID: F-R06
+Severity: **MEDIUM**
+Category: concurrency / recovery proof quality
+Affected unit: 1B
+Affected contract: two-OS-process production doors; crash-before-response
 Source evidence/tests: two-process race uses human-turn vs
 dispatch-operation (different keys). Same-key two-writer and schema
 compat tests still use `mutationFn`. No fan-out executor test. No
 crash-after-authoritative-mutation-before-response except close
-idempotent retry.  
+idempotent retry.
 Why current proof is insufficient: charter requires same-key two-process
-proof **through production use cases** for every write family.  
+proof **through production use cases** for every write family.
 Required fix: same-key races + crash/retry on
 `executeCoordinationActionUseCase` **after** F-R01 rewires it to kernel
-doors.  
+doors.
 Blocks Phase 2 implementation: **yes** (until F-R01’s real doors are
 proven)
 
 ### F-R07
 
-ID: F-R07  
-Severity: **LOW**  
-Category: report/source drift  
-Affected unit: 0D–1B  
-Affected contract: implementer closeout  
+ID: F-R07
+Severity: **LOW**
+Category: report/source drift
+Affected unit: 0D–1B
+Affected contract: implementer closeout
 Source evidence: `units-0d-1b-recheck-discharge.md` claims all R2 findings
-discharged and Phase 2 unblocked. Source still exhibits F-R01–F-R06.  
+discharged and Phase 2 unblocked. Source still exhibits F-R01–F-R06.
 Blocks Phase 2 implementation: **no** independently
 
 ### Closed vs prior independent findings

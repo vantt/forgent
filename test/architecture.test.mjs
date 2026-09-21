@@ -482,4 +482,183 @@ test('R8 posture check actually catches an EXECUTOR_ADAPTERS direct call site vi
   );
 });
 
+function extractFunctionBody(source, functionName) {
+  const match = source.match(new RegExp(`(?:async\\s+)?function\\s+${functionName}\\s*\\([^)]*\\)\\s*\\{`));
+  if (!match) return null;
+  const startIdx = match.index + match[0].length;
+  let depth = 1;
+  for (let i = startIdx; i < source.length; i++) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') {
+      depth--;
+      if (depth === 0) return source.slice(startIdx, i);
+    }
+  }
+  return null;
+}
 
+export function checkCoordinationActionsArchitecture(actionsSource, runSource, closeSource) {
+  const violations = [];
+
+  // 1. actions.mjs must not import or reference any *Locked mutators in executable code
+  const cleanActions = actionsSource.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  const lockedMutatorPattern = /\b[a-zA-Z0-9_]*Locked\b/g;
+  const lockedMatches = cleanActions.match(lockedMutatorPattern);
+  const cleanRun = runSource.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  if (lockedMatches && lockedMatches.length > 0) {
+    violations.push(`actions.mjs illegally references *Locked functions: ${[...new Set(lockedMatches)].join(', ')}`);
+  }
+
+  // 2. actions.mjs must import/reference executeCoordinationRunKernel and executeCoordinationCloseKernel
+  if (!cleanActions.includes('executeCoordinationRunKernel')) {
+    violations.push('actions.mjs does not reference executeCoordinationRunKernel');
+  }
+  if (!cleanActions.includes('executeCoordinationCloseKernel')) {
+    violations.push('actions.mjs does not reference executeCoordinationCloseKernel');
+  }
+
+  // F-R01 is a graph property, not a filename property. The action adapter
+  // must compose and validate a production request, then the kernel must hand
+  // its normalized steps to the one executor used by raw run.
+  if (!cleanActions.includes('validateCoordinationRequest')) {
+    violations.push('production action path does not call validateCoordinationRequest');
+  }
+  if (!cleanActions.includes('composeActionRequest')) {
+    violations.push('production action path does not pass a canonical action composer');
+  }
+  const actionBody = extractFunctionBody(cleanActions, 'executeCoordinationActionUseCase') ?? '';
+  if (!actionBody.includes('composeActionRequest')) {
+    violations.push('production action path does not execute its canonical composed request');
+  }
+  const stepExecutorDefinition = /(?:async\s+)?function\s+executeValidatedCoordinationStep\s*\(/;
+  if (!stepExecutorDefinition.test(cleanRun)) {
+    violations.push('run.mjs has no single executeValidatedCoordinationStep implementation');
+  }
+  const stepExecutorCalls = cleanRun.match(/executeValidatedCoordinationStep\s*\(/g) ?? [];
+  if (stepExecutorCalls.length < 2) {
+    violations.push('raw and action paths do not both call executeValidatedCoordinationStep');
+  }
+  const kernelBody = extractFunctionBody(cleanRun, 'executeCoordinationRunKernel') ?? '';
+  if (/actionPrecondition[\s\S]*switch\s*\([^)]*kind/.test(kernelBody) && /Locked\s*\(/.test(kernelBody)) {
+    violations.push('executeCoordinationRunKernel contains an action-only locked-mutator switch');
+  }
+  const writeSwitches = kernelBody.match(/switch\s*\((?:kind|step\.type)\)/g) ?? [];
+  if (writeSwitches.length > 1) {
+    violations.push('raw and action paths contain duplicate write-family switches');
+  }
+
+  // 3. runCoordinationUseCase must delegate to executeCoordinationRunKernel
+  const runBody = extractFunctionBody(cleanRun, 'runCoordinationUseCase');
+  if (!runBody || !runBody.includes('executeCoordinationRunKernel(')) {
+    violations.push('runCoordinationUseCase does not delegate to executeCoordinationRunKernel');
+  }
+
+  // 4. closeCoordinationUseCase must delegate to executeCoordinationCloseKernel
+  const cleanClose = closeSource.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+  const closeBody = extractFunctionBody(cleanClose, 'closeCoordinationUseCase');
+  if (!closeBody || !closeBody.includes('executeCoordinationCloseKernel(')) {
+    violations.push('closeCoordinationUseCase does not delegate to executeCoordinationCloseKernel');
+  }
+
+  return violations;
+}
+
+test('F-R01 architectural authority: actions.mjs contains NO *Locked mutators and delegates to executeCoordinationRunKernel and executeCoordinationCloseKernel', () => {
+  const actionsPath = path.join(root, 'src/verbs/coordination/actions.mjs');
+  const runPath = path.join(root, 'src/verbs/coordination/run.mjs');
+  const closePath = path.join(root, 'src/verbs/coordination/close.mjs');
+
+  const actionsSource = fs.readFileSync(actionsPath, 'utf8');
+  const runSource = fs.readFileSync(runPath, 'utf8');
+  const closeSource = fs.readFileSync(closePath, 'utf8');
+
+  const violations = checkCoordinationActionsArchitecture(actionsSource, runSource, closeSource);
+  assert.deepEqual(
+    violations,
+    [],
+    `coordination action architecture violations: ${violations.join('; ')}`,
+  );
+});
+
+test('F-R01 posture check catches violations (deliberate mutator introduction or missing kernel delegation)', () => {
+  const validActions = `
+    import { executeCoordinationRunKernel } from './run.mjs';
+    import { executeCoordinationCloseKernel } from './close.mjs';
+    import { validateCoordinationRequest } from './schema.mjs';
+    function composeActionRequest() { return validateCoordinationRequest({}); }
+    export async function executeCoordinationActionUseCase() {
+      if (close) return executeCoordinationCloseKernel();
+      return executeCoordinationRunKernel(ctx, req, { composeActionRequest });
+    }
+  `;
+  const validRun = `
+    async function executeValidatedCoordinationStep() {}
+    export async function runCoordinationUseCase(ctx, options) {
+      return executeCoordinationRunKernel(ctx, req, options);
+    }
+    async function executeCoordinationRunKernel() {
+      await executeValidatedCoordinationStep();
+    }
+  `;
+  const validClose = `
+    export async function closeCoordinationUseCase(ctx, options) {
+      return executeCoordinationCloseKernel(ctx, req, options);
+    }
+  `;
+
+  // Valid baseline
+  assert.deepEqual(checkCoordinationActionsArchitecture(validActions, validRun, validClose), []);
+
+  // 1. Catches *Locked mutator introduced into actions.mjs
+  const brokenActionsWithLocked = validActions + '\n dispatchDeclaredOperationLocked();';
+  const lockedViolations = checkCoordinationActionsArchitecture(brokenActionsWithLocked, validRun, validClose);
+  assert.ok(lockedViolations.some((v) => v.includes('*Locked functions')), 'must catch *Locked mutator');
+
+  // 2. Catches missing executeCoordinationRunKernel in actions.mjs
+  const missingRunInActions = `
+    import { executeCoordinationCloseKernel } from './close.mjs';
+    export async function executeCoordinationActionUseCase() {}
+  `;
+  const missingRunViolations = checkCoordinationActionsArchitecture(missingRunInActions, validRun, validClose);
+  assert.ok(missingRunViolations.some((v) => v.includes('executeCoordinationRunKernel')), 'must catch missing executeCoordinationRunKernel');
+
+  // 3. Catches runCoordinationUseCase not delegating
+  const brokenRun = `
+    export async function runCoordinationUseCase(ctx, options) {
+      return doSomethingElse(ctx);
+    }
+  `;
+  const runViolations = checkCoordinationActionsArchitecture(validActions, brokenRun, validClose);
+  assert.ok(runViolations.some((v) => v.includes('runCoordinationUseCase does not delegate')), 'must catch runCoordinationUseCase not delegating');
+
+  // 4. Catches closeCoordinationUseCase not delegating
+  const brokenClose = `
+    export async function closeCoordinationUseCase(ctx, options) {
+      return doSomethingElse(ctx);
+    }
+  `;
+  const closeViolations = checkCoordinationActionsArchitecture(validActions, validRun, brokenClose);
+  assert.ok(closeViolations.some((v) => v.includes('closeCoordinationUseCase does not delegate')), 'must catch closeCoordinationUseCase not delegating');
+
+  // Deliberate defect: actions.mjs is clean, but the second engine was moved
+  // into run.mjs. Filename/import checks must still reject it.
+  const movedSecondEngine = `
+    async function executeValidatedCoordinationStep() {}
+    async function executeCoordinationRunKernel(actionPrecondition, kind) {
+      if (actionPrecondition) switch (kind) { case 'operation': dispatchDeclaredOperationLocked(); break; }
+      switch (kind) { case 'operation': dispatchDeclaredOperationLocked(); break; }
+      return executeValidatedCoordinationRunKernel();
+    }
+    export async function runCoordinationUseCase() { return executeCoordinationRunKernel(); }
+  `;
+  const movedViolations = checkCoordinationActionsArchitecture(validActions, movedSecondEngine, validClose);
+  assert.ok(movedViolations.some((v) => v.includes('action-only locked-mutator switch')), 'must catch a second engine moved into run.mjs');
+  assert.ok(movedViolations.some((v) => v.includes('duplicate write-family switches')), 'must catch duplicate raw/action switches');
+
+  const missingProductionValidation = validActions.replace('composeActionRequest });', 'mutateFromPayload();');
+  assert.ok(
+    checkCoordinationActionsArchitecture(missingProductionValidation, validRun, validClose)
+      .some((v) => v.includes('validateCoordinationRequest') || v.includes('canonical composed request')),
+    'must catch an action path that never validates the production request',
+  );
+});

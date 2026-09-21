@@ -825,18 +825,18 @@ function assertWithinBindingInvocationCap({ eventsPath, coordinationId, cap, aut
  *   `maxRoundsForActor` is lock-held.
  * @returns {Readonly<object>} The Assignment (freshly created, or the one already claimed for this taskKey)
  */
-export function createSessionAssignment(
+export function createSessionAssignmentLocked(
   { coordinationId, taskKey, actorId, contract, caller, work, workId, createdBy, options, authorizationProvenance },
+  paths,
   opts = {},
 ) {
   assertValidTaskKey(taskKey);
-  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = paths;
   const assignmentsDir = path.join(fgosDir, 'assignments');
   const tasksDir = path.join(sessionDir, 'tasks');
   const taskClaimPath = path.join(tasksDir, `${hashTaskKey(taskKey)}.json`);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
+  const manifest = readManifestRaw(manifestPath);
     assertSchemaVersionCurrent(manifest, manifestPath);
     if (manifest.status !== 'active') {
       throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot create an Assignment`);
@@ -1024,8 +1024,15 @@ export function createSessionAssignment(
       authorizationProvenance,
     });
 
-    return assignment;
-  });
+  return assignment;
+}
+
+export function createSessionAssignment(
+  params,
+  opts = {},
+) {
+  const paths = resolveSessionPaths(params.coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => createSessionAssignmentLocked(params, paths, opts));
 }
 
 // Driver authority: `authorizedBy.id` is pinned to this session's OWN driver
@@ -1082,12 +1089,13 @@ export function assertDriverIdentity(manifest, authorizedBy, { coordinationId, l
  * -- `session-engine.mjs`'s `authorizeDeclaredOperation` is that caller, and
  * this module deliberately takes on no definition awareness of its own.
  */
-export function authorizeOperation(
+export function authorizeOperationLocked(
   coordinationId,
   { authorizationId, operationId, nodeId, targetActorId, invocationKey, authorizedBy, reason, grantedContextRefs, targetArtifactRef },
+  paths,
   opts = {},
 ) {
-  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { sessionDir, eventsPath, manifestPath } = paths;
   const payload = {
     authorizationId,
     operationId,
@@ -1101,8 +1109,7 @@ export function authorizeOperation(
   };
   validateEventPayload('operation-authorized', payload);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
+  const manifest = readManifestRaw(manifestPath);
     assertSchemaVersionCurrent(manifest, manifestPath);
     if (manifest.status !== 'active') {
       throw new CoordinationError(
@@ -1189,7 +1196,15 @@ export function authorizeOperation(
 
     appendSessionEventLocked(eventsPath, { type: 'operation-authorized', payload }, sessionDir, manifest);
     return Object.freeze({ ...payload, appended: true });
-  });
+}
+
+export function authorizeOperation(
+  coordinationId,
+  params,
+  opts = {},
+) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => authorizeOperationLocked(coordinationId, params, paths, opts));
 }
 
 /**
@@ -1418,71 +1433,74 @@ function assertDispositionRefOwnedBySession(ref, { coordinationId, assignmentRef
  * footing as `authorizeOperation`/`recordRunRetry` -- a closed session's
  * ledger is not reopened.
  */
-export function recordDriverDisposition(coordinationId, { targetRef, disposition, rationale, evidenceRefs, authorizedBy }, opts = {}) {
-  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+export function recordDriverDispositionLocked(coordinationId, { targetRef, disposition, rationale, evidenceRefs, authorizedBy }, paths, opts = {}) {
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = paths;
   const payload = { targetRef, disposition, rationale, evidenceRefs, authorizedBy };
   validateEventPayload('driver-disposition-recorded', payload);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
-    assertSchemaVersionCurrent(manifest, manifestPath);
-    if (manifest.status !== 'active') {
-      throw new CoordinationError(
-        'validation',
-        `recordDriverDisposition: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot record a disposition once the session has closed`,
-      );
-    }
-    assertDriverIdentity(manifest, authorizedBy, {
-      coordinationId,
-      label: 'recordDriverDisposition',
-      subject: 'a disposition',
-    });
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError(
+      'validation',
+      `recordDriverDisposition: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot record a disposition once the session has closed`,
+    );
+  }
+  assertDriverIdentity(manifest, authorizedBy, {
+    coordinationId,
+    label: 'recordDriverDisposition',
+    subject: 'a disposition',
+  });
 
-    // Read once, lock-held, so a `contribution:`/`human-turn:` ref is
-    // resolved against the log as it actually is at the moment the
-    // disposition is written -- never against a snapshot taken before the
-    // lock.
-    const eventsForRefs = readEvents(eventsPath);
-    const contributionIds = linkedContributionIds(eventsForRefs);
-    const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
-    assertDispositionRefOwnedBySession(targetRef, {
+  // Read once, lock-held, so a `contribution:`/`human-turn:` ref is
+  // resolved against the log as it actually is at the moment the
+  // disposition is written -- never against a snapshot taken before the
+  // lock.
+  const eventsForRefs = readEvents(eventsPath);
+  const contributionIds = linkedContributionIds(eventsForRefs);
+  const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
+  assertDispositionRefOwnedBySession(targetRef, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: 'recordDriverDisposition: targetRef',
+    contributionIds,
+    humanTurnIds,
+  });
+  evidenceRefs.forEach((ref, i) =>
+    assertDispositionRefOwnedBySession(ref, {
       coordinationId,
       assignmentRefs: manifest.assignmentRefs,
       fgosDir,
-      label: 'recordDriverDisposition: targetRef',
+      label: `recordDriverDisposition: evidenceRefs[${i}]`,
       contributionIds,
       humanTurnIds,
-    });
-    evidenceRefs.forEach((ref, i) =>
-      assertDispositionRefOwnedBySession(ref, {
-        coordinationId,
-        assignmentRefs: manifest.assignmentRefs,
-        fgosDir,
-        label: `recordDriverDisposition: evidenceRefs[${i}]`,
-        contributionIds,
-        humanTurnIds,
-      }),
-    );
+    }),
+  );
 
-    // Idempotency compares a CANONICAL shape, not the raw payload:
-    // `JSON.stringify` is key-insertion-order sensitive, and `authorizedBy`
-    // is a caller-supplied nested object stored verbatim -- two calls
-    // describing the exact same decision with `authorizedBy`'s two fields
-    // in a different order would otherwise compare unequal and silently
-    // append twice -- empirically reproduced. Every other field is
-    // a flat, caller-owned value already in fixed key order from the
-    // destructure above, so only `authorizedBy` needs normalizing.
-    const canonicalize = (value) =>
-      JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
-    const serialized = canonicalize(payload);
-    const alreadyRecorded = eventsForRefs.some(
-      (event) => event.type === 'driver-disposition-recorded' && canonicalize(event.payload) === serialized,
-    );
-    if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
+  // Idempotency compares a CANONICAL shape, not the raw payload:
+  // `JSON.stringify` is key-insertion-order sensitive, and `authorizedBy`
+  // is a caller-supplied nested object stored verbatim -- two calls
+  // describing the exact same decision with `authorizedBy`'s two fields
+  // in a different order would otherwise compare unequal and silently
+  // append twice -- empirically reproduced. Every other field is
+  // a flat, caller-owned value already in fixed key order from the
+  // destructure above, so only `authorizedBy` needs normalizing.
+  const canonicalize = (value) =>
+    JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
+  const serialized = canonicalize(payload);
+  const alreadyRecorded = eventsForRefs.some(
+    (event) => event.type === 'driver-disposition-recorded' && canonicalize(event.payload) === serialized,
+  );
+  if (alreadyRecorded) return Object.freeze({ ...payload, appended: false });
 
-    appendSessionEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir, manifest);
-    return Object.freeze({ ...payload, appended: true });
-  });
+  appendSessionEventLocked(eventsPath, { type: 'driver-disposition-recorded', payload }, sessionDir, manifest);
+  return Object.freeze({ ...payload, appended: true });
+}
+
+export function recordDriverDisposition(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => recordDriverDispositionLocked(coordinationId, params, paths, opts));
 }
 
 // `attributedTo.id`/`recordedBy.id` canonicalization for idempotency
@@ -1567,13 +1585,14 @@ function assertHumanTurnIdShape(turnId, label) {
  * checked with the SAME `assertDispositionRefOwnedBySession` a disposition's
  * own refs already go through, never a second, divergent ownership rule.
  */
-export function recordHumanTurn(
+export function recordHumanTurnLocked(
   coordinationId,
   { turnId, turnOrdinal, channel, artifactRef, revision, externalRef, attributedTo, recordedBy, respondsToRefs },
+  paths,
   opts = {},
 ) {
   assertHumanTurnIdShape(turnId, 'recordHumanTurn');
-  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = paths;
   const payload = {
     turnId,
     turnOrdinal,
@@ -1587,94 +1606,97 @@ export function recordHumanTurn(
   };
   validateEventPayload('human-turn-recorded', payload);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
-    assertSchemaVersionCurrent(manifest, manifestPath);
-    if (manifest.status !== 'active') {
-      throw new CoordinationError(
-        'validation',
-        `recordHumanTurn: session "${coordinationId}" is not active (status: "${manifest.status}") -- a human turn cannot be recorded into a session that has already closed`,
-      );
-    }
-    assertDriverIdentity(manifest, recordedBy, {
-      coordinationId,
-      label: 'recordHumanTurn',
-      subject: 'a recorded human turn',
-      fieldName: 'recordedBy',
-    });
-
-    // T1: a driver-authored artifact/actor identity can never occupy the
-    // human-decision slot -- checked before the idempotency read below, so
-    // even a byte-identical repeat of an already-illegal payload is refused
-    // again rather than silently accepted as "already recorded".
-    if (attributedTo.id === recordedBy.id) {
-      throw new CoordinationError(
-        'validation',
-        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is the same identity as recordedBy.id -- a driver cannot attribute a human turn to itself`,
-      );
-    }
-    const declaredActorIds = new Set((manifest.actors ?? []).map((actor) => actor.id));
-    if (declaredActorIds.has(attributedTo.id)) {
-      throw new CoordinationError(
-        'validation',
-        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is a declared panel actor of session "${coordinationId}" -- a panel actor cannot occupy the human-decision slot`,
-      );
-    }
-    if (/^asgn_/.test(attributedTo.id) || attributedTo.id.startsWith(CONTRIBUTION_REF_PREFIX) || attributedTo.id.startsWith(HUMAN_TURN_REF_PREFIX)) {
-      throw new CoordinationError(
-        'validation',
-        `recordHumanTurn: attributedTo.id "${attributedTo.id}" is shaped like a driver-authored ref (an Assignment id, or the reserved "${CONTRIBUTION_REF_PREFIX}"/"${HUMAN_TURN_REF_PREFIX}" namespace) -- a driver-authored ref cannot occupy the human-decision slot`,
-      );
-    }
-
-    const events = readEvents(eventsPath);
-    const priorTurns = events.filter((event) => event.type === 'human-turn-recorded');
-
-    const priorForId = priorTurns.find((event) => event.payload.turnId === turnId);
-    if (priorForId) {
-      if (canonicalizeHumanTurnPayload(priorForId.payload) === canonicalizeHumanTurnPayload(payload)) {
-        return Object.freeze({ ...payload, appended: false });
-      }
-      throw new CoordinationError(
-        'duplicate-ref',
-        `recordHumanTurn: turnId "${turnId}" in session "${coordinationId}" was already recorded with different content -- a human turn is immutable; record a new turnId instead`,
-      );
-    }
-
-    const maxOrdinal = priorTurns.reduce((max, event) => Math.max(max, event.payload.turnOrdinal), 0);
-    if (turnOrdinal !== maxOrdinal + 1) {
-      throw new CoordinationError(
-        'validation',
-        `recordHumanTurn: turnOrdinal ${turnOrdinal} is not the next ordinal for session "${coordinationId}" (expected ${maxOrdinal + 1}) -- no gaps, no ordinal reuse`,
-      );
-    }
-
-    const externalRefCollision = priorTurns.find((event) => event.payload.externalRef === externalRef);
-    if (externalRefCollision) {
-      throw new CoordinationError(
-        'duplicate-ref',
-        `recordHumanTurn: externalRef "${externalRef}" in session "${coordinationId}" was already used by turn "${externalRefCollision.payload.turnId}" -- an externalRef may back at most one real human turn`,
-      );
-    }
-
-    if (respondsToRefs !== undefined) {
-      const contributionIds = linkedContributionIds(events);
-      const humanTurnIds = recordedHumanTurnIds(events);
-      respondsToRefs.forEach((ref, i) =>
-        assertDispositionRefOwnedBySession(ref, {
-          coordinationId,
-          assignmentRefs: manifest.assignmentRefs,
-          fgosDir,
-          label: `recordHumanTurn: respondsToRefs[${i}]`,
-          contributionIds,
-          humanTurnIds,
-        }),
-      );
-    }
-
-    appendSessionEventLocked(eventsPath, { type: 'human-turn-recorded', payload }, sessionDir, manifest);
-    return Object.freeze({ ...payload, appended: true });
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError(
+      'validation',
+      `recordHumanTurn: session "${coordinationId}" is not active (status: "${manifest.status}") -- a human turn cannot be recorded into a session that has already closed`,
+    );
+  }
+  assertDriverIdentity(manifest, recordedBy, {
+    coordinationId,
+    label: 'recordHumanTurn',
+    subject: 'a recorded human turn',
+    fieldName: 'recordedBy',
   });
+
+  // T1: a driver-authored artifact/actor identity can never occupy the
+  // human-decision slot -- checked before the idempotency read below, so
+  // even a byte-identical repeat of an already-illegal payload is refused
+  // again rather than silently accepted as "already recorded".
+  if (attributedTo.id === recordedBy.id) {
+    throw new CoordinationError(
+      'validation',
+      `recordHumanTurn: attributedTo.id "${attributedTo.id}" is the same identity as recordedBy.id -- a driver cannot attribute a human turn to itself`,
+    );
+  }
+  const declaredActorIds = new Set((manifest.actors ?? []).map((actor) => actor.id));
+  if (declaredActorIds.has(attributedTo.id)) {
+    throw new CoordinationError(
+      'validation',
+      `recordHumanTurn: attributedTo.id "${attributedTo.id}" is a declared panel actor of session "${coordinationId}" -- a panel actor cannot occupy the human-decision slot`,
+    );
+  }
+  if (/^asgn_/.test(attributedTo.id) || attributedTo.id.startsWith(CONTRIBUTION_REF_PREFIX) || attributedTo.id.startsWith(HUMAN_TURN_REF_PREFIX)) {
+    throw new CoordinationError(
+      'validation',
+      `recordHumanTurn: attributedTo.id "${attributedTo.id}" is shaped like a driver-authored ref (an Assignment id, or the reserved "${CONTRIBUTION_REF_PREFIX}"/"${HUMAN_TURN_REF_PREFIX}" namespace) -- a driver-authored ref cannot occupy the human-decision slot`,
+    );
+  }
+
+  const events = readEvents(eventsPath);
+  const priorTurns = events.filter((event) => event.type === 'human-turn-recorded');
+
+  const priorForId = priorTurns.find((event) => event.payload.turnId === turnId);
+  if (priorForId) {
+    if (canonicalizeHumanTurnPayload(priorForId.payload) === canonicalizeHumanTurnPayload(payload)) {
+      return Object.freeze({ ...payload, appended: false });
+    }
+    throw new CoordinationError(
+      'duplicate-ref',
+      `recordHumanTurn: turnId "${turnId}" in session "${coordinationId}" was already recorded with different content -- a human turn is immutable; record a new turnId instead`,
+    );
+  }
+
+  const maxOrdinal = priorTurns.reduce((max, event) => Math.max(max, event.payload.turnOrdinal), 0);
+  if (turnOrdinal !== maxOrdinal + 1) {
+    throw new CoordinationError(
+      'validation',
+      `recordHumanTurn: turnOrdinal ${turnOrdinal} is not the next ordinal for session "${coordinationId}" (expected ${maxOrdinal + 1}) -- no gaps, no ordinal reuse`,
+    );
+  }
+
+  const externalRefCollision = priorTurns.find((event) => event.payload.externalRef === externalRef);
+  if (externalRefCollision) {
+    throw new CoordinationError(
+      'duplicate-ref',
+      `recordHumanTurn: externalRef "${externalRef}" in session "${coordinationId}" was already used by turn "${externalRefCollision.payload.turnId}" -- an externalRef may back at most one real human turn`,
+    );
+  }
+
+  if (respondsToRefs !== undefined) {
+    const contributionIds = linkedContributionIds(events);
+    const humanTurnIds = recordedHumanTurnIds(events);
+    respondsToRefs.forEach((ref, i) =>
+      assertDispositionRefOwnedBySession(ref, {
+        coordinationId,
+        assignmentRefs: manifest.assignmentRefs,
+        fgosDir,
+        label: `recordHumanTurn: respondsToRefs[${i}]`,
+        contributionIds,
+        humanTurnIds,
+      }),
+    );
+  }
+
+  appendSessionEventLocked(eventsPath, { type: 'human-turn-recorded', payload }, sessionDir, manifest);
+  return Object.freeze({ ...payload, appended: true });
+}
+
+export function recordHumanTurn(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => recordHumanTurnLocked(coordinationId, params, paths, opts));
 }
 
 /**
@@ -1789,13 +1811,14 @@ export function asCoordinationError(err, context) {
  * `linkSessionContribution` is the mediated door that derives every one of
  * those values from the session itself and takes none of them from a caller.
  */
-export function recordContributionLink(
+export function recordContributionLinkLocked(
   coordinationId,
   { contributionId, operationRef, type, assignmentId, runId, artifactRef, revision, roundKey, visibilityWindowRef, anchors, respondsTo, linkedBy },
+  paths,
   opts = {},
 ) {
   assertContributionIdShape(contributionId, 'recordContributionLink');
-  const { fgosDir, sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+  const { fgosDir, sessionDir, eventsPath, manifestPath } = paths;
   const payload = {
     contributionId,
     operationRef,
@@ -1812,66 +1835,69 @@ export function recordContributionLink(
   };
   validateEventPayload('deliberation-contribution-linked', payload);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
-    assertSchemaVersionCurrent(manifest, manifestPath);
-    if (manifest.status !== 'active') {
-      throw new CoordinationError(
-        'validation',
-        `recordContributionLink: session "${coordinationId}" is not active (status: "${manifest.status}") -- a contribution cannot be linked into a session that has already closed`,
-      );
-    }
-    assertDriverIdentity(manifest, linkedBy, {
-      coordinationId,
-      label: 'recordContributionLink',
-      subject: 'a linked contribution',
-      fieldName: 'linkedBy',
-    });
-
-    if (!manifest.assignmentRefs.includes(assignmentId)) {
-      throw new CoordinationError(
-        'foreign-ref',
-        `recordContributionLink: assignmentId "${assignmentId}" is not an Assignment of session "${coordinationId}" -- a contribution may only be backed by this session's own work`,
-      );
-    }
-    assertValidRunIdForAssignment(assignmentId, runId, 'recordContributionLink');
-    assertDispositionRefOwnedBySession(artifactRef, {
-      coordinationId,
-      assignmentRefs: manifest.assignmentRefs,
-      fgosDir,
-      label: 'recordContributionLink: artifactRef',
-    });
-
-    const events = readEvents(eventsPath);
-    const prior = events.find(
-      (event) => event.type === 'deliberation-contribution-linked' && event.payload?.contributionId === contributionId,
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError(
+      'validation',
+      `recordContributionLink: session "${coordinationId}" is not active (status: "${manifest.status}") -- a contribution cannot be linked into a session that has already closed`,
     );
-    if (prior) {
-      const canonicalize = (value) =>
-        JSON.stringify({ ...value, linkedBy: { type: value.linkedBy?.type, id: value.linkedBy?.id } });
-      if (canonicalize(prior.payload) === canonicalize(payload)) return Object.freeze({ ...payload, appended: false });
-      throw new CoordinationError(
-        'duplicate-ref',
-        `recordContributionLink: contributionId "${contributionId}" in session "${coordinationId}" was already linked with different content -- a contribution link is immutable; record a new contributionId instead`,
-      );
-    }
-
-    // P08.1's own lineage validators, called (never forked) against the real
-    // ledger. The candidate's own id is deliberately absent from this map --
-    // it has not been appended yet -- so a self-anchor or a self-response is a
-    // dangling ref here, and a lineage cycle cannot be built at all: every ref
-    // must already exist, and an append-only log has no back edges.
-    const known = knownContributionsFromEvents(events, coordinationId);
-    try {
-      validateAnchors(payload, known, coordinationId);
-      validateResponseLineage(payload, known, coordinationId);
-    } catch (err) {
-      asCoordinationError(err, `recordContributionLink: session "${coordinationId}" contribution "${contributionId}"`);
-    }
-
-    appendSessionEventLocked(eventsPath, { type: 'deliberation-contribution-linked', payload }, sessionDir, manifest);
-    return Object.freeze({ ...payload, appended: true });
+  }
+  assertDriverIdentity(manifest, linkedBy, {
+    coordinationId,
+    label: 'recordContributionLink',
+    subject: 'a linked contribution',
+    fieldName: 'linkedBy',
   });
+
+  if (!manifest.assignmentRefs.includes(assignmentId)) {
+    throw new CoordinationError(
+      'foreign-ref',
+      `recordContributionLink: assignmentId "${assignmentId}" is not an Assignment of session "${coordinationId}" -- a contribution may only be backed by this session's own work`,
+    );
+  }
+  assertValidRunIdForAssignment(assignmentId, runId, 'recordContributionLink');
+  assertDispositionRefOwnedBySession(artifactRef, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: 'recordContributionLink: artifactRef',
+  });
+
+  const events = readEvents(eventsPath);
+  const prior = events.find(
+    (event) => event.type === 'deliberation-contribution-linked' && event.payload?.contributionId === contributionId,
+  );
+  if (prior) {
+    const canonicalize = (value) =>
+      JSON.stringify({ ...value, linkedBy: { type: value.linkedBy?.type, id: value.linkedBy?.id } });
+    if (canonicalize(prior.payload) === canonicalize(payload)) return Object.freeze({ ...payload, appended: false });
+    throw new CoordinationError(
+      'duplicate-ref',
+      `recordContributionLink: contributionId "${contributionId}" in session "${coordinationId}" was already linked with different content -- a contribution link is immutable; record a new contributionId instead`,
+    );
+  }
+
+  // P08.1's own lineage validators, called (never forked) against the real
+  // ledger. The candidate's own id is deliberately absent from this map --
+  // it has not been appended yet -- so a self-anchor or a self-response is a
+  // dangling ref here, and a lineage cycle cannot be built at all: every ref
+  // must already exist, and an append-only log has no back edges.
+  const known = knownContributionsFromEvents(events, coordinationId);
+  try {
+    validateAnchors(payload, known, coordinationId);
+    validateResponseLineage(payload, known, coordinationId);
+  } catch (err) {
+    asCoordinationError(err, `recordContributionLink: session "${coordinationId}" contribution "${contributionId}"`);
+  }
+
+  appendSessionEventLocked(eventsPath, { type: 'deliberation-contribution-linked', payload }, sessionDir, manifest);
+  return Object.freeze({ ...payload, appended: true });
+}
+
+export function recordContributionLink(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => recordContributionLinkLocked(coordinationId, params, paths, opts));
 }
 
 /**
@@ -2080,74 +2106,51 @@ export function assertValidRunIdForAssignment(assignmentId, runId, context) {
  * caller omits this flag, so behavior is byte-identical to before it
  * existed.
  */
-export function linkResult(coordinationId, { assignmentId, runId }, opts = {}) {
-  const { sessionDir, eventsPath, manifestPath } = resolveSessionPaths(coordinationId, opts);
+export function linkResultLocked(coordinationId, { assignmentId, runId }, paths, opts = {}) {
+  const { sessionDir, eventsPath, manifestPath } = paths;
   const payload = { assignmentId, runId };
   validateEventPayload('result-linked', payload);
 
-  return withEventsLock(eventsPath, () => {
-    const manifest = readManifestRaw(manifestPath);
-    assertSchemaVersionCurrent(manifest, manifestPath);
-    if (!manifest.assignmentRefs.includes(assignmentId)) {
-      throw new CoordinationError('validation', `assignment "${assignmentId}" is not a member of session "${coordinationId}" -- cannot link a result to it`);
-    }
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (!manifest.assignmentRefs.includes(assignmentId)) {
+    throw new CoordinationError('validation', `assignment "${assignmentId}" is not a member of session "${coordinationId}" -- cannot link a result to it`);
+  }
 
-    // R6 (Phase 06, cell P06.2): reject a `runId` that does not carry
-    // `assignmentId`'s own naming convention (`run_<assignmentId>_<attempt>`,
-    // the shape EVERY real dispatch in this codebase produces --
-    // `assignment-runner.mjs`'s own `runId` construction, unchanged) AT
-    // WRITE TIME, not just when the linked result is later read back
-    // (`session-engine.mjs`'s `readLinkedRunResultFromDisk` already throws
-    // `foreign-ref` for the identical mismatch, but only once something
-    // actually tries to read it -- e.g. at quorum evaluation). Confirmed
-    // empirically before this fix: `linkResult` accepted a REAL, genuine
-    // sibling Assignment's own runId (foreign evidence) with no complaint at
-    // write time, silently writing a permanently-unresolvable cross-linked
-    // event into the log -- it never produced a false SUCCESS (the later
-    // read still fails closed), but it violated this module's own
-    // established validate-at-the-boundary discipline (schema.mjs) by
-    // deferring a detectable, always-wrong write to a later, unrelated
-    // caller. Every legitimate caller already supplies a runId in this exact
-    // shape, so this is not a behavior change for any real dispatch path.
-    // Checked here, INSIDE the lock and AFTER the schema-version/membership
-    // checks above (same precedence every other check in this function
-    // already follows -- schema-version mismatch and non-membership both
-    // still win first, matching this function's own pre-existing tests).
-    //
-    // Round 2: uses the FULL-SHAPE `assertValidRunIdForAssignment` (above),
-    // not a prefix-only check -- a prefix-only check accepts a same-prefix,
-    // malicious-suffix runId (e.g. `run_<assignmentId>_../../../../tmp/evil`)
-    // since that string genuinely starts with the expected prefix.
-    assertValidRunIdForAssignment(assignmentId, runId, 'linkResult');
+  assertValidRunIdForAssignment(assignmentId, runId, 'linkResult');
 
-    const freshEvents = readEvents(eventsPath);
-    const existingLinks = freshEvents.filter((event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId);
-    const existingLink = existingLinks[existingLinks.length - 1];
-    if (existingLink) {
-      if (existingLink.payload.runId === runId) {
-        return; // idempotent no-op: the SAME run is already linked
-      }
-      if (opts.allowSupersede) {
-        const existingLinkIndex = freshEvents.indexOf(existingLink);
-        const authorizedByRetry = freshEvents
-          .slice(existingLinkIndex + 1)
-          .some((event) => event.type === 'run-retried' && event.payload.assignmentId === assignmentId);
-        if (!authorizedByRetry) {
-          throw new CoordinationError(
-            'validation',
-            `linkResult: supersede requested for assignment "${assignmentId}" but no "run-retried" event authorizes replacing runId "${existingLink.payload.runId}" with "${runId}" -- retries must be declared via recordRunRetry before their result can supersede the prior link`,
-          );
-        }
-        appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
-        return;
-      }
-      throw new CoordinationError(
-        'duplicate-ref',
-        `assignment "${assignmentId}" in session "${coordinationId}" already has a result linked (runId "${existingLink.payload.runId}") -- refusing to link a second, DIFFERENT run ("${runId}")`,
-      );
+  const freshEvents = readEvents(eventsPath);
+  const existingLinks = freshEvents.filter((event) => event.type === 'result-linked' && event.payload.assignmentId === assignmentId);
+  const existingLink = existingLinks[existingLinks.length - 1];
+  if (existingLink) {
+    if (existingLink.payload.runId === runId) {
+      return; // idempotent no-op: the SAME run is already linked
     }
-    appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
-  });
+    if (opts.allowSupersede) {
+      const existingLinkIndex = freshEvents.indexOf(existingLink);
+      const authorizedByRetry = freshEvents
+        .slice(existingLinkIndex + 1)
+        .some((event) => event.type === 'run-retried' && event.payload.assignmentId === assignmentId);
+      if (!authorizedByRetry) {
+        throw new CoordinationError(
+          'validation',
+          `linkResult: supersede requested for assignment "${assignmentId}" but no "run-retried" event authorizes replacing runId "${existingLink.payload.runId}" with "${runId}" -- retries must be declared via recordRunRetry before their result can supersede the prior link`,
+        );
+      }
+      appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
+      return;
+    }
+    throw new CoordinationError(
+      'duplicate-ref',
+      `assignment "${assignmentId}" in session "${coordinationId}" already has a result linked (runId "${existingLink.payload.runId}") -- refusing to link a second, DIFFERENT run ("${runId}")`,
+    );
+  }
+  appendSessionEventLocked(eventsPath, { type: 'result-linked', payload }, sessionDir, manifest);
+}
+
+export function linkResult(coordinationId, params, opts = {}) {
+  const paths = resolveSessionPaths(coordinationId, opts);
+  return withEventsLock(paths.eventsPath, () => linkResultLocked(coordinationId, params, paths, opts));
 }
 
 /**
@@ -2877,7 +2880,7 @@ export function transitionSessionStatus(coordinationId, status, extra = {}, opts
  */
 export function withSessionLock(coordinationId, fn, opts = {}) {
   const paths = resolveSessionPaths(coordinationId, opts);
-  return withEventsLock(paths.eventsPath, () => fn(paths));
+  return withEventsLock(paths.eventsPath, (releaseLock) => fn(paths, releaseLock));
 }
 
 /** Read the current manifest without replay reconstruction/consistency checks (see replay.mjs for that). */

@@ -1,8 +1,8 @@
 # Phase 0 — Baseline, Drift Reconciliation, and `coordination-actions.v1`
 
-Status: design complete; implementation and measurements not started  
-Date: 2026-09-19  
-Parent plan: `plans/260919-coordination-skill-harness-simplification/plan.md`  
+Status: design complete; implementation and measurements not started
+Date: 2026-09-19
+Parent plan: `plans/260919-coordination-skill-harness-simplification/plan.md`
 Architecture assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
 

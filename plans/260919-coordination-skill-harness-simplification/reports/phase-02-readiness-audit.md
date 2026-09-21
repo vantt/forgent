@@ -1,7 +1,7 @@
 # Phase 2 Readiness Audit
 
-Date: 2026-09-20  
-Scope: Units 0B–1B and readiness for semantic request composers  
+Date: 2026-09-20
+Scope: Units 0B–1B and readiness for semantic request composers
 Verdict: design ready; implementation blocked
 
 ## Repository state

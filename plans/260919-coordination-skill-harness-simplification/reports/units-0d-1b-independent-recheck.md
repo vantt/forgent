@@ -1,7 +1,7 @@
 # Independent recheck — Units 0D, 1A, 1B (round 2)
 
-Date: 2026-09-21  
-Scope: repair proposed by `units-0d-1b-recheck-discharge.md`  
+Date: 2026-09-21
+Scope: repair proposed by `units-0d-1b-recheck-discharge.md`
 Final verdict: **REQUEST CHANGES**
 
 Current source and executable proof are authoritative. This report supersedes
@@ -83,165 +83,165 @@ unused because the index is stale and text search contradicts them.
 
 ### R2-01
 
-ID: R2-01  
-Severity: **CRITICAL**  
-Category: stale-action atomicity / production authority  
-Affected unit: 1B  
+ID: R2-01
+Severity: **CRITICAL**
+Category: stale-action atomicity / production authority
+Affected unit: 1B
 Affected contract: every action-backed production mutation must reload,
-reproject, validate, and mutate under one existing session lock.  
+reproject, validate, and mutate under one existing session lock.
 Source evidence: codebase-wide search finds
 `executeUnderActionPrecondition` imported/called only by
 `src/verbs/coordination/close.mjs`. `runCoordinationUseCase` does not consume
 action keys. Operation, authorize, fan-out, contribution, human-turn, and
-disposition still mutate through independently locking paths.  
+disposition still mutate through independently locking paths.
 Test evidence: the two-OS-process test calls the seam with a callback that
 appends `actor-bound`. The test titled “production mutator integration:
 dispatch-operation” creates assignment files and appends JSON directly. The
 human-turn test calls `recordHumanTurnLocked` directly. Only close uses a real
-public production use case.  
+public production use case.
 Why current proof is insufficient: callbacks and direct locked helpers do not
 prove a production command cannot validate outside the lock or reacquire the
-non-reentrant lock. The required shared seam is absent from five write families.  
+non-reentrant lock. The required shared seam is absent from five write families.
 Required fix: add one production semantic action door, or lock-aware paths in
 the existing run use case, for every projected mutation, using existing
 `*Locked` kernel mutators inside the seam. Exercise those actual doors in the
-two-process, throw-release, and stale-before-mutation tests.  
+two-process, throw-release, and stale-before-mutation tests.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-02
 
-ID: R2-02  
-Severity: **CRITICAL**  
-Category: durable idempotency / crash recovery  
-Affected unit: 1B  
+ID: R2-02
+Severity: **CRITICAL**
+Category: durable idempotency / crash recovery
+Affected unit: 1B
 Affected contract: mutation committed then process dies before response must
-recover for every family without a second truth store.  
+recover for every family without a second truth store.
 Source evidence: `action-precondition.mjs` still accepts an arbitrary
 `mutationFn` and reconstructs payloads heuristically. Dispatch reconstruction
 records only `objective`; disposition omits `evidenceRefs`; contribution omits
 anchors/responds-to/assignment binding; fan-out compares only actor/objective.
-No production run door uses this recovery code.  
+No production run door uses this recovery code.
 Test evidence: non-close retries are produced by hand-written callback events;
 there is no kill/crash after an actual operation, authorize, fan-out,
-contribution, human-turn, or disposition use case commits.  
+contribution, human-turn, or disposition use case commits.
 Why current proof is insufficient: same action key with a different omitted
 optional field can be returned as already applied, and a production crash path
 has not been demonstrated. Absence of `.action-keys.json` closes the second
-store issue but not durable recovery.  
+store issue but not durable recovery.
 Required fix: reconstruct and compare the complete normalized payload from
 authoritative Assignment/Run/RunResult/events for every family, then prove
-process-death recovery through each production door with no duplicate effect.  
+process-death recovery through each production door with no duplicate effect.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-03
 
-ID: R2-03  
-Severity: **HIGH**  
-Category: action descriptor / request-schema mismatch  
-Affected unit: 1A  
+ID: R2-03
+Severity: **HIGH**
+Category: action descriptor / request-schema mismatch
+Affected unit: 1A
 Affected contract: descriptors must compose current raw requests without
-inventing inputs.  
+inventing inputs.
 Source evidence: both dispatch descriptors declare `objective` required and
 `expectedOutputs` optional, while `validateOperationStep` requires non-empty
 `expectedOutputs`. `authorize-and-dispatch` requires only
 `authorizedBy, objective`; the raw authorize step forbids `authorizedBy` and
 requires `authorizationId`, `invocationKey`, and `reason`. Close advertises
 `dissentingActorIds` and `aggregationId`, while
-`validateCoordinationCloseRequest` normalizes neither field.  
+`validateCoordinationCloseRequest` normalizes neither field.
 Test evidence: tests validate hand-built requests that supply fields outside
 the descriptor; they do not compose each action from descriptor target plus
-declared inputs and then execute it through the kernel.  
+declared inputs and then execute it through the kernel.
 Why current proof is insufficient: Phase 2 composer output can fail the raw
-validator before reaching the kernel, or silently drop advertised close data.  
+validator before reaching the kernel, or silently drop advertised close data.
 Required fix: align each descriptor exactly with the current request surface,
 including compound authorize+dispatch semantics, and add descriptor-driven
-validation plus kernel-acceptance fixtures.  
+validation plus kernel-acceptance fixtures.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-04
 
-ID: R2-04  
-Severity: **HIGH**  
-Category: fan-out target authority  
-Affected unit: 1A  
-Affected contract: no caller topology expansion; exact operation/actor cohort.  
+ID: R2-04
+Severity: **HIGH**
+Category: fan-out target authority
+Affected unit: 1A
+Affected contract: no caller topology expansion; exact operation/actor cohort.
 Source evidence: the projector derives `allowedActorIds` by filtering the
 entire `spec.actors` roster for sibling topology edges, not by the selected
 operation's graph bindings or cohort planner allocations.
 `dispatchResearchFanOut` later requires an allocation for every branch and
-dispatches the same `operationId` to each branch actor.  
+dispatches the same `operationId` to each branch actor.
 Test evidence: the fixture permits `worker-fan-2` and `worker-contrib` for
 `op-fan` even though only `worker-fan-1` is bound to `op-fan`; it proves only
-shape validation, not kernel acceptance.  
+shape validation, not kernel acceptance.
 Why current proof is insufficient: the descriptor authorizes actors bound to
 other operations and can direct a composer into kernel refusal/topology
-expansion.  
+expansion.
 Required fix: derive the exact legal branch actor set from current kernel
 cohort/allocation and operation bindings. If it is not safely derivable, do not
-emit fan-out. Prove the composed request through the production fan-out door.  
+emit fan-out. Prove the composed request through the production fan-out door.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-05
 
-ID: R2-05  
-Severity: **HIGH**  
-Category: close parity  
-Affected unit: 0D / 1A  
-Affected contract: action `readyToClose` must agree with the real close kernel.  
+ID: R2-05
+Severity: **HIGH**
+Category: close parity
+Affected unit: 0D / 1A
+Affected contract: action `readyToClose` must agree with the real close kernel.
 Source evidence: `evaluateClosePrerequisites` blocks whenever a definition
 declares aggregation and no/latest non-consensus aggregation exists. The real
 `closeSessionByQuorumLocked` checks aggregation only when the caller supplies
 `aggregationId`; omitting it preserves the legacy quorum close path. The close
-descriptor lists aggregation as optional.  
+descriptor lists aggregation as optional.
 Test evidence: no side-by-side test invokes projection and the close kernel for
-aggregation absent, non-consensus omitted, and non-consensus explicitly named.  
+aggregation absent, non-consensus omitted, and non-consensus explicitly named.
 Why current proof is insufficient: the action view can block a close the
-kernel accepts, violating bidirectional close parity.  
+kernel accepts, violating bidirectional close parity.
 Required fix: choose and document one current contract, then make projector and
 kernel use the same rule and assert both directions against the real close
-door. Preserve explicit caller close.  
+door. Preserve explicit caller close.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-06
 
-ID: R2-06  
-Severity: **HIGH**  
-Category: driver identity  
-Affected unit: 1B  
+ID: R2-06
+Severity: **HIGH**
+Category: driver identity
+Affected unit: 1B
 Affected contract: one writer identity channel matching
-`manifest.provenanceRoot.writerId`.  
+`manifest.provenanceRoot.writerId`.
 Source evidence: `resolveDriverIdentity` accepts `inputPayload.authorizedBy`,
 `precondition.authorizedBy`, `inputPayload.writerId`, or
 `precondition.writerId`. Raw run schema says top-level `writerId` is the single
-channel and rejects step-level `authorizedBy`.  
+channel and rejects step-level `authorizedBy`.
 Test evidence: seam tests alternate between precondition `writerId` and payload
-`authorizedBy`; no negative test rejects the second channel.  
+`authorizedBy`; no negative test rejects the second channel.
 Why current proof is insufficient: matching multiple channels is still a
-second identity surface even when mismatch is rejected.  
+second identity surface even when mismatch is rejected.
 Required fix: select the existing request contract's single channel per public
 door, derive it once, and reject every alternate channel. Test absent, foreign,
-and duplicate-channel cases through production doors.  
+and duplicate-channel cases through production doors.
 Blocks Phase 2 implementation: **yes**
 
 ### R2-07
 
-ID: R2-07  
-Severity: **HIGH**  
-Category: fail-loud determinism  
-Affected unit: 1A / 1B  
-Affected contract: corrupt or unsupported state must fail loudly.  
+ID: R2-07
+Severity: **HIGH**
+Category: fail-loud determinism
+Affected unit: 1A / 1B
+Affected contract: corrupt or unsupported state must fail loudly.
 Source evidence: both `showCoordinationActionsUseCase` and
 `executeUnderActionPrecondition` catch every per-window
 `deriveVisibilityWindowState` exception and silently replace it with
-`open:false`; the precondition also swallows quorum/phase errors.  
+`open:false`; the precondition also swallows quorum/phase errors.
 Test evidence: no corruption test asserts projection/precondition rejection
-instead of a closed window or degraded facts.  
+instead of a closed window or degraded facts.
 Why current proof is insufficient: corruption becomes a plausible legal
 projection instead of a diagnosed failure, so callers cannot distinguish
-“closed” from “could not evaluate.”  
+“closed” from “could not evaluate.”
 Required fix: propagate categorized corruption/unsupported/definition errors;
 only degrade errors explicitly declared safe by contract. Add
-mutation-sensitive negative tests.  
+mutation-sensitive negative tests.
 Blocks Phase 2 implementation: **yes**
 
 ### Non-blocking observations

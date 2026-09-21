@@ -352,16 +352,10 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
   return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
 }
 
-/** Blocking exclusive acquire of `.fgos/events.lock` (derived from
- * `path.dirname(logPath)`, so a caller passing a different log dir — e.g.
- * porting-store.mjs — automatically gets its own dedicated lock). Retries the
- * single-attempt primitive with a synchronous backoff until it wins or the
- * timeout elapses, then throws `EventLogError('lock-timeout')`. Returns a
- * handle with `release()`; the caller MUST release in a finally. */
 function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK_TIMEOUT_MS, retryMs = EVENTS_LOCK_RETRY_MS } = {}) {
   const dir = path.dirname(logPath);
   fs.mkdirSync(dir, { recursive: true });
-  const lockPath = path.join(dir, EVENTS_LOCK_FILE);
+  const lockPath = path.resolve(dir, EVENTS_LOCK_FILE);
   const deadline = Date.now() + timeoutMs;
 
   for (;;) {
@@ -403,11 +397,34 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
  */
 export function withEventsLock(logPath, fn) {
   const lock = acquireEventsLock(logPath);
+  let released = false;
+  const releaseLock = () => {
+    if (!released) {
+      released = true;
+      lock.release();
+    }
+  };
+  let res;
   try {
-    return fn();
-  } finally {
-    lock.release();
+    res = fn(releaseLock);
+  } catch (err) {
+    releaseLock();
+    throw err;
   }
+  if (res && typeof res.then === 'function') {
+    return res.then(
+      (val) => {
+        releaseLock();
+        return val;
+      },
+      (err) => {
+        releaseLock();
+        throw err;
+      },
+    );
+  }
+  releaseLock();
+  return res;
 }
 
 /**

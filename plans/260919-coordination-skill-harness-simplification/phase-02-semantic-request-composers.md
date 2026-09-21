@@ -1,8 +1,8 @@
 # Phase 2 — Semantic Request Composers
 
-Status: design ready; implementation blocked by the gate in this document  
-Date: 2026-09-20  
-Parent plan: `plans/260919-coordination-skill-harness-simplification/plan.md`  
+Status: design ready; implementation blocked by the gate in this document
+Date: 2026-09-20
+Parent plan: `plans/260919-coordination-skill-harness-simplification/plan.md`
 Readiness audit: `reports/phase-02-readiness-audit.md`
 
 ## Purpose
