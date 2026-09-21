@@ -13,17 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   fast-feedback door: runs explicit canary files first, stops before the
   full suite on a red canary, and invokes the unchanged `npm test` exactly
   once on a green canary. `npm test` semantics are unchanged.
-- `npm run test:related:shadow -- --explain` — shadow-mode-only related-test
-  selection: a small, auditable, reality-checked ownership manifest
+- `npm run test:related -- --explain` — an inner-loop-only related-test
+  selector: a small, auditable, reality-checked ownership manifest
   (`test/test-ownership.mjs`, currently `src/intake/**`, most of
   `src/report/**`, and a handful of low-fan-in `src/state/**` leaf modules)
-  maps changed source paths to their direct/boundary tests; any unknown,
-  unsafe, or declared full-trigger path (bin/, scripts/, package.json,
-  shared state core, etc.) escalates the whole run to the full suite. Always
-  runs the full suite afterward regardless of the related result and
-  reports the full-suite status as authoritative. There is no `test:related`
-  command yet — promotion requires the evidence thresholds in
-  `plans/260920-immediate-test-feedback-reduction/plan.md`'s P05 phase.
+  maps changed source paths to their direct/boundary tests. When every
+  changed path maps cleanly it runs only that subset (typically well under
+  a second); any unknown, unsafe, or declared full-trigger path (bin/,
+  scripts/, package.json, shared state core, `src/verbs/merge/`, etc.)
+  falls back to the unchanged full suite instead. Promoted after P05's
+  evaluation met every threshold on an adapted evidence set (real
+  fault-injection + real sampled edits, not the plan's literal
+  30-historical-commit design — see
+  `plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`).
+  Not a Definition-of-Done substitute: `npm test`, Work verification,
+  post-merge and CI remain full-suite, unaffected by this command.
+- `npm run test:related:shadow -- --explain` — same selection, but always
+  runs the full suite as well and reports its status as authoritative,
+  for continued agreement evidence-gathering without trusting the narrow
+  result alone.
 
 ## [v0.1.0] - 2026-09-18
 

@@ -18,26 +18,46 @@ npm run test:canary -- --from-file /tmp/my-list.txt   # one path per line
 Any flag-shaped argument (e.g. a reporter) applies only to the canary
 sub-run, never to the full suite that follows.
 
-## `npm run test:related:shadow -- --explain`
+## `npm run test:related -- --explain`
 
 Computes which tests a small, auditable ownership manifest
 (`test/test-ownership.mjs`) says are related to your current changes
-(committed since `main`, staged, unstaged, and untracked), runs that
-related subset, then **always** runs the unchanged full suite as well, and
-prints a comparison. The full-suite result is always the authoritative
-exit status — the related result is recorded for evaluation only.
+(committed since `main`, staged, unstaged, and untracked). If every
+changed path maps cleanly, it runs **only** that related subset and its
+result is authoritative — typically well under a second instead of the
+full suite's several minutes. If any changed path is unknown, unsafe, or
+a declared full-trigger (`bin/`, `scripts/`, `package.json`, shared
+`src/state/` core, `src/verbs/merge/`, etc.), it falls back to running
+the unchanged full suite instead — never a narrower, unproven result.
+
+```sh
+npm run test:related -- --explain
+```
+
+**This is an inner-loop convenience command, not completion proof.**
+The manifest currently covers a narrow, reality-checked pilot area
+(`src/intake/**`, most of `src/report/**`, and a handful of low-fan-in
+leaf modules under `src/state/**`) — real changes very often also touch
+something outside that area (docs, other source files, skills), which
+correctly falls back to full. `npm test` remains the only Definition-of-
+Done command; Work verification, post-merge checks and CI all stay
+full-suite, unaffected by this command's existence. Promoted after P05's
+evaluation met every threshold (`plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`)
+on an evidence set adapted from the plan's literal 30-historical-commit
+design (a real, documented infrastructure blocker made that design
+infeasible on this machine; see the report for the full root-cause
+chain) — narrower evidence than originally planned, explicitly accepted
+by the user rather than assumed.
+
+## `npm run test:related:shadow -- --explain`
+
+Same computation as `test:related`, but **always** runs the unchanged
+full suite as well (even when the related subset alone would have been
+enough) and prints a comparison — the full-suite result is always
+authoritative here, the related result is recorded for ongoing
+evaluation only. Useful for continuing to gather agreement evidence
+without trusting the narrow result on its own.
 
 ```sh
 npm run test:related:shadow -- --explain
 ```
-
-This is shadow mode only. There is no `test:related` command yet — the
-manifest currently covers a narrow, reality-checked pilot area
-(`src/intake/**`, most of `src/report/**`, and a handful of low-fan-in
-leaf modules under `src/state/**`); anything else escalates to a full-suite
-run. P05's evaluation (`plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`)
-met every promotion threshold on an adapted evidence set (real
-fault-injection + real sampled edits on the current tree, not the
-plan's literal 30-historical-commit design) — promoting to an adopted
-`test:related` command is a deliberate follow-up decision, not
-automatic just because the shadow numbers are green.

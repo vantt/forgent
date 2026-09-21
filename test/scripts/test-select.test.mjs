@@ -511,6 +511,63 @@ test('runSelected: an all-matched change set runs runSelectedTests with exactly 
   assert.ok(!captured.some((a) => a.endsWith('unrelated.test.mjs')), 'the unrelated file must not be selected');
 });
 
+test('promoted test:related semantics: a related decision runs the narrow subset EXACTLY ONCE and never also runs the full suite (distinct from :shadow, which always runs both)', () => {
+  const root = tmpRepo();
+  write(root, 'seed.mjs');
+  commit(root, 'seed');
+  write(root, 'test/a.test.mjs', "import { test } from 'node:test';\ntest('a', () => {});\n");
+  write(root, 'test/unrelated.test.mjs', "import { test } from 'node:test';\ntest('u', () => {});\n");
+  execFileSync('git', ['add', '-A'], { cwd: root });
+  commit(root, 'add tests');
+  write(root, 'src/a.mjs');
+  execFileSync('git', ['add', 'src/a.mjs'], { cwd: root });
+
+  const manifest = [{ id: 'a', pattern: 'src/a.mjs', directTests: ['test/a.test.mjs'], boundaryTests: [] }];
+  let spawnCalls = 0;
+  const result = runSelected({
+    base: 'main',
+    cwd: root,
+    repoRoot: root,
+    testRoot: path.join(root, 'test'),
+    manifest,
+    fullTriggers: [],
+    spawn: () => {
+      spawnCalls += 1;
+      return { status: 0 };
+    },
+  });
+  assert.equal(spawnCalls, 1, 'test:related must spawn exactly once (the narrow subset) -- never a second, hidden full-suite run');
+  assert.equal(result.status, 0, "the narrow subset's own status is authoritative");
+});
+
+test('promoted test:related semantics: a red narrow subset is authoritative on its own (non-zero status), no second spawn', () => {
+  const root = tmpRepo();
+  write(root, 'seed.mjs');
+  commit(root, 'seed');
+  write(root, 'test/a.test.mjs', "import { test } from 'node:test';\ntest('a', () => {});\n");
+  execFileSync('git', ['add', '-A'], { cwd: root });
+  commit(root, 'add test');
+  write(root, 'src/a.mjs');
+  execFileSync('git', ['add', 'src/a.mjs'], { cwd: root });
+
+  const manifest = [{ id: 'a', pattern: 'src/a.mjs', directTests: ['test/a.test.mjs'], boundaryTests: [] }];
+  let spawnCalls = 0;
+  const result = runSelected({
+    base: 'main',
+    cwd: root,
+    repoRoot: root,
+    testRoot: path.join(root, 'test'),
+    manifest,
+    fullTriggers: [],
+    spawn: () => {
+      spawnCalls += 1;
+      return { status: 1 };
+    },
+  });
+  assert.equal(spawnCalls, 1);
+  assert.equal(result.status, 1);
+});
+
 test('runSelected: zero changes refuses without spawning', () => {
   const root = tmpRepo();
   write(root, 'seed.mjs');
