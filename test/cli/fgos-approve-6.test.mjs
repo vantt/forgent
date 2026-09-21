@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -153,7 +153,7 @@ test('approve on a risk:heavy runner-sourced item that DOES carry a plan.md on i
 // for one named item id without touching moveWork/store.mjs itself.
 
 test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is caught, recorded, and left diagnosable instead of crashing uncaught', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'approve-lock-timeout', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'doing']);
   run(cwd, ['move', 'approve-lock-timeout', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -192,7 +192,7 @@ test('approve (pull-door/verify-only): a simulated post-verify lock-timeout is c
 
 
 test('approve (pull-door/verify-only): with no simulated failure, the same item approves normally — the guard changes nothing on the happy path', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'approve-lock-timeout-control', { verify: 'true' });
   run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'doing']);
   run(cwd, ['move', 'approve-lock-timeout-control', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);

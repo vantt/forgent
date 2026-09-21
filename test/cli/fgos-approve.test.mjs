@@ -73,7 +73,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -104,14 +104,14 @@ function moveRootToResolved(cwd, rootId, finalStatus) {
 
 
 test('approve on a nonexistent id is rejected as validation, exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['approve', 'ghost']);
   assert.equal(result.status, 4);
 });
 
 
 test('approve on a non-proposed item is rejected as precondition, exit 2', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'not-proposed-approve');
   const result = run(cwd, ['approve', 'not-proposed-approve']);
   assert.equal(result.status, 2);

@@ -25,7 +25,7 @@ import {
   os,
   path,
   run,
-  tmpCwd,
+  tmpCwdFromTemplate,
   eventLines,
   createSession,
   endSession,
@@ -37,7 +37,7 @@ import {
 // `git worktree add` check out a real (not symlinked, not stripped) `.fgos/`
 // copy into the new worktree.
 function initGitCwdMainWithCommittedFgos() {
-  const cwd = tmpCwd(); // bootstraps .fgos/ via a real `fgos init`
+  const cwd = tmpCwdFromTemplate(); // bootstraps .fgos/ via a real `fgos init`
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });

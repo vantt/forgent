@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -113,7 +113,7 @@ The chosen mechanism determines security requirements and user authentication fl
 
 
 test('add --parent "" (bare, no value) is rejected as a valueless flag, same as add --discovered-from', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'parent-bad', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--parent', '--description', 'tsk-535 fixture description.']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /--parent requires a non-empty id/);
@@ -121,7 +121,7 @@ test('add --parent "" (bare, no value) is rejected as a valueless flag, same as 
 
 
 test('add with no --priority/--intent leaves both fields absent (undefined), not null and not zero', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'add-no-priority-intent');
   const item = stateView(cwd).work['add-no-priority-intent'];
   assert.equal(item.priority, undefined);
@@ -138,7 +138,7 @@ test('add with no --priority/--intent leaves both fields absent (undefined), not
 // established shape --priority/--intent already use above).
 
 test('add --urgent sets the item urgent field, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'add-urgent', '--title', 'Add urgent', '--kind', 'task', '--risk', 'light', '--verify', 'npm test', '--urgent', 'high', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['add-urgent'].urgent, 'high');
@@ -146,14 +146,14 @@ test('add --urgent sets the item urgent field, exit 0', () => {
 
 
 test('add with no --urgent leaves the field absent (undefined), not a default of medium', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'add-no-urgent');
   assert.equal(stateView(cwd).work['add-no-urgent'].urgent, undefined);
 });
 
 
 test('decision logs one event and appears in the view, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
   const result = run(cwd, ['decision', '--text', 'locked D5 naming', '--rationale', 'avoids a naming collision with an existing verb', '--relation', 'none']);
@@ -168,7 +168,7 @@ test('decision logs one event and appears in the view, exit 0', () => {
 
 
 test('decision without --text is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
   const result = run(cwd, ['decision']);
@@ -180,7 +180,7 @@ test('decision without --text is rejected as validation, exit 4, no event writte
 // tsk-63c D2: rationale is required on `decision`, mirroring bee's own
 // throw-if-blank rule -- --text alone is no longer sufficient.
 test('decision without --rationale is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
   const result = run(cwd, ['decision', '--text', 'locked D5 naming']);
@@ -192,7 +192,7 @@ test('decision without --rationale is rejected as validation, exit 4, no event w
 // tsk-63c D1/D3: alternatives/source are optional free text, and an explicit
 // --source overrides the 'session' default.
 test('decision with --alternatives, --source, and --id folds all fields, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-a');
   const before = eventLines(cwd).length;
   const result = run(cwd, [
@@ -217,14 +217,14 @@ test('decision with --alternatives, --source, and --id folds all fields, exit 0'
 
 
 test('add with no flags at all is rejected as validation (missing --title), exit 4', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
 
 
 test('add omitting --id auto-generates a collision-free tsk-<hash> id from --title, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', '--title', 'Auto id from title', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   const generatedId = envelopeData(result.stdout).id;
@@ -234,7 +234,7 @@ test('add omitting --id auto-generates a collision-free tsk-<hash> id from --tit
 
 
 test('add with --title but no --id is rejected the same as a fully bare call (missing --title still checked first)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
 });
@@ -243,7 +243,7 @@ test('add with --title but no --id is rejected the same as a fully bare call (mi
 // --- D6 tier: --tier on `add` (phase-2-routing-3) ---
 
 test('add with --tier records the given tier explicitly in the view, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--tier', 'heavy', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['heavy-item'].tier, 'heavy');
@@ -251,7 +251,7 @@ test('add with --tier records the given tier explicitly in the view, exit 0', ()
 
 
 test('add without --tier defaults to work.mjs DEFAULTS.tier ("standard"), exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const result = addOk(cwd, 'default-tier-item');
   assert.equal(result.status, 0);
   assert.equal(stateView(cwd).work['default-tier-item'].tier, 'standard');
@@ -259,7 +259,7 @@ test('add without --tier defaults to work.mjs DEFAULTS.tier ("standard"), exit 0
 
 
 test('add explicitly writes the tier into the work.add event payload itself, not only the folded view', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'explicit-tier-item');
   const lines = eventLines(cwd);
   const addEvent = JSON.parse(lines[lines.length - 1]);

@@ -21,11 +21,11 @@ import {
   run,
   stateView,
   eventLines,
-  tmpCwd,
+  tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
 
 test('decision --kind engine tags the stored record kind "engine", exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['init']);
   const before = eventLines(cwd).length;
   const result = run(cwd, [
@@ -42,7 +42,7 @@ test('decision --kind engine tags the stored record kind "engine", exit 0', () =
 });
 
 test('decision with no --kind still defaults to "design" -- unchanged behavior for every existing caller', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   run(cwd, ['init']);
   const result = run(cwd, [
     'decision',
@@ -56,7 +56,7 @@ test('decision with no --kind still defaults to "design" -- unchanged behavior f
 });
 
 test('decision --kind folds into the per-item decisionsById view too, not just the flat log', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-kind-flag');
   const result = run(cwd, [
     'decision',

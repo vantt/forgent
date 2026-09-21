@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -334,7 +334,7 @@ test('approve of a pull-door item (no merge, code already on main): re-verifies 
 
 
 test('approve of a legacy item with a failing verify: blocked (reason verify-fail), not merge-related, exit 0', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'approve-legacy-fail-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-fail-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -351,7 +351,7 @@ test('approve of a legacy item with a failing verify: blocked (reason verify-fai
 
 
 test("approve verify-fail (legacy item): park edge stamps role 'system' (not human) on the awaiting-approval -> blocked event", () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'approve-legacy-fail-role-item', { verify: 'false' });
   run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-fail-role-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -368,7 +368,7 @@ test("approve verify-fail (legacy item): park edge stamps role 'system' (not hum
 
 
 test('approve of a legacy item with a passing verify closes it to done — legacy degrade never blocks approve/reject from working (must_have)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'approve-legacy-ok-item', { verify: 'true' });
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'doing']);
   run(cwd, ['move', 'approve-legacy-ok-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup, not exercising return's own guard"]);
@@ -380,7 +380,7 @@ test('approve of a legacy item with a passing verify closes it to done — legac
 
 
 test('approve catches transitionWork CAS conflict when item becomes blocked before failure block write, returning structured result (AC4)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-blocked-item", to: "blocked", expectedStatus: "awaiting-approval", reason: "concurrent-block", role: "system" }); process.exit(1);'`;
   addOk(cwd, 'cas-blocked-item', { verify: verifyCmd });
   run(cwd, ['move', 'cas-blocked-item', '--to', 'doing']);
@@ -397,7 +397,7 @@ test('approve catches transitionWork CAS conflict when item becomes blocked befo
 
 
 test('approve CAS conflict returns fresh actual status from store on event-regression replay / stale status (AC5)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-todo-item", to: "todo", expectedStatus: "awaiting-approval", reason: "concurrent-todo", role: "system" }); process.exit(1);'`;
   addOk(cwd, 'cas-todo-item', { verify: verifyCmd });
   run(cwd, ['move', 'cas-todo-item', '--to', 'doing']);

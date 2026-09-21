@@ -72,7 +72,7 @@ import {
   spawnSync,
   startSession,
   stateView,
-  tmpCwd,
+  tmpCwdFromTemplate,
   tmpLinkedWorktree,
   toDoneViaChain,
   toProposed,
@@ -115,7 +115,7 @@ The chosen mechanism determines security requirements and user authentication fl
 // --- work-graph-intelligence S9: footprint field + `fgos conflicts` -------
 
 test('add --footprint persists the list; omitting the flag leaves footprint absent', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   assert.equal(run(cwd, ['init']).status, 0);
   assert.equal(run(cwd, ['add', 'withfp', '--title', 'X', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/a.mjs,src/b.mjs', '--description', 'tsk-535 fixture description.']).status, 0);
   assert.equal(addOk(cwd, 'nofp').status, 0);
@@ -128,9 +128,9 @@ test('add --footprint persists the list; omitting the flag leaves footprint abse
 // --- str73-done-flip-cos-check cell 1: --acceptance on add/submit/edit ----
 
 test('add --acceptance persists work.acceptance as the given array, validated through validateWork', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   // tsk-5q5-2: evidence must resolve to a real path under cwd (the new
-  // write-time traceability gate) -- tmpCwd() only guarantees `.fgos/`
+  // write-time traceability gate) -- tmpCwdFromTemplate() only guarantees `.fgos/`
   // files exist, so this points there rather than a fictional source path.
   const clauses = [{ text: 'CLI exits 0 on success' }, { text: 'field round-trips', evidence: '.fgos/events.jsonl' }];
   const result = run(cwd, ['add', 'with-acceptance', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
@@ -143,7 +143,7 @@ test('add --acceptance persists work.acceptance as the given array, validated th
 // narrow write-time evidence-traceability gate, end to end through the CLI.
 
 test('add --acceptance is refused when a clause supplies text+evidence together but evidence cites no real path', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const clauses = [{ text: 'root cause confirmed', evidence: 'trust me, this is definitely correct' }];
   const result = run(cwd, ['add', 'untraceable', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 4);
@@ -153,7 +153,7 @@ test('add --acceptance is refused when a clause supplies text+evidence together 
 
 
 test('add --acceptance succeeds when a text+evidence clause cites a real path that exists under cwd', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const clauses = [{ text: 'root cause confirmed', evidence: '.fgos/events.jsonl documents the real event log' }];
   const result = run(cwd, ['add', 'traceable', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
@@ -162,7 +162,7 @@ test('add --acceptance succeeds when a text+evidence clause cites a real path th
 
 
 test('add --acceptance with a text-only clause (no evidence yet) is completely unaffected by the traceability gate', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const clauses = [{ text: 'ship it' }];
   const result = run(cwd, ['add', 'text-only', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(clauses), '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
@@ -171,7 +171,7 @@ test('add --acceptance with a text-only clause (no evidence yet) is completely u
 
 
 test('submit --acceptance persists work.acceptance as the given array (opts -> submitWork work object)', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const clauses = [{ text: 'the intake item satisfies its ask' }];
   const result = run(cwd, ['submit', 'Do the thing', '--acceptance', JSON.stringify(clauses)]);
   assert.equal(result.status, 0);
@@ -181,7 +181,7 @@ test('submit --acceptance persists work.acceptance as the given array (opts -> s
 
 
 test('add with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const before = eventLines(cwd).length;
 
   const invalidJson = run(cwd, ['add', 'bad-json', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', 'not json', '--description', 'tsk-535 fixture description.']);
@@ -204,7 +204,7 @@ test('add with a malformed --acceptance is rejected as validation, exit 4, no ev
 
 
 test('submit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   const before = eventLines(cwd).length;
   const result = run(cwd, ['submit', 'Try a bad acceptance value', '--acceptance', 'not json']);
   assert.equal(result.status, 4);
@@ -225,7 +225,7 @@ test('submit with a malformed --acceptance is rejected as validation, exit 4, no
 // that check trivially green so the test isolates the acceptance gate.
 
 test('move --to delivered is refused when a populated acceptance clause has no evidence: precondition, exit 2, item stays proposed, no event written', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'cli-cos-missing');
   run(cwd, ['edit', 'cli-cos-missing', '--acceptance', JSON.stringify([{ text: 'ship it' }])]);
 
@@ -239,7 +239,7 @@ test('move --to delivered is refused when a populated acceptance clause has no e
 
 
 test('move --to delivered succeeds when every acceptance clause has non-empty evidence, exactly as before this cell', () => {
-  const cwd = tmpCwd();
+  const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'cli-cos-evidenced');
   // tsk-5q5-2: evidence must resolve to a real path under cwd -- assert the
   // edit itself succeeds too, so a future regression in the new write-time
