@@ -152,10 +152,47 @@ test('lease reclaim requires dead-run proof', () => {
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: "ERROR: You've hit your usage limit" }).reasonCode, 'quota-limit');
-  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found for the selected model. Use /login.' }).reasonCode, 'auth-token');
+  assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found for the selected model. Use /login.', adapterOutcome: 1 }).reasonCode, 'auth-token');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', adapterOutcome: 'paused-limit' }).reasonCode, 'quota-limit');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: '', structuredAgent: { stopReason: 'paused-limit' } }).reasonCode, 'quota-limit');
   assert.equal(classifyProviderCapacityFault({ provider: 'openai', stderr: 'tests mention quota in a report' }).action, 'evidence-only');
+});
+
+// C2b (review probe): a plain test-suite failure whose stderr happens to
+// contain the words "token" (from a JS SyntaxError) and "failed" (from a
+// test runner summary) several lines apart used to be misclassified as
+// `auth-token` (manual-clear, the more disruptive of the two outcomes) --
+// nothing about it is actually an auth fault.
+test('C2b negative fixture: "Unexpected token ... 1 test failed" is never classified as an auth fault', () => {
+  const stderr = [
+    'SyntaxError: Unexpected token } in JSON at position 42',
+    '    at JSON.parse (<anonymous>)',
+    '    at Object.<anonymous> (/repo/test/fixture.test.mjs:12:18)',
+    'FAIL test/fixture.test.mjs',
+    '1 test failed, 0 passed',
+  ].join('\n');
+  const result = classifyProviderCapacityFault({ provider: 'openai', stderr, adapterOutcome: 1 });
+  assert.notEqual(result.reasonCode, 'auth-token');
+  assert.equal(result.action, 'evidence-only');
+});
+
+test('C2b: provider is required -- omitting it never falls back to openai\'s own vocabulary (no more provider === undefined wildcard)', () => {
+  const result = classifyProviderCapacityFault({ stderr: 'No API key found. Use /login.', adapterOutcome: 1 });
+  assert.equal(result.action, 'evidence-only');
+  assert.equal(result.reasonCode, 'provider-unknown');
+});
+
+test('C2b: an auth-anchored phrase without adapterOutcome corroboration (a clean/settled completion) is never quarantined', () => {
+  const noOutcome = classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found. Use /login.' });
+  assert.equal(noOutcome.action, 'evidence-only');
+  const settled = classifyProviderCapacityFault({ provider: 'openai', stderr: 'No API key found. Use /login.', adapterOutcome: 'settled' });
+  assert.equal(settled.action, 'evidence-only');
+});
+
+test('C2b: an auth-anchored phrase far outside the trailing line window is not matched', () => {
+  const stderr = ['No API key found. Use /login.', ...Array.from({ length: 20 }, (_, i) => `unrelated log line ${i}`)].join('\n');
+  const result = classifyProviderCapacityFault({ provider: 'openai', stderr, adapterOutcome: 1 });
+  assert.notEqual(result.reasonCode, 'auth-token');
 });
 
 // Pre-Phase-05 gate H1 (plans/260915-executor-policy-dispatch-seams/plan.md):

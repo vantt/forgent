@@ -82,7 +82,12 @@ export function normalizeProviderFamily(providerFamily, command) {
 
   if (norm === 'z-ai' || norm === 'glm') return 'z-ai';
   if (cmd === 'pi' || norm === 'pi') return 'pi';
-  if (norm === 'openai-codex' || norm === 'codex' || cmd === 'codex') return 'openai-codex';
+  // M6: bare 'openai' (a providerModel/provider value some configs declare
+  // instead of the CLI-derived 'openai-codex') is the same provider family
+  // as 'openai-codex'/'codex' -- unified here so provider-capacity
+  // inventory lookup and the fault classifier never silently split one
+  // provider's accounts/quarantine state across two different keys.
+  if (norm === 'openai-codex' || norm === 'openai' || norm === 'codex' || cmd === 'codex') return 'openai-codex';
   if (norm === 'gemini' || norm === 'agy' || cmd === 'agy') return 'gemini';
   if (norm === 'claude' || cmd === 'claude') return 'claude';
   return norm || cmd || 'unknown';

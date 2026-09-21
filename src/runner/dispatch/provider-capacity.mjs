@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { normalizeProviderFamily } from './provider-adapter.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -65,11 +66,24 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
   if (!isPlainObject(providers)) {
     throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) must be an object mapping provider -> { accounts } when present.`);
   }
+  // M6: keyed by the NORMALIZED provider family ('openai' and 'openai-codex'
+  // are the same bucket) -- a config declaring accounts under both spellings
+  // is refused with a named collision rather than silently splitting one
+  // provider's accounts across two never-jointly-visible inventory keys
+  // (the fault classifier and lease/quarantine lookups only ever see one).
+  const rawToNormalized = {};
   const normalized = {};
   for (const [provider, providerEntry] of Object.entries(providers)) {
     if (!provider || typeof provider !== 'string') {
       throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers) provider id must be a non-empty string.`);
     }
+    const canonicalProvider = normalizeProviderFamily(provider) || provider;
+    if (normalized[canonicalProvider] !== undefined) {
+      throw new ProviderCapacityConfigError(
+        `runner config (${sourceLabel}.providers) declares both "${rawToNormalized[canonicalProvider]}" and "${provider}", which normalize to the same provider family "${canonicalProvider}" -- consolidate their accounts under one key.`,
+      );
+    }
+    rawToNormalized[canonicalProvider] = provider;
     if (!isPlainObject(providerEntry)) {
       throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}) must be an object.`);
     }
@@ -85,7 +99,7 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
     if (!isPlainObject(accounts)) {
       throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts) must be a keyed object, not an array.`);
     }
-    normalized[provider] = { accounts: {} };
+    normalized[canonicalProvider] = { accounts: {} };
     for (const [accountId, account] of Object.entries(accounts)) {
       validateAccountId(accountId, `${sourceLabel}.providers.${provider}.accounts`);
       if (!isPlainObject(account)) {
@@ -123,7 +137,7 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
       if (typeof credentialSource.home !== 'string' || !credentialSource.home.trim()) {
         throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.home) must be a non-empty string.`);
       }
-      normalized[provider].accounts[accountId] = {
+      normalized[canonicalProvider].accounts[accountId] = {
         id: accountId,
         label: account.label ?? accountId,
         credentialSource: { kind: credentialSource.kind, home: credentialSource.home },
@@ -156,11 +170,50 @@ function emptyState() {
   };
 }
 
+// H3: a corrupt state.json (a torn write from a crash before this phase's
+// atomic writeState below existed, or external tampering) used to throw
+// JSON.parse's raw SyntaxError straight out of every reader -- every
+// lease/release/quarantine/inspect call for every provider/account on the
+// whole host, not just the affected one. Renamed aside (never deleted, so
+// the raw evidence survives for a human to look at) with an audit entry
+// recorded in the FRESH state describing the corruption, and callers get a
+// genuinely empty, working state back -- open leases/quarantines are lost
+// (accepted; the risk/rollback note calls this out explicitly), but every
+// account still re-derives cleanly from the config inventory on the next
+// call, rather than every provider-capacity operation on the host staying
+// broken until an operator manually intervenes.
 function readState(statePath) {
   if (!fs.existsSync(statePath)) return emptyState();
   const raw = fs.readFileSync(statePath, 'utf8');
   if (!raw.trim()) return emptyState();
-  const parsed = JSON.parse(raw);
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    const corruptPath = `${statePath}.corrupt-${Date.now()}`;
+    try { fs.renameSync(statePath, corruptPath); } catch {}
+    const fresh = emptyState();
+    fresh.audit.push({
+      contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+      action: 'state-reset',
+      status: 'corrupt-state-reset',
+      resetAt: new Date().toISOString(),
+      reason: err.message,
+      corruptStateRenamedTo: corruptPath,
+    });
+    return fresh;
+  }
+  if (!isPlainObject(parsed)) {
+    const fresh = emptyState();
+    fresh.audit.push({
+      contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+      action: 'state-reset',
+      status: 'corrupt-state-reset',
+      resetAt: new Date().toISOString(),
+      reason: 'state.json parsed but is not an object',
+    });
+    return fresh;
+  }
   return {
     ...emptyState(),
     ...parsed,
@@ -171,10 +224,41 @@ function readState(statePath) {
 }
 
 function writeState(statePath, state) {
-  fs.mkdirSync(path.dirname(statePath), { recursive: true });
-  fs.writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`);
+  const dir = path.dirname(statePath);
+  fs.mkdirSync(dir, { recursive: true });
+  const content = `${JSON.stringify(state, null, 2)}\n`;
+  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const fd = fs.openSync(tmpPath, 'w');
+  try {
+    fs.writeSync(fd, content);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  fs.renameSync(tmpPath, statePath);
 }
 
+export class ProviderCapacityLockError extends Error {
+  constructor(message, { lockPath, holderPid } = {}) {
+    super(message);
+    this.name = 'ProviderCapacityLockError';
+    this.code = 'provider-capacity-lock-stale';
+    this.lockPath = lockPath;
+    this.holderPid = holderPid ?? null;
+  }
+}
+
+// C2c: this used to retry on EEXIST purely by elapsed time, never reading
+// the lock file's own {pid} back or checking whether that holder is still
+// alive -- a crashed process's lock file (openSync succeeded, the process
+// died before unlinkSync) held EVERY future lease/release/quarantine call
+// hostage for the full waitMs, then threw the raw, uncaught EEXIST error.
+// Now: on contention, read the holder's pid and reclaim (unlink) the lock
+// immediately once `!isPidAlive(pid)` proves it dead, rather than waiting
+// out the deadline for a holder that can never release it. A lock file
+// that can't be read/parsed (mid-write, or from a version that wrote a
+// different shape) is treated as unknown, not dead -- retried like a live
+// holder, never force-reclaimed on a guess.
 function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
   fs.mkdirSync(path.dirname(lockPath), { recursive: true });
   const deadline = Date.now() + waitMs;
@@ -193,7 +277,24 @@ function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
       if (fd !== undefined) {
         try { fs.closeSync(fd); } catch {}
       }
-      if (err.code !== 'EEXIST' || Date.now() > deadline) throw err;
+      if (err.code !== 'EEXIST') throw err;
+      let holderPid = null;
+      try {
+        holderPid = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid ?? null;
+      } catch {
+        // Unreadable/mid-write: unknown, not dead -- fall through to the
+        // normal wait/retry path below, same as a genuinely live holder.
+      }
+      if (Number.isInteger(holderPid) && holderPid > 0 && !isPidAlive(holderPid)) {
+        try { fs.unlinkSync(lockPath); } catch {}
+        continue; // Immediately retry openSync -- no need to wait out the deadline for a proven-dead holder.
+      }
+      if (Date.now() > deadline) {
+        throw new ProviderCapacityLockError(
+          `provider-capacity lock at "${lockPath}" is still held by a live process (pid ${holderPid ?? 'unknown'}) after ${waitMs}ms.`,
+          { lockPath, holderPid },
+        );
+      }
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
     }
   }
@@ -228,7 +329,7 @@ function isQuarantined(accountStateValue, now = Date.now()) {
   return untilMs > now;
 }
 
-function isPidAlive(pid) {
+export function isPidAlive(pid) {
   if (!Number.isInteger(pid) || pid <= 0) return false;
   try {
     process.kill(pid, 0);
@@ -410,6 +511,26 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
   return { contract: 'provider-capacity-inspect.v1', providers };
 }
 
+// C2c doctor support: a pure read (never opens/writes/unlinks the lock
+// itself -- that mutation stays inside withFileLock's own reclaim path)
+// so `fgos doctor`'s provider-capacity-lock-stale check can report a lock
+// file whose recorded holder pid is provably dead without racing a real
+// lease/release/quarantine call for the same lock.
+export function inspectProviderCapacityLock(runtimeDir) {
+  const { lockPath } = providerCapacityStatePaths(runtimeDir);
+  if (!fs.existsSync(lockPath)) {
+    return { present: false, lockPath, holderPid: null, holderAlive: null };
+  }
+  let holderPid = null;
+  try {
+    holderPid = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid ?? null;
+  } catch {
+    return { present: true, lockPath, holderPid: null, holderAlive: null };
+  }
+  const holderAlive = Number.isInteger(holderPid) && holderPid > 0 ? isPidAlive(holderPid) : null;
+  return { present: true, lockPath, holderPid, holderAlive };
+}
+
 // Pre-Phase-05 gate H1 / post-review-recut.md "Fault classifier correction":
 // "quota/rate-limit -> account quarantine with parsed reset window when
 // available, otherwise conservative long TTL". A quota quarantine must never
@@ -419,9 +540,37 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
 // rather than lean on the defensive fallback silently.
 const DEFAULT_QUOTA_QUARANTINE_TTL_MS = 60 * 60 * 1000; // 1 hour, conservative default reset window.
 
+// C2b: the auth-fault regex used to scan the ENTIRE stderr text for the
+// bare words "token"/"auth"/"login" anywhere near "failed"/"expired"/etc,
+// with no provider check at all when `provider` was omitted (a wildcard
+// that matched every provider's stderr). Measured false positive: a plain
+// JS test failure whose output happens to contain both "token" (e.g. a
+// SyntaxError "Unexpected token") and "failed" (e.g. "1 test failed")
+// several lines apart got classified as `auth-token` -- the WORSE of the
+// two outcomes (`manual-clear`, requiring an operator, vs `temporary`).
+// Anchored instead to actual observed provider CLI error phrases, and only
+// within the last few lines (the real failure surface a CLI prints at
+// the end of a crash, never scattered incidentally through earlier
+// output).
+const AUTH_ANCHOR_LINE_WINDOW = 5;
+const AUTH_ANCHOR_PATTERNS = [
+  /no api key found/i,
+  /use\s+\/login/i,
+  /authentication failed/i,
+  /api key is invalid/i,
+  /api key.{0,20}(missing|invalid|expired)/i,
+  /login required/i,
+];
+
 export function classifyProviderCapacityFault({ provider, stderr = '', adapterOutcome, structuredAgent, now = Date.now() } = {}) {
+  // C2b: provider is now required -- the old `provider === undefined`
+  // wildcard classified stderr from ANY provider using openai's own
+  // vocabulary, which is exactly what let an unrelated syntax-error stderr
+  // (no provider identity attached at all) reach the auth-fault regex.
+  if (!provider) {
+    return { action: 'evidence-only', reasonCode: 'provider-unknown' };
+  }
   const text = typeof stderr === 'string' ? stderr : '';
-  const lower = text.toLowerCase();
   if (adapterOutcome === 'paused-limit' || structuredAgent?.stopReason === 'paused-limit') {
     // No stderr text to parse a reset window from at all in this branch --
     // always the conservative default, never an expiry-less quarantine.
@@ -432,7 +581,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
       until: new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString(),
     };
   }
-  if (provider === 'openai' || provider === undefined) {
+  if (provider === 'openai' || provider === 'openai-codex') {
     if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
       const reset = /resets?\s+in\s+(\d+)\s*h/i.exec(text);
       // Missing/unparseable reset text falls back to the SAME conservative
@@ -443,8 +592,20 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
         : new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
       return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until };
     }
-    if (/\b(login|auth|authentication|token)\b/i.test(lower) && /\b(failed|expired|invalid|required|missing|no api key)\b/i.test(lower)) {
-      return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
+    // C2b: auth-token is the manual-clear (operator-intervention) outcome,
+    // the more disruptive of the two -- require BOTH a corroborating
+    // adapterOutcome (the process actually failed/errored, not a clean
+    // settle) AND an anchored phrase in only the trailing lines, never
+    // text-anywhere alone.
+    const adapterCorroborates = adapterOutcome !== undefined
+      && adapterOutcome !== 0
+      && adapterOutcome !== 'settled'
+      && adapterOutcome !== 'done';
+    if (adapterCorroborates) {
+      const lastLines = text.split('\n').slice(-AUTH_ANCHOR_LINE_WINDOW).join('\n');
+      if (AUTH_ANCHOR_PATTERNS.some((pattern) => pattern.test(lastLines))) {
+        return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
+      }
     }
   }
   return { action: 'evidence-only', reasonCode: 'unknown-or-low-confidence' };
