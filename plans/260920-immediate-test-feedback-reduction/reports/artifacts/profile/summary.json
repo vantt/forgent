@@ -1,0 +1,424 @@
+{
+  "status": 0,
+  "wallSeconds": 400.213011916,
+  "userSeconds": 2374.39,
+  "systemSeconds": 621.57,
+  "maxRssKb": 288936,
+  "cpuScope": "process-tree (GNU time -v wait4 rusage, includes reaped descendants)",
+  "stdoutPath": "plans/260920-immediate-test-feedback-reduction/reports/artifacts/profile/stdout.log",
+  "stderrPath": "plans/260920-immediate-test-feedback-reduction/reports/artifacts/profile/stderr.log",
+  "before": {
+    "clean": true,
+    "env": {
+      "sha": "a5c29f6ea936454962ebf9b5749a8a4113ced8a0",
+      "node": "v24.18.0",
+      "platform": "linux",
+      "arch": "x64",
+      "cpuCount": 16,
+      "loadavg": [
+        5.42,
+        14.88,
+        17.32
+      ],
+      "timestamp": "2026-09-21T05:05:53.242Z"
+    }
+  },
+  "after": {
+    "clean": true
+  },
+  "valid": true,
+  "junitPath": "plans/260920-immediate-test-feedback-reduction/reports/artifacts/profile/junit.xml",
+  "summary": {
+    "topTests": [
+      {
+        "name": "R11 &amp; R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail",
+        "time": 42.463116,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)",
+        "time": 29.201599,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)",
+        "time": 27.674016,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init",
+        "time": 25.217481,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts",
+        "time": 24.021452,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)",
+        "time": 23.681503,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-setup.test.mjs"
+      },
+      {
+        "name": "Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free",
+        "time": 23.060147,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin",
+        "time": 23.036288,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever",
+        "time": 22.12861,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs"
+      },
+      {
+        "name": "R5: Node-against-Node passes all coverage-floor cases",
+        "time": 17.681261,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/harness.test.mjs"
+      },
+      {
+        "name": "R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH",
+        "time": 15.521124,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/release-tree.test.mjs"
+      },
+      {
+        "name": "e2e: fresh external project reaches expected fgos doctor state after init + setup",
+        "time": 13.678215,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/setup/doctor-fresh-run.test.mjs"
+      },
+      {
+        "name": "a genuine, untampered herdr-spawn receipt is accepted -- workerCommandDigest agrees with Authority's own prepared-invocation digest",
+        "time": 12.250323,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      },
+      {
+        "name": "executeAssignment dispatches a herdr-spawn executor (invocations[] shape) through the real herdr seam",
+        "time": 11.65992,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      },
+      {
+        "name": "executeAssignment dispatches a herdr-spawn executor (flat adapter shape) through the real herdr seam",
+        "time": 11.023359,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/herdr-spawn-assignment-dispatch.test.mjs"
+      },
+      {
+        "name": "e2e synthetic domain: add --domain synthetic (no --stage) dispatches through the real runner side by side with a plain coding item, both reaching done via the identical dispatch.mjs code path, zero cross-effect",
+        "time": 9.381336,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/e2e/synthetic-domain.test.mjs"
+      },
+      {
+        "name": "R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true",
+        "time": 9.145285,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs"
+      },
+      {
+        "name": "SPIKE: fgos uninstall --yes --remove-package removes a real npm -g installed package on this platform",
+        "time": 9.021963,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/setup/self-uninstall-spike.test.mjs"
+      },
+      {
+        "name": "resolve-park-reason regression guard: ordinary work.move reason fold on active item is unaffected (RUL32)",
+        "time": 8.989588,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-edit-3.test.mjs"
+      },
+      {
+        "name": "knowledge-verbs - doc lifecycle and promote preconditions",
+        "time": 8.692274,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/knowledge-verbs.test.mjs"
+      },
+      {
+        "name": "Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready",
+        "time": 8.629835,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs"
+      },
+      {
+        "name": "list --id scopes every id-keyed view section to just the requested item, excluding another item's data (tsk-2u9 D1/D2)",
+        "time": 8.448713,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read.test.mjs"
+      },
+      {
+        "name": "approve from the main checkout is unaffected by the guard even while a session is registered — runner and pull both close to done, exit 0",
+        "time": 8.130782,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-approve-5.test.mjs"
+      },
+      {
+        "name": "e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no-ops on a fresh clarify item (D16); explicit discover/decompose --verdict calls advance it to executing, then --once dispatches it",
+        "time": 7.959499,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/e2e/runner-loop.test.mjs"
+      },
+      {
+        "name": "Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest",
+        "time": 7.6313,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs"
+      },
+      {
+        "name": "R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish",
+        "time": 7.62719,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs"
+      },
+      {
+        "name": "e2e: moving a fixture-marketing item into &amp;quot;blocked&amp;quot; stamps statusCategory &amp;quot;canceled&amp;quot; (its own declined-equivalent) while the same move for a plain coding item stamps &amp;quot;in-progress&amp;quot;",
+        "time": 7.232785,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/e2e/fixture-marketing-domain.test.mjs"
+      },
+      {
+        "name": "resolve-park-reason on done item clears reason and parkReason and records note in parkResolutions",
+        "time": 7.223433,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-edit-3.test.mjs"
+      },
+      {
+        "name": "R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule",
+        "time": 7.198385,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs"
+      },
+      {
+        "name": "approve from the main checkout is unaffected by the ad-hoc-worktree guard — runner and pull both still close to done, exit 0",
+        "time": 7.07175,
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-approve-5.test.mjs"
+      }
+    ],
+    "topFiles": [
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-init.test.mjs",
+        "totalSeconds": 218.41725000000002,
+        "count": 20
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-merge.test.mjs",
+        "totalSeconds": 119.84733599999998,
+        "count": 59
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-return.test.mjs",
+        "totalSeconds": 96.088701,
+        "count": 44
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/rust-host/fgctl-upgrade.test.mjs",
+        "totalSeconds": 78.404857,
+        "count": 15
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-merge-2.test.mjs",
+        "totalSeconds": 68.83880599999999,
+        "count": 30
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-edit.test.mjs",
+        "totalSeconds": 63.350998,
+        "count": 29
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/loop.test.mjs",
+        "totalSeconds": 58.61345400000001,
+        "count": 92
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/coordination-driver-authorization.test.mjs",
+        "totalSeconds": 58.01398999999999,
+        "count": 70
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-edit-3.test.mjs",
+        "totalSeconds": 57.150977999999995,
+        "count": 19
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-setup.test.mjs",
+        "totalSeconds": 49.466156999999995,
+        "count": 17
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read-2.test.mjs",
+        "totalSeconds": 46.891287000000005,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-stage.test.mjs",
+        "totalSeconds": 46.33561399999999,
+        "count": 18
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/dispatch.test.mjs",
+        "totalSeconds": 45.82755000000003,
+        "count": 322
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read-4.test.mjs",
+        "totalSeconds": 43.95214,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-post-merge-4.test.mjs",
+        "totalSeconds": 42.787303,
+        "count": 12
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/herdr-spawn-adapter.test.mjs",
+        "totalSeconds": 41.706167,
+        "count": 35
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-claim.test.mjs",
+        "totalSeconds": 40.570887,
+        "count": 26
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read.test.mjs",
+        "totalSeconds": 40.054097000000006,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-edit-2.test.mjs",
+        "totalSeconds": 39.91245499999999,
+        "count": 19
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-stage-3.test.mjs",
+        "totalSeconds": 39.043935,
+        "count": 13
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read-3.test.mjs",
+        "totalSeconds": 38.778351000000015,
+        "count": 21
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-read-5.test.mjs",
+        "totalSeconds": 37.812301,
+        "count": 18
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-post-merge.test.mjs",
+        "totalSeconds": 37.319756,
+        "count": 17
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-post-merge-3.test.mjs",
+        "totalSeconds": 36.303311,
+        "count": 11
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-approve-5.test.mjs",
+        "totalSeconds": 35.717407,
+        "count": 9
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/e2e/runner-loop.test.mjs",
+        "totalSeconds": 35.526894000000006,
+        "count": 10
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-stage-2.test.mjs",
+        "totalSeconds": 35.273691,
+        "count": 15
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-approve-6.test.mjs",
+        "totalSeconds": 35.175294,
+        "count": 9
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+        "totalSeconds": 34.933602,
+        "count": 3
+      },
+      {
+        "file": "/home/vantt/projects/forgentX/.claude/worktrees/immediate-test-feedback-reduction/test/cli/fgos-intake-5.test.mjs",
+        "totalSeconds": 32.694348999999995,
+        "count": 21
+      }
+    ],
+    "directoryTotals": [
+      {
+        "dir": "cli",
+        "totalSeconds": 1718.3943839999988,
+        "count": 868
+      },
+      {
+        "dir": "runner",
+        "totalSeconds": 671.0539899999997,
+        "count": 2932
+      },
+      {
+        "dir": "rust-host",
+        "totalSeconds": 346.29738299999997,
+        "count": 100
+      },
+      {
+        "dir": "verbs",
+        "totalSeconds": 169.96249299999997,
+        "count": 219
+      },
+      {
+        "dir": "e2e",
+        "totalSeconds": 105.38975700000003,
+        "count": 57
+      },
+      {
+        "dir": "setup",
+        "totalSeconds": 103.20574999999995,
+        "count": 595
+      },
+      {
+        "dir": "state",
+        "totalSeconds": 66.68522000000019,
+        "count": 1189
+      },
+      {
+        "dir": "report",
+        "totalSeconds": 43.69901199999998,
+        "count": 136
+      },
+      {
+        "dir": "scripts",
+        "totalSeconds": 26.44344199999998,
+        "count": 253
+      },
+      {
+        "dir": "skills",
+        "totalSeconds": 10.421688,
+        "count": 14
+      },
+      {
+        "dir": "intake",
+        "totalSeconds": 5.747615,
+        "count": 173
+      },
+      {
+        "dir": "install",
+        "totalSeconds": 0.631633,
+        "count": 17
+      },
+      {
+        "dir": "util",
+        "totalSeconds": 0.523338,
+        "count": 38
+      },
+      {
+        "dir": "(test root)",
+        "totalSeconds": 0.43571600000000005,
+        "count": 14
+      },
+      {
+        "dir": "evolve",
+        "totalSeconds": 0.30077700000000007,
+        "count": 35
+      },
+      {
+        "dir": "docs",
+        "totalSeconds": 0.056774,
+        "count": 10
+      },
+      {
+        "dir": "config",
+        "totalSeconds": 0.033418,
+        "count": 21
+      }
+    ]
+  }
+}

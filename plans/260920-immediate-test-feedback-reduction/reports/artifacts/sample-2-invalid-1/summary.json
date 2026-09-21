@@ -1,0 +1,30 @@
+{
+  "status": 1,
+  "wallSeconds": 523.79071382,
+  "userSeconds": 2468.03,
+  "systemSeconds": 653.12,
+  "maxRssKb": 264308,
+  "cpuScope": "process-tree (GNU time -v wait4 rusage, includes reaped descendants)",
+  "stdoutPath": "plans/260920-immediate-test-feedback-reduction/reports/artifacts/sample-2/stdout.log",
+  "stderrPath": "plans/260920-immediate-test-feedback-reduction/reports/artifacts/sample-2/stderr.log",
+  "before": {
+    "clean": true,
+    "env": {
+      "sha": "a5c29f6ea936454962ebf9b5749a8a4113ced8a0",
+      "node": "v24.18.0",
+      "platform": "linux",
+      "arch": "x64",
+      "cpuCount": 16,
+      "loadavg": [
+        1.84,
+        5.4,
+        6.71
+      ],
+      "timestamp": "2026-09-21T04:41:01.329Z"
+    }
+  },
+  "after": {
+    "clean": true
+  },
+  "valid": false
+}
