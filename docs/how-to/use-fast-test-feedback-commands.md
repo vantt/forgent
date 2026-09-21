@@ -35,6 +35,9 @@ This is shadow mode only. There is no `test:related` command yet — the
 manifest currently covers a narrow, reality-checked pilot area
 (`src/intake/**`, most of `src/report/**`, and a handful of low-fan-in
 leaf modules under `src/state/**`); anything else escalates to a full-suite
-run. Promotion to an adopted inner-loop command requires the evidence
-thresholds in `plans/260920-immediate-test-feedback-reduction/plan.md`'s
-P05 phase, not just green shadow runs.
+run. P05's evaluation (`plans/260920-immediate-test-feedback-reduction/reports/selector-shadow-evaluation.md`)
+met every promotion threshold on an adapted evidence set (real
+fault-injection + real sampled edits on the current tree, not the
+plan's literal 30-historical-commit design) — promoting to an adopted
+`test:related` command is a deliberate follow-up decision, not
+automatic just because the shadow numbers are green.
