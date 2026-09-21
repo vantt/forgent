@@ -2685,12 +2685,24 @@ export async function executeAssignment(assignment, opts = {}) {
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
-    agentClaim: agentClaim ?? {
-      status,
-      summary: claimInvalid
-        ? 'agent-result.json was present but failed schema validation'
-        : (executionError ? executionError.message : (isTimeout ? 'Execution timed out' : 'Settled')),
-    },
+    // M4 (dispatch-execution-engine architecture review 260920): never
+    // fabricate a claim-shaped object when the worker wrote none. A
+    // synthesized {status,summary} here used to be indistinguishable from
+    // a real worker claim to every downstream reader (basis would even
+    // record 'valid-agent-result-claim' for a claim the worker never
+    // wrote). Pass the real value through unchanged (null when absent);
+    // normalizeRunResultV2 derives its own runner-authored `runnerNote`
+    // from the same runtime facts when there is no real claim, under a
+    // field name that cannot be mistaken for worker attestation.
+    agentClaim,
+    // Pre-existing gap this fix also closes: `claimInvalid` was computed
+    // above but never threaded into normalizeRunResultV2 at this call
+    // site, so a malformed/schema-invalid agent-result.json only produced
+    // status:'failed' through the OLD synthesized agentClaim.status --
+    // itself unrelated to this field. normalizeRunResultV2 already fails
+    // closed on claimInvalid (policy.disposition:'refuse' and
+    // confidence:'failed'); it just needs to actually receive it.
+    claimInvalid,
     evidence: {
       // changedFiles at top level for RunResult backward compatibility (Step 03 §5 shape)
       gitBefore,
@@ -3041,10 +3053,11 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
-    agentClaim: agentClaim ?? {
-      status,
-      summary: claimInvalid ? 'agent-result.json was present but failed schema validation' : (isTimeout ? 'Execution timed out' : 'Settled'),
-    },
+    // M4 — see the sibling site above: pass the real claim through
+    // unchanged, never a synthesized stand-in.
+    agentClaim,
+    // Same pre-existing gap closed at the sibling site above.
+    claimInvalid,
     evidence: {
       gitBefore,
       gitAfter,

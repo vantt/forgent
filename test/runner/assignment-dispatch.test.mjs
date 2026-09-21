@@ -2588,7 +2588,12 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
   });
   assert.equal(result.status, 'failed');
   assert.equal(result.confidence, 'failed');
-  assert.deepEqual(result.agentClaim, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  // M4 (dispatch-execution-engine architecture review 260920): the claim
+  // failed schema validation, so there IS no real worker claim -- agentClaim
+  // must be absent, never a runner-fabricated stand-in. The same
+  // explanation now lives under runnerNote.
+  assert.equal(result.agentClaim, undefined);
+  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
 });
 
 test('executeAssignment rejects a legacy failed claim with an object error at the production classification gate', async () => {
@@ -2611,7 +2616,9 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
   });
   assert.equal(result.status, 'failed');
   assert.equal(result.confidence, 'failed');
-  assert.deepEqual(result.agentClaim, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  // Same M4 rationale as the sibling test above.
+  assert.equal(result.agentClaim, undefined);
+  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
 });
 
 

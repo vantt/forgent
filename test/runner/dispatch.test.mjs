@@ -3950,15 +3950,35 @@ test('buildDispatchResult: a [DONE]/[BLOCKED] mention inside backtick-quoted tex
   assert.equal(quotedAndReal.outcome, undefined);
 });
 
-test('buildDispatchResult: verifiedSha is added only for a real [DONE] with a truthy headAfter, never for [BLOCKED] or a null headAfter', () => {
-  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+test('buildDispatchResult: verifiedSha is added only for a real [DONE] with a truthy headAfter AND status:0, never for [BLOCKED], a null headAfter, or a non-zero/missing status', () => {
+  const done = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
   assert.equal(done.verifiedSha, 'sha-after');
 
-  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[BLOCKED]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  const blocked = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[BLOCKED]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
   assert.equal(blocked.verifiedSha, undefined);
 
-  const doneNoHeadAfter = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: null, provider: 'p', command: 'c' });
+  const doneNoHeadAfter = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 0, stdout: '[DONE]' }, headBefore: 'a', headAfter: null, provider: 'p', command: 'c' });
   assert.equal(doneNoHeadAfter.verifiedSha, undefined);
+});
+
+// H5 (dispatch-execution-engine architecture review 260920): process/token
+// success must never substitute for semantic success. A worker that printed
+// [DONE] and then exited non-zero, or was killed by a signal (code null),
+// reaches this ladder on the direct cli-spawn path — transport.mjs's normal
+// `close` handler resolves on ANY exit code, it only rejects on timeout or
+// spawn-fail. `fgos return` trusts `verifiedSha` to skip its own verify, so
+// stamping one here on a failed process would be a false-success path
+// entirely outside RunResult's own fail-closed machinery.
+test('buildDispatchResult: a real [DONE] token does NOT get verifiedSha when the process itself did not succeed (non-zero exit, killed by signal, or no status field at all)', () => {
+  const nonZeroExit = buildDispatchResult({ mechanism: 'out-of-process', result: { status: 1, stdout: 'work done\n[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(nonZeroExit.verifiedSha, undefined);
+  assert.equal(nonZeroExit.status, 1);
+
+  const killedBySignal = buildDispatchResult({ mechanism: 'out-of-process', result: { status: null, signal: 'SIGKILL', stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(killedBySignal.verifiedSha, undefined);
+
+  const noStatusField = buildDispatchResult({ mechanism: 'out-of-process', result: { stdout: '[DONE]' }, headBefore: 'a', headAfter: 'sha-after', provider: 'p', command: 'c' });
+  assert.equal(noStatusField.verifiedSha, undefined);
 });
 
 test('buildDispatchResult: lostUncommittedPaths is included only when given, omitted (never null/empty) otherwise', () => {

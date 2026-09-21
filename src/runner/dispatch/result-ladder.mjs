@@ -51,11 +51,22 @@ export function buildDispatchResult({ mechanism, result, headBefore, headAfter, 
   // outcome of their own -- `cli-spawn`, `http` -- take exactly the three
   // rungs above, unchanged.
   const adapterOutcome = result && typeof result.outcome === 'string' ? result.outcome : null;
+  // A worker that printed [DONE] and then exited non-zero (or was killed by
+  // a signal) still reaches this ladder on the direct cli-spawn path --
+  // `transport.mjs`'s normal `close` handler resolves on ANY exit code, it
+  // only rejects on timeout/spawn-fail. Process/token success must never
+  // stand in for semantic success: `status === 0` is required before the
+  // worker's own [DONE] token is trusted enough to stamp a verifiedSha that
+  // `fgos return` will use to skip its own verify (dispatch-execution-engine
+  // architecture review 260920, H5). herdr's own settled result always
+  // carries `status: 0` by construction (its failure paths throw before
+  // reaching this function), so this adds no new restriction there.
+  const succeeded = result && result.status === 0;
   return {
     mechanism,
     ...result,
     ...(hasSignal || adapterOutcome ? {} : { outcome: 'unsignaled', headBefore, headAfter }),
-    ...(isDone && headAfter ? { verifiedSha: headAfter } : {}),
+    ...(isDone && succeeded && headAfter ? { verifiedSha: headAfter } : {}),
     ...(lostUncommittedPaths ? { lostUncommittedPaths } : {}),
     provider,
     command,

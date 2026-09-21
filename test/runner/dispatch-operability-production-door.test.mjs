@@ -188,7 +188,12 @@ test('production assignment door distinguishes reviewer findings, invalid claim,
   });
   assert.equal(invalid.status, 'failed');
   assert.equal(invalid.confidence, 'failed');
-  assert.equal(invalid.agentClaim.summary, 'agent-result.json was present but failed schema validation');
+  // M4 (dispatch-execution-engine architecture review 260920): invalid
+  // schema means there is no real worker claim -- agentClaim must be
+  // absent, never a runner-fabricated stand-in; the explanation moves to
+  // runnerNote.
+  assert.equal(invalid.agentClaim, undefined);
+  assert.equal(invalid.runnerNote.summary, 'agent-result.json was present but failed schema validation');
   const invalidEvidence = readJson(path.join(runDirFor(root, invalidAssignment.assignmentId), 'evidence.json'));
   assert.equal(invalidEvidence.artifacts.find((artifact) => artifact.kind === 'agent-result')?.valid, false);
 
