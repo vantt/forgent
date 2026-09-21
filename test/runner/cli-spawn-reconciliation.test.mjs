@@ -73,10 +73,14 @@ test('1. legacy ad-hoc spawnWorker and cliSpawnAdapter parity for argv/env/cwd/s
     },
     {
       cwd: tmp,
-      onChunk: (a, b) => {
-        const stream = typeof a === 'string' ? a : b;
-        const buf = typeof a === 'string' ? b : a;
-        chunks.push({ stream, text: Buffer.isBuffer(buf) ? buf.toString('utf8') : String(buf) });
+      // Canonical order everywhere else in the codebase (transport.mjs's
+      // teeChunk, cli.mjs, loop.mjs): onChunk(stream, chunk). Recorded raw
+      // here, not asserted inline -- teeChunk wraps this call in try/catch
+      // (an observability callback must never crash dispatch), so an inline
+      // assertion failure would be silently swallowed there instead of
+      // failing the test; the shape is checked below, outside the callback.
+      onChunk: (stream, chunk) => {
+        chunks.push({ stream, chunk });
       },
     },
   );
@@ -84,7 +88,17 @@ test('1. legacy ad-hoc spawnWorker and cliSpawnAdapter parity for argv/env/cwd/s
   assert.equal(res.exitCode, 0);
   assert.match(res.stdout, /out:hello-parity/);
   assert.match(res.stderr, /err:msg/);
-  assert.ok(chunks.some((c) => c.stream === 'stdout' && c.text.includes('out:hello-parity')));
+  assert.ok(chunks.length > 0, 'onChunk must have been called at least once');
+  for (const c of chunks) {
+    // Order is the one contract every onChunk caller shares (stream first);
+    // the chunk's own type is adapter-specific -- this adapter sets
+    // `child.stdout.setEncoding('utf8')`, so its chunks are strings, while
+    // cli-spawn-supervisor.mjs's detached path hands Buffers. Both are valid.
+    assert.equal(typeof c.stream, 'string', 'onChunk must receive stream (stdout/stderr) as its first argument');
+    assert.ok(c.stream === 'stdout' || c.stream === 'stderr', `stream must be stdout/stderr, got ${c.stream}`);
+    assert.ok(typeof c.chunk === 'string' || Buffer.isBuffer(c.chunk), 'onChunk must receive the chunk as its second argument');
+  }
+  assert.ok(chunks.some((c) => c.stream === 'stdout' && c.chunk.toString('utf8').includes('out:hello-parity')));
 });
 
 // 2. Assignment-owned fresh launch writes pending command, baseline, envelope, bindings, capture, receipt
@@ -159,9 +173,17 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
   assert.equal(baseline.contract, 'evaluator-baseline.v1');
   assert.ok(baseline.gitBefore);
 
-  // Verify envelope
+  // Verify envelope (H11: v2 -- env redacted, secretsRef added)
   const envelope = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'launch-envelope.json'), 'utf8'));
-  assert.equal(envelope.contract, 'cli-spawn-launch-envelope.v1');
+  assert.equal(envelope.contract, 'cli-spawn-launch-envelope.v2');
+  assert.ok(envelope.invocation.secretsRef, 'v2 envelope must name the secrets side file');
+  assert.equal(envelope.invocation.env.PATH, process.env.PATH, 'allow-listed keys still appear');
+  assert.ok(!('ANTHROPIC_API_KEY' in envelope.invocation.env), 'the persisted envelope must never carry a credential-shaped key');
+  // H11: the real supervisor process reads this side file once to spawn the
+  // real worker (proven by the run having genuinely settled above, using
+  // real process.env.PATH etc. it could only have gotten from there) and
+  // unlinks it immediately after -- it must not survive a settled run.
+  assert.equal(fs.existsSync(path.join(runDir, envelope.invocation.secretsRef)), false, 'the secrets side file must be consumed and deleted by the supervisor, never left behind');
 
   // Verify supervisor binding
   const supBinding = readSupervisorBinding(runDir, cmdState.launchCommandId);

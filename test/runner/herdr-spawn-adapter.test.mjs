@@ -8,6 +8,7 @@ import { EXECUTOR_ADAPTERS, DispatchError } from '../../src/runner/dispatch/tran
 import { loadRunnerConfig } from '../../src/runner/dispatch/config.mjs';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
+import { readVisibility } from '../../src/runner/dispatch/visibility-session.mjs';
 
 function writeRunnerConfigFixture(root, cfg) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
@@ -491,6 +492,55 @@ test('an agent that never becomes ready fails by that name and leaves its pane o
     !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'close'),
     'a failed dispatch keeps its pane -- that screen is the only place the reason is still legible',
   );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces via the door and removes it on teardown', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-agy-trust-'));
+  const mock = createMockHerdr(tmpDir, {});
+  const settingsPath = path.join(tmpDir, 'agy-settings.json');
+  // seedWorkspaceTrust derives repoRoot as path.dirname(cwd) when the caller
+  // passes none, and dispatchThroughMock passes cwd: tmpDir with no repoRoot.
+  const repoRoot = path.dirname(path.resolve(tmpDir));
+  fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [repoRoot] }, null, 2));
+
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'do the thing',
+    interactiveMode: { kind: 'agy', trustStore: { kind: 'agy', path: settingsPath } },
+  });
+  assert.equal(res.status, 0);
+
+  // Both notes survive in the merged visibility record (writeVisibility
+  // merges patches onto distinct keys), so this proves the door was actually
+  // called on the way in AND the way out -- not just that the end state
+  // happens to look clean.
+  const visibility = readVisibility(path.join(tmpDir, 'run'));
+  assert.equal(visibility.trustSeeded, 'agy', 'seedWorkspaceTrust ran seedAgyTrust for kind agy');
+  assert.equal(visibility.trustRemoved, 'agy', 'teardown removed the entry seeded for this round');
+
+  const after = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.equal(
+    after.trustedWorkspaces.includes(path.resolve(tmpDir)),
+    false,
+    'the entry seeded for this round does not survive teardown',
+  );
+  assert.ok(after.trustedWorkspaces.includes(repoRoot), 'the pre-existing repo-root entry is untouched');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('R6: a bare submit timeout with no result yet does not fail the round -- it resends and settles once the retry lands', async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-submit-timeout-'));
+  // Attempt 1 times out at the transport layer before the mock worker ever
+  // writes anything; only attempt 2 (the resend `pollForOutcome` fires after
+  // `resendAfterMs`) actually produces ack+result. Before R6 this always threw
+  // worker-spawn-fail on attempt 1's bare timeout, even though the brief may
+  // well have landed -- the resend below never got the chance to happen.
+  const mock = createMockHerdr(tmpDir, { promptError: 'timeout', workerOnPrompt: 2 });
+
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  assert.equal(res.status, 0, 'the round settles once the resend delivers the brief');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

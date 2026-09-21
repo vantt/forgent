@@ -43,6 +43,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
+import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON } from '../runner/dispatch/config.mjs';
@@ -59,7 +60,8 @@ import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecP
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
   sharedConfigFilePath,
@@ -1688,8 +1690,12 @@ function checkProviderCapacityState() {
   if (!quarantined.length) {
     return { passed: true, message: `provider-capacity healthy — ${accounts.length} account(s), no quarantine` };
   }
+  // C2a: inspectProviderCapacity's account shape names the field
+  // `accountId`, not `id` (always undefined here before this fix), and a
+  // quarantine record's own field is `kind` ('temporary' | 'manual-clear'
+  // | 'manual-clear' evidence), never a `manualClear` boolean.
   const summary = quarantined
-    .map((account) => `${account.id}:${account.quarantine.reasonCode || account.quarantine.kind || 'quarantined'}${account.quarantine.manualClear ? ':manual-clear' : ''}`)
+    .map((account) => `${account.accountId}:${account.quarantine.reasonCode || 'quarantined'}${account.quarantine.kind === 'manual-clear' ? ':manual-clear' : ''}${account.quarantine.until ? `:until=${account.quarantine.until}` : ''}`)
     .join(', ');
   return {
     passed: false,
@@ -1701,6 +1707,41 @@ registerCheck({
   id: 'provider-capacity-state',
   description: 'provider-capacity account leases/quarantine state is reportable; doctor never auto-clears quarantine',
   check: () => checkProviderCapacityState(),
+});
+
+// C2c: withFileLock's own runtime reclaim handles a dead-holder lock the
+// moment the NEXT lease/release/quarantine call contends for it, but doctor
+// gets a passive, standalone signal so an operator sees a stuck lock (a
+// SIGKILL between openSync and unlinkSync leaves every future provider-
+// capacity call blocked for waitMs until the next contender happens to
+// reclaim it) without needing to wait for that next real call. Read-only;
+// never reclaims the lock itself -- pure inspection.
+export function checkProviderCapacityLockStale() {
+  let lock;
+  try {
+    lock = inspectProviderCapacityLock(defaultProviderCapacityRuntimeDir());
+  } catch (err) {
+    return { passed: false, message: `provider-capacity lock unreadable: ${err.message}` };
+  }
+  if (!lock.present) {
+    return { passed: true, message: 'no provider-capacity lock file present' };
+  }
+  if (lock.holderAlive === false) {
+    return {
+      passed: false,
+      message: `provider-capacity lock at ${lock.lockPath} is held by dead pid ${lock.holderPid} -- will self-heal on the next lease/release/quarantine call, or remove the file manually`,
+    };
+  }
+  if (lock.holderAlive === null) {
+    return { passed: true, message: `provider-capacity lock present but unreadable/unattributed at ${lock.lockPath} -- treated as live, not stale` };
+  }
+  return { passed: true, message: `provider-capacity lock held by live pid ${lock.holderPid} -- expected under real contention` };
+}
+
+registerCheck({
+  id: 'provider-capacity-lock-stale',
+  description: 'provider-capacity lock file (if any) is not held by a dead process',
+  check: () => checkProviderCapacityLockStale(),
 });
 
 // tsk-2uf-3 (docs/history/dispatch-activation-and-handoff-redesign/
@@ -3559,6 +3600,51 @@ export function checkTrustStoreWritable(storePath = path.join(os.homedir(), '.cl
   }
 }
 
+/** `checkTrustStoreWritable` only ever reads the default claude-json path --
+ * an executor declaring `interactiveMode.trustStore.kind: 'codex-toml'` or
+ * `'agy'`/`'agy-json'` had no doctor coverage at all before this, so an
+ * unreadable codex config.toml or agy settings.json surfaced for the first
+ * time as a live dispatch failure instead of a doctor line. Reuses the same
+ * readers `seedCodexTrust`/`seedAgyTrust` use, so a "readable" verdict here
+ * means the exact same read the real dispatch will do also succeeds. */
+export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
+  const problems = [];
+  const notes = [];
+  const seen = new Set();
+
+  function checkOne(trustStore, env, label) {
+    if (!trustStore || (trustStore.kind !== 'codex-toml' && trustStore.kind !== 'agy' && trustStore.kind !== 'agy-json')) return;
+    const storePath = trustStore.kind === 'codex-toml'
+      ? (trustStore.path ?? path.join(env?.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'))
+      : (trustStore.path ?? defaultAgySettingsPath(env?.HOME ?? os.homedir()));
+    const dedupeKey = `${trustStore.kind}:${storePath}`;
+    if (seen.has(dedupeKey)) return;
+    seen.add(dedupeKey);
+    try {
+      if (trustStore.kind === 'codex-toml') {
+        readCodexTrust(storePath, path.resolve(cwd));
+      } else {
+        readAgyStore(storePath);
+      }
+      notes.push(`${label}: ${trustStore.kind} trust store at ${storePath} is readable`);
+    } catch (err) {
+      problems.push(`${label}: ${trustStore.kind} trust store at ${storePath} is unreadable (${err.message})`);
+    }
+  }
+
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    checkOne(executor?.interactiveMode?.trustStore, executor?.env, `executor "${id}"`);
+    for (const inv of executor?.invocations ?? []) {
+      checkOne(inv?.interactiveMode?.trustStore, inv?.env ?? executor?.env, `executor "${id}" invocation "${inv?.id ?? '?'}"`);
+    }
+  }
+
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
+}
+
 /** Second reading of the config door's own C5 invariant. Names the executor and
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
@@ -3726,6 +3812,18 @@ registerCheck({
   id: 'trust-store-readable',
   description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
   check: () => checkTrustStoreWritable(),
+});
+
+registerCheck({
+  id: 'non-claude-trust-stores-readable',
+  description: 'every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do',
+  check: (cwd) => {
+    try {
+      return checkTrustStoresReadable(cwd, loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };
+    }
+  },
 });
 
 registerCheck({
@@ -4177,6 +4275,109 @@ registerCheck({
 registerFix({
   id: 'confinement-backend-registry-readable',
   fix: () => fixConfinementBackendRegistryReadable(),
+});
+
+// ─── Confinement orphan reaper (Phase 04 M8) ───────────────────────────────
+// `reapOrphanedConfinementResources` (confinement/cleanup.mjs) existed but
+// was never called from any production path -- only a test called it
+// directly, so a temporary confinement resource whose owning process died
+// (or timed out, see finalizeConfinementResources's own `retained` outcome)
+// stayed on disk forever. Wiring it in here (checked/fixed via `doctor
+// --fix`) and at runner start (loop.mjs) is what actually reclaims it.
+
+export function defaultConfinementTempRoots() {
+  const roots = new Set([path.join(os.tmpdir(), 'fgos-confinement')]);
+  try {
+    const registry = loadMachineBackendRegistry();
+    for (const instance of Object.values(registry?.confinementBackends || {})) {
+      if (instance?.config?.tempRoot) roots.add(instance.config.tempRoot);
+    }
+  } catch {
+    // An unreadable/malformed registry is its own check (above); fall back
+    // to the one default root rather than failing this check too.
+  }
+  return [...roots];
+}
+
+export function checkConfinementOrphanedResourcesReaped() {
+  // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
+  // own (it deletes), so this counts dead-owned markers itself instead of
+  // calling it -- a `check` must never mutate.
+  const roots = defaultConfinementTempRoots();
+  const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
+  if (markedDeadOwnerDirs === 0) {
+    return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
+  }
+  return {
+    passed: false,
+    message: `${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')} -- run "fgos doctor --fix"`,
+  };
+}
+
+function countDeadOwnedConfinementDirs(roots) {
+  let count = 0;
+  for (const tempRoot of roots) {
+    if (!fs.existsSync(tempRoot)) continue;
+    let entries = [];
+    try {
+      entries = fs.readdirSync(tempRoot, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const dispatchDir = path.join(tempRoot, entry.name);
+      const candidates = [dispatchDir];
+      try {
+        for (const sub of fs.readdirSync(dispatchDir, { withFileTypes: true })) {
+          if (sub.isDirectory()) candidates.push(path.join(dispatchDir, sub.name));
+        }
+      } catch {}
+      for (const cand of candidates) {
+        const markerPath = path.join(cand, OWNERSHIP_MARKER_FILE);
+        if (!fs.existsSync(markerPath)) continue;
+        try {
+          const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
+            try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
+          })();
+          if (!alive) count += 1;
+        } catch {
+          // Unreadable marker: not this check's concern (ownership itself
+          // is what reapOrphanedConfinementResources trusts or refuses).
+        }
+      }
+    }
+  }
+  return count;
+}
+
+export function fixConfinementOrphanedResourcesReaped() {
+  const roots = defaultConfinementTempRoots();
+  let totalReaped = 0;
+  const messages = [];
+  for (const tempRoot of roots) {
+    const { reaped } = reapOrphanedConfinementResources({ tempRoot });
+    totalReaped += reaped.length;
+    if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
+  }
+  return {
+    changed: totalReaped > 0,
+    message: totalReaped > 0
+      ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
+      : 'no orphaned confinement resources to reap',
+  };
+}
+
+registerCheck({
+  id: 'confinement-orphaned-resources-reaped',
+  description: 'no confinement temp resources are left behind by a dead owning process',
+  check: () => checkConfinementOrphanedResourcesReaped(),
+});
+
+registerFix({
+  id: 'confinement-orphaned-resources-reaped',
+  fix: () => fixConfinementOrphanedResourcesReaped(),
 });
 
 export function checkConfinementBwrapPlatform() {

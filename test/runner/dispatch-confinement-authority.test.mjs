@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { spawnSync } from "node:child_process";
 import { executeThroughConfinement, buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
 import { normalizeAgentName } from "../../src/runner/dispatch/herdr-agent.mjs";
 import { buildConfinementRequest, validateConfinementRequest } from "../../src/runner/dispatch/confinement/request.mjs";
+import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
+import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { executeExecutorCli, spawnWorker } from "../../src/runner/dispatch/cli.mjs";
 import { loadRunnerConfigFromDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
@@ -249,6 +252,16 @@ test("confinement execution failure wraps into named DispatchError with attestat
 
 test("H1: spawnWorker resolves and binds curated capability confinement (code:implement) instead of ignoring it", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-h1-test-"));
+  // H10/D2: a missing backendId now defaults to 'bwrap' (never an outright
+  // refusal on its own), so this fixture must isolate itself from whatever
+  // 'bwrap' backend is ACTUALLY registered on the machine running the test
+  // (real dev machines commonly have one at ~/.fgos/confinement-backends.json)
+  // -- an empty registry keeps this test's own "no backend configured ->
+  // refuse" intent deterministic instead of racing real machine state.
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
   const cfg = {
     capabilities: {
       "code:implement": {
@@ -283,15 +296,24 @@ test("H1: spawnWorker resolves and binds curated capability confinement (code:im
     kind: "feat",
   };
 
-  await assert.rejects(
-    () => spawnWorker(sampleWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
-      assert.match(err.message, /required confinement refused for capability "code:implement"/);
-      return true;
-    },
-  );
+  try {
+    await assert.rejects(
+      () => spawnWorker(sampleWork, cfg, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
+        // H10/D2: the isolated empty registry above refuses at the shared
+        // backend-instance-resolution step (before the "required" branch's
+        // own message is ever built), since 'bwrap' -- the now-defaulted
+        // backendId -- simply isn't registered in it.
+        assert.match(err.message, /confinement backend instance "bwrap" not found in machine registry/);
+        return true;
+      },
+    );
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+  }
 });
 
 test("M1: buildConfinementAttestation surfaces legacy confinement and bwrap observation in effectiveControls, coverage, grants, channels, and evidence", () => {
@@ -524,6 +546,12 @@ test("HIGH-1 regression: fake adapter returning status/contract/result does not 
 
 test("MED-1: required policy on execute, advise, and stage names binds on spawnWorker", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med1-test-"));
+  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
+  // this machine -- see the H1 test above for the full rationale.
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
   try {
     const baseCfg = {
       executors: {
@@ -596,12 +624,20 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       },
     );
   } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
 
 test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for research domain", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med2-test-"));
+  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
+  // this machine -- see the H1 test above for the full rationale.
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
   try {
     const cfg = {
       capabilities: {
@@ -653,12 +689,20 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
     }
     assert.equal(cliRefusedCap, "code:implement", "executeExecutorCli folded research domain to coding and resolved code:implement identically");
   } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
 
 test("MED-3: executor for[] order does not affect capability resolution or required refusal", async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-med3-test-"));
+  // H10/D2: isolate from whatever 'bwrap' backend is actually registered on
+  // this machine -- see the H1 test above for the full rationale.
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  fs.writeFileSync(regPath, JSON.stringify({ contract: "confinement-backend-registry.v1", confinementBackends: {} }));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
   try {
     const cfgA = {
       capabilities: {
@@ -721,6 +765,8 @@ test("MED-3: executor for[] order does not affect capability resolution or requi
     assert.equal(refusedCapA, "code:review", "order ['advise', 'code:review'] binds required policy");
     assert.equal(refusedCapB, "code:review", "order ['code:review', 'advise'] binds required policy identically");
   } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 });
@@ -992,6 +1038,77 @@ test("recorded herdrName is normalized identically to the launch call's own agen
     assert.equal(preparedLaunch.launchCommand.herdrName, liveLaunchName, "recorded herdrName must match the live launch's own normalized agent name");
     assert.ok(preparedLaunch.launchCommand.herdrName.length <= 32, "normalized name must respect herdr's 32-char cap");
   } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+// ─── H9 (Phase 04 R1): assignment/Run-owned launch door must attest
+// outcome:'enforced', matching P06 evidence shape (plans/260910-1243-
+// confinement-authority-implementation/reports/phase-06-evidence/
+// attestation-host-write-denied-*.json) -- the direct-door "required" path
+// (backendId only, no assignmentLaunchContext) already attested this
+// correctly; the assignment door regressed to outcome:'unknown' when
+// prepareConfinementForLaunch was split out as its own function with its
+// own local backendPlan/preparedConfinement never written back to the
+// caller's same-named outer variables. ─────────────────────────────────────
+
+const BWRAP_PRESENT = (() => {
+  try {
+    return spawnSync("bwrap", ["--version"], { stdio: "ignore" }).status === 0;
+  } catch {
+    return false;
+  }
+})();
+
+test("H9: the assignment/Run-owned launch door attests outcome:'enforced' on a genuinely prepared+successful required dispatch (P06 evidence regression)", { skip: !BWRAP_PRESENT }, async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-h9-assignment-door-enforced-"));
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    const registryPath = path.join(tmp, "confinement-backends.json");
+    ensureMachineBackendRegistryDefaults(registryPath);
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = registryPath;
+
+    const runDir = path.join(tmp, ".fgos", "assignments", "asgn_h9", "runs", "01");
+    fs.mkdirSync(runDir, { recursive: true });
+
+    const req = buildConfinementRequest({
+      capability: "code:implement",
+      executorId: "claude-bwrap",
+      backendId: "bwrap",
+      requirement: {
+        mode: "required",
+        policyId: "host-write-denied",
+        policy: resolveConfinementPolicy("host-write-denied"),
+      },
+      invocation: {
+        command: process.execPath,
+        args: ["-e", "console.log('h9-assignment-door-ok')"],
+        adapter: "cli-spawn",
+      },
+      context: { cwd: tmp, repoRoot: tmp, runDir, fgosDir: path.join(tmp, ".fgos") },
+      assignmentLaunchContext: {
+        contract: "assignment-cli-spawn-launch-context.v1",
+        run: {
+          runId: "run_h9",
+          assignmentId: "asgn_h9",
+          attempt: 1,
+          dispatchPlanDigest: `sha256:${"a".repeat(64)}`,
+          evaluatorBaselineDigest: `sha256:${"b".repeat(64)}`,
+        },
+        command: { launchCommandId: "lc-h9-01", controlEpoch: 1, controlTokenDigest: `sha256:${"c".repeat(64)}` },
+      },
+    });
+
+    const fakeAdapter = async () => ({ status: 0, stdout: "h9-assignment-door-ok" });
+    const res = await executeThroughConfinement(req, fakeAdapter);
+
+    assert.equal(res.status, "completed");
+    assert.equal(res.attestation.phase, "completed");
+    assert.equal(res.attestation.outcome, "enforced", "assignment door must attest enforced, not unknown, when confinement was genuinely prepared");
+    assert.equal(res.attestation.backend.id, "bwrap");
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });

@@ -28,6 +28,7 @@
 // here rather than dressed up as a check that does nothing.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
@@ -112,6 +113,24 @@ export function readTrust(storePath, projectPath) {
   return entry?.hasTrustDialogAccepted === true;
 }
 
+/** The shape of one `projects[<path>]` entry claude.json's own schema
+ * expects -- exported so a caller that must write this file's shape from
+ * outside `seedTrust` (worker-home.mjs's private, freshly-created
+ * `.claude.json`, which has no existing repoRoot entry to derive B1 trust
+ * from) uses the SAME shape rather than a second, independently-drifting
+ * copy of it. Returns a fresh object every call: entries are never shared
+ * references a caller could mutate into each other. */
+export function trustedProjectEntry() {
+  return {
+    allowedTools: [],
+    hasTrustDialogAccepted: true,
+    mcpServers: {},
+    enabledMcpjsonServers: [],
+    disabledMcpjsonServers: [],
+    history: [],
+  };
+}
+
 /**
  * Record trust for `projectPath`, derived from an already-trusted `repoRoot`.
  *
@@ -145,14 +164,7 @@ export function seedTrust(storePath, { projectPath, repoRoot } = {}) {
 
   if (projects[projectPath]?.hasTrustDialogAccepted === true) return false; // already seeded
 
-  projects[projectPath] = {
-    allowedTools: [],
-    hasTrustDialogAccepted: true,
-    mcpServers: {},
-    enabledMcpjsonServers: [],
-    disabledMcpjsonServers: [],
-    history: [],
-  };
+  projects[projectPath] = trustedProjectEntry();
   writeStoreAtomic(storePath, store);
   return true;
 }
@@ -295,9 +307,20 @@ export function removeCodexTrust(configPath, projectPath) {
 // fresh worktree), it shows a blocking folder-trust dialog that causes herdr
 // to report `agent_not_ready`.
 //
-// Best-effort: reads settings.json (or starts fresh if missing), appends
-// projectPath and repoRoot to trustedWorkspaces, writes atomically, and never
-// throws.
+// Same B1 rule as the other two formats: trust is derived from a repoRoot
+// already trusted, never invented, and a store this module cannot make sense
+// of is refused rather than quietly treated as empty -- the same "unreadable
+// beats fabricated" choice `readStore` makes for the JSON store above.
+
+/** Where agy keeps its trust store under a given HOME. `homeDir` must be the
+ * HOME the agy PROCESS itself will run under, never the operator's own --
+ * an agy executor is declared with its own private HOME (typically
+ * `~/.agy-homes/<name>`, resolved from the executor's own env), and seeding
+ * `~/.gemini/...` under the wrong HOME leaves agy's own dialog exactly where
+ * it was. */
+export function defaultAgySettingsPath(homeDir = os.homedir()) {
+  return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
+}
 
 /** Read agy's settings.json to check whether a path is trusted. */
 export function readAgyTrust(settingsPath, projectPath) {
@@ -313,67 +336,85 @@ export function readAgyTrust(settingsPath, projectPath) {
   }
 }
 
+/** Read agy's settings.json, refusing (never inventing `{}`) when the file
+ * exists but cannot be understood. A missing file is a different case: agy
+ * was simply never seeded here, so an empty `trustedWorkspaces` is correct,
+ * not a fabrication. */
+export function readAgyStore(settingsPath) {
+  if (!fs.existsSync(settingsPath)) return {};
+  let raw;
+  try {
+    raw = fs.readFileSync(settingsPath, 'utf8');
+  } catch (err) {
+    throw new TrustStoreError('unreadable-store', `agy trust store at "${settingsPath}" could not be read: ${err.message}.`, { settingsPath });
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new TrustStoreError('unreadable-store', `agy trust store at "${settingsPath}" is not valid JSON: ${err.message}.`, { settingsPath });
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new TrustStoreError('schema-drift', `agy trust store at "${settingsPath}" is not a JSON object -- its shape changed and this module must not guess.`, { settingsPath });
+  }
+  return parsed;
+}
+
 /**
- * Trust a workspace for agy by adding projectPath and repoRoot to agy's
- * `trustedWorkspaces` list in settings.json.
+ * Trust one workspace for agy, deriving that trust from a root agy already
+ * trusts -- the same B1 rule the other two formats enforce, for the same
+ * reason: fgOS may propagate a trust decision a person already made, never
+ * invent one for a root nobody vouched for.
  *
- * Best-effort and idempotent: writes atomically and never throws.
+ * Refuses, without writing anything, when:
+ * - `projectPath`/`repoRoot` is not absolute (`invalid-path`);
+ * - `repoRoot` is not itself in `trustedWorkspaces` (`untrusted-root`) --
+ *   this includes a settings.json that does not exist yet, since nothing is
+ *   trusted there at all;
+ * - the store exists but is unreadable or shaped unexpectedly.
+ *
+ * Idempotent: seeding an already-seeded path rewrites nothing.
  */
 export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
-  try {
-    if (typeof settingsPath !== 'string' || !settingsPath.trim()) return false;
-
-    const toAdd = [];
-    if (typeof projectPath === 'string' && projectPath.trim()) {
-      toAdd.push(path.resolve(projectPath));
-    }
-    if (typeof repoRoot === 'string' && repoRoot.trim()) {
-      toAdd.push(path.resolve(repoRoot));
-    }
-    if (toAdd.length === 0) return false;
-
-    let store = {};
-    if (fs.existsSync(settingsPath)) {
-      try {
-        const raw = fs.readFileSync(settingsPath, 'utf8');
-        const parsed = JSON.parse(raw);
-        if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
-          store = parsed;
-        }
-      } catch {
-        store = {};
-      }
-    }
-
-    const current = Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : [];
-    const set = new Set(current);
-    let changed = false;
-
-    for (const p of toAdd) {
-      if (!set.has(p)) {
-        set.add(p);
-        changed = true;
-      }
-    }
-
-    if (!changed) return false;
-
-    store.trustedWorkspaces = Array.from(set);
-
-    const dir = path.dirname(settingsPath);
-    fs.mkdirSync(dir, { recursive: true });
-    const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
-    try {
-      fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
-      fs.renameSync(tmp, settingsPath);
-    } catch {
-      try { fs.unlinkSync(tmp); } catch {}
-      return false;
-    }
-    return true;
-  } catch {
-    return false;
+  if (typeof settingsPath !== 'string' || !settingsPath.trim()) {
+    throw new TrustStoreError('invalid-path', `agy trust seed refused: settingsPath must be a non-empty string, got "${settingsPath}".`);
   }
+  if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
+    throw new TrustStoreError('invalid-path', `agy trust seed refused: projectPath must be an absolute path, got "${projectPath}".`, { projectPath });
+  }
+  if (typeof repoRoot !== 'string' || !path.isAbsolute(repoRoot)) {
+    throw new TrustStoreError('invalid-path', `agy trust seed refused: repoRoot must be an absolute path, got "${repoRoot}".`, { repoRoot });
+  }
+
+  const store = readAgyStore(settingsPath);
+  const resolvedProjectPath = path.resolve(projectPath);
+  const resolvedRepoRoot = path.resolve(repoRoot);
+  const trusted = new Set(Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : []);
+
+  if (!trusted.has(resolvedRepoRoot)) {
+    throw new TrustStoreError(
+      'untrusted-root',
+      `agy trust seed refused for "${resolvedProjectPath}": its repo root "${resolvedRepoRoot}" is not itself trusted in ${settingsPath}, so there is nothing to derive trust from.`,
+      { projectPath: resolvedProjectPath, repoRoot: resolvedRepoRoot, settingsPath },
+    );
+  }
+
+  if (trusted.has(resolvedProjectPath)) return false; // already seeded
+
+  trusted.add(resolvedProjectPath);
+  store.trustedWorkspaces = Array.from(trusted);
+
+  const dir = path.dirname(settingsPath);
+  fs.mkdirSync(dir, { recursive: true });
+  const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
+  try {
+    fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
+    fs.renameSync(tmp, settingsPath);
+  } catch (err) {
+    try { fs.unlinkSync(tmp); } catch {}
+    throw new TrustStoreError('write-failed', `agy trust store at "${settingsPath}" could not be written: ${err.message}.`, { settingsPath });
+  }
+  return true;
 }
 
 /** Drop one workspace's agy trust entry. Returns whether anything was there. */

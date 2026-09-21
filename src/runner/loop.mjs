@@ -51,6 +51,7 @@
 // to contain its source.
 
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
@@ -98,6 +99,7 @@ import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
+import { reapOrphanedConfinementResources } from './dispatch/confinement/cleanup.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
@@ -1369,6 +1371,21 @@ export async function runOnce(options = {}) {
   }
 
   try {
+    // M8: reclaim confinement temp resources (worker homes etc.) whose
+    // owning process is dead -- best-effort, never blocks/fails runner
+    // startup. `dryRun` skips it the same way it skips the claim reaper
+    // above, since a dry run must never mutate the filesystem.
+    if (!dryRun) {
+      try {
+        const confinementReap = reapOrphanedConfinementResources({ tempRoot: path.join(os.tmpdir(), 'fgos-confinement') });
+        if (confinementReap.reaped.length > 0) {
+          log(`fgos-runner: reaped ${confinementReap.reaped.length} orphaned confinement resource dir(s)`);
+        }
+      } catch (err) {
+        log(`fgos-runner: confinement resource reap skipped: ${err.message}`);
+      }
+    }
+
     const reap = await startupReap({ repoRoot, dir, worktreeDir, verifyTimeoutMs: config?.timeoutMs, log, dryRun });
     // Hoisted above its original DRAIN RUN position (tsk-5mj): the new
     // DISCOVERY DISPATCH sweep right below also writes through this same

@@ -38,7 +38,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readTrust, TrustStoreError } from './trust-store.mjs';
+import { readTrust, trustedProjectEntry, TrustStoreError } from './trust-store.mjs';
 
 /** Marker file written into every home this module creates. `removeWorkerHome`
  * refuses to delete a directory that does not carry it, so a teardown bug can
@@ -132,14 +132,10 @@ export function createWorkerHome(baseDir, { runId, sourceHome, workspacePath, re
       theme: 'dark',
       installMethod: 'native',
       projects: {
-        [workspacePath]: {
-          allowedTools: [],
-          hasTrustDialogAccepted: true,
-          mcpServers: {},
-          enabledMcpjsonServers: [],
-          disabledMcpjsonServers: [],
-          history: [],
-        },
+        // Same shape trust-store.mjs's own `seedTrust` writes for the
+        // operator's store -- one definition of what a trusted entry looks
+        // like, so the two writers of this file format cannot drift apart.
+        [workspacePath]: trustedProjectEntry(),
       },
     }, null, 2)}\n`);
     provisioned.push('.claude.json (onboarding + workspace trust)');

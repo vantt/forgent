@@ -63,6 +63,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'tool-registry-configured',
       'config-awareness',
       'provider-capacity-state',
+      'provider-capacity-lock-stale',
       'dependencies-installed',
       'gate-bypass-configured',
       'root-drift',
@@ -116,6 +117,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'herdr-available',
       'trust-store-readable',
+      // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
+      // no doctor coverage at all -- only claude-json's default path did.
+      'non-claude-trust-stores-readable',
       'executor-confinement',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
@@ -130,6 +134,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-backend-registry-readable',
       'confinement-bwrap-platform',
       'confinement-herdr-maturity',
+      'confinement-orphaned-resources-reaped',
       'confinement-probe-freshness',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
@@ -1520,7 +1525,7 @@ test('provider-capacity-state doctor check reports quarantine without clearing i
       'openai-codex': {
         accounts: {
           tetnu: {
-            quarantine: { reasonCode: 'auth-token', manualClear: true, quarantinedAt: '2026-09-16T00:00:00.000Z' },
+            quarantine: { reasonCode: 'auth-token', kind: 'manual-clear', quarantinedAt: '2026-09-16T00:00:00.000Z' },
             leases: {},
           },
         },

@@ -17,6 +17,7 @@
 // proof is a file the worker itself wrote, and it is read somewhere else.
 
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 /** A herdr call that did not succeed. `code` is herdr's own error code when
  * herdr answered (`agent_not_ready`, `agent_blocked`, `agent_prompt_stalled`,
@@ -35,10 +36,16 @@ export class HerdrError extends Error {
  * rejected outright in live probing. Normalize rather than fail late inside a
  * pane that is already open.
  *
- * Length is trimmed from the MIDDLE, never the end. Names arrive as
- * `fgos-<workId>-<timestamp>`, so cutting the tail off a long workId takes
- * the timestamp with it -- and two rounds of that same item would then share
- * one agent name in one session, where herdr addresses agents by name.
+ * A truncated name keeps its head (so it still reads as the item that
+ * produced it) and replaces the rest with a short hash of the FULL cleaned
+ * string, not a literal middle/tail slice. A plain middle-trim (keep head +
+ * tail chars, drop the rest) still collides: two different inputs that
+ * happen to share both a head and a tail after cleaning -- plausible when
+ * names share a common prefix and a similarly-shaped trailing timestamp --
+ * would truncate to the identical name, and herdr addresses agents by name.
+ * Hashing the full string makes any difference anywhere in the input, middle
+ * included, change the suffix. Deterministic on purpose: the same input must
+ * keep producing the same name so a resume/reattach can find the agent again.
  *
  * 32 is herdr's own limit, quoted from its refusal: "agent name must start
  * with a lowercase letter and contain only lowercase letters, digits, '-' or
@@ -52,11 +59,10 @@ export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
     .replace(/[^a-z0-9_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
   if (cleaned.length <= maxLength) return cleaned || 'fgos-agent';
-  // Keep enough of the head to recognise the item and all of the tail that
-  // makes it unique.
-  const tail = Math.min(16, Math.floor(maxLength / 2));
-  const head = maxLength - tail;
-  return `${cleaned.slice(0, head)}${cleaned.slice(-tail)}`;
+  const hashLen = Math.min(8, Math.floor(maxLength / 2));
+  const hash = createHash('sha1').update(cleaned).digest('hex').slice(0, hashLen);
+  const head = maxLength - hashLen;
+  return `${cleaned.slice(0, head)}${hash}`;
 }
 
 function defaultRun(bin, args, { cwd, env, timeoutMs }) {

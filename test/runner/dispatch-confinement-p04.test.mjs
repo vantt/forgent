@@ -42,41 +42,58 @@ const HAS_WORKING_BWRAP = hasWorkingBwrap();
 
 // ─── R1: Required Policy Refusal Before Spawn (0 Adapter Calls) ────────────────
 
-test("R1 Case 1: missing backendId refuses with confinement-backend-missing and 0 adapter calls", async () => {
+test("R1 Case 1: a missing backendId defaults to 'bwrap' (H10/D2); on a registry with no 'bwrap' entry that still refuses with confinement-backend-missing and 0 adapter calls", async () => {
   const tmpDir = mkTemp("p04-r1-c1-");
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  fs.writeFileSync(
+    regPath,
+    JSON.stringify({
+      contract: "confinement-backend-registry.v1",
+      confinementBackends: {},
+    }),
+  );
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
+
   let adapterCalls = 0;
   const fakeAdapter = async () => {
     adapterCalls++;
     return { status: 0, stdout: "ok", stderr: "" };
   };
 
-  const req = buildConfinementRequest({
-    capability: "advise",
-    executorId: "test-exec",
-    requirement: {
-      mode: "required",
-      policyId: "host-write-denied",
-      policy: resolveConfinementPolicy("host-write-denied"),
-    },
-    backendId: null, // missing backend
-    invocation: { command: "echo", args: ["hi"], adapter: "cli-spawn" },
-    context: { cwd: tmpDir, runDir: tmpDir },
-  });
+  try {
+    const req = buildConfinementRequest({
+      capability: "advise",
+      executorId: "test-exec",
+      requirement: {
+        mode: "required",
+        policyId: "host-write-denied",
+        policy: resolveConfinementPolicy("host-write-denied"),
+      },
+      backendId: null, // missing backend -- H10/D2: defaults to 'bwrap', never an outright refusal on its own
+      invocation: { command: "echo", args: ["hi"], adapter: "cli-spawn" },
+      context: { cwd: tmpDir, runDir: tmpDir },
+    });
 
-  await assert.rejects(
-    async () => executeThroughConfinement(req, fakeAdapter),
-    (err) => {
-      assert.ok(err instanceof DispatchError);
-      assert.equal(err.code, "confinement-backend-missing");
-      assert.equal(err.data?.status, "refused");
-      assert.equal(err.data?.attestation?.phase, "refused");
-      assert.equal(err.data?.attestation?.outcome, "refused");
-      return true;
-    },
-  );
+    await assert.rejects(
+      async () => executeThroughConfinement(req, fakeAdapter),
+      (err) => {
+        assert.ok(err instanceof DispatchError);
+        assert.equal(err.code, "confinement-backend-missing");
+        assert.match(err.message, /"bwrap"/, "refusal must name the DEFAULTED backend id, not a generic \"no backend\" message");
+        assert.equal(err.data?.status, "refused");
+        assert.equal(err.data?.attestation?.phase, "refused");
+        assert.equal(err.data?.attestation?.outcome, "refused");
+        return true;
+      },
+    );
 
-  assert.equal(adapterCalls, 0, "adapter must not be called when backend is missing");
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+    assert.equal(adapterCalls, 0, "adapter must not be called when the (defaulted) backend is missing from the registry");
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
 
 test("R1 Case 2: unknown/missing backend in registry refuses with confinement-backend-missing and 0 adapter calls", async () => {
@@ -123,6 +140,53 @@ test("R1 Case 2: unknown/missing backend in registry refuses with confinement-ba
   assert.equal(adapterCalls, 0, "adapter must not be called when backend is not in registry");
   delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
   fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test("H10/D2: the production scenario (a required capability with no executor-level confinement.backend, e.g. advise/code:review/code:debug) dispatches successfully via the defaulted 'bwrap' backend, never refuses for lack of an explicit backendId", { skip: !HAS_WORKING_BWRAP }, async () => {
+  const tmpDir = mkTemp("p04-h10-default-ok-");
+  const regPath = path.join(tmpDir, "confinement-backends.json");
+  const oldRegistry = process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+  try {
+    ensureMachineBackendRegistryDefaults(regPath);
+    process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = regPath;
+
+    const fgosDir = path.join(tmpDir, ".fgos");
+    const runDir = path.join(fgosDir, "runs", "1");
+    fs.mkdirSync(runDir, { recursive: true });
+
+    let adapterCalls = 0;
+    const fakeAdapter = async () => {
+      adapterCalls++;
+      return { status: 0, stdout: "ok", stderr: "" };
+    };
+
+    // No backendId anywhere in this request -- the exact reviewer probe
+    // scenario ("advise/claude, code:review/openai, code:debug/openai ->
+    // backendId=null") that made every real direct `dispatch execute`
+    // door call refuse before this fix.
+    const req = buildConfinementRequest({
+      capability: "advise",
+      executorId: "test-exec",
+      requirement: {
+        mode: "required",
+        policyId: "host-write-denied",
+        policy: resolveConfinementPolicy("host-write-denied"),
+      },
+      invocation: { command: "echo", args: ["hi"], adapter: "cli-spawn" },
+      context: { cwd: tmpDir, repoRoot: tmpDir, runDir, fgosDir },
+    });
+    assert.equal(req.backendId, null, "fixture sanity: no backendId resolved anywhere upstream of Authority");
+
+    const res = await executeThroughConfinement(req, fakeAdapter);
+    assert.equal(res.status, "completed");
+    assert.equal(res.attestation.outcome, "enforced");
+    assert.equal(res.attestation.backend.id, "bwrap");
+    assert.equal(adapterCalls, 1);
+  } finally {
+    if (oldRegistry === undefined) delete process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH;
+    else process.env.FGOS_CONFINEMENT_BACKEND_REGISTRY_PATH = oldRegistry;
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
 
 test("R1 Case 3: disabled backend refuses with confinement-backend-disabled and 0 adapter calls", async () => {
@@ -881,7 +945,26 @@ test("R7: read-only DEFAULT_CAPABILITY_SLOTS use the explicit interim unconfined
 
 // ─── R8: Optional Live Bwrap Test (Gated) ──────────────────────────────────────
 
-test("R8: live bwrap dispatch executes through Confinement Authority when FGOS_LIVE_BWRAP_TESTS=1", { skip: process.env.FGOS_LIVE_BWRAP_TESTS !== "1" }, async () => {
+// Phase 04 (dispatch-engine-hardening): runs by default whenever bwrap is
+// actually on this machine -- FGOS_LIVE_BWRAP_TESTS is now an opt-OUT
+// ('0' skips even when bwrap is present), not an opt-IN. A machine with no
+// bwrap at all still skips (no explicit '1' can make a real spawn succeed).
+const BWRAP_AVAILABLE = (() => {
+  try {
+    const r = cp.spawnSync("bwrap", ["--version"], { stdio: "ignore" });
+    return r.error === undefined && r.status === 0;
+  } catch {
+    return false;
+  }
+})();
+const skipLiveBwrap =
+  process.env.FGOS_LIVE_BWRAP_TESTS === "0"
+    ? true
+    : process.env.FGOS_LIVE_BWRAP_TESTS === "1"
+      ? false
+      : !BWRAP_AVAILABLE;
+
+test("R8: live bwrap dispatch executes through Confinement Authority when bwrap is available (FGOS_LIVE_BWRAP_TESTS=0 to opt out)", { skip: skipLiveBwrap }, async () => {
   const tmpDir = mkTemp("p04-r8-live-");
   const regPath = path.join(tmpDir, "confinement-backends.json");
   ensureMachineBackendRegistryDefaults(regPath);
