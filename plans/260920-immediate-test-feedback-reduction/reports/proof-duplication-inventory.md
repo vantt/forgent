@@ -81,6 +81,8 @@ No `direct-business-proof`, `git-process-integration`, or `large-state-artifact-
 
 `impact-analysis: inactive` — 0 registered providers in this worktree (see P00's baseline report for the same finding); this phase adds no edits to existing functions/classes/methods outside the two brand-new files (`scripts/test-proof-inventory.mjs`, `test/scripts/test-proof-inventory.test.mjs`), so there is no pre-existing symbol to run upstream impact on.
 
+**Correction (P01):** see `current-baseline.md`'s matching correction — the live `mcp__gitnexus__impact`/`mcp__gitnexus__detect_changes` MCP tools are available in this session independent of the "inactive" fgOS dispatch-registry finding above; later phases should use them directly.
+
 ## Acceptance
 
 - [x] Inventory totals reconcile with scanned scope (7 static sites + 50 profiled tests + 30 profiled files = 87 entries, matches `proof-inventory.json.scope`).

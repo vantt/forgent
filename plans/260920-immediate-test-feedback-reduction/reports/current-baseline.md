@@ -121,6 +121,8 @@ The inherited P02 baseline (`plans/260915-0455-test-suite-feedback-cost/reports/
 
 `impact-analysis: inactive` — `fgos tool query --capability impact-analysis --status present` returned zero registered providers in this worktree (no `.gitnexus/run.cjs` present either); per `CLAUDE.md`'s capability gate this is Inactive, not a gap, so GitNexus impact/detect-changes evidence is skipped for this phase's commit. This phase changed no functions/classes/methods (report + raw log artifacts only); the tooling-fix commits already on this branch predate this report.
 
+**Correction (P01):** this note conflated fgOS's own dispatch-executor capability registry with this session's own `mcp__gitnexus__*` tools, which are live and unrelated to that registry — see `hotspot-leak-removal.md`'s "Impact analysis" section for a confirmed, working `mcp__gitnexus__impact` call. No factual claim above changes (this phase still edited no existing symbols), but later phases should query the live MCP tools directly rather than reusing this "inactive" framing.
+
 ## Handoff
 
 P00A (proof/duplication inventory) and P01 (hotspot removal, max 3 candidates) reproduce this exact command (`node scripts/test-timing.mjs sample`/`profile`) against their own before/after state on this same machine, and register a minimum effect threshold greater than the observed noise above (wall range 398.66-453.00s across the 3 samples, ~12% spread dominated by run-to-run/ambient-load variance, not measurement error) before mutating anything, per ITR-D09/ITR-D12 and the plan's Measurement Contract.
