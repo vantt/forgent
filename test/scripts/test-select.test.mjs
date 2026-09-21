@@ -563,6 +563,30 @@ test("this repo's real MANIFEST/FULL_TRIGGERS validate cleanly", async () => {
   assert.ok(FULL_TRIGGERS.length > 0);
 });
 
+test('P05 regression: no FULL_TRIGGERS prefix shadows a src/state/** leaf module that has its own manifest rule (a blanket "src/state/" trigger previously made every state-leaf rule unreachable)', async () => {
+  const { MANIFEST, FULL_TRIGGERS } = await import('../../test/test-ownership.mjs');
+  const idx = buildManifestIndex(MANIFEST);
+  const stateLeafRules = MANIFEST.filter((r) => r.pattern.startsWith('src/state/'));
+  assert.ok(stateLeafRules.length > 0, 'sanity: this repo\'s manifest should have at least one src/state/ leaf rule');
+  for (const rule of stateLeafRules) {
+    const trigger = matchFullTrigger(rule.pattern, FULL_TRIGGERS);
+    assert.equal(trigger, null, `${rule.pattern} (manifest rule "${rule.id}") must not also match a full-trigger, or it can never be selected as related`);
+    assert.ok(idx.get(rule.pattern), `${rule.pattern} must still resolve via the manifest index`);
+  }
+});
+
+test('P05 regression: a src/state/ file with NO manifest rule still escalates via the unknown-path default-deny (not a named full-trigger, but same safe outcome)', async () => {
+  const { MANIFEST, FULL_TRIGGERS } = await import('../../test/test-ownership.mjs');
+  const idx = buildManifestIndex(MANIFEST);
+  const unmapped = 'src/state/events.mjs'; // shared core, deliberately not manifest-mapped
+  assert.equal(idx.get(unmapped), undefined, 'sanity: events.mjs must not be in the manifest');
+  assert.equal(matchFullTrigger(unmapped, FULL_TRIGGERS), null);
+  // selectTests must still escalate it -- via 'unknown', proven end to end:
+  const result = selectTests({ changes: [{ path: unmapped, status: 'M', source: 'unstaged' }], manifest: MANIFEST, fullTriggers: FULL_TRIGGERS, fileExists: () => true });
+  assert.equal(result.decision, 'full');
+  assert.equal(result.escalations[0].ruleId, 'unknown');
+});
+
 // -- runShadow (test:related:shadow) -------------------------------------
 
 test('runShadow: related green + full green -- runs both, agree=true, patchRelatedMiss=false, status is the FULL result', () => {

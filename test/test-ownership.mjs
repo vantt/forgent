@@ -87,7 +87,6 @@ export const FULL_TRIGGERS = [
   { id: 'package-manifest', exact: 'package.json', reason: 'package manifest' },
   { id: 'package-lock', exact: 'package-lock.json', reason: 'lockfile' },
   { id: 'ci-workflows', prefix: '.github/', reason: 'CI configuration' },
-  { id: 'state-shared-core', prefix: 'src/state/', reason: 'default for any src/state/** file not explicitly leaf-mapped in the manifest -- events/store/replay/envelope/work/frontier/etc. and anything new all stay full by default' },
   { id: 'verbs-merge', prefix: 'src/verbs/merge/', reason: 'excluded from this pilot -- boundary-test mapping for the approve/merge gate was not completed with confidence' },
   { id: 'setup-registry', prefix: 'src/setup/', reason: 'install/setup/doctor config-merge and check registry' },
   { id: 'core-projection', prefix: 'core/', reason: 'generated/projection relationships not fully mapped' },
