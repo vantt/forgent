@@ -9,6 +9,43 @@ Kế hoạch này viết cho **một agent tự code không có ngữ cảnh h�
 phase file tự chứa: đọc phase file + các link trong đó là đủ làm, không cần đọc
 lại toàn bộ DISCUSSION.md 1700 dòng.
 
+## Execution boundary — bắt buộc branch/worktree riêng
+
+Kế hoạch này **không được thực hiện trên main checkout** và không được bắt đầu
+chỉ vì plan đã tồn tại. Chỉ bắt đầu khi có yêu cầu cụ thể cho kế hoạch hoặc một
+phase cụ thể.
+
+Khi được yêu cầu thực hiện:
+
+1. Tạo một branch riêng cho toàn bộ kế hoạch, ví dụ
+   `plan/260825-1841-knowledge-registry`.
+2. Main checkout chỉ dùng làm repo root/reference; mọi mutation của plan phải
+   chạy trong branch/worktree riêng.
+3. Phase có mutation dùng worktree riêng hoặc tuần tự trên plan branch; không
+   cho hai worker cùng sửa một worktree.
+4. Phase read-only có thể chạy song song, nhưng phải khai báo rõ là read-only và
+   không được ghi `.fgos/`, docs state, registry hay generated projections.
+5. Mỗi phase mutation phải có commit riêng, mô tả rõ phase và proof. Không dùng
+   `git add -A`; chỉ stage đúng file thuộc phase.
+6. Trước mỗi phase phải kiểm tra branch/worktree, clean state, dependency và
+   footprint. Nếu checkout không đúng branch/worktree hoặc dirty ngoài scope thì
+   dừng, không tự sửa hộ.
+7. Chỉ merge branch kế hoạch về main sau khi acceptance của phase tương ứng xanh;
+   chỉ đóng toàn bộ kế hoạch sau khi acceptance và retirement gates cuối cùng xanh.
+8. Không fan-out nhiều worktree cho cùng một target/topic. Phase 11 đã có thêm
+   conservation gate và rollback theo từng target; quy định này áp dụng cho mọi
+   phase mutation, không chỉ migration.
+
+| Execution mode | Ý nghĩa |
+|---|---|
+| `read-only` | Chỉ đọc/đo/inventory; không ghi source, state, registry hoặc projection |
+| `plan-branch` | Mutation tuần tự trong worktree của branch kế hoạch |
+| `isolated-worktree` | Mutation trong worktree riêng của phase/target; commit rồi trả về branch kế hoạch |
+
+Mặc định phase 01, 02, 04–10, 12 là `plan-branch`; phase 03 và các inventory
+sub-step là `read-only`; phase 11 là `isolated-worktree` theo từng target và
+không được chạy song song nếu chưa pin worktree + dependency rõ ràng.
+
 ## Vấn đề đang giải (một đoạn)
 
 `fgos-coding-compounding` viết tài liệu end-user bằng cách **tự nghĩ ra tên file
@@ -44,20 +81,20 @@ nó nằm trong frontmatter (`framework: diataxis`, `mode: explanation`).
 
 ## Phases
 
-| Phase | Nội dung | Chặn bởi | Là cổng cho |
-|---|---|---|---|
-| [01](phase-01-registry-domain-model.md) | Domain model + reducer + invariant | — | 04, 05 |
-| [02](phase-02-resolver-alias.md) | Resolver `oldPath→currentPath` | 01 | 07 |
-| [03](phase-03-classifier-inventory.md) | Classifier/inventory đọc-thuần 268 docs | — | **04, 11** |
-| [04](phase-04-bootstrap-registry.md) | Bootstrap registry từ output 03 | 01, **03** | 06 |
-| [05](phase-05-registry-verbs.md) | Verb `fgos topic *` / `fgos doc *` | 01 | 06 |
-| [06](phase-06-attest-gate.md) | `fgos knowledge attest` + gate + enforce | 04, 05 | **09** |
-| [07](phase-07-consumers-resolver.md) | `doc-sources`/`docs-index` qua resolver | 02 | **11** |
-| [08](phase-08-projections-doctor.md) | Hai ảnh cuối cùng + 8 doctor check | 01, 02 | — |
-| [09](phase-09-writer-skill.md) | Skill `fgos-coding-knowledge` registry-first | 06 | 10 |
-| [10](phase-10-writer-canary.md) | Writer canary | 09 | **11** |
-| [11](phase-11-migration.md) | Migration dry-run → apply/fold | 03, 07, **10** | 12 |
-| [12](phase-12-deprecate-compound.md) | Deprecate `fgos compound` | 11 | — |
+| Phase | Execution mode | Nội dung | Chặn bởi | Là cổng cho |
+|---|---|---|---|---|
+| [01](phase-01-registry-domain-model.md) | `plan-branch` | Domain model + reducer + invariant | — | 04, 05 |
+| [02](phase-02-resolver-alias.md) | `plan-branch` | Resolver `oldPath→currentPath` | 01 | 07 |
+| [03](phase-03-classifier-inventory.md) | `read-only` | Classifier/inventory đọc-thuần 268 docs | — | **04, 11** |
+| [04](phase-04-bootstrap-registry.md) | `plan-branch` | Bootstrap registry từ output 03 | 01, **03** | 06 |
+| [05](phase-05-registry-verbs.md) | `plan-branch` | Verb `fgos topic *` / `fgos doc *` | 01 | 06 |
+| [06](phase-06-attest-gate.md) | `plan-branch` | `fgos knowledge attest` + gate + enforce | 04, 05 | **09** |
+| [07](phase-07-consumers-resolver.md) | `plan-branch` | `doc-sources`/`docs-index` qua resolver | 02 | **11** |
+| [08](phase-08-projections-doctor.md) | `plan-branch` | Hai ảnh cuối cùng + 8 doctor check | 01, 02 | — |
+| [09](phase-09-writer-skill.md) | `plan-branch` | Skill `fgos-coding-knowledge` registry-first | 06 | 10 |
+| [10](phase-10-writer-canary.md) | `plan-branch` | Writer canary | 09 | **11** |
+| [11](phase-11-migration.md) | `isolated-worktree` | Migration dry-run → apply/fold | 03, 07, **10** | 12 |
+| [12](phase-12-deprecate-compound.md) | `plan-branch` | Deprecate `fgos compound` | 11 | — |
 
 ### Ba cổng cứng — vi phạm là hỏng dữ liệu, không phải chậm tiến độ
 

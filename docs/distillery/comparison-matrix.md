@@ -221,3 +221,18 @@ Bối cảnh quan trọng: **beehive chưng cất từ repository-harness** (cù
 | output-quality-gate | ~ review severity | ✗ | ✓ fgOS default-FAIL [→](sources/marketing-cockpit.md#rigor-scaled-evaluation) | fgOS 3-tier (free→LLM→human) theo rigor + reviewer giả định FAIL; cùng tinh thần adversarial của bee-validating nhưng ở review output |
 | metric-optimize-loop | ✗ | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#metric-driven-optimize-loop) | Không nguồn nào khác có vòng tối-ưu experiment: hard-metric HOẶC LLM-as-judge mode + hypothesis backlog + degenerate gate + disk checkpoint CP-0..5 write-then-read-back. LLM-judge mode hợp khi forgent cần chấm chất lượng output agent không có metric cứng |
 | cross-model-review | ~ (llm-judge cross-family [→](sources/marketing-cockpit.md#crossfamily-llm-judge)) | ✗ | ✓ ce [→](sources/compound-engineering-plugin.md#cross-model-peer-pass) | CE chạy peer review bằng model KHÁC cho finding Tier 2/3 (consent + recipient validation) — adversarial thật vì model không tự bắt lỗi mình. Cùng gene chống self-bias với fgOS cross-family judge nhưng áp cho code/doc/POV review, không chỉ eval |
+
+## Open Knowledge Format v0.2
+
+OKF là reference format ngoài họ harness chính; các điểm giao cắt đáng học:
+
+| Feature | OKF | Liên hệ forgent | Nhận xét |
+|---|---|---|---|
+| provenance-trust-freshness | ✓ [→](sources/okf.md#provenance-as-queryable-source-family) | ~ registry + frontmatter + evidence | Queryable provenance, verification và freshness |
+| generation-verification-separation | ✓ [→](sources/okf.md#generation-verification-separation) | ~ contribution events | Tách người tạo khỏi người xác nhận và canonical authority |
+| permissive-conformance-floor | ✓ [→](sources/okf.md#conformance-softness-with-hard-floor) | ~ semantic checks | Hard floor nhỏ; profile governance nghiêm hơn ở trên |
+| progressive-disclosure-index | ✓ [→](sources/okf.md#progressive-disclosure-index-files) | ✓ enduser index / reading map | Index là projection, không phải authority |
+| attested-computation | ✓ [→](sources/okf.md#attested-computation-contract) | ✗ direct analogue | Mẫu cho executable proof claims |
+| bounded-untrusted-enrichment | ✓ [→](sources/okf.md#bounded-web-enrichment) | ✓ distill boundary | Seed, allowlist, page cap và tool enforcement |
+| producer-consumer-contract | ✓ [→](sources/okf.md#producer-consumer-separation) | ✓ Knowledge/Context split | Format và workflow/projection là hai boundary khác nhau |
+| consumer-contract-tolerance | ✓ [→](sources/okf.md#consumer-tolerance-contract-tests) | ~ doc tests | Test permissive behavior và compatibility fallback |
