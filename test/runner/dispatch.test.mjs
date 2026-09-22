@@ -2836,7 +2836,13 @@ test('the "decide" CLI entry point (node src/runner/dispatch.mjs decide <executo
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', 'no-such-executor-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
   const parsed = JSON.parse(result.stdout);
-  assert.equal(parsed.mechanism, 'out-of-process');
+  // H6b (D1, 2026-09-20 ACCEPTED): an unregistered positional executorId is
+  // now refused the same way an unregistered --for purpose already was --
+  // "unavailable", never a silently-guessed native-first mechanism for a
+  // name that resolves to nothing real. (`reasonCodes` is not part of the
+  // CLI's printed {mechanism} JSON shape -- verified separately at the
+  // compileDispatchPlan level, where the full plan object is asserted.)
+  assert.equal(parsed.mechanism, 'unavailable');
 });
 
 test('the "decide" CLI entry point exits non-zero with a usage message when executorId is omitted', () => {
@@ -5266,11 +5272,16 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
   assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false });
-  // The SAME unregistered executorId, looked up by NAME (not --work), keeps
-  // its pre-D4 byte-identical "no executor -> out-of-process" behavior --
-  // only the work-item-shaped lookup gets the native-first default.
+  // The SAME unregistered executorId, looked up by NAME (not --work), used
+  // to keep its pre-D4 byte-identical "no executor -> out-of-process"
+  // behavior. H6b (D1, 2026-09-20 ACCEPTED) changed that: a bare
+  // positional executorId that names nothing registered is now refused
+  // outright (same rule --for already applied) rather than silently
+  // guessed at -- only the work-item-shaped lookup (byWork, above) still
+  // gets the native-first default, since a work item's OWN executorId is
+  // derived, not a caller-typed name that could be a typo.
   const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byName, { mechanism: 'out-of-process', configured: false });
+  assert.deepEqual(byName, { mechanism: 'unavailable', configured: false });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.executors entry -- never claims in-process dishonestly', async () => {

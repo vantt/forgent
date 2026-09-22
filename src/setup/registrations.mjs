@@ -83,7 +83,7 @@ import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.
 import { parseFrontmatter } from '../report/frontmatter.mjs';
 import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
 import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
-import { FlowDefinitionError } from '../runner/definitions/schema.mjs';
+import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
 import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -852,10 +852,13 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
             if (typeof op.policy !== 'object' || op.policy === null || Array.isArray(op.policy)) {
               problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy must be an object`);
             } else {
-              const ALLOWED_POLICY_KEYS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility']);
-              const disallowedKeys = Object.keys(op.policy).filter((k) => !ALLOWED_POLICY_KEYS.has(k));
+              // M12: reads the ONE allow-list PolicyPatch validation itself
+              // enforces (schema.mjs's POLICY_PATCH_FIELDS) instead of a
+              // second, hand-copied Set that had already drifted (missing
+              // preferInvocation/repeatMode).
+              const disallowedKeys = Object.keys(op.policy).filter((k) => !POLICY_PATCH_FIELDS.has(k));
               if (disallowedKeys.length > 0) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...ALLOWED_POLICY_KEYS].join(', ')})`);
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...POLICY_PATCH_FIELDS].join(', ')})`);
               }
               if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
                 problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
