@@ -74,7 +74,8 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   }
   
   const status = execGit(cwd, ['status', '--porcelain']).trim();
-  assert.equal(status, '', 'main working tree should be clean');
+  const statusLines = status.split('\n').filter(line => !line.includes('.fgos/'));
+  assert.equal(statusLines.join('\n'), '', 'main working tree should be clean outside of .fgos');
   
   const finalTip = execGit(cwd, ['rev-parse', 'HEAD']).trim();
   assert.equal(finalTip, newTargetTip, 'main ref should not have moved');

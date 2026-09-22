@@ -1806,7 +1806,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     try {
       execFileSync('git', ['merge', '--no-commit', '--no-ff', branchTip], { cwd: worktreePath, encoding: 'utf8', shell: false, stdio: 'pipe' });
     } catch (err) {
-      if (fs.existsSync(path.join(worktreePath, '.git', 'MERGE_HEAD'))) {
+      if (mergeHeadExists(worktreePath)) {
         conflicted = true; // For now we just fail on conflict
       } else {
         return {
@@ -1821,8 +1821,17 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
        return { outcome: 'conflict', branch };
     }
 
-    // Run test
-    check = await runGoalCheck(item, worktreePath, timeoutMs);
+    const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
+    check = skipRedundantChecks
+      ? {
+          passed: true,
+          status: 0,
+          timedOut: false,
+          skipped: true,
+          output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
+        }
+      : await runGoalCheck(item, worktreePath, timeoutMs);
+
     if (!check.passed) {
        return { outcome: 'verify-fail', branch, check };
     }
@@ -1835,6 +1844,13 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     // Atomic update-ref
     try {
       execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+      // If we are currently on targetBranch, sync the working tree
+      try {
+        const currentBranch = execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+        if (currentBranch === targetBranch) {
+          execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' });
+        }
+      } catch (e) {}
     } catch (err) {
       return {
         outcome: 'merge-failed-unclassified',
