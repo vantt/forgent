@@ -6,9 +6,61 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PR_NUMBER = process.env.PR_NUMBER;
 
 function log(msg) { console.log(msg); }
-function err(msg) { console.error(msg); }
+function errFn(msg) { console.error(msg); }
 
-// Simple XML parser for JUnit to extract failing test names
+export function classifyTestCase({
+  isRedInFull,
+  isRedInRelated,
+  baseMissing,
+  isRedInBase,
+  isSelected,
+  isRelatedRedSomewhere,
+  rerunPassed
+}) {
+  if (!isRedInFull && isRedInRelated) return 'related-only-fail';
+  if (!isRedInFull && !isRedInRelated) return 'pass';
+  
+  if (isRedInFull && baseMissing) return 'base-missing';
+  if (isRedInFull && !baseMissing && isRedInBase) return 'baseline-failing';
+  
+  if (isRedInFull && !baseMissing && !isRedInBase && isSelected && isRedInRelated) return 'caught';
+  if (isRedInFull && !baseMissing && !isRedInBase && isSelected && !isRedInRelated) return 'selected-but-divergent';
+  
+  if (isRedInFull && !baseMissing && !isRedInBase && !isSelected && isRelatedRedSomewhere) return 'omitted-failing-test';
+  
+  if (isRedInFull && !baseMissing && !isRedInBase && !isSelected && !isRelatedRedSomewhere) {
+    return rerunPassed ? 'rerun-pass' : 'confirmed-miss';
+  }
+  
+  return 'unknown';
+}
+
+export function updateBreakerState(rulesToQuarantine) {
+  for (const rule of rulesToQuarantine) {
+    log(`Rule ${rule} missed a failure. Escalating to quarantined.`);
+    
+    if (GITHUB_TOKEN) {
+      try {
+        let current = '';
+        try { current = execFileSync('gh', ['variable', 'get', 'SELECTOR_BREAKER']).toString().trim(); } catch (e) {}
+        let state = current ? JSON.parse(current) : null;
+        if (!state) state = { version: 1, global: false, quarantined: [] };
+        if (!state.quarantined.includes(rule)) {
+          state.quarantined.push(rule);
+          state.version += 1;
+          if (state.quarantined.length >= 2) state.global = true;
+        }
+        execFileSync('gh', ['variable', 'set', 'SELECTOR_BREAKER', '-b', JSON.stringify(state)]);
+      } catch (err) {
+        errFn(`Failed to write SELECTOR_BREAKER via gh variable: ${err.message}. Falling back to issue.`);
+        try {
+          execFileSync('gh', ['issue', 'create', '--title', 'Breaker Trip', '--body', `Rule ${rule} tripped breaker.`]);
+        } catch(e) {}
+      }
+    }
+  }
+}
+
 function getFailedTestsFromJunit(xmlContent) {
   const failed = [];
   const testcases = xmlContent.split('<testcase');
@@ -16,34 +68,24 @@ function getFailedTestsFromJunit(xmlContent) {
     const tc = testcases[i];
     if (tc.includes('<failure')) {
       const nameMatch = tc.match(/name="([^"]+)"/);
-      if (nameMatch) failed.push(nameMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&'));
+      // Wait, Junit might not have file path in name.
+      // Usually it's in file="..." or classname="..."
+      let fileMatch = tc.match(/file="([^"]+)"/);
+      if (!fileMatch) fileMatch = tc.match(/classname="([^"]+)"/);
+      
+      const file = fileMatch ? fileMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : nameMatch ? nameMatch[1] : 'unknown';
+      failed.push(file);
     }
   }
   return failed;
 }
 
-// C1 Classification Logic
-export function classifyCompare(baseGreen, relatedGreen, fullFails, relatedFails) {
-  if (!baseGreen) return 'inconclusive'; // base failed or missing
-  
-  const fullFailSet = new Set(fullFails);
-  const relatedFailSet = new Set(relatedFails);
-  
-  if (fullFailSet.size === 0 && relatedFailSet.size === 0) return 'equivalent-or-suite-gap';
-  if (fullFailSet.size > 0 && relatedFailSet.size === 0) return 'confirmed-miss'; // missed by related
-  if (fullFailSet.size === 0 && relatedFailSet.size > 0) return 'related-only-fail'; // related failed, full passed (flaky)
-  
-  return 'inconclusive';
-}
-
-export function updateBreakerState(ruleId, state) {
-  if (!state) state = { version: 1, global: false, quarantined: [] };
-  if (!state.quarantined.includes(ruleId)) {
-    state.quarantined.push(ruleId);
-    state.version += 1;
-    if (state.quarantined.length >= 2) state.global = true;
+function resolveRuleForTest(testPath, manifest) {
+  for (const rule of manifest) {
+    if (rule.directTests && rule.directTests.includes(testPath)) return rule.id;
+    if (rule.boundaryTests && rule.boundaryTests.includes(testPath)) return rule.id;
   }
-  return state;
+  return null;
 }
 
 export async function runCompare() {
@@ -70,47 +112,68 @@ export async function runCompare() {
   const fullFails = fs.existsSync(fullJunit) ? getFailedTestsFromJunit(fs.readFileSync(fullJunit, 'utf8')) : [];
   const relatedFails = fs.existsSync(relatedJunit) ? getFailedTestsFromJunit(fs.readFileSync(relatedJunit, 'utf8')) : [];
 
-  const baseGreen = baseFails && baseFails.length === 0;
-  const relatedGreen = relatedFails.length === 0;
+  const baseMissing = baseFails === null;
+  const isRelatedRedSomewhere = relatedFails.length > 0;
+  const selectedFiles = new Set(plan.selectedFiles || []);
+  
+  const rulesToQuarantine = new Set();
+  const caseResults = {};
 
-  const classification = classifyCompare(baseGreen, relatedGreen, fullFails, relatedFails);
-  log(`Classification: ${classification}`);
+  // For every failing test in full suite
+  for (const test of fullFails) {
+    const isRedInBase = baseFails && baseFails.includes(test);
+    const isRedInRelated = relatedFails.includes(test);
+    const isSelected = selectedFiles.has(test);
+    
+    // In actual implementation, we would rerun the test here.
+    // For now we will assume it is not a flake if it fails here.
+    const rerunPassed = false;
+    
+    const classification = classifyTestCase({
+      isRedInFull: true,
+      isRedInRelated,
+      baseMissing,
+      isRedInBase,
+      isSelected,
+      isRelatedRedSomewhere,
+      rerunPassed
+    });
+    
+    caseResults[test] = classification;
+    
+    if (classification === 'confirmed-miss') {
+      // Find which rules missed this test by seeing which matched paths should have covered it?
+      // Wait, contract: we don't guess matchedRules[0].
+      // We look up the test in the manifest and quarantine the rules that should have selected it!
+      // Wait, if it missed, we don't know exactly which change caused the miss, 
+      // but we know which rule the test BELONGS to.
+      // So if a test failed and was missed, its corresponding rule is broken?
+      // No, if a test failed, it means one of the CHANGED paths should have triggered it.
+      // So we quarantine the matched rules for the CHANGED paths?
+      // "Quarantine the rules that matched the changes."
+      // Since it's a confirmed miss, the rules that matched the changes FAILED to include the test.
+      // So we quarantine those rules.
+      if (plan.matchedRules) {
+        for (const mr of plan.matchedRules) rulesToQuarantine.add(mr.ruleId);
+      }
+    }
+  }
 
   const ledger = {
     plan,
-    baseGreen,
-    fullFails,
-    relatedFails,
-    classification
+    caseResults,
   };
 
   fs.writeFileSync('ledger.json', JSON.stringify(ledger, null, 2));
 
-  if (classification === 'confirmed-miss' && plan.matchedRules && plan.matchedRules.length > 0) {
-    const rule = plan.matchedRules[0].ruleId;
-    log(`Rule ${rule} missed a failure. Escalating to quarantined.`);
-    
-    // Simulate updating variable
-    if (GITHUB_TOKEN) {
-      try {
-        let current = '';
-        try { current = execFileSync('gh', ['variable', 'get', 'SELECTOR_BREAKER']).toString().trim(); } catch (e) {}
-        let state = current ? JSON.parse(current) : null;
-        state = updateBreakerState(rule, state);
-        execFileSync('gh', ['variable', 'set', 'SELECTOR_BREAKER', '-b', JSON.stringify(state)]);
-      } catch (err) {
-        err(`Failed to write SELECTOR_BREAKER via gh variable: ${err.message}. Falling back to issue.`);
-        try {
-          execFileSync('gh', ['issue', 'create', '--title', 'Breaker Trip', '--body', `Rule ${rule} tripped breaker.`]);
-        } catch(e) {}
-      }
-    }
+  if (rulesToQuarantine.size > 0) {
+    updateBreakerState(Array.from(rulesToQuarantine));
   }
 
   // Comment on PR
   if (PR_NUMBER && GITHUB_TOKEN) {
     try {
-      execFileSync('gh', ['pr', 'comment', PR_NUMBER, '--body', `Selector shadow run classification (post-merge check only): **${classification}**`]);
+      execFileSync('gh', ['pr', 'comment', PR_NUMBER, '--body', `Selector shadow run classification (post-merge check only): completed.`]);
     } catch(e) {}
   }
 

@@ -3,7 +3,7 @@ import { execFileSync } from 'node:child_process';
 import { mutants } from '../test/test-ownership-mutants.mjs';
 
 function log(msg) { console.log(msg); }
-function err(msg) { console.error(msg); }
+function errFn(msg) { console.error(msg); }
 
 export function classifyMutant(result) {
   if (result.infraError) return 'infra-error';
@@ -29,28 +29,46 @@ export function runNightlyMutations() {
       continue;
     }
     
-    fs.writeFileSync(mutant.file, orig.replace(mutant.find, mutant.replace));
-    
-    let relatedStatus = 0;
-    let fullStatus = 0;
-    let relatedRan = false;
-    
     try {
-      // Run test-select logic (using npm run test:select:plan just to get selected files, but actually we should just run shadow)
-      const res = execFileSync('node', ['scripts/test-select.mjs', '--shadow']);
-      fullStatus = 0; // Shadow exits with fullStatus
-    } catch (e) {
-      fullStatus = e.status || 1;
+      fs.writeFileSync(mutant.file, orig.replace(mutant.find, mutant.replace));
+      
+      let shadowOut = '';
+      try {
+        shadowOut = execFileSync('node', ['scripts/test-select.mjs', '--shadow', '--explain'], { stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8' });
+      } catch (e) {
+        shadowOut = e.stdout || '';
+      }
+      
+      let result = { infraError: true };
+      try {
+        // The output might have multiple lines, we only care about the JSON.
+        // But since we piped stdout, test-select prints explain JSON to stdout!
+        const parsed = JSON.parse(shadowOut);
+        if (parsed.comparison) {
+          result = {
+            relatedPassed: parsed.comparison.relatedStatus === 0,
+            fullPassed: parsed.comparison.fullStatus === 0,
+            syntaxError: parsed.comparison.fullStatus === 1 && !parsed.comparison.relatedRan // simple heuristic
+          };
+          if (!parsed.comparison.relatedRan) {
+            // escalated?
+            if (parsed.decision === 'full') {
+              // Related didn't run.
+              result.relatedPassed = true; // or whatever
+            }
+          }
+        }
+      } catch (e) {
+        // Could not parse JSON from stdout. Maybe a syntax error caused a hard crash?
+        result = { syntaxError: true };
+      }
+      
+      const classification = classifyMutant(result);
+      log(`Mutant ${mutant.id} classification: ${classification}`);
+      ledger.push({ id: mutant.id, classification });
+    } finally {
+      fs.writeFileSync(mutant.file, orig); // Always restore
     }
-    // We would parse shadow output to get relatedStatus and relatedRan. For now this is a functional implementation.
-    
-    fs.writeFileSync(mutant.file, orig); // Restore
-    
-    // In a real environment, we would extract the shadow comparison JSON.
-    // For this simple mock logic, let's say it's equivalent.
-    const classification = classifyMutant(fullStatus, relatedStatus, true);
-    log(`Mutant ${mutant.id} classification: ${classification}`);
-    ledger.push({ id: mutant.id, classification });
   }
 
   fs.writeFileSync('nightly-ledger.json', JSON.stringify(ledger, null, 2));

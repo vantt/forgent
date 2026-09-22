@@ -234,7 +234,7 @@ export function selectTests({
   }
 
   
-  if (!breakerState || (typeof breakerState === 'string' && breakerState.includes('invalid'))) {
+  if (!breakerState || (typeof breakerState === 'string' && breakerState.includes('breaker-unreadable'))) {
     return {
       decision: 'full',
       reason: 'breaker-unreadable',
@@ -460,12 +460,17 @@ if (process.argv[1] === __filename) {
   const explainRequested = args.includes('--explain');
   const shadowRequested = args.includes('--shadow');
 
-  let breakerState = null;
+  let breakerState = { version: 1, quarantined: [], global: false };
   if (process.env.SELECTOR_BREAKER) {
     try {
-      breakerState = JSON.parse(process.env.SELECTOR_BREAKER);
+      const parsed = JSON.parse(process.env.SELECTOR_BREAKER);
+      if (typeof parsed === 'object' && parsed !== null && 'version' in parsed) {
+        breakerState = parsed;
+      } else {
+        breakerState = 'breaker-unreadable';
+      }
     } catch (e) {
-      breakerState = 'invalid';
+      breakerState = 'breaker-unreadable';
     }
   }
 
@@ -480,15 +485,20 @@ if (process.argv[1] === __filename) {
     const output = {
       base,
       mergeBase: collected.mergeBase,
-      breakerVersion: breakerState?.version ?? null,
+      breakerVersion: typeof breakerState === 'object' ? breakerState.version : null,
       changedPaths: collected.changes,
       decision: selection.decision,
       reason: selection.reason,
       matchedRules: selection.matched,
       escalations: selection.escalations,
-      selectedFiles: selection.selectedFiles
+      selectedFiles: selection.selectedFiles,
+      sha: process.env.GITHUB_SHA || 'unknown',
+      manifestHash: (await import('node:crypto')).createHash('sha256').update(JSON.stringify(MANIFEST)).digest('hex'),
+      selectorVersion: 1,
+      os: process.platform,
+      node: process.version
     };
-    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\n');
+    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\\n');
     console.error(`test-select (post-merge check only): wrote plan to ${planOut}, decision=${selection.decision}`);
     process.exit(0);
   }

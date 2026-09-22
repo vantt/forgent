@@ -17,7 +17,7 @@ function getFiles(dir, files = []) {
 }
 
 async function generateCoverageMap() {
-  console.log("Running coverage-map generator (static analysis fallback)...");
+  console.log("Running coverage-map generator (static + NODE_V8_COVERAGE)...");
   
   const repoRoot = process.cwd();
   const testFiles = getFiles(path.join(repoRoot, 'test'));
@@ -83,6 +83,43 @@ async function generateCoverageMap() {
 
   // Also include the missing rule from reviewer: intake-verify-pattern-check
   // (We'll verify if it gets added by transitive closure, if not, it means the tests don't statically import it, so we might need V8 coverage. But static closure should be better).
+
+  
+  const coverageDir = process.env.NODE_V8_COVERAGE;
+  if (coverageDir && fs.existsSync(coverageDir)) {
+    console.log("Merging NODE_V8_COVERAGE data...");
+    const covFiles = fs.readdirSync(coverageDir).filter(f => f.endsWith('.json'));
+    for (const file of covFiles) {
+      const covPath = path.join(coverageDir, file);
+      try {
+        const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));
+        // Find the test file in this coverage profile
+        let testScript = null;
+        for (const res of data.result || []) {
+          if (res.url.includes('/test/') && (res.url.endsWith('.test.mjs') || res.url.endsWith('.mjs'))) {
+            const urlObj = new URL(res.url);
+            testScript = path.relative(repoRoot, urlObj.pathname).replace(/\\/g, '/');
+            break;
+          }
+        }
+        
+        if (testScript) {
+          for (const res of data.result || []) {
+            if (res.url.includes('/src/') || res.url.includes('/bin/')) {
+              const urlObj = new URL(res.url);
+              const srcRel = path.relative(repoRoot, urlObj.pathname).replace(/\\/g, '/');
+              if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {
+                if (!mapping[srcRel]) mapping[srcRel] = new Set();
+                mapping[srcRel].add(testScript);
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse coverage file", file, e);
+      }
+    }
+  }
 
   // Convert Sets to Arrays
   const finalMapping = {};
