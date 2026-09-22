@@ -19,7 +19,9 @@ Units **I02** and **I03** unify the Phase 01 RunResult truth contract (`9049e611
   - **R5 (Superseded Work Product Preservation)**: Evaluated and chosen disposition: **`IMPLEMENT`**. At settlement barriers in `assignment-runner.mjs`, if a controller is superseded mid-flight (`!isRunControlCurrent(...)`), its normalized output is saved atomically as `result.superseded.json` before raising `RunnerConfigError('run-control-superseded')`. Authoritative `result.json` is never written or overwritten, and `markRunSettled` is never called.
 - **Unit I03 (Verification Matrix)**:
   - Added targeted mutation-sensitive tests in `coordination-session-engine.test.mjs` and `coordination-aggregation.test.mjs`.
-  - Verified the entire 11-suite matrix with **315 tests passing, 0 failing**.
+  - **Historical initial matrix** (pre-F-01 fix at commit `2681b389`): **11 suites, 315 tests passing, 0 failing** (74 pass in `assignment-dispatch.test.mjs`).
+  - **Post-fix verification matrix** (post-F-01 resolution at commit `f835c215` / `72894c98` with the new reconciliation barrier race test): **11 suites, 317 tests passing, 0 failing** (75 pass in `assignment-dispatch.test.mjs`).
+  - **Reviewer smoke rerun** (independently verified at commits `81c56e11`, `510f35f5`, `4362bfec`): `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
   - Verified GitNexus impact analysis: **LOW risk, 0 affected execution flows**.
 
 ---
@@ -202,19 +204,23 @@ Running `node /home/vantt/projects/forgentX/.gitnexus/run.cjs detect-changes --s
 
 To ensure exact consistency and clarity across all review and doer records:
 
-- **Full Doer Verification Matrix**: **11 suites, 317 tests passing, 0 failing**.
-  - `test/runner/run-result-v2.test.mjs` (13 tests)
-  - `test/runner/assignment-runresult.test.mjs` (31 tests)
-  - `test/runner/assignment-dispatch.test.mjs` (75 tests, including two-OS-process reconciliation barrier race test)
-  - `test/runner/coordination-session-engine.test.mjs` (23 tests)
-  - `test/runner/coordination-research-fan-out.test.mjs` (12 tests)
-  - `test/runner/coordination-recovery-and-quorum.test.mjs` (46 tests)
-  - `test/runner/coordination-replay.test.mjs` (29 tests)
-  - `test/runner/coordination-legacy-schema-compatibility.test.mjs` (3 tests)
-  - `test/runner/coordination-stale-action-proof.test.mjs` (22 tests — note: resolved count discrepancy from 21)
-  - `test/runner/coordination-phase2-concurrency.test.mjs` (16 tests)
-  - `test/runner/coordination-aggregation.test.mjs` (47 tests)
-- **Smoke Suite**: `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
+- **Historical Initial Matrix** (initial candidate `0c17bd62` / `2681b389`):
+  - **11 suites, 315 tests pass / 0 fail** (74 tests in `assignment-dispatch.test.mjs`).
+- **Post-Fix Verification Matrix** (candidate `f835c215` / `72894c98` after F-01 resolution):
+  - **11 suites, 317 tests passing, 0 failing**:
+    - `test/runner/run-result-v2.test.mjs` (13 tests)
+    - `test/runner/assignment-runresult.test.mjs` (31 tests)
+    - `test/runner/assignment-dispatch.test.mjs` (**75 tests**, including the new two-OS-process reconciliation barrier race test)
+    - `test/runner/coordination-session-engine.test.mjs` (23 tests)
+    - `test/runner/coordination-research-fan-out.test.mjs` (12 tests)
+    - `test/runner/coordination-recovery-and-quorum.test.mjs` (46 tests)
+    - `test/runner/coordination-replay.test.mjs` (29 tests)
+    - `test/runner/coordination-legacy-schema-compatibility.test.mjs` (3 tests)
+    - `test/runner/coordination-stale-action-proof.test.mjs` (22 tests — note: resolved count discrepancy from 21)
+    - `test/runner/coordination-phase2-concurrency.test.mjs` (16 tests)
+    - `test/runner/coordination-aggregation.test.mjs` (47 tests)
+- **Reviewer Smoke Suite Rerun** (independently verified at commits `81c56e11`, `510f35f5`, and `4362bfec`):
+  - Command: `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
 - **Focused Fix Rechecks**:
   - 6 R5 concurrency, settlement authority & reconciliation barrier tests in `assignment-dispatch.test.mjs` (100% pass).
   - 76 run-lock tests in `test/runner/main-checkout-lock.test.mjs` (100% pass).
@@ -246,22 +252,27 @@ To ensure exact consistency and clarity across all review and doer records:
 ## 9. Next Eligible Units & Integration Disposition
 
 - **Candidate Branch**: `coordination-integration-i02-result-truth`
-- **Candidate Branch Tip**: `81c56e11` (prior tip `46e09c30`)
-- **Code Fix SHA**: `f835c215` (alternate-writer CAS settlement & reconciliation barrier race proof)
+- **Candidate Branch Tip**: `510f35f5` (status-recording commit; prior tips `81c56e11`, `46e09c30`, code fix `f835c215`)
+- **Code Fix SHA**: `f835c215` (alternate-writer CAS settlement & reconciliation barrier race proof; merged at `72894c98`)
 - **Candidate Commit Lineage**:
   - `0c17bd62` (initial I02/I03 reconciliation and R5 implementation)
   - `2681b389` (settlement authority TOCTOU fix for commitRunSettlement)
   - `f835c215` (code fix resolving F-01 alternate writers and TOCTOU barrier race)
   - `46e09c30` (cross-plan status synchronization for F-02)
   - `81c56e11` (cross-plan status synchronization for F-02-REOPEN)
-- **Prior Code Baseline / Integration**: `2b8f7aeb` (clean integration of candidate branch tip `46e09c30`)
-- **Current Local Main Tip**: `500b6e1b` (clean integration of candidate branch tip `81c56e11`)
-- **Local Main Integration Lineage**:
+  - `510f35f5` (cross-plan status synchronization for F-02-REOPEN-2)
+- **Code Integration Baseline**: `72894c98` (merge of code fix `f835c215`)
+- **Status-Recording Integration Lineage**:
   - `73845314` (initial merge of `0c17bd62`)
   - `dca4efd5` (merge of `2681b389`)
   - `72894c98` (merge of code fix `f835c215`)
-  - `2b8f7aeb` (merge of candidate branch tip `46e09c30`)
-  - `500b6e1b` (merge of candidate branch tip `81c56e11`)
-- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; local main is ahead of origin by 8 commits; gate requires independent re-review approval before push).
-- **Verification Matrix**: **11 suites, 317 tests pass / 0 fail** (focused matrix: 220 9-suite + 22 stale-action + 75 assignment-dispatch); 76 pass in run-lock; 20 pass in cli-spawn reconciliation.
+  - `2b8f7aeb` (merge of status-recording candidate tip `46e09c30`)
+  - `500b6e1b` (merge of status-recording candidate tip `81c56e11`)
+  - `4362bfec` (merge of status-recording candidate tip `510f35f5`)
+- **Current Local Main Tip**: `4362bfec` (merge of status-recording candidate tip `510f35f5`)
+- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; local main is ahead of origin by 10 commits; gate requires independent re-review approval before push).
+- **Verification Matrix**:
+  - **Historical initial matrix**: **11 suites, 315 tests pass / 0 fail** (commit `2681b389`).
+  - **Post-fix verification matrix**: **11 suites, 317 tests pass / 0 fail** (commit `f835c215` / `72894c98`: focused matrix 220 9-suite + 22 stale-action + 75 assignment-dispatch); 76 pass in run-lock; 20 pass in cli-spawn reconciliation.
+  - **Reviewer smoke rerun**: **75 pass / 0 fail** (`assignment-dispatch.test.mjs`).
 - **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.
