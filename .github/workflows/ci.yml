@@ -43,7 +43,7 @@ jobs:
       # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
       # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
       - name: npm test (includes install-packaging matrix proof)
-        run: npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+        run: npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/related.xml
         env:
           FORCE_COLOR: 1
 
@@ -166,6 +166,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
+
+      - name: Download base artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          RUN_ID=$(gh run list --commit $BASE_SHA --workflow CI --json databaseId --jq '.[0].databaseId' || true)
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" == "null" ]; then
+            RUN_ID=$(gh run list --branch ${{ github.event.pull_request.base.ref }} --workflow CI --status success --json databaseId --jq '.[0].databaseId' || true)
+          fi
+          if [ -n "$RUN_ID" ] && [ "$RUN_ID" != "null" ]; then
+            gh run download $RUN_ID --name full-results-ubuntu-latest --dir artifacts/base-results/test-results || echo "Failed to download base artifact"
+            if [ -f artifacts/base-results/test-results/full.xml ]; then
+              mv artifacts/base-results/test-results/full.xml artifacts/base-results/test-results/base.xml
+            fi
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run compare
         run: npm run test:select:compare

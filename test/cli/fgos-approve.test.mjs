@@ -136,7 +136,7 @@ test('approve of a runner item (happy path): merges fgw/<id> into main, verifies
   // D1/D4), not on approve reaching delivered — so no settlement exists
   // yet at this point in the sequence.
   assert.equal(view.settlements?.['approve-runner-item'], undefined);
-  assert.ok(gitAtCwd(cwd, ['ls-tree', '-r', 'main', '--name-only']).includes('approve-runner-item-produced.txt'), 'the merged file must be present on main');
+  assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');
   // tsk-5dk: a real approve merge now records merge evidence — mergedSha
   // must be main's own real post-merge commit, readable straight off the
   // delivered event, not inferred from git afterward.

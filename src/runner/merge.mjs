@@ -1870,6 +1870,15 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     // Atomic update-ref
     try {
       execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+      if (currentBranch === targetBranch) {
+        try {
+          execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+        } catch (e) {
+          // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
+          // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
+        }
+      }
 
     } catch (err) {
       return {

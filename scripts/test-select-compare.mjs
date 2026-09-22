@@ -15,8 +15,10 @@ export function classifyTestCase({
   isRedInBase,
   isSelected,
   isRelatedRedSomewhere,
-  rerunPassed
+  rerunPassed,
+  isOsSpecific
 }) {
+  if (isOsSpecific) return 'os-specific';
   if (!isRedInFull && isRedInRelated) return 'related-only-fail';
   if (!isRedInFull && !isRedInRelated) return 'pass';
   
@@ -35,28 +37,36 @@ export function classifyTestCase({
   return 'unknown';
 }
 
-export function updateBreakerState(rulesToQuarantine) {
-  for (const rule of rulesToQuarantine) {
-    log(`Rule ${rule} missed a failure. Escalating to quarantined.`);
-    
-    if (GITHUB_TOKEN) {
-      try {
-        let current = '';
-        try { current = execFileSync('gh', ['variable', 'get', 'SELECTOR_BREAKER']).toString().trim(); } catch (e) {}
-        let state = current ? JSON.parse(current) : null;
-        if (!state) state = { version: 1, global: false, quarantined: [] };
+export function updateBreakerState(rulesToQuarantine, global = false) {
+  if (GITHUB_TOKEN) {
+    try {
+      let current = '';
+      try { current = execFileSync('gh', ['variable', 'get', 'SELECTOR_BREAKER']).toString().trim(); } catch (e) {}
+      let state = current ? JSON.parse(current) : null;
+      if (!state) state = { version: 1, global: false, quarantined: [] };
+      let changed = false;
+      if (global && !state.global) {
+        state.global = true;
+        changed = true;
+        log('Unattributed miss detected. Escalating to global quarantine.');
+      }
+      for (const rule of rulesToQuarantine) {
+        log(`Rule ${rule} missed a failure. Escalating to quarantined.`);
         if (!state.quarantined.includes(rule)) {
           state.quarantined.push(rule);
-          state.version += 1;
+          changed = true;
           if (state.quarantined.length >= 2) state.global = true;
         }
-        execFileSync('gh', ['variable', 'set', 'SELECTOR_BREAKER', '-b', JSON.stringify(state)]);
-      } catch (err) {
-        errFn(`Failed to write SELECTOR_BREAKER via gh variable: ${err.message}. Falling back to issue.`);
-        try {
-          execFileSync('gh', ['issue', 'create', '--title', 'Breaker Trip', '--body', `Rule ${rule} tripped breaker.`]);
-        } catch(e) {}
       }
+      if (changed) {
+        state.version += 1;
+        execFileSync('gh', ['variable', 'set', 'SELECTOR_BREAKER', '-b', JSON.stringify(state)]);
+      }
+    } catch (err) {
+      errFn(`Failed to write SELECTOR_BREAKER via gh variable: ${err.message}. Falling back to issue.`);
+      try {
+        execFileSync('gh', ['issue', 'create', '--title', 'Breaker Trip', '--body', `Miss tripped breaker. Global: ${global}. Rules: ${rulesToQuarantine.join(', ')}`]);
+      } catch(e) {}
     }
   }
 }
@@ -71,8 +81,12 @@ function getFailedTestsFromJunit(xmlContent) {
       let fileMatch = tc.match(/file="([^"]+)"/);
       if (!fileMatch) fileMatch = tc.match(/classname="([^"]+)"/);
       const name = nameMatch ? nameMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : 'unknown';
-      const file = fileMatch ? fileMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : 'unknown';
-      failed.push({ name, file });
+      let filePath = fileMatch ? fileMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : 'unknown';
+      const repoRoot = process.cwd();
+      if (filePath.startsWith(repoRoot)) {
+        filePath = filePath.substring(repoRoot.length + 1).replace(/\\/g, '/');
+      }
+      failed.push({ name, file: filePath });
     }
   }
   return failed;
@@ -96,18 +110,30 @@ export async function runCompare() {
   }
 
   const baseJunit = 'artifacts/base-results/test-results/base.xml';
-  const fullJunit = 'artifacts/full-results-ubuntu-latest/full.xml';
+  const fullJunitUbuntu = 'artifacts/full-results-ubuntu-latest/full.xml';
+  const fullJunitMacos = 'artifacts/full-results-macos-latest/full.xml';
+  const fullJunitWindows = 'artifacts/full-results-windows-latest/full.xml';
   const relatedJunit = 'artifacts/related-results/related.xml';
 
   const baseFails = fs.existsSync(baseJunit) ? getFailedTestsFromJunit(fs.readFileSync(baseJunit, 'utf8')) : null;
-  const fullFails = fs.existsSync(fullJunit) ? getFailedTestsFromJunit(fs.readFileSync(fullJunit, 'utf8')) : [];
+  const fullFailsUbuntu = fs.existsSync(fullJunitUbuntu) ? getFailedTestsFromJunit(fs.readFileSync(fullJunitUbuntu, 'utf8')) : [];
+  const fullFailsMacos = fs.existsSync(fullJunitMacos) ? getFailedTestsFromJunit(fs.readFileSync(fullJunitMacos, 'utf8')) : [];
+  const fullFailsWindows = fs.existsSync(fullJunitWindows) ? getFailedTestsFromJunit(fs.readFileSync(fullJunitWindows, 'utf8')) : [];
   const relatedFails = fs.existsSync(relatedJunit) ? getFailedTestsFromJunit(fs.readFileSync(relatedJunit, 'utf8')) : [];
+
+  // Combine all OS failures for iteration
+  const allFullFailsMap = new Map();
+  [...fullFailsUbuntu, ...fullFailsMacos, ...fullFailsWindows].forEach(f => {
+    allFullFailsMap.set(f.name, f);
+  });
+  const fullFails = Array.from(allFullFailsMap.values());
 
   const baseMissing = baseFails === null;
   const isRelatedRedSomewhere = relatedFails.length > 0;
   const selectedFiles = new Set(plan.selectedFiles || []);
   
   const rulesToQuarantine = new Set();
+  let quarantineGlobal = false;
   const caseResults = {};
 
   // For every failing test in full suite
@@ -116,9 +142,16 @@ export async function runCompare() {
     const isRedInRelated = relatedFails.some(t => t.name === test.name);
     const isSelected = selectedFiles.has(test.file);
     
-    // In actual implementation, we would rerun the test here.
-    // For now we will assume it is not a flake if it fails here.
-    const rerunPassed = false; // TODO: implement rerun to detect flakes
+    let rerunPassed = false;
+    if (!isSelected) {
+      try {
+        const { execSync } = require('child_process');
+        execSync(`node --test "${test.file}" --test-name-pattern="^${test.name}$"`, { stdio: 'ignore' });
+        rerunPassed = true;
+      } catch (e) {
+        rerunPassed = false;
+      }
+    }
     
     const classification = classifyTestCase({
       isRedInFull: true,
@@ -127,19 +160,19 @@ export async function runCompare() {
       isRedInBase,
       isSelected,
       isRelatedRedSomewhere,
-      rerunPassed
+      rerunPassed,
+      isOsSpecific
     });
     
     caseResults[test.name] = classification;
     
     if (classification === 'confirmed-miss') {
-      
-      if (plan.matchedRules) {
-        // filter out already quarantined rules
+      if (plan.matchedRules && plan.matchedRules.length > 0) {
         plan.matchedRules.forEach(mr => {
           if (mr.status !== 'quarantined') rulesToQuarantine.add(mr.ruleId);
         });
-        
+      } else {
+        quarantineGlobal = true;
       }
     }
   }
@@ -151,8 +184,8 @@ export async function runCompare() {
 
   fs.writeFileSync('ledger.json', JSON.stringify(ledger, null, 2));
 
-  if (rulesToQuarantine.size > 0) {
-    updateBreakerState(Array.from(rulesToQuarantine));
+  if (rulesToQuarantine.size > 0 || quarantineGlobal) {
+    updateBreakerState(Array.from(rulesToQuarantine), quarantineGlobal);
   }
 
   // Comment on PR
