@@ -12,8 +12,6 @@ import {
 import {
   showCoordinationStatusUseCase,
 } from '../../src/verbs/coordination/status.mjs';
-import { cleanCoordinationUseCase } from '../../src/verbs/coordination/clean.mjs';
-import { inspectCoordinationUseCase } from '../../src/verbs/coordination/inspect.mjs';
 import {
   showCoordinationActionsUseCase,
   executeOperationUseCase,
@@ -415,62 +413,4 @@ test('Unit 2C: input validation catches forbidden overrides on all semantic use 
     },
     (err) => err instanceof CoordinationError && err.message.includes('disposition'),
   );
-});
-
-test('Unit 2D: cleanCoordinationUseCase and inspectCoordinationUseCase semantics', async () => {
-  const tempDir = mkTempDir();
-  writeFixture(tempDir);
-  const ctx = { cwd: tempDir, repoRoot: tempDir };
-
-  // 1. inspect requires id
-  assert.throws(
-    () => inspectCoordinationUseCase(ctx, {}),
-    (err) => err instanceof StoreError && err.message.includes('id'),
-  );
-
-  // 2. clean on empty store
-  const cleanEmpty = cleanCoordinationUseCase(ctx);
-  assert.equal(cleanEmpty.ok, true);
-  assert.equal(cleanEmpty.cleaned, true);
-  assert.equal(cleanEmpty.scannedSessions, 0);
-
-  // 3. clean on non-existent session throws StoreError
-  assert.throws(
-    () => cleanCoordinationUseCase(ctx, { id: 'coord_nonexistent' }),
-    (err) => err instanceof StoreError && err.message.includes('not found'),
-  );
-
-  // 4. start a session
-  const startResult = await startCoordinationUseCase(ctx, {
-    kind: 'declared-protocol',
-    protocolId: PROTOCOL_ID,
-    coordinationId: 'coord_clean_inspect_1',
-    writerId: 'driver_alice',
-    objective: 'Test clean and inspect semantics',
-  });
-  assert.equal(startResult.coordinationId, 'coord_clean_inspect_1');
-
-  // 5. inspect active session
-  const inspectResult = inspectCoordinationUseCase(ctx, { id: 'coord_clean_inspect_1' });
-  assert.equal(inspectResult.ok, true);
-  assert.equal(inspectResult.operationId, 'coordination.inspect');
-  assert.equal(inspectResult.effect, 'read');
-  assert.equal(inspectResult.coordinationId, 'coord_clean_inspect_1');
-  assert.equal(inspectResult.status, 'active');
-  assert.equal(inspectResult.session.status, 'active');
-  assert.ok(inspectResult.snapshot?.digest);
-  assert.ok(Array.isArray(inspectResult.actions));
-
-  // 6. clean active session without force: safe no-op
-  const cleanActive = cleanCoordinationUseCase(ctx, { id: 'coord_clean_inspect_1' });
-  assert.equal(cleanActive.ok, true);
-  assert.equal(cleanActive.coordinationId, 'coord_clean_inspect_1');
-  assert.equal(cleanActive.cleaned, false);
-  assert.match(cleanActive.message, /safe no-op/);
-
-  // 7. clean active session with force
-  const cleanForce = cleanCoordinationUseCase(ctx, { id: 'coord_clean_inspect_1', force: true });
-  assert.equal(cleanForce.ok, true);
-  assert.equal(cleanForce.coordinationId, 'coord_clean_inspect_1');
-  assert.equal(cleanForce.cleaned, true);
 });

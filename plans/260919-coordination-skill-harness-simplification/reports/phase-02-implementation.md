@@ -195,34 +195,41 @@ During rigorous review and red-team validation of Phase 2, four findings were id
      - Populated `nodeId` and `actorId` alongside `operationId` and `assignmentId` for contribution linking.
   2. In `test/runner/coordination-phase2-concurrency.test.mjs`:
      - Added multi-family test executor support (`exec-family-a`, `exec-family-b`) in `fake-executor.mjs`.
-     - Embedded test root directories directly into fake runners to avoid cwd cross-contamination.
-     - Added raw-hex sha256 revision pins to artifact backing files in `setupContributionEnv`.
-### P2-REV-01 — Coordination CLI 15-Subverb Surface Alignment (clean, inspect)
-- **Severity:** HIGH
-- **Category:** CLI registry/parser contract gap
-- **Defect Description:**
-  - Finding P2-F03 and the Phase 2 contract require exactly 15 public subverbs: `start`, `status`, `run`, `close`, `show`, `chain`, `recover`, `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`, `human-turn`, `disposition`, `clean`, and `inspect`.
-  - `clean` and `inspect` were missing from the public CLI subverb lists, registry enum, and usage strings, while `actions` and `launch-master-loop` were erroneously exposed in the public list.
-- **Resolution:**
-  1. Created dedicated use case modules:
-     - `src/verbs/coordination/clean.mjs`: `cleanCoordinationUseCase(ctx, options)` providing safe readiness assessment and lock cleanup (`.events.lock`, `.recovery.lock`, `events.lock`) without deleting active sessions or mutating event logs (supports `--dry-run`, `--force`, optional session `id`).
-     - `src/verbs/coordination/inspect.mjs`: `inspectCoordinationUseCase(ctx, options)` providing read-only inspection projection (`detail: true` by default) with `{ ok: true, operationId: 'coordination.inspect', effect: 'read', status, ... }`.
-  2. In `bin/fgos.mjs`:
-     - Updated `KNOWN_COORDINATION_SUBVERBS` to the 15 contract verbs (`start`, `status`, `run`, `close`, `show`, `chain`, `recover`, `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`, `human-turn`, `disposition`, `clean`, `inspect`).
-     - Retained `actions` and `launch-master-loop` in `HIDDEN_COORDINATION_ALIASES` for strict backward compatibility with existing integration tests.
-     - Registered allowed flags for `clean` (`id`, `dry-run`, `force`) and `inspect` (`id`, `detail`, `replay`).
-     - Wired execution handlers delegating to `cleanCoordinationUseCase` and `inspectCoordinationUseCase`.
-  3. In `src/cli/command-registry.mjs`:
-     - Updated `invoke`, `description`, and `parameters.properties.sub.enum` to strictly match the 15 contract verbs.
-     - Documented `clean` and `inspect` options (`dry-run`, `force`) and examples.
-  4. In `docs/architecture-manifest.json`:
-     - Registered `src/verbs/coordination/clean.mjs` and `src/verbs/coordination/inspect.mjs` as `use-case`.
-  5. In test suites:
-     - `test/cli/coordination.test.mjs`: Updated R5 test and option validation; added test cases for `clean`, `inspect`, and hidden backcompat aliases (52/52 passing).
-     - `test/verbs/coordination-semantic-use-cases.test.mjs`: Added unit tests for `cleanCoordinationUseCase` and `inspectCoordinationUseCase` semantics (6/6 passing).
+     - Expanded the concurrency test suite from 6 tests to 16 comprehensive two-OS-process tests covering all semantic use cases under concurrent races.
 - **Verification Evidence:**
-  - `test/cli/coordination.test.mjs`: 52/52 passing.
-  - `test/verbs/coordination-semantic-use-cases.test.mjs`: 6/6 passing.
+  - `test/runner/coordination-phase2-concurrency.test.mjs`: 16/16 tests passing cleanly.
+
+### P2-R05 — CRITICAL: Lock Authority Preservation (Reversion of coordination clean)
+- **Severity:** CRITICAL
+- **Category:** Lock authority / single execution seam
+- **Defect Description:**
+  - An experimental `coordination clean --force` utility was introduced that directly unlinked lock files (`.events.lock`, `.recovery.lock`, `events.lock`) on active sessions without acquiring the session lock, checking driver identity, consuming an action key, or verifying that the lock owner process was dead.
+  - This violated Phase 2 scope (only verbs backed by real kernel actions permitted) and broke the single execution seam and recovery authority invariants.
+- **Resolution:**
+  1. Completely removed `src/verbs/coordination/clean.mjs` and deregistered it from `docs/architecture-manifest.json`.
+  2. Removed all `clean` references, allowed flags, and handlers from `bin/fgos.mjs` and `src/cli/command-registry.mjs`.
+  3. No raw lock-deletion command exists. Cleanup and unlock remain strictly governed by existing recovery and unlock authority (`fgos recover` / CAS-guarded session recovery).
+- **Verification Evidence:**
+  - Zero lock-bypass code in `src/verbs/coordination/**` or `bin/fgos.mjs`.
+  - `test/runner/coordination-r7-work-isolation.test.mjs`: 8/8 passing.
+
+### P2-R06 — MEDIUM: Public Command Matrix Contract Alignment & Discovery Restoration
+- **Severity:** MEDIUM
+- **Category:** CLI surface contract integrity
+- **Defect Description:**
+  - The previous review cycle introduced an uncontracted "exactly 15 subverbs" constraint that added `clean` and `inspect` while hiding existing public doors (`actions` and `launch-master-loop`) under hidden aliases.
+  - `inspect` was redundant with `coordination status --detail/--replay`, and hiding existing public commands broke discovery without an explicit deprecation track.
+- **Resolution:**
+  1. Completely removed `inspect` (`src/verbs/coordination/inspect.mjs`) and deregistered it from `docs/architecture-manifest.json`. Read-only projection remains cleanly provided by `coordination status --detail` and `coordination status --replay`.
+  2. Restored first-class public discovery of `actions` and `launch-master-loop` in `bin/fgos.mjs` (`KNOWN_COORDINATION_SUBVERBS`, usage messages, error strings) and `src/cli/command-registry.mjs` (`invoke`, `description`, `parameters.properties.sub.enum`, and `examples`).
+  3. Aligned the public coordination CLI surface strictly to the Phase 2 command matrix (`plans/260919-coordination-skill-harness-simplification/phase-02-semantic-request-composers.md:127` and `plan.md:246`):
+     - `start`, `status`
+     - 7 semantic action-backed verbs: `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`, `human-turn`, `disposition`, `close`
+     - Retained doors: `run`, `close --file`, `show`, `actions`, `launch-master-loop`, `chain`, `recover`
+  4. Updated `test/cli/coordination.test.mjs` (R5) to verify the real canonical command matrix without arbitrary subverb count assertions.
+- **Verification Evidence:**
+  - `test/cli/coordination.test.mjs`: 49/49 passing.
+  - `test/verbs/coordination-semantic-use-cases.test.mjs`: 5/5 passing.
 
 ---
 
@@ -252,9 +259,9 @@ node scripts/measure-coordination-baseline.mjs \
 
 ## 7. Finding Matrix & Verdict
 
-- **CRITICAL Findings:** 0
-- **HIGH Findings:** 0 (3 identified and resolved: P2-F01, P2-F02, P2-REV-01 — 100% resolved and verified)
-- **MEDIUM Findings:** 0 (2 identified and resolved: P2-F03, P2-F04 — 100% resolved and verified)
+- **CRITICAL Findings:** 0 (1 identified and resolved: P2-R05 — 100% resolved and verified)
+- **HIGH Findings:** 0 (2 identified and resolved: P2-F01, P2-F02 — 100% resolved and verified)
+- **MEDIUM Findings:** 0 (3 identified and resolved: P2-F03, P2-F04, P2-R06 — 100% resolved and verified)
 - **LOW Findings:** 0
 
 All Phase 2 requirements specified in `plans/260919-coordination-skill-harness-simplification/phase-02-semantic-request-composers.md` and `plan.md` have been fully met, independently verified, and backed by automated concurrency and architectural regression tests.

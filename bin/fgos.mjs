@@ -109,8 +109,6 @@ import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
 import { recoverSessionObserveUseCase, recoverSessionApplyUseCase } from '../src/verbs/coordination/recover.mjs';
-import { cleanCoordinationUseCase } from '../src/verbs/coordination/clean.mjs';
-import { inspectCoordinationUseCase } from '../src/verbs/coordination/inspect.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -3047,25 +3045,24 @@ async function runVerb(verb, flags, positional, dir) {
       const KNOWN_COORDINATION_SUBVERBS = [
         'start',
         'status',
-        'run',
-        'close',
-        'show',
-        'chain',
-        'recover',
         'operation',
         'authorize-and-dispatch',
         'fan-out',
         'contribution',
         'human-turn',
         'disposition',
-        'clean',
-        'inspect',
+        'close',
+        'run',
+        'show',
+        'actions',
+        'launch-master-loop',
+        'chain',
+        'recover',
       ];
-      const HIDDEN_COORDINATION_ALIASES = new Set(['actions', 'launch-master-loop']);
 
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|run|close|show|chain|recover|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|clean|inspect> ...');
-      if (!KNOWN_COORDINATION_SUBVERBS.includes(sub) && !HIDDEN_COORDINATION_ALIASES.has(sub)) {
-        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, run, close, show, chain, recover, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, clean, inspect).`);
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover> ...');
+      if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
+        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover).`);
       }
 
       const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
@@ -3150,14 +3147,6 @@ async function runVerb(verb, flags, positional, dir) {
           ...COMMON_FLAGS,
           'id', 'action', 'expected-snapshot', 'expected-event-seq',
           'expected-run-control-epoch', 'expected-expires-at', 'action-key',
-        ]),
-        'clean': new Set([
-          ...COMMON_FLAGS,
-          'id', 'dry-run', 'force',
-        ]),
-        'inspect': new Set([
-          ...COMMON_FLAGS,
-          'id', 'detail', 'replay',
         ]),
       };
 
@@ -3524,20 +3513,6 @@ async function runVerb(verb, flags, positional, dir) {
           expectedExpiresAt: requireField(flags['expected-expires-at'], 'coordination recover --action requires --expected-expires-at'),
           actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
         });
-      }
-      if (sub === 'clean') {
-        const id = positional[1] ?? flags.id;
-        return cleanCoordinationUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          { id, dryRun: flags['dry-run'] ?? flags.dryRun, force: flags.force },
-        );
-      }
-      if (sub === 'inspect') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination inspect requires an id: fgos coordination inspect <id> [--detail] [--replay] [--json]');
-        return inspectCoordinationUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          { id, detail: flags.detail, replay: flags.replay },
-        );
       }
       throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: ${KNOWN_COORDINATION_SUBVERBS.join(', ')}).`);
     }
