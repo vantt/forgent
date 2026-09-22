@@ -1,10 +1,8 @@
 const fs = require('fs');
-const file = 'test/cli/fgos-approve.test.mjs';
+const file = 'src/verbs/merge/approve.mjs';
 let content = fs.readFileSync(file, 'utf8');
-
 content = content.replace(
-  "assert.ok(gitAtCwd(cwd, ['ls-tree', '-r', 'main', '--name-only']).includes('approve-runner-item-produced.txt'), 'the merged file must be present on main');",
-  "assert.ok(fs.existsSync(path.join(cwd, 'approve-runner-item-produced.txt')), 'the merged file must be present on main');"
+  "if (github && process.env.NODE_ENV !== 'test')",
+  "if (github && process.env.NODE_ENV !== 'test' && process.env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS !== '1')"
 );
-
 fs.writeFileSync(file, content);

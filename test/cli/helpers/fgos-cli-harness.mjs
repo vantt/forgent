@@ -119,7 +119,7 @@ function run(cwd, args, extraEnv = {}) {
   // unchanged via the `...process.env` spread), and an explicit
   // extraEnv.FGOS_SESSION_ID from the caller still wins (R2) since it is
   // spread last.
-  opts.env = { ...process.env, FGOS_SESSION_ID: DEFAULT_CLI_SESSION_ID, ...extraEnv };
+  opts.env = { ...process.env, FGOS_SESSION_ID: DEFAULT_CLI_SESSION_ID, FGOS_TEST_SUITE: '1', ...extraEnv };
   return spawnSync(process.execPath, [FGOS, ...args], opts);
 }
 
