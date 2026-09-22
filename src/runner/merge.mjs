@@ -1779,3 +1779,77 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
     return { outcome: 'merged', catchupHead, output: check.output };
   });
 }
+
+
+export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs } = {}) {
+  const { detectTrunk, resolveRefSha, WorktreeError } = await import('./worktree.mjs');
+  const targetBranch = detectTrunk(repoRoot);
+  const targetTip = resolveRefSha(repoRoot, targetBranch);
+  const branchTip = resolveRefSha(repoRoot, branch);
+
+  const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
+  fs.mkdirSync(baseDir, { recursive: true });
+  const worktreePath = fs.mkdtempSync(path.join(baseDir, 'cas-merge-'));
+
+  let check;
+  let commitSha;
+
+  try {
+    const { execFileSync } = await import('child_process');
+    execFileSync('git', ['worktree', 'add', '--detach', worktreePath, targetTip], { cwd: repoRoot });
+    fs.rmSync(path.join(worktreePath, '.fgos'), { recursive: true, force: true });
+    
+    // Attempt merge without commit
+    let conflicted = false;
+    let resolveErr = null;
+    try {
+      execFileSync('git', ['merge', '--no-commit', '--no-ff', branchTip], { cwd: worktreePath, encoding: 'utf8', shell: false, stdio: 'pipe' });
+    } catch (err) {
+      if (fs.existsSync(path.join(worktreePath, '.git', 'MERGE_HEAD'))) {
+        conflicted = true; // For now we just fail on conflict
+      } else {
+        return {
+          outcome: 'merge-failed-unclassified',
+          branch,
+          error: { message: err.message, stderr: err.stderr ?? null, status: err.status ?? null }
+        };
+      }
+    }
+
+    if (conflicted) {
+       return { outcome: 'conflict', branch };
+    }
+
+    // Run test
+    check = await runGoalCheck(item, worktreePath, timeoutMs);
+    if (!check.passed) {
+       return { outcome: 'verify-fail', branch, check };
+    }
+
+    // Git CAS
+    const treeSha = execFileSync('git', ['write-tree'], { cwd: worktreePath, encoding: 'utf8' }).trim();
+    const commitMsg = `merge ${branch} into ${targetBranch}`;
+    commitSha = execFileSync('git', ['commit-tree', treeSha, '-p', targetTip, '-p', branchTip, '-m', commitMsg], { cwd: repoRoot, encoding: 'utf8' }).trim();
+
+    // Atomic update-ref
+    try {
+      execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+    } catch (err) {
+      return {
+        outcome: 'merge-failed-unclassified',
+        branch,
+        error: { message: `update-ref failed: ${err.message}`, stderr: err.stderr ?? null, status: err.status ?? null }
+      };
+    }
+  } finally {
+    const { execFileSync } = await import('child_process');
+    try {
+      execFileSync('git', ['worktree', 'remove', '--force', worktreePath], { cwd: repoRoot });
+    } catch (e) {}
+    try {
+      execFileSync('git', ['worktree', 'prune'], { cwd: repoRoot });
+    } catch (e) {}
+  }
+  
+  return { outcome: 'merged', branch, check };
+}
