@@ -60,6 +60,99 @@ jobs:
   # job needs no third-party action beyond the checkout this repo already
   # trusts. `rustup show` fails loudly if that ever stops being true, instead
   # of letting a missing toolchain read as a passing job.
+  selector-plan:
+    name: selector-plan
+    runs-on: ubuntu-latest
+    outputs:
+      decision: ${{ steps.plan.outputs.decision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Generate plan
+        id: plan
+        run: |
+          npm run test:select:plan -- --base origin/main --plan-out selector-plan.json
+          DECISION=$(node -p "require('./selector-plan.json').decision")
+          echo "decision=$DECISION" >> $GITHUB_OUTPUT
+
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: selector-plan
+          path: selector-plan.json
+          retention-days: 14
+
+  related:
+    name: related
+    needs: selector-plan
+    if: needs.selector-plan.outputs.decision == 'related'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: selector-plan
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Run related tests
+        run: node scripts/test-select-run-plan.mjs --files-from selector-plan.json --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+        env:
+          FORCE_COLOR: 1
+          NODE_V8_COVERAGE: coverage/related
+
+      - name: Write test marker
+        if: always()
+        run: node scripts/write-test-marker.mjs
+        env:
+          JOB_STATUS: ${{ job.status }}
+
+      - name: Upload related results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: related-results
+          path: test-results/
+          retention-days: 14
+
+  compare:
+    name: compare
+    needs: [selector-plan, related, test]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Run compare
+        run: npm run test:select:compare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   herdr-plugin:
     name: cargo test (herdr-plugin)
     runs-on: ubuntu-latest
