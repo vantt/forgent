@@ -176,6 +176,8 @@
     "src/verbs/coordination/composers.mjs": "use-case",
     "src/verbs/coordination/start.mjs": "use-case",
     "src/verbs/coordination/status.mjs": "use-case",
+    "src/verbs/coordination/clean.mjs": "use-case",
+    "src/verbs/coordination/inspect.mjs": "use-case",
     "src/verbs/dispatch/show-run.mjs": "use-case",
     "src/verbs/dispatch/inspect.mjs": "use-case",
     "src/verbs/dispatch/reconcile.mjs": "use-case",

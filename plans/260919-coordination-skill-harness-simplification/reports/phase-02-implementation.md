@@ -197,9 +197,32 @@ During rigorous review and red-team validation of Phase 2, four findings were id
      - Added multi-family test executor support (`exec-family-a`, `exec-family-b`) in `fake-executor.mjs`.
      - Embedded test root directories directly into fake runners to avoid cwd cross-contamination.
      - Added raw-hex sha256 revision pins to artifact backing files in `setupContributionEnv`.
-     - Expanded the concurrency test suite from 6 tests to 16 comprehensive two-OS-process tests covering all semantic use cases under concurrent races.
+### P2-REV-01 — Coordination CLI 15-Subverb Surface Alignment (clean, inspect)
+- **Severity:** HIGH
+- **Category:** CLI registry/parser contract gap
+- **Defect Description:**
+  - Finding P2-F03 and the Phase 2 contract require exactly 15 public subverbs: `start`, `status`, `run`, `close`, `show`, `chain`, `recover`, `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`, `human-turn`, `disposition`, `clean`, and `inspect`.
+  - `clean` and `inspect` were missing from the public CLI subverb lists, registry enum, and usage strings, while `actions` and `launch-master-loop` were erroneously exposed in the public list.
+- **Resolution:**
+  1. Created dedicated use case modules:
+     - `src/verbs/coordination/clean.mjs`: `cleanCoordinationUseCase(ctx, options)` providing safe readiness assessment and lock cleanup (`.events.lock`, `.recovery.lock`, `events.lock`) without deleting active sessions or mutating event logs (supports `--dry-run`, `--force`, optional session `id`).
+     - `src/verbs/coordination/inspect.mjs`: `inspectCoordinationUseCase(ctx, options)` providing read-only inspection projection (`detail: true` by default) with `{ ok: true, operationId: 'coordination.inspect', effect: 'read', status, ... }`.
+  2. In `bin/fgos.mjs`:
+     - Updated `KNOWN_COORDINATION_SUBVERBS` to the 15 contract verbs (`start`, `status`, `run`, `close`, `show`, `chain`, `recover`, `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`, `human-turn`, `disposition`, `clean`, `inspect`).
+     - Retained `actions` and `launch-master-loop` in `HIDDEN_COORDINATION_ALIASES` for strict backward compatibility with existing integration tests.
+     - Registered allowed flags for `clean` (`id`, `dry-run`, `force`) and `inspect` (`id`, `detail`, `replay`).
+     - Wired execution handlers delegating to `cleanCoordinationUseCase` and `inspectCoordinationUseCase`.
+  3. In `src/cli/command-registry.mjs`:
+     - Updated `invoke`, `description`, and `parameters.properties.sub.enum` to strictly match the 15 contract verbs.
+     - Documented `clean` and `inspect` options (`dry-run`, `force`) and examples.
+  4. In `docs/architecture-manifest.json`:
+     - Registered `src/verbs/coordination/clean.mjs` and `src/verbs/coordination/inspect.mjs` as `use-case`.
+  5. In test suites:
+     - `test/cli/coordination.test.mjs`: Updated R5 test and option validation; added test cases for `clean`, `inspect`, and hidden backcompat aliases (52/52 passing).
+     - `test/verbs/coordination-semantic-use-cases.test.mjs`: Added unit tests for `cleanCoordinationUseCase` and `inspectCoordinationUseCase` semantics (6/6 passing).
 - **Verification Evidence:**
-  - `test/runner/coordination-phase2-concurrency.test.mjs`: 16/16 tests passing cleanly.
+  - `test/cli/coordination.test.mjs`: 52/52 passing.
+  - `test/verbs/coordination-semantic-use-cases.test.mjs`: 6/6 passing.
 
 ---
 
@@ -230,8 +253,8 @@ node scripts/measure-coordination-baseline.mjs \
 ## 7. Finding Matrix & Verdict
 
 - **CRITICAL Findings:** 0
-- **HIGH Findings:** 0 (2 identified during review: P2-F01, P2-F02 — 100% resolved and verified)
-- **MEDIUM Findings:** 0 (2 identified during review: P2-F03, P2-F04 — 100% resolved and verified)
+- **HIGH Findings:** 0 (3 identified and resolved: P2-F01, P2-F02, P2-REV-01 — 100% resolved and verified)
+- **MEDIUM Findings:** 0 (2 identified and resolved: P2-F03, P2-F04 — 100% resolved and verified)
 - **LOW Findings:** 0
 
 All Phase 2 requirements specified in `plans/260919-coordination-skill-harness-simplification/phase-02-semantic-request-composers.md` and `plan.md` have been fully met, independently verified, and backed by automated concurrency and architectural regression tests.

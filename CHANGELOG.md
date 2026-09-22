@@ -11,10 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Semantic coordination CLI surface: `fgos coordination start`, `status`,
   `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`,
-  `human-turn`, `disposition`, and `close`. These semantic subcommands
+  `human-turn`, `disposition`, `close`, `clean`, and `inspect`. These semantic subcommands
   compose normalized coordination requests, enforce action preconditions
   and descriptor bindings under session locks, derive deterministic request
-  IDs, and preserve idempotent retry and concurrency isolation.
+  IDs, provide safe cleanup and read-only inspection, and preserve idempotent retry
+  and concurrency isolation.
 - `fgos coordination actions` now exposes deterministic, read-only semantic
   actions backed by the production coordination validator and execution seam;
   action keys bind authoritative session state and normalized requests so

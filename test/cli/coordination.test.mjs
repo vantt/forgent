@@ -858,32 +858,39 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/,
-    'requireField usage message must enumerate all 15 subverbs including "close", "actions", and "chain"',
+    /coordination requires a sub-verb: fgos coordination <start\|status\|run\|close\|show\|chain\|recover\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|clean\|inspect>/,
+    'requireField usage message must enumerate all 15 subverbs including "clean" and "inspect"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover\)/,
-    'unknown-sub-verb error message must enumerate all 15 subverbs including "close", "actions", and "chain"',
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, run, close, show, chain, recover, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, clean, inspect\)/,
+    'unknown-sub-verb error message must enumerate all 15 subverbs including "clean" and "inspect"',
   );
 
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
   assert.ok(entry, 'the "coordination" registry entry must exist');
+  assert.match(entry.invoke, /clean/, 'registry invoke string must enumerate "clean"');
+  assert.match(entry.invoke, /inspect/, 'registry invoke string must enumerate "inspect"');
   assert.match(entry.invoke, /close/, 'registry invoke string must enumerate "close"');
   assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
-  assert.match(entry.invoke, /actions/, 'registry invoke string must enumerate "actions"');
+  assert.equal(entry.parameters.properties.sub.enum.length, 15, 'registry sub enum must contain exactly 15 subverbs');
+  assert.ok(entry.parameters.properties.sub.enum.includes('clean'), 'registry sub enum must include "clean"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('inspect'), 'registry sub enum must include "inspect"');
   assert.ok(entry.parameters.properties.sub.enum.includes('close'), 'registry sub enum must include "close"');
-  assert.ok(entry.parameters.properties.sub.enum.includes('actions'), 'registry sub enum must include "actions"');
   assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.ok(!entry.parameters.properties.sub.enum.includes('actions'), 'registry sub enum must not include "actions"');
+  assert.ok(!entry.parameters.properties.sub.enum.includes('launch-master-loop'), 'registry sub enum must not include "launch-master-loop"');
+  assert.match(entry.description, /"clean"/, 'registry description must document "clean"');
+  assert.match(entry.description, /"inspect"/, 'registry description must document "inspect"');
   assert.match(entry.description, /"close"/, 'registry description must document "close"');
-  assert.match(entry.description, /"actions"/, 'registry description must document "actions"');
   assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
+  assert.ok(entry.examples.some((e) => e.includes('clean')), 'registry examples must include a "clean" example');
+  assert.ok(entry.examples.some((e) => e.includes('inspect')), 'registry examples must include an "inspect" example');
   assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
-  assert.ok(entry.examples.some((e) => e.includes('actions')), 'registry examples must include an "actions" example');
 
   const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
-  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover/);
+  assert.match(unknownSubResult.stderr, /known: start, status, run, close, show, chain, recover, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, clean, inspect/);
 });
 
 test('coordination CLI option validation: rejects unknown, mis-scoped, and forbidden options per subverb', () => {
@@ -917,10 +924,20 @@ test('coordination CLI option validation: rejects unknown, mis-scoped, and forbi
   assert.notEqual(resOpBranches.status, 0);
   assert.match(resOpBranches.stderr, /coordination operation: unknown or unsupported option "--branches"/);
 
-  // 6. Missing sub-verb usage error enumerates all 15 subverbs
+  // 6. Mis-scoped option on clean
+  const resCleanUnknown = run(cwd, ['coordination', 'clean', '--unknown-flag']);
+  assert.notEqual(resCleanUnknown.status, 0);
+  assert.match(resCleanUnknown.stderr, /coordination clean: unknown or unsupported option "--unknown-flag"/);
+
+  // 7. Mis-scoped option on inspect
+  const resInspectUnknown = run(cwd, ['coordination', 'inspect', 'coord-1', '--unknown-flag']);
+  assert.notEqual(resInspectUnknown.status, 0);
+  assert.match(resInspectUnknown.stderr, /coordination inspect: unknown or unsupported option "--unknown-flag"/);
+
+  // 8. Missing sub-verb usage error enumerates all 15 subverbs
   const resNoSub = run(cwd, ['coordination']);
   assert.notEqual(resNoSub.status, 0);
-  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/);
+  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|run\|close\|show\|chain\|recover\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|clean\|inspect>/);
 });
 
 // ─── Semantic coordination CLI subcommands ─────────────────────────────────
@@ -1013,6 +1030,105 @@ test('fgos coordination semantic workflow: start -> operation -> close', () => {
   ]);
   assert.notEqual(staleCloseRes.status, 0);
   assert.match(staleCloseRes.stderr, /stale|precondition|not found|does not match/i);
+});
+
+test('fgos coordination inspect: produces read-only projection with operationId coordination.inspect', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-inspect-test-1',
+    '--kind', 'declared-protocol',
+    '--protocol', 'core.coordination-protocol.declared-consult',
+    '--objective', 'Test inspect semantic command',
+    '--writer-id', 'test-operator',
+    '--actors', JSON.stringify([{ id: 'consultant-actor' }]),
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+
+  // inspect without id fails
+  const noIdRes = run(cwd, ['coordination', 'inspect']);
+  assert.notEqual(noIdRes.status, 0);
+  assert.match(noIdRes.stderr, /coordination inspect requires an id/);
+
+  // inspect with id returns inspection projection
+  const inspectRes = run(cwd, ['coordination', 'inspect', 'coord-inspect-test-1']);
+  assert.equal(inspectRes.status, 0, inspectRes.stderr);
+  const inspectData = envelopeData(inspectRes.stdout);
+  assert.equal(inspectData.ok, true);
+  assert.equal(inspectData.operationId, 'coordination.inspect');
+  assert.equal(inspectData.effect, 'read');
+  assert.equal(inspectData.coordinationId, 'coord-inspect-test-1');
+  assert.equal(inspectData.status, 'active');
+  assert.equal(inspectData.session.status, 'active');
+  assert.ok(Array.isArray(inspectData.actions));
+});
+
+test('fgos coordination clean: safe no-op on active session and cleans on terminal session or with --force', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  // 1. Clean when no sessions exist
+  const cleanEmptyRes = run(cwd, ['coordination', 'clean']);
+  assert.equal(cleanEmptyRes.status, 0, cleanEmptyRes.stderr);
+  const emptyData = envelopeData(cleanEmptyRes.stdout);
+  assert.equal(emptyData.ok, true);
+  assert.equal(emptyData.cleaned, true);
+
+  // 2. Start session
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-clean-test-1',
+    '--kind', 'declared-protocol',
+    '--protocol', 'core.coordination-protocol.declared-consult',
+    '--objective', 'Test clean semantic command',
+    '--writer-id', 'test-operator',
+    '--actors', JSON.stringify([{ id: 'consultant-actor' }]),
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+
+  // 3. Clean active session without force: safe no-op
+  const cleanActiveRes = run(cwd, ['coordination', 'clean', 'coord-clean-test-1']);
+  assert.equal(cleanActiveRes.status, 0, cleanActiveRes.stderr);
+  const activeData = envelopeData(cleanActiveRes.stdout);
+  assert.equal(activeData.ok, true);
+  assert.equal(activeData.coordinationId, 'coord-clean-test-1');
+  assert.equal(activeData.cleaned, false);
+  assert.match(activeData.message, /safe no-op/);
+
+  // 4. Clean active session with --force: cleans
+  const cleanForceRes = run(cwd, ['coordination', 'clean', 'coord-clean-test-1', '--force']);
+  assert.equal(cleanForceRes.status, 0, cleanForceRes.stderr);
+  const forceData = envelopeData(cleanForceRes.stdout);
+  assert.equal(forceData.ok, true);
+  assert.equal(forceData.cleaned, true);
+
+  // 5. Clean with --dry-run
+  const cleanDryRunRes = run(cwd, ['coordination', 'clean', 'coord-clean-test-1', '--dry-run']);
+  assert.equal(cleanDryRunRes.status, 0, cleanDryRunRes.stderr);
+  const dryRunData = envelopeData(cleanDryRunRes.stdout);
+  assert.equal(dryRunData.ok, true);
+  assert.equal(dryRunData.dryRun, true);
+});
+
+test('coordination CLI: hidden aliases "actions" and "launch-master-loop" still dispatch for backcompat', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-compat-test-1',
+    '--kind', 'declared-protocol',
+    '--protocol', 'core.coordination-protocol.declared-consult',
+    '--objective', 'Test backcompat command',
+    '--writer-id', 'test-operator',
+    '--actors', JSON.stringify([{ id: 'consultant-actor' }]),
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+
+  const actionsRes = run(cwd, ['coordination', 'actions', 'coord-compat-test-1', '--json']);
+  assert.equal(actionsRes.status, 0, actionsRes.stderr);
+  const actionsData = envelopeData(actionsRes.stdout);
+  assert.equal(actionsData.coordinationId, 'coord-compat-test-1');
+  assert.ok(Array.isArray(actionsData.actions));
 });
 
 // `execFileSync` re-export sanity: confirms the harness genuinely spawns a
