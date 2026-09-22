@@ -6,6 +6,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../transport.mjs";
 import { RunnerConfigError } from "../config.mjs";
+import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
 import { saveAttestationRecord, savePlanRecord, assertAttestationStoreIsolated, verifyAttestationStoreIsolation } from "./attestation-store.mjs";
 import {
@@ -1419,12 +1420,14 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   const workerArgs = sourceInvocation.args || [];
   const workerCwd = request.context.cwd;
   const depth = currentDispatchDepth();
+  const writerId = resolveWriterIdentity(request.context.fgosDir).id;
   const rawEnv = sourceInvocation.env || {};
   const resolvedExecutorEnv = resolveExecutorEnv(rawEnv);
   const workerEnv = {
     ...process.env,
     ...resolvedExecutorEnv,
     [DISPATCH_DEPTH_ENV]: String(depth + 1),
+    FGOS_SESSION_ID: writerId,
   };
 
   const workerCommandDigest = computeSha256Digest({ command: workerCommand, args: workerArgs });

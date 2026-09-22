@@ -51,6 +51,7 @@ import { resolveVerifiedProviderArgs } from './provider-adapter.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
+import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
 // the two never have to import each other. Re-exported so callers that have
@@ -471,7 +472,7 @@ export function cliSpawnAdapter(invocation, opts) {
       shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
       detached: true,
-      env: { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) },
+      env: { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1), FGOS_SESSION_ID: resolveWriterIdentity(opts.fgosDir).id },
     });
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');

@@ -888,11 +888,12 @@ export async function runSupervisor(envelopePath, opts = {}) {
 /**
  * Start a supervisor process in the background, or await it if live.
  */
-export function startSupervisorProcess({ envelopePath, detached = true, onChunk = null }) {
+export function startSupervisorProcess({ envelopePath, detached = true, onChunk = null, env }) {
   const supervisorScript = fileURLToPath(import.meta.url);
   const proc = child_process.spawn(process.execPath, [supervisorScript, envelopePath], {
     detached,
     stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
+    env: env || process.env,
   });
 
   if (onChunk) {

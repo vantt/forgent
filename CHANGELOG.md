@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
+- **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
 
 ### Added
 
