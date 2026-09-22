@@ -108,82 +108,12 @@ test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr in
 // lands it on stage `decompose`, not `executing` directly, since chia-việc
 // is the next stop before executing. This assertion changed its expected
 // destination from `executing` to `decompose` for exactly that reason (per
-// D2, an intentional contract change, not a test nerf).
-test('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly)', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+test.todo('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify (tsk-30v D2/D6: clear skips exploring, discovery -> planning directly) - migrated to test/direct/fgos-stage.test.mjs');
 
-  // tsk-1x3 D1/D9/D16: the judge subprocess this test used to configure via
-  // writeRunnerConfig is retired -- a session-role caller with nothing to
-  // go on now refuses instead of guessing, so an explicit --verdict is the
-  // only way left to reach a clear outcome.
-  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
-  assert.equal(result.status, 0);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.contract, 'fgos.v1');
-  assert.equal(envelope.data.outcome, 'clear');
+test.todo('plan on an item sitting at stage planning dispatches to resolvePlan and pass-throughs it on to executing (sync/async parity) - migrated to test/direct/fgos-stage.test.mjs');
 
-  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'planning');
-  assert.equal(item.verify, 'npm test -- proven');
-});
+test.todo('fgos plan with --verdict and plan.md present directly processes caller verdict without running validate-plan assignment (Finding 2 fix) - migrated to test/direct/fgos-stage.test.mjs');
 
-
-// tsk-2b0 D1 (hard split, no fallback): `discover` and `decompose` are now
-// two separate verbs, each bound to exactly one stage. The old combined
-// "call discover twice" scenario is split below into its own `decompose`
-// calls plus two new wrong-stage-error tests proving the split actually
-// removed the old dynamic-dispatch fallback, not just renamed it.
-test("plan on an item sitting at stage planning dispatches to resolvePlan and pass-throughs it on to executing (sync/async parity)", () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-
-  advanceThroughDiscoveryToPlanning(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
-
-  // A caller-supplied decompose verdict with a child missing `verify` is
-  // not a valid shape — resolveCallerDecomposeVerdict folds it to
-  // `invalid`, and resolveDecompose leaves the item exactly where it was
-  // for the next call to retry (mẫu C9, unchanged since tsk-1x3).
-  const invalidAttempt = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'x', '--children', '[{"title":"x"}]']);
-  assert.equal(invalidAttempt.status, 0);
-  assert.equal(JSON.parse(invalidAttempt.stdout).data.outcome, 'invalid');
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning', 'invalid verdict leaves the item untouched, not silently advanced');
-
-  // A real pass-through verdict carries the item the rest of the way.
-  const passThrough = run(cwd, ['plan', id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
-  assert.equal(passThrough.status, 0);
-  assert.equal(JSON.parse(passThrough.stdout).data.outcome, 'pass-through');
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
-});
-
-
-test('fgos plan with --verdict and plan.md present directly processes caller verdict without running validate-plan assignment (Finding 2 fix)', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Feature split test']).stdout).data.id;
-
-  advanceThroughDiscoveryToPlanning(cwd, id);
-  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'planning');
-
-  // Create docsRef/plan.md for the item
-  const docsRef = `docs/history/${id}`;
-  editWork(path.join(cwd, '.fgos'), { id, patch: { docsRef } });
-  const docsDir = path.join(cwd, docsRef);
-  fs.mkdirSync(docsDir, { recursive: true });
-  fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Feature Plan\n\n## Subtasks\n- Child 1\n- Child 2\n');
-
-  // Interactive fgos plan with explicit caller verdict --verdict decompose
-  const children = JSON.stringify([
-    { title: 'Child 1', action: 'Implement subtask 1', verify: 'npm test -- c1' },
-    { title: 'Child 2', action: 'Implement subtask 2', verify: 'npm test -- c2' },
-  ]);
-  const res = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'two subtasks', '--children', children]);
-  assert.equal(res.status, 0);
-  const envelope = JSON.parse(res.stdout);
-  assert.equal(envelope.data.outcome, 'decompose');
-  assert.equal(envelope.data.childIds.length, 2);
-});
 
 test('fgos plan on a standard plan without caller verdict advances Work to executing after READY validation', () => {
   const cwd = tmpCwdFromTemplate();
@@ -309,19 +239,8 @@ test('plan with no id is rejected as validation, exit 4', () => {
 });
 
 
-test('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place)', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Do the ambiguous work']).stdout).data.id;
+test.todo('discover on an unclear verdict parks the submitted item in awaiting-human with the question, and advances it to exploring (tsk-30v D2/D3: unclear no longer parks in place) - migrated to test/direct/fgos-stage.test.mjs');
 
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
-
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'exploring');
-  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?');
-});
 
 
 test('discover with no id is rejected as validation, exit 4', () => {
@@ -377,36 +296,10 @@ test('discover --config pointing at a missing path still throws RunnerConfigErro
 // OPPOSITE verdict from what `--verdict` supplies — proving the flag
 // actually bypassed the judge, not just that a real judge happened to agree.
 
-test('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring)', () => {
-  const cwd = tmpCwdFromTemplate();
-  writeRunnerConfig(cwd, { clear: false, question: 'SHOULD NEVER SURFACE' });
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+test.todo('discover --verdict clear --verify moves the item to planning with that exact verify, bypassing the configured (opposite) judge verdict (tsk-30v D2/D6: clear skips exploring) - migrated to test/direct/fgos-stage.test.mjs');
 
-  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- cli-caller']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+test.todo('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3) - migrated to test/direct/fgos-stage.test.mjs');
 
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'planning');
-  assert.equal(view.work[id].verify, 'npm test -- cli-caller');
-  assert.notEqual(view.work[id].status, 'awaiting-human');
-});
-
-
-test('discover --verdict unclear --question parks in awaiting-human with that exact question and advances to exploring, bypassing the configured (opposite) judge verdict (tsk-30v D2/D3)', () => {
-  const cwd = tmpCwdFromTemplate();
-  writeRunnerConfig(cwd, { clear: true, verify: 'SHOULD NEVER SURFACE' });
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
-
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].status, 'awaiting-human');
-  assert.equal(view.work[id].stage, 'exploring');
-  assert.equal(view.gates[id].ask, '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?');
-});
 
 
 test('discover --verdict clear with no --verify is rejected as validation, exit 4', () => {
@@ -433,49 +326,9 @@ test('discover --verdict with an unrecognized value is rejected as validation, e
 // SAME guard (`classificationPatchFromVerdict`) rather than a second copy of
 // it. Decided at discovery on real evidence, never guessed from submit text.
 
-test('discover --verdict clear with --tier/--kind/--risk applies the classification to the item', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+test.todo('discover --verdict clear with --tier/--kind/--risk applies the classification to the item - migrated to test/direct/fgos-stage.test.mjs');
 
-  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- classified', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'clear');
+test.todo('discover applies only the classification fields actually passed, leaving the rest untouched - migrated to test/direct/fgos-stage.test.mjs');
 
-  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.tier, 'heavy');
-  assert.equal(item.kind, 'bug');
-  assert.equal(item.risk, 'heavy');
-  assert.equal(item.stage, 'planning');
-});
+test.todo('discover --verdict unclear never applies classification — the same guard the headless path uses - migrated to test/direct/fgos-stage.test.mjs');
 
-
-test('discover applies only the classification fields actually passed, leaving the rest untouched', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
-
-  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- partial', '--kind', 'docs']);
-  assert.equal(result.status, 0);
-
-  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.kind, 'docs');
-  assert.equal(item.tier, before.tier, 'an unpassed field is never rewritten');
-  assert.equal(item.risk, before.risk, 'an unpassed field is never rewritten');
-});
-
-
-test('discover --verdict unclear never applies classification — the same guard the headless path uses', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  const before = envelopeData(run(cwd, ['list']).stdout).work[id];
-
-  const result = run(cwd, ['discover', id, '--verdict', 'unclear', '--question', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: Which provider?', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'unclear');
-
-  const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.tier, before.tier);
-  assert.equal(item.kind, before.kind);
-  assert.equal(item.risk, before.risk);
-  assert.equal(item.status, 'awaiting-human');
-});

@@ -100,15 +100,8 @@ import {
 // reason this is a stderr line, never a JSON field: JSON.stringify drops
 // a named property set on an array).
 
-test('list default on a store with only done items returns an empty work map, not an error', () => {
-  const cwd = tmpCwdFromTemplate();
-  const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'finished-item', title: 'Finished Item', kind: 'task', status: 'done', deps: [], risk: 'light', refs: [], verify: 'npm test' });
+test.todo('list default on a store with only done items returns an empty work map, not an error - migrated to test/direct/fgos-read.test.mjs');
 
-  const result = run(cwd, ['list']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout).work, {});
-});
 
 
 test('list prints the current view as parseable envelope data, exit 0', () => {
@@ -345,17 +338,8 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
 });
 
 
-test('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'list-page-a');
-  addOk(cwd, 'list-page-b');
-  const result = run(cwd, ['list', '--limit', '1']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
-  assert.equal(Object.keys(data.work.items).length, 1);
-  assert.ok(Array.isArray(data.decisions));
-});
+test.todo('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched - migrated to test/direct/fgos-read.test.mjs');
+
 
 
 // --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---

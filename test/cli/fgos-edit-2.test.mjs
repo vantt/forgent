@@ -119,46 +119,19 @@ test('edit --verify-from-targets with empty targets throws a validation error in
 // `submit` (no --docs-ref of its own before this) had no way to ever gain
 // this link. ---
 
-test('edit --docs-ref sets docsRef on an item that had none, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-docs-ref-new');
-  const result = run(cwd, ['edit', 'edit-docs-ref-new', '--docs-ref', 'docs/history/edit-docs-ref-new/']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-docs-ref-new'].docsRef, 'docs/history/edit-docs-ref-new/');
-});
+test.todo('edit --docs-ref sets docsRef on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  run(cwd, ['add', 'edit-docs-ref-replace', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--docs-ref', 'docs/history/old-feature/', '--description', 'tsk-535 fixture description.']);
-  const result = run(cwd, ['edit', 'edit-docs-ref-replace', '--docs-ref', 'docs/history/new-feature/']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-docs-ref-replace'].docsRef, 'docs/history/new-feature/');
-});
+test.todo('edit --docs-ref replaces an existing docsRef (latest-wins), exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 // --- edit --merge-after (tsk-2u0, docs/history/
 //     tsk-3bn-merge-conductor-harness-v2/D4/D5) -----------------------------
 
-test('edit --merge-after sets mergeAfter on an item that had none, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-target');
-  addOk(cwd, 'merge-after-item');
-  const result = run(cwd, ['edit', 'merge-after-item', '--merge-after', 'merge-after-target']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(stateView(cwd).work['merge-after-item'].mergeAfter, ['merge-after-target']);
-});
+test.todo('edit --merge-after sets mergeAfter on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --merge-after "" clears an existing mergeAfter, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-clear-target');
-  addOk(cwd, 'merge-after-clear-item');
-  run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', 'merge-after-clear-target']);
-  const result = run(cwd, ['edit', 'merge-after-clear-item', '--merge-after', '']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(stateView(cwd).work['merge-after-clear-item'].mergeAfter, []);
-});
+test.todo('edit --merge-after "" clears an existing mergeAfter, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --merge-after rejects a target id that does not exist, exit 4, item unchanged', () => {
@@ -193,38 +166,16 @@ test('edit --merge-after rejects a mergeAfter that would close a cycle mixed wit
 });
 
 
-test('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits)', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'merge-after-independent-target');
-  addOk(cwd, 'merge-after-independent-item');
-  const result = run(cwd, ['edit', 'merge-after-independent-item', '--merge-after', 'merge-after-independent-target']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(stateView(cwd).work['merge-after-independent-item'].deps, []);
-});
+test.todo('edit --merge-after does not require the deps field to have been touched (byte-identical to other list edits) - migrated to test/direct/fgos-edit.test.mjs');
 
 
 // --- edit --superseded-by / --duplicates (tsk-2ie, docs/history/
 //     tsk-2ie-duplicate-superseded-guard/ D1-D3) ---------------------------
 
-test('edit --superseded-by sets supersededBy on an item that had none, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'superseded-by-target');
-  addOk(cwd, 'superseded-by-item');
-  const result = run(cwd, ['edit', 'superseded-by-item', '--superseded-by', 'superseded-by-target']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(stateView(cwd).work['superseded-by-item'].supersededBy, 'superseded-by-target');
-});
+test.todo('edit --superseded-by sets supersededBy on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --superseded-by "" clears an existing supersededBy, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'superseded-by-clear-target');
-  addOk(cwd, 'superseded-by-clear-item');
-  run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', 'superseded-by-clear-target']);
-  const result = run(cwd, ['edit', 'superseded-by-clear-item', '--superseded-by', '']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(stateView(cwd).work['superseded-by-clear-item'].supersededBy, null);
-});
+test.todo('edit --superseded-by "" clears an existing supersededBy, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --superseded-by rejects a target id that does not exist, exit 4, item unchanged', () => {
@@ -255,25 +206,10 @@ test('edit --superseded-by with no value is a validation error, exit 4', () => {
 });
 
 
-test('edit --duplicates sets duplicates on an item that had none, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'duplicates-target');
-  addOk(cwd, 'duplicates-item');
-  const result = run(cwd, ['edit', 'duplicates-item', '--duplicates', 'duplicates-target']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(stateView(cwd).work['duplicates-item'].duplicates, ['duplicates-target']);
-});
+test.todo('edit --duplicates sets duplicates on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --duplicates "" clears an existing duplicates, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'duplicates-clear-target');
-  addOk(cwd, 'duplicates-clear-item');
-  run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', 'duplicates-clear-target']);
-  const result = run(cwd, ['edit', 'duplicates-clear-item', '--duplicates', '']);
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(stateView(cwd).work['duplicates-clear-item'].duplicates, []);
-});
+test.todo('edit --duplicates "" clears an existing duplicates, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --duplicates rejects a target id that does not exist, exit 4, item unchanged', () => {

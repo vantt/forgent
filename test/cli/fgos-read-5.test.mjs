@@ -108,117 +108,13 @@ import {
 
 // --- work-graph-intelligence S5: `fgos graph` read verb -------------------
 
-test('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read (no event appended, exit 0)', () => {
-  const cwd = tmpCwdFast();
-  assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(addOk(cwd, 'c').status, 0); // isolated -> its own track
-
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['graph']);
-  assert.equal(result.status, 0);
-
-  const data = envelopeData(result.stdout); // asserts the C1 envelope shape
-  assert.equal(data.order_version, 2); // FRONTIER_ORDER_VERSION bumped to v2 by str7-str8-priority-intent D2
-  assert.equal(data.componentCount, 2);
-  assert.deepEqual(data.components.map((component) => component.items), [['a', 'b'], ['c']]);
-
-  // S6: the umbrella completes P43's stated acceptance — critical path,
-  // stale-blocked, and greedy top-k-unblock. S7 adds the architecture frame.
-  assert.deepEqual(Object.keys(data), ['order_version', 'frame', 'componentCount', 'components', 'criticalPath', 'staleBlocked', 'topUnblock', 'stageByItem']);
-  assert.deepEqual(data.criticalPath, { depth: 2, path: ['b', 'a'] });
-  assert.deepEqual(data.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
-  assert.deepEqual(data.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
-  // tsk-4zj D6: a/c via addOk carry addOk's own explicit --stage executing
-  // default; b via the raw CLI `add` (no --stage) stamps 'discovery' by
-  // default (add-stage-default-gap D1/D2; tsk-qod D1/D2: discovery is
-  // stages[0] now, clarify retired).
-  assert.deepEqual(data.stageByItem, { a: 'executing', b: 'discovery', c: 'executing' });
-  assert.match(data.frame.revision, /^[0-9a-f]{64}$/);
-  assert.equal(data.frame.nodeCount, 3);
-  assert.deepEqual(data.frame.skipped, []);
-
-  // Pure read: no event written by the verb.
-  assert.equal(eventLines(cwd).length, before, 'graph must not append any event');
-});
-
-
-test('graph use case --what-if <id>: reports what completing that item unblocks, pure read', () => {
-  const cwd = tmpCwdFast();
-  assert.equal(addOk(cwd, 'a').status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'a', '--description', 'tsk-535 fixture description.']).status, 0);
-
-  const before = eventLines(cwd).length;
-  const data = graphUseCase({ dir: path.join(cwd, '.fgos') }, { whatIfId: 'a' });
-  // tsk-4zj D6: a via addOk carries addOk's own explicit --stage executing
-  // default; b via the raw CLI `add` (no --stage) stamps 'discovery' by
-  // default (add-stage-default-gap D1/D2; tsk-qod D1/D2: discovery is
-  // stages[0] now, clarify retired).
-  assert.deepEqual(data, { id: 'a', exists: true, unblocksTransitive: 1, newlyReady: ['b'], stageByItem: { a: 'executing', b: 'discovery' } });
-  assert.equal(eventLines(cwd).length, before, 'what-if must not append any event');
-});
-
-
-test('graph use case --what-if on an unknown id: exists false, zero impact', () => {
-  const cwd = tmpCwdFast();
-  assert.deepEqual(graphUseCase({ dir: path.join(cwd, '.fgos') }, { whatIfId: 'ghost' }), { id: 'ghost', exists: false, unblocksTransitive: 0, newlyReady: [] });
-});
-
-
-// --- work-graph-intelligence S8: `fgos stale` advisory --------------------
-
-test('stale verb: a freshly-claimed doing item is NOT stale; a valid envelope + pure read (no event, exit 0)', () => {
-  const cwd = tmpCwdFast();
-  assert.equal(addOk(cwd, 'a').status, 0);
-  moveToDurableDoingForTest(cwd, 'a');
-
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['stale']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(data.stale, [], 'a just-claimed item is well within any grace window');
-  assert.equal(data.thresholds.agentMs, 15 * 60 * 1000);
-  assert.equal(data.thresholds.humanMs, 24 * 60 * 60 * 1000);
-  assert.equal(eventLines(cwd).length, before, 'stale must not append any event');
-});
-
-
-test('stale use case on a store with nothing in doing: empty advisory', () => {
-  const cwd = tmpCwdFast();
-  assert.equal(addOk(cwd, 'a').status, 0); // stays todo, never claimed
-  const data = staleUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd, cleanupTtlDays: 7 });
-  assert.deepEqual(data.stale, []);
-});
-
-
-// --- work-graph-intelligence S10 (tsk-1bl, CONTEXT.md D4/D7): `fgos stale`'s
-// `postDelivery` field, additive alongside the existing `stale`/`thresholds`
-// this verb already returns -- same one-verb surface, no new CLI command.
-
-test('stale use case: postDelivery is additive — existing stale/thresholds shape is unchanged, postDelivery.stale is a sibling field', () => {
-  const cwd = tmpCwdFast();
-  assert.equal(addOk(cwd, 'a').status, 0);
-  moveToDurableDoingForTest(cwd, 'a');
-
-  const data = staleUseCase({ dir: path.join(cwd, '.fgos'), repoRoot: cwd, cleanupTtlDays: 7 });
-  assert.deepEqual(data.stale, [], 'existing doing-advisory shape untouched');
-  assert.equal(data.thresholds.agentMs, 15 * 60 * 1000, 'existing doing-advisory thresholds untouched');
-  assert.deepEqual(data.postDelivery.stale, [], 'no delivered/retrospective/cleanup items yet');
-  assert.ok(Number.isFinite(data.postDelivery.thresholds.deliveredMs));
-});
-
-
-test('stale verb: a just-delivered item is NOT flagged in postDelivery (well within the 3d threshold)', () => {
-  const cwd = tmpCwdFast();
-  addOk(cwd, 'just-delivered');
-  moveToDurableDoingForTest(cwd, 'just-delivered');
-  run(cwd, ['move', 'just-delivered', '--to', 'delivered']);
-
-  const before = eventLines(cwd).length;
-  const data = envelopeData(run(cwd, ['stale']).stdout);
-  assert.deepEqual(data.postDelivery.stale, []);
-  assert.equal(eventLines(cwd).length, before, 'stale must not append any event');
-});
+test.todo('graph verb: reports connected components (independent parallel tracks) in a fgos.v1 envelope, and is a pure read - migrated to test/direct/fgos-read.test.mjs');
+test.todo('graph use case --what-if <id>: reports what completing that item unblocks, pure read - migrated to test/direct/fgos-read.test.mjs');
+test.todo('graph use case --what-if on an unknown id: exists false, zero impact - migrated to test/direct/fgos-read.test.mjs');
+test.todo('stale verb: a freshly-claimed doing item is NOT stale - migrated to test/direct/fgos-read.test.mjs');
+test.todo('stale use case on a store with nothing in doing: empty advisory - migrated to test/direct/fgos-read.test.mjs');
+test.todo('stale use case: postDelivery is additive - migrated to test/direct/fgos-read.test.mjs');
+test.todo('stale verb: a just-delivered item is NOT flagged in postDelivery - migrated to test/direct/fgos-read.test.mjs');
 
 
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
@@ -371,83 +267,8 @@ test('graph verb on an empty store: zero components, still a valid envelope, exi
 });
 
 
-test('list --limit paginates work into {items, nextCursor}, AND scopes every other view key to just the paged ids (tsk-483, supersedes D5/D35)', () => {
-  const cwd = tmpCwdFast();
-  addOk(cwd, 'list-page-a');
-  addOk(cwd, 'list-page-b');
-  assert.equal(run(cwd, ['decision', '--id', 'list-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
-  assert.equal(run(cwd, ['decision', '--id', 'list-page-b', '--text', 'decision for b', '--rationale', 'r', '--relation', 'none']).status, 0);
-  const result = run(cwd, ['list', '--limit', '1']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(Object.keys(data.work).sort(), ['items', 'nextCursor']);
-  const pagedIds = Object.keys(data.work.items);
-  assert.equal(pagedIds.length, 1);
-  // tsk-483: decisions now scoped to exactly the ids on THIS page -- the
-  // other item's own decision must not leak through, unlike D5/D35's own
-  // "every other view key untouched" behavior this item supersedes.
-  assert.deepEqual(
-    data.decisions.map((d) => d.id).sort(),
-    pagedIds,
-  );
-});
+test.todo('list --limit paginates work into {items, nextCursor}, AND scopes every other view key to just the paged ids - migrated to test/direct/fgos-read.test.mjs');
+test.todo('list --all --limit combined: scopes side-logs to the paged ids too - migrated to test/direct/fgos-read.test.mjs');
+test.todo('list default (no flags at all) scopes side-logs to only the open (non-done) ids - migrated to test/direct/fgos-read.test.mjs');
+test.todo('list --all with NO pagination flags stays byte-identical and unscoped - migrated to test/direct/fgos-read.test.mjs');
 
-
-test('list --all --limit combined: scopes side-logs to the paged ids too -- a combination herdr-plugin never uses (tsk-483 D2)', () => {
-  const cwd = tmpCwdFast();
-  addOk(cwd, 'list-all-page-a');
-  addOk(cwd, 'list-all-page-b');
-  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-a', '--text', 'decision for a', '--rationale', 'r', '--relation', 'none']).status, 0);
-  assert.equal(run(cwd, ['decision', '--id', 'list-all-page-b', '--text', 'decision for b', '--rationale', 'r', '--relation', 'none']).status, 0);
-  const result = run(cwd, ['list', '--all', '--limit', '1']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  const pagedIds = Object.keys(data.work.items);
-  assert.equal(pagedIds.length, 1);
-  assert.deepEqual(
-    data.decisions.map((d) => d.id).sort(),
-    pagedIds,
-  );
-});
-
-
-test('list default (no flags at all) scopes side-logs to only the open (non-done) ids -- a done item\'s own decision must not appear (tsk-483)', () => {
-  const cwd = tmpCwdFast();
-  addOk(cwd, 'list-default-open');
-  assert.equal(run(cwd, ['decision', '--id', 'list-default-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
-  toProposed(cwd, 'list-default-done');
-  assert.equal(run(cwd, ['decision', '--id', 'list-default-done', '--text', 'decision for done', '--rationale', 'r', '--relation', 'none']).status, 0);
-  assert.equal(toDoneViaChain(cwd, 'list-default-done').status, 0);
-  const result = run(cwd, ['list']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(Object.keys(data.work).sort(), ['list-default-open']);
-  assert.deepEqual(data.decisions.map((d) => d.id), ['list-default-open']);
-});
-
-
-test('list --all --json with NO pagination flags stays byte-identical -- herdr-plugin\'s own protected contract (tsk-483 D2)', () => {
-  const cwd = tmpCwdFast();
-  addOk(cwd, 'list-protected-open');
-  assert.equal(run(cwd, ['decision', '--id', 'list-protected-open', '--text', 'decision for open', '--rationale', 'r', '--relation', 'none']).status, 0);
-  toProposed(cwd, 'list-protected-done');
-  assert.equal(run(cwd, ['decision', '--id', 'list-protected-done', '--text', 'decision for done', '--rationale', 'r', '--relation', 'none']).status, 0);
-  assert.equal(toDoneViaChain(cwd, 'list-protected-done').status, 0);
-  const result = run(cwd, ['list', '--all', '--json']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  // Both items' work rows present (D1: --all restores done items).
-  assert.deepEqual(Object.keys(data.work).sort(), ['list-protected-done', 'list-protected-open']);
-  // Both items' decisions present, UNSCOPED -- this exact combination must
-  // never gain tsk-483's new scoping, matching herdr-plugin's own real,
-  // vendored call sites (herdr-plugin/src/fgos.rs, confirmed directly:
-  // every one of its 3 call sites is exactly ["list", "--all", "--json"]).
-  // 'list-protected-done' carries its own explicit decision above --
-  // tsk-40m: toProposed no longer claims through 'doing' at all (a direct
-  // todo -> awaiting-approval move, the redesign's own new edge), so there
-  // is no --skip-return-guard override left to log a second decision for.
-  assert.deepEqual(
-    data.decisions.map((d) => d.id).sort(),
-    ['list-protected-done', 'list-protected-open'],
-  );
-});
