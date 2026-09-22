@@ -3374,6 +3374,139 @@ test('executeAssignment: non-authoritative isolation guarantees result.supersede
   assert.notEqual(readAuth.summary, supersededOnlyPayload.summary);
 });
 
+function spawnCommitRunSettlementWithBarrier({
+  runDir,
+  runId,
+  controlEpoch,
+  controlToken,
+  runResult,
+  barrierPauseFile,
+  barrierResumeFile,
+}) {
+  const runnerUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const script = [
+    `import fs from 'node:fs';`,
+    `import('${runnerUrl}').then(async ({ commitRunSettlement }) => {`,
+    `  try {`,
+    `    const result = commitRunSettlement({`,
+    `      runDir: ${JSON.stringify(runDir)},`,
+    `      runId: ${JSON.stringify(runId)},`,
+    `      controlEpoch: ${JSON.stringify(controlEpoch)},`,
+    `      controlToken: ${JSON.stringify(controlToken)},`,
+    `      runResult: ${JSON.stringify(runResult)},`,
+    `      _beforeAuthoritativePublish: () => {`,
+    `        fs.writeFileSync(${JSON.stringify(barrierPauseFile)}, JSON.stringify({ paused: true, pid: process.pid }));`,
+    `        while (!fs.existsSync(${JSON.stringify(barrierResumeFile)})) {`,
+    `          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);`,
+    `        }`,
+    `      },`,
+    `    });`,
+    `    process.stdout.write(JSON.stringify({ ok: true, result }));`,
+    `  } catch (err) {`,
+    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message, code: err.code }));`,
+    `  }`,
+    `  process.exit(0);`,
+    `});`,
+  ].join('\n');
+  return execFileAsync(process.execPath, ['-e', script], { encoding: 'utf8' }).then((r) => JSON.parse(r.stdout));
+}
+
+test('executeAssignment: two-OS-process TOCTOU barrier race proves stale controller cannot overwrite authoritative result.json (R5 / I02-REV-04 settlement authority)', async () => {
+  const tempDir = mkTempDir();
+  const assignment = buildAssignment({ work: { id: 'tsk-r5-toctou-barrier', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  const barrierPauseFile = path.join(tempDir, 'barrier-paused.json');
+  const barrierResumeFile = path.join(tempDir, 'barrier-resume.json');
+
+  // 1. Initial controller acquires control token epoch 1
+  const initialControl = acquireRunControl(runDir, { holder: { id: 'stale-controller', pid: 10003 }, purpose: 'worker-spawn' });
+  assert.equal(initialControl.status, 'acquired');
+  assert.equal(initialControl.controlEpoch, 1);
+  const staleToken = initialControl.controlToken;
+
+  const stalePayload = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'failed',
+    confidence: 'failed',
+    summary: 'Stale controller attempting to overwrite after pausing at publication',
+    staleTag: 'should-never-become-authoritative',
+  };
+
+  // 2. Spawn Old Writer process in background.
+  // It passes precondition (epoch 1 is current) and pauses at _beforeAuthoritativePublish barrier.
+  const oldWriterPromise = spawnCommitRunSettlementWithBarrier({
+    runDir,
+    runId,
+    controlEpoch: 1,
+    controlToken: staleToken,
+    runResult: stalePayload,
+    barrierPauseFile,
+    barrierResumeFile,
+  });
+
+  // Wait for Old Writer to pass precondition and signal it is paused right before authoritative publication
+  while (!fs.existsSync(barrierPauseFile)) {
+    await new Promise((r) => setTimeout(r, 20));
+  }
+
+  // 3. Newer controller takes over (epoch 2) and settles authoritative result.json
+  // Takeover: release epoch 1 and acquire epoch 2
+  releaseRunControl(runDir, { controlEpoch: 1, controlToken: staleToken });
+  const newerControl = acquireRunControl(runDir, { holder: { id: 'newer-controller', pid: process.pid }, purpose: 'settle-authoritative' });
+  assert.equal(newerControl.status, 'acquired');
+  assert.equal(newerControl.controlEpoch, 2);
+
+  const authoritativeResult = {
+    contract: 'run-result.v2',
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative settlement from newer controller epoch 2',
+    authoritativeMarker: 'immutable-auth-marker-barrier-test-777',
+  };
+
+  const newerSettlement = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: 2,
+    controlToken: newerControl.controlToken,
+    runResult: authoritativeResult,
+  });
+  assert.equal(newerSettlement.authoritativeMarker, 'immutable-auth-marker-barrier-test-777');
+
+  // Verify authoritative result.json is on disk
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDiskAuthBeforeResume = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuthBeforeResume.authoritativeMarker, 'immutable-auth-marker-barrier-test-777');
+
+  // 4. Release Old Writer from barrier pause
+  fs.writeFileSync(barrierResumeFile, JSON.stringify({ proceed: true }));
+
+  // 5. Await Old Writer completion: must be refused with run-control-superseded
+  const oldWriterOutcome = await oldWriterPromise;
+  assert.equal(oldWriterOutcome.ok, false);
+  assert.equal(oldWriterOutcome.code, 'run-control-superseded');
+
+  // 6. Prove Old Writer CANNOT overwrite result.json:
+  // result.json must STILL be the Newer Controller's authoritative result!
+  const onDiskAuthAfterOldWriter = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuthAfterOldWriter.authoritativeMarker, 'immutable-auth-marker-barrier-test-777');
+  assert.equal(onDiskAuthAfterOldWriter.summary, 'Authoritative settlement from newer controller epoch 2');
+  assert.equal(onDiskAuthAfterOldWriter.staleTag, undefined);
+
+  // 7. Old Writer's payload was safely preserved at result.superseded.json
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
+  const onDiskSuperseded = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
+  assert.equal(onDiskSuperseded.staleTag, 'should-never-become-authoritative');
+  assert.equal(onDiskSuperseded.summary, 'Stale controller attempting to overwrite after pausing at publication');
+});
+
 test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
