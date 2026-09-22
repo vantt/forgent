@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@72894c98` (candidate `f835c215`, origin/main not pushed); Unit I04 / Phase 3 is next
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@2b8f7aeb` (candidate branch tip `46e09c30`, code fix `f835c215`, origin/main at `ad8dbaf0` not pushed); Unit I04 / Phase 3 is next
 Created: 2026-09-19
 Last Updated: 2026-09-22
 Mode: high-risk
@@ -771,21 +771,21 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: execute
   depends-on: I00 approved
   stop: `main` changes during integration or tree is not clean
-- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (integrated at `main@72894c98`, candidate `f835c215`)
+- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (integrated at `main@2b8f7aeb`, candidate branch tip `46e09c30`, code fix `f835c215`)
   capability: code:implement
   depends-on: I01
   status: integrated
-  candidate-sha: `f835c215` (lineage `0c17bd62` -> `2681b389` -> `f835c215`)
-  integrated-sha: `72894c98` (merge of `f835c215`)
-  origin-status: `origin/main` at `ad8dbaf0` (not pushed)
+  candidate-sha: `46e09c30` (code fix `f835c215`; lineage `0c17bd62` -> `2681b389` -> `f835c215` -> `46e09c30`)
+  integrated-sha: `2b8f7aeb` (clean integration of candidate branch tip `46e09c30`)
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed; 6 commits ahead)
   findings-resolved: I02-REV-01, I02-REV-02, I02-REV-03, I02-REV-04, F-01 (Settlement Authority / Alternate Writers), F-02 (Cross-Plan Status Synchronization)
   stop: current RunResult path contradicts the old patch or authority is ambiguous
-- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (integrated at `main@72894c98`)
+- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (integrated at `main@2b8f7aeb`)
   capability: code:test
   depends-on: I02
   status: integrated
-  integrated-sha: `72894c98`
-  origin-status: `origin/main` at `ad8dbaf0` (not pushed)
+  integrated-sha: `2b8f7aeb`
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed; 6 commits ahead)
   verification: 11 suites, 317 tests pass / 0 fail (doer matrix); 75 pass in assignment-dispatch.test.mjs
   stop: corrupt evidence can settle or close
 - unit: I04 — implement Phase 3 template registry/resolver/provenance
