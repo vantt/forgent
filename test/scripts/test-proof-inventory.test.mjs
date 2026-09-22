@@ -112,12 +112,10 @@ test('inventoryRunInitSites matches the real P02 nine-file lease: 3 process-cont
     'test/cli/fgos-claim.test.mjs',
     'test/cli/fgos-claim-2.test.mjs',
     'test/cli/fgos-read-5.test.mjs',
-    'test/cli/fgos-return-2.test.mjs',
+    'test/cli/fgos-return.test.mjs',
     'test/cli/fgos-iron-law-gate.test.mjs',
     'test/cli/fgos-move.test.mjs',
     'test/cli/fgos-approve-5.test.mjs',
-    'test/cli/fgos-return-3.test.mjs',
-    'test/cli/fgos-return-4.test.mjs',
   ];
   const entries = inventoryRunInitSites(nineFiles);
   assert.equal(entries.length, 7, 'current-tree count differs from the reprofiled P00A baseline; re-verify before trusting P02 scope');

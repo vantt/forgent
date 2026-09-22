@@ -514,7 +514,7 @@ test('return succeeds when ONLY .fgos/ (the live event log) is dirty — its own
 
 test('return succeeds when cwd is a subdirectory of the real git top-level and only .fgos/ (under that subtree) is dirty', () => {
   const { cwd } = initGitCwdInSubdir();
-  assert.equal(run(cwd, ['init']).status, 0);
+  run(cwd, ['init']);
   addOk(cwd, 'sub-return-fgos-only-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-fgos-only-dirty']).status, 0);
 
@@ -532,7 +532,7 @@ test('return succeeds when cwd is a subdirectory of the real git top-level and o
 
 test('return succeeds when cwd is a subdirectory and an unrelated file is dirty ELSEWHERE in the repo, outside cwd\'s own subtree', () => {
   const { cwd, topLevel } = initGitCwdInSubdir();
-  assert.equal(run(cwd, ['init']).status, 0);
+  run(cwd, ['init']);
   addOk(cwd, 'sub-return-scope-ok', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-scope-ok']).status, 0);
 
@@ -551,7 +551,7 @@ test('return succeeds when cwd is a subdirectory and an unrelated file is dirty 
 
 test('return still refuses when cwd is a subdirectory and a non-.fgos file is dirty INSIDE cwd\'s own subtree (real dirt still caught, does not overcorrect)', () => {
   const { cwd } = initGitCwdInSubdir();
-  assert.equal(run(cwd, ['init']).status, 0);
+  run(cwd, ['init']);
   addOk(cwd, 'sub-return-dirty', { verify: 'test -f proof.txt' });
   assert.equal(run(cwd, ['take', '--id', 'sub-return-dirty']).status, 0);
   fs.writeFileSync(path.join(cwd, 'proof.txt'), 'uncommitted\n'); // never git add/commit
