@@ -79,6 +79,7 @@ jobs:
       - name: Generate plan
         id: plan
         run: |
+          npm run test:ownership:lint
           npm run test:select:plan -- --base origin/main --plan-out selector-plan.json
           DECISION=$(node -p "require('./selector-plan.json').decision")
           echo "decision=$DECISION" >> $GITHUB_OUTPUT
