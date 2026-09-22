@@ -80,6 +80,25 @@ import { replaySession } from './replay.mjs';
 import { CoordinationError, CONTRIBUTION_REF_PREFIX, SCHEMA_VERSION_2, SCHEMA_VERSION_3 } from './schema.mjs';
 import { validateFlowDefinition } from '../definitions/schema.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
+// H4 (dispatch-execution-engine architecture review 260920): this engine is
+// the Run Result Evaluator's own quorum/fan-in gate, and used to read
+// result.json with a raw JSON.parse -- gating only on the compat
+// status/confidence fields a corrupt v2 record can still carry. A record
+// whose classification disagrees with its own compat fields (contractCorrupt)
+// was silently accepted. interpretRunResult is dispatch's own fail-closed
+// interpreter (already used by resume/reconcile/inspect); routing every read
+// here through it means a contract-corrupt record projects to
+// status:'no-evidence'/confidence:'failed' deterministically; this engine's
+// quorum/fan-in gates already read those two compat fields, so nothing
+// downstream needs to change to fail closed on it.
+import { interpretRunResult } from '../dispatch/run-result.mjs';
+// M14: the herdr-spawn worker report lives at outbox/report-N.md, not the
+// flat agent-report.md a cli-spawn worker uses -- worker-artifacts.mjs is
+// the one function that already knows to check both (assignment-runner.mjs's
+// own collector uses it). Reusing it here means this evaluator agrees with
+// the collector about where a report actually is, instead of re-deriving a
+// path that only matches half of dispatch's own adapters.
+import { resolveWorkerArtifactPath } from '../dispatch/worker-artifacts.mjs';
 import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
@@ -294,11 +313,20 @@ function readLinkedRunResultFromDisk(fgosDir, assignmentId, runId) {
   if (!fs.existsSync(resultPath)) {
     throw new CoordinationError('dangling-ref', `session recorded result-linked for runId "${runId}" but no result.json exists at ${resultPath}`);
   }
+  let parsed;
   try {
-    return JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+    parsed = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
   } catch (err) {
     throw new CoordinationError('corrupt-log', `result.json at ${resultPath} is not valid JSON: ${err.message}`);
   }
+  // H4: a syntactically valid JSON file can still be a contract-corrupt
+  // RunResult (v2 contract present but invariant-violating, or a compat
+  // status/confidence that disagrees with its own classification).
+  // interpretRunResult projects that to status:'no-evidence'/
+  // confidence:'failed' deterministically; this engine's quorum/fan-in gates
+  // already read those two compat fields, so nothing downstream needs to
+  // change to fail closed on it.
+  return interpretRunResult(parsed);
 }
 
 /**
@@ -327,11 +355,14 @@ function findLatestRunResult(fgosDir, assignmentId) {
   } catch (err) {
     throw new CoordinationError('corrupt-log', `result.json for assignment "${assignmentId}" run "${latest}" could not be read: ${err.message}`);
   }
+  let parsed;
   try {
-    return JSON.parse(raw);
+    parsed = JSON.parse(raw);
   } catch (err) {
     throw new CoordinationError('corrupt-log', `result.json for assignment "${assignmentId}" run "${latest}" is not valid JSON: ${err.message}`);
   }
+  // H4 -- see readLinkedRunResultFromDisk's sibling comment above.
+  return interpretRunResult(parsed);
 }
 
 /**
@@ -3546,17 +3577,26 @@ function sha256OfFile(filePath) {
  */
 function aggregationSourceFrom(fgosDir, sourceOperationRef, assignmentId, runId, runResult) {
   const settleReports = Array.isArray(runResult.settleReports) ? runResult.settleReports : [];
-  // Today's runner records at most one settle report per run (the single
-  // `agent-report.md`), so this is a guard against a shape this code has no
-  // rule for, not a routine branch: with several artifacts there is no
-  // declared way to pick which one the revision pin refers to.
+  // Today's runner records at most one settle report per run, so this is a
+  // guard against a shape this code has no rule for, not a routine branch:
+  // with several artifacts there is no declared way to pick which one the
+  // revision pin refers to. That one report can still be at either of two
+  // paths depending on which adapter produced it (see resolveWorkerArtifactPath
+  // below) -- "exactly one report" and "which path it lives at" are separate
+  // questions.
   if (settleReports.length !== 1) return null;
   const [report] = settleReports;
   if (typeof report?.path !== 'string' || typeof report?.sha256 !== 'string') return null;
 
   assertValidRunIdForAssignment(assignmentId, runId, 'aggregationSourceFrom (settle-report artifact)');
   const attemptStr = runId.slice(`run_${assignmentId}_`.length);
-  const reportPath = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr, 'agent-report.md');
+  const runDir = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr);
+  // M14 (dispatch-execution-engine architecture review 260920): was
+  // hardcoded to the flat agent-report.md, so a herdr-spawn worker's real
+  // report at outbox/report-N.md was never found -- sha256OfFile below threw
+  // ENOENT, currentRevision came back undefined, and the source read as
+  // stale, forcing every herdr-spawn settle-report gate to no-consensus.
+  const reportPath = resolveWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
 
   return {
     source: {

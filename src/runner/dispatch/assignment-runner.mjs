@@ -1389,6 +1389,58 @@ function attemptProviderCapacityFallback({
 }
 
 /**
+ * R5 (Phase 01 result truth, Decision D3): Authoritative RunResult settlement gate.
+ *
+ * Contract & Concurrency Invariants:
+ * 1. Authority & Exclusivity:
+ *    - Only the controller holding the current control epoch (`isRunControlCurrent(runDir, { controlEpoch, controlToken })`)
+ *      is permitted to commit the authoritative settlement: publishing `result.json` and transitioning the run via `markRunSettled(runDir)`.
+ * 2. Superseded Controller Late Settlement Preservation:
+ *    - When a controller finishes late after control moved to a newer epoch (e.g. orchestrator timeout, retry takeover,
+ *      or split-brain worker completion), it is refused from mutating `result.json`.
+ *    - Instead, its normalized work product (`runResult`) is preserved at `result.superseded.json`.
+ *    - The function throws a typed RunnerConfigError({ code: 'run-control-superseded', phase: 'post-admission' }).
+ * 3. Atomic Publication Guarantees:
+ *    - Writes to both `result.json` and `result.superseded.json` use `publishMutableProjection`, which writes to a
+ *      process-unique temporary file (`.tmp-${process.pid}-${timestamp}-${rand}`), calls `fs.fsyncSync`, and performs
+ *      POSIX `fs.renameSync`.
+ *    - This guarantees that readers and concurrent writers never observe a partially written, torn, or corrupted file.
+ * 4. Same-Payload Retry Determinism:
+ *    - Multiple concurrent or sequential late attempts producing identical normalized work products converge
+ *      deterministically to the identical byte representation in `result.superseded.json`.
+ * 5. Conflicting Late Payloads (Atomic Last-Writer-Wins):
+ *    - If multiple distinct late workers produce conflicting payloads, atomic rename guarantees last-writer-wins.
+ *      `result.superseded.json` always contains a complete, valid JSON payload of the latest writer, never torn or mixed.
+ *    - Authoritative `result.json` is NEVER overwritten, touched, or corrupted by any late writer.
+ * 6. Non-Authoritative Isolation:
+ *    - `result.superseded.json` is strictly a diagnostic projection. Downstream consumers (session engine,
+ *      `readLinkedRunResultFromDisk`, `findLatestRunResult`, `evaluateSessionQuorum`, `closeSessionByQuorum`, `replaySession`)
+ *      read only `result.json` and completely ignore `result.superseded.json`.
+ *
+ * @param {object} params
+ * @param {string} params.runDir Path to the run directory
+ * @param {string} params.runId Run identifier
+ * @param {number} params.controlEpoch Control epoch held by this controller
+ * @param {string} params.controlToken Control token held by this controller
+ * @param {object} params.runResult Normalized RunResult v2 object
+ * @returns {Readonly<object>} Frozen runResult on authoritative settlement
+ */
+export function commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult }) {
+  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+    publishMutableProjection(path.join(runDir, 'result.superseded.json'), runResult);
+    throw new RunnerConfigError(
+      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
+    );
+  }
+
+  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
+  markRunSettled(runDir);
+  Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
+  return Object.freeze(runResult);
+}
+
+/**
  * Execute an assignment by dispatching a worker and recording the Run & RunResult (Step 03 §5).
  *
  * @param {object} assignment Assignment object
@@ -2483,13 +2535,6 @@ export async function executeAssignment(assignment, opts = {}) {
         await new Promise((r) => setTimeout(r, 20));
       }
 
-      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-        throw new RunnerConfigError(
-          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-          { code: 'run-control-superseded', phase: 'post-admission' },
-        );
-      }
-
       // 9. Guarded update: command reconciled with receipt-backed outcome
       if (supervisorReceipt) {
         commandState.state = 'reconciled';
@@ -2596,17 +2641,10 @@ export async function executeAssignment(assignment, opts = {}) {
       }
 
       // The adapter call above is the ONE async gap this control token has to
-      // outlive. Before appending anything a reader would treat as this Run's
-      // settlement, confirm nothing superseded this token while it ran --
-      // otherwise a controller that lost control mid-flight could still write
-      // a result a fresher controller never authorized (crash matrix: "result
-      // with stale control token -- refuse and append no settlement").
-      if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-        throw new RunnerConfigError(
-          `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-          { code: 'run-control-superseded', phase: 'post-admission' },
-        );
-      }
+      // outlive. The settlement gate below checks isRunControlCurrent before
+      // writing result.json: if superseded, it preserves the work product as
+      // result.superseded.json (R5 / Decision D3) and throws
+      // run-control-superseded without touching authoritative result.json.
     }
 
   const durationMs = Date.now() - startTime;
@@ -2921,25 +2959,7 @@ export async function executeAssignment(assignment, opts = {}) {
     },
   });
 
-  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-    throw new RunnerConfigError(
-      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-      { code: 'run-control-superseded', phase: 'post-admission' },
-    );
-  }
-
-  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
-
-  // Close the sentence run.json started. It was written `running` before the
-  // worker launched and, until now, was never written again -- so a run that
-  // finished an hour ago and a run whose process was killed mid-flight read
-  // identically off disk, and nothing could tell them apart afterwards.
-  //
-  // `settled` here means the run reached its end and produced a RunResult. It
-  // says nothing about whether the work succeeded; that verdict is the
-  markRunSettled(runDir);
-  Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
-  return Object.freeze(runResult);
+  return commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult });
   } finally {
     if (useSupervisorRecovery && launchCommandId) {
       try {

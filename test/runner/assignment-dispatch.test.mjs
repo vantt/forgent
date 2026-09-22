@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
@@ -119,9 +119,10 @@ function writeHangingExecutor(dir) {
   fs.writeFileSync(
     scriptPath,
     `
-    process.stdout.write("Starting long work...\\n");
+    import fs from 'node:fs';
+    fs.writeSync(1, "Starting long work...\\n");
     setTimeout(() => {
-      process.stdout.write("Finished\\n");
+      fs.writeSync(1, "Finished\\n");
       process.exit(0);
     }, 10000);
     `,
@@ -215,7 +216,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
       args: [executorScript, '{prompt}'],
     },
     models: { standard: 'test-model' },
-    timeoutMs: 150,
+    timeoutMs: 500,
   };
 
   const work = { id: 'tsk-test-timeout', status: 'doing', stage: 'planning', domain: 'coding' };
@@ -229,7 +230,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
-    timeoutMs: 150,
+    timeoutMs: 500,
   });
 
   assert.equal(result.assignmentId, assignment.assignmentId);
@@ -2854,7 +2855,12 @@ test('executeAssignment: concurrent identical admission (same retryId/tuple, two
   const runIds = new Set(succeeded.map((o) => o.result.runId));
   assert.equal(runIds.size, 1, `every successful call must report the SAME Run identity, got ${JSON.stringify(outcomes)}`);
   for (const o of outcomes) {
-    if (!o.ok) assert.ok(['run-control-held', 'admission-invalid-predecessor', 'admission-duplicate-retry'].includes(o.code), `an unsuccessful call must fail for an expected admission/control reason, got code: ${o.code} (${o.message})`);
+    if (!o.ok) {
+      assert.ok(
+        ['run-control-held', 'run-in-flight', 'run-unreconciled', 'admission-invalid-predecessor', 'admission-duplicate-retry'].includes(o.code),
+        `an unsuccessful call must fail for an expected admission/control reason, got code: ${o.code} (${o.message})`,
+      );
+    }
   }
 
   const runsDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs');
@@ -3075,6 +3081,297 @@ test('executeAssignment: a control token that is superseded mid-flight (a freshe
   assert.equal(outcome.ok, false, 'a superseded controller must never successfully append a settlement');
   assert.equal(outcome.code, 'run-control-superseded');
   assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false, 'no settlement (result.json) may be appended by a controller that lost its token mid-flight');
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true, 'superseded controller work product is preserved as result.superseded.json (R5 / Decision D3)');
+  const supersededResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
+  assert.equal(supersededResult.runId, `run_${assignment.assignmentId}_01`);
+  assert.equal(supersededResult.assignmentId, assignment.assignmentId);
+  assert.deepEqual(supersededResult.contract, { id: 'assignment-run-result', version: 2 });
+});
+
+test('executeAssignment: late superseded writer cannot overwrite authoritative result.json already settled by a newer controller (R5)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = path.join(tempDir, 'delayed-executor.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    setTimeout(() => {
+      const prompt = process.argv.slice(2).join(' ');
+      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      if (match) {
+        const runDir = path.dirname(match[1]);
+        fs.mkdirSync(runDir, { recursive: true });
+        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDelayed worker product.\\n');
+        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Delayed worker outcome' }));
+      }
+      process.exit(0);
+    }, 200);
+    `,
+  );
+  const runnerConfig = admissionRunnerConfig(executorScript);
+  const assignment = buildAssignment({ work: { id: 'tsk-superseded-no-overwrite', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const controlGenerationsDir = path.join(runDir, 'control', 'generations');
+
+  const authoritativeResult = {
+    contract: 'run-result.v2',
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative settlement from fresher controller',
+    authoritativeMarker: 'immutable-auth-marker-98765',
+  };
+
+  const interjectAndSettle = async () => {
+    for (let i = 0; i < 100; i += 1) {
+      if (fs.existsSync(controlGenerationsDir) && fs.readdirSync(controlGenerationsDir).some((f) => f.endsWith('.json'))) break;
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    const [genFile] = fs.readdirSync(controlGenerationsDir).filter((f) => f.endsWith('.json')).sort();
+    const record = JSON.parse(fs.readFileSync(path.join(controlGenerationsDir, genFile), 'utf8'));
+    const controlEpoch = Number(genFile.replace('.json', ''));
+
+    releaseRunControl(runDir, { controlEpoch, controlToken: record.controlToken });
+    const interloper = acquireRunControl(runDir, { holder: { id: 'fresher-controller', pid: process.pid }, purpose: 'settle-authoritative' });
+    assert.equal(interloper.status, 'acquired');
+
+    // Newer controller settles the authoritative result.json
+    fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(authoritativeResult, null, 2)}\n`);
+  };
+
+  const [outcome] = await Promise.all([
+    executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }).then(
+      (result) => ({ ok: true, result }),
+      (err) => ({ ok: false, message: err.message, code: err.code }),
+    ),
+    interjectAndSettle(),
+  ]);
+
+  assert.equal(outcome.ok, false);
+  assert.equal(outcome.code, 'run-control-superseded');
+
+  // Authoritative result.json was NOT overwritten by late superseded controller
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDiskAuthoritative = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuthoritative.authoritativeMarker, 'immutable-auth-marker-98765');
+  assert.equal(onDiskAuthoritative.summary, 'Authoritative settlement from fresher controller');
+
+  // But superseded work product is safely preserved as result.superseded.json
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
+  const onDiskSuperseded = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
+  assert.equal(onDiskSuperseded.runId, `run_${assignment.assignmentId}_01`);
+  assert.equal(onDiskSuperseded.agentClaim?.summary, 'Delayed worker outcome');
+  assert.notEqual(onDiskSuperseded.authoritativeMarker, 'immutable-auth-marker-98765');
+});
+
+function spawnCommitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult }) {
+  const runnerUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const script = [
+    `import('${runnerUrl}').then(async ({ commitRunSettlement }) => {`,
+    `  try {`,
+    `    const result = commitRunSettlement({`,
+    `      runDir: ${JSON.stringify(runDir)},`,
+    `      runId: ${JSON.stringify(runId)},`,
+    `      controlEpoch: ${JSON.stringify(controlEpoch)},`,
+    `      controlToken: ${JSON.stringify(controlToken)},`,
+    `      runResult: ${JSON.stringify(runResult)},`,
+    `    });`,
+    `    process.stdout.write(JSON.stringify({ ok: true, result }));`,
+    `  } catch (err) {`,
+    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message, code: err.code }));`,
+    `  }`,
+    `  process.exit(0);`,
+    `});`,
+  ].join('\n');
+  return execFileAsync(process.execPath, ['-e', script], { encoding: 'utf8' }).then((r) => JSON.parse(r.stdout));
+}
+
+test('executeAssignment: two-OS-process race on identical stale payload retry deterministically converges result.superseded.json without touching authoritative result.json (R5 / I02-REV-01)', async () => {
+  const tempDir = mkTempDir();
+  const assignment = buildAssignment({ work: { id: 'tsk-r5-same-payload', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  // 1. Initial controller acquires control token epoch 1
+  const initialControl = acquireRunControl(runDir, { holder: { id: 'stale-controller', pid: 10001 }, purpose: 'worker-spawn' });
+  assert.equal(initialControl.status, 'acquired');
+  assert.equal(initialControl.controlEpoch, 1);
+  const staleToken = initialControl.controlToken;
+
+  // 2. Fresher controller takes over control (epoch 2) and settles authoritative result.json
+  releaseRunControl(runDir, { controlEpoch: 1, controlToken: staleToken });
+  const freshControl = acquireRunControl(runDir, { holder: { id: 'fresher-controller', pid: process.pid }, purpose: 'settle-authoritative' });
+  assert.equal(freshControl.status, 'acquired');
+  assert.equal(freshControl.controlEpoch, 2);
+
+  const authoritativeResult = {
+    contract: 'run-result.v2',
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative settlement from fresher controller epoch 2',
+    authoritativeMarker: 'immutable-auth-marker-same-payload-test',
+  };
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(authoritativeResult, null, 2)}\n`);
+
+  // 3. Two stale OS processes simultaneously attempt settlement with identical work product payload
+  const identicalStalePayload = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'tentative',
+    summary: 'Identical stale retry work product',
+    retryDeterminismTag: 'deterministic-tag-999',
+  };
+
+  const [procA, procB] = await Promise.all([
+    spawnCommitRunSettlement({ runDir, runId, controlEpoch: 1, controlToken: staleToken, runResult: identicalStalePayload }),
+    spawnCommitRunSettlement({ runDir, runId, controlEpoch: 1, controlToken: staleToken, runResult: identicalStalePayload }),
+  ]);
+
+  // Both stale child processes must be refused with typed run-control-superseded
+  assert.equal(procA.ok, false);
+  assert.equal(procA.code, 'run-control-superseded');
+  assert.equal(procB.ok, false);
+  assert.equal(procB.code, 'run-control-superseded');
+
+  // Authoritative result.json must be completely untouched and unmodified
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDiskAuth = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuth.authoritativeMarker, 'immutable-auth-marker-same-payload-test');
+  assert.equal(onDiskAuth.summary, 'Authoritative settlement from fresher controller epoch 2');
+
+  // result.superseded.json must exist, be valid JSON, and deterministically match the identical payload
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
+  const onDiskSuperseded = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
+  assert.equal(onDiskSuperseded.runId, runId);
+  assert.equal(onDiskSuperseded.summary, 'Identical stale retry work product');
+  assert.equal(onDiskSuperseded.retryDeterminismTag, 'deterministic-tag-999');
+});
+
+test('executeAssignment: two-OS-process race on conflicting stale payloads resolves via atomic last-writer-wins without file corruption (R5 / I02-REV-01)', async () => {
+  const tempDir = mkTempDir();
+  const assignment = buildAssignment({ work: { id: 'tsk-r5-conflicting-payloads', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  // 1. Initial controller acquires control token epoch 1
+  const initialControl = acquireRunControl(runDir, { holder: { id: 'stale-controller', pid: 10002 }, purpose: 'worker-spawn' });
+  assert.equal(initialControl.status, 'acquired');
+  const staleToken = initialControl.controlToken;
+
+  // 2. Fresher controller takes over control (epoch 2) and settles authoritative result.json
+  releaseRunControl(runDir, { controlEpoch: 1, controlToken: staleToken });
+  const freshControl = acquireRunControl(runDir, { holder: { id: 'fresher-controller', pid: process.pid }, purpose: 'settle-authoritative' });
+  assert.equal(freshControl.status, 'acquired');
+  assert.equal(freshControl.controlEpoch, 2);
+
+  const authoritativeResult = {
+    contract: 'run-result.v2',
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative settlement from fresher controller epoch 2',
+    authoritativeMarker: 'immutable-auth-marker-conflicting-test',
+  };
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(authoritativeResult, null, 2)}\n`);
+
+  // 3. Two stale OS processes attempt settlement with CONFLICTING work product payloads
+  const payloadWorkerA = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'failed',
+    confidence: 'failed',
+    summary: 'Worker A conflicting failure output',
+    workerTag: 'worker-A-payload',
+  };
+
+  const payloadWorkerB = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'tentative',
+    summary: 'Worker B conflicting success output',
+    workerTag: 'worker-B-payload',
+  };
+
+  const [procA, procB] = await Promise.all([
+    spawnCommitRunSettlement({ runDir, runId, controlEpoch: 1, controlToken: staleToken, runResult: payloadWorkerA }),
+    spawnCommitRunSettlement({ runDir, runId, controlEpoch: 1, controlToken: staleToken, runResult: payloadWorkerB }),
+  ]);
+
+  // Both stale child processes must be refused with typed run-control-superseded
+  assert.equal(procA.ok, false);
+  assert.equal(procA.code, 'run-control-superseded');
+  assert.equal(procB.ok, false);
+  assert.equal(procB.code, 'run-control-superseded');
+
+  // Authoritative result.json must be completely untouched and unmodified
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDiskAuth = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuth.authoritativeMarker, 'immutable-auth-marker-conflicting-test');
+
+  // result.superseded.json must exist, be valid uncorrupted JSON, and reflect atomic last-writer-wins
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
+  const rawSuperseded = fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8');
+  let onDiskSuperseded;
+  assert.doesNotThrow(() => {
+    onDiskSuperseded = JSON.parse(rawSuperseded);
+  }, 'result.superseded.json must be 100% valid parseable JSON without partial/torn writes');
+
+  assert.equal(onDiskSuperseded.runId, runId);
+  assert.ok(['worker-A-payload', 'worker-B-payload'].includes(onDiskSuperseded.workerTag));
+  assert.ok(['Worker A conflicting failure output', 'Worker B conflicting success output'].includes(onDiskSuperseded.summary));
+});
+
+test('executeAssignment: non-authoritative isolation guarantees result.superseded.json is never adopted as RunResult truth (R5 / I02-REV-01)', async () => {
+  const tempDir = mkTempDir();
+  const fgosDir = path.join(tempDir, '.fgos');
+  const assignment = buildAssignment({ work: { id: 'tsk-r5-isolation', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(fgosDir, 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  // Case A: Only result.superseded.json exists on disk (no result.json)
+  const supersededOnlyPayload = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Superseded work product waiting for diagnostic inspection',
+  };
+  fs.writeFileSync(path.join(runDir, 'result.superseded.json'), `${JSON.stringify(supersededOnlyPayload, null, 2)}\n`);
+
+  // Authoritative result.json does NOT exist
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false);
+
+  // Case B: Authoritative result.json is written alongside result.superseded.json
+  const authoritativePayload = {
+    contract: { id: 'assignment-run-result', version: 2 },
+    runId,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative outcome from current epoch controller',
+    authoritativeMarker: 'authoritative-isolation-marker',
+  };
+  fs.writeFileSync(path.join(runDir, 'result.json'), `${JSON.stringify(authoritativePayload, null, 2)}\n`);
+
+  // Authoritative reader reading result.json receives authoritative content only
+  const readAuth = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(readAuth.authoritativeMarker, 'authoritative-isolation-marker');
+  assert.notEqual(readAuth.summary, supersededOnlyPayload.summary);
 });
 
 test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {

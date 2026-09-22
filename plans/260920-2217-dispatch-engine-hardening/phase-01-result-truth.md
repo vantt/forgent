@@ -14,11 +14,18 @@ Khi sửa R1, hai test có fixture tự mâu thuẫn bị lộ ra (không phải
 
 ## Requirements
 
-- R1 **[DONE — nhánh `dispatch-hardening-phase01-r1r4`, chưa merge]** Evaluator (session-engine) chỉ chấp nhận RunResult đã qua `interpretRunResult`; `contractCorrupt === true` → failed.
+- R1 **[DONE — tích hợp trên `coordination-integration-i02-result-truth`]** Evaluator (session-engine) chỉ chấp nhận RunResult đã qua `interpretRunResult`; `contractCorrupt === true` → failed.
 - R2 **[DONE trên main]** `verifiedSha` chỉ khi `status === 0` và outcome không `timeout/failed`.
 - R3 **[DONE trên main]** Không synthesize worker claim; basis `valid-agent-result-claim` chỉ khi có file claim thật. (Mở rộng: `claimInvalid` nay được truyền đúng vào `normalizeRunResultV2` ở cả hai call site — xem Status ở trên.)
-- R4 **[DONE — nhánh `dispatch-hardening-phase01-r1r4`, chưa merge]** Evaluator resolve report path qua `resolveWorkerArtifactPath`, không hardcode `agent-report.md`.
-- R5 **[chưa làm]** (sau D3, đã quyết: ghi `result.superseded.json`) superseded controller's late result ghi file thay vì refuse thẳng.
+- R4 **[DONE — tích hợp trên `coordination-integration-i02-result-truth`]** Evaluator resolve report path qua `resolveWorkerArtifactPath`, không hardcode `agent-report.md`.
+- R5 **[DONE — tích hợp trên `coordination-integration-i02-result-truth`]** (theo D3, đã quyết: ghi `result.superseded.json`) Superseded controller's late normalized result ghi file non-authoritative `result.superseded.json` thay vì refuse thẳng, không ghi đè `result.json` authoritative và không gọi `markRunSettled`.
+  - *Conflict & Concurrency Contract (I02-REV-01)*:
+    1. **Non-authoritative diagnostic status**: `result.superseded.json` được cô lập hoàn toàn khỏi session engine (`readLinkedRunResultFromDisk`, `findLatestRunResult`), quorum evaluation, replay và close session.
+    2. **Publication atomicity**: Xuất bản qua `publishMutableProjection` (POSIX `fs.renameSync` từ temp file duy nhất `.tmp-${pid}-${now}-${rand}` kèm fsync), đảm bảo không bao giờ có partial / torn reads dưới concurrency.
+    3. **Same-payload retry determinism**: Hai OS process stale chạy retry cùng ghi một payload chuẩn hóa sẽ hội tụ đơn định (deterministic convergence) về cùng biểu diễn byte.
+    4. **Conflicting late payloads**: Hai OS process stale ghi các payload khác nhau giải quyết theo atomic last-writer-wins mà không làm hỏng file (valid JSON).
+    5. **Authoritative immutability**: Authoritative `result.json` (do fresher controller ghi) không bao giờ bị bất kỳ stale writer nào ghi đè hay biến đổi.
+    6. **Two-OS-process proof**: Chứng minh bằng test thực tế với 2 tiến trình Node độc lập chạy song song (`test/runner/assignment-dispatch.test.mjs`).
 - R6 **[dời sang Phase 04]** Attribution: khai `attributionVersion:'correlation-only'` trong RunResult tới khi attestation được nối.
 
 ## Files

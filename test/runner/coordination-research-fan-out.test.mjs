@@ -636,6 +636,13 @@ test('R7: synthesizeResearchFanIn accepts a genuinely "verified"-confidence bran
   const resultPath = path.join(tempDir, '.fgos', 'assignments', branchA.assignment.assignmentId, 'runs', '01', 'result.json');
   const parsed = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
   parsed.confidence = 'verified';
+  // H4 (dispatch-execution-engine architecture review 260920): the compat
+  // top-level field and classification.confidence.level must agree, or
+  // interpretRunResult -- now the sole reader on this path -- correctly
+  // treats the record as contract-corrupt (a real, non-worker-provided
+  // consistency invariant, not this test's target). Patch both so this
+  // stays a genuinely valid "verified" v2 record.
+  parsed.classification.confidence.level = 'verified';
   fs.writeFileSync(resultPath, JSON.stringify(parsed, null, 2));
 
   const synthesis = synthesizeResearchFanIn('coord_fanout_r7_accept', { branchActorIds: ['researcher-a', 'researcher-b'] }, { cwd: tempDir });
@@ -685,6 +692,10 @@ test('R7: synthesizeResearchFanIn NEVER erases a caller-declared contradiction a
     const resultPath = path.join(tempDir, '.fgos', 'assignments', branch.result.assignment.assignmentId, 'runs', '01', 'result.json');
     const parsed = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
     parsed.confidence = 'verified';
+    // H4 -- see the sibling "accept" test above: keep the compat field and
+    // classification.confidence.level in agreement so this stays a valid
+    // v2 record under interpretRunResult, not an incidental contract-corrupt one.
+    parsed.classification.confidence.level = 'verified';
     fs.writeFileSync(resultPath, JSON.stringify(parsed, null, 2));
   }
 
