@@ -1,3 +1,4 @@
+import os from 'node:os';
 // merge.mjs — the approval-gate merge engine (per pr-lifecycle D1-D5):
 // mechanics that turn an approved proposal into a merged, verified `done`
 // item — extracted from bin/fgos.mjs so the CLI stays a thin verb table,

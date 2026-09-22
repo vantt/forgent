@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { REPO_ROOT, DEFAULT_TEST_ROOT, discoverTestFiles, runSelectedTests, runTests } from './run-tests.mjs';
 import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
 
-const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing']);
+const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status']);
 
 // Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
 // already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
@@ -129,6 +129,7 @@ export function validateManifest(manifest, { repoRoot = REPO_ROOT } = {}) {
   for (const rule of manifest) {
     for (const key of Object.keys(rule)) {
       if (!KNOWN_RULE_FIELDS.has(key)) errors.push(`rule "${rule.id ?? '(no id)'}" has unsupported field "${key}"`);
+      if (key === 'status' && !['shadow', 'live', 'quarantined'].includes(rule.status)) errors.push(`rule "${rule.id}" has invalid status "${rule.status}"`);
     }
     if (!rule.id) {
       errors.push('a rule is missing an id');

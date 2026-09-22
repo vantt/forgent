@@ -74,7 +74,7 @@ export const MANIFEST = [
   { id: 'state-tool-registry', status: 'shadow', pattern: 'src/state/tool-registry.mjs', directTests: ['test/state/tool-registry.test.mjs'], boundaryTests: [] },
 
   { id: 'verbs-state-edit', status: 'shadow', pattern: 'src/verbs/state/edit.mjs', directTests: ['test/direct/fgos-edit.test.mjs'], boundaryTests: [] },
-  { id: 'verbs-state-move', status: 'shadow', pattern: 'src/verbs/state/move.mjs', directTests: [], boundaryTests: [] },
+  { id: 'verbs-state-move', status: 'shadow', pattern: 'src/verbs/state/move.mjs', directTests: [], boundaryTests: ['test/direct/fgos-stage.test.mjs'] },
   { id: 'verbs-state-read', status: 'shadow', pattern: 'src/verbs/state/read.mjs', directTests: ['test/direct/fgos-read.test.mjs'], boundaryTests: [] },
   { id: 'verbs-state-stage', status: 'shadow', pattern: 'src/verbs/state/stage.mjs', directTests: ['test/direct/fgos-stage.test.mjs'], boundaryTests: [] },
 ];

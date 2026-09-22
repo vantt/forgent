@@ -5,11 +5,13 @@ import { mutants } from '../test/test-ownership-mutants.mjs';
 function log(msg) { console.log(msg); }
 function err(msg) { console.error(msg); }
 
-export function classifyMutant(fullStatus, relatedStatus, relatedRan) {
-  if (fullStatus === 0 && relatedStatus === 0) return 'equivalent-or-suite-gap';
-  if (fullStatus !== 0 && relatedStatus === 0 && relatedRan) return 'confirmed-miss';
-  if (fullStatus !== 0 && relatedStatus !== 0) return 'killed';
-  if (fullStatus !== 0 && !relatedRan) return 'killed-by-full'; // Related didn't run (e.g. escalated)
+export function classifyMutant(result) {
+  if (result.infraError) return 'infra-error';
+  if (result.timeout) return 'timeout';
+  if (result.syntaxError) return 'invalid-syntax';
+  if (result.relatedPassed === false) return 'caught';
+  if (result.relatedPassed === true && result.fullPassed === true) return 'equivalent-or-missing-test';
+  if (result.relatedPassed === true && result.fullPassed === false) return 'confirmed-miss';
   return 'invalid';
 }
 
