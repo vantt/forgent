@@ -117,6 +117,68 @@ export function compileDispatchPlan(
     if (!hasExplicitExecutor) {
       const mechanism = decideDispatchMechanism({ hasNativeMechanism: true, hasLiveTaskAccess, forceCliSpawn: false });
       reasonCodes.push(hasLiveTaskAccess ? 'native-first.rule-2.live-task-access' : 'native-first.rule-1.no-native-mechanism');
+      // H6a: this branch used to hardcode `governance: {providerFamily:
+      // null, egress: null}` unconditionally -- a real DispatchPlan
+      // reported as dispatchable (native-first, `configured: false` just
+      // means "no executors.<id> entry of its own", not "nothing will run")
+      // with no governance evaluated at all. `disallowedProviders`/
+      // `disallowedExecutors` (assignment-policy.mjs's own governance gate)
+      // silently never fired for a `--work` dispatch that fell through to
+      // here. Same fix shape as the out-of-process resolveExecutorConfig
+      // path further below: resolve the global executor's real config,
+      // synthesize a minimal policy so the SAME governance gate runs, and
+      // -- exactly like that other path -- report `mechanism: 'unavailable'`
+      // instead of silently previewing as dispatchable when it actually
+      // is not.
+      let workGovernance = { providerFamily: null, egress: null };
+      let workResolvedForDispatch;
+      try {
+        workResolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, workItem?.agentType);
+        workGovernance = workResolvedForDispatch?.governance ?? workGovernance;
+      } catch { /* no real config to resolve governance from -- stays null, same as before */ }
+      if (workResolvedForDispatch) {
+        const workSyntheticPolicy = { preferExecutor: executorId };
+        const workAssignmentForPolicy = {
+          operation: executorId,
+          role: undefined,
+          policy: workSyntheticPolicy,
+          skills: [],
+        };
+        try {
+          resolveAssignmentDispatchPolicy({
+            assignment: workAssignmentForPolicy,
+            work: workItem,
+            runnerConfig: cfg,
+            cliOverride,
+            options,
+          });
+        } catch (err) {
+          // Only a REAL governance refusal (assignment-policy.mjs's own
+          // "governance gate rejected ..." throw, disallowedProviders/
+          // disallowedExecutors) downgrades this plan to unavailable. This
+          // branch's assignment/work are synthesized, the same as the main
+          // success path's own `assignmentForPolicy` -- any OTHER throw
+          // (a synthesis-shape mismatch this narrower object hits that a
+          // real Assignment would not) must degrade the same lenient way
+          // the main path already does for a synthesized assignment: never
+          // crash plan compilation, never claim a governance block that
+          // was never actually evaluated.
+          if (/governance gate rejected/.test(err.message)) {
+            return {
+              selector,
+              caller: callerObj,
+              mechanism: 'unavailable',
+              executorId,
+              capability: executorId,
+              invocation: null,
+              governance: workGovernance,
+              reasonCodes: [...reasonCodes, 'governance.blocked'],
+              configured: false,
+              blockedReason: err.message,
+            };
+          }
+        }
+      }
       return {
         selector,
         caller: callerObj,
@@ -124,7 +186,7 @@ export function compileDispatchPlan(
         executorId,
         capability: executorId,
         invocation: null,
-        governance: { providerFamily: null, egress: null },
+        governance: workGovernance,
         reasonCodes,
         configured: false,
       };
@@ -182,6 +244,31 @@ export function compileDispatchPlan(
         ? purposeResolved
         : resolveExecutorAndOverrides(cfg, executorId);
   const { executor, configured } = resolved;
+
+  // H6b (D1, 2026-09-20 ACCEPTED): `decide <executorId>` naming an
+  // unregistered id used to keep falling through to `decideExecutorDispatchMechanism`'s
+  // guessed native-first mechanism -- a typo in an explicit executorId
+  // silently "worked" via whatever native fallback happened to apply,
+  // while the exact same situation for `--for` (below, `!executorId` after
+  // purpose resolution fails) already refused outright with
+  // `mechanism: 'unavailable'`/`reasonCodes: ['selector.unregistered']`.
+  // D1 accepted making both doors apply the same rule: an unregistered
+  // name is never silently guessed at, whether it arrived as `--for` or as
+  // a bare positional executorId.
+  if (selector.type === 'executor' && !configured) {
+    reasonCodes.push('selector.unregistered');
+    return {
+      selector,
+      caller: callerObj,
+      mechanism: 'unavailable',
+      executorId,
+      capability: purpose ?? (executorId ?? null),
+      invocation: null,
+      governance: { providerFamily: null, egress: null },
+      reasonCodes,
+      configured: false,
+    };
+  }
 
   let mcpTool;
   let finalMechanism = mechanism;

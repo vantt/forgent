@@ -122,7 +122,15 @@ const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 // -- optional, only meaningful together with it. See ACTOR_ALLOWED_KEYS's
 // own `invocation` field (src/verbs/coordination/schema.mjs), the trusted
 // request field this PolicyPatch value is threaded in from.
-const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode']);
+// M12: the ONE source of truth for what field names a PolicyPatch may ever
+// carry -- exported so every OTHER reader (registrations.mjs's domain-
+// workflow policy-shape doctor check, execution-contract.mjs's narrower
+// contract.policy subset) reads this same Set instead of hand-copying it,
+// which had already drifted once (registrations.mjs's own copy was still
+// missing `preferInvocation` and `repeatMode`, silently flagging both as
+// "disallowed" in a domain workflow's declared policy even though this
+// schema accepts them).
+export const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode']);
 
 const WORKFLOW_PROFILE_FIELDS = new Set(['kind', 'work']);
 const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
@@ -340,7 +348,7 @@ export function mergePolicyStack(scopedPatches) {
       resolved.repeatMode = validated.repeatMode;
       resolvedRepeatModeLabel = label;
     }
-    for (const key of ['preferPersona', 'preferExecutor', 'visibility']) {
+    for (const key of ['preferPersona', 'preferExecutor', 'preferInvocation', 'visibility']) {
       if (validated[key] !== undefined) resolved[key] = validated[key];
     }
     if (validated.fallbackExecutors !== undefined) resolved.fallbackExecutors = validated.fallbackExecutors;

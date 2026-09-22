@@ -956,11 +956,21 @@ function resolveDeclaredPolicyStack(scopeStack) {
   const merged = mergePolicyStack(scopeStack.map(({ scope, id, policy }) => ({ scope, source: id, policy: policy ?? {} })));
   return {
     merged,
+    // M12: provenance for EVERY PolicyPatch field (schema.mjs's own
+    // POLICY_PATCH_FIELDS enumerates all seven) -- `invocation`/
+    // `fallbackExecutors`/`repeatMode` used to have no provenance entry at
+    // all, so a caller reading `cliOverride.policyProvenance` could not
+    // tell which scope won a `preferInvocation`/`fallbackExecutors`/
+    // `repeatMode` value the same way it already could for tier/persona/
+    // executor/visibility.
     provenance: {
       tier: lastSourceFor(scopeStack, 'minTier'),
       persona: lastSourceFor(scopeStack, 'preferPersona'),
       executor: lastSourceFor(scopeStack, 'preferExecutor'),
+      invocation: lastSourceFor(scopeStack, 'preferInvocation'),
+      fallbackExecutors: lastSourceFor(scopeStack, 'fallbackExecutors'),
       visibility: lastSourceFor(scopeStack, 'visibility'),
+      repeatMode: lastSourceFor(scopeStack, 'repeatMode'),
     },
   };
 }
@@ -2497,6 +2507,7 @@ export async function dispatchDeclaredOperationLocked(
     ...(merged.minTier !== undefined ? { minTier: merged.minTier } : {}),
     ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
     ...(merged.preferExecutor !== undefined ? { preferExecutor: merged.preferExecutor } : {}),
+    ...(merged.preferInvocation !== undefined ? { preferInvocation: merged.preferInvocation } : {}),
     ...(merged.fallbackExecutors !== undefined ? { fallbackExecutors: merged.fallbackExecutors } : {}),
     ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
     ...(merged.repeatMode !== undefined ? { repeatMode: merged.repeatMode } : {}),
