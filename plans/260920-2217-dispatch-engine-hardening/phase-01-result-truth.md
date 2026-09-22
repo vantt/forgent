@@ -6,7 +6,7 @@ Nhỏ nhất, giá trị cao nhất: hai consumer quyết "thành công" hôm na
 
 ## Status — 2026-09-22
 
-**R1, R2, R3, R4, R5 ĐÃ HOÀN TẤT VÀ TÍCH HỢP TRÊN LOCAL `main`** (commit `dca4efd5`, candidate `2681b389` kèm F-01 CAS hardening cho mọi writer, origin/main chưa push). R2, R3 tích hợp từ commit `26f53318`. R1, R4 và R5 được hợp nhất qua kế hoạch tích hợp thống nhất `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 & I03). Nhánh `dispatch-hardening-phase01-r1r4` (commit `9049e611`) đã được supersede hoàn toàn. R6 dời sang Phase 04 cùng attestation.
+**R1, R2, R3, R4, R5 ĐÃ HOÀN TẤT VÀ TÍCH HỢP TRÊN LOCAL `main`** (commit `72894c98`, candidate `f835c215` kèm F-01 CAS hardening cho mọi writer, origin/main chưa push). R2, R3 tích hợp từ commit `26f53318`. R1, R4 và R5 được hợp nhất qua kế hoạch tích hợp thống nhất `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 & I03). Nhánh `dispatch-hardening-phase01-r1r4` (commit `9049e611`) đã được supersede hoàn toàn. R6 dời sang Phase 04 cùng attestation.
 
 Khi sửa R3 (M4), phát hiện một gap tiền tồn tại ngoài phạm vi review gốc: `claimInvalid` được tính ở cả hai settle call site nhưng **chưa bao giờ được truyền vào** `normalizeRunResultV2` — "fails closed on malformed/invalid agent-result.json" (Step 04 §5.2) trước đây chỉ đúng *tình cờ*, qua field `.status` của claim giả mạo. Đã vá cùng lúc (nằm trong commit `26f53318`): truyền `claimInvalid` ở cả hai call site + thêm nhánh confidence-classification cho `claimInvalid` trong `run-result.mjs`.
 
@@ -55,7 +55,7 @@ R1 có thể làm một số session cũ có `result.json` v1 → `legacy-derive
 
 ## R1/R4 & R5 — Reconciled and Integrated
 
-**Status:** INTEGRATED into local `main` (commit `dca4efd5`, candidate `2681b389` + F-01/F-02 fix; `origin/main` at `ad8dbaf0` not pushed pending re-review) via unified integration plan `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 and I03).
+**Status:** INTEGRATED into local `main` (commit `72894c98`, candidate `f835c215` + F-01/F-02 fix; `origin/main` at `ad8dbaf0` not pushed pending re-review) via unified integration plan `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 and I03).
 **Date:** 2026-09-22.
 **Reconciliation details:**
 - R1 (`interpretRunResult` evaluator routing on on-disk result readers) and R4 (`resolveWorkerArtifactPath` in `aggregationSourceFrom`) from `9049e611` were forward-reconciled with post-Phase-2 `session-engine.mjs`.
