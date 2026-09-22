@@ -38,6 +38,7 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
+import { POLICY_PATCH_FIELDS } from '../definitions/schema.mjs';
 
 export const CONTRACT_POLICY_VERSION = '1';
 
@@ -211,7 +212,21 @@ const ACCEPTED_BUDGET_FIELDS = new Set(['timeoutMs', 'maxRuns', 'tokens']);
 const ACCEPTED_EVIDENCE_FIELDS = new Set(['required']);
 // Step 08 P04.2b: see the `'policy'` entry in ACCEPTED_CONTRACT_FIELDS above
 // for why this exists and why it is exactly one field wide.
+//
+// M12: still deliberately narrower than a full PolicyPatch -- this inline
+// contract's own `policy` field is `minTier` alone, never the
+// preferExecutor/preferPersona/... fields the real PolicyPatch schema
+// carries elsewhere. Cross-checked against schema.mjs's own
+// POLICY_PATCH_FIELDS (the one place ALL legal PolicyPatch field names are
+// enumerated) so a future rename/removal of 'minTier' there is caught here
+// as a real assertion failure, rather than this Set silently naming a field
+// PolicyPatch itself no longer recognizes.
 const ACCEPTED_POLICY_FIELDS = new Set(['minTier']);
+for (const field of ACCEPTED_POLICY_FIELDS) {
+  if (!POLICY_PATCH_FIELDS.has(field)) {
+    throw new Error(`execution-contract.mjs's ACCEPTED_POLICY_FIELDS names "${field}", which schema.mjs's POLICY_PATCH_FIELDS no longer recognizes as a legal PolicyPatch field -- these two lists have drifted.`);
+  }
+}
 
 // ADR-006 §6: no session or coordination reference in this slice.
 const FORBIDDEN_SESSION_FIELDS = new Set(['coordinationId', 'sessionId', 'threadId', 'coordinationRef']);

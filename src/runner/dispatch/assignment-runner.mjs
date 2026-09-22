@@ -267,7 +267,11 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
       `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
     );
   }
-  return verifiedExecutorId;
+  // M7: the caller needs the FULL decision (pool/seed alongside the chosen
+  // id) to persist it into dispatch-plan.json -- before this, everything
+  // but the final executorId was discarded here, leaving no audit trail
+  // for WHY a read-only redirect landed on the executor it did.
+  return { executorId: verifiedExecutorId, pool: rawPool, seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}` };
 }
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
@@ -1540,10 +1544,9 @@ export async function executeAssignment(assignment, opts = {}) {
   // invocation would still get silently substituted away to the
   // redirect's target executor entirely, discarding the caller's choice.
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
-  let resolvedExecutorId =
-    isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude' && !hasExplicitInvocationPin
-      ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment)
-      : defaultExecutorId;
+  const redirectAttempted = isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude' && !hasExplicitInvocationPin;
+  const redirectResult = redirectAttempted ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment) : null;
+  let resolvedExecutorId = redirectResult ? redirectResult.executorId : defaultExecutorId;
   // executor-id-consolidation Step 2: the pool entry that named
   // `resolvedExecutorId` may have pinned a specific invocation (Step 2.1's
   // `id`) -- e.g. redirecting to a specific confined variant, not
@@ -1553,6 +1556,26 @@ export async function executeAssignment(assignment, opts = {}) {
   const readOnlyRedirectInvocationId = resolvedExecutorId !== defaultExecutorId
     ? readOnlyRedirectInvocationFor(cfg, defaultExecutorId, effectiveAssignment?.operation, resolvedExecutorId)
     : undefined;
+  // M7: persist the FULL redirect decision (not just the chosen id) onto
+  // the compiled plan -- before this, dispatch-plan.json carried no record
+  // of which pool was considered or what seed drove the deterministic
+  // pick, so a redirected dispatch had no audit trail for why it landed on
+  // the executor it did. Only set when a redirect was actually attempted
+  // (redirectResult non-null); an ordinary, non-read-only or already-pinned
+  // dispatch carries no redirectDecision at all, same as before this field
+  // existed.
+  if (redirectResult && compiledPlan) {
+    compiledPlan = {
+      ...compiledPlan,
+      redirectDecision: {
+        sourceExecutorId: defaultExecutorId,
+        pool: redirectResult.pool,
+        seed: redirectResult.seed,
+        chosen: resolvedExecutorId,
+        invocation: readOnlyRedirectInvocationId ?? null,
+      },
+    };
+  }
   effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
   // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
   // resolveAssignmentDispatchPolicy (inside compileDispatchPlan above) already

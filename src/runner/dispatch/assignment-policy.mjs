@@ -131,13 +131,29 @@ export function resolveStrongerTier(tierA, tierB) {
  * @param {object} [params.options] Governance and lookup options
  * @returns {Readonly<object>} Effective dispatch policy
  */
+// M12: `cliOverride` renamed to `policyInputs` -- the merged PolicyPatch a
+// caller wants layered on top of the assignment/work/operation stack was
+// never CLI-specific (session-engine.mjs's own coordination dispatch path
+// builds and passes one with no CLI in sight), so the old name described
+// where the FIRST caller of this function happened to source it from, not
+// what the parameter actually is. `cliOverride` is kept as a working alias
+// for one release rather than a breaking rename -- accepted alongside
+// `policyInputs`, with `policyInputs` winning when a caller (unusually)
+// supplies both.
 export function resolveAssignmentDispatchPolicy({
   assignment,
   work,
   runnerConfig,
   cliOverride = {},
+  policyInputs,
   options = {},
 }) {
+  // `policyInputs` wins when a caller supplies both; every reference below
+  // stays named `cliOverride` (including provenance's own `{scope:
+  // 'cliOverride'}` stamp -- an internal attribution label, not part of
+  // this rename) since reassigning the one binding here covers all of them
+  // without a large, error-prone rename sweep across this whole function.
+  if (policyInputs !== undefined) cliOverride = policyInputs;
   if (!assignment || typeof assignment !== 'object') {
     throw new RunnerConfigError('resolveAssignmentDispatchPolicy requires an assignment object');
   }
