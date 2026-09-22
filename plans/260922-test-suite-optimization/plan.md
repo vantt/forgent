@@ -424,7 +424,7 @@ Replay 50 commit lịch sử đã bị red-team bác (`patchRelatedMiss` = false
 - **Manifest decay:** lint block chỉ cho test không tồn tại/schema sai/`test/direct/*` mồ côi; warn cho file mới không rule và import check; coverage-map H2 (∪ static closure) sinh suggestion, người review — ITR-D07 giữ nguyên.
 - **Ranh giới bảo vệ:** full CI vẫn required trên PR; `fgos return`/`approve` không dùng related; full hiện chỉ chạy **sau** merge cục bộ — sửa ở item merge-gate riêng (hướng (c) đã phê duyệt), không thuộc Pillar 3.
 
-Chi tiết thực thi, 3 contract kỹ thuật, 12 AC, 9 slice, 2 prompt cho item liên quan: **[phase-03-selector-promotion-shadow-ci.md](phase-03-selector-promotion-shadow-ci.md)**. Contract nguồn: `plans/reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md` §3–§4, §12.
+Chi tiết thực thi, 3 contract kỹ thuật, 12 AC, 9 slice, 2 prompt cho item liên quan: **[phase-03-selector-promotion-shadow-ci.md](phase-03-selector-promotion-shadow-ci.md)**. Contract nguồn: [tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md](../reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md) §3–§4, §12.
 
 ### 3.3 Definition of Done — Pillar 3
 
@@ -640,4 +640,4 @@ Chi tiết thực thi, 3 contract kỹ thuật, 12 AC, 9 slice, 2 prompt cho ite
 
 **Quan hệ với D-OPT-03:** giữ kết luận "không replay lịch sử, shadow trên PR"; **thay** cơ chế (jobs song song + classifier per test case thay `runShadow()` tuần tự trong một job) và **thay** tiêu chí tin cậy ("2-3 tuần" → failure opportunities đếm được: mutant kill + full-shadow fail phân loại được; thời gian không phải bằng chứng).
 
-**Nguồn:** `plans/reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md` (§3–§4 contract, §7–§15 lịch sử 10 vòng), `phase-03-selector-promotion-shadow-ci.md`.
+**Nguồn:** [tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md](../reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md) (§3–§4 contract, §7–§15 lịch sử 10 vòng), [phase-03-selector-promotion-shadow-ci.md](phase-03-selector-promotion-shadow-ci.md).
