@@ -799,6 +799,15 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I06 — complete dispatch-hardening Phase 05 remainder
   capability: code:implement
   depends-on: I01
+  status: implemented-ready-for-review
+  candidate-branch: `coordination-skill-harness-i06-dispatch-governance`
+  base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
+  requirements-completed:
+    - R5 (provider-family vs model lookup decoupling verified and preserved)
+    - R6 (cross-provider redirect contract: schema, typed refusal redirect.cross-provider-not-permitted, full provenance)
+    - R7 (PlacementPolicy authority reconciled as active binder, stablePoolIndex deduplicated)
+    - R8 (adapter registry leaf module src/runner/dispatch/adapters.mjs cycle cut)
+  report: `plans/260919-coordination-skill-harness-simplification/reports/phase-03a-i06-dispatch-governance-implementation.md`
   stop: provider/placement authority decision is not settled
 - unit: I07 — implement dispatch-hardening Phase 08 operability/doctor
   capability: code:implement

@@ -438,9 +438,10 @@ test('R8 one-door confinement authority: EXECUTOR_ADAPTERS execute-handle lookup
   );
   assert.equal(sites[0].file, 'src/runner/dispatch/confinement/authority.mjs');
 
-  // Also assert that no production files other than authority.mjs, transport.mjs (definition),
-  // and config.mjs (metadata reader) import or reference EXECUTOR_ADAPTERS.
+  // Also assert that no production files other than authority.mjs, adapters.mjs (definition),
+  // transport.mjs, and config.mjs (metadata reader) import or reference EXECUTOR_ADAPTERS.
   const allowedReferences = new Set([
+    'src/runner/dispatch/adapters.mjs',
     'src/runner/dispatch/confinement/authority.mjs',
     'src/runner/dispatch/transport.mjs',
     'src/runner/dispatch/config.mjs',
@@ -457,6 +458,17 @@ test('R8 one-door confinement authority: EXECUTOR_ADAPTERS execute-handle lookup
     invalidRefFiles,
     [],
     `production files illegally referencing EXECUTOR_ADAPTERS: ${invalidRefFiles.join(', ')}`,
+  );
+});
+
+test('R8 cycle cut: src/runner/dispatch/config.mjs does not import src/runner/dispatch/transport.mjs', () => {
+  const configSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/config.mjs'), 'utf8');
+  const imports = extractImports(configSource);
+  const importsTransport = imports.some((spec) => spec.includes('transport.mjs'));
+  assert.equal(
+    importsTransport,
+    false,
+    'config.mjs must not import transport.mjs (import cycle cut via adapters.mjs leaf)',
   );
 });
 
