@@ -93,19 +93,7 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-test('edit use case changes only the targeted field, every other field unchanged', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-risk', { risk: 'light' });
-  const before = eventLines(cwd).length;
-  const result = editUseCase({ dir: path.join(cwd, '.fgos') }, { id: 'edit-risk', patch: { risk: 'heavy' } });
-  assert.deepEqual(result.fields, ['risk']);
-  assert.equal(eventLines(cwd).length, before + 1);
-  const item = stateView(cwd).work['edit-risk'];
-  assert.equal(item.risk, 'heavy');
-  assert.equal(item.title, 'Title edit-risk');
-  assert.equal(item.kind, 'task');
-  assert.equal(item.status, 'todo');
-});
+test.todo('edit use case changes only the targeted field, every other field unchanged - migrated to test/direct/fgos-edit.test.mjs');
 
 // tsk-1t2: real events for tsk-26r (work.move/work.outcome/work.edit) were
 // once found sitting in the shared repo's frozen `.fgos/events.jsonl`
@@ -184,54 +172,13 @@ test('edit rejects a patch targeting id/status/stage/domain, exit 4, no event wr
 });
 
 
-test('edit succeeds identically regardless of the item current status', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-any-status');
-  // tsk-40m: tmpCwdFromTemplate() has no real git repo, so `take` (which computes a
-  // real HEAD) can't be used here -- raw-inject the durable 'doing' status
-  // this test actually asserts against instead.
-  moveToDurableDoingForTest(cwd, 'edit-any-status');
-  const result = run(cwd, ['edit', 'edit-any-status', '--risk', 'heavy']);
-  assert.equal(result.status, 0);
-  const item = stateView(cwd).work['edit-any-status'];
-  assert.equal(item.risk, 'heavy');
-  assert.equal(item.status, 'doing');
-});
+test.todo('edit succeeds identically regardless of the item current status - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it', () => {
-  const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['add', 'edit-refs', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--refs', 'a,b', '--description', 'tsk-535 fixture description.']);
-  assert.equal(result.status, 0);
-
-  const untouched = run(cwd, ['edit', 'edit-refs', '--risk', 'heavy']);
-  assert.equal(untouched.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-refs'].refs, ['a', 'b']);
-
-  const cleared = run(cwd, ['edit', 'edit-refs', '--refs', '']);
-  assert.equal(cleared.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-refs'].refs, []);
-});
+test.todo('edit omitting --refs/--deps leaves the field untouched; an explicit empty value clears it - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it', () => {
-  const cwd = tmpCwdFromTemplate();
-  assert.equal(addOk(cwd, 'parent-edit-root').status, 0);
-  assert.equal(addOk(cwd, 'parent-edit-child').status, 0);
-  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
-
-  const untouched = run(cwd, ['edit', 'parent-edit-child', '--risk', 'heavy']);
-  assert.equal(untouched.status, 0);
-  assert.equal(stateView(cwd).work['parent-edit-child'].parent, undefined);
-
-  const setParent = run(cwd, ['edit', 'parent-edit-child', '--parent', 'parent-edit-root']);
-  assert.equal(setParent.status, 0);
-  assert.equal(stateView(cwd).work['parent-edit-child'].parent, 'parent-edit-root');
-
-  const cleared = run(cwd, ['edit', 'parent-edit-child', '--parent', '']);
-  assert.equal(cleared.status, 0);
-  assert.equal(stateView(cwd).work['parent-edit-child'].parent, null);
-});
+test.todo('edit omitting --parent leaves it untouched; an explicit --parent sets it; --parent "" clears it - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --parent (bare, no value) is rejected as a valueless flag, distinct from --parent ""', () => {
@@ -256,20 +203,7 @@ test('edit --parent closing a cycle is rejected at the CLI, same "graph cycle" m
 });
 
 
-test('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-store-locked');
-  const dir = path.join(cwd, '.fgos');
-  const before = eventLines(cwd).length;
-  for (const key of ['id', 'status', 'stage', 'domain']) {
-    assert.throws(
-      () => editWork(dir, { id: 'edit-store-locked', patch: { [key]: 'whatever' } }),
-      (err) => err instanceof StoreError && err.category === 'validation',
-      `patch.${key} should be rejected`,
-    );
-  }
-  assert.equal(eventLines(cwd).length, before);
-});
+test.todo('editWork rejects a patch containing id/status/stage/domain as validation, before merge, no event written - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit reports the real event seq in its envelope data, not undefined', () => {
@@ -292,22 +226,10 @@ test('edit reports the real event seq in its envelope data, not undefined', () =
 // equivalent there by design, so no test asserts a negative for `add` —
 // the flags simply don't appear in its parser wiring at all).
 
-test('edit --priority sets the item priority field to the given integer, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-priority');
-  const result = run(cwd, ['edit', 'edit-priority', '--priority', '3']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-priority'].priority, 3);
-});
+test.todo('edit --priority sets the item priority field to the given integer, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --intent accepts a negative value (no sign constraint), exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-intent-neg');
-  const result = run(cwd, ['edit', 'edit-intent-neg', '--intent', '-1']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-intent-neg'].intent, -1);
-});
+test.todo('edit --intent accepts a negative value (no sign constraint), exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
@@ -322,16 +244,7 @@ for (const [label, badFlagArgs, fieldName] of EDIT_BAD_FLAG_CASES) {
   });
 }
 
-test('edit --urgent/--impact/--effort set the item fields to the given values, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-priority-matrix');
-  const result = run(cwd, ['edit', 'edit-priority-matrix', '--urgent', 'critical', '--impact', '12.5', '--effort', '3']);
-  assert.equal(result.status, 0);
-  const item = stateView(cwd).work['edit-priority-matrix'];
-  assert.equal(item.urgent, 'critical');
-  assert.equal(item.impact, 12.5);
-  assert.equal(item.effort, 3);
-});
+test.todo('edit --urgent/--impact/--effort set the item fields to the given values, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 for (const [label, badFlagArgs, fieldName] of EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES) {

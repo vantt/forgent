@@ -101,34 +101,13 @@ import {
 // item created via `addOk` can no longer "have none" -- reframed to prove
 // `edit --description` still overwrites an existing one, the same
 // capability this test always covered.
-test('edit --description overwrites an existing description, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-description-existing');
-  assert.equal(stateView(cwd).work['edit-description-existing'].description, 'tsk-535 fixture description.');
-  const result = run(cwd, ['edit', 'edit-description-existing', '--description', 'the full story']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-description-existing'].description, 'the full story');
-});
+test.todo('edit --description overwrites an existing description, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --footprint sets footprint on an item that had none, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-footprint-new');
-  assert.equal(stateView(cwd).work['edit-footprint-new'].footprint, undefined);
-  const result = run(cwd, ['edit', 'edit-footprint-new', '--footprint', 'src/a.mjs,src/b.mjs']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-footprint-new'].footprint, ['src/a.mjs', 'src/b.mjs']);
-});
+test.todo('edit --footprint sets footprint on an item that had none, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --action sets action directive prose on an item, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-action-new');
-  assert.equal(stateView(cwd).work['edit-action-new'].action, undefined);
-  const result = run(cwd, ['edit', 'edit-action-new', '--action', 'Implement feature X per plan.md']);
-  assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['edit-action-new'].action, 'Implement feature X per plan.md');
-});
+test.todo('edit --action sets action directive prose on an item, exit 0 - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --action with empty string is rejected as validation, exit 4', () => {
@@ -150,28 +129,10 @@ test('edit --acceptance is refused when a clause supplies text+evidence together
 });
 
 
-test('edit --acceptance persists work.acceptance as the given array', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-acceptance');
-  const clauses = [{ text: 'newly added clause' }];
-  const result = run(cwd, ['edit', 'edit-acceptance', '--acceptance', JSON.stringify(clauses)]);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-acceptance'].acceptance, clauses);
-});
+test.todo('edit --acceptance persists work.acceptance as the given array - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps', () => {
-  const cwd = tmpCwdFromTemplate();
-  const first = [{ text: 'first clause' }, { text: 'second clause' }];
-  const result = run(cwd, ['add', 'edit-acceptance-replace', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--acceptance', JSON.stringify(first), '--description', 'tsk-535 fixture description.']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, first);
-
-  const second = [{ text: 'a completely different clause' }];
-  const replaced = run(cwd, ['edit', 'edit-acceptance-replace', '--acceptance', JSON.stringify(second)]);
-  assert.equal(replaced.status, 0);
-  assert.deepEqual(stateView(cwd).work['edit-acceptance-replace'].acceptance, second, 'edit --acceptance must replace, not merge, the array');
-});
+test.todo('edit --acceptance replaces the whole array (latest-wins), same semantics as --refs/--deps - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit with a malformed --acceptance is rejected as validation, exit 4, no event written', () => {
@@ -216,28 +177,10 @@ test('editing in the missing evidence after a refusal, then retrying move --to d
 // tsk-34o: edit --role, mirroring take --role's own optional-flag pattern --
 // role only ever lands in the raw event's payload (never projected onto
 // work[id], unlike take's claimRole), so these read eventLines directly.
-test('edit --role session tags the stored event payload.role "session" instead of the default human', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-role-session');
-
-  const result = run(cwd, ['edit', 'edit-role-session', '--risk', 'heavy', '--role', 'session']);
-  assert.equal(result.status, 0, `edit failed: ${result.stderr}`);
-
-  const last = JSON.parse(eventLines(cwd).at(-1));
-  assert.equal(last.payload.role, 'session');
-});
+test.todo('edit --role session tags the stored event payload.role "session" instead of the default human - migrated to test/direct/fgos-edit.test.mjs');
 
 
-test('edit omitting --role still stamps payload.role "human" -- unchanged default for every existing caller', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'edit-role-default');
-
-  const result = run(cwd, ['edit', 'edit-role-default', '--risk', 'heavy']);
-  assert.equal(result.status, 0, `edit failed: ${result.stderr}`);
-
-  const last = JSON.parse(eventLines(cwd).at(-1));
-  assert.equal(last.payload.role, 'human');
-});
+test.todo('edit omitting --role still stamps payload.role "human" -- unchanged default for every existing caller - migrated to test/direct/fgos-edit.test.mjs');
 
 
 test('edit --role with an invalid value is rejected as validation, exit 4, no event written', () => {
