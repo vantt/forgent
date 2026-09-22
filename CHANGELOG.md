@@ -71,6 +71,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the original the other two mirror. Now writes the pid to a temp file and
   atomically `fs.linkSync`s it onto the lock path, closing the window by
   construction.
+- Single-live-worker guarantee for a dispatch Run (Phase 03): resuming a Run
+  whose prior dispatch attempt reconciles as anything other than settled or
+  genuinely never-dispatched now refuses (`run-in-flight`/`run-unreconciled`)
+  instead of silently launching a second worker over it, and admitting a
+  brand-new attempt for an Assignment is refused the same way unless the
+  prior attempt has settled or its control holder is provably dead (`--force
+  -new-attempt` overrides). `herdr-round.mjs`'s controller/commands writes
+  now go through the same controlEpoch/controlToken-fenced door
+  (`commitCommandOutcome`/new `patchCommandRecord`) every terminal write
+  already used, closing a stale-controller clobber window on the interim
+  ones. `dispatch recover --action resume-driver` now refuses a
+  CoordinationSession-owned Run, requires the driver's last heartbeat to be
+  confirmed stale (`liveness.fresh === false`) before authorizing resume, and
+  clears `dispatch.claim` through the same session-ownership/dead-holder
+  proof `dispatch.runtime.reconcile`'s own guard-repair action already
+  applies, instead of an unconditional unlink. `reconciliation-planner.mjs`'s
+  own internal `reconcile.lock` can now reclaim a dead holder (PID +
+  processStartTime) instead of staying wedged forever after a crash.
+
+### Deprecated
+
+- `session-engine.mjs`'s `dispatch.claim`/`retry-<n>.claim` exclusive-create
+  files are redundant as of the single-live-worker fix above:
+  `admitRunAttempt`'s own admission-time check now covers the same race more
+  robustly (a real cross-process control-epoch/PID proof, not a
+  same-process-only marker file). Kept for one release rather than removed
+  outright; slated for removal after that.
 
 ### Security
 

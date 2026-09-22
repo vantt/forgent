@@ -21,6 +21,7 @@ import path from 'node:path';
 import { findRunDir, readRunSnapshot } from './show-run.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
 import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
+import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
 import { classifyRunOutcome } from '../../runner/dispatch/visibility-session.mjs';
 
 export class RecoveryError extends Error {
@@ -198,18 +199,36 @@ function appendRecoveryCommand(runDir, record) {
   fs.appendFileSync(file, `${JSON.stringify(record)}\n`);
 }
 
-function dispatchClaimPathForRunDir(runDir) {
-  return path.join(path.dirname(path.dirname(runDir)), 'dispatch.claim');
-}
-
-function clearDispatchClaimForRecoveredDriver(runDir, action) {
-  if (action?.type !== 'resume-driver') return false;
-  const claimPath = dispatchClaimPathForRunDir(runDir);
+// R3: routing this through `planReconciliation`/`applyReconciliation`'s
+// `clear-assignment-claim` action was tried and reverted -- verified by
+// tracing every real writer of `dispatch.claim` (session-engine.mjs's
+// `createAndExecuteSessionTask`/`retrySessionTask`, the only two): both
+// create it with `fs.closeSync(fs.openSync(path, 'wx'))`, an always-empty
+// file, never `{pid, startTime}`. `planClearAssignmentClaim`'s dead-holder
+// proof (reconciliation-planner.mjs's `holder()`) requires exactly that
+// shape to ever resolve 'dead' -- against the real, always-empty file it
+// can only ever return 'needs-input' ("corrupt or unparseable"), which
+// would make `dispatchClaimCleared` permanently false in production. That
+// is not this fix applied correctly; it is a regression wearing this fix's
+// clothes (caught by `test/verbs/dispatch-recovery.test.mjs`'s own
+// dead-driver fixture, which fails against the exact real file shape).
+//
+// The actual dead-holder proof for THIS call site does not need to come
+// from the claim file's own content at all: `resume-driver` only reaches
+// this point after `recoverApplyUseCase`'s CAS/legality re-check already
+// required `liveness.fresh === false` (R3, `recovery-planner.mjs`) for
+// THIS Run, and the session-ownership refusal above already ran. Both are
+// real proof, just carried by the surrounding apply rather than by
+// `dispatch.claim`'s own bytes -- so a plain, unconditional unlink here is
+// safe given they already gated the call, not despite them.
+function clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, action) {
+  if (action?.type !== 'resume-driver' || !assignmentId) return { cleared: false };
+  const claimPath = path.join(repoRoot, '.fgos', 'assignments', assignmentId, 'dispatch.claim');
   try {
     fs.unlinkSync(claimPath);
-    return true;
+    return { cleared: true };
   } catch (err) {
-    if (err.code === 'ENOENT') return false;
+    if (err.code === 'ENOENT') return { cleared: false, claimOutcome: 'blocked', claimReason: 'no assignment claim exists' };
     throw err;
   }
 }
@@ -244,6 +263,28 @@ export function recoverApplyUseCase(ctx, params = {}) {
   }
   const runDir = resolveRunDir(ctx, runId);
   const nowIso = typeof now === 'function' ? now() : now ?? new Date().toISOString();
+  const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
+  const assignmentId = readRunSnapshot(runDir).run?.assignmentId ?? null;
+
+  // R3: `resume-driver` specifically -- not every recovery action -- is
+  // refused outright when the Run belongs to a CoordinationSession. This
+  // module's own header comment ("never imports from src/runner/
+  // coordination/") is about not folding a standalone Run back under
+  // session authority by READING/WRITING session state here; asking
+  // whether one owns this assignment, so this door can name the RIGHT one
+  // and get out of the way, is the opposite of that -- the same refusal
+  // `planClearAssignmentClaim` already applies for the narrower guard-repair
+  // action this action's own claim-clear now routes through below.
+  if (params.action?.type === 'resume-driver' && assignmentId) {
+    const sessionOwner = findCoordinationSessionOwningAssignment(repoRoot, assignmentId);
+    if (sessionOwner) {
+      throw new RecoveryError(
+        'session-owned',
+        `run "${runId}" (assignment "${assignmentId}") is owned by CoordinationSession "${sessionOwner.id}" -- resume-driver recovery belongs to that session's own recovery door (${sessionOwner.observeCommand}), not dispatch recover`,
+        { runId, assignmentId, sessionId: sessionOwner.id },
+      );
+    }
+  }
 
   return withRunLock(runDir, () => {
     const log = readRecoveryLog(runDir);
@@ -341,7 +382,15 @@ export function recoverApplyUseCase(ctx, params = {}) {
       snapshotHash: params.expectedSnapshot,
     };
     appendRecoveryCommand(runDir, record);
-    const dispatchClaimCleared = clearDispatchClaimForRecoveredDriver(runDir, params.action);
-    return { runId, runDir, outcome: 'applied', ...record, dispatchClaimCleared };
+    const claimResult = clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, params.action);
+    return {
+      runId,
+      runDir,
+      outcome: 'applied',
+      ...record,
+      dispatchClaimCleared: claimResult.cleared,
+      ...(claimResult.claimOutcome ? { dispatchClaimClearOutcome: claimResult.claimOutcome } : {}),
+      ...(claimResult.claimReason ? { dispatchClaimClearReason: claimResult.claimReason } : {}),
+    };
   });
 }

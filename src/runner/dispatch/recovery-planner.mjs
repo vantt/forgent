@@ -126,10 +126,34 @@ export function deriveRecoveryFacts(snapshot, evidence, requestedIntent) {
   if (blocked) return blocked;
 
   if (requestedIntent === 'resume') {
+    // Phase 03 R3/M15a: `collectEvidence` already computes a `liveness`
+    // entry (`fresh` from `visibility.lastSeenAt` vs. the same freshness
+    // window a live driver's own heartbeat renews), but this branch never
+    // consulted it -- resume was authorized purely on "not settled", which
+    // is also true of a Run whose driver is still very much alive and
+    // heartbeating. That is exactly how a second worker got spawned over a
+    // live one: resume-driver told the caller it was safe to clear the
+    // dispatch claim and relaunch while the original driver was still
+    // running. Strict `=== false`, not merely falsy -- missing evidence or
+    // an unconfirmed reading must never default to "safe to resume",
+    // matching this module's "never guessing an action" rule.
+    const liveness = evidence.find((e) => e.type === 'liveness');
+    if (!liveness) {
+      return {
+        status: 'needs-input',
+        reason: 'resume requested but no liveness evidence was supplied -- fresh/not-fresh cannot be guessed',
+      };
+    }
+    if (liveness.fresh !== false) {
+      return {
+        status: 'park',
+        reason: 'resume refused: the driver\'s last heartbeat is still fresh (or freshness could not be confirmed) -- a live driver may still be running this Run',
+      };
+    }
     return {
       status: 'ok',
       action: { type: 'resume-driver' },
-      reason: 'run is not settled and no unrecognized evidence was found -- the current driver may resume',
+      reason: 'run is not settled, no unrecognized evidence was found, and the driver has no fresh heartbeat (liveness.fresh === false) -- the current driver may resume',
     };
   }
 
@@ -163,7 +187,19 @@ export function isActionLegal(snapshot, evidence, action) {
     return { status: 'park', reason: 'action is missing or malformed -- never guessing what was meant' };
   }
   if (action.type === 'resume-driver') {
-    return { status: 'ok', reason: 'resume-driver remains legal: run is not settled and evidence is recognized' };
+    // Phase 03 R3/M15a: the same strict `fresh === false` requirement
+    // `deriveRecoveryFacts`'s `resume` branch now applies -- this function's
+    // own doc comment says "legal right now can never diverge between the
+    // two paths", so a live-driver check missing from ONE of them is a
+    // divergence, not an independent bug to fix once.
+    const liveness = evidence.find((e) => e.type === 'liveness');
+    if (!liveness) {
+      return { status: 'needs-input', reason: 'resume-driver re-check found no liveness evidence -- fresh/not-fresh cannot be guessed' };
+    }
+    if (liveness.fresh !== false) {
+      return { status: 'park', reason: 'resume-driver no longer legal: the driver\'s last heartbeat is fresh (or freshness could not be confirmed) at re-check time' };
+    }
+    return { status: 'ok', reason: 'resume-driver remains legal: run is not settled, evidence is recognized, and the driver has no fresh heartbeat' };
   }
   if (action.type === 'reassign-driver') {
     const authority = evidence.find((e) => e.type === 'replacement-authority' && e.driverId === action.toDriverId);

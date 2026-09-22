@@ -499,10 +499,47 @@ function planRepairProjection(root, { runId, now, ttlMs }) {
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['terminal-result-valid', 'status-stale', 'projection-epoch-matches'] };
 }
 
+// M9a: this module already has everything a dead-holder reclaim needs
+// (`startTime`/`holder`, the exact {pid, startTime} proof clear-assignment-
+// claim's own dead-holder check already applies) -- withLocalLock itself
+// never used any of it. A crashed applyReconciliation/applyCollectResult/
+// applyClearAssignmentClaim/applyRepairProjection call used to leave
+// reconcile.lock wedged FOREVER (no TTL, no reclaim at all), blocking every
+// future reconcile apply on this host. Reclaim only ever fires on
+// `holder(...).state === 'dead'` -- the same PID+startTime proof, never
+// elapsed time alone.
 function withLocalLock(root, fn) {
   const file = localLock(root); fs.mkdirSync(path.dirname(file), { recursive: true });
-  let fd; try { fd = fs.openSync(file, 'wx'); } catch (e) { return { outcome: 'blocked', reason: 'another reconcile apply is in progress' }; }
-  try { fs.writeSync(fd, String(process.pid)); return fn(); } finally { fs.closeSync(fd); try { fs.unlinkSync(file); } catch {} }
+  const record = { pid: process.pid, startTime: startTime(process.pid) };
+  let fd;
+  try {
+    fd = fs.openSync(file, 'wx');
+  } catch (e) {
+    if (e.code !== 'EEXIST') throw e;
+    let existing;
+    try {
+      existing = JSON.parse(fs.readFileSync(file, 'utf8'));
+    } catch {
+      return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
+    }
+    if (holder(existing).state !== 'dead') {
+      return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
+    }
+    try { fs.unlinkSync(file); } catch { /* raced with the dead holder's own cleanup -- fine either way */ }
+    try {
+      fd = fs.openSync(file, 'wx');
+    } catch (retryErr) {
+      if (retryErr.code === 'EEXIST') return { outcome: 'blocked', reason: 'another reconcile apply is in progress' };
+      throw retryErr;
+    }
+  }
+  try {
+    fs.writeSync(fd, JSON.stringify(record));
+    return fn();
+  } finally {
+    fs.closeSync(fd);
+    try { fs.unlinkSync(file); } catch {}
+  }
 }
 
 // collect-result's own target (a specific run.json, keyed by runId) cannot be
