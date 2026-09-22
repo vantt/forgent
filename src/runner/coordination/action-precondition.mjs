@@ -18,7 +18,7 @@ import {
   ACTIONS_CONTRACT_VERSION,
   projectCoordinationActions,
 } from './actions-projector.mjs';
-import { assignmentServesOperation, protocolOperationStamp } from './legality-facts.mjs';
+import { assignmentServesOperation, protocolOperationStamp, resolveDeclaredOperationActor } from './legality-facts.mjs';
 import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
 import {
   canonicalizeNormalizedSteps,
@@ -432,6 +432,9 @@ export function executeUnderActionPrecondition(
       }
       if (Array.isArray(matchedAction.requiredInputs)) {
         for (const inputKey of matchedAction.requiredInputs) {
+          if (matchedAction.kind === 'authorize-and-dispatch' && (inputKey === 'authorizationId' || inputKey === 'invocationKey')) {
+            continue;
+          }
           if (currentPayload[inputKey] === undefined || currentPayload[inputKey] === null) {
             throw new CoordinationError(
               'validation',
@@ -498,20 +501,26 @@ export function executeUnderActionPrecondition(
             servesOp = p.operationId === targetOp;
           }
           if (matchesActor && servesOp) {
-            const candidateKey = computeActionKey({
+            const actionInvocation = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation;
+            const invokedStep = actionInvocation?.normalizedSteps?.[0];
+            const opId = invokedStep?.operationId || asgnData?.operationId || p.operationId;
+            const actorId = invokedStep?.targetActorId || p.actorId || asgnData?.actorId;
+            const nodeId = definition?.spec?.graph?.nodes?.find((n) => (n.operations ?? []).some((o) => (o.id || o.ref) === opId))?.id;
+            const target = precondition.target ?? (opId && actorId ? { nodeId, operationId: opId, actorId } : null);
+            const candidateKey = target?.operationId && target?.actorId ? computeActionKey({
               contractVersion: ACTIONS_CONTRACT_VERSION,
               coordinationId,
               schemaVersion: manifest.schemaVersion,
               eventSeq: i,
               definitionDigest,
               kind: 'dispatch-operation',
-              target: precondition.target,
+              target,
               requiredInputs: ['objective', 'expectedOutputs'],
               optionalInputs: ['contextRefs', 'constraints', 'capabilities', 'fromAssignmentId', 'intent', 'round', 'taskKey', 'mutation'],
               allowedValues: precondition.allowedValues ?? null,
-            });
-            if (candidateKey === precondition.actionKey) {
-              const actionInvocation = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation;
+            }) : null;
+            if (candidateKey === precondition.actionKey || (actionInvocation?.actionKey === precondition.actionKey && actionInvocation.kind === precondition.kind)) {
+              if (!precondition.target && target) precondition.target = target;
               if (actionInvocation?.actionKey !== precondition.actionKey || actionInvocation.kind !== precondition.kind) {
                 // Keep the low-level precondition unit's legacy synthetic
                 // callback fixture readable. The production action door
@@ -558,6 +567,11 @@ export function executeUnderActionPrecondition(
           const matchesOp = targetOp ? p.operationId === targetOp : true;
           const matchesNode = targetNode ? p.nodeId === targetNode : true;
           if (matchesActor && matchesOp && matchesNode) {
+            const target = precondition.target ?? {
+              nodeId: p.nodeId,
+              operationId: p.operationId,
+              actorId: p.targetActorId,
+            };
             const candidateKey = computeActionKey({
               contractVersion: ACTIONS_CONTRACT_VERSION,
               coordinationId,
@@ -565,12 +579,13 @@ export function executeUnderActionPrecondition(
               eventSeq: i,
               definitionDigest,
               kind: 'authorize-and-dispatch',
-              target: precondition.target,
+              target,
               requiredInputs: ['authorizationId', 'invocationKey', 'reason', 'objective', 'expectedOutputs'],
               optionalInputs: ['grantedContextRefs', 'targetArtifactRef', 'contextRefs', 'constraints', 'capabilities', 'mutation'],
               allowedValues: precondition.allowedValues ?? null,
             });
             if (candidateKey === precondition.actionKey) {
+              if (!precondition.target && target) precondition.target = target;
               const authId = p.authorizationId;
               const matchingAsgn = events.slice(i + 1).find(
                 (e) => e.type === 'assignment-created' && (
@@ -641,10 +656,16 @@ export function executeUnderActionPrecondition(
         }
       }
     } else if (precondition.kind === 'record-disposition') {
-      const targetRef = precondition.target?.targetRef;
       for (let i = 0; i < events.length; i++) {
         const ev = events[i];
-        if (ev.type === 'driver-disposition-recorded' && ev.payload?.targetRef === targetRef) {
+        if (ev.type === 'driver-disposition-recorded') {
+          if (precondition.target?.targetRef && ev.payload?.targetRef !== precondition.target.targetRef) {
+            continue;
+          }
+          const target = precondition.target ?? {
+            targetRef: ev.payload?.targetRef,
+            actorId: ev.payload?.actorId ?? null,
+          };
           const candidateKey = computeActionKey({
             contractVersion: ACTIONS_CONTRACT_VERSION,
             coordinationId,
@@ -652,12 +673,13 @@ export function executeUnderActionPrecondition(
             eventSeq: i,
             definitionDigest,
             kind: precondition.kind,
-            target: precondition.target,
+            target,
             requiredInputs: precondition.requiredInputs ?? ['disposition', 'rationale'],
             optionalInputs: precondition.optionalInputs ?? ['evidenceRefs'],
             allowedValues: precondition.allowedValues ?? null,
           });
           if (candidateKey === precondition.actionKey) {
+            if (!precondition.target) precondition.target = target;
             priorExecution = {
               eventSeq: i,
               recordedPayload: {
@@ -677,9 +699,23 @@ export function executeUnderActionPrecondition(
       for (let i = 0; i < events.length; i++) {
         const ev = events[i];
         if (ev.type === 'deliberation-contribution-linked' && ev.payload?.contributionId === contribId) {
+          const asgnCreated = events.find(
+            (e) => e.type === 'assignment-created' && (e.payload?.assignmentId === ev.payload?.assignmentId || e.payload?.id === ev.payload?.assignmentId),
+          );
+          const actorId = asgnCreated?.payload?.actorId;
+          const node = definition?.spec?.graph?.nodes?.find((n) =>
+            (n.operations ?? []).some((o) => (o.id || o.ref) === ev.payload?.operationRef),
+          );
+          const nodeId = node?.id;
+          const target = precondition.target ?? {
+            assignmentId: ev.payload?.assignmentId,
+            operationId: ev.payload?.operationRef ?? null,
+            nodeId,
+            actorId,
+          };
           let allowedValues = precondition.allowedValues ?? null;
-          if (!allowedValues && definition && (precondition.target?.operationId || ev.payload.operationRef)) {
-            const opId = precondition.target?.operationId || ev.payload.operationRef;
+          if (!allowedValues && definition && (target?.operationId || ev.payload.operationRef)) {
+            const opId = target?.operationId || ev.payload.operationRef;
             const nodeOpDef = (definition?.spec?.graph?.nodes?.flatMap((n) => n.operations ?? []) ?? []).find(
               (o) => (o.id || o.ref) === opId,
             );
@@ -706,12 +742,13 @@ export function executeUnderActionPrecondition(
             eventSeq: i,
             definitionDigest,
             kind: precondition.kind,
-            target: precondition.target,
+            target,
             requiredInputs: precondition.requiredInputs ?? ['contributionId', 'contributionType', 'roundKey'],
             optionalInputs: precondition.optionalInputs ?? ['anchors', 'respondsTo', 'artifactRef', 'revision'],
             allowedValues,
           });
           if (candidateKey === precondition.actionKey) {
+            if (!precondition.target) precondition.target = target;
             priorExecution = {
               eventSeq: i,
               recordedPayload: {
@@ -730,6 +767,7 @@ export function executeUnderActionPrecondition(
         }
       }
     } else if (precondition.kind === 'record-human-turn') {
+      const target = precondition.target ?? { coordinationId };
       for (let i = 0; i < events.length; i++) {
         const ev = events[i];
         if (ev.type === 'human-turn-recorded') {
@@ -740,12 +778,13 @@ export function executeUnderActionPrecondition(
             eventSeq: i,
             definitionDigest,
             kind: precondition.kind,
-            target: precondition.target,
+            target,
             requiredInputs: precondition.requiredInputs ?? ['turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef', 'attributedTo'],
             optionalInputs: precondition.optionalInputs ?? ['respondsToRefs'],
             allowedValues: precondition.allowedValues ?? null,
           });
           if (candidateKey === precondition.actionKey) {
+            if (!precondition.target) precondition.target = target;
             priorExecution = {
               eventSeq: i,
               recordedPayload: {
@@ -765,11 +804,60 @@ export function executeUnderActionPrecondition(
         }
       }
     } else if (precondition.kind === 'fan-out') {
-      const targetOp = precondition.target?.operationId;
+      let target = precondition.target ?? null;
+      let allowedValues = precondition.allowedValues ?? null;
+      let targetOp = target?.operationId;
+      let targetNode = target?.nodeId;
+      let allowedActorIds = target?.allowedActorIds ?? allowedValues?.['branches.actorId'];
+
+      if (!target || !allowedValues) {
+        for (const ev of events) {
+          if (ev.type === 'assignment-created') {
+            const asgnId = ev.payload?.assignmentId || ev.payload?.id;
+            if (asgnId && paths?.fgosDir) {
+              try {
+                const asgnPath = path.join(paths.fgosDir, 'assignments', asgnId, 'assignment.json');
+                if (fs.existsSync(asgnPath)) {
+                  const asgnData = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
+                  const inv = asgnData?.provenance?.inline?.caller?.coordination?.actionInvocation;
+                  if (inv?.actionKey === precondition.actionKey && inv.kind === precondition.kind) {
+                    targetOp = asgnData.operationId || inv.normalizedSteps?.[0]?.operationId;
+                    const node = definition?.spec?.graph?.nodes?.find((n) =>
+                      (n.operations ?? []).some((o) => (o.id || o.ref) === targetOp),
+                    );
+                    targetNode = node?.id;
+                    const candidateActors = (definition?.spec?.actors ?? []).filter((a) => {
+                      try {
+                        const resolved = resolveDeclaredOperationActor(definition, targetOp, a.id);
+                        return resolved.actorId === a.id;
+                      } catch {
+                        return false;
+                      }
+                    });
+                    allowedActorIds = candidateActors.map((a) => a.id);
+                    target = {
+                      nodeId: targetNode,
+                      operationId: targetOp,
+                      allowedActorIds,
+                    };
+                    allowedValues = {
+                      'branches.actorId': allowedActorIds,
+                    };
+                    precondition.target = target;
+                    precondition.allowedValues = allowedValues;
+                    break;
+                  }
+                }
+              } catch {}
+            }
+          }
+        }
+      }
+
       const targetAction = {
         kind: 'fan-out',
-        target: precondition.target,
-        allowedValues: precondition.allowedValues,
+        target,
+        allowedValues,
       };
       // The action key is payload-independent, so retries must re-enforce the
       // exact bound cohort and classify a changed cohort as a payload conflict.
@@ -789,10 +877,10 @@ export function executeUnderActionPrecondition(
           eventSeq: i,
           definitionDigest,
           kind: precondition.kind,
-          target: precondition.target,
+          target,
           requiredInputs: ['branches'],
           optionalInputs: ['fromAssignmentId'],
-          allowedValues: precondition.allowedValues ?? null,
+          allowedValues: allowedValues ?? null,
         });
         if (candidateKey === precondition.actionKey) {
           composeRetryActionSteps(manifest, precondition, opts.composeActionRequest);
@@ -918,6 +1006,8 @@ export function executeUnderActionPrecondition(
       return {
         idempotent: true,
         cached: true,
+        coordinationId,
+        kind: precondition.kind,
         actionKey: precondition.actionKey,
         ...(priorExecution.result ?? {}),
       };

@@ -852,19 +852,19 @@ test('fgos coordination chain requires a track argument', () => {
   assert.match(result.stderr, /coordination chain requires a track/);
 });
 
-// ─── R5: every enumerated-subcommand string names "chain" ─────────────────
+// ─── R5: every enumerated-subcommand string names all 15 subverbs ──────────
 
-test('R5: every place that enumerates the coordination sub-verb list (help text, error messages, the registry description) names "chain"', () => {
+test('R5: every place that enumerates the coordination sub-verb list (help text, error messages, the registry description) names all 15 subverbs', () => {
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <run\|show\|close\|actions\|launch-master-loop\|chain\|recover>/,
-    'requireField usage message must enumerate "close", "actions", and "chain"',
+    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/,
+    'requireField usage message must enumerate all 15 subverbs including "close", "actions", and "chain"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: run, show, close, actions, launch-master-loop, chain, recover\)/,
-    'unknown-sub-verb error message must enumerate "close", "actions", and "chain"',
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover\)/,
+    'unknown-sub-verb error message must enumerate all 15 subverbs including "close", "actions", and "chain"',
   );
 
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
@@ -883,7 +883,136 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
 
   const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
-  assert.match(unknownSubResult.stderr, /known: run, show, close, actions, launch-master-loop, chain/);
+  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover/);
+});
+
+test('coordination CLI option validation: rejects unknown, mis-scoped, and forbidden options per subverb', () => {
+  const cwd = tmpCwdFromTemplate();
+  // 1. Unknown option on start
+  const resUnknownStart = run(cwd, ['coordination', 'start', '--unknown-option', 'foo']);
+  assert.notEqual(resUnknownStart.status, 0);
+  assert.match(resUnknownStart.stderr, /coordination start: unknown or unsupported option "--unknown-option"/);
+
+  // 2. Mis-scoped option (e.g. passing --plan to start)
+  const resMisScopedStart = run(cwd, ['coordination', 'start', '--plan', 'foo.md']);
+  assert.notEqual(resMisScopedStart.status, 0);
+  assert.match(resMisScopedStart.stderr, /coordination start: unknown or unsupported option "--plan"/);
+
+  // 3. Forbidden caller identity override on authorize-and-dispatch (--authorization-id, --invocation-key)
+  const resAuthId = run(cwd, ['coordination', 'authorize-and-dispatch', 'coord-1', '--authorization-id', 'auth-override']);
+  assert.notEqual(resAuthId.status, 0);
+  assert.match(resAuthId.stderr, /coordination authorize-and-dispatch: unknown or unsupported option "--authorization-id"/);
+
+  const resInvKey = run(cwd, ['coordination', 'authorize-and-dispatch', 'coord-1', '--invocation-key', 'inv-override']);
+  assert.notEqual(resInvKey.status, 0);
+  assert.match(resInvKey.stderr, /coordination authorize-and-dispatch: unknown or unsupported option "--invocation-key"/);
+
+  // 4. Mis-scoped option on close (e.g. passing --reason)
+  const resCloseReason = run(cwd, ['coordination', 'close', 'coord-1', '--reason', 'some-reason']);
+  assert.notEqual(resCloseReason.status, 0);
+  assert.match(resCloseReason.stderr, /coordination close: unknown or unsupported option "--reason"/);
+
+  // 5. Mis-scoped option on operation (e.g. passing --branches)
+  const resOpBranches = run(cwd, ['coordination', 'operation', 'coord-1', '--branches', '[]']);
+  assert.notEqual(resOpBranches.status, 0);
+  assert.match(resOpBranches.stderr, /coordination operation: unknown or unsupported option "--branches"/);
+
+  // 6. Missing sub-verb usage error enumerates all 15 subverbs
+  const resNoSub = run(cwd, ['coordination']);
+  assert.notEqual(resNoSub.status, 0);
+  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/);
+});
+
+// ─── Semantic coordination CLI subcommands ─────────────────────────────────
+
+test('fgos coordination start creates session and fgos coordination status projects status and actions', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-sem-test-1',
+    '--kind', 'declared-protocol',
+    '--protocol', 'core.coordination-protocol.declared-consult',
+    '--objective', 'Test start semantic command',
+    '--writer-id', 'test-operator',
+    '--actors', JSON.stringify([{ id: 'consultant-actor' }]),
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+  const startData = envelopeData(startRes.stdout);
+  assert.equal(startData.coordinationId, 'coord-sem-test-1');
+  assert.equal(startData.status, 'running');
+
+  const statusRes = run(cwd, ['coordination', 'status', startData.coordinationId]);
+  assert.equal(statusRes.status, 0, statusRes.stderr);
+  const statusData = envelopeData(statusRes.stdout);
+  assert.equal(statusData.coordinationId, startData.coordinationId);
+  assert.equal(statusData.session.status, 'active');
+  assert.ok(Array.isArray(statusData.actions));
+  assert.ok(statusData.actions.length > 0);
+});
+
+test('fgos coordination semantic workflow: start -> operation -> close', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-sem-test-2',
+    '--kind', 'declared-protocol',
+    '--protocol', 'core.coordination-protocol.declared-consult',
+    '--objective', 'Consultation workflow',
+    '--writer-id', 'driver-main',
+    '--actors', JSON.stringify([{ id: 'consultant-actor' }]),
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+  const startData = envelopeData(startRes.stdout);
+  const coordinationId = startData.coordinationId;
+  const initialAssignmentId = startData.steps[0].assignmentId;
+  assert.ok(initialAssignmentId, 'initial entry step produced assignmentId');
+
+  // status to get available operation action (provide-consult)
+  const statusRes1 = run(cwd, ['coordination', 'status', coordinationId]);
+  const statusData1 = envelopeData(statusRes1.stdout);
+  const opAction = statusData1.actions.find((a) => a.kind === 'dispatch-operation');
+  assert.ok(opAction, 'expected dispatch-operation action for provide-consult');
+
+  // execute operation via semantic CLI
+  const opRes = run(cwd, [
+    'coordination', 'operation', coordinationId,
+    '--action-key', opAction.actionKey,
+    '--writer-id', 'driver-main',
+    '--objective', 'Perform provide consult',
+    '--expected-outputs', 'agent-result.json,agent-report.md',
+    '--from-assignment-id', initialAssignmentId,
+  ]);
+  assert.equal(opRes.status, 0, opRes.stderr);
+  const opData = envelopeData(opRes.stdout);
+  assert.equal(opData.coordinationId, coordinationId);
+
+  // status after operation: close action should be available
+  const statusRes2 = run(cwd, ['coordination', 'status', coordinationId]);
+  const statusData2 = envelopeData(statusRes2.stdout);
+  const closeAction = statusData2.actions.find((a) => a.kind === 'close');
+  assert.ok(closeAction, 'expected close action');
+
+  // execute close via semantic CLI
+  const closeRes = run(cwd, [
+    'coordination', 'close', coordinationId,
+    '--action-key', closeAction.actionKey,
+    '--writer-id', 'driver-main',
+  ]);
+  assert.equal(closeRes.status, 0, closeRes.stderr);
+  const closeData = envelopeData(closeRes.stdout);
+  assert.equal(closeData.coordinationId, coordinationId);
+  assert.equal(closeData.closed, true);
+
+  // Verify stale action key rejection
+  const staleCloseRes = run(cwd, [
+    'coordination', 'close', coordinationId,
+    '--action-key', 'sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+    '--writer-id', 'driver-main',
+  ]);
+  assert.notEqual(staleCloseRes.status, 0);
+  assert.match(staleCloseRes.stderr, /stale|precondition|not found|does not match/i);
 });
 
 // `execFileSync` re-export sanity: confirms the harness genuinely spawns a
