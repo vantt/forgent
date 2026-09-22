@@ -121,7 +121,7 @@ export function updateBreakerState(newMisses) {
     const issueBody = `The compare job detected confirmed misses for the following rules:\n\n${newMisses.map(r => `- \`${r}\``).join('\n')}\n\nSince \`GITHUB_TOKEN\` cannot write repository variables, please manually update the \`SELECTOR_BREAKER\` variable to include these rules.`;
     
     try {
-      execSync(`gh issue create --title "${issueTitle}" --body "${issueBody}"`, { stdio: 'inherit' });
+      execSync(`gh issue create --title "${issueTitle}" -F -`, { input: issueBody, stdio: ['pipe', 'inherit', 'inherit'] });
       console.log("Created fallback issue.");
     } catch (issueErr) {
       console.error("Failed to create issue.", issueErr.message);
