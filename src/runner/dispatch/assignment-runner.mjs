@@ -77,6 +77,7 @@ import {
   fsyncFileBestEffort,
   fsyncDirBestEffort,
   buildRunControlHolder,
+  inspectRunControl,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
 import { reconcileHerdrSpawnRun } from './herdr-round.mjs';
@@ -941,7 +942,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -1049,6 +1050,32 @@ function admitRunAttempt(
       const currentValid = validGenerations.length > 0 ? validGenerations[validGenerations.length - 1] : null;
       return { stop: true, status: 'invalid-predecessor', currentRunId: currentValid?.record?.runId ?? null, expectedRunId, computedRunId: runId };
     }
+    // M1: refuse an unfenced new admission when the CURRENT (most recent)
+    // attempt has neither settled (result.json) nor a provably-dead
+    // control holder -- admitting anyway spawns a second worker racing an
+    // unsettled first one, the exact double-materialization this phase
+    // exists to close, one level up from R1's own resume-time check (this
+    // fires on a FRESH dispatch that never resumes anything, so R1's guard
+    // never runs). Only a dead holder (inspectRunControl, Phase 02
+    // identity) authorizes silently proceeding; alive or undisprovable
+    // liveness refuses unless the operator explicitly overrides via
+    // `forceNewAttempt` (--force-new-attempt).
+    if (current && !forceNewAttempt) {
+      const priorAttemptStr = current.record.attemptStr || String(current.record.attempt).padStart(2, '0');
+      const priorRunDir = path.join(runsDir, priorAttemptStr);
+      if (!fs.existsSync(path.join(priorRunDir, 'result.json'))) {
+        const priorControl = inspectRunControl(priorRunDir);
+        if (priorControl.held) {
+          return {
+            stop: true,
+            status: 'run-in-flight',
+            priorRunId: current.record.runId,
+            priorAttempt: current.record.attempt,
+            holder: priorControl.holder,
+          };
+        }
+      }
+    }
     return {
       record: {
         attempt,
@@ -1073,6 +1100,17 @@ function admitRunAttempt(
     throw new RunnerConfigError(
       `executeAssignment: predecessorRunId "${predecessorRunId}" for assignment "${assignmentId}" does not match the current committed Run "${admission.currentRunId}" -- refusing (invalid-predecessor)`,
       { code: 'admission-invalid-predecessor', phase: 'pre-admission' },
+    );
+  }
+  if (admission.status === 'run-in-flight') {
+    // M1: nothing for THIS new attempt was ever created (no run directory,
+    // no dispatch.claim scope beyond the caller's own pre-existing one) --
+    // 'pre-admission' is correct, matching every other admission refusal
+    // above, so H2's session-engine claim cleanup still removes the
+    // caller's own claim on this throw.
+    throw new RunnerConfigError(
+      `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,
+      { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },
     );
   }
 
@@ -1586,6 +1624,11 @@ export async function executeAssignment(assignment, opts = {}) {
     destination: opts.destination ?? effectiveCwd,
     payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
     expectedRunId: opts.expectedRunId,
+    // M1: operator escape valve for a prior attempt this host can no
+    // longer observe correctly (e.g. its control ledger identity is on an
+    // unreachable filesystem) -- never the default, always an explicit opt
+    // sourced from the caller (CLI: --force-new-attempt).
+    forceNewAttempt: opts.forceNewAttempt === true,
     buildRunMeta: (record) => ({
       contract: 'assignment-run.v2',
       runId: record.runId,
@@ -1975,6 +2018,31 @@ export async function executeAssignment(assignment, opts = {}) {
       const rec = await reconcileFn(runDir);
       if (rec.settled && rec.runResult) {
         return rec.runResult;
+      }
+      // C1a: a resumed Run whose reconcile did NOT come back settled has a
+      // dispatch attempt already on record -- launching a second worker over
+      // it is exactly the double-materialization this phase exists to close.
+      // Allow-listed by SAFETY, not by enumerating every status both
+      // adapters can return (that list already includes 'waiting', 'held',
+      // 'stale', 'observed', 'observed-stale', 'refused', and herdr's own
+      // 'failed' for a receipt-backed outcome whose outbox file could not be
+      // verified -- none of them mean "nothing was ever dispatched"). The
+      // ONLY state that legitimately means that is `parked` with reason
+      // `command-missing` (no commands/*.json ever got written, or none
+      // parsed) -- everything else falls through to a refusal below instead
+      // of silently becoming a fresh launch attempt.
+      const isCommandMissing = rec.status === 'parked' && rec.reason === 'command-missing';
+      if (!isCommandMissing) {
+        const confirmedLive = rec.status === 'waiting';
+        throw new RunnerConfigError(
+          `executeAssignment: Run "${runId}" resume found an existing dispatch attempt in a non-settled state (status: "${rec.status}"${rec.reason ? `, reason: "${rec.reason}"` : ''}) -- refusing to launch a second worker over it`,
+          {
+            code: confirmedLive ? 'run-in-flight' : 'run-unreconciled',
+            phase: 'post-admission',
+            reconcileStatus: rec.status,
+            ...(rec.reason ? { reconcileReason: rec.reason } : {}),
+          },
+        );
       }
     }
   }

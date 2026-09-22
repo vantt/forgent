@@ -51,6 +51,8 @@ import {
   computeSha256Digest,
   canonicalJson,
   getProcessStartTime,
+  commitCommandOutcome,
+  patchCommandRecord,
 } from './cli-spawn-supervisor.mjs';
 
 /**
@@ -1116,7 +1118,21 @@ export async function runHerdrRound(ctx) {
         // live-but-not-yet-observed worker fell through reconcile's probe
         // branch to `unknown-launch` instead of actually asking herdr.
         const reconcileClient = ctx.herdrClient ?? createHerdrClient({ herdrBin, cwd, env: fullEnv });
-        return await reconcileHerdrSpawnRun(preResumeRunDir, { ...ctx, herdrClient: reconcileClient });
+        const rec = await reconcileHerdrSpawnRun(preResumeRunDir, { ...ctx, herdrClient: reconcileClient });
+        // C1a/M15a (R2): reconcile's own internal status vocabulary
+        // ('parked'/'refused'/'observed'/'waiting'/'failed', each with its
+        // own `reason`) is an implementation detail of the reconcile
+        // door, not this function's adapter-result contract -- a caller
+        // of `runHerdrRound` must never have to know reconcile's status
+        // strings to tell "this round is done" from "this round is not
+        // done yet". Settled unwraps to the plain runResult (the same
+        // shape a caller reads off a freshly-settled dispatch); anything
+        // else is the one explicit sentinel every caller can check
+        // without branching on reconcile's own vocabulary.
+        if (rec.settled && rec.runResult) {
+          return rec.runResult;
+        }
+        return { settled: false, observed: true, reconcileStatus: rec.status, ...(rec.reason ? { reconcileReason: rec.reason } : {}) };
       }
     }
   }
@@ -1394,13 +1410,20 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     // and checks the pane's real foreground process below before ever
     // deciding to launch a second real one.
     if (isAssignmentRun) {
-      const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
-      if (fs.existsSync(commandPath)) {
-        try {
-          const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-          publishMutableProjection(commandPath, { ...cmd, paneId: round.paneId });
-        } catch {}
-      }
+      // H13: CAS-fenced through the same controlEpoch/controlToken check
+      // every terminal commitCommandOutcome write already applies -- a
+      // stale controller (superseded by a newer attempt for this Run) must
+      // never silently clobber the current controller's own command
+      // record, interim field or not. Best-effort either way: a failure
+      // here (including a genuine epoch mismatch) only costs the
+      // crash-recovery optimization this write exists for, never the round.
+      try {
+        patchCommandRecord({
+          runDir, launchCommandId: ctx.launchCommandId,
+          controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
+          patch: { paneId: round.paneId },
+        });
+      } catch {}
     }
 
     let verifiedProc = null;
@@ -1592,20 +1615,20 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   }
 
   if (isAssignmentRun) {
-    const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
-    if (fs.existsSync(commandPath)) {
-      try {
-        const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-        publishMutableProjection(commandPath, {
-          ...cmd,
+    // H13: same CAS-fenced door as the pre-launch persist above.
+    try {
+      patchCommandRecord({
+        runDir, launchCommandId: ctx.launchCommandId,
+        controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
+        patch: {
           paneId: round.paneId,
-          agentSession: round.agentSession?.value || cmd.agentSession || null,
-          resourceIncarnation: resourceIncarnation || cmd.resourceIncarnation,
+          ...(round.agentSession?.value ? { agentSession: round.agentSession.value } : {}),
+          ...(resourceIncarnation ? { resourceIncarnation } : {}),
           workerCommandDigest,
           startArgvDigest: computeSha256Digest(herdrStartArgv),
-        });
-      } catch {}
-    }
+        },
+      });
+    } catch {}
   }
 
   // One line so a person watching the runner's own stderr can find the pane to
@@ -1677,21 +1700,19 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
           result: null,
         };
         const receipt = publishHerdrAdapterReceipt(runDir, ctx.launchCommandId, receiptData);
-        const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
-        if (fs.existsSync(commandPath)) {
-          const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-          publishMutableProjection(commandPath, {
-            ...cmd,
-            state: 'reconciled',
+        // H13: CAS-fenced terminal commit -- same door settleRound's own
+        // success-path reconciliation uses below.
+        commitCommandOutcome({
+          runDir, launchCommandId: ctx.launchCommandId,
+          controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
+          state: 'reconciled',
+          outcome: { kind: 'receipt-backed', receiptDigest: receipt.digest },
+          patch: {
             paneId: round.paneId,
             agentSession: round.agentSession?.value || null,
             resourceIncarnation,
-            outcome: {
-              kind: 'receipt-backed',
-              receiptDigest: receipt.digest,
-            },
-          });
-        }
+          },
+        });
       } catch (err) {
         // A genuine digest tamper (`confinement-mismatch`, thrown just above)
         // is a typed refusal that must reach the caller -- swallowing it here
@@ -1776,24 +1797,22 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     };
     const receipt = publishHerdrAdapterReceipt(runDir, ctx.launchCommandId, receiptData);
 
-    const commandPath = path.join(runDir, 'controller', 'commands', `${ctx.launchCommandId}.json`);
-    if (fs.existsSync(commandPath)) {
-      try {
-        const cmd = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-        const updatedCmd = {
-          ...cmd,
-          state: 'reconciled',
+    // H13: CAS-fenced terminal commit, same door as the failure-path commit
+    // above -- a stale controller must never win this write over whichever
+    // controller's epoch/token is actually current on disk.
+    try {
+      commitCommandOutcome({
+        runDir, launchCommandId: ctx.launchCommandId,
+        controlEpoch: ctx.controlEpoch, controlToken: ctx.controlToken,
+        state: 'reconciled',
+        outcome: { kind: 'receipt-backed', receiptDigest: receipt.digest },
+        patch: {
           paneId: round.paneId,
           agentSession: round.agentSession?.value || null,
           resourceIncarnation,
-          outcome: {
-            kind: 'receipt-backed',
-            receiptDigest: receipt.digest,
-          },
-        };
-        publishMutableProjection(commandPath, updatedCmd);
-      } catch {}
-    }
+        },
+      });
+    } catch {}
   }
 
   return {
@@ -2080,7 +2099,15 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
       try {
         const prep = await opts.prepareConfinement();
         command.preparedInvocationDigest = prep.preparedInvocationDigest;
-        publishMutableProjection(commandPath, command);
+        // H13: same CAS-fenced door as driveRound's own interim writes --
+        // a caller reaching this branch is doing live confinement
+        // preparation, the same class of operation that already threads a
+        // real controlEpoch/controlToken everywhere else in this file.
+        patchCommandRecord({
+          runDir, launchCommandId,
+          controlEpoch: opts.controlEpoch, controlToken: opts.controlToken,
+          patch: { preparedInvocationDigest: command.preparedInvocationDigest },
+        });
       } catch (err) {
         return { status: 'parked', reason: 'prepared-invocation-missing', error: err.message };
       }
@@ -2182,18 +2209,23 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
       });
     }
 
-    command.state = 'reconciled';
-    command.outcome = {
-      kind: 'receipt-backed',
-      receiptDigest: effectiveReceipt.digest,
-    };
-    publishMutableProjection(commandPath, command);
+    // H13: CAS-fenced terminal commit -- same door driveRound's own settle
+    // writes use, so a stale controller can never win a reconcile-inferred
+    // settlement over whichever controller's epoch/token is actually
+    // current.
+    const commandOutcome = { kind: 'receipt-backed', receiptDigest: effectiveReceipt.digest };
+    commitCommandOutcome({
+      runDir, launchCommandId,
+      controlEpoch: opts.controlEpoch, controlToken: opts.controlToken,
+      state: 'reconciled',
+      outcome: commandOutcome,
+    });
 
     return {
       status: 'settled',
       settled: true,
       receipt: effectiveReceipt,
-      outcome: command.outcome,
+      outcome: commandOutcome,
     };
   }
 
