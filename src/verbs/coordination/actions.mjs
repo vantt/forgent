@@ -25,128 +25,26 @@ import { normalizeFanOutPayload } from '../../runner/coordination/fan-out-payloa
 
 const __filename = fileURLToPath(import.meta.url);
 
-const ACTION_INPUT_RESERVED_FIELDS = new Set([
-  'coordinationId', 'actionKey', 'kind', 'target', 'writerId', 'authorizedBy',
-  'operationId', 'actorId', 'nodeId', 'assignmentId', 'targetRef',
-]);
+import {
+  ACTION_INPUT_RESERVED_FIELDS,
+  composeCoordinationActionRequest,
+  normalizeStringArray,
+  assertNoForbiddenOverrides,
+  deriveAuthorizationId,
+  deriveInvocationKey,
+  deriveContributionId,
+} from './composers.mjs';
 
-/**
- * Compose the authoritative action descriptor into the production run schema.
- * This is deliberately called only after executeUnderActionPrecondition has
- * reloaded and matched the descriptor while holding the session lock.
- */
-export function composeCoordinationActionRequest({ manifest, action, precondition }) {
-  const input = precondition.inputPayload ?? {};
-  for (const field of ACTION_INPUT_RESERVED_FIELDS) {
-    if (field in input) {
-      throw new CoordinationError('validation', `coordination action: input field "${field}" cannot override an authoritative action binding`);
-    }
-  }
-  const target = action.target ?? {};
-  const base = {
-    kind: 'declared-protocol',
-    coordinationId: manifest.coordinationId,
-    writerId: precondition.writerId,
-    objective: manifest.objective,
-    protocolRef: { id: manifest.definitionRef?.id },
-    actors: [],
-    close: false,
-  };
-  const common = { as: `action-${precondition.kind}` };
-  let steps;
-  switch (precondition.kind) {
-    case 'dispatch-operation':
-      steps = [{
-        ...common,
-        type: 'operation',
-        operationId: target.operationId,
-        targetActorId: target.actorId,
-        objective: input.objective,
-        expectedOutputs: input.expectedOutputs,
-        contextRefs: input.contextRefs,
-        constraints: input.constraints,
-        capabilities: input.capabilities,
-        fromAssignmentId: input.fromAssignmentId,
-        intent: input.intent,
-        round: input.round,
-        taskKey: input.taskKey,
-        mutation: input.mutation,
-      }];
-      break;
-    case 'authorize-and-dispatch':
-      steps = [
-        {
-          ...common,
-          as: 'action-authorize',
-          type: 'authorize',
-          operationId: target.operationId,
-          targetActorId: target.actorId,
-          nodeId: target.nodeId,
-          authorizationId: input.authorizationId,
-          invocationKey: input.invocationKey,
-          reason: input.reason,
-          grantedContextRefs: input.grantedContextRefs,
-          targetArtifactRef: input.targetArtifactRef,
-        },
-        {
-          ...common,
-          as: 'action-dispatch',
-          type: 'operation',
-          operationId: target.operationId,
-          targetActorId: target.actorId,
-          objective: input.objective,
-          expectedOutputs: input.expectedOutputs,
-          contextRefs: input.contextRefs ?? input.grantedContextRefs,
-          constraints: input.constraints,
-          capabilities: input.capabilities,
-          taskKey: input.taskKey,
-          mutation: input.mutation ?? 'read-only',
-        },
-      ];
-      break;
-    case 'record-disposition':
-      steps = [{
-        ...common,
-        type: 'disposition',
-        targetRef: target.targetRef,
-        disposition: input.disposition,
-        rationale: input.rationale,
-        evidenceRefs: input.evidenceRefs,
-      }];
-      break;
-    case 'record-human-turn':
-      steps = [{ ...common, type: 'human-turn', ...input }];
-      break;
-    case 'link-contribution':
-      steps = [{
-        ...common,
-        type: 'contribution',
-        contributionId: input.contributionId,
-        contributionType: input.contributionType,
-        assignmentId: target.assignmentId,
-        roundKey: input.roundKey,
-        anchors: input.anchors,
-        respondsTo: input.respondsTo,
-      }];
-      break;
-    case 'fan-out':
-      // The action descriptor binds the complete cohort. The precondition has
-      // already rejected subsets, supersets, replacements, and duplicates;
-      // sort the canonical request so an equivalent caller order has one
-      // normalized step shape before production validation/execution.
-      steps = [{
-        ...common,
-        type: 'fan-out',
-        operationId: target.operationId,
-        branches: normalizeFanOutPayload({ branches: input.branches, fromAssignmentId: input.fromAssignmentId }),
-        fromAssignmentId: input.fromAssignmentId,
-      }];
-      break;
-    default:
-      throw new CoordinationError('validation', `unsupported action kind "${precondition.kind}"`);
-  }
-  return validateCoordinationRequest({ ...base, steps });
-}
+export {
+  ACTION_INPUT_RESERVED_FIELDS,
+  composeCoordinationActionRequest,
+  normalizeStringArray,
+  assertNoForbiddenOverrides,
+  deriveAuthorizationId,
+  deriveInvocationKey,
+  deriveContributionId,
+} from './composers.mjs';
+
 
 /**
  * Use case: Read-only projection of session status and legal actions (coordination-actions.v1).
@@ -268,7 +166,7 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
       throw new CoordinationError('validation', 'coordination close: authorizedBy is required and must have an id');
     }
     const closeRequest = {
-      kind: 'coordination-close',
+      kind: 'close',
       coordinationId,
       actionKey,
       authorizedBy: auth,
@@ -298,6 +196,395 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
       composeActionRequest: composeCoordinationActionRequest,
     },
   );
+}
+
+/**
+ * Use case: Execute one currently projected required or authorized operation.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, objective, expectedOutputs, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeOperationUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination operation: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination operation: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination operation: "writerId" is required');
+  }
+  if (!options.objective || typeof options.objective !== 'string') {
+    throw new CoordinationError('validation', 'coordination operation: "objective" is required');
+  }
+  if (options.expectedOutputs === undefined) {
+    throw new CoordinationError('validation', 'coordination operation: "expectedOutputs" is required');
+  }
+  const expectedOutputs = normalizeStringArray(options.expectedOutputs);
+  if (!expectedOutputs || expectedOutputs.length === 0) {
+    throw new CoordinationError('validation', 'coordination operation: "expectedOutputs" must be a non-empty array of strings');
+  }
+
+  // Reject caller forbidden overrides
+  for (const field of ['actorId', 'targetActorId', 'operationId', 'nodeId', 'assignmentId', 'targetRef', 'target', 'authorizedBy']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination operation: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const inputPayload = {
+    objective: options.objective,
+    expectedOutputs,
+    ...(options.contextRefs !== undefined ? { contextRefs: normalizeStringArray(options.contextRefs) } : {}),
+    ...(options.constraints !== undefined ? { constraints: normalizeStringArray(options.constraints) } : {}),
+    ...(options.capabilities !== undefined ? { capabilities: normalizeStringArray(options.capabilities) } : {}),
+    ...(options.fromAssignmentId !== undefined ? { fromAssignmentId: options.fromAssignmentId } : {}),
+    ...(options.intent !== undefined ? { intent: options.intent } : {}),
+    ...(options.round !== undefined ? { round: options.round } : {}),
+    ...(options.taskKey !== undefined ? { taskKey: options.taskKey } : {}),
+    ...(options.mutation !== undefined ? { mutation: options.mutation } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'dispatch-operation',
+    writerId: options.writerId,
+    inputPayload,
+    cliExecutor: options.cliExecutor,
+    cliModel: options.cliModel,
+    cliTier: options.cliTier,
+  });
+}
+
+/**
+ * Use case: Driver elects to authorize and dispatch an optional operation.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, objective, reason, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeAuthorizeAndDispatchUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination authorize-and-dispatch: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination authorize-and-dispatch: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination authorize-and-dispatch: "writerId" is required');
+  }
+  if (!options.objective || typeof options.objective !== 'string') {
+    throw new CoordinationError('validation', 'coordination authorize-and-dispatch: "objective" is required');
+  }
+  if (!options.reason || typeof options.reason !== 'string') {
+    throw new CoordinationError('validation', 'coordination authorize-and-dispatch: "reason" is required');
+  }
+
+  for (const field of ['actorId', 'targetActorId', 'operationId', 'nodeId', 'assignmentId', 'targetRef', 'target', 'authorizedBy', 'authorizationId', 'invocationKey']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination authorize-and-dispatch: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const expectedOutputs = normalizeStringArray(options.expectedOutputs) ?? ['agent-result.json'];
+
+  const inputPayload = {
+    objective: options.objective,
+    reason: options.reason,
+    expectedOutputs,
+    ...(options.grantedContextRefs !== undefined ? { grantedContextRefs: normalizeStringArray(options.grantedContextRefs) } : {}),
+    ...(options.contextRefs !== undefined ? { contextRefs: normalizeStringArray(options.contextRefs) } : {}),
+    ...(options.constraints !== undefined ? { constraints: normalizeStringArray(options.constraints) } : {}),
+    ...(options.capabilities !== undefined ? { capabilities: normalizeStringArray(options.capabilities) } : {}),
+    ...(options.targetArtifactRef !== undefined ? { targetArtifactRef: options.targetArtifactRef } : {}),
+    ...(options.taskKey !== undefined ? { taskKey: options.taskKey } : {}),
+    ...(options.mutation !== undefined ? { mutation: options.mutation } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'authorize-and-dispatch',
+    writerId: options.writerId,
+    inputPayload,
+    cliExecutor: options.cliExecutor,
+    cliModel: options.cliModel,
+    cliTier: options.cliTier,
+  });
+}
+
+/**
+ * Use case: Dispatch a kernel-supported fan-out whose branch set is legal now.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, branches, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeFanOutUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination fan-out: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination fan-out: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination fan-out: "writerId" is required');
+  }
+  if (!Array.isArray(options.branches) || options.branches.length === 0) {
+    throw new CoordinationError('validation', 'coordination fan-out: "branches" is required and must be a non-empty array');
+  }
+
+  for (const field of ['operationId', 'nodeId', 'assignmentId', 'targetRef', 'target', 'authorizedBy']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination fan-out: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const inputPayload = {
+    branches: options.branches,
+    ...(options.fromAssignmentId !== undefined ? { fromAssignmentId: options.fromAssignmentId } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'fan-out',
+    writerId: options.writerId,
+    inputPayload,
+    cliExecutor: options.cliExecutor,
+    cliModel: options.cliModel,
+    cliTier: options.cliTier,
+  });
+}
+
+/**
+ * Use case: Link one typed contribution backed by an already-settled Assignment.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, contributionType/type, roundKey, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeContributionUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination contribution: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination contribution: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination contribution: "writerId" is required');
+  }
+  const contributionType = options.contributionType ?? options.type;
+  if (!contributionType || typeof contributionType !== 'string') {
+    throw new CoordinationError('validation', 'coordination contribution: "contributionType" (or "type") is required');
+  }
+  if (!options.roundKey || typeof options.roundKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination contribution: "roundKey" is required');
+  }
+
+  for (const field of ['assignmentId', 'operationId', 'nodeId', 'targetRef', 'target', 'authorizedBy']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination contribution: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const contributionId = options.contributionId ?? deriveContributionId(coordinationId, options.actionKey);
+
+  const inputPayload = {
+    contributionId,
+    contributionType,
+    roundKey: options.roundKey,
+    ...(options.anchors !== undefined ? { anchors: normalizeStringArray(options.anchors) } : {}),
+    ...(options.respondsTo !== undefined ? { respondsTo: normalizeStringArray(options.respondsTo) } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'link-contribution',
+    writerId: options.writerId,
+    inputPayload,
+  });
+}
+
+/**
+ * Use case: Record one real person-attributed external turn.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, turnId, turnOrdinal/ordinal, channel, artifactRef, externalRef, attributedTo, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeHumanTurnUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "writerId" is required');
+  }
+  if (!options.turnId || typeof options.turnId !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "turnId" is required');
+  }
+  const ordinal = options.turnOrdinal ?? options.ordinal;
+  if (ordinal === undefined || ordinal === null) {
+    throw new CoordinationError('validation', 'coordination human-turn: "turnOrdinal" is required');
+  }
+  const turnOrdinal = typeof ordinal === 'string' ? Number(ordinal) : ordinal;
+  if (!Number.isInteger(turnOrdinal) || turnOrdinal < 0) {
+    throw new CoordinationError('validation', 'coordination human-turn: "turnOrdinal" must be a non-negative integer');
+  }
+  if (!options.channel || typeof options.channel !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "channel" is required');
+  }
+  if (!options.artifactRef || typeof options.artifactRef !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "artifactRef" is required');
+  }
+  if (!options.externalRef || typeof options.externalRef !== 'string') {
+    throw new CoordinationError('validation', 'coordination human-turn: "externalRef" is required');
+  }
+  if (!options.attributedTo) {
+    throw new CoordinationError('validation', 'coordination human-turn: "attributedTo" is required');
+  }
+
+  for (const field of ['revision', 'targetRef', 'target', 'authorizedBy']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination human-turn: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  let attributedTo;
+  if (typeof options.attributedTo === 'string') {
+    attributedTo = { type: 'person', id: options.attributedTo };
+  } else if (typeof options.attributedTo === 'object' && options.attributedTo !== null) {
+    attributedTo = options.attributedTo;
+  } else {
+    throw new CoordinationError('validation', 'coordination human-turn: "attributedTo" must be a string or object');
+  }
+
+  const inputPayload = {
+    turnId: options.turnId,
+    turnOrdinal,
+    channel: options.channel,
+    artifactRef: options.artifactRef,
+    externalRef: options.externalRef,
+    attributedTo,
+    ...(options.respondsToRefs !== undefined ? { respondsToRefs: normalizeStringArray(options.respondsToRefs) } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'record-human-turn',
+    writerId: options.writerId,
+    inputPayload,
+  });
+}
+
+/**
+ * Use case: Record driver explicit disposition on an owned target.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, disposition, rationale, evidenceRefs? }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeDispositionUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination disposition: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination disposition: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination disposition: "writerId" is required');
+  }
+  if (!options.disposition || typeof options.disposition !== 'string') {
+    throw new CoordinationError('validation', 'coordination disposition: "disposition" is required');
+  }
+  if (!options.rationale || typeof options.rationale !== 'string') {
+    throw new CoordinationError('validation', 'coordination disposition: "rationale" is required');
+  }
+
+  for (const field of ['targetRef', 'target', 'actorId', 'authorizedBy']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination disposition: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const inputPayload = {
+    disposition: options.disposition,
+    rationale: options.rationale,
+    ...(options.evidenceRefs !== undefined ? { evidenceRefs: normalizeStringArray(options.evidenceRefs) } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'record-disposition',
+    writerId: options.writerId,
+    inputPayload,
+  });
+}
+
+/**
+ * Use case: Driver explicitly attempts terminal close.
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, authorizedBy?, dissentingActorIds?, aggregationId? }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeCloseUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination close: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination close: "actionKey" is required');
+  }
+  const writerId = options.writerId;
+  const rawAuth = options.authorizedBy;
+  let authorizedBy = null;
+  if (typeof rawAuth === 'string') {
+    authorizedBy = { type: 'driver', id: rawAuth };
+  } else if (rawAuth && typeof rawAuth === 'object') {
+    authorizedBy = rawAuth;
+  } else if (writerId && typeof writerId === 'string') {
+    authorizedBy = { type: 'driver', id: writerId };
+  }
+  if (!authorizedBy || !authorizedBy.id) {
+    throw new CoordinationError('validation', 'coordination close: "writerId" or "authorizedBy" is required');
+  }
+
+  for (const field of ['ready', 'status', 'terminalStatus', 'quorum']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination close: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const dissenting = options.dissentingActorIds ?? options.dissent;
+  const inputPayload = {
+    authorizedBy,
+    ...(dissenting !== undefined ? { dissentingActorIds: normalizeStringArray(dissenting) } : {}),
+    ...(options.aggregationId !== undefined ? { aggregationId: options.aggregationId } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'close',
+    writerId: writerId ?? authorizedBy.id,
+    authorizedBy,
+    inputPayload,
+  });
 }
 
 // Direct CLI invocation helper

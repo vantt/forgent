@@ -89,7 +89,18 @@ import { graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '.
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { closeCoordinationUseCase } from '../src/verbs/coordination/close.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
-import { showCoordinationActionsUseCase } from '../src/verbs/coordination/actions.mjs';
+import {
+  showCoordinationActionsUseCase,
+  executeOperationUseCase,
+  executeAuthorizeAndDispatchUseCase,
+  executeFanOutUseCase,
+  executeContributionUseCase,
+  executeHumanTurnUseCase,
+  executeDispositionUseCase,
+  executeCloseUseCase,
+} from '../src/verbs/coordination/actions.mjs';
+import { startCoordinationUseCase } from '../src/verbs/coordination/start.mjs';
+import { showCoordinationStatusUseCase } from '../src/verbs/coordination/status.mjs';
 import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mjs';
@@ -3031,7 +3042,123 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'coordination': {
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <run|show|close|actions|launch-master-loop|chain|recover> ...');
+      const KNOWN_COORDINATION_SUBVERBS = [
+        'start',
+        'status',
+        'operation',
+        'authorize-and-dispatch',
+        'fan-out',
+        'contribution',
+        'human-turn',
+        'disposition',
+        'close',
+        'run',
+        'show',
+        'actions',
+        'launch-master-loop',
+        'chain',
+        'recover',
+      ];
+
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover> ...');
+      if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
+        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover).`);
+      }
+
+      const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
+      const ALLOWED_COORDINATION_FLAGS = {
+        'start': new Set([
+          ...COMMON_FLAGS,
+          'id', 'coordination-id',
+          'protocol', 'protocol-id', 'protocolRef.id',
+          'kind', 'objective', 'writer-id',
+          'work-ref', 'work', 'primary-role',
+          'task', 'task-file', 'bounds', 'partial-policy',
+          'actors', 'steps', 'executor', 'model', 'tier',
+        ]),
+        'status': new Set([
+          ...COMMON_FLAGS,
+          'id', 'detail', 'replay',
+        ]),
+        'operation': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'objective',
+          'expected-outputs', 'outputs', 'context-refs', 'context',
+          'constraints', 'capabilities', 'from-assignment-id',
+          'intent', 'round', 'task-key', 'mutation',
+          'executor', 'model', 'tier',
+        ]),
+        'authorize-and-dispatch': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'objective', 'reason',
+          'expected-outputs', 'outputs', 'granted-context-refs',
+          'context-refs', 'context', 'constraints', 'capabilities',
+          'target-artifact-ref', 'task-key', 'mutation',
+          'executor', 'model', 'tier',
+        ]),
+        'fan-out': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'branches',
+          'from-assignment-id', 'executor', 'model', 'tier',
+        ]),
+        'contribution': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'type', 'contribution-type',
+          'round-key', 'contribution-id', 'anchors', 'responds-to',
+        ]),
+        'human-turn': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'turn-id', 'turn-ordinal', 'ordinal',
+          'channel', 'artifact-ref', 'external-ref', 'attributed-to',
+          'responds-to-refs', 'responds-to',
+        ]),
+        'disposition': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'disposition', 'rationale',
+          'evidence-refs',
+        ]),
+        'close': new Set([
+          ...COMMON_FLAGS,
+          'file', 'id', 'action-key', 'writer-id', 'authorized-by',
+          'dissenting-actor-ids', 'dissent', 'aggregation-id',
+        ]),
+        'run': new Set([
+          ...COMMON_FLAGS,
+          'file', 'executor', 'model', 'tier',
+        ]),
+        'show': new Set([
+          ...COMMON_FLAGS,
+          'id',
+        ]),
+        'actions': new Set([
+          ...COMMON_FLAGS,
+          'id',
+        ]),
+        'launch-master-loop': new Set([
+          ...COMMON_FLAGS,
+          'plan', 'objective', 'writer-id', 'coordination-id',
+          'fixture-version', 'executor', 'model', 'tier',
+        ]),
+        'chain': new Set([
+          ...COMMON_FLAGS,
+          'track',
+        ]),
+        'recover': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action', 'expected-snapshot', 'expected-event-seq',
+          'expected-run-control-epoch', 'expected-expires-at', 'action-key',
+        ]),
+      };
+
+      const allowedFlags = ALLOWED_COORDINATION_FLAGS[sub];
+      if (allowedFlags) {
+        for (const flag of Object.keys(flags)) {
+          if (!allowedFlags.has(flag)) {
+            throw new StoreError('validation', `coordination ${sub}: unknown or unsupported option "--${flag}"`);
+          }
+        }
+      }
+
       // Same repoRoot resolution `catchup`/`merge next` already use:
       // `--dir` names the main checkout's `.fgos/`, so its parent is the
       // repo root; omitted, the caller's own cwd is the repo root.
@@ -3043,6 +3170,233 @@ async function runVerb(verb, flags, positional, dir) {
       // stays identical to `repoRootForCoordination`, byte-identical to
       // this adapter's behavior before this flag existed.
       const cwdForCoordination = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : repoRootForCoordination;
+
+      if (sub === 'start') {
+        const protocolId = flags.protocol ?? flags['protocol-id'] ?? flags['protocolRef.id'];
+        const kind = flags.kind ?? (protocolId ? 'declared-protocol' : 'agent-led');
+        const objective = requireField(flags.objective, 'coordination start requires --objective <text>');
+        const writerId = requireField(flags['writer-id'], 'coordination start requires --writer-id <id>');
+        const coordinationId = positional[1] ?? flags.id ?? flags['coordination-id'];
+        const workRef = flags['work-ref'] ?? flags.work;
+        const primaryRole = flags['primary-role'];
+        let task = flags.task ? (typeof flags.task === 'string' ? JSON.parse(flags.task) : flags.task) : undefined;
+        if (!task && flags['task-file']) {
+          task = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), flags['task-file']), 'utf8'));
+        }
+        let aggregateBounds = flags.bounds ? (typeof flags.bounds === 'string' ? JSON.parse(flags.bounds) : flags.bounds) : undefined;
+        let partialPolicy = flags['partial-policy'] ? (typeof flags['partial-policy'] === 'string' ? JSON.parse(flags['partial-policy']) : flags['partial-policy']) : undefined;
+        let actors = flags.actors ? (typeof flags.actors === 'string' ? JSON.parse(flags.actors) : flags.actors) : undefined;
+        let steps = flags.steps ? (typeof flags.steps === 'string' ? JSON.parse(flags.steps) : flags.steps) : undefined;
+
+        return await startCoordinationUseCase(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            kind,
+            protocolId,
+            coordinationId,
+            writerId,
+            objective,
+            workRef,
+            primaryRole,
+            task,
+            aggregateBounds,
+            partialPolicy,
+            actors,
+            steps,
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+
+      if (sub === 'status') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination status requires an id: fgos coordination status <id> [--detail] [--replay] [--json]');
+        return showCoordinationStatusUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          { id, detail: flags.detail, replay: flags.replay },
+        );
+      }
+
+      if (sub === 'operation') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination operation requires an id: fgos coordination operation <id> --action-key <key> --writer-id <id> --objective <text> --expected-outputs <outputs>');
+        const actionKey = requireField(flags['action-key'], 'coordination operation requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination operation requires --writer-id <id>');
+        const objective = requireField(flags.objective, 'coordination operation requires --objective <text>');
+        const expectedOutputs = requireField(flags['expected-outputs'] ?? flags.outputs, 'coordination operation requires --expected-outputs <files>');
+
+        return await executeOperationUseCase(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            id,
+            actionKey,
+            writerId,
+            objective,
+            expectedOutputs,
+            contextRefs: flags['context-refs'] ?? flags.context,
+            constraints: flags.constraints,
+            capabilities: flags.capabilities,
+            fromAssignmentId: flags['from-assignment-id'],
+            intent: flags.intent,
+            round: flags.round,
+            taskKey: flags['task-key'],
+            mutation: flags.mutation,
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+
+      if (sub === 'authorize-and-dispatch') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination authorize-and-dispatch requires an id: fgos coordination authorize-and-dispatch <id> --action-key <key> --writer-id <id> --objective <text> --reason <text>');
+        const actionKey = requireField(flags['action-key'], 'coordination authorize-and-dispatch requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination authorize-and-dispatch requires --writer-id <id>');
+        const objective = requireField(flags.objective, 'coordination authorize-and-dispatch requires --objective <text>');
+        const reason = requireField(flags.reason, 'coordination authorize-and-dispatch requires --reason <text>');
+
+        return await executeAuthorizeAndDispatchUseCase(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            id,
+            actionKey,
+            writerId,
+            objective,
+            reason,
+            expectedOutputs: flags['expected-outputs'] ?? flags.outputs,
+            grantedContextRefs: flags['granted-context-refs'],
+            contextRefs: flags['context-refs'] ?? flags.context,
+            constraints: flags.constraints,
+            capabilities: flags.capabilities,
+            targetArtifactRef: flags['target-artifact-ref'],
+            taskKey: flags['task-key'],
+            mutation: flags.mutation,
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+
+      if (sub === 'fan-out') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination fan-out requires an id: fgos coordination fan-out <id> --action-key <key> --writer-id <id> --branches <json>');
+        const actionKey = requireField(flags['action-key'], 'coordination fan-out requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination fan-out requires --writer-id <id>');
+        let branches = flags.branches;
+        if (typeof branches === 'string') {
+          try {
+            branches = JSON.parse(branches);
+          } catch (err) {
+            if (fs.existsSync(path.resolve(process.cwd(), branches))) {
+              branches = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), branches), 'utf8'));
+            }
+          }
+        }
+        if (!Array.isArray(branches)) {
+          throw new StoreError('validation', 'coordination fan-out requires --branches <json-array-or-path>');
+        }
+
+        return await executeFanOutUseCase(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            id,
+            actionKey,
+            writerId,
+            branches,
+            fromAssignmentId: flags['from-assignment-id'],
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
+      }
+
+      if (sub === 'contribution') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination contribution requires an id: fgos coordination contribution <id> --action-key <key> --writer-id <id> --type <type> --round-key <key>');
+        const actionKey = requireField(flags['action-key'], 'coordination contribution requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination contribution requires --writer-id <id>');
+        const contributionType = requireField(flags.type ?? flags['contribution-type'], 'coordination contribution requires --type <type>');
+        const roundKey = requireField(flags['round-key'], 'coordination contribution requires --round-key <key>');
+
+        return await executeContributionUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          {
+            id,
+            actionKey,
+            writerId,
+            contributionType,
+            roundKey,
+            contributionId: flags['contribution-id'],
+            anchors: flags.anchors,
+            respondsTo: flags['responds-to'],
+          },
+        );
+      }
+
+      if (sub === 'human-turn') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination human-turn requires an id: fgos coordination human-turn <id> --action-key <key> --writer-id <id> --turn-id <id> --turn-ordinal <num> --channel <channel> --artifact-ref <path> --external-ref <ref> --attributed-to <person>');
+        const actionKey = requireField(flags['action-key'], 'coordination human-turn requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination human-turn requires --writer-id <id>');
+        const turnId = requireField(flags['turn-id'], 'coordination human-turn requires --turn-id <id>');
+        const ordinal = requireField(flags['turn-ordinal'] ?? flags.ordinal, 'coordination human-turn requires --turn-ordinal <number>');
+        const channel = requireField(flags.channel, 'coordination human-turn requires --channel <channel>');
+        const artifactRef = requireField(flags['artifact-ref'], 'coordination human-turn requires --artifact-ref <path>');
+        const externalRef = requireField(flags['external-ref'], 'coordination human-turn requires --external-ref <ref>');
+        const attributedTo = requireField(flags['attributed-to'], 'coordination human-turn requires --attributed-to <person>');
+
+        return await executeHumanTurnUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          {
+            id,
+            actionKey,
+            writerId,
+            turnId,
+            turnOrdinal: ordinal,
+            channel,
+            artifactRef,
+            externalRef,
+            attributedTo,
+            respondsToRefs: flags['responds-to-refs'] ?? flags['responds-to'],
+          },
+        );
+      }
+
+      if (sub === 'disposition') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination disposition requires an id: fgos coordination disposition <id> --action-key <key> --writer-id <id> --disposition <val> --rationale <text>');
+        const actionKey = requireField(flags['action-key'], 'coordination disposition requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination disposition requires --writer-id <id>');
+        const disposition = requireField(flags.disposition, 'coordination disposition requires --disposition <val>');
+        const rationale = requireField(flags.rationale, 'coordination disposition requires --rationale <text>');
+
+        return await executeDispositionUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          {
+            id,
+            actionKey,
+            writerId,
+            disposition,
+            rationale,
+            evidenceRefs: flags['evidence-refs'],
+          },
+        );
+      }
+
       if (sub === 'run') {
         const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
         return await runCoordinationUseCase(
@@ -3060,15 +3414,37 @@ async function runVerb(verb, flags, positional, dir) {
         );
       }
       if (sub === 'close') {
-        const filePath = requireField(flags.file, 'coordination close requires --file <request-path>: fgos coordination close --file <request.json>');
-        const requestObject = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), filePath), 'utf8'));
-        return await closeCoordinationUseCase(
+        if (flags.file) {
+          const filePath = flags.file;
+          const requestObject = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), filePath), 'utf8'));
+          return await closeCoordinationUseCase(
+            {
+              cwd: cwdForCoordination,
+              repoRoot: repoRootForCoordination,
+              runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+            },
+            { requestObject }
+          );
+        }
+
+        const id = requireField(positional[1] ?? flags.id, 'coordination close requires an id or --file: fgos coordination close <id> --action-key <key> --writer-id <id>');
+        const actionKey = requireField(flags['action-key'], 'coordination close requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'] ?? flags['authorized-by'], 'coordination close requires --writer-id <id>');
+
+        return await executeCloseUseCase(
           {
             cwd: cwdForCoordination,
             repoRoot: repoRootForCoordination,
             runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
           },
-          { requestObject }
+          {
+            id,
+            actionKey,
+            writerId,
+            authorizedBy: flags['authorized-by'] ?? { type: 'driver', id: writerId },
+            dissentingActorIds: flags['dissenting-actor-ids'] ?? flags.dissent,
+            aggregationId: flags['aggregation-id'],
+          },
         );
       }
       if (sub === 'show') {
@@ -3138,7 +3514,7 @@ async function runVerb(verb, flags, positional, dir) {
           actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
         });
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: run, show, close, actions, launch-master-loop, chain, recover).`);
+      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: ${KNOWN_COORDINATION_SUBVERBS.join(', ')}).`);
     }
 
     case 'rebuild': {
@@ -4954,7 +5330,10 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   goal: (positional) => positional[0] === 'set',
   gateway: (positional) => ['start', 'stop'].includes(positional[0]),
   knowledge: (positional) => positional[0] === 'attest',
-  coordination: (positional, flags) => ['run', 'close', 'launch-master-loop'].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
+  coordination: (positional, flags) => [
+    'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
+    'fan-out', 'contribution', 'human-turn', 'disposition',
+  ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,
   // `dispatch show-run`/`watch` never write; `dispatch recover` writes

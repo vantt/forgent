@@ -1314,8 +1314,6 @@ test('production mutator integration: authorize-and-dispatch executes under seam
       coordinationId,
       writerId: 'driver-1',
       inputPayload: {
-        authorizationId: 'auth-gate-1',
-        invocationKey: 'inv-gate-1',
         reason: 'Authorized for testing',
         objective: 'Execute authorized operation',
         expectedOutputs: ['auth-result.json'],
@@ -1333,22 +1331,37 @@ test('production mutator integration: authorize-and-dispatch executes under seam
     const res1 = await executeCoordinationActionUseCase(ctx, action);
     assert.equal(res1.kind, 'authorize-and-dispatch');
     assert.equal(res1.status, 'dispatched');
-    assert.equal(res1.authorizationId, 'auth-gate-1');
+    assert.ok(res1.authorizationId.startsWith('auth_'));
     assert.ok(res1.assignmentId);
 
     // 2. Repeat call is idempotent
     const res2 = await executeCoordinationActionUseCase(ctx, action);
     assert.equal(res2.idempotent, true);
     assert.equal(res2.cached, true);
-    assert.equal(res2.authorizationId, 'auth-gate-1');
+    assert.equal(res2.authorizationId, res1.authorizationId);
     assert.equal(res2.assignmentId, res1.assignmentId);
 
     const eventsAfterDispatch = fs.readFileSync(path.join(sessionDir, 'events.jsonl'), 'utf8');
     const assignmentsDir = path.join(tempDir, '.fgos/assignments');
     const assignmentsAfterDispatch = JSON.stringify(fs.readdirSync(assignmentsDir, { recursive: true }).sort());
+
+    // P2-F01 invariant: caller cannot override authorizationId or invocationKey
+    await assert.rejects(
+      () => executeCoordinationActionUseCase(ctx, {
+        ...action,
+        inputPayload: { ...action.inputPayload, authorizationId: 'auth_override' },
+      }),
+      (err) => err.category === 'validation' && err.message.includes('authorizationId'),
+    );
+    await assert.rejects(
+      () => executeCoordinationActionUseCase(ctx, {
+        ...action,
+        inputPayload: { ...action.inputPayload, invocationKey: 'inv_override' },
+      }),
+      (err) => err.category === 'validation' && err.message.includes('invocationKey'),
+    );
+
     const changedFields = [
-      ['authorizationId', 'auth-gate-2'],
-      ['invocationKey', 'inv-gate-2'],
       ['reason', 'Different authorization reason'],
       ['objective', 'Conflicting objective text'],
       ['expectedOutputs', ['different-result.json']],

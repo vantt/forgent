@@ -1,0 +1,127 @@
+{
+  "contractVersion": "coordination-baseline.v1",
+  "source": {
+    "commit": "d2a87c6e4bd0192f27bea0371a467a64c8a5cc69",
+    "dirtyFingerprint": "sha256:365c701357c4f675121390a018b44addcc63f04b2d3628763f75b687dfd09875",
+    "node": "v24.18.0",
+    "lockfileDigest": "sha256:b097ecd850ca73e265a2dcbf94c63aa48c118069db53d42b00996fecd83fe2fc"
+  },
+  "skills": [
+    {
+      "path": "core/skills/fgos-plan-loop/SKILL.md",
+      "bytes": 40745,
+      "words": 4917,
+      "lines": 727
+    },
+    {
+      "path": "core/skills/fgos-architecture-panel/SKILL.md",
+      "bytes": 63985,
+      "words": 9006,
+      "lines": 971
+    },
+    {
+      "path": "domains/coding/skills/fgos-code-panel/SKILL.md",
+      "bytes": 53835,
+      "words": 7049,
+      "lines": 915
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "clean-plan-loop-shaped",
+      "promptBytes": 154,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 3,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "accepted-finding-remediation-recheck",
+      "promptBytes": 240,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 5,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "architecture-advisory",
+      "promptBytes": 185,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "human-turn-reopen",
+      "promptBytes": 210,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 5,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "rfc-review",
+      "promptBytes": 160,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 3,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "nominal-group-technique",
+      "promptBytes": 175,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "delphi-method",
+      "promptBytes": 190,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 4,
+      "sequentialWaves": 3,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    },
+    {
+      "id": "explicit-close-success-refusal",
+      "promptBytes": 145,
+      "inputTokens": null,
+      "outputTokens": null,
+      "dispatchCount": 2,
+      "sequentialWaves": 2,
+      "durationMs": 0,
+      "retryCount": 0,
+      "evidenceOutcome": "verified"
+    }
+  ],
+  "replay": {
+    "corpusPresent": false,
+    "sessionCount": 0,
+    "bySchema": {},
+    "semanticDigest": null,
+    "measuredSessions": [],
+    "failures": []
+  }
+}
