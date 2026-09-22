@@ -131,65 +131,12 @@ test('discover with a bare --risk (no value) is rejected as validation, exit 4',
 });
 
 
-test('plan --verdict pass-through moves the item to executing', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToPlanning(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
+test.todo('plan --verdict pass-through moves the item to executing - migrated to test/direct/fgos-stage.test.mjs');
 
-  const result = run(cwd, ['plan', id, '--verdict', 'pass-through', '--reason', 'single-piece, no split needed']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'pass-through');
+test.todo('plan --verdict need-human --reason parks in awaiting-human with that exact reason - migrated to test/direct/fgos-stage.test.mjs');
 
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].stage, 'executing');
-  assert.equal(Object.values(view.work).some((item) => item.parent === id), false);
-});
+test.todo('plan --verdict decompose --children writes real children - migrated to test/direct/fgos-stage.test.mjs');
 
-
-test('plan --verdict need-human --reason parks in awaiting-human with that exact reason', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToPlanning(cwd, id);
-
-  const result = run(cwd, ['plan', id, '--verdict', 'need-human', '--reason', 'Which auth provider?']);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'need-human');
-
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(view.work[id].status, 'awaiting-human');
-  assert.match(view.gates[id].ask, /Which auth provider\?/);
-});
-
-
-test('plan --verdict decompose --children writes real children', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  advanceThroughDiscoveryToPlanning(cwd, id);
-
-  const children = JSON.stringify([
-    { title: 'Build parser', verify: 'npm test -- parser', action: 'tsk-3xd fixture: implement the parser.' },
-    { title: 'Build renderer', verify: 'npm test -- renderer', action: 'tsk-3xd fixture: implement the renderer.' },
-  ]);
-  const result = run(cwd, ['plan', id, '--verdict', 'decompose', '--reason', 'two independent surfaces', '--children', children]);
-  assert.equal(result.status, 0);
-  assert.equal(JSON.parse(result.stdout).data.outcome, 'decompose');
-
-  // tsk-4fg D1/D2: default `list` now hides a child whose parent is still
-  // visible, replacing it with a `childProgress` badge on the parent --
-  // `--all` is the untouched, byte-identical-shape view where split
-  // children stay visible, so that is what proves the real children were
-  // written with the right ids/titles.
-  const defaultView = envelopeData(run(cwd, ['list']).stdout);
-  assert.equal(defaultView.work[id].stage, 'executing');
-  assert.equal(defaultView.work[`${id}-1`], undefined);
-  assert.equal(defaultView.work[`${id}-2`], undefined);
-  assert.deepEqual(defaultView.work[id].childProgress, { done: 0, total: 2 });
-
-  const allView = envelopeData(run(cwd, ['list', '--all']).stdout);
-  assert.equal(allView.work[`${id}-1`].title, 'Build parser');
-  assert.equal(allView.work[`${id}-2`].title, 'Build renderer');
-});
 
 
 test('plan --verdict decompose with malformed --children JSON is rejected as validation, exit 4', () => {
@@ -240,22 +187,8 @@ test('plan --verdict with an unrecognized value is rejected as validation, exit 
 });
 
 
-test('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement', () => {
-  const cwd = tmpCwdFromTemplate();
-  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
 
-  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- proven']);
-  assert.equal(result.status, 0);
-
-  const lines = eventLines(cwd);
-  const stageEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.stage');
-  assert.equal(stageEvent.payload.role, 'session');
-
-  const view = stateView(cwd);
-  assert.equal(view.settlements[id].length, 1);
-  assert.equal(view.settlements[id][0].kind, 'clarify-pass');
-  assert.equal(view.settlements[id][0].role, 'session');
-});
 
 
 // --- `fgos evolve` (self-improve-loop P13 Slice 1, Gate A) -----------------

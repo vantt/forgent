@@ -85,7 +85,7 @@ import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
 import { discoverUseCase, planUseCase } from '../src/verbs/state/stage.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
-import { graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
+import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
 import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
 import { closeCoordinationUseCase } from '../src/verbs/coordination/close.mjs';
 import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
@@ -2203,208 +2203,17 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     case 'list': {
-      // External consumer note (decision record 0027's audit §5, tsk-38t-4):
-      // `herdr-plugin/src/fgos.rs` (a separate Rust crate outside this Node
-      // project's own build/test surface — its own Cargo.toml, not an npm
-      // workspace member) parses THIS verb's `--all --json` stdout and
-      // filters on literal `item.status == "doing" || item.status ==
-      // "awaiting-approval"` to build its "in-process" pane. It reads
-      // `status` directly, not `statusCategory` — today harmless (`coding`
-      // is the only domain that ever writes those two literal strings), but
-      // a future domain that relabels its own doing/awaiting-approval-
-      // equivalent statuses would silently break this Rust consumer unless
-      // it is updated separately (it cannot be fixed from this file; a JSON
-      // shape change here is a public contract this external process reads).
-      // Left untouched by tsk-38t-4 on purpose — Rust code outside this
-      // repo's own Node test/build surface is out of that item's scope.
-      const rawView = listWork(dir);
-      // tsk-483: generalizes tsk-2u9's own single-id `scopedById` (below,
-      // inside the `--id` branch, left untouched -- already correct) to a
-      // SET of ids, for the default/paginated multi-item paths further
-      // down. Same shapes tsk-2u9 already proved safe: id-keyed dicts
-      // filtered to `{[id]: v[id]}` per matching id; the flat `decisions`
-      // array filtered by `d.id` membership; `tools`/`work`/
-      // `awaitingContext` untouched (not id-keyed, or already correctly
-      // scoped by the caller before this runs).
-      const scopedByIds = (section, idSet) =>
-        section ? Object.fromEntries(Object.entries(section).filter(([id]) => idSet.has(id))) : {};
-      const scopeSideLogsTo = (view, idSet) => ({
-        ...view,
-        decisions: (view.decisions ?? []).filter((d) => idSet.has(d.id)),
-        discovery: scopedByIds(view.discovery, idSet),
-        gates: scopedByIds(view.gates, idSet),
-        settlements: scopedByIds(view.settlements, idSet),
-        outcomes: scopedByIds(view.outcomes, idSet),
-        frictions: scopedByIds(view.frictions, idSet),
-        learnings: scopedByIds(view.learnings, idSet),
-        decisionsById: scopedByIds(view.decisionsById, idSet),
-      });
-      // Single-item lookup (tsk-42m D1/D2): `--id` bypasses the open-only
-      // default and `--all` entirely -- naming a specific id already
-      // commits to that item regardless of status, the same way every
-      // other id-based verb (take/return/review/approve/reject/rollup/
-      // compound/discover) resolves `work[id]` directly and throws the
-      // same not-found shape on a miss.
-      if (flags.id !== undefined) {
-        const id = requireField(flags.id, 'list --id requires a non-empty work id');
-        const item = rawView.work[id];
-        if (!item) {
-          throw new StoreError('validation', `list: work "${id}" not found.`);
-        }
-        if (flags.fields !== undefined) {
-          const ALLOWED_ID_FIELDS = new Set([
-            'stage', 'status', 'holder', 'title', 'docsRef',
-            'verify', 'parent', 'id', 'domain', 'kind', 'risk', 'tier',
-          ]);
-          const fieldList = parseListFlag(flags.fields);
-          if (fieldList.length === 0) {
-            throw new StoreError('validation', 'list --fields requires a non-empty comma-separated list of field names.');
-          }
-          for (const f of fieldList) {
-            if (!ALLOWED_ID_FIELDS.has(f)) {
-              throw new StoreError('validation', `list --fields: unknown field "${f}". Allowed fields: ${Array.from(ALLOWED_ID_FIELDS).join(', ')}.`);
-            }
-          }
-          const fullItem = withStageEffective(item);
-          const filteredItem = {};
-          for (const f of fieldList) {
-            if (fullItem[f] !== undefined) {
-              filteredItem[f] = fullItem[f];
-            }
-          }
-          const {
-            decisions, discovery, gates, settlements, outcomes,
-            frictions, learnings, decisionsById, callThreads,
-            ...restView
-          } = rawView;
-          const singleView = {
-            ...restView,
-            work: { [id]: filteredItem },
-          };
-          if (item.status === 'awaiting-human') {
-            const ctx = computeAwaitingContext(singleView, id);
-            if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
-          }
-          return singleView;
-        }
-        // tsk-2u9 D1/D2: scope every OTHER id-keyed view section to this
-        // item too, not just `work` -- `rawView` otherwise leaks the
-        // entire backlog's decisions/discovery/gates/settlements/outcomes/
-        // frictions/learnings/decisionsById through a single-item request
-        // (confirmed live: 2.2MB for one item). `decisions` is a flat
-        // append-only array (some entries carry no `id` at all -- a
-        // global decision, correctly excluded here) rather than a dict,
-        // so it gets its own filter instead of the `{[id]: v[id]}` shape
-        // the rest share. `tools` is deliberately left untouched -- it is
-        // keyed by tool NAME (e.g. "gitnexus"), never by work item id.
-        const scopedById = (section) => (section?.[id] !== undefined ? { [id]: section[id] } : {});
-        const singleView = {
-          ...rawView,
-          work: { [id]: withStageEffective(item) },
-          decisions: (rawView.decisions ?? []).filter((d) => d.id === id),
-          discovery: scopedById(rawView.discovery),
-          gates: scopedById(rawView.gates),
-          settlements: scopedById(rawView.settlements),
-          outcomes: scopedById(rawView.outcomes),
-          frictions: scopedById(rawView.frictions),
-          learnings: scopedById(rawView.learnings),
-          decisionsById: scopedById(rawView.decisionsById),
-          callThreads: scopedById(rawView.callThreads),
-        };
-        if (item.status === 'awaiting-human') {
-          const ctx = computeAwaitingContext(singleView, id);
-          if (ctx) return { ...singleView, awaitingContext: { [id]: ctx } };
-        }
-        return singleView;
-      }
-      // Open-only default (tsk-5oa D1/D2; broadened by
-      // wontfix-terminal-status-filter-consistency D2): `list` shows only
-      // not-RESOLVED (`done`/`wontfix`) items unless `--all` is passed,
-      // matching `triage`'s pre-existing open-only default. Only the `work`
-      // map changes shape here — every other view key (decisions/gates/
-      // settlements/etc.) is untouched either way.
-      const showAll = Boolean(flags.all);
-      // tsk-4zj D3: stageEffective is applied to every item in `view.work`
-      // up front, both branches -- additive-only, so it never disturbs
-      // herdr-plugin's `--all` byte-identical contract (tsk-4fg D1 below);
-      // the childProgress spread further down preserves it automatically.
-      const filteredWork = showAll
-        ? rawView.work
-        : Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item)));
-      const view = {
-        ...rawView,
-        work: Object.fromEntries(Object.entries(filteredWork).map(([id, item]) => [id, withStageEffective(item)])),
-      };
-      // Child-view gate (tsk-4fg D1/D2): DEFAULT view only -- `--all`
-      // stays byte-identical/raw (D1), preserving herdr-plugin's own
-      // `list --all --json` contract (bin/fgos.mjs comment above, `case
-      // 'list'`). A row is dropped from the default view only when its
-      // `parent` is itself present in this SAME filtered set -- a child
-      // whose parent already got filtered out (resolved/hidden) falls
-      // back to a normal top-level row instead of vanishing with no
-      // parent left to carry its progress (D2; proven live against
-      // tsk-19y's still-open children). An `awaiting-human` child is
-      // never dropped either, regardless of parent visibility, so a
-      // parked question can never be silently hidden by this filter --
-      // the parent-anchored `awaitingContext` loop just below this block
-      // depends on `view.work` still carrying every `awaiting-human` row.
-      // Every dropped child's parent gets a `childProgress` badge instead,
-      // reusing `childrenOf`/the same `doneCount` rule `collectRollupData`
-      // already uses -- computed from ALL of that parent's children in
-      // `rawView`, not just the ones still visible after filtering, so a
-      // parent with e.g. 3 already-`done` (hidden) children and 3 still-
-      // open ones reports an honest `3/6`, not `0/3`.
-      if (!showAll) {
-        const isHideableChild = (item) =>
-          item.parent !== undefined && item.parent !== null && item.parent in view.work && item.status !== 'awaiting-human';
-        view.work = Object.fromEntries(
-          Object.entries(view.work)
-            .filter(([, item]) => !isHideableChild(item))
-            .map(([id, item]) => {
-              const children = childrenOf(rawView, id);
-              if (children.length === 0) return [id, item];
-              const done = children.filter((w) => w.status === 'done').length;
-              return [id, { ...item, childProgress: { done, total: children.length } }];
-            }),
-        );
-      }
-      // Parent-anchored context (str61 D1/D2/D3): additive-only key,
-      // computed fresh from `view` on every read (D1 — never a persisted
-      // "session"), never touching store.listWork itself. Only
-      // `awaiting-human` items ever produce an entry; a repo/scenario with
-      // none of them sees `view` returned byte-identical, no
-      // `awaitingContext` key at all.
-      const awaitingContext = {};
-      for (const item of Object.values(view.work)) {
-        if (item.status !== 'awaiting-human') continue;
-        const ctx = computeAwaitingContext(view, item.id);
-        if (ctx) awaitingContext[item.id] = ctx;
-      }
-      const base = Object.keys(awaitingContext).length > 0 ? { ...view, awaitingContext } : view;
-      // Pagination (D5/D35, reopened by tsk-483 -- see docs/history/
-      // tsk-483-list-side-log-pagination-scoping/CONTEXT.md D1): `work`
-      // still drives the actual page slice, but every other view key
-      // (decisions/gates/settlements/etc.) now scopes to the SAME ids
-      // being returned, everywhere except the one protected combination
-      // below. `view.work` is a map keyed by id, so it is wrapped into
-      // `{id, item}` pairs before going through the same generic
-      // `paginate()` every array-returning verb uses, then unwrapped back
-      // into a plain id->item map for the page itself.
+      const id = flags.id !== undefined
+        ? requireField(flags.id, 'list --id requires a non-empty work id')
+        : undefined;
       const { cursor, limit } = readPaginationFlags(flags, 'list');
-      if (cursor === undefined && limit === undefined) {
-        // tsk-483 D2: the ONE combination that must stay byte-identical --
-        // `herdr-plugin/src/fgos.rs` (confirmed directly, not by comment:
-        // exactly 3 call sites, every one `["list", "--all", "--json"]`
-        // verbatim, never combined with pagination flags, never reading
-        // any of the scoped-away fields) parses exactly this shape.
-        if (showAll) return base;
-        return scopeSideLogsTo(base, new Set(Object.keys(base.work)));
-      }
-      const entries = Object.entries(view.work).map(([id, item]) => ({ id, item }));
-      const { items: pagedEntries, nextCursor } = paginate(entries, { cursor, limit, order: 'list-work-v1' });
-      const workPage = Object.fromEntries(pagedEntries.map(({ id, item }) => [id, item]));
-      const scoped = scopeSideLogsTo(base, new Set(pagedEntries.map(({ id }) => id)));
-      return { ...scoped, work: { items: workPage, nextCursor } };
+      return listUseCase({ dir }, {
+        id,
+        fields: flags.fields,
+        all: Boolean(flags.all),
+        cursor,
+        limit,
+      });
     }
 
     // Request-class per D1 (same contract as `list`): a pure read — never
