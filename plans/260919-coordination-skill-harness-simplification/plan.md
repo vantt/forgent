@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@73845314`; Unit I04 / Phase 3 is next
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@dca4efd5` (candidate `2681b389` + F-01/F-02 fix, origin/main not pushed); Unit I04 / Phase 3 is next
 Created: 2026-09-19
 Last Updated: 2026-09-22
 Mode: high-risk
@@ -771,20 +771,22 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: execute
   depends-on: I00 approved
   stop: `main` changes during integration or tree is not clean
-- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (integrated at `main@73845314`)
+- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (integrated at `main@dca4efd5`, candidate `2681b389` + F-01/F-02 fix)
   capability: code:implement
   depends-on: I01
   status: integrated
-  candidate-sha: `0c17bd62` (plus settlement authority hardening)
-  integrated-sha: `73845314`
-  findings-resolved: I02-REV-01, I02-REV-02, I02-REV-03, I02-REV-04, Settlement Authority TOCTOU
+  candidate-sha: `2681b389` (plus settlement authority & alternate writer CAS hardening)
+  integrated-sha: `dca4efd5` (merge of `2681b389`)
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed)
+  findings-resolved: I02-REV-01, I02-REV-02, I02-REV-03, I02-REV-04, F-01 (Settlement Authority / Alternate Writers), F-02 (Cross-Plan Status Synchronization)
   stop: current RunResult path contradicts the old patch or authority is ambiguous
-- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (integrated at `main@73845314`)
+- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (integrated at `main@dca4efd5`)
   capability: code:test
   depends-on: I02
   status: integrated
-  integrated-sha: `73845314`
-  verification: 11 suites, 315 tests pass / 0 fail (doer matrix); 74 pass in assignment-dispatch.test.mjs
+  integrated-sha: `dca4efd5`
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed)
+  verification: 11 suites, 317 tests pass / 0 fail (doer matrix); 75 pass in assignment-dispatch.test.mjs
   stop: corrupt evidence can settle or close
 - unit: I04 — implement Phase 3 template registry/resolver/provenance
   capability: code:implement

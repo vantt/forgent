@@ -196,33 +196,63 @@ Running `node /home/vantt/projects/forgentX/.gitnexus/run.cjs detect-changes --s
 
 ---
 
+---
+
 ## 7. Test Verification Accounting Summary
 
 To ensure exact consistency and clarity across all review and doer records:
 
-- **Full Doer Verification Matrix**: **11 suites, 315 tests passing, 0 failing**.
+- **Full Doer Verification Matrix**: **11 suites, 317 tests passing, 0 failing**.
   - `test/runner/run-result-v2.test.mjs` (13 tests)
   - `test/runner/assignment-runresult.test.mjs` (31 tests)
-  - `test/runner/assignment-dispatch.test.mjs` (74 tests)
+  - `test/runner/assignment-dispatch.test.mjs` (75 tests, including two-OS-process reconciliation barrier race test)
   - `test/runner/coordination-session-engine.test.mjs` (23 tests)
   - `test/runner/coordination-research-fan-out.test.mjs` (12 tests)
   - `test/runner/coordination-recovery-and-quorum.test.mjs` (46 tests)
   - `test/runner/coordination-replay.test.mjs` (29 tests)
   - `test/runner/coordination-legacy-schema-compatibility.test.mjs` (3 tests)
-  - `test/runner/coordination-stale-action-proof.test.mjs` (21 tests)
+  - `test/runner/coordination-stale-action-proof.test.mjs` (22 tests — note: resolved count discrepancy from 21)
   - `test/runner/coordination-phase2-concurrency.test.mjs` (16 tests)
   - `test/runner/coordination-aggregation.test.mjs` (47 tests)
-- **Reviewer Smoke Rerun**: `node --test test/runner/assignment-dispatch.test.mjs` (**74 tests passing, 0 failing**).
+- **Smoke Suite**: `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
 - **Focused Fix Rechecks**:
-  - 5 R5 concurrency & settlement authority tests in `assignment-dispatch.test.mjs` (100% pass).
+  - 6 R5 concurrency, settlement authority & reconciliation barrier tests in `assignment-dispatch.test.mjs` (100% pass).
   - 76 run-lock tests in `test/runner/main-checkout-lock.test.mjs` (100% pass).
+  - 20 CLI spawn reconciliation tests in `test/runner/cli-spawn-reconciliation.test.mjs` (100% pass).
   - 23 coordination session tests in `coordination-session-engine.test.mjs` / `coordination-session-cli.test.mjs` (100% pass).
 
 ---
 
-## 8. Next Eligible Units & Integration Disposition
+## 8. Resolution of Review Finding F-01 (Alternate Writers & Linearizable CAS)
+
+- **Finding F-01 (BLOCKER)**:
+  `commitRunSettlement()` was hardened with `settleRunControl()` + `publishImmutableProof()`, but alternate production `result.json` writers bypassed that boundary:
+  1. Provider-capacity refusal path used `publishMutableProjection(result.json)` then `markRunSettled()`.
+  2. CLI-spawn reconciliation path (`settleReceiptRunFromOutcome` and `settleFailedRunFromOutcome`) checked `isRunControlCurrent()` outside the write boundary then used `publishMutableProjection(result.json)`.
+- **Resolution & Architecture**:
+  1. **Provider-Capacity Refusal**:
+     - Runs before main `acquireRunControl`. Now acquires an ephemeral control token (`purpose: 'provider-capacity-refusal'`) and commits through `commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult })`.
+     - The resulting `settled` generation record fences any future controller, closing the TOCTOU bypass.
+  2. **Reconciliation Settlement Paths**:
+     - `settleReceiptRunFromOutcome` and `settleFailedRunFromOutcome` now route authoritative `result.json` publication strictly through `commitRunSettlement()`.
+     - Stale writers are atomically detected at the CAS boundary, write diagnostic `result.superseded.json`, and are refused with `run-control-superseded`. Authoritative `result.json` is never overwritten.
+     - `reconcileCliSpawnRun` includes a ledger bootstrap if called with an explicit token on an empty ledger (e.g., direct-reconciler call sites), ensuring `settleRunControl` has a valid generation record to validate.
+  3. **Deterministic Concurrency Proof**:
+     - Added `reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reconciler cannot overwrite authoritative result.json (R5 / F-01 settlement authority)` in `test/runner/assignment-dispatch.test.mjs`.
+     - Verifies Old Reconciler passes pre-check, pauses before publication, Newer Controller settles epoch 2, Old Reconciler resumes and is strictly refused with `run-control-superseded` while authoritative `result.json` remains untouched.
+
+---
+
+## 9. Next Eligible Units & Integration Disposition
 
 - **Candidate Branch**: `coordination-integration-i02-result-truth`
-- **Candidate Commit**: `0c17bd62` (and hardened settlement authority commit)
-- **Integration Commit**: Merged into local `main` at commit `73845314`.
+- **Candidate Commit Lineage**:
+  - `0c17bd62` (initial I02/I03 reconciliation and R5 implementation)
+  - `2681b389` (settlement authority TOCTOU fix for commitRunSettlement)
+  - fix commit resolving F-01 (alternate writers) and F-02 (cross-plan sync)
+- **Local Main Integration Lineage**:
+  - `73845314` (initial merge of `0c17bd62`)
+  - `dca4efd5` (merge of `2681b389`)
+  - final merge incorporating F-01/F-02 resolution
+- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; gate requires independent re-review approval before push).
 - **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.
