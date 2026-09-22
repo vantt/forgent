@@ -1844,27 +1844,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     // Atomic update-ref
     try {
       execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
-      // If we are currently on targetBranch, sync the working tree
-      try {
-        const currentBranch = execFileSync('git', ['branch', '--show-current'], { cwd: repoRoot, encoding: 'utf8' }).trim();
-        if (currentBranch === targetBranch) {
-          // Preserve uncommitted .fgos state that isWorkingTreeClean explicitly allows
-          const fgosPath = path.join(repoRoot, '.fgos');
-          const tmpFgosPath = path.join(os.tmpdir(), `fgos-save-${Date.now()}`);
-          let saved = false;
-          if (fs.existsSync(fgosPath)) {
-            fs.cpSync(fgosPath, tmpFgosPath, { recursive: true });
-            saved = true;
-          }
-          
-          execFileSync('git', ['reset', '--hard', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' });
-          
-          if (saved) {
-            fs.cpSync(tmpFgosPath, fgosPath, { recursive: true, force: true });
-            fs.rmSync(tmpFgosPath, { recursive: true, force: true });
-          }
-        }
-      } catch (e) {}
+
     } catch (err) {
       return {
         outcome: 'merge-failed-unclassified',

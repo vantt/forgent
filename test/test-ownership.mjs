@@ -30,12 +30,6 @@
 //     recorded plainly rather than guessed past.
 
 export const MANIFEST = [
-  {
-    id: 'merge-gate',
-    pattern: 'src/runner/merge.mjs',
-    directTests: ['test/direct/merge-gate.test.mjs'],
-    status: 'live'
-  },
   // -- src/intake/** (plan candidate area 1) --
   { id: 'intake-classify', status: 'shadow', pattern: 'src/intake/classify.mjs', directTests: ['test/intake/classify.test.mjs'], boundaryTests: [] },
   { id: 'intake-discovery', status: 'shadow', pattern: 'src/intake/discovery.mjs', directTests: ['test/intake/discovery.test.mjs'], boundaryTests: [] },
@@ -98,6 +92,7 @@ export const FULL_TRIGGERS = [
   { id: 'package-lock', exact: 'package-lock.json', reason: 'lockfile' },
   { id: 'ci-workflows', prefix: '.github/', reason: 'CI configuration' },
   { id: 'verbs-merge', prefix: 'src/verbs/merge/', reason: 'excluded from this pilot -- boundary-test mapping for the approve/merge gate was not completed with confidence' },
+  { id: 'runner-merge', prefix: 'src/runner/merge.mjs', reason: 'excluded from this pilot -- boundary-test mapping for the approve/merge gate was not completed with confidence' },
   { id: 'setup-registry', prefix: 'src/setup/', reason: 'install/setup/doctor config-merge and check registry' },
   { id: 'core-projection', prefix: 'core/', reason: 'generated/projection relationships not fully mapped' },
   { id: 'domains-projection', prefix: 'domains/', reason: 'generated/projection relationships not fully mapped' },
