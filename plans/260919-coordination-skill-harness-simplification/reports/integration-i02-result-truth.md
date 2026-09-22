@@ -249,10 +249,10 @@ To ensure exact consistency and clarity across all review and doer records:
 - **Candidate Commit Lineage**:
   - `0c17bd62` (initial I02/I03 reconciliation and R5 implementation)
   - `2681b389` (settlement authority TOCTOU fix for commitRunSettlement)
-  - fix commit resolving F-01 (alternate writers) and F-02 (cross-plan sync)
+  - `f835c215` (fix resolving F-01 alternate writers and F-02 cross-plan sync)
 - **Local Main Integration Lineage**:
   - `73845314` (initial merge of `0c17bd62`)
   - `dca4efd5` (merge of `2681b389`)
-  - final merge incorporating F-01/F-02 resolution
+  - `72894c98` (final merge incorporating F-01/F-02 resolution)
 - **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; gate requires independent re-review approval before push).
 - **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.
