@@ -246,13 +246,19 @@ To ensure exact consistency and clarity across all review and doer records:
 ## 9. Next Eligible Units & Integration Disposition
 
 - **Candidate Branch**: `coordination-integration-i02-result-truth`
+- **Candidate Branch Tip**: `46e09c30`
+- **Code Fix SHA**: `f835c215` (alternate-writer CAS settlement & reconciliation barrier race proof)
 - **Candidate Commit Lineage**:
   - `0c17bd62` (initial I02/I03 reconciliation and R5 implementation)
   - `2681b389` (settlement authority TOCTOU fix for commitRunSettlement)
-  - `f835c215` (fix resolving F-01 alternate writers and F-02 cross-plan sync)
+  - `f835c215` (code fix resolving F-01 alternate writers and TOCTOU barrier race)
+  - `46e09c30` (cross-plan status synchronization for F-02)
+- **Final Local Main**: `2b8f7aeb` (clean integration of candidate branch tip `46e09c30`)
 - **Local Main Integration Lineage**:
   - `73845314` (initial merge of `0c17bd62`)
   - `dca4efd5` (merge of `2681b389`)
-  - `72894c98` (final merge incorporating F-01/F-02 resolution)
-- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; gate requires independent re-review approval before push).
+  - `72894c98` (merge of code fix `f835c215`)
+  - `2b8f7aeb` (merge of candidate branch tip `46e09c30`)
+- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; local main is ahead of origin by 6 commits; gate requires independent re-review approval before push).
+- **Verification Matrix**: **11 suites, 317 tests pass / 0 fail** (focused matrix: 220 9-suite + 22 stale-action + 75 assignment-dispatch); 76 pass in run-lock; 20 pass in cli-spawn reconciliation.
 - **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.
