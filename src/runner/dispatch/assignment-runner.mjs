@@ -70,6 +70,7 @@ import {
   publishNextGeneration,
   acquireRunControl,
   releaseRunControl,
+  settleRunControl,
   isRunControlCurrent,
   isProcessAlive,
   readMarker,
@@ -1425,16 +1426,55 @@ function attemptProviderCapacityFallback({
  * @param {object} params.runResult Normalized RunResult v2 object
  * @returns {Readonly<object>} Frozen runResult on authoritative settlement
  */
-export function commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult }) {
+export function commitRunSettlement({
+  runDir,
+  runId,
+  controlEpoch,
+  controlToken,
+  runResult,
+  _beforeAuthoritativePublish = null,
+}) {
+  const resultJsonPath = path.join(runDir, 'result.json');
+  const supersededJsonPath = path.join(runDir, 'result.superseded.json');
+
+  // 1. Precondition check: controller must have current control
   if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-    publishMutableProjection(path.join(runDir, 'result.superseded.json'), runResult);
+    publishMutableProjection(supersededJsonPath, runResult);
     throw new RunnerConfigError(
       `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
       { code: 'run-control-superseded', phase: 'post-admission' },
     );
   }
 
-  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
+  // 2. Barrier hook for two-process race testing: called after passing precondition,
+  // right before entering the authoritative publication / CAS transaction.
+  if (typeof _beforeAuthoritativePublish === 'function') {
+    _beforeAuthoritativePublish({ runDir, runId, controlEpoch, controlToken });
+  }
+
+  // 3. Authoritative settlement CAS: validate control token and commit settlement in the run-lock ledger.
+  // This atomically validates that { controlEpoch, controlToken } is STILL current and publishes the
+  // 'settled' generation record, locking out any future controller.
+  const settlement = settleRunControl(runDir, { controlEpoch, controlToken });
+  if (settlement.status !== 'settled') {
+    publishMutableProjection(supersededJsonPath, runResult);
+    throw new RunnerConfigError(
+      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current (settlement status: "${settlement.status}") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
+    );
+  }
+
+  // 4. Authoritative publication via immutable hard link (atomic EEXIST protection against overwriting):
+  // Authoritative result.json is immutable and must NEVER be overwritten by any subsequent writer.
+  const published = publishImmutableProof(resultJsonPath, runResult);
+  if (!published) {
+    publishMutableProjection(supersededJsonPath, runResult);
+    throw new RunnerConfigError(
+      `executeAssignment: authoritative result.json for Run "${runId}" already exists -- refusing to overwrite authoritative result`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
+    );
+  }
+
   markRunSettled(runDir);
   Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
   return Object.freeze(runResult);
@@ -1991,14 +2031,31 @@ export async function executeAssignment(assignment, opts = {}) {
           },
           evidence: evidenceData,
         });
-        publishMutableProjection(path.join(runDir, 'result.json'), refusedRunResult);
-        // Same convention as the normal completion path below: markRunSettled
-        // is the sole writer of run.json's own `status` field (default
-        // "settled" -- "reached its end and produced a RunResult", distinct
-        // from result.json's own success/failure verdict). No separate manual
-        // run.json write here.
-        markRunSettled(runDir);
-        return Object.freeze(refusedRunResult);
+        // This early-exit runs BEFORE the main acquireRunControl at line 2231, so
+        // no control token exists yet. Acquire one now, use the shared atomic
+        // settlement primitive (CAS + immutable publication), and return.
+        // The settled generation record fences any future controller from acquiring
+        // this Run — consistent with every other settlement path (F-01).
+        const refusalControlHolder = buildRunControlHolder(`${runId}:${process.pid}:provider-capacity-refusal`);
+        const refusalControl = acquireRunControl(runDir, { holder: refusalControlHolder, purpose: 'provider-capacity-refusal' });
+        if (refusalControl.status !== 'acquired') {
+          // Already settled by another path — rehydrate and return.
+          try {
+            const resultJsonPath = path.join(runDir, 'result.json');
+            if (fs.existsSync(resultJsonPath)) return Object.freeze(interpretRunResult(resultJsonPath));
+          } catch {}
+          throw new RunnerConfigError(
+            `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
+            { code: 'run-control-held', phase: 'provider-capacity-refusal' },
+          );
+        }
+        return commitRunSettlement({
+          runDir,
+          runId,
+          controlEpoch: refusalControl.controlEpoch,
+          controlToken: refusalControl.controlToken,
+          runResult: refusedRunResult,
+        });
       }
     }
     if (providerCapacitySelection?.status === 'selected') {
@@ -2571,7 +2628,7 @@ export async function executeAssignment(assignment, opts = {}) {
             executorId,
           };
         }
-        const settledFailed = await settleFailedRunFromOutcome(runDir, runMeta, commandState, controlEpoch, controlToken);
+        const settledFailed = await settleFailedRunFromOutcome(runDir, runMeta, commandState, controlEpoch, controlToken, opts);
         return settledFailed.runResult;
       }
 
@@ -2980,7 +3037,7 @@ export async function executeAssignment(assignment, opts = {}) {
   }
 }
 
-async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken) {
+async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
@@ -2988,19 +3045,8 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
-  const generationsDir = path.join(runDir, 'control', 'generations');
-  if (fs.existsSync(generationsDir)) {
-    try {
-      const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
-      if (files.length > 0 && !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-        throw new RunnerConfigError(
-          `settleFailedRunFromOutcome: control token for Run "${runMeta?.runId || ''}" (epoch ${controlEpoch}) is no longer current -- refusing to append a settlement from a superseded controller`,
-        );
-      }
-    } catch (err) {
-      if (err instanceof RunnerConfigError) throw err;
-    }
-  }
+  // result.json early-return: if a prior settlement already exists, rehydrate it.
+  // (Control CAS check below in commitRunSettlement handles the stale-writer case.)
   const settledAt = new Date().toISOString();
   const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
 
@@ -3064,19 +3110,35 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
     },
   });
 
-  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
+  // Route result.json publication through the shared atomic settlement
+  // primitive: settleRunControl CAS + immutable hard-link publication.
+  // This closes the TOCTOU gap (F-01): stale writers are refused here the
+  // same way commitRunSettlement refuses them in the normal completion path.
+  // The old isRunControlCurrent() pre-check was a non-atomic read that left
+  // a window between check and write; commitRunSettlement collapses them.
+  const settled = commitRunSettlement({
+    runDir,
+    runId: runMeta.runId,
+    controlEpoch,
+    controlToken,
+    runResult,
+    _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
+  });
   const runJsonPath = path.join(runDir, 'run.json');
   let runJsonMeta = runMeta || {};
   if (fs.existsSync(runJsonPath)) {
     try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
   }
+  // run.json status 'failed' is a mutable projection (not authoritative result.json).
+  // commitRunSettlement already wrote 'settled' via markRunSettled; overwrite with
+  // 'failed' to preserve the reconciliation path's explicit status convention.
   publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'failed', settledAt });
   await finalizeConfinementResources({ runDir, launchCommandId: command.launchCommandId });
 
-  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+  return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
 }
 
-async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receiptOpt = null) {
+async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receiptOpt = null, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
@@ -3084,19 +3146,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
-  const generationsDir = path.join(runDir, 'control', 'generations');
-  if (fs.existsSync(generationsDir)) {
-    try {
-      const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
-      if (files.length > 0 && !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-        throw new RunnerConfigError(
-          `settleReceiptRunFromOutcome: control token for Run "${runMeta?.runId || ''}" (epoch ${controlEpoch}) is no longer current -- refusing to append a settlement from a superseded controller`,
-        );
-      }
-    } catch (err) {
-      if (err instanceof RunnerConfigError) throw err;
-    }
-  }
+  // (Control CAS check below in commitRunSettlement handles the stale-writer case.)
   const launchCommandId = command.launchCommandId;
   const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
   const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
@@ -3292,7 +3342,17 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
     },
   });
 
-  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
+  // Route result.json publication through the shared atomic settlement
+  // primitive: settleRunControl CAS + immutable hard-link publication.
+  // This closes the TOCTOU gap (F-01) for the receipt-backed reconciliation path.
+  const settled = commitRunSettlement({
+    runDir,
+    runId: runMeta.runId,
+    controlEpoch,
+    controlToken,
+    runResult,
+    _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
+  });
   const runJsonPath = path.join(runDir, 'run.json');
   let runJsonMeta = runMeta || {};
   if (fs.existsSync(runJsonPath)) {
@@ -3301,7 +3361,7 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'settled', settledAt });
   await finalizeConfinementResources({ runDir, launchCommandId, receipt });
 
-  return { status: 'settled', settled: true, runResult: Object.freeze(runResult) };
+  return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
 }
 
 /**
@@ -3372,6 +3432,27 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
         controlToken = control.controlToken;
       }
     } catch {}
+  } else {
+    // opts.controlToken was supplied (e.g., from a parent executeAssignment).
+    // The control ledger must have a registered generation for settleRunControl's
+    // CAS to work. If the generations dir is empty (direct-reconciler call site
+    // or legacy fixture without prior acquireRunControl), bootstrap it now.
+    const generationsDir = path.join(runDir, 'control', 'generations');
+    const ledgerEmpty = !fs.existsSync(generationsDir) ||
+      fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json')).length === 0;
+    if (ledgerEmpty) {
+      const bootstrapHolder = opts.holder || buildRunControlHolder(`reconciler-bootstrap:${process.pid}`);
+      try {
+        const bootstrapControl = acquireRunControl(runDir, { holder: bootstrapHolder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
+        if (bootstrapControl.status === 'acquired') {
+          // Use the freshly acquired epoch/token for settlement; the caller's
+          // opts.controlToken was only used for the stale-check above.
+          acquiredControl = bootstrapControl;
+          controlEpoch = bootstrapControl.controlEpoch;
+          controlToken = bootstrapControl.controlToken;
+        }
+      } catch {}
+    }
   }
 
   function checkRunControlCurrent() {
@@ -3409,7 +3490,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
       if (!checkRunControlCurrent()) {
         return { status: 'observed', outcome: command.outcome, settled: false };
       }
-      return await settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken);
+      return await settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken, opts);
     }
 
     // Check receipt tamper if receipt already exists
@@ -3450,7 +3531,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
       if (!checkRunControlCurrent()) {
         return { status: 'observed', outcome: command.outcome, settled: false };
       }
-      return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken);
+      return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, null, opts);
     }
 
     // Window 2: Command pending without envelope
@@ -3598,7 +3679,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
     command.outcome = outcome;
     publishMutableProjection(commandPath, command);
 
-    return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receipt);
+    return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receipt, opts);
   } finally {
     if (acquiredControl?.controlToken) {
       try {

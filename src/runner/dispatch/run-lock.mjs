@@ -329,6 +329,9 @@ export function acquireRunControl(runDir, { holder, purpose, expectedControlEpoc
     }
 
     if (current) {
+      if (current.record?.purpose === 'settled') {
+        return { stop: true, status: 'settled', controlEpoch: current.epoch };
+      }
       const released = readMarker(releaseMarkerPath(releasesDir, current.epoch)) !== null;
       if (!released) {
         const heartbeatFresh = typeof ttlMs === 'number' && now - current.record.acquiredAt <= ttlMs;
@@ -381,10 +384,46 @@ export function inspectRunControl(runDir) {
   const { generationsDir, releasesDir } = controlDirs(runDir);
   const current = currentGeneration(generationsDir);
   if (!current) return { held: false };
+  if (current.record?.purpose === 'settled') return { held: false, settled: true, controlEpoch: current.epoch };
   const released = readMarker(releaseMarkerPath(releasesDir, current.epoch)) !== null;
   if (released) return { held: false, controlEpoch: current.epoch };
   if (resolveHolderLiveness(current.record.holder) === 'dead') return { held: false, controlEpoch: current.epoch };
   return { held: true, controlEpoch: current.epoch, holder: current.record.holder };
+}
+
+/**
+ * Commit authoritative settlement for a Run under its control ledger.
+ *
+ * Atomic CAS:
+ * - Checks that { controlEpoch, controlToken } is the current generation in generationsDir.
+ * - Publishes the next generation with purpose: 'settled', fencing any future controller.
+ * - If current generation does not match or a newer controller has taken over, returns
+ *   { status: 'superseded', controlEpoch: current?.epoch }.
+ * - If already settled, returns { status: 'already-settled', controlEpoch: current?.epoch }.
+ */
+export function settleRunControl(runDir, { controlEpoch, controlToken, now = Date.now() } = {}) {
+  const { generationsDir } = controlDirs(runDir);
+  const result = publishNextGeneration(generationsDir, ({ current, nextEpoch }) => {
+    if (!current || current.epoch !== controlEpoch || current.record.controlToken !== controlToken) {
+      return { stop: true, status: 'superseded', controlEpoch: current?.epoch ?? null };
+    }
+    if (current.record.purpose === 'settled') {
+      return { stop: true, status: 'already-settled', controlEpoch: current.epoch };
+    }
+    return {
+      record: {
+        controlToken,
+        purpose: 'settled',
+        settledEpoch: controlEpoch,
+        acquiredAt: now,
+      },
+    };
+  });
+
+  if (!result.published) {
+    return { status: result.status, controlEpoch: result.controlEpoch ?? null };
+  }
+  return { status: 'settled', controlEpoch: result.epoch };
 }
 
 /**

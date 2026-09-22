@@ -19,7 +19,9 @@ Units **I02** and **I03** unify the Phase 01 RunResult truth contract (`9049e611
   - **R5 (Superseded Work Product Preservation)**: Evaluated and chosen disposition: **`IMPLEMENT`**. At settlement barriers in `assignment-runner.mjs`, if a controller is superseded mid-flight (`!isRunControlCurrent(...)`), its normalized output is saved atomically as `result.superseded.json` before raising `RunnerConfigError('run-control-superseded')`. Authoritative `result.json` is never written or overwritten, and `markRunSettled` is never called.
 - **Unit I03 (Verification Matrix)**:
   - Added targeted mutation-sensitive tests in `coordination-session-engine.test.mjs` and `coordination-aggregation.test.mjs`.
-  - Verified the entire 11-suite matrix with **312 tests passing, 0 failing**.
+  - **Historical initial matrix** (pre-F-01 fix at commit `2681b389`): **11 suites, 315 tests passing, 0 failing** (74 pass in `assignment-dispatch.test.mjs`).
+  - **Post-fix verification matrix** (post-F-01 resolution at commit `f835c215` / `72894c98` with the new reconciliation barrier race test): **11 suites, 317 tests passing, 0 failing** (75 pass in `assignment-dispatch.test.mjs`).
+  - **Reviewer smoke rerun** (independently verified at commits `81c56e11`, `510f35f5`, `4362bfec`): `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
   - Verified GitNexus impact analysis: **LOW risk, 0 affected execution flows**.
 
 ---
@@ -163,12 +165,114 @@ Running `node /home/vantt/projects/forgentX/.gitnexus/run.cjs detect-changes --s
 - **Verification**:
   - `node --test --test-name-pattern="concurrent identical admission" test/runner/assignment-dispatch.test.mjs` passes consistently.
   - `node --test --test-name-pattern="captures timeout" test/runner/assignment-dispatch.test.mjs` passes consistently.
-  - Full smoke suite `node --test test/runner/assignment-dispatch.test.mjs`: **73 pass / 0 fail** (duration ~67s).
+  - Full smoke suite `node --test test/runner/assignment-dispatch.test.mjs`: **74 pass / 0 fail**.
+
+### Settlement Authority TOCTOU Resolution (HIGH — Atomic CAS & Barrier Concurrency Proof)
+- **Finding**: Reviewer identified that in `commitRunSettlement`:
+  ```javascript
+  if (!isRunControlCurrent(...)) {
+    publish result.superseded.json;
+    throw ...;
+  }
+  publish result.json;
+  markRunSettled;
+  ```
+  The check for current control epoch/token and the publication of `result.json` were separate operations outside an atomic CAS/lock boundary. An interleaving where:
+  1. Old controller checks `isRunControlCurrent()` -> true.
+  2. Newer controller takes over (acquires newer epoch) and settles (`publish result.json`).
+  3. Old controller unpauses and executes `publishMutableProjection(result.json)` (via POSIX `renameSync`), overwriting the newer controller's authoritative result.
+- **Root Cause & Contract Hardening**:
+  1. `run-lock.mjs`: Implemented `settleRunControl(runDir, { controlEpoch, controlToken })`. It executes an atomic CAS via `publishNextGeneration` in `control/generations/`, validating that `{ controlEpoch, controlToken }` is still the current active generation and appending an immutable generation record with `purpose: 'settled'`.
+  2. Updated `acquireRunControl` and `inspectRunControl` in `run-lock.mjs` to recognize `purpose: 'settled'` and refuse future controller acquisitions, closing any post-settlement takeover window.
+  3. `assignment-runner.mjs`: `commitRunSettlement` now executes `settleRunControl` within the run-lock ledger. Furthermore, authoritative `result.json` is published via `publishImmutableProof` (`fs.linkSync`), failing closed with `EEXIST` so it can NEVER overwrite an existing authoritative result file.
+  4. Added deterministic barrier hook `_beforeAuthoritativePublish` to `commitRunSettlement` for multi-process race verification.
+- **Deterministic Two-Process Barrier Attack Verification**:
+  - Added test in `test/runner/assignment-dispatch.test.mjs`: `executeAssignment: two-OS-process TOCTOU barrier race proves stale controller cannot overwrite authoritative result.json (R5 / I02-REV-04 settlement authority)`.
+  - Step 1: Old writer starts under epoch 1, passes precondition (`isRunControlCurrent`).
+  - Step 2: Old writer pauses at `_beforeAuthoritativePublish` barrier (writes `barrier-paused.json`, polls for release).
+  - Step 3: Newer controller takes over, acquires epoch 2, commits settlement via `commitRunSettlement`, writes authoritative `result.json`.
+  - Step 4: Newer controller releases Old Writer via `barrier-resume.json`.
+  - Step 5: Old writer unpauses and attempts authoritative publication.
+  - **Outcome**: Old writer is strictly refused (`settleRunControl` returns `superseded`, `publishImmutableProof` refuses with `EEXIST`), Old writer writes `result.superseded.json` and throws typed `run-control-superseded`.
+  - Authoritative `result.json` remains byte-for-byte Newer Controller's output, completely untouched and uncorrupted.
 
 ---
 
-## 7. Next Eligible Units
+---
 
-With Unit I02 and Unit I03 fully verified and all review findings resolved:
-- **Eligible Next Unit**: **I04** (coordination-phase2-concurrency multi-process integration) or Phase 3 forward progress.
-- **Branch Candidate**: Ready to commit on `coordination-integration-i02-result-truth`.
+## 7. Test Verification Accounting Summary
+
+To ensure exact consistency and clarity across all review and doer records:
+
+- **Historical Initial Matrix** (initial candidate `0c17bd62` / `2681b389`):
+  - **11 suites, 315 tests pass / 0 fail** (74 tests in `assignment-dispatch.test.mjs`).
+- **Post-Fix Verification Matrix** (candidate `f835c215` / `72894c98` after F-01 resolution):
+  - **11 suites, 317 tests passing, 0 failing**:
+    - `test/runner/run-result-v2.test.mjs` (13 tests)
+    - `test/runner/assignment-runresult.test.mjs` (31 tests)
+    - `test/runner/assignment-dispatch.test.mjs` (**75 tests**, including the new two-OS-process reconciliation barrier race test)
+    - `test/runner/coordination-session-engine.test.mjs` (23 tests)
+    - `test/runner/coordination-research-fan-out.test.mjs` (12 tests)
+    - `test/runner/coordination-recovery-and-quorum.test.mjs` (46 tests)
+    - `test/runner/coordination-replay.test.mjs` (29 tests)
+    - `test/runner/coordination-legacy-schema-compatibility.test.mjs` (3 tests)
+    - `test/runner/coordination-stale-action-proof.test.mjs` (22 tests — note: resolved count discrepancy from 21)
+    - `test/runner/coordination-phase2-concurrency.test.mjs` (16 tests)
+    - `test/runner/coordination-aggregation.test.mjs` (47 tests)
+- **Reviewer Smoke Suite Rerun** (independently verified at commits `81c56e11`, `510f35f5`, and `4362bfec`):
+  - Command: `node --test test/runner/assignment-dispatch.test.mjs` (**75 tests passing, 0 failing**).
+- **Focused Fix Rechecks**:
+  - 6 R5 concurrency, settlement authority & reconciliation barrier tests in `assignment-dispatch.test.mjs` (100% pass).
+  - 76 run-lock tests in `test/runner/main-checkout-lock.test.mjs` (100% pass).
+  - 20 CLI spawn reconciliation tests in `test/runner/cli-spawn-reconciliation.test.mjs` (100% pass).
+  - 23 coordination session tests in `coordination-session-engine.test.mjs` / `coordination-session-cli.test.mjs` (100% pass).
+
+---
+
+## 8. Resolution of Review Finding F-01 (Alternate Writers & Linearizable CAS)
+
+- **Finding F-01 (BLOCKER)**:
+  `commitRunSettlement()` was hardened with `settleRunControl()` + `publishImmutableProof()`, but alternate production `result.json` writers bypassed that boundary:
+  1. Provider-capacity refusal path used `publishMutableProjection(result.json)` then `markRunSettled()`.
+  2. CLI-spawn reconciliation path (`settleReceiptRunFromOutcome` and `settleFailedRunFromOutcome`) checked `isRunControlCurrent()` outside the write boundary then used `publishMutableProjection(result.json)`.
+- **Resolution & Architecture**:
+  1. **Provider-Capacity Refusal**:
+     - Runs before main `acquireRunControl`. Now acquires an ephemeral control token (`purpose: 'provider-capacity-refusal'`) and commits through `commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult })`.
+     - The resulting `settled` generation record fences any future controller, closing the TOCTOU bypass.
+  2. **Reconciliation Settlement Paths**:
+     - `settleReceiptRunFromOutcome` and `settleFailedRunFromOutcome` now route authoritative `result.json` publication strictly through `commitRunSettlement()`.
+     - Stale writers are atomically detected at the CAS boundary, write diagnostic `result.superseded.json`, and are refused with `run-control-superseded`. Authoritative `result.json` is never overwritten.
+     - `reconcileCliSpawnRun` includes a ledger bootstrap if called with an explicit token on an empty ledger (e.g., direct-reconciler call sites), ensuring `settleRunControl` has a valid generation record to validate.
+  3. **Deterministic Concurrency Proof**:
+     - Added `reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reconciler cannot overwrite authoritative result.json (R5 / F-01 settlement authority)` in `test/runner/assignment-dispatch.test.mjs`.
+     - Verifies Old Reconciler passes pre-check, pauses before publication, Newer Controller settles epoch 2, Old Reconciler resumes and is strictly refused with `run-control-superseded` while authoritative `result.json` remains untouched.
+
+---
+
+## 9. Next Eligible Units & Integration Disposition
+
+- **Candidate Branch**: `coordination-integration-i02-result-truth`
+- **Candidate Branch Tip**: `510f35f5` (status-recording commit; prior tips `81c56e11`, `46e09c30`, code fix `f835c215`)
+- **Code Fix SHA**: `f835c215` (alternate-writer CAS settlement & reconciliation barrier race proof; merged at `72894c98`)
+- **Candidate Commit Lineage**:
+  - `0c17bd62` (initial I02/I03 reconciliation and R5 implementation)
+  - `2681b389` (settlement authority TOCTOU fix for commitRunSettlement)
+  - `f835c215` (code fix resolving F-01 alternate writers and TOCTOU barrier race)
+  - `46e09c30` (cross-plan status synchronization for F-02)
+  - `81c56e11` (cross-plan status synchronization for F-02-REOPEN)
+  - `510f35f5` (cross-plan status synchronization for F-02-REOPEN-2)
+- **Code Integration Baseline**: `72894c98` (merge of code fix `f835c215`)
+- **Status-Recording Integration Lineage**:
+  - `73845314` (initial merge of `0c17bd62`)
+  - `dca4efd5` (merge of `2681b389`)
+  - `72894c98` (merge of code fix `f835c215`)
+  - `2b8f7aeb` (merge of status-recording candidate tip `46e09c30`)
+  - `500b6e1b` (merge of status-recording candidate tip `81c56e11`)
+  - `4362bfec` (merge of status-recording candidate tip `510f35f5`)
+- **Current Local Main Tip**: `4362bfec` (merge of status-recording candidate tip `510f35f5`)
+- **Origin/Main Status**: `origin/main` is at `ad8dbaf0` (**not pushed**; local main is ahead of origin by 10 commits; gate requires independent re-review approval before push).
+- **Verification Matrix**:
+  - **Historical initial matrix**: **11 suites, 315 tests pass / 0 fail** (commit `2681b389`).
+  - **Post-fix verification matrix**: **11 suites, 317 tests pass / 0 fail** (commit `f835c215` / `72894c98`: focused matrix 220 9-suite + 22 stale-action + 75 assignment-dispatch); 76 pass in run-lock; 20 pass in cli-spawn reconciliation.
+  - **Reviewer smoke rerun**: **75 pass / 0 fail** (`assignment-dispatch.test.mjs`).
+- **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.

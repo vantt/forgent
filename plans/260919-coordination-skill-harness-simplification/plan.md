@@ -1,7 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; I02 result-truth reconciliation is next
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec` (candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`, origin/main at `ad8dbaf0` not pushed; 10 commits ahead); Unit I04 / Phase 3 is next
 Created: 2026-09-19
+Last Updated: 2026-09-22
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -770,13 +771,22 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: execute
   depends-on: I00 approved
   stop: `main` changes during integration or tree is not clean
-- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (complete on candidate branch)
+- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (integrated at `main@4362bfec`, candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`)
   capability: code:implement
   depends-on: I01
+  status: integrated
+  candidate-sha: `510f35f5` (code fix `f835c215`; status-recording lineage `0c17bd62` -> `2681b389` -> `f835c215` -> `46e09c30` -> `81c56e11` -> `510f35f5`)
+  integrated-sha: `4362bfec` (clean integration of candidate branch tip `510f35f5`; code integration at `72894c98`)
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed; 10 commits ahead)
+  findings-resolved: I02-REV-01, I02-REV-02, I02-REV-03, I02-REV-04, F-01 (Settlement Authority / Alternate Writers), F-02 / F-02-REOPEN / F-02-REOPEN-2 (Cross-Plan Status Synchronization)
   stop: current RunResult path contradicts the old patch or authority is ambiguous
-- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (complete on candidate branch)
+- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (integrated at `main@4362bfec`)
   capability: code:test
   depends-on: I02
+  status: integrated
+  integrated-sha: `4362bfec` (code integration at `72894c98`)
+  origin-status: `origin/main` at `ad8dbaf0` (not pushed; 10 commits ahead)
+  verification: 11 suites, 317 tests pass / 0 fail (post-fix matrix; 315 in historical matrix); 75 pass in assignment-dispatch.test.mjs smoke rerun
   stop: corrupt evidence can settle or close
 - unit: I04 — implement Phase 3 template registry/resolver/provenance
   capability: code:implement
