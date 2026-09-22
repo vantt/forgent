@@ -398,14 +398,14 @@ replay evidence.
 - **Satisfied:** approved Phase 2 candidate `43fdd378` merged without conflict
   into `main` at `5a02e81a` (first parent `a5b1535c`), with a tree
   byte-identical to the approved candidate, then pushed to `origin/main`.
-- Re-evaluate commit `9049e611` from branch
-  `dispatch-hardening-phase01-r1r4` against post-Phase-2 source. Forward-port
-  its behavior rather than blindly cherry-picking if `session-engine.mjs` has
-  diverged.
-- Re-evaluate dispatch-hardening Phase 01 R5 (late result from a superseded
-  controller). Either implement the settled `result.superseded.json` behavior
-  or document direct source evidence that a newer authoritative path has
-  superseded it.
+- **Satisfied (Unit I02):** Re-evaluated commit `9049e611` from branch
+  `dispatch-hardening-phase01-r1r4` against post-Phase-2 source. Forward-ported
+  evaluator `interpretRunResult` routing (R1) and dynamic artifact path
+  resolution `resolveWorkerArtifactPath` in `aggregationSourceFrom` (R4 / M14).
+- **Satisfied (Unit I02):** Implemented Phase 01 R5: late normalized output of
+  superseded controllers is preserved as non-authoritative
+  `result.superseded.json`, protecting authoritative `result.json` and refusing
+  authoritative settlement without discarding completed worker work product.
 
 ### Invariants
 
@@ -418,12 +418,16 @@ replay evidence.
   hardcoded filename.
 - No result-truth repair weakens Phase 2 driver identity, action-key atomicity,
   explicit-close, or schema 1/2/3 replay compatibility.
+- `result.superseded.json` is strictly non-authoritative: it is never consumed by
+  `classifySessionQuorum`, `closeSessionByQuorum`, or `replaySession`.
 
 ### Exit
 
-Post-Phase-2 `main` has a recorded clean SHA; focused coordination, RunResult,
-replay, stale-action, and concurrency tests pass; all following branches start
-from that same SHA.
+Post-Phase-2 `main` baseline reconciled with Phase 01 result truth;
+focused coordination, RunResult, replay, stale-action, and concurrency tests
+pass (11 suites, 312 tests passing, 0 failing); all following branches start
+from this verified integration baseline. Detailed integration report:
+[integration-i02-result-truth.md](reports/integration-i02-result-truth.md).
 
 ## Phase 3 — Operation prompt-template registry and resolver
 
@@ -766,11 +770,11 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: execute
   depends-on: I00 approved
   stop: `main` changes during integration or tree is not clean
-- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5
+- unit: I02 — reconcile Phase 01 result-truth commit `9049e611` and R5 (complete on candidate branch)
   capability: code:implement
   depends-on: I01
   stop: current RunResult path contradicts the old patch or authority is ambiguous
-- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility
+- unit: I03 — verify result truth, replay, quorum, and stale-action compatibility (complete on candidate branch)
   capability: code:test
   depends-on: I02
   stop: corrupt evidence can settle or close

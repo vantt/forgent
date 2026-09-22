@@ -995,6 +995,70 @@ test('regression: a definition that has drifted since the session was opened is 
   assert.deepEqual([...replaySession(coordinationId, ctx.opts).aggregations], []);
 });
 
+test('runtime: aggregationSourceFrom resolves herdr-spawn worker report at outbox/report-1.md (M14)', async () => {
+  const coordinationId = 'coord_agg_m14_herdr_outbox';
+  const ctx = openAggregationSession(coordinationId);
+
+  // Fake executor that writes to outbox/report-1.md and outbox/result-1.json (herdr-spawn style)
+  // instead of flat agent-report.md and agent-result.json
+  const executorScript = path.join(ctx.tempDir, `fake-herdr-agg-executor-${Math.random().toString(36).slice(2)}.mjs`);
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+        if (!fs.existsSync(runsDir)) continue;
+        for (const run of fs.readdirSync(runsDir)) {
+          const runDir = path.join(runsDir, run);
+          const outboxDir = path.join(runDir, 'outbox');
+          if (!fs.existsSync(path.join(outboxDir, 'result-1.json'))) {
+            fs.mkdirSync(outboxDir, { recursive: true });
+            fs.writeFileSync(path.join(outboxDir, 'report-1.md'), '# Research Report\\nHerdr worker findings.\\n');
+            fs.writeFileSync(path.join(outboxDir, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'Settled by herdr worker.' }));
+          }
+        }
+      }
+    }
+    process.stdout.write('done\\n');
+    `,
+  );
+  ctx.runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model' } },
+    timeoutMs: 8000,
+  };
+
+  const a = await dispatchResearch(coordinationId, ctx, 'researcher-a');
+  await dispatchResearch(coordinationId, ctx, 'researcher-b');
+  await dispatchReview(coordinationId, ctx);
+
+  // Verify that the settled RunResults point to outbox/report-1.md
+  const { fgosDir } = resolveSessionPaths(coordinationId, ctx.opts);
+  const resultA = JSON.parse(fs.readFileSync(path.join(fgosDir, 'assignments', a.assignmentId, 'runs', '01', 'result.json'), 'utf8'));
+  assert.equal(resultA.settleReports.length, 1);
+  assert.ok(resultA.settleReports[0].path.endsWith('outbox/report-1.md'));
+
+  // validateSessionAggregation calls aggregationSourceFrom, which resolves reportPath via
+  // resolveWorkerArtifactPath(runDir, /^report-(\\d+)\\.md$/, 'agent-report.md').
+  // It finds outbox/report-1.md, hashes it to currentRevision, matches report.sha256, and reaches consensus.
+  const result = validateSessionAggregation(
+    coordinationId,
+    { aggregationId: 'agg_m14_1', validatedBy: validatedBy() },
+    ctx.opts,
+  );
+  assert.equal(result.outcome, 'consensus');
+  assert.equal(result.event.sourceResultRefs.length, 2);
+  assert.equal(result.event.artifactRevisionRefs.length, 2);
+  assert.equal(result.event.missingActors, undefined);
+
+  const manifest = closeSessionByQuorum(coordinationId, { aggregationId: 'agg_m14_1' }, ctx.opts);
+  assert.equal(manifest.status, 'completed');
+});
+
 // ─── Authority boundary, statically ────────────────────────────────────────
 
 test('authority: the aggregation evaluator itself contains no session-transition call -- only session-engine transitions', () => {

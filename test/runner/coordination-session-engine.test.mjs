@@ -20,6 +20,8 @@ import {
   proposeConsult,
   validateConsultProposal,
   resumeSession,
+  evaluateSessionQuorum,
+  closeSessionByQuorum,
   PRIMARY_ACTOR_ID,
   DEFAULT_SPECIALIST_ACTOR_ID,
 } from '../../src/runner/coordination/session-engine.mjs';
@@ -254,7 +256,17 @@ test('resume crash point "after result, before event": a settled result.json wit
 
   assert.equal(resumed.assignment.assignmentId, assignment.assignmentId);
   assert.equal(resumed.resumed, true);
-  assert.deepEqual(resumed.runResult, orphanResult);
+  // H4 (dispatch-execution-engine architecture review 260920): this engine
+  // now reads result.json through interpretRunResult, so a legacy v1-shaped
+  // file (no `contract` field, as hand-written above) comes back as the
+  // richer, deterministic "legacy-derived" projection rather than the bare
+  // parsed object -- the same self-heal still happens off the same four
+  // essential facts, not a byte-identical passthrough.
+  assert.equal(resumed.runResult.runId, orphanResult.runId);
+  assert.equal(resumed.runResult.assignmentId, orphanResult.assignmentId);
+  assert.equal(resumed.runResult.status, orphanResult.status);
+  assert.equal(resumed.runResult.confidence, orphanResult.confidence);
+  assert.equal(resumed.runResult.classification.provenance, 'legacy-derived');
 
   // No second run attempt was dispatched -- only "01" exists.
   assert.deepEqual(fs.readdirSync(path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs')), ['01']);
@@ -636,4 +648,112 @@ test('resumeSession is replaySession -- reconstructs manifest/assignmentRefs/eve
   const view = resumeSession('coord_resume_view', { cwd: tempDir });
   assert.deepEqual(view.assignmentRefs, [assignment.assignmentId]);
   assert.equal(view.manifest.coordinationId, 'coord_resume_view');
+});
+
+// ─── Unit I03: RunResult truth, contract invariants, and superseded isolation ──
+
+test('contract-corrupt RunResult cannot satisfy quorum (contractCorrupt === true fails closed)', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir);
+  const coordinationId = 'coord_corrupt_runresult_quorum';
+  openStandaloneSession({ coordinationId, objective: 'Investigate package.json.', writerId: 'coordinator-1', primaryRole: 'researcher' }, { cwd: tempDir });
+  const { assignment } = await dispatchPrimaryTask(coordinationId, primaryTaskParams(), { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  // Tamper with the settled result.json to make it contract-corrupt:
+  // execution.completed with provider failure is explicitly contract-corrupt in RunResult v2 invariants.
+  const resultPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'result.json');
+  const corruptResult = {
+    contract: { id: 'run-result', version: 2 },
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    classification: {
+      execution: { status: 'completed', exitCode: 0 },
+      assessment: { verdict: 'pass' },
+      confidence: { level: 'verified', basis: ['deterministic-tool-output'] },
+      failure: { family: 'provider', code: 'unexpected-error' },
+      policy: { disposition: 'allow' },
+      delivery: { mode: 'fresh' },
+      provenance: 'authoritative',
+    },
+  };
+  fs.writeFileSync(resultPath, JSON.stringify(corruptResult, null, 2));
+
+  // evaluateSessionQuorum must fail closed: contractCorrupt results are projected to status:'no-evidence' / confidence:'failed'
+  // and classified as a failed outcome, preventing quorum satisfaction.
+  const quorum = evaluateSessionQuorum(coordinationId, { cwd: tempDir });
+  assert.equal(quorum.completed.length, 0);
+  assert.equal(quorum.failed.length, 1);
+  assert.equal(quorum.failed[0].actorId, PRIMARY_ACTOR_ID);
+  assert.equal(quorum.failed[0].assignmentId, assignment.assignmentId);
+
+  // closeSessionByQuorum must refuse to close because required actor failed
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\) \[primary\]/.test(err.message),
+  );
+});
+
+test('raw valid JSON with unknown/invalid RunResult contract fails closed in quorum evaluation', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir);
+  const coordinationId = 'coord_invalid_contract_quorum';
+  openStandaloneSession({ coordinationId, objective: 'Investigate package.json.', writerId: 'coordinator-1', primaryRole: 'researcher' }, { cwd: tempDir });
+  const { assignment } = await dispatchPrimaryTask(coordinationId, primaryTaskParams(), { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  const resultPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01', 'result.json');
+  const unknownContractResult = {
+    contract: { id: 'some-future-contract', version: 99 },
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    status: 'done',
+    confidence: 'verified',
+  };
+  fs.writeFileSync(resultPath, JSON.stringify(unknownContractResult, null, 2));
+
+  const quorum = evaluateSessionQuorum(coordinationId, { cwd: tempDir });
+  assert.equal(quorum.completed.length, 0);
+  assert.equal(quorum.failed.length, 1);
+  assert.equal(quorum.failed[0].actorId, PRIMARY_ACTOR_ID);
+  assert.equal(quorum.failed[0].assignmentId, assignment.assignmentId);
+
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /missing required actor\(s\) \[primary\]/.test(err.message),
+  );
+});
+
+test('preserved result.superseded.json cannot be consumed by quorum, replay, or closeSessionByQuorum', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeExecutor(tempDir);
+  const coordinationId = 'coord_superseded_not_consumed';
+  openStandaloneSession({ coordinationId, objective: 'Investigate package.json.', writerId: 'coordinator-1', primaryRole: 'researcher' }, { cwd: tempDir });
+  const { assignment } = await dispatchPrimaryTask(coordinationId, primaryTaskParams(), { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const resultPath = path.join(runDir, 'result.json');
+  const supersededPath = path.join(runDir, 'result.superseded.json');
+
+  // Move authoritative result.json to non-authoritative result.superseded.json (simulating superseded settlement)
+  fs.renameSync(resultPath, supersededPath);
+  assert.ok(fs.existsSync(supersededPath));
+  assert.ok(!fs.existsSync(resultPath));
+
+  // 1. Quorum evaluation rejects missing authoritative result.json (does NOT fall back to result.superseded.json)
+  assert.throws(
+    () => evaluateSessionQuorum(coordinationId, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'dangling-ref',
+  );
+
+  // 2. closeSessionByQuorum refuses with dangling-ref
+  assert.throws(
+    () => closeSessionByQuorum(coordinationId, {}, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'dangling-ref',
+  );
+
+  // 3. resumeSession reconstructs event log correctly and does not invent or trust result.superseded.json
+  const view = resumeSession(coordinationId, { cwd: tempDir });
+  assert.ok(view.events.some((e) => e.type === 'result-linked'));
+  assert.equal(view.manifest.status, 'active');
 });
