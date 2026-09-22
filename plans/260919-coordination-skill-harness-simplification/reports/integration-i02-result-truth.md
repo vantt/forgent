@@ -19,7 +19,7 @@ Units **I02** and **I03** unify the Phase 01 RunResult truth contract (`9049e611
   - **R5 (Superseded Work Product Preservation)**: Evaluated and chosen disposition: **`IMPLEMENT`**. At settlement barriers in `assignment-runner.mjs`, if a controller is superseded mid-flight (`!isRunControlCurrent(...)`), its normalized output is saved atomically as `result.superseded.json` before raising `RunnerConfigError('run-control-superseded')`. Authoritative `result.json` is never written or overwritten, and `markRunSettled` is never called.
 - **Unit I03 (Verification Matrix)**:
   - Added targeted mutation-sensitive tests in `coordination-session-engine.test.mjs` and `coordination-aggregation.test.mjs`.
-  - Verified the entire 11-suite matrix with **312 tests passing, 0 failing**.
+  - Verified the entire 11-suite matrix with **315 tests passing, 0 failing**.
   - Verified GitNexus impact analysis: **LOW risk, 0 affected execution flows**.
 
 ---
@@ -163,12 +163,66 @@ Running `node /home/vantt/projects/forgentX/.gitnexus/run.cjs detect-changes --s
 - **Verification**:
   - `node --test --test-name-pattern="concurrent identical admission" test/runner/assignment-dispatch.test.mjs` passes consistently.
   - `node --test --test-name-pattern="captures timeout" test/runner/assignment-dispatch.test.mjs` passes consistently.
-  - Full smoke suite `node --test test/runner/assignment-dispatch.test.mjs`: **73 pass / 0 fail** (duration ~67s).
+  - Full smoke suite `node --test test/runner/assignment-dispatch.test.mjs`: **74 pass / 0 fail**.
+
+### Settlement Authority TOCTOU Resolution (HIGH — Atomic CAS & Barrier Concurrency Proof)
+- **Finding**: Reviewer identified that in `commitRunSettlement`:
+  ```javascript
+  if (!isRunControlCurrent(...)) {
+    publish result.superseded.json;
+    throw ...;
+  }
+  publish result.json;
+  markRunSettled;
+  ```
+  The check for current control epoch/token and the publication of `result.json` were separate operations outside an atomic CAS/lock boundary. An interleaving where:
+  1. Old controller checks `isRunControlCurrent()` -> true.
+  2. Newer controller takes over (acquires newer epoch) and settles (`publish result.json`).
+  3. Old controller unpauses and executes `publishMutableProjection(result.json)` (via POSIX `renameSync`), overwriting the newer controller's authoritative result.
+- **Root Cause & Contract Hardening**:
+  1. `run-lock.mjs`: Implemented `settleRunControl(runDir, { controlEpoch, controlToken })`. It executes an atomic CAS via `publishNextGeneration` in `control/generations/`, validating that `{ controlEpoch, controlToken }` is still the current active generation and appending an immutable generation record with `purpose: 'settled'`.
+  2. Updated `acquireRunControl` and `inspectRunControl` in `run-lock.mjs` to recognize `purpose: 'settled'` and refuse future controller acquisitions, closing any post-settlement takeover window.
+  3. `assignment-runner.mjs`: `commitRunSettlement` now executes `settleRunControl` within the run-lock ledger. Furthermore, authoritative `result.json` is published via `publishImmutableProof` (`fs.linkSync`), failing closed with `EEXIST` so it can NEVER overwrite an existing authoritative result file.
+  4. Added deterministic barrier hook `_beforeAuthoritativePublish` to `commitRunSettlement` for multi-process race verification.
+- **Deterministic Two-Process Barrier Attack Verification**:
+  - Added test in `test/runner/assignment-dispatch.test.mjs`: `executeAssignment: two-OS-process TOCTOU barrier race proves stale controller cannot overwrite authoritative result.json (R5 / I02-REV-04 settlement authority)`.
+  - Step 1: Old writer starts under epoch 1, passes precondition (`isRunControlCurrent`).
+  - Step 2: Old writer pauses at `_beforeAuthoritativePublish` barrier (writes `barrier-paused.json`, polls for release).
+  - Step 3: Newer controller takes over, acquires epoch 2, commits settlement via `commitRunSettlement`, writes authoritative `result.json`.
+  - Step 4: Newer controller releases Old Writer via `barrier-resume.json`.
+  - Step 5: Old writer unpauses and attempts authoritative publication.
+  - **Outcome**: Old writer is strictly refused (`settleRunControl` returns `superseded`, `publishImmutableProof` refuses with `EEXIST`), Old writer writes `result.superseded.json` and throws typed `run-control-superseded`.
+  - Authoritative `result.json` remains byte-for-byte Newer Controller's output, completely untouched and uncorrupted.
 
 ---
 
-## 7. Next Eligible Units
+## 7. Test Verification Accounting Summary
 
-With Unit I02 and Unit I03 fully verified and all review findings resolved:
-- **Eligible Next Unit**: **I04** (coordination-phase2-concurrency multi-process integration) or Phase 3 forward progress.
-- **Branch Candidate**: Ready to commit on `coordination-integration-i02-result-truth`.
+To ensure exact consistency and clarity across all review and doer records:
+
+- **Full Doer Verification Matrix**: **11 suites, 315 tests passing, 0 failing**.
+  - `test/runner/run-result-v2.test.mjs` (13 tests)
+  - `test/runner/assignment-runresult.test.mjs` (31 tests)
+  - `test/runner/assignment-dispatch.test.mjs` (74 tests)
+  - `test/runner/coordination-session-engine.test.mjs` (23 tests)
+  - `test/runner/coordination-research-fan-out.test.mjs` (12 tests)
+  - `test/runner/coordination-recovery-and-quorum.test.mjs` (46 tests)
+  - `test/runner/coordination-replay.test.mjs` (29 tests)
+  - `test/runner/coordination-legacy-schema-compatibility.test.mjs` (3 tests)
+  - `test/runner/coordination-stale-action-proof.test.mjs` (21 tests)
+  - `test/runner/coordination-phase2-concurrency.test.mjs` (16 tests)
+  - `test/runner/coordination-aggregation.test.mjs` (47 tests)
+- **Reviewer Smoke Rerun**: `node --test test/runner/assignment-dispatch.test.mjs` (**74 tests passing, 0 failing**).
+- **Focused Fix Rechecks**:
+  - 5 R5 concurrency & settlement authority tests in `assignment-dispatch.test.mjs` (100% pass).
+  - 76 run-lock tests in `test/runner/main-checkout-lock.test.mjs` (100% pass).
+  - 23 coordination session tests in `coordination-session-engine.test.mjs` / `coordination-session-cli.test.mjs` (100% pass).
+
+---
+
+## 8. Next Eligible Units & Integration Disposition
+
+- **Candidate Branch**: `coordination-integration-i02-result-truth`
+- **Candidate Commit**: `0c17bd62` (and hardened settlement authority commit)
+- **Integration Commit**: Merged into local `main` at commit `73845314`.
+- **Next Eligible Units**: Unit **I04** (Phase 3 operation prompt-template registry and resolver), **I06** (dispatch-hardening Phase 05 remainder), and **I07** (dispatch-hardening Phase 08). All prerequisites for DAG forward-port (I09) grounded in verified result truth.

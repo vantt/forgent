@@ -161,3 +161,10 @@ not meaningfully shorten the critical path.
 - Shared-cwd caveated review/red-team outcomes cannot close or disposition a
   cell without recheck.
 - No BLOCKER/HIGH reviewer or red-team finding remains unresolved.
+
+## Integration Cross-Reference and Baseline Disposition
+
+- **Unified Integration Plan:** `plans/260919-coordination-skill-harness-simplification/plan.md`
+- **Date:** 2026-09-22
+- **Prerequisite Baseline Status:** FULFILLED. The prerequisite dispatch-hardening and result-truth baseline (Phase 01 R1/R4/R5, RunResult v2 fail-closed verification, non-authoritative superseded preservation, immutable authoritative publication, and atomic settlement CAS) has been completed and integrated into `main` (commit `73845314` and candidate settlement authority hardening) through integration units I02 and I03.
+- **DAG Forward-Port Schedule:** Forward-porting the cold-resumable coordination DAG track onto the unified baseline is scheduled as Unit I09 in the unified integration plan, following template resolution (Unit I04) and dispatch governance reconciliation (Unit I06).

@@ -70,6 +70,7 @@ import {
   publishNextGeneration,
   acquireRunControl,
   releaseRunControl,
+  settleRunControl,
   isRunControlCurrent,
   isProcessAlive,
   readMarker,
@@ -1425,16 +1426,55 @@ function attemptProviderCapacityFallback({
  * @param {object} params.runResult Normalized RunResult v2 object
  * @returns {Readonly<object>} Frozen runResult on authoritative settlement
  */
-export function commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult }) {
+export function commitRunSettlement({
+  runDir,
+  runId,
+  controlEpoch,
+  controlToken,
+  runResult,
+  _beforeAuthoritativePublish = null,
+}) {
+  const resultJsonPath = path.join(runDir, 'result.json');
+  const supersededJsonPath = path.join(runDir, 'result.superseded.json');
+
+  // 1. Precondition check: controller must have current control
   if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-    publishMutableProjection(path.join(runDir, 'result.superseded.json'), runResult);
+    publishMutableProjection(supersededJsonPath, runResult);
     throw new RunnerConfigError(
       `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
       { code: 'run-control-superseded', phase: 'post-admission' },
     );
   }
 
-  publishMutableProjection(path.join(runDir, 'result.json'), runResult);
+  // 2. Barrier hook for two-process race testing: called after passing precondition,
+  // right before entering the authoritative publication / CAS transaction.
+  if (typeof _beforeAuthoritativePublish === 'function') {
+    _beforeAuthoritativePublish({ runDir, runId, controlEpoch, controlToken });
+  }
+
+  // 3. Authoritative settlement CAS: validate control token and commit settlement in the run-lock ledger.
+  // This atomically validates that { controlEpoch, controlToken } is STILL current and publishes the
+  // 'settled' generation record, locking out any future controller.
+  const settlement = settleRunControl(runDir, { controlEpoch, controlToken });
+  if (settlement.status !== 'settled') {
+    publishMutableProjection(supersededJsonPath, runResult);
+    throw new RunnerConfigError(
+      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current (settlement status: "${settlement.status}") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
+    );
+  }
+
+  // 4. Authoritative publication via immutable hard link (atomic EEXIST protection against overwriting):
+  // Authoritative result.json is immutable and must NEVER be overwritten by any subsequent writer.
+  const published = publishImmutableProof(resultJsonPath, runResult);
+  if (!published) {
+    publishMutableProjection(supersededJsonPath, runResult);
+    throw new RunnerConfigError(
+      `executeAssignment: authoritative result.json for Run "${runId}" already exists -- refusing to overwrite authoritative result`,
+      { code: 'run-control-superseded', phase: 'post-admission' },
+    );
+  }
+
   markRunSettled(runDir);
   Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
   return Object.freeze(runResult);

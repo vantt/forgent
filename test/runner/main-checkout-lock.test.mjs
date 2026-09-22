@@ -28,6 +28,7 @@ import {
   listGenerations,
   acquireRunControl,
   releaseRunControl,
+  settleRunControl,
   isRunControlCurrent,
 } from '../../src/runner/dispatch/run-lock.mjs';
 
@@ -1307,4 +1308,29 @@ test('run-lock: releaseRunControl is idempotent and never throws for an unknown 
   assert.equal(releaseRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken }).status, 'released');
   // Releasing the same, already-released epoch/token again is a no-op, not an error.
   assert.equal(releaseRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken }).status, 'already-released');
+});
+
+test('run-lock: settleRunControl commits settlement on current generation and fences future acquisition', () => {
+  const dir = mkRunLockTempDir();
+  const runDir = path.join(dir, 'run');
+
+  const acquired = acquireRunControl(runDir, { holder: { id: 'controller-a', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(acquired.status, 'acquired');
+
+  // Settle using current generation
+  const settled = settleRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken });
+  assert.equal(settled.status, 'settled');
+  assert.equal(settled.controlEpoch, 2);
+
+  // Subsequent acquireRunControl must refuse because Run is settled
+  const contender = acquireRunControl(runDir, { holder: { id: 'contender', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(contender.status, 'settled');
+
+  // Repeating settleRunControl on old epoch returns superseded
+  const repeatSettle = settleRunControl(runDir, { controlEpoch: acquired.controlEpoch, controlToken: acquired.controlToken });
+  assert.equal(repeatSettle.status, 'superseded');
+
+  // A stale controller attempting to settle is refused as superseded
+  const staleSettle = settleRunControl(runDir, { controlEpoch: 1, controlToken: 'stale-token' });
+  assert.equal(staleSettle.status, 'superseded');
 });

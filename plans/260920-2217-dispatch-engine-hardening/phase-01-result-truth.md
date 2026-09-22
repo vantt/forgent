@@ -4,9 +4,9 @@ Wave 1 · Gate: none (L6 chờ D3) · Findings: H4, H5, M4, M14, L6, L7. Context
 
 Nhỏ nhất, giá trị cao nhất: hai consumer quyết "thành công" hôm nay bỏ qua fail-closed của RunResult v2. Diff tổng ≈ 20 dòng code + tests.
 
-## Status — 2026-09-21
+## Status — 2026-09-22
 
-**R2, R3 xong trên `main`** (commit `26f53318`, 868 test). **R1, R4 xong nhưng CHƯA MERGE** — `session-engine.mjs` ở `main` vẫn còn diff 953 dòng chưa commit từ track `coordination-skill-harness-simplification`, nên thay vì sửa đè lên đó, việc được làm trong một **worktree cô lập**: `.claude/worktrees/dispatch-hardening-phase01-r1r4` (nhánh `dispatch-hardening-phase01-r1r4`, rẽ từ `main`@`3d65657f`, commit `9049e611`, 476 test coordination xanh). Track kia hoàn toàn không bị đụng tới. **Merge vào `main` là bước riêng, chờ track kia commit/đóng** (xem cuối file) — git sẽ tự chặn an toàn nếu merge lúc `session-engine.mjs` vẫn còn uncommitted ở checkout chính, không có rủi ro mất dữ liệu ở bước merge. R5/R6 chưa làm (R5 phụ thuộc D3 đã quyết nhưng chưa triển khai; R6 dời sang Phase 04 cùng attestation).
+**R1, R2, R3, R4, R5 ĐÃ HOÀN TẤT VÀ TÍCH HỢP TRÊN `main`** (commit `73845314` và candidate settlement authority hardening). R2, R3 tích hợp từ commit `26f53318`. R1, R4 và R5 được hợp nhất qua kế hoạch tích hợp thống nhất `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 & I03). Nhánh `dispatch-hardening-phase01-r1r4` (commit `9049e611`) đã được supersede hoàn toàn. R6 dời sang Phase 04 cùng attestation.
 
 Khi sửa R3 (M4), phát hiện một gap tiền tồn tại ngoài phạm vi review gốc: `claimInvalid` được tính ở cả hai settle call site nhưng **chưa bao giờ được truyền vào** `normalizeRunResultV2` — "fails closed on malformed/invalid agent-result.json" (Step 04 §5.2) trước đây chỉ đúng *tình cờ*, qua field `.status` của claim giả mạo. Đã vá cùng lúc (nằm trong commit `26f53318`): truyền `claimInvalid` ở cả hai call site + thêm nhánh confidence-classification cho `claimInvalid` trong `run-result.mjs`.
 
@@ -53,11 +53,11 @@ Khi sửa R1, hai test có fixture tự mâu thuẫn bị lộ ra (không phải
 
 R1 có thể làm một số session cũ có `result.json` v1 → `legacy-derived` (đã hỗ trợ). R2 có thể làm `fgos return` chạy verify nhiều hơn (đúng ý). Rollback từng R độc lập.
 
-## R1/R4 — chờ merge vào main
+## R1/R4 & R5 — Reconciled and Integrated
 
-R1/R4 đã xong và test xanh, nằm cô lập trên nhánh `dispatch-hardening-phase01-r1r4` (worktree `.claude/worktrees/dispatch-hardening-phase01-r1r4`, commit `9049e611`), không đụng gì tới track `coordination-skill-harness-simplification`. Merge vào `main` cần một trong hai điều kiện, anh chọn:
-
-1. **Chờ** track kia commit/đóng phase-02 trước — sau đó merge nhánh này vào `main` là thao tác bình thường, xung đột (nếu có, vì cả hai đụng `session-engine.mjs`) resolve qua git 3-way merge thật, không phải đoán ý người khác trên working tree thô.
-2. Nếu track kia đã **bỏ dở/không còn hiệu lực**, anh xác nhận để em `git checkout -- src/runner/coordination/session-engine.mjs` khôi phục checkout chính về sạch, rồi merge nhánh này vào `main` ngay — **bước khôi phục là destructive trên checkout chính, cần anh xác nhận rõ ràng trước khi em chạy**.
-
-Dọn dẹp sau merge: `git worktree remove .claude/worktrees/dispatch-hardening-phase01-r1r4` và xoá nhánh `dispatch-hardening-phase01-r1r4`.
+**Status:** INTEGRATED into `main` (commit `73845314`) via unified integration plan `plans/260919-coordination-skill-harness-simplification/plan.md` (Units I02 and I03).
+**Date:** 2026-09-22.
+**Reconciliation details:**
+- R1 (`interpretRunResult` evaluator routing on on-disk result readers) and R4 (`resolveWorkerArtifactPath` in `aggregationSourceFrom`) from `9049e611` were forward-reconciled with post-Phase-2 `session-engine.mjs`.
+- R5 (late superseded normalized work product preservation as non-authoritative `result.superseded.json`, immutable protection of authoritative `result.json`, and atomic run-lock settlement CAS) was fully implemented in `assignment-runner.mjs` and `run-lock.mjs`.
+- Branch `dispatch-hardening-phase01-r1r4` (commit `9049e611`) is superseded by the integrated candidate.
