@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - Semantic coordination CLI surface: `fgos coordination start`, `status`,
   `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`,
@@ -169,6 +172,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   recorded a disposition against the specific failed attempt.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - `npm run release:check` and `npm run release:prepare`, a repo-owner release
   preparation door that validates a target tag, updates `package.json`,
@@ -498,6 +504,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `dispatchDeclaredOperation` (`src/runner/coordination/session-engine.mjs`) can now dispatch a declared `operation` step as a real, mutating worker instead of always forcing read-only, under a narrow four-condition rule: the step declares `mutation: 'mutating'` (schema-accepted only on an `operation` step, `src/verbs/coordination/schema.mjs`; every other step type stays hard-refused for anything but `read-only`); the bound operation declares `result.kind: 'work-product'`; the dispatch `cwd` resolves to a linked git worktree, never the main checkout (refused, naming the reason, before any Assignment is created); and the resulting inline execution contract carries the engine's own reserved `protocol-operation:` provenance stamp. `dispatchPrimaryTask`/`proposeConsult`'s own hard read-only assertions are completely unchanged. `buildReadOnlyContract` is renamed `buildSessionContract` (no longer an accurate name once it can build either posture). At the actual dispatch layer (`assignment-runner.mjs`), an inline mutating Assignment is refused unless the caller explicitly asserts `isReadOnlyMode: false` (an omitted flag is read-only, never permission) — mistake-proofing for an in-process caller that reaches `buildAssignment`/`executeAssignment` without going through `dispatchDeclaredOperation`, independently re-checking `result.kind`/worktree-vs-main-checkout via the same shared predicates the pre-check uses (`operationDeclaresWorkProduct`/`resolveMutatingCwdPosture`, `execution-contract.mjs`). This is mistake-proofing for a well-behaved in-process caller, not authentication against a hostile one — this codebase's already-established trust boundary (`docs/routing-handoff-contract.md`) treats any caller able to import internal dispatch modules and write `.fgos/` as the same trust class as the user who invoked it (see `docs/specs/runner.md`'s decision entry 0035). Also fixes a real, confirmed session/assignment-path resolution bug: `store.mjs`'s session-path resolver keyed `.fgos/` on the raw `cwd` instead of the resolved main-checkout root, so a session dispatched from inside a linked worktree silently read/wrote session and Assignment state under that worktree's own `.fgos/` (wiped on worktree creation, ADR0020) instead of the real one at the main checkout.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - `fgos doc demote` — the mirror of `fgos doc promote` (`active` -> `provisional`), the door `scripts/knowledge-migration.mjs` needs to satisfy the registry redesign's "leaves every migrated document provisional unless explicitly promoted" rule (tsk-3uc).
 - Doctor checks `doc-current-path-missing` (a live doc's `currentPath` not committed at `HEAD`) and `doc-source-unreachable` (a path-shaped `sourceCaptureIds` entry not reachable through its own current/alias paths); `doc-source-conservation` extended from a single outcome-reachability check to also catch a target document with no source, a duplicate migration-inventory source assignment, and a source lost mid-migration (tsk-3uc).
@@ -631,6 +640,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   authoring split the moment fgOS is installed rather than checked out.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - `runner.executors.claude` in `.fgos/config.json` — claude is now
   addressable by name in dispatch (`decide claude`, `executors.claude`)
@@ -863,6 +875,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   export with `canAutoApproveMergedGate`.)
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - New config key `ironLaw.level` in `.fgos/config.json`, with two values:
   `ask` (the default — the gate refuses until a person acknowledges) and
@@ -1149,6 +1164,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stands.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - New `fgos version` verb: reports this build's own `package.json` version,
   git commit (when resolvable), and its full dispatched verb set — a
@@ -1310,6 +1328,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the caller to run itself through Bash.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - `decide` gains a `--needs-soul` flag: the caller's own self-declaration
   that it is about to fire its own Agent/Task tool with no capacity or
@@ -1365,6 +1386,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Baseline snapshot of the public surface as of this entry.
 
 ### Added
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 
 - `fgos` CLI with 49 verbs covering the work-item lifecycle (submit,
   clarify/decompose/execute, review/merge, and maintenance operations).

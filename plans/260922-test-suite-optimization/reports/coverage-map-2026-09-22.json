@@ -1,0 +1,1074 @@
+{
+  "version": 1,
+  "generatedAt": "2026-09-22T09:49:15.310Z",
+  "mapping": {
+    "src/cli/command-registry.mjs": [
+      "test/cli/command-registry.test.mjs",
+      "test/cli/coordination.test.mjs",
+      "test/cli/fgos-help.test.mjs",
+      "test/cli/fgos-manifest.test.mjs",
+      "test/cli/knowledge-deprecation.test.mjs",
+      "test/runner/dispatch-operability-production-door.test.mjs",
+      "test/rust-host/command-routes.test.mjs",
+      "test/rust-host/generate-vectors.mjs"
+    ],
+    "src/state/workflow-stage-graphs.mjs": [
+      "test/cli/command-registry.test.mjs",
+      "test/e2e/fixture-marketing-domain.test.mjs",
+      "test/intake/classify.test.mjs",
+      "test/runner/flow-definition-workflow-adapter.test.mjs",
+      "test/runner/operation-choice.test.mjs",
+      "test/state/handoff.test.mjs",
+      "test/state/show-list-move-consistency.test.mjs",
+      "test/state/work.test.mjs",
+      "test/state/workflow-multiplicity.test.mjs",
+      "test/state/workflow-stage-graphs.test.mjs"
+    ],
+    "src/verbs/coordination/schema.mjs": [
+      "test/cli/coordination.test.mjs",
+      "test/runner/coordination-actions-v1.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/verbs/coordination-launch-master-loop.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/state/store.mjs": [
+      "test/cli/coordination.test.mjs",
+      "test/cli/fgos-handoff.test.mjs",
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/cli/knowledge-attest-gate.test.mjs",
+      "test/cli/knowledge-deprecation.test.mjs",
+      "test/cli/knowledge-verbs.test.mjs",
+      "test/cli/take-pick-claim-eligibility.test.mjs",
+      "test/direct/fgos-edit.test.mjs",
+      "test/direct/fgos-read.test.mjs",
+      "test/direct/fgos-stage.test.mjs",
+      "test/intake/discovery.test.mjs",
+      "test/intake/judge-verify-second-pass-stability.test.mjs",
+      "test/intake/plan.test.mjs",
+      "test/parity/edit-parity.test.mjs",
+      "test/parity/read-parity.test.mjs",
+      "test/parity/stage-parity.test.mjs",
+      "test/report/decision-index.test.mjs",
+      "test/report/helpers/docs-index-state-fixture.mjs",
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/claim-port.test.mjs",
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/lock.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/runner/operation-choice.test.mjs",
+      "test/scripts/knowledge-migration.test.mjs",
+      "test/setup/checks.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/setup/instruction-composition.test.mjs",
+      "test/setup/instruction-registry.test.mjs",
+      "test/setup/knowledge-doctor.test.mjs",
+      "test/skills/fgos-coding-knowledge.test.mjs",
+      "test/skills/knowledge-canary.test.mjs",
+      "test/state/awaiting.test.mjs",
+      "test/state/backward-compat.test.mjs",
+      "test/state/compound-learn-done-gate.test.mjs",
+      "test/state/decision-relation.test.mjs",
+      "test/state/decision-scope-field.test.mjs",
+      "test/state/domain-fields.test.mjs",
+      "test/state/gate-bypass.test.mjs",
+      "test/state/knowledge-bootstrap.test.mjs",
+      "test/state/knowledge-registry.test.mjs",
+      "test/state/migrate-clarify-split.test.mjs",
+      "test/state/replay.test.mjs",
+      "test/state/retrospective-doors.test.mjs",
+      "test/state/runtime-coordination.test.mjs",
+      "test/state/show-list-move-consistency.test.mjs",
+      "test/state/stage.test.mjs",
+      "test/state/status-category.test.mjs",
+      "test/state/store.test.mjs",
+      "test/state/worker-slots.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-pack-registration.test.mjs",
+      "test/verbs/coordination-group-thinking-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-launch-master-loop.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/state/events.mjs": [
+      "test/cli/fgos-approve.test.mjs",
+      "test/cli/fgos-handoff.test.mjs",
+      "test/cli/fgos-return.test.mjs",
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/intake/discovery.test.mjs",
+      "test/intake/plan.test.mjs",
+      "test/runner/attestation-guard.test.mjs",
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/runner/coordination-replay.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/scripts/backfill-status-category.test.mjs",
+      "test/scripts/migrate-actor-to-role.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/state/awaiting.test.mjs",
+      "test/state/backward-compat.test.mjs",
+      "test/state/compound-learn-done-gate.test.mjs",
+      "test/state/events.test.mjs",
+      "test/state/migrate-clarify-split.test.mjs",
+      "test/state/porting-store.test.mjs",
+      "test/state/replay.test.mjs",
+      "test/state/store.test.mjs"
+    ],
+    "src/verbs/state/edit.mjs": [
+      "test/cli/fgos-edit.test.mjs",
+      "test/direct/fgos-edit.test.mjs",
+      "test/parity/edit-parity.test.mjs"
+    ],
+    "src/cli/deprecation.mjs": [
+      "test/cli/fgos-manifest.test.mjs"
+    ],
+    "src/state/cleanup-harness.mjs": [
+      "test/cli/fgos-merge.test.mjs",
+      "test/state/cleanup-harness.test.mjs"
+    ],
+    "src/util/session-identity.mjs": [
+      "test/cli/fgos-post-merge.test.mjs",
+      "test/state/store.test.mjs",
+      "test/util/session-identity.test.mjs"
+    ],
+    "src/verbs/state/read.mjs": [
+      "test/cli/fgos-read-5.test.mjs",
+      "test/direct/fgos-read.test.mjs",
+      "test/parity/read-parity.test.mjs"
+    ],
+    "src/state/runtime-coordination.mjs": [
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/intake/discovery.test.mjs",
+      "test/intake/plan.test.mjs",
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/claim-port.test.mjs",
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/state/awaiting.test.mjs",
+      "test/state/runtime-coordination.test.mjs",
+      "test/state/show-list-move-consistency.test.mjs",
+      "test/state/worker-slots.test.mjs"
+    ],
+    "src/runner/session.mjs": [
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/runner/session.test.mjs",
+      "test/setup/checks.test.mjs"
+    ],
+    "src/runner/main-checkout-lock.mjs": [
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+      "test/runner/claim-port.test.mjs",
+      "test/runner/dispatch-reconciliation.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/main-checkout-lock.test.mjs",
+      "test/runner/merge-target-slot-multiprocess.test.mjs",
+      "test/runner/merge.test.mjs",
+      "test/rust-host/fgctl-init.test.mjs"
+    ],
+    "src/state/fgos-file-registry.mjs": [
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/cli/take-pick-claim-eligibility.test.mjs",
+      "test/e2e/compound-learn-lifecycle.test.mjs",
+      "test/e2e/domain-aware-stage-literals.test.mjs",
+      "test/e2e/fixture-marketing-domain.test.mjs",
+      "test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs",
+      "test/e2e/pr-gate.test.mjs",
+      "test/e2e/rebuild-determinism.test.mjs",
+      "test/e2e/resync-worktree-bare-invocation.test.mjs",
+      "test/e2e/runner-loop.test.mjs",
+      "test/e2e/self-improve-loop.test.mjs",
+      "test/e2e/synthetic-domain.test.mjs",
+      "test/report/authoritative-match.test.mjs",
+      "test/runner/claim-port.test.mjs",
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/runner/merge.test.mjs",
+      "test/state/decision-scope-field.test.mjs",
+      "test/state/events-jsonl-truncation-guard.test.mjs",
+      "test/state/replay.test.mjs",
+      "test/state/runtime-coordination.test.mjs",
+      "test/state/store.test.mjs",
+      "test/verbs/merge/approve.test.mjs"
+    ],
+    "src/install/coexist.mjs": [
+      "test/cli/helpers/fgos-cli-harness.mjs",
+      "test/install/coexist.test.mjs"
+    ],
+    "src/config/shared-config-file.mjs": [
+      "test/cli/knowledge-attest-gate.test.mjs",
+      "test/config/shared-config-file.test.mjs",
+      "test/runner/claim-port.test.mjs",
+      "test/runner/merge.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs"
+    ],
+    "src/config/global-config.mjs": [
+      "test/config/global-config.test.mjs",
+      "test/setup/bin-discovery.test.mjs"
+    ],
+    "src/state/work.mjs": [
+      "test/direct/fgos-edit.test.mjs",
+      "test/intake/classify.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/state/backward-compat.test.mjs",
+      "test/state/dep-graph.test.mjs",
+      "test/state/domain-fields.test.mjs",
+      "test/state/events.test.mjs",
+      "test/state/status-category.test.mjs",
+      "test/state/store.test.mjs",
+      "test/state/work.test.mjs"
+    ],
+    "src/verbs/state/stage.mjs": [
+      "test/direct/fgos-stage.test.mjs",
+      "test/parity/stage-parity.test.mjs"
+    ],
+    "src/state/frontier.mjs": [
+      "test/e2e/synthetic-domain.test.mjs",
+      "test/runner/root-affinity.test.mjs",
+      "test/state/frontier.test.mjs"
+    ],
+    "src/evolve/candidates.mjs": [
+      "test/evolve/candidates.test.mjs"
+    ],
+    "src/report/entropy.mjs": [
+      "test/evolve/candidates.test.mjs",
+      "test/report/entropy.test.mjs"
+    ],
+    "src/evolve/iron-law.mjs": [
+      "test/evolve/iron-law.test.mjs"
+    ],
+    "src/intake/risk-keywords.mjs": [
+      "test/evolve/iron-law.test.mjs"
+    ],
+    "src/intake/classify.mjs": [
+      "test/evolve/iron-law.test.mjs",
+      "test/intake/classify.test.mjs"
+    ],
+    "src/intake/discovery.mjs": [
+      "test/intake/discovery.test.mjs",
+      "test/intake/judge-verify-second-pass-stability.test.mjs",
+      "test/runner/loop.test.mjs"
+    ],
+    "src/state/priority-formula.mjs": [
+      "test/intake/discovery.test.mjs",
+      "test/intake/plan.test.mjs",
+      "test/state/priority-formula.test.mjs",
+      "test/state/workflow-stage-graphs.test.mjs"
+    ],
+    "src/runner/worktree.mjs": [
+      "test/intake/discovery.test.mjs",
+      "test/intake/plan.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/runner/merge.test.mjs",
+      "test/runner/promote-engine.test.mjs",
+      "test/runner/worktree-callsite-wrapper.test.mjs",
+      "test/runner/worktree.test.mjs"
+    ],
+    "src/runner/loop.mjs": [
+      "test/intake/discovery.test.mjs",
+      "test/runner/lock.test.mjs",
+      "test/runner/loop.test.mjs",
+      "test/runner/operation-choice.test.mjs"
+    ],
+    "src/intake/verify-pattern-check.mjs": [
+      "test/intake/judge-verify-second-pass-stability.test.mjs"
+    ],
+    "src/intake/plan-verdict-from-plan-md.mjs": [
+      "test/intake/plan-verdict-from-plan-md.test.mjs"
+    ],
+    "src/intake/plan.mjs": [
+      "test/intake/plan.test.mjs",
+      "test/report/context-render.test.mjs"
+    ],
+    "src/report/authoritative-match.mjs": [
+      "test/report/authoritative-match.test.mjs"
+    ],
+    "src/report/capability-plan-lint.mjs": [
+      "test/report/capability-plan-lint.test.mjs"
+    ],
+    "src/setup/registrations.mjs": [
+      "test/report/capability-plan-lint.test.mjs",
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/setup/bwrap-check.test.mjs",
+      "test/setup/capability-catalog-doctrine.test.mjs",
+      "test/setup/checks-doctor-config.test.mjs",
+      "test/setup/checks-setup-config.test.mjs",
+      "test/setup/checks.test.mjs",
+      "test/setup/confinement-doctor-checks.test.mjs",
+      "test/setup/doctor-coordination-checks.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/setup/plugin-marketplace-doctor-check.test.mjs",
+      "test/setup/registrations.test.mjs",
+      "test/setup/visibility-checks.test.mjs",
+      "test/state/events-legacy-absence.test.mjs",
+      "test/state/worker-slots.test.mjs"
+    ],
+    "src/report/context-render.mjs": [
+      "test/report/context-render.test.mjs"
+    ],
+    "src/report/decision-index.mjs": [
+      "test/report/decision-index.test.mjs",
+      "test/setup/instruction-composition.test.mjs",
+      "test/setup/instruction-registry.test.mjs"
+    ],
+    "src/report/enduser-index.mjs": [
+      "test/report/enduser-index.test.mjs"
+    ],
+    "src/report/enduser-index-generate.mjs": [
+      "test/report/enduser-index.test.mjs"
+    ],
+    "src/report/frontmatter.mjs": [
+      "test/report/enduser-index.test.mjs",
+      "test/report/frontmatter.test.mjs"
+    ],
+    "src/report/knowledge-resolver.mjs": [
+      "test/report/knowledge-resolver.test.mjs"
+    ],
+    "src/runner/dispatch/agent-result-claim-contract.mjs": [
+      "test/runner/agent-result-claim-contract.test.mjs"
+    ],
+    "src/runner/anti-loop.mjs": [
+      "test/runner/anti-loop.test.mjs",
+      "test/runner/loop.test.mjs"
+    ],
+    "src/runner/dispatch/assignment.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/assignment-policy.test.mjs",
+      "test/runner/assignment-provenance.test.mjs",
+      "test/runner/assignment-runresult.test.mjs",
+      "test/runner/assignment.test.mjs",
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs",
+      "test/runner/dispatch-operability-production-door.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/effective-execution-contract.test.mjs",
+      "test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+      "test/runner/operation-choice.test.mjs"
+    ],
+    "src/runner/dispatch/assignment-runner.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/assignment-runresult.test.mjs",
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/coordination-recovery-and-quorum.test.mjs",
+      "test/runner/dispatch-operability-production-door.test.mjs",
+      "test/runner/dispatch-visibility-session.test.mjs",
+      "test/runner/effective-execution-contract.test.mjs",
+      "test/runner/herdr-spawn-assignment-dispatch.test.mjs",
+      "test/runner/operation-choice.test.mjs"
+    ],
+    "src/runner/dispatch/config.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/assignment-normalizer.test.mjs",
+      "test/runner/assignment-policy.test.mjs",
+      "test/runner/assignment-provenance.test.mjs",
+      "test/runner/assignment.test.mjs",
+      "test/runner/coordination-declared-consult.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/coordination-session-engine.test.mjs",
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-policies.test.mjs",
+      "test/runner/dispatch-coordination-role-tiers.test.mjs",
+      "test/runner/dispatch-executor-profile.test.mjs",
+      "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "test/runner/dispatch-production-call-sites.test.mjs",
+      "test/runner/effective-execution-contract.test.mjs",
+      "test/runner/egress-governance.test.mjs",
+      "test/runner/enrich-and-validate-contract.test.mjs",
+      "test/runner/execution-contract.test.mjs",
+      "test/runner/group-cognition-framework.test.mjs",
+      "test/runner/herdr-spawn-adapter.test.mjs",
+      "test/runner/placement-policy-matrix-coverage.test.mjs",
+      "test/runner/placement-policy.test.mjs",
+      "test/runner/provider-adapter.test.mjs"
+    ],
+    "src/runner/dispatch/prepare.mjs": [
+      "test/runner/assignment-dispatch.test.mjs"
+    ],
+    "src/runner/dispatch/plan.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/dispatch-effect-guarantee.test.mjs",
+      "test/runner/dispatch-recovery.test.mjs"
+    ],
+    "src/runner/dispatch/cli.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/codex-cli-glm-cli-live-executors.test.mjs",
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-production-call-sites.test.mjs",
+      "test/runner/herdr-spawn-adapter.test.mjs"
+    ],
+    "src/runner/coordination/store.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/coordination-aggregation.test.mjs",
+      "test/runner/coordination-declared-consult.test.mjs",
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/coordination-deliberation-method-chains.test.mjs",
+      "test/runner/coordination-driver-authorization.test.mjs",
+      "test/runner/coordination-group-thinking-rfc-review-lite.test.mjs",
+      "test/runner/coordination-human-turn.test.mjs",
+      "test/runner/coordination-legacy-schema-compatibility.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/coordination-r5-hard-budgets.test.mjs",
+      "test/runner/coordination-r6-security-adversarial.test.mjs",
+      "test/runner/coordination-r7-work-isolation.test.mjs",
+      "test/runner/coordination-read-evaluator.test.mjs",
+      "test/runner/coordination-recheck-discharge.test.mjs",
+      "test/runner/coordination-recheck-disposition.test.mjs",
+      "test/runner/coordination-recovery-and-quorum.test.mjs",
+      "test/runner/coordination-replay.test.mjs",
+      "test/runner/coordination-research-fan-out.test.mjs",
+      "test/runner/coordination-session-engine.test.mjs",
+      "test/runner/coordination-specialist-binding.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs",
+      "test/runner/coordination-store-fault-injection.test.mjs",
+      "test/runner/coordination-store.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-launch-master-loop.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs",
+      "test/verbs/coordination-run-live-proof.test.mjs"
+    ],
+    "src/runner/dispatch/run-lock.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/main-checkout-lock.test.mjs",
+      "test/runner/run-lock-identity.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/dispatch-recovery.test.mjs"
+    ],
+    "src/runner/dispatch/provider-capacity.mjs": [
+      "test/runner/assignment-dispatch.test.mjs",
+      "test/runner/dispatch-reconcile-operation.test.mjs",
+      "test/runner/provider-capacity.test.mjs"
+    ],
+    "src/runner/dispatch/assignment-normalizer.mjs": [
+      "test/runner/assignment-normalizer.test.mjs"
+    ],
+    "src/runner/dispatch/assignment-policy.mjs": [
+      "test/runner/assignment-policy.test.mjs",
+      "test/runner/dispatch-effect-guarantee.test.mjs",
+      "test/runner/dispatch.test.mjs"
+    ],
+    "src/runner/dispatch/resolve.mjs": [
+      "test/runner/assignment-policy.test.mjs",
+      "test/runner/cohort-planner.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-executor-profile.test.mjs",
+      "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/egress-governance.test.mjs",
+      "test/runner/placement-policy-matrix-coverage.test.mjs",
+      "test/runner/provider-adapter.test.mjs"
+    ],
+    "src/runner/dispatch/run-result.mjs": [
+      "test/runner/assignment-runresult.test.mjs",
+      "test/runner/dispatch-runtime-inspect.test.mjs",
+      "test/runner/herdr-round-reconcile.test.mjs",
+      "test/runner/run-result-v2.test.mjs"
+    ],
+    "src/runner/attestation-guard.mjs": [
+      "test/runner/attestation-guard.test.mjs"
+    ],
+    "src/runner/claim-liveness.mjs": [
+      "test/runner/claim-liveness.test.mjs"
+    ],
+    "src/runner/claim-port.mjs": [
+      "test/runner/claim-port.test.mjs",
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/state/worker-slots.test.mjs"
+    ],
+    "src/runner/dispatch/cli-spawn-supervisor.mjs": [
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs",
+      "test/runner/herdr-round-reconcile.test.mjs"
+    ],
+    "src/runner/dispatch/transport.mjs": [
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/runner/dispatch-policy-baseline-snapshot.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/egress-governance.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs",
+      "test/runner/herdr-spawn-adapter.test.mjs",
+      "test/runner/provider-adapter.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/request.mjs": [
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/authority.mjs": [
+      "test/runner/cli-spawn-reconciliation.test.mjs",
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs"
+    ],
+    "src/state/tool-registry.mjs": [
+      "test/runner/codex-cli-glm-cli-live-executors.test.mjs",
+      "test/runner/dispatch.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs",
+      "test/runner/herdr-spawn-adapter.test.mjs",
+      "test/state/tool-registry.test.mjs"
+    ],
+    "src/runner/coordination/cohort-planner.mjs": [
+      "test/runner/cohort-planner.test.mjs"
+    ],
+    "src/runner/definitions/schema.mjs": [
+      "test/runner/cohort-planner.test.mjs",
+      "test/runner/coordination-aggregation.test.mjs",
+      "test/runner/coordination-declared-consult.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/runner/flow-definition-protocol-loader.test.mjs",
+      "test/runner/flow-definition-schema.test.mjs",
+      "test/runner/flow-definition-standalone-master-coordination-loop.test.mjs",
+      "test/runner/flow-definition-workflow-adapter.test.mjs",
+      "test/runner/group-cognition-framework.test.mjs"
+    ],
+    "src/state/events-jsonl-truncation-guard.mjs": [
+      "test/runner/concurrent-claim-eventlog-loss.test.mjs",
+      "test/setup/checks-doctor-config.test.mjs",
+      "test/setup/checks.test.mjs",
+      "test/state/events-jsonl-truncation-guard.test.mjs"
+    ],
+    "src/runner/coordination/actions-projector.mjs": [
+      "test/runner/coordination-actions-v1.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs"
+    ],
+    "src/verbs/coordination/actions.mjs": [
+      "test/runner/coordination-actions-v1.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs"
+    ],
+    "src/runner/coordination/session-engine.mjs": [
+      "test/runner/coordination-aggregation.test.mjs",
+      "test/runner/coordination-declared-consult.test.mjs",
+      "test/runner/coordination-declared-vs-agent-led-equivalence.test.mjs",
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/coordination-deliberation-method-chains.test.mjs",
+      "test/runner/coordination-delphi-feedback-lite.test.mjs",
+      "test/runner/coordination-driver-authorization.test.mjs",
+      "test/runner/coordination-group-thinking-rfc-review-lite.test.mjs",
+      "test/runner/coordination-legacy-schema-compatibility.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/coordination-nominal-group-lite.test.mjs",
+      "test/runner/coordination-r5-hard-budgets.test.mjs",
+      "test/runner/coordination-r6-security-adversarial.test.mjs",
+      "test/runner/coordination-r7-work-isolation.test.mjs",
+      "test/runner/coordination-read-evaluator.test.mjs",
+      "test/runner/coordination-recheck-discharge.test.mjs",
+      "test/runner/coordination-recheck-disposition.test.mjs",
+      "test/runner/coordination-recovery-and-quorum.test.mjs",
+      "test/runner/coordination-research-fan-out.test.mjs",
+      "test/runner/coordination-session-engine.test.mjs",
+      "test/runner/coordination-specialist-binding.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/runner/dispatch-coordination-role-tiers.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-pack-registration.test.mjs",
+      "test/verbs/coordination-group-thinking-pack.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/runner/coordination/replay.mjs": [
+      "test/runner/coordination-aggregation.test.mjs",
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/coordination-deliberation-method-chains.test.mjs",
+      "test/runner/coordination-delphi-feedback-lite.test.mjs",
+      "test/runner/coordination-driver-authorization.test.mjs",
+      "test/runner/coordination-group-thinking-rfc-review-lite.test.mjs",
+      "test/runner/coordination-human-turn.test.mjs",
+      "test/runner/coordination-legacy-schema-compatibility.test.mjs",
+      "test/runner/coordination-nominal-group-lite.test.mjs",
+      "test/runner/coordination-r6-security-adversarial.test.mjs",
+      "test/runner/coordination-read-evaluator.test.mjs",
+      "test/runner/coordination-recheck-disposition.test.mjs",
+      "test/runner/coordination-recovery-and-quorum.test.mjs",
+      "test/runner/coordination-replay.test.mjs",
+      "test/runner/coordination-specialist-binding.test.mjs",
+      "test/runner/coordination-store.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/coordination-run-live-proof.test.mjs"
+    ],
+    "src/runner/coordination/schema.mjs": [
+      "test/runner/coordination-aggregation.test.mjs",
+      "test/runner/coordination-declared-consult.test.mjs",
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/coordination-deliberation-method-chains.test.mjs",
+      "test/runner/coordination-delphi-feedback-lite.test.mjs",
+      "test/runner/coordination-driver-authorization.test.mjs",
+      "test/runner/coordination-group-thinking-rfc-review-lite.test.mjs",
+      "test/runner/coordination-human-turn.test.mjs",
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/coordination-nominal-group-lite.test.mjs",
+      "test/runner/coordination-r5-hard-budgets.test.mjs",
+      "test/runner/coordination-r6-security-adversarial.test.mjs",
+      "test/runner/coordination-r7-work-isolation.test.mjs",
+      "test/runner/coordination-read-evaluator.test.mjs",
+      "test/runner/coordination-recheck-discharge.test.mjs",
+      "test/runner/coordination-recheck-disposition.test.mjs",
+      "test/runner/coordination-recovery-and-quorum.test.mjs",
+      "test/runner/coordination-replay.test.mjs",
+      "test/runner/coordination-research-fan-out.test.mjs",
+      "test/runner/coordination-schema.test.mjs",
+      "test/runner/coordination-session-engine.test.mjs",
+      "test/runner/coordination-specialist-binding.test.mjs",
+      "test/runner/coordination-store.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-recovery.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/runner/deliberation/schema.mjs": [
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/deliberation-schema.test.mjs"
+    ],
+    "src/verbs/coordination/show.mjs": [
+      "test/runner/coordination-deliberation-ledger.test.mjs",
+      "test/runner/coordination-specialist-binding.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/runner/definitions/protocol-loader.mjs": [
+      "test/runner/coordination-driver-authorization.test.mjs",
+      "test/runner/coordination-legality-facts.test.mjs",
+      "test/runner/coordination-visibility-window-fixture.test.mjs",
+      "test/runner/flow-definition-protocol-loader.test.mjs",
+      "test/runner/flow-definition-standalone-master-coordination-loop.test.mjs",
+      "test/runner/group-cognition-framework.test.mjs",
+      "test/verbs/coordination-run-live-proof.test.mjs"
+    ],
+    "src/verbs/coordination/run.mjs": [
+      "test/runner/coordination-headless-adapter-identity.test.mjs",
+      "test/runner/dispatch-coordination-role-tiers.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-chain.test.mjs",
+      "test/verbs/coordination-launch-master-loop.test.mjs",
+      "test/verbs/coordination-run-driver-steps.test.mjs"
+    ],
+    "src/runner/coordination/headless-adapter.mjs": [
+      "test/runner/coordination-headless-adapter-identity.test.mjs",
+      "test/verbs/coordination-aggregation-surface.test.mjs",
+      "test/verbs/coordination-group-thinking-pack-registration.test.mjs"
+    ],
+    "src/runner/coordination/legality-facts.mjs": [
+      "test/runner/coordination-legality-facts.test.mjs",
+      "test/runner/coordination-stale-action-proof.test.mjs"
+    ],
+    "src/runner/dispatch/execution-contract.mjs": [
+      "test/runner/coordination-mutation-unlock.test.mjs",
+      "test/runner/execution-contract.test.mjs"
+    ],
+    "src/runner/coordination/read-evaluators.mjs": [
+      "test/runner/coordination-read-evaluator.test.mjs"
+    ],
+    "src/runner/coordination/action-precondition.mjs": [
+      "test/runner/coordination-stale-action-proof.test.mjs"
+    ],
+    "src/verbs/coordination/close.mjs": [
+      "test/runner/coordination-stale-action-proof.test.mjs"
+    ],
+    "src/runner/dispatch/brief.mjs": [
+      "test/runner/dispatch-brief.test.mjs",
+      "test/runner/effective-execution-contract.test.mjs"
+    ],
+    "src/runner/dispatch/herdr-agent.mjs": [
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/herdr-agent.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/backend-registry.mjs": [
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-policies.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/policies.mjs": [
+      "test/runner/dispatch-confinement-authority.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/runner/dispatch-confinement-policies.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/drivers/bwrap.mjs": [
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-effect-guarantee.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/resources.mjs": [
+      "test/runner/dispatch-confinement-backend-p03.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/cleanup.mjs": [
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/setup/confinement-doctor-checks.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/attestation-store.mjs": [
+      "test/runner/dispatch-confinement-backend-p03.test.mjs",
+      "test/runner/dispatch-confinement-p04.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/probes/harness.mjs": [
+      "test/runner/dispatch-confinement-backend-p03.test.mjs"
+    ],
+    "src/runner/dispatch/herdr-round.mjs": [
+      "test/runner/dispatch-confinement-p04.test.mjs",
+      "test/runner/dispatch-confinement-p05.test.mjs",
+      "test/runner/herdr-reconciliation.test.mjs",
+      "test/runner/herdr-round-reconcile.test.mjs"
+    ],
+    "src/runner/dispatch/confinement/bypass-pairing.mjs": [
+      "test/runner/dispatch-confinement-p05.test.mjs"
+    ],
+    "src/runner/dispatch/recovery.mjs": [
+      "test/runner/dispatch-effect-guarantee.test.mjs",
+      "test/runner/dispatch-recovery.test.mjs"
+    ],
+    "src/runner/dispatch/placement-policy.mjs": [
+      "test/runner/dispatch-executor-profile.test.mjs",
+      "test/runner/placement-policy-matrix-coverage.test.mjs",
+      "test/runner/placement-policy-redirect-selection.test.mjs",
+      "test/runner/placement-policy.test.mjs"
+    ],
+    "src/runner/dispatch/liveness.mjs": [
+      "test/runner/dispatch-liveness.test.mjs"
+    ],
+    "src/verbs/dispatch/reconcile.mjs": [
+      "test/runner/dispatch-operability-production-door.test.mjs",
+      "test/runner/dispatch-reconcile-operation.test.mjs"
+    ],
+    "src/runner/dispatch/reconciliation-planner.mjs": [
+      "test/runner/dispatch-reconciliation-concurrency.test.mjs",
+      "test/runner/dispatch-reconciliation.test.mjs",
+      "test/runner/reconcile-apply-cas-worker.helper.mjs"
+    ],
+    "src/runner/dispatch/runtime-inspection.mjs": [
+      "test/runner/dispatch-runtime-inspect.test.mjs"
+    ],
+    "src/verbs/dispatch/inspect.mjs": [
+      "test/runner/dispatch-runtime-inspect.test.mjs"
+    ],
+    "src/runner/dispatch/trust-store.mjs": [
+      "test/runner/dispatch-trust-store.test.mjs"
+    ],
+    "src/runner/dispatch/visibility-session.mjs": [
+      "test/runner/dispatch-visibility-session.test.mjs",
+      "test/runner/herdr-spawn-adapter.test.mjs",
+      "test/verbs/dispatch-observe.test.mjs"
+    ],
+    "src/runner/dispatch/worker-home.mjs": [
+      "test/runner/dispatch-worker-home.test.mjs"
+    ],
+    "src/runner/dispatch/worker-session-boot.mjs": [
+      "test/runner/dispatch-worker-session-boot.test.mjs"
+    ],
+    "src/runner/dispatch/worker-session.mjs": [
+      "test/runner/dispatch-worker-session.test.mjs"
+    ],
+    "src/runner/dispatch.mjs": [
+      "test/runner/dispatch.test.mjs",
+      "test/setup/capability-catalog-doctrine.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/setup/registrations.test.mjs"
+    ],
+    "src/runner/dispatch/result-ladder.mjs": [
+      "test/runner/dispatch.test.mjs"
+    ],
+    "src/report/dispatch-confidence.mjs": [
+      "test/runner/dispatch.test.mjs"
+    ],
+    "src/runner/recovery.mjs": [
+      "test/runner/dispatch.test.mjs",
+      "test/runner/recovery.test.mjs"
+    ],
+    "src/runner/dispatch/effective-execution-contract.mjs": [
+      "test/runner/effective-execution-contract.test.mjs"
+    ],
+    "src/runner/dispatch/evidence-attribution.mjs": [
+      "test/runner/evidence-attribution.test.mjs"
+    ],
+    "src/runner/definitions/workflow-adapter.mjs": [
+      "test/runner/flow-definition-workflow-adapter.test.mjs"
+    ],
+    "src/runner/frozen-judge.mjs": [
+      "test/runner/frozen-judge.test.mjs"
+    ],
+    "src/runner/gateway-control.mjs": [
+      "test/runner/gateway-control.test.mjs"
+    ],
+    "src/runner/github-adapter.mjs": [
+      "test/runner/github-adapter.test.mjs"
+    ],
+    "src/runner/goal-check.mjs": [
+      "test/runner/goal-check.test.mjs"
+    ],
+    "src/runner/dispatch/dispatch-error.mjs": [
+      "test/runner/herdr-reconciliation.test.mjs"
+    ],
+    "src/runner/lock-wait.mjs": [
+      "test/runner/lock-wait.test.mjs"
+    ],
+    "src/runner/main-checkout-reset-guard.mjs": [
+      "test/runner/main-checkout-reset-guard.test.mjs"
+    ],
+    "src/runner/merge.mjs": [
+      "test/runner/merge-target-slot-multiprocess.test.mjs",
+      "test/runner/merge.test.mjs",
+      "test/state/working-tree-clean-unified.test.mjs"
+    ],
+    "src/runner/dispatch/operation-choice.mjs": [
+      "test/runner/operation-choice.test.mjs"
+    ],
+    "src/runner/paths.mjs": [
+      "test/runner/paths.test.mjs",
+      "test/setup/skill-wrappers.test.mjs"
+    ],
+    "src/runner/promote-engine.mjs": [
+      "test/runner/promote-engine.test.mjs"
+    ],
+    "src/runner/promote-preflight.mjs": [
+      "test/runner/promote-preflight.test.mjs"
+    ],
+    "src/runner/prompt-templates.mjs": [
+      "test/runner/prompt-templates.test.mjs"
+    ],
+    "src/runner/dispatch/provider-adapter.mjs": [
+      "test/runner/provider-adapter.test.mjs"
+    ],
+    "src/runner/root-affinity.mjs": [
+      "test/runner/root-affinity.test.mjs"
+    ],
+    "src/runner/dispatch/process-identity.mjs": [
+      "test/runner/run-lock-identity.test.mjs"
+    ],
+    "src/runner/team-cognition/aggregation-evaluator.mjs": [
+      "test/runner/team-cognition-aggregation-evaluator.test.mjs"
+    ],
+    "src/runner/team-cognition/schema.mjs": [
+      "test/runner/team-cognition-aggregation-evaluator.test.mjs",
+      "test/runner/team-cognition-schema.test.mjs"
+    ],
+    "src/runner/worker-log.mjs": [
+      "test/runner/worker-log.test.mjs"
+    ],
+    "src/runner/write-queue.mjs": [
+      "test/runner/write-queue.test.mjs"
+    ],
+    "src/state/envelope.mjs": [
+      "test/rust-host/envelope-contract.test.mjs",
+      "test/rust-host/generate-vectors.mjs",
+      "test/state/envelope.test.mjs"
+    ],
+    "src/setup/checks.mjs": [
+      "test/rust-host/release-tree.test.mjs",
+      "test/setup/capability-catalog-doctrine.test.mjs",
+      "test/setup/confinement-doctor-checks.test.mjs",
+      "test/setup/coordination-doctor-check.test.mjs",
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/setup/instruction-projections.test.mjs",
+      "test/setup/knowledge-doctor.test.mjs",
+      "test/setup/registrations.test.mjs"
+    ],
+    "src/setup/agy-permissions.mjs": [
+      "test/setup/agy-permissions.test.mjs"
+    ],
+    "src/setup/ansi.mjs": [
+      "test/setup/ansi.test.mjs"
+    ],
+    "src/setup/bin-discovery.mjs": [
+      "test/setup/bin-discovery.test.mjs"
+    ],
+    "src/state/worker-slots.mjs": [
+      "test/setup/checks-doctor-config.test.mjs",
+      "test/setup/checks.test.mjs",
+      "test/state/worker-slots.test.mjs"
+    ],
+    "src/setup/claude-code-hooks.mjs": [
+      "test/setup/claude-code-hooks.test.mjs"
+    ],
+    "src/setup/config-merge.mjs": [
+      "test/setup/config-merge.test.mjs"
+    ],
+    "src/setup/executor-profile-warnings.mjs": [
+      "test/setup/executor-profile-warnings.test.mjs"
+    ],
+    "src/state/gate-bypass.mjs": [
+      "test/setup/helpers/setup-checks-harness.mjs",
+      "test/state/gate-bypass.test.mjs"
+    ],
+    "src/setup/instruction-composition.mjs": [
+      "test/setup/instruction-composition.test.mjs",
+      "test/setup/instruction-projections.test.mjs"
+    ],
+    "src/setup/instruction-registry.mjs": [
+      "test/setup/instruction-composition.test.mjs",
+      "test/setup/instruction-projections.test.mjs",
+      "test/setup/instruction-registry.test.mjs"
+    ],
+    "src/setup/instruction-projections.mjs": [
+      "test/setup/instruction-projections.test.mjs"
+    ],
+    "src/report/knowledge-projection.mjs": [
+      "test/setup/knowledge-doctor.test.mjs"
+    ],
+    "src/state/main-checkout-guard-warnings.mjs": [
+      "test/setup/registrations.test.mjs",
+      "test/state/events-jsonl-truncation-guard.test.mjs"
+    ],
+    "src/setup/shell-rc.mjs": [
+      "test/setup/shell-rc.test.mjs"
+    ],
+    "src/setup/skill-wrappers.mjs": [
+      "test/setup/skill-wrappers.test.mjs",
+      "test/skills/fgos-mirror.test.mjs"
+    ],
+    "src/setup/git-hooks.mjs": [
+      "test/setup/uninstall-wiring.test.mjs"
+    ],
+    "src/state/awaiting-context.mjs": [
+      "test/state/awaiting-context.test.mjs"
+    ],
+    "src/state/replay.mjs": [
+      "test/state/backward-compat.test.mjs",
+      "test/state/domain-fields.test.mjs",
+      "test/state/events-compaction.test.mjs",
+      "test/state/replay.test.mjs",
+      "test/state/show-list-move-consistency.test.mjs",
+      "test/state/status-category.test.mjs",
+      "test/state/workflow-stage-graphs.test.mjs"
+    ],
+    "src/state/cleanup-pool.mjs": [
+      "test/state/cleanup-pool.test.mjs"
+    ],
+    "src/state/cursor.mjs": [
+      "test/state/cursor.test.mjs"
+    ],
+    "src/state/dep-graph.mjs": [
+      "test/state/dep-graph.test.mjs"
+    ],
+    "src/state/discover-pool.mjs": [
+      "test/state/discover-pool.test.mjs"
+    ],
+    "src/state/drift-status.mjs": [
+      "test/state/drift-status.test.mjs"
+    ],
+    "src/state/events-compaction.mjs": [
+      "test/state/events-compaction.test.mjs"
+    ],
+    "src/state/status-fsm.mjs": [
+      "test/state/fsm.test.mjs",
+      "test/state/stage.test.mjs"
+    ],
+    "src/state/graph-harness.mjs": [
+      "test/state/graph-harness.test.mjs"
+    ],
+    "src/state/graph-metrics.mjs": [
+      "test/state/graph-metrics.test.mjs"
+    ],
+    "src/state/handoff.mjs": [
+      "test/state/handoff.test.mjs"
+    ],
+    "src/state/impact.mjs": [
+      "test/state/impact.test.mjs"
+    ],
+    "src/state/knowledge-registry.mjs": [
+      "test/state/knowledge-bootstrap.test.mjs",
+      "test/state/knowledge-registry.test.mjs"
+    ],
+    "src/state/plan-pool.mjs": [
+      "test/state/plan-pool.test.mjs"
+    ],
+    "src/state/porting-store.mjs": [
+      "test/state/porting-store.test.mjs"
+    ],
+    "src/state/porting.mjs": [
+      "test/state/porting-store.test.mjs",
+      "test/state/porting.test.mjs"
+    ],
+    "src/state/postland-drift.mjs": [
+      "test/state/postland-drift.test.mjs"
+    ],
+    "src/state/retro-pool.mjs": [
+      "test/state/retro-pool.test.mjs"
+    ],
+    "src/state/retrospective-doors.mjs": [
+      "test/state/retrospective-doors.test.mjs"
+    ],
+    "src/state/stage-fsm.mjs": [
+      "test/state/stage.test.mjs"
+    ],
+    "src/util/format-bytes.mjs": [
+      "test/util/format-bytes.test.mjs"
+    ],
+    "src/util/format-duration.mjs": [
+      "test/util/format-duration.test.mjs"
+    ],
+    "src/verbs/coordination/group-thinking-pack.mjs": [
+      "test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-delphi-feedback-lite-pack-conformance.test.mjs",
+      "test/verbs/coordination-group-thinking-nominal-group-lite-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-pack-registration.test.mjs",
+      "test/verbs/coordination-group-thinking-pack.test.mjs",
+      "test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs"
+    ],
+    "src/verbs/coordination/chain.mjs": [
+      "test/verbs/coordination-chain.test.mjs"
+    ],
+    "src/verbs/coordination/launch-master-loop.mjs": [
+      "test/verbs/coordination-chain.test.mjs",
+      "test/verbs/coordination-group-thinking-pack-registration.test.mjs",
+      "test/verbs/coordination-launch-master-loop.test.mjs"
+    ],
+    "src/verbs/coordination/recover.mjs": [
+      "test/verbs/coordination-recovery.test.mjs"
+    ],
+    "src/runner/coordination/recovery-planner.mjs": [
+      "test/verbs/coordination-recovery.test.mjs"
+    ],
+    "src/verbs/dispatch/show-run.mjs": [
+      "test/verbs/dispatch-observe.test.mjs",
+      "test/verbs/dispatch-recovery.test.mjs"
+    ],
+    "src/verbs/dispatch/watch.mjs": [
+      "test/verbs/dispatch-observe.test.mjs"
+    ],
+    "src/verbs/dispatch/recover.mjs": [
+      "test/verbs/dispatch-recovery.test.mjs"
+    ],
+    "src/runner/dispatch/recovery-planner.mjs": [
+      "test/verbs/dispatch-recovery.test.mjs"
+    ]
+  },
+  "suggestedFullTriggers": [
+    "test/runner/assignment-provenance.test.mjs",
+    "test/runner/coordination-read-evaluator.test.mjs",
+    "test/runner/lock.test.mjs",
+    "test/runner/session.test.mjs",
+    "test/state/events-legacy-absence.test.mjs",
+    "test/verbs/coordination-chain.test.mjs",
+    "test/verbs/coordination-group-thinking-pack-registration.test.mjs"
+  ]
+}
