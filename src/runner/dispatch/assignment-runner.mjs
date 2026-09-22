@@ -1528,6 +1528,22 @@ export async function executeAssignment(assignment, opts = {}) {
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
   let effectiveAssignment = assignment;
   if (!fs.existsSync(assignmentJsonPath)) {
+    // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
+    // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
+    if (assignment.contractTemplate && !assignment.provenance?.template?.templateSnapshot) {
+      const initialResolution = resolveAndRenderOperationPrompt(assignment, {
+        cwd,
+        domain: assignment.domain,
+      });
+      assignment = Object.freeze({
+        ...assignment,
+        provenance: Object.freeze({
+          ...(assignment.provenance || {}),
+          template: initialResolution.templateProvenance,
+        }),
+      });
+    }
+    effectiveAssignment = assignment;
     fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
   } else {
     let raw;

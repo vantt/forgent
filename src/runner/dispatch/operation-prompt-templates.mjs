@@ -435,15 +435,46 @@ export function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options 
     throw new TemplateResolutionError('template-invalid', 'assignment object or templateId string is required');
   }
 
+  // I04-REV-01: Check for already-pinned template snapshot in provenance or options.
+  // When an assignment already has a pinned template snapshot (from initial resolution or stored
+  // assignment.json), render directly from the pinned snapshot so retry/replay attribution is
+  // strictly deterministic even if the disk template changes or is removed later.
+  const pinnedTemplate = target.provenance?.template ?? options.templateProvenance ?? options.pinnedTemplate;
   if (!templateId || typeof templateId !== 'string') {
-    throw new TemplateResolutionError('template-invalid', 'assignment does not declare valid contractTemplate string');
+    if (pinnedTemplate && typeof pinnedTemplate.id === 'string' && pinnedTemplate.id.trim()) {
+      templateId = pinnedTemplate.id;
+    } else {
+      throw new TemplateResolutionError('template-invalid', 'assignment does not declare valid contractTemplate string');
+    }
   }
 
-  const templateEntry = loadOperationPromptTemplate(templateId, {
-    cwd: options.cwd,
-    packageRoot: options.packageRoot,
-    domain: options.domain || target.domain,
-  });
+  let templateEntry;
+  if (pinnedTemplate && typeof pinnedTemplate.templateSnapshot === 'string' && pinnedTemplate.templateSnapshot.length > 0) {
+    if (pinnedTemplate.id && pinnedTemplate.id !== templateId) {
+      throw new TemplateResolutionError(
+        'template-invalid',
+        `pinned template id "${pinnedTemplate.id}" does not match contractTemplate "${templateId}"`,
+        { pinnedId: pinnedTemplate.id, templateId },
+      );
+    }
+    // Re-verify bounded variables on the snapshot to preserve template-invalid invariants
+    validateOperationPromptTemplate(pinnedTemplate.templateSnapshot, templateId);
+
+    templateEntry = {
+      id: pinnedTemplate.id || templateId,
+      tier: pinnedTemplate.tier || 'pinned',
+      source: pinnedTemplate.source || 'pinned',
+      relativeFilePath: pinnedTemplate.filePath || null,
+      content: pinnedTemplate.templateSnapshot,
+      contentDigest: pinnedTemplate.contentDigest || computeSha256Digest(pinnedTemplate.templateSnapshot),
+    };
+  } else {
+    templateEntry = loadOperationPromptTemplate(templateId, {
+      cwd: options.cwd,
+      packageRoot: options.packageRoot,
+      domain: options.domain || target.domain,
+    });
+  }
 
   const variables = {
     objective: target.objective ?? '',

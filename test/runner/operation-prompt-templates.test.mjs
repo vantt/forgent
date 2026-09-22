@@ -29,6 +29,7 @@ import {
   validateEffectiveExecutionContract,
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 
+import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 
@@ -528,6 +529,170 @@ test('operation-prompt-templates-valid doctor check fails when a malformed templ
     assert.equal(result.passed, false);
     assert.match(result.message, /malformed operation prompt template/);
     assert.match(result.message, /forbiddenVar/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted', () => {
+  const tmpDir = createTempDir('fgos-rev01-probe-');
+  try {
+    const projectTemplatesDir = path.join(tmpDir, '.fgos', 'prompt-templates');
+    fs.mkdirSync(projectTemplatesDir, { recursive: true });
+
+    const originalContent = '# Original Template\nRole: {role}\nObjective: {objective}\n';
+    const templateFilePath = path.join(projectTemplatesDir, 'probe-op.md');
+    fs.writeFileSync(templateFilePath, originalContent);
+
+    const assignment = {
+      assignmentId: 'asgn_rev01_probe',
+      role: 'reviewer',
+      objective: 'Verify probe fix',
+      contractTemplate: 'probe-op',
+    };
+
+    // First render / resolution
+    const firstPrompt = renderAssignmentPrompt(assignment, { cwd: tmpDir });
+    assert.match(firstPrompt, /# Original Template/);
+
+    const firstResolution = resolveAndRenderOperationPrompt(assignment, { cwd: tmpDir });
+    const assignmentWithPinned = {
+      ...assignment,
+      provenance: {
+        template: firstResolution.templateProvenance,
+      },
+    };
+
+    // Modify template on disk
+    fs.writeFileSync(templateFilePath, '# Modified Template V2\nRole: {role}\nObjective: {objective}\n');
+
+    // Second render using assignment with pinned snapshot
+    const secondPrompt = renderAssignmentPrompt(assignmentWithPinned, { cwd: tmpDir });
+    const secondUsesChanged = secondPrompt.includes('# Modified Template V2');
+    const secondUsesSnapshot = secondPrompt.includes('# Original Template');
+
+    assert.equal(secondUsesChanged, false, 'second render must not use changed disk template');
+    assert.equal(secondUsesSnapshot, true, 'second render must use pinned snapshot');
+
+    // Delete template from disk entirely
+    fs.unlinkSync(templateFilePath);
+
+    // Third render using pinned snapshot must still succeed
+    const thirdPrompt = renderAssignmentPrompt(assignmentWithPinned, { cwd: tmpDir });
+    assert.match(thirdPrompt, /# Original Template/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted', async () => {
+  const tmpDir = createTempDir('fgos-rev01-runner-');
+  try {
+    const projectTemplatesDir = path.join(tmpDir, '.fgos', 'prompt-templates');
+    fs.mkdirSync(projectTemplatesDir, { recursive: true });
+
+    const originalContent = '# Pinned Dispatch Template\nRole: {role}\nObjective: {objective}\n';
+    const templateFilePath = path.join(projectTemplatesDir, 'runner-retry-op.md');
+    fs.writeFileSync(templateFilePath, originalContent);
+
+    const argvLog = path.join(tmpDir, 'argv-log.jsonl');
+    const executorScript = path.join(tmpDir, 'mock-executor.mjs');
+    fs.writeFileSync(
+      executorScript,
+      `
+      import fs from 'node:fs';
+      import path from 'node:path';
+      const prompt = process.argv.slice(2).join(' ');
+      fs.appendFileSync(${JSON.stringify(argvLog)}, JSON.stringify({ prompt }) + '\\n');
+      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      if (match) {
+        const runDir = path.dirname(match[1]);
+        fs.mkdirSync(runDir, { recursive: true });
+        fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full substantive report content.\\n');
+        fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
+      }
+      process.exit(0);
+      `,
+    );
+
+    const runnerConfig = {
+      executor: {
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+      models: { standard: 'test-model' },
+      timeoutMs: 5000,
+    };
+
+    const assignment = {
+      assignmentId: 'asgn_rev01_runner',
+      domain: 'coding',
+      workflow: 'test-wf',
+      stage: 'planning',
+      operation: 'validate-plan',
+      contractTemplate: 'runner-retry-op',
+      role: 'tester',
+      objective: 'Test runner retry snapshot retention',
+      mutation: 'read-only',
+    };
+
+    // First execution
+    const run1 = await executeAssignment(assignment, {
+      cwd: tmpDir,
+      repoRoot: tmpDir,
+      runnerConfig,
+    });
+    assert.equal(run1.status, 'done');
+
+    // Verify assignment.json on disk now carries template provenance with templateSnapshot
+    const assignmentJsonPath = path.join(tmpDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
+    assert.ok(fs.existsSync(assignmentJsonPath));
+    const persistedAssignment = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
+    assert.ok(persistedAssignment.provenance?.template?.templateSnapshot);
+    const originalContentDigest = persistedAssignment.provenance.template.contentDigest;
+    assert.equal(persistedAssignment.provenance.template.templateSnapshot, originalContent);
+
+    // Modify disk template
+    fs.writeFileSync(templateFilePath, '# Modified V2 Template\nRole: {role}\nObjective: {objective}\n');
+
+    // Second execution (retry / second run on same assignment)
+    const run2 = await executeAssignment(assignment, {
+      cwd: tmpDir,
+      repoRoot: tmpDir,
+      runnerConfig,
+    });
+    assert.equal(run2.status, 'done');
+
+    // Delete disk template entirely
+    fs.unlinkSync(templateFilePath);
+
+    // Third execution (third run on same assignment, template file gone)
+    const run3 = await executeAssignment(assignment, {
+      cwd: tmpDir,
+      repoRoot: tmpDir,
+      runnerConfig,
+    });
+    assert.equal(run3.status, 'done');
+
+    // Read recorded prompts from argvLog
+    const logLines = fs.readFileSync(argvLog, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
+    assert.equal(logLines.length, 3);
+    for (let i = 0; i < 3; i++) {
+      assert.ok(logLines[i].prompt.includes('# Pinned Dispatch Template'), `run ${i + 1} must use original pinned template`);
+      assert.ok(!logLines[i].prompt.includes('# Modified V2 Template'), `run ${i + 1} must not use modified template`);
+    }
+
+    // Check effective contract of run 02 and 03
+    const run2ContractPath = path.join(tmpDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '02', 'effective-execution-contract.json');
+    const run2Contract = JSON.parse(fs.readFileSync(run2ContractPath, 'utf8'));
+    assert.equal(run2Contract.provenance.template.contentDigest, originalContentDigest);
+    assert.equal(run2Contract.provenance.template.templateSnapshot, originalContent);
+
+    const run3ContractPath = path.join(tmpDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '03', 'effective-execution-contract.json');
+    const run3Contract = JSON.parse(fs.readFileSync(run3ContractPath, 'utf8'));
+    assert.equal(run3Contract.provenance.template.contentDigest, originalContentDigest);
+    assert.equal(run3Contract.provenance.template.templateSnapshot, originalContent);
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

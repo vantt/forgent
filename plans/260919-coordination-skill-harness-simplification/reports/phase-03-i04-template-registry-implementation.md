@@ -130,7 +130,9 @@ In `src/runner/coordination/session-engine.mjs`, `dispatchDeclaredOperationLocke
    - `retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes` -> **PASS**
    - `operation-prompt-templates-valid doctor check is registered and passes on repository` -> **PASS**
    - `operation-prompt-templates-valid doctor check fails when a malformed template is present` -> **PASS**
-   - **Result:** **22 pass / 0 fail** (duration: 350ms)
+   - `I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted` -> **PASS**
+   - `I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted` -> **PASS**
+   - **Result:** **24 pass / 0 fail** (duration: 870ms)
 
 2. **`test/runner/assignment-dispatch.test.mjs`** (baseline smoke suite):
    - **Result:** **75 pass / 0 fail** (duration: 17s)
@@ -222,3 +224,40 @@ Output of `node .gitnexus/run.cjs detect-changes` against base `main`:
 4. Review migration guardrail in `session-engine.mjs`:
    - Existing definitions without a resolvable template on disk retain the explicit legacy-objective path.
 5. All verification commands can be run independently using the documented test list above.
+
+---
+
+## 7. Reviewer Finding Resolution: I04-REV-01 (HIGH)
+
+### 7.1 Finding Summary
+- **Finding ID:** `I04-REV-01` (Severity: HIGH)
+- **Reviewer Statement:** Phase 3 requires retry/replay attribution deterministic when template changes, and persisted Assignment/dispatch provenance must match the actually delivered prompt. The reviewer probe showed an assignment carrying a pinned `provenance.template.templateSnapshot` still rendered changed disk content after the template file was modified: `{"first":true,"secondUsesChanged":true,"secondUsesSnapshot":false}`.
+- **Root Cause:**
+  1. `executeAssignment` in `src/runner/dispatch/assignment-runner.mjs` was writing `assignment.json` *before* template resolution was invoked. Consequently, fresh `assignment.json` on disk omitted `provenance.template`.
+  2. `resolveAndRenderOperationPrompt` in `src/runner/dispatch/operation-prompt-templates.mjs` always invoked `loadOperationPromptTemplate` from disk, ignoring any pre-existing `target.provenance?.template?.templateSnapshot`.
+  3. `renderAssignmentPrompt` and `executeAssignment` re-resolved from disk during subsequent runs/retries rather than consuming the pinned snapshot.
+
+### 7.2 Corrections Implemented
+1. **Pinned Snapshot Consumption:**
+   In `src/runner/dispatch/operation-prompt-templates.mjs`, `resolveAndRenderOperationPrompt` now inspects `target.provenance?.template ?? options.templateProvenance ?? options.pinnedTemplate`. If a pinned template with a non-empty `templateSnapshot` is present:
+   - Validates that `pinnedTemplate.id` matches the requested `contractTemplate` (if specified).
+   - Re-validates bounded variables directly against `templateSnapshot`.
+   - Constructs `templateEntry` directly from `templateSnapshot` without touching disk (`source: 'pinned'`), preserving original `tier`, `filePath`, and `contentDigest`.
+   - Renders the prompt body from the snapshot and computes `renderedPromptDigest`.
+2. **Immutable Input Ordering in `assignment-runner.mjs`:**
+   - In `executeAssignment`, on fresh assignment dispatch (`!fs.existsSync(assignmentJsonPath)`), template resolution is performed *prior* to writing `assignment.json`, guaranteeing that the immutable persisted `assignment.json` carries full template provenance including `templateSnapshot`.
+   - If `assignment.json` already exists on disk (as in retries, second runs, or resumed runs), it is read as the immutable truth. Because it carries `provenance.template.templateSnapshot`, all subsequent resolution and prompt rendering derive strictly from the snapshot.
+3. **Deterministic Retry/Replay Even When Template Is Modified or Deleted:**
+   - Worker prompt, effective execution contract (`effective-execution-contract.json`), and run metadata all derive from the single immutable pinned snapshot.
+   - If the template file on disk is modified or completely unlinked after the first run, retry and subsequent attempts continue to execute successfully, produce identical prompt text, and record identical digests.
+
+### 7.3 Verification and Regression Tests
+Two dedicated regression tests were added in `test/runner/operation-prompt-templates.test.mjs`:
+1. `I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted`:
+   Directly replicates the reviewer's probe. Asserts that after `provenance.template` is pinned, mutating the disk template file does *not* affect `renderAssignmentPrompt`, and deleting the disk file entirely does *not* throw and still renders the original snapshot.
+2. `I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted`:
+   Executes a 3-run lifecycle for an assignment using `executeAssignment`:
+   - Run 01: Initial execution; persists `assignment.json` with pinned snapshot and digests.
+   - Run 02 (Retry): Template file on disk is modified; asserts execution uses pinned snapshot, and `runs/02/effective-execution-contract.json` records original content digest.
+   - Run 03: Template file on disk is completely deleted (`fs.unlinkSync`); asserts execution still succeeds, uses pinned snapshot, and `runs/03/effective-execution-contract.json` records original content digest.
+Both regression tests pass cleanly. Suite count updated to 24 pass / 0 fail.
