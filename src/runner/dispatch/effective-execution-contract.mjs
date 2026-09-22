@@ -149,6 +149,7 @@ export function buildEffectiveExecutionContract({
   confinement,
   providerCapacity,
   resultClaimPath,
+  templateProvenance,
 } = {}) {
   if (!assignment || typeof assignment !== 'object') {
     throw new RunnerConfigError('effective-execution-contract: assignment must be a non-null object');
@@ -313,6 +314,7 @@ export function buildEffectiveExecutionContract({
       executorId: resolvedExecutorId,
       adapter: resolvedAdapter,
       adapterFamily: resolvedAdapter,
+      ...(templateProvenance ? { template: templateProvenance } : (assignment.provenance?.template ? { template: assignment.provenance.template } : {})),
     },
     ...(providerCapacity ? { providerCapacity: stripSecrets(providerCapacity) } : {}),
     enforcementPosture: overallPosture,
@@ -424,6 +426,9 @@ export function validateEffectiveExecutionContract(value) {
   }
   if (typeof value.provenance.adapter !== 'string' || !value.provenance.adapter.trim()) {
     throw new RunnerConfigError('effective-execution-contract: provenance.adapter must be a non-empty string');
+  }
+  if (value.provenance.template !== undefined && (value.provenance.template === null || typeof value.provenance.template !== 'object' || Array.isArray(value.provenance.template))) {
+    throw new RunnerConfigError('effective-execution-contract: provenance.template must be an object when present');
   }
   if (value.providerCapacity !== undefined) {
     if (!value.providerCapacity || typeof value.providerCapacity !== 'object' || Array.isArray(value.providerCapacity)) {

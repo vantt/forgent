@@ -70,6 +70,7 @@ import {
 // `contract.policy.minTier` at build time follows the exact same
 // never-weaken invariant, rather than a second, competing merge rule.
 import { resolveStrongerTier } from './assignment-policy.mjs';
+import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 
 // ADR-007 §1: the domain harness seam. Foundation code (this module) must
 // never reference one specific domain's module by a hardcoded, literal
@@ -313,6 +314,7 @@ function buildDeclaredAssignment({
   policy,
   role,
   reason,
+  contractTemplate,
   createdBy,
   options = {},
 }) {
@@ -440,6 +442,7 @@ function buildDeclaredAssignment({
     taskSpec: matchedOp.taskSpec,
     skills: frozenSkills,
     objective: defaultObjective,
+    ...(contractTemplate ?? matchedOp.task?.contractTemplate ? { contractTemplate: contractTemplate ?? matchedOp.task.contractTemplate } : {}),
     contextRefs: frozenContextRefs,
     expectedOutputs: frozenExpectedOutputs,
     expectedFiles: frozenExpectedFiles,
@@ -570,6 +573,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     capabilities: frozenCapabilities,
     budget: frozenBudget,
     ...(contract.supports !== undefined ? { supports: contract.supports } : {}),
+    ...(contract.contractTemplate !== undefined ? { contractTemplate: contract.contractTemplate } : {}),
     // Step 08 P04.2b: the agent-declared `{minTier}` policy fragment, when
     // present -- recorded here so the persisted provenance always shows
     // exactly what the caller's own inline contract carried, same as every
@@ -653,6 +657,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     role: contract.role,
     dispatch: 'assignment',
     objective: contract.objective,
+    ...(contract.contractTemplate !== undefined ? { contractTemplate: contract.contractTemplate } : {}),
     contextRefs: frozenContextRefs,
     expectedOutputs: frozenExpectedOutputs,
     expectedFiles: Object.freeze([]),
@@ -716,41 +721,66 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     ? options.persona.value
     : null;
 
+  let renderedTemplateResult = null;
+  if (assignment.contractTemplate) {
+    renderedTemplateResult = resolveAndRenderOperationPrompt(assignment, options);
+    if (typeof options.onTemplateResolved === 'function') {
+      options.onTemplateResolved(renderedTemplateResult.templateProvenance);
+    }
+  }
+
   const lines = [
     `Assignment: ${assignment.assignmentId}`,
     `Work: ${assignment.workId || '(none)'}`,
     ...(assignment.stage && assignment.operation ? [`Stage operation: ${assignment.stage}.${assignment.operation}`] : []),
-    `Role: ${assignment.role}`,
-    ...(taskSpecRelPath ? [`Task-spec: ${taskSpecRelPath}`] : []),
-    `Objective: ${assignment.objective}`,
   ];
 
-  if (personaRef) {
+  if (renderedTemplateResult) {
+    if (personaRef) {
+      lines.push(
+        '',
+        '# Persona',
+        `You are acting under the resolved persona "${personaRef}". Let this persona`,
+        'shape tone, emphasis, and judgment calls for this assignment, without',
+        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+      );
+    }
+    lines.push('', renderedTemplateResult.renderedBody);
+  } else {
+    // Explicit legacy-objective path for definitions without a resolvable template
     lines.push(
-      '',
-      '# Persona',
-      `You are acting under the resolved persona "${personaRef}". Let this persona`,
-      'shape tone, emphasis, and judgment calls for this assignment, without',
-      'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+      `Role: ${assignment.role}`,
+      ...(taskSpecRelPath ? [`Task-spec: ${taskSpecRelPath}`] : []),
+      `Objective: ${assignment.objective}`,
     );
-  }
 
-  lines.push('Context refs:');
-  if (assignment.contextRefs && assignment.contextRefs.length > 0) {
-    for (const ref of assignment.contextRefs) {
-      lines.push(`- ${ref}`);
+    if (personaRef) {
+      lines.push(
+        '',
+        '# Persona',
+        `You are acting under the resolved persona "${personaRef}". Let this persona`,
+        'shape tone, emphasis, and judgment calls for this assignment, without',
+        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+      );
     }
-  } else {
-    lines.push('- (none)');
-  }
 
-  lines.push('Expected outputs:');
-  if (assignment.expectedOutputs && assignment.expectedOutputs.length > 0) {
-    for (const output of assignment.expectedOutputs) {
-      lines.push(`- ${output}`);
+    lines.push('Context refs:');
+    if (assignment.contextRefs && assignment.contextRefs.length > 0) {
+      for (const ref of assignment.contextRefs) {
+        lines.push(`- ${ref}`);
+      }
+    } else {
+      lines.push('- (none)');
     }
-  } else {
-    lines.push('- (none)');
+
+    lines.push('Expected outputs:');
+    if (assignment.expectedOutputs && assignment.expectedOutputs.length > 0) {
+      for (const output of assignment.expectedOutputs) {
+        lines.push(`- ${output}`);
+      }
+    } else {
+      lines.push('- (none)');
+    }
   }
 
   // Step 04 §5.1: include concrete result artifact paths when runDir is known.
