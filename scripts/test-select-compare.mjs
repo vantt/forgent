@@ -1,147 +1,123 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
-/**
- * Classifier C1 (Phase 3)
- * Phân loại một test case (dựa trên kết quả run full PR, full Base, related PR)
- */
-export function classifyTestCase(options) {
-  const { 
-    isRedInFull, 
-    isRedInBase, 
-    baseMissing, 
-    isSelected, 
-    isRedInRelated, 
-    isRelatedRedSomewhere, 
-    rerunPassed 
-  } = options;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const PR_NUMBER = process.env.PR_NUMBER;
 
-  if (isRedInRelated && !isRedInFull) {
-    return 'related-only-fail';
-  }
-  
-  if (!isRedInFull) {
-    return 'pass';
-  }
+function log(msg) { console.log(msg); }
+function err(msg) { console.error(msg); }
 
-  // Nếu tới đây thì chắc chắn là test case này ĐỎ trong job Full PR
-  
-  if (baseMissing) {
-    return 'base-missing'; // inconclusive
-  }
-  
-  if (isRedInBase) {
-    return 'baseline-failing'; // inconclusive
-  }
-
-  if (isSelected) {
-    if (isRedInRelated) {
-      return 'caught';
-    } else {
-      return 'selected-but-divergent'; // inconclusive
+// Simple XML parser for JUnit to extract failing test names
+function getFailedTestsFromJunit(xmlContent) {
+  const failed = [];
+  const testcases = xmlContent.split('<testcase');
+  for (let i = 1; i < testcases.length; i++) {
+    const tc = testcases[i];
+    if (tc.includes('<failure')) {
+      const nameMatch = tc.match(/name="([^"]+)"/);
+      if (nameMatch) failed.push(nameMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&'));
     }
-  } else {
-    if (isRelatedRedSomewhere) {
-      return 'omitted-failing-test';
-    }
-    if (rerunPassed) {
-      return 'rerun-pass'; // inconclusive
-    }
-    return 'confirmed-miss';
   }
+  return failed;
 }
 
-/**
- * Cập nhật biến SELECTOR_BREAKER trên GitHub hoặc tạo Issue nếu không có quyền.
- */
-export function updateBreakerState(newMisses) {
-  if (!newMisses || newMisses.length === 0) return;
+// C1 Classification Logic
+export function classifyCompare(baseGreen, relatedGreen, fullFails, relatedFails) {
+  if (!baseGreen) return 'inconclusive'; // base failed or missing
+  
+  const fullFailSet = new Set(fullFails);
+  const relatedFailSet = new Set(relatedFails);
+  
+  if (fullFailSet.size === 0 && relatedFailSet.size === 0) return 'equivalent-or-suite-gap';
+  if (fullFailSet.size > 0 && relatedFailSet.size === 0) return 'confirmed-miss'; // missed by related
+  if (fullFailSet.size === 0 && relatedFailSet.size > 0) return 'related-only-fail'; // related failed, full passed (flaky)
+  
+  return 'inconclusive';
+}
 
-  const repoInfo = process.env.GITHUB_REPOSITORY;
-  if (!repoInfo) {
-    console.warn("GITHUB_REPOSITORY not set, cannot update breaker state.");
-    return;
+export function updateBreakerState(ruleId, state) {
+  if (!state) state = { version: 1, global: false, quarantined: [] };
+  if (!state.quarantined.includes(ruleId)) {
+    state.quarantined.push(ruleId);
+    state.version += 1;
+    if (state.quarantined.length >= 2) state.global = true;
+  }
+  return state;
+}
+
+export async function runCompare() {
+  log("Running compare job logic...");
+  
+  let plan = {};
+  if (fs.existsSync('selector-plan.json')) {
+    plan = JSON.parse(fs.readFileSync('selector-plan.json', 'utf8'));
+  } else {
+    log("No selector-plan.json found, inconclusive.");
+    process.exit(0);
   }
 
-  console.log(`Attempting to quarantine rules: ${newMisses.join(', ')}`);
-
-  let currentState = { version: 1, quarantined: [] };
-  try {
-    const output = execSync(`gh api repos/${repoInfo}/actions/variables/SELECTOR_BREAKER --jq .value`, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
-    if (output.trim()) {
-      currentState = JSON.parse(output.trim());
-    }
-  } catch (err) {
-    console.log("Variable SELECTOR_BREAKER not found or unreadable, starting fresh.");
+  if (plan.decision === 'full') {
+    log("Plan decision was 'full', no comparison needed.");
+    process.exit(0);
   }
 
-  const existingSet = new Set(currentState.quarantined || []);
-  let added = false;
-  for (const rule of newMisses) {
-    if (!existingSet.has(rule)) {
-      existingSet.add(rule);
-      added = true;
-    }
-  }
+  const baseJunit = 'test-results/base.xml';
+  const fullJunit = 'test-results/full.xml';
+  const relatedJunit = 'test-results/related.xml';
 
-  if (!added) {
-    console.log("All rules already quarantined.");
-    return;
-  }
+  const baseFails = fs.existsSync(baseJunit) ? getFailedTestsFromJunit(fs.readFileSync(baseJunit, 'utf8')) : null;
+  const fullFails = fs.existsSync(fullJunit) ? getFailedTestsFromJunit(fs.readFileSync(fullJunit, 'utf8')) : [];
+  const relatedFails = fs.existsSync(relatedJunit) ? getFailedTestsFromJunit(fs.readFileSync(relatedJunit, 'utf8')) : [];
 
-  currentState.quarantined = Array.from(existingSet);
-  const newValue = JSON.stringify(currentState);
+  const baseGreen = baseFails && baseFails.length === 0;
+  const relatedGreen = relatedFails.length === 0;
 
-  try {
-    // Try to update variable
-    console.log("Attempting to PATCH SELECTOR_BREAKER variable...");
-    // Check if variable exists first by checking if we had success earlier, if not we might need POST, 
-    // but the instruction says "ghi lại bằng gh api -X PATCH". We will assume PATCH or POST.
-    // Actually, setting a variable using gh api:
-    try {
-      execSync(`gh api --method PATCH repos/${repoInfo}/actions/variables/SELECTOR_BREAKER -F name="SELECTOR_BREAKER" -F value='${newValue}'`, { stdio: 'pipe' });
-      console.log("Successfully updated SELECTOR_BREAKER via API.");
-    } catch (patchErr) {
-      // If PATCH fails with 404, try POST
-      if (patchErr.message.includes('404')) {
-        execSync(`gh api --method POST repos/${repoInfo}/actions/variables -F name="SELECTOR_BREAKER" -F value='${newValue}'`, { stdio: 'pipe' });
-        console.log("Successfully created SELECTOR_BREAKER via API.");
-      } else {
-        throw patchErr;
+  const classification = classifyCompare(baseGreen, relatedGreen, fullFails, relatedFails);
+  log(`Classification: ${classification}`);
+
+  const ledger = {
+    plan,
+    baseGreen,
+    fullFails,
+    relatedFails,
+    classification
+  };
+
+  fs.writeFileSync('ledger.json', JSON.stringify(ledger, null, 2));
+
+  if (classification === 'confirmed-miss' && plan.matchedRules && plan.matchedRules.length > 0) {
+    const rule = plan.matchedRules[0].ruleId;
+    log(`Rule ${rule} missed a failure. Escalating to quarantined.`);
+    
+    // Simulate updating variable
+    if (GITHUB_TOKEN) {
+      try {
+        let current = '';
+        try { current = execFileSync('gh', ['variable', 'get', 'SELECTOR_BREAKER']).toString().trim(); } catch (e) {}
+        let state = current ? JSON.parse(current) : null;
+        state = updateBreakerState(rule, state);
+        execFileSync('gh', ['variable', 'set', 'SELECTOR_BREAKER', '-b', JSON.stringify(state)]);
+      } catch (err) {
+        err(`Failed to write SELECTOR_BREAKER via gh variable: ${err.message}. Falling back to issue.`);
+        try {
+          execFileSync('gh', ['issue', 'create', '--title', 'Breaker Trip', '--body', `Rule ${rule} tripped breaker.`]);
+        } catch(e) {}
       }
     }
-  } catch (err) {
-    console.warn("Failed to update Actions variable via GITHUB_TOKEN. Fallback to creating an issue.");
-    console.warn(err.message);
-    
-    // Fallback: Create issue
-    const issueTitle = `[Circuit Breaker] Quarantine rules: ${newMisses.join(', ')}`;
-    const issueBody = `The compare job detected confirmed misses for the following rules:\n\n${newMisses.map(r => `- \`${r}\``).join('\n')}\n\nSince \`GITHUB_TOKEN\` cannot write repository variables, please manually update the \`SELECTOR_BREAKER\` variable to include these rules.`;
-    
-    try {
-      execSync(`gh issue create --title "${issueTitle}" -F -`, { input: issueBody, stdio: ['pipe', 'inherit', 'inherit'] });
-      console.log("Created fallback issue.");
-    } catch (issueErr) {
-      console.error("Failed to create issue.", issueErr.message);
-    }
   }
+
+  // Comment on PR
+  if (PR_NUMBER && GITHUB_TOKEN) {
+    try {
+      execFileSync('gh', ['pr', 'comment', PR_NUMBER, '--body', `Selector shadow run classification (post-merge check only): **${classification}**`]);
+    } catch(e) {}
+  }
+
+  process.exit(0);
 }
 
-async function main() {
-  console.log("Running compare job logic...");
-  
-  // TODO: Tải plan, related, full(ubuntu), base(ubuntu)
-  // Thực hiện classify cho từng case
-  // Rerun confirmed-miss
-  // Ghi ledger.json
-  // Comment PR
-}
-
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch(err => {
-    console.error(err);
-    process.exit(1);
-  });
+const url = typeof process !== 'undefined' && process.argv && process.argv[1] ? process.argv[1] : '';
+if (url.endsWith('test-select-compare.mjs')) {
+  runCompare();
 }

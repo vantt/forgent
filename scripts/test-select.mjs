@@ -335,7 +335,7 @@ export function runSelected({
     return { status: 1, decision: 'full', reason: `invalid-base: ${collected.error}`, explain: { base, error: collected.error }, ran: false };
   }
 
-  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, staticGraphTests });
+  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, breakerState, staticGraphTests });
 
   const explain = {
     base,
@@ -398,7 +398,7 @@ export function runShadow({
     return { status: 1, comparison: null, explain: { base, error: collected.error } };
   }
 
-  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, staticGraphTests });
+  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, breakerState, staticGraphTests });
 
   if (selection.decision === 'refuse') {
     return { status: 1, comparison: null, explain: { base, mergeBase: collected.mergeBase, decision: selection.decision, reason: selection.reason } };
@@ -454,11 +454,46 @@ if (process.argv[1] === __filename) {
   const args = process.argv.slice(2);
   const baseIdx = args.indexOf('--base');
   const base = baseIdx === -1 ? 'main' : args[baseIdx + 1];
+  const planOutIdx = args.indexOf('--plan-out');
+  const planOut = planOutIdx === -1 ? null : args[planOutIdx + 1];
   const explainRequested = args.includes('--explain');
   const shadowRequested = args.includes('--shadow');
 
+  let breakerState = null;
+  if (process.env.SELECTOR_BREAKER) {
+    try {
+      breakerState = JSON.parse(process.env.SELECTOR_BREAKER);
+    } catch (e) {
+      breakerState = 'invalid';
+    }
+  }
+
+  if (planOut) {
+    const collected = collectChangedPaths({ base });
+    let selection;
+    if (collected.error) {
+      selection = { decision: 'full', reason: 'invalid-base: ' + collected.error, escalations: [], matched: [], selectedFiles: null };
+    } else {
+      selection = selectTests({ changes: collected.changes, breakerState });
+    }
+    const output = {
+      base,
+      mergeBase: collected.mergeBase,
+      breakerVersion: breakerState?.version ?? null,
+      changedPaths: collected.changes,
+      decision: selection.decision,
+      reason: selection.reason,
+      matchedRules: selection.matched,
+      escalations: selection.escalations,
+      selectedFiles: selection.selectedFiles
+    };
+    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\n');
+    console.error(`test-select (post-merge check only): wrote plan to ${planOut}, decision=${selection.decision}`);
+    process.exit(0);
+  }
+
   if (shadowRequested) {
-    const result = runShadow({ base, stdio: 'inherit' });
+    const result = runShadow({ base, stdio: 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
     if (result.comparison) {
       console.error(
@@ -467,9 +502,9 @@ if (process.argv[1] === __filename) {
     }
     process.exitCode = result.status;
   } else {
-    const result = runSelected({ base, stdio: 'inherit' });
+    const result = runSelected({ base, stdio: 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
-    console.error(`test-select: decision=${result.decision} reason="${result.reason}"`);
+    console.error(`test-select (post-merge check only): decision=${result.decision} reason="${result.reason}"`);
     process.exitCode = result.status;
   }
 }

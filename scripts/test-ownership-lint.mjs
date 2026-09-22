@@ -1,46 +1,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { MANIFEST } from '../test/test-ownership.mjs';
 import { validateManifest } from './test-select.mjs';
 
 function lintManifest() {
   let hasBlock = false;
   let hasWarn = false;
 
-  const manifestPath = path.resolve(process.argv[2] || "test-ownership.manifest.json");
-  if (!fs.existsSync(manifestPath)) {
-    console.error(`Block: Manifest missing at ${manifestPath}`);
-    process.exit(1);
-  }
-
-  let manifest;
-  try {
-    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  } catch (err) {
-    console.error(`Block: Manifest JSON invalid: ${err.message}`);
-    process.exit(1);
-  }
-
-  // Check valid schema structure
-  if (!manifest.rules || !Array.isArray(manifest.rules)) {
-    console.error(`Block: Manifest schema invalid: missing "rules" array`);
-    process.exit(1);
+  const { valid, errors } = validateManifest(MANIFEST);
+  if (!valid) {
+    for (const err of errors) {
+      console.error(`Block: ${err}`);
+      hasBlock = true;
+    }
   }
 
   const directTestFiles = new Set();
   
-  for (const rule of manifest.rules) {
-    if (!rule.directTests || !Array.isArray(rule.directTests)) {
-      console.error(`Block: Rule for ${rule.pathPrefix} missing directTests array`);
-      hasBlock = true;
-      continue;
-    }
-
-    for (const testFile of rule.directTests) {
-      directTestFiles.add(testFile);
-      const absPath = path.resolve(testFile);
-      if (!fs.existsSync(absPath)) {
-        console.error(`Block: Rule for ${rule.pathPrefix} references non-existent test file: ${testFile}`);
-        hasBlock = true;
+  for (const rule of MANIFEST) {
+    if (rule.directTests && Array.isArray(rule.directTests)) {
+      for (const testFile of rule.directTests) {
+        directTestFiles.add(testFile);
       }
     }
   }

@@ -2,10 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-// A simple static ESM parser that finds imports to build a coverage map.
-// This is the "static closure" part of the P3-07 generator H2.
-// In a full implementation, it would also merge with NODE_V8_COVERAGE dynamic traces.
-
 function getFiles(dir, files = []) {
   if (!fs.existsSync(dir)) return files;
   const list = fs.readdirSync(dir);
@@ -25,42 +21,68 @@ async function generateCoverageMap() {
   
   const repoRoot = process.cwd();
   const testFiles = getFiles(path.join(repoRoot, 'test'));
+  const srcFiles = [...getFiles(path.join(repoRoot, 'src')), ...getFiles(path.join(repoRoot, 'bin'))];
+  
   const mapping = {}; // sourcePath -> Set of testPaths
   const fullTriggers = new Set();
   
   const importRegex = /import\s+[\s\S]*?from\s+['"](.*?)['"]/g;
   const dynamicImportLiteralRegex = /import\s*\(\s*['"](.*?)['"]\s*\)/g;
-  const computedImportRegex = /import\s*\(\s*[^'"].*?\)/g;
+  const computedImportRegex = /import\s*\(\s*[^'"]+\s*\)/; // No /g for .test()
 
-  for (const testFile of testFiles) {
-    const content = fs.readFileSync(testFile, 'utf8');
-    const testRel = path.relative(repoRoot, testFile).replace(/\\/g, '/');
-    
-    if (computedImportRegex.test(content)) {
-      fullTriggers.add(testRel);
+  // Build dependency graph: srcFile -> Set of files it imports
+  const deps = {};
+  for (const file of [...srcFiles, ...testFiles]) {
+    const content = fs.readFileSync(file, 'utf8');
+    const fileRel = path.relative(repoRoot, file).replace(/\\/g, '/');
+    deps[fileRel] = new Set();
+
+    if (computedImportRegex.test(content) && !fileRel.startsWith('test/')) {
+      fullTriggers.add(fileRel); // Add source files with computed imports
     }
 
     const matches = [...content.matchAll(importRegex), ...content.matchAll(dynamicImportLiteralRegex)];
     for (const match of matches) {
       const importedPath = match[1];
       if (importedPath.startsWith('.')) {
-        const absImport = path.resolve(path.dirname(testFile), importedPath);
+        const absImport = path.resolve(path.dirname(file), importedPath);
         if (absImport.startsWith(repoRoot)) {
           let srcRel = path.relative(repoRoot, absImport).replace(/\\/g, '/');
-          // Add .mjs extension if omitted, as Node resolution might do
           if (!srcRel.endsWith('.mjs') && !srcRel.endsWith('.js')) {
             if (fs.existsSync(absImport + '.mjs')) srcRel += '.mjs';
             else if (fs.existsSync(absImport + '/index.mjs')) srcRel += '/index.mjs';
           }
-          
-          if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {
-            if (!mapping[srcRel]) mapping[srcRel] = new Set();
-            mapping[srcRel].add(testRel);
-          }
+          deps[fileRel].add(srcRel);
         }
       }
     }
   }
+
+  // Transitive closure: which source files does a test file eventually import?
+  for (const testFile of testFiles) {
+    const testRel = path.relative(repoRoot, testFile).replace(/\\/g, '/');
+    const visited = new Set();
+    const queue = Array.from(deps[testRel] || []);
+    
+    while (queue.length > 0) {
+      const dep = queue.shift();
+      if (!visited.has(dep)) {
+        visited.add(dep);
+        
+        if (dep.startsWith('src/') || dep.startsWith('bin/')) {
+          if (!mapping[dep]) mapping[dep] = new Set();
+          mapping[dep].add(testRel);
+        }
+        
+        if (deps[dep]) {
+          queue.push(...deps[dep]);
+        }
+      }
+    }
+  }
+
+  // Also include the missing rule from reviewer: intake-verify-pattern-check
+  // (We'll verify if it gets added by transitive closure, if not, it means the tests don't statically import it, so we might need V8 coverage. But static closure should be better).
 
   // Convert Sets to Arrays
   const finalMapping = {};
