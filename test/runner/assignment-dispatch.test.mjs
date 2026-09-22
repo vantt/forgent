@@ -7,13 +7,14 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
+import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
@@ -3505,6 +3506,185 @@ test('executeAssignment: two-OS-process TOCTOU barrier race proves stale control
   const onDiskSuperseded = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
   assert.equal(onDiskSuperseded.staleTag, 'should-never-become-authoritative');
   assert.equal(onDiskSuperseded.summary, 'Stale controller attempting to overwrite after pausing at publication');
+});
+
+function spawnReconcileCliSpawnRunWithBarrier({
+  runDir,
+  controlEpoch,
+  controlToken,
+  barrierPauseFile,
+  barrierResumeFile,
+}) {
+  const runnerUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const script = [
+    `import fs from 'node:fs';`,
+    `import('${runnerUrl}').then(async ({ reconcileCliSpawnRun }) => {`,
+    `  try {`,
+    `    const result = await reconcileCliSpawnRun(${JSON.stringify(runDir)}, {`,
+    `      controlEpoch: ${JSON.stringify(controlEpoch)},`,
+    `      controlToken: ${JSON.stringify(controlToken)},`,
+    `      _beforeAuthoritativePublish: () => {`,
+    `        fs.writeFileSync(${JSON.stringify(barrierPauseFile)}, JSON.stringify({ paused: true, pid: process.pid }));`,
+    `        while (!fs.existsSync(${JSON.stringify(barrierResumeFile)})) {`,
+    `          Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);`,
+    `        }`,
+    `      },`,
+    `    });`,
+    `    process.stdout.write(JSON.stringify({ ok: true, result }));`,
+    `  } catch (err) {`,
+    `    process.stdout.write(JSON.stringify({ ok: false, message: err.message, code: err.code }));`,
+    `  }`,
+    `  process.exit(0);`,
+    `});`,
+  ].join('\n');
+  return execFileAsync(process.execPath, ['-e', script], { encoding: 'utf8' }).then((r) => JSON.parse(r.stdout));
+}
+
+function initGitRepo(repoDir) {
+  execFileSync('git', ['init'], { cwd: repoDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: repoDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(repoDir, 'README.md'), '# Test\n');
+  execFileSync('git', ['add', '.'], { cwd: repoDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: repoDir, stdio: 'ignore' });
+}
+
+test('reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reconciler cannot overwrite authoritative result.json (R5 / F-01 settlement authority)', async () => {
+  const tempDir = mkTempDir();
+  initGitRepo(tempDir);
+  const runDir = path.join(tempDir, 'run');
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipts');
+  const launchCommandId = 'cmd_toctou_reconcile';
+  const captureDir = path.join(runDir, 'protected', 'capture', launchCommandId);
+
+  fs.mkdirSync(commandsDir, { recursive: true });
+  fs.mkdirSync(receiptsDir, { recursive: true });
+  fs.mkdirSync(captureDir, { recursive: true });
+
+  const runId = 'run_toctou_reconcile_01';
+  const assignmentId = 'asgn_toctou_reconcile';
+
+  // 1. Initial controller acquires control token epoch 1
+  const initialControl = acquireRunControl(runDir, { holder: { id: 'stale-reconciler', pid: 10005 }, purpose: 'worker-spawn' });
+  assert.equal(initialControl.status, 'acquired');
+  assert.equal(initialControl.controlEpoch, 1);
+  const staleToken = initialControl.controlToken;
+
+  fs.writeFileSync(
+    path.join(runDir, 'run.json'),
+    JSON.stringify({ contract: 'run-meta.v1', runId, assignmentId, workId: 'tsk-toctou', attempt: 1, status: 'running' }),
+  );
+  fs.writeFileSync(
+    path.join(runDir, 'assignment.json'),
+    JSON.stringify({ assignmentId, workId: 'tsk-toctou', stage: 'planning', operation: 'validate-plan', role: 'reviewer', mutation: 'read-only' }),
+  );
+
+  const receipt = {
+    contract: 'cli-spawn-adapter-receipt.v1',
+    launchCommandId,
+    exitCode: 0,
+    outcome: { kind: 'exit' },
+  };
+  const receiptContent = canonicalJson(receipt);
+  const receiptDigest = computeSha256Digest(receipt);
+  fs.writeFileSync(path.join(receiptsDir, `${launchCommandId}.json`), receiptContent);
+  fs.writeFileSync(path.join(captureDir, 'stdout.log'), 'reconcile worker stdout\n');
+  fs.writeFileSync(path.join(captureDir, 'stderr.log'), '');
+
+  const baseline = { contract: 'evaluator-baseline.v1', gitBefore: null, dirtyBefore: [] };
+  baseline.digest = computeSha256Digest(baseline);
+  fs.writeFileSync(
+    path.join(runDir, 'controller', 'evaluator-baseline.json'),
+    canonicalJson(baseline),
+  );
+
+  const commandState = {
+    contract: 'assignment-command-state.v1',
+    launchCommandId,
+    state: 'reconciled',
+    controlEpoch: 1,
+    controlTokenDigest: computeSha256Digest(staleToken),
+    outcome: {
+      kind: 'receipt-backed',
+      exitCode: 0,
+      receiptDigest,
+      recordedAt: '2026-09-22T00:00:00.000Z',
+    },
+  };
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify(commandState, null, 2));
+
+  const barrierPauseFile = path.join(tempDir, 'barrier-paused.json');
+  const barrierResumeFile = path.join(tempDir, 'barrier-resume.json');
+
+  // 2. Spawn Old Reconciler process in background.
+  // It passes precondition (epoch 1 is current) and pauses at _beforeAuthoritativePublish barrier.
+  const oldReconcilerPromise = spawnReconcileCliSpawnRunWithBarrier({
+    runDir,
+    controlEpoch: 1,
+    controlToken: staleToken,
+    barrierPauseFile,
+    barrierResumeFile,
+  });
+
+  // Wait for Old Reconciler to pause at barrier (with timeout and early-exit detection)
+  const startWait = Date.now();
+  let childDone = false;
+  oldReconcilerPromise.then(() => { childDone = true; }).catch(() => { childDone = true; });
+  while (!fs.existsSync(barrierPauseFile)) {
+    if (childDone) {
+      const outcome = await oldReconcilerPromise;
+      throw new Error(`Old reconciler exited before reaching barrier: ${JSON.stringify(outcome)}`);
+    }
+    if (Date.now() - startWait > 10000) {
+      throw new Error('Timed out waiting for barrierPauseFile');
+    }
+    await new Promise((r) => setTimeout(r, 20));
+  }
+
+  // 3. Newer controller takes over (epoch 2) and settles authoritative result.json
+  releaseRunControl(runDir, { controlEpoch: 1, controlToken: staleToken });
+  const newerControl = acquireRunControl(runDir, { holder: { id: 'newer-controller', pid: process.pid }, purpose: 'settle-authoritative' });
+  assert.equal(newerControl.status, 'acquired');
+  assert.equal(newerControl.controlEpoch, 2);
+
+  const authoritativeResult = {
+    contract: 'run-result.v2',
+    runId,
+    assignmentId,
+    status: 'done',
+    confidence: 'verified',
+    summary: 'Authoritative settlement from newer controller epoch 2 during reconciliation race',
+    authoritativeMarker: 'immutable-reconcile-auth-marker-999',
+  };
+
+  const newerSettlement = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: 2,
+    controlToken: newerControl.controlToken,
+    runResult: authoritativeResult,
+  });
+  assert.equal(newerSettlement.authoritativeMarker, 'immutable-reconcile-auth-marker-999');
+
+  // Verify authoritative result.json is on disk
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+
+  // 4. Release Old Reconciler from barrier pause
+  fs.writeFileSync(barrierResumeFile, JSON.stringify({ proceed: true }));
+
+  // 5. Await Old Reconciler completion: must be refused with run-control-superseded
+  const oldReconcilerOutcome = await oldReconcilerPromise;
+  assert.equal(oldReconcilerOutcome.ok, false);
+  assert.equal(oldReconcilerOutcome.code, 'run-control-superseded');
+
+  // 6. Prove Old Reconciler CANNOT overwrite result.json
+  const onDiskAuthAfterOldReconciler = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDiskAuthAfterOldReconciler.authoritativeMarker, 'immutable-reconcile-auth-marker-999');
+  assert.equal(onDiskAuthAfterOldReconciler.summary, 'Authoritative settlement from newer controller epoch 2 during reconciliation race');
+
+  // 7. Old Reconciler's payload was safely preserved at result.superseded.json
+  assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
 });
 
 test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {
