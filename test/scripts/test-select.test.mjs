@@ -759,3 +759,33 @@ test('runShadow: zero changed paths refuses without spawning anything', () => {
   assert.equal(result.comparison, null);
   assert.equal(calls, 0);
 });
+
+test('P3 breaker tests', async (t) => {
+  await t.test('breaker unreadable -> full', () => {
+    const { root, manifest, fullTriggers } = simpleFixture();
+    const changed = [{ path: 'src/a.mjs', status: 'M' }];
+    const result = selectTests({ changes: changed, manifest, fullTriggers, repoRoot: root, breakerState: null });
+    
+    assert.equal(result.decision, 'full');
+    assert.equal(result.reason, 'breaker-unreadable');
+  });
+
+  await t.test('quarantined -> escalate to full', () => {
+    const { root, manifest, fullTriggers } = simpleFixture();
+    const changed = [{ path: 'src/a.mjs', status: 'M' }];
+    const result = selectTests({ changes: changed, manifest, fullTriggers, repoRoot: root, breakerState: { version: 1, quarantined: ['a'] } });
+    
+    assert.equal(result.decision, 'full');
+    assert.ok(result.escalations.some(e => e.reason === 'quarantined'));
+  });
+
+  await t.test('AC 11: path unknown + staticGraphTests has results still yields full', () => {
+    const { root, manifest, fullTriggers } = simpleFixture();
+    const changed = [{ path: 'unknown/file.mjs', status: 'M' }]; // Not in manifest
+    
+    const result = selectTests({ changes: changed, manifest, fullTriggers, repoRoot: root, staticGraphTests: ['test/unknown.test.mjs'] });
+    
+    assert.equal(result.decision, 'full');
+    assert.ok(result.escalations.some(e => e.reason.includes('no manifest rule')));
+  });
+});

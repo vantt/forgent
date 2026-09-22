@@ -217,6 +217,7 @@ export function selectTests({
   fullTriggers = FULL_TRIGGERS,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   staticGraphTests = [],
   fileExists = (abs) => fs.existsSync(abs),
 } = {}) {
@@ -228,6 +229,26 @@ export function selectTests({
       escalations: errors.map((e) => ({ path: null, ruleId: 'manifest-invalid', reason: e })),
       matched: [],
       selectedFiles: null, // caller discovers the full set itself
+    };
+  }
+
+  
+  if (!breakerState || (typeof breakerState === 'string' && breakerState.includes('invalid'))) {
+    return {
+      decision: 'full',
+      reason: 'breaker-unreadable',
+      escalations: [],
+      matched: [],
+      selectedFiles: null,
+    };
+  }
+  if (breakerState.global) {
+    return {
+      decision: 'full',
+      reason: 'breaker-global',
+      escalations: [],
+      matched: [],
+      selectedFiles: null,
     };
   }
 
@@ -258,11 +279,17 @@ export function selectTests({
       continue;
     }
 
+
     const rule = manifestIndex.get(relPath);
     if (rule) {
-      matched.push({ path: relPath, ruleId: rule.id, directTests: rule.directTests, boundaryTests: rule.boundaryTests });
+      if (breakerState.quarantined && breakerState.quarantined.includes(rule.id)) {
+        escalations.push({ path: relPath, ruleId: rule.id, reason: 'quarantined' });
+      } else {
+        matched.push({ path: relPath, ruleId: rule.id, directTests: rule.directTests, boundaryTests: rule.boundaryTests });
+      }
       continue;
     }
+
 
     escalations.push({ path: relPath, ruleId: 'unknown', reason: 'no manifest rule and no full-trigger rule matches this path' });
   }
@@ -293,6 +320,7 @@ export function runSelected({
   cwd = REPO_ROOT,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   exec = execFileSync,
   spawn,
   execPath = process.execPath,
@@ -354,6 +382,7 @@ export function runShadow({
   cwd = REPO_ROOT,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   exec = execFileSync,
   spawn,
   execPath = process.execPath,
