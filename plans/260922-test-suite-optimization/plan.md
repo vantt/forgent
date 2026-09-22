@@ -408,78 +408,30 @@ flowchart TD
   B --> C["3. Cho mỗi file:\ngrep direct test (cùng tên)\n+ grep boundary test (import)"]
   C --> D["4. Viết rule vào manifest\nvới id, pattern, tests"]
   D --> E["5. Chạy validateManifest()\nxác nhận không lỗi"]
-  E --> F["6. Chạy shadow mode\ntrên 10 historical diffs"]
-  F --> G{Patch-miss = 0?}
+  E --> F["6. Rule vào shadow: CI compare\n+ nightly fault-injection (phase-03)"]
+  F --> G{confirmed-miss = 0\n∧ kill-rate 100%?}
   G -->|Yes| H["7. Merge manifest\nexpansion"]
   G -->|No| I["8. Thêm missing\nboundary tests"]
   I --> F
 ```
 
-#### 3.2.3 Shadow evaluation pipeline
- 
- Trước khi promote selector ra inner-loop, phải chạy đánh giá trên lịch sử
- commit thật:
- 
- ```bash
- # Lấy 50 commit gần nhất có thay đổi src/
- git log --oneline -50 --diff-filter=M -- 'src/**' > /tmp/commits.txt
- 
- # Cho mỗi commit: checkout, chạy related, chạy full, so sánh
- for sha in $(cat /tmp/commits.txt | awk '{print $1}'); do
-   git checkout $sha
-   npm run test:related:shadow -- --base $sha~1 --explain 2>&1 | \
-     grep "patchRelatedMiss"
- done
- ```
- 
- **Ngưỡng promote:** 0 patch-related miss trên ≥50 historical diffs liên tục.
- 
-+**Circuit Breaker Vận Hành:**
-+Sau promotion, CI BẮT BUỘC phải chạy một job có semantics của `runShadow()` (chạy related -> bắt result -> chạy full -> compare). Nếu related green mà full red, bắn alert và tự động demote về shadow mode (sửa package.json). Mọi pipeline CI cuối cùng (DoD) luôn chạy full suite.
-+
- #### 3.2.4 Promotion path
- 
- ```
--Shadow mode (hiện tại)
-+Shadow mode (hiện tại, CI chạy thử)
-   ↓ 0 miss trên 50 diffs
- Inner-loop mode (npm run test:related)
-   ↓ 0 miss trên 200 diffs + 2 tuần production
- DoD supplement (chạy related trước, full sau — giảm wait time)
-   ↓ (Không bao giờ)
- Full replacement (KHÔNG BAO GIỜ — ITR-D01: npm test = full suite)
- ```
- 
- ### 3.3 Phạm vi Phase 1
- 
- 1. **Mở rộng manifest** thêm `src/verbs/state/*` và `src/verbs/merge/*` (2 area, ~20 rules mới).
- 2. **Shadow evaluation** trên 50 historical diffs.
- 3. **Nếu 0 miss:** promote `src/verbs/state/*` ra inner-loop (chỉ area này).
- 
- ### 3.4 Rủi ro & Mitigation
- 
- | Rủi ro | Mức | Mitigation |
- |--------|-----|-----------|
- | Manifest miss → false green | Cao | Shadow mode bắt buộc, full suite vẫn là DoD |
- | Manifest maintenance burden | Trung bình | Lint CI check: file mới phải có rule |
- | Over-escalation (luôn chạy full) | Thấp | Đo escalation rate, target ≤30% |
- 
- ### 3.5 Definition of Done — Pillar 3
- 
- - [ ] Manifest mở rộng lên ≥80 rules, `validateManifest()` green.
- - [ ] Shadow evaluation trên ≥50 diffs, 0 patch-related miss.
- - [ ] Escalation rate ≤50% trên 50 diffs (≥50% related decisions).
- - [ ] Tài liệu hướng dẫn: cách thêm rule khi viết module mới.
- 
- ### 3.6 Ước tính effort
- 
- | Task | Effort |
- |------|--------|
- | Mở rộng manifest (+30 rules) | 2 ngày |
- | Shadow evaluation script + run | 1 ngày |
- | Historical diff replay (50 commits) | 1 ngày chạy |
- | Lint CI cho manifest completeness | 1 ngày |
- | **Tổng Phase 1** | **~5-6 ngày** |
+#### 3.2.3 Shadow CI + circuit breaker + promotion (thay thế replay lịch sử)
+
+Replay 50 commit lịch sử đã bị red-team bác (`patchRelatedMiss` = false theo định nghĩa trên commit đã merge; P05 chứng minh replay trên tree cũ làm hỏng config toàn máy). Thiết kế thay thế, đã chốt sau 10 vòng phản biện và người dùng phê duyệt 2026-09-22:
+
+- **Kiến trúc:** selector-plan artifact → job `related` (ubuntu, không required lúc đầu) song song job `full` (3 OS, required, artifact per test case) → job `compare` (classifier per test case, cùng OS) → ledger + nudge; nightly fault-injection đối chiếu full; breaker per-rule qua `status` trong manifest + control state ngoài source.
+- **Promotion per-rule theo evidence, không theo lịch:** baseline sạch hai phía (selected + tập đối chứng từ full shadow và bộ fault, không từ generator), ≥K failure opportunities không inconclusive, kill-rate 100% trên ≥N mutant hợp lệ, wall-time ratio đo được. N=3/K=10 là budget bootstrap.
+- **Manifest decay:** lint block chỉ cho test không tồn tại/schema sai/`test/direct/*` mồ côi; warn cho file mới không rule và import check; coverage-map H2 (∪ static closure) sinh suggestion, người review — ITR-D07 giữ nguyên.
+- **Ranh giới bảo vệ:** full CI vẫn required trên PR; `fgos return`/`approve` không dùng related; full hiện chỉ chạy **sau** merge cục bộ — sửa ở item merge-gate riêng (hướng (c) đã phê duyệt), không thuộc Pillar 3.
+
+Chi tiết thực thi, 3 contract kỹ thuật, 12 AC, 9 slice, 2 prompt cho item liên quan: **[phase-03-selector-promotion-shadow-ci.md](phase-03-selector-promotion-shadow-ci.md)**. Contract nguồn: `plans/reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md` §3–§4, §12.
+
+### 3.3 Definition of Done — Pillar 3
+
+- [ ] 12 AC trong phase-03 đạt, mỗi AC có bằng chứng link trong phase report.
+- [ ] Canary `src/verbs/state/*` qua exit criteria trong timebox 2 tuần.
+- [ ] `src/runner/dispatch/*` có rule `shadow` từ coverage-map đã review; promote per-rule chỉ khi rule không giao tập 142 case đỏ (item riêng).
+- [ ] Không output nào của Pillar 3 tuyên bố "full bảo vệ trước local merge" cho tới khi merge-gate landed.
  
  ---
  
@@ -676,3 +628,16 @@ flowchart TD
  
  **Lý do:**
  - Tránh gãy history CI khi IPOG tái phân bổ test rows. Giải quyết triệt để bài toán Expected Outcome.
+
+### D-OPT-09: Pillar 3 pivot — fault-injection + shadow CI thay replay lịch sử; promotion per-rule theo evidence
+
+**Quyết định (2026-09-22, người dùng chốt):** Bỏ replay 50 commit lịch sử (§3.2.3 cũ). Pillar 3 = selector-plan artifact + related/full song song + classifier per test case + nightly mutation đối chiếu full + breaker per-rule (manifest `status` là policy, control state ngoài source là vận hành). Promote từng rule theo evidence, không theo lịch. ITR-D07 giữ nguyên (coverage-map chỉ sinh suggestion). Full CI vẫn required; `fgos return`/`approve` không dùng related.
+
+**Lý do:**
+- Red-team §4 + P05: replay lịch sử vô nghĩa cho miss-rate và làm hỏng config khi chạy tree cũ.
+- Default-deny của selector: manifest thiếu chỉ mất tốc độ; rule sai/stale mới lọt lỗi → gate phải đo chất lượng rule (mutation) chứ không đo số diff.
+- Phát hiện kèm theo: cửa merge cục bộ (`fgos approve`) hiện không chạy full suite (chỉ `item.verify` + `test/architecture.test.mjs`); full chỉ chạy sau merge trên CI. Sửa ở item merge-gate riêng, hướng (c) — full tại protected integration boundary (`detectTrunk`), cập nhật ref có điều kiện, verify trong worktree cô lập — đã được phê duyệt hướng, chưa triển khai.
+
+**Quan hệ với D-OPT-03:** giữ kết luận "không replay lịch sử, shadow trên PR"; **thay** cơ chế (jobs song song + classifier per test case thay `runShadow()` tuần tự trong một job) và **thay** tiêu chí tin cậy ("2-3 tuần" → failure opportunities đếm được: mutant kill + full-shadow fail phân loại được; thời gian không phải bằng chứng).
+
+**Nguồn:** `plans/reports/tech-lead-ranking-260922-1508-phase3-selector-promotion-brainstorm.md` (§3–§4 contract, §7–§15 lịch sử 10 vòng), `phase-03-selector-promotion-shadow-ci.md`.
