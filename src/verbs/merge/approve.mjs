@@ -709,6 +709,10 @@ export async function approveUseCase(
     // `main@<sha>` ref in the friction detail. A standalone (no
     // children) root keeps today's exact reason strings and message —
     // zero behavior change for the common case.
+    if (!isMainTreeClean(repoRoot, ownFileSet)) {
+      throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
+    }
+
     const hadChildren = Object.values(view.work).some((w) => w.parent === id);
 
     const result = await runMerge(async () => {

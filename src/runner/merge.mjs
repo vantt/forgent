@@ -1783,6 +1783,28 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 
 
 export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs } = {}) {
+  const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, renewMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs } = await import('./main-checkout-lock.mjs');
+  
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const identity = process.pid;
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  if (lock.status === HELD) {
+    const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
+    throw new MergeError(
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
+    );
+  }
+  if (lock.status === AMBIGUOUS) {
+    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous.`, { branch, code: 'lock-ambiguous' });
+  }
+
+  const HEARTBEAT_INTERVAL_MS = 60 * 1000;
+  const heartbeat = setInterval(() => {
+    renewMainCheckoutLockIfOwn(fgosDir, identity);
+  }, HEARTBEAT_INTERVAL_MS).unref();
+
+  try {
   const { detectTrunk, resolveRefSha, WorktreeError } = await import('./worktree.mjs');
   const targetBranch = detectTrunk(repoRoot);
   const targetTip = resolveRefSha(repoRoot, targetBranch);
@@ -1791,6 +1813,10 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
   fs.mkdirSync(baseDir, { recursive: true });
   const worktreePath = fs.mkdtempSync(path.join(baseDir, 'cas-merge-'));
+
+  if (mergeHeadExists(repoRoot)) {
+    return { outcome: 'merge-blocked-other-item', branch };
+  }
 
   let check;
   let commitSha;
@@ -1863,4 +1889,8 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
   }
   
   return { outcome: 'merged', branch, check };
+  } finally {
+    clearInterval(heartbeat);
+    releaseMainCheckoutLockIfOwn(fgosDir, identity);
+  }
 }
