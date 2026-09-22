@@ -1044,24 +1044,73 @@ export function commitCommandOutcome({
   state = 'reconciled',
   receiptDigest = null,
   bindingDigest = null,
+  // Phase 03 R5: a terminal commit (settleRound's own "reconciled" write)
+  // sometimes also needs to land paneId/agentSession/resourceIncarnation in
+  // the SAME write as the outcome, rather than as a second, separately
+  // CAS-checked call. Merged before the named fields below so `state`/
+  // `outcome`/the digest fields always win on overlap -- this never lets a
+  // patch silently redefine what a "commit" itself means.
+  patch = {},
 }) {
   const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
   if (!fs.existsSync(commandPath)) {
     throw new Error(`Command state file "${commandPath}" does not exist.`);
   }
   const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  const controlTokenDigest = computeSha256Digest(controlToken);
-  if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
-    throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
+  // A caller with no live control context at all (controlToken === undefined
+  // -- a passive/read-mostly reconcile, or a direct call outside the
+  // assignment-owned launch path that never threaded one) has nothing to
+  // fence against and nothing to be stale relative to: the CAS check exists
+  // to stop a SUPERSEDED controller from winning a write, which presupposes
+  // the caller once held a real one. Skipped only in that specific case;
+  // any caller that DOES pass a controlToken (right or wrong) still gets
+  // the full check below, unchanged.
+  if (controlToken !== undefined) {
+    const controlTokenDigest = computeSha256Digest(controlToken);
+    if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
+      throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
+    }
   }
 
   const updated = {
     ...existing,
+    ...patch,
     state,
     outcome,
     receiptDigest: receiptDigest ?? existing.receiptDigest,
     bindingDigest: bindingDigest ?? existing.bindingDigest,
   };
+  publishMutableProjection(commandPath, updated);
+  return updated;
+}
+
+/**
+ * H13: the same controlEpoch/controlToken CAS check `commitCommandOutcome`
+ * applies, for a write that must NOT itself commit a terminal state/outcome
+ * -- persisting paneId/agentSession/resourceIncarnation onto a command
+ * record that is genuinely still pending (herdr-round.mjs's pre-launch and
+ * pre-prompt writes). Before this existed, those writes went straight
+ * through `publishMutableProjection` with no epoch/token check at all: a
+ * controller whose epoch had already been superseded (a newer attempt for
+ * the same Run has since taken over) could still silently overwrite the
+ * CURRENT controller's own command record -- the exact class of
+ * cross-controller clobber `commitCommandOutcome` exists to prevent for a
+ * terminal write, just never extended to an interim one.
+ */
+export function patchCommandRecord({ runDir, launchCommandId, controlEpoch, controlToken, patch }) {
+  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
+  if (!fs.existsSync(commandPath)) {
+    throw new Error(`Command state file "${commandPath}" does not exist.`);
+  }
+  const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
+  // Same no-live-context exemption as commitCommandOutcome above.
+  if (controlToken !== undefined) {
+    const controlTokenDigest = computeSha256Digest(controlToken);
+    if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
+      throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
+    }
+  }
+  const updated = { ...existing, ...patch };
   publishMutableProjection(commandPath, updated);
   return updated;
 }

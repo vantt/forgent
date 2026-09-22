@@ -363,6 +363,31 @@ export function acquireRunControl(runDir, { holder, purpose, expectedControlEpoc
 }
 
 /**
+ * Read-only: is this Run's current control generation still effectively
+ * held? Same "released marker, then dead-holder proof" logic
+ * `acquireRunControl`'s own reclaim decision applies, but with no write --
+ * a caller that only needs to ASK, never to acquire (Phase 03 M1: deciding
+ * whether admitting a brand-new attempt for an Assignment would spawn a
+ * second worker racing an unsettled one), must never cause the side effect
+ * of publishing a new generation into a DIFFERENT Run's own control ledger
+ * just to peek at it.
+ *
+ * Returns `{held: false}` when there is no generation at all, or the
+ * current one is released/its holder is provably dead (Phase 02 identity);
+ * `{held: true, controlEpoch, holder}` otherwise -- alive, or liveness that
+ * cannot be disproven, both read as "still held" (fail closed).
+ */
+export function inspectRunControl(runDir) {
+  const { generationsDir, releasesDir } = controlDirs(runDir);
+  const current = currentGeneration(generationsDir);
+  if (!current) return { held: false };
+  const released = readMarker(releaseMarkerPath(releasesDir, current.epoch)) !== null;
+  if (released) return { held: false, controlEpoch: current.epoch };
+  if (resolveHolderLiveness(current.record.holder) === 'dead') return { held: false, controlEpoch: current.epoch };
+  return { held: true, controlEpoch: current.epoch, holder: current.record.holder };
+}
+
+/**
  * Release a held control token. Idempotent: releasing an already-released
  * epoch/token is a no-op, never an error, so a `finally` block can always
  * call this safely. `status: 'token-mismatch'`/`'unknown-generation'` means

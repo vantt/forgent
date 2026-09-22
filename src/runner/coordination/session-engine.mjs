@@ -401,22 +401,32 @@ async function runExecutorAttempt(assignment, opts) {
  * reaching this code at all).
  *
  * On failure, the claim is removed ONLY when `executeAssignment` threw a
- * `RunnerConfigError` -- every `RunnerConfigError` throw site in
- * assignment-runner.mjs (asserted assignment shape, unknown/human-only
- * operation, read-only-mode violation, corrupt assignment.json, governance/
- * decide-blocked mechanism, decide/policy executor mismatch) fires strictly
- * before that function's own `fs.mkdirSync(runDir, ...)`, i.e. before any
- * per-attempt run directory or subprocess for THIS Assignment has ever been
- * created. Removing the claim there is provably safe: nothing was spawned,
- * so there is no ambiguous in-flight state and no concurrency window left
- * open -- the SAME `taskKey`/assignmentId can be retried (e.g. after an
- * operator fixes a governance-blocked executor config) without leaving a
- * stale claim wedged forever. Any OTHER thrown error type -- most notably
- * anything thrown once `executeAssignment` is past that point -- leaves the
- * claim in place exactly as before: a crashed in-flight dispatch still needs
- * manual reconciliation, not silent auto-retry -- fail closed, matching this
- * module's own dangling-ref/duplicate-ref posture elsewhere. The original
- * error is always rethrown unchanged either way; this only ever affects
+ * `RunnerConfigError` whose `phase` is NOT `'post-admission'` -- every such
+ * throw site in assignment-runner.mjs (asserted assignment shape, unknown/
+ * human-only operation, read-only-mode violation, corrupt assignment.json,
+ * governance/decide-blocked mechanism, decide/policy executor mismatch)
+ * fires strictly before that function's own `fs.mkdirSync(runDir, ...)`,
+ * i.e. before any per-attempt run directory or subprocess for THIS
+ * Assignment has ever been created. Removing the claim there is provably
+ * safe: nothing was spawned, so there is no ambiguous in-flight state and
+ * no concurrency window left open -- the SAME `taskKey`/assignmentId can be
+ * retried (e.g. after an operator fixes a governance-blocked executor
+ * config) without leaving a stale claim wedged forever.
+ *
+ * `phase: 'post-admission'` (Phase 03 C1a: the resume-reconcile refusal,
+ * `run-in-flight`/`run-unreconciled`) is the opposite case on purpose -- it
+ * fires only once a resumed Run's OWN prior dispatch attempt is already on
+ * record, possibly still live. Unlinking the claim there would let a second
+ * concurrent caller see "no claim" and dispatch a second worker over an
+ * unsettled Run, exactly the double-materialization this file exists to
+ * prevent -- so it is grouped with every other error type below instead.
+ * Any OTHER thrown error type -- most notably anything thrown once
+ * `executeAssignment` is past the pre-mkdirSync window, `post-admission`
+ * included -- leaves the claim in place exactly as before: a crashed or
+ * still-live in-flight dispatch still needs manual reconciliation, not
+ * silent auto-retry -- fail closed, matching this module's own
+ * dangling-ref/duplicate-ref posture elsewhere. The original error is
+ * always rethrown unchanged either way; this only ever affects
  * whether the claim file survives the throw.
  */
 async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts = {}, paths = null) {
@@ -444,6 +454,16 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
     return { assignment, runResult: unlinked, resumed: true };
   }
 
+  // L2 (Phase 03 R9, deprecation notice, not yet removed): the in-process
+  // race this exclusive-create file closes is now ALSO closed, more
+  // robustly, by admitRunAttempt's own admission-time in-flight check
+  // (assignment-runner.mjs, Phase 03 R6/M1) -- it reads the Run's real
+  // control-epoch ledger (PID + processStartTime dead-holder proof) rather
+  // than a same-process-only marker file, so it also catches a second
+  // caller in a DIFFERENT process, which this file never could. Kept for
+  // one release rather than removed outright, so a caller still mid-flight
+  // on the old assumption is not broken by a single release cut. Slated
+  // for removal once that window has passed.
   const dispatchClaimPath = path.join(fgosDir, 'assignments', assignment.assignmentId, 'dispatch.claim');
   try {
     fs.closeSync(fs.openSync(dispatchClaimPath, 'wx'));
@@ -468,7 +488,16 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
   try {
     runResult = await runExecutorAttempt(assignment, opts);
   } catch (err) {
-    if (err instanceof RunnerConfigError) {
+    // H2: `phase: 'post-admission'` (executeAssignment's own resume-reconcile
+    // refusal, run-in-flight/run-unreconciled -- see assignment-runner.mjs)
+    // means a real dispatch attempt for this Assignment is already on
+    // record, possibly still live. Unlinking the claim there would let a
+    // second concurrent caller observe "no claim" and dispatch again over
+    // it -- exactly the double-materialization this claim file exists to
+    // prevent. Every OTHER RunnerConfigError this doc comment already
+    // enumerates fires strictly before any run directory or subprocess for
+    // this Assignment exists, so removing the claim for those is still safe.
+    if (err instanceof RunnerConfigError && err.phase !== 'post-admission') {
       try {
         fs.unlinkSync(dispatchClaimPath);
       } catch (unlinkErr) {
@@ -4232,6 +4261,11 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   // attempt so a resumed declaration (same `attempt` number) collides
   // correctly with a genuinely still-in-flight sibling instead of a
   // permanent one-shot flag from the FIRST dispatch.
+  //
+  // L2 (Phase 03 R9, deprecation notice): same redundancy as
+  // `dispatch.claim` above, for the same reason -- `admitRunAttempt`'s own
+  // admission-time in-flight check now covers this race more robustly
+  // (cross-process, not just same-process). Kept for one release.
   const retryClaimPath = path.join(fgosDir, 'assignments', assignmentId, `retry-${attempt}.claim`);
   try {
     fs.closeSync(fs.openSync(retryClaimPath, 'wx'));
@@ -4257,7 +4291,11 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
   try {
     runResult = await runExecutorAttempt(assignment, executionOpts);
   } catch (err) {
-    if (err instanceof RunnerConfigError) {
+    // H2: same reasoning as `createAndExecuteSessionTask`'s `dispatch.claim`
+    // above -- `phase: 'post-admission'` means a real dispatch attempt for
+    // this retry is already on record, possibly still live; removing the
+    // claim would let a second concurrent caller dispatch over it.
+    if (err instanceof RunnerConfigError && err.phase !== 'post-admission') {
       try {
         fs.unlinkSync(retryClaimPath);
       } catch (unlinkErr) {
