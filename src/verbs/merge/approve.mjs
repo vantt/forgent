@@ -1,3 +1,4 @@
+import fs from "node:fs";
 // approve.mjs — use case behind `fgos approve <id>`.
 //
 // Cổng duyệt — approve (pr-lifecycle D3/D4): merges a runner item's
@@ -140,6 +141,10 @@ export async function approveUseCase(
   { dir, repoRoot },
   { id, resolveTimeoutMs, resolveWaitFlags, github, prNumber, ghCommand, acknowledgeIronLaw, acknowledgeDrift, testForceLockTimeoutId },
 ) {
+  try {
+    const _state = JSON.parse(fs.readFileSync(path.join(dir, ".fgos/cache/state.json"), "utf8"));
+    console.error("DEBUG APPROVE START STATE:", _state.work[id]?.status);
+  } catch(e) { console.error("DEBUG ERROR", e.message); }
   // Both resolved first, before any guard, and in this order — the exact
   // positions `case 'approve'` resolved them in before the use-case split,
   // so a run that then refuses still touches the runner config, and still

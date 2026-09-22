@@ -1,3 +1,4 @@
+import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -85,8 +86,53 @@ async function generateCoverageMap() {
   // (We'll verify if it gets added by transitive closure, if not, it means the tests don't statically import it, so we might need V8 coverage. But static closure should be better).
 
   
-  const coverageDir = process.env.NODE_V8_COVERAGE;
-  if (coverageDir && fs.existsSync(coverageDir)) {
+
+
+  // If NODE_V8_COVERAGE is set, use it (assumed to be populated by per-process runs),
+  // otherwise run the tests ourselves one by one to get accurate per-test coverage.
+  let covDirToProcess = process.env.NODE_V8_COVERAGE;
+  let selfGenerated = false;
+
+  if (!covDirToProcess) {
+    console.log("NODE_V8_COVERAGE not set. Running tests individually to collect coverage...");
+    covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));
+    selfGenerated = true;
+    const { execFileSync } = await import('child_process');
+    for (const testFile of testFiles) {
+      const testRel = path.relative(repoRoot, testFile).replace(/\\/g, '/');
+      const testCovDir = path.join(covDirToProcess, encodeURIComponent(testRel));
+      fs.mkdirSync(testCovDir, { recursive: true });
+      try {
+        execFileSync('node', ['--test', testFile], { 
+          env: { ...process.env, NODE_V8_COVERAGE: testCovDir, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' },
+          stdio: 'ignore'
+        });
+      } catch (e) {
+        // ignore test failures during coverage generation
+      }
+      
+      // parse immediately for this test
+      const covFiles = fs.readdirSync(testCovDir).filter(f => f.endsWith('.json'));
+      for (const file of covFiles) {
+        const covPath = path.join(testCovDir, file);
+        try {
+          const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));
+          for (const res of data.result || []) {
+            if (res.url.includes('/src/') || res.url.includes('/bin/')) {
+              const urlObj = new URL(res.url);
+              const srcRel = path.relative(repoRoot, urlObj.pathname).replace(/\\/g, '/');
+              if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {
+                if (!mapping[srcRel]) mapping[srcRel] = new Set();
+                mapping[srcRel].add(testRel);
+              }
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  }
+
+  if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {
     console.log("Merging NODE_V8_COVERAGE data...");
     const covFiles = fs.readdirSync(coverageDir).filter(f => f.endsWith('.json'));
     for (const file of covFiles) {

@@ -68,25 +68,16 @@ function getFailedTestsFromJunit(xmlContent) {
     const tc = testcases[i];
     if (tc.includes('<failure')) {
       const nameMatch = tc.match(/name="([^"]+)"/);
-      // Wait, Junit might not have file path in name.
-      // Usually it's in file="..." or classname="..."
       let fileMatch = tc.match(/file="([^"]+)"/);
       if (!fileMatch) fileMatch = tc.match(/classname="([^"]+)"/);
-      
-      const file = fileMatch ? fileMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : nameMatch ? nameMatch[1] : 'unknown';
-      failed.push(file);
+      const name = nameMatch ? nameMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : 'unknown';
+      const file = fileMatch ? fileMatch[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : 'unknown';
+      failed.push({ name, file });
     }
   }
   return failed;
 }
 
-function resolveRuleForTest(testPath, manifest) {
-  for (const rule of manifest) {
-    if (rule.directTests && rule.directTests.includes(testPath)) return rule.id;
-    if (rule.boundaryTests && rule.boundaryTests.includes(testPath)) return rule.id;
-  }
-  return null;
-}
 
 export async function runCompare() {
   log("Running compare job logic...");
@@ -104,9 +95,9 @@ export async function runCompare() {
     process.exit(0);
   }
 
-  const baseJunit = 'test-results/base.xml';
-  const fullJunit = 'test-results/full.xml';
-  const relatedJunit = 'test-results/related.xml';
+  const baseJunit = 'artifacts/base-results/test-results/base.xml';
+  const fullJunit = 'artifacts/full-results-ubuntu-latest/full.xml';
+  const relatedJunit = 'artifacts/related-results/related.xml';
 
   const baseFails = fs.existsSync(baseJunit) ? getFailedTestsFromJunit(fs.readFileSync(baseJunit, 'utf8')) : null;
   const fullFails = fs.existsSync(fullJunit) ? getFailedTestsFromJunit(fs.readFileSync(fullJunit, 'utf8')) : [];
@@ -121,13 +112,13 @@ export async function runCompare() {
 
   // For every failing test in full suite
   for (const test of fullFails) {
-    const isRedInBase = baseFails && baseFails.includes(test);
-    const isRedInRelated = relatedFails.includes(test);
-    const isSelected = selectedFiles.has(test);
+    const isRedInBase = baseFails && baseFails.some(t => t.name === test.name);
+    const isRedInRelated = relatedFails.some(t => t.name === test.name);
+    const isSelected = selectedFiles.has(test.file);
     
     // In actual implementation, we would rerun the test here.
     // For now we will assume it is not a flake if it fails here.
-    const rerunPassed = false;
+    const rerunPassed = false; // TODO: implement rerun to detect flakes
     
     const classification = classifyTestCase({
       isRedInFull: true,
@@ -139,22 +130,16 @@ export async function runCompare() {
       rerunPassed
     });
     
-    caseResults[test] = classification;
+    caseResults[test.name] = classification;
     
     if (classification === 'confirmed-miss') {
-      // Find which rules missed this test by seeing which matched paths should have covered it?
-      // Wait, contract: we don't guess matchedRules[0].
-      // We look up the test in the manifest and quarantine the rules that should have selected it!
-      // Wait, if it missed, we don't know exactly which change caused the miss, 
-      // but we know which rule the test BELONGS to.
-      // So if a test failed and was missed, its corresponding rule is broken?
-      // No, if a test failed, it means one of the CHANGED paths should have triggered it.
-      // So we quarantine the matched rules for the CHANGED paths?
-      // "Quarantine the rules that matched the changes."
-      // Since it's a confirmed miss, the rules that matched the changes FAILED to include the test.
-      // So we quarantine those rules.
+      
       if (plan.matchedRules) {
-        for (const mr of plan.matchedRules) rulesToQuarantine.add(mr.ruleId);
+        // filter out already quarantined rules
+        plan.matchedRules.forEach(mr => {
+          if (mr.status !== 'quarantined') rulesToQuarantine.add(mr.ruleId);
+        });
+        
       }
     }
   }

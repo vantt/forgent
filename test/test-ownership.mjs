@@ -30,6 +30,12 @@
 //     recorded plainly rather than guessed past.
 
 export const MANIFEST = [
+  {
+    id: 'merge-gate',
+    pattern: 'src/runner/merge.mjs',
+    directTests: ['test/direct/merge-gate.test.mjs'],
+    status: 'live'
+  },
   // -- src/intake/** (plan candidate area 1) --
   { id: 'intake-classify', status: 'shadow', pattern: 'src/intake/classify.mjs', directTests: ['test/intake/classify.test.mjs'], boundaryTests: [] },
   { id: 'intake-discovery', status: 'shadow', pattern: 'src/intake/discovery.mjs', directTests: ['test/intake/discovery.test.mjs'], boundaryTests: [] },

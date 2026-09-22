@@ -283,7 +283,7 @@ export function selectTests({
 
     const rule = manifestIndex.get(relPath);
     if (rule) {
-      if (breakerState.quarantined && breakerState.quarantined.includes(rule.id)) {
+      if (rule.status === 'quarantined' || (breakerState.quarantined && breakerState.quarantined.includes(rule.id))) {
         escalations.push({ path: relPath, ruleId: rule.id, reason: 'quarantined' });
       } else {
         matched.push({ path: relPath, ruleId: rule.id, directTests: rule.directTests, boundaryTests: rule.boundaryTests });
@@ -498,13 +498,13 @@ if (process.argv[1] === __filename) {
       os: process.platform,
       node: process.version
     };
-    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\\n');
+    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\n');
     console.error(`test-select (post-merge check only): wrote plan to ${planOut}, decision=${selection.decision}`);
     process.exit(0);
   }
 
   if (shadowRequested) {
-    const result = runShadow({ base, stdio: 'inherit', breakerState });
+    const result = runShadow({ base, stdio: shadowRequested ? 'pipe' : 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
     if (result.comparison) {
       console.error(
@@ -513,7 +513,7 @@ if (process.argv[1] === __filename) {
     }
     process.exitCode = result.status;
   } else {
-    const result = runSelected({ base, stdio: 'inherit', breakerState });
+    const result = runSelected({ base, stdio: shadowRequested ? 'pipe' : 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
     console.error(`test-select (post-merge check only): decision=${result.decision} reason="${result.reason}"`);
     process.exitCode = result.status;
