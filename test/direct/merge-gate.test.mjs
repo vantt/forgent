@@ -176,3 +176,69 @@ test('root-into-main merge gate: a failing worktreeSetup command is a verify-fai
   assert.match(result.check.output, /setup-broke/);
   assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
 });
+
+test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER the merge+verify started (but before the land step) is caught under the lock, not raced past', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const os = await import('node:os');
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-'));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  fs.writeFileSync(path.join(cwd, 'owned.txt'), 'original\n');
+  execGit(cwd, ['add', 'owned.txt']);
+  execGit(cwd, ['commit', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  execGit(cwd, ['branch', 'fgw/tsk-race', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-race']);
+  fs.writeFileSync(path.join(cwd, 'owned.txt'), 'from the item\n');
+  execGit(cwd, ['add', 'owned.txt']);
+  execGit(cwd, ['commit', '-m', 'update owned.txt']);
+  execGit(cwd, ['checkout', 'main']);
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+
+  // Slow enough that a write fired right after the call starts lands well
+  // before the CAS merge+verify (git worktree add, merge, goal-check) can
+  // possibly finish and reach the land step.
+  const item = { id: 'tsk-race', verify: 'node -e "setTimeout(() => process.exit(0), 400)"' };
+  const racePromise = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-race', {
+    timeoutMs: 60000,
+    ownFileSet: new Set(['owned.txt']),
+  });
+  // Fires on the next tick -- long before the 400ms verify sleep ends, so
+  // this is genuinely mid-merge, not a pre-check the function hasn't
+  // reached yet.
+  setTimeout(() => fs.writeFileSync(path.join(cwd, 'owned.txt'), 'dirtied by another writer mid-merge\n'), 10);
+  const result = await racePromise;
+
+  assert.equal(result.outcome, 'main-checkout-dirty-mid-merge', `expected the second check to catch the race, got ${result.outcome}: ${JSON.stringify(result)}`);
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'update-ref must never have run');
+  assert.equal(fs.readFileSync(path.join(cwd, 'owned.txt'), 'utf8'), 'dirtied by another writer mid-merge\n', 'the dirty write is left exactly as it was -- no working-tree sync was attempted');
+});
+
+test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ownFileSet) does not trip the second check', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const os = await import('node:os');
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-unrelated-'));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  execGit(cwd, ['branch', 'fgw/tsk-race-ok', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-race-ok']);
+  fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
+  execGit(cwd, ['add', 'feature.txt']);
+  execGit(cwd, ['commit', '-m', 'add feature']);
+  execGit(cwd, ['checkout', 'main']);
+
+  const item = { id: 'tsk-race-ok', verify: 'node -e "setTimeout(() => process.exit(0), 400)"' };
+  const racePromise = mergeRootIntoMainCas(cwd, item, 'fgw/tsk-race-ok', {
+    timeoutMs: 60000,
+    ownFileSet: new Set(['feature.txt']),
+  });
+  setTimeout(() => fs.writeFileSync(path.join(cwd, 'unrelated-scratch.txt'), 'another session\'s work\n'), 10);
+  const result = await racePromise;
+
+  assert.equal(result.outcome, 'merged', `an unrelated dirty path must not block landing, got ${result.outcome}: ${result.check?.output ?? ''}`);
+  assert.equal(fs.readFileSync(path.join(cwd, 'unrelated-scratch.txt'), 'utf8'), "another session's work\n", 'the unrelated file is left untouched, still uncommitted');
+});

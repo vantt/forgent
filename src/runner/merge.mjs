@@ -1788,8 +1788,16 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
  * main-checkout.lock (0 = fail at once with lock-held). `failFastIfLocked`
  * (approve --no-wait): check the lock read-only BEFORE doing any work, so a
  * no-wait caller is refused in milliseconds instead of after a full verify.
+ * `ownFileSet`, when given, is re-checked against repoRoot's own working
+ * tree right before the land step's ref move (see `landCasMergeUnderLock`)
+ * -- the caller's own pre-check (same `ownFileSet`, same
+ * `isWorkingTreeClean`) only proves the tree was clean BEFORE this whole
+ * function's merge+verify ran, which can take minutes; without a second
+ * check under the lock, a path dirtied in that window would still let
+ * `update-ref` move the trunk while the working-tree sync then silently
+ * failed (D-ADR0042), leaving repoRoot's index behind the new HEAD.
  */
-export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, failFastIfLocked = false } = {}) {
+export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, failFastIfLocked = false, ownFileSet = null } = {}) {
   const { detectTrunk, resolveRefSha, provisionDependencies, runWorktreeSetupCommands } = await import('./worktree.mjs');
   const { execFileSync } = await import('child_process');
 
@@ -1887,7 +1895,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
     } catch (e) {}
   }
 
-  const land = () => landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha });
+  const land = () => landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet });
   const landed = lockWaitMs > 0 ? await withLockRetry(land, { waitMs: lockWaitMs }) : await land();
   if (landed) return landed;
   return { outcome: 'merged', branch, check };
@@ -1906,8 +1914,15 @@ const CAS_LAND_LOCK_WAIT_MS = 60 * 1000;
  * checkout's working tree when it has the trunk checked out. Returns null
  * on success, or an outcome object when the ref move is refused. Throws
  * MergeError code lock-held/lock-ambiguous, same contract as before.
+ *
+ * `ownFileSet`, when given, is re-checked here -- under the lock, right
+ * before `update-ref` -- against a fresh path this exact merge already
+ * spent minutes proving clean once, before the lock was ever taken (the
+ * caller's own pre-check). A dirty path re-appearing in that window is
+ * reported as `main-checkout-dirty-mid-merge` instead of racing
+ * `update-ref`/`read-tree`.
  */
-async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha }) {
+async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip, commitSha, ownFileSet = null }) {
   const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs } = await import('./main-checkout-lock.mjs');
   const { execFileSync } = await import('child_process');
   const fgosDir = path.join(repoRoot, '.fgos');
@@ -1925,6 +1940,9 @@ async function landCasMergeUnderLock(repoRoot, { branch, targetBranch, targetTip
   }
 
   try {
+    if (ownFileSet && !isWorkingTreeClean(repoRoot, ownFileSet)) {
+      return { outcome: 'main-checkout-dirty-mid-merge', branch };
+    }
     try {
       execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
     } catch (err) {
