@@ -710,10 +710,14 @@ export async function approveUseCase(
     // zero behavior change for the common case.
     const hadChildren = Object.values(view.work).some((w) => w.parent === id);
 
-    const result = await runMerge(async () => {
-       const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
-       const { branchNameFor } = await import('../../runner/worktree.mjs');
-       return await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), { timeoutMs });
+    // Not wrapped in runMerge: a whole-call lock retry would redo the full
+    // verify run. The CAS merge only takes main-checkout.lock for its final
+    // land step and waits there itself (or fails fast under --no-wait).
+    const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
+    const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {
+      timeoutMs,
+      failFastIfLocked: noWait,
+      ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),
     });
 
     if (result.outcome === 'conflict') {

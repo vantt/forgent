@@ -113,3 +113,30 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
   assert.notEqual(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'main should advance to the merge commit');
 });
+
+test('root-into-main merge gate: verify runs without holding main-checkout.lock, so other fgos commands are not refused meanwhile', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const { LOCK_FILE } = await import('../../src/runner/main-checkout-lock.mjs');
+  const os = await import('node:os');
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-lock-'));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  execGit(cwd, ['branch', 'fgw/tsk-lock', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-lock']);
+  fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
+  execGit(cwd, ['add', 'feature.txt']);
+  execGit(cwd, ['commit', '-m', 'add feature']);
+  execGit(cwd, ['checkout', 'main']);
+
+  const lockPath = path.join(cwd, '.fgos', LOCK_FILE);
+  // verify fails (exit 1) if the lock file exists while it runs.
+  const item = { id: 'tsk-lock', verify: `node -e "process.exit(require('fs').existsSync('${lockPath}') ? 1 : 0)"` };
+  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-lock', { timeoutMs: 60000 });
+
+  assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
+  assert.equal(fs.existsSync(lockPath), false, 'the lock is released after landing');
+  assert.ok(fs.existsSync(path.join(cwd, 'feature.txt')), 'main checkout working tree synced to the merge');
+});
