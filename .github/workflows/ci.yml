@@ -43,7 +43,23 @@ jobs:
       # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
       # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
       - name: npm test (includes install-packaging matrix proof)
-        run: npm test
+        run: npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+        env:
+          FORCE_COLOR: 1
+
+      - name: Write test marker
+        if: always()
+        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml
+        env:
+          JOB_STATUS: ${{ job.status }}
+          
+      - name: Upload full results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-results-${{ matrix.os }}
+          path: test-results/
+          retention-days: 14
 
   # `npm test` (scripts/run-tests.mjs, a portable `node --test` wrapper over
   # every discovered test/**/*.test.mjs) cannot see the Rust crate at all,
@@ -60,6 +76,119 @@ jobs:
   # job needs no third-party action beyond the checkout this repo already
   # trusts. `rustup show` fails loudly if that ever stops being true, instead
   # of letting a missing toolchain read as a passing job.
+  selector-plan:
+    name: selector-plan
+    runs-on: ubuntu-latest
+    outputs:
+      decision: ${{ steps.plan.outputs.decision }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Generate plan
+        id: plan
+        run: |
+          npm run test:ownership:lint
+          npm run test:select:plan -- --base origin/main --plan-out selector-plan.json
+          DECISION=$(node -p "require('./selector-plan.json').decision")
+          echo "decision=$DECISION" >> $GITHUB_OUTPUT
+
+      - name: Upload plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: selector-plan
+          path: selector-plan.json
+          retention-days: 14
+
+  related:
+    name: related
+    needs: selector-plan
+    if: needs.selector-plan.outputs.decision == 'related'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download plan
+        uses: actions/download-artifact@v4
+        with:
+          name: selector-plan
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Run related tests
+        run: node scripts/test-select-run-plan.mjs --files-from selector-plan.json --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/related.xml
+        env:
+          FORCE_COLOR: 1
+          NODE_V8_COVERAGE: coverage/related
+
+      - name: Write test marker
+        if: always()
+        run: node scripts/write-test-marker.mjs --type related --xml test-results/related.xml --plan selector-plan.json
+        env:
+          JOB_STATUS: ${{ job.status }}
+
+      - name: Upload related results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: related-results
+          path: test-results/
+          retention-days: 14
+
+  compare:
+    name: compare
+    needs: [selector-plan, related, test]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Download base artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_SHA=${{ github.event.pull_request.base.sha }}
+          RUN_ID=$(gh run list --commit $BASE_SHA --workflow CI --json databaseId --jq '.[0].databaseId' || true)
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" == "null" ]; then
+            RUN_ID=$(gh run list --branch ${{ github.event.pull_request.base.ref }} --workflow CI --status success --json databaseId --jq '.[0].databaseId' || true)
+          fi
+          if [ -n "$RUN_ID" ] && [ "$RUN_ID" != "null" ]; then
+            gh run download $RUN_ID --name full-results-ubuntu-latest --dir artifacts/base-results/test-results || echo "Failed to download base artifact"
+            if [ -f artifacts/base-results/test-results/full.xml ]; then
+              mv artifacts/base-results/test-results/full.xml artifacts/base-results/test-results/base.xml
+            fi
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run compare
+        run: npm run test:select:compare
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   herdr-plugin:
     name: cargo test (herdr-plugin)
     runs-on: ubuntu-latest

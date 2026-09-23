@@ -1,0 +1,40 @@
+name: selector-nightly
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run at 2 AM UTC daily
+  workflow_dispatch:
+
+jobs:
+  nightly-mutate:
+    name: Nightly Fault Injection and Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm install
+
+      - name: Run coverage map generator
+        run: node scripts/test-select-coverage-map.mjs
+        env:
+          FORCE_COLOR: 1
+
+      - name: Run mutation tests
+        run: node scripts/test-select-mutate.mjs
+        env:
+          FORCE_COLOR: 1
+
+      - name: Upload ledger and coverage map
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-ledger
+          path: |
+            nightly-ledger.json
+            plans/260922-test-suite-optimization/reports/coverage-map-*.json
+            plans/260922-test-suite-optimization/reports/coverage-suggestion-*.md
+          retention-days: 30

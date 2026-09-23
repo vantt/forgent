@@ -1,0 +1,114 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { mutants } from '../test/test-ownership-mutants.mjs';
+
+function log(msg) { console.log(msg); }
+function errFn(msg) { console.error(msg); }
+
+export function classifyMutant(result) {
+  if (result.infraError) return 'infra-error';
+  if (result.timeout) return 'timeout';
+  if (result.syntaxError) return 'invalid-syntax';
+  if (result.relatedPassed === false) return 'caught';
+  if (result.relatedPassed === true && result.fullPassed === true) return 'equivalent-or-missing-test';
+  if (result.relatedPassed === true && result.fullPassed === false) return 'confirmed-miss';
+  return 'invalid';
+}
+
+export function runNightlyMutations() {
+  log("Starting nightly fault-injection mutation tests...");
+  const ledger = [];
+  
+  // Baseline run
+  log("Running baseline check...");
+  try {
+    execFileSync('node', ['scripts/test-select.mjs'], { stdio: 'pipe', encoding: 'utf8' });
+  } catch(e) {
+    log("Baseline is red! Cannot run mutation testing.");
+    return;
+  }
+  
+  for (const mutant of mutants) {
+    log(`Applying mutant ${mutant.id} to ${mutant.file}...`);
+    
+    // Create detached worktree
+    const baseDir = path.join(os.tmpdir(), 'fgos-mutations');
+    if (!fs.existsSync(baseDir)) fs.mkdirSync(baseDir, { recursive: true });
+    const worktreePath = fs.mkdtempSync(path.join(baseDir, `mutant-${mutant.id}-`));
+    
+    try {
+      execFileSync('git', ['worktree', 'add', '--detach', worktreePath, 'HEAD'], { encoding: 'utf8' });
+      
+      const targetFile = path.join(worktreePath, mutant.file);
+      const orig = fs.readFileSync(targetFile, 'utf8');
+      
+      if (!orig.includes(mutant.find)) {
+        log(`Mutant ${mutant.id} invalid: string not found.`);
+        ledger.push({ id: mutant.id, classification: 'invalid' });
+        continue;
+      }
+      
+      fs.writeFileSync(targetFile, orig.replace(mutant.find, mutant.replace));
+      
+      // Symlink node_modules
+      if (!fs.existsSync(path.join(worktreePath, 'node_modules'))) {
+        fs.symlinkSync(path.join(process.cwd(), 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
+      }
+
+      let shadowOut = '';
+      let exitCode = 0;
+      try {
+        shadowOut = execFileSync('node', ['scripts/test-select.mjs', '--explain'], { cwd: worktreePath, stdio: ['ignore', 'pipe', 'ignore'], encoding: 'utf8' });
+      } catch (e) {
+        shadowOut = e.stdout || '';
+        exitCode = e.status;
+      }
+      
+      let result = { infraError: true };
+      try {
+        const match = shadowOut.match(/\{[^{}]*"decision"[^]*\}/);
+        const jsonStr = match ? match[0] : shadowOut;
+        const parsed = JSON.parse(jsonStr);
+        if (parsed.decision) {
+          result = {
+            relatedPassed: exitCode === 0,
+            fullPassed: false,
+            syntaxError: false
+          };
+          if (parsed.decision === 'full') {
+            result.relatedPassed = exitCode === 0;
+          }
+          // AC 5: run full ONLY if related passed
+          if (result.relatedPassed) {
+            try {
+              execFileSync('node', ['scripts/run-tests.mjs'], { cwd: worktreePath, stdio: 'ignore' });
+              result.fullPassed = true;
+            } catch (err) {
+              result.fullPassed = false;
+            }
+          }
+        }
+      } catch (e) {
+        result = { syntaxError: true };
+      }
+      
+      const classification = classifyMutant(result);
+      log(`Mutant ${mutant.id} classification: ${classification}`);
+      ledger.push({ id: mutant.id, classification });
+    } finally {
+      try {
+        execFileSync('git', ['worktree', 'remove', '-f', worktreePath], { encoding: 'utf8' });
+      } catch(e) {}
+    }
+  }
+
+  fs.writeFileSync('nightly-ledger.json', JSON.stringify(ledger, null, 2));
+  log("Mutation testing complete. Ledger written.");
+}
+
+const url = typeof process !== 'undefined' && process.argv && process.argv[1] ? process.argv[1] : '';
+if (url.endsWith('test-select-mutate.mjs')) {
+  runNightlyMutations();
+}

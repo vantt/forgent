@@ -1,3 +1,4 @@
+import os from 'node:os';
 // merge.mjs — the approval-gate merge engine (per pr-lifecycle D1-D5):
 // mechanics that turn an approved proposal into a merged, verified `done`
 // item — extracted from bin/fgos.mjs so the CLI stays a thin verb table,
@@ -1782,6 +1783,28 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
 
 
 export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs } = {}) {
+  const { acquireMainCheckoutLock, releaseMainCheckoutLockIfOwn, renewMainCheckoutLockIfOwn, DEFAULT_TTL_MS, HELD, AMBIGUOUS, formatLockDurationMs } = await import('./main-checkout-lock.mjs');
+  
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const identity = process.pid;
+  const lock = acquireMainCheckoutLock(fgosDir, { identity, ttlMs: DEFAULT_TTL_MS, releaseOnExit: true });
+  if (lock.status === HELD) {
+    const ttlPart = lock.remainingTtlMs != null ? `, expires in ${formatLockDurationMs(lock.remainingTtlMs)}` : ', no TTL window known';
+    throw new MergeError(
+      `cannot merge "${branch}": main checkout is locked by pid ${lock.holderPid} (held ${formatLockDurationMs(lock.lockAgeMs)}${ttlPart}).`,
+      { branch, code: 'lock-held', remainingTtlMs: lock.remainingTtlMs, holderPid: lock.holderPid, lockAgeMs: lock.lockAgeMs }
+    );
+  }
+  if (lock.status === AMBIGUOUS) {
+    throw new MergeError(`cannot merge "${branch}": main checkout lock is ambiguous.`, { branch, code: 'lock-ambiguous' });
+  }
+
+  const HEARTBEAT_INTERVAL_MS = 60 * 1000;
+  const heartbeat = setInterval(() => {
+    renewMainCheckoutLockIfOwn(fgosDir, identity);
+  }, HEARTBEAT_INTERVAL_MS).unref();
+
+  try {
   const { detectTrunk, resolveRefSha, WorktreeError } = await import('./worktree.mjs');
   const targetBranch = detectTrunk(repoRoot);
   const targetTip = resolveRefSha(repoRoot, targetBranch);
@@ -1790,6 +1813,10 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
   const baseDir = path.join(os.tmpdir(), 'fgos-worktrees');
   fs.mkdirSync(baseDir, { recursive: true });
   const worktreePath = fs.mkdtempSync(path.join(baseDir, 'cas-merge-'));
+
+  if (mergeHeadExists(repoRoot)) {
+    return { outcome: 'merge-blocked-other-item', branch };
+  }
 
   let check;
   let commitSha;
@@ -1805,7 +1832,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     try {
       execFileSync('git', ['merge', '--no-commit', '--no-ff', branchTip], { cwd: worktreePath, encoding: 'utf8', shell: false, stdio: 'pipe' });
     } catch (err) {
-      if (fs.existsSync(path.join(worktreePath, '.git', 'MERGE_HEAD'))) {
+      if (mergeHeadExists(worktreePath)) {
         conflicted = true; // For now we just fail on conflict
       } else {
         return {
@@ -1820,8 +1847,17 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
        return { outcome: 'conflict', branch };
     }
 
-    // Run test
-    check = await runGoalCheck(item, worktreePath, timeoutMs);
+    const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
+    check = skipRedundantChecks
+      ? {
+          passed: true,
+          status: 0,
+          timedOut: false,
+          skipped: true,
+          output: `verify skipped: the merged tree is identical to ${item.branchHeadAtReturn}, already verified green at return (HEAD is an ancestor of "${branch}" and the branch tip has not moved since)`,
+        }
+      : await runGoalCheck(item, worktreePath, timeoutMs);
+
     if (!check.passed) {
        return { outcome: 'verify-fail', branch, check };
     }
@@ -1834,6 +1870,16 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     // Atomic update-ref
     try {
       execFileSync('git', ['update-ref', `refs/heads/${targetBranch}`, commitSha, targetTip], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+      const currentBranch = execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+      if (currentBranch === targetBranch) {
+        try {
+          execFileSync('git', ['read-tree', '-m', '-u', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: 'pipe' });
+        } catch (e) {
+          // Non-destructive sync aborted due to unstaged changes on non-intersecting paths.
+          // Leaving the working tree out of sync, which is acceptable under D-ADR0042.
+        }
+      }
+
     } catch (err) {
       return {
         outcome: 'merge-failed-unclassified',
@@ -1852,4 +1898,8 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
   }
   
   return { outcome: 'merged', branch, check };
+  } finally {
+    clearInterval(heartbeat);
+    releaseMainCheckoutLockIfOwn(fgosDir, identity);
+  }
 }

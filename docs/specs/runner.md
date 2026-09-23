@@ -2919,7 +2919,7 @@ Mọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `ex
 4. **Attestation bền:** Mỗi dispatch sinh một bản ghi `confinement-attestation.v1` lưu kèm kết quả dispatch, minh bạch coverage theo 7 policy control axes (`hostWrite`, `hostRead`, `networkEgress`, `process`, `home`, `session`, `workspace`), 5 attestation channel cố định (`filesystem`, `inherited-fd`, `stdio`, `host-ipc`, `network` — không phải 7 control axes ở trên), và các write grant được cấp.
 5. **Strict mode:** `runner.confinement.strict` mặc định là `false` với cảnh báo sẵn sàng từ `fgos doctor` (`confinement-strict-readiness`). Khi bật `true`, mọi capability khai báo bắt buộc phải có policy hợp lệ hoặc explicit `unconfined`.
 
-### Đổi sang atomic CAS commit tree cho Merge Gate (D-ADR0042)
+### Đổi sang atomic CAS commit tree cho Merge Gate (D-ADR0042 (atomic CAS commit tree cho Merge Gate))
 
 - **Context**: \`mergeRunnerItem\` cũ sử dụng \`git merge --no-commit\` trực tiếp trên main checkout để kiểm tra và sau đó \`git commit\`. Điều này gây rủi ro làm bẩn working tree của main checkout và dễ lỗi nếu có tiến trình khác can thiệp.
 - **Decision**: Thay thế bằng cơ chế Git CAS (Compare-And-Swap) kết hợp isolated worktree cho luồng \`root-into-main\`. Sử dụng \`git worktree add --detach\` để tạo một worktree ẩn danh trỏ tới tip của trunk. Quá trình patch (\`git merge --no-commit\`) và test suite chạy hoàn toàn trong isolated worktree này. Nếu test pass, dùng \`git write-tree\` lấy tree, \`git commit-tree\` tạo commit với hai parent, và cập nhật ref atomically qua \`git update-ref\`.

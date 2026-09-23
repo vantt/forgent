@@ -279,7 +279,7 @@ test('approve --github --pr on a runner item touching a self-modifying-capable m
 });
 
 
-test('approve --github --pr on the same self-modifying diff PROCEEDS with --acknowledge-iron-law: merges via the fake gh, awaiting-approval -> done (f01)', () => {
+test('approve --github --pr on the same self-modifying diff is explicitly forbidden', () => {
   const cwd = initGitCwdMainFast();
   makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
     verify: 'test -f src/runner/probe.mjs',
@@ -288,9 +288,8 @@ test('approve --github --pr on the same self-modifying diff PROCEEDS with --ackn
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 0, `approve --github with acknowledgment must succeed: ${result.stdout}${result.stderr}`);
-  assert.equal(envelopeData(result.stdout).to, 'delivered');
-  assert.equal(stateView(cwd).work['gh-iron-ack-item'].status, 'delivered');
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 

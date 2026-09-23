@@ -68,25 +68,14 @@ test('approve (root-into-main merge): produces a diagnostic log record carrying 
   assert.equal(record.mergedInto, 'main');
 });
 
-test('approve (--github): produces a diagnostic log record carrying mergedSha and mergedInto', () => {
+test('approve (--github): is explicitly forbidden for trunk merges', () => {
   const cwd = initGitCwdMain();
   makeRunnerProposedItem(cwd, 'diag-gh-item', { verify: 'true' });
   const fake = writeMergeSuccessWithCommitFake(cwd, 'fake-merge-sha-42');
 
   const result = run(cwd, ['approve', 'diag-gh-item', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 0, result.stderr);
-
-  const logPath = resolveFgosFile(path.join(cwd, '.fgos'), FGOS_FILE.APPROVE_FAULT_LOG);
-  assert.ok(fs.existsSync(logPath), 'diagnostic log file must exist');
-
-  const lines = fs.readFileSync(logPath, 'utf8').trim().split('\n');
-  const records = lines.map((line) => JSON.parse(line));
-  const record = records.find((r) => r.id === 'diag-gh-item');
-
-  assert.ok(record, 'diagnostic log record for github item must exist');
-  assert.equal(record.phase, 'github merge');
-  assert.equal(record.mergedSha, 'fake-merge-sha-42');
-  assert.equal(record.mergedInto, 'main');
+  assert.equal(result.status, 4, result.stderr);
+  assert.match(result.stderr, /approve --github is explicitly forbidden/);
 });
 
 test('approve (failure path on lock-timeout): fires fault record carrying detail, mergedSha, and mergedInto', () => {

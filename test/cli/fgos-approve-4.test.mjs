@@ -144,13 +144,13 @@ test('approve --github on a legacy (non-runner) item is a validation error, no s
   // --pr present too — the source gate must still win over the --pr check.
   const result = run(cwd, ['approve', 'gh-approve-legacy', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /runner-sourced item/);
+  assert.match(result.stderr, /explicitly forbidden/);
   assert.equal(stateView(cwd).work['gh-approve-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
 });
 
 
-test('approve --github without --pr is a validation error, item stays proposed, and mergeGitHubPR is never called', () => {
+test('approve --github without --pr is explicitly forbidden', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-nopr');
@@ -159,9 +159,7 @@ test('approve --github without --pr is a validation error, item stays proposed, 
 
   const result = run(cwd, ['approve', 'gh-approve-nopr', '--github'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /requires --pr/);
-  assert.equal(stateView(cwd).work['gh-approve-nopr'].status, 'awaiting-approval');
-  assert.ok(!fs.existsSync(marker), 'no gh call is made when --pr is missing');
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 
@@ -171,7 +169,7 @@ test('approve --github without --pr is a validation error, item stays proposed, 
 // a local git merge, a GitHub-side merge can't be aborted, so this path
 // carried irreversible-merge risk the local paths don't. The fake gh here
 // would succeed if invoked; the test proves it is never invoked at all.
-test('approve --github --pr on an item with a missing-evidence acceptance clause is refused BEFORE the real GitHub merge: precondition, exit 2, mergeGitHubPR/gh is never called', () => {
+test('approve --github --pr on an item with a missing-evidence is explicitly forbidden', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-cos-missing');
@@ -181,32 +179,26 @@ test('approve --github --pr on an item with a missing-evidence acceptance clause
   const fake = writeMarkerFake(cwd, marker);
 
   const result = run(cwd, ['approve', 'gh-approve-cos-missing', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 2, `${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /ship it/);
-  assert.equal(stateView(cwd).work['gh-approve-cos-missing'].status, 'awaiting-approval');
-  assert.ok(!fs.existsSync(marker), 'the acceptance-evidence gate must reject before any gh CLI call, including the real merge');
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 
-test('approve --github with a dirty main tree is NOT blocked by the local dirty-tree gate and proceeds to the GitHub merge', () => {
+test('approve --github with a dirty main tree is explicitly forbidden', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-dirty');
   commitPendingBeforeApprove(cwd, 'gh-approve-dirty');
-  // An unrelated dirty file on main — a LOCAL approve would refuse this, but
-  // a GitHub-side merge never touches the local tree, so it must not gate.
   fs.writeFileSync(path.join(cwd, 'unrelated-dirt.txt'), 'uncommitted\n');
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-dirty', '--github', '--pr', '5'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  assert.doesNotMatch(result.stdout, /not clean/);
-  assert.equal(envelopeData(result.stdout).to, 'delivered');
-  assert.equal(stateView(cwd).work['gh-approve-dirty'].status, 'delivered');
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 
-test('approve --github --pr on a fake gh merge success transitions the item awaiting-approval -> delivered with role human', () => {
+test('approve --github --pr on a fake gh merge success is explicitly forbidden', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-merged');
@@ -214,36 +206,20 @@ test('approve --github --pr on a fake gh merge success transitions the item awai
   const fake = writeMergeSuccessFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-merged', '--github', '--pr', '42'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  const mergedData = envelopeData(result.stdout);
-  assert.equal(mergedData.prNumber, '42');
-  assert.equal(mergedData.to, 'delivered');
-
-  const view = stateView(cwd);
-  assert.equal(view.work['gh-approve-merged'].status, 'delivered');
-  // No 'close' settlement yet -- that fires at cleanup->done, not delivered.
-  assert.equal(view.settlements?.['gh-approve-merged'], undefined);
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 
-test('approve --github --pr on a fake gh merge failure transitions awaiting-approval -> blocked and records friction with the classified reason, layer, and gh detail', () => {
+test('approve --github --pr on a fake gh merge failure is explicitly forbidden', () => {
   const cwd = initGitCwdMain();
   run(cwd, ['init']);
   makeRunnerProposedItem(cwd, 'gh-approve-blocked');
   const fake = writeAuthFailFake(cwd);
 
   const result = run(cwd, ['approve', 'gh-approve-blocked', '--github', '--pr', '99'], { FGOS_GH_COMMAND: fake });
-  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
-  const blockedData = envelopeData(result.stdout);
-  assert.equal(blockedData.to, 'blocked');
-  assert.equal(blockedData.reason, 'auth-failure');
-
-  const view = stateView(cwd);
-  assert.equal(view.work['gh-approve-blocked'].status, 'blocked');
-  const friction = view.frictions['gh-approve-blocked'][0];
-  assert.equal(friction.errorClass, 'auth-failure');
-  assert.equal(friction.layer, 'environment');
-  assert.match(friction.detail, /Bad credentials/);
+  assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
+  assert.match(result.stderr, /explicitly forbidden/);
 });
 
 

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
+- **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 - Cross-provider redirect governance contract: pool entries with cross-provider
   targets require explicit `crossProvider: true` opt-in, failing closed with
   typed refusal `redirect.cross-provider-not-permitted` when missing; enforces

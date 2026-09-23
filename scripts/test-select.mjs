@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { REPO_ROOT, DEFAULT_TEST_ROOT, discoverTestFiles, runSelectedTests, runTests } from './run-tests.mjs';
 import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
 
-const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing']);
+const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status']);
 
 // Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
 // already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
@@ -129,6 +129,7 @@ export function validateManifest(manifest, { repoRoot = REPO_ROOT } = {}) {
   for (const rule of manifest) {
     for (const key of Object.keys(rule)) {
       if (!KNOWN_RULE_FIELDS.has(key)) errors.push(`rule "${rule.id ?? '(no id)'}" has unsupported field "${key}"`);
+      if (key === 'status' && !['shadow', 'live', 'quarantined'].includes(rule.status)) errors.push(`rule "${rule.id}" has invalid status "${rule.status}"`);
     }
     if (!rule.id) {
       errors.push('a rule is missing an id');
@@ -217,6 +218,7 @@ export function selectTests({
   fullTriggers = FULL_TRIGGERS,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   staticGraphTests = [],
   fileExists = (abs) => fs.existsSync(abs),
 } = {}) {
@@ -228,6 +230,26 @@ export function selectTests({
       escalations: errors.map((e) => ({ path: null, ruleId: 'manifest-invalid', reason: e })),
       matched: [],
       selectedFiles: null, // caller discovers the full set itself
+    };
+  }
+
+  
+  if (!breakerState || (typeof breakerState === 'string' && breakerState.includes('breaker-unreadable'))) {
+    return {
+      decision: 'full',
+      reason: 'breaker-unreadable',
+      escalations: [],
+      matched: [],
+      selectedFiles: null,
+    };
+  }
+  if (breakerState.global) {
+    return {
+      decision: 'full',
+      reason: 'breaker-global',
+      escalations: [],
+      matched: [],
+      selectedFiles: null,
     };
   }
 
@@ -258,11 +280,17 @@ export function selectTests({
       continue;
     }
 
+
     const rule = manifestIndex.get(relPath);
     if (rule) {
-      matched.push({ path: relPath, ruleId: rule.id, directTests: rule.directTests, boundaryTests: rule.boundaryTests });
+      if (rule.status === 'quarantined' || (breakerState.quarantined && breakerState.quarantined.includes(rule.id))) {
+        escalations.push({ path: relPath, ruleId: rule.id, reason: 'quarantined' });
+      } else {
+        matched.push({ path: relPath, ruleId: rule.id, directTests: rule.directTests, boundaryTests: rule.boundaryTests });
+      }
       continue;
     }
+
 
     escalations.push({ path: relPath, ruleId: 'unknown', reason: 'no manifest rule and no full-trigger rule matches this path' });
   }
@@ -293,6 +321,7 @@ export function runSelected({
   cwd = REPO_ROOT,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   exec = execFileSync,
   spawn,
   execPath = process.execPath,
@@ -307,7 +336,7 @@ export function runSelected({
     return { status: 1, decision: 'full', reason: `invalid-base: ${collected.error}`, explain: { base, error: collected.error }, ran: false };
   }
 
-  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, staticGraphTests });
+  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, breakerState, staticGraphTests });
 
   const explain = {
     base,
@@ -354,6 +383,7 @@ export function runShadow({
   cwd = REPO_ROOT,
   repoRoot = REPO_ROOT,
   testRoot = DEFAULT_TEST_ROOT,
+  breakerState = { version: 1, quarantined: [], global: false },
   exec = execFileSync,
   spawn,
   execPath = process.execPath,
@@ -369,7 +399,7 @@ export function runShadow({
     return { status: 1, comparison: null, explain: { base, error: collected.error } };
   }
 
-  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, staticGraphTests });
+  const selection = selectTests({ changes: collected.changes, manifest, fullTriggers, repoRoot, testRoot, breakerState, staticGraphTests });
 
   if (selection.decision === 'refuse') {
     return { status: 1, comparison: null, explain: { base, mergeBase: collected.mergeBase, decision: selection.decision, reason: selection.reason } };
@@ -425,11 +455,56 @@ if (process.argv[1] === __filename) {
   const args = process.argv.slice(2);
   const baseIdx = args.indexOf('--base');
   const base = baseIdx === -1 ? 'main' : args[baseIdx + 1];
+  const planOutIdx = args.indexOf('--plan-out');
+  const planOut = planOutIdx === -1 ? null : args[planOutIdx + 1];
   const explainRequested = args.includes('--explain');
   const shadowRequested = args.includes('--shadow');
 
+  let breakerState = { version: 1, quarantined: [], global: false };
+  if (process.env.SELECTOR_BREAKER) {
+    try {
+      const parsed = JSON.parse(process.env.SELECTOR_BREAKER);
+      if (typeof parsed === 'object' && parsed !== null && 'version' in parsed) {
+        breakerState = parsed;
+      } else {
+        breakerState = 'breaker-unreadable';
+      }
+    } catch (e) {
+      breakerState = 'breaker-unreadable';
+    }
+  }
+
+  if (planOut) {
+    const collected = collectChangedPaths({ base });
+    let selection;
+    if (collected.error) {
+      selection = { decision: 'full', reason: 'invalid-base: ' + collected.error, escalations: [], matched: [], selectedFiles: null };
+    } else {
+      selection = selectTests({ changes: collected.changes, breakerState });
+    }
+    const output = {
+      base,
+      mergeBase: collected.mergeBase,
+      breakerVersion: typeof breakerState === 'object' ? breakerState.version : null,
+      changedPaths: collected.changes,
+      decision: selection.decision,
+      reason: selection.reason,
+      matchedRules: selection.matched,
+      escalations: selection.escalations,
+      selectedFiles: selection.selectedFiles,
+      sha: process.env.GITHUB_SHA || 'unknown',
+      manifestHash: (await import('node:crypto')).createHash('sha256').update(JSON.stringify(MANIFEST)).digest('hex'),
+      selectorVersion: 1,
+      os: process.platform,
+      node: process.version
+    };
+    fs.writeFileSync(planOut, JSON.stringify(output, null, 2) + '\n');
+    console.error(`test-select (post-merge check only): wrote plan to ${planOut}, decision=${selection.decision}`);
+    process.exit(0);
+  }
+
   if (shadowRequested) {
-    const result = runShadow({ base, stdio: 'inherit' });
+    const result = runShadow({ base, stdio: shadowRequested ? 'pipe' : 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
     if (result.comparison) {
       console.error(
@@ -438,9 +513,9 @@ if (process.argv[1] === __filename) {
     }
     process.exitCode = result.status;
   } else {
-    const result = runSelected({ base, stdio: 'inherit' });
+    const result = runSelected({ base, stdio: shadowRequested ? 'pipe' : 'inherit', breakerState });
     if (explainRequested) console.log(JSON.stringify(result.explain, null, 2));
-    console.error(`test-select: decision=${result.decision} reason="${result.reason}"`);
+    console.error(`test-select (post-merge check only): decision=${result.decision} reason="${result.reason}"`);
     process.exitCode = result.status;
   }
 }

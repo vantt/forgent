@@ -91,3 +91,5 @@ packages/host-runtime/contracts/*.tmp.*
 
 # Distribution packaging output
 /dist/
+/restore_github.cjs
+/test-results/
