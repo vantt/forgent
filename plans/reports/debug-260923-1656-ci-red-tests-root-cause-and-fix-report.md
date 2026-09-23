@@ -35,6 +35,28 @@ Branch `fix/ci-test-hermeticity`. Evidence: CI run 35836953124 (main @ cc687d92)
 - **`herdr-spawn-adapter` on CI:** the CI failure was the bwrap registry bug (fixed in section 1). Separately, there is a real flake in "a herdr that stops answering…" (1/12 under 4-way parallel load). It is a product bug: `pollForOutcome` only counted blind time up to the *start* of the tick, so a slow failing `agentGet`/`readLiveness` was charged as idle and a healthy round ended `timed-out-idle`. Fix: one `observedAt` taken after all reads, used both for the blind span and as `now`. 18/18 green under 6-way load. GitNexus impact: HIGH (stale index); grep finds 1 direct caller.
 - **R5 concurrency in `coordination-research-fan-out`:** not reproduced in 30 runs under load, and not in the current CI failure list.
 
+## Third pass (PR #5 CI on 3 real OSes)
+
+Each finding below was confirmed on real CI or reproduced locally before it was fixed.
+
+- **Temp-file name collisions between threads** (product bug): the events lock, `session.json`, trust-store, reconciliation-planner and visibility-session built temp names from `pid+Date.now()` (plus a per-module counter). Worker threads share one pid and each thread has its own counter. CI hit `ENOENT link .events.lock.tmp-<pid>-<ms>-1` on both ubuntu and macOS. Fix: `src/util/unique-tmp-tag.mjs` (pid + threadId + time + random bytes). Impact: HIGH, 20 callers of the events lock; only the temp name changes.
+- **Writer identity unstable under load** (product bug): `resolveWriterIdentity` re-walks the ancestor pids with `ps` (200 ms per hop) on every call. On a loaded host a slow hop stops the walk at a different ancestor, so one process claims as one id and settles as another (`settleClaim: writer identity mismatch`, exit 3). This was `loop.test.mjs` "overshooting batch": 15/16 red at 8-way parallelism. Fix: resolve once per process and reuse. Regression test forces a slow `ps` (red without the fix). After the fix: 16/16 green. Impact: HIGH (20 callers); the env-session path is unchanged.
+- **bwrap tests gated on `--version`**: Ubuntu 24.04 ships bwrap but AppArmor blocks unprivileged userns ("setting up uid map"). The guards now check that bwrap can actually build a sandbox, and CI plus the nightly set `kernel.apparmor_restrict_unprivileged_userns=0` so confinement is really exercised.
+- **Two-process race test with no runnerConfig**: whenever the dispatch worker won the race on a machine with no assistant CLI, it failed validation. Same class as #2.
+- **Windows hang (6h on every run)**: the spec reporter holds back each file's output until the file exits. The log stops right after `loop.test.mjs`, but the file that never exits is the next one, `main-checkout-lock.test.mjs`: the SIGSTOP test's `child.kill('SIGSTOP'/'SIGCONT')` throws on Windows, so the `SIGKILL` in `finally` never runs, and a child blocked with `setInterval` holds the stdout pipe. Fix: every holder child is killed in `after`, and the SIGSTOP test skips on win32. The diagnostic step is kept for one more CI round to confirm.
+- **Inode exhaustion, machine-wide**: tests leave temp fixtures in `/tmp` (`fgos-cli-*` alone had 160k), 800k+ entries in total, 100% of inodes used. Every `mkdtemp` failed with ENOSPC. Fix at the choke point: `runSelectedTests` and the coverage collector give each run its own TMPDIR and delete it afterwards. Stale fixtures older than 2h matching test prefixes were removed from `/tmp` (excluding `fgos-worktrees` and `fgos-gateway*`).
+- **Nightly environment ≠ CI**: the nightly did not install zsh, set no git identity and did not build Rust, so `fgos-shell-integration`, `loop` and `rust-host` were red there for environmental reasons. It now mirrors the CI `test` job.
+- **Mutation ledger false `confirmed-miss`**: the full suite had no baseline. Fixed: a failure only counts as a miss when it is new relative to a full-suite baseline on the clean HEAD.
+- **`NODE_TEST_CONTEXT` leaked into nested `node --test` runs**: a nested run exits 0 without running any test, which made the mutate integration test pass vacuously. Fixed: `buildTestEnv` is the shared env for every spawned test run.
+
+## Windows: known failures remaining (separate item)
+
+When `loop.test.mjs` runs alone on Windows, 2/103 tests fail:
+- `resolveRepoRoot` returns the forward-slash long path (`C:/Users/runneradmin/...`), while the test expects the 8.3 short path from `os.tmpdir()` (`RUNNER~1`).
+- "cli-spawn cwd selection for planning.validate-plan": the executor is never called on Windows.
+
+These are Windows path/shell support gaps, not hermeticity. They are out of scope for this PR. The full list will be visible once the Windows job runs to completion.
+
 ## Not in scope
 
 - Windows rust-host: needs a decision on whether to build Rust on Windows.
