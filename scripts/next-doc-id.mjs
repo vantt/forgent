@@ -6,6 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 /**
  * Pure: given file content and a regex pattern string with exactly one
@@ -42,6 +43,6 @@ function runCli(argv, cwd) {
   console.log(String(nextFreeId(text, pattern)));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   runCli(process.argv.slice(2), process.cwd());
 }

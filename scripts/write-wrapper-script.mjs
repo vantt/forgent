@@ -3,6 +3,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 /**
  * Creates an executable shell wrapper script containing the specified command.
@@ -58,7 +59,7 @@ export function runCli(argv = process.argv.slice(2), cwd = process.cwd()) {
   process.stdout.write(`${filePath}\n`);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   try {
     runCli();
   } catch (err) {

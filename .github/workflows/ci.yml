@@ -42,17 +42,31 @@ jobs:
       # includes test/install-packaging.test.mjs (the pack -> install -g ->
       # fgos init proof) and test/setup/doctor-fresh-run.test.mjs (the
       # fresh-runner fgos doctor proof, D4) on every OS in the matrix above.
+      #
+      # `mkdir -p test-results` runs first because `--test-reporter-destination`
+      # never creates its own output directory: node --test opens the file for
+      # writing at test-run start and crashes (ENOENT, exit 7, zero tests run)
+      # the instant that directory is missing. `shell: bash` keeps the same
+      # mkdir/test invocation on all three OSes in the matrix.
       - name: npm test (includes install-packaging matrix proof)
-        run: npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+        id: run-tests
+        shell: bash
+        run: |
+          mkdir -p test-results
+          set +e
+          npm test -- --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/full.xml
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
         env:
           FORCE_COLOR: 1
 
       - name: Write test marker
         if: always()
-        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml
+        run: node scripts/write-test-marker.mjs --type full --xml test-results/full.xml --exit-code "${{ steps.run-tests.outputs.exit_code }}"
         env:
           JOB_STATUS: ${{ job.status }}
-          
+
       - name: Upload full results
         if: always()
         uses: actions/upload-artifact@v4
@@ -127,14 +141,22 @@ jobs:
       - run: npm install
 
       - name: Run related tests
-        run: node scripts/test-select-run-plan.mjs --files-from selector-plan.json --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/related.xml
+        id: run-tests
+        shell: bash
+        run: |
+          mkdir -p test-results
+          set +e
+          node scripts/test-select-run-plan.mjs --files-from selector-plan.json --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=test-results/related.xml
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
         env:
           FORCE_COLOR: 1
           NODE_V8_COVERAGE: coverage/related
 
       - name: Write test marker
         if: always()
-        run: node scripts/write-test-marker.mjs --type related --xml test-results/related.xml --plan selector-plan.json
+        run: node scripts/write-test-marker.mjs --type related --xml test-results/related.xml --plan selector-plan.json --exit-code "${{ steps.run-tests.outputs.exit_code }}"
         env:
           JOB_STATUS: ${{ job.status }}
 

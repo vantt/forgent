@@ -90,12 +90,20 @@ export {
 } from './dispatch/assignment-runner.mjs';
 
 import { runDispatchCli } from './dispatch/cli.mjs';
+import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
 
 // CLI entry point — only runs when this file is executed directly (`node
 // src/runner/dispatch.mjs ...`), never on import (every existing caller
-// imports named exports, none execute this module as a script). Unchanged
-// guard condition from before the split; the body it calls now lives in
-// dispatch/cli.mjs (`runDispatchCli`) — pure relocation, no behavior change.
-if (import.meta.url === `file://${process.argv[1]}`) {
+// imports named exports, none execute this module as a script). The body
+// it calls now lives in dispatch/cli.mjs (`runDispatchCli`) — pure
+// relocation, no behavior change. The guard itself moved off a raw
+// `import.meta.url === \`file://${process.argv[1]}\`` comparison: that
+// never matches on Windows, on any OS when the resolved path has a space,
+// or when this file is invoked through a symlink (a wrapper bin, a
+// dev-checkout shell helper) -- each case makes the guard silently not
+// fire, so `node src/runner/dispatch.mjs decide ...` (the exact invocation
+// AGENTS.md's Dispatch section and a PreToolUse hook require) would exit 0
+// having done nothing instead of running.
+if (isMainModule(import.meta.url)) {
   runDispatchCli();
 }
