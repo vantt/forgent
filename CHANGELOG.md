@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-- **Fixed**: `npm test` on CI previously ran zero tests on every OS after `test-results/` stopped being committed — the junit reporter's destination directory never existed at test-start, so `node --test` crashed before running anything and the step still reported a runtime under a second. Windows separately reported a false "success" with zero tests run, for an unrelated pre-existing reason: its own entrypoint-detection guard never actually matched on Windows paths, so `npm test` silently did nothing there.
+- **Fixed**: `npm test` on CI previously ran zero tests on every OS after `test-results/` stopped being committed — the junit reporter's destination directory never existed at test-start, so `node --test` crashed before running anything and the step still reported a runtime under a second.
+- **Fixed**: several CLI scripts' entrypoint detection (`node <script>.mjs` vs. being imported) silently never matched — always on Windows, and on any OS when the resolved path contained a space or the script was invoked through a symlink — making the script exit 0 having done nothing. This affected `npm test` on Windows and `node src/runner/dispatch.mjs decide/execute/log` (the CLI door `AGENTS.md`'s Dispatch section and a project hook both require) whenever fgOS itself was installed or checked out under such a path.
 - **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
 - **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
 

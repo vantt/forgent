@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -10,9 +10,17 @@ import {
   writeMarker,
 } from '../../scripts/write-test-marker.mjs';
 
+const createdDirs = [];
+
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'write-test-marker-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'write-test-marker-'));
+  createdDirs.push(dir);
+  return dir;
 }
+
+after(() => {
+  for (const dir of createdDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 // --- countXmlCases -----------------------------------------------------
 
@@ -62,7 +70,7 @@ test('parseArgs reads --plan', () => {
   assert.equal(args.planPath, 'selector-plan.json');
 });
 
-// --- buildMarker: `completed` correctness (TI-02b) ------------------------
+// --- buildMarker: `completed` correctness ---------------------------------
 
 test('completed is false when the job crashed before any test ran (0 cases, no xml)', () => {
   const dir = tmpDir();
@@ -123,6 +131,21 @@ test('completed is true for a real green run: xml exists, cases > 0, job succeed
   });
   assert.equal(marker.completed, true);
   assert.equal(marker.reportedCases, 2);
+});
+
+test('completed is false when exitCode is null, even with real cases and a successful job status', () => {
+  const dir = tmpDir();
+  const xmlPath = path.join(dir, 'full.xml');
+  fs.writeFileSync(xmlPath, '<testsuite><testcase name="a"/></testsuite>');
+  const marker = buildMarker({
+    runType: 'full',
+    xmlPath,
+    planPath: null,
+    exitCode: null,
+    jobStatus: 'success',
+    env: {},
+  });
+  assert.equal(marker.completed, false);
 });
 
 test('completed is true for a real red run: xml exists, cases > 0, job failed', () => {

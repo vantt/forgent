@@ -31,10 +31,12 @@ export function parseArgs(argv) {
 
 /**
  * A run only counts as `completed` when there is actual evidence it ran to a
- * real conclusion: a junit file exists, it reports at least one case, and the
+ * real conclusion: a junit file exists, it reports at least one case, the
  * job itself ended in `success` or `failure` (never `cancelled`/`skipped`/an
- * unset `unknown` default) -- a crash before any test executes, or a workflow
- * cancellation, must never read back as a quietly-passing empty run.
+ * unset `unknown` default), and a real exit code was actually recorded --
+ * a crash before any test executes, a workflow cancellation, or a caller
+ * that never passed `--exit-code` at all, must never read back as a
+ * quietly-passing empty run.
  */
 export function buildMarker({ runType, xmlPath, planPath, exitCode, jobStatus, env = process.env }) {
   let plannedFiles = 0;
@@ -49,7 +51,8 @@ export function buildMarker({ runType, xmlPath, planPath, exitCode, jobStatus, e
 
   const xmlExists = fs.existsSync(xmlPath);
   const reportedCases = countXmlCases(xmlPath);
-  const completed = xmlExists && reportedCases > 0 && (jobStatus === 'success' || jobStatus === 'failure');
+  const completed =
+    xmlExists && reportedCases > 0 && exitCode !== null && (jobStatus === 'success' || jobStatus === 'failure');
 
   return {
     sha: env.GITHUB_SHA || 'unknown',
