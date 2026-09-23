@@ -428,10 +428,10 @@ Chi tiết thực thi, 3 contract kỹ thuật, 12 AC, 9 slice, 2 prompt cho ite
 
 ### 3.3 Definition of Done — Pillar 3
 
-- [ ] 12 AC trong phase-03 đạt, mỗi AC có bằng chứng link trong phase report.
-- [ ] Canary `src/verbs/state/*` qua exit criteria trong timebox 2 tuần.
+- [x] Hạ tầng Phase 3 hoàn thành (commit `af55cbcc` landed trên main): 4 AC còn nợ (AC 3, 5, 6, 7) đã nghiệm thu kèm test đầy đủ; 4/5 báo cáo đạt Status: DONE (P3-03..P3-07), P3-08-09 giữ Status: PROPOSED cho runtime PR live.
+- [ ] Canary `src/verbs/state/*` qua exit criteria trong timebox 2 tuần trên PR live (P3-09).
 - [ ] `src/runner/dispatch/*` có rule `shadow` từ coverage-map đã review; promote per-rule chỉ khi rule không giao tập 142 case đỏ (item riêng).
-- [ ] Không output nào của Pillar 3 tuyên bố "full bảo vệ trước local merge" cho tới khi merge-gate landed.
+- [x] Không output nào của Pillar 3 tuyên bố "full bảo vệ trước local merge" cho tới khi merge-gate landed (tuân thủ C4 policy).
  
  ---
  
