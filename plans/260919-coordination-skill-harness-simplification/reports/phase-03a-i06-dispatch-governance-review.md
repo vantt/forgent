@@ -6,7 +6,7 @@
 - **Branch**: `coordination-skill-harness-i06-dispatch-governance`
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i06-dispatch-governance`
 - **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
-- **Candidate Lineage**: `b67f3794ae545d9ddcb3ce711879dd1c4dc1f012` -> `2e210796322cbb950a95703aa7b4d05ed357cd03` -> `d6dc386f442698a07dfadb01c151ec927cedd819`
+- **Candidate Lineage**: `b67f3794ae545d9ddcb3ce711879dd1c4dc1f012` -> `2e210796322cbb950a95703aa7b4d05ed357cd03` -> `d6dc386f442698a07dfadb01c151ec927cedd819` -> `d75d311d1b7a853bfede60c4bf52e10b0a41c82f`
 - **Current Candidate Status**: `implemented` (status: `implemented`; ready for independent re-review verification; non-integrated candidate)
 - **Next Dependency Gate**: Unit I08 (dispatch verification) and Unit I09 (DAG forward-port)
 
@@ -22,7 +22,10 @@
 | **Round 2 Candidate** | `2e210796322cbb950a95703aa7b4d05ed357cd03` |
 | **Round 2 Verdict** | `REQUEST CHANGES` (I06-TM-01 cross-plan status accounting contract) |
 | **Round 3 Candidate** | `d6dc386f442698a07dfadb01c151ec927cedd819` |
-| **Ancestry** | Base is direct ancestor of candidate; range 0 behind / 2 ahead |
+| **Round 3 Verdict** | `REQUEST CHANGES` (I06-REREVIEW-01 cross-plan accounting citations) |
+| **Round 4 Candidate** | `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` |
+| **Round 4 Verdict** | `REQUEST CHANGES` (I06-REREVIEW-02 candidate tip accounting) |
+| **Ancestry** | Base is direct ancestor of candidate; range 0 behind / 3 ahead |
 | **Branch / Worktree** | `coordination-skill-harness-i06-dispatch-governance` |
 | **Integration Status** | **Not integrated**; candidate remains on isolated worktree branch |
 
@@ -50,6 +53,15 @@
   3. Updated implementation report with candidate SHA, status, and next gate.
   4. Checked in this independent review report (`phase-03a-i06-dispatch-governance-review.md`).
   5. Maintained non-integration stance across all documents.
+
+### 2.4 I06-REREVIEW-02 — Candidate Tip Accounting (Discharged)
+- **Finding**: Affected docs recorded `d6dc386f` instead of current candidate tip `d75d311d1b7a853bfede60c4bf52e10b0a41c82f`; ancestry range was reported as `0 behind / 2 ahead` instead of `0 behind / 3 ahead`.
+- **Discharge Evidence**:
+  1. Updated `plans/260919-coordination-skill-harness-simplification/plan.md:805-806` to record `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` as candidate SHA and `last-verified: 2026-09-23 at candidate d75d311d`.
+  2. Updated `plans/260920-2217-dispatch-engine-hardening/phase-05-policy-governance-coherence.md:10-11` to record `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` as candidate SHA and last-verified revision `d75d311d`.
+  3. Updated `reports/phase-03a-i06-dispatch-governance-implementation.md:9` to record `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` as candidate SHA.
+  4. Updated `reports/phase-03a-i06-dispatch-governance-review.md` candidate lineage to `b67f3794 -> 2e210796 -> d6dc386f -> d75d311d` and ancestry range to `0 behind / 3 ahead`.
+  5. Verified `rg "d75d311d"` returns matches across all four accounting files.
 
 ---
 
