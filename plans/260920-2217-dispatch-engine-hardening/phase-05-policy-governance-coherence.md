@@ -2,9 +2,25 @@
 
 Wave 3 · Gate: D1 cho H6(b); M5 phối hợp chủ plan `260915-executor-policy-dispatch-seams` (Phase 08 pending) · Findings: H6, H12, M5, M6, M7, M12, L4. Context: review §H6/H12/M5/M6/M7/M12, Phụ lục 1/2.
 
-## Status — 2026-09-22
+## Status — 2026-09-23 (Unit I06 / Phase 3A Completion)
 
-**R1–R8 100% hoàn tất** (Unit I06 / Phase 3A trong `plans/260919-coordination-skill-harness-simplification/plan.md`) trên nhánh `coordination-skill-harness-i06-dispatch-governance` (worktree cùng tên, rẽ từ `main` commit `15e4048503ca1ee02dae23263dee84b9c983386d`).
+- **Status**: `implemented` (awaiting independent review verification; not claimed as integrated).
+- **Candidate Branch**: `coordination-skill-harness-i06-dispatch-governance`
+- **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
+- **Candidate SHA**: `2e210796322cbb950a95703aa7b4d05ed357cd03` (lineage `b67f3794` -> `2e210796`)
+- **Last-Verified Date / Revision**: 2026-09-23 at revision `2e210796`
+- **Next Dependency Gate**: Unit I08 (dispatch governance/CLI/doctor verification) and Unit I09 (DAG forward-port).
+- **Direct Candidate Evidence**:
+  - `node --test test/architecture.test.mjs test/runner/dispatch-cross-provider-redirect.test.mjs test/runner/placement-policy-matrix-coverage.test.mjs test/runner/placement-policy-redirect-selection.test.mjs test/runner/placement-policy.test.mjs test/runner/dispatch-coordination-role-tiers.test.mjs`: 101 pass / 0 fail (~4.1s).
+  - `node --test test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail (~15.9s).
+  - Full dispatch test matrix: 560 pass / 0 fail.
+  - 11-suite coordination matrix: 317 pass / 0 fail.
+  - `git diff --check`: 0 warnings/errors (clean).
+- **Historical Evidence (separated)**:
+  - Initial Phase 05 exploration (2026-09-22 morning): 529 tests passing across dispatch.test.mjs / assignment-policy.test.mjs / placement-policy.test.mjs.
+
+### Requirements Summary (R1–R8)
+
 - **R5 (M6)**: Revalidated — `deriveProviderFamily` và `normalizeProviderFamily` đã là single canonical path trong `assignment-policy.mjs`. Model lookup / tier resolution đã được phân định độc lập (`modelForTier`, `resolveVerifiedAssignmentModel`). Giữ nguyên, không thêm abstraction `lookupProvider` không cần thiết.
 - **R6 (M7)**: Hoàn tất trọn vẹn contract `crossProvider: true`:
   - `normalizePreferCandidates` (`config.mjs`) validate boolean `crossProvider` cho pool entries (default `false`).
@@ -15,7 +31,7 @@ Wave 3 · Gate: D1 cho H6(b); M5 phối hợp chủ plan `260915-executor-policy
 - **R7 (M5)**: Settled theo **Disposition 1: Retain live PlacementPolicy authority and deduplicate duplicate selection logic**.
   - `PlacementPolicy` là binder thực sự cho model resolution và redirect invocations.
   - Deduplicate: loại bỏ `stableIndex` trùng lặp trong `assignment-runner.mjs`, import và dùng canonical `stablePoolIndex` từ `placement-policy.mjs`.
-  - Giữ lại `evaluatePlacementPolicyShadow` để bảo vệ test coverage lịch sử mà không sinh duplicate code trong production.
+  - Giữ lại `evaluatePlacementPolicyShadow` để bảo vệ test coverage lịch sử mà không sinh duplicate code trong production. Doc comment cập nhật phản ánh đúng việc chia sẻ canonical.
 - **R8 (L4)**: Cắt trọn vẹn import cycle giữa `config.mjs` và `transport.mjs`:
   - Tạo `src/runner/dispatch/adapters.mjs` leaf module chứa adapter registry và lookup helpers.
   - `config.mjs` chỉ import từ `adapters.mjs`.
