@@ -25,6 +25,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { findWorkerClaim } from './worker-artifacts.mjs';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 export class VisibilityError extends Error {
   constructor(code, message, details = {}) {
@@ -86,7 +87,7 @@ function readJson(file) {
 /** Write through a temp file in the same directory, then rename. A reader
  * polling this file must never catch it half-written. */
 function writeJsonAtomic(file, value) {
-  const tmp = `${file}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  const tmp = `${file}.tmp-${uniqueTmpTag()}`;
   try {
     fs.writeFileSync(tmp, `${JSON.stringify(value, null, 2)}\n`);
     fs.renameSync(tmp, file);

@@ -15,6 +15,7 @@ import { inspectDispatchRuntime, findCoordinationSessionOwningAssignment, isWith
 // boundary (see the file-top comment and the static import-graph test in
 // test/runner/dispatch-reconciliation-import-graph.test.mjs).
 import { RUN_STATUSES } from './visibility-session.mjs';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map(stable).join(',')}]` : `{${Object.keys(v).sort().map((k) => `${JSON.stringify(k)}:${stable(v[k])}`).join(',')}}`) : JSON.stringify(v);
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
@@ -583,7 +584,7 @@ function applyCollectResult(root, plan, { now }) {
       if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
       throw err;
     }
-    const tmp = `${plan.proposedAction.path}.tmp-${process.pid}-${Date.now().toString(36)}`;
+    const tmp = `${plan.proposedAction.path}.tmp-${uniqueTmpTag()}`;
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, resultCollectedAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
@@ -690,7 +691,7 @@ function applyRepairProjection(root, plan, { now }) {
       if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'the run record was removed since planning' };
       throw err;
     }
-    const tmp = `${plan.proposedAction.path}.tmp-${process.pid}-${Date.now().toString(36)}`;
+    const tmp = `${plan.proposedAction.path}.tmp-${uniqueTmpTag()}`;
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, status: SETTLED_STATUS, settledAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);

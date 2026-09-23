@@ -581,6 +581,10 @@ test('concurrent two-OS-process race: exactly one process succeeds and second is
     assert.ok(action1, 'record-human-turn must be projected');
     assert.ok(action2, 'dispatch-operation must be projected');
 
+    // A deterministic executor, never whatever assistant CLI happens to be on
+    // this machine's PATH: without it the dispatch worker fails validation on
+    // a machine with no claude/codex whenever it wins the race.
+    const runnerConfig = makeCohortRunnerConfig(tempDir);
     const makeWorkerScript = (scriptPath, act, payload) => {
       fs.writeFileSync(
         scriptPath,
@@ -598,7 +602,7 @@ test('concurrent two-OS-process race: exactly one process succeeds and second is
 
         try {
           await executeCoordinationActionUseCase(
-            { cwd: tempDir, repoRoot: tempDir },
+            { cwd: tempDir, repoRoot: tempDir, runnerConfig: ${JSON.stringify(runnerConfig)} },
             action,
           );
           process.stdout.write('OUTCOME:SUCCESS\\n');

@@ -30,6 +30,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 /** Raised for every refusal and every failure. Carries a `code` so a caller can
  * branch on the reason without matching message text. */
@@ -266,7 +267,7 @@ export function seedCodexTrust(configPath, { projectPath, repoRoot } = {}) {
     throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
   }
   const entry = `\n[projects."${projectPath}"]\ntrust_level = "trusted"\n`;
-  const tmp = `${configPath}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
     fs.writeFileSync(tmp, `${body.replace(/\n*$/, '\n')}${entry}`);
     fs.renameSync(tmp, configPath);
@@ -287,7 +288,7 @@ export function removeCodexTrust(configPath, projectPath) {
     return false;
   }
   const next = body.replace(codexSectionPattern(projectPath), '');
-  const tmp = `${configPath}.tmp-${process.pid}-${Date.now().toString(36)}`;
+  const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
     fs.writeFileSync(tmp, next);
     fs.renameSync(tmp, configPath);

@@ -21,6 +21,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { SCHEMA_VERSION } from './work.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
+import { uniqueTmpTag } from '../util/unique-tmp-tag.mjs';
 
 // Cross-process append lock. `appendEvent` reads the log's last seq then
 // appends — a read-then-write window that, unguarded, lets two concurrent
@@ -273,7 +274,6 @@ function sleepSync(ms) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
-let lockTmpCounter = 0;
 
 /** One attempt at the link-atomic-create lock, mirroring acquireRunnerLock /
  * acquireSessionsLock's stale-pid-reclaim shape. On EEXIST: a live-pid holder
@@ -298,8 +298,7 @@ let lockTmpCounter = 0;
  * over with a retry. */
 function tryAcquireEventsLockOnce(lockPath, pid) {
   const dir = path.dirname(lockPath);
-  lockTmpCounter += 1;
-  const tmpPath = path.join(dir, `.events.lock.tmp-${pid}-${Date.now()}-${lockTmpCounter}`);
+  const tmpPath = path.join(dir, `.events.lock.tmp-${uniqueTmpTag()}`);
   fs.writeFileSync(tmpPath, String(pid), 'utf8');
   try {
     fs.linkSync(tmpPath, lockPath);

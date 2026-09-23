@@ -1052,9 +1052,12 @@ test("recorded herdrName is normalized identically to the launch call's own agen
 // own local backendPlan/preparedConfinement never written back to the
 // caller's same-named outer variables. ─────────────────────────────────────
 
+// bwrap must be able to build a sandbox here, not merely be installed: a host
+// that blocks unprivileged user namespaces (Ubuntu 24.04's AppArmor default)
+// has the binary but fails every probe with "setting up uid map".
 const BWRAP_PRESENT = (() => {
   try {
-    return spawnSync("bwrap", ["--version"], { stdio: "ignore" }).status === 0;
+    return spawnSync("bwrap", ["--ro-bind", "/", "/", "--", "true"], { stdio: "ignore" }).status === 0;
   } catch {
     return false;
   }

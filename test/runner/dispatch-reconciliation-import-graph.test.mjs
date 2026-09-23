@@ -121,6 +121,9 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
     'src/config/global-config.mjs',
     'src/config/shared-config-file.mjs',
     'src/setup/config-merge.mjs',
+    // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
+    // names for the planner's and visibility-session's write-then-rename.
+    'src/util/unique-tmp-tag.mjs',
   ].map((p) => path.join(root, p)).sort();
   assert.deepEqual([...seen].sort(), expected);
 });

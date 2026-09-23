@@ -39,6 +39,7 @@ import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
   if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
@@ -177,11 +178,9 @@ export function readManifestRaw(manifestPath) {
 // closes this, not the readers. `rename` within one directory is atomic on
 // POSIX -- a concurrent reader always observes either the complete OLD file
 // or the complete NEW one, never a partial write.
-let manifestTmpCounter = 0;
 function writeManifestRaw(manifestPath, manifest) {
   const dir = path.dirname(manifestPath);
-  manifestTmpCounter += 1;
-  const tmpPath = path.join(dir, `.session.json.tmp-${process.pid}-${Date.now()}-${manifestTmpCounter}`);
+  const tmpPath = path.join(dir, `.session.json.tmp-${uniqueTmpTag()}`);
   fs.writeFileSync(tmpPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   fs.renameSync(tmpPath, manifestPath);
 }

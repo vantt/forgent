@@ -21,7 +21,15 @@ jobs:
 
       - name: Install Linux test tools
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y bubblewrap zsh
+        # Ubuntu 24.04 blocks unprivileged user namespaces via AppArmor, which
+        # leaves bwrap installed but unable to build a sandbox; lift it so the
+        # required-confinement tests really run here instead of skipping.
+        run: |
+          sudo apt-get update && sudo apt-get install -y bubblewrap zsh
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --ro-bind / / -- true && echo "bwrap can build a sandbox"
 
       - name: Configure git identity for fixture repos
         run: |

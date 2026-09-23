@@ -949,14 +949,10 @@ test("R7: read-only DEFAULT_CAPABILITY_SLOTS use the explicit interim unconfined
 // actually on this machine -- FGOS_LIVE_BWRAP_TESTS is now an opt-OUT
 // ('0' skips even when bwrap is present), not an opt-IN. A machine with no
 // bwrap at all still skips (no explicit '1' can make a real spawn succeed).
-const BWRAP_AVAILABLE = (() => {
-  try {
-    const r = cp.spawnSync("bwrap", ["--version"], { stdio: "ignore" });
-    return r.error === undefined && r.status === 0;
-  } catch {
-    return false;
-  }
-})();
+// "Available" means bwrap can actually build a sandbox here, not just that
+// the binary exists: Ubuntu 24.04 ships bwrap but blocks unprivileged user
+// namespaces by default ("setting up uid map: Permission denied").
+const BWRAP_AVAILABLE = HAS_WORKING_BWRAP;
 const skipLiveBwrap =
   process.env.FGOS_LIVE_BWRAP_TESTS === "0"
     ? true
