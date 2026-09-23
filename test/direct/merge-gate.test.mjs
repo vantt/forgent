@@ -4,6 +4,7 @@ import { tmpCwdFast } from '../cli/helpers/fgos-cli-harness.mjs';
 import { approveUseCase } from '../../src/verbs/merge/approve.mjs';
 import { addWork } from '../../src/state/store.mjs';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -25,7 +26,7 @@ function addTestWork(dir, id, extra = {}) {
 }
 
 test('approve gate: aborts cleanly on test failure without modifying main', async (t) => {
-  const cwd = fs.mkdtempSync(path.join('/tmp', 'test-gate-'));
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'test-gate-'));
   
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
