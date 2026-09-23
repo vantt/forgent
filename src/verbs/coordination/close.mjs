@@ -9,8 +9,27 @@ import {
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
 import { validateCoordinationCloseRequest } from './schema.mjs';
 import { resolveMainCheckoutRoot } from '../../runner/paths.mjs';
-import { assertDriverIdentity } from '../../runner/coordination/store.mjs';
+import { assertDriverIdentity, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { executeUnderActionPrecondition } from '../../runner/coordination/action-precondition.mjs';
+import { computeDagSharedCwdCaveats } from '../../runner/coordination/dag-declaration.mjs';
+import { resolveNodeCwd } from './dag-scheduler.mjs';
+
+function checkDagCloseCaveats(dagDeclaration, assignments, fgosDir, defaultCwd) {
+  if (!dagDeclaration?.nodes) return null;
+  const nodeCwds = new Map();
+  for (const node of dagDeclaration.nodes) {
+    const nodeAssignments = (assignments ?? []).filter((entry) => entry.dagNodeId === node.id);
+    nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, defaultCwd));
+  }
+  const dagCaveats = computeDagSharedCwdCaveats({
+    declaredNodes: dagDeclaration.nodes,
+    getNodeCwd: (id) => nodeCwds.get(id),
+  });
+  if (dagCaveats.size > 0) {
+    return 'recheck-required: concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats';
+  }
+  return null;
+}
 
 function aggregationCloseParams(coordinationId, engineOpts, manifest, aggregations) {
   if (!manifest.definitionRef) return {};
@@ -68,18 +87,23 @@ export async function executeCoordinationCloseKernel(ctx, request, options = {})
         const aggregations = replayed?.aggregations ?? [];
         let closed = false;
         let closeRefusalReason = null;
-        try {
-          const closeParams = aggregationCloseParams(coordinationId, engineOpts, freshManifest, aggregations);
-          closeParams.authorizedBy = request.authorizedBy;
-          if (request.dissentingActorIds) closeParams.dissentingActorIds = request.dissentingActorIds;
-          if (request.aggregationId) closeParams.aggregationId = request.aggregationId;
-          closeSessionByQuorumLocked(coordinationId, closeParams, paths, engineOpts);
-          closed = true;
-        } catch (err) {
-          if (err instanceof CoordinationError && err.category === 'refusal') {
-            closeRefusalReason = err.message;
-          } else {
-            throw err;
+        const dagCaveatReason = checkDagCloseCaveats(replayed?.dag?.declaration, replayed?.assignments, paths?.fgosDir, engineOpts.cwd);
+        if (dagCaveatReason) {
+          closeRefusalReason = dagCaveatReason;
+        } else {
+          try {
+            const closeParams = aggregationCloseParams(coordinationId, engineOpts, freshManifest, aggregations);
+            closeParams.authorizedBy = request.authorizedBy;
+            if (request.dissentingActorIds) closeParams.dissentingActorIds = request.dissentingActorIds;
+            if (request.aggregationId) closeParams.aggregationId = request.aggregationId;
+            closeSessionByQuorumLocked(coordinationId, closeParams, paths, engineOpts);
+            closed = true;
+          } catch (err) {
+            if (err instanceof CoordinationError && err.category === 'refusal') {
+              closeRefusalReason = err.message;
+            } else {
+              throw err;
+            }
           }
         }
         const finalQuorum = evaluateSessionQuorum(coordinationId, engineOpts);
@@ -102,7 +126,9 @@ export async function executeCoordinationCloseKernel(ctx, request, options = {})
   // Backward-compatibility path: unkeyed close bypasses executeUnderActionPrecondition.
   // Note (F11 contract boundary): Phase 2 composers and semantic mutating verbs MUST
   // supply a valid actionKey to ensure atomic lock-held stale-precondition verification.
-  const { manifest, aggregations } = resumeSession(coordinationId, engineOpts);
+  const replayed = resumeSession(coordinationId, engineOpts);
+  const { manifest, aggregations, assignments, dag } = replayed;
+  const { fgosDir } = resolveSessionPaths(coordinationId, engineOpts);
 
   const quorumBeforeClose = evaluateSessionQuorum(coordinationId, engineOpts);
   let closed = false;
@@ -114,16 +140,21 @@ export async function executeCoordinationCloseKernel(ctx, request, options = {})
     subject: 'a session close',
   });
 
-  try {
-    const closeParams = aggregationCloseParams(coordinationId, engineOpts, manifest, aggregations);
-    closeParams.authorizedBy = request.authorizedBy;
-    closeSessionByQuorum(coordinationId, closeParams, engineOpts);
-    closed = true;
-  } catch (err) {
-    if (err instanceof CoordinationError && err.category === 'refusal') {
-      closeRefusalReason = err.message;
-    } else {
-      throw err;
+  const dagCaveatReason = checkDagCloseCaveats(dag?.declaration, assignments, fgosDir, engineOpts.cwd);
+  if (dagCaveatReason) {
+    closeRefusalReason = dagCaveatReason;
+  } else {
+    try {
+      const closeParams = aggregationCloseParams(coordinationId, engineOpts, manifest, aggregations);
+      closeParams.authorizedBy = request.authorizedBy;
+      closeSessionByQuorum(coordinationId, closeParams, engineOpts);
+      closed = true;
+    } catch (err) {
+      if (err instanceof CoordinationError && err.category === 'refusal') {
+        closeRefusalReason = err.message;
+      } else {
+        throw err;
+      }
     }
   }
 

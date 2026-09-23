@@ -29,7 +29,9 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
   SCHEMA_VERSION_2,
+  SCHEMA_VERSION_3,
 } from './schema.mjs';
+import { normalizeDagDeclaration, getAuthoritativeSettledAssignmentIds } from './dag-declaration.mjs';
 import { validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
 // Same parse+validate path store.mjs's own read/write operations use (never
@@ -67,6 +69,7 @@ export function replaySession(coordinationId, opts = {}) {
   const events = readEvents(eventsPath);
 
   const createdIds = new Map(); // assignmentId -> event
+  let dagDeclaration = null;
   // Phase 06 R2: a second (or later) `result-linked` event for the SAME
   // assignmentId is legal ONLY when a `run-retried` event for that
   // assignmentId appears strictly between the previous link and this one --
@@ -174,6 +177,15 @@ export function replaySession(coordinationId, opts = {}) {
 
   for (const event of events) {
     validateEventPayload(event.type, event.payload);
+
+    if (event.type === 'dag-declared') {
+      if (manifest.schemaVersion !== SCHEMA_VERSION_3) {
+        throw new CoordinationError('validation', `session "${coordinationId}": DAG declaration appears outside schema-3`);
+      }
+      if (dagDeclaration) throw new CoordinationError('duplicate-ref', `session "${coordinationId}": duplicate "dag-declared" event`);
+      dagDeclaration = normalizeDagDeclaration(event.payload.declaration);
+      continue;
+    }
 
     if (TERMINAL_EVENT_TYPES.has(event.type)) {
       terminalSeen = true;
@@ -639,6 +651,7 @@ export function replaySession(coordinationId, opts = {}) {
         actorId: event.payload.actorId,
         operationId: event.payload.operationId,
         nodeId: event.payload.nodeId,
+        dagNodeId: event.payload.dagNodeId,
         authorizationId: event.payload.authorizationId,
         invocationKey: event.payload.invocationKey,
         ...(event.payload.contextGrant !== undefined
@@ -687,6 +700,24 @@ export function replaySession(coordinationId, opts = {}) {
       // idempotent-append guard (recordActorReplacement) is what prevents a
       // duplicate at write time; replay has no additional cross-event rule
       // to enforce here.
+    }
+  }
+
+  const declaredNodeIds = dagDeclaration ? new Set(dagDeclaration.nodes.map((n) => n.id)) : null;
+  for (const [id, event] of createdIds) {
+    if (event.payload.dagNodeId) {
+      if (!dagDeclaration) {
+        throw new CoordinationError(
+          'dangling-ref',
+          `session "${coordinationId}": assignment "${id}" references dagNodeId "${event.payload.dagNodeId}", but session has no "dag-declared" event`,
+        );
+      }
+      if (!declaredNodeIds.has(event.payload.dagNodeId)) {
+        throw new CoordinationError(
+          'dangling-ref',
+          `session "${coordinationId}": assignment "${id}" references dagNodeId "${event.payload.dagNodeId}", which is not declared in the session's DAG`,
+        );
+      }
     }
   }
 
@@ -762,6 +793,40 @@ export function replaySession(coordinationId, opts = {}) {
     assertAssignmentIsSessionBlind(assignmentObj, id);
   }
 
+  const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(events);
+  const dag = dagDeclaration
+    ? Object.freeze({
+        kind: 'dag',
+        declaration: dagDeclaration,
+        nodes: Object.freeze(
+          dagDeclaration.nodes.map((node) => {
+            const nodeAssignments = assignments.filter((assignment) => assignment.dagNodeId === node.id);
+            const materialized = nodeAssignments.length > 0;
+            const settled = nodeAssignments.some((assignment) => settledAssignmentIds.has(assignment.assignmentId));
+            const dependenciesSettled = node.dependsOn.every((dependencyId) => {
+              const dependencyAssignments = assignments.filter((assignment) => assignment.dagNodeId === dependencyId);
+              return dependencyAssignments.some((assignment) => settledAssignmentIds.has(assignment.assignmentId));
+            });
+            // A terminal session cannot still offer new work.  We use the
+            // existing refused fact (rather than persist a new lifecycle
+            // status) for every declared node never materialized at close.
+            const refused = !materialized && manifest.status !== 'active';
+            return Object.freeze({
+              nodeId: node.id,
+              displayLabel: node.displayLabel,
+              declared: true,
+              pending: !materialized && dependenciesSettled && !refused,
+              materialized,
+              settled,
+              refused,
+              blocked: !materialized && !dependenciesSettled && !refused,
+              assignmentIds: Object.freeze(nodeAssignments.map((assignment) => assignment.assignmentId)),
+            });
+          }),
+        ),
+      })
+    : Object.freeze({ kind: 'legacy-non-dag', nodes: Object.freeze([]) });
+
   return Object.freeze({
     manifest: Object.freeze(manifest),
     assignmentRefs: Object.freeze([...manifest.assignmentRefs]),
@@ -787,6 +852,7 @@ export function replaySession(coordinationId, opts = {}) {
     // log), so the two lists always partition the linked set exactly.
     resolvedContributionIds: Object.freeze(contributions.filter((c) => resolvedContributionIds.has(c.contributionId)).map((c) => c.contributionId)),
     openContributionIds: Object.freeze(contributions.filter((c) => !resolvedContributionIds.has(c.contributionId)).map((c) => c.contributionId)),
+    dag,
     sessionDir,
   });
 }

@@ -257,7 +257,11 @@ test('dispatchPrimaryTask enforces aggregateBounds.maxTaskDepth against the REAL
       { taskKey: 'grandchild', objective: 'depth 3, one past the cap', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1', parentAssignmentId: depth2.assignment.assignmentId },
       { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir, 'd3') },
     ),
-    (err) => err instanceof CoordinationError && /aggregateBounds\.maxTaskDepth cap of 2/.test(err.message),
+    // Phase 04 H-2: taskDepth is an ordinary non-deferrable refusal -- it
+    // must never carry the concurrency-cap machine code (assertWithinTaskDepth
+    // throws a plain 2-arg CoordinationError, so err.code is always undefined
+    // here, never 'concurrency-cap').
+    (err) => err instanceof CoordinationError && err.code !== 'concurrency-cap' && /aggregateBounds\.maxTaskDepth cap of 2/.test(err.message),
   );
 });
 
@@ -314,13 +318,13 @@ test('dispatchPrimaryTask enforces aggregateBounds.maxRounds session-wide, indep
 
 test('proposeConsult enforces aggregateBounds.wallTimeMs -- a session past its wall-time budget rejects the consult proposal itself, before any Assignment is created', async () => {
   const tempDir = mkTempDir();
-  openSoloSession('coord_r5_consult_walltime', tempDir, { wallTimeMs: 1000 });
+  openSoloSession('coord_r5_consult_walltime', tempDir, { wallTimeMs: 200 });
   const primary = await dispatchPrimaryTask(
     'coord_r5_consult_walltime',
     { objective: 'primary', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1' },
     { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir) },
   );
-  await new Promise((resolve) => setTimeout(resolve, 1050));
+  await new Promise((resolve) => setTimeout(resolve, 250));
 
   await assert.rejects(
     proposeConsult(
@@ -347,7 +351,8 @@ test('proposeConsult enforces aggregateBounds.maxTaskDepth against the primary A
       { primaryAssignmentId: primary.assignment.assignmentId, role: 'researcher', objective: 'consult, depth 2 -- exceeds maxTaskDepth: 1', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1' },
       { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir) },
     ),
-    (err) => err instanceof CoordinationError && /aggregateBounds\.maxTaskDepth cap of 1/.test(err.message),
+    // Phase 04 H-2: same non-deferrable guarantee via the proposeConsult door.
+    (err) => err instanceof CoordinationError && err.code !== 'concurrency-cap' && /aggregateBounds\.maxTaskDepth cap of 1/.test(err.message),
   );
 });
 
@@ -404,13 +409,13 @@ test('proposeConsult now forwards maxConcurrencyForSession to the authoritative 
 
 test('retrySessionTask enforces aggregateBounds.wallTimeMs before dispatching a NEW retry Run -- a session past budget refuses to retry', async () => {
   const tempDir = mkTempDir();
-  openSoloSession('coord_r5_retry_walltime', tempDir, { wallTimeMs: 1000 });
+  openSoloSession('coord_r5_retry_walltime', tempDir, { wallTimeMs: 200 });
   const first = await dispatchPrimaryTask(
     'coord_r5_retry_walltime',
     { objective: 'first', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1' },
     { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir, 'one') },
   );
-  await new Promise((resolve) => setTimeout(resolve, 1050));
+  await new Promise((resolve) => setTimeout(resolve, 250));
 
   await assert.rejects(
     retrySessionTask(

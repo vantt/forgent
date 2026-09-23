@@ -840,7 +840,21 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
-  note: eligible to open — prerequisites I02 (integrated at `main@4362bfec`), I04 (integrated at `main@7472bd74`), and I06 (integrated at `main@3bab9b99`) are all integrated and verified
+  status: implemented
+  branch: `coordination-skill-harness-i09-dag-forward-port`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
+  base-sha: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
+  integration-baseline: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+  evaluated-candidate-sha: `a208bf555927b508ddfa0523009ce87aac1dd0af` (approved in independent review: 0 blocker, 0 high)
+  synchronized-candidate-sha: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (merges `main@cc687d92`; CHANGELOG.md conflict resolved preserving both groups)
+  status-recording-sha: `524579b41d51b617fcc8e1fbf35bdd9c1efb77e7`
+  integration-status: not integrated into main (synchronized candidate c624fe58 ready for integration review; I10 blocked)
+  blast-radius: CRITICAL (189 symbols, 35 processes; GitNexus index degraded/stale per REV-14)
+  rev05-policy: locked (shared-cwd read-only DAG caveat cannot be discharged in original session; original session must be cancelled; recheck runs in separate session; no adjudication event/lifecycle/store added)
+  queued-for-i10-i11: I09-REV-12 (deferred outcome taxonomy), I09-REV-13 (disposition on caveated findings), I09-REV-14 (GitNexus index refresh), cwd helper consolidation
+  next-dependency-gate: I10 remains BLOCKED until synchronized candidate is reviewed, integrated into main, and post-merge verification passes
+  verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test

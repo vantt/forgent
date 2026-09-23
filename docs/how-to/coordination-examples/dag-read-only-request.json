@@ -1,0 +1,43 @@
+{
+  "kind": "declared-protocol",
+  "dag": true,
+  "objective": "Produce a read-only candidate proposal, then overlap independent read-only review and red-team. Every node here is read-only: a dag:true request can never contain a mutating operation (mutation: \"mutating\") or a fan-out step -- both are refused before any session is opened.",
+  "writerId": "coordination-example-dag-read-only",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "steps": [
+    {
+      "type": "operation",
+      "as": "produce",
+      "operationId": "produce-candidate",
+      "targetActorId": "doer",
+      "objective": "Produce the first candidate as a read-only proposal (report only, no file writes).",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "constraints": [
+        "Read-only stand-in: this produce node writes nothing. It is NOT the mutating first-pass produce of plan-loop/code-panel -- a real mutating produce stays outside DAG mode (a prior non-DAG request), and DAG mode only overlaps read-only peers after that produce has settled."
+      ],
+      "mutation": "read-only"
+    },
+    {
+      "type": "operation",
+      "as": "review",
+      "operationId": "review-candidate",
+      "targetActorId": "reviewer",
+      "objective": "Independently review the candidate.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:produce"],
+      "dependsOn": ["produce"],
+      "mutation": "read-only"
+    },
+    {
+      "type": "operation",
+      "as": "red-team",
+      "operationId": "red-team-candidate",
+      "targetActorId": "red-team",
+      "objective": "Independently try to falsify the candidate.",
+      "expectedOutputs": ["agent-result.json (status, summary)"],
+      "contextRefs": ["$ref:produce"],
+      "dependsOn": ["produce"],
+      "mutation": "read-only"
+    }
+  ]
+}

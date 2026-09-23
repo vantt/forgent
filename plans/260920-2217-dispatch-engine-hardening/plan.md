@@ -86,3 +86,18 @@ Phase 00–08: **No component-boundary change** (sửa hành vi bên trong ranh 
 ## Reports
 
 Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-report.md` sau mỗi phase.
+
+## Integration Cross-Reference and Coordination Track Accounting
+
+- **Unified Integration Plan:** `plans/260919-coordination-skill-harness-simplification/plan.md`
+- **Date:** 2026-09-23
+- **Dispatch Hardening Phased Integration:**
+  - Phase 01 R1/R4/R5 (Result truth & settlement CAS) integrated as Units **I02** and **I03** (`main@4362bfec`).
+  - Phase 05 remainder (Cross-provider redirect governance & PlacementPolicy binding) integrated as Unit **I06** (`main@3bab9b99`).
+  - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** / **I08**.
+  - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
+- **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
+  - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
+  - Implementation & synchronization status: IMPLEMENTED. Evaluated candidate `a208bf55` approved by independent review (0 blocker, 0 high). Synchronized implementation candidate `c624fe58` (status-recording SHA `524579b4`) merges `main@cc687d92`.
+  - 14 focused suites pass (538 passed / 0 failed, `git diff --check` clean).
+  - Integration into main is pending; Unit **I10 remains BLOCKED** until synchronized candidate is integrated and post-merge verification passes.
