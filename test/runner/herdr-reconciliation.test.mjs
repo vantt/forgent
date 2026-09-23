@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 import {
   runHerdrRound,
   reconcileHerdrSpawnRun,
@@ -53,6 +54,7 @@ function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
 }
 
 const HAS_WORKING_BWRAP = hasWorkingBwrap();
+seedFileLocalBwrapRegistry();
 
 function createMockHerdr(tmpDir, scenario = {}) {
   fs.mkdirSync(tmpDir, { recursive: true });

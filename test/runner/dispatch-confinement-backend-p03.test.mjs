@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
+import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
 import {
   getBackendDriver,
@@ -79,6 +80,8 @@ function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
 }
 
 const HAS_WORKING_BWRAP = hasWorkingBwrap();
+
+seedFileLocalBwrapRegistry();
 
 // =========================================================================
 // R1: Backend driver allowlist + bwrap driver config validation

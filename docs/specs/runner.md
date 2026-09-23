@@ -2924,6 +2924,6 @@ Mọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `ex
 - **Context**: \`mergeRunnerItem\` cũ sử dụng \`git merge --no-commit\` trực tiếp trên main checkout để kiểm tra và sau đó \`git commit\`. Điều này gây rủi ro làm bẩn working tree của main checkout và dễ lỗi nếu có tiến trình khác can thiệp.
 - **Decision**: Thay thế bằng cơ chế Git CAS (Compare-And-Swap) kết hợp isolated worktree cho luồng \`root-into-main\`. Sử dụng \`git worktree add --detach\` để tạo một worktree ẩn danh trỏ tới tip của trunk. Quá trình patch (\`git merge --no-commit\`) và test suite chạy hoàn toàn trong isolated worktree này. Nếu test pass, dùng \`git write-tree\` lấy tree, \`git commit-tree\` tạo commit với hai parent, và cập nhật ref atomically qua \`git update-ref\`.
 - **Consequences**:
-  - Main checkout không bị chạm vào (working tree luôn sạch).
+  - Merge + verify không chạm main checkout. Nhưng khi main checkout đang checkout chính trunk, `update-ref` dời nhánh đó rồi `read-tree -m -u HEAD` đồng bộ working tree — nên cổng clean-tree theo own-file-set (tsk-598: committed diff + `footprint`, bỏ qua `.fgos/` và path không liên quan) vẫn chạy trước merge; path trong own-file-set đang dirty → từ chối (exit 4, `not clean`), không dời ref.
   - Khóa (lock) thời gian dài không còn cần thiết cho việc thao tác file, chỉ cần cho việc update-ref (nhưng update-ref đã có cơ chế CAS an toàn).
   - Lỗi test hoặc timeout tự động dọn dẹp worktree mà không rò rỉ state vào nhánh chính.

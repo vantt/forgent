@@ -710,6 +710,16 @@ export async function approveUseCase(
     // zero behavior change for the common case.
     const hadChildren = Object.values(view.work).some((w) => w.parent === id);
 
+    // Unlike leaf->root above, this path still lands on the shared main
+    // checkout: the CAS merge verifies in an isolated worktree, but its
+    // `update-ref` moves the branch repoRoot has checked out and then syncs
+    // repoRoot's working tree to it. A dirty path inside the item's own file
+    // set (committed diff + declared footprint) would make that sync fail and
+    // leave repoRoot's index behind the new HEAD, so refuse before merging.
+    if (!isMainTreeClean(repoRoot, ownFileSet)) {
+      throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
+    }
+
     const result = await runMerge(async () => {
        const { mergeRootIntoMainCas } = await import('../../runner/merge.mjs');
        const { branchNameFor } = await import('../../runner/worktree.mjs');

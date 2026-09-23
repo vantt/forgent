@@ -1056,7 +1056,7 @@ test('production mutator integration: dispatch-operation executes under seam via
       },
     };
 
-    const ctx = { cwd: tempDir, repoRoot: tempDir };
+    const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: makeCohortRunnerConfig(tempDir) };
 
     // 1. Initial call executes mutation under seam and creates an assignment
     const res1 = await executeCoordinationActionUseCase(ctx, action);
@@ -1325,7 +1325,7 @@ test('production mutator integration: authorize-and-dispatch executes under seam
       },
     };
 
-    const ctx = { cwd: tempDir, repoRoot: tempDir };
+    const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: makeCohortRunnerConfig(tempDir) };
 
     // 1. Initial call executes authorizeOperationLocked and createSessionAssignmentLocked under seam
     const res1 = await executeCoordinationActionUseCase(ctx, action);
@@ -1819,7 +1819,7 @@ test('durable retry after commit: production door recovers idempotently from aut
   const { tempDir, manifest, def, sessionDir } = setupSessionFixture(coordinationId, { schemaVersion: '3', eventCount: 0 });
 
   try {
-    const ctx = { cwd: tempDir, repoRoot: tempDir };
+    const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: makeCohortRunnerConfig(tempDir) };
 
     // 1. Dispatch an operation and verify crash-after-commit idempotent retry
     const proj1 = projectCoordinationActions({ manifest, events: [], definition: def });
