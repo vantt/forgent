@@ -11,6 +11,29 @@ import { getFailedTestsFromJunit } from './test-select-compare.mjs';
 function log(msg) { console.log(msg); }
 function errFn(msg) { console.error(msg); }
 
+/**
+ * Symlinks `node_modules` and, when present, the Rust workspace's `target`
+ * directory into a fresh detached worktree. Every rust-host test resolves
+ * its own REPO_ROOT from `import.meta.url` (test/rust-host/harness.mjs),
+ * which inside a worktree is the worktree's own root -- so without this,
+ * every rust-host test in that worktree fails "Compiled Rust binary not
+ * found" and pollutes both the mutation full-suite baseline (it's always
+ * red) and the mutated run, on any machine where `cargo build` has already
+ * run once. `target` is gitignored and never present right after
+ * `git worktree add`, and never symlinked when the main checkout has none
+ * (Rust genuinely not built here) -- rust-host stays red for its real
+ * reason in that case, same as before.
+ */
+export function symlinkSharedDirs(worktreePath, repoRoot = REPO_ROOT) {
+  if (!fs.existsSync(path.join(worktreePath, 'node_modules'))) {
+    fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
+  }
+  const targetSrc = path.join(repoRoot, 'target');
+  if (fs.existsSync(targetSrc) && !fs.existsSync(path.join(worktreePath, 'target'))) {
+    fs.symlinkSync(targetSrc, path.join(worktreePath, 'target'), 'dir');
+  }
+}
+
 export function computeRuleHash(rule) {
   if (!rule) return null;
   // Deterministic normalized hash: excludes status, sorts arrays
@@ -212,9 +235,7 @@ export function runNightlyMutations(options = {}) {
     const baselinePath = fs.mkdtempSync(path.join(baseDir, 'baseline-'));
     try {
       execFileFn('git', ['worktree', 'add', '--detach', baselinePath, 'HEAD'], { encoding: 'utf8' });
-      if (!fs.existsSync(path.join(baselinePath, 'node_modules'))) {
-        fs.symlinkSync(path.join(REPO_ROOT, 'node_modules'), path.join(baselinePath, 'node_modules'), 'dir');
-      }
+      symlinkSharedDirs(baselinePath);
       const full = runFull({ cwd: baselinePath });
       baselineCache = full.ran ? full.failed : null;
       log(full.ran
@@ -240,11 +261,7 @@ export function runNightlyMutations(options = {}) {
 
     try {
       execFileFn('git', ['worktree', 'add', '--detach', worktreePath, 'HEAD'], { encoding: 'utf8' });
-
-      // Symlink node_modules
-      if (!fs.existsSync(path.join(worktreePath, 'node_modules'))) {
-        fs.symlinkSync(path.join(REPO_ROOT, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
-      }
+      symlinkSharedDirs(worktreePath);
 
       const { classification, reason } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, runFull, fullBaseline });
       if (reason) log(`Mutant ${mutant.id}: ${reason}`);

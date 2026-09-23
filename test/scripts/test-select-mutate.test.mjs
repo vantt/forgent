@@ -4,7 +4,42 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated } from '../../scripts/test-select-mutate.mjs';
+import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs } from '../../scripts/test-select-mutate.mjs';
+
+test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-wt-'));
+  fs.mkdirSync(path.join(repoRoot, 'node_modules'));
+  try {
+    // No `target` in the source repo root (Rust never built here): node_modules
+    // still gets symlinked, target is silently skipped -- rust-host tests stay
+    // red for their real reason (no binary), never crash the mutation run.
+    symlinkSharedDirs(worktreePath, repoRoot);
+    assert.equal(fs.existsSync(path.join(worktreePath, 'node_modules')), true);
+    assert.equal(fs.lstatSync(path.join(worktreePath, 'node_modules')).isSymbolicLink(), true);
+    assert.equal(fs.existsSync(path.join(worktreePath, 'target')), false);
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(worktreePath, { recursive: true, force: true });
+  }
+});
+
+test('symlinkSharedDirs: symlinks target when the repo root has a built one, so rust-host tests find the real binary', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-wt-'));
+  fs.mkdirSync(path.join(repoRoot, 'node_modules'));
+  fs.mkdirSync(path.join(repoRoot, 'target', 'release'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'target', 'release', 'fgctl'), 'fake-binary');
+  try {
+    symlinkSharedDirs(worktreePath, repoRoot);
+    assert.equal(fs.lstatSync(path.join(worktreePath, 'target')).isSymbolicLink(), true);
+    // The symlink genuinely resolves to the real, already-built binary.
+    assert.equal(fs.readFileSync(path.join(worktreePath, 'target', 'release', 'fgctl'), 'utf8'), 'fake-binary');
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(worktreePath, { recursive: true, force: true });
+  }
+});
 
 test('C2 Mutant Classifier Tests', async (t) => {
   await t.test('infra-error', () => {
