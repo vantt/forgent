@@ -35,7 +35,7 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
-import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort, fsyncFileBestEffort } from '../dispatch/run-lock.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
@@ -186,6 +186,22 @@ function writeManifestRaw(manifestPath, manifest) {
 }
 
 /**
+ * Durably flush one file, failing loudly: a session whose files could not be
+ * fsynced must not open. Opened 'r+' because Windows refuses fsync on a
+ * read-only handle (EPERM), and the fd is closed on every path -- a throw
+ * that left it open kept the file undeletable, so the caller's cleanup then
+ * failed with ENOTEMPTY and masked the real error.
+ */
+function fsyncFile(filePath) {
+  const fd = fs.openSync(filePath, 'r+');
+  try {
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+/**
  * Open a new CoordinationSession: claims `coordinationId` atomically
  * (exclusive `mkdirSync`, the same wx-style claim `claimAssignmentId`
  * itself uses one layer down), writes `session.json`, and appends
@@ -303,10 +319,7 @@ export function openSession(
       try {
         const claimPath = path.join(claimDir, 'claim.json');
         fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-        // 'r+' and an always-closed fd: Windows refuses fsync on a read-only
-        // handle, and an fd left open by that throw kept claim.json undeletable
-        // so the cleanup below failed with ENOTEMPTY, masking the real error.
-        fsyncFileBestEffort(claimPath);
+        fsyncFile(claimPath);
         // Directory fsync is best-effort: Windows cannot open a directory
         // for fsync at all, and that must not abort (and mask) the claim.
         fsyncDirBestEffort(claimDir);
@@ -332,10 +345,7 @@ export function openSession(
         try {
           const claimPath = path.join(claimDir, 'claim.json');
           fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-          // 'r+' and an always-closed fd: Windows refuses fsync on a read-only
-          // handle, and an fd left open by that throw kept claim.json undeletable
-          // so the cleanup below failed with ENOTEMPTY, masking the real error.
-          fsyncFileBestEffort(claimPath);
+          fsyncFile(claimPath);
           fsyncDirBestEffort(claimDir);
 
           if (!fs.existsSync(sessionDir)) {
@@ -392,9 +402,9 @@ export function openSession(
     }
 
     // Fsync files and staging directory for crash durability
-    if (snapshotRef) fsyncFileBestEffort(path.join(stagingDir, 'snapshot.json'));
-    fsyncFileBestEffort(path.join(stagingDir, 'session.json'));
-    fsyncFileBestEffort(eventsPath);
+    if (snapshotRef) fsyncFile(path.join(stagingDir, 'snapshot.json'));
+    fsyncFile(path.join(stagingDir, 'session.json'));
+    fsyncFile(eventsPath);
     fsyncDirBestEffort(stagingDir);
 
     try {
