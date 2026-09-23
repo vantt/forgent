@@ -1,12 +1,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
+import { MANIFEST } from '../test/test-ownership.mjs';
+import { computeRuleHash } from './test-select-mutate.mjs';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PR_NUMBER = process.env.PR_NUMBER;
 
 function log(msg) { console.log(msg); }
 function errFn(msg) { console.error(msg); }
+
+export function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+import { C4_SELECTOR_RE, checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
+export { C4_SELECTOR_RE, checkVerifyForC4 };
 
 export function classifyTestCase({
   isRedInFull,
@@ -71,7 +80,7 @@ export function updateBreakerState(rulesToQuarantine, global = false) {
   }
 }
 
-function getFailedTestsFromJunit(xmlContent) {
+export function getFailedTestsFromJunit(xmlContent) {
   const failed = [];
   const testcases = xmlContent.split('<testcase');
   for (let i = 1; i < testcases.length; i++) {
@@ -92,28 +101,34 @@ function getFailedTestsFromJunit(xmlContent) {
   return failed;
 }
 
-
-export async function runCompare() {
+export async function runCompare(options = {}) {
   log("Running compare job logic...");
   
-  let plan = {};
-  if (fs.existsSync('selector-plan.json')) {
-    plan = JSON.parse(fs.readFileSync('selector-plan.json', 'utf8'));
-  } else {
-    log("No selector-plan.json found, inconclusive.");
-    process.exit(0);
+  const planPath = options.planFile || 'selector-plan.json';
+  const baseJunit = options.baseJunit || 'artifacts/base-results/test-results/base.xml';
+  const fullJunitUbuntu = options.fullJunitUbuntu || 'artifacts/full-results-ubuntu-latest/full.xml';
+  const fullJunitMacos = options.fullJunitMacos || 'artifacts/full-results-macos-latest/full.xml';
+  const fullJunitWindows = options.fullJunitWindows || 'artifacts/full-results-windows-latest/full.xml';
+  const relatedJunit = options.relatedJunit || 'artifacts/related-results/related.xml';
+  const ledgerOut = options.ledgerOut || 'ledger.json';
+  const noExit = options.noExit || false;
+
+  let plan = options.plan || null;
+  if (!plan) {
+    if (fs.existsSync(planPath)) {
+      plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+    } else {
+      log("No selector-plan.json found, inconclusive.");
+      if (noExit) return { error: 'inconclusive', reason: 'no-plan' };
+      process.exit(0);
+    }
   }
 
   if (plan.decision === 'full') {
     log("Plan decision was 'full', no comparison needed.");
+    if (noExit) return { error: 'no-comparison-needed', decision: 'full' };
     process.exit(0);
   }
-
-  const baseJunit = 'artifacts/base-results/test-results/base.xml';
-  const fullJunitUbuntu = 'artifacts/full-results-ubuntu-latest/full.xml';
-  const fullJunitMacos = 'artifacts/full-results-macos-latest/full.xml';
-  const fullJunitWindows = 'artifacts/full-results-windows-latest/full.xml';
-  const relatedJunit = 'artifacts/related-results/related.xml';
 
   const baseFails = fs.existsSync(baseJunit) ? getFailedTestsFromJunit(fs.readFileSync(baseJunit, 'utf8')) : null;
   const fullFailsUbuntu = fs.existsSync(fullJunitUbuntu) ? getFailedTestsFromJunit(fs.readFileSync(fullJunitUbuntu, 'utf8')) : [];
@@ -138,15 +153,20 @@ export async function runCompare() {
 
   // For every failing test in full suite
   for (const test of fullFails) {
+    const isRedInUbuntu = fullFailsUbuntu.some(t => t.name === test.name);
+    const isRedInMacos = fullFailsMacos.some(t => t.name === test.name);
+    const isRedInWindows = fullFailsWindows.some(t => t.name === test.name);
+    // AC 3: os-specific failure occurs only on macOS/Windows and is green on Ubuntu
+    const isOsSpecific = !isRedInUbuntu && (isRedInMacos || isRedInWindows);
+
     const isRedInBase = baseFails && baseFails.some(t => t.name === test.name);
     const isRedInRelated = relatedFails.some(t => t.name === test.name);
     const isSelected = selectedFiles.has(test.file);
     
     let rerunPassed = false;
-    if (!isSelected) {
+    if (!isSelected && !isOsSpecific) {
       try {
-        const { execSync } = require('child_process');
-        execSync(`node --test "${test.file}" --test-name-pattern="^${test.name}$"`, { stdio: 'ignore' });
+        execFileSync('node', ['--test', test.file, `--test-name-pattern=^${escapeRegex(test.name)}$`], { stdio: 'ignore' });
         rerunPassed = true;
       } catch (e) {
         rerunPassed = false;
@@ -164,7 +184,10 @@ export async function runCompare() {
       isOsSpecific
     });
     
-    caseResults[test.name] = classification;
+    caseResults[test.name] = {
+      classification,
+      file: test.file
+    };
     
     if (classification === 'confirmed-miss') {
       if (plan.matchedRules && plan.matchedRules.length > 0) {
@@ -177,12 +200,55 @@ export async function runCompare() {
     }
   }
 
+  // AC 7 (Warn C4 cho item.verify): Check if item.verify references test selector
+  const c4Warnings = [];
+  if (plan.changedPaths) {
+    for (const p of plan.changedPaths) {
+      const norm = p.replace(/\\/g, '/');
+      if (norm.includes('.fgos/') && (norm.endsWith('.jsonl') || norm.endsWith('.json'))) {
+        if (fs.existsSync(p)) {
+          try {
+            const lines = fs.readFileSync(p, 'utf8').split('\n');
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed) continue;
+              try {
+                const record = JSON.parse(trimmed);
+                const verifyCmd = record.verify || (record.item && record.item.verify) || (record.patch && record.patch.verify) || (record.payload && record.payload.verify);
+                if (verifyCmd) {
+                  const warn = checkVerifyForC4(verifyCmd, `"${p}"`);
+                  if (warn) {
+                    c4Warnings.push(warn);
+                    console.warn(warn);
+                  }
+                }
+              } catch {}
+            }
+          } catch (e) {
+            console.error(`Failed to read changed path for C4 check: ${p}`, e);
+          }
+        }
+      }
+    }
+  }
+
+  const enrichedMatchedRules = (plan.matchedRules || []).map(mr => {
+    if (mr.ruleHash) return mr;
+    const manifestRule = MANIFEST.find(r => r.id === (mr.ruleId || mr.id));
+    const ruleHash = manifestRule ? computeRuleHash(manifestRule) : null;
+    return { ...mr, ruleHash };
+  });
+
   const ledger = {
-    plan,
+    plan: {
+      ...plan,
+      matchedRules: enrichedMatchedRules,
+    },
     caseResults,
+    warnings: c4Warnings,
   };
 
-  fs.writeFileSync('ledger.json', JSON.stringify(ledger, null, 2));
+  fs.writeFileSync(ledgerOut, JSON.stringify(ledger, null, 2));
 
   if (rulesToQuarantine.size > 0 || quarantineGlobal) {
     updateBreakerState(Array.from(rulesToQuarantine), quarantineGlobal);
@@ -195,10 +261,16 @@ export async function runCompare() {
     } catch(e) {}
   }
 
+  if (noExit) {
+    return { ledger, rulesToQuarantine: Array.from(rulesToQuarantine), quarantineGlobal, warnings: c4Warnings };
+  }
   process.exit(0);
 }
 
 const url = typeof process !== 'undefined' && process.argv && process.argv[1] ? process.argv[1] : '';
 if (url.endsWith('test-select-compare.mjs')) {
-  runCompare();
+  runCompare().catch(err => {
+    console.error(err);
+    process.exit(1);
+  });
 }

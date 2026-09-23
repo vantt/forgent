@@ -25,7 +25,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
@@ -36,6 +36,7 @@ import { computeDecisionIndex, generateDecisionIndex } from '../src/report/decis
 import { renderLockedDecisionsTable } from '../src/report/context-render.mjs';
 import { runFourDoorChecks } from '../src/state/retrospective-doors.mjs';
 import { findAuthoritativeMatch, findDuplicateAuthoritativeClaims } from '../src/report/authoritative-match.mjs';
+import { checkVerifyForC4 } from '../src/intake/verify-pattern-check.mjs';
 import { parseFrontmatter } from '../src/report/frontmatter.mjs';
 import { probeTool, readLocalStatus, writeLocalStatus, resolvedStatus, normalizeCapability, toolsFromExecutors } from '../src/state/tool-registry.mjs';
 import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs';
@@ -3521,6 +3522,10 @@ async function runVerb(verb, flags, positional, dir) {
           `return: work "${id}" still carries a placeholder verify ("${item.verify}") — set a real command first: fgos edit "${id}" --verify "<command>".`,
         );
       }
+      const c4Warning = checkVerifyForC4(item.verify);
+      if (c4Warning) {
+        console.warn(c4Warning);
+      }
 
       // Branch-source discriminator (human-rounds D2/BINDING repair): checked
       // BEFORE every main-based guard below (headAtTake presence, clean-tree)
@@ -4622,7 +4627,7 @@ async function runVerb(verb, flags, positional, dir) {
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 

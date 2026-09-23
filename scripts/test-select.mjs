@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { REPO_ROOT, DEFAULT_TEST_ROOT, discoverTestFiles, runSelectedTests, runTests } from './run-tests.mjs';
 import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
 
-const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status']);
+const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status', 'quarantinedHash']);
 
 // Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
 // already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
