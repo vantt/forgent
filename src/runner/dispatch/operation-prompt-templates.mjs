@@ -476,23 +476,41 @@ export function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options 
     }
 
     const actualContentDigest = computeSha256Digest(pinnedTemplate.templateSnapshot);
-    if (pinnedTemplate.contentDigest !== undefined) {
-      if (typeof pinnedTemplate.contentDigest !== 'string' || !SHA256_HEX_REGEX.test(pinnedTemplate.contentDigest)) {
-        throw new TemplateResolutionError('template-provenance-mismatch', `pinned template contentDigest is malformed: "${pinnedTemplate.contentDigest}"`, { contentDigest: pinnedTemplate.contentDigest });
-      }
-      if (pinnedTemplate.contentDigest !== actualContentDigest) {
-        throw new TemplateResolutionError(
-          'template-provenance-mismatch',
-          `pinned template contentDigest mismatch: expected "${actualContentDigest}", got "${pinnedTemplate.contentDigest}"`,
-          { expectedContentDigest: actualContentDigest, actualContentDigest: pinnedTemplate.contentDigest },
-        );
-      }
+    if (!pinnedTemplate.contentDigest || typeof pinnedTemplate.contentDigest !== 'string') {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        'pinned template provenance missing required contentDigest',
+        { pinnedTemplate },
+      );
+    }
+    if (!SHA256_HEX_REGEX.test(pinnedTemplate.contentDigest)) {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        `pinned template contentDigest is malformed: "${pinnedTemplate.contentDigest}"`,
+        { contentDigest: pinnedTemplate.contentDigest },
+      );
+    }
+    if (pinnedTemplate.contentDigest !== actualContentDigest) {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        `pinned template contentDigest mismatch: expected "${actualContentDigest}", got "${pinnedTemplate.contentDigest}"`,
+        { expectedContentDigest: actualContentDigest, actualContentDigest: pinnedTemplate.contentDigest },
+      );
     }
 
-    if (pinnedTemplate.renderedPromptDigest !== undefined) {
-      if (typeof pinnedTemplate.renderedPromptDigest !== 'string' || !SHA256_HEX_REGEX.test(pinnedTemplate.renderedPromptDigest)) {
-        throw new TemplateResolutionError('template-provenance-mismatch', `pinned template renderedPromptDigest is malformed: "${pinnedTemplate.renderedPromptDigest}"`, { renderedPromptDigest: pinnedTemplate.renderedPromptDigest });
-      }
+    if (!pinnedTemplate.renderedPromptDigest || typeof pinnedTemplate.renderedPromptDigest !== 'string') {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        'pinned template provenance missing required renderedPromptDigest',
+        { pinnedTemplate },
+      );
+    }
+    if (!SHA256_HEX_REGEX.test(pinnedTemplate.renderedPromptDigest)) {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        `pinned template renderedPromptDigest is malformed: "${pinnedTemplate.renderedPromptDigest}"`,
+        { renderedPromptDigest: pinnedTemplate.renderedPromptDigest },
+      );
     }
 
     // Re-verify bounded variables on the snapshot to preserve template-invalid invariants

@@ -316,3 +316,44 @@ Six dedicated negative tests added in `test/runner/operation-prompt-templates.te
 6. `I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance` (verifies digest mismatch, malformed digests, and missing id are rejected).
 
 All 6 negative tests and all existing tests pass cleanly. Total `operation-prompt-templates.test.mjs` count: **30 pass / 0 fail**. Full focused matrix: **294 pass / 0 fail**.
+
+---
+
+## 9. Reviewer Finding Resolution: I04-REV-03 (HIGH)
+
+### 9.1 Finding Summary
+- **Finding ID:** `I04-REV-03` (Severity: HIGH)
+- **Reviewer Statement:** Contract violated: I04-REV-02 required pinned persisted provenance to validate digest fields and not silently repair corrupt provenance. In candidate `9bce381a7185a7ece2fb5c03537ed7857b3e3e6a`, `resolveAndRenderOperationPrompt` accepted pinned provenance carrying `templateSnapshot` but missing `contentDigest` or `renderedPromptDigest`, silently computed new digests, and returned success. Persisted Assignment provenance could be tampered with by deleting digest fields, and retry/replay would silently "repair" it rather than failing closed, contradicting the invariant: "không âm thầm sửa provenance hỏng".
+- **Root Cause:**
+  In `src/runner/dispatch/operation-prompt-templates.mjs`, the checks for `pinnedTemplate.contentDigest` and `pinnedTemplate.renderedPromptDigest` were guarded by `if (pinnedTemplate.contentDigest !== undefined)` and `if (pinnedTemplate.renderedPromptDigest !== undefined)`. When a caller provided a pinned template snapshot with omitted digest fields, the checks were skipped and new digests were silently computed and accepted.
+
+### 9.2 Corrections Implemented
+1. **Require `contentDigest` on Pinned Provenance:**
+   - In `src/runner/dispatch/operation-prompt-templates.mjs`, `pinnedTemplate.contentDigest` is strictly required to be a non-empty string conforming to `^sha256:[0-9a-f]{64}$`.
+   - Missing, malformed, or mismatched `contentDigest` immediately throws typed refusal `TemplateResolutionError('template-provenance-mismatch', ...)`.
+2. **Require `renderedPromptDigest` on Pinned Provenance:**
+   - In `src/runner/dispatch/operation-prompt-templates.mjs`, `pinnedTemplate.renderedPromptDigest` is strictly required to be a non-empty string conforming to `^sha256:[0-9a-f]{64}$`.
+   - Missing or malformed `renderedPromptDigest` immediately throws typed refusal `TemplateResolutionError('template-provenance-mismatch', ...)`.
+   - After rendering the body, the freshly computed digest is strictly compared to `pinnedTemplate.renderedPromptDigest`. Any discrepancy throws `TemplateResolutionError('template-provenance-mismatch', ...)`.
+3. **Effective Execution Contract Validation:**
+   In `src/runner/dispatch/effective-execution-contract.mjs`, `validateEffectiveExecutionContract` strictly requires both `contentDigest` and `renderedPromptDigest` to be valid sha256 strings whenever `provenance.template` is present.
+4. **Preserve Legacy Assignment Mutation Backfill:**
+   In `src/runner/dispatch/assignment-runner.mjs`, ensured `effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });` is maintained when backfilling mutation for legacy `assignment.json` disk reads.
+
+### 9.3 Verification and Negative Tests
+Two dedicated negative tests added in `test/runner/operation-prompt-templates.test.mjs`:
+1. `I04-REV-03 negative: resolver refuses pinned template provenance with missing contentDigest`:
+   Supplies an assignment with `provenance.template.templateSnapshot` and `renderedPromptDigest`, but `contentDigest` omitted. Asserts `resolveAndRenderOperationPrompt` throws `TemplateResolutionError` with code `template-provenance-mismatch` and message matching `/missing required contentDigest/`.
+2. `I04-REV-03 negative: resolver refuses pinned template provenance with missing renderedPromptDigest`:
+   Supplies an assignment with `provenance.template.templateSnapshot` and valid `contentDigest`, but `renderedPromptDigest` omitted. Asserts `resolveAndRenderOperationPrompt` throws `TemplateResolutionError` with code `template-provenance-mismatch` and message matching `/missing required renderedPromptDigest/`.
+3. Two negative tests added to `validateEffectiveExecutionContract`:
+   - Rejects effective contract when `provenance.template.contentDigest` is missing.
+   - Rejects effective contract when `provenance.template.renderedPromptDigest` is missing.
+
+All 32 tests in `test/runner/operation-prompt-templates.test.mjs` pass cleanly (0 fail).
+All 13 tests in `test/runner/effective-execution-contract.test.mjs` pass cleanly.
+All 83 tests in `test/runner/assignment-runresult.test.mjs`, `test/runner/assignment-provenance.test.mjs`, and `test/runner/assignment.test.mjs` pass cleanly.
+All 75 tests in `test/runner/assignment-dispatch.test.mjs` pass cleanly.
+All 187 tests in setup/doctor pass cleanly.
+All 28 tests in coordination consumer suites pass cleanly.
+Total focused rerun: **388 pass / 0 fail**.

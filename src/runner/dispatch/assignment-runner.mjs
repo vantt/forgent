@@ -1577,6 +1577,8 @@ export async function executeAssignment(assignment, opts = {}) {
     effectiveAssignment.mutation === 'read-only' || effectiveAssignment.mutation === 'mutating'
       ? effectiveAssignment.mutation
       : fallbackMutationForAssignment(effectiveAssignment);
+  effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
+
   validateAssignmentLegality(effectiveAssignment, opts);
 
   let templateResolution = null;

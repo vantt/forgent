@@ -941,4 +941,83 @@ test('I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted 
     () => validateEffectiveExecutionContract(contractEmptyId),
     /id must be a non-empty string/,
   );
+
+  // 5. Missing contentDigest
+  const contractMissingContentDigest = structuredClone(baseContract);
+  contractMissingContentDigest.provenance.template = {
+    id: 'test-tmpl',
+    templateSnapshot: snapshot,
+    renderedPromptDigest: validRenderedDigest,
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractMissingContentDigest),
+    /contentDigest must be a valid sha256 digest string/,
+  );
+
+  // 6. Missing renderedPromptDigest
+  const contractMissingRenderedDigest = structuredClone(baseContract);
+  contractMissingRenderedDigest.provenance.template = {
+    id: 'test-tmpl',
+    templateSnapshot: snapshot,
+    contentDigest: correctContentDigest,
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractMissingRenderedDigest),
+    /renderedPromptDigest must be a valid sha256 digest string/,
+  );
+});
+
+test('I04-REV-03 negative: resolver refuses pinned template provenance with missing contentDigest', () => {
+  const snapshot = 'Objective: {objective}\n';
+  const assignment = {
+    assignmentId: 'asgn_missing_content_digest',
+    objective: 'Test missing contentDigest rejection',
+    contractTemplate: 'test-missing-digest',
+    provenance: {
+      template: {
+        id: 'test-missing-digest',
+        templateSnapshot: snapshot,
+        // contentDigest is omitted!
+        renderedPromptDigest: 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+      },
+    },
+  };
+
+  assert.throws(
+    () => resolveAndRenderOperationPrompt(assignment),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /missing required contentDigest/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-03 negative: resolver refuses pinned template provenance with missing renderedPromptDigest', () => {
+  const snapshot = 'Objective: {objective}\n';
+  const correctContentDigest = `sha256:${crypto.createHash('sha256').update(snapshot).digest('hex')}`;
+  const assignment = {
+    assignmentId: 'asgn_missing_rendered_digest',
+    objective: 'Test missing renderedPromptDigest rejection',
+    contractTemplate: 'test-missing-rendered',
+    provenance: {
+      template: {
+        id: 'test-missing-rendered',
+        templateSnapshot: snapshot,
+        contentDigest: correctContentDigest,
+        // renderedPromptDigest is omitted!
+      },
+    },
+  };
+
+  assert.throws(
+    () => resolveAndRenderOperationPrompt(assignment),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /missing required renderedPromptDigest/);
+      return true;
+    },
+  );
 });
