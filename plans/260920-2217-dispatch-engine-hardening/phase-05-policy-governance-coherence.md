@@ -4,12 +4,14 @@ Wave 3 · Gate: D1 cho H6(b); M5 phối hợp chủ plan `260915-executor-policy
 
 ## Status — 2026-09-23 (Unit I06 / Phase 3A Completion)
 
-- **Status**: `implemented` (awaiting independent review verification; not claimed as integrated).
+- **Status**: `integrated` (cleanly integrated into local `main` at `3bab9b99`, evaluated candidate `d75d311d`, status-recording tip `dec142a5`).
 - **Candidate Branch**: `coordination-skill-harness-i06-dispatch-governance`
 - **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
-- **Candidate SHA**: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d`)
-- **Last-Verified Date / Revision**: 2026-09-23 at revision `d75d311d`
-- **Next Dependency Gate**: Unit I08 (dispatch governance/CLI/doctor verification) and Unit I09 (DAG forward-port).
+- **Evaluated Candidate SHA**: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d` -> `dec142a5`)
+- **Status-Recording SHA**: `dec142a5e0b4417690fd2018333fecc490a3f9b7`
+- **Integrated Commit SHA**: `3bab9b99` (on local `main`)
+- **Last-Verified Date / Revision**: 2026-09-23 at candidate `d75d311d` (post-merge re-verified at `3bab9b99`)
+- **Next Dependency Gate**: Unit I07 (Phase 08 operability/doctor), Unit I08 (dispatch verification), and Unit I09 (DAG forward-port).
 - **Direct Candidate Evidence**:
   - `node --test test/architecture.test.mjs test/runner/dispatch-cross-provider-redirect.test.mjs test/runner/placement-policy-matrix-coverage.test.mjs test/runner/placement-policy-redirect-selection.test.mjs test/runner/placement-policy.test.mjs test/runner/dispatch-coordination-role-tiers.test.mjs`: 101 pass / 0 fail (~4.1s).
   - `node --test test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail (~15.9s).

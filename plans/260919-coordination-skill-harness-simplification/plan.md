@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74` (candidate SHA `f0919405`); I06/I07 parallel eligible (Unit I09 remains closed until I06 is also integrated and verified)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I07 next eligible (I08 requires I07; I09 requires I06/I04/I02 — I06 verified)
 Created: 2026-09-19
 Last Updated: 2026-09-23
 Mode: high-risk
@@ -806,16 +806,20 @@ Executor/provider/model/tier selection remains an execution-time decision.
   status: integrated
   findings-resolved: I04-REV-01, I04-REV-02, I04-REV-03
   stop: unresolved template authority/provenance finding
-- unit: I06 — complete dispatch-hardening Phase 05 remainder
+- unit: I06 — complete dispatch-hardening Phase 05 remainder (integrated at `main@3bab9b99`, evaluated candidate `d75d311d`, status-recording tip `dec142a5`)
   capability: code:implement
   depends-on: I01
-  status: implemented
+  status: integrated
   candidate-branch: `coordination-skill-harness-i06-dispatch-governance`
   base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
-  candidate-sha: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d`)
+  candidate-sha: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d` -> `dec142a5`)
+  status-recording-sha: `dec142a5e0b4417690fd2018333fecc490a3f9b7`
+  integrated-sha: `3bab9b99`
   last-verified: 2026-09-23 at candidate `d75d311d`
   next-dependency-gate: I08 (requires I06 and I07), I09 (requires I02, I04, and I06)
+  findings-resolved: I06-REV-01, I06-REV-02, I06-TM-01, I06-REREVIEW-01, I06-REREVIEW-02
   candidate-verification: 101 pass / 0 fail on focused architecture/redirect/PlacementPolicy smoke; 75 pass / 0 fail in assignment-dispatch.test.mjs; 560 pass / 0 fail on full dispatch matrix; 317 pass / 0 fail on 11-suite coordination matrix; git diff --check exits 0
+  post-merge-verification: 548+ pass / 0 fail across post-merge matrix (13 architecture, 88 placement/redirect/role-tiers, 32 templates, 75 assignment-dispatch, 125 contracts/checks, 215 coordination); git diff --check exits 0
   historical-verification: 529 tests from initial Phase 05 exploration (2026-09-22 morning)
   requirements-completed:
     - R5 (provider-family vs model lookup decoupling verified and preserved)
