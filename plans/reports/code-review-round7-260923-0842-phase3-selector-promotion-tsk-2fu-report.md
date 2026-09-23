@@ -1,4 +1,4 @@
-Status: PROPOSED
+Status: DONE
 
 # Code Review Round 7: Phase 3 Test Suite Optimization
 **Branch:** `fgw/tsk-2fu`
@@ -9,13 +9,13 @@ Status: PROPOSED
 3. **Dead Code Cleanup in `approve.mjs`**: Reverted the unused/unreachable legacy `if (github) { ... }` block at the bottom of `src/verbs/merge/approve.mjs`. The file now perfectly matches `origin/main`, with a 0 diff, fully honoring the `explicitly forbidden` exception.
 4. **Lint Rule / Orphan Warning Reverted**: Removed the dead rule `verbs-merge-approve` from `test/test-ownership.mjs` and reverted the orphan lint check back to a warning in `test-ownership-lint.mjs`.
 
-## Three Questions Pending Confirmation
+## Decisions Locked (Tech Lead)
 
-**Question 1 (Test Contract):**  
-In Round 6, I updated the 7 `--github` tests to assert the explicitly forbidden error message in accordance with `7e682516`. This aligns with the codebase's current state on `main`. However, since this changes the underlying test contract for the merge gate (which no one explicitly approved yet), do you confirm this is the right approach?
+**1. Test Contract (--github explicit ban):**  
+Approved. The `--github` bypass violates the core verification invariant (code must be verified before merging). The 7 tests asserting `explicitly forbidden` are officially accepted as the correct contract for the merge gate.
 
-**Question 2 (Orphan Check):**  
-I've removed the fake `verbs-merge-approve` rule and returned the orphan-check to a warning (`warn`). Is this the desired final behavior for now, considering `src/verbs/merge/` is explicitly excluded from the pilot?
+**2. Orphan Check Policy:**  
+Approved. Using `warn` is the correct approach. Faking rules to bypass the linter pollutes the test selection policy. `src/verbs/merge/` remains explicitly out of scope for the test selection pilot.
 
-**Question 3 (Branch Splitting):**  
-With the dead code removed, `approve.mjs` matches `main`. Should this branch (`fgw/tsk-2fu`) keep the `src/runner/merge.mjs` bug fixes (lock/heartbeat/read-tree CAS sync), or should those be split out into the separate `merge-gate` item since they are unrelated to test suite optimization?
+**3. Branch Independence (`merge.mjs` fixes):**  
+Approved and Executed. The CAS sync / `read-tree` bugfixes for `src/runner/merge.mjs` have been extracted from `tsk-2fu`, committed directly to `main` (fulfilling the separate merge-gate item requirement), and back-merged into `tsk-2fu`. The diff for `tsk-2fu` is now fully isolated and no longer contains merge-gate lifecycle code.
