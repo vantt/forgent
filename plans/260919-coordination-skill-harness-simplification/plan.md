@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec` (candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`, origin/main at `ad8dbaf0` not pushed; 10 commits ahead); Unit I04 implemented (pending I05 review); I06/I07 parallel eligible
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74` (candidate SHA `f0919405`); I06/I07 parallel eligible (Unit I09 remains closed until I06 is also integrated and verified)
 Created: 2026-09-19
-Last Updated: 2026-09-22
+Last Updated: 2026-09-23
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -788,18 +788,23 @@ Executor/provider/model/tier selection remains an execution-time decision.
   origin-status: `origin/main` at `ad8dbaf0` (not pushed; 10 commits ahead)
   verification: 11 suites, 317 tests pass / 0 fail (post-fix matrix; 315 in historical matrix); 75 pass in assignment-dispatch.test.mjs smoke rerun
   stop: corrupt evidence can settle or close
-- unit: I04 — implement Phase 3 template registry/resolver/provenance
+- unit: I04 — implement Phase 3 template registry/resolver/provenance (integrated at `main@7472bd74`, candidate SHA `f0919405`)
   capability: code:implement
   depends-on: I01
-  status: implemented
+  status: integrated
+  candidate-sha: `f0919405`
+  integrated-sha: `7472bd74`
   branch: coordination-skill-harness-i04-template-registry
   base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
-  verification: 32 pass / 0 fail in test/runner/operation-prompt-templates.test.mjs; 13 pass / 0 fail in test/runner/effective-execution-contract.test.mjs; 75 pass / 0 fail in test/runner/assignment-dispatch.test.mjs; 83 pass / 0 fail in assignment suite; 4 pass / 0 fail in test/runner/coordination-group-thinking-rfc-review-lite.test.mjs; 13 pass / 0 fail in test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs; 29 pass / 0 fail in test/runner/coordination-declared-consult.test.mjs; 18 pass / 0 fail in test/verbs/coordination-group-thinking-pack.test.mjs; 112 pass / 0 fail in test/setup/checks.test.mjs; doctor check operation-prompt-templates-valid registered and passing; I04-REV-01, I04-REV-02, and I04-REV-03 resolved with regression & negative tests; GitNexus detect-changes verified.
+  findings-resolved: I04-REV-01, I04-REV-02, I04-REV-03
+  verification: 32 pass / 0 fail in test/runner/operation-prompt-templates.test.mjs; 13 pass / 0 fail in test/runner/effective-execution-contract.test.mjs; 75 pass / 0 fail in test/runner/assignment-dispatch.test.mjs; 83 pass / 0 fail in assignment suite; 4 pass / 0 fail in test/runner/coordination-group-thinking-rfc-review-lite.test.mjs; 13 pass / 0 fail in test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs; 29 pass / 0 fail in test/runner/coordination-declared-consult.test.mjs; 18 pass / 0 fail in test/verbs/coordination-group-thinking-pack.test.mjs; 112 pass / 0 fail in test/setup/checks.test.mjs; doctor check operation-prompt-templates-valid registered and passing; post-merge verification: 418 pass / 0 fail across focused matrix; GitNexus detect-changes verified.
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03-i04-template-registry-implementation.md
   stop: a template can widen authority or requires an unresolved setup contract
-- unit: I05 — independently review Phase 3 trust boundary and migration
+- unit: I05 — independently review Phase 3 trust boundary and migration (complete in I04 integration cycle)
   capability: code:review
   depends-on: I04
+  status: integrated
+  findings-resolved: I04-REV-01, I04-REV-02, I04-REV-03
   stop: unresolved template authority/provenance finding
 - unit: I06 — complete dispatch-hardening Phase 05 remainder
   capability: code:implement
@@ -816,6 +821,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
+  note: blocked — requires both I04 and I06 integrated and verified before opening (I04 integrated at `main@7472bd74`; I06 pending)
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
