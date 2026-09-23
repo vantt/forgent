@@ -103,6 +103,7 @@ import { READ_ONLY_ROLES } from '../dispatch/assignment-normalizer.mjs';
 import { RunnerConfigError } from '../dispatch/config.mjs';
 import { TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
 import { PROTOCOL_OPERATION_STAMP_PREFIX, operationDeclaresWorkProduct, resolveMutatingCwdPosture } from '../dispatch/execution-contract.mjs';
+import { hasOperationPromptTemplate } from '../dispatch/operation-prompt-templates.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   protocolOperationStamp,
@@ -272,7 +273,7 @@ function assertNoReservedOperationStamp(constraints) {
 // checkout) have already passed -- this function trusts its caller for that
 // legality decision and only shapes the contract, exactly like every other
 // field here.
-function buildSessionContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef, mutation = 'read-only' }) {
+function buildSessionContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef, mutation = 'read-only', contractTemplate }) {
   const declared = Array.isArray(constraints) ? [...constraints] : constraints;
   assertNoReservedOperationStamp(declared);
   const stamped = protocolOperationRef !== undefined && Array.isArray(declared) ? [...declared, protocolOperationRef] : declared;
@@ -287,6 +288,7 @@ function buildSessionContract({ objective, contextRefs, constraints, expectedOut
     ...(capabilities !== undefined ? { capabilities } : {}),
     budget: budget ?? { timeoutMs: timeoutMs ?? DEFAULT_TASK_TIMEOUT_MS, maxRuns: 1 },
     ...(minTier !== undefined ? { policy: { minTier } } : {}),
+    ...(contractTemplate !== undefined ? { contractTemplate } : {}),
   };
 }
 
@@ -2588,6 +2590,13 @@ export async function dispatchDeclaredOperationLocked(
     minTier:
       merged.minTier !== undefined && TIER_STRENGTH[merged.minTier] < TIER_STRENGTH.standard
         ? merged.minTier
+        : undefined,
+    // Unit I04 / Phase 3: contractTemplate resolution and legacy fallback guardrail.
+    // Existing definitions with no resolvable template retain an explicit legacy
+    // objective path during migration (plan.md Phase 3).
+    contractTemplate:
+      operation.task?.contractTemplate && hasOperationPromptTemplate(operation.task.contractTemplate, { cwd: opts?.cwd || opts?.repoRoot })
+        ? operation.task.contractTemplate
         : undefined,
   });
   const caller = {

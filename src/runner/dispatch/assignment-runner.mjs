@@ -56,6 +56,7 @@ import {
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
+import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
@@ -1527,6 +1528,22 @@ export async function executeAssignment(assignment, opts = {}) {
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
   let effectiveAssignment = assignment;
   if (!fs.existsSync(assignmentJsonPath)) {
+    // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
+    // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
+    if (assignment.contractTemplate && !assignment.provenance?.template?.templateSnapshot) {
+      const initialResolution = resolveAndRenderOperationPrompt(assignment, {
+        cwd,
+        domain: assignment.domain,
+      });
+      assignment = Object.freeze({
+        ...assignment,
+        provenance: Object.freeze({
+          ...(assignment.provenance || {}),
+          template: initialResolution.templateProvenance,
+        }),
+      });
+    }
+    effectiveAssignment = assignment;
     fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
   } else {
     let raw;
@@ -1563,6 +1580,21 @@ export async function executeAssignment(assignment, opts = {}) {
   effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
 
   validateAssignmentLegality(effectiveAssignment, opts);
+
+  let templateResolution = null;
+  if (effectiveAssignment.contractTemplate) {
+    templateResolution = resolveAndRenderOperationPrompt(effectiveAssignment, {
+      cwd,
+      domain: effectiveAssignment.domain,
+    });
+    effectiveAssignment = Object.freeze({
+      ...effectiveAssignment,
+      provenance: Object.freeze({
+        ...(effectiveAssignment.provenance || {}),
+        template: templateResolution.templateProvenance,
+      }),
+    });
+  }
 
   // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
   // Normalization Slice D: compileDispatchPlan() now merges
@@ -1756,6 +1788,7 @@ export async function executeAssignment(assignment, opts = {}) {
       phase: 'admitted',
       delivery: 'not-sent',
       executorId: resolvedExecutorId,
+      ...(templateResolution ? { template: templateResolution.templateProvenance } : (effectiveAssignment.provenance?.template ? { template: effectiveAssignment.provenance.template } : {})),
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
       effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
       ...(planContentHash ? { planContentHash } : {}),
@@ -2097,6 +2130,7 @@ export async function executeAssignment(assignment, opts = {}) {
       executorId: resolvedExecutorId,
       adapter: resolvedAdapter,
       providerCapacity: providerCapacityEvidence,
+      templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
       // The prompt is built before Authority preparation. Derive its posture
       // from the same requirement that will be handed to Authority, never
       // from an executor profile's merely requested confinement fragment.
@@ -2539,6 +2573,7 @@ export async function executeAssignment(assignment, opts = {}) {
           requirement: prepResult.preparedInvocation.requirement,
           backend: prepResult.preparedInvocation.backend,
         },
+        templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
       });
       publishMutableProjection(effectiveContractPath, effectiveContract);
 

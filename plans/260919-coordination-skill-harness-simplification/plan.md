@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec` (candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`, origin/main at `ad8dbaf0` not pushed; 10 commits ahead); Unit I04 / Phase 3 is next
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec` (candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`, origin/main at `ad8dbaf0` not pushed; 10 commits ahead); Unit I04 implemented (pending I05 review); I06/I07 parallel eligible
 Created: 2026-09-19
 Last Updated: 2026-09-22
 Mode: high-risk
@@ -791,6 +791,11 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I04 — implement Phase 3 template registry/resolver/provenance
   capability: code:implement
   depends-on: I01
+  status: implemented
+  branch: coordination-skill-harness-i04-template-registry
+  base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
+  verification: 32 pass / 0 fail in test/runner/operation-prompt-templates.test.mjs; 13 pass / 0 fail in test/runner/effective-execution-contract.test.mjs; 75 pass / 0 fail in test/runner/assignment-dispatch.test.mjs; 83 pass / 0 fail in assignment suite; 4 pass / 0 fail in test/runner/coordination-group-thinking-rfc-review-lite.test.mjs; 13 pass / 0 fail in test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs; 29 pass / 0 fail in test/runner/coordination-declared-consult.test.mjs; 18 pass / 0 fail in test/verbs/coordination-group-thinking-pack.test.mjs; 112 pass / 0 fail in test/setup/checks.test.mjs; doctor check operation-prompt-templates-valid registered and passing; I04-REV-01, I04-REV-02, and I04-REV-03 resolved with regression & negative tests; GitNexus detect-changes verified.
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-03-i04-template-registry-implementation.md
   stop: a template can widen authority or requires an unresolved setup contract
 - unit: I05 — independently review Phase 3 trust boundary and migration
   capability: code:review
