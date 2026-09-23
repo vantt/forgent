@@ -35,7 +35,7 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
-import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
@@ -306,9 +306,9 @@ export function openSession(
         const fd = fs.openSync(claimPath, 'r');
         fs.fsyncSync(fd);
         fs.closeSync(fd);
-        const fdDir = fs.openSync(claimDir, 'r');
-        fs.fsyncSync(fdDir);
-        fs.closeSync(fdDir);
+        // Directory fsync is best-effort: Windows cannot open a directory
+        // for fsync at all, and that must not abort (and mask) the claim.
+        fsyncDirBestEffort(claimDir);
       } catch (err) {
         fs.rmSync(claimDir, { recursive: true, force: true });
         throw err;
@@ -334,9 +334,7 @@ export function openSession(
           const fd = fs.openSync(claimPath, 'r');
           fs.fsyncSync(fd);
           fs.closeSync(fd);
-          const fdDir = fs.openSync(claimDir, 'r');
-          fs.fsyncSync(fdDir);
-          fs.closeSync(fdDir);
+          fsyncDirBestEffort(claimDir);
 
           if (!fs.existsSync(sessionDir)) {
             claimed = true;
@@ -403,21 +401,20 @@ export function openSession(
     const fdEv = fs.openSync(eventsPath, 'r');
     fs.fsyncSync(fdEv);
     fs.closeSync(fdEv);
-    const fdStaging = fs.openSync(stagingDir, 'r');
-    fs.fsyncSync(fdStaging);
-    fs.closeSync(fdStaging);
+    fsyncDirBestEffort(stagingDir);
 
     try {
       fs.renameSync(stagingDir, sessionDir);
-      const fdParent = fs.openSync(sessionsDir, 'r');
-      fs.fsyncSync(fdParent);
-      fs.closeSync(fdParent);
     } catch (err) {
       if (err.code === 'EEXIST' || err.code === 'ENOTEMPTY' || err.code === 'EPERM') {
         throw new CoordinationError('validation', `coordination session "${id}" already exists`);
       }
       throw err;
     }
+    // Outside the rename's try: a directory fsync the platform refuses
+    // (Windows: EPERM/EISDIR) used to land in the EPERM branch above and be
+    // reported as "session already exists" for a session just created.
+    fsyncDirBestEffort(sessionsDir);
 
     return Object.freeze(manifest);
   } finally {
