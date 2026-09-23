@@ -5,11 +5,14 @@
 - **Date**: 2026-09-23
 - **Branch**: `coordination-skill-harness-i09-dag-forward-port`
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
-- **Base Commit**: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e` (`main`)
+- **Base Commit**: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
+- **Integration Baseline**: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+- **Evaluated Candidate SHA**: `a208bf555927b508ddfa0523009ce87aac1dd0af` (Approved by independent review; 0 blocker, 0 high)
+- **Synchronization Merge Commit**: `c624fe583fe089cb177c44df315dc451ba1d8e1f`
 - **Porting Evidence Tip**: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
-- **Status**: `implemented` (pre-merge implementation complete; candidate ready for I10 test / I11 review)
+- **Status**: `implemented` (synchronized with main@cc687d92; NOT integrated into main; I10 blocked)
 - **Capability**: `code:implement`
-- **Next Dependency Gate**: `I10` (test DAG migration, cold resume, concurrency, and corrupt evidence) -> `I11` (independent review)
+- **Next Dependency Gate**: `I10` remains BLOCKED until synchronized tip is reviewed, integrated into main, and post-merge verification passes.
 
 ---
 
@@ -142,6 +145,11 @@ All review findings from the independent review rounds (evaluated commits `d5209
     2. In `src/runner/coordination/session-engine.mjs`: `closeSessionByQuorumLocked` asserts absence of shared-cwd caveats, throwing `CoordinationError('refusal')` if unadjudicated caveats remain.
     3. In `src/runner/coordination/store.mjs`: `recordDriverDispositionLocked` asserts absence of shared-cwd caveats before recording `disposition = 'cell-closed'`, throwing `CoordinationError('validation')`.
   - Added regression tests verifying closure refusal and disposition rejection when shared-cwd caveats exist.
+- **Policy Confirmation (Option a)**:
+  - Confirmed by Track Manager: shared-cwd read-only DAG caveat cannot be discharged in the original session;
+  - The original session must be cancelled;
+  - Recheck must run in a separate session;
+  - No adjudication event, lifecycle, or store added (candidate has no intra-session adjudication state/event; adding one would exceed I09 scope).
 
 ### 4.6 I09-REV-06 (MEDIUM) — Strict Task-Claim Collision Semantics
 - **Finding**: The task claim collision guard in `store.mjs` diverged from base.
@@ -167,13 +175,40 @@ All review findings from the independent review rounds (evaluated commits `d5209
 - **Finding**: `src/runner/coordination/dag-declaration.mjs` had filesystem imports (`node:fs`, `node:path`) via `resolveNodeCwd`, violating pure declaration layer boundaries.
 - **Resolution**: Cut `resolveNodeCwd` from `dag-declaration.mjs`, making it 100% pure and memory-only. Relocated `resolveNodeCwd` to `src/verbs/coordination/dag-scheduler.mjs` and updated callers in `run.mjs` and `show.mjs`.
 
+### 4.12 I09-REV-12 (MEDIUM) — Nhãn deferred bị dùng sai nghĩa (Verbatim Independent Review Finding)
+- **Finding**:
+  - Node đang chờ retry và node có assignment nhưng chưa có link (probe crash thật, kill -9 driver) đều được gán deferred mà không kèm evidence giải thích.
+  - Proposal §4 quy định deferred chỉ dành cho concurrency-cap.
+  - Kết quả không sai (không có settle giả, và recover vẫn là cửa khôi phục đúng), nhưng các outcome đang bị trộn nghĩa.
+  - Đề xuất: dùng một outcome riêng, ví dụ awaiting-settlement, kèm lý do pending-retry hoặc unlinked-in-flight.
+- **Accounting**: Non-blocking for integration; queued for taxonomy refinement during Unit I10/I11.
+
+### 4.13 I09-REV-13 (MEDIUM) — Vẫn ghi được disposition trên finding bị caveat (Verbatim Independent Review Finding)
+- **Finding**:
+  - recordDriverDisposition vẫn cho ghi accepted/rejected khi target là kết quả của một node bị caveat.
+  - cell-closed và close đã bị chặn nên đây không phải lỗ hổng để đóng cell, nhưng kernel vẫn nhận một phán quyết dựa trên evidence không quy trách nhiệm được.
+- **Accounting**: Non-blocking for integration; queued for tightened disposition validation during Unit I10/I11.
+
+### 4.14 Independent Review LOW Findings (Verbatim)
+- **Finding**:
+  - Logic resolve cwd bị lặp ở ba chỗ: session-engine, store và dag-scheduler. Bản trong store còn quét mọi assignment của session thay vì chỉ assignment của node.
+  - Handoff không ghi SHA mà chỉ ghi tên branch.
+- **Accounting**: Non-blocking for integration; queued for cleanup during Unit I10/I11.
+
 ---
 
 ## 5. Disposition & Readiness
 
-Unit **I09** implementation and all reviewer feedback remediations are complete, strictly isolated in worktree `coordination-skill-harness-i09-dag-forward-port`, and adhere to all platform operating laws and Git boundaries:
-- Base commit: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
-- Evaluation history: `d52093fb` -> `3cc74b41` -> candidate tip
-- All 14 test suites passing cleanly (538 passed / 0 failed, `git diff --check` clean).
+### 5.1 Artifact & Commit Distinctions
+- **Implementation Base**: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
+- **Current Integration Baseline**: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+- **Evaluated Candidate**: `a208bf555927b508ddfa0523009ce87aac1dd0af` (Evaluated & APPROVED by independent review: 0 blocker, 0 high).
+- **Synchronization Merge Commit**: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (Merges `main@cc687d92` into branch `coordination-skill-harness-i09-dag-forward-port`; CHANGELOG conflict resolved preserving all entries).
+- **Synchronized Candidate Tip**: Committed tip on branch `coordination-skill-harness-i09-dag-forward-port`.
+- **Integration Status**: **NOT integrated into main yet**.
+- **Next Gate**: **Unit I10 remains BLOCKED** until the synchronized candidate tip is independently re-reviewed, integrated into main, and post-merge verification passes.
 
-Ready for independent re-review and progression to **Unit I10** (test DAG migration, cold resume, concurrency, and corrupt evidence).
+### 5.2 Verification Summary
+- `git diff --check`: clean (exit 0).
+- Focused 14-suite matrix: 538 passed / 0 failed.
+- Full suite verification and GitNexus impact analysis run on the synchronized candidate tip.

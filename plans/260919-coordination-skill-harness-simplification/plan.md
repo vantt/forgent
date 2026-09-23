@@ -844,9 +844,13 @@ Executor/provider/model/tier selection remains an execution-time decision.
   branch: `coordination-skill-harness-i09-dag-forward-port`
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
   base-sha: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
-  evidence-tip: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
-  review-evaluation-commits: `d52093fb`, `3cc74b41`
-  next-dependency-gate: I10 (test DAG migration, cold resume, concurrency, and corrupt evidence)
+  integration-baseline: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+  evaluated-candidate-sha: `a208bf555927b508ddfa0523009ce87aac1dd0af`
+  synchronization-merge-commit: `c624fe583fe089cb177c44df315dc451ba1d8e1f`
+  integration-status: not integrated into main (synchronized candidate tip prepared for review; I10 blocked)
+  rev05-policy: locked (shared-cwd read-only DAG caveat cannot be discharged in original session; original session must be cancelled; recheck runs in separate session; no adjudication event/lifecycle/store added)
+  queued-for-i10-i11: I09-REV-12 (deferred outcome taxonomy), I09-REV-13 (disposition on caveated findings), cwd helper consolidation
+  next-dependency-gate: I10 remains BLOCKED until synchronized tip is reviewed, integrated into main, and post-merge verification passes
   verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
