@@ -28,11 +28,16 @@ Branch `fix/ci-test-hermeticity`. Evidence: CI run 35836953124 (main @ cc687d92)
 - CI-like environment (`env -i`, empty HOME so no registry, no claude/codex on PATH), full suite: 147 → 53 failures. All 53 are `test/rust-host/*` (Rust binary not built in the worktree; CI builds it on Linux and macOS) plus the 2 herdr-reconciliation tests, which were fixed afterwards. The touched files were re-run in both the CI-like and dev environments: 0 failures.
 - Normal dev environment, full suite: see the commit / PR note.
 
+## Second pass (the items that were still open)
+
+- **rust-host (50 local failures):** after `cargo build --release --workspace`, all 102/102 tests in `test/rust-host/*` pass. The failures were only a missing binary in the worktree. No code change.
+- **`run-lock-identity` on macOS (3 tests):** `process-identity.mjs` only reads `/proc`. On macOS `getBootId()` is always `'unknown-boot'` and `getProcessStartTime()` is always `null`, so `resolveHolderLiveness` fails closed to `'held'`, as the code documents. The tests asserted the Linux-only behavior. They now assert the behavior each platform is supposed to have: `'dead'`/reclaim when `/proc` exists, `'held'` otherwise. Nothing was skipped or loosened.
+- **`herdr-spawn-adapter` on CI:** the CI failure was the bwrap registry bug (fixed in section 1). Separately, there is a real flake in "a herdr that stops answering…" (1/12 under 4-way parallel load). It is a product bug: `pollForOutcome` only counted blind time up to the *start* of the tick, so a slow failing `agentGet`/`readLiveness` was charged as idle and a healthy round ended `timed-out-idle`. Fix: one `observedAt` taken after all reads, used both for the blind span and as `now`. 18/18 green under 6-way load. GitNexus impact: HIGH (stale index); grep finds 1 direct caller.
+- **R5 concurrency in `coordination-research-fan-out`:** not reproduced in 30 runs under load, and not in the current CI failure list.
+
 ## Not in scope
 
 - Windows rust-host: needs a decision on whether to build Rust on Windows.
-- Timing flakes (`herdr-spawn-adapter`, the R5 concurrency test in `coordination-research-fan-out`).
-- `run-lock-identity.test.mjs` on macOS (`'held' !== 'dead'`, 2 tests): not in the original list and not reproducible on Linux. Needs a separate look.
 
 ## Unresolved questions
 

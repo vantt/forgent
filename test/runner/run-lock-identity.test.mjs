@@ -19,6 +19,13 @@ function mkRunDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-lock-identity-'));
 }
 
+// Process identity is read from /proc, so only Linux can prove a pid was
+// reused or the host rebooted. Elsewhere resolveHolderLiveness has nothing to
+// cross-check and fails closed to 'held' by contract; the tests below assert
+// whichever of the two behaviors this platform is supposed to have.
+const HAS_PROC_START_TIME = getProcessStartTime(process.pid) !== null;
+const HAS_BOOT_ID = getBootId() !== 'unknown-boot';
+
 // A definitely-dead PID: spawn a real child, let it exit, then reuse its pid.
 function deadPid() {
   const result = spawnSync(process.execPath, ['-e', 'process.exit(0)']);
@@ -41,7 +48,7 @@ test('resolveHolderLiveness: alive pid + matching processStartTime -> held', () 
 
 test('resolveHolderLiveness: alive pid but a DIFFERENT recorded processStartTime (pid reused by an unrelated process) -> dead', () => {
   const holder = { id: 'stale', pid: process.pid, bootId: getBootId(), processStartTime: 'not-the-real-starttime', host: os.hostname() };
-  assert.equal(resolveHolderLiveness(holder), 'dead');
+  assert.equal(resolveHolderLiveness(holder), HAS_PROC_START_TIME ? 'dead' : 'held');
 });
 
 test('resolveHolderLiveness: a genuinely dead pid (ESRCH) -> dead, regardless of recorded processStartTime', () => {
@@ -57,7 +64,7 @@ test('resolveHolderLiveness: alive pid with NO recorded processStartTime (pre-H1
 
 test('resolveHolderLiveness: bootId recorded and different from the current boot -> dead, even with a coincidentally live pid', () => {
   const holder = { id: 'pre-reboot', pid: process.pid, bootId: 'a-different-boot-id-entirely', processStartTime: getProcessStartTime(process.pid), host: os.hostname() };
-  assert.equal(resolveHolderLiveness(holder), 'dead');
+  assert.equal(resolveHolderLiveness(holder), HAS_BOOT_ID ? 'dead' : 'held');
 });
 
 test('resolveHolderLiveness: no pid at all -> dead', () => {
@@ -82,6 +89,10 @@ test('acquireRunControl: a holder record whose pid was reused by an unrelated pr
   assert.equal(first.status, 'acquired');
 
   const contender = acquireRunControl(runDir, { holder: buildRunControlHolder('contender') });
+  if (!HAS_PROC_START_TIME) {
+    assert.equal(contender.status, 'held', 'without /proc the reused pid cannot be disproven, so the live pid keeps the lock');
+    return;
+  }
   assert.equal(contender.status, 'acquired');
   assert.equal(contender.controlEpoch, first.controlEpoch + 1);
 });
