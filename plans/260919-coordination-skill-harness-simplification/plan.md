@@ -809,6 +809,21 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I06 — complete dispatch-hardening Phase 05 remainder
   capability: code:implement
   depends-on: I01
+  status: implemented
+  candidate-branch: `coordination-skill-harness-i06-dispatch-governance`
+  base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
+  candidate-sha: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d`)
+  last-verified: 2026-09-23 at candidate `d75d311d`
+  next-dependency-gate: I08 (requires I06 and I07), I09 (requires I02, I04, and I06)
+  candidate-verification: 101 pass / 0 fail on focused architecture/redirect/PlacementPolicy smoke; 75 pass / 0 fail in assignment-dispatch.test.mjs; 560 pass / 0 fail on full dispatch matrix; 317 pass / 0 fail on 11-suite coordination matrix; git diff --check exits 0
+  historical-verification: 529 tests from initial Phase 05 exploration (2026-09-22 morning)
+  requirements-completed:
+    - R5 (provider-family vs model lookup decoupling verified and preserved)
+    - R6 (cross-provider redirect contract: schema, typed refusal redirect.cross-provider-not-permitted, full provenance)
+    - R7 (PlacementPolicy authority reconciled as active binder, stablePoolIndex deduplicated)
+    - R8 (adapter registry leaf module src/runner/dispatch/adapters.mjs cycle cut)
+  report: `plans/260919-coordination-skill-harness-simplification/reports/phase-03a-i06-dispatch-governance-implementation.md`
+  review-report: `plans/260919-coordination-skill-harness-simplification/reports/phase-03a-i06-dispatch-governance-review.md`
   stop: provider/placement authority decision is not settled
 - unit: I07 — implement dispatch-hardening Phase 08 operability/doctor
   capability: code:implement

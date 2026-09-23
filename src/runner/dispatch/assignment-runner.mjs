@@ -62,7 +62,14 @@ import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool, readOnlyRedirectInvocationFor } from './placement-policy.mjs';
+import {
+  resolveVerifiedRedirectExecutor,
+  resolveVerifiedAssignmentModel,
+  readOnlyRedirectPool,
+  readOnlyRedirectInvocationFor,
+  readOnlyRedirectEntryFor,
+  stablePoolIndex,
+} from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -231,23 +238,45 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
-function stableIndex(seed, size) {
-  if (!Number.isInteger(size) || size <= 0) return 0;
-  const hash = crypto.createHash('sha256').update(String(seed)).digest();
-  return hash.readUInt32BE(0) % size;
-}
-
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  const configuredRedirects = cfg?.placementPolicy?.readOnlyRedirects;
+  const isConfiguredForSource = configuredRedirects && Object.prototype.hasOwnProperty.call(configuredRedirects, sourceExecutorId);
+
   // Phase D correction (executor-profile-schema-migration): PlacementPolicy
   // itself now owns reading the declared candidate pool
   // (`readOnlyRedirectPool`, `placement-policy.mjs`) -- see that function's
   // own doc comment for why this moved off `executors.<id>` a second time.
   const rawPool = readOnlyRedirectPool(cfg, sourceExecutorId, assignment?.operation);
+
+  // Phase 05 R6: validate explicitly configured pool entries.
+  // Empty configured pools and unknown executors fail with typed refusal codes.
+  if (isConfiguredForSource) {
+    if (rawPool.length === 0) {
+      throw new RunnerConfigError(
+        `read-only redirect pool for "${sourceExecutorId}" is empty.`,
+        { code: 'redirect.empty-pool' },
+      );
+    }
+    for (const candidate of rawPool) {
+      if (!executors[candidate]) {
+        throw new RunnerConfigError(
+          `read-only redirect pool for "${sourceExecutorId}" references unknown executor "${candidate}".`,
+          { code: 'redirect.unknown-executor' },
+        );
+      }
+    }
+  }
+
+  const sourceExecutorEntry = cfg?.executors?.[sourceExecutorId];
+  const sourceProvider = deriveProviderFamily(sourceExecutorEntry, sourceExecutorEntry?.command ?? sourceExecutorId);
+
+  const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
   const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
   const legacyExecutorId = candidates.length === 0
     ? sourceExecutorId
-    : candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+    : candidates[stablePoolIndex(seed, candidates.length)];
+
   // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
   // binder for redirect EXECUTOR selection, self-verifying -- same safety
   // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
@@ -261,7 +290,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
     cfg,
     sourceExecutorId,
     candidatePool: rawPool,
-    seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`,
+    seed,
     legacyExecutorId,
   });
   if (placementDivergence) {
@@ -269,20 +298,47 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
       `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
     );
   }
-  // M7: the caller needs the FULL decision (pool/seed alongside the chosen
-  // id) to persist it into dispatch-plan.json -- before this, everything
-  // but the final executorId was discarded here, leaving no audit trail
-  // for WHY a read-only redirect landed on the executor it did.
-  return { executorId: verifiedExecutorId, pool: rawPool, seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}` };
+
+  const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
+  const selectedProvider = deriveProviderFamily(targetExecutorEntry, targetExecutorEntry?.command ?? verifiedExecutorId);
+
+  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
+  const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
+
+  // Phase 05 R6: cross-provider redirect requires explicit opt-in via crossProvider: true.
+  if (isCrossProvider && entryDesc?.crossProvider !== true) {
+    throw new RunnerConfigError(
+      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${verifiedExecutorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
+      { code: 'redirect.cross-provider-not-permitted' },
+    );
+  }
+
+  // M7 & I06: return full decision (pool, seed, sourceProvider, selectedProvider, crossProvider)
+  // for provenance recording in dispatch-plan.json.
+  return {
+    executorId: verifiedExecutorId,
+    pool: rawPool,
+    seed,
+    sourceProvider,
+    selectedProvider,
+    crossProvider: entryDesc?.crossProvider === true,
+  };
 }
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = deriveProviderFamily(executorEntry);
-  const model = providerModel === policy.providerModel
+  const legacyModel = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+  const { model: verifiedModel } = resolveVerifiedAssignmentModel({
+    cfg,
+    lookupPolicyTier: policy.tier,
+    provider: providerModel,
+    legacyModel,
+  });
+  const model = verifiedModel;
   return {
     ...policy,
     executorId,
@@ -1693,10 +1749,13 @@ export async function executeAssignment(assignment, opts = {}) {
       ...compiledPlan,
       redirectDecision: {
         sourceExecutorId: defaultExecutorId,
+        sourceProvider: redirectResult.sourceProvider,
         pool: redirectResult.pool,
         seed: redirectResult.seed,
         chosen: resolvedExecutorId,
+        selectedProvider: redirectResult.selectedProvider,
         invocation: readOnlyRedirectInvocationId ?? null,
+        crossProvider: redirectResult.crossProvider,
       },
     };
   }
@@ -1719,6 +1778,10 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
       throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+    }
+    const targetEntry = cfg?.executors?.[resolvedExecutorId];
+    if (targetEntry && redirectResult?.crossProvider && targetEntry.allowCrossProvider !== true) {
+      throw new RunnerConfigError(`executor "${resolvedExecutorId}" resolves to cross-provider redirect target without allowCrossProvider: true.`);
     }
   }
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`

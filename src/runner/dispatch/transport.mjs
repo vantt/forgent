@@ -53,10 +53,27 @@ import { DispatchError } from './dispatch-error.mjs';
 import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
+import {
+  DEFAULT_ADAPTER,
+  EXECUTOR_ADAPTER_NAMES,
+  ADAPTER_REGISTRY,
+  EXECUTOR_ADAPTERS,
+  registerExecutorAdapter,
+  getAdapterMetadata,
+} from './adapters.mjs';
+
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
 // the two never have to import each other. Re-exported so callers that have
 // always taken it from this module keep working.
-export { DispatchError };
+export {
+  DispatchError,
+  DEFAULT_ADAPTER,
+  EXECUTOR_ADAPTER_NAMES,
+  ADAPTER_REGISTRY,
+  EXECUTOR_ADAPTERS,
+  registerExecutorAdapter,
+  getAdapterMetadata,
+};
 
 /** Env var a spawned child reads to know its own nested-dispatch depth,
  * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
@@ -303,9 +320,7 @@ function teeChunk(onChunk, stream, chunk) {
  * `rpc`/`app-server` adapter (e.g. talking to a headless agent's
  * app-server over RPC instead of CLI argv) stays deferred beyond these
  * two — this cell only proves the port is pluggable, not that every
- * conceivable mechanism needs its own adapter yet.
  */
-export const DEFAULT_ADAPTER = 'cli-spawn';
 
 /** Kill the spawned child's entire process GROUP, not just the directly-
  * spawned pid — `detached: true` at spawn time (below) makes the child its
@@ -892,36 +907,18 @@ herdrSpawnAdapter.locus = 'herdr-pane';
 herdrSpawnAdapter.preparedInvocationContract = 'exact-v1';
 herdrSpawnAdapter.receiptContract = 'herdr-adapter-receipt.v1';
 
-/** Adapter metadata registry for Assignment-owned recovery profiles. */
-export const ADAPTER_REGISTRY = {
-  [DEFAULT_ADAPTER]: {
-    execute: cliSpawnAdapter,
-    locus: 'local-process',
-    preparedInvocationContract: 'exact-v1',
-    receiptContract: 'confinement-adapter-receipt.v1',
-  },
-  http: {
-    execute: httpAdapter,
-    locus: 'remote-http',
-  },
-  'herdr-spawn': {
-    execute: herdrSpawnAdapter,
-    locus: 'herdr-pane',
-    preparedInvocationContract: 'exact-v1',
-    receiptContract: 'herdr-adapter-receipt.v1',
-  },
-};
+registerExecutorAdapter(DEFAULT_ADAPTER, cliSpawnAdapter, {
+  locus: 'local-process',
+  preparedInvocationContract: 'exact-v1',
+  receiptContract: 'confinement-adapter-receipt.v1',
+});
 
-export function getAdapterMetadata(adapterName) {
-  if (ADAPTER_REGISTRY[adapterName]) {
-    return ADAPTER_REGISTRY[adapterName];
-  }
-  return null;
-}
+registerExecutorAdapter('http', httpAdapter, {
+  locus: 'remote-http',
+});
 
-/** C9 v2 executor-adapter registry — see `cliSpawnAdapter`'s doc comment. */
-export const EXECUTOR_ADAPTERS = {
-  [DEFAULT_ADAPTER]: cliSpawnAdapter,
-  http: httpAdapter,
-  'herdr-spawn': herdrSpawnAdapter,
-};
+registerExecutorAdapter('herdr-spawn', herdrSpawnAdapter, {
+  locus: 'herdr-pane',
+  preparedInvocationContract: 'exact-v1',
+  receiptContract: 'herdr-adapter-receipt.v1',
+});

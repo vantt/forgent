@@ -11,8 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Cross-provider redirect governance contract: pool entries with cross-provider
+  targets require explicit `crossProvider: true` opt-in, failing closed with
+  typed refusal `redirect.cross-provider-not-permitted` when missing; enforces
+  `disallowedProviders`, `disallowedExecutors`, and `allowCrossProvider` invariants
+  with full redirect provenance recorded in `dispatch-plan.json`.
+- Adapter registry leaf module `src/runner/dispatch/adapters.mjs`, cleanly breaking
+  the import cycle between `config.mjs` and `transport.mjs`.
 - Operation prompt-template registry, deterministic resolver, bounded variable renderer, and provenance tracker (Unit I04 / Phase 3). Supports project (`.fgos/prompt-templates/`), domain (`domains/<domain>/prompt-templates/`), and core (`core/prompt-templates/`) resolution precedence, restricts variables strictly to validated semantic actions (`{objective}`, `{contextRefs}`, `{artifactRefs}`, `{expectedOutputs}`, `{role}`, `{constraints}`, `{evidenceContract}`), persists content/rendered digests and immutable snapshots for retry/replay stability, registers doctor check `operation-prompt-templates-valid`, and preserves the legacy objective path for definitions without a resolvable template.
-
 - Semantic coordination CLI surface: `fgos coordination start`, `status`,
   `operation`, `authorize-and-dispatch`, `fan-out`, `contribution`,
   `human-turn`, `disposition`, and `close`. These semantic subcommands
@@ -55,6 +61,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Deduplicated `PlacementPolicy` redirect stable pool indexing in
+  `assignment-runner.mjs` to import and share `stablePoolIndex` from
+  `placement-policy.mjs`.
 - Packaging-distribution and host-invocation verification docs now record the
   published `v0.1.0` preview release proof, post-release CI/external-consumer
   proof, and the preview Node-fallback earliest removal date of 2026-10-18.

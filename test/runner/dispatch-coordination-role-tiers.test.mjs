@@ -125,9 +125,9 @@ function fakeCrossProviderRedirectConfig(tempDir) {
       placementPolicy: {
         readOnlyRedirects: {
           claude: {
-            default: ['codex-bwrap'],
+            default: [{ executor: 'codex-bwrap', crossProvider: true }],
             operations: {
-              'red-team-candidate': ['codex-bwrap'],
+              'red-team-candidate': [{ executor: 'codex-bwrap', crossProvider: true }],
             },
           },
         },

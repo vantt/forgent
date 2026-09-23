@@ -25,6 +25,7 @@
     "src/runner/loop.mjs": "use-case",
     "src/runner/paths.mjs": "infra",
     "src/runner/dispatch.mjs": "infra",
+    "src/runner/dispatch/adapters.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
     "src/runner/dispatch/placement-policy.mjs": "infra",
     "src/runner/dispatch/confinement/policies.mjs": "infra",
