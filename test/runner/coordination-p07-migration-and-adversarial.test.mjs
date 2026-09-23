@@ -16,7 +16,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths } from '../../src/runner/coordination/store.mjs';
+import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths, recordRunRetry, linkResult } from '../../src/runner/coordination/store.mjs';
 import { normalizeDagDeclaration } from '../../src/runner/coordination/dag-declaration.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, SCHEMA_VERSION_2, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
@@ -24,6 +24,7 @@ import { EventLogError, repairTruncatedLastLine } from '../../src/state/events.m
 import { cancelSession } from '../../src/runner/coordination/session-engine.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
+import { scheduleDagSteps } from '../../src/verbs/coordination/dag-scheduler.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
@@ -494,4 +495,146 @@ test('Phase 07: public-door legacy requests still run sequentially and never gro
   assert.equal(shown.schemaMode, 'legacy-non-dag');
   assert.equal(shown.dag.kind, 'legacy-non-dag');
   assert.equal(readManifest(result.coordinationId, { cwd: tempDir, repoRoot: tempDir }).schemaVersion, SCHEMA_VERSION_3);
+});
+
+test('Phase 07: resuming a legacy declared-protocol schema-3 session does NOT write dagNodeId on new assignment-created events (REV-04)', async () => {
+  const { tempDir, ctx } = publicDoorSetup();
+  const initialReq = request({ coordinationId: 'p07-legacy-resume-no-dagnode' });
+  initialReq.steps = [initialReq.steps[0]];
+  const initialResult = await runCoordinationUseCase(ctx, { requestObject: initialReq });
+  assert.equal(initialResult.closed, false);
+
+  const resumeReq = request({ coordinationId: 'p07-legacy-resume-no-dagnode' });
+  resumeReq.steps = [
+    { as: 'produce', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'Candidate.', expectedOutputs: ['artifact.md'] },
+    { as: 'review', type: 'operation', operationId: 'review-candidate', targetActorId: 'reviewer', objective: 'Review.', expectedOutputs: ['review.md'], contextRefs: ['$ref:produce'] },
+  ];
+  await runCoordinationUseCase(ctx, { requestObject: resumeReq });
+
+  const events = readSessionEvents('p07-legacy-resume-no-dagnode', { cwd: tempDir, repoRoot: tempDir });
+  const assignmentCreatedEvents = events.filter((e) => e.type === 'assignment-created');
+  assert.equal(assignmentCreatedEvents.length, 2);
+  for (const event of assignmentCreatedEvents) {
+    assert.equal(event.payload.dagNodeId, undefined, 'legacy resumed session must never write dagNodeId');
+  }
+
+  const replayed = replaySession('p07-legacy-resume-no-dagnode', { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(replayed.dag.kind, 'legacy-non-dag');
+});
+
+test('Phase 07: DAG resume with retry-pending does not treat retried node as settled and blocks successor (REV-01)', async () => {
+  const { tempDir, ctx } = publicDoorSetup();
+  const coordinationId = 'p07-dag-retry-pending';
+  openSession({
+    coordinationId,
+    objective: 'DAG retry pending',
+    provenanceRoot: { writerId: WRITER_ID },
+    schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: normalizeDagDeclaration({
+      nodes: [
+        { id: 'node-produce', displayLabel: 'produce', semantics: { kind: 'operation' }, dependsOn: [] },
+        { id: 'node-review', displayLabel: 'review', semantics: { kind: 'operation' }, dependsOn: ['node-produce'] },
+      ],
+    }),
+  }, { cwd: tempDir, repoRoot: tempDir });
+
+  const asgn = createSessionAssignment({
+    coordinationId,
+    taskKey: 'task-produce',
+    contract: {
+      objective: 'Candidate.',
+      contextRefs: [],
+      constraints: [],
+      expectedOutputs: ['artifact.md'],
+      mutation: 'read-only',
+      evidence: { required: 'reported' },
+      role: 'doer',
+      budget: { timeoutMs: 60000, maxRuns: 1 },
+    },
+    caller: { writerId: WRITER_ID },
+    dagNodeId: 'node-produce',
+  }, { cwd: tempDir, repoRoot: tempDir });
+
+  linkResult(coordinationId, {
+    assignmentId: asgn.assignmentId,
+    runId: `run_${asgn.assignmentId}_01`,
+  }, { cwd: tempDir, repoRoot: tempDir, allowSupersede: true });
+
+  recordRunRetry(coordinationId, { assignmentId: asgn.assignmentId, reason: 'retrying failed run' }, { cwd: tempDir, repoRoot: tempDir });
+
+  const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  const produceNode = replayed.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  const reviewNode = replayed.dag.nodes.find((n) => n.nodeId === 'node-review');
+  assert.equal(produceNode.settled, false, 'produce must not be settled after retry recorded');
+  assert.equal(reviewNode.blocked, true, 'review must be blocked when predecessor is not settled');
+
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: coordinationId });
+  const shownProduce = shown.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  const shownReview = shown.dag.nodes.find((n) => n.nodeId === 'node-review');
+  assert.equal(shownProduce.settled, false);
+  assert.equal(shownReview.dependenciesSettled, false);
+});
+
+test('Phase 07: DAG execution with concurrent read-only nodes sharing cwd emits sharedCwdVerdictCaveat and refuses auto-close (REV-05)', async () => {
+  const { tempDir, ctx } = publicDoorSetup();
+  const dagReq = request({ coordinationId: 'p07-dag-shared-cwd-caveat' });
+  dagReq.dag = true;
+  dagReq.actors = [
+    { id: 'reviewer' },
+    { id: 'red-team' },
+  ];
+  dagReq.steps = [
+    { as: 'review-1', type: 'operation', operationId: 'review-candidate', targetActorId: 'reviewer', objective: 'Review 1.', expectedOutputs: ['review1.md'], dependsOn: [] },
+    { as: 'review-2', type: 'operation', operationId: 'red-team-candidate', targetActorId: 'red-team', objective: 'Review 2.', expectedOutputs: ['review2.md'], dependsOn: [] },
+  ];
+
+  const result = await runCoordinationUseCase(ctx, { requestObject: dagReq });
+
+  assert.equal(result.closed, false, 'auto-close must be refused when nodes carry shared-cwd caveats');
+  assert.equal(result.closeAttempted, false);
+  assert.equal(result.status, 'recheck-required');
+  assert.match(result.closeRefusalReason, /recheck-required/);
+
+  for (const step of result.steps) {
+    assert.equal(step.caveated, true);
+    assert.ok(step.sharedCwdVerdictCaveat);
+    assert.equal(step.sharedCwdVerdictCaveat.status, 'recheck-required');
+  }
+
+  assert.ok(Array.isArray(result.dag.nodes));
+  for (const node of result.dag.nodes) {
+    assert.equal(node.caveated, true);
+    assert.ok(node.sharedCwdVerdictCaveat);
+  }
+});
+
+test('Phase 07: deferred node that settles clears error evidence in scheduler (REV-07)', async () => {
+  const declaration = {
+    nodes: [
+      { id: 'node-a', displayLabel: 'a', semantics: { kind: 'operation' }, dependsOn: [] },
+      { id: 'node-b', displayLabel: 'b', semantics: { kind: 'operation' }, dependsOn: [] },
+    ],
+  };
+  const steps = [
+    { as: 'a', type: 'operation' },
+    { as: 'b', type: 'operation' },
+  ];
+
+  let nodeAAttempts = 0;
+  const execute = async (step) => {
+    if (step.as === 'a') {
+      nodeAAttempts += 1;
+      if (nodeAAttempts === 1) {
+        const err = new CoordinationError('validation', 'Session concurrency limit reached', 'concurrency-cap');
+        throw err;
+      }
+      return { as: 'a', status: 'done' };
+    }
+    return { as: 'b', status: 'done' };
+  };
+
+  const scheduled = await scheduleDagSteps({ steps, declaration, execute });
+  const aResult = scheduled.find((s) => s.as === 'a');
+  assert.equal(aResult.outcome, 'settled');
+  assert.equal(aResult.error, undefined, 'deferred node that subsequently settles must not retain error');
 });

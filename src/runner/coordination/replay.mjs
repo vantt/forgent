@@ -31,7 +31,7 @@ import {
   SCHEMA_VERSION_2,
   SCHEMA_VERSION_3,
 } from './schema.mjs';
-import { normalizeDagDeclaration } from './dag-declaration.mjs';
+import { normalizeDagDeclaration, getAuthoritativeSettledAssignmentIds } from './dag-declaration.mjs';
 import { validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 
 // Same parse+validate path store.mjs's own read/write operations use (never
@@ -703,9 +703,22 @@ export function replaySession(coordinationId, opts = {}) {
     }
   }
 
-  const hasNonDagAssignmentsOnly = createdIds.size > 0 && [...createdIds.values()].every((e) => !e.payload.dagNodeId);
-  if (manifest.schemaVersion === SCHEMA_VERSION_3 && !manifest.snapshotRef && !dagDeclaration && !hasNonDagAssignmentsOnly) {
-    throw new CoordinationError('dangling-ref', `session "${coordinationId}": schema-3 DAG session has no "dag-declared" event`);
+  const declaredNodeIds = dagDeclaration ? new Set(dagDeclaration.nodes.map((n) => n.id)) : null;
+  for (const [id, event] of createdIds) {
+    if (event.payload.dagNodeId) {
+      if (!dagDeclaration) {
+        throw new CoordinationError(
+          'dangling-ref',
+          `session "${coordinationId}": assignment "${id}" references dagNodeId "${event.payload.dagNodeId}", but session has no "dag-declared" event`,
+        );
+      }
+      if (!declaredNodeIds.has(event.payload.dagNodeId)) {
+        throw new CoordinationError(
+          'dangling-ref',
+          `session "${coordinationId}": assignment "${id}" references dagNodeId "${event.payload.dagNodeId}", which is not declared in the session's DAG`,
+        );
+      }
+    }
   }
 
   // An authorization is CONSUMED by the one `assignment-created` event that
@@ -780,6 +793,7 @@ export function replaySession(coordinationId, opts = {}) {
     assertAssignmentIsSessionBlind(assignmentObj, id);
   }
 
+  const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(events);
   const dag = dagDeclaration
     ? Object.freeze({
         kind: 'dag',
@@ -788,10 +802,10 @@ export function replaySession(coordinationId, opts = {}) {
           dagDeclaration.nodes.map((node) => {
             const nodeAssignments = assignments.filter((assignment) => assignment.dagNodeId === node.id);
             const materialized = nodeAssignments.length > 0;
-            const settled = nodeAssignments.some((assignment) => results.some((result) => result.assignmentId === assignment.assignmentId));
+            const settled = nodeAssignments.some((assignment) => settledAssignmentIds.has(assignment.assignmentId));
             const dependenciesSettled = node.dependsOn.every((dependencyId) => {
               const dependencyAssignments = assignments.filter((assignment) => assignment.dagNodeId === dependencyId);
-              return dependencyAssignments.some((assignment) => results.some((result) => result.assignmentId === assignment.assignmentId));
+              return dependencyAssignments.some((assignment) => settledAssignmentIds.has(assignment.assignmentId));
             });
             // A terminal session cannot still offer new work.  We use the
             // existing refused fact (rather than persist a new lifecycle

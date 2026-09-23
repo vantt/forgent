@@ -7,9 +7,9 @@
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
 - **Base Commit**: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e` (`main`)
 - **Porting Evidence Tip**: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
-- **Status**: `implemented` (pre-merge implementation complete; candidate ready for I10 review)
+- **Status**: `implemented` (pre-merge implementation complete; candidate ready for I10 test / I11 review)
 - **Capability**: `code:implement`
-- **Next Dependency Gate**: `I10` (test DAG migration, cold resume, concurrency, and corrupt evidence)
+- **Next Dependency Gate**: `I10` (test DAG migration, cold resume, concurrency, and corrupt evidence) -> `I11` (independent review)
 
 ---
 
@@ -60,7 +60,7 @@ All historical porting evidence from commit `fc259498` has been reconciled again
   - Stores `dagNodeId` on assignment records and preserves assignment lifecycle invariants.
   - Preserved `concurrency-cap` validation code.
 - **Replay (`src/runner/coordination/replay.mjs`)**:
-  - Replays `dag-declared` events into `replayed.dag` projection with derived node statuses (`pending`, `running`, `settled`, `refused`, `deferred`, `skipped`).
+  - Replays `dag-declared` events into `replayed.dag` projection with derived node statuses (`pending`, `materialized`, `settled`, `refused`, `blocked`). An assignment is only considered settled if its `result-linked` event is authoritative (not superseded by a subsequent `run-retried` event).
   - Detects dangling DAG references and rejects corrupt declarations.
   - Differentiates between DAG and non-DAG Schema 3 sessions cleanly: a session is classified as `dag` iff `manifest.schemaVersion === SCHEMA_VERSION_3 && Boolean(dagDeclaration)`. Schema 3 sessions without DAG declarations (such as Phase 2 snapshot sessions) remain `legacy-non-dag`.
 

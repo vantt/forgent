@@ -56,12 +56,12 @@ export function compileDagRequest(request, { durableLedgerIds = [] } = {}) {
 
   const nodes = request.steps.map((step) => {
     if (step.type === 'fan-out') fail(`step "${step.as}" is fan-out; fan-out is not admitted in DAG mode`);
-    // Phase 04 M-1: 'human-turn' included alongside the other step types --
+    // 'human-turn' included alongside the other step types --
     // the schema door (validateCoordinationRequest) already refuses
     // 'mutation' on a human-turn step (it is not in
     // HUMAN_TURN_STEP_ALLOWED_KEYS), but this compiler is also callable
     // directly without that door running first, so the same rule is
-    // re-asserted here in depth (same fix pattern as Phase 02's L-1/H-2).
+    // re-asserted here in depth.
     if (['operation', 'authorize', 'disposition', 'contribution', 'human-turn'].includes(step.type) && step.mutation !== undefined && step.mutation !== 'read-only') fail(`step "${step.as}" mutation "${String(step.mutation)}" must be exactly "read-only" when present; DAG mode admits read-only steps only`);
     const dependencies = new Set(step.dependsOn ?? []);
     const refs = [];
@@ -97,8 +97,8 @@ export function compileDagRequest(request, { durableLedgerIds = [] } = {}) {
     return { id: `node-${as}`, displayLabel: as, semantics, dependsOn: [...dependencies].map((label) => `node-${label}`) };
   });
 
-  // Labels are public request identity.  Validate target existence before
-  // handing the normalized node ids to Phase 01's cycle/identity primitive.
+  // Labels are public request identity. Validate target existence before
+  // handing the normalized node ids to the DAG cycle/identity primitive.
   for (const node of nodes) {
     for (const dependency of node.dependsOn) {
       const label = dependency.slice('node-'.length);

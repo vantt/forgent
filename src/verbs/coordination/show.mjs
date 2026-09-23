@@ -43,6 +43,12 @@ import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordina
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
+import {
+  getAuthoritativeSettledAssignmentIds,
+  computeDagSharedCwdCaveats,
+  resolveNodeCwd,
+} from '../../runner/coordination/dag-declaration.mjs';
+import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { evaluateDriverAuthorizedBindings } from '../../runner/coordination/legality-facts.mjs';
 
 // Same four terminal event kinds `replay.mjs`'s own (unexported)
@@ -195,70 +201,10 @@ function readRunResultForAssignment(fgosDir, assignmentId, runId) {
   const runsDir = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr);
   const resultPath = path.join(runsDir, 'result.json');
   if (fs.existsSync(resultPath)) {
-    return readJsonObjectFile(resultPath, `RunResult "${runId}"`);
-  }
-  const agentResultPath = path.join(runsDir, 'agent-result.json');
-  if (fs.existsSync(agentResultPath)) {
-    return readJsonObjectFile(agentResultPath, `RunResult "${runId}"`);
+    const parsed = readJsonObjectFile(resultPath, `RunResult "${runId}"`);
+    return interpretRunResult(parsed);
   }
   return null;
-}
-
-function resolveNodeCwd(node, nodeAssignments, fgosDir, defaultCwd) {
-  if (typeof node.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
-    return path.resolve(node.semantics.canonicalCwd);
-  }
-  if (typeof node.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
-    return path.resolve(node.semantics.cwd);
-  }
-  for (const asgn of nodeAssignments) {
-    const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
-    if (fs.existsSync(runsDir)) {
-      try {
-        const attempts = fs.readdirSync(runsDir);
-        for (const attempt of attempts) {
-          const runJsonPath = path.join(runsDir, attempt, 'run.json');
-          if (fs.existsSync(runJsonPath)) {
-            const runData = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-            if (typeof runData.cwd === 'string' && runData.cwd.trim() !== '') {
-              return path.resolve(runData.cwd);
-            }
-          }
-        }
-      } catch {
-        // ignore
-      }
-    }
-  }
-  return path.resolve(defaultCwd);
-}
-
-function areNodesConcurrent(nodeA, nodeB, declaredNodes) {
-  const reachableFrom = (startId) => {
-    const visited = new Set();
-    const queue = [startId];
-    while (queue.length > 0) {
-      const currId = queue.shift();
-      const currNode = declaredNodes.find((n) => n.id === currId);
-      if (currNode && Array.isArray(currNode.dependsOn)) {
-        for (const depId of currNode.dependsOn) {
-          if (!visited.has(depId)) {
-            visited.add(depId);
-            queue.push(depId);
-          }
-        }
-      }
-    }
-    return visited;
-  };
-
-  const aDeps = reachableFrom(nodeA.id);
-  if (aDeps.has(nodeB.id)) return false;
-
-  const bDeps = reachableFrom(nodeB.id);
-  if (bDeps.has(nodeA.id)) return false;
-
-  return true;
 }
 
 /**
@@ -424,15 +370,21 @@ export function showCoordinationUseCase(ctx, { id }) {
         nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
       }
 
+      const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(coordinationState.events);
+      const dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes,
+        getNodeCwd: (id) => nodeCwds.get(id),
+      });
+
       const renderedNodes = declaredNodes.map((node) => {
         const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
         const assignmentIds = nodeAssignments.map((a) => a.assignmentId);
         const materialized = assignmentIds.length > 0;
-        const settled = nodeAssignments.some((a) => coordinationState.results.some((r) => r.assignmentId === a.assignmentId));
+        const settled = nodeAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
 
         const dependencies = node.dependsOn.map((depId) => {
           const depAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === depId);
-          const depSettled = depAssignments.some((a) => coordinationState.results.some((r) => r.assignmentId === a.assignmentId));
+          const depSettled = depAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
           return { id: depId, settled: depSettled };
         });
         const dependenciesSettled = dependencies.every((d) => d.settled);
@@ -444,57 +396,7 @@ export function showCoordinationUseCase(ctx, { id }) {
         const runResultStatus = runResult ? (runResult.status ?? (settled ? 'done' : null)) : (settled ? 'done' : null);
         const runResultConfidence = runResult?.confidence ?? null;
 
-        const canonicalCwd = nodeCwds.get(node.id);
-        const isReadOnly = (node.semantics?.mutation ?? 'read-only') === 'read-only';
-        const peerNodeIds = declaredNodes
-          .filter(
-            (other) =>
-              other.id !== node.id &&
-              (other.semantics?.mutation ?? 'read-only') === 'read-only' &&
-              nodeCwds.get(other.id) === canonicalCwd &&
-              areNodesConcurrent(node, other, declaredNodes),
-          )
-          .map((other) => other.id);
-
-        const hasExplicitCaveat = Boolean(
-          node.semantics?.sharedCwdVerdictCaveat ||
-          node.semantics?.sharedCwdCaveat ||
-          node.semantics?.caveat ||
-          node.semantics?.hasCaveat ||
-          runResult?.sharedCwdVerdictCaveat ||
-          runResult?.sharedCwdCaveat ||
-          runResult?.caveat,
-        );
-        const hasOverlapEvidence = Boolean(
-          runResult?.changedFiles?.length > 0 ||
-          node.semantics?.overlap ||
-          runResult?.sharedCwdOverlap,
-        );
-        const peerHasCaveatForUs = declaredNodes.some((other) => {
-          if (other.id === node.id) return false;
-          const otherPeers = other.semantics?.peerNodeIds ?? [];
-          return otherPeers.includes(node.id);
-        });
-        const hasSharedCwdPeers = isReadOnly && peerNodeIds.length > 0;
-        const isCaveated = hasSharedCwdPeers || hasExplicitCaveat || hasOverlapEvidence || peerHasCaveatForUs;
-
-        const allPeerNodeIds = Array.from(new Set([
-          ...peerNodeIds,
-          ...(Array.isArray(node.semantics?.peerNodeIds) ? node.semantics.peerNodeIds : []),
-          ...declaredNodes.filter((o) => o.id !== node.id && Array.isArray(o.semantics?.peerNodeIds) && o.semantics.peerNodeIds.includes(node.id)).map((o) => o.id),
-        ]));
-
-        let sharedCwdCaveat = null;
-        if (isCaveated && allPeerNodeIds.length > 0) {
-          sharedCwdCaveat = {
-            canonicalCwd,
-            peerNodeIds: allPeerNodeIds,
-            recheckRequired: true,
-            status: 'recheck-required',
-            verdict: 'non-attributable',
-            reason: 'concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats',
-          };
-        }
+        const sharedCwdCaveat = dagCaveats.get(node.id) ?? null;
 
         const refused = !materialized && manifest.status !== 'active';
         const pending = !materialized && dependenciesSettled && !refused;

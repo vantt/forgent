@@ -75,9 +75,8 @@ export const EXIT_CODES = Object.freeze({
   'lock-timeout': 7,
   'session-fail': 8,
   'merge-fail': 9,
-  // Phase 04 H-3 (cold-resumable-coordination-dag): a genuine integrity
-  // failure (session manifest or protocol definition really missing), never
-  // an ordinary caller-correctable validation mistake. Mapped to the SAME
+  // A genuine integrity failure (session manifest or protocol definition really missing),
+  // never an ordinary caller-correctable validation mistake. Mapped to the SAME
   // exit code as 'validation' so no existing CLI exit-code contract changes
   // -- only `err.category` becomes distinguishable, so a StoreError/
   // CoordinationError carrying it is never mistaken for an ordinary

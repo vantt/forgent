@@ -76,11 +76,15 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
     if (!settled.error) {
       state.outcome = 'settled';
       state.result = settled.result;
+      delete state.error;
       // A capacity refusal is intentionally transient. A result-linked node
       // just freed an invocation-owned slot, so retry only those deferred
       // admissions immediately on this settlement signal (never by polling).
       for (const candidate of states.values()) {
-        if (candidate.outcome === 'deferred') candidate.outcome = 'pending';
+        if (candidate.outcome === 'deferred') {
+          candidate.outcome = 'pending';
+          delete candidate.error;
+        }
       }
     } else {
       const outcome = outcomeFor(settled.error);

@@ -1,6 +1,8 @@
 // Immutable, schema-3 DAG declaration.  This deliberately contains no
 // scheduler state: it is the durable request identity from which replay can
 // derive facts using the pre-existing Assignment/Run/session evidence.
+import fs from 'node:fs';
+import path from 'node:path';
 import { createHash } from 'node:crypto';
 
 export const DAG_DECLARATION_VERSION = '1';
@@ -78,4 +80,152 @@ export function normalizeDagDeclaration(input) {
   for (const node of nodes) visit(node.id);
   const normalized = { version: DAG_DECLARATION_VERSION, nodes, continuationPolicy: { mode: continuationPolicy.mode } };
   return Object.freeze({ ...normalized, requestFingerprint: digest(normalized) });
+}
+
+/**
+ * Derives the authoritative settled assignment IDs from the session's event stream.
+ * Invariant §8.2: An assignment is only settled if its latest result-linked event
+ * is authoritative (i.e. not superseded by a subsequent run-retried event).
+ *
+ * @param {Iterable<{type: string, payload?: object}>} events
+ * @returns {Set<string>}
+ */
+export function getAuthoritativeSettledAssignmentIds(events) {
+  const settled = new Set();
+  if (!events) return settled;
+  for (const event of events) {
+    if (event.type === 'result-linked' && event.payload?.assignmentId) {
+      settled.add(event.payload.assignmentId);
+    } else if (event.type === 'run-retried' && event.payload?.assignmentId) {
+      settled.delete(event.payload.assignmentId);
+    }
+  }
+  return settled;
+}
+
+/**
+ * Computes whether two nodes in declaredNodes are concurrent (neither is an ancestor of the other).
+ */
+export function areNodesConcurrent(nodeA, nodeB, declaredNodes) {
+  const reachableFrom = (startId) => {
+    const visited = new Set();
+    const queue = [startId];
+    while (queue.length > 0) {
+      const currId = queue.shift();
+      const currNode = declaredNodes.find((n) => n.id === currId);
+      if (currNode && Array.isArray(currNode.dependsOn)) {
+        for (const depId of currNode.dependsOn) {
+          if (!visited.has(depId)) {
+            visited.add(depId);
+            queue.push(depId);
+          }
+        }
+      }
+    }
+    return visited;
+  };
+
+  const aDeps = reachableFrom(nodeA.id);
+  if (aDeps.has(nodeB.id)) return false;
+
+  const bDeps = reachableFrom(nodeB.id);
+  if (bDeps.has(nodeA.id)) return false;
+
+  return true;
+}
+
+/**
+ * Computes shared-cwd attribution caveats for read-only concurrent DAG nodes.
+ *
+ * @param {object} params
+ * @param {Array<object>} params.declaredNodes
+ * @param {Map<string, string>|Function} params.getNodeCwd
+ * @returns {Map<string, object>}
+ */
+export function computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd }) {
+  const caveats = new Map();
+  const getCwd = typeof getNodeCwd === 'function' ? getNodeCwd : (id) => getNodeCwd?.get(id);
+
+  for (const node of declaredNodes) {
+    const isReadOnly = (node.semantics?.mutation ?? 'read-only') === 'read-only';
+    if (!isReadOnly) continue;
+    const canonicalCwd = getCwd(node.id);
+    if (!canonicalCwd) continue;
+
+    const peerNodeIds = declaredNodes
+      .filter(
+        (other) =>
+          other.id !== node.id &&
+          (other.semantics?.mutation ?? 'read-only') === 'read-only' &&
+          getCwd(other.id) === canonicalCwd &&
+          areNodesConcurrent(node, other, declaredNodes),
+      )
+      .map((other) => other.id);
+
+    const explicitPeers = Array.isArray(node.semantics?.peerNodeIds) ? node.semantics.peerNodeIds : [];
+    const implicitPeers = declaredNodes
+      .filter((o) => o.id !== node.id && Array.isArray(o.semantics?.peerNodeIds) && o.semantics.peerNodeIds.includes(node.id))
+      .map((o) => o.id);
+
+    const allPeerNodeIds = Array.from(new Set([...peerNodeIds, ...explicitPeers, ...implicitPeers]));
+
+    const hasExplicitCaveat = Boolean(
+      node.semantics?.sharedCwdVerdictCaveat ||
+      node.semantics?.sharedCwdCaveat ||
+      node.semantics?.caveat ||
+      node.semantics?.hasCaveat,
+    );
+
+    if (allPeerNodeIds.length > 0 || hasExplicitCaveat) {
+      caveats.set(node.id, {
+        canonicalCwd,
+        peerNodeIds: allPeerNodeIds,
+        recheckRequired: true,
+        status: 'recheck-required',
+        verdict: 'non-attributable',
+        reason: 'concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats',
+      });
+    }
+  }
+  return caveats;
+}
+
+/**
+ * Resolves the canonical working directory for a DAG node.
+ * Checks node semantics (canonicalCwd / cwd), existing assignment runs on disk,
+ * and falls back to defaultCwd or process.cwd().
+ *
+ * @param {object} node
+ * @param {Array<object>} [nodeAssignments=[]]
+ * @param {string} [fgosDir=null]
+ * @param {string} [defaultCwd=null]
+ * @returns {string}
+ */
+export function resolveNodeCwd(node, nodeAssignments = [], fgosDir = null, defaultCwd = null) {
+  if (typeof node?.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
+    return path.resolve(node.semantics.canonicalCwd);
+  }
+  if (typeof node?.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
+    return path.resolve(node.semantics.cwd);
+  }
+  if (fgosDir && Array.isArray(nodeAssignments)) {
+    for (const asgn of nodeAssignments) {
+      const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
+      if (fs.existsSync(runsDir)) {
+        try {
+          const attempts = fs.readdirSync(runsDir);
+          for (const attempt of attempts) {
+            const runJsonPath = path.join(runsDir, attempt, 'run.json');
+            if (fs.existsSync(runJsonPath)) {
+              const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+              if (typeof run.cwd === 'string' && run.cwd.trim() !== '') {
+                return path.resolve(run.cwd);
+              }
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+  return path.resolve(defaultCwd ?? process.cwd());
 }

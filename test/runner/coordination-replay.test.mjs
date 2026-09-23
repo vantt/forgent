@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { openSession, createSessionAssignment, linkResult, recordHumanTurn, authorizeOperation, transitionSessionStatus } from '../../src/runner/coordination/store.mjs';
+import { openSession, createSessionAssignment, linkResult, recordRunRetry, recordHumanTurn, authorizeOperation, transitionSessionStatus } from '../../src/runner/coordination/store.mjs';
+import { openStandaloneSession } from '../../src/runner/coordination/session-engine.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, SCHEMA_VERSION, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 import { EventLogError } from '../../src/state/events.mjs';
+import { normalizeDagDeclaration } from '../../src/runner/coordination/dag-declaration.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-replay-test-'));
@@ -134,19 +136,79 @@ test('replaySession treats unmaterialized nodes in a partial terminal DAG sessio
   assert.equal(node.pending, false);
 });
 
-test('replaySession names an interrupted schema-3 open missing dag-declared rather than silently reconstructing it', () => {
+test('replaySession replays a schema-3 standalone session with 0 assignments cleanly as legacy-non-dag without throwing (REV-02)', () => {
+  const tempDir = mkTempDir();
+  openStandaloneSession({
+    coordinationId: 'coord_schema3_standalone_empty',
+    objective: 'Standalone schema 3 with 0 assignments.',
+    writerId: 'writer-1',
+    primaryRole: 'reviewer',
+    schemaVersion: SCHEMA_VERSION_3,
+  }, { cwd: tempDir });
+  const replayed = replaySession('coord_schema3_standalone_empty', { cwd: tempDir });
+  assert.equal(replayed.dag.kind, 'legacy-non-dag');
+  assert.deepEqual(replayed.dag.nodes, []);
+});
+
+test('replaySession throws dangling-ref when an assignment references dagNodeId but session has no dag-declared event', () => {
   const tempDir = mkTempDir();
   openSession({
-    coordinationId: 'coord_dag_incomplete_open', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
-    dagDeclaration: dagDeclaration([{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }]),
+    coordinationId: 'coord_dag_missing_declared', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
   }, { cwd: tempDir });
-  const { eventsPath } = sessionPaths(tempDir, 'coord_dag_incomplete_open');
-  const openedOnly = fs.readFileSync(eventsPath, 'utf8').trimEnd().split('\n').find((line) => JSON.parse(line).type === 'session-opened');
-  fs.writeFileSync(eventsPath, `${openedOnly}\n`);
+  createSessionAssignment({
+    coordinationId: 'coord_dag_missing_declared',
+    taskKey: 'task-1',
+    contract: inlineContract(),
+    caller: { writerId: 'writer-1' },
+    dagNodeId: 'node-produce',
+  }, { cwd: tempDir });
   assert.throws(
-    () => replaySession('coord_dag_incomplete_open', { cwd: tempDir }),
+    () => replaySession('coord_dag_missing_declared', { cwd: tempDir }),
     (err) => err instanceof CoordinationError && err.category === 'dangling-ref' && /has no "dag-declared" event/.test(err.message),
   );
+});
+
+test('replaySession marks a DAG node un-settled if run-retried supersedes the latest result-linked event (REV-01)', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_retry_supersedes',
+    objective: 'DAG with retry.',
+    provenanceRoot: { writerId: 'writer-1' },
+    schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: normalizeDagDeclaration({
+      nodes: [
+        { id: 'node-produce', displayLabel: 'produce', semantics: { kind: 'operation' }, dependsOn: [] },
+        { id: 'node-review', displayLabel: 'review', semantics: { kind: 'operation' }, dependsOn: ['node-produce'] },
+      ],
+    }),
+  }, { cwd: tempDir });
+
+  const asgn = createSessionAssignment({
+    coordinationId: 'coord_dag_retry_supersedes',
+    taskKey: 'produce-key',
+    contract: inlineContract(),
+    caller: { writerId: 'writer-1' },
+    dagNodeId: 'node-produce',
+  }, { cwd: tempDir });
+
+  linkResult('coord_dag_retry_supersedes', {
+    assignmentId: asgn.assignmentId,
+    runId: `run_${asgn.assignmentId}_01`,
+  }, { cwd: tempDir, allowSupersede: true });
+
+  let replayed = replaySession('coord_dag_retry_supersedes', { cwd: tempDir });
+  assert.equal(replayed.dag.nodes.find((n) => n.nodeId === 'node-produce').settled, true);
+  assert.equal(replayed.dag.nodes.find((n) => n.nodeId === 'node-review').pending, true);
+
+  // Now record retry for that assignment
+  recordRunRetry('coord_dag_retry_supersedes', { assignmentId: asgn.assignmentId, reason: 'retrying' }, { cwd: tempDir });
+
+  replayed = replaySession('coord_dag_retry_supersedes', { cwd: tempDir });
+  // Produce node is no longer settled!
+  assert.equal(replayed.dag.nodes.find((n) => n.nodeId === 'node-produce').settled, false);
+  // Review node is blocked because its dependency is not settled!
+  assert.equal(replayed.dag.nodes.find((n) => n.nodeId === 'node-review').blocked, true);
+  assert.equal(replayed.dag.nodes.find((n) => n.nodeId === 'node-review').pending, false);
 });
 
 test('replaySession renders an old schema session explicitly as legacy-non-dag without inferring a declaration from Assignment evidence', () => {

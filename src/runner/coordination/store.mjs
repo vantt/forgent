@@ -873,17 +873,17 @@ export function createSessionAssignmentLocked(
   // The raw taskKey is checked inside the file so a hash collision fails loud.
   if (fs.existsSync(taskClaimPath)) {
     const claim = JSON.parse(fs.readFileSync(taskClaimPath, 'utf8'));
-    if (claim.taskKey !== taskKey) {
+    if (isNonEmptyString(claim.taskKey) && claim.taskKey !== taskKey) {
       throw new CoordinationError(
-        'conflict',
-        `taskKey hash collision: "${taskKey}" and "${claim.taskKey}" hash to the same claim file`,
+        'validation',
+        `taskKey claim-file collision for session "${coordinationId}": "${taskKey}" and "${claim.taskKey}" hash to the same claim file -- refusing to return the wrong task's Assignment`,
       );
     }
     const existing = readAssignmentJson(assignmentsDir, claim.assignmentId);
     if (!existing) {
       throw new CoordinationError(
         'corrupt-log',
-        `taskKey "${taskKey}" was claimed by "${claim.assignmentId}" but assignment.json is missing`,
+        `task "${taskKey}" claims assignment "${claim.assignmentId}" for session "${coordinationId}", but no such Assignment exists under ${assignmentsDir}`,
       );
     }
     if (!manifest.assignmentRefs.includes(claim.assignmentId)) {
@@ -979,7 +979,7 @@ export function createSessionAssignmentLocked(
         if (!linkedIdsForConcurrency.has(id)) inFlight += 1;
       }
       if (inFlight >= opts.maxConcurrencyForSession) {
-        // Phase 04 H-1: the ONLY deferrable refusal (dag-request-scheduler.md
+        // The ONLY deferrable refusal (dag-request-scheduler.md
         // §4) -- carries `code: 'concurrency-cap'` so a future DAG scheduler
         // can distinguish "retry me once a slot frees" from every other
         // ordinary, non-deferrable budget refusal below (maxAssignments/
