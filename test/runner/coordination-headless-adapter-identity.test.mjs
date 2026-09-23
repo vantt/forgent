@@ -18,7 +18,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
-import { runCoordinationHeadless, __runCoordinationEngineEntryPoint } from '../../src/runner/coordination/headless-adapter.mjs';
+import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { chainCoordinationUseCase } from '../../src/verbs/coordination/chain.mjs';
+import {
+  runCoordinationHeadless,
+  showCoordinationHeadless,
+  chainCoordinationHeadless,
+  __runCoordinationEngineEntryPoint,
+  __showCoordinationEngineEntryPoint,
+  __chainCoordinationEngineEntryPoint,
+} from '../../src/runner/coordination/headless-adapter.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -67,4 +76,25 @@ test('runCoordinationHeadless accepts a file path too (same door the CLI itself 
     () => runCoordinationHeadless('/nonexistent/path/to/request.json', { ctx: {} }),
     /request file not found/,
   );
+});
+
+test('headless-adapter.mjs re-exports the literal SAME showCoordinationUseCase and chainCoordinationUseCase functions', () => {
+  assert.strictEqual(
+    __showCoordinationEngineEntryPoint,
+    showCoordinationUseCase,
+    'the headless adapter must re-export the exact same showCoordinationUseCase function reference',
+  );
+  assert.strictEqual(
+    __chainCoordinationEngineEntryPoint,
+    chainCoordinationUseCase,
+    'the headless adapter must re-export the exact same chainCoordinationUseCase function reference',
+  );
+});
+
+test('showCoordinationHeadless and chainCoordinationHeadless are thin wrappers forwarding to use-cases', () => {
+  const showSource = showCoordinationHeadless.toString();
+  assert.ok(showSource.includes('showCoordinationUseCase'), 'showCoordinationHeadless must call showCoordinationUseCase directly');
+
+  const chainSource = chainCoordinationHeadless.toString();
+  assert.ok(chainSource.includes('chainCoordinationUseCase'), 'chainCoordinationHeadless must call chainCoordinationUseCase directly');
 });

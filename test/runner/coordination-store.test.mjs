@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { Worker } from 'node:worker_threads';
+import { execFileSync } from 'node:child_process';
 import {
   openSession,
   bindActor,
@@ -15,9 +16,10 @@ import {
   hashTaskKey,
   appendEvent,
   authorizeOperation,
+  recordRecoveryCommand,
   resolveSessionPaths,
 } from '../../src/runner/coordination/store.mjs';
-import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
+import { CoordinationError, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 
 function mkTempDir() {
@@ -60,6 +62,51 @@ test('openSession persists session.json and a session-opened event before any As
   const events = readSessionEvents('coord_open_001', { cwd: tempDir });
   assert.equal(events.length, 1);
   assert.equal(events[0].type, 'session-opened');
+});
+
+test('schema-3 openSession records the DAG declaration before any Assignment can materialize after a successful open', () => {
+  const tempDir = mkTempDir();
+  openSession(
+    {
+      coordinationId: 'coord_dag_open', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+      dagDeclaration: {
+        nodes: [{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }],
+        continuationPolicy: { mode: 'explicit-contract-required' },
+      },
+    },
+    { cwd: tempDir },
+  );
+  const events = readSessionEvents('coord_dag_open', { cwd: tempDir });
+  assert.deepEqual(events.map((event) => event.type), ['session-opened', 'dag-declared']);
+  assert.equal(readManifest('coord_dag_open', { cwd: tempDir }).assignmentRefs.length, 0);
+});
+
+test('this binary writes schema-3 actor and Assignment records through the normal writer gates', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_writer', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: { nodes: [{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }], continuationPolicy: { mode: 'explicit-contract-required' } },
+  }, { cwd: tempDir });
+  bindActor('coord_dag_writer', { id: 'doer', role: 'researcher' }, { cwd: tempDir });
+  const assignment = createSessionAssignment(
+    { coordinationId: 'coord_dag_writer', taskKey: 'produce', actorId: 'doer', contract: inlineContract(), caller: { writerId: 'writer-1' } },
+    { cwd: tempDir },
+  );
+  assert.equal(readManifest('coord_dag_writer', { cwd: tempDir }).actors[0].id, 'doer');
+  assert.deepEqual(readManifest('coord_dag_writer', { cwd: tempDir }).assignmentRefs, [assignment.assignmentId]);
+});
+
+test('recordRecoveryCommand refuses schema-3 sessions because schema 3 does not inherit schema-2 recovery commands', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_no_recovery', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: { nodes: [{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }], continuationPolicy: { mode: 'explicit-contract-required' } },
+  }, { cwd: tempDir });
+  assert.throws(
+    () => recordRecoveryCommand('coord_dag_no_recovery', {}, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /schema-2 only/.test(err.message),
+  );
+  assert.deepEqual(readSessionEvents('coord_dag_no_recovery', { cwd: tempDir }).map((event) => event.type), ['session-opened', 'dag-declared']);
 });
 
 test('openSession with declared actors writes actor-bound events and manifest.actors before the first Assignment', () => {
@@ -563,6 +610,46 @@ try {
   assert.equal(manifest.assignmentRefs.length, 2);
   assert.ok(manifest.assignmentRefs.includes(a.assignmentId));
   assert.ok(manifest.assignmentRefs.includes(b.assignmentId));
+});
+
+test('public coordination CLI without --dir keeps same-id sessions and their appends separate in two actual linked worktrees', () => {
+  const mainCheckout = mkTempDir();
+  const parent = path.dirname(mainCheckout);
+  const stem = path.basename(mainCheckout);
+  const worktreeA = path.join(parent, `${stem}-worktree-a`);
+  const worktreeB = path.join(parent, `${stem}-worktree-b`);
+  const runGit = (args, cwd = mainCheckout) => execFileSync('git', args, { cwd, encoding: 'utf8' });
+
+  runGit(['init']);
+  runGit(['config', 'user.email', 'coordination-test@example.invalid']);
+  runGit(['config', 'user.name', 'Coordination Test']);
+  fs.writeFileSync(path.join(mainCheckout, 'README.md'), 'worktree fixture\n');
+  runGit(['add', 'README.md']);
+  runGit(['commit', '-m', 'fixture']);
+  runGit(['worktree', 'add', '-b', 'coordination-test-a', worktreeA]);
+  runGit(['worktree', 'add', '-b', 'coordination-test-b', worktreeB]);
+
+  const coordinationId = 'coord_worktree_public_cli';
+  const optsA = { cwd: worktreeA, repoRoot: worktreeA };
+  const optsB = { cwd: worktreeB, repoRoot: worktreeB };
+  openSession({ coordinationId, objective: 'Session stored in worktree A.', provenanceRoot: { writerId: 'writer-a' } }, optsA);
+  openSession({ coordinationId, objective: 'Session stored in worktree B.', provenanceRoot: { writerId: 'writer-b' } }, optsB);
+  createSessionAssignment({ coordinationId, taskKey: 'append-a', contract: inlineContract(), caller: { writerId: 'writer-a' } }, optsA);
+  createSessionAssignment({ coordinationId, taskKey: 'append-b', contract: inlineContract(), caller: { writerId: 'writer-b' } }, optsB);
+
+  const cliPath = path.resolve(process.cwd(), 'bin/fgos.mjs');
+  const showA = execFileSync(process.execPath, [cliPath, 'coordination', 'show', coordinationId], { cwd: worktreeA, encoding: 'utf8' });
+  const showB = execFileSync(process.execPath, [cliPath, 'coordination', 'show', coordinationId], { cwd: worktreeB, encoding: 'utf8' });
+
+  assert.match(showA, /Session stored in worktree A\./);
+  assert.match(showB, /Session stored in worktree B\./);
+  assert.equal(readSessionEvents(coordinationId, optsA).filter((event) => event.type === 'assignment-created').length, 1);
+  assert.equal(readSessionEvents(coordinationId, optsB).filter((event) => event.type === 'assignment-created').length, 1);
+  assert.notEqual(
+    resolveSessionPaths(coordinationId, optsA).sessionDir,
+    resolveSessionPaths(coordinationId, optsB).sessionDir,
+    'with --dir omitted, the public CLI supplies each worktree cwd as repoRoot, so the stores do not share a session directory',
+  );
 });
 
 // ─── R3: crash-point on-disk state, constructed directly ───────────────────

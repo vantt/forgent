@@ -462,14 +462,14 @@ async function runExecutorAttempt(assignment, opts) {
  * always rethrown unchanged either way; this only ever affects
  * whether the claim file survives the throw.
  */
-async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts = {}, paths = null) {
+async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance, dagNodeId }, opts = {}, paths = null) {
   const reconciled = replaySession(coordinationId, opts);
   const sessionPaths = paths ?? resolveSessionPaths(coordinationId, opts);
   const { fgosDir } = sessionPaths;
 
   const assignment = paths
-    ? createSessionAssignmentLocked({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, paths, opts)
-    : createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance }, opts);
+    ? createSessionAssignmentLocked({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance, dagNodeId }, paths, opts)
+    : createSessionAssignment({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance, dagNodeId }, opts);
 
   const priorLink = lastEventFor(reconciled.events, 'result-linked', assignment.assignmentId);
   if (priorLink) {
@@ -1947,7 +1947,7 @@ function assertWithinTaskDepth(fgosDir, immediateParentId, maxTaskDepth, label) 
  * @returns {Readonly<object>} The stored manifest
  */
 export function openDeclaredProtocolSession(
-  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null, partialPolicy = null, schemaVersion },
+  { definitionId, coordinationId, objective, writerId, parentAssignmentId, aggregateBounds, workRef = null, partialPolicy = null, schemaVersion, dagDeclaration },
   opts = {},
 ) {
   const definition = loadCoordinationProtocol(definitionId, { cwd: opts.cwd, packageRoot: opts.packageRoot });
@@ -1989,6 +1989,7 @@ export function openDeclaredProtocolSession(
       aggregateBounds,
       partialPolicy,
       schemaVersion,
+      ...(dagDeclaration !== undefined ? { dagDeclaration } : {}),
     },
     { ...opts, resolvedDefinition: definition },
   );
@@ -2180,6 +2181,7 @@ export async function dispatchDeclaredOperationLocked(
     // which accept this parameter at all) can ever thread a non-default
     // value into buildSessionContract.
     mutation = 'read-only',
+    dagNodeId,
   },
   paths = null,
   opts = {},
@@ -2658,8 +2660,24 @@ export async function dispatchDeclaredOperationLocked(
   // unconditionally and enforced authoritatively inside
   // `createSessionAssignment`'s own lock (store.mjs), never decided by a
   // pre-lock read in this function.
+  let effectiveDagNodeId = dagNodeId;
+  if (!effectiveDagNodeId && manifest.schemaVersion === SCHEMA_VERSION_3) {
+    const declaration = replayOnce().dag?.declaration;
+    if (declaration?.nodes) {
+      const matching = declaration.nodes.filter(
+        (n) =>
+          n.semantics?.operationId === operationId &&
+          (!targetActorId || !n.semantics?.targetActorId || n.semantics.targetActorId === targetActorId) &&
+          (!explicitTaskKey || !n.semantics?.taskKey || n.semantics.taskKey === explicitTaskKey),
+      );
+      if (matching.length === 1) {
+        effectiveDagNodeId = matching[0].id;
+      }
+    }
+  }
+
   const dispatchResult = await createAndExecuteSessionTask(
-    { coordinationId, taskKey, actorId, contract, caller, authorizationProvenance },
+    { coordinationId, taskKey, actorId, contract, caller, authorizationProvenance, dagNodeId: effectiveDagNodeId },
     {
       ...opts,
       cliOverride,

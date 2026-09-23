@@ -20,6 +20,7 @@ import { buildMasterLoopRequest, launchMasterLoopUseCase, MASTER_LOOP_PROTOCOL_I
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { StoreError } from '../../src/state/store.mjs';
+import { FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
 import { readManifest, readSessionEvents } from '../../src/runner/coordination/store.mjs';
 
 const WRITER_ID = 'master-loop-launcher-test';
@@ -169,7 +170,7 @@ test('R4: a request naming an unregistered fixture id is refused end to end by t
   // is what proves that, not the raw upstream wording).
   await assert.rejects(
     runCoordinationUseCase({ cwd, repoRoot: cwd }, { requestObject: built }),
-    (err) => err instanceof StoreError && err.category === 'validation' && /protocol "core\.coordination-protocol\.does-not-exist" could not be resolved/.test(err.message),
+    (err) => err instanceof FlowDefinitionError && err.category === 'not-found' && /no CoordinationProtocol definition found|could not be resolved/.test(err.message),
   );
 });
 

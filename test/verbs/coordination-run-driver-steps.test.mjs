@@ -31,10 +31,12 @@ import { createHash } from 'node:crypto';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { compileDagRequest } from '../../src/verbs/coordination/dag-request-compiler.mjs';
 import { StoreError } from '../../src/state/store.mjs';
-import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
-import { readSessionEvents, readManifest, resolveSessionPaths, appendEvent, transitionSessionStatus } from '../../src/runner/coordination/store.mjs';
-import { openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
+import { CoordinationError, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
+import { FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
+import { readSessionEvents, readManifest, resolveSessionPaths, appendEvent, transitionSessionStatus, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
+import { openDeclaredProtocolSession, cancelSession, dispatchDeclaredOperation, replaceSessionActor } from '../../src/runner/coordination/session-engine.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.master-loop-driver-steps';
 
@@ -107,29 +109,58 @@ function writeFixture(tempDir) {
   fs.writeFileSync(path.join(dir, 'master-loop-driver-steps.json'), `${JSON.stringify(definition, null, 2)}\n`);
 }
 
-function fakeExecutor(tempDir) {
+function fakeExecutor(tempDir, { delayObjective = null, delayMs = 0 } = {}) {
   const executorScript = path.join(tempDir, `fake-executor-${Math.random().toString(36).slice(2)}.mjs`);
   fs.writeFileSync(
     executorScript,
     `
     import fs from 'node:fs';
     import path from 'node:path';
-    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
-    if (fs.existsSync(assignmentsRoot)) {
-      for (const asgn of fs.readdirSync(assignmentsRoot)) {
-        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
-        if (!fs.existsSync(runsDir)) continue;
-        for (const run of fs.readdirSync(runsDir)) {
-          const runDir = path.join(runsDir, run);
-          if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
-            fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nValidated.\\n');
-            fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Validated.' }));
-          }
-        }
-      }
-    }
-    process.stdout.write('Validated.\\n');
-    process.exit(0);
+    const prompt = process.argv[2] ?? '';
+    const assignmentId = prompt.match(/^Assignment: (.+)$/m)?.[1];
+    if (!assignmentId) throw new Error('fake executor needs its own Assignment prompt');
+    const runsDir = path.join(process.cwd(), '.fgos', 'assignments', assignmentId, 'runs');
+    const run = fs.readdirSync(runsDir).sort().at(-1);
+    const runDir = path.join(runsDir, run);
+    const finish = () => {
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nValidated.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Validated.' }));
+      process.stdout.write('Validated.\\n');
+    };
+    if (${JSON.stringify(delayObjective)} && prompt.includes(${JSON.stringify(delayObjective)})) setTimeout(finish, ${delayMs});
+    else finish();
+    `,
+  );
+  return {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
+    timeoutMs: 10000,
+  };
+}
+
+// Same real subprocess door as fakeExecutor(), with independent delay windows
+// so a DAG test can make two siblings settle only milliseconds apart without
+// coordinating through scheduler internals.
+function fakeExecutorWithObjectiveDelays(tempDir, delays) {
+  const executorScript = path.join(tempDir, `fake-executor-delays-${Math.random().toString(36).slice(2)}.mjs`);
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv[2] ?? '';
+    const assignmentId = prompt.match(/^Assignment: (.+)$/m)?.[1];
+    if (!assignmentId) throw new Error('fake executor needs its own Assignment prompt');
+    const runsDir = path.join(process.cwd(), '.fgos', 'assignments', assignmentId, 'runs');
+    const run = fs.readdirSync(runsDir).sort().at(-1);
+    const runDir = path.join(runsDir, run);
+    const delays = ${JSON.stringify(delays)};
+    const delay = Object.entries(delays).find(([needle]) => prompt.includes(needle))?.[1] ?? 0;
+    setTimeout(() => {
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nValidated.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Validated.' }));
+      process.stdout.write('Validated.\\n');
+    }, delay);
     `,
   );
   return {
@@ -158,7 +189,7 @@ function produceStep() {
   };
 }
 
-function reviewStep() {
+function reviewStep(overrides = {}) {
   return {
     type: 'operation',
     as: 'review',
@@ -167,6 +198,7 @@ function reviewStep() {
     objective: 'Review the candidate.',
     expectedOutputs: ['agent-result.json (status, summary)'],
     contextRefs: ['$ref:produce'],
+    ...overrides,
   };
 }
 
@@ -183,6 +215,44 @@ function redTeamStep(overrides = {}) {
   };
 }
 
+test('legacy declared-protocol operation steps remain sequential: each later step is dispatched only after the preceding step has settled', async () => {
+  const { tempDir, ctx } = setup();
+  const result = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      coordinationId: 'coord_phase00_legacy_sequential',
+      steps: [produceStep(), reviewStep()],
+    }),
+  });
+
+  assert.deepEqual(result.steps.map((step) => step.as), ['produce', 'review']);
+  const events = readSessionEvents(result.coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.deepEqual(
+    events.map((event) => event.type),
+    ['session-opened', 'actor-bound', 'actor-bound', 'actor-bound', 'actor-bound', 'assignment-created', 'result-linked', 'assignment-created', 'result-linked'],
+    'legacy non-DAG event order is the pre-DAG characterization and must remain byte-for-byte compatible in event shape',
+  );
+  const created = events.filter((event) => event.type === 'assignment-created');
+  assert.equal(created.length, 2);
+  assert.deepEqual(created.map((event) => event.payload.actorId), ['doer', 'reviewer']);
+  const assignments = created.map((event) =>
+    JSON.parse(fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', event.payload.assignmentId, 'assignment.json'), 'utf8')),
+  );
+  assert.equal(
+    assignments[1].contextRefs.includes(result.steps[0].assignmentId),
+    true,
+    'the second legacy step receives the first step\'s resolved Assignment ref, which can exist only after the first awaited dispatch completed',
+  );
+  assert.ok(result.steps.every((step) => step.schedulerOutcome === undefined && step.overlapGroup === undefined), 'legacy responses must not gain DAG scheduler fields');
+  assert.equal(result.dag, undefined, 'legacy responses retain their pre-Phase-05 shape');
+});
+
+test('dependsOn is rejected on a non-DAG request instead of being silently inert', () => {
+  assert.throws(
+    () => validateCoordinationRequest(request({ steps: [{ ...produceStep(), dependsOn: ['review'] }] })),
+    /available only when top-level "dag" is exactly true/,
+  );
+});
+
 function request(overrides = {}) {
   return {
     kind: 'declared-protocol',
@@ -193,6 +263,33 @@ function request(overrides = {}) {
     ...overrides,
   };
 }
+
+test('DAG request round-trips the real validator, compiler, and run door without undefined semantics', async () => {
+  const { ctx } = setup();
+  const raw = request({ dag: true, coordinationId: 'coord_dag_real_validator', steps: [produceStep(), reviewStep()] });
+  const normalized = validateCoordinationRequest(raw);
+  assert.ok(Object.values(normalized.steps[0]).some((value) => value === undefined), 'the real schema preserves omitted optional fields as undefined');
+  const result = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.equal(result.coordinationId, 'coord_dag_real_validator');
+});
+
+test('DAG resume declaration fingerprint gate rejects a genuinely mutated second request with zero new events', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_dag_resume_fingerprint';
+  const original = request({ dag: true, coordinationId, steps: [produceStep(), reviewStep()] });
+  await runCoordinationUseCase(ctx, { requestObject: original });
+  const before = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  const changed = request({
+    dag: true,
+    coordinationId,
+    steps: [produceStep(), { ...reviewStep(), expectedOutputs: ['agent-result.json (status, summary)', 'changed-output'] }],
+  });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: changed }),
+    (err) => err instanceof StoreError && /declaration differs/.test(err.message),
+  );
+  assert.deepEqual(readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir }), before);
+});
 
 function authorizeStep(overrides = {}) {
   return {
@@ -987,27 +1084,50 @@ test('R5 (resume-specific, LOW): resuming against a session with a malformed ses
   assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments')), false);
 });
 
-test('R5 (resume-specific, LOW): resuming against a coordinationId whose session directory exists but has no session.json (a crash between mkdirSync and writeManifestRaw) fails closed, never silently opens fresh over it', async () => {
+test('R5 (resume-specific, LOW): resuming against a coordinationId whose session directory exists but has no session.json (a crash between mkdirSync and writeManifestRaw, or a manifest deleted mid-flight) fails closed with the SAME not-found category preserved -- never silently misdiagnosed as "already exists"', async () => {
   const { tempDir, ctx } = setup();
   const coordinationId = 'coord_run_resume_dangling_dir_probe';
   const { sessionDir } = resolveSessionPaths(coordinationId, { cwd: tempDir, repoRoot: tempDir });
   fs.mkdirSync(sessionDir, { recursive: true });
 
-  // `findExistingManifest` sees `not-found` (ENOENT on session.json) and
-  // correctly treats this as "no existing session" -- falls through to
-  // `openStandaloneSession`/`openDeclaredProtocolSession`, whose own
-  // `openSession` then hits its OWN `mkdirSync` EEXIST guard on the
-  // already-present directory. Still fails closed -- no session.json is ever
-  // written and no Assignment is created -- just at the pre-existing "already
-  // exists" door rather than the resume identity gate (this shape has no
-  // provenanceRoot.writerId to compare against yet).
+  // Phase 04 op_038 fix: `findExistingSession` used to see `not-found`
+  // (ENOENT on session.json) and swallow it to `undefined` ("no existing
+  // session") -- falling through to `openStandaloneSession`/
+  // `openDeclaredProtocolSession`, whose own `openSession` then hit its
+  // OWN `mkdirSync` EEXIST guard on the already-present directory and threw
+  // a misleading `CoordinationError('validation', '...already exists')`.
+  // That misdiagnosed a missing/corrupted manifest as a naming collision.
+  // Now `findExistingSession` itself notices the sessionDir is present
+  // despite the not-found and re-throws with the SAME 'not-found' category
+  // preserved, so the real integrity failure surfaces directly instead.
+  // Still fails closed either way -- no session.json is ever written and no
+  // Assignment is created.
   await assert.rejects(
     runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, steps: [produceStep()] }) }),
-    (err) => err instanceof CoordinationError && err.category === 'validation' && /already exists/.test(err.message),
+    (err) => err instanceof CoordinationError && err.category === 'not-found' && !/already exists/.test(err.message),
   );
 
   assert.equal(fs.existsSync(path.join(sessionDir, 'session.json')), false);
   assert.equal(fs.existsSync(path.join(tempDir, '.fgos', 'assignments')), false);
+});
+
+test('op_038: a real, already-open session whose session.json is deleted mid-flight (a concurrent process or crash) refuses a resume attempt with not-found preserved, not a misleading "already exists" validation error', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'coord_run_resume_manifest_deleted_mid_flight';
+  const opened = await runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, steps: [produceStep()] }) });
+  assert.equal(opened.coordinationId, coordinationId);
+
+  const { sessionDir, manifestPath } = resolveSessionPaths(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(fs.existsSync(manifestPath), true, 'sanity: the session really was opened with a manifest on disk');
+  fs.unlinkSync(manifestPath);
+
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, steps: [produceStep()] }) }),
+    (err) => err instanceof CoordinationError && err.category === 'not-found' && !/already exists/.test(err.message),
+  );
+
+  assert.equal(fs.existsSync(sessionDir), true);
+  assert.equal(fs.existsSync(manifestPath), false);
 });
 
 test('two runs under one writer identity stay two disjoint membership records -- one writer never merges two sessions', async () => {
@@ -1511,4 +1631,695 @@ test('show marks a bare turnId disposition ref as NOT owned, and a human-turn:<i
   assert.ok(found, 'the hand-crafted disposition must still be rendered');
   assert.equal(found.targetRefOwnedBySession, false, 'a bare turn id must never render as an owned ref -- it targets nothing (the write door refuses it as a near-miss)');
   assert.deepEqual(found.evidenceRefsOwnedBySession, [true], 'a real "human-turn:" ref to a recorded turn must render as owned, the same way the write door accepts it');
+});
+// Phase 03: Public-door DAG projection tests (H-1, H-3, M-1, H-4)
+// ---------------------------------------------------------------------
+
+function fakeExecutorWithFailingReviewer(tempDir) {
+  const executorScript = path.join(tempDir, `fake-executor-fail-review-${Math.random().toString(36).slice(2)}.mjs`);
+  fs.writeFileSync(
+    executorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const asgnJsonPath = path.join(assignmentsRoot, asgn, 'assignment.json');
+        let isReviewer = false;
+        if (fs.existsSync(asgnJsonPath)) {
+          try {
+            const asgnData = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
+            const text = JSON.stringify(asgnData);
+            if (text.includes('review-candidate') || text.includes('reviewer')) {
+              isReviewer = true;
+            }
+          } catch {}
+        }
+        const runsDir = path.join(assignmentsRoot, asgn, 'runs');
+        if (!fs.existsSync(runsDir)) continue;
+        for (const run of fs.readdirSync(runsDir)) {
+          const runDir = path.join(runsDir, run);
+          if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+            const status = isReviewer ? 'failed' : 'done';
+            fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nDone.\\n');
+            fs.writeFileSync(
+              path.join(runDir, 'agent-result.json'),
+              JSON.stringify(
+                isReviewer
+                  ? { status: 'failed', summary: 'Review failed.', error: 'Defects found' }
+                  : { status: 'done', summary: 'Validated.' },
+              ),
+            );
+          }
+        }
+      }
+    }
+    process.stdout.write('Validated.\\n');
+    process.exit(0);
+    `,
+  );
+  return {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+    models: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
+    timeoutMs: 10000,
+  };
+}
+
+test('Phase 03 H-1: public door dag:true failed RunResult projects as schedulerOutcome:settled and runResultStatus:failed, not pending/blocked', async () => {
+  const tempDir = mkTempDir();
+  writeFixture(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutorWithFailingReviewer(tempDir) };
+
+  const raw = request({
+    dag: true,
+    coordinationId: 'p03-h1-failed-review',
+    steps: [produceStep(), reviewStep()],
+  });
+
+  const result = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.equal(result.coordinationId, 'p03-h1-failed-review');
+
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: result.coordinationId });
+  assert.equal(shown.schemaMode, 'dag');
+  assert.equal(shown.sessionStatus, 'active');
+  assert.equal(shown.dag.counts.settled, 2);
+  assert.equal(shown.dag.counts.settledFailed, 1);
+  assert.equal(shown.dag.counts.blocked, 0);
+  assert.equal(shown.dag.counts.pending, 0);
+
+  const produceNode = shown.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  assert.ok(produceNode);
+  assert.equal(produceNode.schedulerOutcome, 'settled');
+  // produce-candidate is a mutating operation; the fake executor above never
+  // touches the real working tree, so the classifier correctly has no
+  // external evidence of a real mutation and reports 'no-evidence' rather
+  // than 'done' -- this is the real, documented classification rule
+  // (assignment-runner.mjs: a mutating claim needs changedFiles/dirty-before
+  // evidence to become 'done'/'verified'), not a defect in this fixture's
+  // simplified setup. The node still settles correctly either way.
+  assert.equal(produceNode.runResultStatus, 'no-evidence');
+  assert.equal(produceNode.pending, false);
+  assert.equal(produceNode.blocked, false);
+  assert.equal(produceNode.materialized, true);
+  assert.equal(produceNode.settled, true);
+  assert.ok(produceNode.assignmentIds.length > 0);
+
+  const reviewNode = shown.dag.nodes.find((n) => n.nodeId === 'node-review');
+  assert.ok(reviewNode);
+  assert.equal(reviewNode.schedulerOutcome, 'settled');
+  assert.equal(reviewNode.runResultStatus, 'failed');
+  assert.equal(reviewNode.pending, false);
+  assert.equal(reviewNode.blocked, false);
+  assert.equal(reviewNode.materialized, true);
+  assert.equal(reviewNode.settled, true);
+  assert.ok(reviewNode.assignmentIds.length > 0);
+  assert.match(reviewNode.actionHint, /Settled with failure/);
+});
+
+test('Phase 03 H-3/M-1: shared-cwd across peer read-only assignments is auto-caveated on BOTH peers and reflected in schedulerOutcome as recheck-required', async () => {
+  const { tempDir, ctx } = setup();
+
+  const raw = request({
+    dag: true,
+    coordinationId: 'p03-h3-m1-shared-cwd',
+    steps: [
+      produceStep(),
+      reviewStep(),
+      redTeamStep({ dependsOn: ['produce'] }),
+    ],
+  });
+
+  const result = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.equal(result.coordinationId, 'p03-h3-m1-shared-cwd');
+
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: result.coordinationId });
+  assert.equal(shown.schemaMode, 'dag');
+  assert.equal(shown.sessionStatus, 'active');
+
+  const produceNode = shown.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  assert.ok(produceNode);
+  assert.equal(produceNode.schedulerOutcome, 'settled');
+  assert.equal(produceNode.caveated, false);
+
+  const reviewNode = shown.dag.nodes.find((n) => n.nodeId === 'node-review');
+  const redTeamNode = shown.dag.nodes.find((n) => n.nodeId === 'node-red-team');
+  assert.ok(reviewNode);
+  assert.ok(redTeamNode);
+
+  // Both review and red-team run concurrently in the same cwd, so BOTH must be auto-caveated
+  assert.equal(reviewNode.caveated, true);
+  assert.equal(reviewNode.schedulerOutcome, 'recheck-required');
+  assert.ok(reviewNode.sharedCwdCaveat);
+  assert.equal(reviewNode.sharedCwdCaveat.recheckRequired, true);
+  assert.equal(reviewNode.sharedCwdCaveat.status, 'recheck-required');
+  assert.equal(reviewNode.sharedCwdCaveat.verdict, 'non-attributable');
+  assert.ok(reviewNode.sharedCwdCaveat.peerNodeIds.includes('node-red-team'));
+
+  assert.equal(redTeamNode.caveated, true);
+  assert.equal(redTeamNode.schedulerOutcome, 'recheck-required');
+  assert.ok(redTeamNode.sharedCwdCaveat);
+  assert.equal(redTeamNode.sharedCwdCaveat.recheckRequired, true);
+  assert.equal(redTeamNode.sharedCwdCaveat.status, 'recheck-required');
+  assert.equal(redTeamNode.sharedCwdCaveat.verdict, 'non-attributable');
+  assert.ok(redTeamNode.sharedCwdCaveat.peerNodeIds.includes('node-review'));
+
+  assert.match(shown.actionHint, /caveated node\(s\) \[.*\] require recheck before closure/);
+});
+
+test('Phase 03: uninterrupted DAG declaration reconstruction produces pending root and blocked dependent facts before assignments materialize', async () => {
+  const { tempDir, ctx } = setup();
+
+  // Create an open session with a DAG declaration directly (interrupted before any step runs)
+  const session = openDeclaredProtocolSession(
+    {
+      coordinationId: 'p03-interrupted-dag',
+      objective: 'Reconstruct DAG before assignments materialize.',
+      writerId: WRITER_ID,
+      definitionId: DEFINITION_ID,
+      schemaVersion: SCHEMA_VERSION_3,
+      dagDeclaration: {
+        schemaVersion: SCHEMA_VERSION_3,
+        requestFingerprint: 'sha256:testfingerprint000000000000000000000000000000000000000000000000',
+        nodes: [
+          { id: 'node-produce', displayLabel: 'produce', semantics: { type: 'operation', as: 'produce' }, dependsOn: [] },
+          { id: 'node-review', displayLabel: 'review', semantics: { type: 'operation', as: 'review' }, dependsOn: ['node-produce'] },
+        ],
+      },
+    },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: session.coordinationId });
+  assert.equal(shown.schemaMode, 'dag');
+  assert.equal(shown.sessionStatus, 'active');
+
+  const produce = shown.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  assert.ok(produce);
+  assert.equal(produce.materialized, false);
+  assert.equal(produce.settled, false);
+  assert.equal(produce.pending, true);
+  assert.equal(produce.blocked, false);
+  assert.equal(produce.schedulerOutcome, 'pending');
+
+  const review = shown.dag.nodes.find((n) => n.nodeId === 'node-review');
+  assert.ok(review);
+  assert.equal(review.materialized, false);
+  assert.equal(review.settled, false);
+  assert.equal(review.pending, false);
+  assert.equal(review.blocked, true);
+  assert.deepEqual(review.blockedBy, ['node-produce']);
+  assert.equal(review.schedulerOutcome, 'blocked');
+});
+
+// ─── Phase 04 (read-only admission and outcome taxonomy) ───────────────────
+// H-1: the concurrency-cap admission refusal is the ONLY deferrable outcome
+// (dag-request-scheduler.md §4) and must carry a stable `code:
+// 'concurrency-cap'` distinct from every other budget refusal below.
+// H-2: maxAssignments/maxRounds/wallTimeMs/maxTaskDepth refusals must stay
+// ordinary, non-deferrable, distinctly-identifiable validation errors and
+// must NEVER carry `code: 'concurrency-cap'`.
+// H-3: a missing session (`show`) and an unresolvable protocol (`run`) are
+// integrity failures that must throw with their ORIGINAL 'not-found'
+// category preserved, never collapsed into a plain `StoreError('validation',
+// ...)` indistinguishable from an ordinary refusal.
+// H-4: 3+ concurrent read-only DAG peers sharing one cwd must ALL receive
+// the sharedCwdCaveat (Phase 03 only proved the 2-peer case); a mutating or
+// fan-out step buried (not first) in a `dag: true` request must still be
+// rejected before any session/event is written.
+// M-1: `compileDagRequest` alone (bypassing the schema door) must reject a
+// mutating human-turn step -- defense in depth, matching Phase 02's L-1/H-2
+// fix pattern.
+
+test('Phase 04 H-1: concurrency-cap admission refusal carries code "concurrency-cap", distinguishing the ONE deferrable outcome from every other budget refusal', async () => {
+  const { ctx } = setup();
+  const coordinationId = 'p04-h1-concurrency-cap-code';
+  // Open the session and settle 'produce' first so it is not itself
+  // "in flight" by the time the two peer dispatches below race.
+  await runCoordinationUseCase(ctx, {
+    requestObject: request({ coordinationId, aggregateBounds: { maxConcurrency: 1 }, steps: [produceStep()] }),
+  });
+
+  const outcomes = await Promise.allSettled([
+    runCoordinationUseCase(ctx, {
+      requestObject: request({
+        coordinationId,
+        aggregateBounds: { maxConcurrency: 1 },
+        steps: [produceStep(), { ...reviewStep(), as: 'peer-a', taskKey: 'p04-h1-racer-a' }],
+      }),
+    }),
+    runCoordinationUseCase(ctx, {
+      requestObject: request({
+        coordinationId,
+        aggregateBounds: { maxConcurrency: 1 },
+        steps: [produceStep(), { ...reviewStep(), as: 'peer-b', taskKey: 'p04-h1-racer-b' }],
+      }),
+    }),
+  ]);
+
+  const fulfilled = outcomes.filter((o) => o.status === 'fulfilled');
+  const rejected = outcomes.filter((o) => o.status === 'rejected');
+  assert.equal(fulfilled.length, 1, `exactly one of two concurrent new dispatches should succeed under maxConcurrency: 1 -- got ${JSON.stringify(outcomes.map((o) => o.status))}`);
+  assert.equal(rejected.length, 1);
+  const err = rejected[0].reason;
+  assert.ok(err instanceof CoordinationError, 'the concurrency-cap refusal is a CoordinationError');
+  assert.equal(err.category, 'validation');
+  assert.equal(err.code, 'concurrency-cap', 'the ONLY deferrable refusal must carry this exact machine code');
+});
+
+test('Phase 04 H-2: aggregateBounds.maxAssignments refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
+  const { ctx } = setup();
+  const raw = request({ coordinationId: 'p04-h2-maxassignments', aggregateBounds: { maxAssignments: 1 }, steps: [produceStep(), reviewStep()] });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: raw }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && err.code !== 'concurrency-cap' && /aggregateBounds\.maxAssignments cap of 1/.test(err.message),
+  );
+});
+
+test('Phase 04 H-2: aggregateBounds.maxRounds refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
+  const { ctx } = setup();
+  const raw = request({ coordinationId: 'p04-h2-maxrounds', aggregateBounds: { maxRounds: 1, maxAssignments: 10 }, steps: [produceStep(), reviewStep()] });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: raw }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && err.code !== 'concurrency-cap' && /already used \d+ round\(s\) session-wide/.test(err.message),
+  );
+});
+
+test('Phase 04 H-2: aggregateBounds.wallTimeMs refusal via the real request door (on resume) is refused-shaped and never carries code "concurrency-cap"', async () => {
+  const { ctx } = setup();
+  const coordinationId = 'p04-h2-walltime';
+  await runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 600 }, steps: [produceStep()] }) });
+  await new Promise((resolve) => setTimeout(resolve, 700));
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 600 }, steps: [produceStep(), reviewStep()] }) }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && err.code !== 'concurrency-cap' && /wall-time budget/.test(err.message),
+  );
+});
+
+test('Phase 04 H-3: coordination show on a missing session throws with the ORIGINAL "not-found" category preserved, never collapsed into an ordinary validation refusal', () => {
+  const { tempDir } = setup();
+  assert.throws(
+    () => showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: 'p04-h3-session-never-existed' }),
+    (err) => err instanceof CoordinationError && !(err instanceof StoreError) && err.category === 'not-found' && /no session "p04-h3-session-never-existed" found/.test(err.message),
+  );
+});
+
+test('Phase 04 H-3: coordination run against an unresolvable protocolRef throws with the ORIGINAL "not-found" category preserved, never collapsed into an ordinary validation refusal', async () => {
+  const { ctx } = setup();
+  const raw = request({
+    coordinationId: 'p04-h3-missing-protocol',
+    protocolRef: { id: 'test.coordination-protocol.p04-h3-this-protocol-does-not-exist' },
+    steps: [produceStep()],
+  });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: raw }),
+    (err) => err instanceof FlowDefinitionError && !(err instanceof StoreError) && err.category === 'not-found' && /no CoordinationProtocol definition found|could not be resolved/.test(err.message),
+  );
+});
+
+const THREE_PEER_DEFINITION_ID = 'test.coordination-protocol.p04-h4-three-peer-shared-cwd';
+
+function writeThreePeerFixture(tempDir) {
+  const dir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  const advisory = { kind: 'advisory', evidenceRequired: 'reported' };
+  const workProduct = { kind: 'work-product', evidenceRequired: 'reported' };
+  const definition = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: THREE_PEER_DEFINITION_ID, version: '1.0.0' },
+    spec: {
+      profile: { kind: 'CoordinationProtocol' },
+      roles: ['doer', 'peer-a', 'peer-b', 'peer-c'],
+      actors: [
+        { id: 'doer', role: 'doer' },
+        { id: 'peer-a', role: 'peer-a' },
+        { id: 'peer-b', role: 'peer-b' },
+        { id: 'peer-c', role: 'peer-c' },
+      ],
+      operations: [
+        { id: 'produce-candidate', role: 'doer', result: workProduct },
+        { id: 'peer-a-review', role: 'peer-a', result: advisory },
+        { id: 'peer-b-review', role: 'peer-b', result: advisory },
+        { id: 'peer-c-review', role: 'peer-c', result: advisory },
+      ],
+      graph: {
+        entry: 'phase-produce',
+        nodes: [
+          { id: 'phase-produce', operations: [{ ref: 'produce-candidate', actor: 'doer' }], transitions: ['phase-peers'] },
+          {
+            id: 'phase-peers',
+            operations: [
+              { ref: 'peer-a-review', actor: 'peer-a' },
+              { ref: 'peer-b-review', actor: 'peer-b' },
+              { ref: 'peer-c-review', actor: 'peer-c' },
+            ],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+  fs.writeFileSync(path.join(dir, 'p04-h4-three-peer.json'), `${JSON.stringify(definition, null, 2)}\n`);
+}
+
+function setupThreePeer() {
+  const tempDir = mkTempDir();
+  writeThreePeerFixture(tempDir);
+  return { tempDir, ctx: { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir) } };
+}
+
+function threePeerRequest(overrides = {}) {
+  return {
+    kind: 'declared-protocol',
+    objective: 'Prove 3+ concurrent read-only DAG peers sharing a cwd all get caveated.',
+    writerId: WRITER_ID,
+    protocolRef: { id: THREE_PEER_DEFINITION_ID },
+    dag: true,
+    steps: [
+      { type: 'operation', as: 'produce', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'Produce.', expectedOutputs: ['agent-result.json (status, summary)'] },
+      { type: 'operation', as: 'peer-a', operationId: 'peer-a-review', targetActorId: 'peer-a', objective: 'Peer A reviews.', expectedOutputs: ['agent-result.json (status, summary)'], contextRefs: ['$ref:produce'] },
+      { type: 'operation', as: 'peer-b', operationId: 'peer-b-review', targetActorId: 'peer-b', objective: 'Peer B reviews.', expectedOutputs: ['agent-result.json (status, summary)'], contextRefs: ['$ref:produce'] },
+      { type: 'operation', as: 'peer-c', operationId: 'peer-c-review', targetActorId: 'peer-c', objective: 'Peer C reviews.', expectedOutputs: ['agent-result.json (status, summary)'], contextRefs: ['$ref:produce'] },
+    ],
+    ...overrides,
+  };
+}
+
+test('Phase 04 H-4: 3+ concurrent read-only DAG peers sharing one cwd ALL receive the sharedCwdCaveat (Phase 03 only proved the 2-peer case)', async () => {
+  const { tempDir, ctx } = setupThreePeer();
+  const raw = threePeerRequest({ coordinationId: 'p04-h4-three-peer-caveat' });
+
+  const result = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.equal(result.coordinationId, 'p04-h4-three-peer-caveat');
+
+  const shown = showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: result.coordinationId });
+  assert.equal(shown.schemaMode, 'dag');
+
+  const peerLabels = ['peer-a', 'peer-b', 'peer-c'];
+  const peerNodes = peerLabels.map((label) => shown.dag.nodes.find((n) => n.nodeId === `node-${label}`));
+  for (const node of peerNodes) assert.ok(node, 'every peer node must be present in the projection');
+
+  for (const node of peerNodes) {
+    assert.equal(node.caveated, true, `${node.nodeId} must be caveated -- it shares a cwd with 2 other concurrent read-only peers`);
+    assert.equal(node.schedulerOutcome, 'recheck-required');
+    assert.ok(node.sharedCwdCaveat);
+    assert.equal(node.sharedCwdCaveat.status, 'recheck-required');
+    assert.equal(node.sharedCwdCaveat.verdict, 'non-attributable');
+    const otherPeerIds = peerNodes.filter((other) => other !== node).map((other) => other.nodeId);
+    for (const otherId of otherPeerIds) {
+      assert.ok(node.sharedCwdCaveat.peerNodeIds.includes(otherId), `${node.nodeId}'s caveat must name peer ${otherId}`);
+    }
+    assert.equal(node.sharedCwdCaveat.peerNodeIds.length, 2, `${node.nodeId} must be caveated against BOTH other peers, not just one`);
+  }
+
+  const produceNode = shown.dag.nodes.find((n) => n.nodeId === 'node-produce');
+  assert.ok(produceNode);
+  assert.equal(produceNode.caveated, false, 'produce has no concurrent read-only peer sharing its cwd at its own dependency level');
+
+  // Phase 04 H-1: counts.deferred is a real computed count now, not a
+  // hardcoded stub -- still 0 here since no live scheduler exists yet.
+  assert.equal(shown.dag.counts.deferred, 0);
+});
+
+test('Phase 04 H-4: a mutating operation buried (not first) in a dag:true request is rejected before ANY session/event is written', async () => {
+  const { ctx } = setup();
+  const coordinationId = 'p04-h4-buried-mutation';
+  const raw = request({
+    dag: true,
+    coordinationId,
+    steps: [produceStep(), reviewStep(), { ...redTeamStep({ dependsOn: ['produce'] }), mutation: 'mutating' }],
+  });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: raw }),
+    (err) => err instanceof StoreError && /read-only/.test(err.message),
+  );
+  assert.throws(
+    () => readManifest(coordinationId, { cwd: ctx.cwd }),
+    (err) => err instanceof CoordinationError && err.category === 'not-found',
+    'a buried mutating step must be refused before openDeclaredProtocolSession ever runs -- zero session materialized',
+  );
+});
+
+test('Phase 04 H-4: a fan-out step buried (not first) in a dag:true request is rejected before ANY session/event is written', async () => {
+  const { ctx } = setup();
+  const coordinationId = 'p04-h4-buried-fanout';
+  const raw = request({
+    dag: true,
+    coordinationId,
+    steps: [
+      produceStep(),
+      reviewStep(),
+      { type: 'fan-out', as: 'research', operationId: 'produce-candidate', branches: [{ actorId: 'doer', objective: 'branch a', expectedOutputs: ['y'] }] },
+    ],
+  });
+  await assert.rejects(
+    runCoordinationUseCase(ctx, { requestObject: raw }),
+    (err) => err instanceof StoreError && /fan-out/i.test(err.message),
+  );
+  assert.throws(
+    () => readManifest(coordinationId, { cwd: ctx.cwd }),
+    (err) => err instanceof CoordinationError && err.category === 'not-found',
+    'a buried fan-out step must be refused before openDeclaredProtocolSession ever runs -- zero session materialized',
+  );
+});
+
+test('Phase 04 M-1: compileDagRequest ALONE (bypassing the schema door) rejects a mutating human-turn step -- defense in depth', () => {
+  const raw = {
+    kind: 'declared-protocol',
+    dag: true,
+    objective: 'x',
+    writerId: WRITER_ID,
+    protocolRef: { id: DEFINITION_ID },
+    steps: [
+      produceStep(),
+      {
+        type: 'human-turn',
+        as: 'decision',
+        turnId: 'turn-1',
+        turnOrdinal: 1,
+        channel: 'chat',
+        artifactRef: 'human/1-person.md',
+        externalRef: 'ext-1',
+        attributedTo: { type: 'person', id: 'reviewer-1' },
+        mutation: 'mutating',
+        dependsOn: ['produce'],
+      },
+    ],
+  };
+  assert.throws(
+    () => compileDagRequest(raw, { durableLedgerIds: [] }),
+    (err) => err instanceof StoreError && /read-only/.test(err.message),
+  );
+});
+
+// ─── Phase 05: cold-resumable dynamic DAG scheduler ──────────────────────
+
+test('Phase 05: peer frontier overlaps at the real dispatch door and reports its overlap group', async () => {
+  const tempDir = mkTempDir();
+  writeFixture(tempDir);
+  // The executor delays only the Assignment whose own prompt carries this
+  // objective.  It never scans unrelated pending Assignment directories.
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir, { delayObjective: 'DELAYED PEER', delayMs: 350 }) };
+  // Calibrate against one identical public-door peer in this very process.
+  // This makes the overlap proof relative to real executor startup cost,
+  // which may dwarf a short artificial delay on a loaded worker.
+  const singleStarted = Date.now();
+  await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      dag: true,
+      coordinationId: 'p05-overlap-single-peer-baseline',
+      steps: [produceStep(), { ...reviewStep(), objective: 'DELAYED PEER baseline.' }],
+    }),
+  });
+  const singlePeerElapsed = Date.now() - singleStarted;
+  const started = Date.now();
+  const result = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      dag: true,
+      coordinationId: 'p05-overlap',
+      steps: [produceStep(), { ...reviewStep(), objective: 'DELAYED PEER review.' }, { ...redTeamStep({ dependsOn: ['produce'] }), objective: 'DELAYED PEER red team.' }],
+    }),
+  });
+  const elapsed = Date.now() - started;
+  // Process creation is environment-dependent.  The scheduler proof is
+  // relative: this two-peer invocation must finish well below two measured
+  // one-peer invocations (the serialized equivalent), with a generous 1.8x
+  // one-peer ceiling that retains a substantial overlap margin.
+  assert.ok(elapsed < singlePeerElapsed * 1.8, `two peers must overlap rather than serialize (two-peer ${elapsed}ms; one-peer baseline ${singlePeerElapsed}ms)`);
+  const peers = result.steps.filter((step) => ['review', 'red-team'].includes(step.as));
+  assert.equal(peers.length, 2);
+  assert.equal(peers[0].overlapGroup.id, peers[1].overlapGroup.id);
+  assert.deepEqual(peers[0].overlapGroup.nodeLabels.sort(), ['red-team', 'review']);
+});
+
+test('Phase 05: diamond fan-in admits join only after both near-simultaneous predecessor results are linked', async () => {
+  const tempDir = mkTempDir();
+  writeFixture(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutorWithObjectiveDelays(tempDir, { 'DIAMOND REVIEW': 150, 'DIAMOND RED': 153 }) };
+  const coordinationId = 'p05-diamond-fanin';
+  const result = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      dag: true,
+      coordinationId,
+      steps: [
+        produceStep(),
+        { ...reviewStep(), objective: 'DIAMOND REVIEW' },
+        { ...redTeamStep({ dependsOn: ['produce'] }), objective: 'DIAMOND RED' },
+        { ...reviewStep(), as: 'join', taskKey: 'p05-diamond-join', dependsOn: ['review', 'red-team'] },
+      ],
+    }),
+  });
+  assert.equal(result.steps.find((step) => step.as === 'join').schedulerOutcome, 'settled');
+  const events = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  const joinCreatedAt = events.findIndex((event) => event.type === 'assignment-created' && event.payload.dagNodeId === 'node-join');
+  assert.ok(joinCreatedAt >= 0, 'the join is eventually materialized');
+  for (const label of ['node-review', 'node-red-team']) {
+    const created = events.find((event) => event.type === 'assignment-created' && event.payload.dagNodeId === label);
+    const linkedAt = events.findIndex((event) => event.type === 'result-linked' && event.payload.assignmentId === created.payload.assignmentId);
+    assert.ok(linkedAt >= 0 && linkedAt < joinCreatedAt, `${label} must have result-linked evidence before join admission`);
+  }
+});
+
+test('Phase 05: external in-flight work defers a maxConcurrency:1 DAG immediately, reports it, and suppresses close', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'p05-outside-inflight';
+  const raw = request({ dag: true, coordinationId, aggregateBounds: { maxConcurrency: 1 }, steps: [produceStep(), reviewStep()] });
+  const normalized = validateCoordinationRequest(raw);
+  const declaration = compileDagRequest(normalized, { durableLedgerIds: [] });
+  openDeclaredProtocolSession(
+    { coordinationId, objective: normalized.objective, writerId: WRITER_ID, definitionId: DEFINITION_ID, schemaVersion: SCHEMA_VERSION_3, aggregateBounds: normalized.aggregateBounds, dagDeclaration: declaration },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+  const outside = createSessionAssignment(
+    {
+      coordinationId,
+      taskKey: 'outside-invocation',
+      actorId: 'doer',
+      contract: { objective: 'Externally in-flight work.', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 1000, maxRuns: 1 } },
+      caller: { writerId: WRITER_ID },
+    },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+  const started = Date.now();
+  const result = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.ok(Date.now() - started < 1800, 'an invocation blocked only by external in-flight work must return without polling or sleeping');
+  assert.equal(result.closed, false);
+  assert.equal(result.closeAttempted, false);
+  assert.equal(result.steps.find((step) => step.as === 'produce').schedulerOutcome, 'deferred');
+  assert.equal(result.steps.find((step) => step.as === 'review').schedulerOutcome, 'deferred', 'with no invocation-owned settlement possible, the dependent is deferred rather than falsely blocked by an external Assignment');
+  assert.deepEqual(result.dag.inFlightOutsideInvocation, [outside.assignmentId]);
+});
+
+test('Phase 05: manifest loss after sibling settlement throws without erasing settled sibling evidence', async () => {
+  const tempDir = mkTempDir();
+  writeFixture(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutorWithObjectiveDelays(tempDir, { 'FAST SIBLING': 40, 'SLOW SIBLING': 240 }) };
+  const coordinationId = 'p05-integrity-after-sibling';
+  const raw = request({ dag: true, coordinationId, steps: [produceStep(), { ...reviewStep(), objective: 'FAST SIBLING' }, { ...redTeamStep({ dependsOn: ['produce'] }), objective: 'SLOW SIBLING' }] });
+  const running = runCoordinationUseCase(ctx, { requestObject: raw });
+  for (let attempt = 0; attempt < 800; attempt += 1) {
+    if (readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === 'result-linked').length >= 2) break;
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  const before = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.ok(before.filter((event) => event.type === 'result-linked').length >= 2, 'produce and one sibling must already be durably settled');
+  fs.unlinkSync(resolveSessionPaths(coordinationId, { cwd: tempDir, repoRoot: tempDir }).manifestPath);
+  await assert.rejects(running, (err) => err instanceof CoordinationError && err.category === 'not-found');
+  const after = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.deepEqual(after.slice(0, before.length), before, 'the integrity failure cannot erase evidence that settled before it');
+});
+
+test('Phase 05: actor replacement racing a ready dependent neither double-dispatches it nor loses its scheduler disposition', async () => {
+  const { tempDir, ctx } = setup();
+  const coordinationId = 'p05-replacement-ready-race';
+  const raw = request({ dag: true, coordinationId, steps: [produceStep(), reviewStep()] });
+  const normalized = validateCoordinationRequest(raw);
+  const declaration = compileDagRequest(normalized, { durableLedgerIds: [] });
+  openDeclaredProtocolSession(
+    { coordinationId, objective: normalized.objective, writerId: WRITER_ID, definitionId: DEFINITION_ID, schemaVersion: SCHEMA_VERSION_3, dagDeclaration: declaration },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+  await dispatchDeclaredOperation(
+    coordinationId,
+    { operationId: 'produce-candidate', targetActorId: 'doer', objective: produceStep().objective, expectedOutputs: produceStep().expectedOutputs, writerId: WRITER_ID, dagNodeId: 'node-produce' },
+    ctx,
+  );
+  // runCoordinationUseCase yields at real dispatch boundaries.  Start it,
+  // then replace the still-unassigned reviewer slot before its ready-node
+  // dispatch can complete; this exercises the durable actor ledger rather
+  // than a scheduler mock or a synthetic state transition.
+  const running = runCoordinationUseCase(ctx, { requestObject: raw });
+  replaceSessionActor(coordinationId, { oldActorId: 'reviewer', newActorId: 'reviewer-replacement', reason: 'replace while ready review is being considered' }, { cwd: tempDir, repoRoot: tempDir });
+  const result = await running;
+  const review = result.steps.find((step) => step.as === 'review');
+  assert.ok(['settled', 'refused', 'deferred'].includes(review.schedulerOutcome), 'the raced node has one explicit disposition, never a lost pending state');
+  const reviewCreates = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === 'assignment-created' && event.payload.dagNodeId === 'node-review');
+  assert.ok(reviewCreates.length <= 1, 'replacement racing admission must never create duplicate dependent Assignments');
+});
+
+test('Phase 05: cancellation blocks an unadmitted join but preserves already in-flight peer evidence', async () => {
+  const tempDir = mkTempDir();
+  writeFixture(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir, { delayObjective: 'CANCEL PEER', delayMs: 300 }) };
+  const coordinationId = 'p05-cancel-admission';
+  const raw = request({
+    dag: true,
+    coordinationId,
+    steps: [
+      produceStep(),
+      { ...reviewStep(), objective: 'CANCEL PEER review.' },
+      { ...redTeamStep({ dependsOn: ['produce'] }), objective: 'CANCEL PEER red team.' },
+      { ...reviewStep(), as: 'join', taskKey: 'p05-cancel-join', dependsOn: ['review', 'red-team'] },
+    ],
+  });
+  const running = runCoordinationUseCase(ctx, { requestObject: raw });
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    if (readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === 'assignment-created').length >= 3) break;
+    // Wait only for the real peer assignments to be materialized; no polling
+    // participates in scheduler admission.
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
+  cancelSession(coordinationId, { reason: 'operator cancelled during peer frontier' }, { cwd: tempDir, repoRoot: tempDir });
+  const result = await running;
+  const events = readSessionEvents(coordinationId, { cwd: tempDir, repoRoot: tempDir });
+  assert.equal(events.filter((event) => event.type === 'assignment-created' && event.payload.dagNodeId === 'node-join').length, 0);
+  assert.equal(events.filter((event) => event.type === 'driver-disposition-recorded' && event.payload.targetRef.includes('join')).length, 0);
+  assert.equal(events.filter((event) => event.type === 'result-linked').length, 3);
+  const join = result.steps.find((step) => step.as === 'join');
+  assert.equal(join.schedulerOutcome, 'blocked');
+  assert.ok(join.blockedBy.includes('terminal-session'));
+  assert.equal(showCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { id: coordinationId }).sessionStatus, 'cancelled');
+});
+
+test('Phase 05: an independent peer survives a branch-local refusal, and the refusal names its invoked dispatch door', async () => {
+  const { tempDir, ctx } = setup();
+  const result = await runCoordinationUseCase(ctx, {
+    requestObject: request({
+      dag: true,
+      coordinationId: 'p05-branch-refusal',
+      aggregateBounds: { maxAssignments: 2 },
+      steps: [produceStep(), reviewStep(), redTeamStep({ dependsOn: ['produce'] })],
+    }),
+  });
+  const peers = result.steps.filter((step) => ['review', 'red-team'].includes(step.as));
+  assert.equal(peers.filter((step) => step.schedulerOutcome === 'settled').length, 1);
+  const refused = peers.find((step) => step.schedulerOutcome === 'refused');
+  assert.ok(refused);
+  assert.equal(refused.door, 'dispatchDeclaredOperation');
+  assert.equal(result.closed, false);
+  assert.equal(result.closeAttempted, false);
+  assert.equal(refused.schedulerOutcome, 'refused', 'the live invocation response is authoritative while the active session has no persisted Assignment for a refused node');
+});
+
+test('Phase 05: an identical DAG resume uses result-linked evidence without creating a fresh Assignment', async () => {
+  const { tempDir, ctx } = setup();
+  const raw = request({ dag: true, coordinationId: 'p05-resume', steps: [produceStep(), reviewStep(), redTeamStep({ dependsOn: ['produce'] })] });
+  const first = await runCoordinationUseCase(ctx, { requestObject: raw });
+  const createdBefore = readSessionEvents(first.coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === 'assignment-created').length;
+  const second = await runCoordinationUseCase(ctx, { requestObject: raw });
+  assert.ok(second.steps.every((step) => step.resumed === true));
+  assert.ok(second.steps.every((step) => step.door === 'result-linked'));
+  const createdAfter = readSessionEvents(first.coordinationId, { cwd: tempDir, repoRoot: tempDir }).filter((event) => event.type === 'assignment-created').length;
+  assert.equal(createdAfter, createdBefore);
 });

@@ -51,7 +51,7 @@ function readManifestFor(coordinationId, opts) {
     return replaySession(coordinationId, opts);
   } catch (err) {
     if (err instanceof CoordinationError && err.category === 'not-found') {
-      throw new StoreError('validation', `coordination recover: no session "${coordinationId}" found under .fgos/coordination/sessions/ (${err.message})`);
+      throw new CoordinationError('not-found', `coordination recover: no session "${coordinationId}" found under .fgos/coordination/sessions/ (${err.message})`);
     }
     throw err;
   }

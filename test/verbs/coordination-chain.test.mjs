@@ -11,6 +11,10 @@ import path from 'node:path';
 import { chainCoordinationUseCase } from '../../src/verbs/coordination/chain.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { launchMasterLoopUseCase, MASTER_LOOP_PROTOCOL_ID } from '../../src/verbs/coordination/launch-master-loop.mjs';
+import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { openSession } from '../../src/runner/coordination/store.mjs';
+import { openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
+import { CoordinationError, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-chain-test-'));
@@ -434,4 +438,175 @@ test('chain renders every healthy cell (and a degraded renderError record for th
   // never null this out.
   assert.equal(result.activeCell, 'cellB');
   assert.match(result.nextAction, /cellB/);
+});
+
+// ---------------------------------------------------------------------
+// Phase 00 (baseline lock): a session on a schema version that THIS
+// running binary does not support must be exposed, never mistaken for a
+// healthy replay. `show` reaches its replay-backed quorum/phase derivation
+// before rendering and fails by name; `chain` preserves that failure as the
+// cell's explicit renderError.
+// ---------------------------------------------------------------------
+
+test('show and chain expose a newer/unknown session schema as a named replay failure, never as a successful reconstructed state', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'schematrack--cellNewer';
+  openSession({ coordinationId, objective: 'Characterize newer schema handling.', provenanceRoot: { writerId: 'chain-test-driver' } }, { cwd: tempDir });
+
+  const manifestPath = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.schemaVersion = '999-newer-binary';
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+  assert.throws(
+    () => showCoordinationUseCase(ctx, { id: coordinationId }),
+    (err) => err instanceof CoordinationError && err.category === 'schema-version-mismatch',
+    'show reaches evaluateSessionQuorum()/replaySession() before rendering, so a newer schema is a named failure rather than a partial normal summary',
+  );
+
+  const chain = chainCoordinationUseCase(ctx, { track: 'schematrack' });
+  assert.equal(chain.cells.length, 1);
+  assert.equal(chain.cells[0].renderError?.step, 'showCoordinationUseCase');
+  assert.match(chain.cells[0].renderError?.message ?? '', /schemaVersion|unknown shape/i);
+  assert.equal(chain.cells[0].status, undefined, 'chain must not project an unreplayable session as an active or completed cell');
+});
+
+test('an extra top-level manifest field fails validation before a newer schemaVersion reaches the replay gate', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'schematrack--cellExtraField';
+  openSession({ coordinationId, objective: 'Characterize unknown manifest field handling.', provenanceRoot: { writerId: 'chain-test-driver' } }, { cwd: tempDir });
+
+  const manifestPath = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.schemaVersion = '999-newer-binary';
+  manifest.dagRequestScheduler = { version: 'future' };
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+  assert.throws(
+    () => showCoordinationUseCase(ctx, { id: coordinationId }),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /unknown field "dagRequestScheduler"/.test(err.message),
+    'readManifest validates the closed field table before replay can evaluate schemaVersion compatibility',
+  );
+
+  const chain = chainCoordinationUseCase(ctx, { track: 'schematrack' });
+  assert.equal(chain.cells.length, 1);
+  assert.equal(chain.cells[0].renderError?.step, 'readManifest');
+  assert.equal(chain.cells[0].status, undefined);
+});
+
+test('Phase 03: chain renders DAG cell schemaMode, sessionStatus, sessionPhase, and DAG action hint', () => {
+  const tempDir = mkTempDir();
+  const track = 'dagtrack';
+  const coordinationId = `${track}--cell1`;
+
+  // Write a protocol fixture
+  const fixtureDir = path.join(tempDir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(fixtureDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(fixtureDir, 'dag-test-proto.json'),
+    JSON.stringify({
+      apiVersion: 'fgos.dev/v1alpha1',
+      kind: 'FlowDefinition',
+      metadata: { id: 'test.dag.proto', version: '1.0.0' },
+      spec: {
+        profile: { kind: 'CoordinationProtocol' },
+        roles: ['doer'],
+        actors: [{ id: 'doer', role: 'doer' }],
+        operations: [{ id: 'op1', role: 'doer' }],
+        graph: { entry: 'phase1', nodes: [{ id: 'phase1', operations: [{ ref: 'op1', actor: 'doer' }] }] },
+      },
+    }),
+  );
+
+  openDeclaredProtocolSession(
+    {
+      coordinationId,
+      objective: 'DAG cell chain projection test.',
+      writerId: 'driver-1',
+      definitionId: 'test.dag.proto',
+      schemaVersion: SCHEMA_VERSION_3,
+      dagDeclaration: {
+        schemaVersion: SCHEMA_VERSION_3,
+        requestFingerprint: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        nodes: [
+          { id: 'node-produce', displayLabel: 'produce', semantics: { type: 'operation', as: 'produce' }, dependsOn: [] },
+          { id: 'node-review', displayLabel: 'review', semantics: { type: 'operation', as: 'review' }, dependsOn: ['node-produce'] },
+        ],
+      },
+    },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+  const chain = chainCoordinationUseCase(ctx, { track });
+  assert.equal(chain.cells.length, 1);
+  const cell = chain.cells[0];
+  assert.equal(cell.schemaMode, 'dag');
+  assert.equal(cell.sessionStatus, 'active');
+  assert.equal(cell.status, 'active');
+  assert.ok(cell.dag);
+  assert.equal(cell.dag.nodes.length, 2);
+  assert.match(chain.nextAction, /has ready node\(s\) awaiting execution: produce/);
+});
+
+test('Phase 03: chain and show render legacy-non-dag mode for schema 1 and schema 2 sessions', () => {
+  const tempDir = mkTempDir();
+  const track = 'legtrack';
+  const coordinationId = `${track}--cellLegacy`;
+
+  openSession(
+    { coordinationId, objective: 'Legacy session test.', provenanceRoot: { writerId: 'driver-1' } },
+    { cwd: tempDir },
+  );
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+  const shown = showCoordinationUseCase(ctx, { id: coordinationId });
+  assert.equal(shown.schemaMode, 'legacy-non-dag');
+  assert.equal(shown.dag.kind, 'legacy-non-dag');
+  assert.deepEqual(shown.dag.nodes, []);
+
+  const chain = chainCoordinationUseCase(ctx, { track });
+  assert.equal(chain.cells.length, 1);
+  assert.equal(chain.cells[0].schemaMode, 'legacy-non-dag');
+});
+
+test('Phase 03 H-4: show throws unsupported-newer-schema CoordinationError with error.code/reason while chain maps to cell.schemaMode unsupported-newer-schema', () => {
+  const tempDir = mkTempDir();
+  const track = 'newertrack';
+  const coordinationId = `${track}--cellNewer`;
+
+  openSession(
+    { coordinationId, objective: 'Unsupported newer schema test.', provenanceRoot: { writerId: 'driver-1' } },
+    { cwd: tempDir },
+  );
+
+  const manifestPath = path.join(tempDir, '.fgos', 'coordination', 'sessions', coordinationId, 'session.json');
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+  manifest.schemaVersion = '999-future';
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+
+  // show throws CoordinationError with category schema-version-mismatch, code and reason unsupported-newer-schema
+  let thrownError = null;
+  try {
+    showCoordinationUseCase(ctx, { id: coordinationId });
+  } catch (err) {
+    thrownError = err;
+  }
+  assert.ok(thrownError instanceof CoordinationError);
+  assert.equal(thrownError.category, 'schema-version-mismatch');
+  assert.equal(thrownError.code, 'unsupported-newer-schema');
+  assert.equal(thrownError.reason, 'unsupported-newer-schema');
+
+  // chain catches and sets cell.schemaMode unsupported-newer-schema and renderError.reason unsupported-newer-schema
+  const chain = chainCoordinationUseCase(ctx, { track });
+  assert.equal(chain.cells.length, 1);
+  const cell = chain.cells[0];
+  assert.equal(cell.schemaMode, 'unsupported-newer-schema');
+  assert.equal(cell.renderError?.step, 'showCoordinationUseCase');
+  assert.equal(cell.renderError?.reason, 'unsupported-newer-schema');
+  assert.equal(chain.activeCell, null);
 });

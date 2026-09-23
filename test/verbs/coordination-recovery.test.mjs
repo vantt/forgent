@@ -616,6 +616,38 @@ test('apply requires all expectation flags or throws validation error', () => {
   );
 });
 
+// ─── 9.1 Missing Session Preserves not-found (op_038) ───────────────────────
+
+test('op_038: observe against a genuinely missing session throws CoordinationError not-found, never a generic StoreError validation', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_rec_never_existed';
+
+  assert.throws(
+    () => recoverSessionObserveUseCase({ cwd: tempDir }, { coordinationId }),
+    (err) => err instanceof CoordinationError && err.category === 'not-found' && !(err instanceof StoreError),
+  );
+});
+
+test('op_038: apply against a genuinely missing session throws CoordinationError not-found, never a generic StoreError validation', () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_rec_apply_never_existed';
+
+  assert.throws(
+    () =>
+      recoverSessionApplyUseCase({ cwd: tempDir }, {
+        coordinationId,
+        action: 'close',
+        expectedSnapshot: 'hash',
+        expectedEventSeq: 1,
+        expectedRunControlEpoch: 0,
+        expectedExpiresAt: new Date(Date.now() + 60000).toISOString(),
+        actionKey: 'key',
+        authorizedBy: { type: 'driver', id: 'driver-1' },
+      }),
+    (err) => err instanceof CoordinationError && err.category === 'not-found' && !(err instanceof StoreError),
+  );
+});
+
 // ─── 10. Prevention of Duplicate Commands & Quorum Completion Parity ─────────
 
 test('already-recorded recovery command prevents duplicate recommendation and repeat apply for the target Run', () => {

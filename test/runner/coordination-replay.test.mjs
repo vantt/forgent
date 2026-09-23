@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { openSession, createSessionAssignment, linkResult, recordHumanTurn } from '../../src/runner/coordination/store.mjs';
+import { openSession, createSessionAssignment, linkResult, recordHumanTurn, authorizeOperation, transitionSessionStatus } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
-import { CoordinationError, SCHEMA_VERSION } from '../../src/runner/coordination/schema.mjs';
+import { CoordinationError, SCHEMA_VERSION, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 import { EventLogError } from '../../src/state/events.mjs';
 
 function mkTempDir() {
@@ -39,12 +39,122 @@ function openAndCreate(tempDir, coordinationId, taskKey = 'primary-round-1') {
   );
 }
 
+function dagDeclaration(nodes) {
+  return { nodes, continuationPolicy: { mode: 'explicit-contract-required' } };
+}
+
+function authorizeDagNode(tempDir, coordinationId, nodeId) {
+  const authorizationId = `auth_${nodeId}`;
+  authorizeOperation(coordinationId, {
+    authorizationId,
+    operationId: `operation_${nodeId}`,
+    nodeId,
+    targetActorId: 'doer',
+    invocationKey: `invoke_${nodeId}`,
+    authorizedBy: { type: 'driver', id: 'writer-1' },
+    reason: 'Materialize declared node.',
+    grantedContextRefs: [],
+  }, { cwd: tempDir });
+  return { operationId: `operation_${nodeId}`, nodeId, authorizationId, invocationKey: `invoke_${nodeId}`, contextGrant: { refs: [] } };
+}
+
 test('replaySession reconstructs a clean session: assignmentRefs matches assignment-created events exactly', () => {
   const tempDir = mkTempDir();
   const assignment = openAndCreate(tempDir, 'coord_replay_clean');
   const replayed = replaySession('coord_replay_clean', { cwd: tempDir });
   assert.deepEqual(replayed.assignmentRefs, [assignment.assignmentId]);
   assert.equal(replayed.manifest.coordinationId, 'coord_replay_clean');
+});
+
+test('replaySession derives a pending DAG node after a crash between declaration and first Assignment without persisting node status', () => {
+  const tempDir = mkTempDir();
+  openSession(
+    {
+      coordinationId: 'coord_dag_pending', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+      dagDeclaration: {
+        nodes: [{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }],
+        continuationPolicy: { mode: 'explicit-contract-required' },
+      },
+    },
+    { cwd: tempDir },
+  );
+  const replayed = replaySession('coord_dag_pending', { cwd: tempDir });
+  assert.equal(replayed.dag.kind, 'dag');
+  assert.deepEqual(replayed.dag.nodes[0], {
+    nodeId: 'produce-v1', displayLabel: 'Produce', declared: true, pending: true, materialized: false, settled: false, refused: false, blocked: false, assignmentIds: [],
+  });
+  assert.equal('status' in replayed.dag.nodes[0], false);
+});
+
+test('replaySession derives materialized, settled, blocked, pending, and terminal refused DAG facts deterministically', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_facts', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: dagDeclaration([
+      { id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] },
+      { id: 'review-v1', displayLabel: 'Review', semantics: { kind: 'operation' }, dependsOn: ['produce-v1'] },
+    ]),
+  }, { cwd: tempDir });
+
+  let nodes = replaySession('coord_dag_facts', { cwd: tempDir }).dag.nodes;
+  assert.equal(nodes[0].pending, true);
+  assert.equal(nodes[1].blocked, true);
+
+  const assignment = createSessionAssignment({
+    coordinationId: 'coord_dag_facts', taskKey: 'produce', actorId: 'doer', contract: inlineContract(), caller: { writerId: 'writer-1' },
+    authorizationProvenance: authorizeDagNode(tempDir, 'coord_dag_facts', 'produce-v1'),
+    dagNodeId: 'produce-v1',
+  }, { cwd: tempDir });
+  nodes = replaySession('coord_dag_facts', { cwd: tempDir }).dag.nodes;
+  assert.equal(nodes[0].materialized, true);
+  assert.equal(nodes[0].settled, false);
+  assert.equal(nodes[1].blocked, true);
+
+  linkResult('coord_dag_facts', { assignmentId: assignment.assignmentId, runId: `run_${assignment.assignmentId}_01` }, { cwd: tempDir });
+  nodes = replaySession('coord_dag_facts', { cwd: tempDir }).dag.nodes;
+  assert.equal(nodes[0].settled, true);
+  assert.equal(nodes[1].pending, true);
+
+  transitionSessionStatus('coord_dag_facts', 'completed', {}, { cwd: tempDir });
+  const completed = replaySession('coord_dag_facts', { cwd: tempDir });
+  assert.equal(completed.dag.nodes[1].pending, false);
+  assert.equal(completed.dag.nodes[1].refused, true);
+  assert.deepEqual(replaySession('coord_dag_facts', { cwd: tempDir }), completed);
+});
+
+test('replaySession treats unmaterialized nodes in a partial terminal DAG session as refused, not pending', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_partial', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: dagDeclaration([{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }]),
+  }, { cwd: tempDir });
+  transitionSessionStatus('coord_dag_partial', 'partial', { missingActors: ['doer'] }, { cwd: tempDir });
+  const node = replaySession('coord_dag_partial', { cwd: tempDir }).dag.nodes[0];
+  assert.equal(node.refused, true);
+  assert.equal(node.pending, false);
+});
+
+test('replaySession names an interrupted schema-3 open missing dag-declared rather than silently reconstructing it', () => {
+  const tempDir = mkTempDir();
+  openSession({
+    coordinationId: 'coord_dag_incomplete_open', objective: 'DAG.', provenanceRoot: { writerId: 'writer-1' }, schemaVersion: SCHEMA_VERSION_3,
+    dagDeclaration: dagDeclaration([{ id: 'produce-v1', displayLabel: 'Produce', semantics: { kind: 'operation' }, dependsOn: [] }]),
+  }, { cwd: tempDir });
+  const { eventsPath } = sessionPaths(tempDir, 'coord_dag_incomplete_open');
+  const openedOnly = fs.readFileSync(eventsPath, 'utf8').trimEnd().split('\n').find((line) => JSON.parse(line).type === 'session-opened');
+  fs.writeFileSync(eventsPath, `${openedOnly}\n`);
+  assert.throws(
+    () => replaySession('coord_dag_incomplete_open', { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && err.category === 'dangling-ref' && /has no "dag-declared" event/.test(err.message),
+  );
+});
+
+test('replaySession renders an old schema session explicitly as legacy-non-dag without inferring a declaration from Assignment evidence', () => {
+  const tempDir = mkTempDir();
+  openAndCreate(tempDir, 'coord_legacy_non_dag');
+  const replayed = replaySession('coord_legacy_non_dag', { cwd: tempDir });
+  assert.equal(replayed.dag.kind, 'legacy-non-dag');
+  assert.deepEqual(replayed.dag.nodes, []);
 });
 
 test('replaySession detects a dangling ref: assignmentRefs entry with no corresponding assignment-created event', () => {

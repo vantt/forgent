@@ -23,8 +23,14 @@
 // (accepting an object vs. a path, returning instead of printing). It does
 // not use herdr.
 import { runCoordinationUseCase } from '../../verbs/coordination/run.mjs';
+import { showCoordinationUseCase } from '../../verbs/coordination/show.mjs';
+import { chainCoordinationUseCase } from '../../verbs/coordination/chain.mjs';
 
-export { runCoordinationUseCase as __runCoordinationEngineEntryPoint };
+export {
+  runCoordinationUseCase as __runCoordinationEngineEntryPoint,
+  showCoordinationUseCase as __showCoordinationEngineEntryPoint,
+  chainCoordinationUseCase as __chainCoordinationEngineEntryPoint,
+};
 
 /**
  * Headless invocation of one coordination request. Identical validated-
@@ -56,4 +62,32 @@ export async function runCoordinationHeadless(request, options = {}) {
     cliModel: options.model,
     cliTier: options.tier,
   });
+}
+
+/**
+ * Headless invocation of coordination show. Identical to `fgos coordination show <id>`
+ * (`showCoordinationUseCase`, called directly, unmodified).
+ *
+ * @param {string} id The coordination session id.
+ * @param {object} [options]
+ * @param {object} [options.ctx] `{cwd, repoRoot, packageRoot?}`, forwarded unchanged to `showCoordinationUseCase`.
+ * @returns {object} The same data shape `fgos coordination show` returns.
+ */
+export function showCoordinationHeadless(id, options = {}) {
+  const ctx = options.ctx ?? {};
+  return showCoordinationUseCase(ctx, { id });
+}
+
+/**
+ * Headless invocation of coordination chain. Identical to `fgos coordination chain <track>`
+ * (`chainCoordinationUseCase`, called directly, unmodified).
+ *
+ * @param {string} track The track name.
+ * @param {object} [options]
+ * @param {object} [options.ctx] `{cwd, repoRoot, packageRoot?}`, forwarded unchanged to `chainCoordinationUseCase`.
+ * @returns {object} The same data shape `fgos coordination chain` returns.
+ */
+export function chainCoordinationHeadless(track, options = {}) {
+  const ctx = options.ctx ?? {};
+  return chainCoordinationUseCase(ctx, { track });
 }
