@@ -80,3 +80,36 @@ test('approve gate: aborts cleanly on test failure without modifying main', asyn
   const finalTip = execGit(cwd, ['rev-parse', 'HEAD']).trim();
   assert.equal(finalTip, newTargetTip, 'main ref should not have moved');
 });
+
+test('root-into-main merge gate: verify sees the merged tree\'s own declared dependencies installed', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const os = await import('node:os');
+  // A local `file:` dependency resolves entirely offline, so provisioning
+  // stays fast and never hits the registry.
+  const depDir = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-localdep-'));
+  fs.writeFileSync(path.join(depDir, 'package.json'), JSON.stringify({ name: 'fgos-merge-gate-localdep', version: '1.0.0' }));
+  fs.writeFileSync(path.join(depDir, 'index.js'), 'module.exports = {};\n');
+
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-deps-'));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  fs.writeFileSync(path.join(cwd, 'package.json'), JSON.stringify({ name: 'host', version: '1.0.0', dependencies: { 'fgos-merge-gate-localdep': `file:${depDir}` } }));
+  execGit(cwd, ['add', 'package.json']);
+  execGit(cwd, ['commit', '-m', 'declare dependency']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+
+  execGit(cwd, ['branch', 'fgw/tsk-dep', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-dep']);
+  fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
+  execGit(cwd, ['add', 'feature.txt']);
+  execGit(cwd, ['commit', '-m', 'add feature']);
+  execGit(cwd, ['checkout', 'main']);
+  const mainBefore = execGit(cwd, ['rev-parse', 'HEAD']).trim();
+
+  const item = { id: 'tsk-dep', verify: `node -e "require('fgos-merge-gate-localdep')"` };
+  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-dep', { timeoutMs: 60000 });
+
+  assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
+  assert.notEqual(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore, 'main should advance to the merge commit');
+});

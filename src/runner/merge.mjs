@@ -1805,7 +1805,7 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
   }, HEARTBEAT_INTERVAL_MS).unref();
 
   try {
-  const { detectTrunk, resolveRefSha, WorktreeError } = await import('./worktree.mjs');
+  const { detectTrunk, resolveRefSha, provisionDependencies, WorktreeError } = await import('./worktree.mjs');
   const targetBranch = detectTrunk(repoRoot);
   const targetTip = resolveRefSha(repoRoot, targetBranch);
   const branchTip = resolveRefSha(repoRoot, branch);
@@ -1848,6 +1848,12 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs }
     }
 
     const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
+    // A fresh `git worktree add` checks out tracked files only -- verify
+    // needs the MERGED tree's own declared dependencies installed, exactly
+    // like every other disposable checkout this runner stands up
+    // (finishWorktreeSetup, worktree.mjs). Provisioned after the merge so a
+    // dependency the branch itself adds is installed too.
+    if (!skipRedundantChecks) provisionDependencies(worktreePath);
     check = skipRedundantChecks
       ? {
           passed: true,
