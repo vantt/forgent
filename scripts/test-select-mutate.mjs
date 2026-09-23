@@ -74,11 +74,21 @@ export function runNightlyMutations() {
         if (parsed.decision) {
           result = {
             relatedPassed: exitCode === 0,
-            fullPassed: true, // We stopped running full suite, so assume it would pass if related passed
+            fullPassed: false,
             syntaxError: false
           };
           if (parsed.decision === 'full') {
             result.relatedPassed = exitCode === 0;
+          }
+          // AC 5: run full ONLY if related passed
+          if (result.relatedPassed) {
+            try {
+              const execSync = require('node:child_process').execSync;
+              execSync('node scripts/run-tests.mjs', { cwd: worktreePath, stdio: 'ignore' });
+              result.fullPassed = true;
+            } catch (err) {
+              result.fullPassed = false;
+            }
           }
         }
       } catch (e) {
