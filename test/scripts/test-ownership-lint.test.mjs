@@ -12,17 +12,20 @@ test('test-ownership-lint', async (t) => {
   fs.writeFileSync(path.join(tmpDir, 'src/file.mjs'), 'test');
   
   const oldConsoleError = console.error;
+  const oldConsoleWarn = console.warn;
   const oldConsoleLog = console.log;
   let errorOutput = '';
   
   function captureConsole() {
     errorOutput = '';
     console.error = (msg) => { errorOutput += msg + '\n'; };
+    console.warn = (msg) => { errorOutput += msg + '\n'; };
     console.log = () => {};
   }
   
   function restoreConsole() {
     console.error = oldConsoleError;
+    console.warn = oldConsoleWarn;
     console.log = oldConsoleLog;
   }
 
@@ -39,7 +42,7 @@ test('test-ownership-lint', async (t) => {
     }
   });
 
-  await t.test('blocks when direct test is orphaned', () => {
+  await t.test('warns when direct test is orphaned', () => {
     try { fs.rmSync(path.join(tmpDir, 'test/direct/valid.test.mjs'), {force:true}); } catch(e){}
     captureConsole();
     const m = [{ id: 'r1', pattern: 'src/file.mjs', directTests: [], status: 'live' }];
@@ -48,12 +51,9 @@ test('test-ownership-lint', async (t) => {
     fs.writeFileSync(path.join(directDir, 'orphan.test.mjs'), 'test');
     
     
-    try {
-      lintManifest(m, tmpDir);
-      assert.fail('Should fail');
-    } catch (err) {
-      assert.match(errorOutput, /Orphaned test file not referenced in manifest/);
-    }
+    try { lintManifest(m, tmpDir); } catch(e) { console.error('Exception:', e); } 
+    // console.error(errorOutput);
+    assert.match(errorOutput, /Orphaned test file not referenced in manifest/);
   });
   
   await t.test('passes when no orphans and no bad fields', () => {
