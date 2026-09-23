@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -308,4 +308,20 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal('NODE_TEST_CONTEXT' in env, false);
   assert.equal(env.KEEP, 'yes');
   assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
+});
+
+test('runSelectedTests gives the run its own temp root and removes it afterwards, so test fixtures never pile up in the shared temp dir', () => {
+  let seenTmp = null;
+  const spawn = (execPath, argv, opts) => {
+    seenTmp = opts.env.TMPDIR;
+    assert.equal(opts.env.TMP, seenTmp);
+    assert.equal(opts.env.TEMP, seenTmp);
+    assert.ok(fs.statSync(seenTmp).isDirectory(), 'the root exists while the tests run');
+    fs.writeFileSync(path.join(seenTmp, 'leaked-fixture.txt'), 'x');
+    return { status: 0 };
+  };
+  const { status } = runSelectedTests([path.join(REPO_ROOT, 'test/smoke.test.mjs')], { spawn, stdio: 'ignore' });
+  assert.equal(status, 0);
+  assert.match(path.basename(seenTmp), /^fgos-test-run-/);
+  assert.equal(fs.existsSync(seenTmp), false, 'the whole per-run root, leftovers included, is gone after the run');
 });

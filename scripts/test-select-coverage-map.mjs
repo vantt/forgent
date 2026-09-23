@@ -250,9 +250,14 @@ export async function collectPerFileCoverage(testFiles, {
     const covDir = path.join(covRoot, encodeURIComponent(file));
     fs.mkdirSync(covDir, { recursive: true });
     const t0 = Date.now();
+    // Same per-run temp root as run-tests.mjs: whatever fixtures this file
+    // leaves behind are removed with it instead of piling up in the shared
+    // temp dir across the nightly's hundreds of per-file runs.
+    const baseEnv = buildTestEnv(env);
+    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
     const child = spawn(execPath, ['--test', absFile], {
       cwd: repoRoot,
-      env: { ...buildTestEnv(env), NODE_V8_COVERAGE: covDir },
+      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },
       stdio: 'ignore',
       detached: process.platform !== 'win32',
     });
@@ -268,6 +273,7 @@ export async function collectPerFileCoverage(testFiles, {
     }, timeoutMs);
     const finish = (outcome) => {
       clearTimeout(timer);
+      try { fs.rmSync(tmpRoot, { recursive: true, force: true, maxRetries: 3 }); } catch {}
       resolve({ file, covDir, outcome, durationMs: Date.now() - t0 });
     };
     child.on('error', () => finish('spawn-failed'));

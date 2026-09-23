@@ -117,8 +117,27 @@ export function runSelectedTests(files, {
   stdio = 'inherit',
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
-  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: buildTestEnv(env), stdio });
-  return { status: result.status ?? 1, files: relFiles };
+  // Every temp dir a test makes lands in one per-run root that is removed
+  // when the run ends. Tests create fixtures under os.tmpdir() and most never
+  // delete them; left in the shared temp dir they accumulated by the hundred
+  // thousand across runs until the filesystem ran out of inodes (ENOSPC on
+  // every mkdtemp, machine-wide).
+  const childEnv = buildTestEnv(env);
+  const runTmpRoot = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
+  try {
+    const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), {
+      cwd,
+      env: { ...childEnv, TMPDIR: runTmpRoot, TMP: runTmpRoot, TEMP: runTmpRoot },
+      stdio,
+    });
+    return { status: result.status ?? 1, files: relFiles };
+  } finally {
+    try {
+      fs.rmSync(runTmpRoot, { recursive: true, force: true, maxRetries: 3 });
+    } catch {
+      // A file still held open (Windows) must not turn a finished run into a failure.
+    }
+  }
 }
 
 /**
