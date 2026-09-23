@@ -1790,7 +1790,7 @@ export async function performCatchUp(repoRoot, id, item, target, timeoutMs) {
  * no-wait caller is refused in milliseconds instead of after a full verify.
  */
 export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, lockWaitMs = CAS_LAND_LOCK_WAIT_MS, failFastIfLocked = false } = {}) {
-  const { detectTrunk, resolveRefSha, provisionDependencies } = await import('./worktree.mjs');
+  const { detectTrunk, resolveRefSha, provisionDependencies, runWorktreeSetupCommands } = await import('./worktree.mjs');
   const { execFileSync } = await import('child_process');
 
   if (failFastIfLocked) {
@@ -1847,11 +1847,20 @@ export async function mergeRootIntoMainCas(repoRoot, item, branch, { timeoutMs, 
 
     const skipRedundantChecks = mergedTreeAlreadyVerified(repoRoot, item, branch);
     // A fresh `git worktree add` checks out tracked files only -- verify
-    // needs the MERGED tree's own declared dependencies installed, exactly
-    // like every other disposable checkout this runner stands up
-    // (finishWorktreeSetup, worktree.mjs). Provisioned after the merge so a
-    // dependency the branch itself adds is installed too.
-    if (!skipRedundantChecks) provisionDependencies(worktreePath);
+    // needs the MERGED tree's own declared dependencies installed and the
+    // project's worktreeSetup commands run, exactly like every other
+    // disposable checkout this runner stands up (finishWorktreeSetup,
+    // worktree.mjs). Done after the merge so anything the branch itself
+    // adds is covered too. A failed setup is reported as a failed verify:
+    // the merged tree could not be made verifiable, main stays untouched.
+    if (!skipRedundantChecks) {
+      try {
+        provisionDependencies(worktreePath);
+        runWorktreeSetupCommands(worktreePath, repoRoot);
+      } catch (err) {
+        return { outcome: 'verify-fail', branch, check: { passed: false, status: 1, timedOut: false, output: err.message } };
+      }
+    }
     check = skipRedundantChecks
       ? {
           passed: true,

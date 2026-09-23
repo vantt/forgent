@@ -69,6 +69,8 @@ import {
   writeSharedConfig,
   readInvariantCheckCommands,
   DEFAULT_INVARIANT_CHECK_COMMANDS,
+  readWorktreeSetupCommands,
+  DEFAULT_WORKTREE_SETUP_COMMANDS,
 } from '../config/shared-config-file.mjs';
 import { DEFAULT_LEVEL, LEVELS } from '../state/gate-bypass.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../state/worker-slots.mjs';
@@ -2154,6 +2156,45 @@ registerCheck({
   id: 'invariant-checks-configured',
   description: 'invariantChecks.commands in the shared config file yields at least one runnable command',
   check: (cwd) => checkInvariantChecksConfigured(cwd),
+});
+
+// worktreeSetup: project commands every runner-created worktree runs after
+// its dependency install (e.g. building a binary the test suite needs).
+// Registered so `fgos setup` writes the (empty) default and `fgos doctor`
+// sees the section; like invariantChecks, doctor never executes them.
+registerConfigDefault({
+  id: 'worktreeSetup',
+  key: 'worktreeSetup',
+  shape: { commands: DEFAULT_WORKTREE_SETUP_COMMANDS },
+});
+
+// An empty list is a valid choice (nothing beyond the dependency install),
+// so only a present-but-malformed section fails: it reads as zero commands
+// and silently skips setup while looking configured. The wholly-missing
+// case is already covered generically by checkConfigNotStale.
+function checkWorktreeSetupConfigured(cwd) {
+  const section = readSharedConfig(cwd).worktreeSetup;
+  if (section === undefined) {
+    return { passed: true, message: 'worktreeSetup section absent -- worktrees get only their dependency install' };
+  }
+  const commands = readWorktreeSetupCommands(cwd);
+  const declared = section && typeof section === 'object' && Array.isArray(section.commands) ? section.commands.length : null;
+  if (declared === null || declared !== commands.length) {
+    return {
+      passed: false,
+      message: 'worktreeSetup is present but malformed -- expected { "commands": ["<shell command>", ...] } with only non-empty strings',
+    };
+  }
+  if (commands.length === 0) {
+    return { passed: true, message: 'worktreeSetup.commands is empty -- worktrees get only their dependency install' };
+  }
+  return { passed: true, message: `worktreeSetup.commands = ${commands.length} command(s): ${commands.join(' && ')}` };
+}
+
+registerCheck({
+  id: 'worktree-setup-configured',
+  description: 'worktreeSetup.commands in the shared config file is a list of non-empty shell commands (malformed silently skips worktree setup)',
+  check: (cwd) => checkWorktreeSetupConfigured(cwd),
 });
 
 registerCheck({

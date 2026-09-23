@@ -140,3 +140,39 @@ test('root-into-main merge gate: verify runs without holding main-checkout.lock,
   assert.equal(fs.existsSync(lockPath), false, 'the lock is released after landing');
   assert.ok(fs.existsSync(path.join(cwd, 'feature.txt')), 'main checkout working tree synced to the merge');
 });
+
+async function casRepoWithSetup(commands) {
+  const os = await import('node:os');
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-setup-'));
+  execGit(cwd, ['init', '--initial-branch=main']);
+  execGit(cwd, ['config', 'user.name', 'Test']);
+  execGit(cwd, ['config', 'user.email', 'test@example.com']);
+  execGit(cwd, ['commit', '--allow-empty', '-m', 'initial']);
+  fs.mkdirSync(path.join(cwd, '.fgos'));
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands } }));
+  execGit(cwd, ['branch', 'fgw/tsk-setup', 'HEAD']);
+  execGit(cwd, ['checkout', 'fgw/tsk-setup']);
+  fs.writeFileSync(path.join(cwd, 'feature.txt'), 'feature\n');
+  execGit(cwd, ['add', 'feature.txt']);
+  execGit(cwd, ['commit', '-m', 'add feature']);
+  execGit(cwd, ['checkout', 'main']);
+  return cwd;
+}
+
+test('root-into-main merge gate: runs the project\'s worktreeSetup commands before verify (e.g. building an artifact the suite needs)', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const cwd = await casRepoWithSetup(['echo built > build-artifact.txt']);
+  const item = { id: 'tsk-setup', verify: `node -e "process.exit(require('fs').existsSync('build-artifact.txt') ? 0 : 1)"` };
+  const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-setup', { timeoutMs: 60000 });
+  assert.equal(result.outcome, 'merged', `expected merged, got ${result.outcome}: ${result.check?.output ?? ''}`);
+});
+
+test('root-into-main merge gate: a failing worktreeSetup command is a verify-fail naming the command, main untouched', async () => {
+  const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
+  const cwd = await casRepoWithSetup(['echo setup-broke >&2; exit 2']);
+  const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
+  const result = await mergeRootIntoMainCas(cwd, { id: 'tsk-setup', verify: 'true' }, 'fgw/tsk-setup', { timeoutMs: 60000 });
+  assert.equal(result.outcome, 'verify-fail');
+  assert.match(result.check.output, /setup-broke/);
+  assert.equal(execGit(cwd, ['rev-parse', 'main']).trim(), mainBefore);
+});

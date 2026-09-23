@@ -1434,3 +1434,38 @@ test('checkoutDirtyPaths returns empty array on invalid directory or git error',
   const tmpDir = mkWorktreeDir();
   assert.deepEqual(checkoutDirtyPaths(tmpDir, tmpDir), []);
 });
+
+// --- runWorktreeSetupCommands (worktreeSetup.commands) ----------------------
+
+function writeRepoConfig(repoRoot, config) {
+  fs.mkdirSync(path.join(repoRoot, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, '.fgos', 'config.json'), JSON.stringify(config));
+}
+
+test('createWorktree runs the configured worktreeSetup commands inside the new worktree, in order, with FGOS_REPO_ROOT set', () => {
+  const repoRoot = initTempRepo();
+  writeRepoConfig(repoRoot, {
+    worktreeSetup: { commands: ['echo one > setup-order.txt', 'echo "$FGOS_REPO_ROOT" >> setup-order.txt'] },
+  });
+  const wt = createWorktree(repoRoot, 'item-setup', { worktreeDir: mkWorktreeDir() });
+  const lines = fs.readFileSync(path.join(wt.path, 'setup-order.txt'), 'utf8').trim().split('\n');
+  assert.deepEqual(lines, ['one', repoRoot]);
+});
+
+test('createWorktree with no worktreeSetup section runs nothing extra', () => {
+  const repoRoot = initTempRepo();
+  const wt = createWorktree(repoRoot, 'item-nosetup', { worktreeDir: mkWorktreeDir() });
+  assert.equal(fs.existsSync(path.join(wt.path, 'setup-order.txt')), false);
+});
+
+test('a failing worktreeSetup command throws WorktreeError naming the command and its output, and the half-built worktree is removed', () => {
+  const repoRoot = initTempRepo();
+  writeRepoConfig(repoRoot, { worktreeSetup: { commands: ['echo boom-output >&2; exit 3'] } });
+  const worktreeDir = mkWorktreeDir();
+  assert.throws(
+    () => createWorktree(repoRoot, 'item-badsetup', { worktreeDir }),
+    (err) => err instanceof WorktreeError && /exit 3/.test(err.message) && /boom-output/.test(err.message),
+  );
+  const registered = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
+  assert.doesNotMatch(registered, /item-badsetup/);
+});
