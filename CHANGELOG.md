@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
 - **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
 - **Changed**: `fgos return` now emits `[WARN C4]` when `item.verify` references a test selector (`test:related`, `test-select`, `test:select`), warning that test selectors must not replace full suite in authoritative verification.
+- **Fixed**: the nightly mutation-testing baseline (`test:select:mutate`) always ran against a clean checkout with zero local changes, which the selector always answers "refuse" to — so the whole nightly run silently returned an empty ledger without ever actually testing a single mutant. Baseline now runs per mutant, against that mutant's own rule-related tests, inside the detached worktree before mutation.
+- **Fixed**: `test:select:compare` never checked whether each OS's full-suite run actually completed (its `test-marker.json`) before trusting an empty failure list from that OS's junit — a crashed or partial run could read as "nothing failed here" instead of inconclusive. It now reads each OS's marker first and reports `inconclusive` if any is missing or incomplete.
 
 ### Added
 
-- **CI**: Added `selector-nightly.yml`, a scheduled job that runs the test-selector's coverage-map and mutation-testing scripts nightly. As shipped, its mutation baseline runs against a clean checkout with zero changes, so the selector always refuses and no mutant is ever actually exercised — the job currently produces a ledger artifact without validating anything; treat it as scaffolding, not a working fault-injection gate, until that baseline is fixed.
+- **CI**: Added `selector-nightly.yml`, a scheduled job that runs the test-selector's coverage-map and mutation-testing scripts nightly.
 - **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
 - **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 - **Scripts**: Added `npm run test:select:promote` (`scripts/test-select-promote.mjs`) for conservative per-rule promotion and recovery (§3.1, §3.4, §4.3, §14).
