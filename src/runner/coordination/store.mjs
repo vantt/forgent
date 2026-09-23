@@ -35,7 +35,7 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
-import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort, fsyncFileBestEffort } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
@@ -303,9 +303,10 @@ export function openSession(
       try {
         const claimPath = path.join(claimDir, 'claim.json');
         fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-        const fd = fs.openSync(claimPath, 'r');
-        fs.fsyncSync(fd);
-        fs.closeSync(fd);
+        // 'r+' and an always-closed fd: Windows refuses fsync on a read-only
+        // handle, and an fd left open by that throw kept claim.json undeletable
+        // so the cleanup below failed with ENOTEMPTY, masking the real error.
+        fsyncFileBestEffort(claimPath);
         // Directory fsync is best-effort: Windows cannot open a directory
         // for fsync at all, and that must not abort (and mask) the claim.
         fsyncDirBestEffort(claimDir);
@@ -331,9 +332,10 @@ export function openSession(
         try {
           const claimPath = path.join(claimDir, 'claim.json');
           fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-          const fd = fs.openSync(claimPath, 'r');
-          fs.fsyncSync(fd);
-          fs.closeSync(fd);
+          // 'r+' and an always-closed fd: Windows refuses fsync on a read-only
+          // handle, and an fd left open by that throw kept claim.json undeletable
+          // so the cleanup below failed with ENOTEMPTY, masking the real error.
+          fsyncFileBestEffort(claimPath);
           fsyncDirBestEffort(claimDir);
 
           if (!fs.existsSync(sessionDir)) {
@@ -390,17 +392,9 @@ export function openSession(
     }
 
     // Fsync files and staging directory for crash durability
-    if (snapshotRef) {
-      const fdSnap = fs.openSync(path.join(stagingDir, 'snapshot.json'), 'r');
-      fs.fsyncSync(fdSnap);
-      fs.closeSync(fdSnap);
-    }
-    const fdSess = fs.openSync(path.join(stagingDir, 'session.json'), 'r');
-    fs.fsyncSync(fdSess);
-    fs.closeSync(fdSess);
-    const fdEv = fs.openSync(eventsPath, 'r');
-    fs.fsyncSync(fdEv);
-    fs.closeSync(fdEv);
+    if (snapshotRef) fsyncFileBestEffort(path.join(stagingDir, 'snapshot.json'));
+    fsyncFileBestEffort(path.join(stagingDir, 'session.json'));
+    fsyncFileBestEffort(eventsPath);
     fsyncDirBestEffort(stagingDir);
 
     try {
