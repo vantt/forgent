@@ -9,10 +9,11 @@
 - **Integration Baseline**: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
 - **Evaluated Candidate SHA**: `a208bf555927b508ddfa0523009ce87aac1dd0af` (Approved by independent review; 0 blocker, 0 high)
 - **Synchronization Merge Commit**: `c624fe583fe089cb177c44df315dc451ba1d8e1f`
+- **Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba`
 - **Porting Evidence Tip**: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
-- **Status**: `implemented` (synchronized with main@cc687d92; NOT integrated into main; I10 blocked)
+- **Status**: `integrated at 1ca4023c; post-merge verification pending`
 - **Capability**: `code:implement`
-- **Next Dependency Gate**: `I10` remains BLOCKED until synchronized tip is reviewed, integrated into main, and post-merge verification passes.
+- **Next Dependency Gate**: `I10` remains BLOCKED pending fix and independent re-review of post-merge verification.
 
 ---
 
@@ -201,6 +202,18 @@ All review findings from the independent review rounds (evaluated commits `d5209
   - Authoritative blast radius for Unit I09 remains the un-degraded measurement from candidate evaluation: **CRITICAL blast radius, 189 symbols, and 35 processes**.
 - **Accounting**: Non-blocking for integration; GitNexus index re-analysis (`node .gitnexus/run.cjs analyze`) queued for post-integration baseline / I10.
 
+### 4.16 I09-REV-15 (MEDIUM) — Candidate-Caused Load-Sensitive Test Timing Regression
+- **Finding**:
+  - In `test/runner/coordination-r5-hard-budgets.test.mjs`, candidate commit `d52093fb` reduced `wallTimeMs` from `1000` to `200` and delay from `1050ms` to `250ms` in `proposeConsult` and `retrySessionTask` tests. Under full-suite parallel execution load, session initialization consumed budget before the deliberate delay elapsed, causing intermittent test failures.
+  - In `test/verbs/coordination-run-driver-steps.test.mjs`, candidate commit `d52093fb` set `wallTimeMs: 600` with `setTimeout(resolve, 700)`. Under full-suite load, initial `produceStep` execution took ~837ms, exhausting the 600ms budget before the first step could settle.
+  - Test descriptions and inline comments also carried ephemeral `Phase 04 H-2` audit labels in `test/runner/coordination-r5-hard-budgets.test.mjs` and `test/verbs/coordination-run-driver-steps.test.mjs`.
+- **Resolution**:
+  - Restored safe margins `wallTimeMs: 1000` and `setTimeout(resolve, 1050)` in both `proposeConsult` and `retrySessionTask` tests in `test/runner/coordination-r5-hard-budgets.test.mjs` (0 changes to production runtime).
+  - Widened `wallTimeMs` to `1500` and delay to `1600ms` in `test/verbs/coordination-run-driver-steps.test.mjs`, providing robust margin for subprocess startup while reliably testing wall-time rejection on resume.
+  - Replaced `Phase 04 H-2` labels with stable behavioral descriptions in both test files.
+  - Verified 43/43 pass across 3 consecutive independent runs with zero flakiness in hard-budgets, 86/86 pass in run-driver-steps, and 538/538 pass across the focused matrix.
+- **Baseline Defect Separation**: Pre-existing failures in `fgos-approve.test.mjs` (D2/D3) reproduce identically on exact baseline `main@cc687d92` and are independent of Unit I09.
+
 ---
 
 ## 5. Disposition & Readiness
@@ -210,12 +223,13 @@ All review findings from the independent review rounds (evaluated commits `d5209
 - **Current Integration Baseline**: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
 - **Evaluated Candidate**: `a208bf555927b508ddfa0523009ce87aac1dd0af` (Evaluated & APPROVED by independent review: 0 blocker, 0 high).
 - **Synchronized Implementation Candidate**: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (Merges `main@cc687d92` into branch `coordination-skill-harness-i09-dag-forward-port`; CHANGELOG conflict resolved preserving all entries).
-- **Status-Recording SHA**: `524579b41d51b617fcc8e1fbf35bdd9c1efb77e7` (records initial sync accounting).
-- **Integration Status**: **NOT integrated into main yet**.
-- **Next Gate**: **Unit I10 remains BLOCKED** until the synchronized implementation candidate is approved for integration, merged into main, and post-merge verification passes.
+- **Status-Recording Commits**: `524579b41d51b617fcc8e1fbf35bdd9c1efb77e7` and `dd4fb2e54f95afe5a68b6bcc092bd3d929de96d8`.
+- **Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba` (Merges `cc687d92` + `dd4fb2e5`; verified topology and preserved local state).
+- **Integration Status**: **Integrated at 1ca4023c; post-merge verification pending**.
+- **Next Gate**: **Unit I10 remains BLOCKED** pending fix and independent re-review of post-merge verification.
 
 ### 5.2 Verification Summary
 - `git diff --check`: clean (exit 0).
 - Focused 14-suite matrix: **538 passed / 0 failed**.
-- Full suite verification (`npm test`): **Candidate regressions = 0**. Failures in `fgos-approve.test.mjs` (D2/D3) reproduce identically on exact baseline `main@cc687d92`; transient timing failures (`coordination-r5-hard-budgets.test.mjs`, `herdr-spawn-adapter.test.mjs`) pass 100% cleanly in isolated reruns.
+- Full suite verification (`npm test`): **Candidate regressions = 0**. Failures in `fgos-approve.test.mjs` (D2/D3) reproduce identically on exact baseline `main@cc687d92`.
 - GitNexus Blast Radius: **CRITICAL (189 symbols, 35 processes)**. Tip index is degraded/stale per REV-14 and will be re-analyzed post-integration.

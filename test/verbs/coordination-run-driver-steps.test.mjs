@@ -1887,7 +1887,7 @@ test('Phase 04 H-1: concurrency-cap admission refusal carries code "concurrency-
   assert.equal(err.code, 'concurrency-cap', 'the ONLY deferrable refusal must carry this exact machine code');
 });
 
-test('Phase 04 H-2: aggregateBounds.maxAssignments refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
+test('aggregateBounds.maxAssignments refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
   const { ctx } = setup();
   const raw = request({ coordinationId: 'p04-h2-maxassignments', aggregateBounds: { maxAssignments: 1 }, steps: [produceStep(), reviewStep()] });
   await assert.rejects(
@@ -1896,7 +1896,7 @@ test('Phase 04 H-2: aggregateBounds.maxAssignments refusal via the real request 
   );
 });
 
-test('Phase 04 H-2: aggregateBounds.maxRounds refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
+test('aggregateBounds.maxRounds refusal via the real request door is refused-shaped and never carries code "concurrency-cap"', async () => {
   const { ctx } = setup();
   const raw = request({ coordinationId: 'p04-h2-maxrounds', aggregateBounds: { maxRounds: 1, maxAssignments: 10 }, steps: [produceStep(), reviewStep()] });
   await assert.rejects(
@@ -1905,13 +1905,13 @@ test('Phase 04 H-2: aggregateBounds.maxRounds refusal via the real request door 
   );
 });
 
-test('Phase 04 H-2: aggregateBounds.wallTimeMs refusal via the real request door (on resume) is refused-shaped and never carries code "concurrency-cap"', async () => {
+test('aggregateBounds.wallTimeMs refusal via the real request door (on resume) is refused-shaped and never carries code "concurrency-cap"', async () => {
   const { ctx } = setup();
   const coordinationId = 'p04-h2-walltime';
-  await runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 600 }, steps: [produceStep()] }) });
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  await runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 1500 }, steps: [produceStep()] }) });
+  await new Promise((resolve) => setTimeout(resolve, 1600));
   await assert.rejects(
-    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 600 }, steps: [produceStep(), reviewStep()] }) }),
+    runCoordinationUseCase(ctx, { requestObject: request({ coordinationId, aggregateBounds: { wallTimeMs: 1500 }, steps: [produceStep(), reviewStep()] }) }),
     (err) => err instanceof CoordinationError && err.category === 'validation' && err.code !== 'concurrency-cap' && /wall-time budget/.test(err.message),
   );
 });
