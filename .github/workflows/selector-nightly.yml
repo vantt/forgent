@@ -16,11 +16,26 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Same test environment as ci.yml's `test` job: coverage and the
+      # mutation full-suite runs are only meaningful against the suite CI
+      # actually runs (zsh-based, git-committing and rust-host tests fail
+      # for environmental reasons otherwise).
+      - name: Install Linux test tools
+        run: sudo apt-get update && sudo apt-get install -y bubblewrap zsh
+
+      - name: Configure git identity for fixture repos
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
       - run: npm install
+
+      - name: Build Rust release binaries for npm tests
+        run: cargo build --release --workspace
 
       - name: Run coverage map generator
         run: node scripts/test-select-coverage-map.mjs
