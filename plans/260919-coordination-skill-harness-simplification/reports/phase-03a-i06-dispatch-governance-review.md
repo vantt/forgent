@@ -6,8 +6,8 @@
 - **Branch**: `coordination-skill-harness-i06-dispatch-governance`
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i06-dispatch-governance`
 - **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
-- **Candidate Lineage**: `b67f3794ae545d9ddcb3ce711879dd1c4dc1f012` -> `2e210796322cbb950a95703aa7b4d05ed357cd03`
-- **Current Candidate Status**: `implemented` (ready for independent re-review verification; non-integrated candidate)
+- **Candidate Lineage**: `b67f3794ae545d9ddcb3ce711879dd1c4dc1f012` -> `2e210796322cbb950a95703aa7b4d05ed357cd03` -> `d6dc386f442698a07dfadb01c151ec927cedd819`
+- **Current Candidate Status**: `implemented` (status: `implemented`; ready for independent re-review verification; non-integrated candidate)
 - **Next Dependency Gate**: Unit I08 (dispatch verification) and Unit I09 (DAG forward-port)
 
 ---
@@ -21,7 +21,8 @@
 | **Round 1 Verdict** | `REQUEST CHANGES` (I06-REV-01 whitespace gate; I06-REV-02 full-suite classification) |
 | **Round 2 Candidate** | `2e210796322cbb950a95703aa7b4d05ed357cd03` |
 | **Round 2 Verdict** | `REQUEST CHANGES` (I06-TM-01 cross-plan status accounting contract) |
-| **Ancestry** | Base is direct ancestor of candidate; 0 behind / 1 ahead |
+| **Round 3 Candidate** | `d6dc386f442698a07dfadb01c151ec927cedd819` |
+| **Ancestry** | Base is direct ancestor of candidate; range 0 behind / 2 ahead |
 | **Branch / Worktree** | `coordination-skill-harness-i06-dispatch-governance` |
 | **Integration Status** | **Not integrated**; candidate remains on isolated worktree branch |
 

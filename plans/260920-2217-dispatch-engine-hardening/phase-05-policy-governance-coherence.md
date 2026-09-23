@@ -7,8 +7,8 @@ Wave 3 · Gate: D1 cho H6(b); M5 phối hợp chủ plan `260915-executor-policy
 - **Status**: `implemented` (awaiting independent review verification; not claimed as integrated).
 - **Candidate Branch**: `coordination-skill-harness-i06-dispatch-governance`
 - **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
-- **Candidate SHA**: `2e210796322cbb950a95703aa7b4d05ed357cd03` (lineage `b67f3794` -> `2e210796`)
-- **Last-Verified Date / Revision**: 2026-09-23 at revision `2e210796`
+- **Candidate SHA**: `d6dc386f442698a07dfadb01c151ec927cedd819` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f`)
+- **Last-Verified Date / Revision**: 2026-09-23 at revision `d6dc386f`
 - **Next Dependency Gate**: Unit I08 (dispatch governance/CLI/doctor verification) and Unit I09 (DAG forward-port).
 - **Direct Candidate Evidence**:
   - `node --test test/architecture.test.mjs test/runner/dispatch-cross-provider-redirect.test.mjs test/runner/placement-policy-matrix-coverage.test.mjs test/runner/placement-policy-redirect-selection.test.mjs test/runner/placement-policy.test.mjs test/runner/dispatch-coordination-role-tiers.test.mjs`: 101 pass / 0 fail (~4.1s).

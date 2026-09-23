@@ -6,7 +6,7 @@
 - **Branch**: `coordination-skill-harness-i06-dispatch-governance`
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i06-dispatch-governance`
 - **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
-- **Candidate SHA**: `2e210796322cbb950a95703aa7b4d05ed357cd03` (lineage `b67f3794` -> `2e210796`)
+- **Candidate SHA**: `d6dc386f442698a07dfadb01c151ec927cedd819` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f`)
 - **Status**: `implemented` (pre-merge implementation complete; non-integrated candidate)
 - **Capability**: `code:implement`
 - **Next Dependency Gate**: `I08` (dispatch verification), `I09` (DAG forward-port)

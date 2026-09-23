@@ -802,8 +802,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
   status: implemented
   candidate-branch: `coordination-skill-harness-i06-dispatch-governance`
   base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
-  candidate-sha: `2e210796322cbb950a95703aa7b4d05ed357cd03` (lineage `b67f3794` -> `2e210796`)
-  last-verified: 2026-09-23 at candidate `2e210796`
+  candidate-sha: `d6dc386f442698a07dfadb01c151ec927cedd819` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f`)
+  last-verified: 2026-09-23 at candidate `d6dc386f`
   next-dependency-gate: I08 (requires I06 and I07), I09 (requires I02, I04, and I06)
   candidate-verification: 101 pass / 0 fail on focused architecture/redirect/PlacementPolicy smoke; 75 pass / 0 fail in assignment-dispatch.test.mjs; 560 pass / 0 fail on full dispatch matrix; 317 pass / 0 fail on 11-suite coordination matrix; git diff --check exits 0
   historical-verification: 529 tests from initial Phase 05 exploration (2026-09-22 morning)
