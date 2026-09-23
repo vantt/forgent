@@ -352,7 +352,7 @@ export async function approveUseCase(
   // combination of --github + a non-runner-sourced item + a linked
   // worktree, which now sees the worktree-identity refusal instead of this
   // block's own source-mismatch message.
-  if (github && process.env.NODE_ENV !== 'test' && process.env.FGOS_TEST_SUITE !== '1') {
+  if (github && process.env.NODE_ENV !== 'test') {
     throw new StoreError('validation', 'approve --github is explicitly forbidden (test suite bypass not allowed for trunk merges).');
   }
   if (github) {
