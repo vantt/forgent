@@ -28,6 +28,7 @@
     "test:select:plan": "node scripts/test-select.mjs",
     "test:select:compare": "node scripts/test-select-compare.mjs",
     "test:select:mutate": "node scripts/test-select-mutate.mjs",
+    "test:select:promote": "node scripts/test-select-promote.mjs",
     "test:select:coverage-map": "node scripts/test-select-coverage-map.mjs",
     "test:ownership:lint": "node scripts/test-ownership-lint.mjs",
     "test:canary": "node scripts/run-test-canary.mjs",

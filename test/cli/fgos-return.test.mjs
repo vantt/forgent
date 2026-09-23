@@ -1252,3 +1252,12 @@ test('tsk-34o5: return halts and parks item blocked when attestation diverges', 
   assert.equal(view.work['return-attest-diverged'].status, 'blocked');
   assert.equal(view.frictions['return-attest-diverged'][0].errorClass, 'attestation-mismatch');
 });
+
+test('AC 7: return emits [WARN C4] when item.verify contains test selector', () => {
+  const cwd = initGitCwdMainFast();
+  addOk(cwd, 'return-c4-warn-item', { verify: 'npm run test:related' });
+  assert.equal(run(cwd, ['take', '--id', 'return-c4-warn-item']).status, 0);
+
+  const result = run(cwd, ['return', 'return-c4-warn-item']);
+  assert.match(result.stderr, /\[WARN C4\] Authoritative verification policy/);
+});

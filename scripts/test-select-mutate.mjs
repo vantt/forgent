@@ -1,11 +1,50 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { MANIFEST } from '../test/test-ownership.mjs';
 import { mutants } from '../test/test-ownership-mutants.mjs';
 
 function log(msg) { console.log(msg); }
 function errFn(msg) { console.error(msg); }
+
+export function computeRuleHash(rule) {
+  if (!rule) return null;
+  // Deterministic normalized hash: excludes status, sorts arrays
+  const normalized = {
+    id: rule.id,
+    pattern: rule.pattern,
+    directTests: [...(rule.directTests || [])].sort(),
+    boundaryTests: [...(rule.boundaryTests || [])].sort(),
+    coverageSet: [...(rule.coverageSet || [])].sort()
+  };
+  return crypto.createHash('sha256').update(JSON.stringify(normalized)).digest('hex');
+}
+
+export function generateMutantPayload(mutant, manifest = MANIFEST) {
+  if (!mutant) return null;
+  const rule = manifest.find(r => r.id === mutant.ruleId || r.pattern === mutant.file || r.pattern === mutant.ruleId);
+  // Per AC 5: Mutants lacking boundary metadata must be rejected/omitted, not given fabricated defaults
+  const boundary = mutant.boundary || (rule && rule.boundary) || null;
+  if (!boundary) {
+    return null;
+  }
+  const ruleHash = computeRuleHash(rule);
+  return {
+    ...mutant,
+    ruleId: rule ? rule.id : mutant.ruleId,
+    ruleHash,
+    boundary,
+    origin: mutant.origin || 'authored'
+  };
+}
+
+export function generateMutantPayloads(mutantsList = mutants, manifest = MANIFEST) {
+  return mutantsList
+    .map(m => generateMutantPayload(m, manifest))
+    .filter(m => m !== null);
+}
 
 export function classifyMutant(result) {
   if (result.infraError) return 'infra-error';
@@ -17,9 +56,13 @@ export function classifyMutant(result) {
   return 'invalid';
 }
 
-export function runNightlyMutations() {
+export function runNightlyMutations(options = {}) {
   log("Starting nightly fault-injection mutation tests...");
   const ledger = [];
+  const manifest = options.manifest || MANIFEST;
+  const rawMutants = options.mutants || mutants;
+  const enrichedMutants = generateMutantPayloads(rawMutants, manifest);
+  const ledgerOut = options.ledgerOut || 'nightly-ledger.json';
   
   // Baseline run
   log("Running baseline check...");
@@ -27,10 +70,10 @@ export function runNightlyMutations() {
     execFileSync('node', ['scripts/test-select.mjs'], { stdio: 'pipe', encoding: 'utf8' });
   } catch(e) {
     log("Baseline is red! Cannot run mutation testing.");
-    return;
+    return ledger;
   }
   
-  for (const mutant of mutants) {
+  for (const mutant of enrichedMutants) {
     log(`Applying mutant ${mutant.id} to ${mutant.file}...`);
     
     // Create detached worktree
@@ -46,7 +89,14 @@ export function runNightlyMutations() {
       
       if (!orig.includes(mutant.find)) {
         log(`Mutant ${mutant.id} invalid: string not found.`);
-        ledger.push({ id: mutant.id, classification: 'invalid' });
+        ledger.push({
+          id: mutant.id,
+          ruleId: mutant.ruleId,
+          ruleHash: mutant.ruleHash,
+          boundary: mutant.boundary,
+          origin: mutant.origin || 'authored',
+          classification: 'invalid'
+        });
         continue;
       }
       
@@ -96,7 +146,14 @@ export function runNightlyMutations() {
       
       const classification = classifyMutant(result);
       log(`Mutant ${mutant.id} classification: ${classification}`);
-      ledger.push({ id: mutant.id, classification });
+      ledger.push({
+        id: mutant.id,
+        ruleId: mutant.ruleId,
+        ruleHash: mutant.ruleHash,
+        boundary: mutant.boundary,
+        origin: mutant.origin || 'authored',
+        classification
+      });
     } finally {
       try {
         execFileSync('git', ['worktree', 'remove', '-f', worktreePath], { encoding: 'utf8' });
@@ -104,8 +161,9 @@ export function runNightlyMutations() {
     }
   }
 
-  fs.writeFileSync('nightly-ledger.json', JSON.stringify(ledger, null, 2));
+  fs.writeFileSync(ledgerOut, JSON.stringify(ledger, null, 2));
   log("Mutation testing complete. Ledger written.");
+  return ledger;
 }
 
 const url = typeof process !== 'undefined' && process.argv && process.argv[1] ? process.argv[1] : '';

@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
 - **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
+- **Changed**: `fgos return` now emits `[WARN C4]` when `item.verify` references a test selector (`test:related`, `test-select`, `test:select`), warning that test selectors must not replace full suite in authoritative verification.
 
 ### Added
 
 - **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
 - **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
 - **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
+- **Scripts**: Added `npm run test:select:promote` (`scripts/test-select-promote.mjs`) for conservative per-rule promotion and recovery (§3.1, §3.4, §4.3, §14).
 - Cross-provider redirect governance contract: pool entries with cross-provider
   targets require explicit `crossProvider: true` opt-in, failing closed with
   typed refusal `redirect.cross-provider-not-permitted` when missing; enforces
