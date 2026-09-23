@@ -195,6 +195,12 @@ All review findings from the independent review rounds (evaluated commits `d5209
   - Handoff không ghi SHA mà chỉ ghi tên branch.
 - **Accounting**: Non-blocking for integration; queued for cleanup during Unit I10/I11.
 
+### 4.15 I09-REV-14 (MEDIUM) — GitNexus Index Degraded/Stale & Authoritative Blast Radius (Verbatim Independent Review Finding)
+- **Finding**:
+  - GitNexus index is stale/degraded (indexed commit was `16a7900d` / candidate `a208bf55`, while synchronized tip is ahead); `detect-changes` reporting 24 symbols / 0 processes / LOW cannot be used as blast-radius truth.
+  - Authoritative blast radius for Unit I09 remains the un-degraded measurement from candidate evaluation: **CRITICAL blast radius, 189 symbols, and 35 processes**.
+- **Accounting**: Non-blocking for integration; GitNexus index re-analysis (`node .gitnexus/run.cjs analyze`) queued for post-integration baseline / I10.
+
 ---
 
 ## 5. Disposition & Readiness
@@ -203,12 +209,13 @@ All review findings from the independent review rounds (evaluated commits `d5209
 - **Implementation Base**: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
 - **Current Integration Baseline**: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
 - **Evaluated Candidate**: `a208bf555927b508ddfa0523009ce87aac1dd0af` (Evaluated & APPROVED by independent review: 0 blocker, 0 high).
-- **Synchronization Merge Commit**: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (Merges `main@cc687d92` into branch `coordination-skill-harness-i09-dag-forward-port`; CHANGELOG conflict resolved preserving all entries).
-- **Synchronized Candidate Tip**: Committed tip on branch `coordination-skill-harness-i09-dag-forward-port`.
+- **Synchronized Implementation Candidate**: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (Merges `main@cc687d92` into branch `coordination-skill-harness-i09-dag-forward-port`; CHANGELOG conflict resolved preserving all entries).
+- **Status-Recording SHA**: `524579b41d51b617fcc8e1fbf35bdd9c1efb77e7` (records initial sync accounting).
 - **Integration Status**: **NOT integrated into main yet**.
-- **Next Gate**: **Unit I10 remains BLOCKED** until the synchronized candidate tip is independently re-reviewed, integrated into main, and post-merge verification passes.
+- **Next Gate**: **Unit I10 remains BLOCKED** until the synchronized implementation candidate is approved for integration, merged into main, and post-merge verification passes.
 
 ### 5.2 Verification Summary
 - `git diff --check`: clean (exit 0).
-- Focused 14-suite matrix: 538 passed / 0 failed.
-- Full suite verification and GitNexus impact analysis run on the synchronized candidate tip.
+- Focused 14-suite matrix: **538 passed / 0 failed**.
+- Full suite verification (`npm test`): **Candidate regressions = 0**. Failures in `fgos-approve.test.mjs` (D2/D3) reproduce identically on exact baseline `main@cc687d92`; transient timing failures (`coordination-r5-hard-budgets.test.mjs`, `herdr-spawn-adapter.test.mjs`) pass 100% cleanly in isolated reruns.
+- GitNexus Blast Radius: **CRITICAL (189 symbols, 35 processes)**. Tip index is degraded/stale per REV-14 and will be re-analyzed post-integration.
