@@ -370,9 +370,9 @@ test('buildEffectiveExecutionContract attaches template provenance without secre
     tier: 'core',
     source: 'core',
     filePath: 'core/prompt-templates/master-loop-review-candidate.md',
-    contentDigest: 'sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234',
-    renderedPromptDigest: 'sha256:5678ef015678ef015678ef015678ef015678ef015678ef015678ef015678ef01',
     templateSnapshot: '# Snapshot',
+    contentDigest: `sha256:${crypto.createHash('sha256').update('# Snapshot').digest('hex')}`,
+    renderedPromptDigest: 'sha256:5678ef015678ef015678ef015678ef015678ef015678ef015678ef015678ef01',
   };
 
   const contract = buildEffectiveExecutionContract({
@@ -696,4 +696,249 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }
+});
+
+test('I04-REV-02 negative: resolver refuses corrupted contentDigest on pinned template with template-provenance-mismatch', () => {
+  const snapshot = 'Objective: {objective}\n';
+  const assignment = {
+    assignmentId: 'asgn_tamper_content_digest',
+    objective: 'Test tamper detection',
+    contractTemplate: 'test-tamper',
+    provenance: {
+      template: {
+        id: 'test-tamper',
+        tier: 'core',
+        source: 'core',
+        filePath: 'test.md',
+        templateSnapshot: snapshot,
+        contentDigest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+      },
+    },
+  };
+
+  assert.throws(
+    () => resolveAndRenderOperationPrompt(assignment),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /contentDigest mismatch/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-02 negative: resolver refuses malformed contentDigest or renderedPromptDigest on pinned template', () => {
+  const snapshot = 'Objective: {objective}\n';
+  const correctContentDigest = `sha256:${crypto.createHash('sha256').update(snapshot).digest('hex')}`;
+
+  // Malformed contentDigest format
+  assert.throws(
+    () => resolveAndRenderOperationPrompt({
+      contractTemplate: 'test-malformed-digest',
+      provenance: {
+        template: {
+          id: 'test-malformed-digest',
+          templateSnapshot: snapshot,
+          contentDigest: 'not-a-valid-sha256',
+        },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /contentDigest is malformed/);
+      return true;
+    },
+  );
+
+  // Malformed renderedPromptDigest format
+  assert.throws(
+    () => resolveAndRenderOperationPrompt({
+      contractTemplate: 'test-malformed-rendered',
+      provenance: {
+        template: {
+          id: 'test-malformed-rendered',
+          templateSnapshot: snapshot,
+          contentDigest: correctContentDigest,
+          renderedPromptDigest: 'bad-digest',
+        },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /renderedPromptDigest is malformed/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-02 negative: resolver refuses corrupted or missing templateSnapshot on pinned provenance', () => {
+  // Missing / empty snapshot
+  assert.throws(
+    () => resolveAndRenderOperationPrompt({
+      contractTemplate: 'test-missing-snapshot',
+      provenance: {
+        template: {
+          id: 'test-missing-snapshot',
+          templateSnapshot: '',
+          contentDigest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /missing or non-string templateSnapshot/);
+      return true;
+    },
+  );
+
+  // Non-string snapshot
+  assert.throws(
+    () => resolveAndRenderOperationPrompt({
+      contractTemplate: 'test-nonstring-snapshot',
+      provenance: {
+        template: {
+          id: 'test-nonstring-snapshot',
+          templateSnapshot: 12345,
+        },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /missing or non-string templateSnapshot/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-02 negative: resolver refuses corrupted renderedPromptDigest when prompt recomputed on retry does not match', () => {
+  const snapshot = 'Role: {role}\nObjective: {objective}\n';
+  const correctContentDigest = `sha256:${crypto.createHash('sha256').update(snapshot).digest('hex')}`;
+
+  const assignment = {
+    assignmentId: 'asgn_tamper_rendered_digest',
+    role: 'reviewer',
+    objective: 'Test tamper detection on rendered prompt',
+    contractTemplate: 'test-rendered-tamper',
+    provenance: {
+      template: {
+        id: 'test-rendered-tamper',
+        templateSnapshot: snapshot,
+        contentDigest: correctContentDigest,
+        renderedPromptDigest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+      },
+    },
+  };
+
+  assert.throws(
+    () => resolveAndRenderOperationPrompt(assignment),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /rendered prompt digest mismatch/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-02 negative: resolver refuses templateId mismatch between contractTemplate and pinnedTemplate.id', () => {
+  const snapshot = 'Objective: {objective}\n';
+  const correctContentDigest = `sha256:${crypto.createHash('sha256').update(snapshot).digest('hex')}`;
+
+  assert.throws(
+    () => resolveAndRenderOperationPrompt({
+      contractTemplate: 'declared-template-id',
+      provenance: {
+        template: {
+          id: 'different-pinned-id',
+          templateSnapshot: snapshot,
+          contentDigest: correctContentDigest,
+        },
+      },
+    }),
+    (err) => {
+      assert.ok(err instanceof TemplateResolutionError);
+      assert.equal(err.code, 'template-provenance-mismatch');
+      assert.match(err.message, /does not match contractTemplate/);
+      return true;
+    },
+  );
+});
+
+test('I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance', () => {
+  const baseContract = buildEffectiveExecutionContract({
+    assignment: {
+      assignmentId: 'asgn_contract_val_01',
+      mutation: 'read-only',
+    },
+    dispatchPlan: {
+      mechanism: 'in-process',
+      policy: { executorPreference: ['claude'], confinement: { requirement: 'none', backend: 'none' } },
+      invocation: { adapter: 'cli-spawn', cwd: process.cwd() },
+    },
+    runId: 'run_contract_val_01',
+    runDir: '/tmp',
+    cwd: process.cwd(),
+    executorId: 'claude',
+    adapter: 'cli-spawn',
+  });
+
+  const snapshot = '# Snapshot Text';
+  const correctContentDigest = `sha256:${crypto.createHash('sha256').update(snapshot).digest('hex')}`;
+  const validRenderedDigest = 'sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+
+  // 1. Mismatched templateSnapshot vs contentDigest
+  const contractMismatchedDigest = structuredClone(baseContract);
+  contractMismatchedDigest.provenance.template = {
+    id: 'test-tmpl',
+    templateSnapshot: snapshot,
+    contentDigest: 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+    renderedPromptDigest: validRenderedDigest,
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractMismatchedDigest),
+    /digest mismatch/,
+  );
+
+  // 2. Malformed contentDigest format
+  const contractBadDigest = structuredClone(baseContract);
+  contractBadDigest.provenance.template = {
+    id: 'test-tmpl',
+    templateSnapshot: snapshot,
+    contentDigest: 'not-valid-sha',
+    renderedPromptDigest: validRenderedDigest,
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractBadDigest),
+    /contentDigest must be a valid sha256 digest string/,
+  );
+
+  // 3. Malformed renderedPromptDigest format
+  const contractBadRendered = structuredClone(baseContract);
+  contractBadRendered.provenance.template = {
+    id: 'test-tmpl',
+    templateSnapshot: snapshot,
+    contentDigest: correctContentDigest,
+    renderedPromptDigest: 'not-valid-sha',
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractBadRendered),
+    /renderedPromptDigest must be a valid sha256 digest string/,
+  );
+
+  // 4. Missing / empty id
+  const contractEmptyId = structuredClone(baseContract);
+  contractEmptyId.provenance.template = {
+    id: '  ',
+    templateSnapshot: snapshot,
+    contentDigest: correctContentDigest,
+    renderedPromptDigest: validRenderedDigest,
+  };
+  assert.throws(
+    () => validateEffectiveExecutionContract(contractEmptyId),
+    /id must be a non-empty string/,
+  );
 });

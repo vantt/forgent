@@ -435,40 +435,81 @@ export function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options 
     throw new TemplateResolutionError('template-invalid', 'assignment object or templateId string is required');
   }
 
-  // I04-REV-01: Check for already-pinned template snapshot in provenance or options.
+  // I04-REV-01 & I04-REV-02: Check for already-pinned template snapshot in provenance or options.
   // When an assignment already has a pinned template snapshot (from initial resolution or stored
   // assignment.json), render directly from the pinned snapshot so retry/replay attribution is
   // strictly deterministic even if the disk template changes or is removed later.
+  // Enforce strict integrity: validate schema, recompute digest of snapshot against contentDigest,
+  // recompute renderedPromptDigest and verify match with stored digest. Fail closed on any corruption
+  // with typed 'template-provenance-mismatch'.
   const pinnedTemplate = target.provenance?.template ?? options.templateProvenance ?? options.pinnedTemplate;
-  if (!templateId || typeof templateId !== 'string') {
-    if (pinnedTemplate && typeof pinnedTemplate.id === 'string' && pinnedTemplate.id.trim()) {
-      templateId = pinnedTemplate.id;
-    } else {
-      throw new TemplateResolutionError('template-invalid', 'assignment does not declare valid contractTemplate string');
-    }
-  }
+  const SHA256_HEX_REGEX = /^sha256:[0-9a-f]{64}$/;
 
   let templateEntry;
-  if (pinnedTemplate && typeof pinnedTemplate.templateSnapshot === 'string' && pinnedTemplate.templateSnapshot.length > 0) {
-    if (pinnedTemplate.id && pinnedTemplate.id !== templateId) {
+  if (pinnedTemplate !== undefined && pinnedTemplate !== null) {
+    if (typeof pinnedTemplate !== 'object' || Array.isArray(pinnedTemplate)) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance must be a non-null object', { pinnedTemplate });
+    }
+    if (typeof pinnedTemplate.templateSnapshot !== 'string' || !pinnedTemplate.templateSnapshot.trim()) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance contains missing or non-string templateSnapshot', { pinnedTemplate });
+    }
+    if (typeof pinnedTemplate.id !== 'string' || !pinnedTemplate.id.trim()) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template provenance missing non-empty id', { pinnedTemplate });
+    }
+    if (templateId && pinnedTemplate.id !== templateId) {
       throw new TemplateResolutionError(
-        'template-invalid',
+        'template-provenance-mismatch',
         `pinned template id "${pinnedTemplate.id}" does not match contractTemplate "${templateId}"`,
         { pinnedId: pinnedTemplate.id, templateId },
       );
     }
+    templateId = pinnedTemplate.id;
+
+    if (pinnedTemplate.tier !== undefined && (typeof pinnedTemplate.tier !== 'string' || !pinnedTemplate.tier.trim())) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template tier must be a non-empty string when present', { pinnedTemplate });
+    }
+    if (pinnedTemplate.source !== undefined && (typeof pinnedTemplate.source !== 'string' || !pinnedTemplate.source.trim())) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template source must be a non-empty string when present', { pinnedTemplate });
+    }
+    if (pinnedTemplate.filePath !== undefined && pinnedTemplate.filePath !== null && (typeof pinnedTemplate.filePath !== 'string' || !pinnedTemplate.filePath.trim())) {
+      throw new TemplateResolutionError('template-provenance-mismatch', 'pinned template filePath must be a string or null when present', { pinnedTemplate });
+    }
+
+    const actualContentDigest = computeSha256Digest(pinnedTemplate.templateSnapshot);
+    if (pinnedTemplate.contentDigest !== undefined) {
+      if (typeof pinnedTemplate.contentDigest !== 'string' || !SHA256_HEX_REGEX.test(pinnedTemplate.contentDigest)) {
+        throw new TemplateResolutionError('template-provenance-mismatch', `pinned template contentDigest is malformed: "${pinnedTemplate.contentDigest}"`, { contentDigest: pinnedTemplate.contentDigest });
+      }
+      if (pinnedTemplate.contentDigest !== actualContentDigest) {
+        throw new TemplateResolutionError(
+          'template-provenance-mismatch',
+          `pinned template contentDigest mismatch: expected "${actualContentDigest}", got "${pinnedTemplate.contentDigest}"`,
+          { expectedContentDigest: actualContentDigest, actualContentDigest: pinnedTemplate.contentDigest },
+        );
+      }
+    }
+
+    if (pinnedTemplate.renderedPromptDigest !== undefined) {
+      if (typeof pinnedTemplate.renderedPromptDigest !== 'string' || !SHA256_HEX_REGEX.test(pinnedTemplate.renderedPromptDigest)) {
+        throw new TemplateResolutionError('template-provenance-mismatch', `pinned template renderedPromptDigest is malformed: "${pinnedTemplate.renderedPromptDigest}"`, { renderedPromptDigest: pinnedTemplate.renderedPromptDigest });
+      }
+    }
+
     // Re-verify bounded variables on the snapshot to preserve template-invalid invariants
     validateOperationPromptTemplate(pinnedTemplate.templateSnapshot, templateId);
 
     templateEntry = {
-      id: pinnedTemplate.id || templateId,
+      id: pinnedTemplate.id,
       tier: pinnedTemplate.tier || 'pinned',
       source: pinnedTemplate.source || 'pinned',
       relativeFilePath: pinnedTemplate.filePath || null,
       content: pinnedTemplate.templateSnapshot,
-      contentDigest: pinnedTemplate.contentDigest || computeSha256Digest(pinnedTemplate.templateSnapshot),
+      contentDigest: actualContentDigest,
     };
   } else {
+    if (!templateId || typeof templateId !== 'string') {
+      throw new TemplateResolutionError('template-invalid', 'assignment does not declare valid contractTemplate string');
+    }
     templateEntry = loadOperationPromptTemplate(templateId, {
       cwd: options.cwd,
       packageRoot: options.packageRoot,
@@ -488,6 +529,21 @@ export function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options 
 
   const renderedBody = renderOperationPromptTemplate(templateEntry.content, variables);
   const renderedPromptDigest = computeSha256Digest(renderedBody);
+
+  // I04-REV-02: Recompute rendered digest and verify against stored renderedPromptDigest when retry/replay
+  // occurs with immutable Assignment inputs. Fail closed if there is a mismatch.
+  if (pinnedTemplate && pinnedTemplate.renderedPromptDigest !== undefined) {
+    if (pinnedTemplate.renderedPromptDigest !== renderedPromptDigest) {
+      throw new TemplateResolutionError(
+        'template-provenance-mismatch',
+        `rendered prompt digest mismatch for pinned template "${templateEntry.id}": expected "${pinnedTemplate.renderedPromptDigest}", computed "${renderedPromptDigest}"`,
+        {
+          expectedRenderedPromptDigest: pinnedTemplate.renderedPromptDigest,
+          computedRenderedPromptDigest: renderedPromptDigest,
+        },
+      );
+    }
+  }
 
   const templateProvenance = Object.freeze({
     id: templateEntry.id,

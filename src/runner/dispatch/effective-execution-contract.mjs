@@ -427,8 +427,41 @@ export function validateEffectiveExecutionContract(value) {
   if (typeof value.provenance.adapter !== 'string' || !value.provenance.adapter.trim()) {
     throw new RunnerConfigError('effective-execution-contract: provenance.adapter must be a non-empty string');
   }
-  if (value.provenance.template !== undefined && (value.provenance.template === null || typeof value.provenance.template !== 'object' || Array.isArray(value.provenance.template))) {
-    throw new RunnerConfigError('effective-execution-contract: provenance.template must be an object when present');
+  if (value.provenance.template !== undefined) {
+    const tmpl = value.provenance.template;
+    if (tmpl === null || typeof tmpl !== 'object' || Array.isArray(tmpl)) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template must be an object when present');
+    }
+    if (typeof tmpl.id !== 'string' || !tmpl.id.trim()) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.id must be a non-empty string');
+    }
+    const SHA256_HEX_REGEX = /^sha256:[0-9a-f]{64}$/;
+    if (typeof tmpl.contentDigest !== 'string' || !SHA256_HEX_REGEX.test(tmpl.contentDigest)) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.contentDigest must be a valid sha256 digest string');
+    }
+    if (typeof tmpl.renderedPromptDigest !== 'string' || !SHA256_HEX_REGEX.test(tmpl.renderedPromptDigest)) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.renderedPromptDigest must be a valid sha256 digest string');
+    }
+    if (tmpl.tier !== undefined && (typeof tmpl.tier !== 'string' || !tmpl.tier.trim())) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.tier must be a non-empty string when present');
+    }
+    if (tmpl.source !== undefined && (typeof tmpl.source !== 'string' || !tmpl.source.trim())) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.source must be a non-empty string when present');
+    }
+    if (tmpl.filePath !== undefined && tmpl.filePath !== null && (typeof tmpl.filePath !== 'string' || !tmpl.filePath.trim())) {
+      throw new RunnerConfigError('effective-execution-contract: provenance.template.filePath must be a string or null when present');
+    }
+    if (tmpl.templateSnapshot !== undefined) {
+      if (typeof tmpl.templateSnapshot !== 'string' || !tmpl.templateSnapshot.trim()) {
+        throw new RunnerConfigError('effective-execution-contract: provenance.template.templateSnapshot must be a non-empty string when present');
+      }
+      const actualDigest = `sha256:${crypto.createHash('sha256').update(tmpl.templateSnapshot, 'utf8').digest('hex')}`;
+      if (actualDigest !== tmpl.contentDigest) {
+        throw new RunnerConfigError(
+          `effective-execution-contract: provenance.template.templateSnapshot digest mismatch: expected "${tmpl.contentDigest}", computed "${actualDigest}"`,
+        );
+      }
+    }
   }
   if (value.providerCapacity !== undefined) {
     if (!value.providerCapacity || typeof value.providerCapacity !== 'object' || Array.isArray(value.providerCapacity)) {

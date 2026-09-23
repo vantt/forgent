@@ -132,9 +132,18 @@ In `src/runner/coordination/session-engine.mjs`, `dispatchDeclaredOperationLocke
    - `operation-prompt-templates-valid doctor check fails when a malformed template is present` -> **PASS**
    - `I04-REV-01 regression: renderAssignmentPrompt renders from pinned snapshot when disk template changes or is deleted` -> **PASS**
    - `I04-REV-01 regression: executeAssignment retry uses pinned template snapshot when disk template changes or is deleted` -> **PASS**
-   - **Result:** **24 pass / 0 fail** (duration: 870ms)
+   - `I04-REV-02 negative: resolver refuses corrupted contentDigest on pinned template with template-provenance-mismatch` -> **PASS**
+   - `I04-REV-02 negative: resolver refuses malformed contentDigest or renderedPromptDigest on pinned template` -> **PASS**
+   - `I04-REV-02 negative: resolver refuses corrupted or missing templateSnapshot on pinned provenance` -> **PASS**
+   - `I04-REV-02 negative: resolver refuses corrupted renderedPromptDigest when prompt recomputed on retry does not match` -> **PASS**
+   - `I04-REV-02 negative: resolver refuses templateId mismatch between contractTemplate and pinnedTemplate.id` -> **PASS**
+   - `I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance` -> **PASS**
+   - **Result:** **30 pass / 0 fail** (duration: 735ms)
 
-2. **`test/runner/assignment-dispatch.test.mjs`** (baseline smoke suite):
+2. **`test/runner/effective-execution-contract.test.mjs`**:
+   - **Result:** **13 pass / 0 fail** (duration: 400ms)
+
+3. **`test/runner/assignment-dispatch.test.mjs`** (baseline smoke suite):
    - **Result:** **75 pass / 0 fail** (duration: 17s)
 
 3. **`test/runner/coordination-group-thinking-rfc-review-lite.test.mjs`**:
@@ -261,3 +270,49 @@ Two dedicated regression tests were added in `test/runner/operation-prompt-templ
    - Run 02 (Retry): Template file on disk is modified; asserts execution uses pinned snapshot, and `runs/02/effective-execution-contract.json` records original content digest.
    - Run 03: Template file on disk is completely deleted (`fs.unlinkSync`); asserts execution still succeeds, uses pinned snapshot, and `runs/03/effective-execution-contract.json` records original content digest.
 Both regression tests pass cleanly. Suite count updated to 24 pass / 0 fail.
+
+---
+
+## 8. Reviewer Finding Resolution: I04-REV-02 (HIGH)
+
+### 8.1 Finding Summary
+- **Finding ID:** `I04-REV-02` (Severity: HIGH)
+- **Reviewer Statement:** Pinned provenance integrity was not verified. When consuming `templateSnapshot`, the resolver retained `pinnedTemplate.contentDigest` without checking it against the recomputed digest of the snapshot. An independent review probe passed a valid snapshot (`Objective: {objective}`) with a fake `contentDigest` (`sha256:0000...`), and the resolver returned the forged provenance. Additionally, `validateEffectiveExecutionContract` only validated that `provenance.template` was an object, omitting schema and digest consistency checks.
+- **Root Cause:**
+  1. In `src/runner/dispatch/operation-prompt-templates.mjs`, `templateEntry.contentDigest` fell back to `pinnedTemplate.contentDigest || computeSha256Digest(...)` without asserting equality with the actual computed SHA-256 digest of `templateSnapshot`.
+  2. The resolver did not enforce schema formats (`id`, `tier`, `source`, `filePath`, SHA-256 digest format `^sha256:[0-9a-f]{64}$`) on pinned provenance objects.
+  3. Stored `renderedPromptDigest` was never compared against the freshly recomputed rendered body digest upon retry/replay with immutable Assignment inputs.
+  4. In `src/runner/dispatch/effective-execution-contract.mjs`, `validateEffectiveExecutionContract` lacked validation for template provenance fields and snapshot-to-digest consistency.
+
+### 8.2 Corrections Implemented
+1. **Recompute and Assert `templateSnapshot` Content Digest:**
+   In `src/runner/dispatch/operation-prompt-templates.mjs`, `actualContentDigest = computeSha256Digest(pinnedTemplate.templateSnapshot)`. If `pinnedTemplate.contentDigest` is provided:
+   - Validates that it matches `^sha256:[0-9a-f]{64}$`.
+   - Recomputes the digest and throws typed refusal `TemplateResolutionError('template-provenance-mismatch')` if `pinnedTemplate.contentDigest !== actualContentDigest`. Does not silently fix or accept forged digests.
+2. **Strict Schema & Format Validation for Pinned Provenance:**
+   - Validates that `pinnedTemplate` is a non-null object.
+   - Asserts `templateSnapshot` is a non-empty string.
+   - Asserts `id` is a non-empty string and matches `contractTemplate` when declared (throws `template-provenance-mismatch` on mismatch).
+   - Validates `tier` and `source` are non-empty strings when present.
+   - Validates `filePath` is a string or null when present.
+   - Validates `renderedPromptDigest` conforms to `^sha256:[0-9a-f]{64}$` when present.
+3. **Compare Stored `renderedPromptDigest` on Retry/Replay:**
+   - After rendering `renderedBody` using immutable inputs, computes `actualRenderedPromptDigest = computeSha256Digest(renderedBody)`.
+   - If `pinnedTemplate.renderedPromptDigest` is present, it MUST strictly equal `actualRenderedPromptDigest`. Any tampering with stored prompt digest or inputs throws typed refusal `TemplateResolutionError('template-provenance-mismatch')`.
+4. **Effective Execution Contract Validation:**
+   In `src/runner/dispatch/effective-execution-contract.mjs`, `validateEffectiveExecutionContract` now verifies:
+   - `provenance.template.id` is a non-empty string.
+   - `contentDigest` and `renderedPromptDigest` match `^sha256:[0-9a-f]{64}$`.
+   - If `templateSnapshot` is present, its recomputed SHA-256 digest MUST match `contentDigest`; throws `RunnerConfigError` on any mismatch.
+   - `tier`, `source`, `filePath` match expected types.
+
+### 8.3 Verification and Negative Tests
+Six dedicated negative tests added in `test/runner/operation-prompt-templates.test.mjs`:
+1. `I04-REV-02 negative: resolver refuses corrupted contentDigest on pinned template with template-provenance-mismatch` (exact review probe replication with `sha256:0000...`).
+2. `I04-REV-02 negative: resolver refuses malformed contentDigest or renderedPromptDigest on pinned template`.
+3. `I04-REV-02 negative: resolver refuses corrupted or missing templateSnapshot on pinned provenance`.
+4. `I04-REV-02 negative: resolver refuses corrupted renderedPromptDigest when prompt recomputed on retry does not match`.
+5. `I04-REV-02 negative: resolver refuses templateId mismatch between contractTemplate and pinnedTemplate.id`.
+6. `I04-REV-02 negative: validateEffectiveExecutionContract refuses corrupted or inconsistent template provenance` (verifies digest mismatch, malformed digests, and missing id are rejected).
+
+All 6 negative tests and all existing tests pass cleanly. Total `operation-prompt-templates.test.mjs` count: **30 pass / 0 fail**. Full focused matrix: **294 pass / 0 fail**.
