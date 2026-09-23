@@ -3,6 +3,10 @@ import assert from 'node:assert/strict';
 import { classifyTestCase } from '../../scripts/test-select-compare.mjs';
 
 test('C1 Classifier Tests', async (t) => {
+
+  await t.test('os-specific: returns os-specific if isOsSpecific is true', () => {
+    assert.equal(classifyTestCase({ isOsSpecific: true }), 'os-specific');
+  });
   await t.test('related-only-fail: red in related, green in full', () => {
     assert.equal(classifyTestCase({ isRedInFull: false, isRedInRelated: true }), 'related-only-fail');
   });

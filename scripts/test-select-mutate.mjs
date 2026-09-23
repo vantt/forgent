@@ -83,8 +83,7 @@ export function runNightlyMutations() {
           // AC 5: run full ONLY if related passed
           if (result.relatedPassed) {
             try {
-              const execSync = require('node:child_process').execSync;
-              execSync('node scripts/run-tests.mjs', { cwd: worktreePath, stdio: 'ignore' });
+              execFileSync('node', ['scripts/run-tests.mjs'], { cwd: worktreePath, stdio: 'ignore' });
               result.fullPassed = true;
             } catch (err) {
               result.fullPassed = false;

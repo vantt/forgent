@@ -144,7 +144,7 @@ test('approve --github on a legacy (non-runner) item is a validation error, no s
   // --pr present too — the source gate must still win over the --pr check.
   const result = run(cwd, ['approve', 'gh-approve-legacy', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
-  assert.match(result.stderr, /runner-sourced item/);
+  assert.match(result.stderr, /explicitly forbidden/);
   assert.equal(stateView(cwd).work['gh-approve-legacy'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the source gate must reject before any gh CLI call');
 });

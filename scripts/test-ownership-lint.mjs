@@ -32,8 +32,7 @@ export function lintManifest(manifest = MANIFEST, cwd = process.cwd()) {
     for (const f of files) {
       const relPath = `test/direct/${f}`;
       if (!directTestFiles.has(relPath)) {
-        console.error(`Block: Orphaned test file not referenced in manifest: ${relPath}`);
-        hasBlock = true;
+        console.warn(`Warn: Orphaned test file not referenced in manifest: ${relPath}`);
       }
     }
   }

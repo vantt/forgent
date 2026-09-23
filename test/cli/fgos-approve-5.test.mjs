@@ -280,22 +280,14 @@ test('approve --github --pr on a runner item touching a self-modifying-capable m
 
 
 test('approve --github --pr on the same self-modifying diff is explicitly forbidden', () => {
-  const cwd = initGitCwdMain();
-  run(cwd, ['init']);
-  makeRunnerProposedItem(cwd, 'gh-iron-ack-item');
-  const fgosDir = path.join(cwd, '.fgos');
-  const config = { actions: { allowSelfModification: false } };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(config));
-  execGit(cwd, ['add', '.fgos/config.json']);
-  execGit(cwd, ['commit', '-m', 'config']);
+  const cwd = initGitCwdMainFast();
+  makeRunnerProposedItemTouching(cwd, 'gh-iron-ack-item', 'src/runner/probe.mjs', {
+    verify: 'test -f src/runner/probe.mjs',
+  });
   commitPendingBeforeApprove(cwd, 'gh-iron-ack-item');
-
-  fs.writeFileSync(path.join(cwd, 'src/actions.mjs'), '// changed\n');
-  execGit(cwd, ['add', 'src/actions.mjs']);
-  execGit(cwd, ['commit', '-m', 'mod']);
   const fake = writeMergeSuccessFake(cwd);
 
-  const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--pr', 'f01', '--acknowledge-iron-law'], { FGOS_GH_COMMAND: fake });
+  const result = run(cwd, ['approve', 'gh-iron-ack-item', '--github', '--acknowledge-iron-law', '--pr', '14'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4, `${result.stdout}${result.stderr}`);
   assert.match(result.stderr, /explicitly forbidden/);
 });

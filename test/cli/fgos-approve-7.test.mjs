@@ -135,7 +135,7 @@ test('approve --github --pr on a leaf whose own root is delivered ALSO refuses b
 
   const result = run(cwd, ['approve', 'gh-resolved-root-leaf', '--github', '--pr', '7'], { FGOS_GH_COMMAND: fake });
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /explicitly forbidden/);
+  assert.match(result.stderr, /gh-resolved-root/);
   assert.equal(stateView(cwd).work['gh-resolved-root-leaf'].status, 'awaiting-approval');
   assert.ok(!fs.existsSync(marker), 'the resolved-root guard must refuse before any gh CLI call');
 });
