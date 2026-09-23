@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec` (candidate branch tip `510f35f5`, code fix `f835c215` at `72894c98`, origin/main at `ad8dbaf0` not pushed; 10 commits ahead); Unit I04 / Phase 3 is next
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I07 next eligible (I08 requires I07; I09 requires I06/I04/I02 — I06 verified)
 Created: 2026-09-19
-Last Updated: 2026-09-22
+Last Updated: 2026-09-23
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -788,17 +788,46 @@ Executor/provider/model/tier selection remains an execution-time decision.
   origin-status: `origin/main` at `ad8dbaf0` (not pushed; 10 commits ahead)
   verification: 11 suites, 317 tests pass / 0 fail (post-fix matrix; 315 in historical matrix); 75 pass in assignment-dispatch.test.mjs smoke rerun
   stop: corrupt evidence can settle or close
-- unit: I04 — implement Phase 3 template registry/resolver/provenance
+- unit: I04 — implement Phase 3 template registry/resolver/provenance (integrated at `main@7472bd74`, candidate SHA `f0919405`)
   capability: code:implement
   depends-on: I01
+  status: integrated
+  candidate-sha: `f0919405`
+  integrated-sha: `7472bd74`
+  branch: coordination-skill-harness-i04-template-registry
+  base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
+  findings-resolved: I04-REV-01, I04-REV-02, I04-REV-03
+  verification: 32 pass / 0 fail in test/runner/operation-prompt-templates.test.mjs; 13 pass / 0 fail in test/runner/effective-execution-contract.test.mjs; 75 pass / 0 fail in test/runner/assignment-dispatch.test.mjs; 83 pass / 0 fail in assignment suite; 4 pass / 0 fail in test/runner/coordination-group-thinking-rfc-review-lite.test.mjs; 13 pass / 0 fail in test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs; 29 pass / 0 fail in test/runner/coordination-declared-consult.test.mjs; 18 pass / 0 fail in test/verbs/coordination-group-thinking-pack.test.mjs; 112 pass / 0 fail in test/setup/checks.test.mjs; doctor check operation-prompt-templates-valid registered and passing; post-merge verification: 418 pass / 0 fail across focused matrix; GitNexus detect-changes verified.
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-03-i04-template-registry-implementation.md
   stop: a template can widen authority or requires an unresolved setup contract
-- unit: I05 — independently review Phase 3 trust boundary and migration
+- unit: I05 — independently review Phase 3 trust boundary and migration (complete in I04 integration cycle)
   capability: code:review
   depends-on: I04
+  status: integrated
+  findings-resolved: I04-REV-01, I04-REV-02, I04-REV-03
   stop: unresolved template authority/provenance finding
-- unit: I06 — complete dispatch-hardening Phase 05 remainder
+- unit: I06 — complete dispatch-hardening Phase 05 remainder (integrated at `main@3bab9b99`, evaluated candidate `d75d311d`, status-recording tip `dec142a5`)
   capability: code:implement
   depends-on: I01
+  status: integrated
+  candidate-branch: `coordination-skill-harness-i06-dispatch-governance`
+  base-sha: `15e4048503ca1ee02dae23263dee84b9c983386d`
+  candidate-sha: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d` -> `dec142a5`)
+  status-recording-sha: `dec142a5e0b4417690fd2018333fecc490a3f9b7`
+  integrated-sha: `3bab9b99`
+  last-verified: 2026-09-23 at candidate `d75d311d`
+  next-dependency-gate: I08 (requires I06 and I07), I09 (requires I02, I04, and I06)
+  findings-resolved: I06-REV-01, I06-REV-02, I06-TM-01, I06-REREVIEW-01, I06-REREVIEW-02
+  candidate-verification: 101 pass / 0 fail on focused architecture/redirect/PlacementPolicy smoke; 75 pass / 0 fail in assignment-dispatch.test.mjs; 560 pass / 0 fail on full dispatch matrix; 317 pass / 0 fail on 11-suite coordination matrix; git diff --check exits 0
+  post-merge-verification: 548+ pass / 0 fail across post-merge matrix (13 architecture, 88 placement/redirect/role-tiers, 32 templates, 75 assignment-dispatch, 125 contracts/checks, 215 coordination); git diff --check exits 0
+  historical-verification: 529 tests from initial Phase 05 exploration (2026-09-22 morning)
+  requirements-completed:
+    - R5 (provider-family vs model lookup decoupling verified and preserved)
+    - R6 (cross-provider redirect contract: schema, typed refusal redirect.cross-provider-not-permitted, full provenance)
+    - R7 (PlacementPolicy authority reconciled as active binder, stablePoolIndex deduplicated)
+    - R8 (adapter registry leaf module src/runner/dispatch/adapters.mjs cycle cut)
+  report: `plans/260919-coordination-skill-harness-simplification/reports/phase-03a-i06-dispatch-governance-implementation.md`
+  review-report: `plans/260919-coordination-skill-harness-simplification/reports/phase-03a-i06-dispatch-governance-review.md`
   stop: provider/placement authority decision is not settled
 - unit: I07 — implement dispatch-hardening Phase 08 operability/doctor
   capability: code:implement
@@ -811,6 +840,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
+  note: blocked — requires both I04 and I06 integrated and verified before opening (I04 integrated at `main@7472bd74`; I06 pending)
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test

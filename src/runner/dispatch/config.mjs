@@ -29,14 +29,10 @@ import {
   rejectProjectProviderAccountInventory,
   validateProviderAccountInventory,
 } from './provider-capacity.mjs';
-// EXECUTOR_ADAPTERS lives in ./transport.mjs (the adapter registry is a
-// transport-layer concern) but validateExecutorShape below still needs its
-// key set to validate a config-declared `adapter` name — same cross-module
-// need `dispatch/resolve.mjs`'s `resolveExecutorConfig` has for it. Safe
-// despite the resulting config.mjs <-> transport.mjs cycle: every read of
-// EXECUTOR_ADAPTERS here happens inside a function body invoked well after
-// both modules finish evaluating, never at module-eval time.
-import { EXECUTOR_ADAPTERS } from './transport.mjs';
+// EXECUTOR_ADAPTERS lives in ./adapters.mjs (leaf module) so config loading
+// can validate adapter names without importing transport.mjs (cutting the
+// prior config.mjs <-> transport.mjs import cycle).
+import { EXECUTOR_ADAPTERS } from './adapters.mjs';
 import {
   BUILTIN_POLICIES,
   BUILTIN_POLICY_IDS,
@@ -674,15 +670,22 @@ export function normalizePreferCandidates(prefer, label) {
         if (entry.invocation !== undefined && (typeof entry.invocation !== 'string' || !entry.invocation.trim())) {
           throw new RunnerConfigError(`runner config (${entryLabel}) "invocation" must be a non-empty string when present.`);
         }
-        const ALLOWED_PREFER_ENTRY_KEYS = ['executor', 'invocation'];
+        if (entry.crossProvider !== undefined && typeof entry.crossProvider !== 'boolean') {
+          throw new RunnerConfigError(`runner config (${entryLabel}) "crossProvider" must be a boolean when present.`);
+        }
+        const ALLOWED_PREFER_ENTRY_KEYS = ['executor', 'invocation', 'crossProvider'];
         for (const key of Object.keys(entry)) {
           if (!ALLOWED_PREFER_ENTRY_KEYS.includes(key)) {
             throw new RunnerConfigError(`runner config (${entryLabel}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PREFER_ENTRY_KEYS.join(', ')}.`);
           }
         }
-        return { executor: entry.executor, invocation: entry.invocation };
+        return {
+          executor: entry.executor,
+          invocation: entry.invocation,
+          ...(entry.crossProvider !== undefined ? { crossProvider: entry.crossProvider } : {}),
+        };
       }
-      throw new RunnerConfigError(`runner config (${entryLabel}) must be a non-empty string or an object {executor, invocation?}.`);
+      throw new RunnerConfigError(`runner config (${entryLabel}) must be a non-empty string or an object {executor, invocation?, crossProvider?}.`);
     });
   }
   throw new RunnerConfigError(`runner config (${label}) must be a non-empty string (a executor id) or a non-empty array of candidates when present.`);

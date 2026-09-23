@@ -968,7 +968,7 @@ test('read-only claude redirect can leave the Claude provider and recomputes the
         claude: {
           default: ['claude-reviewer'],
           operations: {
-            'shape-plan': ['codex-bwrap'],
+            'shape-plan': [{ executor: 'codex-bwrap', crossProvider: true }],
           },
         },
       },
@@ -1045,7 +1045,7 @@ test('H5: a readOnlyRedirect target cannot bypass disallowedProviders governance
   const runnerConfig = {
     placementPolicy: {
       readOnlyRedirects: {
-        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+        claude: { operations: { 'shape-plan': [{ executor: 'codex-bwrap', crossProvider: true }] } },
       },
     },
     executors: {
@@ -1127,7 +1127,7 @@ test('provider capacity selection happens after Run admission, records redacted 
   const runnerConfig = {
     placementPolicy: {
       readOnlyRedirects: {
-        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+        claude: { operations: { 'shape-plan': [{ executor: 'codex-bwrap', crossProvider: true }] } },
       },
     },
     executors: {
@@ -1205,7 +1205,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
   const runnerConfig = {
     placementPolicy: {
       readOnlyRedirects: {
-        claude: { operations: { 'shape-plan': ['codex-bwrap'] } },
+        claude: { operations: { 'shape-plan': [{ executor: 'codex-bwrap', crossProvider: true }] } },
       },
     },
     executors: {

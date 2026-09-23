@@ -56,12 +56,20 @@ import {
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
+import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { resolveVerifiedRedirectExecutor, readOnlyRedirectPool, readOnlyRedirectInvocationFor } from './placement-policy.mjs';
+import {
+  resolveVerifiedRedirectExecutor,
+  resolveVerifiedAssignmentModel,
+  readOnlyRedirectPool,
+  readOnlyRedirectInvocationFor,
+  readOnlyRedirectEntryFor,
+  stablePoolIndex,
+} from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -230,23 +238,45 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
-function stableIndex(seed, size) {
-  if (!Number.isInteger(size) || size <= 0) return 0;
-  const hash = crypto.createHash('sha256').update(String(seed)).digest();
-  return hash.readUInt32BE(0) % size;
-}
-
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
+  const configuredRedirects = cfg?.placementPolicy?.readOnlyRedirects;
+  const isConfiguredForSource = configuredRedirects && Object.prototype.hasOwnProperty.call(configuredRedirects, sourceExecutorId);
+
   // Phase D correction (executor-profile-schema-migration): PlacementPolicy
   // itself now owns reading the declared candidate pool
   // (`readOnlyRedirectPool`, `placement-policy.mjs`) -- see that function's
   // own doc comment for why this moved off `executors.<id>` a second time.
   const rawPool = readOnlyRedirectPool(cfg, sourceExecutorId, assignment?.operation);
+
+  // Phase 05 R6: validate explicitly configured pool entries.
+  // Empty configured pools and unknown executors fail with typed refusal codes.
+  if (isConfiguredForSource) {
+    if (rawPool.length === 0) {
+      throw new RunnerConfigError(
+        `read-only redirect pool for "${sourceExecutorId}" is empty.`,
+        { code: 'redirect.empty-pool' },
+      );
+    }
+    for (const candidate of rawPool) {
+      if (!executors[candidate]) {
+        throw new RunnerConfigError(
+          `read-only redirect pool for "${sourceExecutorId}" references unknown executor "${candidate}".`,
+          { code: 'redirect.unknown-executor' },
+        );
+      }
+    }
+  }
+
+  const sourceExecutorEntry = cfg?.executors?.[sourceExecutorId];
+  const sourceProvider = deriveProviderFamily(sourceExecutorEntry, sourceExecutorEntry?.command ?? sourceExecutorId);
+
+  const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
   const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
   const legacyExecutorId = candidates.length === 0
     ? sourceExecutorId
-    : candidates[stableIndex(`${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`, candidates.length)];
+    : candidates[stablePoolIndex(seed, candidates.length)];
+
   // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
   // binder for redirect EXECUTOR selection, self-verifying -- same safety
   // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
@@ -260,7 +290,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
     cfg,
     sourceExecutorId,
     candidatePool: rawPool,
-    seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`,
+    seed,
     legacyExecutorId,
   });
   if (placementDivergence) {
@@ -268,20 +298,47 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
       `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
     );
   }
-  // M7: the caller needs the FULL decision (pool/seed alongside the chosen
-  // id) to persist it into dispatch-plan.json -- before this, everything
-  // but the final executorId was discarded here, leaving no audit trail
-  // for WHY a read-only redirect landed on the executor it did.
-  return { executorId: verifiedExecutorId, pool: rawPool, seed: `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}` };
+
+  const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
+  const selectedProvider = deriveProviderFamily(targetExecutorEntry, targetExecutorEntry?.command ?? verifiedExecutorId);
+
+  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
+  const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
+
+  // Phase 05 R6: cross-provider redirect requires explicit opt-in via crossProvider: true.
+  if (isCrossProvider && entryDesc?.crossProvider !== true) {
+    throw new RunnerConfigError(
+      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${verifiedExecutorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
+      { code: 'redirect.cross-provider-not-permitted' },
+    );
+  }
+
+  // M7 & I06: return full decision (pool, seed, sourceProvider, selectedProvider, crossProvider)
+  // for provenance recording in dispatch-plan.json.
+  return {
+    executorId: verifiedExecutorId,
+    pool: rawPool,
+    seed,
+    sourceProvider,
+    selectedProvider,
+    crossProvider: entryDesc?.crossProvider === true,
+  };
 }
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = deriveProviderFamily(executorEntry);
-  const model = providerModel === policy.providerModel
+  const legacyModel = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+  const { model: verifiedModel } = resolveVerifiedAssignmentModel({
+    cfg,
+    lookupPolicyTier: policy.tier,
+    provider: providerModel,
+    legacyModel,
+  });
+  const model = verifiedModel;
   return {
     ...policy,
     executorId,
@@ -1527,6 +1584,22 @@ export async function executeAssignment(assignment, opts = {}) {
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
   let effectiveAssignment = assignment;
   if (!fs.existsSync(assignmentJsonPath)) {
+    // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
+    // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
+    if (assignment.contractTemplate && !assignment.provenance?.template?.templateSnapshot) {
+      const initialResolution = resolveAndRenderOperationPrompt(assignment, {
+        cwd,
+        domain: assignment.domain,
+      });
+      assignment = Object.freeze({
+        ...assignment,
+        provenance: Object.freeze({
+          ...(assignment.provenance || {}),
+          template: initialResolution.templateProvenance,
+        }),
+      });
+    }
+    effectiveAssignment = assignment;
     fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
   } else {
     let raw;
@@ -1563,6 +1636,21 @@ export async function executeAssignment(assignment, opts = {}) {
   effectiveAssignment = Object.freeze({ ...effectiveAssignment, mutation: effectiveMutation });
 
   validateAssignmentLegality(effectiveAssignment, opts);
+
+  let templateResolution = null;
+  if (effectiveAssignment.contractTemplate) {
+    templateResolution = resolveAndRenderOperationPrompt(effectiveAssignment, {
+      cwd,
+      domain: effectiveAssignment.domain,
+    });
+    effectiveAssignment = Object.freeze({
+      ...effectiveAssignment,
+      provenance: Object.freeze({
+        ...(effectiveAssignment.provenance || {}),
+        template: templateResolution.templateProvenance,
+      }),
+    });
+  }
 
   // Enforce decide-first governance gate (Step 06). Dispatch Core Contract
   // Normalization Slice D: compileDispatchPlan() now merges
@@ -1661,10 +1749,13 @@ export async function executeAssignment(assignment, opts = {}) {
       ...compiledPlan,
       redirectDecision: {
         sourceExecutorId: defaultExecutorId,
+        sourceProvider: redirectResult.sourceProvider,
         pool: redirectResult.pool,
         seed: redirectResult.seed,
         chosen: resolvedExecutorId,
+        selectedProvider: redirectResult.selectedProvider,
         invocation: readOnlyRedirectInvocationId ?? null,
+        crossProvider: redirectResult.crossProvider,
       },
     };
   }
@@ -1687,6 +1778,10 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
       throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+    }
+    const targetEntry = cfg?.executors?.[resolvedExecutorId];
+    if (targetEntry && redirectResult?.crossProvider && targetEntry.allowCrossProvider !== true) {
+      throw new RunnerConfigError(`executor "${resolvedExecutorId}" resolves to cross-provider redirect target without allowCrossProvider: true.`);
     }
   }
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
@@ -1756,6 +1851,7 @@ export async function executeAssignment(assignment, opts = {}) {
       phase: 'admitted',
       delivery: 'not-sent',
       executorId: resolvedExecutorId,
+      ...(templateResolution ? { template: templateResolution.templateProvenance } : (effectiveAssignment.provenance?.template ? { template: effectiveAssignment.provenance.template } : {})),
       ...(compiledPlan ? { dispatchPlanPath: path.relative(root, path.join(runsDir, record.attemptStr, 'dispatch-plan.json')) } : {}),
       effectiveContractPath: path.relative(root, path.join(runsDir, record.attemptStr, EFFECTIVE_EXECUTION_CONTRACT_FILE)),
       ...(planContentHash ? { planContentHash } : {}),
@@ -2097,6 +2193,7 @@ export async function executeAssignment(assignment, opts = {}) {
       executorId: resolvedExecutorId,
       adapter: resolvedAdapter,
       providerCapacity: providerCapacityEvidence,
+      templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
       // The prompt is built before Authority preparation. Derive its posture
       // from the same requirement that will be handed to Authority, never
       // from an executor profile's merely requested confinement fragment.
@@ -2539,6 +2636,7 @@ export async function executeAssignment(assignment, opts = {}) {
           requirement: prepResult.preparedInvocation.requirement,
           backend: prepResult.preparedInvocation.backend,
         },
+        templateProvenance: templateResolution?.templateProvenance ?? effectiveAssignment.provenance?.template,
       });
       publishMutableProjection(effectiveContractPath, effectiveContract);
 

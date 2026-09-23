@@ -362,6 +362,32 @@ export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
 }
 
 /**
+ * Look up the raw pool entry descriptor declared for `executorId` within
+ * `runner.placementPolicy.readOnlyRedirects.<sourceExecutorId>` for `operation`.
+ * Returns `{ executor, invocation, crossProvider: boolean }` or `null` if not found.
+ */
+export function readOnlyRedirectEntryFor(cfg, sourceExecutorId, operation, executorId) {
+  const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
+  const raw = configured && typeof configured === 'object' && !Array.isArray(configured)
+    ? (configured.operations?.[operation] ?? configured.default)
+    : configured;
+  const rawArray = Array.isArray(raw) ? raw : (raw !== undefined ? [raw] : []);
+  const match = rawArray.find((entry) => {
+    if (typeof entry === 'string') return entry.trim() === executorId;
+    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.executor === executorId;
+  });
+  if (!match) return null;
+  if (typeof match === 'string') {
+    return { executor: match.trim(), invocation: undefined, crossProvider: false };
+  }
+  return {
+    executor: match.executor,
+    invocation: match.invocation,
+    crossProvider: match.crossProvider === true,
+  };
+}
+
+/**
  * executor-id-consolidation Step 2: the invocation pin (if any) declared
  * for `executorId` within the SAME raw `readOnlyRedirects` pool
  * `readOnlyRedirectPool` above already read for this exact
@@ -372,25 +398,14 @@ export function readOnlyRedirectPool(cfg, sourceExecutorId, operation) {
  * is a tested, public contract this function does not disturb.
  */
 export function readOnlyRedirectInvocationFor(cfg, sourceExecutorId, operation, executorId) {
-  const configured = cfg?.placementPolicy?.readOnlyRedirects?.[sourceExecutorId];
-  const raw = configured && typeof configured === 'object' && !Array.isArray(configured)
-    ? (configured.operations?.[operation] ?? configured.default)
-    : configured;
-  const rawArray = Array.isArray(raw) ? raw : (raw !== undefined ? [raw] : []);
-  const match = rawArray.find((entry) => {
-    if (typeof entry === 'string') return entry.trim() === executorId;
-    return entry && typeof entry === 'object' && !Array.isArray(entry) && entry.executor === executorId;
-  });
-  return match && typeof match === 'object' ? match.invocation : undefined;
+  const entry = readOnlyRedirectEntryFor(cfg, sourceExecutorId, operation, executorId);
+  return entry?.invocation;
 }
 
 /**
- * Deterministic index into a size-`size` pool from `seed`. BYTE-IDENTICAL
- * to assignment-runner.mjs's own `stableIndex` -- deliberately duplicated
- * rather than imported (assignment-runner.mjs already imports FROM this
- * module; importing back would be circular), so any accidental drift
- * between the two copies shows up immediately as a
- * `resolveVerifiedRedirectExecutor` divergence, never silently.
+ * Deterministic index into a size-`size` pool from `seed`. Canonical
+ * implementation shared with assignment-runner.mjs (which imports this
+ * function directly, deduplicating the selection logic per R7 / Disposition 1).
  */
 export function stablePoolIndex(seed, size) {
   if (!Number.isInteger(size) || size <= 0) return 0;

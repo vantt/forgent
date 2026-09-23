@@ -2,9 +2,47 @@
 
 Wave 3 · Gate: D1 cho H6(b); M5 phối hợp chủ plan `260915-executor-policy-dispatch-seams` (Phase 08 pending) · Findings: H6, H12, M5, M6, M7, M12, L4. Context: review §H6/H12/M5/M6/M7/M12, Phụ lục 1/2.
 
-## Status — 2026-09-22
+## Status — 2026-09-23 (Unit I06 / Phase 3A Completion)
 
-**R1–R4, R6 xong; R5 một nửa; R7/R8 điều tra kỹ rồi hoãn có chủ đích** trên nhánh `dispatch-hardening-phase05-policy-governance-coherence` (worktree cùng tên, rẽ từ `main` HEAD lúc bắt đầu — chờ đúng lúc main checkout hết bị session khác checkout sang branch khác). D1 (H6b's quyết định) đã có sẵn từ Phase 00: `unavailable` + `reasonCodes:['selector.unregistered']`. Test đích: 529 test qua `dispatch.test.mjs`/`assignment-policy.test.mjs`/`assignment-dispatch.test.mjs`/`coordination-session-engine.test.mjs`/`placement-policy.test.mjs` — 0 fail. Full `npm test` đang chạy so baseline.
+- **Status**: `integrated` (cleanly integrated into local `main` at `3bab9b99`, evaluated candidate `d75d311d`, status-recording tip `dec142a5`).
+- **Candidate Branch**: `coordination-skill-harness-i06-dispatch-governance`
+- **Base Commit**: `15e4048503ca1ee02dae23263dee84b9c983386d` (`main`)
+- **Evaluated Candidate SHA**: `d75d311d1b7a853bfede60c4bf52e10b0a41c82f` (code fix `2e210796`; lineage `b67f3794` -> `2e210796` -> `d6dc386f` -> `d75d311d` -> `dec142a5`)
+- **Status-Recording SHA**: `dec142a5e0b4417690fd2018333fecc490a3f9b7`
+- **Integrated Commit SHA**: `3bab9b99` (on local `main`)
+- **Last-Verified Date / Revision**: 2026-09-23 at candidate `d75d311d` (post-merge re-verified at `3bab9b99`)
+- **Next Dependency Gate**: Unit I07 (Phase 08 operability/doctor), Unit I08 (dispatch verification), and Unit I09 (DAG forward-port).
+- **Direct Candidate Evidence**:
+  - `node --test test/architecture.test.mjs test/runner/dispatch-cross-provider-redirect.test.mjs test/runner/placement-policy-matrix-coverage.test.mjs test/runner/placement-policy-redirect-selection.test.mjs test/runner/placement-policy.test.mjs test/runner/dispatch-coordination-role-tiers.test.mjs`: 101 pass / 0 fail (~4.1s).
+  - `node --test test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail (~15.9s).
+  - Full dispatch test matrix: 560 pass / 0 fail.
+  - 11-suite coordination matrix: 317 pass / 0 fail.
+  - `git diff --check`: 0 warnings/errors (clean).
+- **Historical Evidence (separated)**:
+  - Initial Phase 05 exploration (2026-09-22 morning): 529 tests passing across dispatch.test.mjs / assignment-policy.test.mjs / placement-policy.test.mjs.
+
+### Requirements Summary (R1–R8)
+
+- **R5 (M6)**: Revalidated — `deriveProviderFamily` và `normalizeProviderFamily` đã là single canonical path trong `assignment-policy.mjs`. Model lookup / tier resolution đã được phân định độc lập (`modelForTier`, `resolveVerifiedAssignmentModel`). Giữ nguyên, không thêm abstraction `lookupProvider` không cần thiết.
+- **R6 (M7)**: Hoàn tất trọn vẹn contract `crossProvider: true`:
+  - `normalizePreferCandidates` (`config.mjs`) validate boolean `crossProvider` cho pool entries (default `false`).
+  - `selectReadOnlyRedirectExecutor` (`assignment-runner.mjs`) ném typed refusal `redirect.cross-provider-not-permitted` nếu redirect candidate vượt provider boundary mà không opt in `crossProvider: true`.
+  - Ném `redirect.empty-pool` khi pool rỗng và `redirect.unknown-executor` khi executor chưa đăng ký.
+  - Governance checks (`disallowedProviders`, `disallowedExecutors`, và `allowCrossProvider`) được bảo vệ nghiêm ngặt trước và trong execution.
+  - Persist toàn bộ `redirectDecision` (`{sourceExecutorId, sourceProvider, pool, seed, chosen, selectedProvider, invocation, crossProvider}`) vào `dispatch-plan.json`.
+- **R7 (M5)**: Settled theo **Disposition 1: Retain live PlacementPolicy authority and deduplicate duplicate selection logic**.
+  - `PlacementPolicy` là binder thực sự cho model resolution và redirect invocations.
+  - Deduplicate: loại bỏ `stableIndex` trùng lặp trong `assignment-runner.mjs`, import và dùng canonical `stablePoolIndex` từ `placement-policy.mjs`.
+  - Giữ lại `evaluatePlacementPolicyShadow` để bảo vệ test coverage lịch sử mà không sinh duplicate code trong production. Doc comment cập nhật phản ánh đúng việc chia sẻ canonical.
+- **R8 (L4)**: Cắt trọn vẹn import cycle giữa `config.mjs` và `transport.mjs`:
+  - Tạo `src/runner/dispatch/adapters.mjs` leaf module chứa adapter registry và lookup helpers.
+  - `config.mjs` chỉ import từ `adapters.mjs`.
+  - `transport.mjs` re-export registry để bảo toàn backward compatibility.
+  - Đăng ký `adapters.mjs` trong `docs/architecture-manifest.json` và thêm architectural cycle-cut tests trong `test/architecture.test.mjs`.
+
+### Trước đó (2026-09-22 sáng)
+
+**R1–R4, R6 xong; R5 một nửa; R7/R8 điều tra kỹ rồi hoãn có chủ đích** trên nhánh `dispatch-hardening-phase05-policy-governance-coherence`. D1 (H6b's quyết định) đã có sẵn từ Phase 00: `unavailable` + `reasonCodes:['selector.unregistered']`. Test đích: 529 test qua `dispatch.test.mjs`/`assignment-policy.test.mjs`/`assignment-dispatch.test.mjs`/`coordination-session-engine.test.mjs`/`placement-policy.test.mjs` — 0 fail. Full `npm test` đang chạy so baseline.
 
 Chi tiết:
 - **R3 (H12)**: `preferInvocation` được VALIDATE (schema.mjs) nhưng KHÔNG BAO GIỜ thực sự merge — thiếu trong `mergePolicyStack`'s field loop (`schema.mjs:343`) VÀ thiếu trong `session-engine.mjs`'s `cliOverride` rebuild (`:2496-2504`) — khai báo `preferInvocation` trong một PolicyPatch không có tác dụng gì, dù consumer thật (`assignment-runner.mjs`'s `opts.cliOverride?.preferInvocation`) đã sẵn sàng đọc. Thêm vào cả 2 chỗ, nối trọn đường ống.

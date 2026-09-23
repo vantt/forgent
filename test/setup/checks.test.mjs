@@ -138,6 +138,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-probe-freshness',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
+      'operation-prompt-templates-valid',
       'runner-coordination-orgPolicy-shape',
     ].sort(),
   );
