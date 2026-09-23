@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
+import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
@@ -126,12 +127,12 @@ export function readRunSnapshot(runDir) {
       if (st.isDirectory()) {
         resultCorrupt = true;
       } else {
-        const parsed = readJsonOrNull(resultFile);
-        if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        const interpreted = interpretRunResult(resultFile);
+        if (!interpreted || interpreted.corrupt || interpreted.contractCorrupt || interpreted.classification?.provenance === 'contract-corrupt') {
           resultCorrupt = true;
         } else {
           settled = true;
-          result = parsed;
+          result = interpreted;
         }
       }
     } catch {

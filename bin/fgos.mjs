@@ -2552,6 +2552,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           return await runDispatchCli(rawArgv, { returnResult: true });
         } catch (err) {
           if (sub === 'execute' || err instanceof DispatchError || err.errorClass) {
+            err.isDispatchExecute = (sub === 'execute');
             const payload = {
               error: err.message,
               ...(err.errorClass ? { errorClass: err.errorClass } : {}),
@@ -5120,7 +5121,7 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
-    if (err instanceof DispatchError || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
+    if (err instanceof DispatchError || err.isDispatchExecute || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
       process.exitCode = 1;
     } else {
       process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;

@@ -850,7 +850,7 @@ function validateInteractiveModeShape(interactiveMode, label) {
  */
 function warnIfProviderFamilyUnreliable(executorId, executor) {
   if (executor.providerModel !== undefined || executor.provider !== undefined) return;
-  // Phase 08 R8 (L10): Skip warning when every declared invocation is non-CLI (e.g. mcp-only or http-only).
+  // Skip warning when every declared invocation is non-CLI (e.g. mcp-only or http-only).
   if (Array.isArray(executor.invocations) && executor.invocations.length > 0 && executor.invocations.every((inv) => inv.via !== 'cli')) {
     return;
   }

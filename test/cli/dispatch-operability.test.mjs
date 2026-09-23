@@ -143,3 +143,17 @@ test('fgos dispatch execute and node src/runner/dispatch.mjs execute preserve er
   assert.equal(fgosJson.errorClass, 'dispatch-depth-exceeded');
   assert.match(fgosJson.error, /nested out-of-process dispatch depth 10 is already at the cap/);
 });
+
+test('fgos dispatch execute and node src/runner/dispatch.mjs execute exit 1 on all execute errors (L3)', () => {
+  const direct = runDispatchDirect(['execute', 'no-such-exec', '--repo-root', '/nonexistent/path/12345', '--prompt', 'hi']);
+  assert.equal(direct.status, 1);
+  const directLines = direct.stdout.trim().split('\n').filter(Boolean);
+  const directJson = JSON.parse(directLines[directLines.length - 1]);
+  assert.match(directJson.error, /--repo-root.*passed without --cwd/);
+
+  const fgos = runFgos(['dispatch', 'execute', 'no-such-exec', '--repo-root', '/nonexistent/path/12345', '--prompt', 'hi']);
+  assert.equal(fgos.status, 1);
+  const fgosLines = fgos.stdout.trim().split('\n').filter(Boolean);
+  const fgosJson = JSON.parse(fgosLines[fgosLines.length - 1]);
+  assert.match(fgosJson.error, /--repo-root.*passed without --cwd/);
+});

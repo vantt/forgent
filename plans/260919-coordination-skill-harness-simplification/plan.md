@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I07 next eligible (I08 requires I07; I09 requires I06/I04/I02 — I06 verified)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I07 implemented / ready for independent review (candidate on branch `dispatch-hardening-i07-operability-cli-doctor`); Unit I08 requires I07; I09 requires I06/I04/I02 — I06 verified
 Created: 2026-09-19
 Last Updated: 2026-09-23
 Mode: high-risk
@@ -832,6 +832,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I07 — implement dispatch-hardening Phase 08 operability/doctor
   capability: code:implement
   depends-on: I01
+  status: implemented / ready for independent review
+  report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
   stop: command/setup/doctor contract cannot be made consistent
 - unit: I08 — verify dispatch governance, CLI, doctor, and performance gates
   capability: code:test

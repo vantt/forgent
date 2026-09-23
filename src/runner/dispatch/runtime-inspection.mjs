@@ -117,7 +117,7 @@ function owner(l, root, all) {
   return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
 }
 function authority(l, root, all) { const o = owner(l, root, all); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
-const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'running', 'delivered', 'settled', 'unknown']);
+const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']);
 const VALID_RESOURCE_STATES = new Set(['live-proven', 'dead-proven', 'absent-proven', 'ambiguous', 'unobserved', 'unsupported']);
 const VALID_DELIVERIES = new Set(['not-started', 'running', 'delivered', 'unknown', 'replayed', 'recovered']);
 
@@ -135,8 +135,8 @@ function derivePhase(l, terminal) {
 
   if (l.run?.status === 'running') {
     if (l.run?.launchedAt || l.run?.delivery === 'running') return 'launched';
-    if (l.run?.phase === 'admitted') return 'admitted';
-    return 'running';
+    if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
+    return 'admitted';
   }
 
   if (l.run?.status === 'launched' || l.run?.launchedAt) return 'launched';
@@ -193,7 +193,7 @@ function one(l, root, now, all) {
     phase,
     resourceState,
     delivery,
-    inspectionStatus: terminal.present ? 'resolved' : 'partial',
+    inspectionStatus: terminal.present && !terminal.corrupt ? 'resolved' : 'partial',
     evidenceCompleteness: {
       identity: 'complete',
       lifecycle: 'complete',
@@ -201,8 +201,10 @@ function one(l, root, now, all) {
         ? 'unsupported'
         : (resourceState === 'unobserved'
           ? 'missing'
-          : (resourceState === 'ambiguous' ? 'incomplete' : 'complete')),
-      result: terminal.present ? 'complete' : 'missing',
+          : (resourceState === 'ambiguous' ? 'stale' : 'complete')),
+      result: !terminal.present
+        ? 'missing'
+        : (terminal.corrupt ? 'corrupt' : 'complete'),
       ownership: o.complete ? 'complete' : 'partial',
       workspace: workspaceCompleteness,
     },
@@ -210,7 +212,7 @@ function one(l, root, now, all) {
     observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }],
   };
   const hint = authority(l, root, all);
-  return { inspectionStatus: o.complete && terminal.present ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } };
+  return { inspectionStatus: o.complete && terminal.present && !terminal.corrupt ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } };
 }
 function workspace(input) { const absolute = path.resolve(input); let cursor = absolute; try { if (!fs.statSync(cursor).isDirectory()) cursor = path.dirname(cursor); } catch { return { path: absolute, root: absolute, commonDir: null, key: absolute }; } for (;;) { const dot = path.join(cursor, '.git'); if (fs.existsSync(dot)) { let gitDir = dot; try { if (fs.statSync(dot).isFile()) { const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8')); if (m) gitDir = path.resolve(cursor, m[1]); } } catch {} const common = text(path.join(gitDir, 'commondir')), commonDir = common ? path.resolve(gitDir, common) : gitDir; return { path: absolute, root: real(cursor), commonDir: real(commonDir), key: `${real(cursor)}::${real(commonDir)}` }; } const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent; } return { path: absolute, root: absolute, commonDir: null, key: absolute }; }
 const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject: { kind, id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } });

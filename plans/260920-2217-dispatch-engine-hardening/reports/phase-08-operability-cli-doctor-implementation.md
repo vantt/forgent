@@ -23,8 +23,8 @@ Unit **I07** implements all nine requirements (R1–R9) of Dispatch-Hardening Ph
 | **R1** | `decide` result vocabulary & dead check removal | **Satisfied** | Added additive `reasonCodes` and `blockedReason` to `decideExecutorCli` (`cli.mjs`). Removed dead `plan.dispatch === 'human-only'` check in `cli.mjs` and `assignment-runner.mjs`. Tests prove governance-blocked JSON ≠ unregistered JSON. |
 | **R2** | Production CLI door & envelope wrapping | **Satisfied** | Registered `fgos dispatch decide\|execute\|log` in `src/cli/command-registry.mjs` with `touchesState: true`, `externalEffect: true` (`[write+external]`). Delegating to `runDispatchCli` in `bin/fgos.mjs`, wrapped in `fgos.v1` envelope on success, preserving `{ error, errorClass }` and exit code 1 on dispatch failure. Retained `node src/runner/dispatch.mjs` as raw JSON compatibility alias. Updated `AGENTS.md` and `scripts/dispatch-decide-hook.mjs`. |
 | **R3** | CLI validation, aliases & error categorization | **Satisfied** | Added `--run` alias for `--run-id` on `show-run`, `watch`, `recover`. Standardized run not-found errors to categorized exit code 2 (`precondition`) in `show-run.mjs` and `recover.mjs`, documented in `docs/io-contract.md`. Validated unknown sub-verb before requiring `runId` (exit 4). Added validation that `reconcile plan --run/--assignment` without `--action` exits 4 with actionable message. Preserved positional `undefined` semantics. Usage includes `fanout-batch` and `reconcile`. |
-| **R4** | Watch settlement | **Satisfied** | `readRunSnapshot` in `src/verbs/dispatch/show-run.mjs` validates `result.json` (regular file and valid JSON object); flags `settled: false`, `resultCorrupt: true` if missing, empty, invalid JSON, or a directory. `watchRunUseCase` in `src/verbs/dispatch/watch.mjs` breaks only on valid `snapshot.settled`. |
-| **R5** | `RunObservation` closed vocabulary | **Satisfied** | Aligned `RunObservation` vocabulary to fact-grounded status sets in `src/runner/dispatch/runtime-inspection.mjs`: `phase` derived from facts (`result.json` present and not corrupt -> `settled`; active controller commands -> `bound`; controller alive -> `launched`; run status running -> `running`; run status settled without result -> `unknown`), `delivery` maps `not-sent` -> `not-started`, `resourceState` checks visibility session status freshness (<60s) for `live-proven` (otherwise `ambiguous`; absence proof unsupported maps to `ambiguous`), and `evidenceCompleteness.resource` emits `incomplete` or `unsupported` when ambiguous. |
+| **R4** | Watch settlement & corrupt evidence handling | **Satisfied** | `readRunSnapshot` in `src/verbs/dispatch/show-run.mjs` validates `result.json` via `interpretRunResult`; flags `settled: false`, `resultCorrupt: true` if missing, empty, invalid JSON, `{}`, or a directory. `watchRunUseCase` in `src/verbs/dispatch/watch.mjs` terminates with `stoppedBecause: 'terminal'` when `snapshot.settled` is true, or with `stoppedBecause: 'corrupt-evidence'` when `snapshot.resultCorrupt` is true or run is terminal with corrupt evidence. |
+| **R5** | `RunObservation` closed vocabulary | **Satisfied** | Aligned `RunObservation` vocabulary to fact-grounded closed contract status sets in `src/runner/dispatch/runtime-inspection.mjs`: `phase` strictly in `[admitted, launched, bound, delivered, settled, unknown]` (`result.json` valid -> `settled`; active controller commands -> `bound`; controller alive -> `launched`; run status running -> `admitted`; run status settled without valid result -> `unknown`), `delivery` maps `not-sent` -> `not-started`, `resourceState` checks visibility session status freshness (<60s) for `live-proven` (otherwise `ambiguous`; absence proof unsupported maps to `ambiguous`), `evidenceCompleteness.resource` uses `stale` (when ambiguous), `missing` (when unobserved), or `complete`/`unsupported` (never `incomplete`), and `evidenceCompleteness.result` uses `corrupt` when terminal evidence is corrupt. |
 | **R6** | Doctor & setup coherence | **Satisfied** | Updated `checkHerdrAvailable` in `src/setup/registrations.mjs` to resolve binary via `resolveHerdrBin()` (`process.env.FGOS_HERDR_BIN?.trim() || 'herdr'`). Added diagnosis of `FGOS_HERDR_ANCHOR_PANE`: fails closed (`passed: false`) if empty, whitespace, or fails resolution via `pane get`. Normalized anchor pane trimming between transport and doctor. Documented intentional host-global state directories (`~/.fgos/runtime/provider-capacity/` and `~/.local/state/fgos/attestations/`) in `docs/specs/distribution.md` (rows 5d and 5e). |
 | **R7** | Polling & backoff performance | **Satisfied** | Replaced flat 250ms polling backoff with event-driven `fs.watch` on `receiptsDir` backed by 20ms fallback polling in `transport.mjs` and `assignment-runner.mjs`. Herdr round polling in `herdr-round.mjs` backs off to 1500ms after ack, and skips `paneProcessInfo` while status is `working`. Verified via $n=40$ benchmark: median 31ms, p95 40ms (exceeds p95 $\le$ base + 100ms threshold). |
 | **R8** | Provider-family warning condition | **Satisfied** | `warnIfProviderFamilyUnreliable` in `src/runner/dispatch/config.mjs` skips warning when all declared executor invocations are non-CLI (`invocations.every(inv => inv.via !== 'cli')`). |
@@ -54,7 +54,7 @@ Unit **I07** implements all nine requirements (R1–R9) of Dispatch-Hardening Ph
   - Imported `runDispatchCli`.
   - Handled `sub === 'decide' || sub === 'execute' || sub === 'log'` by delegating to `await runDispatchCli(rawArgv, { returnResult: true })`.
   - The returned data object is wrapped in the standard `fgos.v1` output envelope via `wrapEnvelope(data)`.
-  - If a dispatch failure throws, catches and writes `{ error, errorClass }` directly to stdout, exiting with code 1, exactly preserving the compatibility door contract (`node src/runner/dispatch.mjs execute`).
+  - If a dispatch failure throws, catches and writes `{ error, errorClass }` directly to stdout, exiting with code 1, exactly preserving the compatibility door contract (`node src/runner/dispatch.mjs execute`). Set `err.isDispatchExecute` to ensure exit 1 across all execute failures (L3).
   - Calling `node src/runner/dispatch.mjs` directly remains an exact backwards-compatibility alias that outputs raw JSON without envelope.
 - In `AGENTS.md` and `scripts/dispatch-decide-hook.mjs`:
   - Documented `fgos dispatch execute` alongside `node src/runner/dispatch.mjs execute`.
@@ -72,20 +72,21 @@ Unit **I07** implements all nine requirements (R1–R9) of Dispatch-Hardening Ph
 - In `docs/io-contract.md`:
   - Updated Exit 2 (`precondition`) documentation to explicitly include target run not found.
 
-### 2.4 R4 — Watch Settlement
+### 2.4 R4 — Watch Settlement & Result Interpretation
 - In `src/verbs/dispatch/show-run.mjs`:
-  - `readRunSnapshot(runDir)` parses `result.json` if it exists and is a regular file.
-  - If missing, or if empty, directory, or invalid JSON, sets `settled: false`. Sets `resultCorrupt: true` if corrupted or directory.
+  - `readRunSnapshot(runDir)` validates `result.json` through `interpretRunResult(resultFile)`.
+  - If missing, or if empty, directory, invalid JSON, `{}`, or corrupt contract, sets `settled: false`, `resultCorrupt: true`.
+- In `src/runner/dispatch/run-result.mjs`:
+  - In `interpretRunResult`, checks if `!rawObj.contract && !rawObj.status && !rawObj.runId` and returns `contract-corrupt` with `corrupt: true`.
 - In `src/verbs/dispatch/watch.mjs`:
-  - In `watchRunUseCase`, added check: `if (snapshot.settled) { stoppedBecause = 'terminal'; break; }`.
-  - Corrupt or non-settled results do not trigger premature terminal exit.
+  - In `watchRunUseCase`: terminates with `stoppedBecause: 'terminal'` when `snapshot.settled` is true; terminates with `stoppedBecause: 'corrupt-evidence'` when `snapshot.resultCorrupt` is true or run is terminal with corrupt evidence; terminates with `stoppedBecause: 'terminal'` when run status is in `TERMINAL_RUN_STATUSES`. Does not hang without `--ticks`.
 
 ### 2.5 R5 — `RunObservation` Closed Vocabulary
 - In `src/runner/dispatch/runtime-inspection.mjs`:
-  - `derivePhase`: returns `'settled'` only when valid `result.json` exists without corruption; `'bound'` when active controller commands exist; `'launched'` when controller is alive; `'running'` when `run.status === 'running'`; `'unknown'` when `run.status === 'settled'` without valid result.
+  - `derivePhase`: returns `'settled'` only when valid `result.json` exists without corruption; `'bound'` when active controller commands exist; `'launched'` when controller is alive; `'admitted'` when `run.status === 'running'`; `'unknown'` when `run.status === 'settled'` without valid result. Closed vocabulary: `['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']`.
   - `deriveDelivery`: maps `'not-sent'` to `'not-started'`.
   - `deriveResourceState`: checks visibility session status freshness (<60s) for `'live-proven'`, otherwise `'ambiguous'`. Absence proof unsupported maps to `'ambiguous'`.
-  - `evidenceCompleteness`: maps resource completeness to `'incomplete'` when ambiguous, `'missing'` when unobserved, and `'complete'` when observed and live/dead proven. Emits `'unsupported'` for workspace completeness when unsupported.
+  - `evidenceCompleteness`: maps resource completeness to `'stale'` when ambiguous, `'missing'` when unobserved, and `'complete'` when observed and live/dead proven. Maps result completeness to `'corrupt'` when `terminal.corrupt` is true. Emits `'unsupported'` for workspace completeness when unsupported. All values strictly adhere to `['complete', 'missing', 'stale', 'corrupt', 'conflicting', 'unsupported']`.
 
 ### 2.6 R6 — Doctor and Setup Coherence
 - In `src/runner/dispatch/transport.mjs`:
@@ -129,7 +130,8 @@ Unit **I07** implements all nine requirements (R1–R9) of Dispatch-Hardening Ph
 - **Symbol Impact Analysis**:
   - `runDispatchCli`: only caller is `src/runner/dispatch.mjs:108` script guard and the new delegation in `bin/fgos.mjs:2550`. Blast radius is low and strictly bounded.
   - `decideExecutorCli`: callers include `bin/fgos.mjs`, `scripts/dispatch-decide-hook.mjs`, `assignment-runner.mjs`, `cli.mjs`. All additive properties (`reasonCodes`, `blockedReason`) preserve backward compatibility for existing callers.
-  - `readRunSnapshot`: called by `show-run.mjs`, `watch.mjs`, `recover.mjs`. Addition of `settled` boolean is additive and strictly non-breaking.
+  - `readRunSnapshot`: called by `show-run.mjs`, `watch.mjs`, `recover.mjs`. Uses `interpretRunResult` to ensure validation agreement across all dispatch readers.
+  - `interpretRunResult`: called by `show-run.mjs`, `runtime-inspection.mjs`, `session-engine.mjs`, `assignment-runner.mjs`. Rejects vacuous `{}` as `contract-corrupt`.
   - `resolveHerdrBin`: used by `transport.mjs` and `setup/registrations.mjs`. Blast radius bounded.
   - `inspectDispatchRuntime`: tested via `dispatch-runtime-inspect.test.mjs` and `dispatch-inspect.test.mjs`.
 
@@ -141,7 +143,7 @@ Unit **I07** implements all nine requirements (R1–R9) of Dispatch-Hardening Ph
 
 All targeted and blast-radius suites passed cleanly (0 failures):
 
-1. **`test/cli/dispatch-operability.test.mjs`** (NEW - 10 tests, 0 failures):
+1. **`test/cli/dispatch-operability.test.mjs`** (NEW - 11 tests, 0 failures):
    - `fgos dispatch decide` returns `fgos.v1` envelope with `reasonCodes`.
    - `node src/runner/dispatch.mjs decide` returns raw JSON without envelope.
    - Unknown dispatch sub-verb rejects before requiring `runId` (exit 4).
@@ -152,15 +154,22 @@ All targeted and blast-radius suites passed cleanly (0 failures):
    - `fgos dispatch --help` correctly renders compound positional fields `sub, run-id`.
    - `fgos dispatch` registry entry has `touchesState: true` and `externalEffect: true`, rendering `[write+external]`.
    - `fgos dispatch execute` preserves `{ error, errorClass }` payload and exit code 1 identically to `node src/runner/dispatch.mjs execute`.
+   - `fgos dispatch execute` and `node src/runner/dispatch.mjs execute` exit 1 on all execute errors (L3).
 2. **`test/cli/dispatch-inspect.test.mjs`** & **`test/cli/dispatch-reconcile.test.mjs`**:
    - 6/6 pass on reconcile CLI tests.
    - All inspect selector CLI tests pass.
 3. **`test/verbs/dispatch-observe.test.mjs`** (12 tests, 0 failures):
-   - Tested `readRunSnapshot` and `watchRunUseCase` with `settled: true` on valid `result.json`.
-   - Tested corrupt, empty, and directory `result.json`: flags `settled: false`, `resultCorrupt: true`, and `watchRunUseCase` does not terminate with `terminal`.
+   - Tested `readRunSnapshot` and `watchRunUseCase` for all 5 probe cases without `--ticks`:
+     1. Chưa có (absent) -> watch continues without premature termination.
+     2. Hợp lệ (valid) -> watch terminates immediately with `stoppedBecause: 'terminal'`, `settled: true`.
+     3. Hỏng (invalid JSON) -> watch terminates with `stoppedBecause: 'corrupt-evidence'`, `settled: false`.
+     4. {} (empty object) -> watch terminates with `stoppedBecause: 'corrupt-evidence'`, `settled: false`.
+     5. Status terminal kèm result hỏng -> watch terminates with `stoppedBecause: 'corrupt-evidence'`, `settled: false`.
+     6. Directory result.json -> watch terminates with `stoppedBecause: 'corrupt-evidence'`, `settled: false`.
 4. **`test/runner/dispatch-runtime-inspect.test.mjs`** (19 tests, 0 failures):
-   - Verified closed vocabulary for `phase`, `delivery`, `resourceState`, `evidenceCompleteness.workspace`.
-   - Tested fact-based phase derivation (`settled`, `bound`, `launched`, `running`, `unknown`), visibility freshness <60s for `live-proven`, absence proof unsupported for `ambiguous`, and resource completeness mapping.
+   - Verified closed vocabulary for `phase` (`['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']`).
+   - Tested `evidenceCompleteness.resource` uses `stale` when ambiguous (never `incomplete`).
+   - Tested `evidenceCompleteness.result` uses `corrupt` when terminal evidence is corrupt.
 5. **`test/setup/visibility-checks.test.mjs`** & **`test/setup/*.test.mjs`** (608 tests, 0 failures):
    - Verified `checkHerdrAvailable` with `FGOS_HERDR_BIN` override and `FGOS_HERDR_ANCHOR_PANE` validation.
    - Verified fail-closed behavior when anchor pane cannot be resolved (`pane get` fails).
@@ -179,9 +188,41 @@ All targeted and blast-radius suites passed cleanly (0 failures):
 12. **`git diff --check cc687d92`**:
     - Clean (0 warnings, 0 errors).
 
-### 4.2 Latency Benchmark Measurement (R7)
+### 4.2 Latency Benchmark Measurement & Reproducibility (R7 / L4)
 
-- **Test**: 40 trials of `executeAssignment` with a 1.1s worker script under `cli-spawn-supervisor` polling.
+- **Benchmark Method**: 40 iterations executing an assignment via `executeAssignment` with a worker shell script sleeping 1100ms:
+```javascript
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { executeAssignment } from './src/runner/dispatch/assignment-runner.mjs';
+
+const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-bench-'));
+const workerScript = path.join(workDir, 'worker.sh');
+fs.writeFileSync(workerScript, '#!/bin/sh\nsleep 1.1\nexit 0\n', { mode: 0o755 });
+
+const latencies = [];
+for (let i = 0; i < 40; i++) {
+  const asgnId = `asgn_bench_${i}`;
+  const t0 = Date.now();
+  // executeAssignment creates assignment, spawns worker, waits for supervisor receipt, returns
+  await executeAssignment({
+    assignmentId: asgnId,
+    repoRoot: workDir,
+    executor: {
+      id: 'bench-exec',
+      adapter: 'cli-spawn-supervisor',
+      command: workerScript,
+    },
+  });
+  const elapsed = Date.now() - t0;
+  latencies.push(elapsed - 1100);
+}
+latencies.sort((a, b) => a - b);
+const median = latencies[Math.floor(latencies.length / 2)];
+const p95 = latencies[Math.floor(latencies.length * 0.95)];
+console.log(JSON.stringify({ n: latencies.length, median, p95, min: latencies[0], max: latencies.at(-1) }));
+```
 - **Results**:
   - Baseline `cc687d92`: median 26ms, p95 46ms.
   - Candidate (event-driven `fs.watch` + 20ms fallback): median 31ms, p95 40ms ($n=40$).
@@ -190,18 +231,25 @@ All targeted and blast-radius suites passed cleanly (0 failures):
 
 ---
 
-## 5. Review Findings Resolution (F1–F8)
+## 5. Review Findings Resolution (F1–F8, N1–N3, L1–L4)
 
 | Finding | Severity | Resolution Summary |
 |---|---|---|
 | **F1** | HIGH (R7) | Latency regression resolved by implementing event-driven `fs.watch` on `receiptsDir` backed by 20ms fallback polling in `transport.mjs` and `assignment-runner.mjs`. p95 latency reduced from 246ms to 40ms. |
 | **F2** | HIGH (R9/R2) | `src/cli/command-registry.mjs`: set `touchesState: true`, `externalEffect: true`, rendering `[write+external]`. Documented writes to run/guard directories. |
-| **F3** | MEDIUM (R5) | Fact-based `RunObservation`: removed ungrounded `staging`/`unadmitted`; added `running` and `unknown` phases; verified freshness (<60s) for `live-proven`; mapped unsupported absence proof to `ambiguous`; mapped resource completeness to `incomplete`/`unsupported`. |
-| **F4** | MEDIUM (R4) | Corrupt/empty/directory `result.json` sets `settled: false`, `resultCorrupt: true`. `watch` does not treat corrupt results as terminal settled. |
+| **F3** | MEDIUM (R5) | Fact-based `RunObservation`: verified freshness (<60s) for `live-proven`; mapped unsupported absence proof to `ambiguous`. |
+| **F4** | MEDIUM (R4) | Corrupt/empty/directory `result.json` sets `settled: false`, `resultCorrupt: true`. |
 | **F5** | MEDIUM (R6) | Doctor check `herdr-available` fails closed (`passed: false`) if anchor pane fails `pane get`. Normalized whitespace trimming across transport and doctor. |
 | **F6** | MEDIUM (R2) | Preserved `{ error, errorClass }` payload on stdout and exit code 1 on dispatch failure across `fgos dispatch execute` and `node src/runner/dispatch.mjs execute`. |
-| **F7** | MEDIUM | Updated `AGENTS.md` §Dispatch in worktree; updated `plan.md` Phase 08 status; updated this implementation report. |
+| **F7** | MEDIUM | Updated `AGENTS.md` §Dispatch in worktree; updated `plan.md` Phase 08 status. |
 | **F8** | LOW | Verified clean diff with `git diff --check cc687d92`. |
+| **N1** | MEDIUM (R5) | Removed `running` from `VALID_PHASES`, mapped `status: 'running'` to `admitted`; removed `incomplete` from `evidenceCompleteness.resource`, mapping to `stale`; set `evidenceCompleteness.result` to `corrupt` when terminal evidence is corrupt. Tested in `dispatch-runtime-inspect.test.mjs`. |
+| **N2** | MEDIUM (R4) | In `watch.mjs`, terminates with `stoppedBecause: 'corrupt-evidence'` on corrupt evidence (including terminal run with corrupt result), without hanging or reporting settled. Tested in `dispatch-observe.test.mjs`. |
+| **N3** | MEDIUM (R4) | `show-run.mjs` and `runtime-inspection.mjs` agree via `interpretRunResult`; vacuous `{}` without contract, status, or runId is treated as `contract-corrupt` with `settled: false`, `resultCorrupt: true`. Tested in `dispatch-observe.test.mjs`. |
+| **L1** | LOW | Updated Unit I07 status in `plans/260919-coordination-skill-harness-simplification/plan.md` to `implemented / ready for independent review`. |
+| **L2** | LOW | Cleaned up internal plan references from comments in `config.mjs` and `CHANGELOG.md`. |
+| **L3** | LOW | Tracked `err.isDispatchExecute` in `bin/fgos.mjs` so all dispatch execute errors exit 1 identically to compatibility door. Tested in `dispatch-operability.test.mjs`. |
+| **L4** | LOW | Documented exact reproducible benchmark script and methodology in this report. |
 
 ---
 
@@ -214,6 +262,7 @@ The following files constitute the candidate diff against `cc687d92`:
 - `CHANGELOG.md`
 - `docs/io-contract.md`
 - `docs/specs/distribution.md`
+- `plans/260919-coordination-skill-harness-simplification/plan.md`
 - `plans/260920-2217-dispatch-engine-hardening/phase-08-operability-cli-doctor.md`
 - `plans/260920-2217-dispatch-engine-hardening/plan.md`
 - `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
@@ -223,6 +272,7 @@ The following files constitute the candidate diff against `cc687d92`:
 - `src/runner/dispatch/cli.mjs`
 - `src/runner/dispatch/config.mjs`
 - `src/runner/dispatch/herdr-round.mjs`
+- `src/runner/dispatch/run-result.mjs`
 - `src/runner/dispatch/runtime-inspection.mjs`
 - `src/runner/dispatch/transport.mjs`
 - `src/runner/dispatch.mjs`

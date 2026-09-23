@@ -248,33 +248,74 @@ test('watch terminates when result.json exists (settled: true)', async () => {
   } finally { cleanup(root); }
 });
 
-test('empty, corrupt, or directory result.json does not settle and watch does not terminate as terminal (F4)', async () => {
+test('watch and show-run handle empty, corrupt, {}, valid, and terminal-with-corrupt evidence (R4 / N2 / N3)', async () => {
   const { root, runDir } = makeRepo({ status: 'running' });
   try {
-    // 1. Empty result.json
-    fs.writeFileSync(path.join(runDir, 'result.json'), '');
-    const snapEmpty = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
-    assert.equal(snapEmpty.settled, false);
-    assert.equal(snapEmpty.resultCorrupt, true);
+    // 1. Chưa có: result.json does not exist yet (running)
+    const snapAbsent = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(snapAbsent.settled, false);
+    assert.equal(snapAbsent.resultCorrupt, undefined);
 
-    const watchEmpty = await watchRunUseCase({ repoRoot: root }, {
-      runId: 'run_1',
-      maxTicks: 2,
-    });
-    assert.equal(watchEmpty.settled, false);
-    assert.equal(watchEmpty.stoppedBecause, 'tick-budget');
+    // 2. Hợp lệ: valid result.json terminates watch without maxTicks
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'run_1', status: 'done' }));
+    const snapValid = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(snapValid.settled, true);
+    assert.equal(snapValid.resultCorrupt, undefined);
+    assert.equal(snapValid.result.status, 'done');
 
-    // 2. Corrupt JSON
+    const watchValid = await watchRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(watchValid.settled, true);
+    assert.equal(watchValid.stoppedBecause, 'terminal');
+    assert.equal(watchValid.ticks, 1);
+
+    // 3. Hỏng: invalid JSON terminates watch as corrupt-evidence without maxTicks
     fs.writeFileSync(path.join(runDir, 'result.json'), 'not-valid-json{');
     const snapCorrupt = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
     assert.equal(snapCorrupt.settled, false);
     assert.equal(snapCorrupt.resultCorrupt, true);
 
-    // 3. Directory result.json
+    const watchCorrupt = await watchRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(watchCorrupt.settled, false);
+    assert.equal(watchCorrupt.resultCorrupt, true);
+    assert.equal(watchCorrupt.stoppedBecause, 'corrupt-evidence');
+    assert.equal(watchCorrupt.ticks, 1);
+
+    // 4. {}: empty object terminates watch as corrupt-evidence without maxTicks
+    fs.writeFileSync(path.join(runDir, 'result.json'), '{}');
+    const snapEmptyObj = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(snapEmptyObj.settled, false);
+    assert.equal(snapEmptyObj.resultCorrupt, true);
+
+    const watchEmptyObj = await watchRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(watchEmptyObj.settled, false);
+    assert.equal(watchEmptyObj.resultCorrupt, true);
+    assert.equal(watchEmptyObj.stoppedBecause, 'corrupt-evidence');
+    assert.equal(watchEmptyObj.ticks, 1);
+
+    // 5. Status terminal kèm result hỏng: run status settled + corrupt result terminates as corrupt-evidence
+    fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run_1', status: 'settled' }));
+    fs.writeFileSync(path.join(runDir, 'result.json'), '');
+    const snapTerminalCorrupt = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(snapTerminalCorrupt.settled, false);
+    assert.equal(snapTerminalCorrupt.resultCorrupt, true);
+
+    const watchTerminalCorrupt = await watchRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(watchTerminalCorrupt.settled, false);
+    assert.equal(watchTerminalCorrupt.resultCorrupt, true);
+    assert.equal(watchTerminalCorrupt.stoppedBecause, 'corrupt-evidence');
+    assert.equal(watchTerminalCorrupt.ticks, 1);
+
+    // 6. Directory result.json terminates watch as corrupt-evidence
     fs.rmSync(path.join(runDir, 'result.json'));
     fs.mkdirSync(path.join(runDir, 'result.json'));
     const snapDir = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
     assert.equal(snapDir.settled, false);
     assert.equal(snapDir.resultCorrupt, true);
+
+    const watchDir = await watchRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(watchDir.settled, false);
+    assert.equal(watchDir.resultCorrupt, true);
+    assert.equal(watchDir.stoppedBecause, 'corrupt-evidence');
+    assert.equal(watchDir.ticks, 1);
   } finally { cleanup(root); }
 });

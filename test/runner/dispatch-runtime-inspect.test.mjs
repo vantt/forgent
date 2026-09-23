@@ -108,7 +108,7 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   assert.equal(obs2.evidenceCompleteness.resource, 'complete');
   assert.equal(obs2.evidenceCompleteness.workspace, 'complete');
 
-  // 3. Visibility settling -> ambiguous (no adapter declares absence proof), evidence incomplete
+  // 3. Visibility settling -> ambiguous (no adapter declares absence proof), evidence stale
   assignment(root, 'asgn3');
   const run3Dir = run(root, 'asgn3', '01', { runId: 'run3', status: 'launched', cwd });
   fs.writeFileSync(path.join(run3Dir, 'visibility.json'), JSON.stringify({ status: 'settling' }));
@@ -117,15 +117,15 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   const obs3 = inspectDispatchRuntime(root, { run: 'run3' }).runObservation;
   assert.equal(obs3.phase, 'launched');
   assert.equal(obs3.resourceState, 'ambiguous');
-  assert.equal(obs3.evidenceCompleteness.resource, 'incomplete');
+  assert.equal(obs3.evidenceCompleteness.resource, 'stale');
   assert.equal(obs3.evidenceCompleteness.workspace, 'partial');
 
-  // 4. Real writer status: 'running' maps to running when no commands/launchedAt exist
+  // 4. Real writer status: 'running' maps to admitted when no commands/launchedAt exist
   assignment(root, 'asgn4');
   const run4Dir = run(root, 'asgn4', '01', { runId: 'run4', status: 'running' });
   admit(root, 'asgn4', 1, { runId: 'run4', attempt: 1 });
   const obs4 = inspectDispatchRuntime(root, { run: 'run4' }).runObservation;
-  assert.equal(obs4.phase, 'running');
+  assert.equal(obs4.phase, 'admitted');
   assert.equal(obs4.resourceState, 'unobserved');
   assert.equal(obs4.evidenceCompleteness.resource, 'missing');
 
@@ -136,7 +136,7 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   const obs5 = inspectDispatchRuntime(root, { run: 'run5' }).runObservation;
   assert.equal(obs5.phase, 'unknown');
 
-  // 6. Stale visibility heartbeat (>60s) -> ambiguous
+  // 6. Stale visibility heartbeat (>60s) -> ambiguous, evidence stale
   assignment(root, 'asgn6');
   const run6Dir = run(root, 'asgn6', '01', { runId: 'run6', status: 'running' });
   fs.writeFileSync(path.join(run6Dir, 'visibility.json'), JSON.stringify({
@@ -146,5 +146,14 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   admit(root, 'asgn6', 1, { runId: 'run6', attempt: 1 });
   const obs6 = inspectDispatchRuntime(root, { run: 'run6' }).runObservation;
   assert.equal(obs6.resourceState, 'ambiguous');
-  assert.equal(obs6.evidenceCompleteness.resource, 'incomplete');
+  assert.equal(obs6.evidenceCompleteness.resource, 'stale');
+
+  // 7. Corrupt result.json -> evidenceCompleteness.result is corrupt
+  assignment(root, 'asgn7');
+  const run7Dir = run(root, 'asgn7', '01', { runId: 'run7', status: 'settled' });
+  fs.writeFileSync(path.join(run7Dir, 'result.json'), 'not-valid-json{');
+  admit(root, 'asgn7', 1, { runId: 'run7', attempt: 1 });
+  const obs7 = inspectDispatchRuntime(root, { run: 'run7' }).runObservation;
+  assert.equal(obs7.phase, 'unknown');
+  assert.equal(obs7.evidenceCompleteness.result, 'corrupt');
 });
