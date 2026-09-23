@@ -35,6 +35,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { isMainModule } from './lib/is-main-module.mjs';
 import {
   parseFrontmatter,
 } from '../src/report/frontmatter.mjs';
@@ -506,7 +507,7 @@ function runCli(argv, cwd) {
   return 1;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   process.exitCode = runCli(
     process.argv.slice(2),
     process.cwd(),

@@ -22,6 +22,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -135,7 +136,7 @@ export function runTests({
   return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   const { status, message } = runTests({ forwardedArgs: process.argv.slice(2) });
   if (message) console.error(message);
   process.exitCode = status;

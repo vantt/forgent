@@ -37,6 +37,7 @@
 import path from "node:path";
 import { listWork, moveStage } from "../src/state/store.mjs";
 import { readLockedContext, resolveContentRoot } from "../src/intake/plan.mjs";
+import { isMainModule } from "./lib/is-main-module.mjs";
 
 /**
  * Decide the target stage for one `stage: 'clarify'` item, per tsk-qod D1.
@@ -122,6 +123,6 @@ function runCli(argv, cwd) {
   console.log(JSON.stringify(report, null, 2));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   runCli(process.argv.slice(2), process.cwd());
 }

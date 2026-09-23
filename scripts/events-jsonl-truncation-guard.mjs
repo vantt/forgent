@@ -7,6 +7,7 @@
 // full truncate-then-reappend problem this solves.
 
 import path from "node:path";
+import { isMainModule } from "./lib/is-main-module.mjs";
 import {
   checkEventsJsonlTruncationGuard,
   advanceEventsJsonlTruncationGuard,
@@ -58,6 +59,6 @@ function runCli(argv, cwd) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   runCli(process.argv.slice(2), process.cwd());
 }

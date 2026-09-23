@@ -98,17 +98,21 @@ test('installGitHooks treats a pre-existing absolute core.hooksPath resolving to
 // --- CLI: real end-to-end run, mirroring the production <repoRoot>/scripts/ layout ---
 
 const gitHooksModulePath = fileURLToPath(new URL('../../src/setup/git-hooks.mjs', import.meta.url));
+const isMainModulePath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
 
 // The real script is a thin shim over src/setup/git-hooks.mjs (that layer
 // ships with the npm package; scripts/ does not — see the script's own
-// header comment) — a fixture exercising it as a real CLI must mirror BOTH
-// files at their real relative nesting, not just the shim alone.
+// header comment) — a fixture exercising it as a real CLI must mirror ALL
+// three files (the shim, its entrypoint-guard helper, and git-hooks.mjs) at
+// their real relative nesting, not just the shim alone.
 function setupCliFixture() {
   const fixtureRoot = mkTempDir('install-git-hooks-cli-');
   const scriptsDir = path.join(fixtureRoot, 'scripts');
-  fs.mkdirSync(scriptsDir, { recursive: true });
+  const libDir = path.join(scriptsDir, 'lib');
+  fs.mkdirSync(libDir, { recursive: true });
   const scriptCopyPath = path.join(scriptsDir, 'install-git-hooks.mjs');
   fs.copyFileSync(scriptPath, scriptCopyPath);
+  fs.copyFileSync(isMainModulePath, path.join(libDir, 'is-main-module.mjs'));
   const setupDir = path.join(fixtureRoot, 'src', 'setup');
   fs.mkdirSync(setupDir, { recursive: true });
   fs.copyFileSync(gitHooksModulePath, path.join(setupDir, 'git-hooks.mjs'));

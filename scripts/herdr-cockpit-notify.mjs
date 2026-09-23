@@ -13,6 +13,7 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { resolveFgosBin } from '../src/setup/bin-discovery.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 /**
  * Pure: given the set of ids currently believed to be `awaiting-human`
@@ -96,7 +97,7 @@ function parseIntervalSeconds(argv) {
   return Number.isFinite(value) && value > 0 ? value : 5;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   const intervalSeconds = parseIntervalSeconds(process.argv.slice(2));
   const repoRoot = path.resolve(import.meta.dirname, '..');
   runLoop({ repoRoot, intervalMs: intervalSeconds * 1000 });

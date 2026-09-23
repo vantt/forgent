@@ -245,3 +245,45 @@ test('the script itself, spawned for real, refuses (non-zero, no crash) over an 
 function spawnSyncNode(scriptPath) {
   return spawnSync(process.execPath, [scriptPath], { encoding: 'utf8' });
 }
+
+// --- Integration: the real CLI entrypoint guard, proven by actually --------
+// running `node scripts/run-tests.mjs` as its own process (never importing
+// its exports) against a faithfully-mirrored "scripts/ + test/" layout. A
+// broken `import.meta.url === \`file://${process.argv[1]}\`` guard makes the
+// whole top-level `if` block silently never run: the process would exit 0
+// with no stderr at all instead of refusing loudly, which is exactly the
+// failure the tests above (driving `runTests` through an imported driver)
+// can never catch.
+
+const realScriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
+const realLibPath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
+
+function mirroredRepoRoot(prefix) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  fs.mkdirSync(path.join(root, 'scripts', 'lib'), { recursive: true });
+  fs.mkdirSync(path.join(root, 'test'), { recursive: true }); // empty: zero test files
+  fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
+  fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
+  return root;
+}
+
+test('the real entrypoint, run directly as `node scripts/run-tests.mjs` against an empty test/ dir, refuses with exit 1 and a message', () => {
+  const root = mirroredRepoRoot('run-tests-cli-');
+  const result = spawnSync(process.execPath, [path.join(root, 'scripts', 'run-tests.mjs')], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /discovered 0 test files/);
+});
+
+test('the real entrypoint still fires when its own absolute path contains a space (URL-encoding mismatch, not just a Windows-only bug)', () => {
+  const root = mirroredRepoRoot('run tests cli-');
+  assert.match(root, / /, 'fixture root must actually contain a space to exercise this case');
+  const result = spawnSync(process.execPath, [path.join(root, 'scripts', 'run-tests.mjs')], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /discovered 0 test files/);
+});
