@@ -18,6 +18,14 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Default shallow (depth 1) clone: test/runner/coordination-p07-
+          # migration-and-adversarial.test.mjs does `git archive <old ancestor
+          # sha>` to materialize a real pre-schema-3 source tree, which needs
+          # that commit's object present locally -- a shallow clone only has
+          # the tip, so `git archive` failed "not a tree object" on all three
+          # OSes. Full history, matching selector-plan's own checkout below.
+          fetch-depth: 0
 
       - name: Install Linux test tools
         if: runner.os == 'Linux'
