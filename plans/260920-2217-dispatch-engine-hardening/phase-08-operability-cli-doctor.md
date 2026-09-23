@@ -2,6 +2,24 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
+## Status — 2026-09-23 (Unit I07 Implementation Complete)
+
+- **Status**: `implemented` (pre-merge implementation complete; non-integrated candidate on branch `dispatch-hardening-i07-operability-cli-doctor`).
+- **Base Commit**: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2` (`main`)
+- **Report**: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
+- **Verification Evidence**:
+  - `test/cli/dispatch-operability.test.mjs`: 8 pass / 0 fail.
+  - `test/cli/dispatch-reconcile.test.mjs`: 6 pass / 0 fail.
+  - `test/verbs/dispatch-observe.test.mjs`: 11 pass / 0 fail.
+  - `test/runner/dispatch-runtime-inspect.test.mjs`: 19 pass / 0 fail.
+  - `test/setup/visibility-checks.test.mjs`: 17 pass / 0 fail.
+  - `test/setup/*.test.mjs`: 607 pass / 0 fail.
+  - `test/runner/dispatch.test.mjs`: 387 pass / 0 fail.
+  - `test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail.
+  - `test/runner/herdr-*.test.mjs`: 97 pass / 0 fail (1 skipped by design).
+  - `test/architecture.test.mjs`: 13 pass / 0 fail.
+  - `git diff --check cc687d92`: clean (0 errors/warnings).
+
 ## Requirements
 
 - R1 (M11a) `decideExecutorCli` trả thêm `reasonCodes`, `blockedReason` (additive); xoá dead check `plan.dispatch==='human-only'` (`cli.mjs:1543`, `assignment-runner.mjs:1433`). Test: governance-blocked JSON ≠ unregistered JSON.

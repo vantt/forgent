@@ -107,9 +107,78 @@ function owner(l, root, all) {
   return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
 }
 function authority(l, root, all) { const o = owner(l, root, all); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
+const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']);
+const VALID_RESOURCE_STATES = new Set(['live-proven', 'dead-proven', 'absent-proven', 'ambiguous', 'unobserved', 'unsupported']);
+const VALID_DELIVERIES = new Set(['not-started', 'running', 'delivered', 'unknown', 'replayed', 'recovered']);
+
+function derivePhase(l, terminal) {
+  if (terminal.present) return 'settled';
+  if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
+  if (fs.existsSync(path.join(l.runDir, 'controller', 'commands')) || fs.existsSync(path.join(l.runDir, 'recovery-commands.jsonl'))) {
+    return 'bound';
+  }
+  if (l.run?.status === 'bound' || l.run?.controller || l.run?.bound) return 'bound';
+  if (l.run?.status === 'launched' || l.run?.launchedAt) return 'launched';
+  if (l.run?.status === 'admitted') return 'admitted';
+  if (l.run?.status === 'delivered') return 'delivered';
+  if (l.run?.status === 'settled') return 'settled';
+  return 'unknown';
+}
+
+function deriveDelivery(l) {
+  const d = l.run?.delivery;
+  if (d === 'not-sent') return 'not-started';
+  if (VALID_DELIVERIES.has(d)) return d;
+  if (l.run?.status === 'not-started' || l.run?.status === 'todo') return 'not-started';
+  if (l.run?.status === 'running' || l.run?.status === 'doing') return 'running';
+  return 'unknown';
+}
+
+function deriveResourceState(l) {
+  const vis = json(path.join(l.runDir, 'visibility.json'));
+  if (!vis) {
+    return 'unobserved';
+  }
+  const s = vis.status;
+  if (VALID_RESOURCE_STATES.has(s)) return s;
+  if (['working', 'briefed', 'agent-ready'].includes(s)) return 'live-proven';
+  if (['died'].includes(s)) return 'dead-proven';
+  if (['settling', 'reconciled'].includes(s)) return 'absent-proven';
+  if (['requested', 'detached', 'blocked'].includes(s)) return 'ambiguous';
+  return 'ambiguous';
+}
+
+function deriveWorkspaceCompleteness(l) {
+  if (!l.run?.cwd) return 'unsupported';
+  if (fs.existsSync(path.join(l.runDir, 'workspace-evidence.json'))) return 'complete';
+  return 'partial';
+}
+
 function one(l, root, now, all) {
-  const terminal = result(l), runResult = terminal.value, o = owner(l, root, all), phase = l.run.phase ?? (terminal.present ? 'settled' : l.run.status ?? 'unknown');
-  const observation = { contract: { id: 'run-observation', version: 1 }, observedAt: now(), subject: { kind: 'run', runId: l.run.runId }, phase, resourceState: json(path.join(l.runDir, 'visibility.json'))?.status ?? 'unknown', delivery: l.run.delivery ?? 'unknown', inspectionStatus: terminal.present ? 'resolved' : 'partial', evidenceCompleteness: { identity: 'complete', lifecycle: 'complete', resource: 'missing', result: terminal.present ? 'complete' : 'missing', ownership: o.complete ? 'complete' : 'partial', workspace: 'partial' }, recoveryAuthority: null, observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }] };
+  const terminal = result(l), runResult = terminal.value, o = owner(l, root, all);
+  const phase = derivePhase(l, terminal);
+  const resourceState = deriveResourceState(l);
+  const delivery = deriveDelivery(l);
+  const workspaceCompleteness = deriveWorkspaceCompleteness(l);
+  const observation = {
+    contract: { id: 'run-observation', version: 1 },
+    observedAt: now(),
+    subject: { kind: 'run', runId: l.run.runId },
+    phase,
+    resourceState,
+    delivery,
+    inspectionStatus: terminal.present ? 'resolved' : 'partial',
+    evidenceCompleteness: {
+      identity: 'complete',
+      lifecycle: 'complete',
+      resource: resourceState === 'unsupported' ? 'unsupported' : (resourceState === 'unobserved' ? 'missing' : 'complete'),
+      result: terminal.present ? 'complete' : 'missing',
+      ownership: o.complete ? 'complete' : 'partial',
+      workspace: workspaceCompleteness,
+    },
+    recoveryAuthority: null,
+    observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }],
+  };
   const hint = authority(l, root, all);
   return { inspectionStatus: o.complete && terminal.present ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } };
 }

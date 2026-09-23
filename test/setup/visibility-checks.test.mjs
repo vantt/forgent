@@ -172,3 +172,29 @@ test('when herdr cannot be asked, kinds are not evaluated rather than guessed', 
   assert.equal(r.passed, true);
   assert.match(r.message, /not evaluated/);
 });
+
+test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
+  const oldBin = process.env.FGOS_HERDR_BIN;
+  try {
+    process.env.FGOS_HERDR_BIN = '/no/such/custom-herdr-bin';
+    const r = checkHerdrAvailable();
+    assert.equal(r.passed, false);
+    assert.match(r.message, /\/no\/such\/custom-herdr-bin/);
+  } finally {
+    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = oldBin;
+  }
+});
+
+test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', () => {
+  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
+  try {
+    process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
+    const r = checkHerdrAvailable();
+    assert.equal(r.passed, false);
+    assert.match(r.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
+  } finally {
+    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
+    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
+  }
+});

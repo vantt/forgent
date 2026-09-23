@@ -21,7 +21,7 @@ import { DEFAULTS } from '../../state/work.mjs';
 import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
-import { listWork, resolveWriterLogPath } from '../../state/store.mjs';
+import { listWork, resolveWriterLogPath, StoreError } from '../../state/store.mjs';
 import { appendEvent } from '../../state/events.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
@@ -1232,10 +1232,27 @@ export async function decideExecutorCli(
 
   const resolvedIndirectly = !executorIdArg;
   const base = plan.mcpTool
-    ? { mechanism: 'in-process', mcpTool: plan.mcpTool, configured: plan.configured }
+    ? {
+        mechanism: 'in-process',
+        mcpTool: plan.mcpTool,
+        configured: plan.configured,
+        reasonCodes: plan.reasonCodes ?? [],
+        ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
+      }
     : typeof plan.agentType === 'string' && plan.agentType
-      ? { mechanism: plan.mechanism, agentType: plan.agentType, configured: plan.configured }
-      : { mechanism: plan.mechanism, configured: plan.configured };
+      ? {
+          mechanism: plan.mechanism,
+          agentType: plan.agentType,
+          configured: plan.configured,
+          reasonCodes: plan.reasonCodes ?? [],
+          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
+        }
+      : {
+          mechanism: plan.mechanism,
+          configured: plan.configured,
+          reasonCodes: plan.reasonCodes ?? [],
+          ...(plan.blockedReason !== undefined ? { blockedReason: plan.blockedReason } : {}),
+        };
 
   return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;
 }
@@ -1419,8 +1436,8 @@ export function guardCwdRepoRootDivergence(cwd, repoRoot) {
  * byte-identical to before the split, only wrapped in a function instead
  * of an `if` block.
  */
-export async function runDispatchCli() {
-  const [subcommand, ...afterSubcommand] = process.argv.slice(2);
+export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false } = {}) {
+  const [subcommand, ...afterSubcommand] = argv;
   // Purpose-based binding (tsk-2c1): a caller with no pre-registered
   // executorId to name (a gather branch) passes `--for <purpose>` instead
   // of a positional id — distinguished here by whether the token right
@@ -1482,9 +1499,9 @@ export async function runDispatchCli() {
       // dispatches it positionally -- `decide --for` is unaffected by
       // this, only `execute --for` is refused.
       if (flagValue('--for')) {
-        process.stderr.write(
-          'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)\n',
-        );
+        const msg = 'execute --for is no longer supported -- resolve the purpose first (`decide --for <purpose>`), then dispatch the resolved executorId positionally (`execute <executorId>`)';
+        if (returnResult) throw new StoreError('validation', msg);
+        process.stderr.write(`${msg}\n`);
         process.exitCode = 1;
         break;
       }
@@ -1498,9 +1515,9 @@ export async function runDispatchCli() {
       // already short-circuits the rest of this branch on its own flag
       // alone, immediately below.
       if (contractFile && assignmentId) {
-        process.stderr.write(
-          'execute --contract cannot be combined with --assignment -- pick exactly one dispatch door\n',
-        );
+        const msg = 'execute --contract cannot be combined with --assignment -- pick exactly one dispatch door';
+        if (returnResult) throw new StoreError('validation', msg);
+        process.stderr.write(`${msg}\n`);
         process.exitCode = 1;
         break;
       }
@@ -1519,7 +1536,9 @@ export async function runDispatchCli() {
           ? path.resolve(root, assignmentId)
           : path.join(fgosDir, 'assignments', assignmentId, 'assignment.json');
         if (!fs.existsSync(asgnPath)) {
-          process.stderr.write(`assignment "${assignmentId}" not found at ${asgnPath}\n`);
+          const msg = `assignment "${assignmentId}" not found at ${asgnPath}`;
+          if (returnResult) throw new StoreError('precondition', msg);
+          process.stderr.write(`${msg}\n`);
           process.exitCode = 1;
           break;
         }
@@ -1527,55 +1546,63 @@ export async function runDispatchCli() {
         try {
           asgnObj = JSON.parse(fs.readFileSync(asgnPath, 'utf8'));
         } catch (err) {
-          process.stderr.write(`failed to parse assignment at ${asgnPath}: ${err.message}\n`);
+          const msg = `failed to parse assignment at ${asgnPath}: ${err.message}`;
+          if (returnResult) throw new StoreError('validation', msg);
+          process.stderr.write(`${msg}\n`);
           process.exitCode = 1;
           break;
         }
         const hasLiveTaskAccess = rest.includes('--has-live-task-access');
-        decideExecutorCli(undefined, {
-          cwd,
-          repoRoot: root,
-          assignment: assignmentId,
-          hasLiveTaskAccess,
-        }).then(
-          (decided) => {
-            if (decided && (decided.dispatch === 'human-only' || decided.mechanism === 'unavailable' || decided.mechanism === null)) {
-              process.stderr.write(`dispatch decide blocked assignment execution: ${decided.blockedReason ?? decided.reason ?? 'unexecutable mechanism'}\n`);
-              process.exitCode = 1;
-              return;
-            }
-            const duplicateFlag = findDuplicateOverrideFlag();
-            if (duplicateFlag) {
-              process.stderr.write(`duplicate flag "${duplicateFlag}" -- pass it at most once before launch\n`);
-              process.exitCode = 1;
-              return;
-            }
-            const cliOverride = {};
-            if (flagValue('--model')) cliOverride.model = flagValue('--model');
-            if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
-            if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
-            return executeAssignment(asgnObj, {
-              cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
-              repoRoot: root,
-              cliOverride,
-              hasLiveTaskAccess,
-              isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
-              onChunk: (stream, chunk) => process.stderr.write(chunk),
-            }).then(
-              (result) => {
-                process.stdout.write(`${JSON.stringify(result)}\n`);
-              },
-              (err) => {
-                process.stderr.write(`${err.message}\n`);
-                process.exitCode = 1;
-              },
-            );
-          },
-          (err) => {
-            process.stderr.write(`dispatch decide failed: ${err.message}\n`);
-            process.exitCode = 1;
-          },
-        );
+        let decided;
+        try {
+          decided = await decideExecutorCli(undefined, {
+            cwd,
+            repoRoot: root,
+            assignment: assignmentId,
+            hasLiveTaskAccess,
+          });
+        } catch (err) {
+          const msg = `dispatch decide failed: ${err.message}`;
+          if (returnResult) throw new StoreError('validation', msg);
+          process.stderr.write(`${msg}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        if (decided && (decided.mechanism === 'unavailable' || decided.mechanism === null)) {
+          const msg = `dispatch decide blocked assignment execution: ${decided.blockedReason ?? decided.reason ?? 'unexecutable mechanism'}`;
+          if (returnResult) throw new StoreError('validation', msg);
+          process.stderr.write(`${msg}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        const duplicateFlag = findDuplicateOverrideFlag();
+        if (duplicateFlag) {
+          const msg = `duplicate flag "${duplicateFlag}" -- pass it at most once before launch`;
+          if (returnResult) throw new StoreError('validation', msg);
+          process.stderr.write(`${msg}\n`);
+          process.exitCode = 1;
+          break;
+        }
+        const cliOverride = {};
+        if (flagValue('--model')) cliOverride.model = flagValue('--model');
+        if (flagValue('--tier')) cliOverride.tier = flagValue('--tier');
+        if (flagValue('--executor')) cliOverride.preferExecutor = flagValue('--executor');
+        try {
+          const result = await executeAssignment(asgnObj, {
+            cwd: flagValue('--cwd') ?? flagValue('--dir') ?? process.cwd(),
+            repoRoot: root,
+            cliOverride,
+            hasLiveTaskAccess,
+            isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
+            onChunk: (stream, chunk) => process.stderr.write(chunk),
+          });
+          if (returnResult) return result;
+          process.stdout.write(`${JSON.stringify(result)}\n`);
+        } catch (err) {
+          if (returnResult) throw err;
+          process.stderr.write(`${err.message}\n`);
+          process.exitCode = 1;
+        }
         break;
       }
 
@@ -1605,7 +1632,9 @@ export async function runDispatchCli() {
         try {
           raw = fs.readFileSync(contractFile, 'utf8');
         } catch (err) {
-          process.stderr.write(`failed to read contract file at ${contractFile}: ${err.message}\n`);
+          const msg = `failed to read contract file at ${contractFile}: ${err.message}`;
+          if (returnResult) throw new StoreError('precondition', msg);
+          process.stderr.write(`${msg}\n`);
           process.exitCode = 1;
           break;
         }
@@ -1613,7 +1642,9 @@ export async function runDispatchCli() {
         try {
           parsed = JSON.parse(raw);
         } catch (err) {
-          process.stderr.write(`failed to parse contract file at ${contractFile}: ${err.message}\n`);
+          const msg = `failed to parse contract file at ${contractFile}: ${err.message}`;
+          if (returnResult) throw new StoreError('validation', msg);
+          process.stderr.write(`${msg}\n`);
           process.exitCode = 1;
           break;
         }
@@ -1662,7 +1693,9 @@ export async function runDispatchCli() {
         if (workIdArg) {
           work = listWork(fgosDir).work[workIdArg];
           if (!work) {
-            process.stderr.write(`no work item "${workIdArg}" found -- cannot attach inline contract to it\n`);
+            const msg = `no work item "${workIdArg}" found -- cannot attach inline contract to it`;
+            if (returnResult) throw new StoreError('precondition', msg);
+            process.stderr.write(`${msg}\n`);
             process.exitCode = 1;
             break;
           }
@@ -1698,6 +1731,7 @@ export async function runDispatchCli() {
             assignmentsDir,
           );
         } catch (err) {
+          if (returnResult) throw err;
           process.stderr.write(`${err.message}\n`);
           process.exitCode = 1;
           break;
@@ -1718,7 +1752,9 @@ export async function runDispatchCli() {
           // mission-lite-strictly-read-only (ADR-006 R8).
           const duplicateFlag = findDuplicateOverrideFlag();
           if (duplicateFlag) {
-            process.stderr.write(`duplicate flag "${duplicateFlag}" -- pass it at most once before launch\n`);
+            const msg = `duplicate flag "${duplicateFlag}" -- pass it at most once before launch`;
+            if (returnResult) throw new StoreError('validation', msg);
+            process.stderr.write(`${msg}\n`);
             process.exitCode = 1;
             break;
           }
@@ -1734,8 +1770,10 @@ export async function runDispatchCli() {
             isReadOnlyMode: true,
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
+          if (returnResult) return result;
           process.stdout.write(`${JSON.stringify(result)}\n`);
         } catch (err) {
+          if (returnResult) throw err;
           process.stderr.write(`${err.message}\n`);
           process.exitCode = 1;
         }
@@ -1748,6 +1786,7 @@ export async function runDispatchCli() {
         try {
           prompt = fs.readFileSync(promptFile, 'utf8');
         } catch (err) {
+          if (returnResult) throw new StoreError('precondition', err.message);
           process.stdout.write(
             `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
           );
@@ -1759,6 +1798,7 @@ export async function runDispatchCli() {
       try {
         guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
       } catch (err) {
+        if (returnResult) throw err;
         process.stdout.write(
           `${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`,
         );
@@ -1766,61 +1806,62 @@ export async function runDispatchCli() {
         process.exitCode = 1;
         break;
       }
-      executeExecutorCli(executorId, {
-        prompt,
-        model: flagValue('--model'),
-        tier: flagValue('--tier'),
-        carries: flagValue('--carries'),
-        cwd: flagValue('--cwd') ?? flagValue('--dir'),
-        repoRoot: flagValue('--repo-root'),
-        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-        onChunk: (stream, chunk) => process.stderr.write(chunk),
-      }).then(
-        (executed) => {
-          process.stdout.write(`${JSON.stringify(executed)}\n`);
-        },
-        (err) => {
-          // Structured errorClass on stdout (dispatch-execute optimization
-          // pass): a caller (a skill following executor-dispatch-fallback.md,
-          // or the runner loop) can now tell "dispatch-in-flight -- back off
-          // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
-          // this needs a human" apart from every other failure, instead of
-          // only ever seeing a bare exit-1 + a human-readable message on
-          // stderr. `err.message` on stderr is unchanged for a human tailing
-          // the terminal.
-          process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        },
-      );
+      try {
+        const executed = await executeExecutorCli(executorId, {
+          prompt,
+          model: flagValue('--model'),
+          tier: flagValue('--tier'),
+          carries: flagValue('--carries'),
+          cwd: flagValue('--cwd') ?? flagValue('--dir'),
+          repoRoot: flagValue('--repo-root'),
+          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+          onChunk: (stream, chunk) => process.stderr.write(chunk),
+        });
+        if (returnResult) return executed;
+        process.stdout.write(`${JSON.stringify(executed)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        // Structured errorClass on stdout (dispatch-execute optimization
+        // pass): a caller (a skill following executor-dispatch-fallback.md,
+        // or the runner loop) can now tell "dispatch-in-flight -- back off
+        // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
+        // this needs a human" apart from every other failure, instead of
+        // only ever seeing a bare exit-1 + a human-readable message on
+        // stderr. `err.message` on stderr is unchanged for a human tailing
+        // the terminal.
+        process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
       break;
     }
     case 'decide': {
       try {
         guardCwdRepoRootDivergence(flagValue('--cwd') ?? flagValue('--dir'), flagValue('--repo-root'));
       } catch (err) {
+        if (returnResult) throw err;
         process.stderr.write(`${err.message}\n`);
         process.exitCode = 1;
         break;
       }
-      decideExecutorCli(executorId, {
-        cwd: flagValue('--cwd') ?? flagValue('--dir'),
-        repoRoot: flagValue('--repo-root'),
-        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-        for: flagValue('--for'),
-        work: flagValue('--work'),
-        assignment: flagValue('--assignment'),
-        stage: flagValue('--stage'),
-        needsSoul: rest.includes('--needs-soul'),
-      }).then(
-        (decided) => {
-          process.stdout.write(`${JSON.stringify(decided)}\n`);
-        },
-        (err) => {
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        },
-      );
+      try {
+        const decided = await decideExecutorCli(executorId, {
+          cwd: flagValue('--cwd') ?? flagValue('--dir'),
+          repoRoot: flagValue('--repo-root'),
+          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+          for: flagValue('--for'),
+          work: flagValue('--work'),
+          assignment: flagValue('--assignment'),
+          stage: flagValue('--stage'),
+          needsSoul: rest.includes('--needs-soul'),
+        });
+        if (returnResult) return decided;
+        process.stdout.write(`${JSON.stringify(decided)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
       break;
     }
     case 'log': {
@@ -1837,14 +1878,16 @@ export async function runDispatchCli() {
       const fallbackReason = flagValue('--fallback-reason');
       const outcome = flagValue('--outcome');
       if (!id || !executorId || !provider || !command) {
-        process.stderr.write(
-          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>] [--capability <name>] [--mechanism <m>] [--tier <t>] [--fallback-reason <text>] [--outcome <status>]\n',
-        );
+        const usageMsg =
+          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>] [--capability <name>] [--mechanism <m>] [--tier <t>] [--fallback-reason <text>] [--outcome <status>]\n';
+        if (returnResult) throw new StoreError('validation', usageMsg.trim());
+        process.stderr.write(usageMsg);
         process.exitCode = 1;
       } else {
         const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
         const fgosDir = fgosDirFromRoot(root);
         const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, capability, mechanism, tier, fallbackReason, outcome });
+        if (returnResult) return event;
         process.stdout.write(`${JSON.stringify(event)}\n`);
       }
       break;
@@ -1852,45 +1895,47 @@ export async function runDispatchCli() {
     case 'fanout-batch': {
       const candidateArg = executorId ?? flagValue('--candidates');
       const candidateIds = candidateArg ? String(candidateArg).split(',').map((s) => s.trim()).filter(Boolean) : [];
-      fanoutBatchExecutorCli(candidateIds, {
-        cwd: flagValue('--cwd') ?? flagValue('--dir'),
-        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-      }).then(
-        (result) => {
-          process.stdout.write(`${JSON.stringify(result)}\n`);
-        },
-        (err) => {
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        },
-      );
+      try {
+        const result = await fanoutBatchExecutorCli(candidateIds, {
+          cwd: flagValue('--cwd') ?? flagValue('--dir'),
+          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+        });
+        if (returnResult) return result;
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
       break;
     }
     case 'reconcile': {
-      const runDir = executorId ?? flagValue('--run-dir') ?? positional[1];
+      const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);
       if (!runDir) {
-        process.stderr.write('dispatch reconcile requires a run directory: node src/runner/dispatch.mjs reconcile <runDir>\n');
+        const msg = 'dispatch reconcile requires a run directory: node src/runner/dispatch.mjs reconcile <runDir>\n';
+        if (returnResult) throw new StoreError('validation', msg.trim());
+        process.stderr.write(msg);
         process.exitCode = 1;
         break;
       }
-      reconcileCliSpawnRun(runDir, {
-        controlEpoch: flagValue('--control-epoch') ? Number(flagValue('--control-epoch')) : undefined,
-        controlToken: flagValue('--control-token'),
-      }).then(
-        (result) => {
-          process.stdout.write(`${JSON.stringify(result)}\n`);
-        },
-        (err) => {
-          process.stderr.write(`${err.message}\n`);
-          process.exitCode = 1;
-        },
-      );
+      try {
+        const result = await reconcileCliSpawnRun(runDir, {
+          controlEpoch: flagValue('--control-epoch') ? Number(flagValue('--control-epoch')) : undefined,
+          controlToken: flagValue('--control-token'),
+        });
+        if (returnResult) return result;
+        process.stdout.write(`${JSON.stringify(result)}\n`);
+      } catch (err) {
+        if (returnResult) throw err;
+        process.stderr.write(`${err.message}\n`);
+        process.exitCode = 1;
+      }
       break;
     }
     default: {
-      process.stderr.write(
-        `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>]\n`,
-      );
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>] | fanout-batch <candidates> [--cwd <dir>] [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
+      if (returnResult) throw new StoreError('validation', msg.trim());
+      process.stderr.write(msg);
       process.exitCode = 1;
     }
   }

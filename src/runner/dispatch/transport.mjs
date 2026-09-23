@@ -91,6 +91,10 @@ export function currentDispatchDepth() {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+export function resolveHerdrBin(optsHerdrBin) {
+  return optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+}
+
 /**
  * Substitute `{prompt}` and `{model}` into the resolved executor's `args` —
  * PER ARRAY ELEMENT (never joined into one shell string, per the security
@@ -377,7 +381,7 @@ export function cliSpawnAdapter(invocation, opts) {
         if (settled) return;
         if (!fs.existsSync(receiptPath)) return;
         settled = true;
-        if (pollInterval) clearInterval(pollInterval);
+        if (pollInterval) clearTimeout(pollInterval);
 
         let receipt;
         try {
@@ -436,11 +440,21 @@ export function cliSpawnAdapter(invocation, opts) {
         });
       }
 
-      pollInterval = setInterval(() => {
-        if (fs.existsSync(receiptPath)) {
-          finishWithReceipt();
-        }
-      }, 50);
+      const pollStart = Date.now();
+      function scheduleReceiptPoll() {
+        if (settled) return;
+        const elapsed = Date.now() - pollStart;
+        const delay = elapsed >= 1000 ? 250 : 50;
+        pollInterval = setTimeout(() => {
+          if (settled) return;
+          if (fs.existsSync(receiptPath)) {
+            finishWithReceipt();
+          } else {
+            scheduleReceiptPoll();
+          }
+        }, delay);
+      }
+      scheduleReceiptPoll();
 
       if (supervisorProc) {
         supervisorProc.on('close', () => {
@@ -450,7 +464,7 @@ export function cliSpawnAdapter(invocation, opts) {
                 finishWithReceipt();
               } else {
                 settled = true;
-                if (pollInterval) clearInterval(pollInterval);
+                if (pollInterval) clearTimeout(pollInterval);
                 reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": supervisor exited without receipt`, {
                   workId,
                   tier,
@@ -813,7 +827,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
   }
 
   const resolvedEnv = resolveExecutorEnv(rawEnv);
-  const herdrBin = optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+  const herdrBin = resolveHerdrBin(optsHerdrBin);
   const fullEnv = { ...process.env, ...resolvedEnv, [DISPATCH_DEPTH_ENV]: String(depth + 1) };
   const delivery = promptDelivery ?? 'file-pointer';
 

@@ -61,6 +61,7 @@ import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '..
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
 import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
 import {
@@ -3597,11 +3598,31 @@ registerCheck({
 /** herdr is the transport every interactive mechanism depends on; without it
  * there is nothing to dispatch into. */
 export function checkHerdrAvailable() {
+  const bin = resolveHerdrBin();
   try {
-    const out = execFileSync('herdr', ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    return { passed: true, message: `herdr is available on PATH (${out})` };
+    const out = execFileSync(bin, ['--version'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const anchorPane = process.env.FGOS_HERDR_ANCHOR_PANE;
+    let anchorDetails = '';
+    if (anchorPane !== undefined) {
+      const trimmed = anchorPane.trim();
+      if (!trimmed) {
+        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE is empty` };
+      }
+      try {
+        const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 });
+        let parsed;
+        try { parsed = JSON.parse(paneOut); } catch {}
+        if (parsed?.error) {
+          return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${parsed.error.message || parsed.error.code}` };
+        }
+        anchorDetails = `; anchor pane "${trimmed}" verified`;
+      } catch (paneErr) {
+        anchorDetails = `; anchor pane: ${trimmed} (pane query unverified: ${paneErr.message})`;
+      }
+    }
+    return { passed: true, message: `herdr is available on PATH (${out})${anchorDetails}` };
   } catch (err) {
-    return { passed: false, message: `herdr is not usable on PATH: ${err.message}` };
+    return { passed: false, message: `herdr is not usable on PATH (${bin}): ${err.message}` };
   }
 }
 
@@ -3720,7 +3741,8 @@ export function readHerdrIntegrationStatus(run = defaultHerdrRun) {
 
 function defaultHerdrRun(args) {
   try {
-    return execFileSync('herdr', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 });
+    const bin = resolveHerdrBin();
+    return execFileSync(bin, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 });
   } catch {
     return null;
   }

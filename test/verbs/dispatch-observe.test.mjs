@@ -223,3 +223,27 @@ test('reading a log or an outbox that does not exist yet is normal, not an error
     assert.deepEqual(listOutbox(runDir), []);
   } finally { cleanup(root); }
 });
+
+test('watch terminates when result.json exists (settled: true)', async () => {
+  const { root, runDir } = makeRepo({ status: 'running' });
+  try {
+    const initial = showRunUseCase({ repoRoot: root }, { runId: 'run_1' });
+    assert.equal(initial.settled, false);
+
+    const seen = [];
+    const sleepFn = async () => {
+      if (seen.length === 1) {
+        fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ status: 'done' }));
+      }
+    };
+    const out = await watchRunUseCase({ repoRoot: root }, {
+      runId: 'run_1',
+      maxTicks: 10,
+      onTick: (t) => seen.push(t.settled),
+      sleepFn,
+    });
+    assert.deepEqual(seen, [false, true]);
+    assert.equal(out.settled, true);
+    assert.equal(out.stoppedBecause, 'terminal');
+  } finally { cleanup(root); }
+});

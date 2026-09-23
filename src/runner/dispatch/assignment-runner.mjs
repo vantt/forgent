@@ -1361,7 +1361,7 @@ function attemptProviderCapacityFallback({
     // Same three guards the primary's own `shouldSelectProviderAccount`
     // applies (executeAssignment, above) -- resolveFallback proves
     // governance/tier/visibility, never mechanism.
-    if (plan.dispatch === 'human-only' || plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
+    if (plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
       skippedCandidates.push({ executorId: candidateId, reasonCode: 'unsupported-mechanism' });
       continue;
     }
@@ -1679,7 +1679,7 @@ export async function executeAssignment(assignment, opts = {}) {
     options: opts.options,
   });
 
-  if (compiledPlan.dispatch === 'human-only' || compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {
+  if (compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {
     const reason = compiledPlan.blockedReason ?? compiledPlan.reasonCodes?.join(', ') ?? 'governance-blocked or unavailable mechanism';
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
@@ -2673,7 +2673,8 @@ export async function executeAssignment(assignment, opts = {}) {
 
       // 8. Wait for receipt in live execution
       const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
-      const pollDeadline = Date.now() + timeoutMs + 10000;
+      const pollStart = Date.now();
+      const pollDeadline = pollStart + timeoutMs + 10000;
       while (Date.now() < pollDeadline) {
         if (fs.existsSync(receiptPath)) {
           try {
@@ -2687,7 +2688,9 @@ export async function executeAssignment(assignment, opts = {}) {
           }
           break;
         }
-        await new Promise((r) => setTimeout(r, 20));
+        const elapsed = Date.now() - pollStart;
+        const delay = elapsed >= 1000 ? 250 : 20;
+        await new Promise((r) => setTimeout(r, delay));
       }
 
       // 9. Guarded update: command reconciled with receipt-backed outcome

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Dispatch Operability & CLI Hardening (Unit I07 / Phase 08)**:
+  - Registered `fgos dispatch decide|execute|log` as canonical public CLI sub-verbs wrapped in the `fgos.v1` output envelope, retaining `node src/runner/dispatch.mjs` as backwards-compatible alias.
+  - Added additive `reasonCodes` and `blockedReason` to `decideExecutorCli`, and removed dead `plan.dispatch === 'human-only'` check.
+  - Added `--run` alias for `--run-id` on `show-run`, `watch`, and `recover`; standardized run not-found errors to categorized exit code 2 (`precondition`).
+  - Enforced unknown dispatch sub-verb validation (exit 4) before requiring `runId`, and validated that `dispatch reconcile plan` with `--run` or `--assignment` requires `--action`.
+  - Added `settled` flag to `watch` snapshots for clean termination when `result.json` exists.
+  - Aligned `RunObservation` vocabulary to closed status sets (`phase`, `delivery`, `resourceState`, `evidenceCompleteness.workspace`).
+  - Updated doctor check `herdr-available` to resolve binary via `FGOS_HERDR_BIN` and diagnose empty `FGOS_HERDR_ANCHOR_PANE`; documented intentional host-global state directories in distribution spec.
+  - Optimized receipt polling (250ms backoff after 1s) and Herdr round polling (1.5s backoff after ack, skip process inspection while working).
+  - Conditioned provider-family warning to skip when all declared executor invocations are non-CLI.
+  - Synchronized command registry metadata, `touchesState` descriptions, and help text rendering for compound positional fields (`sub, run-id`).
 - **Fixed**: `npm test` on CI previously ran zero tests on every OS after `test-results/` stopped being committed — the junit reporter's destination directory never existed at test-start, so `node --test` crashed before running anything and the step still reported a runtime under a second.
 - **Fixed**: several CLI scripts' entrypoint detection (`node <script>.mjs` vs. being imported) silently never matched — always on Windows, and on any OS when the resolved path contained a space or the script was invoked through a symlink — making the script exit 0 having done nothing. This affected `npm test` on Windows and `node src/runner/dispatch.mjs decide/execute/log` (the CLI door `AGENTS.md`'s Dispatch section and a project hook both require) whenever fgOS itself was installed or checked out under such a path.
 - **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.

@@ -19,6 +19,7 @@ export class DispatchObserveError extends Error {
     super(message);
     this.name = 'DispatchObserveError';
     this.code = code;
+    this.category = (code === 'run-not-found' || code === 'missing-run') ? 'precondition' : 'validation';
     Object.assign(this, details);
   }
 }
@@ -115,6 +116,7 @@ export function readRunSnapshot(runDir) {
   if (!run) {
     throw new DispatchObserveError('missing-run', `no run.json in ${dir}`, { runDir: dir });
   }
+  const settled = fs.existsSync(path.join(dir, 'result.json'));
   let visibility = null;
   let visibilityError = null;
   try {
@@ -125,6 +127,7 @@ export function readRunSnapshot(runDir) {
   return {
     runDir: dir,
     run,
+    settled,
     visibility,
     ...(visibilityError ? { visibilityError } : {}),
     outbox: listOutbox(dir),

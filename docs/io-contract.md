@@ -72,7 +72,7 @@ lệ có lý do" dưới) có thể tự chứa output của trợ lý bắt đ�
 
 ### Mã thoát (exit code) — một nguồn duy nhất
 
-`src/state/store.mjs`'s `EXIT_CODES` (2 precondition · 3 conflict ·
+`src/state/store.mjs`'s `EXIT_CODES` (2 precondition [bao gồm not-found / run-not-found / missing-run] · 3 conflict ·
 4 validation · 5 corrupt-log · 7 lock-timeout · 8 session-fail ·
 9 merge-fail) cộng `src/runner/loop.mjs`'s `EXIT_BUSY` (6, riêng của
 runner) là bảng DUY NHẤT. 0 = ok, 1 = bất ngờ (mọi thứ chưa phân loại).
