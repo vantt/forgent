@@ -840,7 +840,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
-  note: blocked — requires both I04 and I06 integrated and verified before opening (I04 integrated at `main@7472bd74`; I06 pending)
+  note: eligible to open — prerequisites I02 (integrated at `main@4362bfec`), I04 (integrated at `main@7472bd74`), and I06 (integrated at `main@3bab9b99`) are all integrated and verified
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
