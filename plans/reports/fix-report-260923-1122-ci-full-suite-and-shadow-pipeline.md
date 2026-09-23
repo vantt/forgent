@@ -4,6 +4,8 @@ Branch: `fix/ci-full-suite-and-entrypoint-guard` (worktree `.claude/worktrees/ci
 
 Scope: Slice 1 only (TI-01, TI-02, TI-02b). Slice 2 (TI-03/TI-04, `test-select-compare.mjs`/`test-select-mutate.mjs`) is **held** — the parallel session on `fgw/phase3-completion` is actively editing exactly those two files (last commit 13 min before this task started). Editing them concurrently risks a real conflict, so Slice 2 was not started this run.
 
+**Update**: `fgw/phase3-completion`'s work landed on local `main` (`af55cbcc`, then a docs-only follow-up `c7a45c56`) partway through this task. Merged both into this branch — clean, zero conflicts except `CHANGELOG.md` (auto-resolved, both sides' lines preserved). This branch now also carries Slice 2's actual fix (`test-select-compare.mjs`/`test-select-mutate.mjs`/new `test-select-promote.mjs`), authored by that other session, not by this task. Re-verified after merge: `test/scripts/*.test.mjs` 442/442, `test/runner/dispatch.test.mjs` 385/385, full suite 7513/7438/2-known-fail/8-skip — no regressions from the merge.
+
 ## Root causes
 
 **TI-01 — CI ran zero tests on every OS.** `test-results/` was removed from git (already gitignored) with no step re-creating it. `node --test --test-reporter-destination=test-results/full.xml` opens that path for writing at run start and crashes (`ENOENT`, exit 7) before any test runs — a ~1s "green" run. Reproduced locally byte-for-byte (see Commands below).
@@ -64,4 +66,21 @@ Full suite re-run after all fixes: **7483 tests, 7408 pass, 2 fail (same tsk-598
 
 ## CI evidence (GATE-1)
 
-<!-- Filled in after push + PR; see PR checks for the authoritative per-OS run. -->
+PR: https://github.com/vantt/forgent/pull/4. Run: https://github.com/vantt/forgent/actions/runs/35821243823 (triggered by the push before the main-sync merge above — the `npm test`/CI-yaml behavior under test is identical either way since the merge only added Slice 2 files, untouched by this fix).
+
+| OS | tests | pass | fail | cancelled | skipped | todo |
+|---|---|---|---|---|---|---|
+| ubuntu-latest | 7483 | 7263 | 144 | 0 | 11 | 65 |
+| macos-latest | 7483 | 7246 | 158 | 0 | 14 | 65 |
+| windows-latest | *pending* | | | | | |
+
+Both OSes ran the real, full suite for the first time since the TI-01 regression (previously: zero tests, ~1s, false green) — the primary thing this PR needed to prove. `Write test marker` step ran and succeeded on both (`if: always()` + the new `--exit-code` wiring both worked as designed).
+
+**Failure classification — none are new regressions from this fix:**
+- **122 failures on both OS** carry the exact error `DispatchError: confinement backend instance "bwrap" not found in machine registry` (`src/runner/dispatch/confinement/authority.mjs`). This is a pre-existing, already-diagnosed, separately-tracked issue: `plans/260922-test-suite-optimization/phase-03-selector-promotion-shadow-ci.md`'s "Appendix A" documents this exact signature from an earlier real CI run (35702387686, back when `npm test` still executed for real, before the TI-01 regression broke it) — CI installs bubblewrap but never runs `fgos setup`, so the confinement-backend registry (`~/.fgos/confinement-backends.json`) is never populated on the runner; every dispatch call needing confinement correctly fails closed. Appendix A explicitly scopes fixing this to its own separate future work item, out of scope for both Phase 3 and this task.
+- **2 of the failures on each OS are the same known `tsk-598` D2/D3 cases** already called out in the local acceptance criteria (`test/cli/fgos-approve.test.mjs`).
+- **The remaining ~11–49 (ubuntu: 11, macos: 49)** are `RunnerConfigError`/`NO_ASSISTANT_CLI_FOUND` — a runner-machine-dependent gap (no assistant CLI on the CI image), same hermeticity class as the confinement gap, not a code defect.
+- 144 (ubuntu) = 142 (Appendix A's documented baseline) + 2 (tsk-598) exactly. 158 (macos) = the same 142+2 plus additional machine-dependent `NO_ASSISTANT_CLI_FOUND` cases specific to that OS's image.
+- Zero failures reference `run-tests.mjs`, `write-test-marker.mjs`, `is-main-module.mjs`, or any of the 19 guard-fixed scripts.
+
+Windows result will be added once its job completes (it is expected to newly run real tests too — the second thing this PR needed to prove — and likely to newly surface `test/rust-host/*` failures, since `ci.yml`'s Rust-binary build step is gated `if: runner.os != 'Windows'`; that gap is pre-existing and out of this task's scope, not a regression).
