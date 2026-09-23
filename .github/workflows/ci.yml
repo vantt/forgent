@@ -13,7 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+    # Backstop so a hung run fails in bounded time instead of GitHub's 6h job cap.
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -37,6 +39,16 @@ jobs:
       - name: Build Rust release binaries for npm tests
         if: runner.os != 'Windows'
         run: cargo build --release --workspace
+
+      # Temporary diagnostic: on Windows the full suite never exits after
+      # test/runner/loop.test.mjs finishes its last test. Run that file alone
+      # under a watchdog that lists whatever processes are still keeping it
+      # alive, then kills them, so the real suite below still gets its turn.
+      - name: Diagnose loop.test.mjs hang (Windows)
+        if: runner.os == 'Windows'
+        continue-on-error: true
+        timeout-minutes: 15
+        run: node scripts/ci-diagnose-hang.mjs test/runner/loop.test.mjs 600
 
       # Full suite (docs/distribution-vision.md tsk-49r D1): already
       # includes test/install-packaging.test.mjs (the pack -> install -g ->
@@ -93,6 +105,7 @@ jobs:
   selector-plan:
     name: selector-plan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       decision: ${{ steps.plan.outputs.decision }}
     steps:
@@ -126,6 +139,7 @@ jobs:
     needs: selector-plan
     if: needs.selector-plan.outputs.decision == 'related'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -173,6 +187,7 @@ jobs:
     needs: [selector-plan, related, test]
     if: always()
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       issues: write
     steps:
@@ -214,6 +229,7 @@ jobs:
   herdr-plugin:
     name: cargo test (herdr-plugin)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -230,6 +246,7 @@ jobs:
   rust-workspace:
     name: cargo (workspace)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -248,6 +265,7 @@ jobs:
   external-consumer:
     name: external consumer proof
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
