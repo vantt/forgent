@@ -82,11 +82,10 @@ import { validateCoordinationRequest, computeHumanTurnArtifactRevision } from '.
 import { recordCoordinationSchemaFault } from './schema-fault-log.mjs';
 import { FlowDefinitionError } from '../../runner/definitions/schema.mjs';
 import { compileDagRequest } from './dag-request-compiler.mjs';
-import { scheduleDagSteps } from './dag-scheduler.mjs';
+import { scheduleDagSteps, resolveNodeCwd } from './dag-scheduler.mjs';
 import {
   getAuthoritativeSettledAssignmentIds,
   computeDagSharedCwdCaveats,
-  resolveNodeCwd,
 } from '../../runner/coordination/dag-declaration.mjs';
 
 function readRequestFile(requestPath) {
@@ -725,16 +724,34 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
         const assignment = replayed.assignments.find((entry) => entry.dagNodeId === node.id);
         if (!assignment) continue;
         labels[node.displayLabel] = assignment.assignmentId;
+        const step = request.steps.find((s) => s.as === node.displayLabel);
         if (settledAssignmentIds.has(assignment.assignmentId)) {
           resumedDagStates.set(node.displayLabel, {
             outcome: 'settled',
             resumed: true,
             result: {
               as: node.displayLabel,
-              type: request.steps.find((step) => step.as === node.displayLabel).type,
+              type: step?.type ?? 'operation',
               assignmentId: assignment.assignmentId,
               resumed: true,
               door: 'result-linked',
+              authoritativeSettled: true,
+              settled: true,
+            },
+          });
+        } else {
+          resumedDagStates.set(node.displayLabel, {
+            outcome: 'deferred',
+            resumed: true,
+            result: {
+              as: node.displayLabel,
+              type: step?.type ?? 'operation',
+              assignmentId: assignment.assignmentId,
+              resumed: true,
+              door: 'dispatchDeclaredOperation',
+              authoritativeSettled: false,
+              settled: false,
+              schedulerOutcome: 'deferred',
             },
           });
         }
@@ -757,6 +774,14 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
             engineOpts,
             dagDeclaration,
           });
+          const replayedNow = resumeSession(manifest.coordinationId, engineOpts);
+          const settledIdsNow = getAuthoritativeSettledAssignmentIds(replayedNow.events);
+          const asgnId = stepResult?.assignmentId ?? labels[step.as];
+          if (asgnId && !settledIdsNow.has(asgnId)) {
+            stepResult.authoritativeSettled = false;
+            stepResult.settled = false;
+            stepResult.schedulerOutcome = 'deferred';
+          }
           stepResults.push(stepResult);
           return stepResult;
         },
@@ -834,7 +859,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
 
   const finalQuorum = closed ? evaluateSessionQuorum(manifest.coordinationId, engineOpts) : quorumBeforeClose;
   const phase = deriveSessionPhase(manifest.coordinationId, engineOpts);
-  const status = (dagDeclaration && hasDagCaveat) ? 'recheck-required' : phase;
+  const status = phase;
 
   const finalReplay = dagDeclaration ? resumeSession(manifest.coordinationId, engineOpts) : null;
   const finalSettledIds = finalReplay ? getAuthoritativeSettledAssignmentIds(finalReplay.events) : new Set();
@@ -867,6 +892,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     objective: manifest.objective,
     status,
     closed,
+    ...(hasDagCaveat ? { caveated: true } : {}),
     closeAttempted: dagDeclaration ? (!hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     ...(fanOutFailure !== null ? { fanOutFailure } : {}),

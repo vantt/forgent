@@ -36,11 +36,12 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
-import { normalizeDagDeclaration } from './dag-declaration.mjs';
+import { normalizeDagDeclaration, computeDagSharedCwdCaveats } from './dag-declaration.mjs';
 import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
+import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
   if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
@@ -1495,6 +1496,44 @@ export function recordDriverDispositionLocked(coordinationId, { targetRef, dispo
   // disposition is written -- never against a snapshot taken before the
   // lock.
   const eventsForRefs = readEvents(eventsPath);
+
+  if (disposition === 'cell-closed') {
+    const dagEvent = eventsForRefs.find((e) => e.type === 'dag-declared');
+    if (dagEvent?.payload?.declaration) {
+      const declaredNodes = dagEvent.payload.declaration.nodes;
+      const getNodeCwd = (id) => {
+        const node = declaredNodes.find((n) => n.id === id);
+        let cwd = node?.semantics?.canonicalCwd || node?.semantics?.cwd;
+        if (!cwd && fgosDir) {
+          for (const asgnId of manifest.assignmentRefs) {
+            const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
+            if (fs.existsSync(runsDir)) {
+              try {
+                const attempts = fs.readdirSync(runsDir);
+                for (const attempt of attempts) {
+                  const runJsonPath = path.join(runsDir, attempt, 'run.json');
+                  if (fs.existsSync(runJsonPath)) {
+                    const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+                    if (run.cwd) { cwd = run.cwd; break; }
+                  }
+                }
+              } catch {}
+            }
+            if (cwd) break;
+          }
+        }
+        return path.resolve(cwd ?? opts.cwd ?? process.cwd());
+      };
+      const caveats = computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd });
+      if (caveats.size > 0) {
+        throw new CoordinationError(
+          'validation',
+          `recordDriverDisposition: session "${coordinationId}" has unadjudicated shared-cwd caveats (recheck-required) -- cannot record "cell-closed" disposition`,
+        );
+      }
+    }
+  }
+
   const contributionIds = linkedContributionIds(eventsForRefs);
   const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
   assertDispositionRefOwnedBySession(targetRef, {

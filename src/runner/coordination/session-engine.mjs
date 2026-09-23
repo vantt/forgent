@@ -120,6 +120,7 @@ import {
   evaluateVisibilityWindowState,
   classifySessionQuorum as pureClassifySessionQuorum,
 } from './legality-facts.mjs';
+import { computeDagSharedCwdCaveats } from './dag-declaration.mjs';
 
 export function loadDefinitionForSession(manifest, opts) {
   if (manifest.schemaVersion === '3') {
@@ -3437,6 +3438,44 @@ export function closeSessionByQuorumLocked(coordinationId, { dissentingActorIds 
       throw new CoordinationError(
         'refusal',
         `closeSessionByQuorum: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata?.version}" -- refusing to close against a drifted definition`,
+      );
+    }
+  }
+
+  if (replayed.dag?.kind === 'dag' && replayed.dag.declaration?.nodes) {
+    const { fgosDir } = paths ?? resolveSessionPaths(coordinationId, opts);
+    const nodeCwds = new Map();
+    for (const node of replayed.dag.declaration.nodes) {
+      const nodeAssignments = (replayed.assignments ?? []).filter((entry) => entry.dagNodeId === node.id);
+      let cwd = node.semantics?.canonicalCwd || node.semantics?.cwd;
+      if (!cwd && fgosDir) {
+        for (const asgn of nodeAssignments) {
+          const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
+          if (fs.existsSync(runsDir)) {
+            try {
+              const attempts = fs.readdirSync(runsDir);
+              for (const attempt of attempts) {
+                const runJsonPath = path.join(runsDir, attempt, 'run.json');
+                if (fs.existsSync(runJsonPath)) {
+                  const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+                  if (run.cwd) { cwd = run.cwd; break; }
+                }
+              }
+            } catch {}
+          }
+          if (cwd) break;
+        }
+      }
+      nodeCwds.set(node.id, path.resolve(cwd ?? opts.cwd ?? process.cwd()));
+    }
+    const dagCaveats = computeDagSharedCwdCaveats({
+      declaredNodes: replayed.dag.declaration.nodes,
+      getNodeCwd: (id) => nodeCwds.get(id),
+    });
+    if (dagCaveats.size > 0) {
+      throw new CoordinationError(
+        'refusal',
+        `closeSessionByQuorum: session "${coordinationId}" has unadjudicated shared-cwd caveats (recheck-required) -- cannot close session`,
       );
     }
   }

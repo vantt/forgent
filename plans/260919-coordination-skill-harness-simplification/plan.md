@@ -845,8 +845,9 @@ Executor/provider/model/tier selection remains an execution-time decision.
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
   base-sha: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
   evidence-tip: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
+  review-evaluation-commits: `d52093fb`, `3cc74b41`
   next-dependency-gate: I10 (test DAG migration, cold resume, concurrency, and corrupt evidence)
-  verification: 14 targeted suites (414+ tests pass / 0 fail: 3 skill contract, 51 schema, 33 replay, 47 store, 43 hard budgets, 7 headless adapter, 11 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
+  verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence

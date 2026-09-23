@@ -46,8 +46,8 @@ import { loadDefinitionForSession } from '../../runner/coordination/session-engi
 import {
   getAuthoritativeSettledAssignmentIds,
   computeDagSharedCwdCaveats,
-  resolveNodeCwd,
 } from '../../runner/coordination/dag-declaration.mjs';
+import { resolveNodeCwd } from './dag-scheduler.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { evaluateDriverAuthorizedBindings } from '../../runner/coordination/legality-facts.mjs';
 

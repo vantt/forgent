@@ -1,8 +1,47 @@
-// Request-boundary scheduler for immutable coordination DAG declarations.
-// It deliberately owns only admission order: `execute` remains the existing
-// run.mjs step interpreter and therefore reaches the normal engine doors.
+import fs from 'node:fs';
+import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
 import { CoordinationError } from '../../runner/coordination/schema.mjs';
+
+/**
+ * Resolves the canonical working directory for a DAG node.
+ * Checks node semantics (canonicalCwd / cwd), existing assignment runs on disk,
+ * and falls back to defaultCwd or process.cwd().
+ *
+ * @param {object} node
+ * @param {Array<object>} [nodeAssignments=[]]
+ * @param {string} [fgosDir=null]
+ * @param {string} [defaultCwd=null]
+ * @returns {string}
+ */
+export function resolveNodeCwd(node, nodeAssignments = [], fgosDir = null, defaultCwd = null) {
+  if (typeof node?.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
+    return path.resolve(node.semantics.canonicalCwd);
+  }
+  if (typeof node?.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
+    return path.resolve(node.semantics.cwd);
+  }
+  if (fgosDir && Array.isArray(nodeAssignments)) {
+    for (const asgn of nodeAssignments) {
+      const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
+      if (fs.existsSync(runsDir)) {
+        try {
+          const attempts = fs.readdirSync(runsDir);
+          for (const attempt of attempts) {
+            const runJsonPath = path.join(runsDir, attempt, 'run.json');
+            if (fs.existsSync(runJsonPath)) {
+              const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+              if (typeof run.cwd === 'string' && run.cwd.trim() !== '') {
+                return path.resolve(run.cwd);
+              }
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+  return path.resolve(defaultCwd ?? process.cwd());
+}
 
 function outcomeFor(error) {
   if ((error instanceof CoordinationError || error instanceof StoreError) && error.category === 'validation') {
@@ -74,17 +113,23 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
     inFlight.delete(settled.step.as);
     const state = states.get(settled.step.as);
     if (!settled.error) {
-      state.outcome = 'settled';
-      state.result = settled.result;
-      delete state.error;
-      // A capacity refusal is intentionally transient. A result-linked node
-      // just freed an invocation-owned slot, so retry only those deferred
-      // admissions immediately on this settlement signal (never by polling).
-      for (const candidate of states.values()) {
-        if (candidate.outcome === 'deferred') {
-          candidate.outcome = 'pending';
-          delete candidate.error;
+      const isSettled = settled.result?.authoritativeSettled !== false && settled.result?.settled !== false;
+      if (isSettled) {
+        state.outcome = 'settled';
+        state.result = settled.result;
+        delete state.error;
+        // A capacity refusal is intentionally transient. A result-linked node
+        // just freed an invocation-owned slot, so retry only those deferred
+        // admissions immediately on this settlement signal (never by polling).
+        for (const candidate of states.values()) {
+          if (candidate.outcome === 'deferred' && candidate.error?.code === 'concurrency-cap') {
+            candidate.outcome = 'pending';
+            delete candidate.error;
+          }
         }
+      } else {
+        state.outcome = settled.result?.schedulerOutcome ?? 'deferred';
+        state.result = settled.result;
       }
     } else {
       const outcome = outcomeFor(settled.error);

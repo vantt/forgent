@@ -85,14 +85,14 @@ All historical porting evidence from commit `fc259498` has been reconciled again
 ## 3. Verification & Test Evidence
 
 ### 3.1 Targeted DAG & Coordination Matrix
-All focused unit and integration test suites pass with 0 failures:
+All focused unit and integration test suites pass with 0 failures (538 total tests):
 1. `test/skills/coordination-dag-driver-skill-contract.test.mjs` (3 pass / 0 fail)
 2. `test/runner/coordination-schema.test.mjs` (51 pass / 0 fail)
-3. `test/runner/coordination-replay.test.mjs` (33 pass / 0 fail)
+3. `test/runner/coordination-replay.test.mjs` (35 pass / 0 fail)
 4. `test/runner/coordination-store.test.mjs` (47 pass / 0 fail)
 5. `test/runner/coordination-r5-hard-budgets.test.mjs` (43 pass / 0 fail)
 6. `test/runner/coordination-headless-adapter-identity.test.mjs` (7 pass / 0 fail)
-7. `test/runner/coordination-p07-migration-and-adversarial.test.mjs` (11 pass / 0 fail)
+7. `test/runner/coordination-p07-migration-and-adversarial.test.mjs` (16 pass / 0 fail)
 8. `test/verbs/coordination-chain.test.mjs` (16 pass / 0 fail)
 9. `test/verbs/coordination-recovery.test.mjs` (20 pass / 0 fail)
 10. `test/verbs/coordination-run-driver-steps.test.mjs` (86 pass / 0 fail)
@@ -109,8 +109,71 @@ All focused unit and integration test suites pass with 0 failures:
 
 ---
 
-## 4. Disposition & Readiness
+## 4. Review Findings Reconciliation & Resolution
 
-Unit **I09** implementation is complete, strictly isolated in worktree `coordination-skill-harness-i09-dag-forward-port`, and adheres to all platform operating laws and Git boundaries.
+All review findings from the independent review rounds (evaluated commits `d52093fb` and `3cc74b41`) have been resolved, verified, and locked:
 
-Ready to proceed to **Unit I10** (independent verification of DAG migration, cold resume, concurrency, and corrupt evidence).
+### 4.1 I09-REV-01 (BLOCKER) — Authoritative Settlement & Superseded Link / Retry Invariant
+- **Finding**: A node whose latest assignment was retried (`run-retried`) was prematurely marked settled because code checked for any linked result rather than an authoritative link.
+- **Resolution**:
+  - Implemented `getAuthoritativeSettledAssignmentIds(assignments)` to ensure an assignment is authoritative only when no subsequent `run-retried` event supersedes its `result-linked` event.
+  - Aligned `replay.mjs`, `run.mjs` (`resumedDagStates`), and `show.mjs` to use this authoritative settlement check.
+  - In `run.mjs` invocation and resume paths, if an assignment's link was superseded by retry, marked `authoritativeSettled = false`, `settled = false`, and `schedulerOutcome = 'deferred'`.
+  - In `dag-scheduler.mjs`, verified `isSettled = settled.result?.authoritativeSettled !== false && settled.result?.settled !== false`. Only unblocks concurrency-deferred candidates, preventing premature dispatch of dependent successors (Probe R and Probe R2 resolved).
+  - Added regression test `Phase 07: DAG resume with retried predecessor does not dispatch successor (REV-01 Probe R2)` in `test/runner/coordination-p07-migration-and-adversarial.test.mjs`.
+
+### 4.2 I09-REV-02 (HIGH) — Standalone Schema-3 Legacy Replay Compatibility
+- **Finding**: Standalone schema-3 sessions created on base threw a spurious `dangling-ref` error on replay.
+- **Resolution**: Relaxed the eager guard in `replay.mjs`. A session is treated as DAG iff a `dag-declared` event is present; schema-3 sessions without DAG declarations (such as Phase 2 snapshot sessions) cleanly replay as `legacy-non-dag`. Verified with regression test in `coordination-replay.test.mjs`.
+
+### 4.3 I09-REV-03 (HIGH) — Restored Schema 3 for Standalone / Agent-Led Sessions
+- **Finding**: Standalone sessions were downgraded to schema version 1 in `run.mjs`.
+- **Resolution**: Restored `SCHEMA_VERSION_3` in `openStandaloneSession` in `run.mjs`.
+
+### 4.4 I09-REV-04 (HIGH) — Preserve Legacy Session Invariants on Resume
+- **Finding**: Resuming a legacy session attached `dagNodeId` to newly created assignments, breaking backwards compatibility.
+- **Resolution**: In `run.mjs`, restricted `dagNodeId` attachment strictly to sessions with active DAG declarations (`request.dag && Boolean(manifest.dagDeclaration)`).
+
+### 4.5 I09-REV-05 (HIGH) — Fail-Closed Shared-CWD Concurrency Attribution Caveats
+- **Finding**: Shared-cwd concurrency caveats (`non-attributable-verdict`) in `show.mjs` did not block session closure at the kernel / engine level.
+- **Resolution**:
+  - Implemented fail-closed enforcement across all close doors:
+    1. In `src/verbs/coordination/close.mjs`: `checkDagCloseCaveats` evaluates active DAG shared-cwd caveats in both keyed (`executeUnderActionPrecondition`) and unkeyed close use cases, refusing closure with `closed = false` and `closeRefusalReason = 'recheck-required: concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats'`.
+    2. In `src/runner/coordination/session-engine.mjs`: `closeSessionByQuorumLocked` asserts absence of shared-cwd caveats, throwing `CoordinationError('refusal')` if unadjudicated caveats remain.
+    3. In `src/runner/coordination/store.mjs`: `recordDriverDispositionLocked` asserts absence of shared-cwd caveats before recording `disposition = 'cell-closed'`, throwing `CoordinationError('validation')`.
+  - Added regression tests verifying closure refusal and disposition rejection when shared-cwd caveats exist.
+
+### 4.6 I09-REV-06 (MEDIUM) — Strict Task-Claim Collision Semantics
+- **Finding**: The task claim collision guard in `store.mjs` diverged from base.
+- **Resolution**: Restored exact verbatim check from base in `store.mjs`.
+
+### 4.7 I09-REV-07 (LOW) — Clean State on Node Retry Settlement
+- **Finding**: Nodes that settled after a transient error/retry retained stale error state in scheduler tracking.
+- **Resolution**: In `dag-scheduler.mjs`, cleared `candidate.error` when a deferred/retried node successfully settles.
+
+### 4.8 I09-REV-08 (LOW) — Changelog & Documentation Consistency
+- **Finding**: Minor status notes and changelog wording needed synchronization.
+- **Resolution**: Synchronized `CHANGELOG.md` and report notes.
+
+### 4.9 I09-REV-09 (MEDIUM) — Session Phase & Caveat Projection in `run.mjs`
+- **Finding**: `run.mjs` returned `status: 'recheck-required'` directly as session status rather than maintaining phase alignment.
+- **Resolution**: Restored `status = phase;` and projected `caveated: hasDagCaveat` on the use case return object.
+
+### 4.10 I09-REV-10 (LOW) — Tracking & Metric Precision
+- **Finding**: Updated test metrics, evaluation commit references, and status details required in plan and reports.
+- **Resolution**: Fully updated `plan.md` and this implementation report with 538 tests passing across 14 suites and exact evaluation history.
+
+### 4.11 I09-REV-11 (LOW) — Module Purity for `dag-declaration.mjs`
+- **Finding**: `src/runner/coordination/dag-declaration.mjs` had filesystem imports (`node:fs`, `node:path`) via `resolveNodeCwd`, violating pure declaration layer boundaries.
+- **Resolution**: Cut `resolveNodeCwd` from `dag-declaration.mjs`, making it 100% pure and memory-only. Relocated `resolveNodeCwd` to `src/verbs/coordination/dag-scheduler.mjs` and updated callers in `run.mjs` and `show.mjs`.
+
+---
+
+## 5. Disposition & Readiness
+
+Unit **I09** implementation and all reviewer feedback remediations are complete, strictly isolated in worktree `coordination-skill-harness-i09-dag-forward-port`, and adhere to all platform operating laws and Git boundaries:
+- Base commit: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
+- Evaluation history: `d52093fb` -> `3cc74b41` -> candidate tip
+- All 14 test suites passing cleanly (538 passed / 0 failed, `git diff --check` clean).
+
+Ready for independent re-review and progression to **Unit I10** (test DAG migration, cold resume, concurrency, and corrupt evidence).

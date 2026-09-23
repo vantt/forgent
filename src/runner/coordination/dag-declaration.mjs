@@ -1,8 +1,6 @@
 // Immutable, schema-3 DAG declaration.  This deliberately contains no
 // scheduler state: it is the durable request identity from which replay can
 // derive facts using the pre-existing Assignment/Run/session evidence.
-import fs from 'node:fs';
-import path from 'node:path';
 import { createHash } from 'node:crypto';
 
 export const DAG_DECLARATION_VERSION = '1';
@@ -188,44 +186,4 @@ export function computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd }) {
     }
   }
   return caveats;
-}
-
-/**
- * Resolves the canonical working directory for a DAG node.
- * Checks node semantics (canonicalCwd / cwd), existing assignment runs on disk,
- * and falls back to defaultCwd or process.cwd().
- *
- * @param {object} node
- * @param {Array<object>} [nodeAssignments=[]]
- * @param {string} [fgosDir=null]
- * @param {string} [defaultCwd=null]
- * @returns {string}
- */
-export function resolveNodeCwd(node, nodeAssignments = [], fgosDir = null, defaultCwd = null) {
-  if (typeof node?.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
-    return path.resolve(node.semantics.canonicalCwd);
-  }
-  if (typeof node?.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
-    return path.resolve(node.semantics.cwd);
-  }
-  if (fgosDir && Array.isArray(nodeAssignments)) {
-    for (const asgn of nodeAssignments) {
-      const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
-      if (fs.existsSync(runsDir)) {
-        try {
-          const attempts = fs.readdirSync(runsDir);
-          for (const attempt of attempts) {
-            const runJsonPath = path.join(runsDir, attempt, 'run.json');
-            if (fs.existsSync(runJsonPath)) {
-              const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-              if (typeof run.cwd === 'string' && run.cwd.trim() !== '') {
-                return path.resolve(run.cwd);
-              }
-            }
-          }
-        } catch {}
-      }
-    }
-  }
-  return path.resolve(defaultCwd ?? process.cwd());
 }

@@ -16,16 +16,18 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths, recordRunRetry, linkResult } from '../../src/runner/coordination/store.mjs';
+import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths, recordRunRetry, linkResult, recordDriverDisposition } from '../../src/runner/coordination/store.mjs';
 import { normalizeDagDeclaration } from '../../src/runner/coordination/dag-declaration.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, SCHEMA_VERSION_2, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 import { EventLogError, repairTruncatedLastLine } from '../../src/state/events.mjs';
-import { cancelSession } from '../../src/runner/coordination/session-engine.mjs';
+import { cancelSession, openDeclaredProtocolSession } from '../../src/runner/coordination/session-engine.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { scheduleDagSteps } from '../../src/verbs/coordination/dag-scheduler.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { closeCoordinationUseCase } from '../../src/verbs/coordination/close.mjs';
+import { compileDagRequest } from '../../src/verbs/coordination/dag-request-compiler.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
 
@@ -575,7 +577,7 @@ test('Phase 07: DAG resume with retry-pending does not treat retried node as set
   assert.equal(shownReview.dependenciesSettled, false);
 });
 
-test('Phase 07: DAG execution with concurrent read-only nodes sharing cwd emits sharedCwdVerdictCaveat and refuses auto-close (REV-05)', async () => {
+test('Phase 07: DAG execution with concurrent read-only nodes sharing cwd emits sharedCwdVerdictCaveat and refuses auto-close (REV-05 / REV-09)', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const dagReq = request({ coordinationId: 'p07-dag-shared-cwd-caveat' });
   dagReq.dag = true;
@@ -592,7 +594,8 @@ test('Phase 07: DAG execution with concurrent read-only nodes sharing cwd emits 
 
   assert.equal(result.closed, false, 'auto-close must be refused when nodes carry shared-cwd caveats');
   assert.equal(result.closeAttempted, false);
-  assert.equal(result.status, 'recheck-required');
+  assert.equal(result.status, 'running', 'session status must reflect phase, not recheck-required (REV-09)');
+  assert.equal(result.caveated, true);
   assert.match(result.closeRefusalReason, /recheck-required/);
 
   for (const step of result.steps) {
@@ -606,6 +609,96 @@ test('Phase 07: DAG execution with concurrent read-only nodes sharing cwd emits 
     assert.equal(node.caveated, true);
     assert.ok(node.sharedCwdVerdictCaveat);
   }
+
+  // Explicit closeCoordinationUseCase must also be refused (REV-05)
+  const closeRes = await closeCoordinationUseCase(ctx, {
+    requestObject: {
+      kind: 'close',
+      coordinationId: 'p07-dag-shared-cwd-caveat',
+      authorizedBy: { type: 'operator', id: WRITER_ID },
+    },
+  });
+  assert.equal(closeRes.closed, false);
+  assert.match(closeRes.closeRefusalReason, /recheck-required/);
+
+  // recordDriverDisposition with cell-closed must throw validation error (REV-05)
+  assert.throws(
+    () => recordDriverDisposition('p07-dag-shared-cwd-caveat', {
+      targetRef: 'step:review-1',
+      disposition: 'cell-closed',
+      rationale: 'attempt closing caveated session',
+      evidenceRefs: [],
+      authorizedBy: { type: 'driver', id: WRITER_ID },
+    }, { cwd: tempDir }),
+    (err) => err instanceof CoordinationError && /recheck-required/.test(err.message),
+  );
+});
+
+test('Phase 07: DAG resume with retried predecessor does not dispatch successor (REV-01 Probe R2)', async () => {
+  const { tempDir, ctx } = publicDoorSetup();
+  const coordinationId = 'p07-dag-probe-r2';
+  const dagReq = request({ coordinationId });
+  dagReq.dag = true;
+  dagReq.actors = [
+    { id: 'doer' },
+    { id: 'reviewer' },
+  ];
+  dagReq.steps = [
+    { as: 'produce', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'Produce candidate.', expectedOutputs: ['produce.md'], dependsOn: [] },
+    { as: 'review', type: 'operation', operationId: 'review-candidate', targetActorId: 'reviewer', objective: 'Review candidate.', expectedOutputs: ['review.md'], dependsOn: ['produce'] },
+  ];
+
+  // 1. Open session with the 2-node DAG declaration
+  const validatedReq = validateCoordinationRequest(dagReq);
+  const dagDeclaration = compileDagRequest(validatedReq);
+  openSession({
+    coordinationId,
+    objective: validatedReq.objective,
+    provenanceRoot: { writerId: WRITER_ID },
+    schemaVersion: SCHEMA_VERSION_3,
+    definitionRef: { id: DEFINITION_ID, version: '1.0.0' },
+    dagDeclaration,
+  }, { cwd: tempDir, repoRoot: tempDir });
+
+  // 2. Produce ran and linked a result, review has never run
+  const produceAsgn = createSessionAssignment({
+    coordinationId,
+    taskKey: 'declared:produce-candidate',
+    actorId: 'doer',
+    contract: {
+      objective: 'Produce candidate.',
+      contextRefs: [],
+      constraints: [],
+      expectedOutputs: ['produce.md'],
+      mutation: 'read-only',
+      evidence: { required: 'reported' },
+      role: 'doer',
+      budget: { timeoutMs: 60000, maxRuns: 1 },
+    },
+    caller: { writerId: WRITER_ID },
+    dagNodeId: 'node-produce',
+  }, { cwd: tempDir, repoRoot: tempDir });
+
+  linkResult(coordinationId, {
+    assignmentId: produceAsgn.assignmentId,
+    runId: `run_${produceAsgn.assignmentId}_01`,
+  }, { cwd: tempDir, repoRoot: tempDir, allowSupersede: true });
+
+  // 3. Simulate retry recorded on produce (superseding prior result-linked)
+  recordRunRetry(coordinationId, {
+    assignmentId: produceAsgn.assignmentId,
+    reason: 'retrying produce run',
+  }, { cwd: tempDir, repoRoot: tempDir });
+
+  // 4. Now resume DAG with full request (produce + review)
+  const resumeResult = await runCoordinationUseCase(ctx, { requestObject: dagReq });
+
+  const produceStep = resumeResult.steps.find((s) => s.as === 'produce');
+  const reviewStep = resumeResult.steps.find((s) => s.as === 'review');
+
+  assert.equal(produceStep.schedulerOutcome, 'deferred', 'produce must be deferred when retry is pending');
+  assert.equal(reviewStep.schedulerOutcome, 'deferred', 'review must not be admitted when predecessor produce is not authoritative settled');
+  assert.equal(resumeResult.closed, false);
 });
 
 test('Phase 07: deferred node that settles clears error evidence in scheduler (REV-07)', async () => {
