@@ -2,6 +2,28 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { classifyTestCase } from '../../scripts/test-select-compare.mjs';
 
+/**
+ * Writes a `completed: true` marker for each OS into `tmpDir` and returns
+ * the option names `runCompare` expects for them, spread into its options
+ * object -- every fixture below that exercises `runCompare` end to end
+ * needs these, or the new marker gate reads their fixture as an
+ * incomplete/crashed run and short-circuits to `inconclusive` before ever
+ * reaching the classification logic under test.
+ */
+async function writeCompleteMarkers(tmpDir) {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const paths = {
+    fullMarkerUbuntu: path.join(tmpDir, 'marker-ubuntu.json'),
+    fullMarkerMacos: path.join(tmpDir, 'marker-macos.json'),
+    fullMarkerWindows: path.join(tmpDir, 'marker-windows.json'),
+  };
+  for (const p of Object.values(paths)) {
+    fs.writeFileSync(p, JSON.stringify({ completed: true, reportedCases: 1, exitCode: 0 }));
+  }
+  return paths;
+}
+
 test('C1 Classifier Tests', async (t) => {
 
   await t.test('os-specific: returns os-specific if isOsSpecific is true', () => {
@@ -130,6 +152,7 @@ test('AC 3: OS-specific fixture simulation in runCompare', async (t) => {
       fullJunitWindows: windowsXml,
       relatedJunit: relatedXml,
       ledgerOut: ledgerPath,
+      ...(await writeCompleteMarkers(tmpDir)),
       noExit: true
     });
 
@@ -176,6 +199,7 @@ test('AC 7: C4 warning on item.verify referencing test selector in compare job',
       fullJunitWindows: 'non-existent.xml',
       relatedJunit: 'non-existent.xml',
       ledgerOut: path.join(tmpDir, 'ledger.json'),
+      ...(await writeCompleteMarkers(tmpDir)),
       noExit: true
     });
 
@@ -218,10 +242,104 @@ test('AC 7: Title or description mentioning test-select does NOT trigger C4 warn
       fullJunitWindows: 'non-existent.xml',
       relatedJunit: 'non-existent.xml',
       ledgerOut: path.join(tmpDir, 'ledger.json'),
+      ...(await writeCompleteMarkers(tmpDir)),
       noExit: true
     });
 
     assert.equal(result.warnings.length, 0, 'Must not trigger C4 warning for non-verify field');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('runCompare: missing marker for any OS makes the run inconclusive, never a false-empty classification', async (t) => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const os = await import('node:os');
+  const { runCompare } = await import('../../scripts/test-select-compare.mjs');
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-compare-marker-missing-'));
+  try {
+    const ubuntuXml = path.join(tmpDir, 'full-ubuntu.xml');
+    fs.writeFileSync(ubuntuXml, '<?xml version="1.0"?><testsuites></testsuites>');
+
+    const plan = { decision: 'related', selectedFiles: [], matchedRules: [], changedPaths: [] };
+    const result = await runCompare({
+      plan,
+      baseJunit: path.join(tmpDir, 'nope-base.xml'),
+      fullJunitUbuntu: ubuntuXml,
+      fullJunitMacos: path.join(tmpDir, 'nope-macos.xml'),
+      fullJunitWindows: path.join(tmpDir, 'nope-windows.xml'),
+      relatedJunit: path.join(tmpDir, 'nope-related.xml'),
+      // No markers written at all -- every OS's marker is missing.
+      ledgerOut: path.join(tmpDir, 'ledger.json'),
+      noExit: true,
+    });
+
+    assert.equal(result.error, 'inconclusive');
+    assert.equal(result.reason, 'marker-incomplete');
+    assert.deepEqual(result.incompleteOses.sort(), ['macos-latest', 'ubuntu-latest', 'windows-latest']);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('runCompare: one OS marker reports completed:false -- inconclusive, names only that OS', async (t) => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const os = await import('node:os');
+  const { runCompare } = await import('../../scripts/test-select-compare.mjs');
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-compare-marker-incomplete-'));
+  try {
+    const markers = await writeCompleteMarkers(tmpDir);
+    // Overwrite just the windows marker with completed:false (a crashed/partial run).
+    fs.writeFileSync(markers.fullMarkerWindows, JSON.stringify({ completed: false, reportedCases: 0, exitCode: null }));
+
+    const plan = { decision: 'related', selectedFiles: [], matchedRules: [], changedPaths: [] };
+    const result = await runCompare({
+      plan,
+      baseJunit: path.join(tmpDir, 'nope-base.xml'),
+      fullJunitUbuntu: path.join(tmpDir, 'nope-ubuntu.xml'),
+      fullJunitMacos: path.join(tmpDir, 'nope-macos.xml'),
+      fullJunitWindows: path.join(tmpDir, 'nope-windows.xml'),
+      relatedJunit: path.join(tmpDir, 'nope-related.xml'),
+      ledgerOut: path.join(tmpDir, 'ledger.json'),
+      ...markers,
+      noExit: true,
+    });
+
+    assert.equal(result.error, 'inconclusive');
+    assert.deepEqual(result.incompleteOses, ['windows-latest']);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('runCompare: all 3 OS markers completed:true -- proceeds past the marker gate', async (t) => {
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const os = await import('node:os');
+  const { runCompare } = await import('../../scripts/test-select-compare.mjs');
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-compare-marker-complete-'));
+  try {
+    const markers = await writeCompleteMarkers(tmpDir);
+    const plan = { decision: 'related', selectedFiles: [], matchedRules: [], changedPaths: [] };
+    const result = await runCompare({
+      plan,
+      baseJunit: path.join(tmpDir, 'nope-base.xml'),
+      fullJunitUbuntu: path.join(tmpDir, 'nope-ubuntu.xml'),
+      fullJunitMacos: path.join(tmpDir, 'nope-macos.xml'),
+      fullJunitWindows: path.join(tmpDir, 'nope-windows.xml'),
+      relatedJunit: path.join(tmpDir, 'nope-related.xml'),
+      ledgerOut: path.join(tmpDir, 'ledger.json'),
+      ...markers,
+      noExit: true,
+    });
+
+    assert.notEqual(result.error, 'inconclusive');
+    assert.ok(result.ledger, 'must reach real ledger construction, not short-circuit');
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

@@ -101,15 +101,33 @@ export function getFailedTestsFromJunit(xmlContent) {
   return failed;
 }
 
+/**
+ * Reads a `test-marker.json` written alongside a `full.xml`/`related.xml` in
+ * the same uploaded artifact directory. Returns null when the file is
+ * missing or unparseable -- indistinguishable, from this caller's
+ * perspective, from "no trustworthy evidence this run actually completed".
+ */
+function readMarker(markerPath) {
+  if (!fs.existsSync(markerPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
 export async function runCompare(options = {}) {
   log("Running compare job logic...");
-  
+
   const planPath = options.planFile || 'selector-plan.json';
   const baseJunit = options.baseJunit || 'artifacts/base-results/test-results/base.xml';
   const fullJunitUbuntu = options.fullJunitUbuntu || 'artifacts/full-results-ubuntu-latest/full.xml';
   const fullJunitMacos = options.fullJunitMacos || 'artifacts/full-results-macos-latest/full.xml';
   const fullJunitWindows = options.fullJunitWindows || 'artifacts/full-results-windows-latest/full.xml';
   const relatedJunit = options.relatedJunit || 'artifacts/related-results/related.xml';
+  const fullMarkerUbuntu = options.fullMarkerUbuntu || 'artifacts/full-results-ubuntu-latest/test-marker.json';
+  const fullMarkerMacos = options.fullMarkerMacos || 'artifacts/full-results-macos-latest/test-marker.json';
+  const fullMarkerWindows = options.fullMarkerWindows || 'artifacts/full-results-windows-latest/test-marker.json';
   const ledgerOut = options.ledgerOut || 'ledger.json';
   const noExit = options.noExit || false;
 
@@ -127,6 +145,25 @@ export async function runCompare(options = {}) {
   if (plan.decision === 'full') {
     log("Plan decision was 'full', no comparison needed.");
     if (noExit) return { error: 'no-comparison-needed', decision: 'full' };
+    process.exit(0);
+  }
+
+  // A full-results junit with no <failure> entries is indistinguishable
+  // from "this OS's run crashed before producing any real output" unless
+  // its own marker vouches for it -- classifying test cases off an
+  // incomplete run's fail list would silently read a crash as "nothing
+  // failed here", the exact false-green class TI-01/TI-02b existed to stop.
+  const markers = {
+    'ubuntu-latest': readMarker(fullMarkerUbuntu),
+    'macos-latest': readMarker(fullMarkerMacos),
+    'windows-latest': readMarker(fullMarkerWindows),
+  };
+  const incompleteOses = Object.entries(markers)
+    .filter(([, marker]) => !marker || marker.completed !== true)
+    .map(([osName]) => osName);
+  if (incompleteOses.length > 0) {
+    log(`Marker missing or reports completed:false for: ${incompleteOses.join(', ')} -- inconclusive.`);
+    if (noExit) return { error: 'inconclusive', reason: 'marker-incomplete', incompleteOses };
     process.exit(0);
   }
 
