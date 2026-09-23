@@ -58,6 +58,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { StoreError } from '../state/store.mjs';
+import { readWorktreeSetupCommands } from '../config/shared-config-file.mjs';
 
 /** Raised for any git worktree/branch operation failure. `errorClass`
  * reuses the vocabulary declared in `recovery.mjs`'s `ERROR_CLASSES` (per
@@ -103,6 +104,43 @@ export function provisionDependencies(worktreePath) {
   if (!hasDeps) return;
   const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
   execFileSync('npm', [hasLockfile ? 'ci' : 'install'], { cwd: worktreePath, stdio: 'ignore' });
+}
+
+// Generous ceiling for one setup command (a cold compile can take minutes on
+// a loaded machine) -- only there so a hung command can never wedge a claim
+// or approve forever.
+const WORKTREE_SETUP_TIMEOUT_MS = 30 * 60 * 1000;
+
+/**
+ * Run the project's configured `worktreeSetup.commands` (read from
+ * `repoRoot`'s shared config) inside `worktreePath`, in order, after
+ * `provisionDependencies`. Covers what a fresh checkout lacks beyond
+ * declared npm dependencies -- e.g. a compiled binary the test suite
+ * expects (`cargo build --release`). No-ops when nothing is configured.
+ * Each command runs through the shell with `FGOS_REPO_ROOT` set to the
+ * main checkout, so a project can point at shared caches from there.
+ * Throws WorktreeError (with the command's output) on the first failure.
+ */
+export function runWorktreeSetupCommands(worktreePath, repoRoot) {
+  const commands = readWorktreeSetupCommands(repoRoot);
+  for (const command of commands) {
+    try {
+      execFileSync(command, {
+        cwd: worktreePath,
+        shell: true,
+        encoding: 'utf8',
+        stdio: 'pipe',
+        timeout: WORKTREE_SETUP_TIMEOUT_MS,
+        env: { ...process.env, FGOS_REPO_ROOT: repoRoot },
+      });
+    } catch (err) {
+      const output = `${err.stdout ?? ''}${err.stderr ?? ''}`.trim();
+      throw new WorktreeError(`worktree setup command failed in "${worktreePath}": ${command}${output ? `\n${output}` : ''}`, {
+        worktreePath,
+        command,
+      });
+    }
+  }
 }
 
 function git(repoRoot, args) {
@@ -592,7 +630,7 @@ export function createBranchRef(repoRoot, id, opts = {}) {
  * (`withMergeTargetSlot`, merge.mjs) already has a working heartbeat, so it
  * has no TTL-starvation gap to close and stays byte-identical.
  */
-function finishWorktreeSetup(worktreePath, branch, { beforeProvision } = {}) {
+function finishWorktreeSetup(repoRoot, worktreePath, branch, { beforeProvision } = {}) {
   // `.fgos/` (ADR0020): since `.fgos/` is git-tracked in this repo, a bare
   // checkout would carry a snapshot frozen at fork time — stale the moment
   // main gets another uncommitted event, and a live escape hatch into the
@@ -622,6 +660,7 @@ function finishWorktreeSetup(worktreePath, branch, { beforeProvision } = {}) {
   // cost of the install itself.
   beforeProvision?.();
   provisionDependencies(worktreePath);
+  runWorktreeSetupCommands(worktreePath, repoRoot);
 }
 
 /**
@@ -708,7 +747,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
   // fails, so a cleanup failure never masks the real error the caller needs
   // to see.
   try {
-    finishWorktreeSetup(worktreePath, branch, { beforeProvision: opts.beforeProvision });
+    finishWorktreeSetup(repoRoot, worktreePath, branch, { beforeProvision: opts.beforeProvision });
   } catch (err) {
     try {
       removeWorktree(repoRoot, worktreePath, { force: true });
@@ -1245,7 +1284,7 @@ function createDetachedMergeWorktree(repoRoot, id) {
   // relocate/reattach paths. Left unfixed, a repeated npm registry flake
   // during `approve` accumulates full checkouts under tmp indefinitely.
   try {
-    finishWorktreeSetup(worktreePath, branch);
+    finishWorktreeSetup(repoRoot, worktreePath, branch);
   } catch (err) {
     try {
       removeWorktree(repoRoot, worktreePath, { force: true });

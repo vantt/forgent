@@ -257,7 +257,11 @@ test('dispatchPrimaryTask enforces aggregateBounds.maxTaskDepth against the REAL
       { taskKey: 'grandchild', objective: 'depth 3, one past the cap', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1', parentAssignmentId: depth2.assignment.assignmentId },
       { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir, 'd3') },
     ),
-    (err) => err instanceof CoordinationError && /aggregateBounds\.maxTaskDepth cap of 2/.test(err.message),
+    // taskDepth is an ordinary non-deferrable refusal -- it
+    // must never carry the concurrency-cap machine code (assertWithinTaskDepth
+    // throws a plain 2-arg CoordinationError, so err.code is always undefined
+    // here, never 'concurrency-cap').
+    (err) => err instanceof CoordinationError && err.code !== 'concurrency-cap' && /aggregateBounds\.maxTaskDepth cap of 2/.test(err.message),
   );
 });
 
@@ -347,7 +351,8 @@ test('proposeConsult enforces aggregateBounds.maxTaskDepth against the primary A
       { primaryAssignmentId: primary.assignment.assignmentId, role: 'researcher', objective: 'consult, depth 2 -- exceeds maxTaskDepth: 1', expectedOutputs: ['agent-result.json'], evidenceRequired: 'reported', writerId: 'writer-1' },
       { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir) },
     ),
-    (err) => err instanceof CoordinationError && /aggregateBounds\.maxTaskDepth cap of 1/.test(err.message),
+    // Non-deferrable refusal guarantee via the proposeConsult door.
+    (err) => err instanceof CoordinationError && err.code !== 'concurrency-cap' && /aggregateBounds\.maxTaskDepth cap of 1/.test(err.message),
   );
 });
 

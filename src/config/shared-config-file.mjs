@@ -76,6 +76,26 @@ export function readInvariantCheckCommands(dir) {
   return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');
 }
 
+// Project-specific commands every runner-created worktree runs after its
+// dependency install, before anything verifies in it -- e.g. building a
+// compiled binary the test suite needs, which a fresh checkout never has
+// (git only checks out tracked files). Empty by default: a project that
+// declares nothing keeps exactly today's behavior.
+export const DEFAULT_WORKTREE_SETUP_COMMANDS = [];
+
+/**
+ * The worktree setup commands configured at `dir` (`worktreeSetup.commands`),
+ * as a list of non-empty command strings. `[]` for an absent or malformed
+ * section -- same never-assume-a-default discipline as
+ * `readInvariantCheckCommands`.
+ */
+export function readWorktreeSetupCommands(dir) {
+  const section = readSharedConfig(dir).worktreeSetup;
+  if (!section || typeof section !== 'object' || Array.isArray(section)) return [];
+  if (!Array.isArray(section.commands)) return [];
+  return section.commands.filter((command) => typeof command === 'string' && command.trim() !== '');
+}
+
 /**
  * Write `config` to the shared config file at `dir`, creating `.fgos/` if
  * needed. The only write path in this module -- callers decide WHEN to

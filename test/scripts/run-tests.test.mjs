@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, runTests, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -257,6 +257,7 @@ function spawnSyncNode(scriptPath) {
 
 const realScriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
 const realLibPath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
+const realQueueLibPath = fileURLToPath(new URL('../../scripts/lib/full-suite-queue.mjs', import.meta.url));
 const mirroredRoots = [];
 
 after(() => {
@@ -270,6 +271,7 @@ function mirroredRepoRoot(prefix) {
   fs.mkdirSync(path.join(root, 'test'), { recursive: true }); // empty: zero test files
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
+  fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   return root;
 }
 
@@ -301,4 +303,59 @@ test('the real entrypoint still fires when invoked through a symlink pointing at
   const result = spawnSync(process.execPath, [link], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /discovered 0 test files/);
+});
+
+// --- per-run temp dir: every fixture the suite mkdtemps lands under one
+// directory that is removed when the run ends, so leaked fixtures can never
+// pile up in the OS temp dir across runs.
+
+function tempBase() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-tmpbase-'));
+}
+
+test('runSelectedTests points the child at a fresh per-run temp dir and removes it when the run ends', () => {
+  const base = tempBase();
+  let seen;
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => {
+      seen = opts.env;
+      fs.writeFileSync(path.join(opts.env.TMPDIR, 'leaked-fixture'), 'x'); // a test that never cleans up
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.status, 0);
+  assert.equal(path.dirname(seen.TMPDIR), fs.realpathSync(base));
+  assert.match(path.basename(seen.TMPDIR), /^fgos-test-run-/);
+  assert.equal(seen.TMP, seen.TMPDIR);
+  assert.equal(seen.TEMP, seen.TMPDIR);
+  assert.equal(fs.existsSync(seen.TMPDIR), false, 'the per-run dir and everything leaked into it is gone');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests keeps the per-run temp dir when FGOS_TEST_KEEP_TMP=1, and says where', () => {
+  const base = tempBase();
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base, [KEEP_TMP_ENV]: '1' },
+    spawn: () => ({ status: 0 }),
+    log: (msg) => logs.push(msg),
+  });
+  assert.equal(fs.existsSync(result.runTemp), true);
+  assert.match(logs.join('\n'), new RegExp(result.runTemp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests removes the per-run temp dir even when spawning the suite throws', () => {
+  const base = tempBase();
+  let runTemp;
+  assert.throws(() => runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => { runTemp = opts.env.TMPDIR; throw new Error('spawn blew up'); },
+  }), /spawn blew up/);
+  assert.equal(fs.existsSync(runTemp), false);
+  fs.rmSync(base, { recursive: true, force: true });
 });

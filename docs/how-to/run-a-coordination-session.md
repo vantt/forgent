@@ -10,10 +10,11 @@ framework).
 
 ## `fgos coordination run --file <request>`
 
-Reads a JSON request file, dispatches every declared step synchronously (in
-V1, one CLI call runs the whole session to completion or to its best-effort
-terminal state), attempts to close the session, and prints an `fgos.v1`
-envelope reporting what happened.
+Reads a JSON request file, dispatches every declared step (sequentially by
+default; overlapping only for an explicit read-only `dag: true` request — see
+"DAG mode" below), attempts to close the session, and prints an `fgos.v1`
+envelope reporting what happened. One CLI call still runs the request to
+completion or to its best-effort terminal state.
 
 If `coordinationId` is omitted, a new session is opened. If it names an
 EXISTING, still-`active` session, the call resumes that session instead of
@@ -146,6 +147,10 @@ fan-out branch) — the real Assignment id is only known once dispatch
 actually happens, so this is how a request chains steps together without
 guessing ids ahead of time.
 
+Without top-level `"dag": true`, declared-protocol steps stay **legacy
+sequential**: each step is awaited before the next starts. That is still the
+default, including for old sessions opened before schema version 3.
+
 Three real, published examples, using the protocols already registered
 under `core/coordination-protocols/`:
 
@@ -185,6 +190,45 @@ allocated by the protocol's own cohort planner, which accepts no
 per-branch policy override — a request that tries to set one there is
 refused rather than silently ignored.
 
+## DAG mode (`"dag": true`) — read-only individual nodes only
+
+An explicit top-level `"dag": true` on a `kind: "declared-protocol"` request
+opts the session into schema version 3. Independent read-only operation
+nodes can overlap once their dependencies have **settled** (predecessor
+evidence is linked and readable — not the same thing as RunResult success).
+`fgos coordination show` / `fgos coordination chain` reconstruct the declared
+graph and derived node outcomes so a fresh process can resume.
+
+This is **not** a general DAG runtime. Scope that is in, and scope that is
+explicitly out:
+
+- **In:** read-only individual `operation` nodes (and the ledger nodes needed
+  to express their causal graph), immutable declaration + fingerprint,
+  cold resume of an equivalent request, `show`/`chain` projection.
+- **Out, deferred behind future evidence gates:** mutating DAG nodes,
+  per-node worktrees, mutation takeover, and **fan-out as a DAG node**.
+  A `dag: true` request that contains a mutating operation or a `fan-out`
+  step is refused before any session is opened. Existing sequential mutation
+  and existing `dispatchResearchFanOut` behavior remain available only
+  **outside** DAG mode. Do not assume `dag: true` covers more than read-only
+  individual nodes.
+
+Compatibility:
+
+- An older binary (schema versions 1/2 only) that reads a schema-3 DAG
+  session fails clearly with `schema-version-mismatch` and **must not
+  append** to that session.
+- A current binary reading a schema-1/2 session keeps legacy sequential
+  semantics (`schemaMode: "legacy-non-dag"`). It never infers a DAG from
+  Assignment events, and it refuses to convert a legacy session into DAG
+  mode on resume.
+
+Shared-cwd overlap between concurrent read-only peers is allowed but the
+resulting reviewer/red-team outcomes are caveated (`sharedCwdCaveat`,
+`recheck-required`) and are not trustworthy closure evidence.
+
+Example: `docs/how-to/coordination-examples/dag-read-only-request.json`.
+
 ## What gets rejected, and why
 
 `fgos coordination run` validates the request file against a strict
@@ -221,6 +265,10 @@ never a silent acceptance:
 
 ## Related
 
+- `docs/how-to/coordination-examples/dag-read-only-request.json` — a
+  `dag: true` first-pass shape (`produce -> {review, red-team}`). Read-only
+  individual nodes only; mutation/fan-out DAG is not this example and is not
+  this feature.
 - `docs/architect/agent-coordination/contracts/coordination-session.md` —
   the CoordinationSession manifest/event contract this CLI drives.
 - `docs/specs/runner.md` §"CoordinationSession — điều phối agent

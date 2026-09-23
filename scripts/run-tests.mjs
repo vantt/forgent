@@ -23,6 +23,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
@@ -82,6 +83,8 @@ export function buildTestArgv(files, forwardedArgs = []) {
  * run are byte-for-byte identical in every way except which files are
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
  */
+export const KEEP_TMP_ENV = 'FGOS_TEST_KEEP_TMP';
+
 export function runSelectedTests(files, {
   cwd = REPO_ROOT,
   forwardedArgs = [],
@@ -89,22 +92,40 @@ export function runSelectedTests(files, {
   spawn = spawnSync,
   env = process.env,
   stdio = 'inherit',
+  log = (msg) => console.error(msg),
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
   const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
-  if (process.platform === 'darwin') {
-    const tempRoot = env.TMPDIR || os.tmpdir();
-    try {
-      const realTempRoot = fs.realpathSync(tempRoot);
-      childEnv.TMPDIR = realTempRoot;
-      childEnv.TMP = realTempRoot;
-      childEnv.TEMP = realTempRoot;
-    } catch {
-      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
+  // Every temp dir the suite creates lands under one per-run directory that
+  // is removed once the run ends: tests mkdtemp fixtures (git repos,
+  // worktrees, .fgos stores) and mostly never delete them, so without this
+  // each full run leaves tens of thousands of dirs in the OS temp dir --
+  // enough, across a day of concurrent runs, to exhaust the disk's inodes.
+  // On darwin the realpath is used (the darwin TMPDIR symlink fix).
+  const baseTemp = env.TMPDIR || env.TEMP || env.TMP || os.tmpdir();
+  let runTemp = null;
+  try {
+    runTemp = fs.mkdtempSync(path.join(baseTemp, 'fgos-test-run-'));
+    if (process.platform === 'darwin') runTemp = fs.realpathSync(runTemp);
+    childEnv.TMPDIR = runTemp;
+    childEnv.TMP = runTemp;
+    childEnv.TEMP = runTemp;
+  } catch {
+    // If the temp root is unusable, let Node's normal temp logic fail naturally.
+    runTemp = null;
+  }
+  try {
+    const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+    return { status: result.status ?? 1, files: relFiles, runTemp };
+  } finally {
+    if (runTemp) {
+      if (env[KEEP_TMP_ENV] === '1') {
+        log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);
+      } else {
+        fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });
+      }
     }
   }
-  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-  return { status: result.status ?? 1, files: relFiles };
 }
 
 /**
@@ -123,6 +144,7 @@ export function runTests({
   env = process.env,
   cwd = REPO_ROOT,
   stdio = 'inherit',
+  queue = null,
 } = {}) {
   const files = discoverTestFiles(root);
   if (files.length === 0) {
@@ -133,11 +155,20 @@ export function runTests({
     };
   }
 
-  return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio });
+  // `queue` (the CLI door passes acquireFullSuiteQueue): taken only once
+  // there is real work to run, and marked on the child's env so a test that
+  // spawns this door itself never waits on its own parent's lock.
+  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio });
+  const release = queue({ env });
+  try {
+    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio });
+  } finally {
+    release();
+  }
 }
 
 if (isMainModule(import.meta.url)) {
-  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2) });
+  const { status, message } = runTests({ forwardedArgs: process.argv.slice(2), queue: acquireFullSuiteQueue });
   if (message) console.error(message);
   process.exitCode = status;
 }

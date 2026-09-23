@@ -17,6 +17,7 @@
 // drift surface, and this one is the enum two independent validators
 // (`validateContributionLineage` and this event's payload check) must agree on.
 import { CONTRIBUTION_TYPES } from '../deliberation/schema.mjs';
+import { normalizeDagDeclaration } from './dag-declaration.mjs';
 
 export const SCHEMA_VERSION = '1';
 
@@ -112,10 +113,11 @@ const AGGREGATE_BOUND_FIELDS = new Set(Object.keys(DEFAULT_AGGREGATE_BOUNDS));
  * 'foreign-ref', 'out-of-order-ref', 'schema-version-mismatch').
  */
 export class CoordinationError extends Error {
-  constructor(category, message) {
+  constructor(category, message, code) {
     super(message);
     this.name = 'CoordinationError';
     this.category = category;
+    if (code !== undefined) this.code = code;
   }
 }
 
@@ -303,6 +305,7 @@ export function validateManifest(manifest) {
 const EVENT_SPECS = {
   'session-opened': { required: ['coordinationId', 'provenanceRoot'], accepted: ['coordinationId', 'provenanceRoot'] },
   'actor-bound': { required: ['actorId', 'role'], accepted: ['actorId', 'role', 'persona', 'policy'] },
+  'dag-declared': { required: ['declaration'], accepted: ['declaration'] },
   // `operationId`/`nodeId`/`authorizationId`/`invocationKey`/`contextGrant`
   // are ADDITIVE driver-authorization provenance, present only on a
   // dispatch that a driver actually authorized ("so replay can explain why
@@ -313,7 +316,7 @@ const EVENT_SPECS = {
   'assignment-created': {
     required: ['assignmentId'],
     // 'runId' is accepted for legacy schema-1 backwards compatibility
-    accepted: ['assignmentId', 'actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'contextGrant', 'runId'],
+    accepted: ['assignmentId', 'actorId', 'operationId', 'nodeId', 'authorizationId', 'invocationKey', 'contextGrant', 'runId', 'dagNodeId'],
   },
   // A driver authorizes ONE `activation.mode: driver-authorized` node-
   // operation binding for dispatch. The binding is identified by the full
@@ -597,6 +600,7 @@ const OPTIONAL_STRING_FIELDS = new Set([
   'nextRunId',
   'admissionPayloadDigest',
   'authorityRef',
+  'dagNodeId',
 ]);
 
 // Schema-2 run-retried's own optional positive-integer field. A separate,
@@ -742,6 +746,10 @@ export function validateEventPayload(type, payload, opts = {}) {
       if (!isPlainObject(value)) fail('validation', `event "${type}" payload.provenanceRoot must be a non-null object`);
       continue;
     }
+    if (field === 'declaration') {
+      if (!isPlainObject(value)) fail('validation', `event "${type}" payload.declaration must be a non-null object`);
+      continue;
+    }
     if (field === 'authorizedBy' || field === 'validatedBy' || field === 'linkedBy' || field === 'recordedBy') {
       // `validatedBy`/`linkedBy`/`recordedBy` are the same driver-provenance
       // shape under a name that says what the driver did (validated an
@@ -870,6 +878,19 @@ export function validateEventPayload(type, payload, opts = {}) {
       );
     }
   }
+  if (type === 'dag-declared') {
+    try {
+      const normalized = normalizeDagDeclaration(body.declaration);
+      if (normalized.requestFingerprint !== body.declaration.requestFingerprint) {
+        fail('validation', 'event "dag-declared" declaration.requestFingerprint does not match normalized request');
+      }
+      if (JSON.stringify(normalized) !== JSON.stringify(body.declaration)) {
+        fail('validation', 'event "dag-declared" declaration is not normalized');
+      }
+    } catch (err) {
+      fail('validation', err.message.replace(/^invalid DAG declaration: /, 'event "dag-declared" '));
+    }
+  }
   if (type === 'run-retried') {
     const s2Fields = ['retryId', 'nextRunId', 'nextAttempt', 'admissionPayloadDigest', 'authorityRef'];
     const presentS2 = s2Fields.filter((field) => body[field] !== undefined);
@@ -993,10 +1014,13 @@ export function validateEventPayload(type, payload, opts = {}) {
  */
 export function assertSchemaVersionCurrent(manifest, manifestPath) {
   if (!SUPPORTED_SCHEMA_VERSIONS.has(manifest.schemaVersion)) {
-    throw new CoordinationError(
+    const error = new CoordinationError(
       'schema-version-mismatch',
       `session.json at ${manifestPath} has schemaVersion "${manifest.schemaVersion}", running contract supports ${[...SUPPORTED_SCHEMA_VERSIONS].join(' | ')} -- recovery refuses to reinterpret an unknown shape`,
     );
+    error.code = 'unsupported-newer-schema';
+    error.reason = 'unsupported-newer-schema';
+    throw error;
   }
 }
 
