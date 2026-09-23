@@ -74,6 +74,32 @@ export function buildTestArgv(files, forwardedArgs = []) {
 }
 
 /**
+ * The env every spawned `node --test` run gets, whoever spawns it (the full
+ * suite, the canary, the selector's related run, mutation and coverage runs):
+ * - FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1;
+ * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
+ *   nested run that inherits it reports to a parent that is not listening
+ *   and exits 0 without running a single test;
+ * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
+ */
+export function buildTestEnv(env = process.env) {
+  const { NODE_TEST_CONTEXT: _enclosingRunner, ...rest } = env;
+  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  if (process.platform === 'darwin') {
+    const tempRoot = env.TMPDIR || os.tmpdir();
+    try {
+      const realTempRoot = fs.realpathSync(tempRoot);
+      childEnv.TMPDIR = realTempRoot;
+      childEnv.TMP = realTempRoot;
+      childEnv.TEMP = realTempRoot;
+    } catch {
+      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
+    }
+  }
+  return childEnv;
+}
+
+/**
  * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
  * the shared seam between the full-suite door and the canary runner).
  * Applies the exact same env/argv construction `runTests()` always has
@@ -91,19 +117,7 @@ export function runSelectedTests(files, {
   stdio = 'inherit',
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
-  const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
-  if (process.platform === 'darwin') {
-    const tempRoot = env.TMPDIR || os.tmpdir();
-    try {
-      const realTempRoot = fs.realpathSync(tempRoot);
-      childEnv.TMPDIR = realTempRoot;
-      childEnv.TMP = realTempRoot;
-      childEnv.TEMP = realTempRoot;
-    } catch {
-      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
-    }
-  }
-  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+  const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: buildTestEnv(env), stdio });
   return { status: result.status ?? 1, files: relFiles };
 }
 

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { discoverTestFiles } from './run-tests.mjs';
+import { buildTestEnv, discoverTestFiles } from './run-tests.mjs';
 
 // Per-file ceiling for one `node --test <file>` coverage run. The slowest
 // real test files take tens of seconds on a loaded runner; anything past this
@@ -250,13 +250,9 @@ export async function collectPerFileCoverage(testFiles, {
     const covDir = path.join(covRoot, encodeURIComponent(file));
     fs.mkdirSync(covDir, { recursive: true });
     const t0 = Date.now();
-    // NODE_TEST_CONTEXT is set by an enclosing `node --test` run; inherited,
-    // it makes this nested `node --test` report to a parent that is not
-    // listening and exit without running the file.
-    const { NODE_TEST_CONTEXT: _enclosingRunner, ...childEnv } = env;
     const child = spawn(execPath, ['--test', absFile], {
       cwd: repoRoot,
-      env: { ...childEnv, NODE_V8_COVERAGE: covDir, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' },
+      env: { ...buildTestEnv(env), NODE_V8_COVERAGE: covDir },
       stdio: 'ignore',
       detached: process.platform !== 'win32',
     });

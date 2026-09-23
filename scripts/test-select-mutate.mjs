@@ -5,7 +5,8 @@ import crypto from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { MANIFEST } from '../test/test-ownership.mjs';
 import { mutants } from '../test/test-ownership-mutants.mjs';
-import { REPO_ROOT, buildTestArgv } from './run-tests.mjs';
+import { REPO_ROOT, buildTestArgv, buildTestEnv } from './run-tests.mjs';
+import { getFailedTestsFromJunit } from './test-select-compare.mjs';
 
 function log(msg) { console.log(msg); }
 function errFn(msg) { console.error(msg); }
@@ -73,18 +74,44 @@ export function relatedFilesForRule(rule) {
 
 const SYNTAX_ERROR_PATTERN = /SyntaxError|Unexpected token|Unexpected end of input/;
 
+// One full-suite run on CI takes ~10 min; anything far past that is a hang,
+// reported as "could not run" rather than blocking the nightly job.
+const FULL_SUITE_TIMEOUT_MS = 40 * 60 * 1000;
+
+/**
+ * Runs the whole suite in `cwd` (the same `run-tests.mjs` door `npm test`
+ * uses) with a junit report, and returns the names of the failing test
+ * cases. `ran: false` means there is no usable answer at all: the run timed
+ * out, or it wrote no report.
+ */
+export function runFullSuite({ cwd, spawn = spawnSync, timeoutMs = FULL_SUITE_TIMEOUT_MS } = {}) {
+  const reportDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-mutate-full-'));
+  const reportPath = path.join(reportDir, 'full.xml');
+  try {
+    const result = spawn(process.execPath, [
+      'scripts/run-tests.mjs', '--test-reporter=junit', `--test-reporter-destination=${reportPath}`,
+    ], { cwd, stdio: 'ignore', timeout: timeoutMs, env: buildTestEnv() });
+    if (result.signal || result.error || !fs.existsSync(reportPath)) return { ran: false, failed: new Set() };
+    const xml = fs.readFileSync(reportPath, 'utf8');
+    if (!xml.includes('<testcase')) return { ran: false, failed: new Set() };
+    return { ran: true, failed: new Set(getFailedTestsFromJunit(xml).map((f) => f.name)) };
+  } finally {
+    fs.rmSync(reportDir, { recursive: true, force: true });
+  }
+}
+
 /**
  * Runs `node --test` against an explicit file list inside `cwd`, capturing
  * stdout/stderr (unlike run-tests.mjs's own runSelectedTests, built for
  * `stdio: 'inherit'` CLI use) so a mutation that breaks JS syntax can be
  * told apart from one a real assertion just caught.
  */
-function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
+export function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
   const relFiles = files.map((f) => path.relative(cwd, f));
   const result = spawn(process.execPath, buildTestArgv(relFiles, []), {
     cwd,
     encoding: 'utf8',
-    env: { ...process.env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' },
+    env: buildTestEnv(),
   });
   return {
     status: result.status ?? 1,
@@ -95,7 +122,7 @@ function runRelatedCaptured(files, { cwd, spawn = spawnSync } = {}) {
 
 /**
  * Applies one mutant inside an already-prepared (git worktree) directory
- * and classifies the outcome. `runRelated`/`execFileFn` are injectable so
+ * and classifies the outcome. `runRelated`/`runFull`/`fullBaseline` are injectable so
  * every classification branch (the 6 rows classifyMutant covers) can be
  * exercised with a fake runner, without spawning a real worktree or test
  * process per case.
@@ -110,7 +137,8 @@ export function classifyOneMutant({
   rule,
   worktreePath,
   runRelated = runRelatedCaptured,
-  execFileFn = execFileSync,
+  runFull = runFullSuite,
+  fullBaseline = () => new Set(),
 }) {
   const relatedFiles = relatedFilesForRule(rule);
   if (relatedFiles.length === 0) {
@@ -140,13 +168,18 @@ export function classifyOneMutant({
       result = { syntaxError: true };
     } else {
       result = { relatedPassed: related.status === 0, fullPassed: false };
-      // AC 5: run full ONLY if related passed
+      // AC 5: run full ONLY if related passed. The full suite is judged
+      // against its own unmutated baseline: a test that is already red on
+      // the clean HEAD (an unbuilt Rust binary, an unrelated flake) says
+      // nothing about this mutant, so only a NEW failure counts as the
+      // selector having missed it.
       if (result.relatedPassed) {
-        try {
-          execFileFn('node', ['scripts/run-tests.mjs'], { cwd: worktreePath, stdio: 'ignore' });
-          result.fullPassed = true;
-        } catch {
-          result.fullPassed = false;
+        const baseline = fullBaseline();
+        const full = baseline ? runFull({ cwd: worktreePath }) : null;
+        if (!baseline || !full.ran) {
+          result = { infraError: true };
+        } else {
+          result.fullPassed = ![...full.failed].some((name) => !baseline.has(name));
         }
       }
     }
@@ -165,7 +198,36 @@ export function runNightlyMutations(options = {}) {
   const enrichedMutants = generateMutantPayloads(rawMutants, manifest);
   const ledgerOut = options.ledgerOut || 'nightly-ledger.json';
   const runRelated = options.runRelated || runRelatedCaptured;
+  const runFull = options.runFull || runFullSuite;
   const execFileFn = options.execFileFn || execFileSync;
+
+  // Failing test names of the full suite on the clean HEAD, computed once and
+  // only if some mutant survives its related tests. `null` = the baseline run
+  // itself produced no usable answer, so no mutant can be judged against it.
+  let baselineCache;
+  const fullBaseline = () => {
+    if (baselineCache !== undefined) return baselineCache;
+    const baseDir = path.join(os.tmpdir(), 'fgos-mutations');
+    fs.mkdirSync(baseDir, { recursive: true });
+    const baselinePath = fs.mkdtempSync(path.join(baseDir, 'baseline-'));
+    try {
+      execFileFn('git', ['worktree', 'add', '--detach', baselinePath, 'HEAD'], { encoding: 'utf8' });
+      if (!fs.existsSync(path.join(baselinePath, 'node_modules'))) {
+        fs.symlinkSync(path.join(REPO_ROOT, 'node_modules'), path.join(baselinePath, 'node_modules'), 'dir');
+      }
+      const full = runFull({ cwd: baselinePath });
+      baselineCache = full.ran ? full.failed : null;
+      log(full.ran
+        ? `Full-suite baseline on clean HEAD: ${full.failed.size} test(s) already failing.`
+        : 'Full-suite baseline on clean HEAD produced no report; surviving mutants are infra-error.');
+    } catch (err) {
+      log(`Full-suite baseline could not run: ${err.message}`);
+      baselineCache = null;
+    } finally {
+      try { execFileFn('git', ['worktree', 'remove', '-f', baselinePath], { encoding: 'utf8' }); } catch {}
+    }
+    return baselineCache;
+  };
 
   for (const mutant of enrichedMutants) {
     log(`Applying mutant ${mutant.id} to ${mutant.file}...`);
@@ -184,7 +246,7 @@ export function runNightlyMutations(options = {}) {
         fs.symlinkSync(path.join(REPO_ROOT, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
       }
 
-      const { classification, reason } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, execFileFn });
+      const { classification, reason } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, runFull, fullBaseline });
       if (reason) log(`Mutant ${mutant.id}: ${reason}`);
       log(`Mutant ${mutant.id} classification: ${classification}`);
       ledger.push({
