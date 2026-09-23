@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -257,9 +257,15 @@ function spawnSyncNode(scriptPath) {
 
 const realScriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
 const realLibPath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
+const mirroredRoots = [];
+
+after(() => {
+  for (const root of mirroredRoots) fs.rmSync(root, { recursive: true, force: true });
+});
 
 function mirroredRepoRoot(prefix) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  mirroredRoots.push(root);
   fs.mkdirSync(path.join(root, 'scripts', 'lib'), { recursive: true });
   fs.mkdirSync(path.join(root, 'test'), { recursive: true }); // empty: zero test files
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
@@ -284,6 +290,15 @@ test('the real entrypoint still fires when its own absolute path contains a spac
     cwd: root,
     encoding: 'utf8',
   });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /discovered 0 test files/);
+});
+
+test('the real entrypoint still fires when invoked through a symlink pointing at it (import.meta.url resolves to the symlink\'s real target, argv[1] stays the symlink path)', () => {
+  const root = mirroredRepoRoot('run-tests-symlink-cli-');
+  const link = path.join(root, 'run-tests-link.mjs');
+  fs.symlinkSync(path.join(root, 'scripts', 'run-tests.mjs'), link);
+  const result = spawnSync(process.execPath, [link], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /discovered 0 test files/);
 });
