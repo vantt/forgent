@@ -49,13 +49,34 @@ Each finding below was confirmed on real CI or reproduced locally before it was 
 - **Mutation ledger false `confirmed-miss`**: the full suite had no baseline. Fixed: a failure only counts as a miss when it is new relative to a full-suite baseline on the clean HEAD.
 - **`NODE_TEST_CONTEXT` leaked into nested `node --test` runs**: a nested run exits 0 without running any test, which made the mutate integration test pass vacuously. Fixed: `buildTestEnv` is the shared env for every spawned test run.
 
-## Windows: known failures remaining (separate item)
+## Fourth pass: Windows
 
-When `loop.test.mjs` runs alone on Windows, 2/103 tests fail:
-- `resolveRepoRoot` returns the forward-slash long path (`C:/Users/runneradmin/...`), while the test expects the 8.3 short path from `os.tmpdir()` (`RUNNER~1`).
-- "cli-spawn cwd selection for planning.validate-plan": the executor is never called on Windows.
+- **Coordination sessions could not open on Windows (570 ENOTEMPTY):** `openSession` fsynced `claim.json` (and snapshot/session/events) through a read-only handle. Windows refuses that with EPERM. The throw came before `closeSync`, so the claim file stayed open, and the catch's `rmSync(claimDir)` then failed with ENOTEMPTY, masking the real error.
+  - Fix: a strict `fsyncFile()` that opens `'r+'` and always closes the fd. A failed file fsync still aborts the open; this contract is covered by `coordination-store-fault-injection`, which caught my first, wrong version.
+  - Directory fsync is best-effort, because Windows cannot open a directory at all. That failure used to fall into the rename's EPERM branch as "session already exists".
+- **Windows result: 1318 → 712 failures** (CI 35874329274). The job now finishes in ~26 min instead of timing out.
 
-These are Windows path/shell support gaps, not hermeticity. They are out of scope for this PR. The full list will be visible once the Windows job runs to completion.
+## Final CI status (PR #5, commit 91d4d384, run 35874329274)
+
+| OS | Before (main cc687d92) | Now |
+|---|---|---|
+| ubuntu | 147 fail | **green** (3 runs in a row) |
+| macOS | 157 fail | **green** (3 runs in a row) |
+| Windows | hung until the 6h cap (never finished) | finishes, 712 fail |
+
+Nightly `selector-nightly` 35866526587: success. Coverage 12.7 min, 0 timed out, 0 failed files. Mutation baseline: 51 tests already failing (rust-host, because the mutation worktree has no `target/`).
+
+## Windows: remaining failures (separate item, needs a decision)
+
+The 712 remaining failures are a long tail of Windows support gaps, not hermeticity:
+- path shape (`\` vs `/`, 8.3 short names such as `RUNNER~1`);
+- herdr cannot open a pane (`herdr_unparseable`);
+- linked-worktree `.fgos` handling (`pick`/`sync-root` refusals);
+- `rust-host` (Rust is not built on Windows, by design);
+- `ps -o` usage;
+- `BANNED_FILES` path checks.
+
+Getting Windows green is a product decision (original item 4: build Rust on Windows, and scope of Windows support), not a quick fix.
 
 ## Not in scope
 
@@ -63,4 +84,6 @@ These are Windows path/shell support gaps, not hermeticity. They are out of scop
 
 ## Unresolved questions
 
+- Windows: build Rust there, and how far should Windows support go (712 remaining failures)?
+- Should mutation worktrees symlink `target/` like `node_modules`, so rust-host is not part of the baseline noise?
 - Should the CAS merge also re-check own-file-set cleanliness under the lock, right before `update-ref`, to close the race between the gate and the ref move? Should a failed `read-tree` become loud instead of being swallowed?
