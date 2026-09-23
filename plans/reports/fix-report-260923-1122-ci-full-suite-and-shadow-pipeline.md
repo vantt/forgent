@@ -12,7 +12,7 @@ Scope: Slice 1 only (TI-01, TI-02, TI-02b). Slice 2 (TI-03/TI-04, `test-select-c
 
 **TI-02b — Marker lied about completion.** `write-test-marker.mjs` defaulted `exitCode` to `0` and CI never passed a real value; `completed` only checked `jobStatus !== 'cancelled'`. A crash before any test ran, or a run with zero reported cases, still wrote `completed: true, exitCode: 0`.
 
-## Fix summary (3 commits)
+## Fix summary (see Addendum below for 2 further commits added after review)
 
 1. **`fix(ci): create test-results dir before writing junit output`** — `mkdir -p test-results` folded into the same `run:` block as `npm test` / the related job's test-select-run-plan invocation (not a separate step — kept atomic with the exit-code capture added in the same edit). `shell: bash` added explicitly so the same POSIX script runs identically on Windows (Git Bash) instead of the default `pwsh`. The step's real exit code is captured via `$GITHUB_OUTPUT` for TI-02b to consume.
 
@@ -47,5 +47,21 @@ None. All 19 matches from `grep -rn 'file://\${process.argv\[1\]}' scripts/*.mjs
 ## Unresolved / follow-ups
 
 - **Slice 2 (TI-03/TI-04) not started** — held because `fgw/phase3-completion` is actively editing `test-select-compare.mjs` and `test-select-mutate.mjs` (same files TI-03/TI-04 target). Needs a fresh overlap check before starting.
-- **No real 3-OS CI run yet** — branch hasn't been pushed/PR'd. The Slice 1 acceptance criteria's CI-run evidence (ubuntu ~7456 tests, ~180 known-flaky confinement-registry fails, Windows "runs to wherever it gets but actually runs") needs that push, which wasn't authorized as part of this local-fix task.
 - Rust-host tests (`test/rust-host/*`) failed on the first full-suite attempt in this worktree because its own `target/` build dir had no compiled release binaries (each `git worktree add` gets its own separate build dir, same class of issue as the `node_modules` symlink convention). Symlinked `target/` from the main checkout to resolve — not a code change, just worktree setup; flagging in case this is worth adding to the worktree-setup convention alongside the existing `node_modules` symlink step.
+
+## Addendum: independent review response (2 commits added)
+
+An independent review (`plans/reports/review-report-260923-1150-ci-full-suite-and-shadow-pipeline-fix.md`) re-measured everything above from scratch and confirmed it (full suite 7480/7405/2/8, the 2 fails = tsk-598 D2/D3, 19 scripts each a one-line diff, 411/411 on `test/scripts/*`, no forbidden-path/skip/todo/only additions, no overlap with `fgw/phase3-completion`). It found two real gaps this report's own claims didn't cover, both since fixed:
+
+- **F2 — `src/runner/dispatch.mjs:99` still had the original broken guard.** The "no scripts remain on the old pattern" claim above was true only for `scripts/*.mjs` — the grep sweep never covered `src/`. This is the exact CLI door `AGENTS.md`'s Dispatch section and a `PreToolUse` hook require (`node src/runner/dispatch.mjs decide/execute/log`), so a Windows, space-path, or symlinked fgOS install would have it silently no-op instead of running. Fixed: switched to the shared `isMainModule` helper. The review flagged a packaging question (does `src/` importing from `scripts/lib/` break for npm-installed users if `scripts/` isn't shipped?) — checked `package.json`'s `files` list: `scripts` is explicitly included, and `src/state/retrospective-doors.mjs` already imports from `scripts/check-decision-citation-drift.mjs`, so this is an existing, safe pattern, not a new risk.
+- **F3 — `isMainModule` was still wrong when invoked through a symlink.** Node resolves `import.meta.url` to a symlink's real target, but `path.resolve(argv[1])` doesn't follow the symlink, so the two never matched — the same silent-no-op failure class as the original bug, just triggered by a symlink instead of an unencoded space. Fixed with `fs.realpathSync()` before building the comparison URL, with a try/catch fallback for the (currently impossible, since it's always the running script) case where the resolved path doesn't exist on disk.
+- **3 LOW findings also fixed**: `completed` now also requires `exitCode !== null` (previously `completed:true, exitCode:null` was possible when a caller omitted `--exit-code`); dropped a `(TI-02b)`-style finding-code reference from a test comment; added cleanup for the temp directories the new symlink/space-path tests create.
+- **F7 (commit trailers) and GATE-1 (push for real CI)**: both explicitly deferred to the user, per user decision: keep the `Claude-Session:` trailers as-is (harness default), and push once local verification stayed green.
+
+Regression coverage added for both MEDIUM fixes: a symlink-invocation test for `run-tests.mjs`, and a symlink-in-a-space-path test for `dispatch.mjs` (proves the guard fires without copying `dispatch.mjs`'s whole `dispatch/*` module tree — a symlink still resolves relative imports against the real file's location).
+
+Full suite re-run after all fixes: **7483 tests, 7408 pass, 2 fail (same tsk-598 D2/D3), 0 cancelled, 8 skipped, 65 todo** — 3 more tests than the original 7480 (the two new symlink tests plus the `exitCode:null` case), same 2 known failures, zero new regressions.
+
+## CI evidence (GATE-1)
+
+<!-- Filled in after push + PR; see PR checks for the authoritative per-OS run. -->
