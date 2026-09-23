@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { MANIFEST } from '../test/test-ownership.mjs';
 import { validateManifest } from './test-select.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 export function lintManifest(manifest = MANIFEST, cwd = process.cwd()) {
   let hasBlock = false;
@@ -53,4 +54,4 @@ export function lintManifest(manifest = MANIFEST, cwd = process.cwd()) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) lintManifest();
+if (isMainModule(import.meta.url)) lintManifest();

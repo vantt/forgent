@@ -11,6 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 const D_ID_PATTERN = /\bD\d+\b/g;
 const CANONICAL_SECTION = /##\s*Locked decisions([\s\S]*?)(?:\n##\s|$)/i;
@@ -127,6 +128,6 @@ function runCli(argv, cwd) {
   return 1;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   process.exitCode = runCli(process.argv.slice(2), process.cwd());
 }

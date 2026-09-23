@@ -26,6 +26,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { withEventsLock } from "../src/state/events.mjs";
+import { isMainModule } from "./lib/is-main-module.mjs";
 
 const OLD_VALUE = "proposed";
 const NEW_VALUE = "awaiting-approval";
@@ -176,6 +177,6 @@ function runCli(argv, cwd) {
   console.log(JSON.stringify(report, null, 2));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   runCli(process.argv.slice(2), process.cwd());
 }

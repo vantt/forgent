@@ -58,3 +58,13 @@ export function judgeVerifySemanticCorrectness(proposedVerify) {
   }
   return { agrees: true };
 }
+
+export const C4_SELECTOR_RE = /\b(?:test:related|test-select|test:select)\b/;
+
+export function checkVerifyForC4(verify, location = '') {
+  if (typeof verify === 'string' && C4_SELECTOR_RE.test(verify)) {
+    const loc = location ? ` in ${location}` : '';
+    return `[WARN C4] Authoritative verification policy: item.verify${loc} ("${verify}") contains a test selector reference. Test selectors must not replace full suite in authoritative verification.`;
+  }
+  return null;
+}

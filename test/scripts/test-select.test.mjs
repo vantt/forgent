@@ -789,3 +789,26 @@ test('P3 breaker tests', async (t) => {
     assert.ok(result.escalations.some(e => e.reason.includes('no manifest rule')));
   });
 });
+
+test('the real CLI entrypoint guard still fires when invoked through a symlink sitting in a path with a space', () => {
+  // Same silent-no-op class as run-tests.mjs and dispatch.mjs had:
+  // `process.argv[1] === __filename` never matches when argv[1] is a
+  // symlink (import.meta.url resolves to the symlink's REAL target) or
+  // when the invocation path contains a space. A symlink still resolves
+  // its relative imports against the real file's own location, so this
+  // proves the guard alone, without copying the whole module tree.
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-select cli symlink-'));
+  try {
+    assert.match(dir, / /, 'fixture dir must actually contain a space to exercise this case');
+    const scriptPath = path.resolve('scripts/test-select.mjs');
+    const link = path.join(dir, 'test-select-link.mjs');
+    fs.symlinkSync(scriptPath, link);
+    const planOut = path.join(dir, 'plan.json');
+    const result = execFileSync(process.execPath, [link, '--plan-out', planOut], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.ok(fs.existsSync(planOut), 'the guard must have fired and reached the --plan-out branch, writing a real plan file');
+    const plan = JSON.parse(fs.readFileSync(planOut, 'utf8'));
+    assert.ok('decision' in plan);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

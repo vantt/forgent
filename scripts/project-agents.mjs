@@ -33,6 +33,7 @@ import { parse as parseYaml } from 'yaml';
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
 import { modelForTier } from '../src/runner/dispatch.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
 const TARGET_DIR = path.join(REPO_ROOT, '.claude', 'agents');
@@ -293,6 +294,6 @@ function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   main();
 }

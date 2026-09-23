@@ -11,11 +11,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import { REPO_ROOT, DEFAULT_TEST_ROOT, discoverTestFiles, runSelectedTests, runTests } from './run-tests.mjs';
 import { MANIFEST, FULL_TRIGGERS } from '../test/test-ownership.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
-const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status']);
+const KNOWN_RULE_FIELDS = new Set(['id', 'pattern', 'directTests', 'boundaryTests', 'allowMissing', 'status', 'quarantinedHash']);
 
 // Same worktree-shared-dependency symlink entries scripts/test-timing.mjs
 // already excludes (its own SYMLINKED_BUILD_ARTIFACT_ENTRIES): a worktree
@@ -449,9 +449,7 @@ export function runShadow({
 
 // -- CLI --------------------------------------------------------------------
 
-const __filename = fileURLToPath(import.meta.url);
-
-if (process.argv[1] === __filename) {
+if (isMainModule(import.meta.url)) {
   const args = process.argv.slice(2);
   const baseIdx = args.indexOf('--base');
   const base = baseIdx === -1 ? 'main' : args[baseIdx + 1];

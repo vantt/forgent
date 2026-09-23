@@ -12,6 +12,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installGitHooks } from '../src/setup/git-hooks.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 export { installGitHooks } from '../src/setup/git-hooks.mjs';
 
@@ -21,6 +22,6 @@ function runCli() {
   installGitHooks(repoRoot);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   runCli();
 }

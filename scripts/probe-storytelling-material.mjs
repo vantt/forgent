@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { readEvents } from '../src/state/events.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 // Cùng pattern `git rev-parse --git-common-dir` mà scripts/measure-verify-
 // cost.mjs và scripts/verify-fanout-overlap.mjs đã dùng — verify command
@@ -189,6 +190,6 @@ function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   main();
 }

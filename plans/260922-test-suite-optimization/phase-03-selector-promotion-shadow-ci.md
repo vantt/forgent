@@ -1,6 +1,6 @@
 # Phase 03 — Pillar 3: Selector promotion path + CI shadow/circuit breaker
 
-Ngày: 2026-09-22. Trạng thái: **đề xuất, đã chốt hướng với người dùng** (ITR-D07 giữ nguyên; hướng (c) merge-gate phê duyệt, triển khai ở item riêng; hai item liên quan không nộp, prompt ở Appendix).
+Ngày: 2026-09-22 (cập nhật 2026-09-23). Trạng thái: **Hạ tầng hoàn tất — Merged commit af55cbcc vào main** (P3-01..P3-07 DONE; P3-08..P3-09 ở chế độ Shadow/Canary theo dõi trên PR live; ITR-D07 giữ nguyên; hướng (c) merge-gate phê duyệt triển khai ở item riêng).
 
 ## Context (đọc trước)
 
@@ -163,20 +163,20 @@ Intersect `coverage/related` với hunk diff của PR → "% dòng thay đổi �
 
 ## Ánh xạ AC (contract §12)
 
-| AC | Slice | Bằng chứng |
-|---|---|---|
-| 1 plan artifact | P3-01/03 | artifact `selector-plan.json` trên PR thật |
-| 2 full artifact + marker | P3-02 | 3 artifact/PR; fixture thiếu marker → inconclusive |
-| 3 classifier 8 nhãn + fixture | P3-03 | `test/scripts/test-select-compare.test.mjs` |
-| 4 breaker đọc/fallback/diễn tập | P3-01/04 | 3 run diễn tập |
-| 5 nightly + checklist | P3-06 | registry + nightly ledger |
-| 6 promote per-rule, tập đối chứng độc lập | P3-09 | ledger tổng hợp per rule |
-| 7 `item.verify` policy, migration chưa kiểm chứng | C4, P3-03 | warn C4; audit ở item merge-gate |
-| 8 lint warn/block | P3-05 | test lint |
-| 9 canary exit criteria + timebox | P3-09 | phase report |
-| 10 142 case đỏ là item riêng | Appendix A | không trong scope |
-| 11 static graph union-only test | P3-01 | test contract |
-| 12 Q5 chưa triển khai | C4, P3-09 | ghi trong comment/report |
+| AC | Slice | Trạng thái | Bằng chứng |
+|---|---|---|---|
+| 1 plan artifact | P3-01/03 | DONE | artifact `selector-plan.json` trên PR |
+| 2 full artifact + marker | P3-02 | DONE | 3 artifact/PR; fixture thiếu marker → inconclusive |
+| 3 classifier 8 nhãn + fixture | P3-03 | DONE | `test/scripts/test-select-compare.test.mjs` (AC 3 OS fixture) |
+| 4 breaker đọc/fallback/diễn tập | P3-01/04 | DONE | 3 run diễn tập, GitHub Actions variables fallback |
+| 5 nightly + checklist | P3-06 | DONE | registry + nightly ledger, ruleHash & boundary metadata |
+| 6 promote per-rule, tập đối chứng độc lập | P3-09 | DONE (logic) / PROPOSED (live) | `scripts/test-select-promote.mjs` + `test-select-promote.test.mjs` |
+| 7 `item.verify` policy, migration chưa kiểm chứng | C4, P3-03 | DONE | [WARN C4] trong `fgos return` và compare job; dùng chung helper |
+| 8 lint warn/block | P3-05 | DONE | `scripts/test-ownership-lint.mjs` |
+| 9 canary exit criteria + timebox | P3-09 | PROPOSED | Theo dõi trên PR live (timebox 2 tuần) |
+| 10 142 case đỏ là item riêng | Appendix A | Tách riêng | không trong scope Phase 3 |
+| 11 static graph union-only test | P3-01 | DONE | test contract AC 11 |
+| 12 Q5 chưa triển khai | C4, P3-09 | DONE | ghi trong comment/report, tuân thủ C4 policy |
 
 ## Validation tổng
 

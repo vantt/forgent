@@ -17,6 +17,7 @@ import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { REPO_ROOT } from './run-tests.mjs';
+import { isMainModule } from './lib/is-main-module.mjs';
 
 // Untracked build-artifact directories this track's worktrees deliberately
 // symlink in from the main checkout for fast dependency/binary reuse
@@ -320,7 +321,7 @@ export function summarizeSamples(samples) {
   };
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url)) {
   const mode = process.argv[2];
   if (mode === 'sample') {
     const rest = process.argv.slice(3);
