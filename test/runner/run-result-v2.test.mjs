@@ -310,6 +310,17 @@ test('interpretRunResult treats a present unsupported contract as corrupt, never
   }
 });
 
+test('interpretRunResult treats an object missing contract, status, and runId as contract-corrupt', () => {
+  for (const emptyOrVacuous of [{}, { verdict: 'pass' }, { outcome: 0 }]) {
+    const interpreted = interpretRunResult(emptyOrVacuous);
+    assert.equal(interpreted.contractCorrupt, true);
+    assert.equal(interpreted.corrupt, true);
+    assert.equal(interpreted.status, 'no-evidence');
+    assert.equal(interpreted.confidence, 'failed');
+    assert.equal(interpreted.classification.provenance, 'contract-corrupt');
+  }
+});
+
 // ─── Phase 02 (executor-policy-dispatch-seams): PromptEnvelope evidence ────
 
 test('normalizeRunResultV2: promptEnvelope.persona is derived from policy.persona/provenance.persona, delivery "section", applied true', () => {

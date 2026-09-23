@@ -250,6 +250,10 @@ console.log(JSON.stringify({ n: latencies.length, median, p95, min: latencies[0]
 | **L2** | LOW | Cleaned up internal plan references from comments in `config.mjs` and `CHANGELOG.md`. |
 | **L3** | LOW | Tracked `err.isDispatchExecute` in `bin/fgos.mjs` so all dispatch execute errors exit 1 identically to compatibility door. Tested in `dispatch-operability.test.mjs`. |
 | **L4** | LOW | Documented exact reproducible benchmark script and methodology in this report. |
+| **M1** | MEDIUM (R5) | Workspace and ownership completeness alignment: `deriveWorkspaceCompleteness` returns `unsupported` when no `workspace-evidence.json` exists on disk (as real runs have `cwd` but no workspace evidence writer exists); `owner()` returns `{ complete: false, reason }` mapping ownership to `complete`, `missing`, `conflicting`, or `corrupt` strictly within the contract closed completeness vocabulary `['complete', 'missing', 'stale', 'corrupt', 'conflicting', 'unsupported']` (never `partial`). Real fixture verified in `dispatch-runtime-inspect.test.mjs`. |
+
+### Cross-Plan Synchronization Note (Unit I02 / Phase 01 Result Truth)
+- `interpretRunResult` (`src/runner/dispatch/run-result.mjs`): Objects missing all three identifying fields (`contract`, `status`, and `runId`, e.g. `{}`, `{ verdict: 'pass' }`, `{ outcome: 0 }`) are now classified as `contract-corrupt` (fail-closed, `contractCorrupt: true`, `corrupt: true`, `status: 'no-evidence'`, `confidence: 'failed'`). This preserves reconciliation-planner fail-closed behavior across both `show-run` and `runtime-inspection`, with explicit test coverage added in `test/runner/run-result-v2.test.mjs`.
 
 ---
 
@@ -283,6 +287,7 @@ The following files constitute the candidate diff against `cc687d92`:
 - `test/cli/dispatch-operability.test.mjs`
 - `test/runner/dispatch-runtime-inspect.test.mjs`
 - `test/runner/dispatch.test.mjs`
+- `test/runner/run-result-v2.test.mjs`
 - `test/setup/visibility-checks.test.mjs`
 - `test/verbs/dispatch-observe.test.mjs`
 

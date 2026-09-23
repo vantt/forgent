@@ -106,20 +106,27 @@ export function findCoordinationSessionOwningAssignment(root, assignmentId) {
 }
 
 function owner(l, root, all) {
-  if (l.malformed || !l.run?.runId) return { complete: false };
+  if (l.malformed || !l.run?.runId) return { complete: false, reason: 'corrupt' };
   if (l.kind !== 'assignment-run') return { complete: true, kind: 'standalone-run', id: l.run.runId };
   const dir = path.join(fgosDir(root), 'assignments', l.assignmentId), assignment = json(path.join(dir, 'assignment.json')), evidence = assignmentEvidence(root, l.assignmentId, all);
   const admitted = evidence.facts.records.some((record) => record.runId === l.run.runId);
-  if (!assignment || assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId || !admitted || evidence.incomplete) return { complete: false };
+  if (!assignment || !admitted) return { complete: false, reason: 'missing' };
+  if (assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId) return { complete: false, reason: 'conflicting' };
+  if (evidence.incomplete) {
+    const reason = evidence.facts.corrupt || evidence.malformed.length ? 'corrupt' : (evidence.duplicateCurrent.length ? 'conflicting' : 'missing');
+    return { complete: false, reason };
+  }
   const id = l.run.coordinationId ?? l.run.coordinationSessionId;
   if (!id) return { complete: true, kind: 'standalone-run', id: l.run.runId };
   const session = json(path.join(fgosDir(root), 'coordination', 'sessions', id, 'session.json'));
-  return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
+  if (!session) return { complete: false, reason: 'missing' };
+  return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false, reason: 'conflicting' };
 }
 function authority(l, root, all) { const o = owner(l, root, all); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
 const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']);
 const VALID_RESOURCE_STATES = new Set(['live-proven', 'dead-proven', 'absent-proven', 'ambiguous', 'unobserved', 'unsupported']);
 const VALID_DELIVERIES = new Set(['not-started', 'running', 'delivered', 'unknown', 'replayed', 'recovered']);
+const VALID_COMPLETENESS = new Set(['complete', 'missing', 'stale', 'corrupt', 'conflicting', 'unsupported']);
 
 function derivePhase(l, terminal) {
   if (terminal.present && !terminal.corrupt) return 'settled';
@@ -175,9 +182,8 @@ function deriveResourceState(l, nowFn) {
 }
 
 function deriveWorkspaceCompleteness(l) {
-  if (!l.run?.cwd) return 'unsupported';
   if (fs.existsSync(path.join(l.runDir, 'workspace-evidence.json'))) return 'complete';
-  return 'partial';
+  return 'unsupported';
 }
 
 function one(l, root, now, all) {
@@ -205,7 +211,7 @@ function one(l, root, now, all) {
       result: !terminal.present
         ? 'missing'
         : (terminal.corrupt ? 'corrupt' : 'complete'),
-      ownership: o.complete ? 'complete' : 'partial',
+      ownership: o.complete ? 'complete' : (o.reason ?? 'missing'),
       workspace: workspaceCompleteness,
     },
     recoveryAuthority: null,
@@ -236,4 +242,10 @@ export function inspectDispatchRuntime(root, options = {}, { now = () => new Dat
   const ownershipComplete = found.every((l) => owner(l, root, all).complete), complete = evidenceComplete && !malformed && ownershipComplete, hint = complete && active.length === 1 && !conflict ? authority(active[0], root, all) : null, status = conflict ? 'conflicting' : complete ? 'resolved' : 'partial';
   return { inspectionStatus: status, subject: { kind: 'cwd', id: identity.path, locations: found.map(project) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: complete && !conflict ? 'correlated' : 'partial', value: aggregate }], runObservation: null, runResult: null, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: conflict || !complete ? 'manual-required' : 'not-needed', reason: conflict ? 'Workspace guard/projection or concurrency facts conflict.' : !complete ? 'Workspace guard/projection evidence or Run materialization is incomplete or corrupt.' : 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: found.map((l) => l.run.runId) } };
 }
-export { INSPECTION_STATUSES };
+export {
+  INSPECTION_STATUSES,
+  VALID_PHASES,
+  VALID_RESOURCE_STATES,
+  VALID_DELIVERIES,
+  VALID_COMPLETENESS,
+};

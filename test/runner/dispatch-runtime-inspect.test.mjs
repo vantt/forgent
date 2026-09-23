@@ -3,7 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { inspectDispatchRuntime, validateInspectionSelector } from '../../src/runner/dispatch/runtime-inspection.mjs';
+import {
+  inspectDispatchRuntime,
+  validateInspectionSelector,
+  VALID_PHASES,
+  VALID_RESOURCE_STATES,
+  VALID_DELIVERIES,
+  VALID_COMPLETENESS,
+  INSPECTION_STATUSES,
+} from '../../src/runner/dispatch/runtime-inspection.mjs';
 import { invokeDispatchInspectOperation } from '../../src/verbs/dispatch/inspect.mjs';
 import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
@@ -118,7 +126,7 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   assert.equal(obs3.phase, 'launched');
   assert.equal(obs3.resourceState, 'ambiguous');
   assert.equal(obs3.evidenceCompleteness.resource, 'stale');
-  assert.equal(obs3.evidenceCompleteness.workspace, 'partial');
+  assert.equal(obs3.evidenceCompleteness.workspace, 'unsupported');
 
   // 4. Real writer status: 'running' maps to admitted when no commands/launchedAt exist
   assignment(root, 'asgn4');
@@ -156,4 +164,42 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   const obs7 = inspectDispatchRuntime(root, { run: 'run7' }).runObservation;
   assert.equal(obs7.phase, 'unknown');
   assert.equal(obs7.evidenceCompleteness.result, 'corrupt');
+});
+
+test('real fixture run with cwd strictly conforms to RunObservation closed vocabularies', () => {
+  const root = fixture();
+  assignment(root, 'asgn_real');
+  const cwd = path.join(root, 'work_real');
+  fs.mkdirSync(cwd, { recursive: true });
+  // Real writer produces run.json with cwd, status: 'running', launchedAt
+  run(root, 'asgn_real', '01', {
+    runId: 'run_real_01',
+    cwd,
+    status: 'running',
+    launchedAt: new Date().toISOString(),
+  });
+  admit(root, 'asgn_real', 1, { runId: 'run_real_01', attempt: 1 });
+
+  const inspectRes = inspectDispatchRuntime(root, { run: 'run_real_01' });
+  const obs = inspectRes.runObservation;
+  assert.ok(obs, 'runObservation must be present');
+
+  // Verify all closed vocabularies
+  assert.ok(VALID_PHASES.has(obs.phase), `phase ${obs.phase} must be in VALID_PHASES`);
+  assert.ok(VALID_RESOURCE_STATES.has(obs.resourceState), `resourceState ${obs.resourceState} must be in VALID_RESOURCE_STATES`);
+  assert.ok(VALID_DELIVERIES.has(obs.delivery), `delivery ${obs.delivery} must be in VALID_DELIVERIES`);
+  assert.ok(INSPECTION_STATUSES.has(obs.inspectionStatus), `inspectionStatus ${obs.inspectionStatus} must be in INSPECTION_STATUSES`);
+
+  // Verify every dimension in evidenceCompleteness
+  for (const [dim, val] of Object.entries(obs.evidenceCompleteness)) {
+    assert.ok(VALID_COMPLETENESS.has(val), `evidenceCompleteness.${dim} value '${val}' must be in VALID_COMPLETENESS`);
+  }
+  assert.equal(obs.evidenceCompleteness.workspace, 'unsupported');
+  assert.equal(obs.evidenceCompleteness.ownership, 'complete');
+
+  // Verify unadmitted/conflicting ownership variations adhere to VALID_COMPLETENESS
+  run(root, 'asgn_real', '02', { runId: 'run_unadmitted', cwd });
+  const unadmittedObs = inspectDispatchRuntime(root, { run: 'run_unadmitted' }).runObservation;
+  assert.ok(VALID_COMPLETENESS.has(unadmittedObs.evidenceCompleteness.ownership), 'ownership completeness must be in VALID_COMPLETENESS');
+  assert.equal(unadmittedObs.evidenceCompleteness.ownership, 'missing');
 });
