@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Fixed**: `npm test` on CI previously ran zero tests on every OS after `test-results/` stopped being committed — the junit reporter's destination directory never existed at test-start, so `node --test` crashed before running anything and the step still reported a runtime under a second. Windows separately reported a false "success" with zero tests run, for an unrelated pre-existing reason: its own entrypoint-detection guard never actually matched on Windows paths, so `npm test` silently did nothing there.
 - **Changed**: Merge Gate now uses Git CAS (write-tree -> commit-tree -> update-ref) with an isolated worktree for root-into-main merges, completely eliminating main checkout pollution and locking test execution out of the shared working tree.
 - **Changed**: `approve --github` is now completely forbidden per strict test gate policy.
 
 ### Added
 
-- **CI**: Added Nightly Fault-Injection job for test selector rules (`selector-nightly.yml`).
+- **CI**: Added `selector-nightly.yml`, a scheduled job that runs the test-selector's coverage-map and mutation-testing scripts nightly. As shipped, its mutation baseline runs against a clean checkout with zero changes, so the selector always refuses and no mutant is ever actually exercised — the job currently produces a ledger artifact without validating anything; treat it as scaffolding, not a working fault-injection gate, until that baseline is fixed.
 - **Scripts**: Added `npm run test:ownership:lint` to validate test manifest paths and prevent orphaned files.
 - **Scripts**: Added test selector diagnostic scripts (`test:select:compare`, `test:select:mutate`, `test:select:coverage-map`).
 - Cross-provider redirect governance contract: pool entries with cross-provider

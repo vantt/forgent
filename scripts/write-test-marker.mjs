@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { isMainModule } from './lib/is-main-module.mjs';
 
-function countXmlCases(xmlPath) {
+export function countXmlCases(xmlPath) {
   if (!fs.existsSync(xmlPath)) return 0;
   const content = fs.readFileSync(xmlPath, 'utf8');
   // Simple regex to count testcases
@@ -9,46 +10,73 @@ function countXmlCases(xmlPath) {
   return matches ? matches.length : 0;
 }
 
-const args = process.argv.slice(2);
-let runType = 'full';
-let xmlPath = 'test-results/full.xml';
-let planPath = null;
-let exitCode = 0;
+export function parseArgs(argv) {
+  let runType = 'full';
+  let xmlPath = 'test-results/full.xml';
+  let planPath = null;
+  let exitCode = null;
 
-for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--type') runType = args[++i];
-  if (args[i] === '--xml') xmlPath = args[++i];
-  if (args[i] === '--plan') planPath = args[++i];
-  if (args[i] === '--exit-code') exitCode = parseInt(args[++i], 10);
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--type') runType = argv[++i];
+    if (argv[i] === '--xml') xmlPath = argv[++i];
+    if (argv[i] === '--plan') planPath = argv[++i];
+    if (argv[i] === '--exit-code') {
+      const parsed = parseInt(argv[++i], 10);
+      exitCode = Number.isNaN(parsed) ? null : parsed;
+    }
+  }
+
+  return { runType, xmlPath, planPath, exitCode };
 }
 
-const outDir = 'test-results';
-if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+/**
+ * A run only counts as `completed` when there is actual evidence it ran to a
+ * real conclusion: a junit file exists, it reports at least one case, and the
+ * job itself ended in `success` or `failure` (never `cancelled`/`skipped`/an
+ * unset `unknown` default) -- a crash before any test executes, or a workflow
+ * cancellation, must never read back as a quietly-passing empty run.
+ */
+export function buildMarker({ runType, xmlPath, planPath, exitCode, jobStatus, env = process.env }) {
+  let plannedFiles = 0;
+  if (planPath && fs.existsSync(planPath)) {
+    try {
+      const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
+      if (plan.selectedFiles) plannedFiles = plan.selectedFiles.length;
+    } catch {
+      // Malformed plan file: leave plannedFiles at 0 rather than crash marker writing.
+    }
+  }
 
-let plannedFiles = 0;
-if (planPath && fs.existsSync(planPath)) {
-  try {
-    const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
-    if (plan.selectedFiles) plannedFiles = plan.selectedFiles.length;
-  } catch (e) {}
+  const xmlExists = fs.existsSync(xmlPath);
+  const reportedCases = countXmlCases(xmlPath);
+  const completed = xmlExists && reportedCases > 0 && (jobStatus === 'success' || jobStatus === 'failure');
+
+  return {
+    sha: env.GITHUB_SHA || 'unknown',
+    runType,
+    os: process.platform,
+    node: process.version,
+    plannedFiles,
+    reportedCases,
+    exitCode,
+    completed,
+    timestamp: new Date().toISOString(),
+  };
 }
 
-const reportedCases = countXmlCases(xmlPath);
-// job status might be passed via env
-const jobStatus = process.env.JOB_STATUS || 'unknown';
-const completed = jobStatus !== 'cancelled';
+export function writeMarker(outDir, marker) {
+  if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(path.join(outDir, 'test-marker.json'), JSON.stringify(marker, null, 2));
+}
 
-const marker = {
-  sha: process.env.GITHUB_SHA || 'unknown',
-  runType,
-  os: process.platform,
-  node: process.version,
-  plannedFiles,
-  reportedCases,
-  exitCode,
-  completed,
-  timestamp: new Date().toISOString()
-};
+function main(argv) {
+  const { runType, xmlPath, planPath, exitCode } = parseArgs(argv);
+  const jobStatus = process.env.JOB_STATUS || 'unknown';
+  const marker = buildMarker({ runType, xmlPath, planPath, exitCode, jobStatus });
+  writeMarker('test-results', marker);
+  console.log(`Wrote test-marker.json for runType: ${marker.runType}`);
+}
 
-fs.writeFileSync(path.join(outDir, 'test-marker.json'), JSON.stringify(marker, null, 2));
-console.log(`Wrote test-marker.json for runType: ${marker.runType}`);
+if (isMainModule(import.meta.url)) {
+  main(process.argv.slice(2));
+}
