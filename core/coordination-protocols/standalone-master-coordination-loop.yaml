@@ -102,6 +102,8 @@ spec:
         evidenceRequired: reported
     - id: review-candidate
       role: reviewer
+      task:
+        contractTemplate: master-loop-review-candidate
       # repeatMode (Step 09/P03 fallback-and-effect-boundary contract):
       # declared here, on the operation itself, never inferred from
       # Assignment.mutation -- this first review pass runs once, before the

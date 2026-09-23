@@ -188,6 +188,10 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   // reads its starting floor from, instead of only through
   // `cliOverride.minTier` (which can only ever RAISE the floor, never
   // lower it, per that resolver's own `resolveStrongerTier` monotonicity).
+  // Unit I04 / Phase 3: FlowDefinition task.contractTemplate reference for
+  // operation prompt template resolution at dispatch time. Format-check only
+  // here (non-empty string when present).
+  'contractTemplate',
   'policy',
 ]);
 
@@ -339,6 +343,9 @@ export function validateExecutionContract({ contract, caller } = {}) {
   }
   if (contract.supports !== undefined && !isNonEmptyString(contract.supports)) {
     fail('contract.supports must be a non-empty string when provided (an operation id it claims to support -- legality against the Work\'s declared Stage is checked by the domain harness seam, ADR-007 §3, not here)');
+  }
+  if (contract.contractTemplate !== undefined && !isNonEmptyString(contract.contractTemplate)) {
+    fail('contract.contractTemplate must be a non-empty string when provided');
   }
   if (contract.capabilities !== undefined && !isStringArray(contract.capabilities)) {
     fail('contract.capabilities must be an array of strings when provided (capability hints)');

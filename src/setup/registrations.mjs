@@ -85,6 +85,7 @@ import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runn
 import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
 import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
 import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
+import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -3427,6 +3428,27 @@ registerCheck({
   id: 'coordination-protocol-fixtures-valid',
   description: 'every discoverable CoordinationProtocol definition (project/domain/core tiers) normalizes through validateFlowDefinition (Phase 02 R6/R7)',
   check: (cwd) => checkCoordinationProtocolFixturesValid(cwd),
+});
+
+function checkOperationPromptTemplatesValid(cwd) {
+  try {
+    const entries = discoverOperationPromptTemplates({ cwd });
+    return {
+      passed: true,
+      message: `${entries.length} operation prompt template(s) discovered and validated cleanly (project/domain/core tiers)`,
+    };
+  } catch (err) {
+    if (err instanceof TemplateResolutionError) {
+      return { passed: false, message: `malformed operation prompt template -- ${err.message}` };
+    }
+    throw err;
+  }
+}
+
+registerCheck({
+  id: 'operation-prompt-templates-valid',
+  description: 'every discoverable operation prompt template (project/domain/core tiers) validates against bounded variables and schema (Phase 03 I04)',
+  check: (cwd) => checkOperationPromptTemplatesValid(cwd),
 });
 
 // Exercises R5's adapter itself (not just R7's protocol fixtures) as a

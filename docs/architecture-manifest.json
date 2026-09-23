@@ -54,6 +54,7 @@
     "src/runner/dispatch/runtime-inspection.mjs": "infra",
     "src/runner/dispatch/reconciliation-planner.mjs": "infra",
     "src/runner/dispatch/assignment-policy.mjs": "infra",
+    "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
     "src/runner/dispatch/provider-adapter.mjs": "infra",
     "src/runner/dispatch/provider-capacity.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
