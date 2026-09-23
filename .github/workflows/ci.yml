@@ -49,14 +49,15 @@ jobs:
         run: cargo build --release --workspace
 
       # Temporary diagnostic: on Windows the full suite never exits after
-      # test/runner/loop.test.mjs finishes its last test. Run that file alone
+      # test/runner/loop.test.mjs (the file before main-checkout-lock.test.mjs,
+      # whose output the spec reporter holds back until it exits). Run it alone
       # under a watchdog that lists whatever processes are still keeping it
       # alive, then kills them, so the real suite below still gets its turn.
-      - name: Diagnose loop.test.mjs hang (Windows)
+      - name: Diagnose main-checkout-lock.test.mjs hang (Windows)
         if: runner.os == 'Windows'
         continue-on-error: true
         timeout-minutes: 15
-        run: node scripts/ci-diagnose-hang.mjs test/runner/loop.test.mjs 600
+        run: node scripts/ci-diagnose-hang.mjs test/runner/main-checkout-lock.test.mjs 600
 
       # Full suite (docs/distribution-vision.md tsk-49r D1): already
       # includes test/install-packaging.test.mjs (the pack -> install -g ->
