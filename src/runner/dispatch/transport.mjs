@@ -376,12 +376,21 @@ export function cliSpawnAdapter(invocation, opts) {
 
       let settled = false;
       let pollInterval = null;
+      let watcher = null;
+
+      const cleanupWatcher = () => {
+        if (watcher) {
+          try { watcher.close(); } catch {}
+          watcher = null;
+        }
+      };
 
       function finishWithReceipt() {
         if (settled) return;
         if (!fs.existsSync(receiptPath)) return;
         settled = true;
-        if (pollInterval) clearTimeout(pollInterval);
+        if (pollInterval) clearInterval(pollInterval);
+        cleanupWatcher();
 
         let receipt;
         try {
@@ -440,31 +449,40 @@ export function cliSpawnAdapter(invocation, opts) {
         });
       }
 
-      const pollStart = Date.now();
-      function scheduleReceiptPoll() {
-        if (settled) return;
-        const elapsed = Date.now() - pollStart;
-        const delay = elapsed >= 1000 ? 250 : 50;
-        pollInterval = setTimeout(() => {
-          if (settled) return;
-          if (fs.existsSync(receiptPath)) {
-            finishWithReceipt();
-          } else {
-            scheduleReceiptPoll();
+      // Event-driven receipt detection: watch the receipts directory for immediate resolution
+      const receiptsDir = path.dirname(receiptPath);
+      try {
+        fs.mkdirSync(receiptsDir, { recursive: true });
+        watcher = fs.watch(receiptsDir, (eventType, filename) => {
+          if (!filename || filename === path.basename(receiptPath)) {
+            if (fs.existsSync(receiptPath)) {
+              finishWithReceipt();
+            }
           }
-        }, delay);
-      }
-      scheduleReceiptPoll();
+        });
+      } catch {}
+
+      // Fast fallback poll interval (20ms) ensures p95 latency is bounded tightly <= 100ms
+      pollInterval = setInterval(() => {
+        if (fs.existsSync(receiptPath)) {
+          finishWithReceipt();
+        }
+      }, 20);
 
       if (supervisorProc) {
         supervisorProc.on('close', () => {
+          if (fs.existsSync(receiptPath)) {
+            finishWithReceipt();
+            return;
+          }
           setTimeout(() => {
             if (!settled) {
               if (fs.existsSync(receiptPath)) {
                 finishWithReceipt();
               } else {
                 settled = true;
-                if (pollInterval) clearTimeout(pollInterval);
+                if (pollInterval) clearInterval(pollInterval);
+                cleanupWatcher();
                 reject(new DispatchError('worker-spawn-fail', `executor failed to start for work "${workId}": supervisor exited without receipt`, {
                   workId,
                   tier,
@@ -472,7 +490,7 @@ export function cliSpawnAdapter(invocation, opts) {
                 }));
               }
             }
-          }, 50);
+          }, 20);
         });
       }
     });
@@ -795,7 +813,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     // (one coordination round's own actors) uses `dispatchBatchKey` below
     // instead, which IS threaded through both -- a plain string is not
     // herdr's vocabulary the way an explicit pane id is.
-    anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE,
+    anchorPaneId = process.env.FGOS_HERDR_ANCHOR_PANE?.trim() || undefined,
     // A caller-supplied batch key (see `batchTabFor` in herdr-round.mjs), for
     // a batch whose first round doesn't yet know an explicit anchor pane.
     // Plain data, in-process only -- the batch tab itself is created and

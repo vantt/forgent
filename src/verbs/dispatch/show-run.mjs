@@ -116,7 +116,29 @@ export function readRunSnapshot(runDir) {
   if (!run) {
     throw new DispatchObserveError('missing-run', `no run.json in ${dir}`, { runDir: dir });
   }
-  const settled = fs.existsSync(path.join(dir, 'result.json'));
+  const resultFile = path.join(dir, 'result.json');
+  let settled = false;
+  let resultCorrupt = false;
+  let result = null;
+  if (fs.existsSync(resultFile)) {
+    try {
+      const st = fs.statSync(resultFile);
+      if (st.isDirectory()) {
+        resultCorrupt = true;
+      } else {
+        const parsed = readJsonOrNull(resultFile);
+        if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          resultCorrupt = true;
+        } else {
+          settled = true;
+          result = parsed;
+        }
+      }
+    } catch {
+      resultCorrupt = true;
+    }
+  }
+
   let visibility = null;
   let visibilityError = null;
   try {
@@ -128,6 +150,8 @@ export function readRunSnapshot(runDir) {
     runDir: dir,
     run,
     settled,
+    ...(resultCorrupt ? { resultCorrupt: true } : {}),
+    ...(result ? { result } : {}),
     visibility,
     ...(visibilityError ? { visibilityError } : {}),
     outbox: listOutbox(dir),

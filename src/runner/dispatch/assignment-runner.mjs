@@ -2671,8 +2671,20 @@ export async function executeAssignment(assignment, opts = {}) {
         throw err;
       }
 
-      // 8. Wait for receipt in live execution
+      // 8. Wait for receipt in live execution (event-driven with fs.watch + 20ms fallback)
       const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
+      const receiptsDir = path.dirname(receiptPath);
+      let watcher = null;
+      let watcherTrigger = null;
+      try {
+        fs.mkdirSync(receiptsDir, { recursive: true });
+        watcher = fs.watch(receiptsDir, (eventType, filename) => {
+          if (!filename || filename === path.basename(receiptPath)) {
+            if (watcherTrigger) watcherTrigger();
+          }
+        });
+      } catch {}
+
       const pollStart = Date.now();
       const pollDeadline = pollStart + timeoutMs + 10000;
       while (Date.now() < pollDeadline) {
@@ -2688,9 +2700,17 @@ export async function executeAssignment(assignment, opts = {}) {
           }
           break;
         }
-        const elapsed = Date.now() - pollStart;
-        const delay = elapsed >= 1000 ? 250 : 20;
-        await new Promise((r) => setTimeout(r, delay));
+        await new Promise((r) => {
+          const timer = setTimeout(r, 20);
+          watcherTrigger = () => {
+            clearTimeout(timer);
+            r();
+          };
+        });
+      }
+      if (watcher) {
+        try { watcher.close(); } catch {}
+        watcher = null;
       }
 
       // 9. Guarded update: command reconciled with receipt-backed outcome

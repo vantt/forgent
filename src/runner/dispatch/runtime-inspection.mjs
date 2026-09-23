@@ -44,8 +44,18 @@ function allRuns(root) {
 const project = (l) => ({ kind: l.kind, assignmentId: l.assignmentId ?? null, attempt: l.attempt, path: l.runDir });
 function result(l) {
   const file = path.join(l.runDir, 'result.json');
-  if (!fs.existsSync(file)) return { present: false, value: null };
-  try { return { present: true, value: interpretRunResult(file) }; } catch { return { present: true, value: interpretRunResult(null) }; }
+  if (!fs.existsSync(file)) return { present: false, value: null, corrupt: false };
+  try {
+    const st = fs.statSync(file);
+    if (st.isDirectory()) {
+      return { present: true, value: interpretRunResult(null), corrupt: true };
+    }
+    const val = interpretRunResult(file);
+    const corrupt = !val || val.classification === 'contract-corrupt';
+    return { present: true, value: val, corrupt };
+  } catch {
+    return { present: true, value: interpretRunResult(null), corrupt: true };
+  }
 }
 // The admission ledger is read directly. Importing run-lock would make the
 // inspect graph reach its writer/process-control functions.
@@ -107,21 +117,33 @@ function owner(l, root, all) {
   return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
 }
 function authority(l, root, all) { const o = owner(l, root, all); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
-const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']);
+const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'running', 'delivered', 'settled', 'unknown']);
 const VALID_RESOURCE_STATES = new Set(['live-proven', 'dead-proven', 'absent-proven', 'ambiguous', 'unobserved', 'unsupported']);
 const VALID_DELIVERIES = new Set(['not-started', 'running', 'delivered', 'unknown', 'replayed', 'recovered']);
 
 function derivePhase(l, terminal) {
-  if (terminal.present) return 'settled';
-  if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
-  if (fs.existsSync(path.join(l.runDir, 'controller', 'commands')) || fs.existsSync(path.join(l.runDir, 'recovery-commands.jsonl'))) {
+  if (terminal.present && !terminal.corrupt) return 'settled';
+
+  const commandsDir = path.join(l.runDir, 'controller', 'commands');
+  let hasCommands = false;
+  try {
+    hasCommands = fs.existsSync(commandsDir) && fs.readdirSync(commandsDir).length > 0;
+  } catch {}
+  if (hasCommands || l.run?.status === 'bound' || l.run?.controller || l.run?.bound) {
     return 'bound';
   }
-  if (l.run?.status === 'bound' || l.run?.controller || l.run?.bound) return 'bound';
+
+  if (l.run?.status === 'running') {
+    if (l.run?.launchedAt || l.run?.delivery === 'running') return 'launched';
+    if (l.run?.phase === 'admitted') return 'admitted';
+    return 'running';
+  }
+
   if (l.run?.status === 'launched' || l.run?.launchedAt) return 'launched';
   if (l.run?.status === 'admitted') return 'admitted';
   if (l.run?.status === 'delivered') return 'delivered';
-  if (l.run?.status === 'settled') return 'settled';
+
+  if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
   return 'unknown';
 }
 
@@ -134,17 +156,21 @@ function deriveDelivery(l) {
   return 'unknown';
 }
 
-function deriveResourceState(l) {
+function deriveResourceState(l, nowFn) {
   const vis = json(path.join(l.runDir, 'visibility.json'));
   if (!vis) {
     return 'unobserved';
   }
   const s = vis.status;
   if (VALID_RESOURCE_STATES.has(s)) return s;
-  if (['working', 'briefed', 'agent-ready'].includes(s)) return 'live-proven';
-  if (['died'].includes(s)) return 'dead-proven';
-  if (['settling', 'reconciled'].includes(s)) return 'absent-proven';
-  if (['requested', 'detached', 'blocked'].includes(s)) return 'ambiguous';
+  if (s === 'died') return 'dead-proven';
+  if (['working', 'briefed', 'agent-ready'].includes(s) && vis.lastSeenAt) {
+    const ts = new Date(vis.lastSeenAt).getTime();
+    const curr = typeof nowFn === 'function' ? new Date(nowFn()).getTime() : Date.now();
+    if (!Number.isNaN(ts) && curr - ts >= 0 && curr - ts < 60000) {
+      return 'live-proven';
+    }
+  }
   return 'ambiguous';
 }
 
@@ -157,7 +183,7 @@ function deriveWorkspaceCompleteness(l) {
 function one(l, root, now, all) {
   const terminal = result(l), runResult = terminal.value, o = owner(l, root, all);
   const phase = derivePhase(l, terminal);
-  const resourceState = deriveResourceState(l);
+  const resourceState = deriveResourceState(l, now);
   const delivery = deriveDelivery(l);
   const workspaceCompleteness = deriveWorkspaceCompleteness(l);
   const observation = {
@@ -171,7 +197,11 @@ function one(l, root, now, all) {
     evidenceCompleteness: {
       identity: 'complete',
       lifecycle: 'complete',
-      resource: resourceState === 'unsupported' ? 'unsupported' : (resourceState === 'unobserved' ? 'missing' : 'complete'),
+      resource: resourceState === 'unsupported'
+        ? 'unsupported'
+        : (resourceState === 'unobserved'
+          ? 'missing'
+          : (resourceState === 'ambiguous' ? 'incomplete' : 'complete')),
       result: terminal.present ? 'complete' : 'missing',
       ownership: o.complete ? 'complete' : 'partial',
       workspace: workspaceCompleteness,

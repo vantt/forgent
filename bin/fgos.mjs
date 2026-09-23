@@ -43,7 +43,7 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir, runDispatchCli } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
@@ -2548,7 +2548,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
       }
       if (sub === 'decide' || sub === 'execute' || sub === 'log') {
-        return await runDispatchCli(rawArgv, { returnResult: true });
+        try {
+          return await runDispatchCli(rawArgv, { returnResult: true });
+        } catch (err) {
+          if (sub === 'execute' || err instanceof DispatchError || err.errorClass) {
+            const payload = {
+              error: err.message,
+              ...(err.errorClass ? { errorClass: err.errorClass } : {}),
+            };
+            process.stdout.write(`${JSON.stringify(payload)}\n`);
+          }
+          throw err;
+        }
       }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       if (sub === 'inspect') {
@@ -5109,7 +5120,11 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
-    process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
+    if (err instanceof DispatchError || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
+      process.exitCode = 1;
+    } else {
+      process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
+    }
   }
 }
 

@@ -3609,7 +3609,7 @@ export function checkHerdrAvailable() {
         return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE is empty` };
       }
       try {
-        const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 3000 });
+        const paneOut = execFileSync(bin, ['pane', 'get', trimmed], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 3000 });
         let parsed;
         try { parsed = JSON.parse(paneOut); } catch {}
         if (parsed?.error) {
@@ -3617,7 +3617,7 @@ export function checkHerdrAvailable() {
         }
         anchorDetails = `; anchor pane "${trimmed}" verified`;
       } catch (paneErr) {
-        anchorDetails = `; anchor pane: ${trimmed} (pane query unverified: ${paneErr.message})`;
+        return { passed: false, message: `herdr is available (${out}), but FGOS_HERDR_ANCHOR_PANE="${trimmed}" cannot be resolved: ${paneErr.message}` };
       }
     }
     return { passed: true, message: `herdr is available on PATH (${out})${anchorDetails}` };

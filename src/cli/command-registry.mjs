@@ -907,14 +907,15 @@ export const COMMAND_REGISTRY = [
       'fgos dispatch execute <executorId> --prompt "..."',
       'fgos dispatch log <executorId> --id <id> --provider <p> --command <c>',
     ],
-    touchesState: false, // writes run/guard files, never events.jsonl
-    // "recover --action" writes only the target Run's own directory (a
-    // controlEpoch field on its run.json, one recovery-commands.jsonl
-    // line) -- never events.jsonl/state.json, so per this field's own
-    // documented definition (event-log append or state.json overwrite)
-    // this stays false, same reasoning show-run/watch already carry.
+    touchesState: true,
+    // "execute" writes Run directories and state projections; "log"
+    // calls logExecutorDispatch which appends to .fgos/events/<writer>.jsonl
+    // (touchesState: true); "execute" spawns external processes on the host /
+    // containers (externalEffect: true). Per the registry invariant, a verb
+    // with multiple sub-modes is classified by its most-privileged effect on
+    // each axis (renders [write+external] in help).
     requiresExistingStore: false,
-    externalEffect: false,
+    externalEffect: true,
     paginated: false,
     deprecated: null,
   },

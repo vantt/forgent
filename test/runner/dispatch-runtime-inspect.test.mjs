@@ -75,10 +75,12 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
 test('RunObservation vocabulary derives phase, delivery, resourceState and workspace completeness from facts', () => {
   const root = fixture();
   assignment(root, 'asgn1');
-  // 1. In-flight run with controller commands -> phase: bound, delivery: not-sent -> not-started, visibility: working -> live-proven, no cwd -> workspace: unsupported
+  // 1. In-flight run with controller commands -> phase: bound, delivery: not-sent -> not-started, visibility: working with fresh heartbeat -> live-proven, no cwd -> workspace: unsupported
   const run1Dir = run(root, 'asgn1', '01', { runId: 'run1', delivery: 'not-sent' });
-  fs.mkdirSync(path.join(run1Dir, 'controller', 'commands'), { recursive: true });
-  fs.writeFileSync(path.join(run1Dir, 'visibility.json'), JSON.stringify({ status: 'working' }));
+  const cmdFile = path.join(run1Dir, 'controller', 'commands', 'cmd1.json');
+  fs.mkdirSync(path.dirname(cmdFile), { recursive: true });
+  fs.writeFileSync(cmdFile, JSON.stringify({ state: 'pending' }));
+  fs.writeFileSync(path.join(run1Dir, 'visibility.json'), JSON.stringify({ status: 'working', lastSeenAt: new Date().toISOString() }));
   admit(root, 'asgn1', 1, { runId: 'run1', attempt: 1 });
 
   const inspect1 = inspectDispatchRuntime(root, { run: 'run1' });
@@ -86,6 +88,7 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   assert.equal(obs1.phase, 'bound');
   assert.equal(obs1.delivery, 'not-started');
   assert.equal(obs1.resourceState, 'live-proven');
+  assert.equal(obs1.evidenceCompleteness.resource, 'complete');
   assert.equal(obs1.evidenceCompleteness.workspace, 'unsupported');
 
   // 2. Settled run with cwd and workspace evidence, visibility: died -> dead-proven
@@ -102,9 +105,10 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
   assert.equal(obs2.phase, 'settled');
   assert.equal(obs2.delivery, 'delivered');
   assert.equal(obs2.resourceState, 'dead-proven');
+  assert.equal(obs2.evidenceCompleteness.resource, 'complete');
   assert.equal(obs2.evidenceCompleteness.workspace, 'complete');
 
-  // 3. Visibility settling -> absent-proven, requested -> ambiguous, absent visibility -> unobserved
+  // 3. Visibility settling -> ambiguous (no adapter declares absence proof), evidence incomplete
   assignment(root, 'asgn3');
   const run3Dir = run(root, 'asgn3', '01', { runId: 'run3', status: 'launched', cwd });
   fs.writeFileSync(path.join(run3Dir, 'visibility.json'), JSON.stringify({ status: 'settling' }));
@@ -112,6 +116,35 @@ test('RunObservation vocabulary derives phase, delivery, resourceState and works
 
   const obs3 = inspectDispatchRuntime(root, { run: 'run3' }).runObservation;
   assert.equal(obs3.phase, 'launched');
-  assert.equal(obs3.resourceState, 'absent-proven');
+  assert.equal(obs3.resourceState, 'ambiguous');
+  assert.equal(obs3.evidenceCompleteness.resource, 'incomplete');
   assert.equal(obs3.evidenceCompleteness.workspace, 'partial');
+
+  // 4. Real writer status: 'running' maps to running when no commands/launchedAt exist
+  assignment(root, 'asgn4');
+  const run4Dir = run(root, 'asgn4', '01', { runId: 'run4', status: 'running' });
+  admit(root, 'asgn4', 1, { runId: 'run4', attempt: 1 });
+  const obs4 = inspectDispatchRuntime(root, { run: 'run4' }).runObservation;
+  assert.equal(obs4.phase, 'running');
+  assert.equal(obs4.resourceState, 'unobserved');
+  assert.equal(obs4.evidenceCompleteness.resource, 'missing');
+
+  // 5. run.status === 'settled' WITHOUT valid result.json is unknown, never falsely settled
+  assignment(root, 'asgn5');
+  const run5Dir = run(root, 'asgn5', '01', { runId: 'run5', status: 'settled' });
+  admit(root, 'asgn5', 1, { runId: 'run5', attempt: 1 });
+  const obs5 = inspectDispatchRuntime(root, { run: 'run5' }).runObservation;
+  assert.equal(obs5.phase, 'unknown');
+
+  // 6. Stale visibility heartbeat (>60s) -> ambiguous
+  assignment(root, 'asgn6');
+  const run6Dir = run(root, 'asgn6', '01', { runId: 'run6', status: 'running' });
+  fs.writeFileSync(path.join(run6Dir, 'visibility.json'), JSON.stringify({
+    status: 'working',
+    lastSeenAt: new Date(Date.now() - 120000).toISOString(),
+  }));
+  admit(root, 'asgn6', 1, { runId: 'run6', attempt: 1 });
+  const obs6 = inspectDispatchRuntime(root, { run: 'run6' }).runObservation;
+  assert.equal(obs6.resourceState, 'ambiguous');
+  assert.equal(obs6.evidenceCompleteness.resource, 'incomplete');
 });
