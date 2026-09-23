@@ -18,6 +18,7 @@
 // prose).
 import fs from 'node:fs';
 import { resolveCoordinationPaths, readManifest } from '../../runner/coordination/store.mjs';
+import { CoordinationError } from '../../runner/coordination/schema.mjs';
 import { showCoordinationUseCase } from './show.mjs';
 
 const ACTIVE_STATUS = 'active';
@@ -57,8 +58,26 @@ function listMatchingSessionIds(track, opts) {
 // derives (`pendingDriverAuthorizations`, `quorum.missing`), never a new
 // replay/derivation of its own.
 function describeNextActionForCell(cellId, sessionShow) {
-  const { coordinationId, pendingDriverAuthorizations, quorum } = sessionShow;
+  const { coordinationId, pendingDriverAuthorizations, quorum, schemaMode, dag } = sessionShow;
   const showHint = `Run \`fgos coordination show ${coordinationId}\` for detail.`;
+  if (schemaMode === 'dag' && dag?.nodes) {
+    const pendingNodes = dag.nodes.filter((n) => n.schedulerOutcome === 'pending');
+    if (pendingNodes.length > 0) {
+      const names = pendingNodes.map((n) => n.displayLabel || n.nodeId).join(', ');
+      return `DAG cell "${cellId}" (session "${coordinationId}") has ready node(s) awaiting execution: ${names}. ${showHint}`;
+    }
+    const blockedNodes = dag.nodes.filter((n) => n.schedulerOutcome === 'blocked');
+    if (blockedNodes.length > 0) {
+      const descriptions = blockedNodes.map((n) => `${n.displayLabel || n.nodeId} (waiting on ${n.blockedBy.join(', ')})`).join(', ');
+      return `DAG cell "${cellId}" (session "${coordinationId}") has node(s) blocked waiting on dependencies: ${descriptions}. ${showHint}`;
+    }
+    const caveatedNodes = dag.nodes.filter((n) => n.caveated || n.schedulerOutcome === 'recheck-required');
+    if (caveatedNodes.length > 0) {
+      const names = caveatedNodes.map((n) => n.displayLabel || n.nodeId).join(', ');
+      return `DAG cell "${cellId}" (session "${coordinationId}") has caveated node(s) requiring recheck: ${names}. ${showHint}`;
+    }
+    return `DAG cell "${cellId}" (session "${coordinationId}"): all ${dag.nodes.length} node(s) settled. ${showHint}`;
+  }
   if (Array.isArray(pendingDriverAuthorizations) && pendingDriverAuthorizations.length > 0) {
     const names = pendingDriverAuthorizations.map((b) => `${b.nodeId}/${b.operationId}`).join(', ');
     return `Cell "${cellId}" (session "${coordinationId}") has ${pendingDriverAuthorizations.length} declared operation(s) still awaiting driver authorization: ${names}. ${showHint}`;
@@ -97,7 +116,18 @@ function renderCell(track, sessionId, ctx, engineOpts) {
   try {
     show = showCoordinationUseCase(ctx, { id: sessionId });
   } catch (err) {
-    return { cellId, sessionId, createdAt: manifest.createdAt, renderError: { step: 'showCoordinationUseCase', message: err.message } };
+    const isUnsupportedNewer = err instanceof CoordinationError && err.category === 'schema-version-mismatch';
+    return {
+      cellId,
+      sessionId,
+      createdAt: manifest.createdAt,
+      schemaMode: isUnsupportedNewer ? 'unsupported-newer-schema' : undefined,
+      renderError: {
+        step: 'showCoordinationUseCase',
+        message: err.message,
+        ...(isUnsupportedNewer ? { reason: 'unsupported-newer-schema' } : {}),
+      },
+    };
   }
   const dispositions = Array.isArray(show.dispositions) ? show.dispositions : [];
   return {
@@ -105,7 +135,12 @@ function renderCell(track, sessionId, ctx, engineOpts) {
     sessionId,
     createdAt: manifest.createdAt,
     status: show.status,
+    sessionStatus: show.sessionStatus,
     phase: show.phase,
+    sessionPhase: show.sessionPhase,
+    schemaMode: show.schemaMode,
+    dag: show.dag,
+    actionHint: show.actionHint,
     lastDisposition: dispositions.length > 0 ? dispositions[dispositions.length - 1] : null,
     pendingDriverAuthorizations: show.pendingDriverAuthorizations,
     assignmentRefs: show.assignmentRefs,

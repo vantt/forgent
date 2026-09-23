@@ -257,6 +257,7 @@ function spawnSyncNode(scriptPath) {
 
 const realScriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
 const realLibPath = fileURLToPath(new URL('../../scripts/lib/is-main-module.mjs', import.meta.url));
+const realQueueLibPath = fileURLToPath(new URL('../../scripts/lib/full-suite-queue.mjs', import.meta.url));
 const mirroredRoots = [];
 
 after(() => {
@@ -270,6 +271,7 @@ function mirroredRepoRoot(prefix) {
   fs.mkdirSync(path.join(root, 'test'), { recursive: true }); // empty: zero test files
   fs.copyFileSync(realScriptPath, path.join(root, 'scripts', 'run-tests.mjs'));
   fs.copyFileSync(realLibPath, path.join(root, 'scripts', 'lib', 'is-main-module.mjs'));
+  fs.copyFileSync(realQueueLibPath, path.join(root, 'scripts', 'lib', 'full-suite-queue.mjs'));
   return root;
 }
 

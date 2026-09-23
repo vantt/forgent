@@ -38,11 +38,17 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX, SCHEMA_VERSION_3 } from '../../runner/coordination/schema.mjs';
 import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
+import {
+  getAuthoritativeSettledAssignmentIds,
+  computeDagSharedCwdCaveats,
+} from '../../runner/coordination/dag-declaration.mjs';
+import { resolveNodeCwd } from './dag-scheduler.mjs';
+import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { evaluateDriverAuthorizedBindings } from '../../runner/coordination/legality-facts.mjs';
 
 // Same four terminal event kinds `replay.mjs`'s own (unexported)
@@ -169,6 +175,38 @@ function renderHumanTurn(record) {
   };
 }
 
+function readJsonObjectFile(filePath, label) {
+  let parsed;
+  try {
+    parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    throw new CoordinationError(
+      'corrupt-log',
+      `coordination show: ${label} at ${filePath} is truncated or malformed (${err.message})`,
+    );
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new CoordinationError(
+      'corrupt-log',
+      `coordination show: ${label} at ${filePath} is truncated or malformed (not a JSON object)`,
+    );
+  }
+  return parsed;
+}
+
+function readRunResultForAssignment(fgosDir, assignmentId, runId) {
+  if (!assignmentId || !runId) return null;
+  const prefix = `run_${assignmentId}_`;
+  const attemptStr = runId.startsWith(prefix) ? runId.slice(prefix.length) : '01';
+  const runsDir = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr);
+  const resultPath = path.join(runsDir, 'result.json');
+  if (fs.existsSync(resultPath)) {
+    const parsed = readJsonObjectFile(resultPath, `RunResult "${runId}"`);
+    return interpretRunResult(parsed);
+  }
+  return null;
+}
+
 /**
  * @param {object} ctx `{cwd, repoRoot, packageRoot?}`
  * @param {object} options `{id}`
@@ -183,7 +221,7 @@ export function showCoordinationUseCase(ctx, { id }) {
     manifest = readManifest(id, engineOpts);
   } catch (err) {
     if (err instanceof CoordinationError && err.category === 'not-found') {
-      throw new StoreError('validation', `coordination show: no session "${id}" found under .fgos/coordination/sessions/ (${err.message})`);
+      throw new CoordinationError('not-found', `coordination show: no session "${id}" found under .fgos/coordination/sessions/ (${err.message})`);
     }
     // 'corrupt-log'/'schema-version-mismatch' etc. are real, distinct
     // diagnostics (R1's own "missing/corrupt session diagnostics"
@@ -314,10 +352,171 @@ export function showCoordinationUseCase(ctx, { id }) {
     }
   }
 
+  const isDag = manifest.schemaVersion === SCHEMA_VERSION_3 && Boolean(coordinationState?.dag?.declaration);
+  const schemaMode = isDag ? 'dag' : 'legacy-non-dag';
+
+  let dag = null;
+  let actionHint = manifest.status === 'active' ? `Session "${id}" is active.` : `Session "${id}" is ${manifest.status}.`;
+
+  if (coordinationState) {
+    const { fgosDir } = resolveSessionPaths(id, engineOpts);
+    if (isDag && coordinationState.dag?.declaration) {
+      const declaration = coordinationState.dag.declaration;
+      const declaredNodes = declaration.nodes ?? [];
+
+      const nodeCwds = new Map();
+      for (const node of declaredNodes) {
+        const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
+        nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
+      }
+
+      const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(coordinationState.events);
+      const dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes,
+        getNodeCwd: (id) => nodeCwds.get(id),
+      });
+
+      const renderedNodes = declaredNodes.map((node) => {
+        const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
+        const assignmentIds = nodeAssignments.map((a) => a.assignmentId);
+        const materialized = assignmentIds.length > 0;
+        const settled = nodeAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
+
+        const dependencies = node.dependsOn.map((depId) => {
+          const depAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === depId);
+          const depSettled = depAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
+          return { id: depId, settled: depSettled };
+        });
+        const dependenciesSettled = dependencies.every((d) => d.settled);
+        const blockedBy = dependencies.filter((d) => !d.settled).map((d) => d.id);
+
+        const nodeResults = coordinationState.results.filter((r) => assignmentIds.includes(r.assignmentId));
+        const latestResult = nodeResults.length > 0 ? nodeResults[nodeResults.length - 1] : null;
+        const runResult = latestResult ? readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId) : null;
+        const runResultStatus = runResult ? (runResult.status ?? (settled ? 'done' : null)) : (settled ? 'done' : null);
+        const runResultConfidence = runResult?.confidence ?? null;
+
+        const sharedCwdCaveat = dagCaveats.get(node.id) ?? null;
+
+        const refused = !materialized && manifest.status !== 'active';
+        const pending = !materialized && dependenciesSettled && !refused;
+        const blocked = !materialized && !dependenciesSettled && !refused;
+
+        let schedulerOutcome;
+        if (settled) {
+          if (sharedCwdCaveat !== null) {
+            schedulerOutcome = 'recheck-required';
+          } else {
+            schedulerOutcome = 'settled';
+          }
+        } else if (refused) {
+          schedulerOutcome = 'refused';
+        } else if (blocked) {
+          schedulerOutcome = 'blocked';
+        } else if (pending) {
+          schedulerOutcome = 'pending';
+        } else if (materialized) {
+          schedulerOutcome = 'materialized';
+        } else {
+          schedulerOutcome = 'pending';
+        }
+
+        let nodeActionHint;
+        if (schedulerOutcome === 'pending') {
+          nodeActionHint = 'Ready to execute. Dependencies are settled.';
+        } else if (schedulerOutcome === 'blocked') {
+          nodeActionHint = `Blocked waiting on dependency: ${blockedBy.join(', ')}.`;
+        } else if (schedulerOutcome === 'recheck-required') {
+          nodeActionHint = 'Settled with caveat: recheck required before closure.';
+        } else if (schedulerOutcome === 'settled') {
+          if (runResultStatus === 'failed') {
+            nodeActionHint = 'Settled with failure. Dependent operations may proceed with settled failure evidence.';
+          } else {
+            nodeActionHint = 'Settled cleanly.';
+          }
+        } else if (schedulerOutcome === 'refused') {
+          nodeActionHint = 'Refused because session is terminal.';
+        } else if (schedulerOutcome === 'materialized') {
+          nodeActionHint = 'Materialized and currently in flight.';
+        } else {
+          nodeActionHint = 'Declared.';
+        }
+
+        return {
+          nodeId: node.id,
+          displayLabel: node.displayLabel,
+          declared: true,
+          sessionStatus: manifest.status,
+          sessionPhase: phase,
+          schedulerOutcome,
+          runResultStatus,
+          runResultConfidence,
+          schemaMode: 'dag',
+          dependsOn: [...node.dependsOn],
+          dependenciesSettled,
+          blockedBy,
+          actionHint: nodeActionHint,
+          caveated: sharedCwdCaveat !== null,
+          sharedCwdCaveat,
+          sharedCwdVerdictCaveat: sharedCwdCaveat,
+          assignmentIds,
+          materialized,
+          settled,
+          refused,
+          pending,
+          blocked,
+        };
+      });
+
+      const counts = {
+        settled: renderedNodes.filter((n) => n.schedulerOutcome === 'settled' || n.schedulerOutcome === 'recheck-required').length,
+        settledFailed: renderedNodes.filter((n) => (n.schedulerOutcome === 'settled' || n.schedulerOutcome === 'recheck-required') && n.runResultStatus === 'failed').length,
+        refused: renderedNodes.filter((n) => n.schedulerOutcome === 'refused').length,
+        blocked: renderedNodes.filter((n) => n.schedulerOutcome === 'blocked').length,
+        pending: renderedNodes.filter((n) => n.schedulerOutcome === 'pending').length,
+        deferred: renderedNodes.filter((n) => n.schedulerOutcome === 'deferred').length,
+      };
+
+      dag = {
+        kind: 'dag',
+        schemaMode: 'dag',
+        declaration,
+        requestFingerprint: declaration?.requestFingerprint ?? null,
+        continuationPolicy: declaration?.continuationPolicy ?? null,
+        nodes: renderedNodes,
+        counts,
+      };
+
+      const pendingLabels = renderedNodes.filter((n) => n.schedulerOutcome === 'pending').map((n) => n.displayLabel || n.nodeId);
+      const blockedLabels = renderedNodes.filter((n) => n.schedulerOutcome === 'blocked').map((n) => `${n.displayLabel || n.nodeId} (waiting on ${n.blockedBy.join(', ')})`);
+      const caveatedLabels = renderedNodes.filter((n) => n.caveated || n.schedulerOutcome === 'recheck-required').map((n) => n.displayLabel || n.nodeId);
+      if (pendingLabels.length > 0) {
+        actionHint = `Resume DAG session "${id}": ready node(s) [${pendingLabels.join(', ')}].`;
+      } else if (blockedLabels.length > 0) {
+        actionHint = `DAG session "${id}": blocked waiting on [${blockedLabels.join(', ')}].`;
+      } else if (caveatedLabels.length > 0) {
+        actionHint = `DAG session "${id}": caveated node(s) [${caveatedLabels.join(', ')}] require recheck before closure.`;
+      } else {
+        actionHint = `DAG session "${id}": all ${renderedNodes.length} node(s) settled.`;
+      }
+    } else {
+      dag = {
+        kind: 'legacy-non-dag',
+        schemaMode: 'legacy-non-dag',
+        nodes: [],
+      };
+    }
+  }
+
   return {
     coordinationId: manifest.coordinationId,
     status: manifest.status,
+    sessionStatus: manifest.status,
     phase,
+    sessionPhase: phase,
+    schemaMode,
+    actionHint,
+    dag,
     objective: manifest.objective,
     definitionRef: manifest.definitionRef,
     workRef: manifest.workRef,

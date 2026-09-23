@@ -236,6 +236,7 @@ test('config-not-stale passes when the existing config already has every default
       herdrOrchestrator: DEFAULT_HERDR_ORCHESTRATOR_SETTINGS,
       herdrWebDashboard: DEFAULT_HERDR_WEB_DASHBOARD_SETTINGS,
       invariantChecks: { commands: DEFAULT_INVARIANT_CHECK_COMMANDS },
+      worktreeSetup: { commands: [] },
       workerSlots: { ceiling: null },
       gateway: { port: 4170, token: null },
       ironLaw: { level: DEFAULT_IRON_LAW_LEVEL },
@@ -315,6 +316,45 @@ test('invariant-checks-configured passes and names the configured commands', () 
   assert.equal(passed, true);
   assert.match(message, /1 command\(s\)/);
   assert.match(message, /node --test test\/architecture\.test\.mjs/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── worktree-setup-configured: an empty or absent section is a valid
+// choice (worktrees get only their dependency install); only a
+// present-but-malformed one fails, since it reads as zero commands and
+// silently skips setup. Never executes the configured commands.
+
+test('worktree-setup-configured passes when the section is absent or empty', () => {
+  for (const config of [{}, { worktreeSetup: { commands: [] } }]) {
+    const cwd = mkTemp('doctor-wtsetup-empty-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify(config));
+    const { passed, message } = checkById('worktree-setup-configured').check(cwd);
+    assert.equal(passed, true, JSON.stringify(config));
+    assert.match(message, /only their dependency install/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('worktree-setup-configured fails when the section is present but malformed', () => {
+  for (const malformed of [{ commands: 'cargo build' }, {}, { commands: ['cargo build', ''] }, ['cargo build']]) {
+    const cwd = mkTemp('doctor-wtsetup-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: malformed }));
+    const { passed, message } = checkById('worktree-setup-configured').check(cwd);
+    assert.equal(passed, false, `malformed: ${JSON.stringify(malformed)}`);
+    assert.match(message, /present but malformed/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('worktree-setup-configured passes and names the configured commands', () => {
+  const cwd = mkTemp('doctor-wtsetup-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ worktreeSetup: { commands: ['cargo build --release'] } }));
+  const { passed, message } = checkById('worktree-setup-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.match(message, /1 command\(s\): cargo build --release/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

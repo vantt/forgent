@@ -185,6 +185,15 @@ session with no chat history may use the user's request, the resolved plan path,
 the plan's cell-status table, `.fgos/coordination/sessions/**`, and Git evidence
 only. It must not rely on a previous assistant's narration.
 
+Read the `chain` / `show` JSON fields (`dagNodeId`, `schedulerOutcome`, `resumed`, `dag.counts`) as the cold-resume oracle. Those doors belong to `fgos-plan-loop`; this skill classifies durable state and delegates — it does not originate the multi-cell chain or run loop.
+
+**Refused-vs-pending ambiguity:** Note that a live-refused node in a still-active session, and a genuinely never-attempted node, can both currently project as `schedulerOutcome='pending'` in `show`'s reconstruction. **It is SAFE to retry a 'pending'-shaped node after a fresh-process resume regardless of which case it actually is.** A genuinely-settled node is safely caught by the engine's own `resumed:true`/door:`'result-linked'` idempotency and is never re-dispatched twice. A previously-refused node will either succeed on retry or resurface its own fresh typed error for the driver to see and act on. Do not blindly trust 'pending' as 'definitely fresh, unattempted work' -- it means 'safe to (re)attempt', which is a different, weaker, and correct claim.
+
+**Known projection gaps (accepted, P05-style scoping limits — not silently hidden):**
+
+- **`dag.counts.deferred` is not a live deferred-work oracle.** Direct read of `src/verbs/coordination/show.mjs`: `counts.deferred` is no longer a hardcoded `0` (P04 replaced that stub with `renderedNodes.filter((n) => n.schedulerOutcome === 'deferred').length`). The remaining gap is that this same reconstruction never assigns `schedulerOutcome: 'deferred'` — only `settled` / `recheck-required` / `refused` / `blocked` / `pending` / `materialized`. Live DAG runs can mark a node deferred (the DAG scheduler / `runCoordinationUseCase`), but a cold `show` still reports `counts.deferred: 0`. Do not treat that count as evidence that nothing was deferred.
+- **The `chain` verb's `nextAction` can say `all N node(s) settled` while the session is not fully settled.** `describeNextActionForCell` only special-cases `pending`, `blocked`, and caveated nodes before falling through to that phrase. A materialized in-flight node (`schedulerOutcome: 'materialized'`, no pending/blocked/caveated status) therefore makes `nextAction` report the session as fully settled when work is still in flight. Inspect per-node `schedulerOutcome` before treating that hint as a close signal.
+
 Before handing off to `fgos-plan-loop`, classify the durable state as one of:
 
 - **active cell** -- an existing coordination session for the current/next cell
@@ -687,11 +696,61 @@ engine refuses `"mutating"` whenever `cwd` resolves to the main checkout
 `docs/architect/agent-coordination/contracts/coordination-session.md`,
 "Mutation Rule" section).
 
+### Optional: Concurrent Read-Only Fan-Out (Two-Request DAG Mode)
+
+The legacy template above remains the default and primary path, as DAG mode admits read-only steps only and cannot contain the mutating `produce` step. However, if a driver wants a concurrent read-only fan-out (e.g., two independent read-only inspection/analysis tasks) *after* the mutating work has already landed, a **two-request DAG-mode pattern** is used.
+
+1. **Request 1:** The exact legacy shape above, containing the mutating step. Let it settle.
+2. **Request 2:** A separate, optional `dag: true` request with a **NEW** `coordinationId`, containing ONLY read-only steps. Because `contextRefs` cannot reference an assignment in a different `coordinationId` session ("cross-session grant authority is out of scope"), Request 2's step objectives must name the exact branch, commit, or worktree path directly instead of using `contextRefs` or `$ref`.
+
+Example `open-dag-inspections.json` (Request 2):
+
+```json
+{
+  "kind": "declared-protocol",
+  "dag": true,
+  "objective": "Run concurrent read-only inspections against the landed commit on code-panel--<change-slug>.",
+  "writerId": "<lead-identity>",
+  "coordinationId": "code-panel--<change-slug>-inspections",
+  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
+  "actors": [
+    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "code-quality-reviewer" },
+    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "edge-case-and-security-attacker" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "review",
+      "operationId": "review-candidate",
+      "targetActorId": "reviewer",
+      "taskKey": "review-candidate-reviewer",
+      "objective": "Inspect the landed commit <testedSha> at worktree path ../code-panel-<change-slug> (pin the SHA, not the moving branch name code-panel--<change-slug>) for correctness. Read `git show <testedSha>` from that worktree.",
+      "expectedOutputs": ["agent-result.json (status, summary, findings)"]
+    },
+    {
+      "type": "operation",
+      "as": "redTeam",
+      "operationId": "red-team-candidate",
+      "targetActorId": "red-team",
+      "taskKey": "red-team-candidate-red-team",
+      "objective": "Attempt to find security flaws in the landed commit <testedSha> at worktree path ../code-panel-<change-slug> (pin the SHA, not the moving branch name). Read `git show <testedSha>` from that worktree.",
+      "expectedOutputs": ["agent-result.json (status, summary, findings)"]
+    }
+  ]
+}
+```
+
+Notice that `dag: true` is at the top level, there is no `mutation: "mutating"` anywhere, and `contextRefs` are completely omitted. If you use `dependsOn`, it must name ONLY labels declared within this same request, never across requests.
+
+**Caveat teaching note:** this specific example is intentionally single-peer-safe / expected to self-caveat and require recheck. Both `review` and `redTeam` steps share the same `fgos coordination run --cwd` (cwd is a CLI flag, not a JSON field). Two concurrent read-only peers sharing one cwd receive a `sharedCwdCaveat` with `status: 'recheck-required'` — Architecture Invariant 7 in action, the same irony this track hit in P00–P05. That is a fine, honest teaching example: either recheck with two genuinely distinct `--cwd` values, or treat the caveat as blocking close. Pin the objective to a specific commit SHA or worktree path, not a branch name (a branch can move; a fresh read-only inspector needs a pinned reference).
+
 ## 2. Read results, disposition findings
 
 ```sh
 fgos coordination show code-panel--<change-slug> --json
 ```
+
+**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding.
 
 Verify the doer's real outcome yourself first (section above), then
 record each accept/reject/deferred decision as a `disposition` step:
@@ -748,6 +807,8 @@ Repeat with `fix-2.json`, ... (new `authorizationId`/`invocationKey`
 values each time) if a recheck itself surfaces a new accepted finding.
 
 ## 4. Close, then merge, then verify
+
+**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding. **Never issue `cell-closed` while any node carries a `sharedCwdCaveat` with `status: 'recheck-required'`.** A driver reading only this close template, without having read section 2 first, is still bound by that caveat-blocks-close rule.
 
 **A first-pass finding is discharged only by disposition + a satisfied
 recheck, never by disposition alone.** `review-candidate`/

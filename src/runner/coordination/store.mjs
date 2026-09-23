@@ -26,6 +26,7 @@ import {
   CoordinationError,
   SCHEMA_VERSION,
   SCHEMA_VERSION_2,
+  SCHEMA_VERSION_3,
   SUPPORTED_SCHEMA_VERSIONS,
   STATUS_VALUES,
   validateManifest,
@@ -35,10 +36,12 @@ import {
   CONTRIBUTION_REF_PREFIX,
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
+import { normalizeDagDeclaration, computeDagSharedCwdCaveats } from './dag-declaration.mjs';
 import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
+import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
@@ -254,7 +257,7 @@ function buildEffectiveDefinitionSnapshot(rawDefinition, orgDischargeOn) {
 }
 
 export function openSession(
-  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null, schemaVersion = SCHEMA_VERSION },
+  { coordinationId, objective, provenanceRoot, definitionRef = null, workRef = null, actors, aggregateBounds, partialPolicy = null, schemaVersion = SCHEMA_VERSION, dagDeclaration },
   opts = {},
 ) {
   if (!SUPPORTED_SCHEMA_VERSIONS.has(schemaVersion)) {
@@ -262,6 +265,17 @@ export function openSession(
       'validation',
       `openSession: schemaVersion "${schemaVersion}" is not one of the supported versions (${[...SUPPORTED_SCHEMA_VERSIONS].join(' | ')})`,
     );
+  }
+  if (schemaVersion !== SCHEMA_VERSION_3 && dagDeclaration !== undefined) {
+    throw new CoordinationError('validation', 'openSession: dagDeclaration requires schemaVersion "3"');
+  }
+  let normalizedDagDeclaration;
+  if (dagDeclaration !== undefined) {
+    try {
+      normalizedDagDeclaration = normalizeDagDeclaration(dagDeclaration);
+    } catch (err) {
+      throw new CoordinationError('validation', `openSession: ${err.message}`);
+    }
   }
   const { sessionsDir } = resolveCoordinationPaths(opts);
   fs.mkdirSync(sessionsDir, { recursive: true });
@@ -387,6 +401,13 @@ export function openSession(
     const openedPayload = { coordinationId: id, provenanceRoot };
     validateEventPayload('session-opened', openedPayload);
     appendSessionEventLocked(eventsPath, { type: 'session-opened', payload: openedPayload }, stagingDir, manifest);
+    if (normalizedDagDeclaration) {
+      const payload = { declaration: normalizedDagDeclaration };
+      validateEventPayload('dag-declared', payload);
+      // Same lock-held append path as every session event.  It is emitted
+      // during openSession, before this session can expose an Assignment door.
+      appendSessionEventLocked(eventsPath, { type: 'dag-declared', payload }, stagingDir, manifest);
+    }
 
     if (resolvedActors) {
       for (const actor of resolvedActors) {
@@ -539,12 +560,17 @@ function readAssignmentJson(assignmentsDir, assignmentId) {
 // "interrupted, needs completing." Without this check, a further retry
 // re-entering this function would append a SECOND `assignment-created` for
 // the same id, which replay.mjs's duplicate-ref check fails closed on.
-function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, sessionDir, assignmentId, actorId, authorizationProvenance }) {
+function completeAssignmentRegistration({ manifest, manifestPath, eventsPath, sessionDir, assignmentId, actorId, authorizationProvenance, dagNodeId }) {
   const alreadyAppended = readEvents(eventsPath).some(
     (event) => event.type === 'assignment-created' && event.payload?.assignmentId === assignmentId,
   );
   if (!alreadyAppended) {
-    const eventPayload = { assignmentId, ...(actorId ? { actorId } : {}), ...(authorizationProvenance ?? {}) };
+    const eventPayload = {
+      assignmentId,
+      ...(actorId ? { actorId } : {}),
+      ...(dagNodeId ? { dagNodeId } : {}),
+      ...(authorizationProvenance ?? {})
+    };
     validateEventPayload('assignment-created', eventPayload);
     appendSessionEventLocked(eventsPath, { type: 'assignment-created', payload: eventPayload }, sessionDir, manifest);
   }
@@ -826,7 +852,7 @@ function assertWithinBindingInvocationCap({ eventsPath, coordinationId, cap, aut
  * @returns {Readonly<object>} The Assignment (freshly created, or the one already claimed for this taskKey)
  */
 export function createSessionAssignmentLocked(
-  { coordinationId, taskKey, actorId, contract, caller, work, workId, createdBy, options, authorizationProvenance },
+  { coordinationId, taskKey, actorId, contract, caller, work, workId, createdBy, options, authorizationProvenance, dagNodeId },
   paths,
   opts = {},
 ) {
@@ -837,74 +863,80 @@ export function createSessionAssignmentLocked(
   const taskClaimPath = path.join(tasksDir, `${hashTaskKey(taskKey)}.json`);
 
   const manifest = readManifestRaw(manifestPath);
-    assertSchemaVersionCurrent(manifest, manifestPath);
-    if (manifest.status !== 'active') {
-      throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot create an Assignment`);
-    }
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError('validation', `session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot create an Assignment`);
+  }
 
-    if (fs.existsSync(taskClaimPath)) {
-      const claim = JSON.parse(fs.readFileSync(taskClaimPath, 'utf8'));
-      if (isNonEmptyString(claim.taskKey) && claim.taskKey !== taskKey) {
-        throw new CoordinationError(
-          'validation',
-          `taskKey claim-file collision for session "${coordinationId}": "${taskKey}" and "${claim.taskKey}" hash to the same claim file -- refusing to return the wrong task's Assignment`,
-        );
-      }
-      const existing = readAssignmentJson(assignmentsDir, claim.assignmentId);
-      if (!existing) {
-        throw new CoordinationError(
-          'corrupt-log',
-          `task "${taskKey}" claims assignment "${claim.assignmentId}" for session "${coordinationId}", but no such Assignment exists under ${assignmentsDir}`,
-        );
-      }
-      if (!manifest.assignmentRefs.includes(claim.assignmentId)) {
-        // Self-heal: a prior attempt reserved the id and wrote
-        // assignment.json but crashed before the event/ref append
-        // completed -- complete it now instead of returning a phantom
-        // "successful" Assignment that was never a real session member.
-        //
-        // This branch APPENDS a consuming `assignment-created`, so it is
-        // bound by the same authorization invariants the genuinely-new-
-        // taskKey path below is. Exempting only this claim's OWN
-        // assignmentId keeps a genuine idempotent resume passing while
-        // refusing the crash-plus-race shape where a DIFFERENT taskKey
-        // spent this authorization first.
-        assertAuthorizationSpendable({
-          eventsPath,
-          coordinationId,
-          authorizationProvenance,
-          ownAssignmentId: claim.assignmentId,
-        });
-        // The binding cap must gate this branch too, not just the
-        // genuinely-new-taskKey path below: this call carries the SAME
-        // authorizationId the interrupted attempt already reserved
-        // (the provenance-vs-authorization consistency check above ties it to that authorization),
-        // and `assertWithinBindingInvocationCap` already excludes its OWN
-        // `authorizationId` from the "already invoked" count -- so
-        // completing an interrupted registration never double-counts
-        // against the cap, while a cap already exhausted by OTHER
-        // invocations still refuses here exactly as it would on the
-        // new-taskKey path. Without this call, a crash into this self-heal
-        // shape was the one door that let a binding materialize past its
-        // declared `activation.maxInvocations`.
-        assertWithinBindingInvocationCap({
-          eventsPath,
-          coordinationId,
-          cap: opts.bindingInvocationCap,
-          authorizationProvenance,
-        });
-        completeAssignmentRegistration({
-          manifest,
-          manifestPath,
-          eventsPath,
-          sessionDir,
-          assignmentId: claim.assignmentId,
-          actorId,
-          authorizationProvenance,
-        });
-      }
-      return Object.freeze(existing);
+  // Authoritative task-claim fast path (Recovery Rule point 3). A taskKey
+  // already claimed under this session returns the SAME Assignment
+  // immediately -- crash-safe idempotency without scanning the event log.
+  // The raw taskKey is checked inside the file so a hash collision fails loud.
+  if (fs.existsSync(taskClaimPath)) {
+    const claim = JSON.parse(fs.readFileSync(taskClaimPath, 'utf8'));
+    if (isNonEmptyString(claim.taskKey) && claim.taskKey !== taskKey) {
+      throw new CoordinationError(
+        'validation',
+        `taskKey claim-file collision for session "${coordinationId}": "${taskKey}" and "${claim.taskKey}" hash to the same claim file -- refusing to return the wrong task's Assignment`,
+      );
     }
+    const existing = readAssignmentJson(assignmentsDir, claim.assignmentId);
+    if (!existing) {
+      throw new CoordinationError(
+        'corrupt-log',
+        `task "${taskKey}" claims assignment "${claim.assignmentId}" for session "${coordinationId}", but no such Assignment exists under ${assignmentsDir}`,
+      );
+    }
+    if (!manifest.assignmentRefs.includes(claim.assignmentId)) {
+      // Fast-path self-heal: the claim file was written, but the session's
+      // manifest update / `assignment-created` event was interrupted
+      // before it could land. Both invariants from the slow path must be
+      // re-checked here before completing the registration:
+      //
+      //   1. The driver authorization must still be spendable by THIS
+      //      Assignment (the interrupted attempt).
+      //   2. The binding's invocation cap must not be exceeded.
+      //
+      // `ownAssignmentId` exempts THIS Assignment from the "spent" check,
+      // refusing the crash-plus-race shape where a DIFFERENT taskKey
+      // spent this authorization first.
+      assertAuthorizationSpendable({
+        eventsPath,
+        coordinationId,
+        authorizationProvenance,
+        ownAssignmentId: claim.assignmentId,
+      });
+      // The binding cap must gate this branch too, not just the
+      // genuinely-new-taskKey path below: this call carries the SAME
+      // authorizationId the interrupted attempt already reserved
+      // (the provenance-vs-authorization consistency check above ties it to that authorization),
+      // and `assertWithinBindingInvocationCap` already excludes its OWN
+      // `authorizationId` from the "already invoked" count -- so
+      // completing an interrupted registration never double-counts
+      // against the cap, while a cap already exhausted by OTHER
+      // invocations still refuses here exactly as it would on the
+      // new-taskKey path. Without this call, a crash into this self-heal
+      // shape was the one door that let a binding materialize past its
+      // declared `activation.maxInvocations`.
+      assertWithinBindingInvocationCap({
+        eventsPath,
+        coordinationId,
+        cap: opts.bindingInvocationCap,
+        authorizationProvenance,
+      });
+      completeAssignmentRegistration({
+        manifest,
+        manifestPath,
+        eventsPath,
+        sessionDir,
+        assignmentId: claim.assignmentId,
+        actorId,
+        authorizationProvenance,
+        dagNodeId,
+      });
+    }
+    return Object.freeze(existing);
+  }
 
     // A driver authorization must have been really issued, and is spent by
     // exactly ONE Assignment. On this genuinely-NEW-taskKey path there is no
@@ -948,9 +980,15 @@ export function createSessionAssignmentLocked(
         if (!linkedIdsForConcurrency.has(id)) inFlight += 1;
       }
       if (inFlight >= opts.maxConcurrencyForSession) {
+        // The ONLY deferrable refusal (dag-request-scheduler.md
+        // §4) -- carries `code: 'concurrency-cap'` so a future DAG scheduler
+        // can distinguish "retry me once a slot frees" from every other
+        // ordinary, non-deferrable budget refusal below (maxAssignments/
+        // maxRounds/wallTime/taskDepth), which must never carry this code.
         throw new CoordinationError(
           'validation',
           `createSessionAssignment: session "${coordinationId}" already has ${inFlight} Assignment(s) in flight (created but not yet result-linked), at or above the declared aggregateBounds.maxConcurrency cap of ${opts.maxConcurrencyForSession} -- refusing to create a new Assignment`,
+          'concurrency-cap',
         );
       }
     }
@@ -1022,6 +1060,7 @@ export function createSessionAssignmentLocked(
       assignmentId: assignment.assignmentId,
       actorId,
       authorizationProvenance,
+      dagNodeId,
     });
 
   return assignment;
@@ -1457,6 +1496,44 @@ export function recordDriverDispositionLocked(coordinationId, { targetRef, dispo
   // disposition is written -- never against a snapshot taken before the
   // lock.
   const eventsForRefs = readEvents(eventsPath);
+
+  if (disposition === 'cell-closed') {
+    const dagEvent = eventsForRefs.find((e) => e.type === 'dag-declared');
+    if (dagEvent?.payload?.declaration) {
+      const declaredNodes = dagEvent.payload.declaration.nodes;
+      const getNodeCwd = (id) => {
+        const node = declaredNodes.find((n) => n.id === id);
+        let cwd = node?.semantics?.canonicalCwd || node?.semantics?.cwd;
+        if (!cwd && fgosDir) {
+          for (const asgnId of manifest.assignmentRefs) {
+            const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
+            if (fs.existsSync(runsDir)) {
+              try {
+                const attempts = fs.readdirSync(runsDir);
+                for (const attempt of attempts) {
+                  const runJsonPath = path.join(runsDir, attempt, 'run.json');
+                  if (fs.existsSync(runJsonPath)) {
+                    const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+                    if (run.cwd) { cwd = run.cwd; break; }
+                  }
+                }
+              } catch {}
+            }
+            if (cwd) break;
+          }
+        }
+        return path.resolve(cwd ?? opts.cwd ?? process.cwd());
+      };
+      const caveats = computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd });
+      if (caveats.size > 0) {
+        throw new CoordinationError(
+          'validation',
+          `recordDriverDisposition: session "${coordinationId}" has unadjudicated shared-cwd caveats (recheck-required) -- cannot record "cell-closed" disposition`,
+        );
+      }
+    }
+  }
+
   const contributionIds = linkedContributionIds(eventsForRefs);
   const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
   assertDispositionRefOwnedBySession(targetRef, {

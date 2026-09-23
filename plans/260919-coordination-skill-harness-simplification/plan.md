@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I07 next eligible (I08 requires I07; I09 requires I06/I04/I02 — I06 verified)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 next eligible (I08 requires I07; I10 requires I09 post-merge verification — I10 blocked)
 Created: 2026-09-19
 Last Updated: 2026-09-23
 Mode: high-risk
@@ -840,7 +840,23 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
-  note: eligible to open — prerequisites I02 (integrated at `main@4362bfec`), I04 (integrated at `main@7472bd74`), and I06 (integrated at `main@3bab9b99`) are all integrated and verified
+  status: integrated, post-merge verification pending
+  branch: `coordination-skill-harness-i09-dag-forward-port`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
+  base-sha: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
+  integration-baseline: `main@cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+  evaluated-candidate-sha: `a208bf555927b508ddfa0523009ce87aac1dd0af` (approved in independent review: 0 blocker, 0 high)
+  synchronized-candidate-sha: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (merges `main@cc687d92`; CHANGELOG.md conflict resolved preserving both groups)
+  status-recording-sha: `dd4fb2e54f95afe5a68b6bcc092bd3d929de96d8` (lineage `524579b4` -> `dd4fb2e5`)
+  integrated-sha: `1ca4023c98c2f449cb58cba481e82cab49ba51ba` (merges `cc687d92` + `dd4fb2e5`; verified topology and preserved local state)
+  integration-status: integrated at 1ca4023c; post-merge verification pending (I09-REV-15 timing fix in progress; I10 remains BLOCKED)
+  findings-resolved: I09-REV-01 through I09-REV-11, I09-REV-15 (MEDIUM, candidate test timing regression resolved by restoring 1000ms/1050ms margins and stripping Phase 04 H-2 test labels). Baseline defect note: D2/D3 in fgos-approve.test.mjs is pre-existing on main@cc687d92, not an I09 regression.
+  blast-radius: CRITICAL (189 symbols, 35 processes; GitNexus index degraded/stale per REV-14)
+  rev05-policy: locked (shared-cwd read-only DAG caveat cannot be discharged in original session; original session must be cancelled; recheck runs in separate session; no adjudication event/lifecycle/store added)
+  queued-for-i10-i11: I09-REV-12 (deferred outcome taxonomy), I09-REV-13 (disposition on caveated findings), I09-REV-14 (GitNexus index refresh), cwd helper consolidation
+  next-dependency-gate: I10 remains BLOCKED pending fix and independent re-review
+  verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test

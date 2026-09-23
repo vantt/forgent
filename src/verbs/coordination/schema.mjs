@@ -282,7 +282,7 @@ function validateProtocolRef(protocolRef) {
 
 const OPERATION_STEP_ALLOWED_KEYS = new Set([
   'type', 'as', 'operationId', 'targetActorId', 'objective', 'expectedOutputs',
-  'contextRefs', 'constraints', 'capabilities', 'fromAssignmentId', 'intent', 'round', 'taskKey', 'mutation',
+  'contextRefs', 'constraints', 'capabilities', 'fromAssignmentId', 'intent', 'round', 'taskKey', 'mutation', 'dependsOn',
 ]);
 
 export function validateOperationStep(step, i = 0) {
@@ -301,6 +301,8 @@ export function validateOperationStep(step, i = 0) {
   if (step.intent !== undefined && !isNonEmptyString(step.intent)) fail(`steps[${i}].intent must be a non-empty string when present`);
   if (step.round !== undefined && (!Number.isInteger(step.round) || step.round < 1)) fail(`steps[${i}].round must be a positive integer when present`);
   if (step.taskKey !== undefined) assertSafeId(step.taskKey, `steps[${i}].taskKey`);
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
   return {
     type: 'operation',
     as: step.as,
@@ -321,12 +323,13 @@ export function validateOperationStep(step, i = 0) {
     // byte-identical to every pre-existing request (session-engine.mjs's
     // own dispatchDeclaredOperation applies the "read-only" default).
     mutation: step.mutation,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
   };
 }
 
 const AUTHORIZE_STEP_ALLOWED_KEYS = new Set([
   'type', 'as', 'operationId', 'targetActorId', 'nodeId', 'authorizationId',
-  'invocationKey', 'reason', 'grantedContextRefs', 'targetArtifactRef', 'mutation',
+  'invocationKey', 'reason', 'grantedContextRefs', 'targetArtifactRef', 'mutation', 'dependsOn',
 ]);
 
 const INVOCATION_KEY_MAX_LENGTH = 512;
@@ -383,6 +386,8 @@ export function validateAuthorizeStep(step, i = 0) {
   const grantedContextRefs = validateStringArray(step.grantedContextRefs, `steps[${i}].grantedContextRefs`);
   grantedContextRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].grantedContextRefs[${j}]`));
   if (step.targetArtifactRef !== undefined) assertSafeRefOrId(step.targetArtifactRef, `steps[${i}].targetArtifactRef`);
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
   return {
     type: 'authorize',
     as: step.as,
@@ -394,11 +399,12 @@ export function validateAuthorizeStep(step, i = 0) {
     reason: step.reason,
     grantedContextRefs,
     targetArtifactRef: step.targetArtifactRef,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
   };
 }
 
 const DISPOSITION_STEP_ALLOWED_KEYS = new Set([
-  'type', 'as', 'targetRef', 'disposition', 'rationale', 'evidenceRefs', 'mutation',
+  'type', 'as', 'targetRef', 'disposition', 'rationale', 'evidenceRefs', 'mutation', 'dependsOn',
 ]);
 
 const DISPOSITION_MAX_LENGTH = 200;
@@ -419,6 +425,8 @@ export function validateDispositionStep(step, i = 0) {
   }
   const evidenceRefs = validateStringArray(step.evidenceRefs, `steps[${i}].evidenceRefs`);
   evidenceRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].evidenceRefs[${j}]`));
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
   return {
     type: 'disposition',
     as: step.as,
@@ -426,6 +434,7 @@ export function validateDispositionStep(step, i = 0) {
     disposition: step.disposition,
     rationale: step.rationale,
     evidenceRefs,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
   };
 }
 
@@ -485,7 +494,7 @@ export function validateFanOutStep(step, i = 0) {
 // record (P10.6/P10.7/P10.8's own shared finding; classified and closed by
 // P10.10 as a scoped pack-layer wiring gap, not a new kernel capability).
 const CONTRIBUTION_STEP_ALLOWED_KEYS = new Set([
-  'type', 'as', 'contributionId', 'contributionType', 'assignmentId', 'roundKey', 'anchors', 'respondsTo', 'mutation',
+  'type', 'as', 'contributionId', 'contributionType', 'assignmentId', 'roundKey', 'anchors', 'respondsTo', 'mutation', 'dependsOn',
 ]);
 
 const CONTRIBUTION_TYPE_SET = new Set(CONTRIBUTION_TYPES);
@@ -523,6 +532,8 @@ export function validateContributionStep(step, i = 0) {
   if (anchors !== undefined) anchors.forEach((ref, j) => assertSafeId(ref, `steps[${i}].anchors[${j}]`));
   if (anchors !== undefined && anchors.length === 0) anchors = undefined;
   if (step.respondsTo !== undefined) assertSafeId(step.respondsTo, `steps[${i}].respondsTo`);
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
   return {
     type: 'contribution',
     as: step.as,
@@ -532,6 +543,7 @@ export function validateContributionStep(step, i = 0) {
     roundKey: step.roundKey,
     anchors,
     respondsTo: step.respondsTo,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
   };
 }
 
@@ -543,7 +555,7 @@ export function validateContributionStep(step, i = 0) {
 // revision hash itself, so a caller cannot fake "these bytes existed at
 // record time" by hand-typing a hash.
 const HUMAN_TURN_STEP_ALLOWED_KEYS = new Set([
-  'type', 'as', 'turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef', 'attributedTo', 'respondsToRefs',
+  'type', 'as', 'turnId', 'turnOrdinal', 'channel', 'artifactRef', 'externalRef', 'attributedTo', 'respondsToRefs', 'dependsOn',
 ]);
 
 const ATTRIBUTED_TO_ALLOWED_KEYS = new Set(['type', 'id']);
@@ -592,6 +604,8 @@ export function validateHumanTurnStep(step, i = 0) {
   let respondsToRefs = step.respondsToRefs !== undefined ? validateStringArray(step.respondsToRefs, `steps[${i}].respondsToRefs`) : undefined;
   if (respondsToRefs !== undefined) respondsToRefs.forEach((ref, j) => assertSafeId(ref, `steps[${i}].respondsToRefs[${j}]`));
   if (respondsToRefs !== undefined && respondsToRefs.length === 0) respondsToRefs = undefined;
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
   return {
     type: 'human-turn',
     as: step.as,
@@ -602,6 +616,7 @@ export function validateHumanTurnStep(step, i = 0) {
     externalRef: step.externalRef,
     attributedTo,
     respondsToRefs,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
   };
 }
 
@@ -664,7 +679,7 @@ function validateSteps(steps) {
 
 const TOP_LEVEL_ALLOWED_KEYS = new Set([
   'kind', 'objective', 'writerId', 'coordinationId', 'workRef',
-  'aggregateBounds', 'partialPolicy', 'primaryRole', 'task', 'protocolRef', 'steps', 'actors', 'close',
+  'aggregateBounds', 'partialPolicy', 'primaryRole', 'task', 'protocolRef', 'steps', 'actors', 'close', 'dag',
 ]);
 
 const OBJECTIVE_MAX_LENGTH = 20000;
@@ -735,6 +750,9 @@ export function validateCoordinationRequest(raw, cliFlags = {}) {
     actors,
   };
 
+  if (raw.dag !== undefined && raw.dag !== true) fail('"dag" must be exactly true when present');
+  if (raw.dag === true) normalized.dag = true;
+
   if (raw.kind === 'agent-led') {
     if ('protocolRef' in raw) fail('"protocolRef" is not allowed when kind is "agent-led"');
     if ('steps' in raw) fail('"steps" is not allowed when kind is "agent-led"');
@@ -753,6 +771,9 @@ export function validateCoordinationRequest(raw, cliFlags = {}) {
     if ('task' in raw) fail('"task" is not allowed when kind is "declared-protocol"');
     normalized.protocolRef = validateProtocolRef(raw.protocolRef);
     normalized.steps = validateSteps(raw.steps);
+    if (raw.dag !== true && normalized.steps.some((step) => step.dependsOn !== undefined)) {
+      fail('"dependsOn" is available only when top-level "dag" is exactly true; legacy requests remain sequential and must not carry an inert dependency field');
+    }
     // NOTE: actors[].id membership against the protocol's OWN declared
     // spec.actors is validated by run.mjs (this module has no access to
     // the loaded FlowDefinition) -- see run.mjs's own

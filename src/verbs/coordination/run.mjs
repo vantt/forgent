@@ -48,7 +48,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { StoreError } from '../../state/store.mjs';
-import { CoordinationError, HUMAN_TURN_REF_PREFIX } from '../../runner/coordination/schema.mjs';
+import { CoordinationError, HUMAN_TURN_REF_PREFIX, SCHEMA_VERSION_3 } from '../../runner/coordination/schema.mjs';
 import {
   openStandaloneSession,
   openDeclaredProtocolSession,
@@ -72,6 +72,7 @@ import {
   recordHumanTurn,
   recordHumanTurnLocked,
   readSessionEvents,
+  resolveSessionPaths,
 } from '../../runner/coordination/store.mjs';
 import { executeUnderActionPrecondition } from '../../runner/coordination/action-precondition.mjs';
 import { canonicalizeNormalizedSteps } from '../../runner/coordination/fan-out-payload.mjs';
@@ -79,6 +80,13 @@ import { loadCoordinationProtocol } from '../../runner/definitions/protocol-load
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
 import { validateCoordinationRequest, computeHumanTurnArtifactRevision } from './schema.mjs';
 import { recordCoordinationSchemaFault } from './schema-fault-log.mjs';
+import { FlowDefinitionError } from '../../runner/definitions/schema.mjs';
+import { compileDagRequest } from './dag-request-compiler.mjs';
+import { scheduleDagSteps, resolveNodeCwd } from './dag-scheduler.mjs';
+import {
+  getAuthoritativeSettledAssignmentIds,
+  computeDagSharedCwdCaveats,
+} from '../../runner/coordination/dag-declaration.mjs';
 
 function readRequestFile(requestPath) {
   let raw;
@@ -162,22 +170,32 @@ function findActor(actors, id) {
 // the resume boundary, for every step kind -- mirroring
 // `assertDriverIdentity`'s own check -- so a resumed request can never
 // dispatch a single step under a foreign identity.
-function findExistingManifest(coordinationId, writerId, engineOpts) {
+function findExistingSession(coordinationId, writerId, engineOpts) {
   if (coordinationId === undefined) return undefined;
-  let manifest;
+  let resumed;
   try {
-    manifest = resumeSession(coordinationId, engineOpts).manifest;
+    resumed = resumeSession(coordinationId, engineOpts);
   } catch (err) {
-    if (err instanceof CoordinationError && err.category === 'not-found') return undefined;
+    if (err instanceof CoordinationError && err.category === 'not-found') {
+      const { sessionDir } = resolveSessionPaths(coordinationId, engineOpts);
+      if (fs.existsSync(sessionDir)) {
+        throw new CoordinationError(
+          'not-found',
+          `coordination run: session "${coordinationId}" has a sessionDir but no readable manifest (${err.message}) -- it may have been deleted or corrupted mid-flight; not resumable and not safe to silently treat as brand-new`,
+        );
+      }
+      return undefined;
+    }
     throw err;
   }
+  const { manifest } = resumed;
   if (manifest.provenanceRoot.writerId !== writerId) {
     throw new CoordinationError(
       'validation',
       `coordination run: writerId "${writerId}" is not the driver identity of session "${coordinationId}" (its provenanceRoot.writerId is "${manifest.provenanceRoot.writerId}") -- a resumed request may only dispatch under the session's own driver/provenance-root identity`,
     );
   }
-  return manifest;
+  return resumed;
 }
 
 // dispatchDeclaredOperation (session-engine.mjs) builds its OWN
@@ -209,7 +227,15 @@ function assertModelSupportedForKind(kind, { globalModel, actors }) {
 // unchanged when it is not a $ref (a literal, already safe-charset-checked
 // id -- an advanced/resume use case).
 function resolveRef(value, labels, fieldLabel) {
-  if (value === undefined || !value.startsWith('$ref:')) return value;
+  if (value === undefined) return value;
+  if (!value.startsWith('$ref:')) {
+    if (!(value in labels)) return value;
+    const resolved = labels[value];
+    if (typeof resolved !== 'string') {
+      throw new StoreError('validation', `coordination run: ${fieldLabel} references fan-out step label "${value}" without a branch actor`);
+    }
+    return resolved;
+  }
   const body = value.slice('$ref:'.length);
   const [refLabel, refActor] = body.split('.');
   if (!(refLabel in labels)) {
@@ -370,7 +396,7 @@ export async function runCoordinationUseCase(ctx, options = {}) {
 }
 
 /** Execute exactly one already-normalized declared-protocol step. */
-export async function executeValidatedCoordinationStep({ ctx, request, step, manifest, labels, engineOpts, lockContext }) {
+export async function executeValidatedCoordinationStep({ ctx, request, step, manifest, labels, engineOpts, lockContext, dagDeclaration }) {
   const paths = lockContext?.paths;
   const releaseLock = lockContext?.releaseLock;
   const locked = Boolean(lockContext);
@@ -381,12 +407,15 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
   if (step.type === 'operation') {
     const contextRefs = resolveRefArray(step.contextRefs, labels, `steps[${step.as}].contextRefs`);
     const fromAssignmentId = resolveRef(step.fromAssignmentId, labels, `steps[${step.as}].fromAssignmentId`);
+    const dagNodeId = Boolean(dagDeclaration || request?.dag)
+      ? `node-${step.as}`
+      : undefined;
     const dispatch = await (locked
       ? dispatchDeclaredOperationLocked(manifest.coordinationId, {
           operationId: step.operationId, targetActorId: step.targetActorId, objective: step.objective,
           expectedOutputs: step.expectedOutputs, contextRefs, constraints: step.constraints,
           capabilities: step.capabilities, writerId: request.writerId, fromAssignmentId,
-          intent: step.intent, round: step.round, taskKey: step.taskKey,
+          intent: step.intent, round: step.round, taskKey: step.taskKey, dagNodeId,
           ...(lockContext?.actionInvocation ? { actionInvocation: lockContext.actionInvocation } : {}),
           ...(Object.keys(cliPolicy).length ? { cliPolicy } : {}),
           ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
@@ -395,7 +424,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
           operationId: step.operationId, targetActorId: step.targetActorId, objective: step.objective,
           expectedOutputs: step.expectedOutputs, contextRefs, constraints: step.constraints,
           capabilities: step.capabilities, writerId: request.writerId, fromAssignmentId,
-          intent: step.intent, round: step.round, taskKey: step.taskKey,
+          intent: step.intent, round: step.round, taskKey: step.taskKey, dagNodeId,
           ...(Object.keys(cliPolicy).length ? { cliPolicy } : {}),
           ...(step.mutation !== undefined ? { mutation: step.mutation } : {}),
         }, engineOpts));
@@ -407,7 +436,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
       );
     }
     labels[step.as] = dispatch.assignment.assignmentId;
-    return { as: step.as, type: 'operation', actorId: step.targetActorId ?? null, ...summarizeDispatch(dispatch) };
+    return { as: step.as, type: 'operation', actorId: step.targetActorId ?? null, door: 'dispatchDeclaredOperation', ...summarizeDispatch(dispatch), resumed: dispatch.resumed === true };
   }
   if (step.type === 'authorize') {
     const grantedContextRefs = resolveRefArray(step.grantedContextRefs, labels, `steps[${step.as}].grantedContextRefs`);
@@ -423,7 +452,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     const persisted = authorization.appended ? authorization : readSessionEvents(manifest.coordinationId, engineOpts)
       .find((event) => event.type === 'operation-authorized' && event.payload.authorizationId === authorization.authorizationId)?.payload;
     if (!persisted) throw new CoordinationError('corrupt-log', `authorization ${authorization.authorizationId} was not found after an idempotent authorize`);
-    return { as: step.as, type: 'authorize', operationId: persisted.operationId, nodeId: persisted.nodeId, actorId: persisted.targetActorId,
+    return { as: step.as, type: 'authorize', door: 'authorizeDeclaredOperation', operationId: persisted.operationId, nodeId: persisted.nodeId, actorId: persisted.targetActorId,
       authorizationId: persisted.authorizationId, invocationKey: persisted.invocationKey, grantedContextRefs: persisted.grantedContextRefs,
       targetArtifactRef: persisted.targetArtifactRef ?? null, appended: authorization.appended };
   }
@@ -433,7 +462,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     const disposition = locked
       ? recordDriverDispositionLocked(manifest.coordinationId, params, paths, engineOpts)
       : recordDriverDisposition(manifest.coordinationId, params, engineOpts);
-    return { as: step.as, type: 'disposition', targetRef: disposition.targetRef, disposition: disposition.disposition,
+    return { as: step.as, type: 'disposition', door: 'recordDriverDisposition', targetRef: disposition.targetRef, disposition: disposition.disposition,
       evidenceRefs: disposition.evidenceRefs, appended: disposition.appended };
   }
   if (step.type === 'human-turn') {
@@ -445,7 +474,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     const humanTurn = locked
       ? recordHumanTurnLocked(manifest.coordinationId, params, paths, engineOpts)
       : recordHumanTurn(manifest.coordinationId, params, engineOpts);
-    return { as: step.as, type: 'human-turn', turnId: humanTurn.turnId, turnOrdinal: humanTurn.turnOrdinal, channel: humanTurn.channel,
+    return { as: step.as, type: 'human-turn', door: 'recordHumanTurn', turnId: humanTurn.turnId, turnOrdinal: humanTurn.turnOrdinal, channel: humanTurn.channel,
       artifactRef: humanTurn.artifactRef, revision: humanTurn.revision, externalRef: humanTurn.externalRef,
       attributedTo: humanTurn.attributedTo, respondsToRefs: humanTurn.respondsToRefs ?? [], appended: humanTurn.appended };
   }
@@ -456,7 +485,7 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     const contribution = locked
       ? linkSessionContributionLocked(manifest.coordinationId, params, paths, engineOpts)
       : linkSessionContribution(manifest.coordinationId, params, engineOpts);
-    return { as: step.as, type: 'contribution', contributionId: contribution.contributionId, contributionType: contribution.type,
+    return { as: step.as, type: 'contribution', door: 'linkSessionContribution', contributionId: contribution.contributionId, contributionType: contribution.type,
       assignmentId: contribution.assignmentId, roundKey: contribution.roundKey, anchors: contribution.anchors ?? [],
       respondsTo: contribution.respondsTo ?? null, appended: contribution.appended };
   }
@@ -552,6 +581,16 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       { ...engineOpts, composeActionRequest: options.composeActionRequest },
     );
   }
+  const existingSession = findExistingSession(request.coordinationId, request.writerId, engineOpts);
+  const durableLedgerIds = existingSession
+    ? [
+        ...existingSession.assignmentRefs,
+        ...existingSession.contributions.map((record) => record.contributionId),
+        ...existingSession.humanTurns.map((record) => record.turnId),
+      ]
+    : [];
+  const dagDeclaration = compileDagRequest(request, { durableLedgerIds });
+
   const openParams = {
     coordinationId: request.coordinationId,
     objective: request.objective,
@@ -564,11 +603,12 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
   const stepResults = [];
   let manifest;
   let fanOutFailure = null;
+  let dagCaveats = new Map();
 
   if (request.kind === 'agent-led') {
     manifest =
-      findExistingManifest(request.coordinationId, request.writerId, engineOpts) ??
-      openStandaloneSession({ ...openParams, schemaVersion: "3", primaryRole: request.primaryRole }, engineOpts);
+      existingSession?.manifest ??
+      openStandaloneSession({ ...openParams, schemaVersion: SCHEMA_VERSION_3, primaryRole: request.primaryRole }, engineOpts);
     const primaryActor = findActor(request.actors, 'primary');
     const cliOverride = {
       ...actorPolicyFields(primaryActor, { globalExecutor: cliExecutor, globalTier: cliTier }),
@@ -592,20 +632,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     );
     stepResults.push({ as: 'primary', type: 'operation', actorId: 'primary', ...summarizeDispatch(dispatch) });
   } else {
-    // P10.10 (Promotion And Closeout): this load ran unguarded too, on every
-    // declared-protocol request (open AND resume alike) -- the SAME
-    // resolution-failure class named for `aggregationCloseParams`, below,
-    // but reached EARLIER and unconditionally, before the steps loop ever
-    // runs. Wrapped for the same reason: a genuinely malformed/removed
-    // sibling protocol file must never crash `runCoordinationUseCase` with a
-    // raw `FlowDefinitionError`. Thrown as a `StoreError('validation', ...)`
-    // (not `CoordinationError`), matching this exact block's own sibling
-    // "actors[].id not declared" refusal two lines down -- resolving the
-    // request's own claimed protocol is a request-validation concern here,
-    // never a soft close-time refusal (unlike `aggregationCloseParams`,
-    // this runs before any step dispatches, so there is nothing yet to
-    // "refuse to close").
-    manifest = findExistingManifest(request.coordinationId, request.writerId, engineOpts);
+    manifest = existingSession?.manifest;
     let definition;
     if (manifest) {
       // Resume path: use the snapshot loader to avoid live YAML drift
@@ -622,13 +649,16 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       try {
         definition = loadCoordinationProtocol(request.protocolRef.id, { cwd: ctx.cwd, packageRoot: ctx.packageRoot });
       } catch (err) {
-      const wrapped = new StoreError(
-        'validation',
-        `coordination request: protocol "${request.protocolRef.id}" could not be resolved -- refusing the request rather than crashing with an unresolvable-definition error: ${err.message}`,
-      );
-      wrapped.cause = err;
-      throw wrapped;
-    }
+        if (err instanceof FlowDefinitionError && err.category === 'not-found') {
+          throw err;
+        }
+        const wrapped = new StoreError(
+          'validation',
+          `coordination request: protocol "${request.protocolRef.id}" could not be resolved -- refusing the request rather than crashing with an unresolvable-definition error: ${err.message}`,
+        );
+        wrapped.cause = err;
+        throw wrapped;
+      }
     }
     const declaredActorIds = new Set((definition.spec.actors ?? []).map((a) => a.id));
     for (const actorEntry of request.actors) {
@@ -639,15 +669,6 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
         );
       }
     }
-    // dispatchResearchFanOut (session-engine.mjs) accepts NO caller-supplied
-    // per-branch policy at all -- it always builds its own
-    // `cliPolicy: {preferExecutor: allocation.executorId, minTier:
-    // allocation.tier}` from planCohort's own allocation, with no parameter
-    // path for this function to override it. An `actors[]` policy entry for
-    // an actor that only ever appears in a fan-out step's branches would
-    // therefore have NO real effect if silently accepted -- refused up
-    // front instead (never "silently accepting" a no-op override, per this
-    // cell's own bug taxonomy).
     const fanOutActorIds = new Set(request.steps.filter((s) => s.type === 'fan-out').flatMap((s) => s.branches.map((b) => b.actorId)));
     for (const actorEntry of request.actors) {
       if (fanOutActorIds.has(actorEntry.id) && (actorEntry.persona !== undefined || actorEntry.executor !== undefined || actorEntry.model !== undefined || actorEntry.tier !== undefined)) {
@@ -658,7 +679,21 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       }
     }
     if (!manifest) {
-      manifest = openDeclaredProtocolSession({ ...openParams, schemaVersion: "3", definitionId: request.protocolRef.id }, engineOpts);
+      manifest = openDeclaredProtocolSession({ ...openParams, schemaVersion: SCHEMA_VERSION_3, ...(dagDeclaration ? { dagDeclaration } : {}), definitionId: request.protocolRef.id }, engineOpts);
+    }
+
+    if (request.coordinationId !== undefined) {
+      const resumed = resumeSession(request.coordinationId, engineOpts);
+      if (resumed.dag?.kind === 'dag') {
+        if (!dagDeclaration) {
+          throw new StoreError('validation', `coordination DAG request: session "${request.coordinationId}" is DAG-declared and requires an explicit equivalent DAG request`);
+        }
+        if (resumed.dag?.declaration?.requestFingerprint !== dagDeclaration.requestFingerprint) {
+          throw new StoreError('validation', `coordination DAG request: session "${request.coordinationId}" declaration differs (labels, ordering, semantics, task keys, edges, additions, and removals require an explicit continuation contract)`);
+        }
+      } else if (dagDeclaration) {
+        throw new StoreError('validation', `coordination DAG request: session "${request.coordinationId}" is legacy and cannot be converted to DAG mode on resume`);
+      }
     }
 
     // The driver whose authority an "authorize"/"disposition" step writes
@@ -669,35 +704,152 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     const driverIdentity = { type: 'driver', id: request.writerId };
 
     const labels = Object.create(null);
-    for (const step of request.steps) {
-      const stepResult = await executeValidatedCoordinationStep({
-        ctx,
-        request,
-        step,
-        manifest,
-        labels,
-        engineOpts,
+    const resumedDagStates = new Map();
+    dagCaveats = new Map();
+    if (dagDeclaration) {
+      const replayed = resumeSession(manifest.coordinationId, engineOpts);
+      const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(replayed.events);
+      const { fgosDir } = resolveSessionPaths(manifest.coordinationId, engineOpts);
+      const nodeCwds = new Map();
+      for (const node of dagDeclaration.nodes) {
+        const nodeAssignments = replayed.assignments.filter((entry) => entry.dagNodeId === node.id);
+        nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
+      }
+      dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes: dagDeclaration.nodes,
+        getNodeCwd: (id) => nodeCwds.get(id),
       });
-      stepResults.push(stepResult);
-      if (stepResult.fanOutFailure) {
-        fanOutFailure = stepResult.fanOutFailure;
-        break;
+
+      for (const node of dagDeclaration.nodes) {
+        const assignment = replayed.assignments.find((entry) => entry.dagNodeId === node.id);
+        if (!assignment) continue;
+        labels[node.displayLabel] = assignment.assignmentId;
+        const step = request.steps.find((s) => s.as === node.displayLabel);
+        if (settledAssignmentIds.has(assignment.assignmentId)) {
+          resumedDagStates.set(node.displayLabel, {
+            outcome: 'settled',
+            resumed: true,
+            result: {
+              as: node.displayLabel,
+              type: step?.type ?? 'operation',
+              assignmentId: assignment.assignmentId,
+              resumed: true,
+              door: 'result-linked',
+              authoritativeSettled: true,
+              settled: true,
+            },
+          });
+        } else {
+          resumedDagStates.set(node.displayLabel, {
+            outcome: 'deferred',
+            resumed: true,
+            result: {
+              as: node.displayLabel,
+              type: step?.type ?? 'operation',
+              assignmentId: assignment.assignmentId,
+              resumed: true,
+              door: 'dispatchDeclaredOperation',
+              authoritativeSettled: false,
+              settled: false,
+              schedulerOutcome: 'deferred',
+            },
+          });
+        }
+      }
+    }
+
+    if (dagDeclaration) {
+      const scheduled = await scheduleDagSteps({
+        steps: request.steps,
+        declaration: dagDeclaration,
+        initialStates: resumedDagStates,
+        canAdmit: () => resumeSession(manifest.coordinationId, engineOpts).manifest.status === 'active',
+        execute: async (step) => {
+          const stepResult = await executeValidatedCoordinationStep({
+            ctx,
+            request,
+            step,
+            manifest,
+            labels,
+            engineOpts,
+            dagDeclaration,
+          });
+          const replayedNow = resumeSession(manifest.coordinationId, engineOpts);
+          const settledIdsNow = getAuthoritativeSettledAssignmentIds(replayedNow.events);
+          const asgnId = stepResult?.assignmentId ?? labels[step.as];
+          if (asgnId && !settledIdsNow.has(asgnId)) {
+            stepResult.authoritativeSettled = false;
+            stepResult.settled = false;
+            stepResult.schedulerOutcome = 'deferred';
+          }
+          stepResults.push(stepResult);
+          return stepResult;
+        },
+      });
+      const resultsByLabel = new Map(stepResults.map((result) => [result.as, result]));
+      for (const state of scheduled) {
+        const result = resultsByLabel.get(state.as) ?? state.result ?? { as: state.as, type: request.steps[state.index].type };
+        if (state.error && result.door === undefined && request.steps[state.index].type === 'operation') {
+          result.door = 'dispatchDeclaredOperation';
+        }
+        result.schedulerOutcome = state.outcome;
+        result.resumed = state.resumed === true || result.resumed === true;
+        if (state.error) result.error = state.error;
+        if (state.blockedBy) result.blockedBy = [state.blockedBy === 'terminal-session' ? state.blockedBy : `node-${state.blockedBy}`];
+        if (state.overlapGroup) result.overlapGroup = state.overlapGroup;
+
+        const node = dagDeclaration.nodes.find((n) => n.displayLabel === state.as);
+        const caveat = (node && dagCaveats.get(node.id)) ?? null;
+        if (caveat) {
+          result.caveated = true;
+          result.sharedCwdCaveat = caveat;
+          result.sharedCwdVerdictCaveat = caveat;
+        }
+
+        resultsByLabel.set(state.as, result);
+      }
+      stepResults.splice(0, stepResults.length, ...request.steps.map((step) => resultsByLabel.get(step.as)));
+    } else {
+      for (const step of request.steps) {
+        const stepResult = await executeValidatedCoordinationStep({
+          ctx,
+          request,
+          step,
+          manifest,
+          labels,
+          engineOpts,
+          dagDeclaration: null,
+        });
+        stepResults.push(stepResult);
+        if (stepResult.fanOutFailure) {
+          fanOutFailure = stepResult.fanOutFailure;
+          break;
+        }
       }
     }
   }
 
+  const hasDagCaveat = Boolean(dagDeclaration && dagCaveats?.size > 0);
+  const hasPartialDagOutcome = dagDeclaration && stepResults.some((step) => ['deferred', 'refused', 'blocked'].includes(step.schedulerOutcome));
+  const quorumBeforeClose = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;
-  const explicitCloseRequested = request.close === true || (request.steps ?? []).some((s) => s.type === 'close');
+  const shouldAttemptClose = dagDeclaration
+    ? (!hasPartialDagOutcome && !hasDagCaveat)
+    : (request.close === true || (request.steps ?? []).some((s) => s.type === 'close'));
 
-  if (explicitCloseRequested) {
+  if (dagDeclaration && hasDagCaveat) {
+    closeRefusalReason = 'recheck-required: concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats';
+  }
+
+  if (shouldAttemptClose) {
     try {
       const closeParams = aggregationCloseParams(manifest.coordinationId, engineOpts);
       closeParams.authorizedBy = request.writerId ? { type: 'operator', id: request.writerId } : undefined;
       closeSessionByQuorum(manifest.coordinationId, closeParams, engineOpts);
       closed = true;
     } catch (err) {
-      if (err instanceof CoordinationError && err.category === 'refusal') {
+      if (err instanceof CoordinationError) {
         closeRefusalReason = err.message;
       } else {
         throw err;
@@ -705,20 +857,62 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     }
   }
 
-  const finalQuorum = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
+  const finalQuorum = closed ? evaluateSessionQuorum(manifest.coordinationId, engineOpts) : quorumBeforeClose;
   const phase = deriveSessionPhase(manifest.coordinationId, engineOpts);
+  const status = phase;
+
+  const finalReplay = dagDeclaration ? resumeSession(manifest.coordinationId, engineOpts) : null;
+  const finalSettledIds = finalReplay ? getAuthoritativeSettledAssignmentIds(finalReplay.events) : new Set();
+  const inFlightOutsideInvocation = finalReplay
+    ? finalReplay.assignments
+        .filter((assignment) => !stepResults.some((step) => step.assignmentId === assignment.assignmentId))
+        .filter((assignment) => !finalSettledIds.has(assignment.assignmentId))
+        .map((assignment) => assignment.assignmentId)
+    : [];
+
+  const dagNodes = dagDeclaration
+    ? dagDeclaration.nodes.map((node) => {
+        const step = stepResults.find((s) => s.as === node.displayLabel);
+        const caveat = dagCaveats.get(node.id) ?? null;
+        return {
+          nodeId: node.id,
+          displayLabel: node.displayLabel,
+          schedulerOutcome: step?.schedulerOutcome ?? 'pending',
+          caveated: caveat !== null,
+          sharedCwdCaveat: caveat,
+          sharedCwdVerdictCaveat: caveat,
+        };
+      })
+    : [];
 
   return {
     coordinationId: manifest.coordinationId,
     kind: request.kind,
     definitionRef: manifest.definitionRef,
     objective: manifest.objective,
-    status: phase,
+    status,
     closed,
-    ...(request.close ? { closeAttempted: true } : {}),
+    ...(hasDagCaveat ? { caveated: true } : {}),
+    closeAttempted: dagDeclaration ? (!hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     ...(fanOutFailure !== null ? { fanOutFailure } : {}),
     quorum: finalQuorum,
     steps: stepResults,
+    ...(dagDeclaration
+      ? {
+          dag: {
+            counts: {
+              settled: stepResults.filter((step) => step.schedulerOutcome === 'settled').length,
+              settledFailed: stepResults.filter((step) => step.schedulerOutcome === 'settled' && step.status === 'failed').length,
+              refused: stepResults.filter((step) => step.schedulerOutcome === 'refused').length,
+              blocked: stepResults.filter((step) => step.schedulerOutcome === 'blocked').length,
+              deferred: stepResults.filter((step) => step.schedulerOutcome === 'deferred').length,
+              recheckRequired: stepResults.filter((step) => step.schedulerOutcome === 'recheck-required' || step.caveated).length,
+            },
+            inFlightOutsideInvocation,
+            nodes: dagNodes,
+          },
+        }
+      : {}),
   };
 }

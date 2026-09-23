@@ -268,6 +268,8 @@ filename.
 fgos coordination show <coordinationId> --json
 ```
 
+**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding.
+
 Read-only, no mutation, no external effect
 (`docs/how-to/run-a-coordination-session.md:50-79`). Reports:
 `authorizations` issued and whether each is already consumed;
@@ -443,6 +445,8 @@ be unique per authorization to avoid a duplicate-authorization refusal)
 if a recheck itself surfaces a new accepted finding.
 
 ## 4. Close a cell (`close.json`)
+
+**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding. **Never issue `cell-closed` while any node carries a `sharedCwdCaveat` with `status: 'recheck-required'`.** A driver reading only this close template, without having read section 2 first, is still bound by that caveat-blocks-close rule.
 
 A `disposition` step with `disposition: "cell-closed"` is the whole
 mechanism — there is no separate "close" step or door.
