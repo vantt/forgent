@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated in Unit I08b | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated & integrated (98f501be) | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -114,10 +114,11 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
 - **Unit I08b (Remediation of I08 Base Defects F4, F5, F6, F7, F10) Accounting:**
   - Capability: `code:implement`.
   - Depends-on: Unit I08.
-  - Status: `ready for independent re-review (synchronized candidate)`.
+  - Status: `integrated at main@98f501be` (post-merge verification complete: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions).
+  - Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (candidate `d4e052a6` merged into `origin/main@4ad0b8ca`).
   - Branch: `coordination-skill-harness-i08b-remediation`.
   - Worktree: `.claude/worktrees/coordination-skill-harness-i08b-remediation`.
-  - Base Lineage: Candidate I08 `4e9de19541f2acde2380ff4f78147e389385e95c` + Evaluated Candidate `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate commit `355f9dbd`).
+  - Base Lineage: Candidate I08 `4e9de19541f2acde2380ff4f78147e389385e95c` + Evaluated Candidate `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate `d4e052a6`, merge commit `355f9dbd`).
   - Defects Remediated:
     * F4 (HIGH): Explicit unregistered executor fail-closed with exit code 1 (`DispatchError('executor-not-found')`) across public CLI, compat door, and `executeExecutorCli`. Restored `DispatchError extends Error`; parity achieved via JSON serialization. Preserved implicit resolution for work item dispatches. Pinned tests updated.
     * F5 (HIGH): Canonicalize provider family with declared vendor precedence using `normalizeProviderFamily(deriveProviderFamily(entry, command), command)` in redirect checks and provenance recording in `dispatch-plan.json`. Permits intra-family redirects without `crossProvider: true` and blocks cross-family spoofing.
@@ -125,7 +126,7 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
     * F7 (MEDIUM): Extended `expectedRunId` and closed vocabulary verification across all intake doors (`run-result.mjs`, `show-run.mjs`, `herdr-round.mjs`, `assignment-runner.mjs`, `runtime-inspection.mjs`, `session-engine.mjs`, `show.mjs`; `watch.mjs` covered indirectly via `show-run.mjs`). Mismatched/missing `runId` with `expectedRunId` or non-standard status flags `contract-corrupt` / `resultCorrupt: true` and prevents settling.
     * F10 (MEDIUM): Bare `reconcile plan` returns exit 0 by design (runner.md:21); defect was `--run` or `--assignment` without action (or with `clear-cwd-lock`) returning 0 instead of 4. Validate `--action` requirement up front before evaluating CWD lock, returning exit code 4 (validation error).
   - Follow-up Ledger: N10 (LOW-MEDIUM: disentangle vendor boundary from adapter selection in ProviderAdapter before expanding beyond Claude harness).
-  - Verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 184 pass across 10 focused test files (189 with regression); root dispatch suite: 387 pass; affected matrix (53 files): 1456 pass, 0 fail, 1 skip; full suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (401s); `git diff --check origin/main...HEAD` clean.
+  - Verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 184 pass across 10 focused test files (189 with regression); root dispatch suite: 387 pass; affected matrix (53 files): 1456 pass, 0 fail, 1 skip; full suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (389.6s); post-merge candidate regressions: exactly 0; `git diff --check origin/main...HEAD` clean.
   - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`.
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.

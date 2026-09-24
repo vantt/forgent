@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea`; Unit I08 blocked on base defects F4/F5; Unit I08b ready for independent re-review (synchronized candidate); I10 requires I09 post-merge verification — I10 blocked
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea`; Unit I08 unblocked for re-verification; Unit I08b integrated at `main@98f501be`; I10 requires I09 post-merge verification — I10 blocked
 Created: 2026-09-19
 Last Updated: 2026-09-24
 Mode: high-risk
@@ -859,13 +859,15 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I08b — remediation of I08 base defects F4, F5, F6, F7, F10
   capability: code:implement
   depends-on: I08
-  status: ready for independent re-review (synchronized candidate)
+  status: integrated at main@98f501be
+  integration-sha: `98f501be41756dc80d691cbf63ffeb4cd617fb30`
+  candidate-sha: `d4e052a6e0e80ffe2add08a0f4661433b2e80582`
   branch: `coordination-skill-harness-i08b-remediation`
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08b-remediation`
-  base-sha: `4e9de19541f2acde2380ff4f78147e389385e95c` + evaluated `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate `355f9dbd`)
+  base-sha: `4e9de19541f2acde2380ff4f78147e389385e95c` + evaluated `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate `d4e052a6`, merge `355f9dbd`)
   remediation-scope: F4 (HIGH fail-closed explicit unregistered executor with DispatchError), F5 (HIGH canonicalize provider family with declared vendor precedence), F6 (MEDIUM whitespace trim / option precedence for resolveHerdrBin), F7 (MEDIUM expectedRunId/non-standard status validation across intake doors), F10 (MEDIUM validate --action before checking cwd lock in reconcile plan with --run/--assignment)
   follow-up-ledger: N10 (LOW-MEDIUM: disentangle vendor boundary from adapter selection in ProviderAdapter before expanding beyond Claude harness)
-  verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 184 pass across 10 focused tests (189 with regression); root dispatch suite: 387 pass; affected matrix (53 files): 1456 pass, 0 fail, 1 skip; full repository suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo; git diff --check origin/main...HEAD clean (0 errors/warnings)
+  verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 184 pass across 10 focused tests (189 with regression); root dispatch suite: 387 pass; affected matrix (53 files): 1456 pass, 0 fail, 1 skip; full repository suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo; post-merge candidate regressions: exactly 0; git diff --check origin/main...HEAD clean (0 errors/warnings)
   report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
