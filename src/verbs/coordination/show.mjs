@@ -39,7 +39,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
 import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX, SCHEMA_VERSION_3 } from '../../runner/coordination/schema.mjs';
-import { evaluateSessionQuorum, deriveSessionPhase } from '../../runner/coordination/session-engine.mjs';
+import { evaluateSessionQuorum, deriveSessionPhase, readLinkedRunResultFromDisk } from '../../runner/coordination/session-engine.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
@@ -175,36 +175,20 @@ function renderHumanTurn(record) {
   };
 }
 
-function readJsonObjectFile(filePath, label) {
-  let parsed;
-  try {
-    parsed = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch (err) {
-    throw new CoordinationError(
-      'corrupt-log',
-      `coordination show: ${label} at ${filePath} is truncated or malformed (${err.message})`,
-    );
-  }
-  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new CoordinationError(
-      'corrupt-log',
-      `coordination show: ${label} at ${filePath} is truncated or malformed (not a JSON object)`,
-    );
-  }
-  return parsed;
-}
-
 function readRunResultForAssignment(fgosDir, assignmentId, runId) {
   if (!assignmentId || !runId) return null;
-  const prefix = `run_${assignmentId}_`;
-  const attemptStr = runId.startsWith(prefix) ? runId.slice(prefix.length) : '01';
-  const runsDir = path.join(fgosDir, 'assignments', assignmentId, 'runs', attemptStr);
-  const resultPath = path.join(runsDir, 'result.json');
-  if (fs.existsSync(resultPath)) {
-    const parsed = readJsonObjectFile(resultPath, `RunResult "${runId}"`);
-    return interpretRunResult(parsed);
+  try {
+    const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, runId);
+    return runResult.contractCorrupt === true ? null : runResult;
+  } catch (err) {
+    if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+      return null;
+    }
+    if (err instanceof CoordinationError && err.category === 'corrupt-log') {
+      throw new CoordinationError('corrupt-log', `coordination show: RunResult "${runId}" is truncated or malformed (${err.message})`);
+    }
+    throw err;
   }
-  return null;
 }
 
 /**
@@ -376,15 +360,24 @@ export function showCoordinationUseCase(ctx, { id }) {
         getNodeCwd: (id) => nodeCwds.get(id),
       });
 
+      const isAssignmentSettledWithEvidence = (assignmentId) => {
+        if (!settledAssignmentIds.has(assignmentId)) return false;
+        const results = coordinationState.results.filter((r) => r.assignmentId === assignmentId);
+        const latestResult = results.length > 0 ? results[results.length - 1] : null;
+        if (!latestResult) return false;
+        const runResult = readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId);
+        return Boolean(runResult);
+      };
+
       const renderedNodes = declaredNodes.map((node) => {
         const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
         const assignmentIds = nodeAssignments.map((a) => a.assignmentId);
         const materialized = assignmentIds.length > 0;
-        const settled = nodeAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
+        const settled = nodeAssignments.some((a) => isAssignmentSettledWithEvidence(a.assignmentId));
 
         const dependencies = node.dependsOn.map((depId) => {
           const depAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === depId);
-          const depSettled = depAssignments.some((a) => settledAssignmentIds.has(a.assignmentId));
+          const depSettled = depAssignments.some((a) => isAssignmentSettledWithEvidence(a.assignmentId));
           return { id: depId, settled: depSettled };
         });
         const dependenciesSettled = dependencies.every((d) => d.settled);
@@ -393,17 +386,25 @@ export function showCoordinationUseCase(ctx, { id }) {
         const nodeResults = coordinationState.results.filter((r) => assignmentIds.includes(r.assignmentId));
         const latestResult = nodeResults.length > 0 ? nodeResults[nodeResults.length - 1] : null;
         const runResult = latestResult ? readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId) : null;
-        const runResultStatus = runResult ? (runResult.status ?? (settled ? 'done' : null)) : (settled ? 'done' : null);
+        const runResultStatus = runResult ? (runResult.status ?? (settled ? 'done' : null)) : null;
         const runResultConfidence = runResult?.confidence ?? null;
 
         const sharedCwdCaveat = dagCaveats.get(node.id) ?? null;
 
-        const refused = !materialized && manifest.status !== 'active';
+        const hasCorruptEvidence = nodeAssignments.some(
+          (a) => settledAssignmentIds.has(a.assignmentId) && !isAssignmentSettledWithEvidence(a.assignmentId),
+        );
+
+        const refused = (!materialized && manifest.status !== 'active') || hasCorruptEvidence;
         const pending = !materialized && dependenciesSettled && !refused;
         const blocked = !materialized && !dependenciesSettled && !refused;
 
         let schedulerOutcome;
-        if (settled) {
+        let refusedReason = null;
+        if (hasCorruptEvidence) {
+          schedulerOutcome = 'refused';
+          refusedReason = 'corrupt-evidence';
+        } else if (settled) {
           if (sharedCwdCaveat !== null) {
             schedulerOutcome = 'recheck-required';
           } else {
@@ -422,7 +423,9 @@ export function showCoordinationUseCase(ctx, { id }) {
         }
 
         let nodeActionHint;
-        if (schedulerOutcome === 'pending') {
+        if (hasCorruptEvidence) {
+          nodeActionHint = 'Refused: missing or corrupt RunResult evidence on disk.';
+        } else if (schedulerOutcome === 'pending') {
           nodeActionHint = 'Ready to execute. Dependencies are settled.';
         } else if (schedulerOutcome === 'blocked') {
           nodeActionHint = `Blocked waiting on dependency: ${blockedBy.join(', ')}.`;
@@ -463,6 +466,7 @@ export function showCoordinationUseCase(ctx, { id }) {
           materialized,
           settled,
           refused,
+          refusedReason,
           pending,
           blocked,
         };
@@ -490,10 +494,13 @@ export function showCoordinationUseCase(ctx, { id }) {
       const pendingLabels = renderedNodes.filter((n) => n.schedulerOutcome === 'pending').map((n) => n.displayLabel || n.nodeId);
       const blockedLabels = renderedNodes.filter((n) => n.schedulerOutcome === 'blocked').map((n) => `${n.displayLabel || n.nodeId} (waiting on ${n.blockedBy.join(', ')})`);
       const caveatedLabels = renderedNodes.filter((n) => n.caveated || n.schedulerOutcome === 'recheck-required').map((n) => n.displayLabel || n.nodeId);
+      const corruptNodes = renderedNodes.filter((n) => n.refusedReason === 'corrupt-evidence');
       if (pendingLabels.length > 0) {
         actionHint = `Resume DAG session "${id}": ready node(s) [${pendingLabels.join(', ')}].`;
       } else if (blockedLabels.length > 0) {
         actionHint = `DAG session "${id}": blocked waiting on [${blockedLabels.join(', ')}].`;
+      } else if (corruptNodes.length > 0) {
+        actionHint = `DAG session "${id}": refused due to missing or corrupt evidence on disk.`;
       } else if (caveatedLabels.length > 0) {
         actionHint = `DAG session "${id}": caveated node(s) [${caveatedLabels.join(', ')}] require recheck before closure.`;
       } else {

@@ -444,8 +444,13 @@ outcome = settled | refused | blocked | deferred
 ```
 
 `settled` includes a RunResult whose own `status` is `failed`; it means the
-result was linked and readable, not that the worker succeeded. This avoids a
-real name collision because RunResult already uses values such as `blocked`.
+result was linked and readable on disk, not that the worker succeeded. Settlement
+strictly requires authoritative on-disk `RunResult` evidence (`result.json`)
+matching the v2 contract, validated via canonical `readLinkedRunResultFromDisk`.
+An event link in `events.jsonl` whose target `result.json` is missing, truncated,
+or contract-corrupt fails closed with `corrupt-evidence`: the node is not settled,
+and downstream nodes remain blocked or refused. This avoids a real name collision
+because RunResult already uses values such as `blocked`.
 Each node response contains its `assignmentId` (or `null`), `resumed`,
 `blockedBy`, and, where refused, the original `{category, code, message}`.
 It also records `door`, the scheduler call that produced the outcome. A refused

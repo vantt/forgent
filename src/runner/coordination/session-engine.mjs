@@ -299,7 +299,7 @@ function buildSessionContract({ objective, contextRefs, constraints, expectedOut
  * but the filesystem does not actually have -- an ambiguous/foreign state,
  * never silently guessed past.
  */
-function readLinkedRunResultFromDisk(fgosDir, assignmentId, runId) {
+export function readLinkedRunResultFromDisk(fgosDir, assignmentId, runId) {
   // R6 round 2: FULL-SHAPE validation (store.mjs's `assertValidRunIdForAssignment`,
   // shared with `linkResult`'s own write-time gate), not a prefix-only check.
   // A prefix-only check here previously let a same-prefix, malicious-suffix

@@ -65,6 +65,7 @@ import {
   evaluateSessionQuorum,
   deriveSessionPhase,
   closeSessionByQuorum,
+  readLinkedRunResultFromDisk,
 } from '../../runner/coordination/session-engine.mjs';
 import {
   recordDriverDisposition,
@@ -726,19 +727,54 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
         labels[node.displayLabel] = assignment.assignmentId;
         const step = request.steps.find((s) => s.as === node.displayLabel);
         if (settledAssignmentIds.has(assignment.assignmentId)) {
-          resumedDagStates.set(node.displayLabel, {
-            outcome: 'settled',
-            resumed: true,
-            result: {
-              as: node.displayLabel,
-              type: step?.type ?? 'operation',
-              assignmentId: assignment.assignmentId,
+          const results = replayed.results.filter((entry) => entry.assignmentId === assignment.assignmentId);
+          const latestResult = results.length > 0 ? results[results.length - 1] : null;
+          let hasValidRunResult = false;
+          if (latestResult) {
+            try {
+              const runResult = readLinkedRunResultFromDisk(fgosDir, assignment.assignmentId, latestResult.runId);
+              if (runResult && runResult.contractCorrupt !== true) {
+                hasValidRunResult = true;
+              }
+            } catch {
+              hasValidRunResult = false;
+            }
+          }
+          if (hasValidRunResult) {
+            resumedDagStates.set(node.displayLabel, {
+              outcome: 'settled',
               resumed: true,
-              door: 'result-linked',
-              authoritativeSettled: true,
-              settled: true,
-            },
-          });
+              result: {
+                as: node.displayLabel,
+                type: step?.type ?? 'operation',
+                assignmentId: assignment.assignmentId,
+                resumed: true,
+                door: 'result-linked',
+                authoritativeSettled: true,
+                settled: true,
+              },
+            });
+          } else {
+            resumedDagStates.set(node.displayLabel, {
+              outcome: 'refused',
+              resumed: true,
+              error: {
+                category: 'corrupt-log',
+                code: 'corrupt-evidence',
+                message: `missing or corrupt RunResult on disk for assignment "${assignment.assignmentId}"`,
+              },
+              result: {
+                as: node.displayLabel,
+                type: step?.type ?? 'operation',
+                assignmentId: assignment.assignmentId,
+                resumed: true,
+                door: 'result-linked',
+                authoritativeSettled: false,
+                settled: false,
+                schedulerOutcome: 'refused',
+              },
+            });
+          }
         } else {
           resumedDagStates.set(node.displayLabel, {
             outcome: 'deferred',

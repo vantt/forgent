@@ -77,6 +77,11 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
       blockDescendants(child, blockedBy);
     }
   };
+  for (const [label, state] of states.entries()) {
+    if (state.outcome === 'refused' || state.outcome === 'blocked') {
+      blockDescendants(label, label);
+    }
+  }
   const admit = (step) => {
     const state = states.get(step.as);
     // Cancellation is an admission boundary, not an ordinary dispatch
