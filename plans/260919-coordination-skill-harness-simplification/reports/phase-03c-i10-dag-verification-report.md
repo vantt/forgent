@@ -184,9 +184,20 @@ Result: **538 passed / 0 failed / 0 skipped** (duration: ~74.9s).
 
 Result: **129/129 passed across all 3 runs** (zero flakiness or timing regressions).
 
-### 3.4 Clean Repository Check
-- `git diff --check`: Clean (0 errors/warnings).
-- Main checkout `/home/vantt/projects/forgentX`: Preserved intact (no modifications staged, committed, or deleted).
+### 3.4 Post-Synchronization Verification Matrix (Synchronized Candidate Tip d1b52e44 / 39b658ea)
+All 4 verification tiers executed on the synchronized branch tip:
+1. **Focused Unit I10 DAG Matrix** (`test/runner/coordination-dag-*.test.mjs`):
+   - **41 tests: 38 passed, 3 todo, 0 failed** (duration: ~16.5s)
+2. **I09 Baseline Matrix (16 files)**:
+   - **538 tests: 538 passed, 0 failed, 0 todo** (duration: ~61.1s)
+3. **Coordination-Wide Test Suites** (`test/runner/coordination-*.test.mjs test/verbs/coordination-*.test.mjs test/cli/coordination.test.mjs`):
+   - **1043 tests: 1040 passed, 3 todo, 0 failed** (duration: ~137.6s)
+4. **Full Test Suite** (`env -u CLAUDE_CODE_SESSION_ID npm test -- --test-reporter=dot`):
+   - **7761 tests passed, 3 todo, 0 failed, exit code 0** (duration: ~6.8m)
+5. **Clean Repository & Hygiene Check**:
+   - `git diff --check origin/main..HEAD`: Clean (0 errors/warnings)
+   - `git diff origin/main...HEAD src/`: Strictly contains only the 4 expected candidate files (`session-engine.mjs`, `dag-scheduler.mjs`, `run.mjs`, `show.mjs`)
+   - Main checkout `/home/vantt/projects/forgentX`: Completely untouched
 
 ---
 
@@ -220,6 +231,6 @@ Result: **129/129 passed across all 3 runs** (zero flakiness or timing regressio
 
 ## 5. Next Steps
 
-Unit I10 verification and production fix are complete and verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), and 3x timing rechecks (129/129 pass) are 100% green.
+Unit I10 verification, production fix, and synchronization with `origin/main` (4ad0b8ca) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), and full test suite (7761 passed, 3 todo, 0 failed, exit code 0) are completely verified on the synchronized tip.
 
-Unit I10 is **ready for independent review, not integrated** and submitted for independent review. Unit **I11** remains blocked pending I08 and I10 integration approval.
+Unit I10 status is **approved candidate synchronized, pending integration** awaiting Track Manager integration into main. Unit **I11** remains blocked pending I08 and I10 integration approval.
