@@ -7,9 +7,10 @@
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08b-remediation`
 - **Baseline & Lineage**:
   - I08 Candidate Baseline: `4e9de19541f2acde2380ff4f78147e389385e95c`
-  - Integrated Remote Main Merged: `origin/main@42934bf3e8aa37eee867e5df403e7c5a1c3fdfee`
-  - Merge Commit: `chore(dispatch): merge origin/main into I08b remediation baseline`
-- **Status**: `ready for independent review`
+  - Evaluated Candidate SHA (Approved in Review): `0617c6e41ebec1aa8e73065eac69cd5eb9684343`
+  - Integrated Remote Main Merged: `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743`
+  - Synchronization Commit: `355f9dbd` (`chore(dispatch): synchronize origin/main@4ad0b8ca into Unit I08b candidate`)
+- **Status**: `ready for independent re-review (synchronized candidate)`
 - **Capability**: `code:implement`
 - **Depends-on**: `Unit I08`
 - **Unblocks**: Re-verification of Unit I08 and subsequent Unit I11
@@ -146,9 +147,11 @@ Created dedicated automated regression test suite:
 |---|---|---|---|---|
 | `test/runner/dispatch-i08b-remediation.test.mjs` | Dedicated I08b regression tests (F4, F5, F6, F7, F10) | 5 tests | **5 passed / 0 failed** | **PASS** |
 | `test/runner/dispatch-governance-operability.test.mjs` | Permanent I08 governance & operability suite | 9 tests | **9 passed / 0 failed** | **PASS** |
-| Focused Matrix (10 files) | Core dispatch, CLI, reconciliation, observation, setup | 10 files | **232 passed / 0 failed** (237 with regression) | **PASS** |
-| Affected Matrix (53 files) | Full dispatch and herdr test suite | 53 files | **1439 passed / 0 failed / 1 skipped** | **PASS** |
-| Whitespace & Formatting | `git diff --check` | Whole diff | **0 warnings / 0 errors** | **PASS** |
+| Focused Matrix (10 files) | Core dispatch, CLI, reconciliation, observation, setup | 10 files | **184 passed / 0 failed** (189 with regression) | **PASS** |
+| Root Dispatch Suite | Root comprehensive dispatch test (`dispatch.test.mjs`) | 1 file | **387 passed / 0 failed** | **PASS** |
+| Affected Matrix (53 files) | Full dispatch and herdr test suite (synchronized SHA) | 53 files | **1456 passed / 0 failed / 1 skipped** | **PASS** |
+| Full Repository Suite | Full test suite (`npm test`, synchronized SHA) | Entire repo | **7603 passed / 0 failed / 8 skipped / 65 todo** (401s) | **PASS** |
+| Whitespace & Formatting | `git diff --check origin/main...HEAD` | Synchronized diff | **0 warnings / 0 errors** | **PASS** |
 
 ### 4.2 Detailed Matrix Breakdown
 
@@ -157,7 +160,7 @@ Created dedicated automated regression test suite:
 2. **Permanent Verification Suite**:
    - `test/runner/dispatch-governance-operability.test.mjs`: 9/9 PASS (2.39s).
 3. **Core Focused Matrix (10 files)**:
-   - Core 10 focused suites pass completely with **232 passed / 0 failed** (237 total when combined with the 5 dedicated regression tests):
+   - Core 10 focused suites pass completely with **184 passed / 0 failed** (189 total when combined with the 5 dedicated regression tests):
      * `test/cli/dispatch-operability.test.mjs`: 11/11 PASS (includes F4/F6 exit 1 and errorClass tests).
      * `test/cli/dispatch-reconcile.test.mjs`: 6/6 PASS.
      * `test/verbs/dispatch-observe.test.mjs`: 12/12 PASS (`watch.mjs` is covered indirectly via `show-run.mjs` / `readRunSnapshot`).
@@ -168,11 +171,21 @@ Created dedicated automated regression test suite:
      * `test/setup/checks-doctor-config.test.mjs`: 65/65 PASS.
      * `test/runner/run-result-v2.test.mjs`: 14/14 PASS.
      * `test/runner/dispatch-governance-operability.test.mjs`: 9/9 PASS.
+     * **Sum**: 11 + 6 + 12 + 20 + 27 + 2 + 18 + 65 + 14 + 9 = **184 pass** (+ 5 regression = **189 pass**).
    - In addition, the comprehensive root dispatch suite (`test/runner/dispatch.test.mjs`) passes 387/387 tests with 0 failures.
 4. **Affected Matrix (53 files)**:
-   - Evaluated across all 53 affected test files covering dispatch, herdr, assignment, run-result, placement, provider, and coordination-session: **1439 passed / 0 failed / 1 skipped** (the 1 skipped test is in `test/runner/herdr-spawn-adapter.test.mjs`, intentionally skipped when no live Herdr daemon is running).
-5. **Clean Code & Whitespace Check**:
-   - `git diff --check`: Clean (0 errors, 0 warnings).
+   - Evaluated across all 53 affected test files covering dispatch, herdr, assignment, run-result, placement, provider, and coordination-session: **1456 passed / 0 failed / 1 skipped** (the 1 skipped test is in `test/runner/herdr-spawn-adapter.test.mjs`, intentionally skipped when no live Herdr daemon is running; reflects +17 tests added by windows-ci-hardening on `origin/main@4ad0b8ca`, up from 1439 prior to synchronization).
+5. **Full Repository Test Suite (`npm test`)**:
+   - `node scripts/run-tests.mjs`: **7603 passed / 0 failed / 8 skipped / 65 todo** (duration 401s, exit code 0). Complete hermetic pass confirming zero cross-system regressions across all packages, schemas, and state stores.
+6. **Clean Code & Whitespace Check**:
+   - `git diff --check origin/main...HEAD`: Clean (0 errors, 0 warnings).
+
+### 4.3 Follow-up Ledger
+
+- **N10 (LOW-MEDIUM): Disentangle vendor boundary from adapter selection in ProviderAdapter**:
+  - *Context*: `normalizeProviderFamily` currently serves two roles: (1) vendor boundary for dispatch governance (where declared vendor strictly takes precedence over CLI harness to prevent cross-vendor redirection), and (2) CLI adapter selection in `getProviderAdapter` (where selecting `PiProviderAdapter` vs `CodexProviderAdapter` needs the harness command to know which CLI args like `--tools` apply).
+  - *Production Impact Today*: None. The sole production consumer is `resolveVerifiedProviderArgs` in `transport.mjs:203` which targets `claude` and falls back cleanly; `fgos doctor` on real configs produces output identical to base.
+  - *Follow-up Action*: Before expanding ProviderAdapter roadmap (`design.md §3.5`) beyond Claude harness, refactor adapter selection to key on the invocation harness/command, while using declared vendor solely for endpoint/variant specialization. Add unit tests ensuring `pi` + `deepseek` retains `--tools`.
 
 ---
 

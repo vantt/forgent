@@ -6,7 +6,7 @@ Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), 
 
 - **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
 - **Unit I08 Status**: `blocked on base defects F4/F5` (remediated in Unit I08b; unblocks re-verification).
-- **Unit I08b Status**: `ready for independent review` (Branch: `coordination-skill-harness-i08b-remediation`, Base: candidate I08 `4e9de195` + `origin/main@42934bf3`).
+- **Unit I08b Status**: `ready for independent re-review (synchronized candidate)` (Branch: `coordination-skill-harness-i08b-remediation`, Base: candidate I08 `4e9de195` + evaluated `0617c6e4` + `origin/main@4ad0b8ca`, synchronized SHA `355f9dbd`).
 - **Remediation Scope**: Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
 - **Reports**:
   - Implementation (I07): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
@@ -16,11 +16,13 @@ Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), 
 - **Verification Evidence**:
   - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
   - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
-  - Focused matrix (10 files): 232 pass / 0 fail (237 with regression suite).
+  - Focused matrix (10 files): 184 pass / 0 fail (189 with regression suite).
   - Comprehensive dispatch root suite (`test/runner/dispatch.test.mjs`): 387 pass / 0 fail.
-  - Affected dispatch/herdr matrix (53 files): 1439 pass, 0 fail, 1 skip.
+  - Affected dispatch/herdr matrix (53 files): 1456 pass, 0 fail, 1 skip.
+  - Full repository suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (401s).
   - R7 Latency Benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
-  - `git diff --check`: clean (0 errors/warnings).
+  - Follow-up ledger: N10 (disentangle vendor boundary from adapter selection in ProviderAdapter).
+  - `git diff --check origin/main...HEAD`: clean (0 errors/warnings).
 
 ## Requirements
 
