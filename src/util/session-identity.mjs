@@ -99,6 +99,9 @@ function registryConfirms(fgosDir, sessionId) {
 const PPID_TIMEOUT_MS = 200;
 
 function ppidOf(pid, execFile) {
+  if (execFile === execFileSync && pid === process.pid && typeof process.ppid === 'number' && process.ppid > 0) {
+    return process.ppid;
+  }
   // Git-for-Windows/MSYS ships a `ps` binary, but it is a different dialect
   // that rejects GNU-style `-o ppid= -p <pid>` outright ("unknown option --
   // o") -- and that failure's stderr has been observed to leak into and

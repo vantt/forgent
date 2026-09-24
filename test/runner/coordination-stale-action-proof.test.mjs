@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import crypto from 'node:crypto';
 import {
   assertActionPrecondition,
@@ -32,7 +33,8 @@ import {
 import { protocolOperationStamp } from '../../src/runner/coordination/legality-facts.mjs';
 
 function setupSessionFixture(coordinationId, { schemaVersion = '3', eventCount = 0, withDefinition = true, completed = false } = {}) {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stale-proof-'));
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stale-proof-'));
+  const tempDir = fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
   const sessionDir = path.join(tempDir, '.fgos/coordination/sessions', coordinationId);
   fs.mkdirSync(sessionDir, { recursive: true });
 
@@ -586,13 +588,14 @@ test('concurrent two-OS-process race: exactly one process succeeds and second is
     // a machine with no claude/codex whenever it wins the race.
     const runnerConfig = makeCohortRunnerConfig(tempDir);
     const makeWorkerScript = (scriptPath, act, payload) => {
+      const actionsUrl = pathToFileURL(path.resolve('src/verbs/coordination/actions.mjs')).href;
       fs.writeFileSync(
         scriptPath,
         `
-        import { executeCoordinationActionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeCoordinationActionUseCase } from ${JSON.stringify(actionsUrl)};
 
-        const coordinationId = '${coordinationId}';
-        const tempDir = '${tempDir}';
+        const coordinationId = ${JSON.stringify(coordinationId)};
+        const tempDir = ${JSON.stringify(tempDir)};
         const action = ${JSON.stringify({
           ...act,
           coordinationId,
@@ -664,13 +667,14 @@ test('concurrent two-OS-process same-key race: identical payload yields idempote
     fs.writeFileSync(artifactFile, 'Human feedback content');
 
     const makeWorkerScript = (scriptPath, cId, dir, act, payload) => {
+      const actionsUrl = pathToFileURL(path.resolve('src/verbs/coordination/actions.mjs')).href;
       fs.writeFileSync(
         scriptPath,
         `
-        import { executeCoordinationActionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeCoordinationActionUseCase } from ${JSON.stringify(actionsUrl)};
 
-        const coordinationId = '${cId}';
-        const tempDir = '${dir}';
+        const coordinationId = ${JSON.stringify(cId)};
+        const tempDir = ${JSON.stringify(dir)};
         const action = ${JSON.stringify({
           ...act,
           coordinationId: cId,

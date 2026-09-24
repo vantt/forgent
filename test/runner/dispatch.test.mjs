@@ -1469,12 +1469,16 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
     JSON.stringify({ runner: { timeoutMs: 999999, retries: 3 } }),
   );
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   let cfg;
   try {
     cfg = loadRunnerConfigFromDir(dir);
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
+    else delete process.env.USERPROFILE;
   }
   // Project's own timeoutMs wins over global's.
   assert.equal(cfg.timeoutMs, 5000);
@@ -1505,12 +1509,16 @@ test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instea
     JSON.stringify({ runner: { modelPolicies: { claude: { lightweight: 'haiku', critical: 'opus' } } } }),
   );
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   let cfg;
   try {
     cfg = loadRunnerConfigFromDir(dir);
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
+    else delete process.env.USERPROFILE;
   }
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.lightweight, undefined);
@@ -1531,12 +1539,16 @@ test('loadRunnerConfigFromDir still lets a global modelPolicies tier key fill a 
     JSON.stringify({ runner: { modelPolicies: { claude: { frontier: 'opus' } } } }),
   );
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   let cfg;
   try {
     cfg = loadRunnerConfigFromDir(dir);
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
+    else delete process.env.USERPROFILE;
   }
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.modelPolicies.claude.frontier, 'opus');
@@ -1590,12 +1602,16 @@ test('ensureRunnerConfigForDir on an already-complete shared file does not rewri
   // fixture stops looking "already complete".
   const homeDir = mkTempDir();
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   let cfg;
   try {
     cfg = ensureRunnerConfigForDir(dir);
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) process.env.USERPROFILE = prevUserProfile;
+    else delete process.env.USERPROFILE;
   }
 
   assert.deepEqual(cfg, DEFAULT_RUNNER_CONFIG);
@@ -1606,7 +1622,8 @@ test('ensureRunnerConfigForDir on an already-complete shared file does not rewri
 
 test('detectAssistantCli finds a candidate on an injected PATH without touching the real environment', () => {
   const dir = mkTempDir();
-  fs.writeFileSync(path.join(dir, 'claude'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  const binName = process.platform === 'win32' ? 'claude.cmd' : 'claude';
+  fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   const realPathBefore = process.env.PATH;
 
   const found = detectAssistantCli(['claude', 'codex'], dir);
@@ -1623,7 +1640,8 @@ test('detectAssistantCli returns null when none of the candidates are present on
 
 test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutableOnPath (D5) — same result, one implementation', () => {
   const dir = mkTempDir();
-  fs.writeFileSync(path.join(dir, 'claude'), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+  const binName = process.platform === 'win32' ? 'claude.cmd' : 'claude';
+  fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   assert.equal(detectAssistantCli(['claude', 'codex'], dir), findExecutableOnPath(['claude', 'codex'], dir));
 });
 
@@ -3396,15 +3414,18 @@ test('spawnWorker: idleTimeoutMs is disarmed by default (absent from cfg/opts) -
 
 test('spawnWorker: idleTimeoutMs resets on every chunk -- a worker producing periodic output past the idle budget still completes normally', async () => {
   const dir = mkTempDir();
-  const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count: 5 });
+  const count = process.platform === 'win32' ? 20 : 5;
+  const scriptPath = writePeriodicWriterExecutor(dir, { intervalMs: 150, count });
   const cfg = baseConfig([scriptPath]);
 
-  // idleTimeoutMs (700ms) is smaller than the total runtime (~750ms) but
-  // larger than the gap between any two ticks (150ms) -- only passes if the
-  // idle timer truly resets per chunk instead of firing on total elapsed time.
-  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 700 });
+  // idleTimeoutMs (700ms on posix, 2500ms on win32 to absorb node cold start)
+  // is smaller than the total runtime (750ms / 3000ms) but larger than the
+  // gap between any two ticks (150ms) -- only passes if the idle timer truly
+  // resets per chunk instead of firing on total elapsed time.
+  const idleTimeoutMs = process.platform === 'win32' ? 2500 : 700;
+  const result = await spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs });
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /tick-4/);
+  assert.match(result.stdout, new RegExp(`tick-${count - 1}`));
 });
 
 test('spawnWorker threads a FGOS_DISPATCH_DEPTH of "1" into a fresh (non-nested) dispatch -- the child sees itself one level deep', async () => {
@@ -5829,7 +5850,7 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
     deps: [],
     refs: [],
     risk: 'light',
-    verify: 'true',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
   });
 
   const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
@@ -5866,7 +5887,7 @@ test('fanoutBatchExecutorCli returns candidate as unavailable when executor is g
     deps: [],
     refs: [],
     risk: 'light',
-    verify: 'true',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
   });
 
   const result = await fanoutBatchExecutorCli(['cand1'], { repoRoot, hasLiveTaskAccess: false });
@@ -5918,7 +5939,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     deps: [],
     refs: [],
     risk: 'light',
-    verify: 'true',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
   });
   addWork(fgosDir, {
     id: 'cand2',
@@ -5930,7 +5951,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     deps: [],
     refs: [],
     risk: 'light',
-    verify: 'true',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
   });
 
   const result = await fanoutBatchExecutorCli(['cand1', 'cand2'], { repoRoot, hasLiveTaskAccess: false });

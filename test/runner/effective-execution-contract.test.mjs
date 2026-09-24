@@ -20,7 +20,8 @@ import { renderBrief, briefPaths } from '../../src/runner/dispatch/brief.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-effective-contract-test-'));
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-effective-contract-test-'));
+  return fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
 }
 
 function initGitRepo(repoDir) {

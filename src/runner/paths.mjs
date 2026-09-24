@@ -13,7 +13,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { branchNameFor, findCheckoutPath } from './worktree.mjs';
+import { branchNameFor, findCheckoutPath, realpathOrSelf } from './worktree.mjs';
 
 /** Resolve the repo root. Default (git) mode shells out to `git
  * rev-parse --show-toplevel` — never `__dirname`, since fgos-runner's
@@ -54,7 +54,7 @@ export function resolveRepoRoot(cwd = process.cwd(), { strict = false } = {}) {
     error.category = 'validation';
     throw error;
   }
-  return repoRoot;
+  return realpathOrSelf(repoRoot);
 }
 
 /** Resolve the MAIN CHECKOUT root — never a linked worktree's own root,
@@ -83,7 +83,7 @@ export function resolveMainCheckoutRoot(cwd = process.cwd()) {
   } catch {
     return null;
   }
-  return commonDir ? path.dirname(commonDir) : null;
+  return commonDir ? realpathOrSelf(path.dirname(commonDir)) : null;
 }
 
 /** Join an already-resolved repo root onto `.fgos` — the single place that

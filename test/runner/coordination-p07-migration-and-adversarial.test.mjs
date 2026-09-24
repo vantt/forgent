@@ -37,7 +37,8 @@ const DEFINITION_ID = 'test.coordination-protocol.master-loop-driver-steps';
 const WRITER_ID = 'master-coordinator-1';
 
 function mkTempDir(prefix = 'fgos-p07-') {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
 }
 
 let oldSrcDir;
@@ -50,7 +51,7 @@ function extractOldSrc() {
     maxBuffer: 80 * 1024 * 1024,
   });
   assert.equal(archived.status, 0, `git archive ${TRACK_BASE} failed: ${archived.stderr}`);
-  const extracted = spawnSync('tar', ['-xf', '-', '-C', dest], { input: archived.stdout, cwd: dest });
+  const extracted = spawnSync('tar', ['-xf', '-'], { input: archived.stdout, cwd: dest });
   assert.equal(extracted.status, 0, `tar extract of ${TRACK_BASE} src/ failed: ${extracted.stderr}`);
   oldSrcDir = dest;
   return dest;

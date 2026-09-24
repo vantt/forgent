@@ -4469,7 +4469,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       {
         const id = 'mirror-sync-diff';
         const description = 'Verify skill wrappers across .claude/skills and plugins/fgOS/skills are in sync with source';
-        const buildRes = spawnSync('npm', ['run', 'build:skills'], { cwd: repoRoot, encoding: 'utf8' });
+        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+        const buildRes = spawnSync(npmCmd, ['run', 'build:skills'], { cwd: repoRoot, encoding: 'utf8' });
         if (buildRes.status !== 0) {
           const msg = (buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
           checks.push({ id, description, passed: false, message: msg });

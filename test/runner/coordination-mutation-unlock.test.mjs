@@ -42,7 +42,8 @@ import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 const DEFINITION_ID = 'test.coordination-protocol.mutation-unlock';
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
 }
 
 /** A real disposable git repo (main checkout) with a REAL linked worktree
