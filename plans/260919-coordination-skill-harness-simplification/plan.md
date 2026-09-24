@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I10 ready for independent review, not integrated (production fix commit `3c49cf42`; candidate test commit `97420638`); Unit I07 next eligible (I08 requires I07); Unit I11 BLOCKED (pending I08 and I10)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized `6a638752` and `261ed7ea`, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 ready to unblock upon Track Manager confirmation; Unit I10 approved at `27ffb376`, synchronized, not integrated; Unit I11 BLOCKED (pending I08 and I10)
 Created: 2026-09-19
 Last Updated: 2026-09-24
 Mode: high-risk
@@ -832,6 +832,16 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I07 — implement dispatch-hardening Phase 08 operability/doctor
   capability: code:implement
   depends-on: I01
+  status: integrated, post-merge verification complete
+  branch: `dispatch-hardening-i07-origin-sync`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/dispatch-hardening-i07-origin-sync`
+  base-sha: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+  integration-baseline: `origin/main@c386e9f30b1ac60d78675f688e8d10146f5e8949`
+  evaluated-candidate-sha: `439a1fb078418edff7628555c4b6cb9f4015e4e6` (approved in independent review: 0 blocker, 0 high)
+  synchronized-candidate-sha: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (merges local main@210a8256 into origin/main@c386e9f3; approved for integration)
+  integrated-sha: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (fast-forward local main -> 261ed7ea; preserved user dirty AGENTS.md/CLAUDE.md)
+  integration-status: integrated at 261ed7ea; post-merge verification complete (178/178 focused pass, 559/560 dispatch/herdr pass, 0 regressions; awaiting Track Manager confirmation to unblock I08)
+  report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
   stop: command/setup/doctor contract cannot be made consistent
 - unit: I08 — verify dispatch governance, CLI, doctor, and performance gates
   capability: code:test
@@ -861,11 +871,14 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
   depends-on: I09 (SATISFIED)
-  status: ready for independent review, not integrated (production fix commit `3c49cf4205060fea998abfb2e9ef5df7b816a252`; candidate test commit `97420638c7c0360823b64a4a4b74d05eeee8723d`)
+  status: approved candidate synchronized, pending integration
   branch: `coordination-skill-harness-i10-dag-verification`
   implementation-base: `c386e9f30b1ac60d78675f688e8d10146f5e8949` (descendant containing 1ca4023c and 60132825)
   production-fix-commit: `3c49cf4205060fea998abfb2e9ef5df7b816a252`
   candidate-test-commit: `97420638c7c0360823b64a4a4b74d05eeee8723d`
+  evaluated-candidate-sha: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (approved in independent review: 0 blocker, 0 high)
+  synchronized-candidate-sha: (pending merge commit)
+  integrated-sha: (pending merge into main)
   verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass; candidate regressions = 0
   deferred-findings: I09-REV-12 (OPEN, queued for I11: unlinked/retried node on resume uses deferred outcome taxonomy without concurrency-cap error), I09-REV-13 (OPEN, queued for I11: store-level recordDriverDisposition accepts caveated findings), store-scan (OPEN: manifest.assignmentRefs scan without dagNodeId filtering causes cross-node cwd attribution), replay-evidence-unification (OPEN, Track Manager ghi nhận dời việc thống nhất replaySession().dag.settled sang I11: replaySession dag.nodes[].settled is an event-log-only projection, while run and show execution doors inspect on-disk RunResult validity via readLinkedRunResultFromDisk)
   resolved-findings: F1 (RESOLVED: missing/corrupt RunResult on disk fails closed; sets settled: false and blocks descendant admission; verified live in test 8)

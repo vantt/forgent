@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
@@ -10,7 +11,7 @@ import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.m
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
 
-const repo = path.resolve(new URL('../..', import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
 function tempRoot(label = 'dispatch-operability-door-') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), label));

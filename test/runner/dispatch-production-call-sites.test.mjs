@@ -200,7 +200,7 @@ function soleRunDir(root) {
   return path.join(base, workIds[0], stamps[0]);
 }
 
-test('a confinement the config declares reaches herdr, from the config file down', async () => {
+test('a confinement the config declares reaches herdr, from the config file down', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(confinedExecutor);
   const mock = mockHerdr(root);
   try {
@@ -225,7 +225,7 @@ test('a confinement the config declares reaches herdr, from the config file down
   }
 });
 
-test('a confinement that cannot be established refuses the dispatch instead of running unconfined', async () => {
+test('a confinement that cannot be established refuses the dispatch instead of running unconfined', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(confinedExecutor);
   const mock = mockHerdr(root, { failWorkspaceCreate: true });
   try {
@@ -251,7 +251,7 @@ test('a confinement that cannot be established refuses the dispatch instead of r
   }
 });
 
-test('an executor that declares no confinement dispatches exactly as before', async () => {
+test('an executor that declares no confinement dispatches exactly as before', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo();
   const mock = mockHerdr(root);
   try {
@@ -264,7 +264,7 @@ test('an executor that declares no confinement dispatches exactly as before', as
   }
 });
 
-test('a run this path opened is a run this path closes', async () => {
+test('a run this path opened is a run this path closes', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo();
   mockHerdr(root);
   try {
@@ -275,7 +275,7 @@ test('a run this path opened is a run this path closes', async () => {
   }
 });
 
-test('a dispatch that fails still closes its run -- a failure is an answer, not an unfinished round', async () => {
+test('a dispatch that fails still closes its run -- a failure is an answer, not an unfinished round', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(() => ({
     ...HERDR_EXECUTOR,
     interactiveMode: { exitCommand: '/exit', kind: 'agy', promptTimeoutMs: 10000, maxResends: 0 },
@@ -291,7 +291,7 @@ test('a dispatch that fails still closes its run -- a failure is an answer, not 
   }
 });
 
-test('the in-session entry point carries confinement too -- both call sites or neither', async () => {
+test('the in-session entry point carries confinement too -- both call sites or neither', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(confinedExecutor);
   const mock = mockHerdr(root);
   try {
@@ -310,7 +310,7 @@ test('the in-session entry point carries confinement too -- both call sites or n
   }
 });
 
-test('the in-session door puts its run where the observe verbs look', async () => {
+test('the in-session door puts its run where the observe verbs look', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   // It used to leave `runDir` unset, so the adapter opened a private temp
   // directory: the brief, visibility.json and the worker's outbox all landed
   // somewhere `fgos dispatch show-run`/`watch` do not look. A real dispatch
@@ -335,7 +335,7 @@ test('the in-session door puts its run where the observe verbs look', async () =
   }
 });
 
-test('a caller that supplies its own run directory keeps it', async () => {
+test('a caller that supplies its own run directory keeps it', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo();
   mockHerdr(root);
   const given = path.join(root, 'given-run-dir');
@@ -355,7 +355,7 @@ test('a caller that supplies its own run directory keeps it', async () => {
   }
 });
 
-test('a worker that reports success from the wrong checkout is refused, and the stray paths are named', async () => {
+test('a worker that reports success from the wrong checkout is refused, and the stray paths are named', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   // The failure this closes was measured, not imagined: agy was handed a
   // worktree, wrote six files into the main checkout -- onto a branch
   // belonging to somebody else's work -- and reported settled. The ladder
@@ -391,7 +391,7 @@ test('a worker that reports success from the wrong checkout is refused, and the 
   }
 });
 
-test('a worker that stays in its workspace is not accused of anything', async () => {
+test('a worker that stays in its workspace is not accused of anything', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo();
   const worktree = path.join(root, 'wt');
   fs.mkdirSync(worktree, { recursive: true });
@@ -409,7 +409,7 @@ test('a worker that stays in its workspace is not accused of anything', async ()
   }
 });
 
-test('dirt that was already there is not blamed on the worker', async () => {
+test('dirt that was already there is not blamed on the worker', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   // The main checkout is a live working tree. Anything already dirty when the
   // round starts belongs to whoever put it there, and a round must not be
   // refused for it.
@@ -432,7 +432,7 @@ test('dirt that was already there is not blamed on the worker', async () => {
   }
 });
 
-test('production dispatch attaches confinement attestation to ExecutorResult (R5, R7)', async () => {
+test('production dispatch attaches confinement attestation to ExecutorResult (R5, R7)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo();
   mockHerdr(root);
   try {
@@ -451,7 +451,7 @@ test('production dispatch attaches confinement attestation to ExecutorResult (R5
   }
 });
 
-test('production dispatch inherits a distinct configured capability anchor', async () => {
+test('production dispatch inherits a distinct configured capability anchor', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const root = fixtureRepo(() => ({ ...HERDR_EXECUTOR, for: ['code:review'] }));
   const mock = mockHerdr(root);
   const cfgPath = path.join(root, '.fgos', 'config.json');

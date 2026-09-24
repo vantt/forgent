@@ -194,6 +194,7 @@
     "src/util/format-bytes.mjs": "kernel",
     "src/util/format-duration.mjs": "kernel",
     "src/util/normalize-path.mjs": "kernel",
+    "src/util/release-binary-path.mjs": "kernel",
     "src/util/session-identity.mjs": "kernel",
     "src/util/unique-tmp-tag.mjs": "kernel",
     "src/intake/classify.mjs": "use-case",

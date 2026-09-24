@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-const repo = path.resolve(new URL('../..', import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const run = (root, args) => spawnSync(process.execPath, ['bin/fgos.mjs', ...args, '--dir', root], { cwd: repo, encoding: 'utf8' });
 // Real production per-cwd dispatch lock path/shape (see
 // reconciliation-planner.mjs's own lockFile/cwdLockHolder doc comments).

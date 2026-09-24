@@ -24,6 +24,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
@@ -1078,7 +1079,7 @@ test('runtime: the FlowDefinition is resolved from the session, never from the c
 
 test('static: linkSessionContribution takes no definition, no visibility-window, and no revision parameter', () => {
   const source = fs.readFileSync(
-    path.join(path.dirname(new URL(import.meta.url).pathname), '../../src/runner/coordination/session-engine.mjs'),
+    path.join(path.dirname(fileURLToPath(import.meta.url)), '../../src/runner/coordination/session-engine.mjs'),
     'utf8',
   );
   const signature = source.slice(source.indexOf('export function linkSessionContribution'));

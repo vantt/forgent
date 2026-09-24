@@ -864,7 +864,6 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     } catch {
       agentState = 'unknown';
     }
-    const liveness = readLiveness();
     // One observation time, taken after every herdr read of this tick: a read
     // that takes long to fail (an unresponsive herdr, a loaded host) is part
     // of the blind span too, not idle time the worker is charged for.
@@ -885,6 +884,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
       ackSeen = true;
     }
 
+    const liveness = agentState === 'working' ? 'present' : readLiveness();
     const decision = decide({
       resultFilePresent: fs.existsSync(paths.resultPath),
       liveness,
@@ -914,7 +914,8 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
       }
     }
 
-    await sleep(RECEIPT_POLL_MS);
+    const pollSleepMs = ackSeen ? 1500 : RECEIPT_POLL_MS;
+    await sleep(pollSleepMs);
   }
 }
 

@@ -56,7 +56,7 @@ export {
   redactProviderCapacitySelection,
 } from './dispatch/provider-capacity.mjs';
 
-export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
+export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, resolveHerdrBin, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
 
 export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
 
@@ -88,6 +88,8 @@ export {
   executeAssignment,
   classifyRunEvidence,
 } from './dispatch/assignment-runner.mjs';
+
+export { runDispatchCli } from './dispatch/cli.mjs';
 
 import { runDispatchCli } from './dispatch/cli.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';

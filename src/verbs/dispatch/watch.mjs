@@ -78,7 +78,18 @@ export async function watchRunUseCase(ctx, {
     ticks += 1;
     emit(snapshot);
 
-    if (TERMINAL_RUN_STATUSES.includes(snapshot.run.status)) break;
+    if (snapshot.settled) {
+      stoppedBecause = 'terminal';
+      break;
+    }
+    if (snapshot.resultCorrupt) {
+      stoppedBecause = 'corrupt-evidence';
+      break;
+    }
+    if (TERMINAL_RUN_STATUSES.includes(snapshot.run.status)) {
+      stoppedBecause = 'terminal';
+      break;
+    }
     if (ticks >= maxTicks) { stoppedBecause = 'tick-budget'; break; }
     if (signal?.aborted) { stoppedBecause = 'aborted'; break; }
 

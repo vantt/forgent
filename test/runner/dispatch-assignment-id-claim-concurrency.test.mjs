@@ -17,9 +17,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 
-const repoRoot = path.resolve(new URL('../..', import.meta.url).pathname);
+const repoRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const workerPath = path.join(repoRoot, 'test/runner/dispatch-assignment-id-claim-concurrency.helper.mjs');
 
 function mkTempDir() {

@@ -1361,7 +1361,7 @@ function attemptProviderCapacityFallback({
     // Same three guards the primary's own `shouldSelectProviderAccount`
     // applies (executeAssignment, above) -- resolveFallback proves
     // governance/tier/visibility, never mechanism.
-    if (plan.dispatch === 'human-only' || plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
+    if (plan.mechanism !== 'out-of-process' || cfg.executors?.[candidateId]?.kind === 'tool') {
       skippedCandidates.push({ executorId: candidateId, reasonCode: 'unsupported-mechanism' });
       continue;
     }
@@ -1679,7 +1679,7 @@ export async function executeAssignment(assignment, opts = {}) {
     options: opts.options,
   });
 
-  if (compiledPlan.dispatch === 'human-only' || compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {
+  if (compiledPlan.mechanism === 'unavailable' || compiledPlan.mechanism === null) {
     const reason = compiledPlan.blockedReason ?? compiledPlan.reasonCodes?.join(', ') ?? 'governance-blocked or unavailable mechanism';
     throw new RunnerConfigError(`dispatch decide blocked operation "${effectiveAssignment.operation}": ${reason}`);
   }
@@ -2671,9 +2671,22 @@ export async function executeAssignment(assignment, opts = {}) {
         throw err;
       }
 
-      // 8. Wait for receipt in live execution
+      // 8. Wait for receipt in live execution (event-driven with fs.watch + 20ms fallback)
       const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
-      const pollDeadline = Date.now() + timeoutMs + 10000;
+      const receiptsDir = path.dirname(receiptPath);
+      let watcher = null;
+      let watcherTrigger = null;
+      try {
+        fs.mkdirSync(receiptsDir, { recursive: true });
+        watcher = fs.watch(receiptsDir, (eventType, filename) => {
+          if (!filename || filename === path.basename(receiptPath)) {
+            if (watcherTrigger) watcherTrigger();
+          }
+        });
+      } catch {}
+
+      const pollStart = Date.now();
+      const pollDeadline = pollStart + timeoutMs + 10000;
       while (Date.now() < pollDeadline) {
         if (fs.existsSync(receiptPath)) {
           try {
@@ -2687,7 +2700,17 @@ export async function executeAssignment(assignment, opts = {}) {
           }
           break;
         }
-        await new Promise((r) => setTimeout(r, 20));
+        await new Promise((r) => {
+          const timer = setTimeout(r, 20);
+          watcherTrigger = () => {
+            clearTimeout(timer);
+            r();
+          };
+        });
+      }
+      if (watcher) {
+        try { watcher.close(); } catch {}
+        watcher = null;
       }
 
       // 9. Guarded update: command reconciled with receipt-backed outcome

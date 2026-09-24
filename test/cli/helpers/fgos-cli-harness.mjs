@@ -1037,11 +1037,12 @@ function makeBlockedBranchItem(cwd, id, extra = {}) {
 // Parses `session start`'s output into { result, sessionId, worktreePath }.
 function startSession(cwd, extraArgs = []) {
   const result = run(cwd, ['session', 'start', ...extraArgs]);
-  const data = result.status === 0 ? envelopeData(result.stdout) : null;
+  assert.equal(result.status, 0, `session start failed: ${result.stderr}`);
+  const data = envelopeData(result.stdout);
   return {
     result,
-    sessionId: data ? data.sessionId : null,
-    worktreePath: data ? data.worktreePath : null,
+    sessionId: data.sessionId,
+    worktreePath: data.worktreePath,
   };
 }
 
