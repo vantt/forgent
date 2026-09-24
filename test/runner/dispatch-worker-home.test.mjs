@@ -124,7 +124,9 @@ test('the credential is COPIED, not linked, and keeps owner-only permissions', (
       const dest = path.join(homePath, '.claude', '.credentials.json');
       assert.equal(fs.lstatSync(dest).isSymbolicLink(), false,
         'a symlink would let the worker walk back into the operator home');
-      assert.equal(fs.statSync(dest).mode & 0o777, 0o600, 'the copy must not widen the original permissions');
+      if (process.platform !== 'win32') {
+        assert.equal(fs.statSync(dest).mode & 0o777, 0o600, 'the copy must not widen the original permissions');
+      }
     });
   } finally { src.cleanup(); }
 });

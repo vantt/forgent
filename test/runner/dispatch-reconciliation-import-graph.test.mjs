@@ -42,7 +42,10 @@ const IMPORT_RE = /from\s+['"](\.{1,2}\/[^'"]+)['"]/g;
 // `process.kill`, so this file is proven safe by the same standard every
 // other entry in this test relies on. It imports only `node:crypto`,
 // `node:fs`, `node:os`, `node:path` (no further relative imports to walk).
-const isProvenLeaf = (file) => file.endsWith('/run-result.mjs') || file.endsWith('/provider-capacity.mjs');
+const isProvenLeaf = (file) => {
+  const f = file.replaceAll('\\', '/');
+  return f.endsWith('/run-result.mjs') || f.endsWith('/provider-capacity.mjs');
+};
 
 // Concrete modules -- named explicitly, each confirmed by direct reading, not
 // by guessing at names -- that implement process-control, retry/relaunch,

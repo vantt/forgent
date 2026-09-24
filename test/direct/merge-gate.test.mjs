@@ -26,7 +26,7 @@ function addTestWork(dir, id, extra = {}) {
 }
 
 test('approve gate: aborts cleanly on test failure without modifying main', async (t) => {
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'test-gate-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'test-gate-')));
   
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
@@ -87,11 +87,11 @@ test('root-into-main merge gate: verify sees the merged tree\'s own declared dep
   const os = await import('node:os');
   // A local `file:` dependency resolves entirely offline, so provisioning
   // stays fast and never hits the registry.
-  const depDir = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-localdep-'));
+  const depDir = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-localdep-')));
   fs.writeFileSync(path.join(depDir, 'package.json'), JSON.stringify({ name: 'fgos-merge-gate-localdep', version: '1.0.0' }));
   fs.writeFileSync(path.join(depDir, 'index.js'), 'module.exports = {};\n');
 
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-deps-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-deps-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
@@ -119,7 +119,7 @@ test('root-into-main merge gate: verify runs without holding main-checkout.lock,
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
   const { LOCK_FILE } = await import('../../src/runner/main-checkout-lock.mjs');
   const os = await import('node:os');
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-lock-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-lock-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
@@ -132,7 +132,7 @@ test('root-into-main merge gate: verify runs without holding main-checkout.lock,
   execGit(cwd, ['commit', '-m', 'add feature']);
   execGit(cwd, ['checkout', 'main']);
 
-  const lockPath = path.join(cwd, '.fgos', LOCK_FILE);
+  const lockPath = path.join(cwd, '.fgos', LOCK_FILE).replaceAll('\\', '/');
   // verify fails (exit 1) if the lock file exists while it runs.
   const item = { id: 'tsk-lock', verify: `node -e "process.exit(require('fs').existsSync('${lockPath}') ? 1 : 0)"` };
   const result = await mergeRootIntoMainCas(cwd, item, 'fgw/tsk-lock', { timeoutMs: 60000 });
@@ -144,7 +144,7 @@ test('root-into-main merge gate: verify runs without holding main-checkout.lock,
 
 async function casRepoWithSetup(commands) {
   const os = await import('node:os');
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-setup-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-setup-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
@@ -170,7 +170,7 @@ test('root-into-main merge gate: runs the project\'s worktreeSetup commands befo
 
 test('root-into-main merge gate: a failing worktreeSetup command is a verify-fail naming the command, main untouched', async () => {
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
-  const cwd = await casRepoWithSetup(['echo setup-broke >&2; exit 2']);
+  const cwd = await casRepoWithSetup(['node -e "console.error(\'setup-broke\'); process.exit(2)"']);
   const mainBefore = execGit(cwd, ['rev-parse', 'main']).trim();
   const result = await mergeRootIntoMainCas(cwd, { id: 'tsk-setup', verify: 'true' }, 'fgw/tsk-setup', { timeoutMs: 60000 });
   assert.equal(result.outcome, 'verify-fail');
@@ -181,7 +181,7 @@ test('root-into-main merge gate: a failing worktreeSetup command is a verify-fai
 test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER the merge+verify started (but before the land step) is caught under the lock, not raced past', async () => {
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
   const os = await import('node:os');
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
   execGit(cwd, ['config', 'user.email', 'test@example.com']);
@@ -219,7 +219,7 @@ test('root-into-main merge gate: a path in ownFileSet dirtied on repoRoot AFTER 
 test('root-into-main merge gate: an UNRELATED path dirtied mid-merge (outside ownFileSet) does not trip the second check', async () => {
   const { mergeRootIntoMainCas } = await import('../../src/runner/merge.mjs');
   const os = await import('node:os');
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-unrelated-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'merge-gate-race-unrelated-')));
   execGit(cwd, ['init', '--initial-branch=main']);
   execGit(cwd, ['config', 'user.name', 'Test']);
   execGit(cwd, ['config', 'user.email', 'test@example.com']);

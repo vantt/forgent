@@ -11,7 +11,7 @@ import {
 } from '../../src/config/global-config.mjs';
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 test('loadGlobalConfig returns {} when the global config file does not exist', () => {
@@ -126,12 +126,19 @@ test('describeConfigAwareness: default globalConfigPath honors process.env.HOME 
   const projectDir = mkTempDir('global-config-home-override-project-');
 
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   let result;
   try {
     result = describeConfigAwareness(projectDir);
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) {
+      process.env.USERPROFILE = prevUserProfile;
+    } else {
+      delete process.env.USERPROFILE;
+    }
   }
 
   assert.equal(result.globalConfigPath, path.join(homeDir, '.fgos', 'config.json'));

@@ -235,7 +235,11 @@ test('resolveWorkspaceInstallationBin returns null when manifest entries.fgos es
 
 // Regression: a non-executable manifest entry was selected as tier 0
 // instead of falling through.
-test('resolveWorkspaceInstallationBin returns null when the resolved entry is not executable', () => {
+test('resolveWorkspaceInstallationBin returns null when the resolved entry is not executable', (t) => {
+  if (process.platform === 'win32') {
+    t.skip('fs.constants.X_OK has no effect on Windows (NTFS has no POSIX execute bit)');
+    return;
+  }
   const dir = mkTempDir('bin-discovery-tier0-noexec-');
   const installDir = path.join(dir, '.fgos', 'installation');
   fs.mkdirSync(path.join(installDir, 'bin'), { recursive: true });

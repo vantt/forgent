@@ -55,18 +55,22 @@ function renderScalarOrArray(value) {
  * block degrades to "no frontmatter", never a crash).
  */
 export function parseFrontmatter(content) {
-  if (typeof content !== 'string' || !content.startsWith(`${DELIMITER}\n`)) {
+  if (typeof content !== 'string') {
+    return { meta: {}, body: content };
+  }
+  const normalized = content.replaceAll('\r\n', '\n');
+  if (!normalized.startsWith(`${DELIMITER}\n`)) {
     return { meta: {}, body: content };
   }
 
   const closeMarker = `\n${DELIMITER}\n`;
-  const closeIndex = content.indexOf(closeMarker, DELIMITER.length + 1);
+  const closeIndex = normalized.indexOf(closeMarker, DELIMITER.length + 1);
   if (closeIndex === -1) {
     return { meta: {}, body: content };
   }
 
-  const block = content.slice(DELIMITER.length + 1, closeIndex);
-  const body = content.slice(closeIndex + closeMarker.length);
+  const block = normalized.slice(DELIMITER.length + 1, closeIndex);
+  const body = normalized.slice(closeIndex + closeMarker.length);
 
   const meta = {};
   for (const line of block.split('\n')) {

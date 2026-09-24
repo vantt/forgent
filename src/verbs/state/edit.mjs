@@ -33,6 +33,23 @@ function optionalField(value, message) {
   return value;
 }
 
+function formatJqVerifyCommand(root, ids) {
+  if (process.platform === 'win32') {
+    const idList = ids.map((id) => `\\"${id}\\"`).join(',');
+    return (
+      `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
+      `jq -e ".data.work as $w | [${idList}] | map($w[.].status) | ` +
+      `all(. as $s | [\\"delivered\\",\\"retrospective\\",\\"cleanup\\",\\"done\\"] | index($s) != null)" > NUL`
+    );
+  }
+  const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
+  return (
+    `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
+    `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
+    `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`
+  );
+}
+
 export function generateVerifyFromChildren(dir, id, { cwd = process.cwd(), repoRoot } = {}) {
   const view = listWork(dir);
   const item = view.work[id];
@@ -59,12 +76,7 @@ export function generateVerifyFromChildren(dir, id, { cwd = process.cwd(), repoR
       throw new StoreError('validation', `edit --verify-from-children: could not resolve the repo root via git (${err.message}).`);
     }
   }
-  const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
-  return (
-    `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
-    `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
-    `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`
-  );
+  return formatJqVerifyCommand(root, ids);
 }
 
 export function generateVerifyFromTargets(dir, id, { cwd = process.cwd(), repoRoot } = {}) {
@@ -93,12 +105,7 @@ export function generateVerifyFromTargets(dir, id, { cwd = process.cwd(), repoRo
       throw new StoreError('validation', `edit --verify-from-targets: could not resolve the repo root via git (${err.message}).`);
     }
   }
-  const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
-  return (
-    `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
-    `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
-    `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`
-  );
+  return formatJqVerifyCommand(root, ids);
 }
 
 export function parseEditFlags(flags, { id, dir, cwd = process.cwd(), repoRoot } = {}) {

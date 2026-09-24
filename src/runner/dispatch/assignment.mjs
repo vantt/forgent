@@ -707,7 +707,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   // requires stage/operation and refuses a missing taskSpec), so this is a
   // value-preserving no-op for them.
   const taskSpecRelPath = assignment.taskSpec
-    ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options)
+    ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options).replaceAll('\\', '/')
     : null;
 
   // Phase 02 (executor-policy-dispatch-seams, design.md §3.4 PromptEnvelope):

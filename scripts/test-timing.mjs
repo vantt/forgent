@@ -178,9 +178,9 @@ export function runOneSample({
   environment = () => gatherEnvironment({ cwd }),
   logDir,
 } = {}) {
-  const relLogDir = logDir ? path.relative(cwd, path.resolve(cwd, logDir)) : null;
+  const relLogDir = logDir ? path.relative(cwd, path.resolve(cwd, logDir)).replaceAll('\\', '/') : null;
   const isInternalLogDir = relLogDir && !relLogDir.startsWith('..') && !path.isAbsolute(relLogDir);
-  const parentArtifactsDir = isInternalLogDir ? path.dirname(relLogDir) : null;
+  const parentArtifactsDir = isInternalLogDir ? path.dirname(relLogDir).replaceAll('\\', '/') : null;
   const logDirPrefixes = isInternalLogDir ? [relLogDir, parentArtifactsDir].filter(Boolean) : [];
 
   const defaultCheck = (opts = {}) => isGitClean(cwd, execFileSync, opts);

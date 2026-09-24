@@ -61,7 +61,7 @@ const DEFAULT_CLI_SESSION_ID = 'fgos-cli-harness-test';
 // `requiresExistingStore` guard tests) should use this directly; every
 // other test wants `tmpCwd()` below.
 function rawTmpCwd() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-'));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-')));
 }
 
 // tsk-4fu-2: `fgos init` is no longer implicit — every `requiresExistingStore`
@@ -331,7 +331,7 @@ function tmpLinkedWorktree() {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: main });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: main });
   commitFile(main, 'seed.txt');
-  const wt = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-wt-'));
+  const wt = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-wt-')));
   fs.rmdirSync(wt);
   execFileSync('git', ['worktree', 'add', '-b', 'tsk-56t-dir-flag-test', wt], { cwd: main });
   fs.rmSync(path.join(wt, '.fgos'), { recursive: true, force: true });
@@ -411,7 +411,7 @@ const ADD_BAD_FLAG_CASES = [
 // instead) -- see CONTEXT.md's corrected scout note.
 function initGitCwdWithWorktree() {
   const cwd = initGitCwd();
-  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wt-'));
+  const worktreePath = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wt-')));
   fs.rmSync(worktreePath, { recursive: true, force: true });
   execFileSync('git', ['worktree', 'add', '-b', `wt-${path.basename(worktreePath)}`, worktreePath], { cwd });
   return { cwd, worktreePath };
@@ -598,7 +598,7 @@ function gitAtCwd(cwd, args) {
  * entirely offline, no registry/network hit, so the return-with-a-real-
  * dependency test stays fast and deterministic. */
 function mkLocalDependency() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-test-localdep-'));
+  const dir = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-test-localdep-')));
   fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ name: 'fgos-test-localdep', version: '1.0.0' }));
   fs.writeFileSync(path.join(dir, 'index.js'), 'module.exports = {};\n');
   return dir;
@@ -935,7 +935,7 @@ process.exit(0);`);
 // network, no real GitHub. `git push` against it is a normal fast local op,
 // so `review --github`'s push step works against a real remote.
 function addBareOrigin(cwd) {
-  const bare = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-origin-'));
+  const bare = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-origin-')));
   execFileSync('git', ['init', '-q', '--bare', bare]);
   execFileSync('git', ['remote', 'add', 'origin', bare], { cwd });
   return bare;
@@ -1128,7 +1128,7 @@ function makeSessionSafeRunnerItem(cwd, id, extra = {}) {
 // real ad-hoc worktree of this repo would have on disk).
 
 function addAdHocWorktree(cwd, branch) {
-  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adhoc-wt-'));
+  const worktreePath = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-adhoc-wt-')));
   fs.rmdirSync(worktreePath); // git worktree add requires the path not exist yet
   execFileSync('git', ['worktree', 'add', '-b', branch, worktreePath, 'HEAD'], { cwd });
   return worktreePath;
