@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 next eligible (I08 requires I07; I10 requires I09 post-merge verification — I10 blocked)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I10 ready for independent review, not integrated (production fix commit `3c49cf42`; candidate test commit `97420638`); Unit I07 next eligible (I08 requires I07); Unit I11 BLOCKED (pending I08 and I10)
 Created: 2026-09-19
-Last Updated: 2026-09-23
+Last Updated: 2026-09-24
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -840,7 +840,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06
-  status: integrated, post-merge verification pending
+  status: verified
   branch: `coordination-skill-harness-i09-dag-forward-port`
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i09-dag-forward-port`
   base-sha: `16a7900d9eacf1c1dfa6d0c77ff489c21080305e`
@@ -849,22 +849,32 @@ Executor/provider/model/tier selection remains an execution-time decision.
   synchronized-candidate-sha: `c624fe583fe089cb177c44df315dc451ba1d8e1f` (merges `main@cc687d92`; CHANGELOG.md conflict resolved preserving both groups)
   status-recording-sha: `dd4fb2e54f95afe5a68b6bcc092bd3d929de96d8` (lineage `524579b4` -> `dd4fb2e5`)
   integrated-sha: `1ca4023c98c2f449cb58cba481e82cab49ba51ba` (merges `cc687d92` + `dd4fb2e5`; verified topology and preserved local state)
-  integration-status: integrated at 1ca4023c; post-merge verification pending (I09-REV-15 timing fix in progress; I10 remains BLOCKED)
+  integration-status: verified (integrated at 1ca4023c; post-merge verification satisfied following REV-15 timing fix at 60132825; verified at main@f63f7e7d: 538/538 pass across 16-suite matrix; 3 consecutive timing reruns 129/129 pass; candidate regressions = 0; D2/D3 in fgos-approve.test.mjs confirmed pre-existing baseline defect)
   findings-resolved: I09-REV-01 through I09-REV-11, I09-REV-15 (MEDIUM, candidate test timing regression resolved by restoring 1000ms/1050ms margins and stripping Phase 04 H-2 test labels). Baseline defect note: D2/D3 in fgos-approve.test.mjs is pre-existing on main@cc687d92, not an I09 regression.
   blast-radius: CRITICAL (189 symbols, 35 processes; GitNexus index degraded/stale per REV-14)
   rev05-policy: locked (shared-cwd read-only DAG caveat cannot be discharged in original session; original session must be cancelled; recheck runs in separate session; no adjudication event/lifecycle/store added)
   queued-for-i10-i11: I09-REV-12 (deferred outcome taxonomy), I09-REV-13 (disposition on caveated findings), I09-REV-14 (GitNexus index refresh), cwd helper consolidation
-  next-dependency-gate: I10 remains BLOCKED pending fix and independent re-review
+  next-dependency-gate: I10 dependency gate SATISFIED (Unit I10 candidate ready for independent review, not integrated; production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; ready for review)
   verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
-  depends-on: I09
+  depends-on: I09 (SATISFIED)
+  status: ready for independent review, not integrated (production fix commit `3c49cf4205060fea998abfb2e9ef5df7b816a252`; candidate test commit `97420638c7c0360823b64a4a4b74d05eeee8723d`)
+  branch: `coordination-skill-harness-i10-dag-verification`
+  implementation-base: `c386e9f30b1ac60d78675f688e8d10146f5e8949` (descendant containing 1ca4023c and 60132825)
+  production-fix-commit: `3c49cf4205060fea998abfb2e9ef5df7b816a252`
+  candidate-test-commit: `97420638c7c0360823b64a4a4b74d05eeee8723d`
+  verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass; candidate regressions = 0
+  deferred-findings: I09-REV-12 (OPEN, queued for I11: unlinked/retried node on resume uses deferred outcome taxonomy without concurrency-cap error), I09-REV-13 (OPEN, queued for I11: store-level recordDriverDisposition accepts caveated findings), store-scan (OPEN: manifest.assignmentRefs scan without dagNodeId filtering causes cross-node cwd attribution), replay-evidence-unification (OPEN, Track Manager ghi nhận dời việc thống nhất replaySession().dag.settled sang I11: replaySession dag.nodes[].settled is an event-log-only projection, while run and show execution doors inspect on-disk RunResult validity via readLinkedRunResultFromDisk)
+  resolved-findings: F1 (RESOLVED: missing/corrupt RunResult on disk fails closed; sets settled: false and blocks descendant admission; verified live in test 8)
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i10-dag-verification-report.md
   stop: schema 1/2 replay changes or corrupt evidence settles a node
 - unit: I11 — independently review combined Phase 2/3/dispatch/DAG runtime
   capability: code:review
   depends-on: I03, I05, I08, and I10
+  status: BLOCKED (pending I08 and I10)
   stop: any contract/authority/atomicity/replay blocker remains
 - unit: I12 — refactor dispatch boundaries in small reversible Phase 09 cells
   capability: code:refactor

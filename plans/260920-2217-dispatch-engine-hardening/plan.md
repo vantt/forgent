@@ -98,7 +98,7 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
-  - Integration status: INTEGRATED AT `1ca4023c`, POST-MERGE VERIFICATION PENDING. Evaluated candidate `a208bf55` approved by independent review (0 blocker, 0 high), synchronized candidate `c624fe58` merged into main at `1ca4023c98c2f449cb58cba481e82cab49ba51ba`.
-  - Follow-up finding `I09-REV-15` (candidate test timing regression in `coordination-r5-hard-budgets.test.mjs`) resolved by restoring 1000ms/1050ms margins and stripping audit labels; baseline defect D2/D3 in `fgos-approve.test.mjs` pre-existing on `main@cc687d92`.
+  - Integration status: VERIFIED. Integrated at `1ca4023c`, post-merge verification satisfied at `main@f63f7e7d` following REV-15 timing fix at `60132825` (538/538 pass across 16-suite focused matrix; 3 consecutive timing reruns 129/129 pass; candidate regressions = 0; D2/D3 in `fgos-approve.test.mjs` confirmed pre-existing baseline defect).
+  - Follow-up finding `I09-REV-15` (candidate test timing regression in `coordination-r5-hard-budgets.test.mjs`) resolved and verified on current main baseline.
   - 14 focused suites pass (538 passed / 0 failed, `git diff --check` clean).
-  - Unit **I10 remains BLOCKED** pending independent re-review of post-merge verification.
+  - Unit **I10 status: ready for independent review, not integrated** (base `c386e9f30b1ac60d78675f688e8d10146f5e8949` is descendant containing `1ca4023c` and `60132825`; production fix commit `3c49cf4205060fea998abfb2e9ef5df7b816a252`; candidate test commit `97420638c7c0360823b64a4a4b74d05eeee8723d`; 41 tests across 5 test suites: 38 passed, 3 todo, 0 failed; 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass).
