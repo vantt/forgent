@@ -79,5 +79,6 @@ test file itself, per this repo's GitNexus discipline.
     - Converted module specifiers to `file://` URLs using `pathToFileURL(path.resolve(...)).href`.
     - Sanitized all directory and path interpolations using `JSON.stringify(tempDir)`.
     - Improved `runWorkerSubprocess` error reporting to reject with stderr / exit code on failure, making future worker crashes immediately obvious.
-  - Verified 16/16 tests pass locally. Real Windows CI verification pending push in Phase 01/02 batch.
+  - Verified 16/16 tests pass locally.
+  - **CI Verification**: Real Windows CI run `35996854907` confirmed 16/16 tests PASS (100% GREEN). Merged to `main` via commit `39200c0a`.
 

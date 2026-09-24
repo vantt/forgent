@@ -128,6 +128,10 @@ cross-check with `grep` regardless).
     - Normalized CRLF to LF in staged change assertion.
     - Converted `worktreeSetup` commands to cross-platform `node -e` invocations.
 - **Verification**:
-  - Local tests: `test/runner/worktree.test.mjs` (115/115 passed), `test/runner/promote-engine.test.mjs` (9/9 passed), `test/runner/session.test.mjs` (passed), `test/runner/dispatch-trust-store.test.mjs` (16/16 passed).
-  - Windows CI verification pending push in Phase 01/02 batch.
+  - **CI Verification**: Real Windows CI run `35996854907` confirmed:
+    - `test/runner/worktree.test.mjs`: 88/88 passed (100% GREEN)
+    - `test/runner/promote-engine.test.mjs`: 9/9 passed (100% GREEN)
+    - `test/runner/dispatch-trust-store.test.mjs`: 16/16 passed (100% GREEN)
+    - Failures across the test suite dropped by 173 (from 524 down to 351).
+    - Merged to `main` via commit `39200c0a`.
 

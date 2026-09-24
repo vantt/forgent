@@ -1,7 +1,6 @@
 # Windows CI Hardening
 
-Status: PROPOSED — Phase 00 open now; Phases 01–04 unblocked, can run in any order
-or in parallel (different files/subsystems). Phase 05 depends on 01–04 landing.
+Status: IN-PROGRESS — Phase 00, 01, 02 completed & verified on real Windows CI (merged to main `39200c0a`); Phase 03 awaiting scope decision; Phase 04 ready.
 Created: 2026-09-24. Source: this session's direct investigation of 4 real
 Windows-inclusive CI runs (35966831177, 35970771095, 35975484603 on
 `vantt/forgent`) after the user decided fgOS builds and supports Rust binaries
@@ -47,12 +46,12 @@ re-derive the categorization from a fresh CI run.
 
 | # | Phase | Cluster | Est. failures | Confidence |
 |---|---|---|---|---|
-| 00 | [Fresh evidence snapshot](phase-00-evidence-snapshot.md) | re-run + re-categorize | 524 | high (verified on run 35978159337) |
-| 01 | [Concurrency/timing flake review](phase-01-concurrency-timing-flakes.md) | `Unit 2E` family + sibling-process races | ~13 | medium (same family failed on macOS too) |
-| 02 | [Path case-sensitivity / worktree identity](phase-02-worktree-identity-case-sensitivity.md) | `isMainWorktree`, `retargetMember`, agy trust-store | ~25 | medium (has a concrete hypothesis, unverified) |
-| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~10 | low (may need Rust source changes, tar : colon syntax, Developer Mode gap) |
-| 04 | [CLI message-format & JSON-parse failures](phase-04-cli-message-format-json-parse.md) | Iron Law/forbidden regex mismatches, `Unexpected end of JSON input`, `undefined.status` | ~40 | low (not yet root-caused) |
-| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~436 | none yet — this phase's job is to re-cluster what's left |
+| 00 | [Fresh evidence snapshot](phase-00-evidence-snapshot.md) | re-run + re-categorize | 524 | DONE (baseline run 35978159337) |
+| 01 | [Concurrency/timing flake review](phase-01-concurrency-timing-flakes.md) | `Unit 2E` family + subprocess ESM URLs | 16 | DONE (100% GREEN on Win CI 35996854907, merged to main `39200c0a`) |
+| 02 | [Path case-sensitivity / worktree identity](phase-02-worktree-identity-case-sensitivity.md) | `isMainWorktree`, 8.3 short-name canonicalization, agy trust-store | 168+ | DONE (100% GREEN on Win CI 35996854907, merged to main `39200c0a`) |
+| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~40 | in-flight / user decision needed |
+| 04 | [CLI message-format & JSON-parse failures](phase-04-cli-message-format-json-parse.md) | Iron Law/forbidden regex mismatches, `Unexpected end of JSON input`, `undefined.status` | ~40 | ready |
+| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~270 | pending |
 
 ## Dependencies
 
