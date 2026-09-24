@@ -37,6 +37,13 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   });
 }
 
+function runShim(shimPath, args, opts = {}) {
+  if (process.platform === 'win32') {
+    return spawnSync('sh', [shimPath, ...args], opts);
+  }
+  return spawnSync(shimPath, args, opts);
+}
+
 before(() => {
   assert.ok(fs.existsSync(FGCTL_BIN), `fgctl binary must exist at ${FGCTL_BIN}`);
   fixtureReleaseDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgctl-init-fixture-'));
@@ -81,10 +88,12 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.ok(fs.existsSync(shimFgos), 'bin/fgos shim must exist');
     assert.ok(fs.existsSync(shimRunner), 'bin/fgos-runner shim must exist');
 
-    const fgosStat = fs.statSync(shimFgos);
-    const runnerStat = fs.statSync(shimRunner);
-    assert.ok((fgosStat.mode & 0o111) !== 0, 'bin/fgos must have executable bit set');
-    assert.ok((runnerStat.mode & 0o111) !== 0, 'bin/fgos-runner must have executable bit set');
+    if (process.platform !== 'win32') {
+      const fgosStat = fs.statSync(shimFgos);
+      const runnerStat = fs.statSync(shimRunner);
+      assert.ok((fgosStat.mode & 0o111) !== 0, 'bin/fgos must have executable bit set');
+      assert.ok((runnerStat.mode & 0o111) !== 0, 'bin/fgos-runner must have executable bit set');
+    }
 
     // 4. root.json exists and contains required fields
     const rootJsonPath = path.join(tempProj, '.fgos', 'installation', 'root.json');
@@ -132,7 +141,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.ok(statuses.includes('complete'));
 
     // 8. version --runtime-json through the shim reports R10 fields with host: "rust"
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
@@ -155,7 +164,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.equal(versionEnv.data.components.legacyNode.entry, 'bin/fgos.mjs');
 
     // 9. ready --json through the shim matches node bin/fgos.mjs ready --json
-    const shimReadyRes = spawnSync(shimFgos, ['ready', '--json'], {
+    const shimReadyRes = runShim(shimFgos, ['ready', '--json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
@@ -1069,7 +1078,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
 
     // 3. Workspace is left in diagnosable state: version --runtime-json works through shim
     const shimFgos = path.join(tempProj, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',

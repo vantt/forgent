@@ -39,6 +39,13 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
   });
 }
 
+function runShim(shimPath, args, opts = {}) {
+  if (process.platform === 'win32') {
+    return spawnSync('sh', [shimPath, ...args], opts);
+  }
+  return spawnSync(shimPath, args, opts);
+}
+
 function runFgos(args, { cwd, stateHome, env = {} } = {}) {
   return spawnSync(FGOS_BIN, args, {
     cwd,
@@ -252,7 +259,7 @@ test('R4, R5, R6: Corrupting one byte in active release triggers quarantine and 
 
     // Runtime reader treats quarantined as missing binding / fails closed
     const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const shimRes = spawnSync(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
+    const shimRes = runShim(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
     assert.notEqual(shimRes.status, 0, 'shim execution must fail closed when runtime is quarantined');
     assert.match(shimRes.stderr, /quarantined/);
   } finally {
@@ -753,7 +760,7 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
 
     // Workspace is diagnosable
     const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: projDir,
       env: { ...process.env, FGOS_STATE_HOME: stateHome },
       encoding: 'utf8',
@@ -836,7 +843,7 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
 
     // Workspace is diagnosable
     const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: projDir,
       env: { ...process.env, FGOS_STATE_HOME: stateHome },
       encoding: 'utf8',

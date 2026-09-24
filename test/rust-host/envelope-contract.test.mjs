@@ -44,7 +44,7 @@ test("R4 drift guard: committed envelope vectors match in-memory regeneration by
   for (const [filename, expectedVector] of generated) {
     const diskPath = path.join(DEFAULT_ENVELOPE_DIR, filename);
     assert.ok(fs.existsSync(diskPath), `Committed envelope vector must exist: ${filename}`);
-    const diskContent = fs.readFileSync(diskPath, "utf8");
+    const diskContent = fs.readFileSync(diskPath, "utf8").replace(/\r\n/g, "\n");
     const expectedContent = JSON.stringify(expectedVector, null, 2) + "\n";
     assert.equal(
       diskContent,
@@ -61,7 +61,7 @@ test("R4 drift guard: committed serialization corpus matches in-memory regenerat
   for (const [filename, expectedFixture] of generated) {
     const diskPath = path.join(DEFAULT_SERIALIZATION_DIR, filename);
     assert.ok(fs.existsSync(diskPath), `Committed serialization fixture must exist: ${filename}`);
-    const diskContent = fs.readFileSync(diskPath, "utf8");
+    const diskContent = fs.readFileSync(diskPath, "utf8").replace(/\r\n/g, "\n");
     const expectedContent = JSON.stringify(expectedFixture, null, 2) + "\n";
     assert.equal(
       diskContent,

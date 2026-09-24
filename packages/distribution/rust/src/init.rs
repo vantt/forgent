@@ -28,11 +28,14 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
 [ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos"
+if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
+  entry="${entry}.exe"
+fi
 [ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
 exec "$entry" "$@"
 "#;
@@ -44,11 +47,14 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
 [ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos-runner"
+if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
+  entry="${entry}.exe"
+fi
 [ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
 exec "$entry" "$@"
 "#;
@@ -637,7 +643,13 @@ pub fn run_tail(
 
     for cmd_args in commands {
         let cmd_name = cmd_args.join(" ");
-        let mut cmd = Command::new(shim_path);
+        let mut cmd = if cfg!(windows) {
+            let mut c = Command::new("sh");
+            c.arg(shim_path);
+            c
+        } else {
+            Command::new(shim_path)
+        };
         cmd.args(&cmd_args).current_dir(workspace_root);
 
         let output = match cmd.output() {
@@ -1002,6 +1014,14 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&shim_fgos, std::fs::Permissions::from_mode(0o755));
         let _ = std::fs::set_permissions(&shim_runner, std::fs::Permissions::from_mode(0o755));
+    }
+
+    #[cfg(windows)]
+    {
+        let shim_fgos_cmd = bin_dir.join("fgos.cmd");
+        let shim_runner_cmd = bin_dir.join("fgos-runner.cmd");
+        let _ = std::fs::write(&shim_fgos_cmd, "@sh \"%~dp0fgos\" %*\r\n");
+        let _ = std::fs::write(&shim_runner_cmd, "@sh \"%~dp0fgos-runner\" %*\r\n");
     }
 
     // Write root.json
