@@ -202,7 +202,7 @@ All 4 verification tiers executed on the pre-I08b synchronized branch tip:
    - Main checkout `/home/vantt/projects/forgentX`: Completely untouched
 
 ### 3.5 Post-I08b Synchronization & Re-Verification Matrix (Post-I08b Tip 94988740)
-Following Track Manager merge of Unit I08b (`c6262fb1`, integration commit `98f501be41756dc80d691cbf63ffeb4cd617fb30`), candidate branch synchronized via merge commit `949887407919ca8581cb7e800ef9142eba91c90b`:
+Following synchronization with the I08b integration candidate baseline (branch `coordination-skill-harness-i08b-integration` tip `c6262fb1`, containing candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`), candidate branch synchronized via merge commit `949887407919ca8581cb7e800ef9142eba91c90b`:
 - **Production Files Overlap Analysis & Resolution**:
   1. `src/runner/coordination/session-engine.mjs`: Auto-merged cleanly. Candidate export of `readLinkedRunResultFromDisk` (line 302) preserved; I08b F7 check `interpretRunResult(parsed, { expectedRunId: runId })` (line 332) fully active.
   2. `src/verbs/coordination/show.mjs`: Conflict in `readRunResultForAssignment` resolved by delegating to canonical `readLinkedRunResultFromDisk`, inheriting I08b's `expectedRunId` check while preserving fail-closed DAG evidence validation.
@@ -239,7 +239,7 @@ Following Track Manager merge of Unit I08b (`c6262fb1`, integration commit `98f5
   - Contains all 5 test suites (41 tests total: 38 passed, 3 todo, 0 failed) adhering to permanent standard file names and free of plan-specific labels.
 - **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
 - **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
-- **Post-I08b Integrated Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (I08b integration merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`)
+- **I08b Integration Candidate Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`; pending formal landing onto main)
 - **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`)
 - **Integration SHA**: (pending merge into main)
 
@@ -257,6 +257,6 @@ Following Track Manager merge of Unit I08b (`c6262fb1`, integration commit `98f5
 
 ## 5. Next Steps
 
-Unit I10 verification, production fix, and synchronization with post-I08b integrated main (`c6262fb1` / `98f501be`) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified on the post-I08b synchronized tip.
+Unit I10 verification, production fix, and synchronization with the I08b integration candidate baseline (`c6262fb1` / `98f501be`) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified on the post-I08b synchronized tip.
 
 Unit I10 status is **ready for conditional independent re-review (synchronized with I08b integration candidate c6262fb1; conditional on c6262fb1 landing on main unchanged)** awaiting Track Manager confirmation of I08b landing on main. Unit **I11** remains blocked pending I08 and I10 integration approval.
