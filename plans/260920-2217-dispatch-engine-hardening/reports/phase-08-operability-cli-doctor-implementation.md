@@ -298,16 +298,18 @@ No out-of-scope files or unexpected files were modified. Main checkout was prese
 ## 7. Integration Accounting and Verification Baseline
 
 - **Integration Target**: `main`
-- **Integration Baseline**: `main@f1b49d313f602c6b60785660f36f3bfe93e0a91a`
+- **Integration Baseline**: `origin/main@c386e9f30b1ac60d78675f688e8d10146f5e8949`
 - **Evaluated Candidate SHA**: `439a1fb078418edff7628555c4b6cb9f4015e4e6` (approved in independent review: 0 blocker, 0 high, 113 focused passing)
-- **Synchronized Merge Candidate**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (approved for integration)
-- **Integration SHA**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (fast-forwarded from `f1b49d313f602c6b60785660f36f3bfe93e0a91a` on main)
+- **Local Synchronized Candidate**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (synchronized `main@f1b49d31`)
+- **Local Accounting Tip**: `210a8256184639210b157a5355a70b700a3edefa`
+- **Remote Synchronized Merge Candidate**: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (merges `210a8256` into `origin/main@c386e9f3`; approved for integration)
+- **Integration SHA**: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (fast-forwarded local `main` to `261ed7ea`)
 - **Local Hygiene**: User dirty modifications in `AGENTS.md` and `CLAUDE.md` (GitNexus symbol count updates) and untracked files in `scratch/` were preserved intact.
-- **GitNexus Status**: Recorded as degraded per Track Manager review note (no `.gitnexus/run.cjs`).
-- **Post-Merge Verification Status**: Complete on integrated trunk.
-  - **Focused 178 tests**: 178/178 PASS in 6.3s:
-    - 113 tests across `test/cli/dispatch-*.test.mjs`, `test/verbs/dispatch-observe.test.mjs`, `test/setup/visibility-checks.test.mjs`, `test/runner/dispatch-runtime-inspect.test.mjs`, `test/rust-host/command-routes.test.mjs`, `test/architecture.test.mjs`, `test/runner/run-result-v2.test.mjs`.
-    - 65 tests in `test/setup/checks-doctor-config.test.mjs`.
-  - **Full test suite (`npm test`)**: 7,644 tests total: 7,569 PASS, 73 skipped/todo, 2 fail (pre-existing known D2/D3 baseline defects at `test/cli/fgos-approve.test.mjs:197, 216`).
+- **GitNexus Status**: Recorded as degraded per Track Manager review note (stale index at 16a7900; no `.gitnexus/run.cjs`).
+- **Post-Integration Verification Evidence**:
+  - `git diff --check`: clean (0 errors/warnings).
+  - **Focused 178 tests**: 178/178 PASS in 4.9s on integrated `main`.
+  - **Affected Dispatch/Herdr tests**: 559/560 PASS (1 skipped by design) in 32.1s on integrated `main`.
+  - **Coordination tests**: 728/728 PASS in 30.1s.
   - **Candidate Regressions**: Exactly 0.
-- **Next Unit**: Unit I08 ready to be unblocked upon Track Manager acceptance.
+- **Next Unit**: Unit I08 ready to be unblocked upon Track Manager confirmation.

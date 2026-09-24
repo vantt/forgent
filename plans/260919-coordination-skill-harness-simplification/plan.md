@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@6a638752` (evaluated candidate `439a1fb0`, post-merge verification complete: 178/178 focused pass, full suite 0 regressions); Unit I08 ready to unblock upon Track Manager acceptance; I10 requires I09 post-merge verification — I10 blocked
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized 6a638752 and 261ed7ea, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 ready to unblock upon Track Manager confirmation; I10 requires I09 post-merge verification — I10 blocked
 Created: 2026-09-19
 Last Updated: 2026-09-23
 Mode: high-risk
@@ -833,14 +833,14 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: code:implement
   depends-on: I01
   status: integrated, post-merge verification complete
-  branch: `dispatch-hardening-i07-operability-cli-doctor`
-  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/dispatch-hardening-i07-operability-cli-doctor`
+  branch: `dispatch-hardening-i07-origin-sync`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/dispatch-hardening-i07-origin-sync`
   base-sha: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
-  integration-baseline: `main@f1b49d313f602c6b60785660f36f3bfe93e0a91a`
+  integration-baseline: `origin/main@c386e9f30b1ac60d78675f688e8d10146f5e8949`
   evaluated-candidate-sha: `439a1fb078418edff7628555c4b6cb9f4015e4e6` (approved in independent review: 0 blocker, 0 high)
-  synchronized-candidate-sha: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (synchronizes main@f1b49d31 into branch; approved for integration)
-  integrated-sha: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (fast-forward main@f1b49d31 -> 6a638752; preserved user dirty AGENTS.md/CLAUDE.md)
-  integration-status: integrated at 6a638752; post-merge verification complete (178/178 focused pass, full suite verified with 0 regressions; ready for Track Manager to unblock I08)
+  synchronized-candidate-sha: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (merges local main@210a8256 into origin/main@c386e9f3; approved for integration)
+  integrated-sha: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` (fast-forward local main -> 261ed7ea; preserved user dirty AGENTS.md/CLAUDE.md)
+  integration-status: integrated at 261ed7ea; post-merge verification complete (178/178 focused pass, 559/560 dispatch/herdr pass, 0 regressions; awaiting Track Manager confirmation to unblock I08)
   report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
   stop: command/setup/doctor contract cannot be made consistent
 - unit: I08 — verify dispatch governance, CLI, doctor, and performance gates

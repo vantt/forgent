@@ -98,9 +98,9 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
 - **Unit I07 (Dispatch Hardening Phase 08 Operability/CLI Surface & Doctor) Accounting:**
   - Evaluated candidate `439a1fb0` approved in independent review (0 blocker, 0 high, 113 focused passing).
-  - Synchronized candidate `6a638752` approved for integration; fast-forwarded `main` from `f1b49d31` to `6a638752`.
-  - Integration status: INTEGRATED AT `6a638752`; post-merge verification completed (178/178 focused pass; full suite 7,569 pass with 0 candidate regressions, only baseline D2/D3 pre-existing failures).
-  - Unit **I08 remains BLOCKED** pending Track Manager handoff acceptance.
+  - Synchronized candidate `6a638752` integrated locally; remote synchronized candidate `261ed7ea` approved for integration; fast-forwarded `main` to `261ed7ea`.
+  - Integration status: INTEGRATED AT `261ed7ea`; post-merge verification completed (178/178 focused pass; 559/560 dispatch/herdr pass, 728/728 coordination pass, 0 candidate regressions).
+  - Unit **I08 remains BLOCKED** pending Track Manager confirmation.
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
   - Integration status: INTEGRATED AT `1ca4023c`, POST-MERGE VERIFICATION PENDING. Evaluated candidate `a208bf55` approved by independent review (0 blocker, 0 high), synchronized candidate `c624fe58` merged into main at `1ca4023c98c2f449cb58cba481e82cab49ba51ba`.
