@@ -19,6 +19,8 @@ const __dirname = path.dirname(__filename);
 
 const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
 
+const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
+
 let fixtureReleaseDir = null;
 let fixtureDigest = null;
 
@@ -101,7 +103,7 @@ test('R6 & R9: Staging a valid release tree verifies digests and creates release
     assert.match(res.stdout, new RegExp(`staged release ${fixtureDigest}`));
 
     // Assert releases/<digest>/manifest.json exists
-    const stagedManifestPath = path.join(stateHome, 'releases', fixtureDigest, 'manifest.json');
+    const stagedManifestPath = path.join(stateHome, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     assert.ok(fs.existsSync(stagedManifestPath), `Staged manifest must exist at ${stagedManifestPath}`);
 
     // Verify artifactDigest recomputes identically
@@ -156,8 +158,8 @@ test('R6 & R9: Corrupting one byte before staging triggers quarantine and puts n
     assert.ok(fs.existsSync(quarantineDir), 'quarantine/ directory must exist');
     const quarantineEntries = fs.readdirSync(quarantineDir);
     assert.ok(quarantineEntries.length >= 1, 'quarantine/ must contain at least one quarantine record');
-    const matching = quarantineEntries.filter((name) => name.startsWith(fixtureDigest));
-    assert.ok(matching.length >= 1, `quarantine record must start with ${fixtureDigest}`);
+    const matching = quarantineEntries.filter((name) => name.startsWith(releaseDirName(fixtureDigest)));
+    assert.ok(matching.length >= 1, `quarantine record must start with ${releaseDirName(fixtureDigest)}`);
   } finally {
     fs.rmSync(stateHome, { recursive: true, force: true });
     fs.rmSync(corruptCandidateDir, { recursive: true, force: true });
@@ -206,7 +208,7 @@ test('R6 & R9: Re-staging an already-staged digest is a no-op (manifest mtime un
     const res1 = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome });
     assert.equal(res1.status, 0);
 
-    const manifestPath = path.join(stateHome, 'releases', fixtureDigest, 'manifest.json');
+    const manifestPath = path.join(stateHome, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     assert.ok(fs.existsSync(manifestPath));
     const mtime1 = fs.statSync(manifestPath).mtimeMs;
 
@@ -232,14 +234,15 @@ test('R7: Staging from a .tar.gz archive extracts with pure Rust and stages succ
 
   try {
     // Create archive from fixtureReleaseDir
-    execFileSync('tar', ['-czf', archivePath, '-C', fixtureReleaseDir, '.']);
+    const tarFlags = process.platform === 'win32' ? ['--force-local', '-czf'] : ['-czf'];
+    execFileSync('tar', [...tarFlags, archivePath, '-C', fixtureReleaseDir, '.']);
     assert.ok(fs.existsSync(archivePath));
 
     const res = runFgctl(['stage', '--from', archivePath], { stateHome });
     assert.equal(res.status, 0, `Tar staging failed: ${res.stderr}`);
     assert.match(res.stdout, new RegExp(`staged release ${fixtureDigest}`));
 
-    const manifestPath = path.join(stateHome, 'releases', fixtureDigest, 'manifest.json');
+    const manifestPath = path.join(stateHome, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     assert.ok(fs.existsSync(manifestPath), 'Staged manifest from tar.gz must exist');
   } finally {
     fs.rmSync(stateHome, { recursive: true, force: true });
@@ -294,7 +297,8 @@ test('R7: A .tar.gz with a symlink member alongside a valid release is refused, 
     cpSyncRecursive(fixtureReleaseDir, payloadDir);
     fs.symlinkSync('/etc/hostname', path.join(payloadDir, '__evil_link__'));
 
-    execFileSync('tar', ['-czf', archivePath, '-C', payloadDir, '.']);
+    const tarFlags = process.platform === 'win32' ? ['--force-local', '-czf'] : ['-czf'];
+    execFileSync('tar', [...tarFlags, archivePath, '-C', payloadDir, '.']);
     assert.ok(fs.existsSync(archivePath));
 
     const res = runFgctl(['stage', '--from', archivePath], { stateHome });

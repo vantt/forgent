@@ -46,13 +46,17 @@ test('R1 & R2: Release tree builder stages release tree and produces canonical m
     const fgosBin = path.join(tempOut, 'bin', 'fgos');
     assert.ok(fs.existsSync(fgosBin), 'bin/fgos must exist');
     const fgosStat = fs.statSync(fgosBin);
-    assert.ok(Boolean(fgosStat.mode & 0o111), 'bin/fgos must be executable');
+    if (process.platform !== 'win32') {
+      assert.ok(Boolean(fgosStat.mode & 0o111), 'bin/fgos must be executable');
+    }
 
     // 4. Verify bin/fgos-runner exists, is executable, and is a relative POSIX sh shim
     const runnerBin = path.join(tempOut, 'bin', 'fgos-runner');
     assert.ok(fs.existsSync(runnerBin), 'bin/fgos-runner must exist');
     const runnerStat = fs.statSync(runnerBin);
-    assert.ok(Boolean(runnerStat.mode & 0o111), 'bin/fgos-runner must be executable');
+    if (process.platform !== 'win32') {
+      assert.ok(Boolean(runnerStat.mode & 0o111), 'bin/fgos-runner must be executable');
+    }
     const runnerContent = fs.readFileSync(runnerBin, 'utf8');
     assert.ok(runnerContent.startsWith('#!/bin/sh'), 'bin/fgos-runner must start with #!/bin/sh');
     assert.ok(

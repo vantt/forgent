@@ -202,7 +202,7 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
     };
 
     let digest = manifest.artifact_digest.clone();
-    let release_dir = store_root.join("releases").join(&digest);
+    let release_dir = release_dir_path(store_root, &digest);
 
     // 4. If releases/<digest>/ already exists, treats as no-op success
     if release_dir.exists() {
@@ -232,9 +232,7 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
         }
         Err(verify_err) => {
             // Mismatch: move temp directory to quarantine/<digest>-<timestamp>/
-            let quarantine_dir = store_root
-                .join("quarantine")
-                .join(format!("{}-{}", digest, timestamp));
+            let quarantine_dir = quarantine_dir_path(store_root, &digest, timestamp);
             std::fs::create_dir_all(store_root.join("quarantine"))?;
             let _ = std::fs::rename(&temp_sibling, &quarantine_dir);
             Err(StageError::Quarantined {
@@ -244,6 +242,41 @@ pub fn stage_release(store_root: &Path, from_path: &Path) -> Result<StageOutcome
             })
         }
     }
+}
+
+/// Returns the sanitized directory name for a release under `releases/`.
+/// On Windows, colons are forbidden in path segments (os error 123), so `sha256:<hex>`
+/// is mapped to `sha256-<hex>`.
+pub fn release_dir_name(digest: &str) -> String {
+    if cfg!(windows) {
+        digest.replace(':', "-")
+    } else {
+        digest.to_string()
+    }
+}
+
+/// Returns the sanitized directory name for a quarantine record under `quarantine/`.
+pub fn quarantine_dir_name(digest: &str, timestamp: u128) -> String {
+    format!("{}-{}", release_dir_name(digest), timestamp)
+}
+
+/// Resolves the filesystem path for a release under `store_root/releases/`.
+pub fn release_dir_path(store_root: &Path, digest: &str) -> PathBuf {
+    let releases = store_root.join("releases");
+    if cfg!(windows) {
+        releases.join(digest.replace(':', "-"))
+    } else if releases.join(digest).exists() {
+        releases.join(digest)
+    } else if releases.join(digest.replace(':', "-")).exists() {
+        releases.join(digest.replace(':', "-"))
+    } else {
+        releases.join(digest)
+    }
+}
+
+/// Resolves the filesystem path for a quarantine directory under `store_root/quarantine/`.
+pub fn quarantine_dir_path(store_root: &Path, digest: &str, timestamp: u128) -> PathBuf {
+    store_root.join("quarantine").join(quarantine_dir_name(digest, timestamp))
 }
 
 /// Release status summary entry for `fgctl status --json` (R8).
@@ -324,5 +357,21 @@ mod tests {
         assert_eq!(resolved, PathBuf::from("/custom/fgos/state"));
         std::env::remove_var("FGOS_STATE_HOME");
         std::env::remove_var("XDG_STATE_HOME");
+    }
+
+    #[test]
+    fn test_release_and_quarantine_dir_paths() {
+        let root = Path::new("/test/store");
+        let digest = "sha256:0123456789abcdef";
+        let rel_path = release_dir_path(root, digest);
+        let quar_path = quarantine_dir_path(root, digest, 123456789);
+
+        if cfg!(windows) {
+            assert_eq!(rel_path, root.join("releases").join("sha256-0123456789abcdef"));
+            assert_eq!(quar_path, root.join("quarantine").join("sha256-0123456789abcdef-123456789"));
+        } else {
+            assert_eq!(rel_path, root.join("releases").join("sha256:0123456789abcdef"));
+            assert_eq!(quar_path, root.join("quarantine").join("sha256:0123456789abcdef-123456789"));
+        }
     }
 }

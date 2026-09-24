@@ -20,6 +20,8 @@ const __dirname = path.dirname(__filename);
 
 const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
 
+const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
+
 let fixtureReleaseDir = null;
 let fixtureDigest = null;
 
@@ -606,7 +608,7 @@ test('Item 5: Staged release whose manifest.json digest mismatches pin is refuse
     assert.equal(stageRes.status, 0);
 
     // Tamper with manifest in staged release dir
-    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const stagedManifestPath = path.join(tempState, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
     manifest.artifactDigest = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
@@ -658,7 +660,7 @@ test('Item 5 (widened): a tampered staged release is refused on the pin+matching
     // so only init's own post-match digest assertion can catch this.
     const stageRes = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome: tempState });
     assert.equal(stageRes.status, 0);
-    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const stagedManifestPath = path.join(tempState, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
     manifest.artifactDigest = 'sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
     fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
@@ -936,12 +938,12 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     assert.doesNotMatch(res.stderr, /preflight failed/i, 'the hostile candidate is statically well-formed and must pass preflight');
 
     // The candidate was staged (its tree is a valid release) ...
-    assert.ok(fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'manifest.json')));
+    assert.ok(fs.existsSync(path.join(tempState, 'releases', releaseDirName(manifest.artifactDigest), 'manifest.json')));
     // ... but never executed: no sentinel outside the release tree, no
     // host-visible file in the candidate dir, the staged copy, or the project.
     assert.ok(!fs.existsSync(sentinel), 'preflight executed candidate bin/fgos (sentinel written outside release tree)');
     assert.ok(!fs.existsSync(path.join(hostileReleaseDir, 'AGENTS.md')), 'candidate wrote into its own source tree');
-    assert.ok(!fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'AGENTS.md')), 'candidate wrote into the staged release');
+    assert.ok(!fs.existsSync(path.join(tempState, 'releases', releaseDirName(manifest.artifactDigest), 'AGENTS.md')), 'candidate wrote into the staged release');
     assert.ok(!fs.existsSync(path.join(tempProj, 'AGENTS.md')), 'candidate wrote into the project');
     assert.ok(!fs.existsSync(path.join(installDir, 'activation.json')), 'no activation may be published');
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'no pin may be written');

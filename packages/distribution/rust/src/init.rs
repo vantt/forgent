@@ -8,8 +8,8 @@ use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;
 use crate::manifest::{read_manifest_from_dir, ReleaseManifest};
 use crate::store::{
-    list_releases, now_millis, resolve_machine_release_store_root, stage_release,
-    ReleaseStatusEntry, StageOutcome,
+    list_releases, now_millis, quarantine_dir_path, release_dir_path,
+    resolve_machine_release_store_root, stage_release, ReleaseStatusEntry, StageOutcome,
 };
 use crate::verify::{recompute_artifact_digest, verify_legacy_node, verify_release_files};
 use crate::workspace::{
@@ -694,7 +694,7 @@ fn mark_transaction_status(tx_path: &Path, status: &str) -> std::io::Result<()> 
 /// exactly this "falsely ready" state behind, and status alone cannot tell
 /// the difference from a genuinely healthy binding.
 fn is_release_staged(store_root: &Path, digest: &str) -> bool {
-    store_root.join("releases").join(digest).exists()
+    release_dir_path(store_root, digest).exists()
 }
 
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
@@ -784,7 +784,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 )));
             }
 
-            let dir = store_root.join("releases").join(&staged_digest);
+            let dir = release_dir_path(&store_root, &staged_digest);
             (staged_digest, dir)
         }
         (Some(pin), None) => {
@@ -812,7 +812,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 }
             }
 
-            let dir = store_root.join("releases").join(pin_digest);
+            let dir = release_dir_path(&store_root, pin_digest);
             if !dir.exists() {
                 let quarantine_note = current_activation
                     .as_ref()
@@ -856,7 +856,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 StageOutcome::Staged { artifact_digest } => artifact_digest,
                 StageOutcome::NoOp { artifact_digest } => artifact_digest,
             };
-            let dir = store_root.join("releases").join(&staged_digest);
+            let dir = release_dir_path(&store_root, &staged_digest);
             (staged_digest, dir)
         }
         (None, None) => {
@@ -1218,7 +1218,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         StageOutcome::NoOp { artifact_digest } => artifact_digest,
     };
 
-    let candidate_dir = store_root.join("releases").join(&staged_digest);
+    let candidate_dir = release_dir_path(&store_root, &staged_digest);
     let manifest = read_manifest_from_dir(&candidate_dir).map_err(|e| {
         InitError::Custom(format!(
             "failed to read manifest from {}: {}",
@@ -1334,7 +1334,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
     let is_self_verify = current_activation.previous_artifact_digest.is_none();
     let (target_digest, candidate_dir) =
         if let Some(ref prev_digest) = current_activation.previous_artifact_digest {
-            let dir = store_root.join("releases").join(prev_digest);
+            let dir = release_dir_path(&store_root, prev_digest);
             if !dir.exists() {
                 return Err(InitError::Custom(format!(
                     "cannot repair: previous release {} not found in release store",
@@ -1344,7 +1344,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
             (prev_digest.clone(), dir)
         } else {
             let active_digest = &current_activation.artifact_digest;
-            let dir = store_root.join("releases").join(active_digest);
+            let dir = release_dir_path(&store_root, active_digest);
             if !dir.exists() {
                 return Err(InitError::Custom(format!(
                     "cannot repair: active release {} not found in release store",
@@ -1390,9 +1390,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         Ok(m) => m,
         Err(err_msg) if is_self_verify => {
             let timestamp = now_millis();
-            let quarantine_dir = store_root
-                .join("quarantine")
-                .join(format!("{}-{}", target_digest, timestamp));
+            let quarantine_dir = quarantine_dir_path(&store_root, &target_digest, timestamp);
             std::fs::create_dir_all(store_root.join("quarantine"))?;
             if candidate_dir.exists() {
                 let _ = std::fs::rename(&candidate_dir, &quarantine_dir);
@@ -1482,7 +1480,7 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
     };
 
     let active_digest = current_activation.artifact_digest.clone();
-    let release_dir = store_root.join("releases").join(&active_digest);
+    let release_dir = release_dir_path(&store_root, &active_digest);
 
     let verify_result = (|| -> Result<(), String> {
         if !release_dir.exists() {
@@ -1513,9 +1511,7 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
         Err(err_msg) => {
             // Mismatch: move release directory to quarantine/<digest>-<timestamp>/
             let timestamp = now_millis();
-            let quarantine_dir = store_root
-                .join("quarantine")
-                .join(format!("{}-{}", active_digest, timestamp));
+            let quarantine_dir = quarantine_dir_path(&store_root, &active_digest, timestamp);
             std::fs::create_dir_all(store_root.join("quarantine"))?;
             if release_dir.exists() {
                 let _ = std::fs::rename(&release_dir, &quarantine_dir);
