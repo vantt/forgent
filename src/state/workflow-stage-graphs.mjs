@@ -779,8 +779,8 @@ export function resolveTaskSpecPath(domain, specId, options = {}) {
 
   const filename = specId && specId.endsWith('.md') ? specId : `${specId}.md`;
   const relativePath = domainName === 'core'
-    ? path.posix.join('core', 'task-specs', filename)
-    : path.posix.join('domains', domainName, 'task-specs', filename);
+    ? path.join('core', 'task-specs', filename)
+    : path.join('domains', domainName, 'task-specs', filename);
 
   return root ? path.join(root, relativePath) : relativePath;
 }

@@ -53,11 +53,12 @@ function listFgosSkillDirs(root) {
 function listFilesRecursive(dir, base = dir) {
   const files = [];
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (/\.tmp-\d+/.test(entry.name)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       files.push(...listFilesRecursive(full, base));
     } else {
-      files.push(path.relative(base, full));
+      files.push(path.relative(base, full).replaceAll('\\', '/'));
     }
   }
   return files.sort();

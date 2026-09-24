@@ -304,12 +304,12 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
     fs.linkSync(tmpPath, lockPath);
     return { acquired: true };
   } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
+    if (err.code !== 'EEXIST' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
   } finally {
     try {
       fs.unlinkSync(tmpPath);
     } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
+      if (err.code !== 'ENOENT' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
     }
   }
 
@@ -317,7 +317,7 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
   try {
     raw = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // released in between — retry create
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // released in between — retry create
     throw err;
   }
   const holderPid = parseInt(raw.trim(), 10);
@@ -336,7 +336,7 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
   try {
     current = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // already cleaned
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // already cleaned
     throw err;
   }
   if (current !== raw) {
@@ -346,7 +346,7 @@ function tryAcquireEventsLockOnce(lockPath, pid) {
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
+    if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
   }
   return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
 }
@@ -363,10 +363,23 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
       return {
         lockPath,
         release() {
+          for (let attempt = 0; attempt < 5; attempt++) {
+            try {
+              fs.unlinkSync(lockPath);
+              return;
+            } catch (err) {
+              if (err.code === 'ENOENT') return;
+              if (process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY')) {
+                sleepSync(5);
+                continue;
+              }
+              throw err;
+            }
+          }
           try {
             fs.unlinkSync(lockPath);
           } catch (err) {
-            if (err.code !== 'ENOENT') throw err;
+            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
           }
         },
       };

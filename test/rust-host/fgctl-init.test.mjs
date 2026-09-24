@@ -152,14 +152,14 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.equal(versionEnv.contract, 'fgos.v1');
     assert.equal(versionEnv.data.host, 'rust');
     assert.equal(versionEnv.data.artifactDigest, activation.artifactDigest);
-    assert.equal(versionEnv.data.projectRoot, fs.realpathSync.native(tempProj));
+    assert.equal(path.normalize(versionEnv.data.projectRoot), path.normalize(fs.realpathSync.native(tempProj)));
     assert.equal(versionEnv.data.workspaceId, rootJson.workspaceId);
     assert.equal(versionEnv.data.workStateId, rootJson.workStateId);
     assert.equal(
-      versionEnv.data.workHistoryRoot,
-      path.join(fs.realpathSync.native(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId)
+      path.normalize(versionEnv.data.workHistoryRoot),
+      path.normalize(path.join(fs.realpathSync.native(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId))
     );
-    assert.equal(versionEnv.data.machineReleaseStore, tempState);
+    assert.equal(path.normalize(versionEnv.data.machineReleaseStore), path.normalize(tempState));
     assert.equal(versionEnv.data.schemaVersion, 1);
     assert.ok(versionEnv.data.components?.legacyNode, 'components.legacyNode must be present');
     assert.equal(versionEnv.data.components.legacyNode.entry, 'bin/fgos.mjs');

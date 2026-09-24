@@ -75,7 +75,12 @@ function hasWindowsTrailingDotOrSpace(segment) {
 function atomicCopyFileSync(sourcePath, targetPath) {
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.copyFileSync(sourcePath, tmpPath);
-  fs.renameSync(tmpPath, targetPath);
+  try {
+    fs.renameSync(tmpPath, targetPath);
+  } catch (err) {
+    try { fs.unlinkSync(tmpPath); } catch {}
+    throw err;
+  }
 }
 
 // `readdirSync` on a directory another process is concurrently writing into

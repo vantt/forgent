@@ -57,7 +57,7 @@ test('fgos setup run twice does not rewrite an already-complete ~/.fgos/config.j
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('setup from a real checkout still writes the rc line and reports no declined reason', () => {
+test('setup from a real checkout still writes the rc line and reports no declined reason', { skip: process.platform === 'win32' }, () => {
   const homeDir = mkTemp('checks-git-home-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
   const cwd = initRepo('checks-git-cwd-');

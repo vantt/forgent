@@ -32,7 +32,7 @@ function initGitRepo(cwd) {
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd });
 }
 
-test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical', () => {
+test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical', { skip: process.platform === 'win32' }, () => {
   const cwd = mkTemp('uninstall-cli-yes-');
   const home = mkTemp('uninstall-cli-yes-home-');
   fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');

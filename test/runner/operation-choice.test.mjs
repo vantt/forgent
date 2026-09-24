@@ -1009,8 +1009,8 @@ test('buildAssignment populates contextRefs and expectedOutputs when work has do
   });
 
   assert.ok(assignment.contextRefs.includes('docs/history/feat-refs'));
-  assert.ok(assignment.contextRefs.includes(path.join('docs/history/feat-refs', 'plan.md')));
-  assert.ok(assignment.contextRefs.includes(path.join('docs/history/feat-refs', 'CONTEXT.md')));
+  assert.ok(assignment.contextRefs.includes(path.posix.join('docs/history/feat-refs', 'plan.md')));
+  assert.ok(assignment.contextRefs.includes(path.posix.join('docs/history/feat-refs', 'CONTEXT.md')));
   assert.ok(assignment.contextRefs.includes('extra-ref.txt'));
   assert.ok(assignment.expectedOutputs.some((o) => o.includes('agent-result.json')));
 });

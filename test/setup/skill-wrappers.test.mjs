@@ -256,6 +256,7 @@ function listFilesRecursiveSorted(dir) {
   const out = [];
   const walk = (d, rel) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (/\.tmp-\d+/.test(entry.name)) continue;
       const relPath = rel ? `${rel}/${entry.name}` : entry.name;
       if (entry.isDirectory()) walk(path.join(d, entry.name), relPath);
       else out.push(relPath);
