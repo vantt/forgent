@@ -34,17 +34,18 @@ function optionalField(value, message) {
 }
 
 function formatJqVerifyCommand(root, ids) {
+  const normalizedRoot = path.normalize(root);
   if (process.platform === 'win32') {
     const idList = ids.map((id) => `\\"${id}\\"`).join(',');
     return (
-      `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
+      `node ${normalizedRoot}/bin/fgos.mjs list --json --all --dir ${normalizedRoot} | ` +
       `jq -e ".data.work as $w | [${idList}] | map($w[.].status) | ` +
       `all(. as $s | [\\"delivered\\",\\"retrospective\\",\\"cleanup\\",\\"done\\"] | index($s) != null)" > NUL`
     );
   }
   const idList = ids.map((childId) => JSON.stringify(childId)).join(',');
   return (
-    `node ${root}/bin/fgos.mjs list --json --all --dir ${root} | ` +
+    `node ${normalizedRoot}/bin/fgos.mjs list --json --all --dir ${normalizedRoot} | ` +
     `jq -e '.data.work as $w | [${idList}] | map($w[.].status) | ` +
     `all(. as $s | ["delivered","retrospective","cleanup","done"] | index($s) != null)' > /dev/null`
   );
@@ -71,7 +72,7 @@ export function generateVerifyFromChildren(dir, id, { cwd = process.cwd(), repoR
         ['rev-parse', '--path-format=absolute', '--git-common-dir'],
         { cwd, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
       ).trim();
-      root = path.dirname(gitCommonDir);
+      root = path.resolve(path.dirname(gitCommonDir));
     } catch (err) {
       throw new StoreError('validation', `edit --verify-from-children: could not resolve the repo root via git (${err.message}).`);
     }
@@ -100,7 +101,7 @@ export function generateVerifyFromTargets(dir, id, { cwd = process.cwd(), repoRo
         ['rev-parse', '--path-format=absolute', '--git-common-dir'],
         { cwd, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'ignore'] },
       ).trim();
-      root = path.dirname(gitCommonDir);
+      root = path.resolve(path.dirname(gitCommonDir));
     } catch (err) {
       throw new StoreError('validation', `edit --verify-from-targets: could not resolve the repo root via git (${err.message}).`);
     }

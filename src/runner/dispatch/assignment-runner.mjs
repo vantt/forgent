@@ -1256,7 +1256,11 @@ function admitRunAttempt(
   try {
     fs.renameSync(stagingDir, runDir);
   } catch (err) {
-    if (err.code === 'ENOTEMPTY' || err.code === 'EEXIST') {
+    if (
+      err.code === 'ENOTEMPTY' ||
+      err.code === 'EEXIST' ||
+      (process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EACCES') && fs.existsSync(runDir))
+    ) {
       fs.rmSync(stagingDir, { recursive: true, force: true });
       return { attemptNum: record.attempt, attemptStr: record.attemptStr, runId: record.runId, runDir, resumed: true };
     } else {

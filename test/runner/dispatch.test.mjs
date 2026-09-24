@@ -1416,7 +1416,8 @@ function captureStderr(fn) {
 function withKnownCliOnPath(names, fn) {
   const dir = mkTempDir();
   for (const name of names) {
-    fs.writeFileSync(path.join(dir, name), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
+    const binName = process.platform === 'win32' ? `${name}.cmd` : name;
+    fs.writeFileSync(path.join(dir, binName), '#!/bin/sh\nexit 0\n', { mode: 0o755 });
   }
   const originalPath = process.env.PATH;
   process.env.PATH = `${dir}${path.delimiter}${originalPath ?? ''}`;

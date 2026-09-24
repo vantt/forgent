@@ -903,8 +903,12 @@ test('e2e crash-idempotency: runner killed mid-item (after doing, before propose
   // runner allocated for this attempt.
   const first = runner(repoRoot, ['--once', '--config', configPath]);
   // Killed by SIGKILL: no graceful exit code, no controlled stdout.
-  assert.equal(first.status, null);
-  assert.equal(first.signal, 'SIGKILL');
+  if (process.platform === 'win32') {
+    assert.ok(first.status !== 0);
+  } else {
+    assert.equal(first.status, null);
+    assert.equal(first.signal, 'SIGKILL');
+  }
 
   // The claim (todo -> doing) landed before the kill; the item is left
   // sitting in `doing` with a real commit already on its branch.
@@ -982,7 +986,7 @@ function waitForStdout(child, marker, timeoutMs = 5000) {
   });
 }
 
-test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a single SIGINT stops it cleanly (exit 0) within 2000ms', { timeout: 10_000 }, async () => {
+test('e2e --watch: stays alive over an idle frontier, completes a cycle, and a single SIGINT stops it cleanly (exit 0) within 2000ms', { timeout: 10_000, skip: process.platform === 'win32' ? 'Windows child processes cannot receive SIGINT via child.kill' : false }, async () => {
   const repoRoot = initTempRepo();
   assert.equal(fgos(repoRoot, ['init']).status, 0);
 
