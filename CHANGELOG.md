@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Fixed**: the test-selector promotion pipeline (`test:select:promote`) never had any real evidence to evaluate: the `compare` CI job computed `ledger.json` (the PR-side evidence) but never uploaded it, so every real comparison this repo ever produced was discarded the instant its job container tore down; `nightly-ledger.json` was uploaded but nothing ever downloaded and aggregated it across runs. Added `scripts/test-select-promote-report.mjs` (`npm run test:select:promote:report`), which pulls every non-expired compare/nightly ledger artifact from CI and runs the real `promoteRules` evaluation against the accumulated history — read-only by default. Also registered N=3 authored boundary mutants each for `verbs-state-read`/`verbs-state-stage` (`src/verbs/state/read.mjs`/`stage.mjs`), completing mutant coverage for the P3-09 canary's three rules (previously only `verbs-state-edit` had any).
 - **Dispatch Operability & CLI Hardening**:
   - Registered `fgos dispatch decide|execute|log` as canonical public CLI sub-verbs wrapped in the `fgos.v1` output envelope, retaining `node src/runner/dispatch.mjs` as backwards-compatible alias.
   - Added additive `reasonCodes` and `blockedReason` to `decideExecutorCli`, and removed dead `plan.dispatch === 'human-only'` check.

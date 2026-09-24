@@ -232,6 +232,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # test:select:compare exits before writing ledger.json when the
+      # selector's own decision was 'full' (no comparison to make) -- the
+      # file only exists on a genuine 'related' run. Without this upload,
+      # every real compare ledger this repo ever produced was discarded the
+      # instant the job container tore down: promoteRules (test-select-
+      # promote.mjs) had no durable evidence to ever read, on any rule, ever.
+      - name: Upload compare ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compare-ledger-${{ github.run_id }}
+          path: ledger.json
+          if-no-files-found: ignore
+          retention-days: 90
+
   herdr-plugin:
     name: cargo test (herdr-plugin)
     runs-on: ubuntu-latest
