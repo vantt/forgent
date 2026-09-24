@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea), verification blocked on base defects F4/F5 | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated in Unit I08b | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -111,6 +111,21 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - R7 receipt latency benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
   - Measurement artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`.
   - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`.
+- **Unit I08b (Remediation of I08 Base Defects F4, F5, F6, F7, F10) Accounting:**
+  - Capability: `code:implement`.
+  - Depends-on: Unit I08.
+  - Status: `ready for independent review`.
+  - Branch: `coordination-skill-harness-i08b-remediation`.
+  - Worktree: `.claude/worktrees/coordination-skill-harness-i08b-remediation`.
+  - Base Lineage: Candidate I08 `4e9de19541f2acde2380ff4f78147e389385e95c` + `origin/main@42934bf3e8aa37eee867e5df403e7c5a1c3fdfee`.
+  - Defects Remediated:
+    * F4 (HIGH): Explicit unregistered executor fail-closed with exit code 1 (`DispatchError('executor-not-found')`) across public CLI, compat door, and `executeExecutorCli`. Preserved implicit resolution for work item dispatches. Pinned tests updated.
+    * F5 (HIGH): Canonicalize provider family using `normalizeProviderFamily(deriveProviderFamily(entry, command), command)` in redirect checks and provenance recording in `dispatch-plan.json`. Permits intra-family redirects without `crossProvider: true` and blocks cross-family spoofing.
+    * F6 (MEDIUM): Added `.trim()` and preserved precedence for caller option over environment variable in `resolveHerdrBin()`.
+    * F7 (MEDIUM): Extended `expectedRunId` verification across all intake doors (`run-result.mjs`, `show-run.mjs`, `watch.mjs`, `herdr-round.mjs`, `assignment-runner.mjs`, `runtime-inspection.mjs`, `session-engine.mjs`, `show.mjs`). Mismatched `runId` flags `contract-corrupt` / `resultCorrupt: true` and prevents settling.
+    * F10 (MEDIUM): Validate `--action` requirement on `fgos dispatch reconcile plan` with `--run` or `--assignment` before evaluating CWD lock, returning exit code 4 (validation error).
+  - Verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); 178/178 focused tests pass; affected matrix (55 files): 1410 pass, 0 fail, 1 skip; `git diff --check` clean.
+  - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`.
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
   - Integration status: INTEGRATED AT `1ca4023c`, POST-MERGE VERIFICATION PENDING. Evaluated candidate `a208bf55` approved by independent review (0 blocker, 0 high), synchronized candidate `c624fe58` merged into main at `1ca4023c98c2f449cb58cba481e82cab49ba51ba`.

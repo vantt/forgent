@@ -163,7 +163,12 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // runs of the same assignment.
           let runResult = null;
           try {
-            runResult = interpretRunResult(JSON.parse(fs.readFileSync(resultJsonPath, 'utf8')));
+            let expectedRunId;
+            const runJsonPath = path.join(runsDir, runSub, 'run.json');
+            if (fs.existsSync(runJsonPath)) {
+              try { expectedRunId = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'))?.runId; } catch {}
+            }
+            runResult = interpretRunResult(JSON.parse(fs.readFileSync(resultJsonPath, 'utf8')), { expectedRunId });
           } catch {
             continue;
           }

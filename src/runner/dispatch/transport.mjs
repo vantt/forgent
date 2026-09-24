@@ -92,7 +92,7 @@ export function currentDispatchDepth() {
 }
 
 export function resolveHerdrBin(optsHerdrBin) {
-  return optsHerdrBin ?? process.env.FGOS_HERDR_BIN ?? 'herdr';
+  return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
 }
 
 /**

@@ -8,13 +8,15 @@
 // `transport.mjs` re-exports the name, so every existing importer is
 // unaffected.
 
+import { RunnerConfigError } from './config.mjs';
+
 /** Raised when spawning or running the executor itself fails at runtime.
  * `errorClass` deliberately reuses the vocabulary declared in
  * `recovery.mjs`'s `ERROR_CLASSES` (per the cell's key_link) so the runner
  * can feed it straight into `resolveAction` without a translation layer. */
-export class DispatchError extends Error {
+export class DispatchError extends RunnerConfigError {
   constructor(errorClass, message, details = {}) {
-    super(message);
+    super(message, details);
     this.name = 'DispatchError';
     this.errorClass = errorClass;
     this.code = details.code ?? errorClass;

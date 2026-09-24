@@ -2,21 +2,24 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-24 (Unit I07 Integrated, Unit I08 Blocked on Base Defects F4/F5)
+## Status — 2026-09-24 (Unit I07 Integrated, Unit I08 Remediated via Unit I08b)
 
 - **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
-- **Unit I08 Status**: `blocked on base defects F4/F5 (remediation unit required)` (Branch: `coordination-skill-harness-i08-dispatch-verification`, Base: `6f3fb9038fd66cd9943972a321eed2ba98587fab`).
-- **Stop Condition**: `triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)`.
+- **Unit I08 Status**: `blocked on base defects F4/F5` (remediated in Unit I08b; unblocks re-verification).
+- **Unit I08b Status**: `ready for independent review` (Branch: `coordination-skill-harness-i08b-remediation`, Base: candidate I08 `4e9de195` + `origin/main@42934bf3`).
+- **Remediation Scope**: Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
 - **Reports**:
-  - Implementation: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
-  - Verification: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
+  - Implementation (I07): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
+  - Verification (I08): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
+  - Remediation (I08b): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
   - Benchmark artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
 - **Verification Evidence**:
+  - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
   - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
-  - `test/cli/dispatch-operability.test.mjs`: 8 pass / 0 fail.
+  - `test/cli/dispatch-operability.test.mjs`: 11 pass / 0 fail.
   - `test/cli/dispatch-reconcile.test.mjs`: 6 pass / 0 fail.
-  - `test/verbs/dispatch-observe.test.mjs`: 11 pass / 0 fail.
-  - `test/runner/dispatch-runtime-inspect.test.mjs`: 19 pass / 0 fail.
+  - `test/verbs/dispatch-observe.test.mjs`: 12 pass / 0 fail.
+  - `test/runner/dispatch-runtime-inspect.test.mjs`: 20 pass / 0 fail.
   - `test/setup/visibility-checks.test.mjs`: 17 pass / 0 fail.
   - `test/setup/*.test.mjs`: 607 pass / 0 fail.
   - `test/runner/dispatch.test.mjs`: 387 pass / 0 fail.

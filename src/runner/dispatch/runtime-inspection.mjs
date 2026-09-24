@@ -50,8 +50,9 @@ function result(l) {
     if (st.isDirectory()) {
       return { present: true, value: interpretRunResult(null), corrupt: true };
     }
-    const val = interpretRunResult(file);
-    const corrupt = !val || val.classification === 'contract-corrupt';
+    const expectedRunId = l.run?.runId;
+    const val = interpretRunResult(file, { expectedRunId });
+    const corrupt = !val || val.corrupt || val.contractCorrupt || val.resultCorrupt || val.classification?.provenance === 'contract-corrupt';
     return { present: true, value: val, corrupt };
   } catch {
     return { present: true, value: interpretRunResult(null), corrupt: true };

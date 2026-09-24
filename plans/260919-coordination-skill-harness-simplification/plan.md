@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea`; Unit I08 blocked on base defects F4/F5 (remediation unit required); I10 requires I09 post-merge verification — I10 blocked
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea`; Unit I08 blocked on base defects F4/F5; Unit I08b ready for independent review; I10 requires I09 post-merge verification — I10 blocked
 Created: 2026-09-19
 Last Updated: 2026-09-24
 Mode: high-risk
@@ -856,6 +856,16 @@ Executor/provider/model/tier selection remains an execution-time decision.
   measurement-artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
   report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
   stop: redirect/governance bypass or measured latency regression
+- unit: I08b — remediation of I08 base defects F4, F5, F6, F7, F10
+  capability: code:implement
+  depends-on: I08
+  status: ready for independent review
+  branch: `coordination-skill-harness-i08b-remediation`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08b-remediation`
+  base-sha: `4e9de19541f2acde2380ff4f78147e389385e95c` + `origin/main@42934bf3e8aa37eee867e5df403e7c5a1c3fdfee`
+  remediation-scope: F4 (HIGH fail-closed explicit unregistered executor), F5 (HIGH canonicalize provider family on real command), F6 (MEDIUM whitespace trim / option precedence for resolveHerdrBin), F7 (MEDIUM expectedRunId verification across all intake doors), F10 (MEDIUM validate --action before checking cwd lock in reconcile plan)
+  verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); 178/178 focused pass; affected matrix (55 files): 1410 pass, 0 fail, 1 skip; git diff --check clean (0 errors/warnings)
+  report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
   depends-on: I02, I04, and I06

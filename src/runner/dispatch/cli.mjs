@@ -723,7 +723,14 @@ export async function executeExecutorCli(
     executorConfigured = resolved.configured;
   } else {
     const resolved = resolveExecutorAndOverrides(cfg, executorId);
-    resolvedExecutor = resolved.executor; // undefined when unconfigured -- falls through to the global executor below, unchanged
+    if (!work && (!resolved.configured || !resolved.executor)) {
+      throw new DispatchError(
+        'executor-not-found',
+        `no executor registered for id "${executorIdArg}"`,
+        { executorId: executorIdArg },
+      );
+    }
+    resolvedExecutor = resolved.executor;
     capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
@@ -746,6 +753,13 @@ export async function executeExecutorCli(
   const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
+  if (!work && mechanism === 'unavailable') {
+    throw new DispatchError(
+      'executor-not-found',
+      `executor "${executorId}" is unavailable`,
+      { executorId },
+    );
+  }
   if (mechanism === 'in-process') {
     const agentType = resolvedExecutor?.agentType;
     const stageSkill = executorIdArg;
@@ -880,39 +894,61 @@ export async function executeExecutorCli(
   // resolved against. A value that fails to translate (an invalid --tier)
   // already failed inside `modelForTier` above before reaching here.
   const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-  resolveAssignmentDispatchPolicy({
-    assignment: {
-      operation: purpose ?? executorId,
-      role: undefined,
-      policy: {
-        minTier: policyTier,
-        providerModel: capabilityOverrides?.providerModel,
-        // Only when a real registered executor resolved -- an unconfigured
-        // executorId must fall through to resolveAssignmentDispatchPolicy's
-        // own global-executor default, exactly like resolveExecutorCommand
-        // does downstream, never throw "not a registered executor" for a
-        // case this function's own contract has never thrown for.
-        ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
+  try {
+    resolveAssignmentDispatchPolicy({
+      assignment: {
+        operation: purpose ?? executorId,
+        role: undefined,
+        policy: {
+          minTier: policyTier,
+          providerModel: capabilityOverrides?.providerModel,
+          // Only when a real registered executor resolved -- an unconfigured
+          // executorId must fall through to resolveAssignmentDispatchPolicy's
+          // own global-executor default, exactly like resolveExecutorCommand
+          // does downstream, never throw "not a registered executor" for a
+          // case this function's own contract has never thrown for.
+          ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
+        },
+        skills: [],
       },
-      skills: [],
-    },
-    runnerConfig: cfg,
-    cliOverride: { model },
-    options,
-  });
+      runnerConfig: cfg,
+      cliOverride: { model },
+      options,
+    });
+  } catch (err) {
+    if (err.message && /governance gate rejected/.test(err.message)) {
+      throw new DispatchError('governance-refused', err.message, {
+        executorId,
+        cause: err,
+      });
+    }
+    throw err;
+  }
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
-    prompt,
-    model,
-    tier,
-    executorId,
-    fgosDir,
-    contentCarries: carries,
-    attestRoot: cwd,
-    resolvedAgentType,
-  });
+  let commandInfo;
+  try {
+    commandInfo = resolveExecutorCommand(cfg, {
+      prompt,
+      model,
+      tier,
+      executorId,
+      fgosDir,
+      contentCarries: carries,
+      attestRoot: cwd,
+      resolvedAgentType,
+    });
+  } catch (err) {
+    if (err.message && (/cross-provider/.test(err.message) || /governance/.test(err.message))) {
+      throw new DispatchError('governance-refused', err.message, {
+        executorId,
+        cause: err,
+      });
+    }
+    throw err;
+  }
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = commandInfo;
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;

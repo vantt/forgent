@@ -125,7 +125,7 @@ export function projectLegacyStatusAndConfidence(classification) {
  * @param {unknown} result
  * @returns {{ valid: boolean, corrupt: boolean, reasons: string[] }}
  */
-export function validateRunResultV2(result) {
+export function validateRunResultV2(result, { expectedRunId } = {}) {
   const reasons = [];
   if (!result || typeof result !== 'object' || Array.isArray(result)) {
     return { valid: false, corrupt: true, reasons: ['RunResult must be an object'] };
@@ -139,6 +139,8 @@ export function validateRunResultV2(result) {
 
   if (typeof result.runId !== 'string' || !result.runId.trim()) {
     reasons.push('runId must be a non-empty string');
+  } else if (expectedRunId && result.runId !== expectedRunId) {
+    reasons.push(`runId "${result.runId}" does not match expectedRunId "${expectedRunId}"`);
   }
 
   const c = result.classification;
@@ -561,6 +563,7 @@ export function normalizeRunResultV2({
  * @returns {object} Interpreted RunResult
  */
 export function interpretRunResult(input, options = {}) {
+  const expectedRunId = typeof options === 'string' ? options : options?.expectedRunId;
   let rawObj = input;
   let filePath = null;
 
@@ -587,10 +590,36 @@ export function interpretRunResult(input, options = {}) {
       status: 'no-evidence',
       confidence: 'failed',
       contractCorrupt: true,
+      resultCorrupt: true,
       corrupt: true,
       corruptionReasons: ['Input is not an object'],
       runtime: {},
       evidence: {},
+    });
+  }
+
+  if (expectedRunId && rawObj.runId && rawObj.runId !== expectedRunId) {
+    return Object.freeze({
+      contract: { ...RUN_RESULT_CONTRACT },
+      runId: rawObj.runId,
+      assignmentId: rawObj.assignmentId ?? null,
+      classification: {
+        execution: { status: 'completion-unknown', exitCode: null },
+        assessment: { verdict: 'inconclusive' },
+        confidence: { level: 'failed', basis: ['run-id-mismatch'] },
+        failure: { family: 'contract', code: 'run-id-mismatch' },
+        policy: { disposition: 'refuse', code: 'corrupt-result' },
+        delivery: { mode: 'legacy-derived' },
+        provenance: 'contract-corrupt',
+      },
+      status: 'no-evidence',
+      confidence: 'failed',
+      contractCorrupt: true,
+      resultCorrupt: true,
+      corrupt: true,
+      corruptionReasons: [`runId "${rawObj.runId}" does not match expectedRunId "${expectedRunId}"`],
+      runtime: rawObj.runtime ?? {},
+      evidence: rawObj.evidence ?? {},
     });
   }
 
@@ -599,7 +628,7 @@ export function interpretRunResult(input, options = {}) {
   // mismatched contract must never demote itself into attacker-controlled v1
   // projections.
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
-    const validation = validateRunResultV2(rawObj);
+    const validation = validateRunResultV2(rawObj, { expectedRunId });
     if (!validation.valid) {
       return {
         ...rawObj,
@@ -611,6 +640,7 @@ export function interpretRunResult(input, options = {}) {
         status: 'no-evidence',
         confidence: 'failed',
         contractCorrupt: true,
+        resultCorrupt: true,
         corrupt: true,
         corruptionReasons: validation.reasons,
       };
@@ -629,6 +659,7 @@ export function interpretRunResult(input, options = {}) {
       status: 'no-evidence',
       confidence: 'failed',
       contractCorrupt: true,
+      resultCorrupt: true,
       corrupt: true,
       corruptionReasons: [
         `contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: ${RUN_RESULT_CONTRACT.version}}`,
@@ -654,6 +685,7 @@ export function interpretRunResult(input, options = {}) {
       status: 'no-evidence',
       confidence: 'failed',
       contractCorrupt: true,
+      resultCorrupt: true,
       corrupt: true,
       corruptionReasons: ['Legacy result must have at least runId or status'],
       runtime: {},

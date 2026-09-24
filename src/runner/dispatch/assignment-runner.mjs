@@ -269,7 +269,8 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   }
 
   const sourceExecutorEntry = cfg?.executors?.[sourceExecutorId];
-  const sourceProvider = deriveProviderFamily(sourceExecutorEntry, sourceExecutorEntry?.command ?? sourceExecutorId);
+  const sourceCommand = sourceExecutorEntry?.command ?? sourceExecutorId;
+  const sourceProvider = normalizeProviderFamily(deriveProviderFamily(sourceExecutorEntry, sourceCommand), sourceCommand);
 
   const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
   const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
@@ -300,7 +301,8 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   }
 
   const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
-  const selectedProvider = deriveProviderFamily(targetExecutorEntry, targetExecutorEntry?.command ?? verifiedExecutorId);
+  const targetCommand = targetExecutorEntry?.command ?? verifiedExecutorId;
+  const selectedProvider = normalizeProviderFamily(deriveProviderFamily(targetExecutorEntry, targetCommand), targetCommand);
 
   const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
   const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
@@ -328,7 +330,8 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
-  const providerModel = deriveProviderFamily(executorEntry);
+  const targetCommand = executorEntry?.command ?? executorId;
+  const providerModel = normalizeProviderFamily(deriveProviderFamily(executorEntry, targetCommand), targetCommand);
   const legacyModel = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);
@@ -2138,7 +2141,12 @@ export async function executeAssignment(assignment, opts = {}) {
           // Already settled by another path — rehydrate and return.
           try {
             const resultJsonPath = path.join(runDir, 'result.json');
-            if (fs.existsSync(resultJsonPath)) return Object.freeze(interpretRunResult(resultJsonPath));
+            if (fs.existsSync(resultJsonPath)) {
+              const res = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+              if (!res.corrupt && !res.contractCorrupt && !res.resultCorrupt && res.classification?.provenance !== 'contract-corrupt') {
+                return Object.freeze(res);
+              }
+            }
           } catch {}
           throw new RunnerConfigError(
             `executeAssignment: provider-capacity refusal could not acquire control for Run "${runId}" (status: "${refusalControl.status}")`,
@@ -2207,9 +2215,16 @@ export async function executeAssignment(assignment, opts = {}) {
   if (admitted.resumed) {
     if (fs.existsSync(resultJsonPath)) {
       try {
-        const settledResult = interpretRunResult(resultJsonPath);
+        const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+        if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
+          throw new RunnerConfigError(
+            `executeAssignment: Run "${runId}" resume found an existing result.json that failed validation or is contract-corrupt -- refusing to relaunch over corrupt settlement evidence`,
+            { code: 'result-corrupt', phase: 'post-admission' },
+          );
+        }
         return Object.freeze(settledResult);
       } catch (err) {
+        if (err instanceof RunnerConfigError) throw err;
         // H3: result.json EXISTS (checked above) but failed to read/parse --
         // a torn or corrupt write, not "no result yet". Falling through here
         // used to silently continue toward launching a brand-new worker over
@@ -3162,8 +3177,12 @@ async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = interpretRunResult(resultJsonPath);
-      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
+      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
+        // Do not rehydrate a contract-corrupt result
+      } else {
+        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+      }
     } catch {}
   }
   // result.json early-return: if a prior settlement already exists, rehydrate it.
@@ -3263,8 +3282,12 @@ async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, c
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = interpretRunResult(resultJsonPath);
-      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
+      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
+        // Do not rehydrate a contract-corrupt result
+      } else {
+        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
+      }
     } catch {}
   }
   // (Control CAS check below in commitRunSettlement handles the stale-writer case.)
@@ -3504,7 +3527,17 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = interpretRunResult(resultJsonPath);
+      let expectedRunId = opts.expectedRunId ?? opts.runId;
+      if (!expectedRunId) {
+        const runJsonPath = path.join(runDir, 'run.json');
+        if (fs.existsSync(runJsonPath)) {
+          try { expectedRunId = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'))?.runId; } catch {}
+        }
+      }
+      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId });
+      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
+        return { status: 'corrupt', corrupt: true, resultCorrupt: true, runResult: Object.freeze(settledResult) };
+      }
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }
