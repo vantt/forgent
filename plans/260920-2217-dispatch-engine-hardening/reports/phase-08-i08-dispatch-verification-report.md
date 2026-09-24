@@ -7,7 +7,7 @@
 - **Worktree**: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08-dispatch-verification`
 - **Base Commit**: `6f3fb9038fd66cd9943972a321eed2ba98587fab` (`main`)
 - **Integration Baseline Lineage**:
-  - I06 Integrated Commit: `3bab9b999fc9ee586901804f3237eb7203b55c11`
+  - I06 Integrated Commit: `3bab9b99ec5bbd41c991ad9d6cb05a32f1d32fab`
   - I07 Evaluated Candidate: `439a1fb078418edff7628555c4b6cb9f4015e4e6`
   - I07 Remote-Synchronized Integration: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea`
   - Post-Integration Verification Baseline: `6f3fb9038fd66cd9943972a321eed2ba98587fab`

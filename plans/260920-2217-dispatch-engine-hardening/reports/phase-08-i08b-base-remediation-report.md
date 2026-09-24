@@ -10,8 +10,8 @@
   - Evaluated Candidate SHA (Approved in Review): `0617c6e41ebec1aa8e73065eac69cd5eb9684343`
   - Integrated Remote Main Merged: `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743`
   - Synchronization Commit: `355f9dbd` (`chore(dispatch): synchronize origin/main@4ad0b8ca into Unit I08b candidate`)
-  - Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (`merge: remediate base defects F4, F5, F6, F7, F10 (Unit I08b)`)
-- **Status**: `integrated at main@98f501be` (post-merge verification complete: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions)
+  - Integration Candidate Merge Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (`merge: remediate base defects F4, F5, F6, F7, F10 (Unit I08b)`)
+- **Status**: `integration candidate c6262fb1, pending landing` (post-merge verification complete on integration branch: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions)
 - **Capability**: `code:implement`
 - **Depends-on**: `Unit I08`
 - **Unblocks**: Re-verification of Unit I08 on integrated baseline and subsequent Unit I11
@@ -203,13 +203,13 @@ Created dedicated automated regression test suite:
 
 ## 6. Integration Verification & Unblock Status
 
-- **Integration Commit**: `98f501be41756dc80d691cbf63ffeb4cd617fb30`
+- **Integration Candidate Merge Commit**: `98f501be41756dc80d691cbf63ffeb4cd617fb30`
 - **Candidate Merged**: `d4e052a6e0e80ffe2add08a0f4661433b2e80582` into `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743`
-- **Post-Merge Verification Evidence**:
+- **Post-Merge Verification Evidence (Integration Branch)**:
   - `test/runner/dispatch-i08b-remediation.test.mjs`: 5/5 PASS.
   - Focused Matrix (10 files): 184/184 PASS (189/189 with regression suite).
   - Comprehensive Root Suite (`test/runner/dispatch.test.mjs`): 387/387 PASS.
   - Affected Matrix (53 files): 1456/1457 PASS (1 skipped by design).
   - Full Repository Test Suite (`npm test`): 7603/7603 PASS (8 skipped, 65 todo, exit code 0).
   - Candidate Regressions: Exactly 0.
-- **Unblock Progression**: Unit I08b is fully integrated. Unit I08 is unblocked for re-verification against the integrated baseline (no rebase or history rewriting required, as I08 is an immutable ancestor of this baseline). Subsequent Unit I11 remains blocked pending I08 re-verification and I10 integration.
+- **Unblock Progression**: Unit I08b integration candidate verified on branch (c6262fb1). Unit I08 is pending post-integration re-verification once I08b lands on main. Subsequent Unit I11 remains blocked pending I08 re-verification and I10 integration.

@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated & integrated (98f501be) | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated in I08b candidate (c6262fb1, pending landing) | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -113,9 +113,9 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`.
 - **Unit I08b (Remediation of I08 Base Defects F4, F5, F6, F7, F10) Accounting:**
   - Capability: `code:implement`.
-  - Depends-on: Unit I08.
-  - Status: `integrated at main@98f501be` (post-merge verification complete: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions).
-  - Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (candidate `d4e052a6` merged into `origin/main@4ad0b8ca`).
+  - Depends-on: Unit I08 (pending post-integration re-verification).
+  - Status: `integration candidate c6262fb1, pending landing` (post-merge verification complete on integration branch: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions).
+  - Integration Candidate Merge Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (candidate `d4e052a6` merged into `origin/main@4ad0b8ca`).
   - Branch: `coordination-skill-harness-i08b-remediation`.
   - Worktree: `.claude/worktrees/coordination-skill-harness-i08b-remediation`.
   - Base Lineage: Candidate I08 `4e9de19541f2acde2380ff4f78147e389385e95c` + Evaluated Candidate `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate `d4e052a6`, merge commit `355f9dbd`).

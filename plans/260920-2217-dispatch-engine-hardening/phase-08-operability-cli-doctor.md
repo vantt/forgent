@@ -2,18 +2,18 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-24 (Unit I07 Integrated, Unit I08b Integrated at main@98f501be)
+## Status — 2026-09-24 (Unit I07 Integrated, Unit I08b Integration Candidate at c6262fb1, pending landing)
 
 - **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
-- **Unit I08 Status**: `unblocked for re-verification against integrated baseline main@98f501be`.
-- **Unit I08b Status**: `integrated at main@98f501be` (Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30`, Candidate SHA: `d4e052a6e0e80ffe2add08a0f4661433b2e80582` merged into `origin/main@4ad0b8ca`).
+- **Unit I08 Status**: `pending post-integration re-verification`.
+- **Unit I08b Status**: `integration candidate c6262fb1, pending landing` (Integration Candidate Merge Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30`, Candidate SHA: `d4e052a6e0e80ffe2add08a0f4661433b2e80582` merged into `origin/main@4ad0b8ca`).
 - **Remediation Scope**: Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
 - **Reports**:
   - Implementation (I07): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
   - Verification (I08): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
   - Remediation (I08b): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
   - Benchmark artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
-- **Verification Evidence (Post-Merge)**:
+- **Verification Evidence (Integration Branch)**:
   - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
   - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
   - Focused matrix (10 files): 184 pass / 0 fail (189 with regression suite).
