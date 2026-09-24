@@ -165,16 +165,49 @@ function gitQuiet(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 
+function stripExtendedPrefix(p) {
+  if (typeof p !== 'string') return p;
+  if (p.startsWith('\\\\?\\UNC\\')) {
+    return '\\\\' + p.slice(8);
+  }
+  if (p.startsWith('\\\\?\\')) {
+    return p.slice(4);
+  }
+  return p;
+}
+
+export function pathsEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (process.platform === 'win32') {
+    return a.toLowerCase() === b.toLowerCase();
+  }
+  return a === b;
+}
+
+export function pathStartsWith(child, parent) {
+  if (typeof child !== 'string' || typeof parent !== 'string') return false;
+  if (process.platform === 'win32') {
+    return child.toLowerCase().startsWith(parent.toLowerCase());
+  }
+  return child.startsWith(parent);
+}
+
 /** Resolve `p` through the filesystem when it exists, and fall back to a
  * plain absolute resolve when it does not — the shape every caller
  * comparing two checkout paths for identity needs. Exported (tsk-49i D3)
  * because `approve`'s session-worktree guard needs the identical rule and
- * used to carry its own byte-identical copy in bin/fgos.mjs. */
+ * used to carry its own byte-identical copy in bin/fgos.mjs.
+ *
+ * Uses `fs.realpathSync.native` so Windows 8.3 short paths (e.g. RUNNER~1)
+ * expand to canonical long paths (runneradmin), matching git's own output,
+ * strips Win32 `\\?\` extended-path prefixes, and normalizes separators. */
 export function realpathOrSelf(p) {
+  if (typeof p !== 'string') return p;
   try {
-    return fs.realpathSync(p);
+    const resolved = fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
+    return path.normalize(stripExtendedPrefix(resolved));
   } catch {
-    return path.resolve(p);
+    return path.normalize(path.resolve(p));
   }
 }
 
@@ -276,7 +309,7 @@ export function isMainWorktree(repoRoot) {
   const commonDirRaw = gitQuiet(repoRoot, ['rev-parse', '--git-common-dir']).trim();
   const commonDirAbs = path.isAbsolute(commonDirRaw) ? commonDirRaw : path.resolve(repoRoot, commonDirRaw);
   const commonDirParent = realpathOrSelf(path.dirname(commonDirAbs));
-  return toplevel === commonDirParent;
+  return pathsEqual(toplevel, commonDirParent);
 }
 
 // Push a runner item's branch to origin unless it already tracks an upstream.
@@ -437,7 +470,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
   // intends. Refuses the same way the dirty-checkout guard below does,
   // rather than silently reclaiming the ground the caller itself may be
   // standing on.
-  if (path.resolve(orphanPath) === path.resolve(repoRoot)) {
+  if (pathsEqual(realpathOrSelf(orphanPath), realpathOrSelf(repoRoot))) {
     throw new WorktreeError(
       `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it resolves to repoRoot itself, so reclaiming it would force-remove the main checkout's own working tree. This is never a genuine crash-orphan; check how "${branch}" ended up checked out at repoRoot before retrying.`,
       { branch, orphanPath },
@@ -460,11 +493,11 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
   // both, one call at a time, with no cross-call state needed. `callerCwd`
   // is injectable (tests only; production always uses the real
   // `process.cwd()`).
-  const resolvedOrphanPath = path.resolve(orphanPath);
-  const resolvedCallerCwd = path.resolve(callerCwd);
+  const resolvedOrphanPath = realpathOrSelf(orphanPath);
+  const resolvedCallerCwd = realpathOrSelf(callerCwd);
   if (
-    resolvedOrphanPath === resolvedCallerCwd ||
-    resolvedCallerCwd.startsWith(resolvedOrphanPath + path.sep)
+    pathsEqual(resolvedOrphanPath, resolvedCallerCwd) ||
+    pathStartsWith(resolvedCallerCwd, resolvedOrphanPath + path.sep)
   ) {
     throw new WorktreeError(
       `refusing to reclaim checkout of "${branch}" at "${orphanPath}" — it is the calling session's own live checkout (cwd "${callerCwd}"), so it is not a genuine crash-orphan (a real one belongs to no live session) and force-removing it would destroy the session's own working directory mid-operation. Finish or exit that session's work there before retrying.`,
@@ -497,7 +530,7 @@ export function reclaimOrphanedCheckout(repoRoot, branch, { callerCwd = process.
       );
     }
   }
-  return { reclaimed: true, path: orphanPath };
+  return { reclaimed: true, path: realpathOrSelf(orphanPath) };
 }
 
 /**
@@ -763,7 +796,7 @@ export function createWorktree(repoRoot, id, opts = {}) {
     throw err;
   }
 
-  return { path: worktreePath, branch, reused };
+  return { path: realpathOrSelf(worktreePath), branch, reused };
 }
 
 // OPERATION-TYPE WRAPPERS (docs/decisions/0022 candidate #3, ranked-priority
@@ -811,12 +844,12 @@ function reattachableCheckout(repoRoot, branch, baseDir) {
   try {
     // realpath both sides: `git worktree list` reports resolved paths, while
     // a caller's baseDir can still carry a symlinked segment.
-    relative = path.relative(fs.realpathSync(baseDir), fs.realpathSync(registered));
+    relative = path.relative(realpathOrSelf(baseDir), realpathOrSelf(registered));
   } catch {
     return null;
   }
   if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return null;
-  return registered;
+  return realpathOrSelf(registered);
 }
 
 /**
