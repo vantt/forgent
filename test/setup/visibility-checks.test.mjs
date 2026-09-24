@@ -187,15 +187,34 @@ test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
 });
 
 test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', () => {
+  // A bare 'herdr' is never guaranteed to be on PATH (it isn't in CI, which
+  // never installs the compiled binary there) -- mock FGOS_HERDR_BIN the
+  // same way the neighboring F5 test does, so this test exercises the
+  // empty-anchor-pane diagnostic itself rather than the host's PATH.
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
+  const mockScript = path.join(tmp, 'mock-herdr.mjs');
+  fs.writeFileSync(mockScript, `#!/usr/bin/env node
+if (process.argv[2] === '--version') {
+  process.stdout.write('herdr 0.8.0\\n');
+  process.exit(0);
+}
+process.exit(0);
+`, { mode: 0o755 });
+
+  const oldBin = process.env.FGOS_HERDR_BIN;
   const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
   try {
+    process.env.FGOS_HERDR_BIN = mockScript;
     process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
     const r = checkHerdrAvailable();
     assert.equal(r.passed, false);
     assert.match(r.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
   } finally {
+    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = oldBin;
     if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
     else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
 

@@ -17,7 +17,7 @@ import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FGCTL_BIN = path.resolve(REPO_ROOT, 'target', 'release', 'fgctl');
+const FGCTL_BIN = path.resolve(REPO_ROOT, 'target', 'release', process.platform === 'win32' ? 'fgctl.exe' : 'fgctl');
 
 let fixtureReleaseDir = null;
 let fixtureDigest = null;

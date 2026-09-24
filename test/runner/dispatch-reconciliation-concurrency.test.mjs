@@ -3,10 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { planReconciliation } from '../../src/runner/dispatch/reconciliation-planner.mjs';
 
-const repoRoot = path.resolve(new URL('../..', import.meta.url).pathname);
+const repoRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const workerPath = path.join(repoRoot, 'test/runner/reconcile-apply-cas-worker.helper.mjs');
 
 function root() {

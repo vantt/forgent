@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   inspectDispatchRuntime,
   validateInspectionSelector,
@@ -40,7 +41,7 @@ test('cwd selector fails closed when a bound sibling is valid but unadmitted', (
 test('cwd not-found and concurrency-permitted active runs are distinct from conflict', () => { const root = fixture(), cwd = path.join(root, 'cwd'); fs.mkdirSync(cwd); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'not-found'); assignment(root, 'a'); assignment(root, 'b'); run(root, 'a', '01', { runId: 'a', cwd, concurrency: 'permitted' }); run(root, 'b', '01', { runId: 'b', cwd, concurrency: 'permitted' }); admit(root, 'a', 1, { runId: 'a' }); admit(root, 'b', 1, { runId: 'b' }); fs.mkdirSync(path.join(root, '.fgos', 'dispatch'), { recursive: true }); fs.writeFileSync(path.join(root, '.fgos', 'dispatch.lock'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'workspace-evidence.json'), '{}'); fs.writeFileSync(path.join(root, '.fgos', 'dispatch', 'projection-conflicts.json'), '[]'); assert.equal(inspectDispatchRuntime(root, { cwd }).inspectionStatus, 'resolved'); });
 test('host routing selects solely operation/effect; Dispatch alone receives selector payload', () => { const selected = []; const answer = invokeDispatchInspectOperation({ operationId: 'dispatch.runtime.inspect', effect: 'read', payload: { selector: { run: 'none' } }, ctx: { repoRoot: fixture() } }, { selectProvider: (route) => { selected.push(route); return (ctx, selector) => ({ ctx, selector }); } }); assert.deepEqual(selected, [{ operationId: 'dispatch.runtime.inspect', effect: 'read' }]); assert.deepEqual(answer.selector, { run: 'none' }); });
 test('public inspect use-case import graph cannot reach mutation/recovery/process/Git execution', () => {
-  const root = path.resolve(new URL('../..', import.meta.url).pathname);
+  const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
   const seen = new Set();
   // run-result.mjs: proven leaf (this test's own header comment on the
   // sibling reconciliation-import-graph test cites this exact carve-out).

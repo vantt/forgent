@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const repo = path.resolve(new URL('../..', import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 function run(args, extra = {}) { return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], { cwd: repo, encoding: 'utf8', ...extra }); }
 function assignment(root, id) { const dir = path.join(root, '.fgos', 'assignments', id); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'assignment.json'), JSON.stringify({ assignmentId: id })); return dir; }
 function admission(root, id, runId) { const dir = path.join(root, '.fgos', 'assignments', id, 'admission', 'generations'); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, '0000000001.json'), JSON.stringify({ runId, attempt: 1 })); }
