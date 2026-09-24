@@ -171,6 +171,9 @@ export function buildRustDistribution({
   const stagedFgos = path.join(stagedBinDir, 'fgos');
   fs.copyFileSync(releaseBin, stagedFgos);
   fs.chmodSync(stagedFgos, 0o755);
+  if (process.platform === 'win32') {
+    fs.copyFileSync(releaseBin, path.join(stagedBinDir, 'fgos.exe'));
+  }
 
   // 2. Stage bin/fgos-runner shim
   const stagedRunner = path.join(stagedBinDir, 'fgos-runner');

@@ -645,7 +645,9 @@ pub fn run_tail(
         let cmd_name = cmd_args.join(" ");
         let mut cmd = if cfg!(windows) {
             let mut c = Command::new("sh");
-            c.arg(shim_path);
+            let p_str = shim_path.to_string_lossy();
+            let clean = p_str.trim_start_matches(r"\\?\").replace('\\', "/");
+            c.arg(clean);
             c
         } else {
             Command::new(shim_path)

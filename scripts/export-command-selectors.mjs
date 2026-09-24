@@ -344,7 +344,7 @@ export function checkCommandRoutes({
   }
 
   const actualContent = fs.readFileSync(routesPath, 'utf8');
-  if (actualContent === expectedContent) {
+  if (actualContent.replace(/\r\n/g, '\n') === expectedContent.replace(/\r\n/g, '\n')) {
     return { clean: true, summary: '' };
   }
 

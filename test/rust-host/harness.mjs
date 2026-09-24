@@ -79,6 +79,10 @@ function buildPathShim(shimDir, spyLogPath) {
     ].join("\n");
     const shimPath = path.join(shimDir, name);
     fs.writeFileSync(shimPath, shimScript, { mode: 0o755 });
+    if (process.platform === "win32") {
+      const cmdPath = path.join(shimDir, `${name}.cmd`);
+      fs.writeFileSync(cmdPath, `@sh "${shimPath.replace(/\\/g, "/")}" %*\r\n`);
+    }
   }
   return shimDir;
 }
@@ -103,7 +107,10 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
     };
   } else if (entrySpec.startsWith("bin:")) {
     const targetPath = entrySpec.slice(4);
-    const resolvedPath = path.isAbsolute(targetPath) ? targetPath : path.resolve(repoRoot, targetPath);
+    let resolvedPath = path.isAbsolute(targetPath) ? targetPath : path.resolve(repoRoot, targetPath);
+    if (process.platform === "win32" && !resolvedPath.endsWith(".exe") && fs.existsSync(resolvedPath + ".exe")) {
+      resolvedPath += ".exe";
+    }
     return {
       type: "bin",
       executable: resolvedPath,

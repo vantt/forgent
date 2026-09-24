@@ -39,7 +39,8 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
 
 function runShim(shimPath, args, opts = {}) {
   if (process.platform === 'win32') {
-    return spawnSync('sh', [shimPath, ...args], opts);
+    const clean = shimPath.replace(/^\\\\\?\\/, '').replace(/\\/g, '/');
+    return spawnSync('sh', [clean, ...args], opts);
   }
   return spawnSync(shimPath, args, opts);
 }
