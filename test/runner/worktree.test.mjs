@@ -20,6 +20,7 @@ import {
   refreshUnstartedBranch,
   withMergeEphemeralWorktree,
   checkoutDirtyPaths,
+  realpathOrSelf,
   WorktreeError,
 } from '../../src/runner/worktree.mjs';
 
@@ -1114,7 +1115,7 @@ test('createClaimWorktree ignores a checkout outside its own worktreeDir (a runn
   const claim = createClaimWorktree(repoRoot, 'reattach-elsewhere', { worktreeDir: claimDir });
 
   assert.notEqual(claim.path, dispatch.path, 'a checkout in another caller\'s directory is not reattachable');
-  assert.equal(path.dirname(claim.path), fs.realpathSync(claimDir));
+  assert.equal(path.dirname(claim.path), realpathOrSelf(claimDir));
   assert.equal(claim.reused, true, 'still a branch reuse — just not a checkout reattach');
   assert.equal(fs.existsSync(dispatch.path), false, 'the out-of-dir checkout goes through the normal reclaim path');
 

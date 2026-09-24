@@ -516,7 +516,7 @@ function writeFakeExecutor(tempDir) {
     `
     import fs from 'node:fs';
     import path from 'node:path';
-    const assignmentsRoot = '${path.join(tempDir, '.fgos', 'assignments')}';
+    const assignmentsRoot = ${JSON.stringify(path.join(tempDir, '.fgos', 'assignments'))};
     if (fs.existsSync(assignmentsRoot)) {
       for (const asgn of fs.readdirSync(assignmentsRoot)) {
         const runsDir = path.join(assignmentsRoot, asgn, 'runs');
@@ -530,7 +530,7 @@ function writeFakeExecutor(tempDir) {
         }
       }
     }
-    const invocationsLog = '${path.join(tempDir, 'executor-invocations.txt')}';
+    const invocationsLog = ${JSON.stringify(path.join(tempDir, 'executor-invocations.txt'))};
     fs.appendFileSync(invocationsLog, 'INVOCATION\\n');
     process.stdout.write('Done.\\n');
     process.exit(0);
