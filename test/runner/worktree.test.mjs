@@ -1193,7 +1193,7 @@ test('provisionDependencies runs npm ci when package-lock.json is present', () =
   // Generate a real lockfile first (npm install), then re-provision a fresh
   // worktree from scratch with that lockfile already in place — proving
   // the npm-ci branch specifically, not just "some install happened".
-  execFileSync('npm', ['install', '--package-lock-only'], { cwd: worktreeDir });
+  execFileSync('npm', ['install', '--package-lock-only'], { cwd: worktreeDir, shell: process.platform === 'win32' });
   fs.rmSync(path.join(worktreeDir, 'node_modules'), { recursive: true, force: true });
   assert.equal(fs.existsSync(path.join(worktreeDir, 'package-lock.json')), true);
 

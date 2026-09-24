@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const repo = path.resolve(new URL('../..', import.meta.url).pathname);
+const repo = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
 function runFgos(args, options = {}) {
   return spawnSync(process.execPath, ['bin/fgos.mjs', ...args], {

@@ -30,6 +30,7 @@ import { fileURLToPath } from 'node:url';
 
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
+import { releaseBinaryPath } from '../util/release-binary-path.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -4061,8 +4062,8 @@ function checkRustHostBinaryPresent(cwd) {
     }
   } else if (releaseInfo.isDevCheckout) {
     for (const candidate of candidateDirs) {
-      const releaseTarget = path.join(candidate, 'target', 'release', 'fgos');
-      const debugTarget = path.join(candidate, 'target', 'debug', 'fgos');
+      const releaseTarget = releaseBinaryPath(path.join(candidate, 'target', 'release'), 'fgos');
+      const debugTarget = releaseBinaryPath(path.join(candidate, 'target', 'debug'), 'fgos');
       if (fs.existsSync(releaseTarget)) {
         binaryPath = releaseTarget;
         break;
@@ -4072,7 +4073,7 @@ function checkRustHostBinaryPresent(cwd) {
       }
     }
     if (!binaryPath) {
-      binaryPath = path.join(cwd, 'target', 'release', 'fgos');
+      binaryPath = releaseBinaryPath(path.join(cwd, 'target', 'release'), 'fgos');
     }
   } else {
     // No active release, no manifest, and not this repo's own Rust host
