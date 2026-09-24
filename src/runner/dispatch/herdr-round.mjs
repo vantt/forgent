@@ -864,13 +864,18 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     } catch {
       agentState = 'unknown';
     }
-    if (!statusReadable) blindMs += tickAt - lastTickAt;
-    lastTickAt = tickAt;
+    const liveness = readLiveness();
+    // One observation time, taken after every herdr read of this tick: a read
+    // that takes long to fail (an unresponsive herdr, a loaded host) is part
+    // of the blind span too, not idle time the worker is charged for.
+    const observedAt = Date.now();
+    if (!statusReadable) blindMs += observedAt - lastTickAt;
+    lastTickAt = observedAt;
 
     // `working` is a progress signal and nothing more. It never concludes a
     // round -- only the worker's own result file does that.
     if (agentState === 'working') {
-      lastProgressAt = tickAt;
+      lastProgressAt = observedAt;
       blindMs = 0;
       // For resend purposes only: an agent herdr itself reports as `working`
       // has the brief and is acting on it, whether or not the worker's own
@@ -882,12 +887,12 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
 
     const decision = decide({
       resultFilePresent: fs.existsSync(paths.resultPath),
-      liveness: readLiveness(),
+      liveness,
       agentState,
       lastProgressAt,
       blindMs,
       startedAt,
-      now: Date.now(),
+      now: observedAt,
       screen: null,
     });
     prior = decision;

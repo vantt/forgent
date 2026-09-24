@@ -271,3 +271,28 @@ test('3-hop walk reaches the real ancestor across a spawned process chain', { ti
     top.kill('SIGKILL');
   }
 });
+
+test('one process keeps one pid-walk writer id even when a later `ps` would time out (loaded host)', { skip: process.platform === 'win32' }, () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'writer-id-stable-'));
+  try {
+    // A `ps` that is slower than PPID_TIMEOUT_MS: re-walking with it would
+    // stop at hop 0 and yield a different (UNRESOLVED, own-pid) identity.
+    const slowBin = path.join(tmp, 'bin');
+    fs.mkdirSync(slowBin);
+    fs.writeFileSync(path.join(slowBin, 'ps'), '#!/bin/sh\nsleep 1\n', { mode: 0o755 });
+    const moduleUrl = new URL('../../src/util/session-identity.mjs', import.meta.url).href;
+    const script = `
+import { resolveWriterIdentity } from ${JSON.stringify(moduleUrl)};
+const first = resolveWriterIdentity();
+process.env.PATH = ${JSON.stringify(slowBin)} + ':' + process.env.PATH;
+const second = resolveWriterIdentity();
+process.stdout.write(JSON.stringify({ first, second }));
+`;
+    const env = { PATH: process.env.PATH, HOME: process.env.HOME };
+    const out = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8' }));
+    assert.equal(out.first.source, 'pid', 'sanity: no session env, so the identity comes from the ancestor walk');
+    assert.deepEqual(out.second, out.first);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

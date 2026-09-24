@@ -710,6 +710,17 @@ export async function approveUseCase(
     // zero behavior change for the common case.
     const hadChildren = Object.values(view.work).some((w) => w.parent === id);
 
+    // Unlike leaf->root above, this path still lands on the shared main
+    // checkout: the CAS merge verifies in an isolated worktree, but its
+    // final land step's `update-ref` moves the branch repoRoot has checked
+    // out and then syncs repoRoot's working tree to it. A dirty path inside
+    // the item's own file set (committed diff + declared footprint) would
+    // make that sync fail and leave repoRoot's index behind the new HEAD,
+    // so refuse before merging.
+    if (!isMainTreeClean(repoRoot, ownFileSet)) {
+      throw new StoreError('validation', `approve: working tree at "${repoRoot}" is not clean — commit or stash pending changes before approving "${id}".`);
+    }
+
     // Not wrapped in runMerge: a whole-call lock retry would redo the full
     // verify run. The CAS merge only takes main-checkout.lock for its final
     // land step and waits there itself (or fails fast under --no-wait).
@@ -717,6 +728,7 @@ export async function approveUseCase(
     const result = await mergeRootIntoMainCas(repoRoot, item, branchNameFor(id), {
       timeoutMs,
       failFastIfLocked: noWait,
+      ownFileSet,
       ...(noWait ? { lockWaitMs: 0 } : waitMs !== undefined ? { lockWaitMs: waitMs } : {}),
     });
 
@@ -800,6 +812,29 @@ export async function approveUseCase(
         detail,
       });
       return { id, mode: 'merge', to: 'blocked', reason: 'lock-lost-mid-merge', target: 'main' };
+    }
+
+    if (result.outcome === 'main-checkout-dirty-mid-merge') {
+      // A path in the item's own file set was clean at the pre-check above
+      // (before the CAS worktree merge+verify, which can take minutes) but
+      // was found dirty again by the second check taken under
+      // main-checkout.lock, right before update-ref -- the exact same
+      // real-conflict shape the pre-check refuses, just caught later.
+      // Nothing was moved: no ref update, no working-tree sync attempted.
+      const detail = hadChildren
+        ? `cross-root integration attempt at main@${currentHead(repoRoot)}; a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`
+        : `a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`;
+      const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });
+      if (conflict) return conflict;
+      addFriction(dir, {
+        id,
+        disposition: 'blocked',
+        errorClass: 'main-checkout-dirty-mid-merge',
+        layer: 'state',
+        attempts: 1,
+        detail,
+      });
+      return { id, mode: 'merge', to: 'blocked', reason: 'main-checkout-dirty-mid-merge', target: 'main' };
     }
 
     if (result.outcome === 'fgos-write-rejected') {

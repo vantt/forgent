@@ -640,9 +640,15 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   // capabilities like advise/code:review/code:debug, whose executor
   // config never sets confinement.backend) refused outright below instead
   // of resolving the same default the assignment door already gets.
-  const effectiveBackendId = request.backendId ?? 'bwrap';
+  // The 'bwrap' default is for `required` mode only: a dispatch that does not
+  // require confinement never uses the resolved backend, so it must not refuse
+  // on a machine whose registry has no bwrap entry (macOS, or any machine that
+  // never ran `fgos setup`). An explicitly named backendId is still resolved
+  // (and still refused when missing/disabled) in every mode.
+  const isRequired = request.requirement?.mode === "required";
+  const effectiveBackendId = request.backendId ?? (isRequired ? 'bwrap' : null);
 
-  if (!request.assignmentLaunchContext) {
+  if (!request.assignmentLaunchContext && effectiveBackendId) {
     const registryDoc = loadMachineBackendRegistry();
     const rawInstance = registryDoc?.confinementBackends?.[effectiveBackendId];
     if (rawInstance && rawInstance.enabled === false) {

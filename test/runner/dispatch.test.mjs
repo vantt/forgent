@@ -3290,8 +3290,11 @@ test('spawnWorker: idleTimeoutMs kills a worker that has gone silent, well befor
   const cfg = baseConfig([scriptPath]);
   const start = Date.now();
 
+  // The idle clock starts at spawn, so the window must comfortably cover a
+  // node cold start on a loaded host; 300ms let it fire before the worker
+  // had printed anything. Still far under the 10s hard cap under test.
   await assert.rejects(
-    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 300 }),
+    () => spawnWorker(sampleWork(), cfg, mkTempDir(), { timeoutMs: 10000, idleTimeoutMs: 1500 }),
     (err) => {
       assert.ok(err instanceof DispatchError);
       assert.equal(err.errorClass, 'worker-timeout');
@@ -3302,7 +3305,7 @@ test('spawnWorker: idleTimeoutMs kills a worker that has gone silent, well befor
   );
 
   const elapsed = Date.now() - start;
-  assert.ok(elapsed < 5000, `expected the idle timeout (300ms) to fire well before the 10000ms hard cap, took ${elapsed}ms`);
+  assert.ok(elapsed < 6000, `expected the idle timeout (1500ms) to fire well before the 10000ms hard cap, took ${elapsed}ms`);
 });
 
 test('spawnWorker: idleTimeoutMs is disarmed by default (absent from cfg/opts) -- a silent worker only ever hits the hard timeoutMs cap, byte-identical to before this field existed', async () => {

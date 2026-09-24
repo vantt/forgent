@@ -44,7 +44,13 @@ import { performCatchUp } from '../../runner/merge.mjs';
 // tsk-2qp: 'lock-lost-mid-merge' joins this set — the lock was lost mid-merge
 // due to a lapsed heartbeat or a reclaimed lock, so a retry via catchup
 // once the target/lock is free is the natural recovery.
-const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item', 'lock-lost-mid-merge']);
+// 'main-checkout-dirty-mid-merge' joins this set the same way: the item's
+// own file set was found dirty again under the lock, right before
+// update-ref, after already proving clean at approve's own pre-check --
+// nothing was moved or committed, so a retry once that transient dirty
+// path is resolved is the natural recovery, same shape as
+// 'lock-lost-mid-merge'.
+const CATCHUP_REASONS = new Set(['merge-conflict', 'verify-fail-post-merge', 'verify-timeout-post-merge', 'integration-drift', 'merge-failed-unclassified', 'merge-blocked-other-item', 'lock-lost-mid-merge', 'main-checkout-dirty-mid-merge']);
 
 /**
  * @param {{dir: string, repoRoot: string}} ctx - `repoRoot` is always

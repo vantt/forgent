@@ -1,7 +1,18 @@
 import os from 'node:os';
 import fs from 'node:fs';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { spawn } from 'node:child_process';
+import { isMainModule } from './lib/is-main-module.mjs';
+import { buildTestEnv, discoverTestFiles } from './run-tests.mjs';
+
+// Per-file ceiling for one `node --test <file>` coverage run. The slowest
+// real test files take tens of seconds on a loaded runner; anything past this
+// is a hang, recorded as `coverage-collection-timeout` for that file, never a
+// reason to stall the whole job.
+export const COVERAGE_FILE_TIMEOUT_MS = 5 * 60 * 1000;
+// Small bounded pool: each test file may itself spawn git/node children, so
+// running all of them at once would only trade a hang for contention.
+export const COVERAGE_CONCURRENCY = Math.max(1, Math.min(4, os.cpus().length));
 
 function getFiles(dir, files = []) {
   if (!fs.existsSync(dir)) return files;
@@ -22,6 +33,10 @@ async function generateCoverageMap() {
   
   const repoRoot = process.cwd();
   const testFiles = getFiles(path.join(repoRoot, 'test'));
+  // Only real suite files (`*.test.mjs`, same discovery as `npm test`) count
+  // as tests; helpers, fixtures and worker scripts under test/ stay in the
+  // import graph (a suite may reach src/ through them) but are not suites.
+  const suiteFiles = discoverTestFiles(path.join(repoRoot, 'test'));
   const srcFiles = [...getFiles(path.join(repoRoot, 'src')), ...getFiles(path.join(repoRoot, 'bin'))];
   
   const mapping = {}; // sourcePath -> Set of testPaths
@@ -60,7 +75,7 @@ async function generateCoverageMap() {
   }
 
   // Transitive closure: which source files does a test file eventually import?
-  for (const testFile of testFiles) {
+  for (const testFile of suiteFiles) {
     const testRel = path.relative(repoRoot, testFile).replace(/\\/g, '/');
     const visited = new Set();
     const queue = Array.from(deps[testRel] || []);
@@ -89,54 +104,36 @@ async function generateCoverageMap() {
 
 
   // If NODE_V8_COVERAGE is set, use it (assumed to be populated by per-process runs),
-  // otherwise run the tests ourselves one by one to get accurate per-test coverage.
+  // otherwise run the tests ourselves one file per process to get accurate per-test coverage.
   let covDirToProcess = process.env.NODE_V8_COVERAGE;
   let selfGenerated = false;
+  let collection = null;
 
   if (!covDirToProcess) {
-    console.log("NODE_V8_COVERAGE not set. Running tests individually to collect coverage...");
+    console.log(`NODE_V8_COVERAGE not set. Collecting coverage for ${suiteFiles.length} test files (concurrency ${COVERAGE_CONCURRENCY}, ${COVERAGE_FILE_TIMEOUT_MS / 1000}s per file)...`);
     covDirToProcess = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coverage-'));
     selfGenerated = true;
-    const { execFileSync } = await import('child_process');
-    for (const testFile of testFiles) {
-      const testRel = path.relative(repoRoot, testFile).replace(/\\/g, '/');
-      const testCovDir = path.join(covDirToProcess, encodeURIComponent(testRel));
-      fs.mkdirSync(testCovDir, { recursive: true });
-      try {
-        execFileSync('node', ['--test', testFile], { 
-          env: { ...process.env, NODE_V8_COVERAGE: testCovDir, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' },
-          stdio: 'ignore'
-        });
-      } catch (e) {
-        // ignore test failures during coverage generation
-      }
-      
-      // parse immediately for this test
-      const covFiles = fs.readdirSync(testCovDir).filter(f => f.endsWith('.json'));
-      for (const file of covFiles) {
-        const covPath = path.join(testCovDir, file);
-        try {
-          const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));
-          for (const res of data.result || []) {
-            if (res.url.includes('/src/') || res.url.includes('/bin/')) {
-              const urlObj = new URL(res.url);
-              const srcRel = path.relative(repoRoot, urlObj.pathname).replace(/\\/g, '/');
-              if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) {
-                if (!mapping[srcRel]) mapping[srcRel] = new Set();
-                mapping[srcRel].add(testRel);
-              }
-            }
-          }
-        } catch(e) {}
+    collection = await collectPerFileCoverage(suiteFiles, {
+      repoRoot,
+      covRoot: covDirToProcess,
+      onResult: (r, done, total) => console.log(`[${done}/${total}] ${r.outcome} ${(r.durationMs / 1000).toFixed(1)}s ${r.file}`),
+    });
+    for (const r of collection.results) {
+      for (const srcRel of coveredSourceFiles(r.covDir, repoRoot)) {
+        if (!mapping[srcRel]) mapping[srcRel] = new Set();
+        mapping[srcRel].add(r.file);
       }
     }
+    fs.rmSync(covDirToProcess, { recursive: true, force: true });
+    const timedOut = collection.results.filter((r) => r.outcome === 'coverage-collection-timeout');
+    console.log(`Coverage collection finished in ${(collection.durationMs / 60000).toFixed(1)} min; ${timedOut.length} file(s) timed out${timedOut.length ? `: ${timedOut.map((r) => r.file).join(', ')}` : ''}.`);
   }
 
   if (covDirToProcess && !selfGenerated && fs.existsSync(covDirToProcess)) {
     console.log("Merging NODE_V8_COVERAGE data...");
-    const covFiles = fs.readdirSync(coverageDir).filter(f => f.endsWith('.json'));
+    const covFiles = fs.readdirSync(covDirToProcess).filter(f => f.endsWith('.json'));
     for (const file of covFiles) {
-      const covPath = path.join(coverageDir, file);
+      const covPath = path.join(covDirToProcess, file);
       try {
         const data = JSON.parse(fs.readFileSync(covPath, 'utf8'));
         // Find the test file in this coverage profile
@@ -183,7 +180,14 @@ async function generateCoverageMap() {
     version: 1,
     generatedAt: new Date().toISOString(),
     mapping: finalMapping,
-    suggestedFullTriggers: Array.from(fullTriggers).sort()
+    suggestedFullTriggers: Array.from(fullTriggers).sort(),
+    ...(collection ? {
+      coverageCollection: {
+        durationMs: collection.durationMs,
+        timedOut: collection.results.filter((r) => r.outcome === 'coverage-collection-timeout').map((r) => r.file),
+        failed: collection.results.filter((r) => r.outcome === 'test-failed').map((r) => r.file),
+      },
+    } : {}),
   }, null, 2));
 
   // Generate simple markdown suggestion diff
@@ -201,7 +205,93 @@ async function generateCoverageMap() {
   console.log("Coverage map generated.");
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+/** Source files (`src/`, `bin/`) a V8 coverage directory says were loaded. */
+function coveredSourceFiles(covDir, repoRoot) {
+  const found = new Set();
+  if (!fs.existsSync(covDir)) return found;
+  for (const file of fs.readdirSync(covDir).filter((f) => f.endsWith('.json'))) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(covDir, file), 'utf8'));
+      for (const res of data.result || []) {
+        if (!res.url.startsWith('file:')) continue;
+        const srcRel = path.relative(repoRoot, new URL(res.url).pathname).replace(/\\/g, '/');
+        if (srcRel.startsWith('src/') || srcRel.startsWith('bin/')) found.add(srcRel);
+      }
+    } catch {
+      // a partially written profile (killed on timeout) is simply skipped
+    }
+  }
+  return found;
+}
+
+/**
+ * Run `node --test <file>` once per file with NODE_V8_COVERAGE pointed at a
+ * per-file directory, at most `concurrency` at a time, each bounded by
+ * `timeoutMs`. A file that overruns has its whole process group killed (test
+ * files spawn their own children) and is reported as
+ * `coverage-collection-timeout`; collection always continues with the next
+ * file. Test failures are expected here and only recorded.
+ */
+export async function collectPerFileCoverage(testFiles, {
+  repoRoot,
+  covRoot,
+  timeoutMs = COVERAGE_FILE_TIMEOUT_MS,
+  concurrency = COVERAGE_CONCURRENCY,
+  execPath = process.execPath,
+  env = process.env,
+  onResult = () => {},
+} = {}) {
+  const startedAt = Date.now();
+  const results = [];
+  let next = 0;
+
+  const runOne = (absFile) => new Promise((resolve) => {
+    const file = path.relative(repoRoot, absFile).replace(/\\/g, '/');
+    const covDir = path.join(covRoot, encodeURIComponent(file));
+    fs.mkdirSync(covDir, { recursive: true });
+    const t0 = Date.now();
+    // Same per-run temp root as run-tests.mjs: whatever fixtures this file
+    // leaves behind are removed with it instead of piling up in the shared
+    // temp dir across the nightly's hundreds of per-file runs.
+    const baseEnv = buildTestEnv(env);
+    const tmpRoot = fs.mkdtempSync(path.join(baseEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
+    const child = spawn(execPath, ['--test', absFile], {
+      cwd: repoRoot,
+      env: { ...baseEnv, TMPDIR: tmpRoot, TMP: tmpRoot, TEMP: tmpRoot, NODE_V8_COVERAGE: covDir },
+      stdio: 'ignore',
+      detached: process.platform !== 'win32',
+    });
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try {
+        if (process.platform !== 'win32') process.kill(-child.pid, 'SIGKILL');
+        else child.kill('SIGKILL');
+      } catch {
+        // already gone
+      }
+    }, timeoutMs);
+    const finish = (outcome) => {
+      clearTimeout(timer);
+      try { fs.rmSync(tmpRoot, { recursive: true, force: true, maxRetries: 3 }); } catch {}
+      resolve({ file, covDir, outcome, durationMs: Date.now() - t0 });
+    };
+    child.on('error', () => finish('spawn-failed'));
+    child.on('exit', (code) => finish(timedOut ? 'coverage-collection-timeout' : code === 0 ? 'ok' : 'test-failed'));
+  });
+
+  const worker = async () => {
+    while (next < testFiles.length) {
+      const result = await runOne(testFiles[next++]);
+      results.push(result);
+      onResult(result, results.length, testFiles.length);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, testFiles.length) }, worker));
+  return { results, durationMs: Date.now() - startedAt };
+}
+
+if (isMainModule(import.meta.url)) {
   generateCoverageMap().catch(err => {
     console.error(err);
     process.exit(1);

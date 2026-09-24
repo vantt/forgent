@@ -37,11 +37,12 @@ import {
   HUMAN_TURN_REF_PREFIX,
 } from './schema.mjs';
 import { normalizeDagDeclaration, computeDagSharedCwdCaveats } from './dag-declaration.mjs';
-import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations } from '../dispatch/run-lock.mjs';
+import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
+import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
 
 function appendSessionEventLocked(eventsPath, event, sessionDir, manifest) {
   if (manifest?.schemaVersion === SCHEMA_VERSION_2) {
@@ -180,13 +181,27 @@ export function readManifestRaw(manifestPath) {
 // closes this, not the readers. `rename` within one directory is atomic on
 // POSIX -- a concurrent reader always observes either the complete OLD file
 // or the complete NEW one, never a partial write.
-let manifestTmpCounter = 0;
 function writeManifestRaw(manifestPath, manifest) {
   const dir = path.dirname(manifestPath);
-  manifestTmpCounter += 1;
-  const tmpPath = path.join(dir, `.session.json.tmp-${process.pid}-${Date.now()}-${manifestTmpCounter}`);
+  const tmpPath = path.join(dir, `.session.json.tmp-${uniqueTmpTag()}`);
   fs.writeFileSync(tmpPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
   fs.renameSync(tmpPath, manifestPath);
+}
+
+/**
+ * Durably flush one file, failing loudly: a session whose files could not be
+ * fsynced must not open. Opened 'r+' because Windows refuses fsync on a
+ * read-only handle (EPERM), and the fd is closed on every path -- a throw
+ * that left it open kept the file undeletable, so the caller's cleanup then
+ * failed with ENOTEMPTY and masked the real error.
+ */
+function fsyncFile(filePath) {
+  const fd = fs.openSync(filePath, 'r+');
+  try {
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 /**
@@ -318,12 +333,10 @@ export function openSession(
       try {
         const claimPath = path.join(claimDir, 'claim.json');
         fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-        const fd = fs.openSync(claimPath, 'r');
-        fs.fsyncSync(fd);
-        fs.closeSync(fd);
-        const fdDir = fs.openSync(claimDir, 'r');
-        fs.fsyncSync(fdDir);
-        fs.closeSync(fdDir);
+        fsyncFile(claimPath);
+        // Directory fsync is best-effort: Windows cannot open a directory
+        // for fsync at all, and that must not abort (and mask) the claim.
+        fsyncDirBestEffort(claimDir);
       } catch (err) {
         fs.rmSync(claimDir, { recursive: true, force: true });
         throw err;
@@ -346,12 +359,8 @@ export function openSession(
         try {
           const claimPath = path.join(claimDir, 'claim.json');
           fs.writeFileSync(claimPath, JSON.stringify({ pid: process.pid, processStartTime, createdAt: Date.now(), token }));
-          const fd = fs.openSync(claimPath, 'r');
-          fs.fsyncSync(fd);
-          fs.closeSync(fd);
-          const fdDir = fs.openSync(claimDir, 'r');
-          fs.fsyncSync(fdDir);
-          fs.closeSync(fdDir);
+          fsyncFile(claimPath);
+          fsyncDirBestEffort(claimDir);
 
           if (!fs.existsSync(sessionDir)) {
             claimed = true;
@@ -414,32 +423,23 @@ export function openSession(
     }
 
     // Fsync files and staging directory for crash durability
-    if (snapshotRef) {
-      const fdSnap = fs.openSync(path.join(stagingDir, 'snapshot.json'), 'r');
-      fs.fsyncSync(fdSnap);
-      fs.closeSync(fdSnap);
-    }
-    const fdSess = fs.openSync(path.join(stagingDir, 'session.json'), 'r');
-    fs.fsyncSync(fdSess);
-    fs.closeSync(fdSess);
-    const fdEv = fs.openSync(eventsPath, 'r');
-    fs.fsyncSync(fdEv);
-    fs.closeSync(fdEv);
-    const fdStaging = fs.openSync(stagingDir, 'r');
-    fs.fsyncSync(fdStaging);
-    fs.closeSync(fdStaging);
+    if (snapshotRef) fsyncFile(path.join(stagingDir, 'snapshot.json'));
+    fsyncFile(path.join(stagingDir, 'session.json'));
+    fsyncFile(eventsPath);
+    fsyncDirBestEffort(stagingDir);
 
     try {
       fs.renameSync(stagingDir, sessionDir);
-      const fdParent = fs.openSync(sessionsDir, 'r');
-      fs.fsyncSync(fdParent);
-      fs.closeSync(fdParent);
     } catch (err) {
       if (err.code === 'EEXIST' || err.code === 'ENOTEMPTY' || err.code === 'EPERM') {
         throw new CoordinationError('validation', `coordination session "${id}" already exists`);
       }
       throw err;
     }
+    // Outside the rename's try: a directory fsync the platform refuses
+    // (Windows: EPERM/EISDIR) used to land in the EPERM branch above and be
+    // reported as "session already exists" for a session just created.
+    fsyncDirBestEffort(sessionsDir);
 
     return Object.freeze(manifest);
   } finally {

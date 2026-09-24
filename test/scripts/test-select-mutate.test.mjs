@@ -4,7 +4,42 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { classifyMutant, classifyOneMutant, relatedFilesForRule } from '../../scripts/test-select-mutate.mjs';
+import { classifyMutant, classifyOneMutant, relatedFilesForRule, runNightlyMutations, runRelatedCaptured as realRunRelated, symlinkSharedDirs } from '../../scripts/test-select-mutate.mjs';
+
+test('symlinkSharedDirs: symlinks node_modules always, target only when the repo root has one', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-wt-'));
+  fs.mkdirSync(path.join(repoRoot, 'node_modules'));
+  try {
+    // No `target` in the source repo root (Rust never built here): node_modules
+    // still gets symlinked, target is silently skipped -- rust-host tests stay
+    // red for their real reason (no binary), never crash the mutation run.
+    symlinkSharedDirs(worktreePath, repoRoot);
+    assert.equal(fs.existsSync(path.join(worktreePath, 'node_modules')), true);
+    assert.equal(fs.lstatSync(path.join(worktreePath, 'node_modules')).isSymbolicLink(), true);
+    assert.equal(fs.existsSync(path.join(worktreePath, 'target')), false);
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(worktreePath, { recursive: true, force: true });
+  }
+});
+
+test('symlinkSharedDirs: symlinks target when the repo root has a built one, so rust-host tests find the real binary', () => {
+  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-repo-'));
+  const worktreePath = fs.mkdtempSync(path.join(os.tmpdir(), 'symlink-shared-wt-'));
+  fs.mkdirSync(path.join(repoRoot, 'node_modules'));
+  fs.mkdirSync(path.join(repoRoot, 'target', 'release'), { recursive: true });
+  fs.writeFileSync(path.join(repoRoot, 'target', 'release', 'fgctl'), 'fake-binary');
+  try {
+    symlinkSharedDirs(worktreePath, repoRoot);
+    assert.equal(fs.lstatSync(path.join(worktreePath, 'target')).isSymbolicLink(), true);
+    // The symlink genuinely resolves to the real, already-built binary.
+    assert.equal(fs.readFileSync(path.join(worktreePath, 'target', 'release', 'fgctl'), 'utf8'), 'fake-binary');
+  } finally {
+    fs.rmSync(repoRoot, { recursive: true, force: true });
+    fs.rmSync(worktreePath, { recursive: true, force: true });
+  }
+});
 
 test('C2 Mutant Classifier Tests', async (t) => {
   await t.test('infra-error', () => {
@@ -129,22 +164,45 @@ test('classifyOneMutant: the 6 classification rows via a fake runner', async (t)
     assert.equal(classification, 'caught');
   });
 
+  const green = () => ({ status: 0, signal: null, stderr: '' });
+
   await t.test('equivalent-or-missing-test: baseline green, related green, full also green', () => {
     const worktreePath = setup();
-    const runRelated = () => ({ status: 0, signal: null, stderr: '' });
-    const execFileFn = () => '';
-    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, execFileFn });
+    const runFull = () => ({ ran: true, failed: new Set() });
+    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated: green, runFull });
     assert.equal(classification, 'equivalent-or-missing-test');
   });
 
-  await t.test('confirmed-miss: baseline green, related green, full run throws (red)', () => {
+  await t.test('confirmed-miss: baseline green, related green, full has a NEW failure', () => {
     const worktreePath = setup();
-    const runRelated = () => ({ status: 0, signal: null, stderr: '' });
-    const execFileFn = () => {
-      throw new Error('full suite failed');
-    };
-    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated, execFileFn });
+    const runFull = () => ({ ran: true, failed: new Set(['already red', 'caught only by the full suite']) });
+    const fullBaseline = () => new Set(['already red']);
+    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated: green, runFull, fullBaseline });
     assert.equal(classification, 'confirmed-miss');
+  });
+
+  await t.test('a full suite that is red only where the clean HEAD is already red is not a miss', () => {
+    const worktreePath = setup();
+    const runFull = () => ({ ran: true, failed: new Set(['rust binary not built']) });
+    const fullBaseline = () => new Set(['rust binary not built']);
+    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated: green, runFull, fullBaseline });
+    assert.equal(classification, 'equivalent-or-missing-test');
+  });
+
+  await t.test('infra-error when the full-suite baseline itself has no usable answer', () => {
+    const worktreePath = setup();
+    let fullRuns = 0;
+    const runFull = () => { fullRuns++; return { ran: true, failed: new Set(['x']) }; };
+    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated: green, runFull, fullBaseline: () => null });
+    assert.equal(classification, 'infra-error');
+    assert.equal(fullRuns, 0, 'no mutated full run is spent once the baseline is known to be unusable');
+  });
+
+  await t.test('infra-error when the mutated full run produced no report (timeout/crash)', () => {
+    const worktreePath = setup();
+    const runFull = () => ({ ran: false, failed: new Set() });
+    const { classification } = classifyOneMutant({ mutant, rule, worktreePath, runRelated: green, runFull });
+    assert.equal(classification, 'infra-error');
   });
 
   await t.test('timeout: mutated related run killed by signal', () => {
@@ -228,10 +286,19 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   execFileSync('git', ['worktree', 'add', '--detach', worktreePath, 'HEAD'], { cwd: repoRoot, encoding: 'utf8' });
   try {
     fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(worktreePath, 'node_modules'), 'dir');
-    const { classification } = classifyOneMutant({ mutant, rule, worktreePath });
+    // The related runs are real processes in a real worktree. The full-suite
+    // step is stubbed: running `npm test` from inside `npm test` would recurse
+    // into this very test; runFullSuite's own contract is covered by the
+    // runNightlyMutations test above and exercised for real by the nightly job.
+    let relatedRuns = 0;
+    const runRelated = (files, opts) => { relatedRuns++; return realRunRelated(files, opts); };
+    const { classification } = classifyOneMutant({
+      mutant, rule, worktreePath, runRelated,
+      runFull: () => ({ ran: true, failed: new Set() }),
+    });
+    assert.equal(relatedRuns, 2, 'baseline and mutated related runs both really executed');
     // A real mutant against real code: any outcome other than 'invalid'/'infra-error'
-    // proves the whole wire-up (baseline, mutation, related run, full run) actually
-    // executed real processes end to end -- the thing that never happened before.
+    // proves the wire-up (baseline, mutation, related run) executed real processes.
     assert.ok(
       ['caught', 'confirmed-miss', 'equivalent-or-missing-test'].includes(classification),
       `expected a real classification outcome, got "${classification}"`,
@@ -241,3 +308,43 @@ test('integration: a real mutant (m-edit-1) is applied and classified inside a r
   }
 });
 
+
+test('runNightlyMutations: the full-suite baseline runs once on a clean HEAD and every surviving mutant is judged against it', () => {
+  const manifest = [{ id: 'fake-rule', pattern: 'src/fake.mjs', directTests: ['test/fake.test.mjs'], boundaryTests: [] }];
+  const fakeMutants = ['m-a', 'm-b'].map((id) => ({
+    id, ruleId: 'fake-rule', file: 'src/fake.mjs', boundary: 'b', find: 'ORIGINAL', replace: 'MUTATED',
+  }));
+  const worktreesAdded = [];
+  // Fake git: "worktree add" materialises the one source file a mutant edits.
+  const execFileFn = (cmd, args) => {
+    if (cmd === 'git' && args[0] === 'worktree' && args[1] === 'add') {
+      const wt = args[3];
+      worktreesAdded.push(path.basename(wt));
+      fs.mkdirSync(path.join(wt, 'src'), { recursive: true });
+      fs.writeFileSync(path.join(wt, 'src/fake.mjs'), 'const x = "ORIGINAL";\n');
+    }
+    return '';
+  };
+  const fullRunDirs = [];
+  const runFull = ({ cwd }) => {
+    fullRunDirs.push(path.basename(cwd));
+    // Clean HEAD already has one red test; m-b's worktree adds a new one.
+    const mutated = fs.readFileSync(path.join(cwd, 'src/fake.mjs'), 'utf8').includes('MUTATED');
+    const failed = new Set(['already red']);
+    if (mutated && cwd.includes('mutant-m-b-')) failed.add('only the full suite sees this');
+    return { ran: true, failed };
+  };
+  const ledgerOut = path.join(tmpWorktree(), 'ledger.json');
+  const ledger = runNightlyMutations({
+    manifest, mutants: fakeMutants, ledgerOut, execFileFn,
+    runRelated: () => ({ status: 0, signal: null, stderr: '' }),
+    runFull,
+  });
+  assert.deepEqual(ledger.map((l) => [l.id, l.classification]), [
+    ['m-a', 'equivalent-or-missing-test'],
+    ['m-b', 'confirmed-miss'],
+  ]);
+  assert.equal(worktreesAdded.filter((n) => n.startsWith('baseline-')).length, 1, 'one baseline worktree for the whole run');
+  assert.equal(fullRunDirs.filter((n) => n.startsWith('baseline-')).length, 1, 'the baseline full suite runs exactly once');
+  assert.equal(fullRunDirs.length, 3, 'baseline + one full run per surviving mutant');
+});

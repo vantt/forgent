@@ -8,17 +8,42 @@ jobs:
   nightly-mutate:
     name: Nightly Fault Injection and Coverage
     runs-on: ubuntu-latest
+    # Backstop: the coverage step bounds every test file itself; this covers
+    # the mutation step too, sized against a real full run (~55 min end to end).
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # Same test environment as ci.yml's `test` job: coverage and the
+      # mutation full-suite runs are only meaningful against the suite CI
+      # actually runs (zsh-based, git-committing and rust-host tests fail
+      # for environmental reasons otherwise).
+      - name: Install Linux test tools
+        # Ubuntu 24.04 blocks unprivileged user namespaces via AppArmor, which
+        # leaves bwrap installed but unable to build a sandbox; lift it so the
+        # required-confinement tests really run here instead of skipping.
+        run: |
+          sudo apt-get update && sudo apt-get install -y bubblewrap zsh
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          bwrap --ro-bind / / -- true && echo "bwrap can build a sandbox"
+
+      - name: Configure git identity for fixture repos
+        run: |
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
       - run: npm install
+
+      - name: Build Rust release binaries for npm tests
+        run: cargo build --release --workspace
 
       - name: Run coverage map generator
         run: node scripts/test-select-coverage-map.mjs

@@ -75,6 +75,32 @@ export function buildTestArgv(files, forwardedArgs = []) {
 }
 
 /**
+ * The env every spawned `node --test` run gets, whoever spawns it (the full
+ * suite, the canary, the selector's related run, mutation and coverage runs):
+ * - FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1;
+ * - no inherited NODE_TEST_CONTEXT: an enclosing `node --test` sets it, and a
+ *   nested run that inherits it reports to a parent that is not listening
+ *   and exits 0 without running a single test;
+ * - on darwin, TMPDIR/TMP/TEMP resolved through realpath (/var -> /private/var).
+ */
+export function buildTestEnv(env = process.env) {
+  const { NODE_TEST_CONTEXT: _enclosingRunner, ...rest } = env;
+  const childEnv = { ...rest, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
+  if (process.platform === 'darwin') {
+    const tempRoot = env.TMPDIR || os.tmpdir();
+    try {
+      const realTempRoot = fs.realpathSync(tempRoot);
+      childEnv.TMPDIR = realTempRoot;
+      childEnv.TMP = realTempRoot;
+      childEnv.TEMP = realTempRoot;
+    } catch {
+      // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
+    }
+  }
+  return childEnv;
+}
+
+/**
  * Runs `node --test` against an EXPLICIT, already-resolved file list (P03:
  * the shared seam between the full-suite door and the canary runner).
  * Applies the exact same env/argv construction `runTests()` always has
@@ -95,18 +121,20 @@ export function runSelectedTests(files, {
   log = (msg) => console.error(msg),
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
-  const childEnv = { ...env, FGOS_DISABLE_OPPORTUNISTIC_CHECKS: '1' };
   // Every temp dir the suite creates lands under one per-run directory that
   // is removed once the run ends: tests mkdtemp fixtures (git repos,
   // worktrees, .fgos stores) and mostly never delete them, so without this
   // each full run leaves tens of thousands of dirs in the OS temp dir --
   // enough, across a day of concurrent runs, to exhaust the disk's inodes.
-  // On darwin the realpath is used (the darwin TMPDIR symlink fix).
-  const baseTemp = env.TMPDIR || env.TEMP || env.TMP || os.tmpdir();
+  // buildTestEnv also strips an inherited NODE_TEST_CONTEXT (a nested
+  // `node --test` would otherwise report to a parent that isn't listening
+  // and exit without running anything) and applies darwin's own TMPDIR
+  // realpath fix to the OUTER temp root; this per-run dir is created inside
+  // that already-resolved root, so it needs no realpath of its own.
+  const childEnv = buildTestEnv(env);
   let runTemp = null;
   try {
-    runTemp = fs.mkdtempSync(path.join(baseTemp, 'fgos-test-run-'));
-    if (process.platform === 'darwin') runTemp = fs.realpathSync(runTemp);
+    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
     childEnv.TMPDIR = runTemp;
     childEnv.TMP = runTemp;
     childEnv.TEMP = runTemp;
@@ -122,7 +150,11 @@ export function runSelectedTests(files, {
       if (env[KEEP_TMP_ENV] === '1') {
         log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);
       } else {
-        fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });
+        try {
+          fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });
+        } catch {
+          // A file still held open (Windows) must not turn a finished run into a failure.
+        }
       }
     }
   }

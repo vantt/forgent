@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -303,6 +303,13 @@ test('the real entrypoint still fires when invoked through a symlink pointing at
   const result = spawnSync(process.execPath, [link], { cwd: root, encoding: 'utf8' });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /discovered 0 test files/);
+});
+
+test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test really runs its files', () => {
+  const env = buildTestEnv({ PATH: '/usr/bin', NODE_TEST_CONTEXT: 'child-v8', KEEP: 'yes' });
+  assert.equal('NODE_TEST_CONTEXT' in env, false);
+  assert.equal(env.KEEP, 'yes');
+  assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
 // --- per-run temp dir: every fixture the suite mkdtemps lands under one

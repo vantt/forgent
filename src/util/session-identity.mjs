@@ -137,6 +137,21 @@ export function resolveWriterIdentity(fgosDir, { env = process.env, pid = proces
     return { id: sessionId, source: registryConfirms(fgosDir, sessionId) ? REGISTRY : ENV };
   }
 
+  // This process's own ancestor chain does not change while it runs, so the
+  // walk is done once and reused. Re-walking on every call let a loaded host
+  // (a `ps` hop over PPID_TIMEOUT_MS) stop the walk at a different hop each
+  // time, giving ONE process two writer ids -- a claim acquired as one id
+  // then refused to settle as another ("writer identity mismatch").
+  const ownProcess = pid === process.pid && execFile === execFileSync;
+  if (ownProcess && ownPidIdentity) return { ...ownPidIdentity };
+  const resolved = walkAncestors(pid, execFile);
+  if (ownProcess) ownPidIdentity = resolved;
+  return { ...resolved };
+}
+
+let ownPidIdentity = null;
+
+function walkAncestors(pid, execFile) {
   let current = pid;
   for (let hop = 0; hop < MAX_HOPS; hop++) {
     const next = ppidOf(current, execFile);

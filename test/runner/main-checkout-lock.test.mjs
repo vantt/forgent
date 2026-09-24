@@ -1,4 +1,4 @@
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -1030,6 +1030,17 @@ function mkRunLockTempDir() {
  * then blocks forever (until killed) so the test can signal it externally.
  * Resolves with `{ pid, result }` once the first stdout line is observed --
  * the child is still alive and holding control at that point. */
+// Every holder child blocks forever until killed. A test that fails an
+// assertion (or throws on a signal the platform lacks) before its own kill
+// would otherwise leave the child alive holding this file's stdout pipe, and
+// the test file -- and the whole `node --test` run -- would never exit.
+const liveControlHolders = new Set();
+after(() => {
+  for (const child of liveControlHolders) {
+    try { child.kill('SIGKILL'); } catch { /* already gone */ }
+  }
+});
+
 function spawnControlHolder(runDir, { ttlMs } = {}) {
   const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/run-lock.mjs')).href;
   const script = [
@@ -1040,6 +1051,8 @@ function spawnControlHolder(runDir, { ttlMs } = {}) {
     `});`,
   ].join('\n');
   const child = spawn(process.execPath, ['-e', script]);
+  liveControlHolders.add(child);
+  child.on('exit', () => liveControlHolders.delete(child));
   return new Promise((resolve, reject) => {
     let buffered = '';
     const onData = (chunk) => {
@@ -1214,7 +1227,7 @@ test('run-lock: SIGKILL without a release marker can be reclaimed only after PID
   assert.equal(reclaimed.controlEpoch, 2);
 });
 
-test('run-lock: SIGSTOP with an expired heartbeat/ttl remains HELD -- a live-but-stopped PID is never mistaken for dead', async () => {
+test('run-lock: SIGSTOP with an expired heartbeat/ttl remains HELD -- a live-but-stopped PID is never mistaken for dead', { skip: process.platform === 'win32' && 'SIGSTOP/SIGCONT do not exist on Windows' }, async () => {
   const dir = mkRunLockTempDir();
   const runDir = path.join(dir, 'run');
   const shortTtl = 200;
