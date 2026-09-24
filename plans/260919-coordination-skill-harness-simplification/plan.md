@@ -877,7 +877,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
   production-fix-commit: `3c49cf4205060fea998abfb2e9ef5df7b816a252`
   candidate-test-commit: `97420638c7c0360823b64a4a4b74d05eeee8723d`
   evaluated-candidate-sha: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (approved in independent review: 0 blocker, 0 high)
-  synchronized-candidate-sha: (pending merge commit)
+  synchronized-candidate-sha: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (merges `origin/main@4ad0b8ca` into evaluated candidate `27ffb376`)
   integrated-sha: (pending merge into main)
   verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass; candidate regressions = 0
   deferred-findings: I09-REV-12 (OPEN, queued for I11: unlinked/retried node on resume uses deferred outcome taxonomy without concurrency-cap error), I09-REV-13 (OPEN, queued for I11: store-level recordDriverDisposition accepts caveated findings), store-scan (OPEN: manifest.assignmentRefs scan without dagNodeId filtering causes cross-node cwd attribution), replay-evidence-unification (OPEN, Track Manager ghi nhận dời việc thống nhất replaySession().dag.settled sang I11: replaySession dag.nodes[].settled is an event-log-only projection, while run and show execution doors inspect on-disk RunResult validity via readLinkedRunResultFromDisk)

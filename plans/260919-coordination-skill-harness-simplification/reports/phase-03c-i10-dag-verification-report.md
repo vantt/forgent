@@ -8,9 +8,12 @@
 - **Implementation Base Commit**: `c386e9f30b1ac60d78675f688e8d10146f5e8949` (`origin/main`, clean rebase, descendant containing `1ca4023c` and `60132825`)
 - **Production Fix Commit SHA**: `3c49cf4205060fea998abfb2e9ef5df7b816a252` (`fix(coordination): require valid on-disk RunResult evidence for DAG node settlement and descendant admission`)
 - **Candidate Test Commit SHA**: `97420638c7c0360823b64a4a4b74d05eeee8723d` (`test(coordination): verify DAG migration, cold resume, concurrency, and corrupt evidence`)
+- **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
+- **Synchronized Candidate SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (`merge: synchronize origin/main into coordination-skill-harness-i10-dag-verification`)
+- **Integration SHA**: (pending merge into main)
 - **I09 Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba`
 - **I09-REV-15 Fix SHA**: `601328256e4e8f26fbf4b44aaaefab23e6821162`
-- **Status**: `ready for independent review, not integrated` (production defect F1 resolved with fail-closed RunResult check; candidate tests passing 38 pass / 3 todo / 0 fail; 538 focused matrix pass; 3x timing recheck pass)
+- **Status**: `approved candidate synchronized, pending integration`
 - **Capability**: `code:test`
 - **Next Dependency Gate**: `I11` remains BLOCKED pending I08 and I10 integration approval
 
@@ -199,6 +202,9 @@ Result: **129/129 passed across all 3 runs** (zero flakiness or timing regressio
   - Added entry under `## [Unreleased]` in `CHANGELOG.md` and updated `docs/architect/agent-coordination/proposals/dag-request-scheduler.md`.
 - **Candidate Test Commit**: `97420638c7c0360823b64a4a4b74d05eeee8723d` (`test(coordination): verify DAG migration, cold resume, concurrency, and corrupt evidence`)
   - Contains all 5 test suites (41 tests total: 38 passed, 3 todo, 0 failed) adhering to permanent standard file names and free of plan-specific labels.
+- **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
+- **Synchronized Candidate SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (`merge: synchronize origin/main into coordination-skill-harness-i10-dag-verification`)
+- **Integration SHA**: (pending merge into main)
 
 ### Callers Analysis
 - `readLinkedRunResultFromDisk` callers in source tree:
