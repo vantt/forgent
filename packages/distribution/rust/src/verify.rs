@@ -268,8 +268,8 @@ pub fn verify_legacy_node(
 
     let real_path_clean = {
         let s = real_path.to_string_lossy();
-        if s.starts_with(r"\\?\") {
-            std::path::PathBuf::from(&s[4..])
+        if let Some(stripped) = s.strip_prefix(r"\\?\") {
+            std::path::PathBuf::from(stripped)
         } else {
             real_path
         }

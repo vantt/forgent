@@ -170,7 +170,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
       const sourceContent = fs.readFileSync(sourcePath, 'utf8');
       const wrapperDir = path.join(claudeSkillsRoot, entry.name);
       const wrapperPath = path.join(wrapperDir, 'SKILL.md');
-      const sourceRelativePath = path.relative(wrapperDir, sourcePath);
+      const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
       fs.mkdirSync(wrapperDir, { recursive: true });
       fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
       written.push(wrapperPath);
@@ -545,7 +545,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
       const skillFile = path.join(skillDir, 'SKILL.md');
       if (!fs.existsSync(skillFile)) continue;
 
-      const relPath = path.relative(projectRoot, skillDir);
+      const relPath = path.relative(projectRoot, skillDir).replaceAll('\\', '/');
       if (!nameToSources.has(entry.name)) {
         nameToSources.set(entry.name, []);
       }
@@ -562,7 +562,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         authority: 'core',
         domain: null,
         canonicalDir: relPath,
-        skillFilePath: path.relative(projectRoot, skillFile),
+        skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\', '/'),
         frontmatter,
         userInvocable,
         intentId,
@@ -585,7 +585,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         const skillFile = path.join(skillDir, 'SKILL.md');
         if (!fs.existsSync(skillFile)) continue;
 
-        const relPath = path.relative(projectRoot, skillDir);
+        const relPath = path.relative(projectRoot, skillDir).replaceAll('\\', '/');
         if (!nameToSources.has(entry.name)) {
           nameToSources.set(entry.name, []);
         }
@@ -602,7 +602,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
           authority: 'domain',
           domain: domainEntry.name,
           canonicalDir: relPath,
-          skillFilePath: path.relative(projectRoot, skillFile),
+          skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\', '/'),
           frontmatter,
           userInvocable,
           intentId,
@@ -771,7 +771,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
         if (entry.isDirectory()) {
           walk(fullPath, entryRel);
         } else {
-          const projectRelPath = path.relative(projectRoot, fullPath);
+          const projectRelPath = path.relative(projectRoot, fullPath).replaceAll('\\', '/');
           const collisionKey = windowsPathCollisionKey(entryRel);
           if (!pathToSources.has(collisionKey)) {
             pathToSources.set(collisionKey, { relPath: entryRel, sources: [] });

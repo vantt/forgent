@@ -1074,7 +1074,7 @@ test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized 
   );
 });
 
-test('discoverSharedFragments rejects backslash shared fragment names before Windows aliasing can occur', () => {
+test('discoverSharedFragments rejects backslash shared fragment names before Windows aliasing can occur', { skip: process.platform === 'win32' ? 'NTFS does not allow backslashes in filenames' : false }, () => {
   const root = mkTempDir('shared-backslash-alias-src-');
   const coreShared = path.join(root, 'core', 'skills', '_shared');
   fs.mkdirSync(coreShared, { recursive: true });

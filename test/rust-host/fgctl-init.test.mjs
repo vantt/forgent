@@ -101,7 +101,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.ok(fs.existsSync(rootJsonPath), 'root.json must exist');
     const rootJson = JSON.parse(fs.readFileSync(rootJsonPath, 'utf8'));
     assert.equal(rootJson.schemaVersion, 1);
-    assert.equal(rootJson.repositoryRoot, fs.realpathSync(tempProj));
+    assert.equal(rootJson.repositoryRoot, fs.realpathSync.native ? fs.realpathSync.native(tempProj) : fs.realpathSync(tempProj));
     assert.equal(rootJson.machineReleaseStore, tempState);
     assert.equal(rootJson.workspaceId.length, 16);
     assert.equal(rootJson.workStateId, rootJson.workspaceId);
@@ -891,12 +891,13 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     // into whatever cwd it is run from.
     fs.cpSync(fixtureReleaseDir, hostileReleaseDir, { recursive: true });
     const sentinel = path.join(outsideDir, 'pwned');
+    const sentinelPosix = sentinel.replaceAll('\\', '/');
     const hostileBin = path.join(hostileReleaseDir, 'bin', 'fgos');
     fs.writeFileSync(
       hostileBin,
       [
         '#!/bin/sh',
-        `printf executed > "${sentinel}"`,
+        `printf executed > "${sentinelPosix}"`,
         'printf executed > "$PWD/AGENTS.md"',
         `printf '{"contract":"fgos.v1","data":{"host":"rust","artifactDigest":"%s"}}\\n' "\${FGOS_CANDIDATE_ARTIFACT_DIGEST:-none}"`,
         'exit 0',
@@ -905,11 +906,14 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
       { mode: 0o755 }
     );
     fs.chmodSync(hostileBin, 0o755);
+    if (process.platform === 'win32') {
+      fs.copyFileSync(hostileBin, path.join(hostileReleaseDir, 'bin', 'fgos.exe'));
+    }
 
     const manifestPath = path.join(hostileReleaseDir, 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     for (const f of manifest.files) {
-      if (f.path === 'bin/fgos') {
+      if (f.path === 'bin/fgos' || f.path === 'bin/fgos.exe') {
         f.digest = hashFile(hostileBin);
       }
     }
@@ -920,10 +924,15 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     // Control: the hostile entry really does write its sentinel when run,
     // so a missing sentinel below proves fgctl never ran it -- not that the
     // script is broken.
-    const control = spawnSync(hostileBin, ['version', '--runtime-json'], {
-      cwd: hostileReleaseDir,
-      encoding: 'utf8',
-    });
+    const control = process.platform === 'win32'
+      ? spawnSync('sh', [hostileBin, 'version', '--runtime-json'], {
+          cwd: hostileReleaseDir,
+          encoding: 'utf8',
+        })
+      : spawnSync(hostileBin, ['version', '--runtime-json'], {
+          cwd: hostileReleaseDir,
+          encoding: 'utf8',
+        });
     assert.equal(control.status, 0, `hostile control run must exit 0: ${control.stderr}`);
     assert.equal(fs.readFileSync(sentinel, 'utf8'), 'executed');
     fs.unlinkSync(sentinel);

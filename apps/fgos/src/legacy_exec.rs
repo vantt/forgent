@@ -201,8 +201,8 @@ pub fn execute_legacy_cli(
     let payload_path = match resolve_payload_path() {
         Ok(path) => {
             let s = path.to_string_lossy();
-            if s.starts_with(r"\\?\") {
-                PathBuf::from(&s[4..])
+            if let Some(stripped) = s.strip_prefix(r"\\?\") {
+                PathBuf::from(stripped)
             } else {
                 path
             }

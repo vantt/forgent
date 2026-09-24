@@ -126,33 +126,25 @@ test('node-version-and-git passes under the current process (real Node, real git
 
 test('shell-integration-sourced passes trivially when no rc files exist', () => {
   const homeDir = mkTemp('doctor-shell-none-');
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
+  withHome(homeDir, () => {
     const { passed } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, true);
-  } finally {
-    process.env.HOME = prevHome;
-    fs.rmSync(homeDir, { recursive: true, force: true });
-  }
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('shell-integration-sourced fails when a detected rc file is missing the source line', () => {
+test('shell-integration-sourced fails when a detected rc file is missing the source line', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-missing-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), 'echo hi\n');
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
+  withHome(homeDir, () => {
     const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, false);
     assert.ok(message.includes('.bashrc'));
-  } finally {
-    process.env.HOME = prevHome;
-    fs.rmSync(homeDir, { recursive: true, force: true });
-  }
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works', () => {
+test('shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-present-');
   const rcFile = path.join(homeDir, '.bashrc');
   fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
@@ -166,22 +158,21 @@ test('shell-integration-sourced passes when every detected rc file already has t
   // known-good fixture.
   const safeFixture = path.join(homeDir, 'safe-fgos.sh');
   fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
-  const prevHome = process.env.HOME;
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
-  process.env.HOME = homeDir;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
-    const { passed } = checkById('shell-integration-sourced').check(process.cwd());
-    assert.equal(passed, true);
+    withHome(homeDir, () => {
+      const { passed } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, true);
+    });
   } finally {
-    process.env.HOME = prevHome;
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
 
-test('shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)', () => {
+test('shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-broken-fn-');
   const rcFile = path.join(homeDir, '.bashrc');
   fs.writeFileSync(rcFile, `source "${integrationScriptPath()}"\n`);
@@ -194,17 +185,16 @@ test('shell-integration-sourced fails when the source line is present but the so
     fragileFixture,
     '_fgos_helper() {\n  echo resolved\n}\n\nfgos() {\n  _fgos_helper >/dev/null || return 1\n  echo "fgos $@"\n}\n',
   );
-  const prevHome = process.env.HOME;
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
-  process.env.HOME = homeDir;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
   try {
-    const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
-    assert.equal(passed, false);
-    assert.match(message, /fgos --help.*fails/);
-    assert.match(message, /_fgos_helper/);
+    withHome(homeDir, () => {
+      const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, false);
+      assert.match(message, /fgos --help.*fails/);
+      assert.match(message, /_fgos_helper/);
+    });
   } finally {
-    process.env.HOME = prevHome;
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -856,47 +846,39 @@ test('integrationScriptPath names the main checkout even when this copy runs fro
 
 // ─── D1/D5: dead source lines are reported as a failed check ────────────────
 
-test('shell-integration-sourced fails on a dead fgos source line even when the live line is present', () => {
+test('shell-integration-sourced fails on a dead fgos source line even when the live line is present', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-dead-');
   const gone = path.join(homeDir, 'removed-worktree', 'scripts', 'fgos-shell-integration.sh');
   fs.writeFileSync(
     path.join(homeDir, '.bashrc'),
     `source "${integrationScriptPath()}"\nsource "${gone}"\n`,
   );
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
+  withHome(homeDir, () => {
     const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, false);
     assert.ok(message.includes(gone), `message did not name the dead path: ${message}`);
     assert.ok(message.includes('1 dead'), `message did not count the dead lines: ${message}`);
-  } finally {
-    process.env.HOME = prevHome;
-    fs.rmSync(homeDir, { recursive: true, force: true });
-  }
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('shell-integration-sourced counts dead lines per rc file across both bash and zsh', () => {
+test('shell-integration-sourced counts dead lines per rc file across both bash and zsh', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-dead-both-');
   const live = `source "${integrationScriptPath()}"\n`;
   const gone = path.join(homeDir, 'gone', 'scripts', 'fgos-shell-integration.sh');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), `${live}source "${gone}"\n`);
   fs.writeFileSync(path.join(homeDir, '.zshrc'), `${live}source "${gone}"\nsource "${gone}"\n`);
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
+  withHome(homeDir, () => {
     const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, false);
     assert.ok(message.includes('3 dead'), `expected 3 dead across both files: ${message}`);
     assert.ok(message.includes(`${path.join(homeDir, '.bashrc')} (1)`), message);
     assert.ok(message.includes(`${path.join(homeDir, '.zshrc')} (2)`), message);
-  } finally {
-    process.env.HOME = prevHome;
-    fs.rmSync(homeDir, { recursive: true, force: true });
-  }
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
-test('shell-integration-sourced still passes when every rc file has only the live line', () => {
+test('shell-integration-sourced still passes when every rc file has only the live line', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   const homeDir = mkTemp('doctor-shell-clean-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), `source "${integrationScriptPath()}"\n`);
   // See FGOS_SHELL_INTEGRATION_PROBE_SCRIPT's doc comment (registrations.mjs)
@@ -905,22 +887,21 @@ test('shell-integration-sourced still passes when every rc file has only the liv
   // rather than this repo's own real script.
   const safeFixture = path.join(homeDir, 'safe-fgos.sh');
   fs.writeFileSync(safeFixture, 'fgos() {\n  echo "safe fgos $@"\n}\n');
-  const prevHome = process.env.HOME;
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
-  process.env.HOME = homeDir;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = safeFixture;
   try {
-    const { passed } = checkById('shell-integration-sourced').check(process.cwd());
-    assert.equal(passed, true);
+    withHome(homeDir, () => {
+      const { passed } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, true);
+    });
   } finally {
-    process.env.HOME = prevHome;
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
   }
 });
 
-test('shell-integration-sourced samples dead paths instead of printing all of them', () => {
+test('shell-integration-sourced samples dead paths instead of printing all of them', { skip: process.platform === 'win32' ? 'bash/zsh rc files are not detected on win32' : false }, () => {
   // Real profiles accumulate these into the hundreds; a check message that
   // names every one scrolls the rest of the doctor report off the screen.
   const homeDir = mkTemp('doctor-shell-dead-many-');
@@ -931,19 +912,15 @@ test('shell-integration-sourced samples dead paths instead of printing all of th
     path.join(homeDir, '.bashrc'),
     `source "${integrationScriptPath()}"\n${dead.map((d) => `source "${d}"`).join('\n')}\n`,
   );
-  const prevHome = process.env.HOME;
-  process.env.HOME = homeDir;
-  try {
+  withHome(homeDir, () => {
     const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
     assert.equal(passed, false);
     assert.ok(message.includes('12 dead'), `expected the full count: ${message}`);
     assert.ok(message.includes('(+9 more path(s))'), `expected the remainder note: ${message}`);
     const named = dead.filter((d) => message.includes(d));
     assert.equal(named.length, 3, `expected exactly 3 sampled paths, got ${named.length}`);
-  } finally {
-    process.env.HOME = prevHome;
-    fs.rmSync(homeDir, { recursive: true, force: true });
-  }
+  });
+  fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
 test('no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD', () => {

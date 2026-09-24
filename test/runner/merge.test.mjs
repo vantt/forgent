@@ -1463,7 +1463,7 @@ test('mergeRunnerItem does not false-flag an already-merged branch just because 
   const firstResult = await mergeRunnerItem(repoRoot, makeItem({ verify: 'true' }));
   assert.equal(firstResult.outcome, 'merged');
   assert.equal(
-    fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8'),
+    fs.readFileSync(path.join(repoRoot, 'shared.txt'), 'utf8').replaceAll('\r\n', '\n'),
     'other added\nline1\ndemo added\n',
   );
 
@@ -1633,7 +1633,7 @@ test('mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely di
   // content EXACTLY — not a union of both sides, and not the worker's
   // stale copy either.
   const finalContent = fs.readFileSync(path.join(repoRoot, logRelPath), 'utf8');
-  assert.equal(finalContent, mainOwnContent, 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the worker branch');
+  assert.equal(finalContent.replaceAll('\r\n', '\n'), mainOwnContent.replaceAll('\r\n', '\n'), 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the worker branch');
   assert.ok(!finalContent.includes('worker-only'), 'the worker branch\'s stale .fgos/ line must never land on main');
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
@@ -1768,7 +1768,7 @@ test('mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
 
   const finalContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
-  assert.equal(finalContent, mainOwnContent, 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the branch\'s stale revert');
+  assert.equal(finalContent.replaceAll('\r\n', '\n'), mainOwnContent.replaceAll('\r\n', '\n'), 'target .fgos/ state must be exactly its own pre-merge version, unaffected by the branch\'s stale revert');
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
@@ -1825,7 +1825,7 @@ test('mergeRunnerItem merges cleanly when a .fgos/ path is absent at branchHeadA
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
 
   const finalContent = fs.readFileSync(path.join(repoRoot, configRelPath), 'utf8');
-  assert.equal(finalContent, seedContent, 'main\'s own content must survive unaffected');
+  assert.equal(finalContent.replaceAll('\r\n', '\n'), seedContent.replaceAll('\r\n', '\n'), 'main\'s own content must survive unaffected');
   assert.equal(isWorkingTreeClean(repoRoot), true);
 });
 
@@ -2040,8 +2040,8 @@ test('mergeRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instea
   assert.equal(result.outcome, 'merged', 'approve must resolve the false .fgos conflict, not report a real one');
   assert.ok(fs.existsSync(path.join(repoRoot, 'produced.txt')), 'the worker\'s real (non-.fgos) work must still land');
   assert.equal(
-    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8'),
-    mainShardBefore,
+    fs.readFileSync(path.join(repoRoot, shardRelPath), 'utf8').replaceAll('\r\n', '\n'),
+    mainShardBefore.replaceAll('\r\n', '\n'),
     'main\'s own .fgos state must land completely unaffected by the stale branch',
   );
   assert.equal(isWorkingTreeClean(repoRoot), true);
@@ -2537,7 +2537,7 @@ test('mergeRunnerItem attaches no postLand report when the merge did not land', 
   assert.equal(result.postLand, undefined);
 });
 
-test('performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles', async () => {
+test('performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles', { skip: process.platform === 'win32' ? 'POSIX git shim test' : false }, async () => {
   const repoRoot = initRepo();
   makeBranchWithCommit(repoRoot, 'fgw/tsk-5et', 'f.txt', 'branch\n');
   git(repoRoot, ['checkout', 'main']);

@@ -90,6 +90,11 @@ function writeFakeClaude(dir, initialState) {
     `,
   );
   fs.chmodSync(scriptPath, 0o755);
+  if (process.platform === 'win32') {
+    const cmdPath = path.join(dir, 'fake-claude.cmd');
+    fs.writeFileSync(cmdPath, `@node "${scriptPath}" %*`);
+    return { scriptPath: cmdPath, statePath };
+  }
   return { scriptPath, statePath };
 }
 
