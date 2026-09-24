@@ -292,4 +292,22 @@ The following files constitute the candidate diff against `cc687d92`:
 - `test/verbs/dispatch-observe.test.mjs`
 
 No out-of-scope files or unexpected files were modified. Main checkout was preserved untouched.
-Candidate is ready for Track Manager re-review and verification.
+
+---
+
+## 7. Integration Accounting and Verification Baseline
+
+- **Integration Target**: `main`
+- **Integration Baseline**: `main@f1b49d313f602c6b60785660f36f3bfe93e0a91a`
+- **Evaluated Candidate SHA**: `439a1fb078418edff7628555c4b6cb9f4015e4e6` (approved in independent review: 0 blocker, 0 high, 113 focused passing)
+- **Synchronized Merge Candidate**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (approved for integration)
+- **Integration SHA**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4` (fast-forwarded from `f1b49d313f602c6b60785660f36f3bfe93e0a91a` on main)
+- **Local Hygiene**: User dirty modifications in `AGENTS.md` and `CLAUDE.md` (GitNexus symbol count updates) and untracked files in `scratch/` were preserved intact.
+- **GitNexus Status**: Recorded as degraded per Track Manager review note (no `.gitnexus/run.cjs`).
+- **Post-Merge Verification Status**: Complete on integrated trunk.
+  - **Focused 178 tests**: 178/178 PASS in 6.3s:
+    - 113 tests across `test/cli/dispatch-*.test.mjs`, `test/verbs/dispatch-observe.test.mjs`, `test/setup/visibility-checks.test.mjs`, `test/runner/dispatch-runtime-inspect.test.mjs`, `test/rust-host/command-routes.test.mjs`, `test/architecture.test.mjs`, `test/runner/run-result-v2.test.mjs`.
+    - 65 tests in `test/setup/checks-doctor-config.test.mjs`.
+  - **Full test suite (`npm test`)**: 7,644 tests total: 7,569 PASS, 73 skipped/todo, 2 fail (pre-existing known D2/D3 baseline defects at `test/cli/fgos-approve.test.mjs:197, 216`).
+  - **Candidate Regressions**: Exactly 0.
+- **Next Unit**: Unit I08 ready to be unblocked upon Track Manager acceptance.

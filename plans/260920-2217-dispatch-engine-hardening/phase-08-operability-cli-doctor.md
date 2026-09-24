@@ -2,10 +2,12 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-23 (Unit I07 Implementation Complete)
+## Status — 2026-09-24 (Unit I07 Integrated into Main)
 
-- **Status**: `implemented` (pre-merge implementation complete; non-integrated candidate on branch `dispatch-hardening-i07-operability-cli-doctor`).
-- **Base Commit**: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2` (`main`)
+- **Status**: `integrated` (fast-forwarded to `main@6a638752422e1c5c39fecb5bf1770f0a24bc4dd4`; post-merge verification completed with 0 candidate regressions).
+- **Base Commit**: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
+- **Integration Baseline**: `f1b49d313f602c6b60785660f36f3bfe93e0a91a`
+- **Integrated Commit**: `6a638752422e1c5c39fecb5bf1770f0a24bc4dd4`
 - **Report**: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
 - **Verification Evidence**:
   - `test/cli/dispatch-operability.test.mjs`: 8 pass / 0 fail.
