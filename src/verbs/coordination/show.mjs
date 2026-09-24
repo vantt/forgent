@@ -202,7 +202,7 @@ function readRunResultForAssignment(fgosDir, assignmentId, runId) {
   const resultPath = path.join(runsDir, 'result.json');
   if (fs.existsSync(resultPath)) {
     const parsed = readJsonObjectFile(resultPath, `RunResult "${runId}"`);
-    return interpretRunResult(parsed);
+    return interpretRunResult(parsed, { expectedRunId: runId });
   }
   return null;
 }

@@ -500,6 +500,7 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
     const resolvedNote = realExecutorId && realExecutorId !== executorId ? ` (resolved via capabilities."${executorId}".prefer to executor "${realExecutorId}")` : '';
     throw new RunnerConfigError(
       `executor "${executorId}"${resolvedNote} resolves to cross-provider egress target "${egressTarget}" — prompt content would leave the Claude ecosystem. Set executors.${remediationId}.allowCrossProvider: true to permit this.`,
+      { code: 'governance.cross-provider-not-permitted' },
     );
   }
 

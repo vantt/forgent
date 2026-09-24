@@ -80,17 +80,28 @@ export function normalizeProviderFamily(providerFamily, command) {
   const norm = String(providerFamily ?? '').trim().toLowerCase();
   const cmd = String(command ?? '').trim().toLowerCase();
 
-  if (norm === 'z-ai' || norm === 'glm') return 'z-ai';
-  if (cmd === 'pi' || norm === 'pi') return 'pi';
-  // M6: bare 'openai' (a providerModel/provider value some configs declare
-  // instead of the CLI-derived 'openai-codex') is the same provider family
-  // as 'openai-codex'/'codex' -- unified here so provider-capacity
-  // inventory lookup and the fault classifier never silently split one
-  // provider's accounts/quarantine state across two different keys.
-  if (norm === 'openai-codex' || norm === 'openai' || norm === 'codex' || cmd === 'codex') return 'openai-codex';
-  if (norm === 'gemini' || norm === 'agy' || cmd === 'agy') return 'gemini';
-  if (norm === 'claude' || cmd === 'claude') return 'claude';
-  return norm || cmd || 'unknown';
+  // Declared vendor / provider family always takes precedence over CLI harness.
+  // Harnesses like pi or claude can invoke third-party models; vendor indicates egress destination.
+  if (norm) {
+    if (norm === 'z-ai' || norm === 'glm') return 'z-ai';
+    // M6: bare 'openai' (a providerModel/provider value some configs declare
+    // instead of the CLI-derived 'openai-codex') is the same provider family
+    // as 'openai-codex'/'codex' -- unified here so provider-capacity
+    // inventory lookup and the fault classifier never silently split one
+    // provider's accounts/quarantine state across two different keys.
+    if (norm === 'openai-codex' || norm === 'openai' || norm === 'codex') return 'openai-codex';
+    if (norm === 'gemini' || norm === 'agy') return 'gemini';
+    if (norm === 'claude') return 'claude';
+    if (norm === 'pi') return 'pi';
+    return norm;
+  }
+
+  // Fallback: derive vendor family from CLI command only when no provider family was declared
+  if (cmd === 'codex') return 'openai-codex';
+  if (cmd === 'agy') return 'gemini';
+  if (cmd === 'claude') return 'claude';
+  if (cmd === 'pi') return 'pi';
+  return cmd || 'unknown';
 }
 
 /**

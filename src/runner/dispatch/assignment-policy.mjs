@@ -524,10 +524,14 @@ export function resolveAssignmentDispatchPolicy({
   // block one specific registered executor entry even when its declared
   // provider family is otherwise trusted)
   if (options.disallowedProviders && options.disallowedProviders.includes(resolvedProvider)) {
-    throw new RunnerConfigError(`governance gate rejected provider "${resolvedProvider}": disallowed egress`);
+    throw new RunnerConfigError(`governance gate rejected provider "${resolvedProvider}": disallowed egress`, {
+      code: 'governance.disallowed-provider',
+    });
   }
   if (options.disallowedExecutors && options.disallowedExecutors.includes(primaryExecutor)) {
-    throw new RunnerConfigError(`governance gate rejected executor "${primaryExecutor}": disallowed`);
+    throw new RunnerConfigError(`governance gate rejected executor "${primaryExecutor}": disallowed`, {
+      code: 'governance.disallowed-executor',
+    });
   }
   const governanceSource = { scope: 'governance', id: resolvedProvider };
 

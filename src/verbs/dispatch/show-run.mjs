@@ -127,8 +127,8 @@ export function readRunSnapshot(runDir) {
       if (st.isDirectory()) {
         resultCorrupt = true;
       } else {
-        const interpreted = interpretRunResult(resultFile);
-        if (!interpreted || interpreted.corrupt || interpreted.contractCorrupt || interpreted.classification?.provenance === 'contract-corrupt') {
+        const interpreted = interpretRunResult(resultFile, { expectedRunId: run?.runId });
+        if (!interpreted || interpreted.corrupt || interpreted.contractCorrupt || interpreted.resultCorrupt || interpreted.classification?.provenance === 'contract-corrupt') {
           resultCorrupt = true;
         } else {
           settled = true;
