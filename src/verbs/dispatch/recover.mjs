@@ -29,6 +29,7 @@ export class RecoveryError extends Error {
     super(message);
     this.name = 'RecoveryError';
     this.code = code;
+    this.category = (code === 'run-not-found' || code === 'missing-run') ? 'precondition' : 'validation';
     Object.assign(this, details);
   }
 }

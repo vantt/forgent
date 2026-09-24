@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | — | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | implemented (Unit I07 candidate under review) | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -96,6 +96,11 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Phase 05 remainder (Cross-provider redirect governance & PlacementPolicy binding) integrated as Unit **I06** (`main@3bab9b99`).
   - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** / **I08**.
   - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
+- **Unit I07 (Dispatch Hardening Phase 08 Operability/CLI Surface & Doctor) Accounting:**
+  - Evaluated candidate `439a1fb0` approved in independent review (0 blocker, 0 high, 113 focused passing).
+  - Synchronized candidate `6a638752` approved for integration; fast-forwarded `main` from `f1b49d31` to `6a638752`.
+  - Integration status: INTEGRATED AT `6a638752`; post-merge verification completed (178/178 focused pass; full suite 7,569 pass with 0 candidate regressions, only baseline D2/D3 pre-existing failures).
+  - Unit **I08 remains BLOCKED** pending Track Manager handoff acceptance.
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
   - Integration status: INTEGRATED AT `1ca4023c`, POST-MERGE VERIFICATION PENDING. Evaluated candidate `a208bf55` approved by independent review (0 blocker, 0 high), synchronized candidate `c624fe58` merged into main at `1ca4023c98c2f449cb58cba481e82cab49ba51ba`.

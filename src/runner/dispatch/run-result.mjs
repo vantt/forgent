@@ -636,6 +636,31 @@ export function interpretRunResult(input, options = {}) {
     };
   }
 
+  // An object with no contract, no status, and no runId is not a valid result structure.
+  if (!rawObj.contract && !rawObj.status && !rawObj.runId) {
+    return Object.freeze({
+      contract: { ...RUN_RESULT_CONTRACT },
+      runId: null,
+      assignmentId: null,
+      classification: {
+        execution: { status: 'completion-unknown', exitCode: null },
+        assessment: { verdict: 'inconclusive' },
+        confidence: { level: 'failed', basis: ['invalid-json'] },
+        failure: { family: 'contract', code: 'invalid-run-result-structure' },
+        policy: { disposition: 'refuse', code: 'corrupt-result' },
+        delivery: { mode: 'legacy-derived' },
+        provenance: 'contract-corrupt',
+      },
+      status: 'no-evidence',
+      confidence: 'failed',
+      contractCorrupt: true,
+      corrupt: true,
+      corruptionReasons: ['Legacy result must have at least runId or status'],
+      runtime: {},
+      evidence: {},
+    });
+  }
+
   // Historical legacy v1 interpretation
   // Deterministic mapping of legacy status/confidence to classification:
   const legacyStatus = rawObj.status || 'no-evidence';

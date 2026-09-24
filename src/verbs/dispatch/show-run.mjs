@@ -13,12 +13,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
+import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
     super(message);
     this.name = 'DispatchObserveError';
     this.code = code;
+    this.category = (code === 'run-not-found' || code === 'missing-run') ? 'precondition' : 'validation';
     Object.assign(this, details);
   }
 }
@@ -115,6 +117,29 @@ export function readRunSnapshot(runDir) {
   if (!run) {
     throw new DispatchObserveError('missing-run', `no run.json in ${dir}`, { runDir: dir });
   }
+  const resultFile = path.join(dir, 'result.json');
+  let settled = false;
+  let resultCorrupt = false;
+  let result = null;
+  if (fs.existsSync(resultFile)) {
+    try {
+      const st = fs.statSync(resultFile);
+      if (st.isDirectory()) {
+        resultCorrupt = true;
+      } else {
+        const interpreted = interpretRunResult(resultFile);
+        if (!interpreted || interpreted.corrupt || interpreted.contractCorrupt || interpreted.classification?.provenance === 'contract-corrupt') {
+          resultCorrupt = true;
+        } else {
+          settled = true;
+          result = interpreted;
+        }
+      }
+    } catch {
+      resultCorrupt = true;
+    }
+  }
+
   let visibility = null;
   let visibilityError = null;
   try {
@@ -125,6 +150,9 @@ export function readRunSnapshot(runDir) {
   return {
     runDir: dir,
     run,
+    settled,
+    ...(resultCorrupt ? { resultCorrupt: true } : {}),
+    ...(result ? { result } : {}),
     visibility,
     ...(visibilityError ? { visibilityError } : {}),
     outbox: listOutbox(dir),

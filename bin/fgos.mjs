@@ -43,7 +43,7 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
@@ -1059,7 +1059,7 @@ function describeCandidate(candidate) {
   return description;
 }
 
-async function runVerb(verb, flags, positional, dir) {
+async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
   switch (verb) {
     case 'version': {
       return resolveCliVersionInfo();
@@ -2533,7 +2533,35 @@ async function runVerb(verb, flags, positional, dir) {
     // imports a herdr client or a dispatch adapter, so there is no path from
     // this case to sending anything into a pane.
     case 'dispatch': {
-      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile>');
+      const sub = requireField(positional[0], 'dispatch requires a sub-verb: fgos dispatch <show-run|inspect|watch|recover|reconcile|decide|execute|log>');
+      const KNOWN_DISPATCH_SUBVERBS = [
+        'show-run',
+        'inspect',
+        'watch',
+        'recover',
+        'reconcile',
+        'decide',
+        'execute',
+        'log',
+      ];
+      if (!KNOWN_DISPATCH_SUBVERBS.includes(sub)) {
+        throw new StoreError('validation', `unknown dispatch sub-verb "${sub}": expected ${KNOWN_DISPATCH_SUBVERBS.join(', ')}`);
+      }
+      if (sub === 'decide' || sub === 'execute' || sub === 'log') {
+        try {
+          return await runDispatchCli(rawArgv, { returnResult: true });
+        } catch (err) {
+          if (sub === 'execute' || err instanceof DispatchError || err.errorClass) {
+            err.isDispatchExecute = (sub === 'execute');
+            const payload = {
+              error: err.message,
+              ...(err.errorClass ? { errorClass: err.errorClass } : {}),
+            };
+            process.stdout.write(`${JSON.stringify(payload)}\n`);
+          }
+          throw err;
+        }
+      }
       const repoRootForDispatch = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
       if (sub === 'inspect') {
         return invokeDispatchInspectOperation({
@@ -2565,11 +2593,18 @@ async function runVerb(verb, flags, positional, dir) {
           // above (the main checkout root). Omitted, the use case's own
           // default (the CLI process's real process.cwd()) applies, same
           // ergonomics as running the command from inside the stuck cwd.
+          const runParam = flags.run ?? flags['run-id'];
+          if ((runParam !== undefined || flags.assignment !== undefined) && !flags.action) {
+            throw new StoreError(
+              'validation',
+              'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',
+            );
+          }
           const cwd = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : undefined;
           return invokeDispatchReconcileOperation({
             operationId: 'dispatch.runtime.reconcile', effect: 'write',
             ctx: reconcileCtx,
-            payload: { action: flags.action, runId: flags.run, assignmentId: flags.assignment, cwd },
+            payload: { action: flags.action, runId: runParam, assignmentId: flags.assignment, cwd },
           });
         }
         if (positional[1] === 'apply') {
@@ -2583,7 +2618,7 @@ async function runVerb(verb, flags, positional, dir) {
         }
         throw new StoreError('validation', 'dispatch reconcile expects plan or apply');
       }
-      const runId = requireField(positional[1] ?? flags['run-id'], `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
+      const runId = requireField(positional[1] ?? flags['run-id'] ?? flags.run, `dispatch ${sub} requires a runId: fgos dispatch ${sub} <runId>`);
       if (sub === 'show-run') {
         return showRunUseCase({ cwd: repoRootForDispatch, repoRoot: repoRootForDispatch }, { runId });
       }
@@ -2631,7 +2666,6 @@ async function runVerb(verb, flags, positional, dir) {
           actionKey: requireField(flags['action-key'], 'dispatch recover --action requires --action-key'),
         });
       }
-      throw new Error(`unknown dispatch sub-verb "${sub}": expected show-run, inspect, watch, recover, or reconcile`);
     }
 
     case 'coordination': {
@@ -4678,7 +4712,7 @@ function renderHelpText(entries = publicManifestEntries()) {
     // gets the `--name` form.
     const positionalRequired = required.filter((r) => positional.includes(r));
     const flagRequired = required.filter((r) => !positional.includes(r));
-    if (positionalRequired.length) lines.push(`    positional: ${positionalRequired.join(', ')}`);
+    if (positional.length) lines.push(`    positional: ${positional.join(', ')}`);
     if (flagRequired.length) lines.push(`    required: ${flagRequired.map((r) => `--${r}`).join(', ')}`);
     const deprecationText = formatDeprecation(entry.deprecated);
     if (deprecationText) {
@@ -5062,7 +5096,7 @@ async function main() {
     // above already answers it without new machinery. The error itself still
     // comes from `runVerb` unchanged.
     faultClass = entry ? null : 'unknown-verb';
-    const data = await runVerb(verb, flags, positional, dir);
+    const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
     } else {
@@ -5087,7 +5121,11 @@ async function main() {
     if (recorded) {
       process.stderr.write(`fgos: invocation fault recorded to ${recorded}\n`);
     }
-    process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
+    if (err instanceof DispatchError || err.isDispatchExecute || (verb === 'dispatch' && err.errorClass && err.errorClass !== 'validation')) {
+      process.exitCode = 1;
+    } else {
+      process.exitCode = EXIT_CODES[categoryOf(err)] ?? 1;
+    }
   }
 }
 

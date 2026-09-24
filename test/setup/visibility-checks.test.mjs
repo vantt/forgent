@@ -172,3 +172,61 @@ test('when herdr cannot be asked, kinds are not evaluated rather than guessed', 
   assert.equal(r.passed, true);
   assert.match(r.message, /not evaluated/);
 });
+
+test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
+  const oldBin = process.env.FGOS_HERDR_BIN;
+  try {
+    process.env.FGOS_HERDR_BIN = '/no/such/custom-herdr-bin';
+    const r = checkHerdrAvailable();
+    assert.equal(r.passed, false);
+    assert.match(r.message, /\/no\/such\/custom-herdr-bin/);
+  } finally {
+    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = oldBin;
+  }
+});
+
+test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', () => {
+  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
+  try {
+    process.env.FGOS_HERDR_ANCHOR_PANE = '   ';
+    const r = checkHerdrAvailable();
+    assert.equal(r.passed, false);
+    assert.match(r.message, /FGOS_HERDR_ANCHOR_PANE is empty/);
+  } finally {
+    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
+    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
+  }
+});
+
+test('checkHerdrAvailable fails closed when FGOS_HERDR_ANCHOR_PANE cannot be resolved (F5)', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
+  const mockScript = path.join(tmp, 'mock-herdr.mjs');
+  fs.writeFileSync(mockScript, `#!/usr/bin/env node
+if (process.argv[2] === '--version') {
+  process.stdout.write('herdr 0.8.0\\n');
+  process.exit(0);
+}
+if (process.argv[2] === 'pane' && process.argv[3] === 'get') {
+  process.stderr.write('error: pane not found\\n');
+  process.exit(1);
+}
+process.exit(0);
+`, { mode: 0o755 });
+
+  const oldBin = process.env.FGOS_HERDR_BIN;
+  const oldPane = process.env.FGOS_HERDR_ANCHOR_PANE;
+  try {
+    process.env.FGOS_HERDR_BIN = mockScript;
+    process.env.FGOS_HERDR_ANCHOR_PANE = 'non-existent-pane-12345';
+    const r = checkHerdrAvailable();
+    assert.equal(r.passed, false);
+    assert.match(r.message, /cannot be resolved/);
+  } finally {
+    if (oldBin === undefined) delete process.env.FGOS_HERDR_BIN;
+    else process.env.FGOS_HERDR_BIN = oldBin;
+    if (oldPane === undefined) delete process.env.FGOS_HERDR_ANCHOR_PANE;
+    else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});

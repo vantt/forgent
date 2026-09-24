@@ -44,8 +44,18 @@ function allRuns(root) {
 const project = (l) => ({ kind: l.kind, assignmentId: l.assignmentId ?? null, attempt: l.attempt, path: l.runDir });
 function result(l) {
   const file = path.join(l.runDir, 'result.json');
-  if (!fs.existsSync(file)) return { present: false, value: null };
-  try { return { present: true, value: interpretRunResult(file) }; } catch { return { present: true, value: interpretRunResult(null) }; }
+  if (!fs.existsSync(file)) return { present: false, value: null, corrupt: false };
+  try {
+    const st = fs.statSync(file);
+    if (st.isDirectory()) {
+      return { present: true, value: interpretRunResult(null), corrupt: true };
+    }
+    const val = interpretRunResult(file);
+    const corrupt = !val || val.classification === 'contract-corrupt';
+    return { present: true, value: val, corrupt };
+  } catch {
+    return { present: true, value: interpretRunResult(null), corrupt: true };
+  }
 }
 // The admission ledger is read directly. Importing run-lock would make the
 // inspect graph reach its writer/process-control functions.
@@ -96,22 +106,119 @@ export function findCoordinationSessionOwningAssignment(root, assignmentId) {
 }
 
 function owner(l, root, all) {
-  if (l.malformed || !l.run?.runId) return { complete: false };
+  if (l.malformed || !l.run?.runId) return { complete: false, reason: 'corrupt' };
   if (l.kind !== 'assignment-run') return { complete: true, kind: 'standalone-run', id: l.run.runId };
   const dir = path.join(fgosDir(root), 'assignments', l.assignmentId), assignment = json(path.join(dir, 'assignment.json')), evidence = assignmentEvidence(root, l.assignmentId, all);
   const admitted = evidence.facts.records.some((record) => record.runId === l.run.runId);
-  if (!assignment || assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId || !admitted || evidence.incomplete) return { complete: false };
+  if (!assignment || !admitted) return { complete: false, reason: 'missing' };
+  if (assignment.assignmentId !== l.assignmentId || l.run.assignmentId !== l.assignmentId) return { complete: false, reason: 'conflicting' };
+  if (evidence.incomplete) {
+    const reason = evidence.facts.corrupt || evidence.malformed.length ? 'corrupt' : (evidence.duplicateCurrent.length ? 'conflicting' : 'missing');
+    return { complete: false, reason };
+  }
   const id = l.run.coordinationId ?? l.run.coordinationSessionId;
   if (!id) return { complete: true, kind: 'standalone-run', id: l.run.runId };
   const session = json(path.join(fgosDir(root), 'coordination', 'sessions', id, 'session.json'));
-  return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false };
+  if (!session) return { complete: false, reason: 'missing' };
+  return session && Array.isArray(session.assignmentRefs) && session.assignmentRefs.includes(l.assignmentId) ? { complete: true, kind: 'coordination-session', id } : { complete: false, reason: 'conflicting' };
 }
 function authority(l, root, all) { const o = owner(l, root, all); if (!o.complete) return null; return o.kind === 'coordination-session' ? { kind: o.kind, id: o.id, observeCommand: `fgos coordination recover ${o.id}` } : { kind: o.kind, id: o.id, observeCommand: `fgos dispatch recover ${o.id}` }; }
+const VALID_PHASES = new Set(['admitted', 'launched', 'bound', 'delivered', 'settled', 'unknown']);
+const VALID_RESOURCE_STATES = new Set(['live-proven', 'dead-proven', 'absent-proven', 'ambiguous', 'unobserved', 'unsupported']);
+const VALID_DELIVERIES = new Set(['not-started', 'running', 'delivered', 'unknown', 'replayed', 'recovered']);
+const VALID_COMPLETENESS = new Set(['complete', 'missing', 'stale', 'corrupt', 'conflicting', 'unsupported']);
+
+function derivePhase(l, terminal) {
+  if (terminal.present && !terminal.corrupt) return 'settled';
+
+  const commandsDir = path.join(l.runDir, 'controller', 'commands');
+  let hasCommands = false;
+  try {
+    hasCommands = fs.existsSync(commandsDir) && fs.readdirSync(commandsDir).length > 0;
+  } catch {}
+  if (hasCommands || l.run?.status === 'bound' || l.run?.controller || l.run?.bound) {
+    return 'bound';
+  }
+
+  if (l.run?.status === 'running') {
+    if (l.run?.launchedAt || l.run?.delivery === 'running') return 'launched';
+    if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
+    return 'admitted';
+  }
+
+  if (l.run?.status === 'launched' || l.run?.launchedAt) return 'launched';
+  if (l.run?.status === 'admitted') return 'admitted';
+  if (l.run?.status === 'delivered') return 'delivered';
+
+  if (l.run?.phase && VALID_PHASES.has(l.run.phase)) return l.run.phase;
+  return 'unknown';
+}
+
+function deriveDelivery(l) {
+  const d = l.run?.delivery;
+  if (d === 'not-sent') return 'not-started';
+  if (VALID_DELIVERIES.has(d)) return d;
+  if (l.run?.status === 'not-started' || l.run?.status === 'todo') return 'not-started';
+  if (l.run?.status === 'running' || l.run?.status === 'doing') return 'running';
+  return 'unknown';
+}
+
+function deriveResourceState(l, nowFn) {
+  const vis = json(path.join(l.runDir, 'visibility.json'));
+  if (!vis) {
+    return 'unobserved';
+  }
+  const s = vis.status;
+  if (VALID_RESOURCE_STATES.has(s)) return s;
+  if (s === 'died') return 'dead-proven';
+  if (['working', 'briefed', 'agent-ready'].includes(s) && vis.lastSeenAt) {
+    const ts = new Date(vis.lastSeenAt).getTime();
+    const curr = typeof nowFn === 'function' ? new Date(nowFn()).getTime() : Date.now();
+    if (!Number.isNaN(ts) && curr - ts >= 0 && curr - ts < 60000) {
+      return 'live-proven';
+    }
+  }
+  return 'ambiguous';
+}
+
+function deriveWorkspaceCompleteness(l) {
+  if (fs.existsSync(path.join(l.runDir, 'workspace-evidence.json'))) return 'complete';
+  return 'unsupported';
+}
+
 function one(l, root, now, all) {
-  const terminal = result(l), runResult = terminal.value, o = owner(l, root, all), phase = l.run.phase ?? (terminal.present ? 'settled' : l.run.status ?? 'unknown');
-  const observation = { contract: { id: 'run-observation', version: 1 }, observedAt: now(), subject: { kind: 'run', runId: l.run.runId }, phase, resourceState: json(path.join(l.runDir, 'visibility.json'))?.status ?? 'unknown', delivery: l.run.delivery ?? 'unknown', inspectionStatus: terminal.present ? 'resolved' : 'partial', evidenceCompleteness: { identity: 'complete', lifecycle: 'complete', resource: 'missing', result: terminal.present ? 'complete' : 'missing', ownership: o.complete ? 'complete' : 'partial', workspace: 'partial' }, recoveryAuthority: null, observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }] };
+  const terminal = result(l), runResult = terminal.value, o = owner(l, root, all);
+  const phase = derivePhase(l, terminal);
+  const resourceState = deriveResourceState(l, now);
+  const delivery = deriveDelivery(l);
+  const workspaceCompleteness = deriveWorkspaceCompleteness(l);
+  const observation = {
+    contract: { id: 'run-observation', version: 1 },
+    observedAt: now(),
+    subject: { kind: 'run', runId: l.run.runId },
+    phase,
+    resourceState,
+    delivery,
+    inspectionStatus: terminal.present && !terminal.corrupt ? 'resolved' : 'partial',
+    evidenceCompleteness: {
+      identity: 'complete',
+      lifecycle: 'complete',
+      resource: resourceState === 'unsupported'
+        ? 'unsupported'
+        : (resourceState === 'unobserved'
+          ? 'missing'
+          : (resourceState === 'ambiguous' ? 'stale' : 'complete')),
+      result: !terminal.present
+        ? 'missing'
+        : (terminal.corrupt ? 'corrupt' : 'complete'),
+      ownership: o.complete ? 'complete' : (o.reason ?? 'missing'),
+      workspace: workspaceCompleteness,
+    },
+    recoveryAuthority: null,
+    observations: [{ kind: 'run-record', source: 'run-repository', level: 'correlated', value: { status: l.run.status ?? null, phase } }],
+  };
   const hint = authority(l, root, all);
-  return { inspectionStatus: o.complete && terminal.present ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } };
+  return { inspectionStatus: o.complete && terminal.present && !terminal.corrupt ? 'resolved' : 'partial', subject: { kind: 'run', id: l.run.runId, locations: [project(l)] }, observations: observation.observations, runObservation: observation, runResult, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: o.complete ? 'not-needed' : 'manual-required', reason: o.complete ? 'No stale local guard was observed.' : 'Run ownership is incomplete or disagrees with repository admission facts.' }, links: { assignmentIds: l.assignmentId ? [l.assignmentId] : [], coordinationIds: l.run.coordinationId ? [l.run.coordinationId] : [], runIds: [l.run.runId] } };
 }
 function workspace(input) { const absolute = path.resolve(input); let cursor = absolute; try { if (!fs.statSync(cursor).isDirectory()) cursor = path.dirname(cursor); } catch { return { path: absolute, root: absolute, commonDir: null, key: absolute }; } for (;;) { const dot = path.join(cursor, '.git'); if (fs.existsSync(dot)) { let gitDir = dot; try { if (fs.statSync(dot).isFile()) { const m = /^gitdir:\s*(.+)\s*$/m.exec(fs.readFileSync(dot, 'utf8')); if (m) gitDir = path.resolve(cursor, m[1]); } } catch {} const common = text(path.join(gitDir, 'commondir')), commonDir = common ? path.resolve(gitDir, common) : gitDir; return { path: absolute, root: real(cursor), commonDir: real(commonDir), key: `${real(cursor)}::${real(commonDir)}` }; } const parent = path.dirname(cursor); if (parent === cursor) break; cursor = parent; } return { path: absolute, root: absolute, commonDir: null, key: absolute }; }
 const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject: { kind, id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } });
@@ -135,4 +242,10 @@ export function inspectDispatchRuntime(root, options = {}, { now = () => new Dat
   const ownershipComplete = found.every((l) => owner(l, root, all).complete), complete = evidenceComplete && !malformed && ownershipComplete, hint = complete && active.length === 1 && !conflict ? authority(active[0], root, all) : null, status = conflict ? 'conflicting' : complete ? 'resolved' : 'partial';
   return { inspectionStatus: status, subject: { kind: 'cwd', id: identity.path, locations: found.map(project) }, observations: [{ kind: 'cwd-aggregate', source: 'workspace-evidence', level: complete && !conflict ? 'correlated' : 'partial', value: aggregate }], runObservation: null, runResult: null, ...(hint ? { recoveryAuthority: hint } : {}), reconciliation: { state: conflict || !complete ? 'manual-required' : 'not-needed', reason: conflict ? 'Workspace guard/projection or concurrency facts conflict.' : !complete ? 'Workspace guard/projection evidence or Run materialization is incomplete or corrupt.' : 'Inspection is read-only and does not repair guards.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: found.map((l) => l.run.runId) } };
 }
-export { INSPECTION_STATUSES };
+export {
+  INSPECTION_STATUSES,
+  VALID_PHASES,
+  VALID_RESOURCE_STATES,
+  VALID_DELIVERIES,
+  VALID_COMPLETENESS,
+};

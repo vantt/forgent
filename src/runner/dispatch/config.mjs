@@ -850,6 +850,10 @@ function validateInteractiveModeShape(interactiveMode, label) {
  */
 function warnIfProviderFamilyUnreliable(executorId, executor) {
   if (executor.providerModel !== undefined || executor.provider !== undefined) return;
+  // Skip warning when every declared invocation is non-CLI (e.g. mcp-only or http-only).
+  if (Array.isArray(executor.invocations) && executor.invocations.length > 0 && executor.invocations.every((inv) => inv.via !== 'cli')) {
+    return;
+  }
   const cliInvocationCommand = Array.isArray(executor.invocations)
     ? executor.invocations.find((inv) => inv.via === 'cli')?.command
     : undefined;

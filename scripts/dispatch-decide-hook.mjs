@@ -68,7 +68,7 @@ try {
 if (blocked) {
   process.stderr.write(
     `BLOCKED: this ${blocked.toolName} call resolves to out-of-process dispatch (no native in-process handler for "${blocked.subagentType}"). ` +
-      'Run `node src/runner/dispatch.mjs execute` instead of calling this tool directly -- it self-executes and hands back the real result. ' +
+      'Run `fgos dispatch execute` (or `node src/runner/dispatch.mjs execute`) instead of calling this tool directly -- it self-executes and hands back the real result. ' +
       `(decided via: decide --for "${blocked.subagentType}" --needs-soul --has-live-task-access)\n`,
   );
   process.exit(2);

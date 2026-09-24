@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Dispatch Operability & CLI Hardening**:
+  - Registered `fgos dispatch decide|execute|log` as canonical public CLI sub-verbs wrapped in the `fgos.v1` output envelope, retaining `node src/runner/dispatch.mjs` as backwards-compatible alias.
+  - Added additive `reasonCodes` and `blockedReason` to `decideExecutorCli`, and removed dead `plan.dispatch === 'human-only'` check.
+  - Added `--run` alias for `--run-id` on `show-run`, `watch`, and `recover`; standardized run not-found errors to categorized exit code 2 (`precondition`).
+  - Enforced unknown dispatch sub-verb validation (exit 4) before requiring `runId`, and validated that `dispatch reconcile plan` with `--run` or `--assignment` requires `--action`.
+  - Added `settled` flag and corrupt evidence detection to `watch` snapshots for clean termination when `result.json` settles or corrupts.
+  - Aligned `RunObservation` vocabulary to closed status sets (`phase`, `delivery`, `resourceState`, `evidenceCompleteness`).
+  - Updated doctor check `herdr-available` to resolve binary via `FGOS_HERDR_BIN` and diagnose empty `FGOS_HERDR_ANCHOR_PANE`; documented intentional host-global state directories in distribution spec.
+  - Optimized receipt polling with event-driven `fs.watch` and 20ms fallback, and Herdr round polling (1.5s backoff after ack, skip process inspection while working).
+  - Conditioned provider-family warning to skip when all declared executor invocations are non-CLI.
+  - Synchronized command registry metadata, `touchesState` descriptions, and help text rendering for compound positional fields (`sub, run-id`).
 - **Fixed**: every `npm test` run left tens of thousands of test fixture directories in the OS temp dir (tests create them and mostly never delete them), which across a day of runs exhausted the disk's inodes and made every command fail with ENOSPC. The test runner now points each run at its own temp directory and removes it when the run ends; set `FGOS_TEST_KEEP_TMP=1` to keep it for debugging.
 - **Added**: `worktreeSetup.commands` in `.fgos/config.json` — shell commands every runner-created worktree (worker checkouts, leaf merges, and `fgos approve`'s root-into-main merge gate) runs after its dependency install and before anything verifies there, e.g. `["cargo build --release --workspace"]` for a project whose tests need a compiled binary a fresh checkout never has. Commands run in the worktree with `FGOS_REPO_ROOT` pointing at the main checkout; a failing command fails worktree creation (or, at the merge gate, the verify) with its output. Empty by default; `fgos doctor` flags a malformed section.
 - **Fixed**: `fgos approve`'s root-into-main merge held `main-checkout.lock` for its entire verify run (often several minutes), so every other lock-taking command (`take`/claim, another `approve`) was refused with "main checkout is locked" meanwhile. The lock is now taken only for the final ref move and main-checkout sync; `--no-wait` still refuses at once when the lock is already held.

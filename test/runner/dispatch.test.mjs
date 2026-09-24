@@ -1870,7 +1870,7 @@ test('loadRunnerConfig does not warn for an "invocations[]"-shaped "executors.<i
   }
 });
 
-test('loadRunnerConfig warns (never throws) for an "invocations[]"-shaped "executors.<id>" entry with no via:"cli" entry at all (gitnexus shape: mcp-only) and no providerModel/provider — assignment-policy.mjs has no command to extract for this shape', () => {
+test('loadRunnerConfig skips provider-family warning when every invocation is non-CLI (R8, gitnexus shape: mcp-only)', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'invocations-shaped-mcp-only-no-provider-model.json');
   fs.writeFileSync(
@@ -1894,8 +1894,39 @@ test('loadRunnerConfig warns (never throws) for an "invocations[]"-shaped "execu
   console.warn = (...args) => calls.push(args);
   try {
     assert.doesNotThrow(() => loadRunnerConfig(configPath));
+    assert.equal(calls.length, 0, 'warning must be skipped when every invocation is non-CLI');
+  } finally {
+    console.warn = original;
+  }
+});
+
+test('loadRunnerConfig still warns when an executor has a CLI invocation with unrecognized command and no providerModel (R8)', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'invocations-shaped-cli-no-provider-model.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities: { 'custom-job': {} },
+      executors: {
+        customTool: {
+          kind: 'agent',
+          for: ['custom-job'],
+          command: 'unrecognized-binary',
+          args: ['{prompt}'],
+        },
+      },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      timeoutMs: 1000,
+    }),
+  );
+  const original = console.warn;
+  const calls = [];
+  console.warn = (...args) => calls.push(args);
+  try {
+    assert.doesNotThrow(() => loadRunnerConfig(configPath));
     assert.equal(calls.length, 1);
-    assert.match(calls[0][0], /gitnexus/);
+    assert.match(calls[0][0], /customTool/);
   } finally {
     console.warn = original;
   }
@@ -2591,7 +2622,7 @@ test('decideExecutorCli resolves "in-process" for a kind:"task" executor when ha
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('judge-discovery', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 test('decideExecutorCli resolves "out-of-process" for the same kind:"task" executor when hasLiveTaskAccess is omitted (safe default), still reporting its agentType', async () => {
@@ -2603,7 +2634,7 @@ test('decideExecutorCli resolves "out-of-process" for the same kind:"task" execu
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('judge-discovery', { repoRoot: root });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', agentType: 'judge', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', agentType: 'judge', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('decideExecutorCli omits agentType entirely for a kind:"tool" executor that declares none (tsk-3ik-3)', async () => {
@@ -2615,7 +2646,7 @@ test('decideExecutorCli omits agentType entirely for a kind:"tool" executor that
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('submit-assist-classify', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   assert.ok(!('agentType' in decided));
 });
 
@@ -2633,9 +2664,9 @@ test('decideExecutorCli defaults to native dispatch for a bare --needs-soul call
     timeoutMs: 5000,
   });
   const withAccess = await decideExecutorCli(undefined, { repoRoot: root, needsSoul: true, hasLiveTaskAccess: true });
-  assert.deepEqual(withAccess, { mechanism: 'in-process', configured: false });
+  assert.deepEqual(withAccess, { mechanism: 'in-process', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
   const withoutAccess = await decideExecutorCli(undefined, { repoRoot: root, needsSoul: true });
-  assert.deepEqual(withoutAccess, { mechanism: 'out-of-process', configured: false });
+  assert.deepEqual(withoutAccess, { mechanism: 'out-of-process', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
 });
 
 test('decideExecutorCli --needs-soul defaults to native dispatch for an unregistered --for purpose, instead of "unavailable"', async () => {
@@ -2646,7 +2677,7 @@ test('decideExecutorCli --needs-soul defaults to native dispatch for an unregist
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'general-purpose', needsSoul: true, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', configured: false });
+  assert.deepEqual(decided, { mechanism: 'in-process', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 test('decideExecutorCli --needs-soul never overrides a real registered purpose match -- a real executor still wins', async () => {
@@ -2659,7 +2690,7 @@ test('decideExecutorCli --needs-soul never overrides a real registered purpose m
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', needsSoul: true, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'gather', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'gather', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('decideExecutorCli throws a usage RunnerConfigError when executorId/--for/--work/--needs-soul are all missing', async () => {
@@ -2686,7 +2717,7 @@ test('decideExecutorCli hands back mcpTool (mechanism upgraded to in-process) fo
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, executorId: 'gitnexus' });
+  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped', 'native-first.mcp-handback'], executorId: 'gitnexus' });
 });
 
 test('decideExecutorCli hands back mcpTool for a direct executorId call with no --for, using the executor\'s own sole "for" entry', async () => {
@@ -2705,7 +2736,7 @@ test('decideExecutorCli hands back mcpTool for a direct executorId call with no 
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped', 'native-first.mcp-handback'] });
 });
 
 test('decideExecutorCli never hands back mcpTool when the requested purpose has no entry in the invocation\'s tools map -- stays out-of-process', async () => {
@@ -2737,7 +2768,11 @@ test('decideExecutorCli never hands back mcpTool when the requested purpose has 
   // refusal is that it cannot be dispatched via cli, not that it is
   // unregistered; conflating the two under one field was itself a bug.
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'other', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable', executorId: 'gitnexus', configured: true });
+  assert.equal(decided.mechanism, 'unavailable');
+  assert.equal(decided.executorId, 'gitnexus');
+  assert.equal(decided.configured, true);
+  assert.deepEqual(decided.reasonCodes, ['native-first.0033.cli-spawn-shaped', 'governance.blocked']);
+  assert.ok(typeof decided.blockedReason === 'string' && decided.blockedReason.length > 0);
 });
 
 test('decideExecutorCli never hands back mcpTool for a direct executorId call when the executor names more than one "for" entry -- ambiguous, no purpose to disambiguate', async () => {
@@ -2760,7 +2795,41 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wh
   // purpose to match against its mcp tools map can dispatch neither way.
   // configured stays true for the same reason as the sibling test.
   const decided = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable', configured: true });
+  assert.equal(decided.mechanism, 'unavailable');
+  assert.equal(decided.configured, true);
+  assert.deepEqual(decided.reasonCodes, ['native-first.0033.cli-spawn-shaped', 'governance.blocked']);
+  assert.ok(typeof decided.blockedReason === 'string' && decided.blockedReason.length > 0);
+});
+
+test('decideExecutorCli: governance-blocked output is clearly distinguishable from unregistered/default executor output (R1)', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { 'unsupported-tool': {}, other: {} },
+    executors: {
+      blockedTool: {
+        kind: 'tool',
+        for: ['unsupported-tool'],
+        invocations: [{ via: 'mcp', command: 'mcp:tool', tools: { other: 'mcp__other' } }],
+      },
+    },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+
+  // 1. Governance-blocked: configured: true, reasonCodes has governance.blocked, blockedReason is populated
+  const blocked = await decideExecutorCli('blockedTool', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.equal(blocked.mechanism, 'unavailable');
+  assert.equal(blocked.configured, true);
+  assert.ok(blocked.reasonCodes.includes('governance.blocked'));
+  assert.ok(typeof blocked.blockedReason === 'string' && blocked.blockedReason.length > 0);
+
+  // 2. Unregistered/default: configured: false, reasonCodes has selector.unregistered, blockedReason is undefined
+  const unregistered = await decideExecutorCli('nonExistentExecutor', { repoRoot: root, hasLiveTaskAccess: true });
+  assert.equal(unregistered.mechanism, 'unavailable');
+  assert.equal(unregistered.configured, false);
+  assert.ok(unregistered.reasonCodes.includes('selector.unregistered'));
+  assert.equal(unregistered.blockedReason, undefined);
 });
 
 test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- agentType always wins, mcpTool and agentType are mutually exclusive', async () => {
@@ -2773,7 +2842,7 @@ test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- a
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true, executorId: 'judge-discovery' });
+  assert.deepEqual(decided, { mechanism: 'in-process', agentType: 'judge', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'], executorId: 'judge-discovery' });
   assert.equal('mcpTool' in decided, false);
 });
 
@@ -2799,7 +2868,7 @@ test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis 
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, executorId: 'gitnexus' });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', mcpTool: 'mcp__gitnexus__impact', configured: true, executorId: 'gitnexus', reasonCodes: ['native-first.0033.cli-spawn-shaped', 'native-first.mcp-handback'] });
 });
 
 test('the "decide" CLI entry point parses --needs-soul', () => {
@@ -2812,7 +2881,7 @@ test('the "decide" CLI entry point parses --needs-soul', () => {
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', configured: false });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 // tsk-in1-4: these CLI-spawn tests used to run against THIS repo's own
@@ -5093,7 +5162,7 @@ test('decideExecutorCli resolves a purpose-named executorId via capabilities.<na
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: false });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 // --- executeExecutorCli / decideExecutorCli: purpose-based (--for) binding,
@@ -5108,7 +5177,7 @@ test('decideExecutorCli resolves "unavailable" when nothing is registered for th
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered'] });
 });
 
 test('decideExecutorCli resolves purpose-based (--for) to the same result a positional executorId would, plus the resolved executorId', async () => {
@@ -5122,10 +5191,10 @@ test('decideExecutorCli resolves purpose-based (--for) to the same result a posi
   });
   const byPurpose = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   const byName = await decideExecutorCli('gather', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byPurpose, { mechanism: 'out-of-process', executorId: 'gather', configured: true });
+  assert.deepEqual(byPurpose, { mechanism: 'out-of-process', executorId: 'gather', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   // Positional-id path stays byte-identical (no executorId field) — every
   // pre-tsk-2c1 caller/test already asserts this exact shape.
-  assert.deepEqual(byName, { mechanism: 'out-of-process', configured: true });
+  assert.deepEqual(byName, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 // --- decideExecutorCli: work-item-shaped lookup (--work, D4/D12(iii),
@@ -5236,10 +5305,10 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
   const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true });
+  assert.deepEqual(byWork, { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // Positional-id path stays byte-identical (no executorId field) -- every
   // pre-D4 caller/test already asserts this exact shape.
-  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose', configured: true });
+  assert.deepEqual(byName, { mechanism: 'in-process', agentType: 'general-purpose', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-coding-implement.prefer -- the real tsk-34n/D3 migration shape (no literal executors.fgos-coding-implement entry, only agy declaring "for")', async () => {
@@ -5266,13 +5335,13 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
   // out-of-process, since agy is cli-spawn-shaped (tsk-pdg D1): this is
   // the exact real gap tsk-1m8 found live before tsk-pdg fixed it.
   const withLiveAccess = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: true });
-  assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true });
+  assert.deepEqual(withLiveAccess, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
   // hasLiveTaskAccess:false (the real fgos loop headless runner) --
   // byte-identical mechanism/configured shape either way, matching
   // tsk-pdg's own live evidence against the real repo before this item's
   // migration.
   const headless = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-prefer-candidate', hasLiveTaskAccess: false });
-  assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true });
+  assert.deepEqual(headless, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to "in-process" by default when the resolved executorId has NO explicit cfg.executors entry -- the real, common fgos-fanout case (D4 fix): a coding-domain work item is a same-provider, soul-needing rootTask (0026 rule 2), never the generic "no executor -> out-of-process" fallback a NAMED executorId lookup keeps unchanged', async () => {
@@ -5297,7 +5366,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
     timeoutMs: 5000,
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
-  assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false });
+  assert.deepEqual(byWork, { mechanism: 'in-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
   // The SAME unregistered executorId, looked up by NAME (not --work), used
   // to keep its pre-D4 byte-identical "no executor -> out-of-process"
   // behavior. H6b (D1, 2026-09-20 ACCEPTED) changed that: a bare
@@ -5307,7 +5376,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
   // gets the native-first default, since a work item's OWN executorId is
   // derived, not a caller-typed name that could be a typo.
   const byName = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: true });
-  assert.deepEqual(byName, { mechanism: 'unavailable', configured: false });
+  assert.deepEqual(byName, { mechanism: 'unavailable', configured: false, reasonCodes: ['native-first.0033.cli-spawn-shaped', 'selector.unregistered'] });
 });
 
 test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" when the caller has no live Task access, even with no explicit cfg.executors entry -- never claims in-process dishonestly', async () => {
@@ -5329,7 +5398,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
     timeoutMs: 5000,
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
-  assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: false });
+  assert.deepEqual(byWork, { mechanism: 'out-of-process', executorId: 'fgos-coding-implement', configured: false, reasonCodes: ['native-first.rule-1.no-native-mechanism'] });
 });
 
 test('decideExecutorCli throws a RunnerConfigError when --work names a work item that does not exist -- never silently "unavailable" (a typo/stale id is a real usage error, unlike an unconfigured purpose)', async () => {
@@ -5369,7 +5438,7 @@ test('a positional executorId still wins over --work when both are somehow passe
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('the "decide" CLI entry point resolves --work <id> the same way as a positional executorId', () => {
@@ -5397,7 +5466,7 @@ test('the "decide" CLI entry point resolves --work <id> the same way as a positi
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'in-process', agentType: 'general-purpose', executorId: 'fgos-coding-implement', configured: true, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 // tsk-60f D4: the two resolveExecutorCli usage-error tests this cluster
@@ -5452,7 +5521,7 @@ test('the "decide" CLI entry point resolves --for <purpose> the same way as a po
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', '--for', 'no-such-purpose-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered'] });
 });
 
 test('the "execute" CLI entry point honors --carries, threading it through end to end', () => {
@@ -6196,7 +6265,7 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', hasLiveTaskAccess: false });
-  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'agy', configured: true });
+  assert.deepEqual(decided, { mechanism: 'out-of-process', executorId: 'agy', configured: true, reasonCodes: ['native-first.0033.cli-spawn-shaped'] });
 });
 
 test('compileDispatchPlan builds a canonical DispatchPlan for all four selector forms (0b)', () => {
