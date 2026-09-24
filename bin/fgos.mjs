@@ -2553,9 +2553,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         } catch (err) {
           if (sub === 'execute' || err instanceof DispatchError || err.errorClass) {
             err.isDispatchExecute = (sub === 'execute');
+            let errorClass = err.errorClass;
+            if (!errorClass) {
+              const code = err.code ?? '';
+              if (code.startsWith('governance') || code.startsWith('redirect.') || (err.message && (/governance gate rejected/.test(err.message) || /cross-provider/.test(err.message)))) {
+                errorClass = 'governance-refused';
+              }
+            }
             const payload = {
               error: err.message,
-              ...(err.errorClass ? { errorClass: err.errorClass } : {}),
+              ...(errorClass ? { errorClass } : {}),
             };
             process.stdout.write(`${JSON.stringify(payload)}\n`);
           }
@@ -2594,7 +2601,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // default (the CLI process's real process.cwd()) applies, same
           // ergonomics as running the command from inside the stuck cwd.
           const runParam = flags.run ?? flags['run-id'];
-          if ((runParam !== undefined || flags.assignment !== undefined) && !flags.action) {
+          if ((runParam !== undefined || flags.assignment !== undefined) && (!flags.action || flags.action === 'clear-cwd-lock')) {
             throw new StoreError(
               'validation',
               'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)',

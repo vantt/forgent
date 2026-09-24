@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | implemented (Unit I07 candidate under review) | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated & integrated (98f501be) | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -90,17 +90,44 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
 ## Integration Cross-Reference and Coordination Track Accounting
 
 - **Unified Integration Plan:** `plans/260919-coordination-skill-harness-simplification/plan.md`
-- **Date:** 2026-09-23
+- **Date:** 2026-09-24
 - **Dispatch Hardening Phased Integration:**
   - Phase 01 R1/R4/R5 (Result truth & settlement CAS) integrated as Units **I02** and **I03** (`main@4362bfec`).
   - Phase 05 remainder (Cross-provider redirect governance & PlacementPolicy binding) integrated as Unit **I06** (`main@3bab9b99`).
-  - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** / **I08**.
+  - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** (implementation) and **I08** (verification).
   - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
 - **Unit I07 (Dispatch Hardening Phase 08 Operability/CLI Surface & Doctor) Accounting:**
-  - Evaluated candidate `439a1fb0` approved in independent review (0 blocker, 0 high, 113 focused passing).
-  - Synchronized candidate `6a638752` integrated locally; remote synchronized candidate `261ed7ea` approved for integration; fast-forwarded `main` to `261ed7ea`.
-  - Integration status: INTEGRATED AT `261ed7ea`; post-merge verification completed (178/178 focused pass; 559/560 dispatch/herdr pass, 728/728 coordination pass, 0 candidate regressions).
-  - Unit **I08 remains BLOCKED** pending Track Manager confirmation.
+  - Evaluated candidate `439a1fb078418edff7628555c4b6cb9f4015e4e6` approved in independent review (0 blocker, 0 high, 113 focused passing).
+  - Synchronized candidate `6a638752` integrated locally; remote synchronized candidate `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` approved for integration; fast-forwarded `main` to `261ed7ea`.
+  - Integration status: INTEGRATED AT `261ed7ea`; post-merge verification completed on `6f3fb9038fd66cd9943972a321eed2ba98587fab` (178/178 focused pass; 559/560 dispatch/herdr pass, 728/728 coordination pass, 0 candidate regressions).
+- **Unit I08 (Dispatch Hardening Phase 08 Verification) Accounting:**
+  - Implementation/verification base: `6f3fb9038fd66cd9943972a321eed2ba98587fab`.
+  - Candidate branch: `coordination-skill-harness-i08-dispatch-verification`.
+  - Status: `blocked on base defects F4/F5 (remediation unit required)`.
+  - Stop condition: `triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)`.
+  - Verification scope: combined I06 + I07 dispatch governance, public CLI contract, observation & recovery truth, doctor/setup coherence, and R7 performance gates.
+  - Test evidence: 178/178 focused tests pass; 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); affected matrix (55 files): 1455 pass, 0 fail, 1 skip.
+  - Base defects uncovered: F4 (HIGH, execute falls back to default claude on unregistered selector), F5 (HIGH, redirect check compares raw providerModel strings without normalizeProviderFamily, bypassing canonical family checks and corrupting provenance), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
+  - R7 receipt latency benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
+  - Measurement artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`.
+  - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`.
+- **Unit I08b (Remediation of I08 Base Defects F4, F5, F6, F7, F10) Accounting:**
+  - Capability: `code:implement`.
+  - Depends-on: Unit I08.
+  - Status: `integrated at main@98f501be` (post-merge verification complete: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions).
+  - Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (candidate `d4e052a6` merged into `origin/main@4ad0b8ca`).
+  - Branch: `coordination-skill-harness-i08b-remediation`.
+  - Worktree: `.claude/worktrees/coordination-skill-harness-i08b-remediation`.
+  - Base Lineage: Candidate I08 `4e9de19541f2acde2380ff4f78147e389385e95c` + Evaluated Candidate `0617c6e41ebec1aa8e73065eac69cd5eb9684343` + `origin/main@4ad0b8ca6576252be01159fcf5853c966ba54743` (synchronized candidate `d4e052a6`, merge commit `355f9dbd`).
+  - Defects Remediated:
+    * F4 (HIGH): Explicit unregistered executor fail-closed with exit code 1 (`DispatchError('executor-not-found')`) across public CLI, compat door, and `executeExecutorCli`. Restored `DispatchError extends Error`; parity achieved via JSON serialization. Preserved implicit resolution for work item dispatches. Pinned tests updated.
+    * F5 (HIGH): Canonicalize provider family with declared vendor precedence using `normalizeProviderFamily(deriveProviderFamily(entry, command), command)` in redirect checks and provenance recording in `dispatch-plan.json`. Permits intra-family redirects without `crossProvider: true` and blocks cross-family spoofing.
+    * F6 (MEDIUM): Added `.trim()` and preserved precedence for caller option over environment variable in `resolveHerdrBin()`.
+    * F7 (MEDIUM): Extended `expectedRunId` and closed vocabulary verification across all intake doors (`run-result.mjs`, `show-run.mjs`, `herdr-round.mjs`, `assignment-runner.mjs`, `runtime-inspection.mjs`, `session-engine.mjs`, `show.mjs`; `watch.mjs` covered indirectly via `show-run.mjs`). Mismatched/missing `runId` with `expectedRunId` or non-standard status flags `contract-corrupt` / `resultCorrupt: true` and prevents settling.
+    * F10 (MEDIUM): Bare `reconcile plan` returns exit 0 by design (runner.md:21); defect was `--run` or `--assignment` without action (or with `clear-cwd-lock`) returning 0 instead of 4. Validate `--action` requirement up front before evaluating CWD lock, returning exit code 4 (validation error).
+  - Follow-up Ledger: N10 (LOW-MEDIUM: disentangle vendor boundary from adapter selection in ProviderAdapter before expanding beyond Claude harness).
+  - Verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 184 pass across 10 focused test files (189 with regression); root dispatch suite: 387 pass; affected matrix (53 files): 1456 pass, 0 fail, 1 skip; full suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (389.6s); post-merge candidate regressions: exactly 0; `git diff --check origin/main...HEAD` clean.
+  - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`.
 - **Unit I09 (Cold-Resumable Read-Only Coordination DAG) Accounting:**
   - Forward-ports DAG capability onto current runtime, consuming Phase 01 result-truth and Phase 05 dispatch governance.
   - Integration status: VERIFIED. Integrated at `1ca4023c`, post-merge verification satisfied at `main@f63f7e7d` following REV-15 timing fix at `60132825` (538/538 pass across 16-suite focused matrix; 3 consecutive timing reruns 129/129 pass; candidate regressions = 0; D2/D3 in `fgos-approve.test.mjs` confirmed pre-existing baseline defect).

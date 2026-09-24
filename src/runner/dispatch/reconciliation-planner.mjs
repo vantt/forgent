@@ -262,6 +262,9 @@ function holder(lock) {
 }
 
 export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000 } = {}) {
+  if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
+    return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)' };
+  }
   if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
   if (action === 'clear-assignment-claim') return planClearAssignmentClaim(root, { assignmentId, now, ttlMs });
   if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });

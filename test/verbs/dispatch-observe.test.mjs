@@ -233,7 +233,7 @@ test('watch terminates when result.json exists (settled: true)', async () => {
     const seen = [];
     const sleepFn = async () => {
       if (seen.length === 1) {
-        fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ status: 'done' }));
+        fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'run_1', status: 'done' }));
       }
     };
     const out = await watchRunUseCase({ repoRoot: root }, {

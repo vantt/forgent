@@ -683,15 +683,12 @@ export async function executeExecutorCli(
   // `capabilities.<purpose>.overrides` — found by re-reading this exact
   // code end to end.
   //
-  // The two doors keep their own pre-existing error contracts, proven by
-  // real tests: `--for` alone throws when nothing resolves ("no executor
-  // registered for purpose..." — guides the caller to `decide --for`
-  // first); a named `executorIdArg` that resolves to nothing NEVER
-  // throws here, silently falling through to the global executor
-  // (`resolvedExecutor` stays `undefined` below) — proven by
-  // `dispatch.test.mjs`'s own "executeExecutorCli falls back to the
-  // global executor when the executorId is not in cfg.executors at all
-  // -- never throws".
+  // The two doors keep their own error contracts: `--for` alone throws when
+  // nothing resolves ("no executor registered for purpose..." — guides the
+  // caller to `decide --for` first); a named `executorIdArg` that resolves
+  // to nothing when `!work` fails closed with DispatchError('executor-not-found')
+  // (F4 explicit fail closed). When `work` is present, it falls through to
+  // implicit/global resolution for work-driven execution.
   let executorId = executorIdArg;
   let resolvedExecutor;
   let capabilityOverrides;
@@ -723,7 +720,14 @@ export async function executeExecutorCli(
     executorConfigured = resolved.configured;
   } else {
     const resolved = resolveExecutorAndOverrides(cfg, executorId);
-    resolvedExecutor = resolved.executor; // undefined when unconfigured -- falls through to the global executor below, unchanged
+    if (!work && (!resolved.configured || !resolved.executor)) {
+      throw new DispatchError(
+        'executor-not-found',
+        `no executor registered for id "${executorIdArg}"`,
+        { executorId: executorIdArg },
+      );
+    }
+    resolvedExecutor = resolved.executor;
     capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
@@ -1827,9 +1831,14 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
         // this needs a human" apart from every other failure, instead of
         // only ever seeing a bare exit-1 + a human-readable message on
-        // stderr. `err.message` on stderr is unchanged for a human tailing
-        // the terminal.
-        process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
+        let errorClass = err.errorClass;
+        if (!errorClass) {
+          const code = err.code ?? '';
+          if (code.startsWith('governance') || code.startsWith('redirect.') || (err.message && (/governance gate rejected/.test(err.message) || /cross-provider/.test(err.message)))) {
+            errorClass = 'governance-refused';
+          }
+        }
+        process.stdout.write(`${JSON.stringify(errorClass ? { error: err.message, errorClass } : { error: err.message })}\n`);
         process.stderr.write(`${err.message}\n`);
         process.exitCode = 1;
       }

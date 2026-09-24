@@ -1992,7 +1992,18 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
   const resultJsonPath = path.join(runDir, 'result.json');
   if (fs.existsSync(resultJsonPath)) {
     try {
-      const settledResult = interpretRunResult(resultJsonPath);
+      let expectedRunId = opts.expectedRunId ?? opts.runId;
+      if (!expectedRunId) {
+        const runJsonPath = path.join(runDir, 'run.json');
+        if (fs.existsSync(runJsonPath)) {
+          try { expectedRunId = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'))?.runId; } catch {}
+        }
+      }
+      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId });
+      const hasMismatch = Boolean(expectedRunId && settledResult?.runId && settledResult.runId !== expectedRunId);
+      if (hasMismatch || !settledResult) {
+        return { status: 'corrupt', corrupt: true, resultCorrupt: true, runResult: Object.freeze(settledResult) };
+      }
       return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
     } catch {}
   }

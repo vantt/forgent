@@ -329,7 +329,7 @@ export function readLinkedRunResultFromDisk(fgosDir, assignmentId, runId) {
   // confidence:'failed' deterministically; this engine's quorum/fan-in gates
   // already read those two compat fields, so nothing downstream needs to
   // change to fail closed on it.
-  return interpretRunResult(parsed);
+  return interpretRunResult(parsed, { expectedRunId: runId });
 }
 
 /**
@@ -364,8 +364,13 @@ function findLatestRunResult(fgosDir, assignmentId) {
   } catch (err) {
     throw new CoordinationError('corrupt-log', `result.json for assignment "${assignmentId}" run "${latest}" is not valid JSON: ${err.message}`);
   }
+  let expectedRunId;
+  const runJsonPath = path.join(runsDir, latest, 'run.json');
+  if (fs.existsSync(runJsonPath)) {
+    try { expectedRunId = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'))?.runId; } catch {}
+  }
   // H4 -- see readLinkedRunResultFromDisk's sibling comment above.
-  return interpretRunResult(parsed);
+  return interpretRunResult(parsed, { expectedRunId });
 }
 
 /**

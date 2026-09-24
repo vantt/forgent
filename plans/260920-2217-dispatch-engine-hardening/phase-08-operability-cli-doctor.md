@@ -2,25 +2,28 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-24 (Unit I07 Integrated into Main)
+## Status — 2026-09-24 (Unit I07 Integrated, Unit I08b Integrated at main@98f501be)
 
-- **Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
-- **Base Commit**: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
-- **Integration Baseline**: `origin/main@c386e9f30b1ac60d78675f688e8d10146f5e8949`
-- **Integrated Commit**: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea`
-- **Report**: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
-- **Verification Evidence**:
-  - `test/cli/dispatch-operability.test.mjs`: 8 pass / 0 fail.
-  - `test/cli/dispatch-reconcile.test.mjs`: 6 pass / 0 fail.
-  - `test/verbs/dispatch-observe.test.mjs`: 11 pass / 0 fail.
-  - `test/runner/dispatch-runtime-inspect.test.mjs`: 19 pass / 0 fail.
-  - `test/setup/visibility-checks.test.mjs`: 17 pass / 0 fail.
-  - `test/setup/*.test.mjs`: 607 pass / 0 fail.
-  - `test/runner/dispatch.test.mjs`: 387 pass / 0 fail.
-  - `test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail.
-  - `test/runner/herdr-*.test.mjs`: 97 pass / 0 fail (1 skipped by design).
-  - `test/architecture.test.mjs`: 13 pass / 0 fail.
-  - `git diff --check cc687d92`: clean (0 errors/warnings).
+- **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
+- **Unit I08 Status**: `unblocked for re-verification against integrated baseline main@98f501be`.
+- **Unit I08b Status**: `integrated at main@98f501be` (Integration Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30`, Candidate SHA: `d4e052a6e0e80ffe2add08a0f4661433b2e80582` merged into `origin/main@4ad0b8ca`).
+- **Remediation Scope**: Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
+- **Reports**:
+  - Implementation (I07): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
+  - Verification (I08): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
+  - Remediation (I08b): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
+  - Benchmark artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
+- **Verification Evidence (Post-Merge)**:
+  - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
+  - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
+  - Focused matrix (10 files): 184 pass / 0 fail (189 with regression suite).
+  - Comprehensive dispatch root suite (`test/runner/dispatch.test.mjs`): 387 pass / 0 fail.
+  - Affected dispatch/herdr matrix (53 files): 1456 pass, 0 fail, 1 skip.
+  - Full repository suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (389.6s).
+  - Candidate Regressions: Exactly 0.
+  - R7 Latency Benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
+  - Follow-up ledger: N10 (disentangle vendor boundary from adapter selection in ProviderAdapter).
+  - `git diff --check origin/main...HEAD`: clean (0 errors/warnings).
 
 ## Requirements
 

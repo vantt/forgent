@@ -3699,7 +3699,7 @@ test('executeExecutorCli resolves a cross-provider executor\'s own providerModel
   assert.deepEqual(payload.args, ['--model', 'gemini-pro', 'classify this']);
 });
 
-test('executeExecutorCli falls back to the global executor when the executorId is not in cfg.executors at all — never throws', async () => {
+test('executeExecutorCli fails closed when the executorId is not in cfg.executors at all (F4 intentional contract adjustment)', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const root = mkTempDir();
@@ -3708,12 +3708,13 @@ test('executeExecutorCli falls back to the global executor when the executorId i
     models: { standard: 'sonnet' },
     timeoutMs: 5000,
   });
-  const result = await executeExecutorCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root });
-  assert.equal(result.mechanism, 'out-of-process');
-  assert.equal(result.provider, process.execPath);
-  assert.equal(result.model, 'sonnet');
-  const payload = JSON.parse(result.stdout);
-  assert.equal(payload.args[0], 'classify this');
+  // Intentional contract adjustment (F4): an explicitly nominated executorId
+  // that does not exist in cfg.executors must fail closed with DispatchError('executor-not-found')
+  // instead of silently falling through to the global executor.
+  await assert.rejects(
+    executeExecutorCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root }),
+    (err) => err instanceof DispatchError && err.errorClass === 'executor-not-found',
+  );
 });
 
 test('executeExecutorCli honors a caller-supplied model override over both the executor\'s own model and the computed modelForTier default', async () => {
@@ -3737,7 +3738,7 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   const scriptPath = writeEchoExecutor(dir);
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
-    executor: { command: process.execPath, args: [scriptPath, '{model}:{prompt}'] },
+    executor: { command: process.execPath, args: [scriptPath, '{model}:{prompt}'], allowCrossProvider: true },
     models: { light: 'flash-3.5', standard: 'sonnet' },
     timeoutMs: 5000,
   });
@@ -3746,7 +3747,7 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   // at all (the pre-existing `executor?.tier ?? DEFAULTS.tier` fallback
   // already lands on 'standard' with no executor match), so it would not
   // actually prove the override path works.
-  const result = await executeExecutorCli('no-such-executor', { prompt: 'x', repoRoot: root, tier: 'light' });
+  const result = await executeExecutorCli('claude', { prompt: 'x', repoRoot: root, tier: 'light' });
   assert.equal(result.model, 'flash-3.5');
   const payload = JSON.parse(result.stdout);
   assert.deepEqual(payload.args, ['flash-3.5:x']);
@@ -3756,11 +3757,11 @@ test('the "execute" CLI entry point honors --model, overriding the computed defa
   const { repoRoot } = mkTempGitRepo();
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'no-such-executor-configured', '--prompt', 'hello', '--model', 'a-specific-override-model'],
+    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--model', 'a-specific-override-model'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -3775,7 +3776,7 @@ test('the "execute" CLI entry point honors --tier, changing which configured mod
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   writeRunnerConfigFixture(repoRoot, {
-    executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'] },
+    executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -3787,7 +3788,7 @@ test('the "execute" CLI entry point honors --tier, changing which configured mod
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'no-such-executor-configured', '--prompt', 'hello', '--tier', 'light'],
+    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--tier', 'light'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
@@ -3800,7 +3801,7 @@ test('the "execute" CLI entry point honors --repo-root, decoupling spawn cwd fro
   const worktreeDir = mkTempDir();
   const scriptPath = writeEchoExecutor(worktreeDir);
   writeRunnerConfigFixture(repoRoot, {
-    executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
+    executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3809,7 +3810,7 @@ test('the "execute" CLI entry point honors --repo-root, decoupling spawn cwd fro
     [
       dispatchPath,
       'execute',
-      'no-such-executor-configured',
+      'claude',
       '--prompt',
       'hello',
       '--cwd',
@@ -5528,11 +5529,11 @@ test('the "execute" CLI entry point honors --carries, threading it through end t
   const { repoRoot } = mkTempGitRepo();
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'no-such-executor-configured', '--prompt', 'hello', '--carries', 'repo-content'],
+    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--carries', 'repo-content'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);
