@@ -236,7 +236,10 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
     // parsing when the checkout lives under a path containing a space --
     // the preload then never loads and child-process evidence becomes
     // vacuously empty instead of erroring.
-    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${SPY_PATH}"`;
+    // On Windows, backslashes in NODE_OPTIONS are treated as escape characters;
+    // normalize to forward slashes so Node.js resolves the path correctly.
+    const normalizedSpyPath = SPY_PATH.replaceAll("\\", "/");
+    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${normalizedSpyPath}"`;
   }
   // PATH shim: the only child-process evidence mechanism a bin: (compiled) entry
   // can get, and a second net for node: entries too (see header comment).

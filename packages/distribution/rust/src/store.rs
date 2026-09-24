@@ -276,7 +276,9 @@ pub fn release_dir_path(store_root: &Path, digest: &str) -> PathBuf {
 
 /// Resolves the filesystem path for a quarantine directory under `store_root/quarantine/`.
 pub fn quarantine_dir_path(store_root: &Path, digest: &str, timestamp: u128) -> PathBuf {
-    store_root.join("quarantine").join(quarantine_dir_name(digest, timestamp))
+    store_root
+        .join("quarantine")
+        .join(quarantine_dir_name(digest, timestamp))
 }
 
 /// Release status summary entry for `fgctl status --json` (R8).
@@ -367,11 +369,25 @@ mod tests {
         let quar_path = quarantine_dir_path(root, digest, 123456789);
 
         if cfg!(windows) {
-            assert_eq!(rel_path, root.join("releases").join("sha256-0123456789abcdef"));
-            assert_eq!(quar_path, root.join("quarantine").join("sha256-0123456789abcdef-123456789"));
+            assert_eq!(
+                rel_path,
+                root.join("releases").join("sha256-0123456789abcdef")
+            );
+            assert_eq!(
+                quar_path,
+                root.join("quarantine")
+                    .join("sha256-0123456789abcdef-123456789")
+            );
         } else {
-            assert_eq!(rel_path, root.join("releases").join("sha256:0123456789abcdef"));
-            assert_eq!(quar_path, root.join("quarantine").join("sha256:0123456789abcdef-123456789"));
+            assert_eq!(
+                rel_path,
+                root.join("releases").join("sha256:0123456789abcdef")
+            );
+            assert_eq!(
+                quar_path,
+                root.join("quarantine")
+                    .join("sha256:0123456789abcdef-123456789")
+            );
         }
     }
 }
