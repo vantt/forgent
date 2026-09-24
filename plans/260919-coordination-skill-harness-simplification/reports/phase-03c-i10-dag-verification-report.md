@@ -9,11 +9,13 @@
 - **Production Fix Commit SHA**: `3c49cf4205060fea998abfb2e9ef5df7b816a252` (`fix(coordination): require valid on-disk RunResult evidence for DAG node settlement and descendant admission`)
 - **Candidate Test Commit SHA**: `97420638c7c0360823b64a4a4b74d05eeee8723d` (`test(coordination): verify DAG migration, cold resume, concurrency, and corrupt evidence`)
 - **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
-- **Synchronized Candidate SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (`merge: synchronize origin/main into coordination-skill-harness-i10-dag-verification`)
+- **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
+- **Post-I08b Integrated Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (I08b integration merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`)
+- **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`)
 - **Integration SHA**: (pending merge into main)
 - **I09 Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba`
 - **I09-REV-15 Fix SHA**: `601328256e4e8f26fbf4b44aaaefab23e6821162`
-- **Status**: `approved candidate synchronized, pending integration`
+- **Status**: `approved candidate synchronized with post-I08b main, pending integration`
 - **Capability**: `code:test`
 - **Next Dependency Gate**: `I11` remains BLOCKED pending I08 and I10 integration approval
 
@@ -184,8 +186,8 @@ Result: **538 passed / 0 failed / 0 skipped** (duration: ~74.9s).
 
 Result: **129/129 passed across all 3 runs** (zero flakiness or timing regressions).
 
-### 3.4 Post-Synchronization Verification Matrix (Synchronized Candidate Tip d1b52e44 / 39b658ea)
-All 4 verification tiers executed on the synchronized branch tip:
+### 3.4 Pre-I08b Synchronization Verification Matrix (Synchronized Candidate Tip d1b52e44 / 39b658ea)
+All 4 verification tiers executed on the pre-I08b synchronized branch tip:
 1. **Focused Unit I10 DAG Matrix** (`test/runner/coordination-dag-*.test.mjs`):
    - **41 tests: 38 passed, 3 todo, 0 failed** (duration: ~16.5s)
 2. **I09 Baseline Matrix (16 files)**:
@@ -198,6 +200,28 @@ All 4 verification tiers executed on the synchronized branch tip:
    - `git diff --check origin/main..HEAD`: Clean (0 errors/warnings)
    - `git diff origin/main...HEAD src/`: Strictly contains only the 4 expected candidate files (`session-engine.mjs`, `dag-scheduler.mjs`, `run.mjs`, `show.mjs`)
    - Main checkout `/home/vantt/projects/forgentX`: Completely untouched
+
+### 3.5 Post-I08b Synchronization & Re-Verification Matrix (Post-I08b Tip 94988740)
+Following Track Manager merge of Unit I08b (`c6262fb1`, integration commit `98f501be41756dc80d691cbf63ffeb4cd617fb30`), candidate branch synchronized via merge commit `949887407919ca8581cb7e800ef9142eba91c90b`:
+- **Production Files Overlap Analysis & Resolution**:
+  1. `src/runner/coordination/session-engine.mjs`: Auto-merged cleanly. Candidate export of `readLinkedRunResultFromDisk` (line 302) preserved; I08b F7 check `interpretRunResult(parsed, { expectedRunId: runId })` (line 332) fully active.
+  2. `src/verbs/coordination/show.mjs`: Conflict in `readRunResultForAssignment` resolved by delegating to canonical `readLinkedRunResultFromDisk`, inheriting I08b's `expectedRunId` check while preserving fail-closed DAG evidence validation.
+- **Re-Verification Results on Post-I08b Synchronized Tip**:
+  1. **Focused Unit I10 DAG Probes** (`test/runner/coordination-dag-*.test.mjs`):
+     - **41 tests: 38 passed, 3 todo, 0 failed** (duration: ~5.7s)
+  2. **I09 Baseline Matrix (16 files)**:
+     - **538 tests: 538 passed, 0 failed, 0 todo** (duration: ~28.9s)
+  3. **Coordination-Wide Suites** (`test/runner/coordination-*.test.mjs test/verbs/coordination-*.test.mjs test/cli/coordination.test.mjs`):
+     - **1043 tests: 1040 passed, 3 todo, 0 failed** (duration: ~97.7s)
+  4. **Dependency Matrix (I08b Remediation & Dispatch Operability)**:
+     - `test/runner/dispatch-i08b-remediation.test.mjs`, `test/runner/dispatch-governance-operability.test.mjs`, `test/cli/dispatch-operability.test.mjs`, `test/verbs/dispatch-observe.test.mjs`: **37 tests: 37 passed, 0 failed** (duration: ~2.7s)
+     - `test/runner/dispatch.test.mjs`: **387 tests: 387 passed, 0 failed** (duration: ~20.3s)
+  5. **Full Repository Test Suite** (`env -u CLAUDE_CODE_SESSION_ID npm test -- --test-reporter=dot`):
+     - **7775 tests passed, 3 todo, 0 failed, exit code 0** (duration: ~5.6m)
+  6. **Clean Repository & Hygiene Check**:
+     - `git diff --check origin/main..HEAD`: Clean (0 errors/warnings)
+     - `git diff coordination-skill-harness-i08b-integration...HEAD src/`: Exactly 4 files changed (`session-engine.mjs`, `dag-scheduler.mjs`, `run.mjs`, `show.mjs`)
+     - Main checkout `/home/vantt/projects/forgentX`: Completely untouched
 
 ---
 
@@ -214,7 +238,9 @@ All 4 verification tiers executed on the synchronized branch tip:
 - **Candidate Test Commit**: `97420638c7c0360823b64a4a4b74d05eeee8723d` (`test(coordination): verify DAG migration, cold resume, concurrency, and corrupt evidence`)
   - Contains all 5 test suites (41 tests total: 38 passed, 3 todo, 0 failed) adhering to permanent standard file names and free of plan-specific labels.
 - **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
-- **Synchronized Candidate SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (`merge: synchronize origin/main into coordination-skill-harness-i10-dag-verification`)
+- **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
+- **Post-I08b Integrated Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (I08b integration merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`)
+- **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`)
 - **Integration SHA**: (pending merge into main)
 
 ### Callers Analysis
@@ -231,6 +257,6 @@ All 4 verification tiers executed on the synchronized branch tip:
 
 ## 5. Next Steps
 
-Unit I10 verification, production fix, and synchronization with `origin/main` (4ad0b8ca) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), and full test suite (7761 passed, 3 todo, 0 failed, exit code 0) are completely verified on the synchronized tip.
+Unit I10 verification, production fix, and synchronization with post-I08b integrated main (`c6262fb1` / `98f501be`) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified on the post-I08b synchronized tip.
 
-Unit I10 status is **approved candidate synchronized, pending integration** awaiting Track Manager integration into main. Unit **I11** remains blocked pending I08 and I10 integration approval.
+Unit I10 status is **approved candidate synchronized with post-I08b main, pending integration** awaiting Track Manager integration into main. Unit **I11** remains blocked pending I08 and I10 integration approval.
