@@ -10,12 +10,12 @@
 - **Candidate Test Commit SHA**: `97420638c7c0360823b64a4a4b74d05eeee8723d` (`test(coordination): verify DAG migration, cold resume, concurrency, and corrupt evidence`)
 - **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
 - **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
-- **Post-I08b Integrated Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (I08b integration merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`)
-- **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`)
+- **I08b Integration Candidate Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`; pending formal landing onto main)
+- **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`, exact evaluated tip: `e516e9750b81eb12b2db7fdff9280b8ee00d3abc`)
 - **Integration SHA**: (pending merge into main)
 - **I09 Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba`
 - **I09-REV-15 Fix SHA**: `601328256e4e8f26fbf4b44aaaefab23e6821162`
-- **Status**: `approved candidate synchronized with post-I08b main, pending integration`
+- **Status**: `ready for conditional independent re-review (synchronized with I08b integration candidate c6262fb1; conditional on c6262fb1 landing on main unchanged)`
 - **Capability**: `code:test`
 - **Next Dependency Gate**: `I11` remains BLOCKED pending I08 and I10 integration approval
 
@@ -259,4 +259,4 @@ Following Track Manager merge of Unit I08b (`c6262fb1`, integration commit `98f5
 
 Unit I10 verification, production fix, and synchronization with post-I08b integrated main (`c6262fb1` / `98f501be`) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified on the post-I08b synchronized tip.
 
-Unit I10 status is **approved candidate synchronized with post-I08b main, pending integration** awaiting Track Manager integration into main. Unit **I11** remains blocked pending I08 and I10 integration approval.
+Unit I10 status is **ready for conditional independent re-review (synchronized with I08b integration candidate c6262fb1; conditional on c6262fb1 landing on main unchanged)** awaiting Track Manager confirmation of I08b landing on main. Unit **I11** remains blocked pending I08 and I10 integration approval.

@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized `6a638752` and `261ed7ea`, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 unblocked for re-verification; Unit I08b integrated at `main@98f501be`; Unit I10 approved at `27ffb376`, synchronized with post-I08b main, pending integration; Unit I11 BLOCKED (pending I08 and I10)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized `6a638752` and `261ed7ea`, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 unblocked for re-verification; Unit I08b candidate integrated on branch at `98f501be` (`c6262fb1`); Unit I10 ready for conditional independent re-review at `e516e975` (synchronized with `c6262fb1` at `94988740`); Unit I11 BLOCKED (pending I08 and I10)
 Created: 2026-09-19
 Last Updated: 2026-09-24
 Mode: high-risk
@@ -893,15 +893,17 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
   depends-on: I09 (SATISFIED)
-  status: approved candidate synchronized, pending integration
+  status: ready for conditional independent re-review (synchronized with I08b candidate c6262fb1)
   branch: `coordination-skill-harness-i10-dag-verification`
   implementation-base: `c386e9f30b1ac60d78675f688e8d10146f5e8949` (descendant containing 1ca4023c and 60132825)
   production-fix-commit: `3c49cf4205060fea998abfb2e9ef5df7b816a252`
   candidate-test-commit: `97420638c7c0360823b64a4a4b74d05eeee8723d`
   evaluated-candidate-sha: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (approved in independent review: 0 blocker, 0 high)
-  synchronized-candidate-sha: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (merges `origin/main@4ad0b8ca` into evaluated candidate `27ffb376`)
+  pre-i08b-synchronized-sha: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (merges `origin/main@4ad0b8ca` into evaluated candidate `27ffb376`)
+  i08b-candidate-baseline-sha: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be`)
+  post-i08b-synchronized-candidate-sha: `949887407919ca8581cb7e800ef9142eba91c90b` (exact evaluated tip `e516e9750b81eb12b2db7fdff9280b8ee00d3abc`)
   integrated-sha: (pending merge into main)
-  verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass; candidate regressions = 0
+  verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; coordination-wide suites: 1040 pass, 3 todo, 0 fail; dependency matrix: 37 pass, root dispatch 387 pass; full suite: 7775 pass, 3 todo, 0 fail (exit code 0); candidate regressions = 0
   deferred-findings: I09-REV-12 (OPEN, queued for I11: unlinked/retried node on resume uses deferred outcome taxonomy without concurrency-cap error), I09-REV-13 (OPEN, queued for I11: store-level recordDriverDisposition accepts caveated findings), store-scan (OPEN: manifest.assignmentRefs scan without dagNodeId filtering causes cross-node cwd attribution), replay-evidence-unification (OPEN, Track Manager ghi nhận dời việc thống nhất replaySession().dag.settled sang I11: replaySession dag.nodes[].settled is an event-log-only projection, while run and show execution doors inspect on-disk RunResult validity via readLinkedRunResultFromDisk)
   resolved-findings: F1 (RESOLVED: missing/corrupt RunResult on disk fails closed; sets settled: false and blocks descendant admission; verified live in test 8)
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i10-dag-verification-report.md
