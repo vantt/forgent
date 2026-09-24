@@ -103,7 +103,13 @@ export function provisionDependencies(worktreePath) {
   const hasDeps = Object.keys(pkg.dependencies ?? {}).length > 0 || Object.keys(pkg.devDependencies ?? {}).length > 0;
   if (!hasDeps) return;
   const hasLockfile = fs.existsSync(path.join(worktreePath, 'package-lock.json'));
-  execFileSync('npm', [hasLockfile ? 'ci' : 'install'], { cwd: worktreePath, stdio: 'ignore' });
+  // On Windows, npm is a .cmd shim, not a directly-executable PE binary --
+  // execFileSync without a shell fails ENOENT before npm ever runs.
+  execFileSync('npm', [hasLockfile ? 'ci' : 'install'], {
+    cwd: worktreePath,
+    stdio: 'ignore',
+    shell: process.platform === 'win32',
+  });
 }
 
 // Generous ceiling for one setup command (a cold compile can take minutes on

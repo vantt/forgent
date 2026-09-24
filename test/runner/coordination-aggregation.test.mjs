@@ -23,6 +23,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
@@ -1063,7 +1064,7 @@ test('runtime: aggregationSourceFrom resolves herdr-spawn worker report at outbo
 
 test('authority: the aggregation evaluator itself contains no session-transition call -- only session-engine transitions', () => {
   const evaluatorPath = path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
+    path.dirname(fileURLToPath(import.meta.url)),
     '../../src/runner/team-cognition/aggregation-evaluator.mjs',
   );
   const source = fs.readFileSync(evaluatorPath, 'utf8');
@@ -1074,7 +1075,7 @@ test('authority: the aggregation evaluator itself contains no session-transition
 
 test('authority: validateSessionAggregation writes only the aggregation event -- it calls no terminal-transition primitive', () => {
   const enginePath = path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
+    path.dirname(fileURLToPath(import.meta.url)),
     '../../src/runner/coordination/session-engine.mjs',
   );
   const source = fs.readFileSync(enginePath, 'utf8');

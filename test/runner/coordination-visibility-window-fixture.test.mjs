@@ -24,6 +24,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   openDeclaredProtocolSession,
   dispatchDeclaredOperation,
@@ -50,7 +51,7 @@ import { validateFlowDefinition, FlowDefinitionError } from '../../src/runner/de
 const GATED_ID = 'core.coordination-protocol.independent-research-fan-out-fan-in-gated';
 const WINDOW_ID = 'post-independent-pass';
 const GATED_FIXTURE_PATH = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname),
+  path.dirname(fileURLToPath(import.meta.url)),
   '../../core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml',
 );
 
