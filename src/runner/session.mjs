@@ -314,11 +314,40 @@ function writeRegistry(fgosDir, entries) {
   fs.writeFileSync(registryPath, `${JSON.stringify(entries, null, 2)}\n`);
 }
 
+function stripExtendedPrefix(p) {
+  if (typeof p !== 'string') return p;
+  if (p.startsWith('\\\\?\\UNC\\')) {
+    return '\\\\' + p.slice(8);
+  }
+  if (p.startsWith('\\\\?\\')) {
+    return p.slice(4);
+  }
+  return p;
+}
+
+function pathsEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (process.platform === 'win32') {
+    return a.toLowerCase() === b.toLowerCase();
+  }
+  return a === b;
+}
+
+function pathStartsWith(child, parent) {
+  if (typeof child !== 'string' || typeof parent !== 'string') return false;
+  if (process.platform === 'win32') {
+    return child.toLowerCase().startsWith(parent.toLowerCase());
+  }
+  return child.startsWith(parent);
+}
+
 function realpathOr(p) {
+  if (typeof p !== 'string') return p;
   try {
-    return fs.realpathSync(p);
+    const resolved = fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
+    return path.normalize(stripExtendedPrefix(resolved));
   } catch {
-    return path.resolve(p);
+    return path.normalize(path.resolve(p));
   }
 }
 
@@ -375,7 +404,7 @@ export function createSession(repoRoot, opts = {}) {
     // worktree root or lives beneath one. Sessions never nest.
     for (const entry of entries) {
       const wtReal = realpathOr(entry.worktreePath);
-      if (cwdReal === wtReal || cwdReal.startsWith(`${wtReal}${path.sep}`)) {
+      if (pathsEqual(cwdReal, wtReal) || pathStartsWith(cwdReal, `${wtReal}${path.sep}`)) {
         throw new SessionError(
           `cannot start a session from inside an existing session worktree (cwd "${cwdReal}" is within session "${entry.sessionId}" at "${wtReal}")`,
           { sessionId: entry.sessionId, worktreePath: entry.worktreePath },
@@ -571,12 +600,19 @@ export function reclaimOrphanedSessions(repoRoot) {
       // worktree symlinks back to this SAME shared registry — so without
       // this guard a session calling reclaimOrphanedSessions(process.cwd())
       // from inside its own worktree would read itself as an orphan.
-      if (realpathOr(entry.worktreePath) === callerRealpath) {
+      const entryReal = realpathOr(entry.worktreePath);
+      if (pathsEqual(entryReal, callerRealpath)) {
         kept.push(entry);
         continue;
       }
 
-      const missingFromGit = !registered.has(realpathOr(entry.worktreePath));
+      let missingFromGit = true;
+      for (const p of registered) {
+        if (pathsEqual(p, entryReal)) {
+          missingFromGit = false;
+          break;
+        }
+      }
       const pidDead = !(Number.isInteger(entry.pid) && entry.pid > 0 && isPidAlive(entry.pid));
       if (!missingFromGit && !pidDead) {
         kept.push(entry); // a live, still-registered session — never touched

@@ -97,3 +97,37 @@ Blast radius unknown until `impact()` runs for real (this session's
 GitNexus index was 179+ commits stale and returned garbage caller counts for
 unrelated queries — re-`gitnexus analyze` before trusting it here, and
 cross-check with `grep` regardless).
+
+## Resolution & Findings
+
+- **Root Causes Confirmed**:
+  1. `isMainWorktree` & `retargetMember`:
+     - `git rev-parse --show-toplevel` on Windows returns forward slashes and long paths (`C:/Users/runneradmin/...`).
+     - Standard `fs.realpathSync(repoRoot)` did not expand 8.3 short paths (`C:\Users\RUNNER~1\...`), producing unequal strings and failing `isMainWorktree(repoRoot)` even in the main checkout.
+  2. `reattachableCheckout` & `WorktreeError: refusing to reclaim dirty checkout`:
+     - `baseDir` was passed as `RUNNER~1` while `registered` from `git worktree list --porcelain` had `runneradmin`.
+     - `path.relative` returned `..\..\..\runneradmin\...`, so `relative.startsWith('..')` was true. `reattachableCheckout` returned `null`, falling through to `relocateOrphanedCheckout` which refused uncommitted changes.
+  3. `reclaimOrphanedCheckout` live session cwd guard:
+     - `resolvedOrphanPath === resolvedCallerCwd` failed due to `RUNNER~1` vs `runneradmin` mismatch, skipping the guard.
+  4. `seedAgyTrust` / `readAgyTrust` / `removeAgyTrust`:
+     - Calling `path.resolve(repoRoot)` turned POSIX fixture paths (`/home/someone/...`) into Windows drive paths (`D:\home\someone\...`), mismatching `trustedWorkspaces`.
+  5. `test/runner/worktree.test.mjs`:
+     - Git converted LF to CRLF in staged file test (line 928).
+     - `worktreeSetup` tests relied on Bash syntax (`echo one > ...`, `$FGOS_REPO_ROOT`, `; exit 3`) which failed under Windows `cmd.exe`.
+- **Fixes Applied**:
+  - `src/runner/worktree.mjs`:
+    - Updated `realpathOrSelf(p)` to use `fs.realpathSync.native` (which invokes Win32 `GetFinalPathNameByHandleW` to expand short names), strip `\\?\` prefixes, and normalize path separators via `path.normalize`.
+    - Added `pathsEqual` and `pathStartsWith` (case-insensitive on `win32`) and updated `isMainWorktree`, repo-root guard, and live session guard.
+    - Updated `reattachableCheckout` to pass both `baseDir` and `registered` through `realpathOrSelf`.
+    - Updated `createWorktree` and `reclaimOrphanedCheckout` to return `realpathOrSelf` paths.
+  - `src/runner/session.mjs`:
+    - Updated `realpathOr` with identical native resolution and canonicalization, and used `pathsEqual` in session guards.
+  - `src/runner/dispatch/trust-store.mjs`:
+    - Added `matchesPath(entry, target)` supporting exact string, normalized, resolved, and `win32` case-insensitive matching.
+  - `test/runner/worktree.test.mjs`:
+    - Normalized CRLF to LF in staged change assertion.
+    - Converted `worktreeSetup` commands to cross-platform `node -e` invocations.
+- **Verification**:
+  - Local tests: `test/runner/worktree.test.mjs` (115/115 passed), `test/runner/promote-engine.test.mjs` (9/9 passed), `test/runner/session.test.mjs` (passed), `test/runner/dispatch-trust-store.test.mjs` (16/16 passed).
+  - Windows CI verification pending push in Phase 01/02 batch.
+

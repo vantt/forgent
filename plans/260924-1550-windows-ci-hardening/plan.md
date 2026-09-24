@@ -47,12 +47,12 @@ re-derive the categorization from a fresh CI run.
 
 | # | Phase | Cluster | Est. failures | Confidence |
 |---|---|---|---|---|
-| 00 | [Fresh evidence snapshot](phase-00-evidence-snapshot.md) | re-run + re-categorize | — | — |
-| 01 | [Concurrency/timing flake review](phase-01-concurrency-timing-flakes.md) | `Unit 2E` family + sibling-process races | ~15 | medium (same family failed on macOS too) |
-| 02 | [Path case-sensitivity / worktree identity](phase-02-worktree-identity-case-sensitivity.md) | `isMainWorktree`, `retargetMember`, agy trust-store | ~10 | medium (has a concrete hypothesis, unverified) |
-| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~10 | low (may need Rust source changes, possibly Windows Developer Mode gap) |
+| 00 | [Fresh evidence snapshot](phase-00-evidence-snapshot.md) | re-run + re-categorize | 524 | high (verified on run 35978159337) |
+| 01 | [Concurrency/timing flake review](phase-01-concurrency-timing-flakes.md) | `Unit 2E` family + sibling-process races | ~13 | medium (same family failed on macOS too) |
+| 02 | [Path case-sensitivity / worktree identity](phase-02-worktree-identity-case-sensitivity.md) | `isMainWorktree`, `retargetMember`, agy trust-store | ~25 | medium (has a concrete hypothesis, unverified) |
+| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~10 | low (may need Rust source changes, tar : colon syntax, Developer Mode gap) |
 | 04 | [CLI message-format & JSON-parse failures](phase-04-cli-message-format-json-parse.md) | Iron Law/forbidden regex mismatches, `Unexpected end of JSON input`, `undefined.status` | ~40 | low (not yet root-caused) |
-| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~450 | none yet — this phase's job is to re-cluster what's left |
+| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~436 | none yet — this phase's job is to re-cluster what's left |
 
 ## Dependencies
 

@@ -323,6 +323,22 @@ export function defaultAgySettingsPath(homeDir = os.homedir()) {
   return path.join(homeDir, '.gemini', 'antigravity-cli', 'settings.json');
 }
 
+function matchesPath(entry, target) {
+  if (typeof entry !== 'string' || typeof target !== 'string') return false;
+  if (entry === target) return true;
+  const entryNorm = path.normalize(entry);
+  const targetNorm = path.normalize(target);
+  if (entryNorm === targetNorm) return true;
+  const entryResolved = path.resolve(entry);
+  const targetResolved = path.resolve(target);
+  if (entryResolved === targetResolved) return true;
+  if (process.platform === 'win32') {
+    if (entryNorm.toLowerCase() === targetNorm.toLowerCase()) return true;
+    if (entryResolved.toLowerCase() === targetResolved.toLowerCase()) return true;
+  }
+  return false;
+}
+
 /** Read agy's settings.json to check whether a path is trusted. */
 export function readAgyTrust(settingsPath, projectPath) {
   try {
@@ -331,7 +347,7 @@ export function readAgyTrust(settingsPath, projectPath) {
     const raw = fs.readFileSync(settingsPath, 'utf8');
     const store = JSON.parse(raw);
     if (!Array.isArray(store?.trustedWorkspaces)) return null;
-    return store.trustedWorkspaces.includes(path.resolve(projectPath));
+    return store.trustedWorkspaces.some((entry) => matchesPath(entry, projectPath));
   } catch {
     return null;
   }
@@ -388,22 +404,19 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
   }
 
   const store = readAgyStore(settingsPath);
-  const resolvedProjectPath = path.resolve(projectPath);
-  const resolvedRepoRoot = path.resolve(repoRoot);
-  const trusted = new Set(Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : []);
+  const trustedList = Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : [];
 
-  if (!trusted.has(resolvedRepoRoot)) {
+  if (!trustedList.some((entry) => matchesPath(entry, repoRoot))) {
     throw new TrustStoreError(
       'untrusted-root',
-      `agy trust seed refused for "${resolvedProjectPath}": its repo root "${resolvedRepoRoot}" is not itself trusted in ${settingsPath}, so there is nothing to derive trust from.`,
-      { projectPath: resolvedProjectPath, repoRoot: resolvedRepoRoot, settingsPath },
+      `agy trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${settingsPath}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, settingsPath },
     );
   }
 
-  if (trusted.has(resolvedProjectPath)) return false; // already seeded
+  if (trustedList.some((entry) => matchesPath(entry, projectPath))) return false; // already seeded
 
-  trusted.add(resolvedProjectPath);
-  store.trustedWorkspaces = Array.from(trusted);
+  store.trustedWorkspaces = [...trustedList, projectPath];
 
   const dir = path.dirname(settingsPath);
   fs.mkdirSync(dir, { recursive: true });
@@ -426,8 +439,7 @@ export function removeAgyTrust(settingsPath, projectPath) {
     const raw = fs.readFileSync(settingsPath, 'utf8');
     const store = JSON.parse(raw);
     if (!Array.isArray(store?.trustedWorkspaces)) return false;
-    const absPath = path.resolve(projectPath);
-    const idx = store.trustedWorkspaces.indexOf(absPath);
+    const idx = store.trustedWorkspaces.findIndex((entry) => matchesPath(entry, projectPath));
     if (idx === -1) return false;
     store.trustedWorkspaces.splice(idx, 1);
     const dir = path.dirname(settingsPath);
@@ -444,3 +456,4 @@ export function removeAgyTrust(settingsPath, projectPath) {
     return false;
   }
 }
+

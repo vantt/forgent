@@ -9,6 +9,10 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawn } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+
+const ACTIONS_MODULE_URL = pathToFileURL(path.resolve('src/verbs/coordination/actions.mjs')).href;
+const DISPATCH_MODULE_URL = pathToFileURL(path.resolve('src/runner/dispatch.mjs')).href;
 import {
   executeOperationUseCase,
   executeAuthorizeAndDispatchUseCase,
@@ -150,7 +154,12 @@ const runWorkerSubprocess = (script) =>
     let err = '';
     p.stdout.on('data', (d) => (out += d.toString()));
     p.stderr.on('data', (d) => (err += d.toString()));
-    p.on('close', (code) => resolve({ code, out: out.trim(), err: err.trim() }));
+    p.on('close', (code) => {
+      if (code !== 0 && !out.trim()) {
+        out = `PROCESS_EXIT_${code}:${err.trim()}`;
+      }
+      resolve({ code, out: out.trim(), err: err.trim() });
+    });
   });
 
 // ─── 1. Real two-OS-process concurrency race: identical retry succeeds idempotently ───
@@ -181,10 +190,10 @@ test('Unit 2E: concurrent two-OS-process semantic human-turn race with identical
       fs.writeFileSync(
         workerPath,
         `
-        import { executeHumanTurnUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeHumanTurnUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeHumanTurnUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${action.actionKey}',
@@ -192,7 +201,7 @@ test('Unit 2E: concurrent two-OS-process semantic human-turn race with identical
               turnId: '${payload.turnId}',
               turnOrdinal: ${payload.turnOrdinal},
               channel: '${payload.channel}',
-              artifactRef: '${payload.artifactRef}',
+              artifactRef: ${JSON.stringify(payload.artifactRef)},
               externalRef: '${payload.externalRef}',
               attributedTo: ${JSON.stringify(payload.attributedTo)},
             }
@@ -245,10 +254,10 @@ test('Unit 2E: concurrent two-OS-process semantic human-turn race with conflicti
       fs.writeFileSync(
         workerPath,
         `
-        import { executeHumanTurnUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeHumanTurnUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeHumanTurnUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${action.actionKey}',
@@ -256,7 +265,7 @@ test('Unit 2E: concurrent two-OS-process semantic human-turn race with conflicti
               turnId: '${turnId}',
               turnOrdinal: 1,
               channel: 'cli',
-              artifactRef: '${artifact}',
+              artifactRef: ${JSON.stringify(artifact)},
               externalRef: '${extRef}',
               attributedTo: { type: 'person', id: 'reviewer-human' },
             }
@@ -456,10 +465,10 @@ test('Unit 2E: concurrent two-OS-process executeCloseUseCase race', async () => 
       fs.writeFileSync(
         workerPath,
         `
-        import { executeCloseUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeCloseUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeCloseUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${closeAction.actionKey}',
@@ -942,12 +951,12 @@ test('Unit 2E: concurrent two-OS-process operation race with identical payload y
       fs.writeFileSync(
         workerPath,
         `
-        import { executeOperationUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeOperationUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeOperationUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${opAction.actionKey}',
@@ -1008,17 +1017,17 @@ test('Unit 2E: concurrent two-OS-process operation race with conflicting payload
       fs.writeFileSync(
         workerPath,
         `
-        import { executeOperationUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeOperationUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeOperationUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${opAction.actionKey}',
               writerId: 'driver-1',
-              objective: '${objective}',
+              objective: ${JSON.stringify(objective)},
               expectedOutputs: ['agent-result.json'],
             }
           );
@@ -1065,12 +1074,12 @@ test('Unit 2E: concurrent two-OS-process authorize-and-dispatch race with identi
       fs.writeFileSync(
         workerPath,
         `
-        import { executeAuthorizeAndDispatchUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeAuthorizeAndDispatchUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeAuthorizeAndDispatchUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${authAction.actionKey}',
@@ -1130,18 +1139,18 @@ test('Unit 2E: concurrent two-OS-process authorize-and-dispatch race with confli
       fs.writeFileSync(
         workerPath,
         `
-        import { executeAuthorizeAndDispatchUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeAuthorizeAndDispatchUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeAuthorizeAndDispatchUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${authAction.actionKey}',
               writerId: 'driver-1',
               objective: 'Perform specialist consultation',
-              reason: '${reason}',
+              reason: ${JSON.stringify(reason)},
               expectedOutputs: ['agent-result.json'],
             }
           );
@@ -1193,12 +1202,12 @@ test('Unit 2E: concurrent two-OS-process fan-out race with identical payload yie
       fs.writeFileSync(
         workerPath,
         `
-        import { executeFanOutUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeFanOutUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeFanOutUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${fanAction.actionKey}',
@@ -1261,12 +1270,12 @@ test('Unit 2E: concurrent two-OS-process fan-out race with conflicting payload r
       fs.writeFileSync(
         workerPath,
         `
-        import { executeFanOutUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
-        import { ensureRunnerConfigForDir } from '${path.resolve('src/runner/dispatch.mjs')}';
+        import { executeFanOutUseCase } from '${ACTIONS_MODULE_URL}';
+        import { ensureRunnerConfigForDir } from '${DISPATCH_MODULE_URL}';
         try {
-          const runnerConfig = ensureRunnerConfigForDir('${tempDir}');
+          const runnerConfig = ensureRunnerConfigForDir(${JSON.stringify(tempDir)});
           const res = await executeFanOutUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}', runnerConfig },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig },
             {
               id: '${coordinationId}',
               actionKey: '${fanAction.actionKey}',
@@ -1317,10 +1326,10 @@ test('Unit 2E: concurrent two-OS-process contribution race with identical payloa
       fs.writeFileSync(
         workerPath,
         `
-        import { executeContributionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeContributionUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeContributionUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${contribAction.actionKey}',
@@ -1374,16 +1383,16 @@ test('Unit 2E: concurrent two-OS-process contribution race with conflicting payl
       fs.writeFileSync(
         workerPath,
         `
-        import { executeContributionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeContributionUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeContributionUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${contribAction.actionKey}',
               writerId: 'driver-1',
               contributionType: 'proposal',
-              roundKey: '${roundKey}',
+              roundKey: ${JSON.stringify(roundKey)},
             }
           );
           if (res.idempotent) {
@@ -1429,10 +1438,10 @@ test('Unit 2E: concurrent two-OS-process disposition race with identical payload
       fs.writeFileSync(
         workerPath,
         `
-        import { executeDispositionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeDispositionUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeDispositionUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${dispAction.actionKey}',
@@ -1486,10 +1495,10 @@ test('Unit 2E: concurrent two-OS-process disposition race with conflicting paylo
       fs.writeFileSync(
         workerPath,
         `
-        import { executeDispositionUseCase } from '${path.resolve('src/verbs/coordination/actions.mjs')}';
+        import { executeDispositionUseCase } from '${ACTIONS_MODULE_URL}';
         try {
           const res = await executeDispositionUseCase(
-            { cwd: '${tempDir}', repoRoot: '${tempDir}' },
+            { cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)} },
             {
               id: '${coordinationId}',
               actionKey: '${dispAction.actionKey}',

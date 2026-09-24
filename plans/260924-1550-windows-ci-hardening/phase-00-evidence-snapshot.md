@@ -78,3 +78,70 @@ original 2026-09-24 numbers once this phase has run at least once.
 Windows CI wall-clock is long (~20-30 min per run) and `full-results-windows-latest`
 artifact retention is 14 days — re-download before it expires, or this phase
 has to burn a fresh CI run just to get the log back.
+
+## Re-run Results (2026-09-24, run `35978159337`, HEAD `42934bf3`)
+
+Downloaded from GitHub Actions:
+- Run ID: `35978159337`
+- Job ID: `107563441839` (`test (windows-latest)`)
+- Commit: `42934bf3` (`docs(plans): add Windows CI hardening plan for the post-fix long tail`)
+- All other platforms green (`macos-latest`, `ubuntu-latest`, `cargo test`, `external consumer proof`, `compare`).
+
+Total `✖` lines: 524 (unchanged from initial estimate, as `42934bf3` only added documentation).
+
+### Refreshed Bucket Counts
+
+```text
+176  Expected values to be strictly equal
+ 35  work "<id>" not found (dominant root-cause symptom across approve/return/sync-root/take)
+ 13  test/runner/coordination-phase2-concurrency.test.mjs (Unit 2E family)
+ 11  Cannot read properties of undefined (reading 'status')
+ 11  /Iron Law/ regex mismatch
+  9  quarantine/ must contain quarantined candidate (fgctl-stage.test.mjs)
+  7  Unexpected end of JSON input
+  7  /explicitly forbidden/ regex mismatch
+  7  Expected values to be strictly deep-equal
+  6  Expected "actual" to be strictly unequal to: 0
+  6  retargetMember: refusing to run from ... linked worktree
+  5  The expression evaluated to a falsy value
+  5  /runner-sourced item/ regex mismatch
+  4  One process must win initial execution
+  4  WorktreeError: refusing to reclaim checkout ... uncommitted changes
+  3  Command failed: node bin/fgos.mjs topic register ... --purpose-slug worktree-reclaim
+  3  /not committed at the main checkout's HEAD/ regex mismatch
+  3  /not clean/ regex mismatch
+  2  the refusal tells the caller how to proceed
+  2  stderr must report lock-held
+  2  Sibling process must get idempotent outcome
+  2  Missing expected exception (WorktreeError)
+  2  stage must succeed: io error: The filename, directory name, or volume label syntax is incorrect. (os error 123)
+  2  TrustStoreError: agy trust seed refused ... not itself trusted
+  1  Cannot read properties of undefined (reading 'branchHeadAtReturn')
+  1  Cannot read properties of undefined (reading 'accounts')
+  1  WorkValidationError: unknown id "guard-dep-item"
+```
+
+### Top Failing Test Files
+
+```text
+ 53  test/cli/fgos-return.test.mjs
+ 41  test/cli/fgos-merge.test.mjs
+ 29  test/runner/herdr-spawn-adapter.test.mjs
+ 23  test/cli/fgos-claim.test.mjs
+ 18  test/cli/fgos-claim-2.test.mjs
+ 17  test/rust-host/fgctl-init.test.mjs
+ 15  test/e2e/runner-loop.test.mjs
+ 14  test/rust-host/fgctl-upgrade.test.mjs
+ 13  test/runner/coordination-phase2-concurrency.test.mjs (Phase 01)
+ 12  test/cli/fgos-move.test.mjs
+ 11  test/cli/fgos-iron-law-gate.test.mjs
+ 11  test/runner/worktree.test.mjs (Phase 02)
+ 10  test/runner/github-adapter.test.mjs
+ 10  test/runner/merge.test.mjs
+  9  test/rust-host/fgctl-stage.test.mjs (Phase 03)
+ 55  test/cli/fgos-approve-* (cumulative)
+  6  test/runner/promote-engine.test.mjs (Phase 02)
+```
+
+No bucket has shrunk to 0 yet. Phase 01–04 remain active with refreshed counts.
+

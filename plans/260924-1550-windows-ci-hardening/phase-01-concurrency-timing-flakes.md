@@ -67,3 +67,17 @@ If this turns out to be a genuine race condition rather than a flaky
 threshold, fixing it could touch production concurrency-control code with
 its own blast radius — run `impact()` before editing anything outside the
 test file itself, per this repo's GitNexus discipline.
+
+## Resolution & Findings
+
+- **Actual Root Cause**: NOT a timing race or load flake! The 13 failing Unit 2E subprocess tests generate standalone `.mjs` worker scripts via template strings that interpolated `import { ... } from '${path.resolve(...)}'` and `cwd: '${tempDir}'`.
+  - On Windows, `path.resolve(...)` produces a drive-letter path like `D:\a\forgent\forgent\...`. In Node.js ESM, `import ... from 'D:\...'` throws `TypeError [ERR_UNSUPPORTED_ESM_URL_SCHEME]: Only URLs with a scheme in: file, data, and node are supported. Received protocol 'd:'`.
+  - Furthermore, `${tempDir}` inside template string literals without escaping produces invalid string literals because Windows backslashes (`\U`, `\r`, `\t`) are interpreted as escape sequences by the JS parser.
+  - Because the subprocesses crashed immediately on startup with ESM syntax errors before writing any `OUTCOME:*` tokens to stdout, `runWorkerSubprocess` received empty stdout (`res1.out === ''`, `res2.out === ''`), failing the assertions `assert.equal(outcomes[0], 'OUTCOME:IDEMPOTENT')` / `assert.equal(outcomes[1], 'OUTCOME:INITIAL')`.
+- **Fix Applied**:
+  - In `test/runner/coordination-phase2-concurrency.test.mjs`:
+    - Converted module specifiers to `file://` URLs using `pathToFileURL(path.resolve(...)).href`.
+    - Sanitized all directory and path interpolations using `JSON.stringify(tempDir)`.
+    - Improved `runWorkerSubprocess` error reporting to reject with stderr / exit code on failure, making future worker crashes immediately obvious.
+  - Verified 16/16 tests pass locally. Real Windows CI verification pending push in Phase 01/02 batch.
+

@@ -926,7 +926,7 @@ test('resyncWorktree reapplies staged content (a new file) after resetting to th
   );
   assert.equal(fs.existsSync(path.join(wt.path, 'plan.md')), true, 'the branch\'s own external advance must be present');
   assert.equal(
-    fs.readFileSync(path.join(wt.path, 'my-change.md'), 'utf8'),
+    fs.readFileSync(path.join(wt.path, 'my-change.md'), 'utf8').replace(/\r\n/g, '\n'),
     '# my staged change\n',
     'the worktree\'s own staged content must survive the resync',
   );
@@ -1444,11 +1444,17 @@ function writeRepoConfig(repoRoot, config) {
 
 test('createWorktree runs the configured worktreeSetup commands inside the new worktree, in order, with FGOS_REPO_ROOT set', () => {
   const repoRoot = initTempRepo();
+  const nodeBin = JSON.stringify(process.execPath);
   writeRepoConfig(repoRoot, {
-    worktreeSetup: { commands: ['echo one > setup-order.txt', 'echo "$FGOS_REPO_ROOT" >> setup-order.txt'] },
+    worktreeSetup: {
+      commands: [
+        `${nodeBin} -e "require('node:fs').writeFileSync('setup-order.txt', 'one\\n')"`,
+        `${nodeBin} -e "require('node:fs').appendFileSync('setup-order.txt', process.env.FGOS_REPO_ROOT + '\\n')"`,
+      ],
+    },
   });
   const wt = createWorktree(repoRoot, 'item-setup', { worktreeDir: mkWorktreeDir() });
-  const lines = fs.readFileSync(path.join(wt.path, 'setup-order.txt'), 'utf8').trim().split('\n');
+  const lines = fs.readFileSync(path.join(wt.path, 'setup-order.txt'), 'utf8').trim().split(/\r?\n/);
   assert.deepEqual(lines, ['one', repoRoot]);
 });
 
@@ -1460,7 +1466,12 @@ test('createWorktree with no worktreeSetup section runs nothing extra', () => {
 
 test('a failing worktreeSetup command throws WorktreeError naming the command and its output, and the half-built worktree is removed', () => {
   const repoRoot = initTempRepo();
-  writeRepoConfig(repoRoot, { worktreeSetup: { commands: ['echo boom-output >&2; exit 3'] } });
+  const nodeBin = JSON.stringify(process.execPath);
+  writeRepoConfig(repoRoot, {
+    worktreeSetup: {
+      commands: [`${nodeBin} -e "process.stderr.write('boom-output\\n'); process.exit(3)" /* exit 3 */`],
+    },
+  });
   const worktreeDir = mkWorktreeDir();
   assert.throws(
     () => createWorktree(repoRoot, 'item-badsetup', { worktreeDir }),
