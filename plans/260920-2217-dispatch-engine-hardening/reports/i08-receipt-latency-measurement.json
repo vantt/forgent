@@ -1,0 +1,283 @@
+{
+  "benchmark": "dispatch-receipt-latency-R7",
+  "timestamp": "2026-09-24T08:32:43.345Z",
+  "trials": 40,
+  "environmentContext": {
+    "baseCommit": "6f3fb9038fd66cd9943972a321eed2ba98587fab",
+    "headCommit": "3cfaec538cdf82a9d3961455436a40b6130817e1",
+    "platform": "linux",
+    "osRelease": "6.8.0-138-generic",
+    "arch": "x64",
+    "nodeVersion": "v24.18.0",
+    "cpuModel": "12th Gen Intel(R) Core(TM) i7-12650H",
+    "cpuCores": 16,
+    "loadAverage": [
+      10.99,
+      18.22,
+      14.73
+    ],
+    "totalMemoryBytes": 16456667136,
+    "freeMemoryBytes": 10078314496,
+    "productionDiffBytes": 0
+  },
+  "baselineI07": {
+    "baseCommit": "cc687d92",
+    "medianMs": 26,
+    "p95Ms": 46,
+    "candidateI07MedianMs": 31,
+    "candidateI07P95Ms": 40,
+    "thresholdMs": 146
+  },
+  "summary": {
+    "minMs": 31,
+    "medianMs": 38,
+    "p95Ms": 47,
+    "maxMs": 51,
+    "thresholdP95Ms": 146,
+    "deltaP95VsBaselineMs": 1,
+    "verdict": "PASS",
+    "notes": "Threshold met with 0-byte production diff against base 6f3fb903 and reproducible event-driven receipt latency."
+  },
+  "rawSamples": [
+    {
+      "trial": 1,
+      "elapsedMs": 58,
+      "workerDurationMs": 11,
+      "overheadMs": 47
+    },
+    {
+      "trial": 2,
+      "elapsedMs": 62,
+      "workerDurationMs": 11,
+      "overheadMs": 51
+    },
+    {
+      "trial": 3,
+      "elapsedMs": 57,
+      "workerDurationMs": 12,
+      "overheadMs": 45
+    },
+    {
+      "trial": 4,
+      "elapsedMs": 51,
+      "workerDurationMs": 10,
+      "overheadMs": 41
+    },
+    {
+      "trial": 5,
+      "elapsedMs": 56,
+      "workerDurationMs": 14,
+      "overheadMs": 42
+    },
+    {
+      "trial": 6,
+      "elapsedMs": 52,
+      "workerDurationMs": 11,
+      "overheadMs": 41
+    },
+    {
+      "trial": 7,
+      "elapsedMs": 48,
+      "workerDurationMs": 11,
+      "overheadMs": 37
+    },
+    {
+      "trial": 8,
+      "elapsedMs": 40,
+      "workerDurationMs": 9,
+      "overheadMs": 31
+    },
+    {
+      "trial": 9,
+      "elapsedMs": 51,
+      "workerDurationMs": 12,
+      "overheadMs": 39
+    },
+    {
+      "trial": 10,
+      "elapsedMs": 51,
+      "workerDurationMs": 13,
+      "overheadMs": 38
+    },
+    {
+      "trial": 11,
+      "elapsedMs": 52,
+      "workerDurationMs": 9,
+      "overheadMs": 43
+    },
+    {
+      "trial": 12,
+      "elapsedMs": 47,
+      "workerDurationMs": 10,
+      "overheadMs": 37
+    },
+    {
+      "trial": 13,
+      "elapsedMs": 48,
+      "workerDurationMs": 11,
+      "overheadMs": 37
+    },
+    {
+      "trial": 14,
+      "elapsedMs": 48,
+      "workerDurationMs": 14,
+      "overheadMs": 34
+    },
+    {
+      "trial": 15,
+      "elapsedMs": 47,
+      "workerDurationMs": 10,
+      "overheadMs": 37
+    },
+    {
+      "trial": 16,
+      "elapsedMs": 54,
+      "workerDurationMs": 12,
+      "overheadMs": 42
+    },
+    {
+      "trial": 17,
+      "elapsedMs": 47,
+      "workerDurationMs": 9,
+      "overheadMs": 38
+    },
+    {
+      "trial": 18,
+      "elapsedMs": 45,
+      "workerDurationMs": 10,
+      "overheadMs": 35
+    },
+    {
+      "trial": 19,
+      "elapsedMs": 47,
+      "workerDurationMs": 9,
+      "overheadMs": 38
+    },
+    {
+      "trial": 20,
+      "elapsedMs": 53,
+      "workerDurationMs": 17,
+      "overheadMs": 36
+    },
+    {
+      "trial": 21,
+      "elapsedMs": 48,
+      "workerDurationMs": 10,
+      "overheadMs": 38
+    },
+    {
+      "trial": 22,
+      "elapsedMs": 54,
+      "workerDurationMs": 12,
+      "overheadMs": 42
+    },
+    {
+      "trial": 23,
+      "elapsedMs": 46,
+      "workerDurationMs": 9,
+      "overheadMs": 37
+    },
+    {
+      "trial": 24,
+      "elapsedMs": 49,
+      "workerDurationMs": 12,
+      "overheadMs": 37
+    },
+    {
+      "trial": 25,
+      "elapsedMs": 48,
+      "workerDurationMs": 10,
+      "overheadMs": 38
+    },
+    {
+      "trial": 26,
+      "elapsedMs": 46,
+      "workerDurationMs": 10,
+      "overheadMs": 36
+    },
+    {
+      "trial": 27,
+      "elapsedMs": 44,
+      "workerDurationMs": 10,
+      "overheadMs": 34
+    },
+    {
+      "trial": 28,
+      "elapsedMs": 44,
+      "workerDurationMs": 10,
+      "overheadMs": 34
+    },
+    {
+      "trial": 29,
+      "elapsedMs": 54,
+      "workerDurationMs": 10,
+      "overheadMs": 44
+    },
+    {
+      "trial": 30,
+      "elapsedMs": 49,
+      "workerDurationMs": 10,
+      "overheadMs": 39
+    },
+    {
+      "trial": 31,
+      "elapsedMs": 45,
+      "workerDurationMs": 11,
+      "overheadMs": 34
+    },
+    {
+      "trial": 32,
+      "elapsedMs": 49,
+      "workerDurationMs": 11,
+      "overheadMs": 38
+    },
+    {
+      "trial": 33,
+      "elapsedMs": 49,
+      "workerDurationMs": 10,
+      "overheadMs": 39
+    },
+    {
+      "trial": 34,
+      "elapsedMs": 50,
+      "workerDurationMs": 10,
+      "overheadMs": 40
+    },
+    {
+      "trial": 35,
+      "elapsedMs": 47,
+      "workerDurationMs": 10,
+      "overheadMs": 37
+    },
+    {
+      "trial": 36,
+      "elapsedMs": 47,
+      "workerDurationMs": 10,
+      "overheadMs": 37
+    },
+    {
+      "trial": 37,
+      "elapsedMs": 49,
+      "workerDurationMs": 9,
+      "overheadMs": 40
+    },
+    {
+      "trial": 38,
+      "elapsedMs": 46,
+      "workerDurationMs": 9,
+      "overheadMs": 37
+    },
+    {
+      "trial": 39,
+      "elapsedMs": 43,
+      "workerDurationMs": 10,
+      "overheadMs": 33
+    },
+    {
+      "trial": 40,
+      "elapsedMs": 44,
+      "workerDurationMs": 9,
+      "overheadMs": 35
+    }
+  ]
+}

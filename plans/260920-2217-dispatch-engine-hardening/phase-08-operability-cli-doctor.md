@@ -2,14 +2,17 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-24 (Unit I07 Integrated into Main)
+## Status — 2026-09-24 (Unit I07 Integrated, Unit I08 Blocked on Base Defects F4/F5)
 
-- **Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
-- **Base Commit**: `cc687d92b94c6652f1cb738b74d1cfa0c72571d2`
-- **Integration Baseline**: `origin/main@c386e9f30b1ac60d78675f688e8d10146f5e8949`
-- **Integrated Commit**: `261ed7ea01765db6c9fa87afddfa8f3e259be1ea`
-- **Report**: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
+- **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
+- **Unit I08 Status**: `blocked on base defects F4/F5 (remediation unit required)` (Branch: `coordination-skill-harness-i08-dispatch-verification`, Base: `6f3fb9038fd66cd9943972a321eed2ba98587fab`).
+- **Stop Condition**: `triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)`.
+- **Reports**:
+  - Implementation: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
+  - Verification: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
+  - Benchmark artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
 - **Verification Evidence**:
+  - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
   - `test/cli/dispatch-operability.test.mjs`: 8 pass / 0 fail.
   - `test/cli/dispatch-reconcile.test.mjs`: 6 pass / 0 fail.
   - `test/verbs/dispatch-observe.test.mjs`: 11 pass / 0 fail.
@@ -19,8 +22,10 @@ Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), 
   - `test/runner/dispatch.test.mjs`: 387 pass / 0 fail.
   - `test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail.
   - `test/runner/herdr-*.test.mjs`: 97 pass / 0 fail (1 skipped by design).
+  - Affected dispatch/herdr matrix (55 files): 1455 pass, 0 fail, 1 skip.
   - `test/architecture.test.mjs`: 13 pass / 0 fail.
-  - `git diff --check cc687d92`: clean (0 errors/warnings).
+  - R7 Latency Benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
+  - `git diff --check 6f3fb903`: clean (0 errors/warnings).
 
 ## Requirements
 

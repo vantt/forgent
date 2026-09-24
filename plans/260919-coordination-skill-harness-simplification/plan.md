@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized 6a638752 and 261ed7ea, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 ready to unblock upon Track Manager confirmation; I10 requires I09 post-merge verification — I10 blocked
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 integrated at `main@1ca4023c` (post-merge verification pending); Unit I07 integrated at `main@261ed7ea`; Unit I08 blocked on base defects F4/F5 (remediation unit required); I10 requires I09 post-merge verification — I10 blocked
 Created: 2026-09-19
-Last Updated: 2026-09-23
+Last Updated: 2026-09-24
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -846,6 +846,15 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I08 — verify dispatch governance, CLI, doctor, and performance gates
   capability: code:test
   depends-on: I06 and I07
+  status: blocked on base defects F4/F5 (remediation unit required)
+  stop-condition: triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)
+  branch: `coordination-skill-harness-i08-dispatch-verification`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08-dispatch-verification`
+  base-sha: `6f3fb9038fd66cd9943972a321eed2ba98587fab`
+  verification: 178/178 focused pass; 9/9 governance tests pass; affected matrix (55 files): 1455 pass, 0 fail, 1 skip
+  benchmark: 40 trials, median 38ms, p95 47ms vs baseline 46ms (threshold <= 146ms; pass)
+  measurement-artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
+  report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
   stop: redirect/governance bypass or measured latency regression
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement
