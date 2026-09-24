@@ -12,12 +12,13 @@ import {
   buildRustDistribution,
   computeArtifactDigest,
 } from '../../scripts/build-rust-distribution.mjs';
+import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FGCTL_BIN = path.resolve(REPO_ROOT, 'target', 'release', process.platform === 'win32' ? 'fgctl.exe' : 'fgctl');
-const FGOS_BIN = path.resolve(REPO_ROOT, 'target', 'release', 'fgos');
+const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
+const FGOS_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgos');
 
 let releaseDirA = null;
 let digestA = null;

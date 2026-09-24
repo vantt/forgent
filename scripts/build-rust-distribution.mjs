@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { releaseBinaryPath } from '../src/util/release-binary-path.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -147,7 +148,7 @@ export function buildRustDistribution({
     throw new Error(`Refusing to stage release tree inside checkout directory: ${resolvedOut}`);
   }
 
-  const releaseBin = path.join(resolvedRepo, 'target', 'release', 'fgos');
+  const releaseBin = releaseBinaryPath(path.join(resolvedRepo, 'target', 'release'), 'fgos');
   if (!fs.existsSync(releaseBin)) {
     throw new Error(`Compiled Rust binary not found at ${releaseBin}. Run "cargo build --release --workspace" first.`);
   }

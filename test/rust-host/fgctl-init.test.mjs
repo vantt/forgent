@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync, spawn, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { releaseBinaryPath } from '../../src/util/release-binary-path.mjs';
 
 import {
   REPO_ROOT,
@@ -17,7 +18,7 @@ import { DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const FGCTL_BIN = path.resolve(REPO_ROOT, 'target', 'release', process.platform === 'win32' ? 'fgctl.exe' : 'fgctl');
+const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
 
 let fixtureReleaseDir = null;
 let fixtureDigest = null;
