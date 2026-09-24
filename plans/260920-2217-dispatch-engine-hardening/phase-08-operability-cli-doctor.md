@@ -16,19 +16,11 @@ Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), 
 - **Verification Evidence**:
   - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
   - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
-  - `test/cli/dispatch-operability.test.mjs`: 11 pass / 0 fail.
-  - `test/cli/dispatch-reconcile.test.mjs`: 6 pass / 0 fail.
-  - `test/verbs/dispatch-observe.test.mjs`: 12 pass / 0 fail.
-  - `test/runner/dispatch-runtime-inspect.test.mjs`: 20 pass / 0 fail.
-  - `test/setup/visibility-checks.test.mjs`: 17 pass / 0 fail.
-  - `test/setup/*.test.mjs`: 607 pass / 0 fail.
-  - `test/runner/dispatch.test.mjs`: 387 pass / 0 fail.
-  - `test/runner/assignment-dispatch.test.mjs`: 75 pass / 0 fail.
-  - `test/runner/herdr-*.test.mjs`: 97 pass / 0 fail (1 skipped by design).
-  - Affected dispatch/herdr matrix (55 files): 1455 pass, 0 fail, 1 skip.
-  - `test/architecture.test.mjs`: 13 pass / 0 fail.
+  - Focused matrix (10 files): 232 pass / 0 fail (237 with regression suite).
+  - Comprehensive dispatch root suite (`test/runner/dispatch.test.mjs`): 387 pass / 0 fail.
+  - Affected dispatch/herdr matrix (53 files): 1439 pass, 0 fail, 1 skip.
   - R7 Latency Benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
-  - `git diff --check 6f3fb903`: clean (0 errors/warnings).
+  - `git diff --check`: clean (0 errors/warnings).
 
 ## Requirements
 

@@ -238,6 +238,22 @@ function fallbackMutationForAssignment(asgn) {
   }
 }
 
+function resolveExecutorCommandFallback(entry, executorId) {
+  if (entry?.command) return entry.command;
+  if (Array.isArray(entry?.invocations)) {
+    const cli = entry.invocations.find((inv) => inv?.via === 'cli');
+    if (cli?.command) return cli.command;
+  }
+  return executorId;
+}
+
+function resolveProviderFamilyForExecutor(entry, executorId) {
+  const declared = entry?.providerModel || entry?.provider;
+  if (declared) return normalizeProviderFamily(declared);
+  const cmd = resolveExecutorCommandFallback(entry, executorId);
+  return normalizeProviderFamily(deriveProviderFamily(entry, cmd), cmd);
+}
+
 function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
   const configuredRedirects = cfg?.placementPolicy?.readOnlyRedirects;
@@ -269,8 +285,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   }
 
   const sourceExecutorEntry = cfg?.executors?.[sourceExecutorId];
-  const sourceCommand = sourceExecutorEntry?.command ?? sourceExecutorId;
-  const sourceProvider = normalizeProviderFamily(deriveProviderFamily(sourceExecutorEntry, sourceCommand), sourceCommand);
+  const sourceProvider = resolveProviderFamilyForExecutor(sourceExecutorEntry, sourceExecutorId);
 
   const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
   const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
@@ -301,8 +316,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   }
 
   const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
-  const targetCommand = targetExecutorEntry?.command ?? verifiedExecutorId;
-  const selectedProvider = normalizeProviderFamily(deriveProviderFamily(targetExecutorEntry, targetCommand), targetCommand);
+  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, verifiedExecutorId);
 
   const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
   const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
@@ -330,8 +344,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
-  const targetCommand = executorEntry?.command ?? executorId;
-  const providerModel = normalizeProviderFamily(deriveProviderFamily(executorEntry, targetCommand), targetCommand);
+  const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
   const legacyModel = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);

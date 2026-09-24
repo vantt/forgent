@@ -19,6 +19,7 @@ export const FAILURE_FAMILIES = Object.freeze(['provider', 'resource', 'contract
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
 export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'legacy-derived', 'contract-corrupt']);
+export const RECOGNIZED_LEGACY_STATUSES = Object.freeze(['done', 'failed', 'blocked', 'no-evidence']);
 
 /**
  * Project canonical classification to legacy status string.
@@ -598,29 +599,55 @@ export function interpretRunResult(input, options = {}) {
     });
   }
 
-  if (expectedRunId && rawObj.runId && rawObj.runId !== expectedRunId) {
-    return Object.freeze({
-      contract: { ...RUN_RESULT_CONTRACT },
-      runId: rawObj.runId,
-      assignmentId: rawObj.assignmentId ?? null,
-      classification: {
-        execution: { status: 'completion-unknown', exitCode: null },
-        assessment: { verdict: 'inconclusive' },
-        confidence: { level: 'failed', basis: ['run-id-mismatch'] },
-        failure: { family: 'contract', code: 'run-id-mismatch' },
-        policy: { disposition: 'refuse', code: 'corrupt-result' },
-        delivery: { mode: 'legacy-derived' },
-        provenance: 'contract-corrupt',
-      },
-      status: 'no-evidence',
-      confidence: 'failed',
-      contractCorrupt: true,
-      resultCorrupt: true,
-      corrupt: true,
-      corruptionReasons: [`runId "${rawObj.runId}" does not match expectedRunId "${expectedRunId}"`],
-      runtime: rawObj.runtime ?? {},
-      evidence: rawObj.evidence ?? {},
-    });
+  if (expectedRunId) {
+    if (!rawObj.runId) {
+      return Object.freeze({
+        contract: { ...RUN_RESULT_CONTRACT },
+        runId: null,
+        assignmentId: rawObj.assignmentId ?? null,
+        classification: {
+          execution: { status: 'completion-unknown', exitCode: null },
+          assessment: { verdict: 'inconclusive' },
+          confidence: { level: 'failed', basis: ['run-id-missing'] },
+          failure: { family: 'contract', code: 'run-id-missing' },
+          policy: { disposition: 'refuse', code: 'corrupt-result' },
+          delivery: { mode: 'legacy-derived' },
+          provenance: 'contract-corrupt',
+        },
+        status: 'no-evidence',
+        confidence: 'failed',
+        contractCorrupt: true,
+        resultCorrupt: true,
+        corrupt: true,
+        corruptionReasons: [`runId is missing but expectedRunId was specified ("${expectedRunId}")`],
+        runtime: rawObj.runtime ?? {},
+        evidence: rawObj.evidence ?? {},
+      });
+    }
+    if (rawObj.runId !== expectedRunId) {
+      return Object.freeze({
+        contract: { ...RUN_RESULT_CONTRACT },
+        runId: rawObj.runId,
+        assignmentId: rawObj.assignmentId ?? null,
+        classification: {
+          execution: { status: 'completion-unknown', exitCode: null },
+          assessment: { verdict: 'inconclusive' },
+          confidence: { level: 'failed', basis: ['run-id-mismatch'] },
+          failure: { family: 'contract', code: 'run-id-mismatch' },
+          policy: { disposition: 'refuse', code: 'corrupt-result' },
+          delivery: { mode: 'legacy-derived' },
+          provenance: 'contract-corrupt',
+        },
+        status: 'no-evidence',
+        confidence: 'failed',
+        contractCorrupt: true,
+        resultCorrupt: true,
+        corrupt: true,
+        corruptionReasons: [`runId "${rawObj.runId}" does not match expectedRunId "${expectedRunId}"`],
+        runtime: rawObj.runtime ?? {},
+        evidence: rawObj.evidence ?? {},
+      });
+    }
   }
 
   // A present contract is an explicit claim of a versioned format. Only the
@@ -690,6 +717,34 @@ export function interpretRunResult(input, options = {}) {
       corruptionReasons: ['Legacy result must have at least runId or status'],
       runtime: {},
       evidence: {},
+    });
+  }
+
+  // For legacy results, an explicit status must be one of the recognized legacy statuses.
+  if (rawObj.status !== undefined && rawObj.status !== null && !RECOGNIZED_LEGACY_STATUSES.includes(rawObj.status)) {
+    return Object.freeze({
+      contract: { ...RUN_RESULT_CONTRACT },
+      runId: rawObj.runId ?? null,
+      assignmentId: rawObj.assignmentId ?? null,
+      classification: {
+        execution: { status: 'completion-unknown', exitCode: null },
+        assessment: { verdict: 'inconclusive' },
+        confidence: { level: 'failed', basis: ['invalid-status'] },
+        failure: { family: 'contract', code: 'non-standard-status' },
+        policy: { disposition: 'refuse', code: 'corrupt-result' },
+        delivery: { mode: 'legacy-derived' },
+        provenance: 'contract-corrupt',
+      },
+      status: 'no-evidence',
+      confidence: 'failed',
+      contractCorrupt: true,
+      resultCorrupt: true,
+      corrupt: true,
+      corruptionReasons: [
+        `status "${rawObj.status}" is not a recognized status (must be one of [${RECOGNIZED_LEGACY_STATUSES.join(', ')}])`,
+      ],
+      runtime: rawObj.runtime ?? {},
+      evidence: rawObj.evidence ?? {},
     });
   }
 

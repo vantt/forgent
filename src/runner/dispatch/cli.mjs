@@ -683,15 +683,12 @@ export async function executeExecutorCli(
   // `capabilities.<purpose>.overrides` — found by re-reading this exact
   // code end to end.
   //
-  // The two doors keep their own pre-existing error contracts, proven by
-  // real tests: `--for` alone throws when nothing resolves ("no executor
-  // registered for purpose..." — guides the caller to `decide --for`
-  // first); a named `executorIdArg` that resolves to nothing NEVER
-  // throws here, silently falling through to the global executor
-  // (`resolvedExecutor` stays `undefined` below) — proven by
-  // `dispatch.test.mjs`'s own "executeExecutorCli falls back to the
-  // global executor when the executorId is not in cfg.executors at all
-  // -- never throws".
+  // The two doors keep their own error contracts: `--for` alone throws when
+  // nothing resolves ("no executor registered for purpose..." — guides the
+  // caller to `decide --for` first); a named `executorIdArg` that resolves
+  // to nothing when `!work` fails closed with DispatchError('executor-not-found')
+  // (F4 explicit fail closed). When `work` is present, it falls through to
+  // implicit/global resolution for work-driven execution.
   let executorId = executorIdArg;
   let resolvedExecutor;
   let capabilityOverrides;
@@ -753,13 +750,6 @@ export async function executeExecutorCli(
   const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
-  if (!work && mechanism === 'unavailable') {
-    throw new DispatchError(
-      'executor-not-found',
-      `executor "${executorId}" is unavailable`,
-      { executorId },
-    );
-  }
   if (mechanism === 'in-process') {
     const agentType = resolvedExecutor?.agentType;
     const stageSkill = executorIdArg;
@@ -894,61 +884,39 @@ export async function executeExecutorCli(
   // resolved against. A value that fails to translate (an invalid --tier)
   // already failed inside `modelForTier` above before reaching here.
   const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-  try {
-    resolveAssignmentDispatchPolicy({
-      assignment: {
-        operation: purpose ?? executorId,
-        role: undefined,
-        policy: {
-          minTier: policyTier,
-          providerModel: capabilityOverrides?.providerModel,
-          // Only when a real registered executor resolved -- an unconfigured
-          // executorId must fall through to resolveAssignmentDispatchPolicy's
-          // own global-executor default, exactly like resolveExecutorCommand
-          // does downstream, never throw "not a registered executor" for a
-          // case this function's own contract has never thrown for.
-          ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
-        },
-        skills: [],
+  resolveAssignmentDispatchPolicy({
+    assignment: {
+      operation: purpose ?? executorId,
+      role: undefined,
+      policy: {
+        minTier: policyTier,
+        providerModel: capabilityOverrides?.providerModel,
+        // Only when a real registered executor resolved -- an unconfigured
+        // executorId must fall through to resolveAssignmentDispatchPolicy's
+        // own global-executor default, exactly like resolveExecutorCommand
+        // does downstream, never throw "not a registered executor" for a
+        // case this function's own contract has never thrown for.
+        ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
       },
-      runnerConfig: cfg,
-      cliOverride: { model },
-      options,
-    });
-  } catch (err) {
-    if (err.message && /governance gate rejected/.test(err.message)) {
-      throw new DispatchError('governance-refused', err.message, {
-        executorId,
-        cause: err,
-      });
-    }
-    throw err;
-  }
+      skills: [],
+    },
+    runnerConfig: cfg,
+    cliOverride: { model },
+    options,
+  });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
-  let commandInfo;
-  try {
-    commandInfo = resolveExecutorCommand(cfg, {
-      prompt,
-      model,
-      tier,
-      executorId,
-      fgosDir,
-      contentCarries: carries,
-      attestRoot: cwd,
-      resolvedAgentType,
-    });
-  } catch (err) {
-    if (err.message && (/cross-provider/.test(err.message) || /governance/.test(err.message))) {
-      throw new DispatchError('governance-refused', err.message, {
-        executorId,
-        cause: err,
-      });
-    }
-    throw err;
-  }
-  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = commandInfo;
+  const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
+    prompt,
+    model,
+    tier,
+    executorId,
+    fgosDir,
+    contentCarries: carries,
+    attestRoot: cwd,
+    resolvedAgentType,
+  });
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
@@ -1863,9 +1831,14 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         // and retry shortly" apart from "dispatch-depth-exceeded -- stop,
         // this needs a human" apart from every other failure, instead of
         // only ever seeing a bare exit-1 + a human-readable message on
-        // stderr. `err.message` on stderr is unchanged for a human tailing
-        // the terminal.
-        process.stdout.write(`${JSON.stringify(err instanceof DispatchError ? { error: err.message, errorClass: err.errorClass } : { error: err.message })}\n`);
+        let errorClass = err.errorClass;
+        if (!errorClass) {
+          const code = err.code ?? '';
+          if (code.startsWith('governance') || code.startsWith('redirect.') || (err.message && (/governance gate rejected/.test(err.message) || /cross-provider/.test(err.message)))) {
+            errorClass = 'governance-refused';
+          }
+        }
+        process.stdout.write(`${JSON.stringify(errorClass ? { error: err.message, errorClass } : { error: err.message })}\n`);
         process.stderr.write(`${err.message}\n`);
         process.exitCode = 1;
       }

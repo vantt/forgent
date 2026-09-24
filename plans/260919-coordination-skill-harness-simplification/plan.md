@@ -863,8 +863,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
   branch: `coordination-skill-harness-i08b-remediation`
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08b-remediation`
   base-sha: `4e9de19541f2acde2380ff4f78147e389385e95c` + `origin/main@42934bf3e8aa37eee867e5df403e7c5a1c3fdfee`
-  remediation-scope: F4 (HIGH fail-closed explicit unregistered executor), F5 (HIGH canonicalize provider family on real command), F6 (MEDIUM whitespace trim / option precedence for resolveHerdrBin), F7 (MEDIUM expectedRunId verification across all intake doors), F10 (MEDIUM validate --action before checking cwd lock in reconcile plan)
-  verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); 178/178 focused pass; affected matrix (55 files): 1410 pass, 0 fail, 1 skip; git diff --check clean (0 errors/warnings)
+  remediation-scope: F4 (HIGH fail-closed explicit unregistered executor with DispatchError), F5 (HIGH canonicalize provider family with declared vendor precedence), F6 (MEDIUM whitespace trim / option precedence for resolveHerdrBin), F7 (MEDIUM expectedRunId/non-standard status validation across intake doors), F10 (MEDIUM validate --action before checking cwd lock in reconcile plan with --run/--assignment)
+  verification: 5/5 dedicated regression tests pass (`test/runner/dispatch-i08b-remediation.test.mjs`); 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); 232 pass across 10 focused tests (237 with regression); affected matrix (53 files): 1439 pass, 0 fail, 1 skip; git diff --check clean (0 errors/warnings)
   report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
 - unit: I09 — forward-port DAG declaration, replay, scheduler, and projections
   capability: code:implement

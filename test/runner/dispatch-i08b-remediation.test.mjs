@@ -20,6 +20,7 @@ import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { interpretRunResult, validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
+import { normalizeProviderFamily } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import { reconcileHerdrSpawnRun } from '../../src/runner/dispatch/herdr-round.mjs';
@@ -67,7 +68,7 @@ test('F4: explicit unregistered executor fails closed across public CLI, compat 
     executeExecutorCli(unregisteredId, { prompt: 'test' }),
     (err) => {
       assert.ok(err instanceof DispatchError, 'must be an instance of DispatchError');
-      assert.ok(err instanceof RunnerConfigError, 'DispatchError must extend RunnerConfigError');
+      assert.equal(err.name, 'DispatchError');
       assert.equal(err.errorClass, 'executor-not-found');
       assert.match(err.message, new RegExp(unregisteredId));
       return true;
@@ -75,53 +76,68 @@ test('F4: explicit unregistered executor fails closed across public CLI, compat 
   );
 });
 
-// ─── 2. F5: Canonicalize Provider Family Based on Real Command ───────────────
+// ─── 2. F5: Declared Vendor Precedence Over CLI Harness in Redirects ──────────
 
-test('F5: spoofed providerModel is caught as cross-provider, intra-family is allowed, and canonical family recorded', async () => {
+test('F5: declared vendor takes precedence over CLI harness; cross-vendor redirect is blocked, intra-family is allowed', async () => {
+  // 2a. Unit tests for normalizeProviderFamily: declared vendor takes precedence over command
+  assert.equal(normalizeProviderFamily('deepseek', 'pi'), 'deepseek', 'pi harness running deepseek must be deepseek');
+  assert.equal(normalizeProviderFamily('openai', 'pi'), 'openai-codex', 'pi harness running openai must normalize to openai-codex');
+  assert.equal(normalizeProviderFamily('openai-codex', 'pi'), 'openai-codex');
+  assert.equal(normalizeProviderFamily('z-ai', 'claude'), 'z-ai', 'claude harness running GLM/z-ai must be z-ai');
+  assert.equal(normalizeProviderFamily('glm', 'claude'), 'z-ai');
+  assert.equal(normalizeProviderFamily('claude', 'codex'), 'claude', 'declared claude takes precedence over codex command');
+  // Fallback to command when no providerModel/provider is declared:
+  assert.equal(normalizeProviderFamily(undefined, 'codex'), 'openai-codex');
+  assert.equal(normalizeProviderFamily(undefined, 'claude'), 'claude');
+  assert.equal(normalizeProviderFamily(undefined, 'pi'), 'pi');
+  assert.equal(normalizeProviderFamily(undefined, 'agy'), 'gemini');
+
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f5-regression-'));
   const workerScript = path.join(tmp, 'worker.mjs');
   fs.writeFileSync(workerScript, 'process.exit(0);');
 
-  // 2a. Spoofed providerModel: 'claude' but command is 'codex' (openai family)
-  // Without allowCrossProvider: true, it must fail closed before spawning.
-  const runnerConfigSpoofed = {
+  // 2b. Both executors use CLI harness 'pi', but declare different vendors:
+  // source: 'claude' (command: 'pi', providerModel: 'deepseek' -> family 'deepseek')
+  // target: 'target-openai' (command: 'pi', providerModel: 'openai' -> family 'openai-codex')
+  // Because they cross vendors, redirect MUST fail closed without crossProvider: true!
+  const runnerConfigPiCrossVendor = {
     placementPolicy: {
       readOnlyRedirects: {
         claude: {
           operations: {
-            'shape-plan': ['codex-spoofed'],
+            'shape-plan': ['target-openai'],
           },
         },
       },
     },
     modelPolicies: {
-      claude: { standard: 'claude-3-5-sonnet' },
+      deepseek: { standard: 'deepseek-chat' },
       openai: { standard: 'gpt-4o' },
     },
     executors: {
       claude: {
-        command: process.execPath,
+        command: 'pi',
         args: [workerScript],
-        providerModel: 'claude',
+        providerModel: 'deepseek',
         allowCrossProvider: true,
       },
-      'codex-spoofed': {
-        command: 'codex', // Actual command is codex (openai family)
+      'target-openai': {
+        command: 'pi',
         args: [workerScript],
-        providerModel: 'claude', // Spoofed!
+        providerModel: 'openai',
         allowCrossProvider: false,
       },
     },
   };
 
-  const asgnSpoofed = buildAssignment({
-    assignmentId: 'asgn_f5_spoofed_' + Date.now(),
+  const asgnCross = buildAssignment({
+    assignmentId: 'asgn_f5_cross_' + Date.now(),
     role: 'planner',
     operation: 'shape-plan',
     workId: 'wrk_f5_1',
     stage: 'planning',
     policy: {
-      providerModel: 'claude',
+      providerModel: 'deepseek',
       executorPreference: ['claude'],
       minTier: 'standard',
     },
@@ -129,32 +145,36 @@ test('F5: spoofed providerModel is caught as cross-provider, intra-family is all
   });
 
   await assert.rejects(
-    executeAssignment(asgnSpoofed, {
-      runnerConfig: runnerConfigSpoofed,
+    executeAssignment(asgnCross, {
+      runnerConfig: runnerConfigPiCrossVendor,
       repoRoot: tmp,
       cwd: tmp,
     }),
     (err) => {
       assert.ok(err instanceof RunnerConfigError);
+      assert.equal(err.code, 'redirect.cross-provider-not-permitted');
       assert.match(err.message, /crosses provider family without explicit opt-in/);
+      assert.match(err.message, /deepseek/);
+      assert.match(err.message, /openai-codex/);
       return true;
     },
   );
 
-  // 2b. Intra-family redirect: openai -> openai-codex (both canonical family 'openai')
-  // Should NOT be treated as cross-provider, even without allowCrossProvider: true on target!
+  // 2c. Intra-family redirect:
+  // source: 'claude' (command: 'pi', providerModel: 'openai' -> family 'openai-codex')
+  // target: 'codex-target' (command: process.execPath, providerModel: 'openai-codex' -> family 'openai-codex')
+  // Both are canonical family 'openai-codex', so redirect is allowed without crossProvider: true!
   const runnerConfigIntraFamily = {
     placementPolicy: {
       readOnlyRedirects: {
         claude: {
           operations: {
-            'shape-plan': ['openai-codex-target'],
+            'shape-plan': ['codex-target'],
           },
         },
       },
     },
     modelPolicies: {
-      claude: { standard: 'claude-3-5-sonnet' },
       openai: { standard: 'gpt-4o' },
       'openai-codex': { standard: 'gpt-4o' },
     },
@@ -165,11 +185,11 @@ test('F5: spoofed providerModel is caught as cross-provider, intra-family is all
         providerModel: 'openai',
         allowCrossProvider: true,
       },
-      'openai-codex-target': {
+      'codex-target': {
         command: process.execPath,
         args: [workerScript],
-        providerModel: 'openai-codex', // Same canonical family 'openai' as source!
-        allowCrossProvider: true, // Executor egress permission
+        providerModel: 'openai-codex',
+        allowCrossProvider: true,
       },
     },
   };
@@ -188,7 +208,6 @@ test('F5: spoofed providerModel is caught as cross-provider, intra-family is all
     mutation: 'read-only',
   });
 
-  // executeAssignment will run workerScript (process.exit(0)) successfully without cross-provider error
   const intraRes = await executeAssignment(asgnIntra, {
     runnerConfig: runnerConfigIntraFamily,
     repoRoot: tmp,
@@ -203,7 +222,7 @@ test('F5: spoofed providerModel is caught as cross-provider, intra-family is all
   const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
   assert.ok(plan.redirectDecision);
   assert.equal(plan.redirectDecision.sourceProvider, 'openai-codex');
-  assert.equal(plan.redirectDecision.selectedProvider, 'openai-codex'); // Canonical family!
+  assert.equal(plan.redirectDecision.selectedProvider, 'openai-codex');
   assert.equal(plan.redirectDecision.crossProvider, false);
 
   fs.rmSync(tmp, { recursive: true, force: true });
@@ -246,7 +265,7 @@ test('F6: resolveHerdrBin trims whitespace and honors caller opts over env', () 
 test('F7: result.json with mismatched runId is flagged contract-corrupt and never settles', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-f7-regression-'));
 
-  // 4a. interpretRunResult directly
+  // 4a. interpretRunResult directly with mismatched runId
   const mismatchedV2 = {
     contract: { id: 'assignment-run-result', version: 2 },
     runId: 'run_actual_wrong',
@@ -266,6 +285,36 @@ test('F7: result.json with mismatched runId is flagged contract-corrupt and neve
   assert.equal(interpreted.status, 'no-evidence');
   assert.equal(interpreted.confidence, 'failed');
   assert.equal(interpreted.classification.provenance, 'contract-corrupt');
+
+  // 4a-1. Missing runId when expectedRunId is specified fails closed as contract-corrupt (N7)
+  const missingRunIdLegacy = { status: 'done', confidence: 'reported' };
+  const interpretedMissing = interpretRunResult(missingRunIdLegacy, { expectedRunId: 'run_expected_right' });
+  assert.equal(interpretedMissing.contractCorrupt, true);
+  assert.equal(interpretedMissing.resultCorrupt, true);
+  assert.equal(interpretedMissing.corrupt, true);
+  assert.equal(interpretedMissing.status, 'no-evidence');
+  assert.equal(interpretedMissing.confidence, 'failed');
+  assert.equal(interpretedMissing.classification.provenance, 'contract-corrupt');
+  assert.equal(interpretedMissing.classification.failure?.code, 'run-id-missing');
+  assert.match(interpretedMissing.corruptionReasons[0], /runId is missing but expectedRunId was specified/);
+
+  // 4a-2. Non-standard status is flagged as contract-corrupt (N6)
+  const bogusStatus = { runId: 'run_expected_right', status: 'totally-bogus' };
+  const interpretedBogus = interpretRunResult(bogusStatus, { expectedRunId: 'run_expected_right' });
+  assert.equal(interpretedBogus.contractCorrupt, true);
+  assert.equal(interpretedBogus.resultCorrupt, true);
+  assert.equal(interpretedBogus.corrupt, true);
+  assert.equal(interpretedBogus.classification.provenance, 'contract-corrupt');
+  assert.equal(interpretedBogus.classification.failure?.code, 'non-standard-status');
+  assert.match(interpretedBogus.corruptionReasons[0], /not a recognized status/);
+
+  // 4a-3. Legacy leniency preserved when expectedRunId is NOT specified
+  const validLegacy = { status: 'done', confidence: 'reported' };
+  const interpretedLegacy = interpretRunResult(validLegacy);
+  assert.equal(interpretedLegacy.contractCorrupt, undefined);
+  assert.equal(interpretedLegacy.corrupt, undefined);
+  assert.equal(interpretedLegacy.status, 'done');
+  assert.equal(interpretedLegacy.classification.provenance, 'legacy-derived');
 
   // 4b. readRunSnapshot in show-run.mjs
   const runDir = path.join(tmp, '.fgos', 'assignments', 'asgn_f7_test', 'runs', '01');
