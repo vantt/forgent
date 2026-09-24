@@ -65,7 +65,7 @@ const templateCache = new Map();
 
 function readTemplate(name) {
   if (!templateCache.has(name)) {
-    const content = fs.readFileSync(path.join(TEMPLATE_DIR, name), 'utf8');
+    const content = fs.readFileSync(path.join(TEMPLATE_DIR, name), 'utf8').replace(/\r\n/g, '\n');
     templateCache.set(name, content);
   }
   return templateCache.get(name);

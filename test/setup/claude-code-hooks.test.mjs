@@ -100,7 +100,7 @@ test('fgos setup wires the dispatch-decide PreToolUse hook and reports it in the
   const cwd = mkTempDir('claude-code-hooks-cli-setup-');
   const homeDir = mkTempDir('claude-code-hooks-cli-setup-home-');
   execFileSync('git', ['init', '-q'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.dispatchDecideHookWired, true);
@@ -118,7 +118,7 @@ test('fgos setup leaves a pre-existing SessionStart hook untouched while wiring 
   const before = { hooks: { SessionStart: [{ matcher: 'startup', hooks: [{ type: 'command', command: 'node foo.mjs' }] }] } };
   fs.writeFileSync(path.join(cwd, '.claude', 'settings.json'), JSON.stringify(before, null, 2));
 
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
 
   const after = JSON.parse(fs.readFileSync(path.join(cwd, '.claude', 'settings.json'), 'utf8'));

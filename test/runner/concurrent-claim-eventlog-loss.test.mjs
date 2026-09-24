@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { claimWork } from '../../src/runner/claim-port.mjs';
 import { initStore, addWork, moveWork, readRawEvents } from '../../src/state/store.mjs';
@@ -38,9 +38,9 @@ function checkSeqContiguity(logPath) {
 }
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const CLAIM_PORT_MJS = path.join(REPO_ROOT, 'src/runner/claim-port.mjs');
-const GUARD_MJS = path.join(REPO_ROOT, 'src/state/events-jsonl-truncation-guard.mjs');
-const FGOS_PATHS_MJS = path.join(REPO_ROOT, 'src/state/fgos-file-registry.mjs');
+const CLAIM_PORT_MJS = pathToFileURL(path.join(REPO_ROOT, 'src/runner/claim-port.mjs')).href;
+const GUARD_MJS = pathToFileURL(path.join(REPO_ROOT, 'src/state/events-jsonl-truncation-guard.mjs')).href;
+const FGOS_PATHS_MJS = pathToFileURL(path.join(REPO_ROOT, 'src/state/fgos-file-registry.mjs')).href;
 
 function initTempRepo() {
   const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-concurrent-claim-repo-'));

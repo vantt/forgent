@@ -1041,7 +1041,7 @@ test('runtime: aggregationSourceFrom resolves herdr-spawn worker report at outbo
   const { fgosDir } = resolveSessionPaths(coordinationId, ctx.opts);
   const resultA = JSON.parse(fs.readFileSync(path.join(fgosDir, 'assignments', a.assignmentId, 'runs', '01', 'result.json'), 'utf8'));
   assert.equal(resultA.settleReports.length, 1);
-  assert.ok(resultA.settleReports[0].path.endsWith('outbox/report-1.md'));
+  assert.ok(resultA.settleReports[0].path.replaceAll('\\', '/').endsWith('outbox/report-1.md'));
 
   // validateSessionAggregation calls aggregationSourceFrom, which resolves reportPath via
   // resolveWorkerArtifactPath(runDir, /^report-(\\d+)\\.md$/, 'agent-report.md').

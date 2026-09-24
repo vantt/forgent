@@ -4,12 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addWork, settleClaim, listWork, readyWork, moveWork, editWork, graphWhatIf, footprintConflicts, computedSchedule, staleDoingAdvisory, readRawEvents, addDecision, recordGateApprove, StoreError } from '../../src/state/store.mjs';
 import { acquireClaim, releaseClaim, readClaim, readClaims, buildEffectiveView, getItemDurableRevision, ClaimError } from '../../src/state/runtime-coordination.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
 
-const STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs');
+const STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs')).href;
 
 function makeTmpDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claim-test-'));
@@ -286,7 +286,7 @@ test('settleClaim re-validates the claim AFTER acquiring events.lock: a stale se
   // strictly after settleClaim's outer checks passed with STALE (claim A)
   // data, and strictly before events.lock is released to let it through.
   const childScript = `
-import { readClaim } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/runtime-coordination.mjs'))};
+import { readClaim } from ${JSON.stringify(pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/runtime-coordination.mjs')).href)};
 import { settleClaim } from ${JSON.stringify(STORE_MJS)};
 const dir = ${JSON.stringify(dir)};
 const id = ${JSON.stringify('tsk-1')};

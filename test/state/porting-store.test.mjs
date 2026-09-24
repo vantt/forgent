@@ -4,12 +4,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { initStore, addPorting, movePorting, listPorting, rebuild } from '../../src/state/porting-store.mjs';
 import { PortingError } from '../../src/state/porting.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 
-const PORTING_STORE_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs');
+const PORTING_STORE_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/porting-store.mjs')).href;
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpDir() {

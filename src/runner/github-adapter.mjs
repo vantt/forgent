@@ -38,8 +38,13 @@ import { execFileSync } from 'node:child_process';
  * shell string. Mirrors merge.mjs's private `git(repoRoot, args)` helper.
  * Throws execFileSync's error on a non-zero exit (callers classify it). */
 function gh(repoRoot, args, opts = {}) {
-  const command = opts.ghCommand || 'gh';
-  return execFileSync(command, args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+  let command = opts.ghCommand || 'gh';
+  let execArgs = args;
+  if (process.platform === 'win32' && (command.endsWith('.cjs') || command.endsWith('.js') || command.endsWith('.mjs'))) {
+    execArgs = [command, ...args];
+    command = process.execPath;
+  }
+  return execFileSync(command, execArgs, { cwd: repoRoot, encoding: 'utf8', shell: false });
 }
 
 function sleep(ms) {

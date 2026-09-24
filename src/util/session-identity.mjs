@@ -108,7 +108,7 @@ function ppidOf(pid, execFile) {
   // entirely and land directly on the same UNRESOLVED-first-hop outcome the
   // try/catch below already produces for "no ps binary on this platform"
   // (D17) -- identical result, no subprocess spawned.
-  if (process.platform === 'win32') return null;
+  if (execFile === execFileSync && process.platform === 'win32') return null;
   try {
     const out = execFile('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8', timeout: PPID_TIMEOUT_MS });
     const parsed = Number.parseInt(String(out).trim(), 10);

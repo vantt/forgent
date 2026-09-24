@@ -62,7 +62,7 @@ test('SPIKE: fgos uninstall --yes --remove-package removes a real npm -g install
     const run = (args) => spawnSync(fgosBin, args, {
       cwd: home,
       encoding: 'utf8',
-      env: { ...process.env, HOME: home, npm_config_prefix: installPrefix },
+      env: { ...process.env, HOME: home, USERPROFILE: home, npm_config_prefix: installPrefix },
     });
 
     const result = run(['uninstall', '--yes', '--remove-package']);
@@ -106,7 +106,7 @@ test('tsk-652: fgos uninstall --yes --remove-package reports "skipped", never a 
     const result = spawnSync(process.execPath, [path.join(REPO_ROOT, 'bin', 'fgos.mjs'), 'uninstall', '--yes', '--remove-package'], {
       cwd: home,
       encoding: 'utf8',
-      env: { ...process.env, HOME: home, npm_config_prefix: emptyPrefix },
+      env: { ...process.env, HOME: home, USERPROFILE: home, npm_config_prefix: emptyPrefix },
     });
     assert.equal(result.status, 0, `fgos uninstall --yes --remove-package failed: ${result.stderr}`);
     const data = JSON.parse(result.stdout).data;

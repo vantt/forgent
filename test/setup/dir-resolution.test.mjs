@@ -35,10 +35,11 @@ function cleanup(...dirs) {
 }
 
 function runFgos(cwd, args, homeDir) {
+  const resolvedHome = homeDir ?? mkTemp('dir-resolution-home-');
   return spawnSync(process.execPath, [FGOS, ...args], {
     cwd,
     encoding: 'utf8',
-    env: { ...NO_CLAUDE_ENV, HOME: homeDir ?? mkTemp('dir-resolution-home-') },
+    env: { ...NO_CLAUDE_ENV, HOME: resolvedHome, USERPROFILE: resolvedHome },
   });
 }
 

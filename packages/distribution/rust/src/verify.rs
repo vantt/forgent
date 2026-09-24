@@ -266,7 +266,16 @@ pub fn verify_legacy_node(
         });
     }
 
-    Ok(real_path)
+    let real_path_clean = {
+        let s = real_path.to_string_lossy();
+        if s.starts_with(r"\\?\") {
+            std::path::PathBuf::from(&s[4..])
+        } else {
+            real_path
+        }
+    };
+
+    Ok(real_path_clean)
 }
 
 /// Verifies a release tree end-to-end:

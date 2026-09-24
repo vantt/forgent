@@ -214,7 +214,7 @@ test('a malformed env value falls through to the next source -- a valid fallback
 // slot for the eval'd script itself -- argv[1]/argv[2] ARE the extra args
 // (verified empirically; differs from running a real file, where argv[1]
 // is the file path).
-test('3-hop walk reaches the real ancestor across a spawned process chain', { timeout: 10_000 }, async () => {
+test('3-hop walk reaches the real ancestor across a spawned process chain', { timeout: 10_000, skip: process.platform === 'win32' }, async () => {
   const CHILD_SCRIPT = `
     const { spawn } = require('node:child_process');
     const depth = Number(process.argv[1]);

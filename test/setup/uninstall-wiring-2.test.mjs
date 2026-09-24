@@ -37,12 +37,12 @@ test('uninstall with no --yes refuses (exit 4) and touches nothing', () => {
   const home = mkTemp('uninstall-cli-noyes-home-');
   initGitRepo(cwd);
   assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home });
+  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home, USERPROFILE: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
   const hooksPathBefore = execFileSync('git', ['config', '--get', 'core.hooksPath'], { cwd, encoding: 'utf8' }).trim();
   assert.equal(hooksPathBefore, path.join(cwd, '.githooks'), 'setup must have wired hooksPath before this test proves uninstall refuses to touch it');
 
-  const result = run(cwd, ['uninstall'], { HOME: home });
+  const result = run(cwd, ['uninstall'], { HOME: home, USERPROFILE: home });
 
   assert.equal(result.status, 4, `expected validation refusal, got status ${result.status}: ${result.stderr}`);
   assert.equal(

@@ -49,7 +49,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { withMergeTargetSlot, MergeError } from '../../src/runner/merge.mjs';
 import { mergeSlotLockFile } from '../../src/runner/main-checkout-lock.mjs';
@@ -79,7 +79,7 @@ function writeHolderChild(dir) {
   fs.writeFileSync(
     childPath,
     `import fs from 'node:fs';
-import { withMergeTargetSlot } from ${JSON.stringify(path.join(REPO_ROOT, 'src/runner/merge.mjs'))};
+import { withMergeTargetSlot } from ${JSON.stringify(pathToFileURL(path.join(REPO_ROOT, 'src/runner/merge.mjs')).href)};
 
 const [lockRoot, targetRef, heldMarker, releaseMarker] = process.argv.slice(2);
 

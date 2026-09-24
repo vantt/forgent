@@ -69,7 +69,7 @@ pub fn resolve_machine_release_store_root() -> PathBuf {
             return PathBuf::from(val).join("fgos");
         }
     }
-    if let Ok(home) = std::env::var("HOME") {
+    if let Ok(home) = std::env::var("HOME").or_else(|_| std::env::var("USERPROFILE")) {
         return PathBuf::from(home).join(".local/state/fgos");
     }
     PathBuf::from(".local/state/fgos")

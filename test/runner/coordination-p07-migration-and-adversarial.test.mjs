@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 
 import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths, recordRunRetry, linkResult, recordDriverDisposition } from '../../src/runner/coordination/store.mjs';
@@ -63,8 +63,8 @@ after(() => {
 function runOldBinary(sessionCwd, coordinationId, action) {
   const oldSrc = extractOldSrc();
   const probe = path.join(os.tmpdir(), `fgos-p07-probe-${process.pid}-${createHash('sha1').update(`${coordinationId}:${action}:${Math.random()}`).digest('hex').slice(0, 12)}.mjs`);
-  const replayUrl = path.join(oldSrc, 'src/runner/coordination/replay.mjs');
-  const storeUrl = path.join(oldSrc, 'src/runner/coordination/store.mjs');
+  const replayUrl = pathToFileURL(path.join(oldSrc, 'src/runner/coordination/replay.mjs')).href;
+  const storeUrl = pathToFileURL(path.join(oldSrc, 'src/runner/coordination/store.mjs')).href;
   fs.writeFileSync(
     probe,
     `import { replaySession } from ${JSON.stringify(replayUrl)};

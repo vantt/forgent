@@ -88,11 +88,18 @@ function writeEnduserManifest(tmp, entries) {
 
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   try {
     return fn();
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) {
+      process.env.USERPROFILE = prevUserProfile;
+    } else {
+      delete process.env.USERPROFILE;
+    }
   }
 }
 

@@ -186,7 +186,7 @@ test('checkHerdrAvailable respects FGOS_HERDR_BIN override (R6)', () => {
   }
 });
 
-test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', () => {
+test('checkHerdrAvailable diagnoses empty FGOS_HERDR_ANCHOR_PANE (R6)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
   // A bare 'herdr' is never guaranteed to be on PATH (it isn't in CI, which
   // never installs the compiled binary there) -- mock FGOS_HERDR_BIN the
   // same way the neighboring F5 test does, so this test exercises the
@@ -218,7 +218,7 @@ process.exit(0);
   }
 });
 
-test('checkHerdrAvailable fails closed when FGOS_HERDR_ANCHOR_PANE cannot be resolved (F5)', () => {
+test('checkHerdrAvailable fails closed when FGOS_HERDR_ANCHOR_PANE cannot be resolved (F5)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX script -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-mock-'));
   const mockScript = path.join(tmp, 'mock-herdr.mjs');
   fs.writeFileSync(mockScript, `#!/usr/bin/env node

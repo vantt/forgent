@@ -30,7 +30,7 @@ function doctorCheck(result, id) {
 test('fgos doctor reports agy-permissions-configured as failing when agy has no settings.json yet', () => {
   const cwd = mkTemp('agy-perms-fresh-cwd-');
   const homeDir = mkTemp('agy-perms-fresh-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const check = doctorCheck(result, 'agy-permissions-configured');
   assert.equal(check.passed, false);
@@ -42,7 +42,7 @@ test('fgos doctor reports agy-permissions-configured as failing when agy has no 
 test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty permissions.deny, then the check passes', () => {
   const cwd = mkTemp('agy-perms-fix-cwd-');
   const homeDir = mkTemp('agy-perms-fix-home-');
-  const env = { ...NO_CLAUDE_ENV, HOME: homeDir };
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
 
   const fixed = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
   assert.equal(fixed.status, 0, fixed.stderr);
@@ -60,7 +60,7 @@ test('fgos doctor --fix provisions toolPermission always-proceed + a non-empty p
 test('fgos doctor --fix run twice does not rewrite an already-configured agy settings.json (fill-missing-only)', () => {
   const cwd = mkTemp('agy-perms-idempotent-cwd-');
   const homeDir = mkTemp('agy-perms-idempotent-home-');
-  const env = { ...NO_CLAUDE_ENV, HOME: homeDir };
+  const env = { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir };
 
   const first = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env });
   assert.equal(first.status, 0, first.stderr);
@@ -88,7 +88,7 @@ test('fgos doctor --fix never touches an existing trustedWorkspaces list or an a
   };
   fs.writeFileSync(settingsPath, JSON.stringify(customSettings, null, 2));
 
-  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor', '--fix'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const check = doctorCheck(result, 'agy-permissions-configured');
   assert.equal(check.passed, true);
@@ -244,7 +244,7 @@ test('checkAgySubHomesConfigured passes when no agy sub-HOMEs are referenced in 
 test('fgos doctor CLI reports agy-sub-homes-configured check', () => {
   const cwd = mkTemp('agy-sub-cli-cwd-');
   const homeDir = mkTemp('agy-sub-cli-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'doctor'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const check = doctorCheck(result, 'agy-sub-homes-configured');
   assert.equal(check.passed, true);

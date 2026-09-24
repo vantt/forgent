@@ -38,7 +38,7 @@ test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source
   fs.writeFileSync(path.join(home, '.bashrc'), '# pre-existing rc content\n');
   initGitRepo(cwd);
   assert.equal(run(cwd, ['init']).status, 0);
-  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home });
+  const setupResult = run(cwd, ['setup'], { ...NO_CLAUDE_ENV, HOME: home, USERPROFILE: home });
   assert.equal(setupResult.status, 0, `setup failed: ${setupResult.stderr}`);
 
   const rcFile = path.join(home, '.bashrc');
@@ -48,7 +48,7 @@ test('uninstall --yes unwires hooks, reports (never deletes) the shell-rc source
   const configPath = path.join(cwd, '.fgos', 'config.json');
   const configBefore = fs.readFileSync(configPath, 'utf8');
 
-  const result = run(cwd, ['uninstall', '--yes'], { HOME: home });
+  const result = run(cwd, ['uninstall', '--yes'], { HOME: home, USERPROFILE: home });
   assert.equal(result.status, 0, `uninstall --yes failed: ${result.stderr}`);
   const data = JSON.parse(result.stdout).data;
 

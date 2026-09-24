@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { claimWork, ClaimError } from '../../src/runner/claim-port.mjs';
 import { LOCK_FILE, DEFAULT_TTL_MS } from '../../src/runner/main-checkout-lock.mjs';
 import { initStore, addWork, moveWork, settleClaim, listWork, FsmError, readRawEvents } from '../../src/state/store.mjs';
@@ -728,9 +728,9 @@ test('claimWork re-validates preClaimStatus against a FRESH durable read: a dura
 
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-claimwork-race-'));
   const childScript = `
-import { readRawEvents } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs'))};
-import { foldEvents } from ${JSON.stringify(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/replay.mjs'))};
-import { claimWork } from ${JSON.stringify(CLAIM_PORT_MJS)};
+import { readRawEvents } from ${JSON.stringify(pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/store.mjs')).href)};
+import { foldEvents } from ${JSON.stringify(pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/replay.mjs')).href)};
+import { claimWork } from ${JSON.stringify(pathToFileURL(CLAIM_PORT_MJS).href)};
 const dir = ${JSON.stringify(dir)};
 const preCheck = foldEvents(readRawEvents(dir));
 process.send({ ack: true, status: preCheck.work['item-a']?.status });

@@ -111,6 +111,15 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
     if (process.platform === "win32" && !resolvedPath.endsWith(".exe") && fs.existsSync(resolvedPath + ".exe")) {
       resolvedPath += ".exe";
     }
+    if (process.platform === "win32" && resolvedPath.endsWith(".sh")) {
+      return {
+        type: "bin",
+        executable: "sh",
+        target: resolvedPath,
+        argsPrefix: [resolvedPath.replace(/\\/g, "/")],
+        spec: entrySpec,
+      };
+    }
     return {
       type: "bin",
       executable: resolvedPath,
@@ -257,7 +266,7 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
   env.FGOS_HARNESS_SHIMMED_COMMANDS = PATH_SHIM_COMMANDS.join(",");
 
   const spawnCmd = entry.executable;
-  const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(testCase.args ?? [])];
+  const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(entry.argsPrefix ?? []), ...(testCase.args ?? [])];
 
   const startTimeIso = new Date().toISOString();
   const t0 = performance.now();
@@ -727,7 +736,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       // which risks new flakiness under the same time pressure that produced
       // the original regex bug -- content-identity proof for this specific
       // case is deferred, not silently dropped.
-      return list.map(entry => entry.path.replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
+      return list.map(entry => entry.path.replaceAll('\\', '/').replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
     }
 
     const normCreatedA = normalizeCreatedFiles(deltaA.created);

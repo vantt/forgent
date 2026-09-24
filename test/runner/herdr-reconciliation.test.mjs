@@ -56,6 +56,11 @@ function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
 const HAS_WORKING_BWRAP = hasWorkingBwrap();
 seedFileLocalBwrapRegistry();
 
+const WIN32_MOCK_HERDR_SKIP =
+  process.platform === 'win32'
+    ? 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract'
+    : false;
+
 function createMockHerdr(tmpDir, scenario = {}) {
   fs.mkdirSync(tmpDir, { recursive: true });
   const scriptPath = path.join(tmpDir, 'mock-herdr.mjs');
@@ -294,7 +299,7 @@ test('2. Confinement Authority refuses herdr-spawn when providerKindOnly or work
 });
 
 // 3. Worker-command digest matches prepared invocation digest; startArgv has separate digest
-test('3. recorded Herdr worker-command suffix and startArgv have distinct valid digests', async () => {
+test('3. recorded Herdr worker-command suffix and startArgv have distinct valid digests', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
   const mock = createMockHerdr(tmp, { runDir });
@@ -403,7 +408,7 @@ test('4. completion strictly requires worker outbox result; Herdr idle or done a
 });
 
 // 5. Fresh launch submits once and commits pending record
-test('5. fresh launch submits once with deterministic herdrName', async () => {
+test('5. fresh launch submits once with deterministic herdrName', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
   const mock = createMockHerdr(tmp, { runDir });
@@ -788,7 +793,7 @@ test('15. unsupported operations cancel and shared-cwd-takeover park immediately
 });
 
 // 16. Legacy ad-hoc naming parity vs Assignment-owned deterministic naming
-test('16. ad-hoc run preserves legacy naming while Assignment run uses deterministic name', async () => {
+test('16. ad-hoc run preserves legacy naming while Assignment run uses deterministic name', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmp = mkTempDir();
   const mock = createMockHerdr(tmp);
 
@@ -888,7 +893,7 @@ test('17. launcher script generation and foreground argv verification', async ()
 });
 
 // 18. Fail-closed triggers when backend is unsupported or foreground argv mismatches
-test('18. fail-closed triggers when backend is unsupported or foreground argv mismatches', async () => {
+test('18. fail-closed triggers when backend is unsupported or foreground argv mismatches', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmp = mkTempDir();
   const runDir = path.join(tmp, 'run');
   const mock = createMockHerdr(tmp, { runDir });

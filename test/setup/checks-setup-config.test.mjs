@@ -50,7 +50,7 @@ test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks pat
   const cwd = mkTemp('setup-cli-hooks-');
   const homeDir = mkTemp('setup-cli-hooks-home-');
   execFileSync('git', ['init', '-q'], { cwd });
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   assert.equal(envelope.data.hooksWired, true);
@@ -63,7 +63,7 @@ test('fgos setup wires core.hooksPath to this checkout\'s absolute .githooks pat
 test('fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist', () => {
   const cwd = mkTemp('setup-cli-global-config-');
   const homeDir = mkTemp('setup-cli-global-config-home-');
-  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir } });
+  const result = spawnSync(process.execPath, [FGOS, 'setup'], { cwd, encoding: 'utf8', env: { ...NO_CLAUDE_ENV, HOME: homeDir, USERPROFILE: homeDir } });
   assert.equal(result.status, 0, result.stderr);
   const envelope = JSON.parse(result.stdout);
   const expectedGlobalPath = path.join(homeDir, '.fgos', 'config.json');

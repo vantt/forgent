@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fork } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { appendEvent, readEvents, repairTruncatedLastLine, EventLogError } from '../../src/state/events.mjs';
 import { SCHEMA_VERSION } from '../../src/state/work.mjs';
 
-const EVENTS_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/state/events.mjs');
+const EVENTS_MJS = pathToFileURL(path.resolve(fileURLToPath(import.meta.url), '../../../src/state/events.mjs')).href;
 
 // Every test gets its own mkdtemp dir — never touch the repo's .fgos/.
 function tmpLogPath() {
