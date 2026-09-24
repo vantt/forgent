@@ -109,6 +109,8 @@ export function buildTestEnv(env = process.env) {
  * run are byte-for-byte identical in every way except which files are
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
  */
+export const KEEP_TMP_ENV = 'FGOS_TEST_KEEP_TMP';
+
 export function runSelectedTests(files, {
   cwd = REPO_ROOT,
   forwardedArgs = [],
@@ -116,27 +118,44 @@ export function runSelectedTests(files, {
   spawn = spawnSync,
   env = process.env,
   stdio = 'inherit',
+  log = (msg) => console.error(msg),
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
-  // Every temp dir a test makes lands in one per-run root that is removed
-  // when the run ends. Tests create fixtures under os.tmpdir() and most never
-  // delete them; left in the shared temp dir they accumulated by the hundred
-  // thousand across runs until the filesystem ran out of inodes (ENOSPC on
-  // every mkdtemp, machine-wide).
+  // Every temp dir the suite creates lands under one per-run directory that
+  // is removed once the run ends: tests mkdtemp fixtures (git repos,
+  // worktrees, .fgos stores) and mostly never delete them, so without this
+  // each full run leaves tens of thousands of dirs in the OS temp dir --
+  // enough, across a day of concurrent runs, to exhaust the disk's inodes.
+  // buildTestEnv also strips an inherited NODE_TEST_CONTEXT (a nested
+  // `node --test` would otherwise report to a parent that isn't listening
+  // and exit without running anything) and applies darwin's own TMPDIR
+  // realpath fix to the OUTER temp root; this per-run dir is created inside
+  // that already-resolved root, so it needs no realpath of its own.
   const childEnv = buildTestEnv(env);
-  const runTmpRoot = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
+  let runTemp = null;
   try {
-    const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), {
-      cwd,
-      env: { ...childEnv, TMPDIR: runTmpRoot, TMP: runTmpRoot, TEMP: runTmpRoot },
-      stdio,
-    });
-    return { status: result.status ?? 1, files: relFiles };
+    runTemp = fs.mkdtempSync(path.join(childEnv.TMPDIR || os.tmpdir(), 'fgos-test-run-'));
+    childEnv.TMPDIR = runTemp;
+    childEnv.TMP = runTemp;
+    childEnv.TEMP = runTemp;
+  } catch {
+    // If the temp root is unusable, let Node's normal temp logic fail naturally.
+    runTemp = null;
+  }
+  try {
+    const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+    return { status: result.status ?? 1, files: relFiles, runTemp };
   } finally {
-    try {
-      fs.rmSync(runTmpRoot, { recursive: true, force: true, maxRetries: 3 });
-    } catch {
-      // A file still held open (Windows) must not turn a finished run into a failure.
+    if (runTemp) {
+      if (env[KEEP_TMP_ENV] === '1') {
+        log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);
+      } else {
+        try {
+          fs.rmSync(runTemp, { recursive: true, force: true, maxRetries: 3 });
+        } catch {
+          // A file still held open (Windows) must not turn a finished run into a failure.
+        }
+      }
     }
   }
 }

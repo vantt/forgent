@@ -8,9 +8,9 @@ jobs:
   nightly-mutate:
     name: Nightly Fault Injection and Coverage
     runs-on: ubuntu-latest
-    # Backstop only: the coverage step bounds every test file itself, so this
-    # just stops a job-level stall from holding a runner for GitHub's 6h default.
-    timeout-minutes: 120
+    # Backstop: the coverage step bounds every test file itself; this covers
+    # the mutation step too, sized against a real full run (~55 min end to end).
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
         with:

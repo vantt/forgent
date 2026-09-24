@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -312,18 +312,57 @@ test('buildTestEnv drops an inherited NODE_TEST_CONTEXT so a nested node --test 
   assert.equal(env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS, '1');
 });
 
-test('runSelectedTests gives the run its own temp root and removes it afterwards, so test fixtures never pile up in the shared temp dir', () => {
-  let seenTmp = null;
-  const spawn = (execPath, argv, opts) => {
-    seenTmp = opts.env.TMPDIR;
-    assert.equal(opts.env.TMP, seenTmp);
-    assert.equal(opts.env.TEMP, seenTmp);
-    assert.ok(fs.statSync(seenTmp).isDirectory(), 'the root exists while the tests run');
-    fs.writeFileSync(path.join(seenTmp, 'leaked-fixture.txt'), 'x');
-    return { status: 0 };
-  };
-  const { status } = runSelectedTests([path.join(REPO_ROOT, 'test/smoke.test.mjs')], { spawn, stdio: 'ignore' });
-  assert.equal(status, 0);
-  assert.match(path.basename(seenTmp), /^fgos-test-run-/);
-  assert.equal(fs.existsSync(seenTmp), false, 'the whole per-run root, leftovers included, is gone after the run');
+// --- per-run temp dir: every fixture the suite mkdtemps lands under one
+// directory that is removed when the run ends, so leaked fixtures can never
+// pile up in the OS temp dir across runs.
+
+function tempBase() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-tmpbase-'));
+}
+
+test('runSelectedTests points the child at a fresh per-run temp dir and removes it when the run ends', () => {
+  const base = tempBase();
+  let seen;
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => {
+      seen = opts.env;
+      fs.writeFileSync(path.join(opts.env.TMPDIR, 'leaked-fixture'), 'x'); // a test that never cleans up
+      return { status: 0 };
+    },
+  });
+  assert.equal(result.status, 0);
+  assert.equal(path.dirname(seen.TMPDIR), fs.realpathSync(base));
+  assert.match(path.basename(seen.TMPDIR), /^fgos-test-run-/);
+  assert.equal(seen.TMP, seen.TMPDIR);
+  assert.equal(seen.TEMP, seen.TMPDIR);
+  assert.equal(fs.existsSync(seen.TMPDIR), false, 'the per-run dir and everything leaked into it is gone');
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests keeps the per-run temp dir when FGOS_TEST_KEEP_TMP=1, and says where', () => {
+  const base = tempBase();
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base, [KEEP_TMP_ENV]: '1' },
+    spawn: () => ({ status: 0 }),
+    log: (msg) => logs.push(msg),
+  });
+  assert.equal(fs.existsSync(result.runTemp), true);
+  assert.match(logs.join('\n'), new RegExp(result.runTemp.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests removes the per-run temp dir even when spawning the suite throws', () => {
+  const base = tempBase();
+  let runTemp;
+  assert.throws(() => runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    env: { TMPDIR: base },
+    spawn: (_exec, _argv, opts) => { runTemp = opts.env.TMPDIR; throw new Error('spawn blew up'); },
+  }), /spawn blew up/);
+  assert.equal(fs.existsSync(runTemp), false);
+  fs.rmSync(base, { recursive: true, force: true });
 });

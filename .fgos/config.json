@@ -829,5 +829,10 @@
   },
   "docRegistry": {
     "enforce": true
+  },
+  "worktreeSetup": {
+    "commands": [
+      "cargo build --release --workspace"
+    ]
   }
 }
