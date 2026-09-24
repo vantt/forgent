@@ -134,8 +134,10 @@ export function toolsFromExecutors(executors) {
 // elsewhere on PATH.
 export function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH) {
   const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];
-  const exts = process.platform === 'win32' ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';') : [''];
+  const defaultExts = process.platform === 'win32' ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').filter(Boolean) : [''];
   for (const name of candidateNames) {
+    const hasExt = process.platform === 'win32' && path.extname(name) !== '';
+    const exts = hasExt ? ['', ...defaultExts] : defaultExts;
     for (const dir of dirs) {
       for (const ext of exts) {
         try {

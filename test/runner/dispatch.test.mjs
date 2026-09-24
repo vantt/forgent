@@ -53,7 +53,7 @@ import { classifyDispatchConfidence, classifyDispatchResult } from '../../src/re
 // ever invoked, and nothing here writes `.fgos/` or touches the main repo.
 
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-test-'));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-test-')));
 }
 
 /** tsk-2ig: a real, minimal git repo (not just a bare tmpdir) — `fgosDir`

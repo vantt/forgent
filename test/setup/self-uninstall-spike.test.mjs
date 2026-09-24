@@ -112,7 +112,7 @@ test('tsk-652: fgos uninstall --yes --remove-package reports "skipped", never a 
     const data = JSON.parse(result.stdout).data;
     assert.equal(data.packageRemoval.attempted, false, 'must never claim it attempted removal when npm never had this package');
     assert.equal(data.packageRemoval.outcome, 'skipped', 'must report "skipped", never a false "removed" or a misleading "failed"');
-    assert.match(data.packageRemoval.reason, /npm's own global node_modules/);
+    assert.match(data.packageRemoval.reason, /npm's own global node_modules|npm not on PATH/);
     assert.match(data.packageRemoval.reason, /pnpm\/yarn/);
   } finally {
     fs.rmSync(emptyPrefix, { recursive: true, force: true });

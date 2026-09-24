@@ -4368,8 +4368,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // manager" scope tsk-4iv-2's own SPIKE locked (npm-only), never
         // widened here to actually support pnpm/yarn removal.
         let npmRootG = null;
+        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
         try {
-          npmRootG = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+          npmRootG = execFileSync(npmCmd, ['root', '-g'], { encoding: 'utf8', shell: process.platform === 'win32' }).trim();
         } catch {
           npmRootG = null;
         }
@@ -4384,7 +4385,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           };
         } else {
           try {
-            const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+            const output = execFileSync(npmCmd, ['uninstall', '-g', 'forgent'], { encoding: 'utf8', shell: process.platform === 'win32' });
             packageRemoval = { attempted: true, outcome: 'removed', output };
           } catch (err) {
             packageRemoval = {

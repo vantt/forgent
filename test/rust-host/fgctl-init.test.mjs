@@ -152,12 +152,12 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.equal(versionEnv.contract, 'fgos.v1');
     assert.equal(versionEnv.data.host, 'rust');
     assert.equal(versionEnv.data.artifactDigest, activation.artifactDigest);
-    assert.equal(versionEnv.data.projectRoot, fs.realpathSync(tempProj));
+    assert.equal(versionEnv.data.projectRoot, fs.realpathSync.native(tempProj));
     assert.equal(versionEnv.data.workspaceId, rootJson.workspaceId);
     assert.equal(versionEnv.data.workStateId, rootJson.workStateId);
     assert.equal(
       versionEnv.data.workHistoryRoot,
-      path.join(fs.realpathSync(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId)
+      path.join(fs.realpathSync.native(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId)
     );
     assert.equal(versionEnv.data.machineReleaseStore, tempState);
     assert.equal(versionEnv.data.schemaVersion, 1);

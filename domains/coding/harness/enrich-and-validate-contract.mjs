@@ -126,7 +126,7 @@ export function enrichAndValidateContract(contract, { domain, work } = {}) {
   // already proposed, de-duplicated by exact string match.
   const contextRefs = Array.isArray(contract.contextRefs) ? [...contract.contextRefs] : [];
   if (work.docsRef) {
-    for (const ref of [work.docsRef, path.join(work.docsRef, 'plan.md'), path.join(work.docsRef, 'CONTEXT.md')]) {
+    for (const ref of [work.docsRef, path.posix.join(work.docsRef, 'plan.md'), path.posix.join(work.docsRef, 'CONTEXT.md')]) {
       if (!contextRefs.includes(ref)) contextRefs.push(ref);
     }
   }

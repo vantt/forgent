@@ -18,7 +18,7 @@ import {
 import { loadGlobalConfig } from '../../src/config/global-config.mjs';
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 function writeStub(filePath) {

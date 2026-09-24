@@ -17,7 +17,7 @@ import {
 // (forgent itself), mirroring worktree.test.mjs's own convention.
 
 function initTempRepo() {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-repo-'));
+  const repoRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-repo-')));
   execFileSync('git', ['init', '-q'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -28,7 +28,7 @@ function initTempRepo() {
 }
 
 function mkWorktreeDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-dir-'));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-dir-')));
 }
 
 // --- claim-isolate -----------------------------------------------------

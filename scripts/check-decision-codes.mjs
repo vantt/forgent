@@ -103,7 +103,7 @@ function collectTestFiles(dir, exclude) {
 
 function loadSourceFiles(testDir, cwd, exclude) {
   return collectTestFiles(testDir, exclude).map((full) => ({
-    file: path.relative(cwd, full),
+    file: path.relative(cwd, full).replaceAll('\\', '/'),
     lines: fs.readFileSync(full, 'utf8').split('\n'),
   }));
 }

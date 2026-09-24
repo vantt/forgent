@@ -15,7 +15,7 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const NO_CLAUDE_ENV = { FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTemp(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 function run(cwd, args, extraEnv = {}) {

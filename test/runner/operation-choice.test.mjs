@@ -1656,7 +1656,7 @@ test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunRes
       executorScript,
       scriptContent.replace(
         "import path from 'node:path';",
-        `import path from 'node:path';\n    fs.writeFileSync('${path.join(tempDir, declaredFile)}', 'declared content');`,
+        `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, declaredFile))}, 'declared content');`,
       ),
     );
     const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
@@ -1687,7 +1687,7 @@ test('Step 06 Cell 6.6 end-to-end: executeAssignment + interpretAssignmentRunRes
       executorScript,
       scriptContent.replace(
         "import path from 'node:path';",
-        `import path from 'node:path';\n    fs.writeFileSync('${path.join(tempDir, declaredFile)}', 'declared content 2');\n    fs.writeFileSync('${path.join(tempDir, undeclaredFile)}', 'undeclared content');`,
+        `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, declaredFile))}, 'declared content 2');\n    fs.writeFileSync(${JSON.stringify(path.join(tempDir, undeclaredFile))}, 'undeclared content');`,
       ),
     );
     const runResult = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig: runnerConfigFor(executorScript) });
@@ -2808,7 +2808,7 @@ test('Finding 2: executeAssignment fails closed on read-only validate-plan mutat
   const scriptContent = fs.readFileSync(executorScript, 'utf8');
   const mutatingScriptContent = scriptContent.replace(
     "import path from 'node:path';",
-    "import path from 'node:path';\n    fs.writeFileSync('" + dirtyTmpPath + "', 'dirty temp data');\n    fs.writeFileSync('" + planPath + "', '# Dirty modified plan\\n');"
+    `import path from 'node:path';\n    fs.writeFileSync(${JSON.stringify(dirtyTmpPath)}, 'dirty temp data');\n    fs.writeFileSync(${JSON.stringify(planPath)}, '# Dirty modified plan\\n');`
   );
   fs.writeFileSync(executorScript, mutatingScriptContent);
 

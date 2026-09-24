@@ -127,12 +127,25 @@ export function resolveProjectLocalBin(startDir) {
  * never called on a hot path without the cache-first check below first).
  */
 export function probeGlobalBin() {
-  try {
-    const onPath = execFileSync('sh', ['-c', 'command -v fgos'], { encoding: 'utf8' }).trim();
-    return onPath || null;
-  } catch {
-    return null;
+  const dirs = typeof process.env.PATH === 'string' && process.env.PATH
+    ? process.env.PATH.split(path.delimiter).filter(Boolean)
+    : [];
+  const exts = process.platform === 'win32'
+    ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').filter(Boolean)
+    : [''];
+  for (const dir of dirs) {
+    const candidates = process.platform === 'win32' ? ['', ...exts] : [''];
+    for (const ext of candidates) {
+      const candidatePath = path.join(dir, `fgos${ext}`);
+      try {
+        fs.accessSync(candidatePath, fs.constants.X_OK);
+        return candidatePath;
+      } catch {
+        // keep scanning
+      }
+    }
   }
+  return null;
 }
 
 /**

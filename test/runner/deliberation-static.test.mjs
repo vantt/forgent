@@ -98,7 +98,7 @@ function findForbiddenImportViolations(rootDir) {
   for (const entryFile of entryFiles) {
     for (const { file, specifier } of collectTransitiveImports(entryFile)) {
       const resolved = specifier.startsWith('.') ? resolveRelativeImport(file, specifier) : specifier;
-      const checkTarget = specifier.startsWith('.') ? toRepoRelative(resolved) : resolved;
+      const checkTarget = (specifier.startsWith('.') ? toRepoRelative(resolved) : resolved).replaceAll('\\', '/');
       for (const forbidden of FORBIDDEN_IMPORT_SUBSTRINGS) {
         if (checkTarget.includes(forbidden)) {
           violations.push(

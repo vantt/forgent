@@ -120,12 +120,14 @@ export function isSessionWorktree(repoRoot) {
   let linkRealPath;
   let mainFgosRealPath;
   try {
-    linkRealPath = fs.realpathSync(linkPath);
-    mainFgosRealPath = fs.realpathSync(fgosDirOf(mainCheckoutRoot));
+    linkRealPath = fs.realpathSync.native(linkPath);
+    mainFgosRealPath = fs.realpathSync.native(fgosDirOf(mainCheckoutRoot));
   } catch {
     return false;
   }
-  return linkRealPath === mainFgosRealPath;
+  return process.platform === 'win32'
+    ? linkRealPath.toLowerCase() === mainFgosRealPath.toLowerCase()
+    : linkRealPath === mainFgosRealPath;
 }
 
 /** Remove the `.fgos` symlink we created inside a session worktree. It is our
@@ -208,7 +210,7 @@ function tryAcquireOnce(lockPath, pid) {
     try {
       fs.unlinkSync(tmpPath);
     } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
+      if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
     }
   }
 
@@ -216,7 +218,7 @@ function tryAcquireOnce(lockPath, pid) {
   try {
     raw = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // released in between — retry create
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // released in between — retry create
     throw err;
   }
   const holderPid = parseInt(raw.trim(), 10);
@@ -234,7 +236,7 @@ function tryAcquireOnce(lockPath, pid) {
   try {
     current = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // already cleaned
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // already cleaned
     throw err;
   }
   if (current !== raw) {
@@ -244,7 +246,7 @@ function tryAcquireOnce(lockPath, pid) {
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
+    if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
   }
   return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
 }
@@ -267,7 +269,7 @@ export function acquireSessionsLock(fgosDir, { pid = process.pid, timeoutMs = 10
           try {
             fs.unlinkSync(lockPath);
           } catch (err) {
-            if (err.code !== 'ENOENT') throw err;
+            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
           }
         },
       };

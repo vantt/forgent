@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
+import os from 'node:os';
 
 test('--plan-out writes valid JSON', () => {
-  const planOut = path.join('/tmp', 'test-plan-out.json');
+  const planOut = path.join(os.tmpdir(), 'test-plan-out.json');
   if (fs.existsSync(planOut)) fs.rmSync(planOut);
   
   execFileSync(process.execPath, ['scripts/test-select.mjs', '--base', 'main', '--plan-out', planOut], { encoding: 'utf8' });

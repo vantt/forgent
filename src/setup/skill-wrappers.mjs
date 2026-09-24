@@ -119,10 +119,11 @@ export function generateWrapperContent(sourceContent, sourceRelativePath) {
   if (!frontmatter) {
     throw new Error('generateWrapperContent: source has no YAML frontmatter block (---...---) to copy');
   }
+  const relPath = sourceRelativePath.replaceAll('\\', '/');
   return (
     `${frontmatter}\n` +
     `${GENERATED_WRAPPER_MARKER}\n` +
-    `The real skill content lives at \`${sourceRelativePath}\`, this project's own canonical skill source.\n` +
+    `The real skill content lives at \`${relPath}\`, this project's own canonical skill source.\n` +
     'Read that file and follow it directly.\n'
   );
 }

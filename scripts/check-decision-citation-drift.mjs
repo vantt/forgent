@@ -274,7 +274,7 @@ function loadSourceFiles(
   const sources = [];
   if (fs.existsSync(backlogPath)) {
     sources.push({
-      file: path.relative(cwd, backlogPath),
+      file: path.relative(cwd, backlogPath).replaceAll('\\', '/'),
       lines: fs
         .readFileSync(backlogPath, 'utf8')
         .split('\n'),
@@ -287,7 +287,7 @@ function loadSourceFiles(
     for (const file of specFiles) {
       const fullPath = path.join(specsDir, file);
       sources.push({
-        file: path.relative(cwd, fullPath),
+        file: path.relative(cwd, fullPath).replaceAll('\\', '/'),
         lines: fs
           .readFileSync(fullPath, 'utf8')
           .split('\n'),
@@ -297,7 +297,7 @@ function loadSourceFiles(
   for (const dir of skillsDirs) {
     for (const full of collectMarkdownFiles(dir)) {
       sources.push({
-        file: path.relative(cwd, full),
+        file: path.relative(cwd, full).replaceAll('\\', '/'),
         lines: fs.readFileSync(full, 'utf8').split('\n'),
       });
     }
@@ -350,7 +350,7 @@ export function collectWideSourceFiles(cwd, { roots = WIDE_SWEEP_ROOTS, excludeR
       const current = stack.pop();
       for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
         const abs = path.join(current, entry.name);
-        const rel = path.relative(cwd, abs);
+        const rel = path.relative(cwd, abs).replaceAll('\\', '/');
         if (entry.isDirectory()) {
           if (WIDE_SWEEP_SKIP_DIR_NAMES.has(entry.name) || isExcluded(rel)) continue;
           stack.push(abs);

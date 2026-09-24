@@ -78,9 +78,9 @@ test('every .claude/skills/<name>/SKILL.md is exactly the wrapper generateWrappe
   for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
     const wrapperPath = path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md');
     const sourcePath = path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md');
-    const actualWrapper = fs.readFileSync(wrapperPath, 'utf8');
-    const sourceContent = fs.readFileSync(sourcePath, 'utf8');
-    const expectedWrapper = generateWrapperContent(sourceContent, path.relative(path.dirname(wrapperPath), sourcePath));
+    const actualWrapper = fs.readFileSync(wrapperPath, 'utf8').replaceAll('\r\n', '\n');
+    const sourceContent = fs.readFileSync(sourcePath, 'utf8').replaceAll('\r\n', '\n');
+    const expectedWrapper = generateWrapperContent(sourceContent, path.relative(path.dirname(wrapperPath), sourcePath)).replaceAll('\r\n', '\n');
     assert.equal(
       actualWrapper,
       expectedWrapper,
@@ -91,8 +91,8 @@ test('every .claude/skills/<name>/SKILL.md is exactly the wrapper generateWrappe
 
 test('every .claude/skills/<name>/SKILL.md wrapper carries the exact same frontmatter as its .agents/skills source (name/description stay correct for Claude Code\'s own skill listing)', () => {
   for (const name of listFgosSkillDirs(CLAUDE_SKILLS_ROOT)) {
-    const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
-    const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8');
+    const wrapperContent = fs.readFileSync(path.join(CLAUDE_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
+    const sourceContent = fs.readFileSync(path.join(AGENTS_SKILLS_ROOT, name, 'SKILL.md'), 'utf8').replaceAll('\r\n', '\n');
     assert.equal(
       extractFrontmatter(wrapperContent),
       extractFrontmatter(sourceContent),
