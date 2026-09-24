@@ -239,8 +239,8 @@ Following synchronization with the I08b integration candidate baseline (branch `
   - Contains all 5 test suites (41 tests total: 38 passed, 3 todo, 0 failed) adhering to permanent standard file names and free of plan-specific labels.
 - **Evaluated Candidate SHA**: `27ffb3767f1bec58f48ef611fb8a6353f8cdb76a` (`docs(coordination): record DAG verification and production fix evidence accounting`, approved in independent review: 0 blocker, 0 high)
 - **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
-- **I08b Integration Candidate Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`; pending formal landing onto main)
-- **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`)
+- **I08b Landed Baseline SHA**: `ba8f6a9dca8c84ba1561ab5802e2c89a2010446c` (on `main`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30` and candidate `c6262fb1d86c78af141032dace09011c847715be`)
+- **Post-I08b-Landing Synchronized SHA**: `2613471e80446d5b005c5362c99817293f77b447` (`merge: synchronize main@ba8f6a9d into coordination-skill-harness-i10-dag-verification`)
 - **Integration SHA**: (pending merge into main)
 
 ### Callers Analysis
@@ -257,6 +257,6 @@ Following synchronization with the I08b integration candidate baseline (branch `
 
 ## 5. Next Steps
 
-Unit I10 verification, production fix, and synchronization with the I08b integration candidate baseline (`c6262fb1` / `98f501be`) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified on the post-I08b synchronized tip.
+Unit I10 verification, production fix, and synchronization with `main@ba8f6a9d` (incorporating Unit I08b landed baseline) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified.
 
-Unit I10 status is **ready for conditional independent re-review (synchronized with I08b integration candidate c6262fb1; conditional on c6262fb1 landing on main unchanged)** awaiting Track Manager confirmation of I08b landing on main. Unit **I11** remains blocked pending I08 and I10 integration approval.
+With Unit I08b landed at `main@ba8f6a9d` (satisfying the ancestor condition), Unit I10 status is **ready for final independent review for integration (APPROVE FOR INTEGRATION)**. Unit **I11** remains blocked pending I08 re-verification and I10 integration approval.
