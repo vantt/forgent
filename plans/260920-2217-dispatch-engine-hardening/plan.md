@@ -95,7 +95,7 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Phase 01 R1/R4/R5 (Result truth & settlement CAS) integrated as Units **I02** and **I03** (`main@4362bfec`).
   - Phase 05 remainder (Cross-provider redirect governance & PlacementPolicy binding) integrated as Unit **I06** (`main@3bab9b99`).
   - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** (implementation) and **I08** (verification).
-  - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
+  - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (READY; dependency Unit I11 VERIFIED at main@7d7dc2750f9fb80716a7cffae03d67605629cf9a).
 - **Unit I07 (Dispatch Hardening Phase 08 Operability/CLI Surface & Doctor) Accounting:**
   - Evaluated candidate `439a1fb078418edff7628555c4b6cb9f4015e4e6` approved in independent review (0 blocker, 0 high, 113 focused passing).
   - Synchronized candidate `6a638752` integrated locally; remote synchronized candidate `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` approved for integration; fast-forwarded `main` to `261ed7ea`.
