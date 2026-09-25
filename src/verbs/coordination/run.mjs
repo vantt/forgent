@@ -777,7 +777,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           }
         } else {
           resumedDagStates.set(node.displayLabel, {
-            outcome: 'deferred',
+            outcome: 'materialized',
             resumed: true,
             result: {
               as: node.displayLabel,
@@ -787,7 +787,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
               door: 'dispatchDeclaredOperation',
               authoritativeSettled: false,
               settled: false,
-              schedulerOutcome: 'deferred',
+              schedulerOutcome: 'materialized',
             },
           });
         }
@@ -816,7 +816,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           if (asgnId && !settledIdsNow.has(asgnId)) {
             stepResult.authoritativeSettled = false;
             stepResult.settled = false;
-            stepResult.schedulerOutcome = 'deferred';
+            stepResult.schedulerOutcome = 'materialized';
           }
           stepResults.push(stepResult);
           return stepResult;
@@ -831,7 +831,10 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
         result.schedulerOutcome = state.outcome;
         result.resumed = state.resumed === true || result.resumed === true;
         if (state.error) result.error = state.error;
-        if (state.blockedBy) result.blockedBy = [state.blockedBy === 'terminal-session' ? state.blockedBy : `node-${state.blockedBy}`];
+        if (state.blockedBy) {
+          const rawBlocked = Array.isArray(state.blockedBy) ? state.blockedBy : [state.blockedBy];
+          result.blockedBy = rawBlocked.map((b) => (b === 'terminal-session' ? b : (b.startsWith('node-') ? b : `node-${b}`)));
+        }
         if (state.overlapGroup) result.overlapGroup = state.overlapGroup;
 
         const node = dagDeclaration.nodes.find((n) => n.displayLabel === state.as);
@@ -866,7 +869,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
   }
 
   const hasDagCaveat = Boolean(dagDeclaration && dagCaveats?.size > 0);
-  const hasPartialDagOutcome = dagDeclaration && stepResults.some((step) => ['deferred', 'refused', 'blocked'].includes(step.schedulerOutcome));
+  const hasPartialDagOutcome = dagDeclaration && stepResults.some((step) => ['deferred', 'refused', 'blocked', 'materialized'].includes(step.schedulerOutcome));
   const quorumBeforeClose = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;

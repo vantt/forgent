@@ -22,11 +22,11 @@ export function resolveNodeCwd(node, nodeAssignments = [], fgosDir = null, defau
     return path.resolve(node.semantics.cwd);
   }
   if (fgosDir && Array.isArray(nodeAssignments)) {
-    for (const asgn of nodeAssignments) {
+    for (const asgn of [...nodeAssignments].reverse()) {
       const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
       if (fs.existsSync(runsDir)) {
         try {
-          const attempts = fs.readdirSync(runsDir);
+          const attempts = fs.readdirSync(runsDir).sort().reverse();
           for (const attempt of attempts) {
             const runJsonPath = path.join(runsDir, attempt, 'run.json');
             if (fs.existsSync(runJsonPath)) {
@@ -133,8 +133,12 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
           }
         }
       } else {
-        state.outcome = settled.result?.schedulerOutcome ?? 'deferred';
+        const outcome = settled.result?.schedulerOutcome ?? 'materialized';
+        state.outcome = outcome;
         state.result = settled.result;
+        if (outcome === 'refused') {
+          blockDescendants(settled.step.as, settled.step.as);
+        }
       }
     } else {
       const outcome = outcomeFor(settled.error);
@@ -149,9 +153,18 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
   if (integrityError) throw integrityError;
   for (const step of steps) {
     const state = states.get(step.as);
-    // A ready node denied by the authoritative store cap has already been
-    // classified. Pending here means no invocation-owned capacity can free.
-    if (state.outcome === 'pending') state.outcome = 'deferred';
+    if (state.outcome === 'pending') {
+      const node = nodeByLabel.get(step.as);
+      const depLabels = (node?.dependsOn ?? []).map((id) => id.slice('node-'.length));
+      const unsettledDeps = depLabels.filter((label) => states.get(label)?.outcome !== 'settled');
+      const allUnsettledAreDeferred = unsettledDeps.length > 0 && unsettledDeps.every((label) => states.get(label)?.outcome === 'deferred');
+      if (allUnsettledAreDeferred) {
+        state.outcome = 'deferred';
+      } else if (unsettledDeps.length > 0) {
+        state.outcome = 'blocked';
+        state.blockedBy = unsettledDeps;
+      }
+    }
   }
   return steps.map((step) => ({ as: step.as, index: index.get(step.as), ...states.get(step.as) }));
 }

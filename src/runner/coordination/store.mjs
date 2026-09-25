@@ -1497,43 +1497,6 @@ export function recordDriverDispositionLocked(coordinationId, { targetRef, dispo
   // lock.
   const eventsForRefs = readEvents(eventsPath);
 
-  if (disposition === 'cell-closed') {
-    const dagEvent = eventsForRefs.find((e) => e.type === 'dag-declared');
-    if (dagEvent?.payload?.declaration) {
-      const declaredNodes = dagEvent.payload.declaration.nodes;
-      const getNodeCwd = (id) => {
-        const node = declaredNodes.find((n) => n.id === id);
-        let cwd = node?.semantics?.canonicalCwd || node?.semantics?.cwd;
-        if (!cwd && fgosDir) {
-          for (const asgnId of manifest.assignmentRefs) {
-            const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
-            if (fs.existsSync(runsDir)) {
-              try {
-                const attempts = fs.readdirSync(runsDir);
-                for (const attempt of attempts) {
-                  const runJsonPath = path.join(runsDir, attempt, 'run.json');
-                  if (fs.existsSync(runJsonPath)) {
-                    const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-                    if (run.cwd) { cwd = run.cwd; break; }
-                  }
-                }
-              } catch {}
-            }
-            if (cwd) break;
-          }
-        }
-        return path.resolve(cwd ?? opts.cwd ?? process.cwd());
-      };
-      const caveats = computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd });
-      if (caveats.size > 0) {
-        throw new CoordinationError(
-          'validation',
-          `recordDriverDisposition: session "${coordinationId}" has unadjudicated shared-cwd caveats (recheck-required) -- cannot record "cell-closed" disposition`,
-        );
-      }
-    }
-  }
-
   const contributionIds = linkedContributionIds(eventsForRefs);
   const humanTurnIds = recordedHumanTurnIds(eventsForRefs);
   assertDispositionRefOwnedBySession(targetRef, {
@@ -1544,6 +1507,117 @@ export function recordDriverDispositionLocked(coordinationId, { targetRef, dispo
     contributionIds,
     humanTurnIds,
   });
+  evidenceRefs.forEach((ref, i) =>
+    assertDispositionRefOwnedBySession(ref, {
+      coordinationId,
+      assignmentRefs: manifest.assignmentRefs,
+      fgosDir,
+      label: `recordDriverDisposition: evidenceRefs[${i}]`,
+      contributionIds,
+      humanTurnIds,
+    }),
+  );
+
+  const EVIDENCE_ACCEPTING_DISPOSITIONS = new Set(['cell-closed', 'accepted', 'accept']);
+
+  if (EVIDENCE_ACCEPTING_DISPOSITIONS.has(disposition)) {
+    const dagEvent = eventsForRefs.find((e) => e.type === 'dag-declared');
+    if (dagEvent?.payload?.declaration) {
+      const declaredNodes = dagEvent.payload.declaration.nodes;
+
+      const asgnToNode = new Map();
+      for (const event of eventsForRefs) {
+        if (event.type === 'assignment-created') {
+          const asgnId = event.payload?.assignmentId || event.payload?.id;
+          const dagNodeId = event.payload?.dagNodeId;
+          if (!asgnId) continue;
+          if (asgnToNode.has(asgnId) && asgnToNode.get(asgnId) !== dagNodeId) {
+            throw new CoordinationError(
+              'corrupt-log',
+              `recordDriverDisposition: assignment "${asgnId}" has conflicting dagNodeId declarations in event log ("${asgnToNode.get(asgnId)}" vs "${dagNodeId}")`,
+            );
+          }
+          asgnToNode.set(asgnId, dagNodeId);
+        }
+      }
+
+      const verifyAssignmentOwnership = (asgnId, refLabel) => {
+        if (manifest.assignmentRefs.includes(asgnId)) {
+          const nodeId = asgnToNode.get(asgnId);
+          if (!nodeId) {
+            throw new CoordinationError(
+              'validation',
+              `recordDriverDisposition: ${refLabel} "${asgnId}" has missing dagNodeId ownership in session "${coordinationId}"`,
+            );
+          }
+          if (!declaredNodes.some((n) => n.id === nodeId)) {
+            throw new CoordinationError(
+              'validation',
+              `recordDriverDisposition: ${refLabel} "${asgnId}" references unknown or ambiguous dagNodeId "${nodeId}" in session "${coordinationId}"`,
+            );
+          }
+        }
+      };
+      verifyAssignmentOwnership(targetRef, 'target assignment');
+      evidenceRefs.forEach((ref, i) => verifyAssignmentOwnership(ref, `evidenceRefs[${i}]`));
+
+      const getNodeCwd = (id) => {
+        const node = declaredNodes.find((n) => n.id === id);
+        if (!node) {
+          throw new CoordinationError(
+            'validation',
+            `recordDriverDisposition: node "${id}" is not declared in DAG for session "${coordinationId}"`,
+          );
+        }
+        let cwd = node.semantics?.canonicalCwd || node.semantics?.cwd;
+        if (!cwd && fgosDir) {
+          const matchingAsgnIds = manifest.assignmentRefs.filter((asgnId) => asgnToNode.get(asgnId) === id);
+          for (const asgnId of [...matchingAsgnIds].reverse()) {
+            const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
+            if (fs.existsSync(runsDir)) {
+              let attempts;
+              try {
+                attempts = fs.readdirSync(runsDir).sort().reverse();
+              } catch (err) {
+                throw new CoordinationError(
+                  'corrupt-log',
+                  `recordDriverDisposition: failed to read runs for assignment "${asgnId}": ${err.message}`,
+                );
+              }
+              for (const attempt of attempts) {
+                const runJsonPath = path.join(runsDir, attempt, 'run.json');
+                if (fs.existsSync(runJsonPath)) {
+                  let run;
+                  try {
+                    run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+                  } catch (err) {
+                    throw new CoordinationError(
+                      'corrupt-log',
+                      `recordDriverDisposition: corrupt run.json for assignment "${asgnId}" attempt "${attempt}": ${err.message}`,
+                    );
+                  }
+                  if (typeof run?.cwd === 'string' && run.cwd.trim() !== '') {
+                    cwd = run.cwd;
+                    break;
+                  }
+                }
+              }
+            }
+            if (cwd) break;
+          }
+        }
+        return path.resolve(cwd ?? opts.cwd ?? process.cwd());
+      };
+
+      const caveats = computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd });
+      if (caveats.size > 0) {
+        throw new CoordinationError(
+          'validation',
+          `recordDriverDisposition: session "${coordinationId}" has unadjudicated shared-cwd caveats (recheck-required) -- cannot record "${disposition}" disposition on caveated evidence`,
+        );
+      }
+    }
+  }
   evidenceRefs.forEach((ref, i) =>
     assertDispositionRefOwnedBySession(ref, {
       coordinationId,
