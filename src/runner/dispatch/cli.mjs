@@ -268,6 +268,7 @@ function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
   const runDir = path.join(baseDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({
+    contract: 'dispatch-run.legacy',
     runId: `${path.basename(path.dirname(runDir))}-${path.basename(runDir)}`,
     workId: workId ?? null,
     executorId,

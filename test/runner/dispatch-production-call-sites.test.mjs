@@ -701,3 +701,37 @@ test('dispatchDeclaredOperation routes to adapter in production coordination flo
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.json', async () => {
+  const root = fixtureRepo();
+  try {
+    const fgosDir = path.join(root, '.fgos');
+    const cfg = loadRunnerConfigFromDir(root);
+    await executeExecutorCli('mock-non-assignment', {
+      prompt: 'hello world',
+      cwd: root,
+      repoRoot: root,
+      fgosDir,
+      runnerConfig: {
+        ...cfg,
+        executors: {
+          'mock-non-assignment': {
+            adapter: 'cli-spawn',
+            command: 'echo',
+            args: ['legacy-ok'],
+            allowCrossProvider: true,
+          },
+        },
+      },
+    });
+    const runsBase = path.join(fgosDir, 'dispatch-runs', 'mock-non-assignment');
+    const runDirs = fs.readdirSync(runsBase);
+    assert.ok(runDirs.length > 0, 'dispatch run directory created');
+    const runJsonPath = path.join(runsBase, runDirs[0], 'run.json');
+    const runRecord = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+    assert.equal(runRecord.contract, 'dispatch-run.legacy');
+    assert.equal(runRecord.executorId, 'mock-non-assignment');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
