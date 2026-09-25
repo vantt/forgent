@@ -67,42 +67,38 @@ cross-component contracts were modified.
 
 ## Review Findings Implementation (2026-09-25)
 
-The independent review requested five targeted corrections to Phase 01:
-1. **Finding (1) — Policy-Aware Ratchet by FileClass**:
-   - `scripts/check-legacy-docs-ratchet.mjs` now permits new and edited non-authority payloads (`generated` and `history-evidence`) without false positives.
-   - Strictly blocks new or edited maintained prose (`maintained-authority`, `retained-source`) unless explicitly recorded in exceptions.
-   - Enforces anti-spoofing (`file-class-mismatch`), tree escape protection, and distinct error messages distinguishing maintained prose from non-authority payloads.
-2. **Finding (2) — Shipped Path Inventory Categorization**:
-   - `scripts/generate-shipped-path-inventory.mjs` extended with deterministic `referenceKind`, `existenceStatus`, `sourceRole`, `resolutionStatus`, and `isSafeRewriteTarget`.
-   - Distinguishes literal targets from illustrative examples/patterns/tests/generated-mirrors/stale paths.
-   - Detects nonexistent examples (`scripts/distill.mjs`, `src/auth.mjs`, `src/foo.mjs`, `src/runner/retry.mjs`, `test/parser.test.mjs`, etc.) and sets `isSafeRewriteTarget: false` with `resolutionStatus: example-not-target`.
-   - Markdown report partitioned into §4.1 Verified Safe Rewrite Targets and §4.2 Illustrative Examples. Regenerated deterministically.
-3. **Finding (3) — Transitional Switchboard Authority Status**:
-   - `plans/260925-documentation-authority-unification/transitional-switchboard.json` and `docs/transitional-switchboard.md` updated so `docs/specs/platform-foundations.md` curated generated projection has `authorityStatus: "non-authority"` and explicit `bindingSource: "docs/platform-foundations.md"`.
-   - Explicitly records that generated projections never establish authority.
-4. **Finding (4) — Strengthened Exception Schema and Ledger**:
-   - `validateExceptionsSchema` in `scripts/check-legacy-docs-ratchet.mjs` requires `owner`, `reviewedAt` (`YYYY-MM-DD`), and at least one lifecycle control (`expiry` in `YYYY-MM-DD` or concrete `revisitTrigger`).
-   - Added runtime detection for expired exceptions against current date (`expired-exception`) and stale/unused exceptions when target file does not exist (`unused-exception`).
-   - Updated `scripts/check-legacy-docs-ratchet.exceptions.json` and `docs/platform/migration-authoring-rules.md` §2.4.
-5. **Finding (5) — Committed Fixed Range Verification**:
-   - Eliminated `..HEAD`, working-tree `git status`, and range-less `git diff --check` from authoritative verification.
-   - Pinned `BASE=38a337ecb31dc97b78aca012eba0da89c003a927`.
-   - Verification procedures accept caller-supplied immutable `FIXED_END` commit SHA.
-   - Markdown relative link checks enumerate files from `git diff --name-only $BASE..$FIXED_END`.
-   - Cleanliness check runs `git diff --check $BASE..$FIXED_END`.
-   - Documented how independent reviewer provides fixed-end commit. No self-referential fabricated SHAs are committed.
-   - Status updated to `Phase 01 implementation complete, review changes requested/pending re-review` (never closed). Tagging strictly forbidden until review passes.
+The independent review (asgn_pi_lead_phase01_review_fix_op_003) accepted five targeted findings for Phase 01:
+1. **Finding F1 — Root-Aware and Case-Safe Ratchet Classification**:
+   - `scripts/check-legacy-docs-ratchet.mjs` classification is made root-aware and case-safe:
+     - Under `docs/specs/`: Every file is maintained authority by default regardless of extension or case (`.txt`, `.yml`, `.MD`), except explicitly enumerated generated projections (`docs/specs/platform-foundations.md`). Non-authority is never inferred merely from arbitrary extensions.
+     - Under `docs/architect/`: Markdown case-insensitively (`.md`, `.MD`) is maintained or retained prose, while non-Markdown proof payloads (such as `proof.json`, `.png`) can be `history-evidence`.
+   - Baseline class spoofing protection fails closed: modifying a baselined file whose baseline class OR live classification is maintained prose triggers `unaccounted-edit` alongside `file-class-mismatch`.
+   - Added tests proving `docs/specs/*.txt`, `*.yml`, `*.MD` are blocked, `docs/architect/**/proof.json` new/edit are permitted, generated new/edit permitted, and baseline class spoof remains fail-closed.
+2. **Finding F2 — Committed Fixed-Range Verification and Tree-Only Inspection**:
+   - Authoritative verification snippets in `phase-01-verification.md` REQUIRE explicit `BASE` and `FIXED_END` (all defaults and `HEAD` text removed), validate both resolve to commits, and inspect committed blobs only.
+   - The Markdown link checker reads changed Markdown blobs directly using `git show FIXED_END:path` and tests target existence in `FIXED_END`'s git tree (`git ls-tree -r --name-only FIXED_END`), never `Path.cwd()`, working tree, or `git status`.
+   - All diff checks pass explicit `BASE..FIXED_END`.
+3. **Finding F3 — Curated Projection Secondary Attributes**:
+   - `scripts/generate-shipped-path-inventory.mjs` classifies `docs/specs/platform-foundations.md` as `referenceKind: "generated-mirror"`, `sourceRole: "generated-projection-non-authority"`, and `isSafeRewriteTarget: false`.
+   - Curated projection remains editable in ratchet without exception as required by Finding 1.
+   - Locked laws and anchor tests (`test/docs/rul11-anchor-phrase.test.mjs`) remain strictly unaltered.
+4. **Finding F4 — Real ISO Calendar Date Validation and Expiry Boundary**:
+   - Added `isValidIsoCalendarDate` in `scripts/check-legacy-docs-ratchet.mjs` validating real calendar dates in `YYYY-MM-DD` format (rejecting impossible dates such as `2026-02-30`, `2026-13-40`, `2026-04-31`, and non-leap year `2026-02-29`).
+   - Defined explicit expiry boundary: an exception expires on its expiry date (i.e. `checkDate >= expiry` is expired and flagged with `expired-exception`; active only when `checkDate < expiry`).
+   - Added comprehensive tests for impossible date rejection and explicit boundary conditions.
+5. **Finding F5 — Authoring Rules Alignment**:
+   - Aligned `docs/platform/migration-authoring-rules.md` §2 with policy-aware generated and history-evidence exemptions while maintaining strict exception requirements for maintained prose (`maintained-authority`, `retained-source`).
 
 ## Verification Summary
 
 All verification gates passed:
-1. Focused ratchet test suite: 25/25 passed in 210ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`), including policy-awareness, file class mismatch rejection, expired exception rejection, and unused exception rejection.
-2. Focused shipped path inventory test suite: 8/8 passed in 180ms (`test/scripts/generate-shipped-path-inventory.test.mjs`), including deterministic referenceKind/existenceStatus/sourceRole/resolutionStatus classification and nonexistent example detection.
-   Combined focused suites: 33/33 passed in 210ms.
+1. Focused ratchet test suite: 27/27 passed in 280ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`), including root-aware case-safe classification, calendar date validation, explicit expiry boundary, and anti-spoof fail-closed edit containment.
+2. Focused shipped path inventory test suite: 8/8 passed in 180ms (`test/scripts/generate-shipped-path-inventory.test.mjs`), including deterministic referenceKind/existenceStatus/sourceRole/resolutionStatus classification, nonexistent example non-target detection, and platform-foundations generated-mirror classification.
+   Combined focused suites: 35/35 passed in 280ms.
 3. Ratchet self-check: clean on repository (994 files checked, 1 accounted edit, 0 unaccounted edits, 0 unreviewed new files).
 4. Deterministic regeneration comparisons: verified identical JSON output for ratchet baseline and shipped-path inventory (byte-identical `cmp` against checked-in files).
 5. Historical knowledge-registry plan and all 12 phase files verified byte-identical (all 13 passed sha256sum).
-6. Documentation checks and relative link verification passed: all changed Markdown files in range `BASE..FIXED_END` checked, all relative links exist.
+6. Documentation checks and relative link verification passed: all changed Markdown blobs in range `BASE..FIXED_END` checked against `FIXED_END` tree, all relative links exist.
 7. Git diff --check clean across committed range `BASE..FIXED_END`.
 8. Full suite (FULL_TEST): `npm test` passed cleanly (7746 total tests across 27 suites, 7670 passed, 0 failed, 8 skipped, 68 todo, duration ~5.5 minutes; log retained at `/tmp/phase01-final-full-suite.log`).
 

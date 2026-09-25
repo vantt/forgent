@@ -15,18 +15,26 @@ Result: PASS for Phase 01 review findings; Phases 02–09 remain unauthorized
 ## 1. Branch and Range Preconditions
 
 ```bash
-git rev-parse --abbrev-ref HEAD
+# Require explicit BASE and FIXED_END (no defaults, no HEAD text)
+if [ -z "${BASE:-}" ] || [ -z "${FIXED_END:-}" ]; then
+  echo "Error: BASE and FIXED_END environment variables must be explicitly set" >&2
+  exit 1
+fi
+
+# Validate both resolve to real commits
+git cat-file -e "${BASE}^{commit}" || { echo "Error: BASE ($BASE) does not resolve to a commit" >&2; exit 1; }
+git cat-file -e "${FIXED_END}^{commit}" || { echo "Error: FIXED_END ($FIXED_END) does not resolve to a commit" >&2; exit 1; }
 ```
 
-Outcome: `documentation-authority-unification--phase-01-review-fix`; exit code 0.
-The cell branch is confirmed and isolated from main.
+Outcome: exit code 0.
+Both `BASE` and `FIXED_END` are verified to resolve to real, immutable git commits.
 
 ### Fixed-Range Verification Protocol
 Because tagging is strictly forbidden until independent review passes, authoritative verification procedures operate over an explicit committed range:
-- `BASE`: `38a337ecb31dc97b78aca012eba0da89c003a927` (`documentation-authority-phase-00-20260925`).
-- `FIXED_END`: Supplied by the caller/reviewer as the exact immutable commit SHA of the review branch to be evaluated (for example, the final commit created by the implementer and recorded in `agent-result.json`).
+- `BASE`: Required caller-supplied commit SHA (e.g. `38a337ecb31dc97b78aca012eba0da89c003a927` from `documentation-authority-phase-00-20260925`).
+- `FIXED_END`: Required caller-supplied immutable commit SHA of the review branch to be evaluated (recorded in `agent-result.json`).
 
-Moving pointers (`..HEAD`), uncommitted working-tree scans (`git status`), and range-less checks (`git diff --check`) are removed from authoritative verification. The reviewer supplies `FIXED_END=<commit-sha>` into the verification environment or script invocation to run strictly reproducible verification against the exact committed boundary.
+Moving pointers (`..HEAD`, `HEAD` defaults), uncommitted working-tree scans (`git status`, `Path.cwd()`), and range-less checks (`git diff --check`) are completely eliminated from authoritative verification. The reviewer supplies `BASE=<commit-sha> FIXED_END=<commit-sha>` into the verification environment or script invocation to run strictly reproducible verification against the exact committed boundary.
 
 ## 2. Focused Ratchet and Shipped Inventory Tests (FOCUSED_TESTS)
 
@@ -34,9 +42,9 @@ Moving pointers (`..HEAD`), uncommitted working-tree scans (`git status`), and r
 node --test test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/generate-shipped-path-inventory.test.mjs
 ```
 
-Outcome: exit 0; 33 tests, 33 pass, 0 fail (210ms).
-- `check-legacy-docs-ratchet.test.mjs`: 25/25 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, policy-aware classification permitting new and edited generated projections and history-evidence while strictly blocking maintained prose, file-class-mismatch prevention against spoofing, distinct error messaging for non-authority vs maintained prose, expired exception rejection against today, unused exception rejection when file does not exist, CLI execution, live self-check).
-- `generate-shipped-path-inventory.test.mjs`: 8/8 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], table-driven path grammar / negative glued tokens / positive counterexamples [R1 residual], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, deterministic classification of referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget distinguishing literal targets from illustrative examples/patterns/tests/generated-mirrors/stale paths, detection of nonexistent examples such as `scripts/distill.mjs`, `src/auth.mjs`, `src/foo.mjs`, `src/runner/retry.mjs`, and `test/parser.test.mjs` as non-targets, CLI output).
+Outcome: exit 0; 35 tests, 35 pass, 0 fail (280ms).
+- `check-legacy-docs-ratchet.test.mjs`: 27/27 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, policy-aware classification permitting new and edited generated projections and history-evidence while strictly blocking maintained prose, file-class-mismatch prevention against spoofing, distinct error messaging for non-authority vs maintained prose, expired exception rejection against today, unused exception rejection when file does not exist, root-aware and case-safe blocking of `.txt`/`.yml`/`.MD` under `docs/specs` [F1], calendar date validation rejecting impossible dates and explicit expiry boundary testing [F4], CLI execution, live self-check).
+- `generate-shipped-path-inventory.test.mjs`: 8/8 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], table-driven path grammar / negative glued tokens / positive counterexamples [R1 residual], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, deterministic classification of referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget distinguishing literal targets from illustrative examples/patterns/tests/generated-mirrors/stale paths, detection of nonexistent examples such as `scripts/distill.mjs`, `src/auth.mjs`, `src/foo.mjs`, `src/runner/retry.mjs`, and `test/parser.test.mjs` as non-targets, explicit non-authority/non-safe-rewrite classification of `docs/specs/platform-foundations.md` [F3], CLI output).
 
 ## 3. Live Ratchet Self-Check and Regeneration Comparison
 
@@ -82,46 +90,81 @@ Outcome:
 Command:
 ```python
 python3 - <<'PY'
-import os, re, subprocess
-from pathlib import Path
+import os, posixpath, re, subprocess
 
-root = Path.cwd()
-base = os.environ.get('BASE', '38a337ecb31dc97b78aca012eba0da89c003a927')
-fixed_end = os.environ.get('FIXED_END', 'HEAD')
+base = os.environ.get('BASE')
+fixed_end = os.environ.get('FIXED_END')
 
+if not base or not fixed_end:
+    raise SystemExit('Error: Both BASE and FIXED_END must be explicitly provided in environment (no defaults, no HEAD text allowed)')
+
+# Validate both resolve to real commits
+try:
+    subprocess.run(['git', 'cat-file', '-e', f'{base}^{{commit}}'], check=True, capture_output=True)
+except subprocess.CalledProcessError:
+    raise SystemExit(f'Error: BASE "{base}" does not resolve to a valid commit')
+
+try:
+    subprocess.run(['git', 'cat-file', '-e', f'{fixed_end}^{{commit}}'], check=True, capture_output=True)
+except subprocess.CalledProcessError:
+    raise SystemExit(f'Error: FIXED_END "{fixed_end}" does not resolve to a valid commit')
+
+# Find changed markdown files across explicit committed range BASE..FIXED_END
 out = subprocess.check_output(
     ['git', 'diff', '--name-only', f'{base}..{fixed_end}'], text=True
 )
-files = []
-for line in out.splitlines():
-    p = line.strip()
-    if not p:
-        continue
-    q = root / p
-    if q.suffix == '.md' and q.is_file():
-        files.append(q)
+changed_files = [line.strip() for line in out.splitlines() if line.strip()]
+md_files = [p for p in changed_files if p.lower().endswith('.md')]
+
+# Pre-fetch all paths in FIXED_END's git tree (inspect committed blobs and tree only; never Path.cwd(), working tree, or status)
+tree_out = subprocess.check_output(
+    ['git', 'ls-tree', '-r', '--name-only', fixed_end], text=True
+)
+tree_files = set(tree_out.splitlines())
+tree_dirs = set()
+for f in tree_files:
+    parts = f.split('/')
+    for i in range(1, len(parts)):
+        tree_dirs.add('/'.join(parts[:i]))
+
+def target_exists_in_tree(target_path):
+    target_norm = posixpath.normpath(target_path)
+    return target_norm in tree_files or target_norm in tree_dirs
 
 errors = []
 pat = re.compile(r'(?<!!)\[[^\]]*\]\(([^)]+)\)')
-for f in files:
-    for n, line in enumerate(f.read_text().splitlines(), 1):
+
+for path in md_files:
+    # Verify file exists as a blob in FIXED_END
+    res = subprocess.run(['git', 'cat-file', '-e', f'{fixed_end}:{path}'], capture_output=True)
+    if res.returncode != 0:
+        continue
+
+    # Read committed blob using git show FIXED_END:path (never local working tree or status)
+    content = subprocess.check_output(['git', 'show', f'{fixed_end}:{path}'], text=True)
+    parent_dir = posixpath.dirname(path)
+    for n, line in enumerate(content.splitlines(), 1):
         for raw in pat.findall(line):
             target = raw.strip().split()[0].strip('<>')
             if target.startswith(('http://', 'https://', 'mailto:', '#')):
                 continue
-            target = target.split('#', 1)[0]
-            if target and not (f.parent / target).resolve().exists():
-                errors.append(f'{f.relative_to(root)}:{n}: missing {raw}')
+            target_file = target.split('#', 1)[0]
+            if not target_file:
+                continue
+            # Resolve relative to parent directory within git tree
+            resolved_target = posixpath.normpath(posixpath.join(parent_dir, target_file))
+            if not target_exists_in_tree(resolved_target):
+                errors.append(f'{path}:{n}: missing target "{raw}" (resolved: "{resolved_target}") in {fixed_end} tree')
 
-print(f'checked {len(files)} changed Markdown files in range {base}..{fixed_end}')
+print(f'checked {len(md_files)} changed Markdown blob(s) in range {base}..{fixed_end}')
 if errors:
     print('\n'.join(errors))
     raise SystemExit(1)
-print('all relative Markdown link targets exist')
+print(f'all relative Markdown link targets exist in {fixed_end} tree')
 PY
 ```
 
-Outcome: exit 0; all changed Markdown files in range `BASE..FIXED_END` checked; all relative link targets exist.
+Outcome: exit 0; all changed Markdown blobs in committed range `BASE..FIXED_END` checked; all relative link targets exist in `FIXED_END`'s git tree.
 
 ## 6. Historical Knowledge-Registry Plan Byte-Identity Check
 
@@ -148,13 +191,22 @@ Outcome: all 13 files match with OK; exit code 0.
 ## 7. Git Diff Cleanliness and Scope Boundary
 
 ```bash
-BASE="${BASE:-38a337ecb31dc97b78aca012eba0da89c003a927}"
-FIXED_END="${FIXED_END:-HEAD}"
+# Require explicit BASE and FIXED_END (no defaults, no HEAD text)
+if [ -z "${BASE:-}" ] || [ -z "${FIXED_END:-}" ]; then
+  echo "Error: BASE and FIXED_END environment variables must be explicitly set" >&2
+  exit 1
+fi
+
+# Validate both resolve to real commits
+git cat-file -e "${BASE}^{commit}" || { echo "Error: BASE ($BASE) does not resolve to a commit" >&2; exit 1; }
+git cat-file -e "${FIXED_END}^{commit}" || { echo "Error: FIXED_END ($FIXED_END) does not resolve to a commit" >&2; exit 1; }
+
+# Inspect committed diff across explicit range BASE..FIXED_END
 git diff --check "$BASE..$FIXED_END"
 ```
 
 Outcome: exit 0; no whitespace errors or merge conflicts across committed range `$BASE..$FIXED_END`.
-Range-less `git diff --check` and uncommitted working-tree scans are removed in favor of explicit immutable commit parameters.
+Range-less `git diff --check`, moving HEAD pointers, and uncommitted working-tree scans are completely removed in favor of explicit immutable commit parameters.
 
 Forbidden action checks:
 - No files deleted or moved under `docs/specs/**` or `docs/architect/**`.
