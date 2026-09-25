@@ -4,7 +4,7 @@
 Phase: 00 — Correct planning and routing semantics
 Verification date: 2026-09-25
 Base: ac19f6d1e868c53b2bc59a2c9642ee0e37e7eb08
-Review unit: ac19f6d1e..HEAD on plan/260925-documentation-authority-unification
+Review unit: ac19f6d1e..documentation-authority-phase-00-20260925 on plan/260925-documentation-authority-unification
 Result: PASS for Phase 00; no authorization for Phases 01–09
 ```
 

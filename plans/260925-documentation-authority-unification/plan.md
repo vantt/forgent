@@ -238,7 +238,7 @@ permission to execute it.
 
 | Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
 |---|---|---|---|---|
-| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..HEAD`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
+| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
 | 01 | `not-started`, `not-authorized` | None | Phase 00 complete; requires separate authorization | Switchboard, vocabulary, baseline, ratchet, and shipped-path inventory do not exist yet |
 | 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
 | 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
@@ -251,7 +251,7 @@ permission to execute it.
 
 ### Phase 00 — Correct planning and routing semantics
 
-**Status:** `completed` — review and merge the complete range `ac19f6d1e..HEAD`,
+**Status:** `completed` — review and merge the complete range `ac19f6d1e..documentation-authority-phase-00-20260925`,
 not `a725d4788` alone. The range includes the implementation commit
 `a725d4788`, status commit `0c38df980`, and the Phase 00 review-follow-up at
 HEAD. No later-phase authority is implied.
