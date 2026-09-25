@@ -714,13 +714,21 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       const nodeCwds = new Map();
       for (const node of dagDeclaration.nodes) {
         const nodeAssignments = replayed.assignments.filter((entry) => entry.dagNodeId === node.id);
-        nodeCwds.set(
-          node.id,
-          resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
-            events: replayed.events,
-            results: replayed.results,
-          }),
-        );
+        try {
+          nodeCwds.set(
+            node.id,
+            resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
+              events: replayed.events,
+              results: replayed.results,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+            nodeCwds.set(node.id, null);
+          } else {
+            throw err;
+          }
+        }
       }
       dagCaveats = computeDagSharedCwdCaveats({
         declaredNodes: dagDeclaration.nodes,
@@ -833,13 +841,21 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       const postNodeCwds = new Map();
       for (const node of dagDeclaration.nodes) {
         const nodeAssignments = replayedAfter.assignments.filter((entry) => entry.dagNodeId === node.id);
-        postNodeCwds.set(
-          node.id,
-          resolveNodeCwd(node, nodeAssignments, postFgosDir, ctx.cwd ?? engineOpts.cwd, {
-            events: replayedAfter.events,
-            results: replayedAfter.results,
-          }),
-        );
+        try {
+          postNodeCwds.set(
+            node.id,
+            resolveNodeCwd(node, nodeAssignments, postFgosDir, ctx.cwd ?? engineOpts.cwd, {
+              events: replayedAfter.events,
+              results: replayedAfter.results,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+            postNodeCwds.set(node.id, null);
+          } else {
+            throw err;
+          }
+        }
       }
       dagCaveats = computeDagSharedCwdCaveats({
         declaredNodes: dagDeclaration.nodes,

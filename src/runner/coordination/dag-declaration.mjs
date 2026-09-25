@@ -247,19 +247,22 @@ export function resolveNodeCwd(node, arg2 = [], arg3 = null, arg4 = null, arg5 =
       if (linkedRunMap && typeof linkedRunMap.get === 'function') {
         linkedRunId = linkedRunMap.get(asgnId);
       }
-      if (!linkedRunId && Array.isArray(results)) {
-        for (let i = results.length - 1; i >= 0; i--) {
-          if (results[i].assignmentId === asgnId && results[i].runId) {
-            linkedRunId = results[i].runId;
+      if (!linkedRunId && Array.isArray(events)) {
+        for (let i = events.length - 1; i >= 0; i--) {
+          const ev = events[i];
+          if (ev.type === 'run-retried' && ev.payload?.assignmentId === asgnId) {
+            break;
+          }
+          if (ev.type === 'result-linked' && ev.payload?.assignmentId === asgnId && ev.payload?.runId) {
+            linkedRunId = ev.payload.runId;
             break;
           }
         }
       }
-      if (!linkedRunId && Array.isArray(events)) {
-        for (let i = events.length - 1; i >= 0; i--) {
-          const ev = events[i];
-          if (ev.type === 'result-linked' && ev.payload?.assignmentId === asgnId && ev.payload?.runId) {
-            linkedRunId = ev.payload.runId;
+      if (!linkedRunId && Array.isArray(results) && !Array.isArray(events)) {
+        for (let i = results.length - 1; i >= 0; i--) {
+          if (results[i].assignmentId === asgnId && results[i].runId) {
+            linkedRunId = results[i].runId;
             break;
           }
         }
@@ -268,21 +271,36 @@ export function resolveNodeCwd(node, arg2 = [], arg3 = null, arg4 = null, arg5 =
       if (linkedRunId) {
         const prefix = `run_${asgnId}_`;
         const attempt = linkedRunId.startsWith(prefix) ? linkedRunId.slice(prefix.length) : linkedRunId;
-        const runJsonPath = path.join(fgosDir, 'assignments', asgnId, 'runs', attempt, 'run.json');
-        if (fs.existsSync(runJsonPath)) {
-          let run;
-          try {
-            run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-          } catch (err) {
-            throw new CoordinationError(
-              'corrupt-log',
-              `corrupt run.json for assignment "${asgnId}" attempt "${attempt}": ${err.message}`,
-            );
-          }
-          if (typeof run?.cwd === 'string' && run.cwd.trim() !== '') {
-            return path.resolve(run.cwd);
-          }
+        const runDir = path.join(fgosDir, 'assignments', asgnId, 'runs', attempt);
+        const runJsonPath = path.join(runDir, 'run.json');
+        if (!fs.existsSync(runDir)) {
+          throw new CoordinationError(
+            'dangling-ref',
+            `missing run directory for linked runId "${linkedRunId}" at ${runDir}`,
+          );
         }
+        if (!fs.existsSync(runJsonPath)) {
+          throw new CoordinationError(
+            'corrupt-log',
+            `missing run.json for linked runId "${linkedRunId}" at ${runJsonPath}`,
+          );
+        }
+        let run;
+        try {
+          run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+        } catch (err) {
+          throw new CoordinationError(
+            'corrupt-log',
+            `corrupt run.json for assignment "${asgnId}" attempt "${attempt}": ${err.message}`,
+          );
+        }
+        if (typeof run?.cwd !== 'string' || run.cwd.trim() === '') {
+          throw new CoordinationError(
+            'corrupt-log',
+            `missing or invalid cwd in run.json for linked runId "${linkedRunId}" at ${runJsonPath}`,
+          );
+        }
+        return path.resolve(run.cwd);
       } else {
         const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
         if (fs.existsSync(runsDir)) {
@@ -318,6 +336,10 @@ export function resolveNodeCwd(node, arg2 = [], arg3 = null, arg4 = null, arg5 =
               if (typeof run?.cwd === 'string' && run.cwd.trim() !== '') {
                 return path.resolve(run.cwd);
               }
+              throw new CoordinationError(
+                'corrupt-log',
+                `missing or invalid cwd in run.json for assignment "${asgnId}" attempt "${attempt}": ${runJsonPath}`,
+              );
             }
           }
         }

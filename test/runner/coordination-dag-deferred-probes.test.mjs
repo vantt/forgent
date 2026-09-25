@@ -1000,6 +1000,149 @@ test('DAG probes: F02 node cwd attribution matrix (shared cwd caveat, reverse or
       'show must throw corrupt-log when sibling run.json is corrupt',
     );
   }
+
+  // Subcase 8: Missing or invalid run.json for linked run fails closed with corrupt-log (I11R2-01)
+  {
+    const cidLinked = 'probe-f02-linked-missing-run-json';
+    const tempLinked = mkTempDir('fgos-linked-missing-');
+    writeFixture(tempLinked);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidLinked,
+        objective: 'Linked run.json missing/invalid fails closed',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempLinked, repoRoot: tempLinked },
+    );
+    const sharedDir = path.join(tempLinked, 'shared');
+    fs.mkdirSync(sharedDir, { recursive: true });
+
+    const xL = createSessionAssignment({ coordinationId: cidLinked, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempLinked, repoRoot: tempLinked }).assignmentId;
+    const yL = createSessionAssignment({ coordinationId: cidLinked, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempLinked, repoRoot: tempLinked }).assignmentId;
+
+    const dXL = path.join(tempLinked, '.fgos', 'assignments', xL, 'runs', '01');
+    fs.mkdirSync(dXL, { recursive: true });
+    fs.writeFileSync(path.join(dXL, 'run.json'), JSON.stringify({ cwd: sharedDir }));
+    fs.writeFileSync(path.join(dXL, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x' }));
+    linkResult(cidLinked, { assignmentId: xL, runId: `run_${xL}_01` }, { cwd: tempLinked, repoRoot: tempLinked });
+
+    const dYL = path.join(tempLinked, '.fgos', 'assignments', yL, 'runs', '01');
+    fs.mkdirSync(dYL, { recursive: true });
+    fs.writeFileSync(path.join(dYL, 'run.json'), JSON.stringify({ cwd: sharedDir }));
+    fs.writeFileSync(path.join(dYL, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidLinked, { assignmentId: yL, runId: `run_${yL}_01` }, { cwd: tempLinked, repoRoot: tempLinked });
+
+    // Both runs share cwd -> store disposition accepted is refused with caveat
+    assert.throws(
+      () => recordDriverDisposition(cidLinked, { targetRef: yL, disposition: 'accepted', rationale: 'shared cwd', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempLinked, repoRoot: tempLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+    );
+
+    // Delete linked run.json for xL -> must NOT silently fallback to defaultCwd, must throw corrupt-log across store, show, and close
+    fs.unlinkSync(path.join(dXL, 'run.json'));
+
+    assert.throws(
+      () => recordDriverDisposition(cidLinked, { targetRef: yL, disposition: 'accepted', rationale: 'missing run.json test', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempLinked, repoRoot: tempLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing run\.json for linked runId/.test(err.message),
+      'store must throw corrupt-log when linked run.json is deleted',
+    );
+
+    assert.throws(
+      () => showCoordinationUseCase({ cwd: tempLinked, repoRoot: tempLinked }, { id: cidLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing run\.json for linked runId/.test(err.message),
+      'show must throw corrupt-log when linked run.json is deleted',
+    );
+
+    assert.throws(
+      () => closeSessionByQuorum(cidLinked, {}, { cwd: tempLinked, repoRoot: tempLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing run\.json for linked runId/.test(err.message),
+      'close must throw corrupt-log when linked run.json is deleted',
+    );
+
+    // Now write run.json back but without a valid string cwd (missing/empty cwd)
+    fs.writeFileSync(path.join(dXL, 'run.json'), JSON.stringify({ status: 'running' }));
+
+    assert.throws(
+      () => recordDriverDisposition(cidLinked, { targetRef: yL, disposition: 'accepted', rationale: 'no cwd in run.json', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempLinked, repoRoot: tempLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing or invalid cwd/.test(err.message),
+      'store must throw corrupt-log when linked run.json lacks string cwd',
+    );
+
+    assert.throws(
+      () => showCoordinationUseCase({ cwd: tempLinked, repoRoot: tempLinked }, { id: cidLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing or invalid cwd/.test(err.message),
+      'show must throw corrupt-log when linked run.json lacks string cwd',
+    );
+
+    assert.throws(
+      () => closeSessionByQuorum(cidLinked, {}, { cwd: tempLinked, repoRoot: tempLinked }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /missing or invalid cwd/.test(err.message),
+      'close must throw corrupt-log when linked run.json lacks string cwd',
+    );
+  }
+
+  // Subcase 9: Unlinked attempt numeric sorting regression lock (M2d lock)
+  {
+    const cidM2d = 'probe-f02-unlinked-m2d-lock';
+    const tempM2d = mkTempDir('fgos-m2d-lock-');
+    writeFixture(tempM2d);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidM2d,
+        objective: 'Unlinked attempt numeric sorting regression lock',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempM2d, repoRoot: tempM2d },
+    );
+    const dir9 = path.join(tempM2d, 'dir9');
+    const dir10 = path.join(tempM2d, 'dir10');
+    fs.mkdirSync(dir9, { recursive: true });
+    fs.mkdirSync(dir10, { recursive: true });
+
+    const xM2d = createSessionAssignment({ coordinationId: cidM2d, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempM2d, repoRoot: tempM2d }).assignmentId;
+    const yM2d = createSessionAssignment({ coordinationId: cidM2d, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempM2d, repoRoot: tempM2d }).assignmentId;
+
+    // Assignment xM2d has unlinked attempts '9' and '10' (neither is linked!)
+    const d9 = path.join(tempM2d, '.fgos', 'assignments', xM2d, 'runs', '9');
+    fs.mkdirSync(d9, { recursive: true });
+    fs.writeFileSync(path.join(d9, 'run.json'), JSON.stringify({ cwd: dir9 }));
+    fs.writeFileSync(path.join(d9, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'attempt 9' }));
+
+    const d10 = path.join(tempM2d, '.fgos', 'assignments', xM2d, 'runs', '10');
+    fs.mkdirSync(d10, { recursive: true });
+    fs.writeFileSync(path.join(d10, 'run.json'), JSON.stringify({ cwd: dir10 }));
+    fs.writeFileSync(path.join(d10, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'attempt 10' }));
+
+    // Direct resolver test: unlinked node-A with attempts 9 and 10 must resolve to attempt 10 (dir10), NOT attempt 9 (dir9)
+    const { fgosDir: fgosDirM2d } = resolveSessionPaths(cidM2d, { cwd: tempM2d, repoRoot: tempM2d });
+    const resolvedCwd = resolveNodeCwd(decl.nodes[0], [xM2d], fgosDirM2d, tempM2d);
+    assert.strictEqual(
+      resolvedCwd,
+      path.resolve(dir10),
+      'unlinked attempt resolution must sort numerically (10 > 9), not lexicographically ("10" < "9")',
+    );
+
+    // Assignment yM2d runs in dir10 as well
+    const dY = path.join(tempM2d, '.fgos', 'assignments', yM2d, 'runs', '01');
+    fs.mkdirSync(dY, { recursive: true });
+    fs.writeFileSync(path.join(dY, 'run.json'), JSON.stringify({ cwd: dir10 }));
+    fs.writeFileSync(path.join(dY, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'attempt 1' }));
+    linkResult(cidM2d, { assignmentId: yM2d, runId: `run_${yM2d}_01` }, { cwd: tempM2d, repoRoot: tempM2d });
+
+    // Under numeric sort, xM2d resolves to dir10 (sharing with yM2d in dir10) -> caveat refusal!
+    // If lexicographic sort were used (M2d mutant), xM2d would resolve to dir9 (distinct from dir10) -> false clean accept!
+    assert.throws(
+      () => recordDriverDisposition(cidM2d, { targetRef: yM2d, disposition: 'accepted', rationale: 'attempt 10 shared test', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempM2d, repoRoot: tempM2d }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+      'unlinked attempt 10 sharing cwd with peer must trigger caveat validation refusal under numeric sort',
+    );
+  }
 });
 
 // --------------------------------------------------------------------------

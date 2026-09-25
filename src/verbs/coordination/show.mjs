@@ -348,24 +348,7 @@ export function showCoordinationUseCase(ctx, { id }) {
       const declaration = coordinationState.dag.declaration;
       const declaredNodes = declaration.nodes ?? [];
 
-      const nodeCwds = new Map();
-      for (const node of declaredNodes) {
-        const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
-        nodeCwds.set(
-          node.id,
-          resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
-            events: coordinationState.events,
-            results: coordinationState.results,
-          }),
-        );
-      }
-
       const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(coordinationState.events);
-      const dagCaveats = computeDagSharedCwdCaveats({
-        declaredNodes,
-        getNodeCwd: (id) => nodeCwds.get(id),
-      });
-
       const isAssignmentSettledWithEvidence = (assignmentId) => {
         if (!settledAssignmentIds.has(assignmentId)) return false;
         const results = coordinationState.results.filter((r) => r.assignmentId === assignmentId);
@@ -374,6 +357,38 @@ export function showCoordinationUseCase(ctx, { id }) {
         const runResult = readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId);
         return Boolean(runResult);
       };
+
+      for (const node of declaredNodes) {
+        const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
+        for (const asgn of nodeAssignments) {
+          isAssignmentSettledWithEvidence(asgn.assignmentId);
+        }
+      }
+
+      const nodeCwds = new Map();
+      for (const node of declaredNodes) {
+        const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
+        try {
+          nodeCwds.set(
+            node.id,
+            resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
+              events: coordinationState.events,
+              results: coordinationState.results,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+            nodeCwds.set(node.id, null);
+          } else {
+            throw err;
+          }
+        }
+      }
+
+      const dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes,
+        getNodeCwd: (id) => nodeCwds.get(id),
+      });
 
       const renderedNodes = declaredNodes.map((node) => {
         const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
