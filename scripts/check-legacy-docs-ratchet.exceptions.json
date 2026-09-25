@@ -8,8 +8,10 @@
       "kind": "allowed-edit",
       "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge.",
       "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001)",
+      "owner": "documentation-authority-unification-lead",
       "expectedDigest": "04e7c7b51842d440da94a818e7120c34e8ef833c629021c53ec141757384067f",
-      "reviewedAt": "2026-09-25"
+      "reviewedAt": "2026-09-25",
+      "revisitTrigger": "Phase 08 cutover (retirement of legacy reading-map in favor of docs/reading-map.md)"
     }
   ]
 }

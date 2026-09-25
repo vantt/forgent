@@ -62,8 +62,12 @@ The legacy platform roots (`docs/specs` and `docs/architect`) are frozen against
    - `kind`: `allowed-edit` or `allowed-new-file`.
    - `rationale`: non-empty explanation of the necessity of the change.
    - `approvedBy`: authorization reference (e.g. human approval or phase assignment ID).
+   - `owner`: named owner or role responsible for the exception lifecycle.
    - `expectedDigest`: expected SHA-256 hex digest of the file after the change.
-   - `reviewedAt`: date of review.
+   - `reviewedAt`: date of review in `YYYY-MM-DD` format.
+   - Lifecycle controls (at least one required):
+     - `expiry`: ISO date (`YYYY-MM-DD`) after which the exception is rejected as expired.
+     - `revisitTrigger`: concrete milestone or event triggering review (e.g. Phase 08 cutover).
 
 ## 3. Authoring New Platform Documentation
 

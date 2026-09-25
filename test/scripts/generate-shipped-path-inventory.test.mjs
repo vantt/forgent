@@ -18,6 +18,9 @@ import {
   isValidPathGrammar,
   KNOWN_EXTENSIONS,
   ALLOWED_ROOTS,
+  classifyPathAttributes,
+  KNOWN_NONEXISTENT_EXAMPLES,
+  KNOWN_STALE_OR_DEAD,
 } from '../../scripts/generate-shipped-path-inventory.mjs';
 
 const SCRIPT_PATH = fileURLToPath(
@@ -337,7 +340,108 @@ test('CLI: outputs JSON and Markdown files correctly', () => {
     assert.match(md, /# Shipped Path Conventions Inventory/);
     assert.match(md, /Locked Program Decision 11/);
     assert.match(md, /Mixed Repository-Local and Consumer Contracts/);
+    assert.match(md, /Safe Rewrite Targets/);
+    assert.match(md, /Illustrative Examples and Non-Target References/);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+test('classifyPathAttributes: deterministically differentiates referenceKind, existenceStatus, sourceRole, resolutionStatus', () => {
+  // Known nonexistent examples in code/prompts
+  const fooAttr = classifyPathAttributes('src/foo.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(fooAttr.referenceKind, 'example-or-placeholder');
+  assert.equal(fooAttr.existenceStatus, 'nonexistent');
+  assert.equal(fooAttr.sourceRole, 'illustrative-example');
+  assert.equal(fooAttr.resolutionStatus, 'example-not-target');
+  assert.equal(fooAttr.isSafeRewriteTarget, false);
+
+  const distillAttr = classifyPathAttributes('scripts/distill.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(distillAttr.referenceKind, 'example-or-placeholder');
+  assert.equal(distillAttr.existenceStatus, 'nonexistent');
+  assert.equal(distillAttr.sourceRole, 'illustrative-example');
+  assert.equal(distillAttr.resolutionStatus, 'example-not-target');
+  assert.equal(distillAttr.isSafeRewriteTarget, false);
+
+  const authAttr = classifyPathAttributes('src/auth.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(authAttr.referenceKind, 'example-or-placeholder');
+  assert.equal(authAttr.existenceStatus, 'nonexistent');
+  assert.equal(authAttr.sourceRole, 'illustrative-example');
+  assert.equal(authAttr.resolutionStatus, 'example-not-target');
+  assert.equal(authAttr.isSafeRewriteTarget, false);
+
+  const retryAttr = classifyPathAttributes('src/runner/retry.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(retryAttr.referenceKind, 'example-or-placeholder');
+  assert.equal(retryAttr.existenceStatus, 'nonexistent');
+  assert.equal(retryAttr.sourceRole, 'illustrative-example');
+  assert.equal(retryAttr.resolutionStatus, 'example-not-target');
+  assert.equal(retryAttr.isSafeRewriteTarget, false);
+
+  const parserTestAttr = classifyPathAttributes('test/parser.test.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(parserTestAttr.referenceKind, 'example-or-placeholder');
+  assert.equal(parserTestAttr.existenceStatus, 'nonexistent');
+  assert.equal(parserTestAttr.sourceRole, 'illustrative-example');
+  assert.equal(parserTestAttr.resolutionStatus, 'example-not-target');
+  assert.equal(parserTestAttr.isSafeRewriteTarget, false);
+
+  // Real existing repository-local spec
+  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(runnerAttr.referenceKind, 'literal-current-path');
+  assert.equal(runnerAttr.existenceStatus, 'exists');
+  assert.equal(runnerAttr.sourceRole, 'platform-specification-or-doctrine');
+  assert.equal(runnerAttr.resolutionStatus, 'resolved');
+  assert.equal(runnerAttr.isSafeRewriteTarget, true);
+
+  // Real existing source file
+  const loopAttr = classifyPathAttributes('src/runner/loop.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(loopAttr.referenceKind, 'literal-current-path');
+  assert.equal(loopAttr.existenceStatus, 'exists');
+  assert.equal(loopAttr.sourceRole, 'internal-implementation');
+  assert.equal(loopAttr.resolutionStatus, 'resolved');
+  assert.equal(loopAttr.isSafeRewriteTarget, true);
+
+  // Stale or dead decision citation
+  const staleAttr = classifyPathAttributes('docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(staleAttr.referenceKind, 'stale-or-dead');
+  assert.equal(staleAttr.existenceStatus, 'nonexistent');
+  assert.equal(staleAttr.sourceRole, 'retired-decision-citation');
+  assert.equal(staleAttr.resolutionStatus, 'stale-retired');
+  assert.equal(staleAttr.isSafeRewriteTarget, false);
+
+  // Consumer-project contract
+  const configAttr = classifyPathAttributes('.fgos/config.json', { repoRoot: REPO_ROOT, scope: 'consumer-project-contract' });
+  assert.equal(configAttr.isSafeRewriteTarget, false);
+});
+
+test('repository inventory: detects nonexistent examples and never labels them safe rewrite targets', () => {
+  const inv = generateInventory(REPO_ROOT);
+
+  const targetExamples = [
+    'scripts/distill.mjs',
+    'src/auth.mjs',
+    'src/foo.mjs',
+    'src/runner/retry.mjs',
+    'test/parser.test.mjs',
+  ];
+
+  for (const target of targetExamples) {
+    const item = inv.items.find((i) => i.path === target);
+    assert.ok(item, `Inventory must track "${target}"`);
+    assert.equal(item.contractScope, 'repository-local-contract', `"${target}" contractScope is repository-local`);
+    assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
+    assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
+    assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
+    assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
+    assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
+  }
+
+  // Summary counts
+  assert.ok(inv.summary.rewriteSafety.safeRewriteTargetsCount > 0);
+  assert.ok(inv.summary.rewriteSafety.nonTargetExamplesCount > 0);
+  assert.equal(
+    inv.summary.rewriteSafety.safeRewriteTargetsCount + inv.summary.rewriteSafety.nonTargetExamplesCount,
+    inv.totalUniquePathsCount
+  );
+  assert.equal(inv.summary.referenceKinds.exampleOrPlaceholder >= 5, true);
+  assert.equal(inv.summary.referenceKinds.literalCurrentPath > 100, true);
 });
