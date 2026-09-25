@@ -55,10 +55,23 @@ export function renderBrief({ prompt, round, runDir, agentName, effectiveContrac
   const contractSection = effectiveContract
     ? `\n## Execution contract\n\n` +
       `- Mutation: ${effectiveContract.mutation}\n` +
-      `- Result claim path: ${effectiveContract.resultClaim?.path || p.resultPath}\n` +
+      `- Result claim path: ${p.resultPath}\n` +
       `- Timeout: ${effectiveContract.limits?.executorTimeoutMs ?? effectiveContract.limits?.timeoutMs}ms\n` +
       `- Persisted contract: ${p.effectiveExecutionContractPath}\n`
     : '';
+
+  // Phase 09 R6: Unify result path and claim schema.
+  // If the inner prompt already contains a conflicting "Result artifact:" section
+  // naming <runDir>/agent-result.json, strip it so the brief maintains exactly
+  // ONE result path (p.resultPath) and ONE claim schema section in ## When you finish.
+  let cleanPrompt = prompt ?? '';
+  if (typeof cleanPrompt === 'string') {
+    cleanPrompt = cleanPrompt.replace(
+      /\n*Result artifact:\n(?:[ \t]*-[^\n]*\n?|[ \t]+[^\n]*\n?)+/g,
+      '\n',
+    ).trim();
+  }
+
   return `# Brief ${round}
 ${contractSection}
 ## Acknowledge first
@@ -77,7 +90,7 @@ moment, and a rename is the only step that is either done or not done.
 
 ## Your task
 
-${prompt}
+${cleanPrompt}
 
 ## When you finish
 
@@ -92,7 +105,7 @@ Write these two files, in this order, each one \`.tmp\`-then-rename:
         "summary": "<one or two sentences>", "evidenceRefs": []}
 
    Claim requirements:
-${renderAgentResultClaimInstructions()}
+${renderAgentResultClaimInstructions(effectiveContract?.assignment || {})}
 
    "settled" is not a valid status here -- that word names the run reaching
    its end, not whether the work succeeded; a worker that writes "settled"

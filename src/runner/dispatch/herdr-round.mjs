@@ -1156,7 +1156,13 @@ export async function runHerdrRound(ctx) {
     : normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
   const round = openRound({ runDir, workId, tier, model, agentName });
 
-  const briefText = renderBrief({ prompt, round: roundNumber, runDir, agentName });
+  const briefText = renderBrief({
+    prompt,
+    round: roundNumber,
+    runDir,
+    agentName,
+    effectiveContract: ctx.effectiveContract ?? ctx.effectiveExecutionContract ?? null,
+  });
   fs.writeFileSync(paths.briefPath, briefText);
   round.note({ status: 'requested', agentName, round: roundNumber });
 

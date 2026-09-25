@@ -9,7 +9,6 @@ import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
@@ -279,17 +278,6 @@ test('executeAssignment rejects human-only assignment before spawning', async ()
     () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir }),
     (err) => err instanceof RunnerConfigError && /cannot execute human-only/i.test(err.message),
   );
-});
-
-test('prepareDispatch accepts an Assignment unit with assignmentId', () => {
-  const assignment = buildAssignment({
-    workId: 'tsk-prep-test',
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  const prepared = prepareDispatch(assignment);
-  assert.equal(prepared.unit.assignmentId, assignment.assignmentId);
 });
 
 test('compileDispatchPlan produces selector.type: "assignment" and resolves executor from assignment policy', () => {

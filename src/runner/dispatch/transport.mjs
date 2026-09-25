@@ -197,6 +197,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
       );
     }
   }
+  const MAX_ARG_STRLEN = 131072;
+  for (let i = 0; i < args.length; i++) {
+    if (typeof args[i] === 'string' && Buffer.byteLength(args[i]) > MAX_ARG_STRLEN) {
+      process.stderr.write(
+        `fgos: warning: executor argument at index ${i} exceeds Linux MAX_ARG_STRLEN 128 KiB (${Buffer.byteLength(args[i])} bytes); spawn may fail with E2BIG. Consider delivery via file-pointer.\n`,
+      );
+    }
+  }
   return {
     command: executor.command,
     args,

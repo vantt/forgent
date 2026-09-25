@@ -31,33 +31,4 @@
 // auto-logging, `kind`-aware lifecycle-bearing vs. ephemeral routing per D5)
 // once a real caller needs it.
 
-import { RunnerConfigError } from './config.mjs';
-
 export { buildPrompt } from './operation-choice.mjs';
-
-/**
- * Validate that a dispatch call is legal BEFORE any payload is built for
- * it — the "named concept in the middle" D7 introduces (`docs/history/
- * dispatch-activation-and-handoff-redesign/CONTEXT.md`). Deliberately
- * narrow for this item: checks call legality only (`unit` is a real,
- * addressable dispatch target — a non-empty `id`), never the dispatch
- * MECHANISM (`tsk-5tm-3` D5 forbids re-deciding that here; `decide`'s own
- * judgment in `dispatch/mechanism.mjs` is untouched and unconsulted by this
- * function). Throws `RunnerConfigError` — the same error vocabulary every
- * other call-legality gate in this module family already uses — for a
- * `unit` with no `id`, rather than silently building a payload for nothing.
- * `opts` is accepted and returned unchanged: no options are validated yet,
- * kept for forward compatibility with the fuller shape a later item may
- * grow into (claim-ownership/footprint refusal, `kind`-aware routing per
- * D5) without changing this function's own call signature again.
- */
-export function prepareDispatch(unit, opts = {}) {
-  if (!unit || typeof unit !== 'object' || Array.isArray(unit)) {
-    throw new RunnerConfigError('prepareDispatch requires a "unit" object (the work item, or ad-hoc task, this dispatch is for).');
-  }
-  const id = unit.id || unit.assignmentId;
-  if (typeof id !== 'string' || !id.trim()) {
-    throw new RunnerConfigError('prepareDispatch requires "unit.id" (a non-empty string) — the dispatch target must be addressable.');
-  }
-  return { unit, opts };
-}

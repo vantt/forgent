@@ -556,6 +556,31 @@ export async function runSupervisor(envelopePath, opts = {}) {
     }
 
     // Step 3: Spawn worker process
+    const MAX_ARG_STRLEN = 131072;
+    const oversizedIdx = Array.isArray(args) ? args.findIndex((a) => typeof a === 'string' && Buffer.byteLength(a) > MAX_ARG_STRLEN) : -1;
+    if (oversizedIdx !== -1) {
+      const size = Buffer.byteLength(args[oversizedIdx]);
+      const durationMs = Date.now() - startTime;
+      deliverReceipt(
+        {
+          kind: 'spawn-failed',
+          exitCode: 1,
+          signal: null,
+          errorClass: 'worker-spawn-fail',
+          cause: `argument at index ${oversizedIdx} exceeds Linux MAX_ARG_STRLEN (128 KiB, size: ${size} bytes); consider delivery via file-pointer`,
+          settledAt: new Date().toISOString(),
+          durationMs,
+        },
+        {
+          terminationTarget: 'worker-pgid',
+          terminatedPgid: null,
+          coverage: 'process-group',
+          stoppedProof: 'not-claimed',
+        },
+      );
+      return;
+    }
+
     try {
       workerChild = child_process.spawn(command, args, {
         cwd,
@@ -589,13 +614,16 @@ export async function runSupervisor(envelopePath, opts = {}) {
     workerChild.on('error', (err) => {
       if (captureFrozen) return;
       const durationMs = Date.now() - startTime;
+      const cause = err.code === 'E2BIG'
+        ? `${err.message} (argument list too long; single argument exceeds Linux MAX_ARG_STRLEN 128 KiB; consider delivery via file-pointer)`
+        : err.message;
       deliverReceipt(
         {
           kind: 'spawn-failed',
           exitCode: 1,
           signal: null,
           errorClass: 'worker-spawn-fail',
-          cause: err.message,
+          cause,
           settledAt: new Date().toISOString(),
           durationMs,
         },
