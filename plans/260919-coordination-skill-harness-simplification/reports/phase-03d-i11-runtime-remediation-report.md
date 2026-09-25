@@ -112,9 +112,10 @@ This Round 3 remediation resolves the approval-blocking finding (I11R2-01) and r
 ## 6. Integration & Post-Merge Verification
 
 - **Integrated Commit SHA:** `main@3d706b8901bb8787f8c6c9b35641b9a4acaeea3b`
+- **Accounting & Verification Baseline SHA:** `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a`
 - **Post-Merge Verification Results:**
   - Focused test matrix (155 tests across DAG, driver steps, live-proof, start-status): **155 passed / 0 fail / 0 todo**
   - Full suite (`npm test`): **7652 passed / 0 failed / 8 skipped / 65 todo** (Exit code: 0)
   - Post-merge candidate regressions: **0**
-- **Status:** Integrated at `main@3d706b89`. Awaiting Track Manager final `VERIFIED` declaration.
-- **Unit I12:** Remains strictly **BLOCKED** until Track Manager authorizes opening I12.
+- **Status:** **VERIFIED** at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (ratified and verified by Track Manager).
+- **Unit I12:** **READY** (dependency Unit I11 verified; ready for implementation session).
