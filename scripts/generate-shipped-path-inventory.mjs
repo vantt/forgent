@@ -6,6 +6,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 
@@ -48,6 +49,61 @@ export const ALLOWED_ROOTS = [
   'scripts',
   'test',
 ];
+
+/**
+ * Resolves a given treeish or commit input to a full 40-character commit SHA.
+ * Fails closed if the input is absent, empty, or does not resolve to a valid commit object.
+ */
+export function resolveCommitSha(commit, repoRoot = process.cwd()) {
+  if (!commit || typeof commit !== 'string' || commit.trim() === '') {
+    throw new Error('Explicit commit/treeish is required (fail closed; cannot default to HEAD or working tree)');
+  }
+  const trimmed = commit.trim();
+  try {
+    const sha = execFileSync('git', ['rev-parse', '--verify', `${trimmed}^{commit}`], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    }).trim();
+    return sha;
+  } catch (err) {
+    throw new Error(`Explicit commit/treeish "${commit}" must resolve to a valid git commit: ${err.message}`);
+  }
+}
+
+/**
+ * Loads all tracked files and directories from the given commit SHA.
+ */
+export function loadCommitTree(commitSha, repoRoot = process.cwd()) {
+  const out = execFileSync('git', ['ls-tree', '-r', '--name-only', commitSha], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 30 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const files = out.split('\n').filter(Boolean);
+  const treeFiles = new Set(files);
+  const treeDirs = new Set();
+  for (const f of treeFiles) {
+    const parts = f.split('/');
+    for (let i = 1; i < parts.length; i++) {
+      treeDirs.add(parts.slice(0, i).join('/'));
+    }
+  }
+  return { commitSha, treeFiles, treeDirs };
+}
+
+/**
+ * Reads a blob's content directly from the git commit tree.
+ */
+export function readBlobAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
+  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 20 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+}
 
 export const EXT_JOIN_GUARD = new RegExp(
   '(?:' + KNOWN_EXTENSIONS.map((e) => e.replace('.', '\\.')).join('|') + ')[-\\/]$',
@@ -263,6 +319,12 @@ export const KNOWN_NONEXISTENT_EXAMPLES = new Set([
   'test/parser.test.mjs',
   'docs/metadata',
   'docs/notes.md',
+  '.claude/skills/gitnexus/gitnexus-cli/SKILL.md',
+  '.claude/skills/gitnexus/gitnexus-debugging/SKILL.md',
+  '.claude/skills/gitnexus/gitnexus-exploring/SKILL.md',
+  '.claude/skills/gitnexus/gitnexus-guide/SKILL.md',
+  '.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md',
+  '.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md',
 ]);
 
 export const KNOWN_STALE_OR_DEAD = new Set([
@@ -284,10 +346,26 @@ export const KNOWN_CONSUMER_PATTERNS = new Set([
 /**
  * Classifies secondary attributes of a referenced path:
  * referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget.
+ *
+ * NOTE: Existence is determined strictly from an explicit immutable Git commit tree
+ * (via treeFiles/treeDirs or commit), NEVER from fs.existsSync or checkout-local/untracked files.
  */
-export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scope = 'repository-local-contract' } = {}) {
+export function classifyPathAttributes(
+  relPath,
+  { repoRoot = process.cwd(), scope = 'repository-local-contract', commit, treeFiles, treeDirs } = {}
+) {
   const norm = normalizePosix(relPath);
-  const exists = fs.existsSync(path.resolve(repoRoot, norm));
+
+  if (!treeFiles && commit) {
+    const sha = resolveCommitSha(commit, repoRoot);
+    const loaded = loadCommitTree(sha, repoRoot);
+    treeFiles = loaded.treeFiles;
+    treeDirs = loaded.treeDirs;
+  }
+
+  // Existence MUST be derived from the committed git tree, never fs.existsSync.
+  // If neither treeFiles nor commit is provided, exists is false (fail safe against filesystem probing).
+  const exists = Boolean(treeFiles && treeDirs && (treeFiles.has(norm) || treeDirs.has(norm)));
   const isConsumerPattern = KNOWN_CONSUMER_PATTERNS.has(norm);
   const existenceStatus = (exists && !isConsumerPattern) ? 'exists' : 'nonexistent';
 
@@ -299,7 +377,7 @@ export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scop
     referenceKind = 'stale-or-dead';
     sourceRole = 'retired-decision-citation';
     resolutionStatus = 'stale-retired';
-  } else if (KNOWN_NONEXISTENT_EXAMPLES.has(norm)) {
+  } else if (KNOWN_NONEXISTENT_EXAMPLES.has(norm) || (norm.startsWith('.claude/skills/gitnexus/') && !exists)) {
     referenceKind = 'example-or-placeholder';
     sourceRole = 'illustrative-example';
     resolutionStatus = 'example-not-target';
@@ -328,7 +406,7 @@ export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scop
       resolutionStatus = 'unresolved';
     }
   } else {
-    // Exists on disk
+    // Exists in git tree
     if (norm === 'docs/specs/platform-foundations.md') {
       // Explicit generated projection of platform operating laws; non-authority mirror (F3)
       referenceKind = 'generated-mirror';
@@ -373,39 +451,32 @@ export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scop
   };
 }
 
-export function scanSurfaceFiles(repoRoot, dirs = SHIPPED_SURFACE_DIRS) {
-  const filePaths = [];
+export function scanSurfaceFiles(repoRoot, dirs = SHIPPED_SURFACE_DIRS, options = {}) {
+  let resolvedDirs = Array.isArray(dirs) ? dirs : SHIPPED_SURFACE_DIRS;
+  let commit = options?.commit ?? (typeof dirs === 'object' && !Array.isArray(dirs) ? dirs.commit : null);
+  let treeFiles = options?.treeFiles ?? (typeof dirs === 'object' && !Array.isArray(dirs) ? dirs.treeFiles : null);
 
-  for (const d of dirs) {
-    const dirAbs = path.resolve(repoRoot, d);
-    if (!fs.existsSync(dirAbs)) continue;
+  if (!treeFiles && commit) {
+    const sha = resolveCommitSha(commit, repoRoot);
+    treeFiles = loadCommitTree(sha, repoRoot).treeFiles;
+  }
 
-    function walk(curr) {
-      const entries = fs.readdirSync(curr, { withFileTypes: true });
-      for (const entry of entries) {
-        if (entry.name.startsWith('.')) {
-          // Allow .agents and .fgos if specifically inside target dirs
-          if (curr === repoRoot && (entry.name === '.agents' || entry.name === '.fgos')) {
-            // descend
-          } else if (entry.name !== '.agents' && entry.name !== '.fgos') {
-            continue;
-          }
-        }
-        const full = path.join(curr, entry.name);
-        if (entry.isDirectory()) {
-          if (!entry.isSymbolicLink()) walk(full);
-        } else if (entry.isFile()) {
-          const rel = normalizePosix(path.relative(repoRoot, full));
-          filePaths.push(rel);
+  if (treeFiles) {
+    const filePaths = [];
+    for (const f of treeFiles) {
+      for (const d of resolvedDirs) {
+        if (f === d || f.startsWith(d + '/')) {
+          filePaths.push(f);
+          break;
         }
       }
     }
-
-    walk(dirAbs);
+    filePaths.sort();
+    return filePaths;
   }
 
-  filePaths.sort();
-  return filePaths;
+  // If neither treeFiles nor commit is provided, fail closed
+  throw new Error('Explicit commit/treeish is required to scan surface files from git tree (fail closed)');
 }
 
 /**
@@ -462,12 +533,30 @@ export function normalizeContent(raw) {
     .join('');
 }
 
-export function extractPathReferences(repoRoot, surfaceFiles) {
+export function extractPathReferences(repoRoot, surfaceFiles, options = {}) {
+  let commitSha = null;
+  let treeFiles = options.treeFiles ?? null;
+  let treeDirs = options.treeDirs ?? null;
+
+  if (options.commit) {
+    commitSha = resolveCommitSha(options.commit, repoRoot);
+    if (!treeFiles || !treeDirs) {
+      const loaded = loadCommitTree(commitSha, repoRoot);
+      treeFiles = loaded.treeFiles;
+      treeDirs = loaded.treeDirs;
+    }
+  }
+
   const pathMap = new Map();
 
   for (const fileRel of surfaceFiles) {
-    const full = path.resolve(repoRoot, fileRel);
-    const raw = fs.readFileSync(full, 'utf8');
+    let raw;
+    if (commitSha) {
+      raw = readBlobAtCommit(commitSha, fileRel, repoRoot);
+    } else {
+      const full = path.resolve(repoRoot, fileRel);
+      raw = fs.readFileSync(full, 'utf8');
+    }
     const content = normalizeContent(raw);
 
     for (const match of content.matchAll(PATH_REGEX)) {
@@ -498,7 +587,7 @@ export function extractPathReferences(repoRoot, surfaceFiles) {
   const entries = sortedPaths.map((p) => {
     const files = [...pathMap.get(p)].sort();
     const { scope, rationale } = classifyContractScope(p);
-    const attrs = classifyPathAttributes(p, { repoRoot, scope });
+    const attrs = classifyPathAttributes(p, { repoRoot, scope, commit: commitSha, treeFiles, treeDirs });
     return {
       path: p,
       occurrencesCount: files.length,
@@ -516,9 +605,28 @@ export function extractPathReferences(repoRoot, surfaceFiles) {
   return entries;
 }
 
-export function generateInventory(repoRoot = process.cwd(), dirs = SHIPPED_SURFACE_DIRS) {
-  const files = scanSurfaceFiles(repoRoot, dirs);
-  const items = extractPathReferences(repoRoot, files);
+export function generateInventory(repoRoot = process.cwd(), dirs = SHIPPED_SURFACE_DIRS, options = {}) {
+  if (typeof repoRoot === 'object' && repoRoot !== null) {
+    options = repoRoot;
+    repoRoot = options.repoRoot || process.cwd();
+    dirs = options.dirs || SHIPPED_SURFACE_DIRS;
+  } else if (typeof dirs === 'object' && dirs !== null && !Array.isArray(dirs)) {
+    options = dirs;
+    dirs = options.dirs || SHIPPED_SURFACE_DIRS;
+  } else if (typeof options === 'string') {
+    options = { commit: options };
+  }
+
+  const commit = options?.commit;
+  if (!commit || typeof commit !== 'string' || commit.trim() === '') {
+    throw new Error('Explicit commit/treeish is required for inventory generation (fail closed; cannot default to HEAD or working tree)');
+  }
+
+  const commitSha = resolveCommitSha(commit, repoRoot);
+  const { treeFiles, treeDirs } = loadCommitTree(commitSha, repoRoot);
+
+  const files = scanSurfaceFiles(repoRoot, dirs, { commit: commitSha, treeFiles });
+  const items = extractPathReferences(repoRoot, files, { commit: commitSha, treeFiles, treeDirs });
 
   let consumerCount = 0;
   let repoLocalCount = 0;
@@ -710,13 +818,29 @@ export function generateMarkdownReport(inventory) {
 }
 
 export function runCli(argv, cwd = process.cwd()) {
+  const commitFlagIdx = argv.indexOf('--commit') >= 0 ? argv.indexOf('--commit') : argv.indexOf('--tree');
+  const commit = commitFlagIdx >= 0 ? argv[commitFlagIdx + 1] : null;
+
+  if (!commit || commit.startsWith('-')) {
+    console.error('Error: --commit <commit-or-treeish> is required (fail closed; cannot default to HEAD or working tree)');
+    return 1;
+  }
+
+  let commitSha;
+  try {
+    commitSha = resolveCommitSha(commit, cwd);
+  } catch (err) {
+    console.error(`Error: ${err.message}`);
+    return 1;
+  }
+
   const jsonOutIdx = argv.indexOf('--json-out');
   const mdOutIdx = argv.indexOf('--md-out');
 
   const jsonOut = jsonOutIdx >= 0 ? path.resolve(cwd, argv[jsonOutIdx + 1]) : null;
   const mdOut = mdOutIdx >= 0 ? path.resolve(cwd, argv[mdOutIdx + 1]) : null;
 
-  const inventory = generateInventory(cwd);
+  const inventory = generateInventory(cwd, SHIPPED_SURFACE_DIRS, { commit: commitSha });
 
   if (jsonOut) {
     fs.writeFileSync(jsonOut, JSON.stringify(inventory, null, 2) + '\n');

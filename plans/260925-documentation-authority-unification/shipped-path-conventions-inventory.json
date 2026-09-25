@@ -11,7 +11,7 @@
     ".agents/skills",
     ".fgos/instructions/effective"
   ],
-  "scannedFilesCount": 248,
+  "scannedFilesCount": 251,
   "totalUniquePathsCount": 183,
   "summary": {
     "consumerProjectContractsCount": 69,
@@ -20,16 +20,16 @@
     "unclassifiedCount": 0,
     "mixedCount": 7,
     "existence": {
-      "existsCount": 155,
-      "nonexistentCount": 28
+      "existsCount": 149,
+      "nonexistentCount": 34
     },
     "rewriteSafety": {
       "safeRewriteTargetsCount": 92,
       "nonTargetExamplesCount": 91
     },
     "referenceKinds": {
-      "literalCurrentPath": 148,
-      "exampleOrPlaceholder": 26,
+      "literalCurrentPath": 142,
+      "exampleOrPlaceholder": 32,
       "generatedMirror": 3,
       "staleOrDead": 2,
       "testEvidenceReference": 4,
@@ -156,10 +156,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
@@ -170,10 +170,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
@@ -184,10 +184,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
@@ -198,10 +198,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
@@ -212,10 +212,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
@@ -226,10 +226,10 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
-      "referenceKind": "literal-current-path",
-      "existenceStatus": "exists",
-      "sourceRole": "shipped-surface-contract",
-      "resolutionStatus": "resolved",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
       "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },

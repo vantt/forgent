@@ -26,13 +26,13 @@ must **never** inadvertently alter or break path contracts that consumer project
 ## 2. Summary Statistics
 
 - **Surfaces Scanned:** core, domains, plugins/fgOS, .agents/skills, .fgos/instructions/effective
-- **Total Shipped Files Scanned:** 248
+- **Total Shipped Files Scanned:** 251
 - **Total Unique Referenced Paths:** 183
 - **Consumer-Project Contracts:** 69
 - **Repository-Local Contracts:** 107
 - **Mixed Repository-Local and Consumer Contracts:** 7
 - **Unclassified Paths:** 0
-- **Path Existence:** 155 existing on disk, 28 nonexistent (examples, placeholders, patterns, retired citations)
+- **Path Existence:** 149 existing on disk, 34 nonexistent (examples, placeholders, patterns, retired citations)
 - **Safe Rewrite Targets:** 92 verified repo-local files
 - **Non-Target Examples & Placeholders:** 91 references (must not be rewritten merely because contractScope is repository-local)
 
@@ -49,12 +49,12 @@ These paths represent conventions expected to exist or be created in user/consum
 | `.claude/skills` | 6 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
 | `.claude/skills/fgos-coding-implement/SKILL.md` | 3 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
 | `.claude/skills/fgos-routing/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
-| `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` | 1 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-debugging/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-exploring/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-guide/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
+| `.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md` | 1 | `example-or-placeholder` | `nonexistent` | `illustrative-example` | `example-not-target` | Agent skill definitions and wrappers deployed to consumer workspaces |
 | `.claude/worktrees` | 1 | `example-or-placeholder` | `nonexistent` | `consumer-workspace-pattern` | `pattern-placeholder` | Harness worktree isolate directory convention |
 | `.fgos/assignments` | 3 | `example-or-placeholder` | `nonexistent` | `consumer-workspace-pattern` | `pattern-placeholder` | Runtime work-state, configuration, coordination, and session storage in consumer workspaces |
 | `.fgos/config.json` | 21 | `literal-current-path` | `exists` | `shipped-surface-contract` | `resolved` | Runtime work-state, configuration, coordination, and session storage in consumer workspaces |

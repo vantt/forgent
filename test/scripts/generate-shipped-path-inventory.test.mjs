@@ -21,6 +21,7 @@ import {
   classifyPathAttributes,
   KNOWN_NONEXISTENT_EXAMPLES,
   KNOWN_STALE_OR_DEAD,
+  SHIPPED_SURFACE_DIRS,
 } from '../../scripts/generate-shipped-path-inventory.mjs';
 
 const SCRIPT_PATH = fileURLToPath(
@@ -281,8 +282,8 @@ test('table-driven path grammar, negative glued tokens, and positive counterexam
 });
 
 test('deterministic generation: generating inventory twice produces identical results', () => {
-  const inv1 = generateInventory(REPO_ROOT);
-  const inv2 = generateInventory(REPO_ROOT);
+  const inv1 = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+  const inv2 = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
 
   assert.equal(
     JSON.stringify(inv1, null, 2),
@@ -321,7 +322,7 @@ test('CLI: outputs JSON and Markdown files correctly', () => {
 
     const res = spawnSync(
       process.execPath,
-      [SCRIPT_PATH, '--json-out', jsonOut, '--md-out', mdOut],
+      [SCRIPT_PATH, '--commit', 'HEAD', '--json-out', jsonOut, '--md-out', mdOut],
       { cwd: REPO_ROOT, encoding: 'utf8' }
     );
 
@@ -349,35 +350,35 @@ test('CLI: outputs JSON and Markdown files correctly', () => {
 
 test('classifyPathAttributes: deterministically differentiates referenceKind, existenceStatus, sourceRole, resolutionStatus', () => {
   // Known nonexistent examples in code/prompts
-  const fooAttr = classifyPathAttributes('src/foo.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const fooAttr = classifyPathAttributes('src/foo.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(fooAttr.referenceKind, 'example-or-placeholder');
   assert.equal(fooAttr.existenceStatus, 'nonexistent');
   assert.equal(fooAttr.sourceRole, 'illustrative-example');
   assert.equal(fooAttr.resolutionStatus, 'example-not-target');
   assert.equal(fooAttr.isSafeRewriteTarget, false);
 
-  const distillAttr = classifyPathAttributes('scripts/distill.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const distillAttr = classifyPathAttributes('scripts/distill.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(distillAttr.referenceKind, 'example-or-placeholder');
   assert.equal(distillAttr.existenceStatus, 'nonexistent');
   assert.equal(distillAttr.sourceRole, 'illustrative-example');
   assert.equal(distillAttr.resolutionStatus, 'example-not-target');
   assert.equal(distillAttr.isSafeRewriteTarget, false);
 
-  const authAttr = classifyPathAttributes('src/auth.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const authAttr = classifyPathAttributes('src/auth.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(authAttr.referenceKind, 'example-or-placeholder');
   assert.equal(authAttr.existenceStatus, 'nonexistent');
   assert.equal(authAttr.sourceRole, 'illustrative-example');
   assert.equal(authAttr.resolutionStatus, 'example-not-target');
   assert.equal(authAttr.isSafeRewriteTarget, false);
 
-  const retryAttr = classifyPathAttributes('src/runner/retry.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const retryAttr = classifyPathAttributes('src/runner/retry.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(retryAttr.referenceKind, 'example-or-placeholder');
   assert.equal(retryAttr.existenceStatus, 'nonexistent');
   assert.equal(retryAttr.sourceRole, 'illustrative-example');
   assert.equal(retryAttr.resolutionStatus, 'example-not-target');
   assert.equal(retryAttr.isSafeRewriteTarget, false);
 
-  const parserTestAttr = classifyPathAttributes('test/parser.test.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const parserTestAttr = classifyPathAttributes('test/parser.test.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(parserTestAttr.referenceKind, 'example-or-placeholder');
   assert.equal(parserTestAttr.existenceStatus, 'nonexistent');
   assert.equal(parserTestAttr.sourceRole, 'illustrative-example');
@@ -385,7 +386,7 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(parserTestAttr.isSafeRewriteTarget, false);
 
   // Real existing repository-local spec
-  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const runnerAttr = classifyPathAttributes('docs/specs/runner.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(runnerAttr.referenceKind, 'literal-current-path');
   assert.equal(runnerAttr.existenceStatus, 'exists');
   assert.equal(runnerAttr.sourceRole, 'platform-specification-or-doctrine');
@@ -393,7 +394,7 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(runnerAttr.isSafeRewriteTarget, true);
 
   // Real existing source file
-  const loopAttr = classifyPathAttributes('src/runner/loop.mjs', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const loopAttr = classifyPathAttributes('src/runner/loop.mjs', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(loopAttr.referenceKind, 'literal-current-path');
   assert.equal(loopAttr.existenceStatus, 'exists');
   assert.equal(loopAttr.sourceRole, 'internal-implementation');
@@ -401,7 +402,7 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(loopAttr.isSafeRewriteTarget, true);
 
   // Stale or dead decision citation
-  const staleAttr = classifyPathAttributes('docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const staleAttr = classifyPathAttributes('docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(staleAttr.referenceKind, 'stale-or-dead');
   assert.equal(staleAttr.existenceStatus, 'nonexistent');
   assert.equal(staleAttr.sourceRole, 'retired-decision-citation');
@@ -409,7 +410,7 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(staleAttr.isSafeRewriteTarget, false);
 
   // F3: Curated generated projection of platform operating laws
-  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'repository-local-contract' });
   assert.equal(genMirrorAttr.referenceKind, 'generated-mirror');
   assert.equal(genMirrorAttr.existenceStatus, 'exists');
   assert.equal(genMirrorAttr.sourceRole, 'generated-projection-non-authority');
@@ -417,12 +418,12 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(genMirrorAttr.isSafeRewriteTarget, false);
 
   // Consumer-project contract
-  const configAttr = classifyPathAttributes('.fgos/config.json', { repoRoot: REPO_ROOT, scope: 'consumer-project-contract' });
+  const configAttr = classifyPathAttributes('.fgos/config.json', { repoRoot: REPO_ROOT, commit: 'HEAD', scope: 'consumer-project-contract' });
   assert.equal(configAttr.isSafeRewriteTarget, false);
 });
 
 test('repository inventory: detects nonexistent examples and never labels them safe rewrite targets', () => {
-  const inv = generateInventory(REPO_ROOT);
+  const inv = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
 
   const targetExamples = [
     'scripts/distill.mjs',
@@ -443,6 +444,27 @@ test('repository inventory: detects nonexistent examples and never labels them s
     assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
   }
 
+  // Untracked GitNexus skills in domains/coding/AGENTS.md must be classified as nonexistent/example-not-target
+  const gitnexusExamples = [
+    '.claude/skills/gitnexus/gitnexus-cli/SKILL.md',
+    '.claude/skills/gitnexus/gitnexus-debugging/SKILL.md',
+    '.claude/skills/gitnexus/gitnexus-exploring/SKILL.md',
+    '.claude/skills/gitnexus/gitnexus-guide/SKILL.md',
+    '.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md',
+    '.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md',
+  ];
+
+  for (const target of gitnexusExamples) {
+    const item = inv.items.find((i) => i.path === target);
+    assert.ok(item, `Inventory must track "${target}"`);
+    assert.equal(item.contractScope, 'consumer-project-contract', `"${target}" contractScope is consumer-project-contract`);
+    assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
+    assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
+    assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
+    assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
+    assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
+  }
+
   // Summary counts
   assert.ok(inv.summary.rewriteSafety.safeRewriteTargetsCount > 0);
   assert.ok(inv.summary.rewriteSafety.nonTargetExamplesCount > 0);
@@ -450,6 +472,71 @@ test('repository inventory: detects nonexistent examples and never labels them s
     inv.summary.rewriteSafety.safeRewriteTargetsCount + inv.summary.rewriteSafety.nonTargetExamplesCount,
     inv.totalUniquePathsCount
   );
-  assert.equal(inv.summary.referenceKinds.exampleOrPlaceholder >= 5, true);
+  assert.equal(inv.summary.referenceKinds.exampleOrPlaceholder >= 11, true);
   assert.equal(inv.summary.referenceKinds.literalCurrentPath > 100, true);
+});
+
+test('environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit', () => {
+  const untrackedSurfaceFile = path.join(REPO_ROOT, 'core', 'untracked-contaminant-surface-file.md');
+  const untrackedGitnexusDir = path.join(REPO_ROOT, '.claude', 'skills', 'gitnexus', 'gitnexus-cli');
+  const untrackedGitnexusFile = path.join(untrackedGitnexusDir, 'SKILL.md');
+
+  try {
+    fs.writeFileSync(untrackedSurfaceFile, '# Untracked surface contaminant\n`docs/specs/fake-path-never-committed.md`\n');
+    fs.mkdirSync(untrackedGitnexusDir, { recursive: true });
+    fs.writeFileSync(untrackedGitnexusFile, '# Untracked gitnexus skill\n');
+
+    assert.ok(fs.existsSync(untrackedSurfaceFile), 'Untracked surface file exists on disk');
+    assert.ok(fs.existsSync(untrackedGitnexusFile), 'Untracked gitnexus file exists on disk');
+
+    const inv = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+
+    // 1. Untracked surface file is NOT scanned because it is absent from the commit tree
+    assert.ok(
+      !inv.items.some((i) => i.referencedIn.includes('core/untracked-contaminant-surface-file.md')),
+      'Untracked surface file must NOT be scanned'
+    );
+    assert.ok(
+      !inv.items.some((i) => i.path === 'docs/specs/fake-path-never-committed.md'),
+      'Paths inside untracked files must not enter inventory'
+    );
+
+    // 2. Untracked gitnexus file remains nonexistent / example-not-target despite physical presence on disk
+    const gnItem = inv.items.find((i) => i.path === '.claude/skills/gitnexus/gitnexus-cli/SKILL.md');
+    assert.ok(gnItem, 'Must track gitnexus path');
+    assert.equal(gnItem.existenceStatus, 'nonexistent', 'Must remain nonexistent despite local untracked file');
+    assert.equal(gnItem.resolutionStatus, 'example-not-target', 'Must remain example-not-target');
+    assert.equal(gnItem.isSafeRewriteTarget, false, 'Must not be safe rewrite target');
+  } finally {
+    if (fs.existsSync(untrackedSurfaceFile)) fs.unlinkSync(untrackedSurfaceFile);
+    if (fs.existsSync(untrackedGitnexusFile)) fs.unlinkSync(untrackedGitnexusFile);
+    if (fs.existsSync(untrackedGitnexusDir)) {
+      try {
+        fs.rmSync(path.join(REPO_ROOT, '.claude', 'skills', 'gitnexus'), { recursive: true, force: true });
+      } catch {}
+    }
+  }
+});
+
+test('fail closed on absent, empty, or non-commit treeish input', () => {
+  assert.throws(
+    () => generateInventory(REPO_ROOT),
+    /Explicit commit\/treeish is required/
+  );
+  assert.throws(
+    () => generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: '' }),
+    /Explicit commit\/treeish is required/
+  );
+  assert.throws(
+    () => generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: '0000000000000000000000000000000000000000' }),
+    /must resolve to a valid git commit/
+  );
+
+  const resMissing = spawnSync(process.execPath, [SCRIPT_PATH], { cwd: REPO_ROOT, encoding: 'utf8' });
+  assert.notEqual(resMissing.status, 0);
+  assert.match(resMissing.stderr, /--commit <commit-or-treeish> is required/);
+
+  const resInvalid = spawnSync(process.execPath, [SCRIPT_PATH, '--commit', 'nonexistent-ref-12345'], { cwd: REPO_ROOT, encoding: 'utf8' });
+  assert.notEqual(resInvalid.status, 0);
+  assert.match(resInvalid.stderr, /must resolve to a valid git commit/);
 });
