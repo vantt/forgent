@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 REMEDIATED, READY FOR INDEPENDENT RE-REVIEW (candidate SHA `15e3c4230`; F01, F02, F03 resolved; full suite 7652 pass exit 0; I11 not self-declared verified; I12 remains BLOCKED)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 REMEDIATION ROUND 2 READY FOR INDEPENDENT RE-REVIEW (candidate SHA `46896eb9de353b4fa88132995e4dfa5766eabdfc`; I11R-01 allow-list gate, I11R-02 unified resolveNodeCwd & target run validation, I11R-03/04 descendant blocked & M3a regression lock; I11 not self-declared verified; Unit I12 remains strictly BLOCKED)
 Created: 2026-09-19
 Last Updated: 2026-09-25
 Mode: high-risk
@@ -920,8 +920,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I11 — independently review combined Phase 2/3/dispatch/DAG runtime
   capability: code:review
   depends-on: I03, I05, I08, and I10
-  status: REMEDIATED, READY FOR INDEPENDENT RE-REVIEW (candidate SHA `15e3c4230`, baseline `585d5ad1f`; defects I11-F01, I11-F02, I11-F03 resolved; 0 todo / 0 fail on deferred probes; 49/49 focused DAG pass; 1045/1045 coord-wide pass; 7652/7652 full suite pass exit 0; I11 not self-declared verified)
-  remediation-candidate-sha: `15e3c4230`
+  status: REMEDIATION ROUND 2 READY FOR INDEPENDENT RE-REVIEW (candidate SHA `46896eb9de353b4fa88132995e4dfa5766eabdfc`, baseline `585d5ad1febc8067caad61b9d8953cf2002a750e`; round 2 remediation addresses I11R-01/F01, I11R-02/F02, I11R-03/F03; 0 todo / 0 fail on deferred probes; 49/49 focused DAG pass; 1045/1045 coord-wide pass; I11 not self-declared verified; Unit I12 remains strictly BLOCKED)
+  remediation-candidate-sha: `46896eb9de353b4fa88132995e4dfa5766eabdfc`
   remediation-report: plans/260919-coordination-skill-harness-simplification/reports/phase-03d-i11-runtime-remediation-report.md
   stop: any contract/authority/atomicity/replay blocker remains
 - unit: I12 — refactor dispatch boundaries in small reversible Phase 09 cells
