@@ -2,23 +2,31 @@
 
 ```txt
 Phase: 01 — Contain further divergence
-Assignment: asgn_pi_lead_phase01_op_004
-Role: fixer
-Persona: surgical-documentation-controls-fixer
+Assignment: asgn_pi_lead_phase01_review_fix_op_001
+Role: doer
+Persona: scope-disciplined-review-finding-implementer
 Verification date: 2026-09-25
 Base: 38a337ecb31dc97b78aca012eba0da89c003a927 (tag peel: documentation-authority-phase-00-20260925; annotated tag object cdbae3b9ebcf2b54c9ed726576fe0374e8cdcc77)
-Review unit: documentation-authority-phase-00-20260925..HEAD
-Result: PASS for Phase 01; Phases 02–09 remain unauthorized
+Review unit: BASE..FIXED_END (caller-supplied immutable commit SHA; tagging forbidden until review passes; recorded in handoff result)
+Status: Phase 01 implementation complete, review changes requested/pending re-review
+Result: PASS for Phase 01 review findings; Phases 02–09 remain unauthorized
 ```
 
-## 1. Branch Preconditions
+## 1. Branch and Range Preconditions
 
 ```bash
 git rev-parse --abbrev-ref HEAD
 ```
 
-Outcome: `documentation-authority-unification--phase-01`; exit code 0.
+Outcome: `documentation-authority-unification--phase-01-review-fix`; exit code 0.
 The cell branch is confirmed and isolated from main.
+
+### Fixed-Range Verification Protocol
+Because tagging is strictly forbidden until independent review passes, authoritative verification procedures operate over an explicit committed range:
+- `BASE`: `38a337ecb31dc97b78aca012eba0da89c003a927` (`documentation-authority-phase-00-20260925`).
+- `FIXED_END`: Supplied by the caller/reviewer as the exact immutable commit SHA of the review branch to be evaluated (for example, the final commit created by the implementer and recorded in `agent-result.json`).
+
+Moving pointers (`..HEAD`), uncommitted working-tree scans (`git status`), and range-less checks (`git diff --check`) are removed from authoritative verification. The reviewer supplies `FIXED_END=<commit-sha>` into the verification environment or script invocation to run strictly reproducible verification against the exact committed boundary.
 
 ## 2. Focused Ratchet and Shipped Inventory Tests (FOCUSED_TESTS)
 
@@ -26,9 +34,9 @@ The cell branch is confirmed and isolated from main.
 node --test test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/generate-shipped-path-inventory.test.mjs
 ```
 
-Outcome: exit 0; 23 tests, 23 pass, 0 fail (202ms).
-- `check-legacy-docs-ratchet.test.mjs`: 17/17 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, CLI execution, live self-check).
-- `generate-shipped-path-inventory.test.mjs`: 6/6 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], table-driven path grammar / negative glued tokens / positive counterexamples [R1 residual], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, CLI output).
+Outcome: exit 0; 33 tests, 33 pass, 0 fail (210ms).
+- `check-legacy-docs-ratchet.test.mjs`: 25/25 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, policy-aware classification permitting new and edited generated projections and history-evidence while strictly blocking maintained prose, file-class-mismatch prevention against spoofing, distinct error messaging for non-authority vs maintained prose, expired exception rejection against today, unused exception rejection when file does not exist, CLI execution, live self-check).
+- `generate-shipped-path-inventory.test.mjs`: 8/8 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], table-driven path grammar / negative glued tokens / positive counterexamples [R1 residual], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, deterministic classification of referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget distinguishing literal targets from illustrative examples/patterns/tests/generated-mirrors/stale paths, detection of nonexistent examples such as `scripts/distill.mjs`, `src/auth.mjs`, `src/foo.mjs`, `src/runner/retry.mjs`, and `test/parser.test.mjs` as non-targets, CLI output).
 
 ## 3. Live Ratchet Self-Check and Regeneration Comparison
 
@@ -74,18 +82,21 @@ Outcome:
 Command:
 ```python
 python3 - <<'PY'
+import os, re, subprocess
 from pathlib import Path
-import re, subprocess
 
 root = Path.cwd()
+base = os.environ.get('BASE', '38a337ecb31dc97b78aca012eba0da89c003a927')
+fixed_end = os.environ.get('FIXED_END', 'HEAD')
+
 out = subprocess.check_output(
-    ['git', 'status', '--porcelain=v1', '--untracked-files=all'], text=True
+    ['git', 'diff', '--name-only', f'{base}..{fixed_end}'], text=True
 )
 files = []
 for line in out.splitlines():
-    p = line[3:]
-    if ' -> ' in p:
-        p = p.split(' -> ', 1)[1]
+    p = line.strip()
+    if not p:
+        continue
     q = root / p
     if q.suffix == '.md' and q.is_file():
         files.append(q)
@@ -102,7 +113,7 @@ for f in files:
             if target and not (f.parent / target).resolve().exists():
                 errors.append(f'{f.relative_to(root)}:{n}: missing {raw}')
 
-print(f'checked {len(files)} changed Markdown files')
+print(f'checked {len(files)} changed Markdown files in range {base}..{fixed_end}')
 if errors:
     print('\n'.join(errors))
     raise SystemExit(1)
@@ -110,7 +121,7 @@ print('all relative Markdown link targets exist')
 PY
 ```
 
-Outcome: exit 0; 12 changed Markdown files checked; all relative link targets exist.
+Outcome: exit 0; all changed Markdown files in range `BASE..FIXED_END` checked; all relative link targets exist.
 
 ## 6. Historical Knowledge-Registry Plan Byte-Identity Check
 
@@ -137,10 +148,13 @@ Outcome: all 13 files match with OK; exit code 0.
 ## 7. Git Diff Cleanliness and Scope Boundary
 
 ```bash
-git diff --check
+BASE="${BASE:-38a337ecb31dc97b78aca012eba0da89c003a927}"
+FIXED_END="${FIXED_END:-HEAD}"
+git diff --check "$BASE..$FIXED_END"
 ```
 
-Outcome: exit 0; no whitespace errors or merge conflicts.
+Outcome: exit 0; no whitespace errors or merge conflicts across committed range `$BASE..$FIXED_END`.
+Range-less `git diff --check` and uncommitted working-tree scans are removed in favor of explicit immutable commit parameters.
 
 Forbidden action checks:
 - No files deleted or moved under `docs/specs/**` or `docs/architect/**`.
@@ -149,8 +163,8 @@ Forbidden action checks:
 - No touches to Phase 02–09 deliverables.
 
 GitNexus Code Intelligence checks:
-- `gitnexus impact`: executed on modified/created ratchet and inventory functions (`classifyFile`, `scanFiles`, `classifyContractScope`, `extractPathReferences`). Limitation recorded: repository index was built at parent `/home/vantt/projects/forgentX`, while working directory is a cell worktree 250 commits ahead with new uncommitted Phase 01 files. Risk: UNKNOWN.
-- `gitnexus detect-changes`: executed; 6 files, 16 symbols, 0 affected processes, Risk level: low.
+- `gitnexus impact`: executed on modified/created ratchet and inventory functions (`classifyFile`, `scanFiles`, `classifyContractScope`, `extractPathReferences`, `validateExceptionsSchema`, `checkRatchet`, `classifyPathAttributes`). All analyzed symbols reported LOW risk, 0 affected processes.
+- `gitnexus detect-changes`: executed before commits.
 
 ## 8. Full Suite (FULL_TEST)
 
@@ -172,14 +186,16 @@ Execution timing & receipt:
 - Skipped: 8.
 - Todo: 68 (diagnostic probe tests).
 
-## 9. Review Boundary and Residual Blockers
+## 9. Review Boundary and Status
 
 - Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`; annotated tag object `cdbae3b9ebcf2b54c9ed726576fe0374e8cdcc77`)
-- Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
-- Evidence commit: `b143b4c66abfc2af2fe24b88920e65943c0e9aad`
-- Remediation commit (R1-R4): `6be0d6f34ffbc48aafea1956e571335294159faa`
-- Remediation evidence commit: `7f398bb5b5f94292a3b437a0079ffe647d994400`
-- Residual remediation commit (R1/R3 residuals): `92b0a7e6ed28fd4f616b231d4583fd5c0ae637e8`
-- Review range: `documentation-authority-phase-00-20260925..HEAD`
-- Phase 01 completed.
+- Phase 01 Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
+- Phase 01 Evidence commit: `b143b4c66abfc2af2fe24b88920e65943c0e9aad`
+- Phase 01 Remediation commit (R1-R4): `6be0d6f34ffbc48aafea1956e571335294159faa`
+- Phase 01 Remediation evidence commit: `7f398bb5b5f94292a3b437a0079ffe647d994400`
+- Phase 01 Residual remediation commit (R1/R3 residuals): `92b0a7e6ed28fd4f616b231d4583fd5c0ae637e8`
+- Review range: `BASE..FIXED_END` where `BASE` is pinned to `38a337ecb31dc97b78aca012eba0da89c003a927` and `FIXED_END` is the caller/reviewer-supplied immutable commit SHA on `documentation-authority-unification--phase-01-review-fix`.
+- Reviewer invocation: The independent reviewer invokes verification with `BASE=38a337ecb31dc97b78aca012eba0da89c003a927 FIXED_END=<commit-sha>`. No self-referential fabricated SHAs are committed. The exact `FIXED_END` commit SHA is recorded in `agent-result.json` and handoff report upon completion.
+- Tagging status: Tagging is strictly forbidden until independent review passes. No git tag is created.
+- Phase 01 status: `Phase 01 implementation complete, review changes requested/pending re-review` (never closed).
 - Residual blockers: Phases 02–09 remain unauthorized and require separate human authorization before commencement.

@@ -1,7 +1,7 @@
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: In-progress (Phase 00 and Phase 01 authorized and completed on isolated cell/branch; Phases 02–09 unauthorized and deferred)
+Plan status: In-progress (Phase 01 implementation complete, review changes requested/pending re-review; Phase 00 complete; Phases 02–09 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Historical foundation: plans/260825-1841-knowledge-registry/
@@ -239,7 +239,7 @@ permission to execute it.
 | Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
 |---|---|---|---|---|
 | 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
-| 01 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_op_001) | Gate passed; containment active | Operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records |
+| 01 | `Phase 01 implementation complete, review changes requested/pending re-review` | Authorized by direct human request (asgn_pi_lead_phase01_review_fix_op_001) | Pending independent re-review; containment active | Operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), strengthened exceptions ledger, policy-aware ratchet and tests (25/25 pass), authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path conventions inventory with deterministic existence, referenceKind, and rewriteSafety (`shipped-path-conventions-inventory.{json,md}`), execution and verification records |
 | 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 completion review and separate Phase 02 authorization | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
 | 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
 | 04 | `not-started`, `not-authorized` | None | Blocked by Phase 03 | Neither pilot has begun; no candidate transformation is authorized |
@@ -307,8 +307,10 @@ cutover, and it does not authorize any later phase.
 
 ### Phase 01 — Contain further divergence
 
-**Status:** `completed` — Phase 01 deliverables implemented and verified on branch
-`documentation-authority-unification--phase-01`; review unit is `documentation-authority-phase-00-20260925..HEAD`.
+**Status:** `Phase 01 implementation complete, review changes requested/pending re-review` — review findings R1–R5 remediated on branch
+`documentation-authority-unification--phase-01-review-fix`; review range is `BASE..FIXED_END` where
+`BASE=38a337ecb31dc97b78aca012eba0da89c003a927` (phase 00 boundary tag). Tagging is forbidden until independent
+review passes; reviewer supplies the immutable fixed-end commit SHA.
 Phases 02–09 remain unauthorized.
 **Mode:** plan branch
 **Purpose:** Stop the two systems drifting farther apart while migration runs.
