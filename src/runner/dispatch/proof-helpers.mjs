@@ -161,7 +161,7 @@ export function commitCommandOutcome({
     throw new Error(`Command state file "${commandPath}" does not exist.`);
   }
   const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  if (controlToken !== undefined) {
+  if (controlToken !== undefined && controlToken !== null) {
     const controlTokenDigest = computeSha256Digest(controlToken);
     if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
       throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
@@ -186,7 +186,7 @@ export function patchCommandRecord({ runDir, launchCommandId, controlEpoch, cont
     throw new Error(`Command state file "${commandPath}" does not exist.`);
   }
   const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  if (controlToken !== undefined) {
+  if (controlToken !== undefined && controlToken !== null) {
     const controlTokenDigest = computeSha256Digest(controlToken);
     if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
       throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);

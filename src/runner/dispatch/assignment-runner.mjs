@@ -93,7 +93,7 @@ import {
   inspectRunControl,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
-import { reconcileHerdrSpawnRun } from './herdr-round.mjs';
+import { reconcileHerdrSpawnRun } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import {
