@@ -1,0 +1,15 @@
+{
+  "$schema": "https://forgent.dev/schemas/legacy-root-exceptions.v1.json",
+  "version": 1,
+  "description": "Reviewed exceptions ledger for legacy roots ratchet during documentation authority unification",
+  "exceptions": [
+    {
+      "path": "docs/specs/reading-map.md",
+      "kind": "allowed-edit",
+      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge.",
+      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001)",
+      "expectedDigest": "04e7c7b51842d440da94a818e7120c34e8ef833c629021c53ec141757384067f",
+      "reviewedAt": "2026-09-25"
+    }
+  ]
+}

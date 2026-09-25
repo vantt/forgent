@@ -1,0 +1,540 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import {
+  generateBaseline,
+  checkRatchet,
+  validateBaselineSchema,
+  validateExceptionsSchema,
+  classifyFile,
+  computeSha256,
+  scanFiles,
+  DEFAULT_ROOTS,
+  DEFAULT_BASELINE_PATH,
+} from '../../scripts/check-legacy-docs-ratchet.mjs';
+
+const SCRIPT_PATH = fileURLToPath(
+  new URL('../../scripts/check-legacy-docs-ratchet.mjs', import.meta.url)
+);
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+function mkTmpDir(prefix = 'ratchet-test-') {
+  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+}
+
+test('deterministic generation: generating baseline twice yields byte-for-byte identical content', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    const rootB = path.join(tmp, 'docs/architect');
+    fs.mkdirSync(rootA, { recursive: true });
+    fs.mkdirSync(rootB, { recursive: true });
+
+    // Create files in random order
+    fs.writeFileSync(path.join(rootA, 'zeta.md'), 'Zeta content\n');
+    fs.writeFileSync(path.join(rootA, 'alpha.md'), 'Alpha content\n');
+    fs.writeFileSync(path.join(rootB, 'beta.json'), '{"beta": 1}\n');
+    fs.writeFileSync(path.join(rootB, 'gamma.md'), 'Gamma content\n');
+
+    const base1 = generateBaseline({ repoRoot: tmp, roots: ['docs/specs', 'docs/architect'] });
+    const base2 = generateBaseline({ repoRoot: tmp, roots: ['docs/specs', 'docs/architect'] });
+
+    const str1 = JSON.stringify(base1, null, 2);
+    const str2 = JSON.stringify(base2, null, 2);
+
+    assert.equal(str1, str2, 'Consecutive generations must be byte-for-byte identical');
+    assert.deepEqual(Object.keys(base1.files), [
+      'docs/architect/beta.json',
+      'docs/architect/gamma.md',
+      'docs/specs/alpha.md',
+      'docs/specs/zeta.md',
+    ]);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('class/scope: properly classifies markdown authority, retained sources, and non-markdown evidence', () => {
+  assert.equal(classifyFile('docs/specs/runner.md'), 'maintained-authority');
+  assert.equal(classifyFile('docs/architect/agent-coordination/contracts/session.md'), 'maintained-authority');
+  assert.equal(classifyFile('docs/architect/agent-coordination/proposals/p1.md'), 'retained-source');
+  assert.equal(classifyFile('docs/architect/agent-coordination/proof.json'), 'history-evidence');
+  assert.equal(classifyFile('docs/architect/agent-coordination/chart.png'), 'history-evidence');
+});
+
+test('new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    fs.writeFileSync(path.join(rootA, 'existing.md'), 'Initial\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Add new unreviewed file
+    fs.writeFileSync(path.join(rootA, 'brand-new-legacy.md'), 'Should be rejected\n');
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    assert.equal(result.findings.length, 1);
+    assert.equal(result.findings[0].type, 'unreviewed-new-file');
+    assert.match(result.findings[0].message, /brand-new-legacy\.md/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('accounted edit: file modified with valid reviewed exception passes', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    const targetFile = path.join(rootA, 'existing.md');
+    fs.writeFileSync(targetFile, 'Initial content\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Modify file
+    fs.writeFileSync(targetFile, 'Updated content for valid reason\n');
+    const newDigest = computeSha256(fs.readFileSync(targetFile));
+
+    const exceptions = {
+      version: 1,
+      exceptions: [
+        {
+          path: 'docs/specs/existing.md',
+          kind: 'allowed-edit',
+          rationale: 'Verified stale standing route correction in Phase 01',
+          approvedBy: 'Phase 01 authorization',
+          expectedDigest: newDigest,
+          reviewedAt: '2026-09-25',
+        },
+      ],
+    };
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions,
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, true);
+    assert.equal(result.findings.length, 0);
+    assert.equal(result.stats.accountedEditsCount, 1);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('unaccounted edit: file modified without exception or with digest mismatch is refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    const targetFile = path.join(rootA, 'existing.md');
+    fs.writeFileSync(targetFile, 'Initial content\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Modify file without exception
+    fs.writeFileSync(targetFile, 'Tampered content\n');
+
+    const resultWithoutException = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(resultWithoutException.clean, false);
+    assert.equal(resultWithoutException.findings.length, 1);
+    assert.equal(resultWithoutException.findings[0].type, 'unaccounted-edit');
+
+    // Modify file with mismatched digest in exception
+    const exceptionsMismatched = {
+      version: 1,
+      exceptions: [
+        {
+          path: 'docs/specs/existing.md',
+          kind: 'allowed-edit',
+          rationale: 'Mismatch test',
+          approvedBy: 'Tester',
+          expectedDigest: '0000000000000000000000000000000000000000000000000000000000000000',
+        },
+      ],
+    };
+
+    const resultMismatch = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: exceptionsMismatched,
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(resultMismatch.clean, false);
+    assert.equal(resultMismatch.findings.length, 1);
+    assert.equal(resultMismatch.findings[0].type, 'unaccounted-edit');
+    assert.match(resultMismatch.findings[0].message, /digest mismatch/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('unexpected deletion: baselined file missing without exception is refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    const f1 = path.join(rootA, 'stay.md');
+    const f2 = path.join(rootA, 'delete-me.md');
+    fs.writeFileSync(f1, 'Staying\n');
+    fs.writeFileSync(f2, 'Will be deleted\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    fs.unlinkSync(f2);
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    assert.equal(result.findings.length, 1);
+    assert.equal(result.findings[0].type, 'unexpected-deletion');
+    assert.match(result.findings[0].message, /delete-me\.md/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('malformed baseline: schema validator rejects invalid baseline structures', () => {
+  assert.throws(() => validateBaselineSchema(null), /Malformed baseline/);
+  assert.throws(() => validateBaselineSchema([]), /Malformed baseline/);
+  assert.throws(() => validateBaselineSchema({ version: 2 }), /expected version 1/);
+  assert.throws(() => validateBaselineSchema({ version: 1, roots: [] }), /roots must be a non-empty array/);
+  assert.throws(() => validateBaselineSchema({ version: 1, roots: ['docs'], files: 'invalid' }), /files must be an object map/);
+  assert.throws(
+    () =>
+      validateBaselineSchema({
+        version: 1,
+        roots: ['docs'],
+        files: {
+          'bad/file.md': { digest: 'short', size: 10, fileClass: 'text' },
+        },
+      }),
+    /invalid sha256 digest/
+  );
+});
+
+test('malformed exception: schema validator rejects invalid exception objects', () => {
+  assert.throws(() => validateExceptionsSchema(null), /Malformed exceptions/);
+  assert.throws(() => validateExceptionsSchema({ version: 2 }), /expected version 1/);
+  assert.throws(() => validateExceptionsSchema({ version: 1, exceptions: 'not-an-array' }), /"exceptions" must be an array/);
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [{ path: 'foo.md', kind: 'invalid-kind', rationale: 'r', approvedBy: 'a' }],
+      }),
+    /invalid kind/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [{ path: 'foo.md', kind: 'allowed-deletion', rationale: 'r', approvedBy: 'a' }],
+      }),
+    /deletions are strictly forbidden/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [
+          {
+            path: 'docs/specs/foo.md',
+            kind: 'allowed-edit',
+            rationale: 'r1',
+            approvedBy: 'a',
+            expectedDigest: 'a'.repeat(64),
+          },
+          {
+            path: 'docs/specs/foo.md',
+            kind: 'allowed-edit',
+            rationale: 'r2',
+            approvedBy: 'b',
+            expectedDigest: 'b'.repeat(64),
+          },
+        ],
+      }),
+    /duplicate exception/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [{ path: 'foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', expectedDigest: 'short' }],
+      }),
+    /valid 64-char hex expectedDigest/
+  );
+});
+
+test('dotfiles: unreviewed dotfile under legacy root is detected and refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    fs.writeFileSync(path.join(rootA, 'regular.md'), 'Content\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Add hidden dotfile
+    fs.writeFileSync(path.join(rootA, '.hidden.md'), 'Hidden\n');
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    const finding = result.findings.find((f) => f.path.includes('.hidden.md'));
+    assert.ok(finding, 'Must find unreviewed dotfile');
+    assert.equal(finding.type, 'unreviewed-new-file');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    fs.writeFileSync(path.join(rootA, 'regular.md'), 'Content\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    const pipePath = path.join(rootA, 'test.fifo');
+    const mkfifoRes = spawnSync('mkfifo', [pipePath]);
+    if (mkfifoRes.status === 0 && fs.existsSync(pipePath)) {
+      const result = checkRatchet({
+        repoRoot: tmp,
+        baseline,
+        exceptions: { version: 1, exceptions: [] },
+        roots: ['docs/specs'],
+      });
+
+      assert.equal(result.clean, false);
+      const finding = result.findings.find((f) => f.path.includes('test.fifo'));
+      assert.ok(finding, 'Must detect FIFO');
+      assert.equal(finding.type, 'forbidden-entry');
+      assert.match(finding.message, /fifo/);
+    }
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('symlink identity: replacing a symlink with regular file of identical bytes is refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    const targetFile = path.join(rootA, 'target.md');
+    fs.writeFileSync(targetFile, 'Same bytes\n');
+
+    const linkPath = path.join(rootA, 'link.md');
+    fs.symlinkSync('target.md', linkPath);
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+    assert.equal(baseline.files['docs/specs/link.md'].isSymlink, true);
+
+    // Replace symlink with regular file containing identical bytes
+    fs.unlinkSync(linkPath);
+    fs.writeFileSync(linkPath, 'Same bytes\n');
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    const finding = result.findings.find((f) => f.path === 'docs/specs/link.md');
+    assert.ok(finding, 'Must detect symlink identity change');
+    assert.equal(finding.type, 'symlink-identity-mismatch');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('symlink target: retargeting a symlink to another file of equal bytes is refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    const targetA = path.join(rootA, 'targetA.md');
+    const targetB = path.join(rootA, 'targetB.md');
+    fs.writeFileSync(targetA, 'Identical bytes\n');
+    fs.writeFileSync(targetB, 'Identical bytes\n');
+
+    const linkPath = path.join(rootA, 'link.md');
+    fs.symlinkSync('targetA.md', linkPath);
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Retarget symlink to targetB
+    fs.unlinkSync(linkPath);
+    fs.symlinkSync('targetB.md', linkPath);
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    const finding = result.findings.find((f) => f.path === 'docs/specs/link.md');
+    assert.ok(finding, 'Must detect symlink target change');
+    assert.equal(finding.type, 'symlink-target-mismatch');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('tree escape: symlink pointing outside repository root or directory symlink is refused', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+
+    const escapeLink = path.join(rootA, 'escape.md');
+    fs.symlinkSync('../../../outside.md', escapeLink);
+
+    const baseline = {
+      $schema: 'https://forgent.dev/schemas/legacy-root-baseline.v1.json',
+      version: 1,
+      roots: ['docs/specs'],
+      fileCount: 0,
+      files: {},
+    };
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false);
+    const escapeFinding = result.findings.find((f) => f.path === 'docs/specs/escape.md');
+    assert.ok(escapeFinding, 'Must detect tree escape');
+    assert.equal(escapeFinding.type, 'tree-escape');
+
+    // Directory symlink test
+    fs.unlinkSync(escapeLink);
+    const dirTarget = path.join(tmp, 'external-dir');
+    fs.mkdirSync(dirTarget);
+    const dirLink = path.join(rootA, 'dir-symlink');
+    fs.symlinkSync(dirTarget, dirLink);
+
+    const resultDir = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(resultDir.clean, false);
+    const dirFinding = resultDir.findings.find((f) => f.path === 'docs/specs/dir-symlink');
+    assert.ok(dirFinding, 'Must detect directory symlink');
+    assert.equal(dirFinding.type, 'forbidden-entry');
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('classification: includes curated generated projections alongside maintained authority', () => {
+  assert.equal(classifyFile('docs/specs/platform-foundations.md'), 'generated');
+  assert.equal(classifyFile('docs/specs/runner.md'), 'maintained-authority');
+  assert.equal(classifyFile('docs/architect/agent-coordination/contracts/session.md'), 'maintained-authority');
+  assert.equal(classifyFile('docs/architect/agent-coordination/proposals/p1.md'), 'retained-source');
+  assert.equal(classifyFile('docs/architect/agent-coordination/proof.json'), 'history-evidence');
+});
+
+test('CLI: exits 0 on clean tree and exits 1 on finding', () => {
+  const tmp = mkTmpDir();
+  try {
+    const rootA = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootA, { recursive: true });
+    fs.writeFileSync(path.join(rootA, 'spec.md'), 'Clean spec\n');
+
+    const baseFile = path.join(tmp, 'baseline.json');
+    const excFile = path.join(tmp, 'exceptions.json');
+
+    // 1. Write baseline via CLI
+    const writeRes = spawnSync(
+      process.execPath,
+      [SCRIPT_PATH, '--write-baseline', '--repo-root', tmp, '--roots', 'docs/specs', '--baseline', baseFile],
+      { encoding: 'utf8' }
+    );
+    assert.equal(writeRes.status, 0, `write-baseline failed: ${writeRes.stderr}`);
+    assert.ok(fs.existsSync(baseFile));
+
+    // 2. Check clean baseline via CLI
+    const checkRes = spawnSync(
+      process.execPath,
+      [SCRIPT_PATH, '--repo-root', tmp, '--roots', 'docs/specs', '--baseline', baseFile, '--exceptions', excFile],
+      { encoding: 'utf8' }
+    );
+    assert.equal(checkRes.status, 0, `check failed: ${checkRes.stderr}`);
+    assert.match(checkRes.stdout, /clean/);
+
+    // 3. Add illegal file
+    fs.writeFileSync(path.join(rootA, 'unauthorized.md'), 'Nope\n');
+
+    const failRes = spawnSync(
+      process.execPath,
+      [SCRIPT_PATH, '--repo-root', tmp, '--roots', 'docs/specs', '--baseline', baseFile, '--exceptions', excFile],
+      { encoding: 'utf8' }
+    );
+    assert.equal(failRes.status, 1, 'CLI should exit 1 on unauthorized file');
+    assert.match(failRes.stderr, /unreviewed-new-file/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('live self-check: repository baseline and ratchet verify cleanly', () => {
+  const baselinePath = path.resolve(REPO_ROOT, DEFAULT_BASELINE_PATH);
+  assert.ok(fs.existsSync(baselinePath), 'Checked-in baseline must exist');
+
+  const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+  assert.equal(baseline.fileCount, 994);
+
+  const res = spawnSync(
+    process.execPath,
+    [SCRIPT_PATH, '--repo-root', REPO_ROOT],
+    { encoding: 'utf8' }
+  );
+  assert.equal(res.status, 0, `Live check failed: ${res.stderr}\n${res.stdout}`);
+  assert.match(res.stdout, /clean/);
+});

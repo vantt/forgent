@@ -1,0 +1,2175 @@
+{
+  "$schema": "https://forgent.dev/schemas/shipped-path-conventions-inventory.v1.json",
+  "version": 1,
+  "generatedAt": "2026-09-25T00:00:00.000Z",
+  "phase": "01",
+  "description": "Deterministic inventory of path conventions referenced in shipped surfaces, separating repository-local from consumer-project contracts",
+  "surfacesScanned": [
+    "core",
+    "domains",
+    "plugins/fgOS",
+    ".agents/skills",
+    ".fgos/instructions/effective"
+  ],
+  "scannedFilesCount": 248,
+  "totalUniquePathsCount": 189,
+  "summary": {
+    "consumerProjectContractsCount": 70,
+    "repositoryLocalContractsCount": 112,
+    "mixedRepositoryLocalAndConsumerCount": 7,
+    "unclassifiedCount": 0,
+    "mixedCount": 7
+  },
+  "items": [
+    {
+      "path": ".agents/skills",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".agents/skills/_shared/catchup-self-recovery.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-loop/references/blocked-pick-decision-tree.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".agents/skills/_shared/coding-worker-contract.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/registry.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".agents/skills/fgos-coding-implement/SKILL.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/fgos-coding-implement/SKILL.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/fgos-routing/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-cli/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-debugging/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-exploring/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-guide/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/skills/gitnexus/gitnexus-refactoring/SKILL.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
+    },
+    {
+      "path": ".claude/worktrees",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/pick/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Harness worktree isolate directory convention"
+    },
+    {
+      "path": ".fgos/assignments",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/config.json",
+      "occurrencesCount": 21,
+      "referencedIn": [
+        ".agents/skills/_shared/capability-catalog.md",
+        ".agents/skills/_shared/catchup-self-recovery.md",
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        ".agents/skills/fgos-coding-implement/SKILL.md",
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/coordination-protocols/group-cognition-framework.yaml",
+        "core/coordination-protocols/independent-research-fan-out-fan-in.yaml",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/catchup-self-recovery.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/terminal/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/coordination/sessions",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/coordination/sessions/code-panel",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/events.jsonl",
+      "occurrencesCount": 10,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/AGENTS.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/discover-loop/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/plan-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-next/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/events.lock",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/cleanup-next/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/installation/bin/fgos",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/logs",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/discover-loop/SKILL.md",
+        "plugins/fgOS/skills/plan-loop/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": ".fgos/main-checkout.lock",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/fgos-unlock/SKILL.md",
+        "core/skills/fgos-unlock/SKILL.md",
+        "core/task-specs/fgos-unlock.md",
+        "plugins/fgOS/skills/fgos-unlock/SKILL.md",
+        "plugins/fgOS/skills/unlock/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
+    },
+    {
+      "path": "bin/fgos.mjs",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/_shared/fgos-cli-fallback.md",
+        "core/skills/_shared/fgos-cli-fallback.md",
+        "plugins/fgOS/skills/_shared/fgos-cli-fallback.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "core/coordination-protocols",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml",
+        "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/architecture-advisory-panel-v1.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/declared-consult.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/declared-consult.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/deliberation-delphi-chain.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/deliberation-delphi-chain.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/deliberation-nominal-group-chain.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/deliberation-nominal-group-chain.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/deliberation-rfc-chain.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/deliberation-rfc-chain.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/group-cognition-framework.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-cognition-framework.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/group-thinking-delphi-feedback-lite.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-thinking-delphi-feedback-lite.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/group-thinking-nominal-group-lite.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-thinking-nominal-group-lite.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/group-thinking-rfc-review-lite.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/independent-research-fan-out-fan-in.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/independent-research-fan-out-fan-in.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/coordination-protocols/standalone-master-coordination-loop.yaml",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/instructions/platform-laws.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        ".fgos/instructions/effective/repo.json"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Platform operating law definitions: authoritative platform source truth projected into consumer workspace instructions"
+    },
+    {
+      "path": "core/protocol-packs/group-thinking.json",
+      "occurrencesCount": 7,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/coordination-protocols/group-thinking-rfc-review-lite.yaml",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
+    },
+    {
+      "path": "core/skills/_shared/private-cell-worktree.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
+    },
+    {
+      "path": "core/skills/fgos-group-thinking/SKILL.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
+    },
+    {
+      "path": "core/skills/fgos-panel/SKILL.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-plan-loop/SKILL.md",
+        "core/skills/fgos-plan-loop/SKILL.md",
+        "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/agent-coordination/verification",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-plan-loop/SKILL.md",
+        "core/skills/fgos-plan-loop/SKILL.md",
+        "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/architect/knowledge-registry-redesign.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-knowledge/SKILL.md",
+        "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/backlog.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/decisions",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-unlock/SKILL.md",
+        "core/skills/fgos-unlock/SKILL.md",
+        "plugins/fgOS/skills/fgos-unlock/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/fgos-clarifying/SKILL.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/fgos-clarifying/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/distillery",
+      "occurrencesCount": 7,
+      "referencedIn": [
+        ".agents/skills/distill/references/consult-protocol.md",
+        ".agents/skills/distill/references/extract-rules.md",
+        ".agents/skills/distill/scripts/distill.mjs",
+        "core/skills/distill/references/consult-protocol.md",
+        "core/skills/distill/references/extract-rules.md",
+        "core/skills/distill/scripts/distill.mjs",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/comparison-matrix.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/deep-dives",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/distill/SKILL.md",
+        ".agents/skills/distill/references/deep-dive-protocol.md",
+        "core/skills/distill/SKILL.md",
+        "core/skills/distill/references/deep-dive-protocol.md",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/porting-log.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/sources",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/distill/references/consult-protocol.md",
+        "core/skills/distill/references/consult-protocol.md",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/state",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/distill/scripts/distill.mjs",
+        ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/skills/distill/scripts/distill.mjs",
+        "core/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/state/porting",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        ".agents/skills/distill/scripts/migrate-porting-state-backfill.mjs",
+        "core/skills/distill/scripts/migrate-porting-state-backfill.mjs"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/distillery/taxonomy.txt",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/distill/SKILL.md",
+        "core/skills/distill/SKILL.md",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Project-local reference-learning distillery area"
+    },
+    {
+      "path": "docs/enduser-docs-index.json",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "core/task-specs/fgos-indexing.md",
+        "domains/coding/task-specs/compound-learn.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/explanation",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/history",
+      "occurrencesCount": 55,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        ".agents/skills/fgos-coding-exploring/SKILL.md",
+        ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        ".agents/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        ".agents/skills/fgos-coding-implement/SKILL.md",
+        ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        ".agents/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        ".agents/skills/fgos-coding-planning/SKILL.md",
+        ".agents/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        ".agents/skills/fgos-coding-shaping/SKILL.md",
+        ".agents/skills/fgos-coding-validating/SKILL.md",
+        ".agents/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        ".agents/skills/fgos-researching/SKILL.md",
+        "core/skills/_shared/citation-format.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "core/task-specs/fgos-researching.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "domains/coding/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "domains/coding/skills/fgos-coding-planning/SKILL.md",
+        "domains/coding/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/SKILL.md",
+        "domains/coding/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "domains/coding/task-specs/lock-decisions.md",
+        "domains/coding/task-specs/shape-plan.md",
+        "plugins/fgOS/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
+        "plugins/fgOS/skills/coding-shape/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/lock-decisions-and-write-context.md",
+        "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/worker-contract-and-orient.md",
+        "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/bootstrap-and-lane.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-validating/references/bootstrap-and-reality-gate.md",
+        "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "plugins/fgOS/skills/fgos-researching/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/agent-coordination-foundation/plan.md",
+      "occurrencesCount": 9,
+      "referencedIn": [
+        ".agents/skills/_shared/capability-catalog.md",
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/_shared/planning-capability-awareness.md",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/claude-named-executor/RESEARCH.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/coding-planning-validating-gate-redesign/CONTEXT.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/cook/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/commit-time-fgos-deletion-guard",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/discover-decompose-skill",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/plan/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/discover-decompose-skill-wrapper-verdict-routing",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/discover/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/discover-decompose-skill-wrapper-verdict-routing/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        "plugins/fgOS/skills/discover-next/SKILL.md",
+        "plugins/fgOS/skills/discover/SKILL.md",
+        "plugins/fgOS/skills/plan/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/fgos-cleanup-loop/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/retro-loop/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/fgos-retro-loop/CONTEXT.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "plugins/fgOS/skills/retro-loop/SKILL.md",
+        "plugins/fgOS/skills/retro-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/fgos-terminal-close-autoclose/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        "plugins/fgOS/skills/discover/SKILL.md",
+        "plugins/fgOS/skills/terminal-close/SKILL.md",
+        "plugins/fgOS/skills/terminal-close/close.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/fgos-terminal-pane-rename/CONTEXT.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "plugins/fgOS/skills/terminal/SKILL.md",
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/gate-bypass/CONTEXT.md",
+      "occurrencesCount": 7,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "domains/coding/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+        "plugins/fgOS/skills/cook/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/gate-mechanics.md",
+        "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/iron-law-gate-human-ux/CONTEXT.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/main-checkout-destructive-git-safety-net/CONTEXT.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "domains/coding/AGENTS.md",
+        "plugins/fgOS/skills/cook/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/merge-standardization/CONTEXT.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/orchestrator-worker-slots/DISCUSSION.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        "plugins/fgOS/skills/terminal/SKILL.md",
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/pi-executor-runtime-capacity/RESEARCH.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/retro-next-shared-driving/CONTEXT.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/retro-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/self-contained-id-references/CONTEXT.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/self-contained-id-references/DISCUSSION.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/tsk-5gd/RESEARCH.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/coding-worker-contract.md",
+        "core/skills/_shared/coding-worker-contract.md",
+        "plugins/fgOS/skills/_shared/coding-worker-contract.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/tsk-5tm-3/iron-law-evidence.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/two-layer-dispatch/DISCUSSION.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/history/worktree-manual-merge-fgos-blob-safety-net",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/how-to",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/author-a-plan-loop-track.md",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        ".agents/skills/fgos-plan-loop/SKILL.md",
+        "core/skills/fgos-plan-loop/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/catchup-self-recovery.md",
+        "core/skills/_shared/catchup-self-recovery.md",
+        "plugins/fgOS/skills/_shared/catchup-self-recovery.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/fix-fgos-write-rejected-merge-block.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/preserve",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/resolve-an-events-jsonl-merge-conflict.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/AGENTS.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/run-a-coordination-session.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-plan-loop/SKILL.md",
+        "core/skills/fgos-plan-loop/SKILL.md",
+        "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/use-fgos-architecture-panel.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/wire-a-skills-classify-step-through-an-agent-executor-executor.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/how-to/write-verify-for-a-skill-prose-change.md",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/id-systems-audit.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/cook/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/metadata",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/notes.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/operator-runbook-herdr-cockpit.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/terminal/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/platform-foundations.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        ".fgos/instructions/effective/repo.json",
+        "core/instructions/platform-laws.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/platform/packaging-distribution/code-panel-rollout-plan.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/reference",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/reference-learning-system.md",
+      "occurrencesCount": 2,
+      "referencedIn": [
+        ".agents/skills/distill/references/consult-protocol.md",
+        "core/skills/distill/references/consult-protocol.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "docs/specs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/specs/reading-map.md",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "core/task-specs/fgos-indexing.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "occurrencesCount": 15,
+      "referencedIn": [
+        ".agents/skills/fgos-clarifying/SKILL.md",
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        ".agents/skills/fgos-coding-shaping/SKILL.md",
+        ".agents/skills/fgos-researching/SKILL.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/skills/fgos-researching/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/fgos-researching/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
+    },
+    {
+      "path": "docs/tutorials",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-indexing/SKILL.md",
+        "core/skills/fgos-indexing/SKILL.md",
+        "plugins/fgOS/skills/fgos-indexing/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
+    },
+    {
+      "path": "domains/coding/AGENTS.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-routing/SKILL.md",
+        "core/skills/fgos-routing/SKILL.md",
+        "plugins/fgOS/skills/fgos-routing/SKILL.md"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "domains/coding/harness/enrich-and-validate-contract.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/harness/enrich-and-validate-contract.mjs"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "domains/coding/instructions/verification-discipline.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "domains/coding/registry.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/registry.yaml"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "domains/coding/task-specs/judge-ambiguity.md",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "domains/coding/workflows/feature.yaml",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/workflows/feature.yaml"
+      ],
+      "contractScope": "mixed-repository-local-and-consumer",
+      "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
+    },
+    {
+      "path": "plugins/fgOS/skills",
+      "occurrencesCount": 12,
+      "referencedIn": [
+        ".agents/skills/_shared/fgos-cli-fallback.md",
+        ".agents/skills/fgos-coding-driving/SKILL.md",
+        ".agents/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "core/skills/_shared/fgos-cli-fallback.md",
+        "domains/coding/skills/fgos-coding-driving/SKILL.md",
+        "domains/coding/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/_shared/fgos-cli-fallback.md",
+        "plugins/fgOS/skills/fgos-coding-driving/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-exploring/references/scope-and-reclaim.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Client plugins providing slash commands in user harnesses"
+    },
+    {
+      "path": "plugins/fgOS/skills/_shared/catchup-self-recovery.md",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-loop/references/blocked-pick-decision-tree.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Client plugins providing slash commands in user harnesses"
+    },
+    {
+      "path": "plugins/fgOS/skills/submit/SKILL.md",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-shaping/SKILL.md",
+        "domains/coding/skills/fgos-coding-shaping/SKILL.md",
+        "plugins/fgOS/skills/cook/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Client plugins providing slash commands in user harnesses"
+    },
+    {
+      "path": "plugins/fgOS/skills/terminal/rename.sh",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Client plugins providing slash commands in user harnesses"
+    },
+    {
+      "path": "plugins/packages/open",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/agents/researcher.yaml"
+      ],
+      "contractScope": "consumer-project-contract",
+      "rationale": "Client plugins providing slash commands in user harnesses"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.baseline.json",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "scripts/check-decision-citation-drift.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/citation-format.md",
+        "core/skills/_shared/citation-format.md",
+        "plugins/fgOS/skills/_shared/citation-format.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "scripts/distill.mjs",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        ".agents/skills/distill/CREATION-LOG.md",
+        ".agents/skills/distill/SKILL.md",
+        "core/skills/distill/CREATION-LOG.md",
+        "core/skills/distill/SKILL.md",
+        "core/task-specs/distill.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "scripts/write-wrapper-script.mjs",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/_shared/fgos-cli-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/fgos-cli-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/fgos-cli-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/auth.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/cli/command-registry.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/evolve/iron-law.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/foo.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/foo.mjscapability",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/planning-capability-awareness.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/intake",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-routing/SKILL.md",
+        "core/skills/fgos-routing/SKILL.md",
+        "core/task-specs/fgos-routing.md",
+        "plugins/fgOS/skills/fgos-routing/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/intake/classify.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/submit/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/intake/discovery.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/discover/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/intake/plan.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/task-specs/shape-plan.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/intake/risk-keywords.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-fanout/SKILL.md",
+        "core/skills/fgos-fanout/SKILL.md",
+        "plugins/fgOS/skills/fgos-fanout/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/parser.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/report/capability-plan-lint.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/planning-capability-awareness.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/report/enduser-index.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/task-specs/fgos-indexing.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/claim-port.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-unlock/SKILL.md",
+        "core/skills/fgos-unlock/SKILL.md",
+        "plugins/fgOS/skills/fgos-unlock/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/coordination/session-engine.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/definitions/protocol-loader.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        "core/coordination-protocols/declared-consult.yaml",
+        "core/coordination-protocols/group-cognition-framework.yaml",
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/definitions/schema.mjs",
+      "occurrencesCount": 5,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml",
+        "core/coordination-protocols/declared-consult.yaml",
+        "core/coordination-protocols/deliberation-rfc-chain.yaml",
+        "core/coordination-protocols/group-cognition-framework.yaml",
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/deliberation/schema.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/dispatch.mjs",
+      "occurrencesCount": 24,
+      "referencedIn": [
+        ".agents/skills/_shared/capability-catalog.md",
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        ".agents/skills/_shared/planning-capability-awareness.md",
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        ".agents/skills/fgos-capability-dispatching/SKILL.md",
+        ".agents/skills/fgos-coding-implement/SKILL.md",
+        ".agents/skills/fgos-fanout/SKILL.md",
+        ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/planning-capability-awareness.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-capability-dispatching/SKILL.md",
+        "core/skills/fgos-fanout/SKILL.md",
+        "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
+        "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-capability-dispatching/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/fgos-fanout/SKILL.md",
+        "plugins/fgOS/skills/fgos-fanout/references/wave-dispatch-mechanics.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/dispatch.mjsexecute",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/dispatch/assignment-policy.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/dispatch/assignment.mjs",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "domains/coding/harness/enrich-and-validate-contract.mjs",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/dispatch/resolve.mjs",
+      "occurrencesCount": 6,
+      "referencedIn": [
+        ".agents/skills/_shared/capability-catalog.md",
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/_shared/capability-catalog.md",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/loop.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-fanout/SKILL.md",
+        "core/skills/fgos-fanout/SKILL.md",
+        "plugins/fgOS/skills/fgos-fanout/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/main-checkout-lock.mjs",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-unlock/SKILL.md",
+        "core/skills/fgos-unlock/SKILL.md",
+        "plugins/fgOS/skills/fgos-unlock/SKILL.md",
+        "plugins/fgOS/skills/unlock/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/merge.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/paths.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/harness/enrich-and-validate-contract.mjs"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/retry.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/worker-log.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/runner/worktree.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/private-cell-worktree.md",
+        "core/skills/_shared/private-cell-worktree.md",
+        "plugins/fgOS/skills/_shared/private-cell-worktree.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/setup/registrations.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/capability-catalog.md",
+        "core/skills/_shared/capability-catalog.md",
+        "plugins/fgOS/skills/_shared/capability-catalog.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/cleanup-harness.mjs",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-knowledge/SKILL.md",
+        "domains/coding/skills/fgos-coding-knowledge/SKILL.md",
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/cleanup-pool.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/cleanup-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/discover-pool.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/discover-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/gate-bypass.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/task-specs/lock-decisions.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/graph-harness.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/merge-list/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/graph-metrics.mjs",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/fgos-fanout/SKILL.md",
+        "core/skills/fgos-fanout/SKILL.md",
+        "plugins/fgOS/skills/fgos-fanout/SKILL.md",
+        "plugins/fgOS/skills/graph/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/plan-pool.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/plan-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/postland-drift.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "domains/coding/skills/fgos-coding-driving/references/loop-mechanics.md",
+        "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/retro-pool.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/retro-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/status-fsm.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-driving/SKILL.md",
+        "domains/coding/skills/fgos-coding-driving/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-driving/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/store.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/cleanup-next/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/tool-registry.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/work.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/state/workflow-stage-graphs.mjs",
+      "occurrencesCount": 11,
+      "referencedIn": [
+        ".agents/skills/fgos-clarifying/SKILL.md",
+        ".agents/skills/fgos-coding-discovering/SKILL.md",
+        ".agents/skills/fgos-coding-driving/SKILL.md",
+        "core/skills/fgos-clarifying/SKILL.md",
+        "core/task-specs/fgos-clarifying.md",
+        "core/task-specs/fgos-routing.md",
+        "domains/coding/skills/fgos-coding-discovering/SKILL.md",
+        "domains/coding/skills/fgos-coding-driving/SKILL.md",
+        "plugins/fgOS/skills/fgos-clarifying/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-driving/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/util/session-identity.mjs",
+      "occurrencesCount": 4,
+      "referencedIn": [
+        ".agents/skills/_shared/executor-dispatch-fallback.md",
+        "core/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+        "plugins/fgOS/skills/terminal/rename.sh"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/verbs/coordination",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/verbs/coordination/group-thinking-pack.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/verbs/coordination/run.mjs",
+      "occurrencesCount": 7,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/verbs/coordination/schema.mjs",
+      "occurrencesCount": 14,
+      "referencedIn": [
+        ".agents/skills/fgos-architecture-panel/SKILL.md",
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        ".agents/skills/fgos-group-thinking/SKILL.md",
+        ".agents/skills/fgos-plan-loop/SKILL.md",
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml",
+        "core/coordination-protocols/standalone-master-coordination-loop.yaml",
+        "core/skills/fgos-architecture-panel/SKILL.md",
+        "core/skills/fgos-group-thinking/SKILL.md",
+        "core/skills/fgos-plan-loop/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-group-thinking/SKILL.md",
+        "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/verbs/coordination/show.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "src/x.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-code-panel/SKILL.md",
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "test/parser.test.mjs",
+      "occurrencesCount": 3,
+      "referencedIn": [
+        ".agents/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "domains/coding/skills/fgos-coding-planning/references/split-and-child-specs.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "test/runner/assignment-policy.test.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "domains/coding/harness/enrich-and-validate-contract.mjs"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "test/runner/coordination-driver-authorization.test.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "test/runner/coordination-group-thinking-rfc-review-lite.test.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    },
+    {
+      "path": "test/runner/coordination-nominal-group-lite.test.mjs",
+      "occurrencesCount": 1,
+      "referencedIn": [
+        "core/coordination-protocols/group-thinking-nominal-group-lite.yaml"
+      ],
+      "contractScope": "repository-local-contract",
+      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
+    }
+  ]
+}

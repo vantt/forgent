@@ -14,6 +14,7 @@ Do not use this for: User-facing task guidance or generated indexes
 Last reviewed: 2026-09-25
 Related:
 - `docs/doc-governance.md`
+- `docs/transitional-switchboard.md`
 - `docs/reading-map.md`
 ```
 
@@ -54,25 +55,28 @@ Target area docs live at `docs/platform/<area>/`.
 |---|---|---|
 | Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |
 | Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |
-| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phase 00 truth reset is completed, Phases 01–09 remain unauthorized |
+| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phase 00 and Phase 01 are completed, Phases 02–09 remain unauthorized |
 | Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |
 | Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 
 ## 4. How To Change Platform Docs
 
 1. Read `docs/doc-governance.md`.
-2. Read this portal and the relevant area portal/spec.
-3. Read the relevant vision and intent-preservation ledger when the change
+2. Read [migration-authoring-rules.md](migration-authoring-rules.md) and [../transitional-switchboard.md](../transitional-switchboard.md).
+3. Read this portal and the relevant area portal/spec.
+4. Read the relevant vision and intent-preservation ledger when the change
    narrows, stages, or simplifies the full design.
-4. Use a discussion scratchpad for multi-round shaping.
-5. Promote settled content into the right canonical doc.
-6. Update links and verification pointers.
+5. Use a discussion scratchpad for multi-round shaping.
+6. Promote settled content into the right canonical doc.
+7. Update links and verification pointers.
 
 ## 5. Related Files
 
 | Relationship | File |
 |---|---|
 | governs docs | [../doc-governance.md](../doc-governance.md) |
+| operative transitional switchboard | [../transitional-switchboard.md](../transitional-switchboard.md) |
+| migration authoring rules | [migration-authoring-rules.md](migration-authoring-rules.md) |
 | routes readers | [../reading-map.md](../reading-map.md) |
 | defines platform direction | [vision.md](vision.md) |
 | preserves platform intent | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
