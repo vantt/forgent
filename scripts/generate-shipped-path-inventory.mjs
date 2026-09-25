@@ -17,8 +17,89 @@ export const SHIPPED_SURFACE_DIRS = [
   '.fgos/instructions/effective'
 ];
 
-export const PATH_REGEX = /(?:^|[\s"'`(\[<])((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]+(?:\.md|\.json|\.mjs|\.yaml|\.txt|\.sh|\.lock|\.jsonl)?)/g;
+export const PATH_REGEX = /(?:^|[\s"'`(\[<])((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]+)/g;
 export const GLUED_TOKEN_REGEX = /(?:\.mjs|\.jsonl|\.yaml|\.yml|\.txt|\.sh|\.lock|\.md|\.json(?!l))[a-zA-Z]/;
+
+export const KNOWN_EXTENSIONS = [
+  '.jsonl',
+  '.yaml',
+  '.lock',
+  '.json',
+  '.mjs',
+  '.cjs',
+  '.yml',
+  '.txt',
+  '.md',
+  '.sh',
+  '.js',
+  '.ts',
+];
+
+export const ALLOWED_ROOTS = [
+  'core',
+  'docs',
+  '.fgos',
+  'domains',
+  '.agents',
+  '.claude',
+  'plugins',
+  'src',
+  'bin',
+  'scripts',
+  'test',
+];
+
+export const EXT_JOIN_GUARD = new RegExp(
+  '(?:' + KNOWN_EXTENSIONS.map((e) => e.replace('.', '\\.')).join('|') + ')[-\\/]$',
+  'i'
+);
+
+export function canonicalizeRepoPath(rawPath) {
+  let p = normalizePosix(rawPath);
+  p = p.replace(/^\.\//, '');
+  p = p.replace(/\/+/g, '/');
+  let prev;
+  do {
+    prev = p;
+    p = p.replace(/\/\.\//g, '/');
+  } while (p !== prev);
+  p = p.replace(/\/\.$/, '');
+  return p;
+}
+
+export function isValidPathGrammar(p) {
+  const segments = p.split('/').filter(Boolean);
+  if (segments.length < 2) return false;
+  if (!ALLOWED_ROOTS.includes(segments[0])) return false;
+  if (segments.includes('..') || segments.includes('.')) return false;
+
+  for (let i = 1; i < segments.length - 1; i++) {
+    const seg = segments[i];
+    if (!/^[a-zA-Z0-9_.-]+$/.test(seg)) return false;
+    for (const ext of KNOWN_EXTENSIONS) {
+      if (seg.endsWith(ext) || seg.includes(ext)) return false;
+    }
+  }
+
+  const leaf = segments[segments.length - 1];
+  const matchedExt = KNOWN_EXTENSIONS.find((ext) => leaf.endsWith(ext));
+  if (matchedExt) {
+    const stem = leaf.slice(0, -matchedExt.length);
+    if (!stem || !/^[a-zA-Z0-9_.-]+$/.test(stem)) return false;
+    for (const ext of KNOWN_EXTENSIONS) {
+      if (stem.endsWith(ext)) return false;
+    }
+    return true;
+  }
+
+  for (const ext of KNOWN_EXTENSIONS) {
+    if (leaf.includes(ext)) return false;
+  }
+  if (leaf.includes('.')) return false;
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(leaf)) return false;
+  return true;
+}
 
 export function normalizePosix(p) {
   return p.split(path.sep).join('/');
@@ -233,7 +314,13 @@ export function normalizeContent(raw) {
       // Process inline code spans: `...`
       let prose = part.replace(/(?<!`)(`{1,2})(?!`)([\s\S]*?)(?<!`)\1(?!`)/g, (_, fence, code) => {
         // Hyphen or slash line wrap inside code span: e.g. "foo-\n  bar" -> "foo-bar"
-        let clean = code.replace(/([-\/])\r?\n\s*/g, '$1');
+        // Guard: do NOT join across line breaks if prefix ends with a known extension (e.g. .mjs- or .mjs/)
+        let clean = code.replace(/([^\s]+[-\/])\r?\n\s*([^\s]+)/g, (match, prefix, suffix) => {
+          if (EXT_JOIN_GUARD.test(prefix)) {
+            return prefix + ' ' + suffix;
+          }
+          return prefix + suffix;
+        });
         // Backslash line continuation
         clean = clean.replace(/\\\r?\n\s*/g, ' ');
         // All other line breaks inside inline code become spaces (CommonMark spec)
@@ -243,7 +330,12 @@ export function normalizeContent(raw) {
       // In prose text outside inline backticks, also rejoin lines that wrap with a hyphen or slash in a path:
       prose = prose.replace(
         /((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]*[-\/])\r?\n\s*([a-zA-Z0-9_\.\/-]+)/g,
-        '$1$2'
+        (match, prefix, suffix) => {
+          if (EXT_JOIN_GUARD.test(prefix)) {
+            return prefix + '\n' + suffix;
+          }
+          return prefix + suffix;
+        }
       );
       return prose;
     })
@@ -266,21 +358,19 @@ export function extractPathReferences(repoRoot, surfaceFiles) {
       candidate = candidate.replace(/[-\/]+$/, '');
       if (candidate.length === 0) continue;
 
-      // Reject glued tokens (e.g. .mjscapability, .mjsexecute, .mdfoo)
+      // Reject glued tokens (denylist fallback)
       if (GLUED_TOKEN_REGEX.test(candidate)) continue;
 
-      // Skip invalid single-segment roots or truncated fragments (must contain at least root/item)
-      const norm = normalizePosix(candidate);
-      const segments = norm.split('/').filter(Boolean);
-      if (segments.length < 2) continue;
+      // Canonicalize repo path: normalize redundant ./ and repeated slashes
+      const canon = canonicalizeRepoPath(candidate);
 
-      // Tree escape guard: ignore any candidate containing '..'
-      if (segments.includes('..')) continue;
+      // Positive boundary and grammar validation
+      if (!isValidPathGrammar(canon)) continue;
 
-      if (!pathMap.has(norm)) {
-        pathMap.set(norm, new Set());
+      if (!pathMap.has(canon)) {
+        pathMap.set(canon, new Set());
       }
-      pathMap.get(norm).add(fileRel);
+      pathMap.get(canon).add(fileRel);
     }
   }
 

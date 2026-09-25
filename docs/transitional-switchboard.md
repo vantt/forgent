@@ -45,11 +45,11 @@ and reader guesswork before atomic cutover.
 
 ## 2. Area Authority Routes
 
-| Area / surface | authorityStatus | fileClass | Current Canonical Route | Retained / Subordinate Sources | Role / Scope Summary |
+| Area / surface | authorityStatus | fileClass | Current Route / Canonical Owner | Retained / Subordinate Sources | Role / Scope Summary |
 |---|---|---|---|---|---|
-| Platform laws | candidate | maintained-authority + retained-source + generated | `docs/platform-foundations.md` (authoritative text); enter at `docs/platform/platform-foundations.md` (entry/summary) | `docs/specs/platform-foundations.md` (spec projection) | Complete binding wording, rationale, sources, and review thresholds are owned exclusively by `docs/platform-foundations.md`. |
-| Platform vision and work lifecycle | candidate | maintained-authority + retained-source | `docs/platform/vision.md` (entry); `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` (retained sources) | `docs/work-item-lifecycle-vision.md` | Target vision is candidate ("Yes, after review"); retained root docs own locked mission/priority wording. |
-| Whole-system architecture and component boundaries | candidate | maintained-authority + retained-source | `docs/architecture-map.md` (architecture); `docs/platform/component-boundary.md` (boundary portal) | `docs/architect/component-boundary/**` | `docs/architecture-map.md` owns full architecture map; component-boundary entry routes to detailed sources under `docs/architect/component-boundary/`. |
+| Platform laws | candidate | maintained-authority + retained-source + generated | `docs/platform-foundations.md` (authoritative text); enter at `docs/platform/platform-foundations.md` (candidate entry/summary) | `docs/specs/platform-foundations.md` (spec projection) | Complete binding wording, rationale, sources, and review thresholds are owned exclusively by `docs/platform-foundations.md`. |
+| Platform vision and work lifecycle | candidate | maintained-authority + retained-source | `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` (retained sources/locked wording); enter at `docs/platform/vision.md` (candidate entry/navigation) | `docs/work-item-lifecycle-vision.md` | Target vision is candidate ("Yes, after review"); retained root docs own locked mission/priority wording. |
+| Whole-system architecture and component boundaries | candidate | maintained-authority + retained-source | `docs/architecture-map.md` (full architecture map); enter at `docs/platform/component-boundary.md` (candidate boundary portal) | `docs/architect/component-boundary/**` | `docs/architecture-map.md` owns full architecture map; component-boundary entry routes to detailed sources under `docs/architect/component-boundary/`. |
 | System overview | legacy-current | maintained-authority | `docs/specs/system-overview.md` | None | Live Area Map and Shared Entities sections remain the consolidated current cross-area spec. |
 | Work state / work lifecycle engine | legacy-current | maintained-authority + retained-source | `docs/specs/work-state.md` | `docs/io-contract.md`, `docs/work-item-lifecycle-vision.md` | `docs/specs/work-state.md` owns core state, events, fsm, store, and envelope. `docs/io-contract.md` owns CLI I/O contract. |
 | Runner / dispatch / merge lifecycle | legacy-current | maintained-authority | `docs/specs/runner.md` | `docs/routing-handoff-contract.md` | `docs/specs/runner.md` owns runner loop, dispatch, merge gate, and worker log. Agent-to-agent boundary owned by `docs/routing-handoff-contract.md`. |
@@ -69,7 +69,7 @@ and reader guesswork before atomic cutover.
 
 ## 3. Root Document Routes
 
-| Root document | authorityStatus | fileClass | Current Canonical Role / Route |
+| Root document | authorityStatus | fileClass | Current Role / Route |
 |---|---|---|---|
 | `docs/README.md` | legacy-current | maintained-authority | Top-level documentation overview. |
 | `docs/architecture-map.md` | legacy-current | maintained-authority | Full current system architecture map (v0.2, ADR0010). |

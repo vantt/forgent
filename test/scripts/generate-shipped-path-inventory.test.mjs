@@ -14,6 +14,10 @@ import {
   normalizeContent,
   GLUED_TOKEN_REGEX,
   PATH_REGEX,
+  canonicalizeRepoPath,
+  isValidPathGrammar,
+  KNOWN_EXTENSIONS,
+  ALLOWED_ROOTS,
 } from '../../scripts/generate-shipped-path-inventory.mjs';
 
 const SCRIPT_PATH = fileURLToPath(
@@ -145,6 +149,129 @@ test('extractPathReferences: handles fenced prose and multiline commands without
       !paths.some((p) => GLUED_TOKEN_REGEX.test(p)),
       'Extracted paths must not contain glued characters after known extensions'
     );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('table-driven path grammar, negative glued tokens, and positive counterexamples (R1 residual)', () => {
+  const tmp = mkTmpDir('shipped-table-test-');
+  try {
+    const negativeCases = [
+      // Op_009 red-team letter glue after extensions
+      { input: 'Invalid: `src/foo.mjscapability`', fakeToken: 'src/foo.mjscapability', reason: 'letter glue after .mjs' },
+      { input: 'Invalid: `src/runner/dispatch.mjsexecute`', fakeToken: 'src/runner/dispatch.mjsexecute', reason: 'letter glue after .mjs' },
+      { input: 'Invalid: `src/foo.cjsability`', fakeToken: 'src/foo.cjsability', reason: 'letter glue after .cjs' },
+      { input: 'Invalid: `src/foo.tsbar`', fakeToken: 'src/foo.tsbar', reason: 'letter glue after .ts' },
+      { input: 'Invalid: `src/foo.jsbar`', fakeToken: 'src/foo.jsbar', reason: 'letter glue after .js' },
+      { input: 'Invalid: `src/foo.jsonx`', fakeToken: 'src/foo.jsonx', reason: 'letter glue after .json' },
+
+      // Op_009 red-team digit glue after extensions
+      { input: 'Invalid: `src/foo.mjs2`', fakeToken: 'src/foo.mjs2', reason: 'digit glue after .mjs' },
+      { input: 'Invalid: `src/foo.json5`', fakeToken: 'src/foo.json5', reason: 'digit glue after .json' },
+
+      // Op_009 red-team underscore glue after extensions
+      { input: 'Invalid: `src/foo.mjs_execute`', fakeToken: 'src/foo.mjs_execute', reason: 'underscore glue after .mjs' },
+
+      // Op_009 red-team hyphen glue after extensions
+      { input: 'Invalid: `src/foo.mjs-execute`', fakeToken: 'src/foo.mjs-execute', reason: 'hyphen glue after .mjs' },
+      { input: 'Invalid: `src/foo.mjs-capability`', fakeToken: 'src/foo.mjs-capability', reason: 'hyphen glue after .mjs' },
+
+      // Op_009 red-team backup suffixes after extensions
+      { input: 'Invalid: `src/foo.mjs.bak`', fakeToken: 'src/foo.mjs.bak', reason: 'backup suffix .bak after .mjs' },
+      { input: 'Invalid: `src/foo.mjs.old`', fakeToken: 'src/foo.mjs.old', reason: 'backup suffix .old after .mjs' },
+      { input: 'Invalid: `src/foo.mjs.tmp`', fakeToken: 'src/foo.mjs.tmp', reason: 'backup suffix .tmp after .mjs' },
+      { input: 'Invalid: `src/foo.mjs.orig`', fakeToken: 'src/foo.mjs.orig', reason: 'backup suffix .orig after .mjs' },
+      { input: 'Invalid: `src/foo.mjs~`', fakeToken: 'src/foo.mjs~', reason: 'backup suffix ~ after .mjs' },
+
+      // Op_009 red-team slash glue after extensions
+      { input: 'Invalid: `src/foo.mjs/execute`', fakeToken: 'src/foo.mjs/execute', reason: 'slash/subpath after .mjs' },
+
+      // Traversal and unknown extension attempts
+      { input: 'Invalid: `docs/specs/../../escape.md`', fakeToken: 'escape.md', reason: 'directory traversal' },
+      { input: 'Invalid: `src/foo.bak`', fakeToken: 'src/foo.bak', reason: 'unknown extension/backup suffix' },
+      { input: 'Invalid: `src/foo.tmp`', fakeToken: 'src/foo.tmp', reason: 'unknown extension/temp suffix' },
+    ];
+
+    for (const { input, fakeToken, reason } of negativeCases) {
+      const fileName = `neg-${Math.random().toString(36).slice(2)}.md`;
+      fs.writeFileSync(path.join(tmp, fileName), input);
+      const extracted = extractPathReferences(tmp, [fileName]).map((i) => i.path);
+      assert.ok(
+        !extracted.includes(fakeToken),
+        `Must NOT extract fake glued token "${fakeToken}" (${reason})`
+      );
+    }
+
+    // Direct grammar checks on individual fake tokens
+    for (const { fakeToken, reason } of negativeCases) {
+      assert.equal(
+        isValidPathGrammar(canonicalizeRepoPath(fakeToken)),
+        false,
+        `isValidPathGrammar must reject "${fakeToken}" (${reason})`
+      );
+    }
+
+    // Line wrap after extension tests (prose and inline code)
+    const wrapTests = [
+      {
+        content: 'Check `src/foo.mjs-\n  capability` for details.',
+        fakeToken: 'src/foo.mjs-capability',
+        expectedClean: 'src/foo.mjs',
+        desc: 'inline code hyphen wrap after .mjs',
+      },
+      {
+        content: 'Check src/foo.mjs-\ncapability for details.',
+        fakeToken: 'src/foo.mjs-capability',
+        expectedClean: 'src/foo.mjs',
+        desc: 'prose hyphen wrap after .mjs',
+      },
+      {
+        content: 'Run `src/foo.mjs/\n  execute` command.',
+        fakeToken: 'src/foo.mjs/execute',
+        expectedClean: 'src/foo.mjs',
+        desc: 'inline code slash wrap after .mjs',
+      },
+      {
+        content: 'Run src/runner/dispatch.mjs/\nexecute command.',
+        fakeToken: 'src/runner/dispatch.mjs/execute',
+        expectedClean: 'src/runner/dispatch.mjs',
+        desc: 'prose slash wrap after .mjs',
+      },
+    ];
+
+    for (const { content, fakeToken, expectedClean, desc } of wrapTests) {
+      const fileName = `wrap-${Math.random().toString(36).slice(2)}.md`;
+      fs.writeFileSync(path.join(tmp, fileName), content);
+      const extracted = extractPathReferences(tmp, [fileName]).map((i) => i.path);
+      assert.ok(!extracted.includes(fakeToken), `Must NOT extract fake token "${fakeToken}" from ${desc}`);
+      assert.ok(extracted.includes(expectedClean), `Must extract clean path "${expectedClean}" from ${desc}`);
+    }
+
+    // Positive counterexamples
+    const positiveCases = [
+      { input: 'Inline `src/foo.mjs`', expected: 'src/foo.mjs', reason: 'clean JS/ESM module' },
+      { input: 'Inline `src/runner/dispatch.mjs`', expected: 'src/runner/dispatch.mjs', reason: 'nested module' },
+      { input: 'Redundant ./ `src/./foo.mjs`', expected: 'src/foo.mjs', reason: 'canonicalized ./ segment' },
+      { input: 'Repeated slashes `src//foo.mjs`', expected: 'src/foo.mjs', reason: 'canonicalized repeated slashes' },
+      { input: 'Nested ./ `src/runner/./dispatch.mjs`', expected: 'src/runner/dispatch.mjs', reason: 'canonicalized intermediate ./' },
+      { input: 'Extensionless executable: `.fgos/installation/bin/fgos`', expected: '.fgos/installation/bin/fgos', reason: 'extensionless executable' },
+      { input: 'Directory path: `docs/specs`', expected: 'docs/specs', reason: 'valid directory convention' },
+      { input: 'Multi-dot basename: `scripts/check-decision-citation-drift.baseline.json`', expected: 'scripts/check-decision-citation-drift.baseline.json', reason: 'valid multi-dot stem with recognized extension' },
+      { input: 'Core skill: `core/skills/fgos-group-thinking/SKILL.md`', expected: 'core/skills/fgos-group-thinking/SKILL.md', reason: 'core skill convention' },
+      { input: 'Wrapped journal: `docs/journals/260803-1612-\n  main-checkout-direct-branch-checkout-tsk-4hk.md`', expected: 'docs/journals/260803-1612-main-checkout-direct-branch-checkout-tsk-4hk.md', reason: 'valid wrapped hyphen in filename stem' },
+      { input: 'Wrapped directory: `docs/history/merge-standardization/\nCONTEXT.md`', expected: 'docs/history/merge-standardization/CONTEXT.md', reason: 'valid wrapped directory slash' },
+    ];
+
+    for (const { input, expected, reason } of positiveCases) {
+      const fileName = `pos-${Math.random().toString(36).slice(2)}.md`;
+      fs.writeFileSync(path.join(tmp, fileName), input);
+      const extracted = extractPathReferences(tmp, [fileName]).map((i) => i.path);
+      assert.ok(
+        extracted.includes(expected),
+        `Must extract positive counterexample "${expected}" (${reason}); got [${extracted.join(', ')}]`
+      );
+    }
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

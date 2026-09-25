@@ -15,13 +15,21 @@
     {
       "area": "Platform laws",
       "authorityStatus": "candidate",
-      "fileClasses": ["maintained-authority", "retained-source", "generated"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source",
+        "generated"
+      ],
       "canonicalRoute": "docs/platform-foundations.md",
-      "canonicalRoutes": ["docs/platform-foundations.md"],
+      "canonicalRoutes": [
+        "docs/platform-foundations.md"
+      ],
       "entryPoint": "docs/platform/platform-foundations.md",
       "bindingSource": "docs/platform-foundations.md",
       "specProjection": "docs/specs/platform-foundations.md",
-      "retainedSources": ["docs/platform-foundations.md"],
+      "retainedSources": [
+        "docs/platform-foundations.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "binding-authoritative-text",
@@ -42,15 +50,44 @@
           "role": "Curated/spec projection of platform operating laws"
         }
       ],
-      "scopeSummary": "Enter at docs/platform/platform-foundations.md; read the complete binding wording, rationale, sources, and review thresholds in docs/platform-foundations.md; use docs/specs/platform-foundations.md as its curated/spec projection."
+      "scopeSummary": "Enter at docs/platform/platform-foundations.md; read the complete binding wording, rationale, sources, and review thresholds in docs/platform-foundations.md; use docs/specs/platform-foundations.md as its curated/spec projection.",
+      "currentRoutes": [
+        {
+          "scope": "binding-authoritative-text",
+          "route": "docs/platform-foundations.md",
+          "authorityStatus": "legacy-current",
+          "role": "Complete binding wording, rationale, sources, and review thresholds are owned exclusively by docs/platform-foundations.md"
+        },
+        {
+          "scope": "candidate-entry-and-summary",
+          "route": "docs/platform/platform-foundations.md",
+          "authorityStatus": "candidate",
+          "role": "Candidate target entry and summary anchor"
+        },
+        {
+          "scope": "curated-spec-projection",
+          "route": "docs/specs/platform-foundations.md",
+          "authorityStatus": "legacy-current",
+          "role": "Curated/spec projection of platform operating laws"
+        }
+      ]
     },
     {
       "area": "Platform vision and work lifecycle",
       "authorityStatus": "candidate",
-      "fileClasses": ["maintained-authority", "retained-source"],
-      "canonicalRoutes": ["docs/work-item-lifecycle-vision.md", "docs/platform-foundations.md"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
+      "canonicalRoutes": [
+        "docs/work-item-lifecycle-vision.md",
+        "docs/platform-foundations.md"
+      ],
       "entryPoint": "docs/platform/vision.md",
-      "retainedSources": ["docs/work-item-lifecycle-vision.md", "docs/platform-foundations.md"],
+      "retainedSources": [
+        "docs/work-item-lifecycle-vision.md",
+        "docs/platform-foundations.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "candidate-entry",
@@ -71,16 +108,43 @@
           "role": "Retained root authority owning locked mission and priority wording"
         }
       ],
-      "scopeSummary": "Target vision at docs/platform/vision.md is candidate ('Yes, after review'); retained root docs docs/work-item-lifecycle-vision.md and docs/platform-foundations.md own locked mission/priority wording."
+      "scopeSummary": "Target vision at docs/platform/vision.md is candidate ('Yes, after review'); retained root docs docs/work-item-lifecycle-vision.md and docs/platform-foundations.md own locked mission/priority wording.",
+      "currentRoutes": [
+        {
+          "scope": "candidate-entry",
+          "route": "docs/platform/vision.md",
+          "authorityStatus": "candidate",
+          "role": "Target vision candidate entry ('Yes, after review')"
+        },
+        {
+          "scope": "retained-work-lifecycle-direction",
+          "route": "docs/work-item-lifecycle-vision.md",
+          "authorityStatus": "legacy-current",
+          "role": "Retained original work lifecycle direction and unresolved questions"
+        },
+        {
+          "scope": "retained-locked-mission-and-priority",
+          "route": "docs/platform-foundations.md",
+          "authorityStatus": "legacy-current",
+          "role": "Retained root authority owning locked mission and priority wording"
+        }
+      ]
     },
     {
       "area": "Whole-system architecture and component boundaries",
       "authorityStatus": "candidate",
-      "fileClasses": ["maintained-authority", "retained-source"],
-      "canonicalRoutes": ["docs/architecture-map.md", "docs/platform/component-boundary.md"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
+      "canonicalRoutes": [
+        "docs/architecture-map.md"
+      ],
       "entryPoint": "docs/platform/component-boundary.md",
       "architectureMap": "docs/architecture-map.md",
-      "retainedSources": ["docs/architect/component-boundary/**"],
+      "retainedSources": [
+        "docs/architect/component-boundary/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "system-architecture-map",
@@ -101,14 +165,38 @@
           "role": "Retained detailed component boundary contracts and specifications"
         }
       ],
-      "scopeSummary": "docs/architecture-map.md owns full architecture map; component-boundary entry routes to detailed sources under docs/architect/component-boundary/."
+      "scopeSummary": "docs/architecture-map.md owns full architecture map; component-boundary entry routes to detailed sources under docs/architect/component-boundary/.",
+      "currentRoutes": [
+        {
+          "scope": "system-architecture-map",
+          "route": "docs/architecture-map.md",
+          "authorityStatus": "legacy-current",
+          "role": "Full current system architecture map (v0.2, ADR0010)"
+        },
+        {
+          "scope": "component-boundary-portal",
+          "route": "docs/platform/component-boundary.md",
+          "authorityStatus": "candidate",
+          "role": "Candidate component-boundary entry portal"
+        },
+        {
+          "scope": "retained-component-boundary-details",
+          "route": "docs/architect/component-boundary/**",
+          "authorityStatus": "legacy-current",
+          "role": "Retained detailed component boundary contracts and specifications"
+        }
+      ]
     },
     {
       "area": "System overview",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/system-overview.md",
-      "canonicalRoutes": ["docs/specs/system-overview.md"],
+      "canonicalRoutes": [
+        "docs/specs/system-overview.md"
+      ],
       "retainedSources": [],
       "scopedRoutes": [
         {
@@ -118,15 +206,31 @@
           "role": "Live Area Map and Shared Entities sections remain the consolidated current cross-area spec"
         }
       ],
-      "scopeSummary": "Live Area Map and Shared Entities sections remain the consolidated current cross-area spec."
+      "scopeSummary": "Live Area Map and Shared Entities sections remain the consolidated current cross-area spec.",
+      "currentRoutes": [
+        {
+          "scope": "cross-area-spec",
+          "route": "docs/specs/system-overview.md",
+          "authorityStatus": "legacy-current",
+          "role": "Live Area Map and Shared Entities sections remain the consolidated current cross-area spec"
+        }
+      ]
     },
     {
       "area": "Work state / work lifecycle engine",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority", "retained-source"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
       "canonicalRoute": "docs/specs/work-state.md",
-      "canonicalRoutes": ["docs/specs/work-state.md"],
-      "retainedSources": ["docs/io-contract.md", "docs/work-item-lifecycle-vision.md"],
+      "canonicalRoutes": [
+        "docs/specs/work-state.md"
+      ],
+      "retainedSources": [
+        "docs/io-contract.md",
+        "docs/work-item-lifecycle-vision.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "core-engine-and-state",
@@ -147,15 +251,41 @@
           "role": "Retained original work lifecycle direction"
         }
       ],
-      "scopeSummary": "docs/specs/work-state.md owns core state, events, fsm, store, and envelope. docs/io-contract.md owns CLI I/O contract."
+      "scopeSummary": "docs/specs/work-state.md owns core state, events, fsm, store, and envelope. docs/io-contract.md owns CLI I/O contract.",
+      "currentRoutes": [
+        {
+          "scope": "core-engine-and-state",
+          "route": "docs/specs/work-state.md",
+          "authorityStatus": "legacy-current",
+          "role": "Owns core state, events, fsm, store, and envelope"
+        },
+        {
+          "scope": "retained-cli-io-contract",
+          "route": "docs/io-contract.md",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical CLI/runner I/O envelope and exit code contract"
+        },
+        {
+          "scope": "retained-direction",
+          "route": "docs/work-item-lifecycle-vision.md",
+          "authorityStatus": "legacy-current",
+          "role": "Retained original work lifecycle direction"
+        }
+      ]
     },
     {
       "area": "Runner / dispatch / merge lifecycle",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/runner.md",
-      "canonicalRoutes": ["docs/specs/runner.md"],
-      "retainedSources": ["docs/routing-handoff-contract.md"],
+      "canonicalRoutes": [
+        "docs/specs/runner.md"
+      ],
+      "retainedSources": [
+        "docs/routing-handoff-contract.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "runner-and-dispatch-lifecycle",
@@ -170,14 +300,33 @@
           "role": "Canonical agent-to-agent handoff contract and trust boundary"
         }
       ],
-      "scopeSummary": "docs/specs/runner.md owns runner loop, dispatch, merge gate, and worker log. Agent-to-agent boundary owned by docs/routing-handoff-contract.md."
+      "scopeSummary": "docs/specs/runner.md owns runner loop, dispatch, merge gate, and worker log. Agent-to-agent boundary owned by docs/routing-handoff-contract.md.",
+      "currentRoutes": [
+        {
+          "scope": "runner-and-dispatch-lifecycle",
+          "route": "docs/specs/runner.md",
+          "authorityStatus": "legacy-current",
+          "role": "Owns runner loop, dispatch, merge gate, and worker log"
+        },
+        {
+          "scope": "agent-handoff-contract",
+          "route": "docs/routing-handoff-contract.md",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical agent-to-agent handoff contract and trust boundary"
+        }
+      ]
     },
     {
       "area": "Packaging-distribution",
       "authorityStatus": "promoted",
-      "fileClasses": ["maintained-authority", "retained-source"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
       "canonicalRoute": "docs/platform/packaging-distribution/README.md",
-      "canonicalRoutes": ["docs/platform/packaging-distribution/README.md"],
+      "canonicalRoutes": [
+        "docs/platform/packaging-distribution/README.md"
+      ],
       "retainedSources": [
         "docs/specs/distribution.md",
         "docs/distribution-vision.md",
@@ -209,15 +358,48 @@
           "role": "Detailed architecture sources consulted only in roles assigned by portal"
         }
       ],
-      "scopeSummary": "Portal owns active navigation and implementation-alignment; legacy specs are consulted only in roles assigned by portal."
+      "scopeSummary": "Portal owns active navigation and implementation-alignment; legacy specs are consulted only in roles assigned by portal.",
+      "currentRoutes": [
+        {
+          "scope": "promoted-portal-and-alignment",
+          "route": "docs/platform/packaging-distribution/README.md",
+          "authorityStatus": "promoted",
+          "role": "Portal owns active navigation and implementation-alignment"
+        },
+        {
+          "scope": "retained-specs",
+          "route": "docs/specs/distribution.md",
+          "authorityStatus": "legacy-current",
+          "role": "Legacy distribution spec consulted only in roles assigned by portal"
+        },
+        {
+          "scope": "retained-vision",
+          "route": "docs/distribution-vision.md",
+          "authorityStatus": "non-authority",
+          "role": "Historical vision consulted only in roles assigned by portal"
+        },
+        {
+          "scope": "retained-architecture",
+          "route": "docs/architect/packaging-distribution/**",
+          "authorityStatus": "legacy-current",
+          "role": "Detailed architecture sources consulted only in roles assigned by portal"
+        }
+      ]
     },
     {
       "area": "Host invocation routing",
       "authorityStatus": "promoted",
-      "fileClasses": ["maintained-authority", "retained-source"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
       "canonicalRoute": "docs/platform/host-invocation-routing/README.md",
-      "canonicalRoutes": ["docs/platform/host-invocation-routing/README.md"],
-      "retainedSources": ["docs/architect/host-invocation-routing/**"],
+      "canonicalRoutes": [
+        "docs/platform/host-invocation-routing/README.md"
+      ],
+      "retainedSources": [
+        "docs/architect/host-invocation-routing/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "promoted-portal-and-navigation",
@@ -232,14 +414,33 @@
           "role": "Retained sources under docs/architect/host-invocation-routing/** remain legacy-current only where not drained"
         }
       ],
-      "scopeSummary": "Portal owns active navigation; retained sources under docs/architect/host-invocation-routing/** remain legacy-current only where not drained."
+      "scopeSummary": "Portal owns active navigation; retained sources under docs/architect/host-invocation-routing/** remain legacy-current only where not drained.",
+      "currentRoutes": [
+        {
+          "scope": "promoted-portal-and-navigation",
+          "route": "docs/platform/host-invocation-routing/README.md",
+          "authorityStatus": "promoted",
+          "role": "Portal owns active navigation"
+        },
+        {
+          "scope": "retained-architecture",
+          "route": "docs/architect/host-invocation-routing/**",
+          "authorityStatus": "legacy-current",
+          "role": "Retained sources under docs/architect/host-invocation-routing/** remain legacy-current only where not drained"
+        }
+      ]
     },
     {
       "area": "Agent coordination",
       "authorityStatus": "promoted",
-      "fileClasses": ["maintained-authority", "history-evidence"],
+      "fileClasses": [
+        "maintained-authority",
+        "history-evidence"
+      ],
       "canonicalRoute": "docs/platform/agent-coordination/README.md",
-      "canonicalRoutes": ["docs/platform/agent-coordination/README.md"],
+      "canonicalRoutes": [
+        "docs/platform/agent-coordination/README.md"
+      ],
       "retainedSources": [
         "docs/architect/agent-coordination/**",
         "docs/specs/runner.md"
@@ -264,15 +465,41 @@
           "role": "Runner integration and dispatch lifecycle"
         }
       ],
-      "scopeSummary": "Target portal owns navigation and status summary; exact accepted contracts, schemas, ADRs, and verification remain in docs/architect/agent-coordination/** until explicitly superseded."
+      "scopeSummary": "Target portal owns navigation and status summary; exact accepted contracts, schemas, ADRs, and verification remain in docs/architect/agent-coordination/** until explicitly superseded.",
+      "currentRoutes": [
+        {
+          "scope": "promoted-portal-navigation-and-status",
+          "route": "docs/platform/agent-coordination/README.md",
+          "authorityStatus": "promoted",
+          "role": "Target portal owns navigation and status summary"
+        },
+        {
+          "scope": "retained-contracts-schemas-and-proofs",
+          "route": "docs/architect/agent-coordination/**",
+          "authorityStatus": "legacy-current",
+          "role": "Exact accepted contracts, schemas, ADRs, and verification remain in docs/architect/agent-coordination/** until explicitly superseded"
+        },
+        {
+          "scope": "runner-coordination-integration",
+          "route": "docs/specs/runner.md",
+          "authorityStatus": "legacy-current",
+          "role": "Runner integration and dispatch lifecycle"
+        }
+      ]
     },
     {
       "area": "Agent confinement",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/confinement-authority.md",
-      "canonicalRoutes": ["docs/specs/confinement-authority.md"],
-      "retainedSources": ["src/runner/dispatch/confinement/**"],
+      "canonicalRoutes": [
+        "docs/specs/confinement-authority.md"
+      ],
+      "retainedSources": [
+        "src/runner/dispatch/confinement/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "runtime-confinement-spec",
@@ -287,15 +514,35 @@
           "role": "Runtime confinement implementations and tests"
         }
       ],
-      "scopeSummary": "Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite."
+      "scopeSummary": "Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite.",
+      "currentRoutes": [
+        {
+          "scope": "runtime-confinement-spec",
+          "route": "docs/specs/confinement-authority.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns runtime confinement contract, machine backend registry, and driver rules; verified by test suite"
+        },
+        {
+          "scope": "implementation-evidence",
+          "route": "src/runner/dispatch/confinement/**",
+          "authorityStatus": "legacy-current",
+          "role": "Runtime confinement implementations and tests"
+        }
+      ]
     },
     {
       "area": "Claude plugin surface",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/fgos-plugin.md",
-      "canonicalRoutes": ["docs/specs/fgos-plugin.md"],
-      "retainedSources": ["plugins/fgOS/**"],
+      "canonicalRoutes": [
+        "docs/specs/fgos-plugin.md"
+      ],
+      "retainedSources": [
+        "plugins/fgOS/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "plugin-specification",
@@ -310,15 +557,36 @@
           "role": "Plugin manifest and command wrapper implementations"
         }
       ],
-      "scopeSummary": "Spec owns slash-command wrappers and plugin manifest behavior."
+      "scopeSummary": "Spec owns slash-command wrappers and plugin manifest behavior.",
+      "currentRoutes": [
+        {
+          "scope": "plugin-specification",
+          "route": "docs/specs/fgos-plugin.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns slash-command wrappers and plugin manifest behavior"
+        },
+        {
+          "scope": "implementation-surface",
+          "route": "plugins/fgOS/**",
+          "authorityStatus": "legacy-current",
+          "role": "Plugin manifest and command wrapper implementations"
+        }
+      ]
     },
     {
       "area": "Herdr gateway and web dashboard",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/herdr-web-dashboard.md",
-      "canonicalRoutes": ["docs/specs/herdr-web-dashboard.md"],
-      "retainedSources": ["docs/operator-runbook-herdr-cockpit.md", "docs/specs/runner.md"],
+      "canonicalRoutes": [
+        "docs/specs/herdr-web-dashboard.md"
+      ],
+      "retainedSources": [
+        "docs/operator-runbook-herdr-cockpit.md",
+        "docs/specs/runner.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "web-dashboard-client",
@@ -339,17 +607,44 @@
           "role": "Runner/gateway integration behavior"
         }
       ],
-      "scopeSummary": "Spec owns web dashboard client behavior; runbook owns cockpit operations."
+      "scopeSummary": "Spec owns web dashboard client behavior; runbook owns cockpit operations.",
+      "currentRoutes": [
+        {
+          "scope": "web-dashboard-client",
+          "route": "docs/specs/herdr-web-dashboard.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns web dashboard client behavior"
+        },
+        {
+          "scope": "cockpit-operations",
+          "route": "docs/operator-runbook-herdr-cockpit.md",
+          "authorityStatus": "legacy-current",
+          "role": "Runbook owns supported operator procedures for cockpit"
+        },
+        {
+          "scope": "runner-gateway-integration",
+          "route": "docs/specs/runner.md",
+          "authorityStatus": "legacy-current",
+          "role": "Runner/gateway integration behavior"
+        }
+      ]
     },
     {
       "area": "End-user authoring, index, and knowledge registry",
       "authorityStatus": "non-authority",
-      "fileClasses": ["maintained-authority", "generated"],
+      "fileClasses": [
+        "maintained-authority",
+        "generated"
+      ],
       "canonicalRoutes": [
         "docs/specs/enduser-docs-authoring.md",
         "docs/specs/enduser-docs-index.md"
       ],
-      "retainedSources": ["docs/doc-registry.md", "docs/doc-registry.json", "docs/knowledge/**"],
+      "retainedSources": [
+        "docs/doc-registry.md",
+        "docs/doc-registry.json",
+        "docs/knowledge/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "authoring-guide-and-profile-rules",
@@ -376,15 +671,47 @@
           "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
         }
       ],
-      "scopeSummary": "Distinct user/end-user knowledge corpus (docs/specs/enduser-docs-authoring.md and docs/specs/enduser-docs-index.md); does not own platform authority."
+      "scopeSummary": "Distinct user/end-user knowledge corpus (docs/specs/enduser-docs-authoring.md and docs/specs/enduser-docs-index.md); does not own platform authority.",
+      "currentRoutes": [
+        {
+          "scope": "authoring-guide-and-profile-rules",
+          "route": "docs/specs/enduser-docs-authoring.md",
+          "authorityStatus": "non-authority",
+          "role": "End-user document authoring workflow, Diataxis profile rules, and writer guidance (user profile)"
+        },
+        {
+          "scope": "tag-and-metadata-index-spec",
+          "route": "docs/specs/enduser-docs-index.md",
+          "authorityStatus": "non-authority",
+          "role": "End-user tag and metadata index specification (user profile)"
+        },
+        {
+          "scope": "generated-registry-projection",
+          "route": "docs/doc-registry.md",
+          "authorityStatus": "non-authority",
+          "role": "Projection of end-user knowledge registry; does not own platform authority"
+        },
+        {
+          "scope": "knowledge-corpus",
+          "route": "docs/knowledge/**",
+          "authorityStatus": "non-authority",
+          "role": "Distinct user/end-user knowledge corpus; does not own platform authority"
+        }
+      ]
     },
     {
       "area": "Decision citation drift",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/decision-citation-drift.md",
-      "canonicalRoutes": ["docs/specs/decision-citation-drift.md"],
-      "retainedSources": ["scripts/check-decision-citation-drift.mjs"],
+      "canonicalRoutes": [
+        "docs/specs/decision-citation-drift.md"
+      ],
+      "retainedSources": [
+        "scripts/check-decision-citation-drift.mjs"
+      ],
       "scopedRoutes": [
         {
           "scope": "drift-detection-invariants",
@@ -399,15 +726,35 @@
           "role": "Implementation ratchet script"
         }
       ],
-      "scopeSummary": "Spec owns citation drift detection invariants and baseline ratchet rules."
+      "scopeSummary": "Spec owns citation drift detection invariants and baseline ratchet rules.",
+      "currentRoutes": [
+        {
+          "scope": "drift-detection-invariants",
+          "route": "docs/specs/decision-citation-drift.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns citation drift detection invariants and baseline ratchet rules"
+        },
+        {
+          "scope": "ratchet-implementation",
+          "route": "scripts/check-decision-citation-drift.mjs",
+          "authorityStatus": "legacy-current",
+          "role": "Implementation ratchet script"
+        }
+      ]
     },
     {
       "area": "Distillery / reference learning",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/specs/distillery.md",
-      "canonicalRoutes": ["docs/specs/distillery.md"],
-      "retainedSources": [".agents/skills/distill/SKILL.md"],
+      "canonicalRoutes": [
+        "docs/specs/distillery.md"
+      ],
+      "retainedSources": [
+        ".agents/skills/distill/SKILL.md"
+      ],
       "scopedRoutes": [
         {
           "scope": "distillery-spec",
@@ -422,21 +769,46 @@
           "role": "Skill owns portable operational surface"
         }
       ],
-      "scopeSummary": "Spec owns bounded reference-learning behavior; skill owns operational surface."
+      "scopeSummary": "Spec owns bounded reference-learning behavior; skill owns operational surface.",
+      "currentRoutes": [
+        {
+          "scope": "distillery-spec",
+          "route": "docs/specs/distillery.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns bounded reference-learning behavior"
+        },
+        {
+          "scope": "operational-skill-surface",
+          "route": ".agents/skills/distill/SKILL.md",
+          "authorityStatus": "legacy-current",
+          "role": "Skill owns portable operational surface"
+        }
+      ]
     },
     {
       "area": "Skills and domainization",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority", "generated"],
+      "fileClasses": [
+        "maintained-authority",
+        "generated"
+      ],
       "canonicalRoutes": [
         "domains/<domain>/AGENTS.md",
         "docs/architect/domainization/README.md",
         ".agents/skills/**",
         "core/skills/**"
       ],
-      "canonicalSkillSources": [".agents/skills/**", "core/skills/**"],
+      "canonicalSkillSources": [
+        ".agents/skills/**",
+        "core/skills/**"
+      ],
       "architectureSource": "docs/architect/domainization/README.md",
-      "retainedSources": ["docs/architect/domainization/README.md", ".agents/skills/**", "core/skills/**", "plugins/fgOS/skills/**"],
+      "retainedSources": [
+        "docs/architect/domainization/README.md",
+        ".agents/skills/**",
+        "core/skills/**",
+        "plugins/fgOS/skills/**"
+      ],
       "scopedRoutes": [
         {
           "scope": "domain-doctrine",
@@ -445,10 +817,16 @@
           "role": "Domain-specific doctrine without coding-domain hardcoding"
         },
         {
-          "scope": "canonical-skill-definitions",
-          "route": [".agents/skills/**", "core/skills/**"],
+          "scope": "canonical-skill-definitions-agents",
+          "route": ".agents/skills/**",
           "authorityStatus": "legacy-current",
-          "role": "Canonical skill definitions in .agents/skills/ and core/skills/"
+          "role": "Canonical skill definitions in .agents/skills/"
+        },
+        {
+          "scope": "canonical-skill-definitions-core",
+          "route": "core/skills/**",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical skill definitions in core/skills/"
         },
         {
           "scope": "domainization-architecture",
@@ -463,14 +841,50 @@
           "role": "Generated skill wrapper projections"
         }
       ],
-      "scopeSummary": "domains/<domain>/AGENTS.md owns domain-specific doctrine; canonical skill definitions live in .agents/skills/ and core/skills/; architecture lives in docs/architect/domainization/README.md; generated mirrors are projections."
+      "scopeSummary": "domains/<domain>/AGENTS.md owns domain-specific doctrine; canonical skill definitions live in .agents/skills/ and core/skills/; architecture lives in docs/architect/domainization/README.md; generated mirrors are projections.",
+      "currentRoutes": [
+        {
+          "scope": "domain-doctrine",
+          "route": "domains/<domain>/AGENTS.md",
+          "authorityStatus": "legacy-current",
+          "role": "Domain-specific doctrine without coding-domain hardcoding"
+        },
+        {
+          "scope": "canonical-skill-definitions-agents",
+          "route": ".agents/skills/**",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical skill definitions in .agents/skills/"
+        },
+        {
+          "scope": "canonical-skill-definitions-core",
+          "route": "core/skills/**",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical skill definitions in core/skills/"
+        },
+        {
+          "scope": "domainization-architecture",
+          "route": "docs/architect/domainization/README.md",
+          "authorityStatus": "legacy-current",
+          "role": "Domainization architecture and decoupling strategy"
+        },
+        {
+          "scope": "generated-skill-mirrors",
+          "route": "plugins/fgOS/skills/**",
+          "authorityStatus": "non-authority",
+          "role": "Generated skill wrapper projections"
+        }
+      ]
     },
     {
       "area": "UI specification",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/ui-spec/00-overview.md",
-      "canonicalRoutes": ["docs/ui-spec/00-overview.md"],
+      "canonicalRoutes": [
+        "docs/ui-spec/00-overview.md"
+      ],
       "corpusRoot": "docs/ui-spec/**",
       "retainedSources": [],
       "scopedRoutes": [
@@ -481,15 +895,29 @@
           "role": "Entry for docs/ui-spec/** defining visual and UI layout contracts; functional behavior owned by area specs"
         }
       ],
-      "scopeSummary": "docs/ui-spec/** defines visual and UI layout contracts with entry at docs/ui-spec/00-overview.md; functional behavior is owned by area specs."
+      "scopeSummary": "docs/ui-spec/** defines visual and UI layout contracts with entry at docs/ui-spec/00-overview.md; functional behavior is owned by area specs.",
+      "currentRoutes": [
+        {
+          "scope": "ui-layout-and-visual-contracts",
+          "route": "docs/ui-spec/00-overview.md",
+          "authorityStatus": "legacy-current",
+          "role": "Entry for docs/ui-spec/** defining visual and UI layout contracts; functional behavior owned by area specs"
+        }
+      ]
     },
     {
       "area": "Coexistence",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority"],
+      "fileClasses": [
+        "maintained-authority"
+      ],
       "canonicalRoute": "docs/coexistence.md",
-      "canonicalRoutes": ["docs/coexistence.md"],
-      "retainedSources": ["src/install/coexist.mjs"],
+      "canonicalRoutes": [
+        "docs/coexistence.md"
+      ],
+      "retainedSources": [
+        "src/install/coexist.mjs"
+      ],
       "scopedRoutes": [
         {
           "scope": "execution-doctrine",
@@ -504,12 +932,29 @@
           "role": "Installation helper"
         }
       ],
-      "scopeSummary": "Living doctrine for running alongside foreign agent harnesses."
+      "scopeSummary": "Living doctrine for running alongside foreign agent harnesses.",
+      "currentRoutes": [
+        {
+          "scope": "execution-doctrine",
+          "route": "docs/coexistence.md",
+          "authorityStatus": "legacy-current",
+          "role": "Living doctrine for running alongside foreign agent harnesses"
+        },
+        {
+          "scope": "install-implementation",
+          "route": "src/install/coexist.mjs",
+          "authorityStatus": "legacy-current",
+          "role": "Installation helper"
+        }
+      ]
     },
     {
       "area": "Documentation system",
       "authorityStatus": "legacy-current",
-      "fileClasses": ["maintained-authority", "retained-source"],
+      "fileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
       "canonicalRoutes": [
         "docs/doc-governance.md",
         "docs/reading-map.md",
@@ -553,7 +998,39 @@
           "role": "Active migration plan (Phase 00/01 complete; 02-09 unauthorized)"
         }
       ],
-      "scopeSummary": "Governance (docs/doc-governance.md), reader routing (docs/reading-map.md), and authority routing (docs/transitional-switchboard.md) are active authority; proposal is non-canonical architecture; plan is active migration."
+      "scopeSummary": "Governance (docs/doc-governance.md), reader routing (docs/reading-map.md), and authority routing (docs/transitional-switchboard.md) are active authority; proposal is non-canonical architecture; plan is active migration.",
+      "currentRoutes": [
+        {
+          "scope": "documentation-governance",
+          "route": "docs/doc-governance.md",
+          "authorityStatus": "legacy-current",
+          "role": "Canonical documentation governance (types, authority, placement, lifecycle)"
+        },
+        {
+          "scope": "reader-routing",
+          "route": "docs/reading-map.md",
+          "authorityStatus": "legacy-current",
+          "role": "Top-level reader routing during transition"
+        },
+        {
+          "scope": "authority-routing",
+          "route": "docs/transitional-switchboard.md",
+          "authorityStatus": "legacy-current",
+          "role": "Operative transitional authority routing switchboard"
+        },
+        {
+          "scope": "long-horizon-architecture-proposal",
+          "route": "docs/platform/proposals/documentation-system-unification.md",
+          "authorityStatus": "non-authority",
+          "role": "Long-horizon, non-canonical architecture proposal"
+        },
+        {
+          "scope": "active-migration-plan",
+          "route": "plans/260925-documentation-authority-unification/plan.md",
+          "authorityStatus": "legacy-current",
+          "role": "Active migration plan (Phase 00/01 complete; 02-09 unauthorized)"
+        }
+      ]
     }
   ],
   "rootDocuments": [
