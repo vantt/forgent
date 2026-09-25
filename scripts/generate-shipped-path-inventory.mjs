@@ -253,6 +253,126 @@ export function classifyContractScope(refPath) {
   };
 }
 
+export const KNOWN_NONEXISTENT_EXAMPLES = new Set([
+  'scripts/distill.mjs',
+  'src/auth.mjs',
+  'src/foo.mjs',
+  'src/parser.mjs',
+  'src/runner/retry.mjs',
+  'src/x.mjs',
+  'test/parser.test.mjs',
+  'docs/metadata',
+  'docs/notes.md',
+]);
+
+export const KNOWN_STALE_OR_DEAD = new Set([
+  'docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md',
+  'docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md',
+]);
+
+export const KNOWN_CONSUMER_PATTERNS = new Set([
+  '.claude/worktrees',
+  '.fgos/assignments',
+  '.fgos/coordination/sessions',
+  '.fgos/coordination/sessions/code-panel',
+  '.fgos/events.lock',
+  '.fgos/installation/bin/fgos',
+  '.fgos/logs',
+  '.fgos/main-checkout.lock',
+]);
+
+/**
+ * Classifies secondary attributes of a referenced path:
+ * referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget.
+ */
+export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scope = 'repository-local-contract' } = {}) {
+  const norm = normalizePosix(relPath);
+  const exists = fs.existsSync(path.resolve(repoRoot, norm));
+  const isConsumerPattern = KNOWN_CONSUMER_PATTERNS.has(norm);
+  const existenceStatus = (exists && !isConsumerPattern) ? 'exists' : 'nonexistent';
+
+  let referenceKind;
+  let sourceRole;
+  let resolutionStatus;
+
+  if (KNOWN_STALE_OR_DEAD.has(norm)) {
+    referenceKind = 'stale-or-dead';
+    sourceRole = 'retired-decision-citation';
+    resolutionStatus = 'stale-retired';
+  } else if (KNOWN_NONEXISTENT_EXAMPLES.has(norm)) {
+    referenceKind = 'example-or-placeholder';
+    sourceRole = 'illustrative-example';
+    resolutionStatus = 'example-not-target';
+  } else if (isConsumerPattern) {
+    referenceKind = 'example-or-placeholder';
+    sourceRole = 'consumer-workspace-pattern';
+    resolutionStatus = 'pattern-placeholder';
+  } else if (!exists) {
+    if (
+      norm.startsWith('.fgos/') ||
+      norm === '.fgos' ||
+      norm.startsWith('.claude/worktrees') ||
+      norm.startsWith('docs/how-to/') ||
+      norm.startsWith('docs/explanation/') ||
+      norm === 'docs/reference-learning-system.md' ||
+      norm === 'plugins/packages/open'
+    ) {
+      referenceKind = 'example-or-placeholder';
+      sourceRole = norm.startsWith('.fgos') || norm.startsWith('.claude')
+        ? 'consumer-workspace-pattern'
+        : 'consumer-knowledge-quadrant';
+      resolutionStatus = 'pattern-placeholder';
+    } else {
+      referenceKind = 'unresolved-dynamic';
+      sourceRole = 'unresolved-path';
+      resolutionStatus = 'unresolved';
+    }
+  } else {
+    // Exists on disk
+    if (norm === 'docs/specs/platform-foundations.md') {
+      // Explicit generated projection of platform operating laws; non-authority mirror (F3)
+      referenceKind = 'generated-mirror';
+      sourceRole = 'generated-projection-non-authority';
+      resolutionStatus = 'resolved';
+    } else if (norm.startsWith('plugins/fgOS/skills/') || norm.startsWith('.fgos/instructions/effective/')) {
+      referenceKind = 'generated-mirror';
+      sourceRole = 'generated-mirror-entry';
+      resolutionStatus = 'resolved';
+    } else if (norm.startsWith('test/') || norm.includes('/proof.') || norm.includes('/fixture')) {
+      referenceKind = 'test-evidence-reference';
+      sourceRole = 'test-suite-or-fixture';
+      resolutionStatus = 'resolved';
+    } else {
+      referenceKind = 'literal-current-path';
+      if (scope === 'repository-local-contract') {
+        sourceRole = (norm.startsWith('src/') || norm.startsWith('bin/') || norm.startsWith('scripts/'))
+          ? 'internal-implementation'
+          : 'platform-specification-or-doctrine';
+      } else if (scope === 'consumer-project-contract') {
+        sourceRole = 'shipped-surface-contract';
+      } else {
+        sourceRole = 'mixed-platform-and-consumer-doctrine';
+      }
+      resolutionStatus = 'resolved';
+    }
+  }
+
+  // Never label nonexistent examples as safe rewrite targets merely because contractScope is repository-local
+  const isSafeRewriteTarget = Boolean(
+    scope === 'repository-local-contract' &&
+    exists &&
+    referenceKind === 'literal-current-path'
+  );
+
+  return {
+    referenceKind,
+    existenceStatus,
+    sourceRole,
+    resolutionStatus,
+    isSafeRewriteTarget,
+  };
+}
+
 export function scanSurfaceFiles(repoRoot, dirs = SHIPPED_SURFACE_DIRS) {
   const filePaths = [];
 
@@ -378,11 +498,17 @@ export function extractPathReferences(repoRoot, surfaceFiles) {
   const entries = sortedPaths.map((p) => {
     const files = [...pathMap.get(p)].sort();
     const { scope, rationale } = classifyContractScope(p);
+    const attrs = classifyPathAttributes(p, { repoRoot, scope });
     return {
       path: p,
       occurrencesCount: files.length,
       referencedIn: files,
       contractScope: scope,
+      referenceKind: attrs.referenceKind,
+      existenceStatus: attrs.existenceStatus,
+      sourceRole: attrs.sourceRole,
+      resolutionStatus: attrs.resolutionStatus,
+      isSafeRewriteTarget: attrs.isSafeRewriteTarget,
       rationale,
     };
   });
@@ -398,12 +524,38 @@ export function generateInventory(repoRoot = process.cwd(), dirs = SHIPPED_SURFA
   let repoLocalCount = 0;
   let mixedContractCount = 0;
   let unclassifiedCount = 0;
+  let safeRewriteTargetsCount = 0;
+  let nonTargetExamplesCount = 0;
+  let existsCount = 0;
+  let nonexistentCount = 0;
+
+  const referenceKindCounts = {
+    literalCurrentPath: 0,
+    exampleOrPlaceholder: 0,
+    generatedMirror: 0,
+    staleOrDead: 0,
+    testEvidenceReference: 0,
+    unresolvedDynamic: 0,
+  };
 
   for (const item of items) {
     if (item.contractScope === 'consumer-project-contract') consumerCount++;
     else if (item.contractScope === 'repository-local-contract') repoLocalCount++;
     else if (item.contractScope === 'mixed-repository-local-and-consumer') mixedContractCount++;
     else unclassifiedCount++;
+
+    if (item.existenceStatus === 'exists') existsCount++;
+    else nonexistentCount++;
+
+    if (item.isSafeRewriteTarget) safeRewriteTargetsCount++;
+    else nonTargetExamplesCount++;
+
+    if (item.referenceKind === 'literal-current-path') referenceKindCounts.literalCurrentPath++;
+    else if (item.referenceKind === 'example-or-placeholder') referenceKindCounts.exampleOrPlaceholder++;
+    else if (item.referenceKind === 'generated-mirror') referenceKindCounts.generatedMirror++;
+    else if (item.referenceKind === 'stale-or-dead') referenceKindCounts.staleOrDead++;
+    else if (item.referenceKind === 'test-evidence-reference') referenceKindCounts.testEvidenceReference++;
+    else if (item.referenceKind === 'unresolved-dynamic') referenceKindCounts.unresolvedDynamic++;
   }
 
   return {
@@ -421,6 +573,15 @@ export function generateInventory(repoRoot = process.cwd(), dirs = SHIPPED_SURFA
       mixedRepositoryLocalAndConsumerCount: mixedContractCount,
       unclassifiedCount,
       mixedCount: mixedContractCount + unclassifiedCount,
+      existence: {
+        existsCount,
+        nonexistentCount,
+      },
+      rewriteSafety: {
+        safeRewriteTargetsCount,
+        nonTargetExamplesCount,
+      },
+      referenceKinds: referenceKindCounts,
     },
     items,
   };
@@ -462,32 +623,54 @@ export function generateMarkdownReport(inventory) {
   lines.push(`- **Repository-Local Contracts:** ${inventory.summary.repositoryLocalContractsCount}`);
   lines.push(`- **Mixed Repository-Local and Consumer Contracts:** ${inventory.summary.mixedRepositoryLocalAndConsumerCount}`);
   lines.push(`- **Unclassified Paths:** ${inventory.summary.unclassifiedCount}`);
+  if (inventory.summary.existence) {
+    lines.push(`- **Path Existence:** ${inventory.summary.existence.existsCount} existing on disk, ${inventory.summary.existence.nonexistentCount} nonexistent (examples, placeholders, patterns, retired citations)`);
+  }
+  if (inventory.summary.rewriteSafety) {
+    lines.push(`- **Safe Rewrite Targets:** ${inventory.summary.rewriteSafety.safeRewriteTargetsCount} verified repo-local files`);
+    lines.push(`- **Non-Target Examples & Placeholders:** ${inventory.summary.rewriteSafety.nonTargetExamplesCount} references (must not be rewritten merely because contractScope is repository-local)`);
+  }
   lines.push('');
   lines.push('## 3. Consumer-Project Contracts');
   lines.push('');
   lines.push('These paths represent conventions expected to exist or be created in user/consumer repositories:');
   lines.push('');
-  lines.push('| Path | Occurrences | Referenced In (Sample) | Scope & Rationale |');
-  lines.push('|---|:---:|---|---|');
+  lines.push('| Path | Occurrences | Reference Kind | Existence | Source Role | Resolution | Scope & Rationale |');
+  lines.push('|---|:---:|---|---|---|---|---|');
 
   const consumerItems = inventory.items.filter((i) => i.contractScope === 'consumer-project-contract');
   for (const item of consumerItems) {
-    const sampleFiles = item.referencedIn.slice(0, 2).join(', ') + (item.referencedIn.length > 2 ? ` (+${item.referencedIn.length - 2} more)` : '');
-    lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | ${sampleFiles} | ${item.rationale} |`);
+    lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | \`${item.referenceKind}\` | \`${item.existenceStatus}\` | \`${item.sourceRole}\` | \`${item.resolutionStatus}\` | ${item.rationale} |`);
   }
 
   lines.push('');
   lines.push('## 4. Repository-Local Contracts');
   lines.push('');
-  lines.push('These paths are internal to fgOS itself and will be safely transformed during unification without altering consumer contracts:');
+  lines.push('These paths are internal to the fgOS platform codebase. They are split into real verified files eligible for rewrite and illustrative non-target examples:');
   lines.push('');
-  lines.push('| Path | Occurrences | Referenced In (Sample) | Scope & Rationale |');
-  lines.push('|---|:---:|---|---|');
+  lines.push('### 4.1 Verified Repository-Local Files (Safe Rewrite Targets)');
+  lines.push('');
+  lines.push('These paths exist on disk within fgOS and are eligible to be safely transformed during Phase 07 preparation:');
+  lines.push('');
+  lines.push('| Path | Occurrences | Reference Kind | Existence | Source Role | Resolution | Scope & Rationale |');
+  lines.push('|---|:---:|---|---|---|---|---|');
 
-  const repoItems = inventory.items.filter((i) => i.contractScope === 'repository-local-contract');
-  for (const item of repoItems) {
-    const sampleFiles = item.referencedIn.slice(0, 2).join(', ') + (item.referencedIn.length > 2 ? ` (+${item.referencedIn.length - 2} more)` : '');
-    lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | ${sampleFiles} | ${item.rationale} |`);
+  const safeRepoItems = inventory.items.filter((i) => i.contractScope === 'repository-local-contract' && i.isSafeRewriteTarget);
+  for (const item of safeRepoItems) {
+    lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | \`${item.referenceKind}\` | \`${item.existenceStatus}\` | \`${item.sourceRole}\` | \`${item.resolutionStatus}\` | ${item.rationale} |`);
+  }
+
+  lines.push('');
+  lines.push('### 4.2 Illustrative Examples and Non-Target References');
+  lines.push('');
+  lines.push('These paths are illustrative examples, hypothetical modules, placeholders, or retired citations referenced inside shipped skills and documentation (e.g., `src/foo.mjs`, `src/auth.mjs`, `scripts/distill.mjs`, `src/runner/retry.mjs`, `test/parser.test.mjs`). Even though their path syntax is repository-local, they do NOT exist on disk and MUST NEVER be labeled or treated as safe rewrite targets merely because contractScope is repository-local:');
+  lines.push('');
+  lines.push('| Path | Occurrences | Reference Kind | Existence | Source Role | Resolution | Scope & Rationale |');
+  lines.push('|---|:---:|---|---|---|---|---|');
+
+  const nonTargetRepoItems = inventory.items.filter((i) => i.contractScope === 'repository-local-contract' && !i.isSafeRewriteTarget);
+  for (const item of nonTargetRepoItems) {
+    lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | \`${item.referenceKind}\` | \`${item.existenceStatus}\` | \`${item.sourceRole}\` | \`${item.resolutionStatus}\` | ${item.rationale} |`);
   }
 
   if (inventory.summary.mixedRepositoryLocalAndConsumerCount > 0) {
@@ -496,11 +679,11 @@ export function generateMarkdownReport(inventory) {
     lines.push('');
     lines.push('These paths serve dual roles: active repository-local doctrine or platform truth for fgOS, and templates or shared conventions for consumer workspaces:');
     lines.push('');
-    lines.push('| Path | Occurrences | Referenced In | Scope & Rationale |');
-    lines.push('|---|:---:|---|---|');
+    lines.push('| Path | Occurrences | Reference Kind | Existence | Source Role | Resolution | Scope & Rationale |');
+    lines.push('|---|:---:|---|---|---|---|---|');
     const mixedItems = inventory.items.filter((i) => i.contractScope === 'mixed-repository-local-and-consumer');
     for (const item of mixedItems) {
-      lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | ${item.referencedIn.join(', ')} | ${item.rationale} |`);
+      lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | \`${item.referenceKind}\` | \`${item.existenceStatus}\` | \`${item.sourceRole}\` | \`${item.resolutionStatus}\` | ${item.rationale} |`);
     }
   }
 
@@ -508,18 +691,18 @@ export function generateMarkdownReport(inventory) {
     lines.push('');
     lines.push('## 6. Unclassified Paths');
     lines.push('');
-    lines.push('| Path | Occurrences | Referenced In | Audit Note |');
-    lines.push('|---|:---:|---|---|');
+    lines.push('| Path | Occurrences | Reference Kind | Existence | Source Role | Resolution | Audit Note |');
+    lines.push('|---|:---:|---|---|---|---|---|');
     const unclassItems = inventory.items.filter((i) => i.contractScope === 'mixed-or-unclassified');
     for (const item of unclassItems) {
-      lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | ${item.referencedIn.join(', ')} | ${item.rationale} |`);
+      lines.push(`| \`${item.path}\` | ${item.occurrencesCount} | \`${item.referenceKind}\` | \`${item.existenceStatus}\` | \`${item.sourceRole}\` | \`${item.resolutionStatus}\` | ${item.rationale} |`);
     }
   }
 
   lines.push('');
   lines.push('## 7. Migration Safeguards');
   lines.push('');
-  lines.push('1. Phase 07 consumer preparation must only rewrite entries classified as `repository-local-contract`.');
+  lines.push('1. Phase 07 consumer preparation must only rewrite verified repository-local files (`isSafeRewriteTarget: true`). Illustrative examples and placeholders (`scripts/distill.mjs`, `src/auth.mjs`, `src/foo.mjs`, `src/runner/retry.mjs`, `test/parser.test.mjs`, `src/parser.mjs`, `src/x.mjs`, `docs/notes.md`, `docs/metadata`) must never be treated as safe rewrite targets merely because contractScope is repository-local.');
   lines.push('2. Shipped skill templates and plugin wrappers that refer to consumer-project contracts (`.fgos/`, `docs/how-to/`, `domains/`, `core/skills/`) must remain stable.');
   lines.push('3. Mixed contracts (`domains/coding/AGENTS.md`, `core/instructions/platform-laws.md`) require explicit separation before modification.');
   lines.push('4. Any skill that cites a repo-local spec as a self-hosting aid must be evaluated for abstraction into a provider or runtime inspection door rather than hardcoding repository paths.');

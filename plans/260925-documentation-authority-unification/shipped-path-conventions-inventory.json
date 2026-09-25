@@ -18,7 +18,23 @@
     "repositoryLocalContractsCount": 107,
     "mixedRepositoryLocalAndConsumerCount": 7,
     "unclassifiedCount": 0,
-    "mixedCount": 7
+    "mixedCount": 7,
+    "existence": {
+      "existsCount": 155,
+      "nonexistentCount": 28
+    },
+    "rewriteSafety": {
+      "safeRewriteTargetsCount": 92,
+      "nonTargetExamplesCount": 91
+    },
+    "referenceKinds": {
+      "literalCurrentPath": 148,
+      "exampleOrPlaceholder": 26,
+      "generatedMirror": 3,
+      "staleOrDead": 2,
+      "testEvidenceReference": 4,
+      "unresolvedDynamic": 0
+    }
   },
   "items": [
     {
@@ -33,6 +49,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -42,6 +63,11 @@
         "plugins/fgOS/skills/merge-loop/references/blocked-pick-decision-tree.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -51,6 +77,11 @@
         "domains/coding/registry.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -62,6 +93,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -76,6 +112,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -87,6 +128,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -96,6 +142,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -105,6 +156,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -114,6 +170,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -123,6 +184,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -132,6 +198,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -141,6 +212,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -150,6 +226,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Agent skill definitions and wrappers deployed to consumer workspaces"
     },
     {
@@ -159,6 +240,11 @@
         "plugins/fgOS/skills/pick/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Harness worktree isolate directory convention"
     },
     {
@@ -170,6 +256,11 @@
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -199,6 +290,11 @@
         "plugins/fgOS/skills/terminal/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -210,6 +306,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -221,6 +322,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -239,6 +345,11 @@
         "plugins/fgOS/skills/retro-next/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -248,6 +359,11 @@
         "plugins/fgOS/skills/cleanup-next/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -257,6 +373,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -270,6 +391,11 @@
         "plugins/fgOS/skills/plan-loop/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -283,6 +409,11 @@
         "plugins/fgOS/skills/unlock/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-workspace-pattern",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Runtime work-state, configuration, coordination, and session storage in consumer workspaces"
     },
     {
@@ -296,6 +427,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -306,6 +442,11 @@
         "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -315,6 +456,11 @@
         "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -324,6 +470,11 @@
         "core/coordination-protocols/declared-consult.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -333,6 +484,11 @@
         "core/coordination-protocols/deliberation-delphi-chain.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -342,6 +498,11 @@
         "core/coordination-protocols/deliberation-nominal-group-chain.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -351,6 +512,11 @@
         "core/coordination-protocols/deliberation-rfc-chain.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -360,6 +526,11 @@
         "core/coordination-protocols/group-cognition-framework.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -369,6 +540,11 @@
         "core/coordination-protocols/group-thinking-delphi-feedback-lite.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -378,6 +554,11 @@
         "core/coordination-protocols/group-thinking-nominal-group-lite.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -387,6 +568,11 @@
         "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -396,6 +582,11 @@
         "core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -405,6 +596,11 @@
         "core/coordination-protocols/independent-research-fan-out-fan-in.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -417,6 +613,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -426,6 +627,11 @@
         ".fgos/instructions/effective/repo.json"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Platform operating law definitions: authoritative platform source truth projected into consumer workspace instructions"
     },
     {
@@ -441,6 +647,11 @@
         "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Core multi-agent coordination protocol definitions and packs shipped with fgOS platform"
     },
     {
@@ -452,6 +663,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
     },
     {
@@ -463,6 +679,11 @@
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
     },
     {
@@ -474,6 +695,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Canonical core skill definitions and shared fragments shipped for harness/workspace operation"
     },
     {
@@ -483,6 +709,11 @@
         "core/coordination-protocols/independent-research-fan-out-fan-in-gated.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -497,6 +728,11 @@
         "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -508,6 +744,11 @@
         "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -517,6 +758,11 @@
         "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -528,6 +774,11 @@
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -539,6 +790,11 @@
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -550,6 +806,11 @@
         "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -561,6 +822,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -572,6 +838,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -583,6 +854,11 @@
         "plugins/fgOS/skills/fgos-unlock/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "stale-or-dead",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "retired-decision-citation",
+      "resolutionStatus": "stale-retired",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -597,6 +873,11 @@
         "plugins/fgOS/skills/fgos-clarifying/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "stale-or-dead",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "retired-decision-citation",
+      "resolutionStatus": "stale-retired",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -614,6 +895,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -623,6 +909,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -636,6 +927,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -647,6 +943,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -658,6 +959,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -670,6 +976,11 @@
         "core/skills/distill/scripts/migrate-porting-state-backfill.mjs"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -680,6 +991,11 @@
         "core/skills/distill/scripts/migrate-porting-state-backfill.mjs"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -689,6 +1005,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Project-local reference-learning distillery area"
     },
     {
@@ -702,6 +1023,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -713,6 +1039,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -723,6 +1054,11 @@
         "plugins/fgOS/skills/retro-loop/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -784,6 +1120,11 @@
         "plugins/fgOS/skills/fgos-researching/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -801,6 +1142,11 @@
         "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -812,6 +1158,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -823,6 +1174,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -832,6 +1188,11 @@
         "plugins/fgOS/skills/cook/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -841,6 +1202,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -852,6 +1218,11 @@
         "plugins/fgOS/skills/plan/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -863,6 +1234,11 @@
         "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -874,6 +1250,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -885,6 +1266,11 @@
         "plugins/fgOS/skills/retro-loop/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -895,6 +1281,11 @@
         "plugins/fgOS/skills/retro-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -906,6 +1297,11 @@
         "plugins/fgOS/skills/terminal-close/close.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -916,6 +1312,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -931,6 +1332,11 @@
         "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -940,6 +1346,11 @@
         "plugins/fgOS/skills/merge-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -950,6 +1361,11 @@
         "plugins/fgOS/skills/cook/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -959,6 +1375,11 @@
         "plugins/fgOS/skills/merge-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -969,6 +1390,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -980,6 +1406,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -990,6 +1421,11 @@
         "plugins/fgOS/skills/retro-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1001,6 +1437,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1012,6 +1453,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1023,6 +1469,11 @@
         "plugins/fgOS/skills/_shared/coding-worker-contract.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1034,6 +1485,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1045,6 +1501,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1054,6 +1515,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1065,6 +1531,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1079,6 +1550,11 @@
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1090,6 +1566,11 @@
         "plugins/fgOS/skills/_shared/catchup-self-recovery.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1099,6 +1580,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1113,6 +1599,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1122,6 +1613,11 @@
         "domains/coding/AGENTS.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1133,6 +1629,11 @@
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1144,6 +1645,11 @@
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1155,6 +1661,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1169,6 +1680,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1180,6 +1696,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1189,6 +1710,11 @@
         "plugins/fgOS/skills/cook/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1200,6 +1726,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1211,6 +1742,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1220,6 +1756,11 @@
         "plugins/fgOS/skills/terminal/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1230,6 +1771,11 @@
         "core/instructions/platform-laws.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1241,6 +1787,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1252,6 +1803,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1262,6 +1818,11 @@
         "core/skills/distill/references/consult-protocol.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1273,6 +1834,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1285,6 +1851,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1308,6 +1879,11 @@
         "plugins/fgOS/skills/fgos-researching/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "platform-specification-or-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
@@ -1319,6 +1895,11 @@
         "plugins/fgOS/skills/fgos-indexing/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
@@ -1330,6 +1911,11 @@
         "plugins/fgOS/skills/fgos-routing/SKILL.md"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1339,6 +1925,11 @@
         "domains/coding/harness/enrich-and-validate-contract.mjs"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1350,6 +1941,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1359,6 +1955,11 @@
         "domains/coding/registry.yaml"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1370,6 +1971,11 @@
         "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1379,6 +1985,11 @@
         "domains/coding/workflows/feature.yaml"
       ],
       "contractScope": "mixed-repository-local-and-consumer",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "mixed-platform-and-consumer-doctrine",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Dual role: active repository-local doctrine for fgOS self-hosting coding domain and template/convention for consumer projects"
     },
     {
@@ -1399,6 +2010,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "shipped-surface-contract",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Client plugins providing slash commands in user harnesses"
     },
     {
@@ -1408,6 +2024,11 @@
         "plugins/fgOS/skills/merge-loop/references/blocked-pick-decision-tree.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "generated-mirror",
+      "existenceStatus": "exists",
+      "sourceRole": "generated-mirror-entry",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Client plugins providing slash commands in user harnesses"
     },
     {
@@ -1420,6 +2041,11 @@
         "plugins/fgOS/skills/fgos-coding-shaping/SKILL.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "generated-mirror",
+      "existenceStatus": "exists",
+      "sourceRole": "generated-mirror-entry",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Client plugins providing slash commands in user harnesses"
     },
     {
@@ -1431,6 +2057,11 @@
         "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "generated-mirror",
+      "existenceStatus": "exists",
+      "sourceRole": "generated-mirror-entry",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Client plugins providing slash commands in user harnesses"
     },
     {
@@ -1440,6 +2071,11 @@
         "core/agents/researcher.yaml"
       ],
       "contractScope": "consumer-project-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "consumer-knowledge-quadrant",
+      "resolutionStatus": "pattern-placeholder",
+      "isSafeRewriteTarget": false,
       "rationale": "Client plugins providing slash commands in user harnesses"
     },
     {
@@ -1451,6 +2087,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1462,6 +2103,11 @@
         "plugins/fgOS/skills/_shared/citation-format.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1475,6 +2121,11 @@
         "core/task-specs/distill.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1489,6 +2140,11 @@
         "plugins/fgOS/skills/_shared/fgos-cli-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1500,6 +2156,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1509,6 +2170,11 @@
         "plugins/fgOS/skills/merge-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1520,6 +2186,11 @@
         "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1534,6 +2205,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1546,6 +2222,11 @@
         "plugins/fgOS/skills/fgos-routing/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1555,6 +2236,11 @@
         "plugins/fgOS/skills/submit/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1564,6 +2250,11 @@
         "plugins/fgOS/skills/discover/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1573,6 +2264,11 @@
         "domains/coding/task-specs/shape-plan.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1584,6 +2280,11 @@
         "plugins/fgOS/skills/fgos-fanout/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1595,6 +2296,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1606,6 +2312,11 @@
         "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1615,6 +2326,11 @@
         "core/task-specs/fgos-indexing.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1626,6 +2342,11 @@
         "plugins/fgOS/skills/fgos-unlock/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1637,6 +2358,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1648,6 +2374,11 @@
         "core/coordination-protocols/standalone-master-coordination-loop.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1661,6 +2392,11 @@
         "core/coordination-protocols/standalone-master-coordination-loop.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1670,6 +2406,11 @@
         "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1705,6 +2446,11 @@
         "plugins/fgOS/skills/fgos-fanout/references/wave-dispatch-mechanics.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1714,6 +2460,11 @@
         "core/coordination-protocols/standalone-master-coordination-loop.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1726,6 +2477,11 @@
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1740,6 +2496,11 @@
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1751,6 +2512,11 @@
         "plugins/fgOS/skills/fgos-fanout/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1763,6 +2529,11 @@
         "plugins/fgOS/skills/unlock/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1774,6 +2545,11 @@
         "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1783,6 +2559,11 @@
         "domains/coding/harness/enrich-and-validate-contract.mjs"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1794,6 +2575,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1805,6 +2591,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1816,6 +2607,11 @@
         "plugins/fgOS/skills/_shared/private-cell-worktree.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1827,6 +2623,11 @@
         "plugins/fgOS/skills/_shared/capability-catalog.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1839,6 +2640,11 @@
         "plugins/fgOS/skills/fgos-coding-knowledge/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1848,6 +2654,11 @@
         "plugins/fgOS/skills/cleanup-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1857,6 +2668,11 @@
         "plugins/fgOS/skills/discover-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1866,6 +2682,11 @@
         "domains/coding/task-specs/lock-decisions.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1875,6 +2696,11 @@
         "plugins/fgOS/skills/merge-list/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1887,6 +2713,11 @@
         "plugins/fgOS/skills/graph/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1896,6 +2727,11 @@
         "plugins/fgOS/skills/plan-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1907,6 +2743,11 @@
         "plugins/fgOS/skills/fgos-coding-driving/references/loop-mechanics.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1916,6 +2757,11 @@
         "plugins/fgOS/skills/retro-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1927,6 +2773,11 @@
         "plugins/fgOS/skills/fgos-coding-driving/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1936,6 +2787,11 @@
         "plugins/fgOS/skills/cleanup-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1945,6 +2801,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1956,6 +2817,11 @@
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1975,6 +2841,11 @@
         "plugins/fgOS/skills/fgos-coding-driving/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1987,6 +2858,11 @@
         "plugins/fgOS/skills/terminal/rename.sh"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -1998,6 +2874,11 @@
         "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2009,6 +2890,11 @@
         "plugins/fgOS/skills/fgos-group-thinking/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2024,6 +2910,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2046,6 +2937,11 @@
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2057,6 +2953,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "literal-current-path",
+      "existenceStatus": "exists",
+      "sourceRole": "internal-implementation",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": true,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2068,6 +2969,11 @@
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2079,6 +2985,11 @@
         "plugins/fgOS/skills/fgos-coding-planning/references/split-and-child-specs.md"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "example-or-placeholder",
+      "existenceStatus": "nonexistent",
+      "sourceRole": "illustrative-example",
+      "resolutionStatus": "example-not-target",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2088,6 +2999,11 @@
         "domains/coding/harness/enrich-and-validate-contract.mjs"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "test-evidence-reference",
+      "existenceStatus": "exists",
+      "sourceRole": "test-suite-or-fixture",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2097,6 +3013,11 @@
         "core/coordination-protocols/architecture-advisory-panel-v1.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "test-evidence-reference",
+      "existenceStatus": "exists",
+      "sourceRole": "test-suite-or-fixture",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2106,6 +3027,11 @@
         "core/coordination-protocols/group-thinking-rfc-review-lite.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "test-evidence-reference",
+      "existenceStatus": "exists",
+      "sourceRole": "test-suite-or-fixture",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     },
     {
@@ -2115,6 +3041,11 @@
         "core/coordination-protocols/group-thinking-nominal-group-lite.yaml"
       ],
       "contractScope": "repository-local-contract",
+      "referenceKind": "test-evidence-reference",
+      "existenceStatus": "exists",
+      "sourceRole": "test-suite-or-fixture",
+      "resolutionStatus": "resolved",
+      "isSafeRewriteTarget": false,
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
     }
   ]

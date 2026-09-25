@@ -46,11 +46,12 @@
         {
           "scope": "curated-spec-projection",
           "route": "docs/specs/platform-foundations.md",
-          "authorityStatus": "legacy-current",
-          "role": "Curated/spec projection of platform operating laws"
+          "authorityStatus": "non-authority",
+          "bindingSource": "docs/platform-foundations.md",
+          "role": "Curated/spec projection of platform operating laws (derived from binding source docs/platform-foundations.md; generated projections never establish authority)"
         }
       ],
-      "scopeSummary": "Enter at docs/platform/platform-foundations.md; read the complete binding wording, rationale, sources, and review thresholds in docs/platform-foundations.md; use docs/specs/platform-foundations.md as its curated/spec projection.",
+      "scopeSummary": "Enter at docs/platform/platform-foundations.md; read the complete binding wording, rationale, sources, and review thresholds in docs/platform-foundations.md; use docs/specs/platform-foundations.md as its non-authority curated/spec projection (binding source: docs/platform-foundations.md; generated projections never establish authority).",
       "currentRoutes": [
         {
           "scope": "binding-authoritative-text",
@@ -67,8 +68,9 @@
         {
           "scope": "curated-spec-projection",
           "route": "docs/specs/platform-foundations.md",
-          "authorityStatus": "legacy-current",
-          "role": "Curated/spec projection of platform operating laws"
+          "authorityStatus": "non-authority",
+          "bindingSource": "docs/platform-foundations.md",
+          "role": "Curated/spec projection of platform operating laws (derived from binding source docs/platform-foundations.md; generated projections never establish authority)"
         }
       ]
     },

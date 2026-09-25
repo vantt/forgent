@@ -21,6 +21,20 @@ export const DEFAULT_ROOTS = ['docs/specs', 'docs/architect'];
 export const DEFAULT_BASELINE_PATH = 'scripts/check-legacy-docs-ratchet.baseline.json';
 export const DEFAULT_EXCEPTIONS_PATH = 'scripts/check-legacy-docs-ratchet.exceptions.json';
 
+export const MAINTAINED_PROSE_CLASSES = new Set([
+  'maintained-authority',
+  'retained-source',
+]);
+
+export const NON_AUTHORITY_PAYLOAD_CLASSES = new Set([
+  'generated',
+  'history-evidence',
+]);
+
+export function isMaintainedProseClass(fileClass) {
+  return MAINTAINED_PROSE_CLASSES.has(fileClass);
+}
+
 const DIGEST_ALGORITHM = 'sha256';
 
 /**
@@ -31,33 +45,66 @@ export function normalizePosix(p) {
 }
 
 /**
- * Classifies a legacy root file by its nature/extension.
+ * Validates whether a string is a real ISO calendar date in YYYY-MM-DD format.
+ * Rejects impossible dates (e.g. 2026-02-30, 2026-13-40, 2026-02-29 on non-leap years).
+ */
+export function isValidIsoCalendarDate(str) {
+  if (typeof str !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return false;
+  }
+  const [yearStr, monthStr, dayStr] = str.split('-');
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+  const day = parseInt(dayStr, 10);
+  if (month < 1 || month > 12) return false;
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return (
+    d.getUTCFullYear() === year &&
+    d.getUTCMonth() === month - 1 &&
+    d.getUTCDate() === day
+  );
+}
+
+export const EXPLICIT_GENERATED_PROJECTIONS = new Set([
+  'docs/specs/platform-foundations.md',
+]);
+
+/**
+ * Classifies a legacy root file by its root, nature, and extension.
  * Deterministically recognizes curated/generated projections alongside
  * maintained authority, retained sources, and history/evidence.
+ *
+ * Rules (F1):
+ * - Under docs/specs: every file is maintained authority by default regardless
+ *   of extension or case, except explicitly enumerated generated projections.
+ *   Non-authority is never inferred merely from arbitrary extensions (.txt, .yml, .MD).
+ * - Under docs/architect: Markdown case-insensitively (.md) is maintained or
+ *   retained prose, while non-Markdown proof payloads (e.g. proof.json) can be history-evidence.
  */
 export function classifyFile(relPath) {
   const norm = normalizePosix(relPath);
-  if (!norm.endsWith('.md')) {
-    return 'history-evidence';
+  const lower = norm.toLowerCase();
+
+  if (norm.startsWith('docs/specs/') || norm === 'docs/specs') {
+    if (EXPLICIT_GENERATED_PROJECTIONS.has(norm)) {
+      return 'generated';
+    }
+    return 'maintained-authority';
   }
-  // Curated/spec projection of platform operating laws
-  if (norm === 'docs/specs/platform-foundations.md') {
-    return 'generated';
-  }
-  if (norm.startsWith('docs/architect/')) {
-    if (norm.includes('/contracts/') || norm.includes('/vocabulary/')) {
+
+  if (norm.startsWith('docs/architect/') || norm === 'docs/architect') {
+    if (lower.endsWith('.md')) {
+      if (norm.includes('/proposals/') || norm.includes('/roadmap/')) {
+        return 'retained-source';
+      }
       return 'maintained-authority';
     }
-    if (norm.includes('/proposals/') || norm.includes('/roadmap/')) {
-      return 'retained-source';
-    }
-    return 'maintained-authority';
+    return 'history-evidence';
   }
-  if (norm.startsWith('docs/specs/')) {
-    return 'maintained-authority';
-  }
+
   return 'history-evidence';
 }
+
 
 /**
  * Computes sha256 digest string for a buffer or string.
@@ -188,6 +235,24 @@ export function validateExceptionsSchema(exceptions) {
     }
     if (typeof item.approvedBy !== 'string' || item.approvedBy.trim().length === 0) {
       throw new Error(`Malformed exceptions: exception at index ${idx} missing approvedBy`);
+    }
+    if (typeof item.owner !== 'string' || item.owner.trim().length === 0) {
+      throw new Error(`Malformed exceptions: exception at index ${idx} missing owner`);
+    }
+    if (typeof item.reviewedAt !== 'string' || !isValidIsoCalendarDate(item.reviewedAt)) {
+      throw new Error(`Malformed exceptions: exception at index ${idx} missing or invalid reviewedAt (expected valid ISO calendar date YYYY-MM-DD)`);
+    }
+    const hasExpiry = typeof item.expiry === 'string' && item.expiry.trim().length > 0;
+    const hasRevisitTrigger = typeof item.revisitTrigger === 'string' && item.revisitTrigger.trim().length > 0;
+    if (!hasExpiry && !hasRevisitTrigger) {
+      throw new Error(
+        `Malformed exceptions: exception at index ${idx} requires at least one lifecycle control ('expiry' or 'revisitTrigger')`
+      );
+    }
+    if (hasExpiry && !isValidIsoCalendarDate(item.expiry)) {
+      throw new Error(
+        `Malformed exceptions: exception at index ${idx} has invalid expiry format or impossible calendar date: "${item.expiry}" (expected valid ISO calendar date YYYY-MM-DD)`
+      );
     }
     if (typeof item.expectedDigest !== 'string' || !/^[0-9a-f]{64}$/.test(item.expectedDigest)) {
       throw new Error(`Malformed exceptions: exception for ${item.path} requires valid 64-char hex expectedDigest`);
@@ -358,6 +423,7 @@ export function checkRatchet({
   baseline,
   exceptions = { version: 1, exceptions: [] },
   roots = DEFAULT_ROOTS,
+  today = new Date().toISOString().slice(0, 10),
 } = {}) {
   validateBaselineSchema(baseline);
   validateExceptionsSchema(exceptions);
@@ -417,12 +483,27 @@ export function checkRatchet({
     }
   }
 
+  // Check for expired exceptions
+  // Expiry boundary definition (F4): An exception expires on its expiry date.
+  // For any check date today >= exc.expiry, the exception is considered expired
+  // (expired-exception) and no longer active. An exception is active only when today < exc.expiry.
+  for (const exc of exceptions.exceptions) {
+    if (exc.expiry && exc.expiry <= today) {
+      findings.push({
+        type: 'expired-exception',
+        path: exc.path,
+        message: `${exc.path}: exception expired on ${exc.expiry} (current check date: ${today}).`,
+      });
+    }
+  }
+
   // Index exceptions by canonical path
   const exceptionsByPath = new Map();
   for (const exc of exceptions.exceptions) {
     exceptionsByPath.set(canonicalizeExceptionPath(exc.path), exc);
   }
 
+  const usedExceptions = new Set();
   let accountedEditsCount = 0;
   let accountedNewFilesCount = 0;
 
@@ -430,22 +511,39 @@ export function checkRatchet({
   for (const [relPath, current] of onDiskMap.entries()) {
     const baseEntry = baseline.files[relPath];
     const exception = exceptionsByPath.get(relPath);
+    const classified = classifyFile(relPath);
 
     if (!baseEntry) {
       // New file on disk
-      if (exception && exception.kind === 'allowed-new-file' && exception.expectedDigest === current.digest) {
-        accountedNewFilesCount++;
-      } else if (exception && exception.kind === 'allowed-new-file') {
-        findings.push({
-          type: 'unaccounted-edit',
-          path: relPath,
-          message: `${relPath}: new file has exception but digest mismatch (expected ${exception.expectedDigest}, got ${current.digest})`,
-        });
+      if (isMaintainedProseClass(classified)) {
+        if (exception && exception.kind === 'allowed-new-file' && exception.expectedDigest === current.digest) {
+          accountedNewFilesCount++;
+          usedExceptions.add(canonicalizeExceptionPath(exception.path));
+        } else if (exception && exception.kind === 'allowed-new-file') {
+          usedExceptions.add(canonicalizeExceptionPath(exception.path));
+          findings.push({
+            type: 'unaccounted-edit',
+            path: relPath,
+            message: `${relPath}: new maintained file has exception but digest mismatch (expected ${exception.expectedDigest}, got ${current.digest})`,
+          });
+        } else {
+          findings.push({
+            type: 'unreviewed-new-file',
+            path: relPath,
+            message: `${relPath}: new maintained file under legacy root refused by ratchet (class: ${classified}). Maintained authority belongs in docs/platform/** or requires reviewed exception.`,
+          });
+        }
+      } else if (NON_AUTHORITY_PAYLOAD_CLASSES.has(classified)) {
+        // Non-authority payload (generated projection or history-evidence): permitted without exception
+        if (exception && exception.kind === 'allowed-new-file' && exception.expectedDigest === current.digest) {
+          accountedNewFilesCount++;
+          usedExceptions.add(canonicalizeExceptionPath(exception.path));
+        }
       } else {
         findings.push({
           type: 'unreviewed-new-file',
           path: relPath,
-          message: `${relPath}: new file under legacy root refused by ratchet. Maintained authority belongs in docs/platform/** or requires reviewed exception.`,
+          message: `${relPath}: new file with unrecognized class "${classified}" refused by ratchet.`,
         });
       }
     } else {
@@ -468,7 +566,6 @@ export function checkRatchet({
       }
 
       // Check fileClass
-      const classified = classifyFile(relPath);
       if (baseEntry.fileClass !== classified) {
         findings.push({
           type: 'file-class-mismatch',
@@ -479,14 +576,34 @@ export function checkRatchet({
 
       // Check digest
       if (baseEntry.digest !== current.digest) {
-        if (exception && exception.kind === 'allowed-edit' && exception.expectedDigest === current.digest) {
-          accountedEditsCount++;
-        } else if (exception && exception.kind === 'allowed-edit') {
-          findings.push({
-            type: 'unaccounted-edit',
-            path: relPath,
-            message: `${relPath}: modified file has exception but digest mismatch (expected ${exception.expectedDigest}, got ${current.digest})`,
-          });
+        // Fail-closed against baseline spoofing: if either the baseline entry
+        // OR the live classification is maintained prose, enforce maintained controls
+        const isMaintained = isMaintainedProseClass(baseEntry.fileClass) || isMaintainedProseClass(classified);
+
+        if (isMaintained) {
+          if (exception && exception.kind === 'allowed-edit' && exception.expectedDigest === current.digest) {
+            accountedEditsCount++;
+            usedExceptions.add(canonicalizeExceptionPath(exception.path));
+          } else if (exception && exception.kind === 'allowed-edit') {
+            usedExceptions.add(canonicalizeExceptionPath(exception.path));
+            findings.push({
+              type: 'unaccounted-edit',
+              path: relPath,
+              message: `${relPath}: modified maintained file has exception but digest mismatch (expected ${exception.expectedDigest}, got ${current.digest})`,
+            });
+          } else {
+            findings.push({
+              type: 'unaccounted-edit',
+              path: relPath,
+              message: `${relPath}: maintained file (class: ${baseEntry.fileClass}) modified under legacy root without reviewed exception in exceptions ledger (baseline ${baseEntry.digest}, current ${current.digest}).`,
+            });
+          }
+        } else if (NON_AUTHORITY_PAYLOAD_CLASSES.has(baseEntry.fileClass) && NON_AUTHORITY_PAYLOAD_CLASSES.has(classified)) {
+          // Non-authority payload (generated projection or history-evidence): permitted without exception
+          if (exception && exception.kind === 'allowed-edit' && exception.expectedDigest === current.digest) {
+            accountedEditsCount++;
+            usedExceptions.add(canonicalizeExceptionPath(exception.path));
+          }
         } else {
           findings.push({
             type: 'unaccounted-edit',
@@ -505,6 +622,18 @@ export function checkRatchet({
         type: 'unexpected-deletion',
         path: relPath,
         message: `${relPath}: baselined file missing from disk without approved exception (legacy deletions are forbidden before Phase 08).`,
+      });
+    }
+  }
+
+  // 3. Check for unused / stale exceptions in ledger
+  for (const exc of exceptions.exceptions) {
+    const canon = canonicalizeExceptionPath(exc.path);
+    if (!usedExceptions.has(canon)) {
+      findings.push({
+        type: 'unused-exception',
+        path: exc.path,
+        message: `${exc.path}: exception in ledger is unused (no matching edit or new file exists on disk).`,
       });
     }
   }
