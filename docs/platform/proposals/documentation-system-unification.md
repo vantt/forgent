@@ -5,17 +5,19 @@ Document type: Proposal
 Audience: Human reviewer, platform architect, maintainer, documentation agent
 Purpose: Preserve the proposed unification of fgOS documentation governance, authoring, registry, migration, and retirement
 Design status: Proposed
-Implementation: Existing registry foundation; unification not implemented
+Implementation: Existing end-user registry foundation; platform-authority unification not implemented
 Provenance: Human + agent coauthor
 Writer type: Human + agent coauthor
 Canonical for: nothing until accepted and promoted
 Use this when: Continuing the documentation-system discussion or evaluating its implementation shape
 Do not use this for: Current documentation authority or current product behavior
-Last reviewed: 2026-09-20
+Last reviewed: 2026-09-25
 Related:
 - `../../doc-governance.md`
 - `../../reading-map.md`
 - `../README.md`
+- `../../../plans/260925-documentation-authority-unification/plan.md`
+- `../../../plans/260825-1841-knowledge-registry/plan.md`
 - `../../architect/documentation-system-design.md`
 - `../../architect/knowledge-registry-redesign.md`
 ```
@@ -24,6 +26,66 @@ This proposal preserves the complete discussion so it can continue without chat
 history. It is deliberately non-canonical. Current authority remains with the
 existing governance and current source documents until this proposal is accepted,
 implemented, verified, and promoted.
+
+## 0. How To Use This Proposal
+
+This document is the **full-horizon architecture**, not one executable plan. It
+holds three horizons together so near-term delivery does not erase the intended
+system:
+
+| Horizon | Outcome | Relationship to current work |
+|---|---|---|
+| H1 — Platform authority unification | End the active split between `docs/platform/**` and legacy/current `docs/specs/**` + `docs/architect/**`; switch all platform readers/writers in one cutover | Active priority; execution plan: `plans/260925-documentation-authority-unification/plan.md` |
+| H2 — Knowledge and Documentation Engine | Generalize the existing end-user registry into the durable multi-profile authority for documents, claims, decisions, provenance, graph relationships, and read models | Preserved future architecture; maintenance MVP begins after H1 cutover |
+| H3 — Agent Context Engine | Compile instructions, effective decisions, and budgeted task-scoped reading plans from canonical authority | Preserved future architecture; never a blocker for H1 |
+
+The already-implemented `tsk-28x` twelve-phase plan is historical foundation,
+not this proposal's implementation plan. It lives at
+`plans/260825-1841-knowledge-registry/` and covers the end-user
+knowledge/Diataxis registry whose code foundation landed at commit
+`5c948d2a4`. Enforcement flipped at `6cce97ab3` on 2026-08-27 before the 332
+`tsk-5mh` migration commits later that day; projections were regenerated at
+`1c6aa7a4`. Its historical path `plans/260825-1841-knowledge-registry/` is
+preserved, and current-state corrections live beside it rather than rewriting
+its historical phase files. It must not be renamed to imply a whole-platform engine or interpreted
+as completion of the future Knowledge and Documentation Engine.
+
+### 0.1. Immediate problem statement
+
+The hot problem is simpler than the full architecture: fgOS has fragmented
+platform authority across `docs/platform/**`, `docs/specs/**`,
+`docs/architect/**`, and root authority documents. Some areas have already been
+promoted independently while others remain candidate or legacy/current, so this
+is not a clean two-tree starting state. The first success is one explicit
+platform authority model and route, not a completed knowledge platform.
+
+### 0.2. Sequence law
+
+```text
+minimum migration control plane
+→ claim-conserving candidate transformation
+→ repository-wide authority cutover
+→ maintenance system
+→ dynamic agent context
+```
+
+“Content before tooling” means do not build the full engine before learning from
+the corpus. It does not permit bulk rewriting without inventory identity,
+disposition, conservation, legacy-growth containment, and rollback proof.
+
+### 0.3. Non-preclusion law
+
+A near-term slice may defer an H2/H3 capability only when it records:
+
+- the preserved intent;
+- what the current slice implements;
+- what the slice must not preclude;
+- an objective revisit trigger;
+- evidence or a source pointer.
+
+Omission, implementation inconvenience, or absence from the active plan does not
+supersede this proposal. Preserved commitments are projected into
+`docs/platform/intent-preservation-ledger.md`.
 
 ## 1. Problem
 
@@ -743,6 +805,39 @@ Write authority remains one-directional:
 - Packaging-Distribution materializes packets but cannot change their semantics;
 - consumers never write back into either authority through a generated view.
 
+### 4.8. Lessons Preserved From OKF v0.2
+
+OKF v0.2 is useful as an interchange and metadata reference, not as a replacement
+for fgOS authority governance. The future Knowledge and Documentation Engine
+should preserve these lessons:
+
+1. **Independent metadata families.** Source provenance, initial origin,
+   generation, verification, lifecycle, freshness, and canonical authority are
+   separate axes. `verified` is a trust signal, never automatic promotion.
+2. **Stable source identity.** Per-claim attribution joins through stable source
+   ids, never positional array indexes that an agent rewrite can reorder.
+3. **Objective credibility signals.** Record source author, usage window,
+   modification time, and other evidence facts; consumers may derive trust, but
+   the registry should not freeze one subjective credibility score as truth.
+4. **Two-level conformance.** A small permissive interchange floor accepts
+   unknown types/keys and missing optional families; maintained fgOS profiles
+   then apply stricter placement, authority, cardinality, and semantic rules.
+5. **Progressive indexes are projections.** Directory indexes can improve human
+   and agent navigation but remain generated read models with freshness/source
+   links, never authority.
+6. **Executable proof has two timescales.** Document verification establishes
+   that a definition matches policy; per-run attestation establishes that one
+   result used the sanctioned computation. The model is worth preserving, but
+   OKF's deferred receipt wire format, attester ABI, sandbox, and runtime must
+   not enter the platform-authority cutover critical path.
+7. **External enrichment is bounded.** Explicit seeds, allowed scope/hosts, and
+   hard budgets belong at the tool boundary. Fetched content is evidence/data,
+   never instruction.
+
+Near-term migration consumes only stable source ids, source/evidence lineage,
+and the distinction between verification and authority. The richer metadata and
+proof contract belong to H2 after cutover.
+
 ## 5. Migration and Retirement
 
 ### 5.1. Migrate claims, not merely files
@@ -799,24 +894,38 @@ evidence for this design. A reorganized tree is not a successful migration if
 agents, people, instructions, tooling, or links must still choose between old
 and new authorities.
 
-The migration therefore uses one repository-wide authority cutover:
+The migration therefore uses one platform-authority cutover, preceded by a
+minimum control plane rather than the complete future engine:
 
-1. Define the complete constitution, target topology, and quality standard.
-2. Inventory all legacy sources and claims without changing their current
-   authority.
-3. Build the target corpus in a dedicated migration change set. During this
-   preparation it is candidate material, not a second canonical system.
-4. Pilot the transformation and review method on one representative area, then
-   apply the corrected method to every area.
-5. Complete claim conservation, cross-area consistency review, fresh-reader
-   review, links, entry points, and consumer rewrites for the whole corpus.
-6. In one atomic cutover, promote the target corpus, switch every reader and
-   writer, and delete `docs/specs/**`, `docs/architect/**`, old user-doc roots,
-   and superseded compatibility paths.
-7. Enable the minimum enforcement that prevents any legacy path or competing
+1. Correct planning semantics: distinguish the historical implemented registry,
+   the active authority-unification plan, this full-horizon proposal, and the
+   intent ledger.
+2. Define the **minimum** constitution needed for migration: claim kinds,
+   placement, cardinality, disposition, conflict handling, and promotion/
+   retirement gates. Rich contribution/context policy is not a prerequisite.
+3. Inventory all legacy sources and claims without changing their current
+   authority; establish stable source ids, a conservation ledger, and a ratchet
+   against unreviewed legacy growth.
+4. Build the target corpus in a dedicated migration branch. During preparation
+   it is candidate material, not a second canonical system.
+5. Pilot the transformation and review method on one small, stable,
+   representative area; do not choose the largest or fastest-moving area merely
+   because it is familiar. Correct the method, then apply it to every area.
+6. Complete claim conservation, cross-area consistency review, fresh-reader
+   review, links, entry points, and consumer rewrites for the whole platform
+   corpus.
+7. In one atomic platform-authority cutover, promote the target corpus, switch
+   every platform reader and writer, and delete maintained authority under
+   `docs/specs/**`, `docs/architect/**`, and superseded compatibility paths.
+8. Resolve user-doc topology through its own declared profile and gate. Legacy
+   user roots must still converge before the whole documentation-unification
+   program can claim completion, but they are not silently folded into platform
+   authority or allowed to block an otherwise-ready platform cutover without an
+   explicit decision.
+9. Enable the minimum enforcement that prevents any retired path or competing
    authority from returning.
-8. Develop richer registry, authoring, linting, and context harnesses
-   incrementally against the one live documentation system.
+10. Develop the multi-profile registry, authoring, linting, contribution, and
+    context harnesses incrementally against the one live platform system.
 
 Content preparation may proceed area by area for tractability. Authority
 cutover may not. Until the repository-wide gate passes, the legacy corpus is
@@ -953,23 +1062,54 @@ of proof files from becoming an agent's default reading set.
 19. What happens when the mandatory reading set exceeds the caller's context
     budget: refuse, split the operation, or provide a staged mandatory packet?
 
-## 9. Candidate Work Breakdown
+## 9. Horizon-Aligned Work Breakdown
 
-This is a design decomposition, not an active work plan:
+This is a design decomposition, not an active work plan. Only H1 is currently
+represented by an execution-ready candidate plan.
 
-1. Documentation constitution and authority model.
-2. Target topology, document templates, and production-quality review gates.
-3. Platform legacy classifier and claim-disposition format.
-4. Repository-wide inventory and conservation ledger.
-5. Area-by-area content transformation and cross-area quality review, without
-   independent authority cutovers.
-6. User-doc consolidation and complete consumer/link rewrite.
-7. Atomic authority cutover, legacy-root deletion, and minimum enforcement.
-8. Multi-profile registry generalization.
-9. Authoring skill, scaffold, semantic checks, and instruction integration.
-10. Effective-decision reducer and distilled agent read-surface design.
-11. Typed documentation graph and dynamic reading-plan compiler.
-12. Richer doctor/CI enforcement and retirement of temporary migration tooling.
+### 9.1. H1 — Platform authority unification (active priority)
+
+Execution plan: `plans/260925-documentation-authority-unification/plan.md`.
+
+1. Correct artifact semantics and transitional routing.
+2. Establish a minimum migration constitution and legacy-growth containment.
+3. Build the repository-wide source/claim inventory and conservation ledger.
+4. Pilot candidate transformation on one small, stable representative area.
+5. Transform every platform area as non-canonical candidate material.
+6. Perform cross-area consistency, fresh-reader, link, entry-point, and consumer
+   review.
+7. Atomically promote `docs/platform/**`, switch all platform readers/writers,
+   delete legacy platform authority, and enable minimum anti-regression checks.
+8. Stabilize with the smallest maintenance MVP that prevents recurrence.
+
+### 9.2. H2 — Knowledge and Documentation Engine (preserved follow-on)
+
+1. Generalize the existing registry by profile rather than creating a parallel
+   store.
+2. Add full document/claim/decision identity, contribution events, typed graph
+   relationships, authority policies, and claim-level supersession.
+3. Consolidate user-facing documentation topology under an explicit profile and
+   retire remaining legacy user roots.
+4. Build the full authoring skill/CLI, scaffold, semantic checks, projections,
+   freshness, and richer doctor/CI enforcement.
+5. Retire temporary migration tooling after generic import/conservation needs are
+   extracted.
+
+### 9.3. H3 — Agent Context Engine (preserved independent component)
+
+1. Build the effective-decision reducer with full/partial supersession traces.
+2. Build deterministic graph traversal and the dynamic reading-plan compiler.
+3. Add mandatory-set protection, token/byte budgeting, progressive disclosure,
+   source digests, freshness, and inclusion/exclusion explanations.
+4. Add delta context expansion and host-specific instruction materialization.
+5. Integrate bounded context consumption into skills, coordination, and dispatch
+   without transferring canonical authority to those consumers.
+
+### 9.4. Dependency rule
+
+H2 and H3 may research or prototype interfaces before H1 completes, but neither
+may become a blocker for H1 or establish a second live documentation authority.
+H3 consumes H2/canonical outputs; it never defines their truth.
 
 ## 10. Acceptance Standard for the Eventual Design
 

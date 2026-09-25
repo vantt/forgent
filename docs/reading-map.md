@@ -85,8 +85,23 @@ docs/explanation/
 ## 3. Transitional Note
 
 The target structure is being introduced incrementally. When both legacy and
-target docs exist, prefer the document with the clearest canonical metadata and
-latest review date, and surface conflicts instead of silently reconciling them.
+target docs exist, **do not infer authority from path, newer date, richer prose,
+or more confident wording**. Follow the explicit current-source mapping in the
+platform/area portal and surface any conflict. A target document marked partial
+or candidate does not outrank a declared legacy/current source merely because it
+lives under `docs/platform/**`.
+
+The verified Phase 00 snapshot is
+[current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).
+It records the explicit current route for every known area and root Markdown
+surface; it is evidence, not a promotion or migration switchboard.
+
+The full-horizon design is
+[documentation-system-unification.md](platform/proposals/documentation-system-unification.md).
+The proposed near-term authority migration is
+[plan.md](../plans/260925-documentation-authority-unification/plan.md). Only
+Phase 00 has been authorized; its existence does not authorize Phase 01 or any
+migration/cutover phase.
 
 ## 4. Related Files
 
@@ -95,3 +110,6 @@ latest review date, and surface conflicts instead of silently reconciling them.
 | governs documentation system | [doc-governance.md](doc-governance.md) |
 | platform portal | [platform/README.md](platform/README.md) |
 | legacy/current detailed source map | [specs/reading-map.md](specs/reading-map.md) |
+| verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |
+| full-horizon documentation-system proposal | [platform/proposals/documentation-system-unification.md](platform/proposals/documentation-system-unification.md) |
+| preserved future documentation intents | [platform/intent-preservation-ledger.md](platform/intent-preservation-ledger.md) |

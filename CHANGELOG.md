@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Documentation**: separated the historical end-user knowledge-registry plan, proposed platform-authority migration, full Knowledge and Documentation Engine horizon, and future Agent Context Engine; added independent review evidence and clarified transitional authority routing without authorizing Phases 01–09.
 - **Fixed**: in DAG coordination sessions (`fgos coordination run`/`show`), a node linked in `events.jsonl` without valid on-disk `RunResult` evidence previously allowed downstream nodes to be scheduled and masked missing/corrupt results under `materialized`. `run` and `show` now fail closed with `readLinkedRunResultFromDisk`, requiring authoritative on-disk evidence (`result.json`) matching the v2 contract, and project `refused` with reason `corrupt-evidence` when artifacts are missing, truncated, or contract-corrupt.
 - **Changed**: `fgos dispatch execute <id>` now fails closed with exit code 1 (`DispatchError('executor-not-found')`) when an unregistered executor is explicitly nominated, aligning with `fgos dispatch decide` (previously fell back silently to the global executor with exit 0).
 - **Changed**: fgOS now builds and supports Rust binaries (`fgctl`/`herdr`) on Windows — `ci.yml`'s `test` job no longer skips `cargo build --release --workspace` on `windows-latest`.

@@ -1,5 +1,13 @@
 # Reading Map (sản phẩm)
 
+> **Quy tắc chuyển tiếp hiện hành:** bắt đầu ở `docs/reading-map.md`, rồi dùng
+> mapping current-source tường minh của portal area. Không suy authority từ
+> path, ngày review, độ chi tiết, hoặc riêng metadata `Canonical:`. Bảng
+> kiểm chứng Phase 00 sống tại
+> `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`;
+> bảng đó không promote, migrate hay retire source nào. Chỉ Phase 00 đã được
+> authorize; Phase 01–09 vẫn chưa được phép chạy.
+
 - `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)
 - `docs/architecture-map.md` — bản chuẩn kiến trúc (v0.2, record ADR0010 (bản đồ kiến trúc là bản chuẩn)): 5 tầng + 2 lớp phủ, sổ component + sổ contract (CTR001–CTR009), nghi thức thẻ-căn-cước-trước-code
