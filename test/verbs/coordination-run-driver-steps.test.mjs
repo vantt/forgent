@@ -2207,7 +2207,8 @@ test('Phase 05: external in-flight work defers a maxConcurrency:1 DAG immediatel
   assert.equal(result.closed, false);
   assert.equal(result.closeAttempted, false);
   assert.equal(result.steps.find((step) => step.as === 'produce').schedulerOutcome, 'deferred');
-  assert.equal(result.steps.find((step) => step.as === 'review').schedulerOutcome, 'deferred', 'with no invocation-owned settlement possible, the dependent is deferred rather than falsely blocked by an external Assignment');
+  assert.equal(result.steps.find((step) => step.as === 'review').schedulerOutcome, 'blocked');
+  assert.deepEqual(result.steps.find((step) => step.as === 'review').blockedBy, ['node-produce']);
   assert.deepEqual(result.dag.inFlightOutsideInvocation, [outside.assignmentId]);
 });
 

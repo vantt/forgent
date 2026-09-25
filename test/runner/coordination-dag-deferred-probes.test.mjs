@@ -30,7 +30,7 @@ import {
   CoordinationError,
   SCHEMA_VERSION_3,
 } from '../../src/runner/coordination/schema.mjs';
-import { openDeclaredProtocolSession, cancelSession, resumeSession } from '../../src/runner/coordination/session-engine.mjs';
+import { openDeclaredProtocolSession, cancelSession, resumeSession, closeSessionByQuorum } from '../../src/runner/coordination/session-engine.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
 import { closeCoordinationUseCase } from '../../src/verbs/coordination/close.mjs';
@@ -286,59 +286,58 @@ test('DAG probes: driver disposition on caveated findings refuses accepted and c
 
   const eventCountBefore = readEvents(eventsPath).length;
 
-  // 1. cell-closed: store explicitly checks caveats and refuses
-  assert.throws(
-    () => recordDriverDisposition(
-      coordinationId,
-      {
-        targetRef: asgnId,
-        disposition: 'cell-closed',
-        rationale: 'attempt closing cell',
-        evidenceRefs: [],
-        authorizedBy: { type: 'driver', id: WRITER_ID },
-      },
-      { cwd: tempDir, repoRoot: tempDir },
-    ),
-    (err) => err instanceof CoordinationError && /cannot record "cell-closed" disposition on caveated evidence/.test(err.message),
-  );
+  // 1. All accept-meaning variants (casing, whitespace, synonyms) MUST be refused by the disposition allow-list gate
+  const acceptVariants = [
+    'accepted',
+    'accept',
+    'cell-closed',
+    'Accepted',
+    'ACCEPTED',
+    ' accepted ',
+    'approved',
+    'partially-accepted',
+    'closed',
+    'resolved',
+    'cell-close',
+  ];
 
-  // 2. accepted: store refuses accepted disposition on caveated evidence
-  assert.throws(
-    () => recordDriverDisposition(
-      coordinationId,
-      {
-        targetRef: asgnId,
-        disposition: 'accepted',
-        rationale: 'driver accepting caveat finding',
-        evidenceRefs: [],
-        authorizedBy: { type: 'driver', id: WRITER_ID },
-      },
-      { cwd: tempDir, repoRoot: tempDir },
-    ),
-    (err) => err instanceof CoordinationError && /cannot record "accepted" disposition on caveated evidence/.test(err.message),
-    'store must refuse accepted disposition on unadjudicated caveated evidence',
-  );
-
-  // 3. accept variant: store refuses accept disposition on caveated evidence
-  assert.throws(
-    () => recordDriverDisposition(
-      coordinationId,
-      {
-        targetRef: asgnId,
-        disposition: 'accept',
-        rationale: 'driver accepting caveat finding variant',
-        evidenceRefs: [],
-        authorizedBy: { type: 'driver', id: WRITER_ID },
-      },
-      { cwd: tempDir, repoRoot: tempDir },
-    ),
-    (err) => err instanceof CoordinationError && /cannot record "accept" disposition on caveated evidence/.test(err.message),
-    'store must refuse accept disposition on unadjudicated caveated evidence',
-  );
+  for (const d of acceptVariants) {
+    assert.throws(
+      () =>
+        recordDriverDisposition(
+          coordinationId,
+          {
+            targetRef: asgnId,
+            disposition: d,
+            rationale: `driver accepting caveat finding variant: ${d}`,
+            evidenceRefs: [],
+            authorizedBy: { type: 'driver', id: WRITER_ID },
+          },
+          { cwd: tempDir, repoRoot: tempDir },
+        ),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+      `store must refuse "${d}" disposition on unadjudicated caveated evidence`,
+    );
+  }
 
   // Verify that NO events were appended to the log when validation refused
   const eventCountAfterRefusals = readEvents(eventsPath).length;
   assert.equal(eventCountAfterRefusals, eventCountBefore, 'no event may be appended when disposition validation fails closed');
+
+  // 2. Explicitly non-accepting dispositions (rejected, deferred) are permitted on caveated evidence
+  const rejectedDisp = recordDriverDisposition(
+    coordinationId,
+    {
+      targetRef: asgnId,
+      disposition: 'rejected',
+      rationale: 'driver rejecting caveat finding',
+      evidenceRefs: [],
+      authorizedBy: { type: 'driver', id: WRITER_ID },
+    },
+    { cwd: tempDir, repoRoot: tempDir },
+  );
+  assert.equal(rejectedDisp.appended, true, 'rejected disposition must be permitted on caveated evidence');
+  assert.equal(readEvents(eventsPath).length, eventCountBefore + 1);
 
   // Stale action precondition protection:
   const dummyActionKey = 'sha256:' + '0'.repeat(64);
@@ -557,6 +556,28 @@ test('DAG probes: distinct node cwds allow cell-closed and accepted disposition 
     { cwd: tempDir, repoRoot: tempDir },
   );
   assert.equal(replayA.appended, false, 'idempotent replay of accepted must not append a duplicate event');
+
+  // 3. Evidence changes after acceptance: node-B now shares cwdA
+  const eventsPath = path.join(fgosDir, 'coordination', 'sessions', coordinationId, 'events.jsonl');
+  const eventCountBeforeChange = readEvents(eventsPath).length;
+  fs.writeFileSync(path.join(runDirB, 'run.json'), JSON.stringify({ cwd: cwdA }));
+  assert.throws(
+    () =>
+      recordDriverDisposition(
+        coordinationId,
+        {
+          targetRef: asgnA.assignmentId,
+          disposition: 'accepted',
+          rationale: 'replay after evidence changed to shared cwd',
+          evidenceRefs: [],
+          authorizedBy: { type: 'driver', id: WRITER_ID },
+        },
+        { cwd: tempDir, repoRoot: tempDir },
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+    'accept/replay after evidence changed to shared cwd must fail closed',
+  );
+  assert.equal(readEvents(eventsPath).length, eventCountBeforeChange, 'no event appended when replay fails closed on altered evidence');
 });
 
 // --------------------------------------------------------------------------
@@ -718,6 +739,267 @@ test('DAG probes: F02 node cwd attribution matrix (shared cwd caveat, reverse or
     (err) => err instanceof CoordinationError && err.category === 'corrupt-log' && /conflicting dagNodeId declarations/.test(err.message),
     'conflicting node ownership must fail closed with corrupt-log',
   );
+
+  // Subcase 5: Multi-attempt attribution (Case L, Case R, Case N) and store/close/show parity
+  // Case L: linked attempt 01 in shared cwd, later unlinked attempt 02 dir in distinct cwd
+  {
+    const cidL = 'probe-f02-case-L';
+    const tempL = mkTempDir('fgos-case-l-');
+    writeFixture(tempL);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidL,
+        objective: 'Case L parity',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempL, repoRoot: tempL },
+    );
+    const sharedL = path.join(tempL, 'shared');
+    const cxL = path.join(tempL, 'cx');
+    fs.mkdirSync(sharedL, { recursive: true });
+    fs.mkdirSync(cxL, { recursive: true });
+
+    const xL = createSessionAssignment({ coordinationId: cidL, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempL, repoRoot: tempL }).assignmentId;
+    const yL = createSessionAssignment({ coordinationId: cidL, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempL, repoRoot: tempL }).assignmentId;
+
+    const dX1 = path.join(tempL, '.fgos', 'assignments', xL, 'runs', '01');
+    fs.mkdirSync(dX1, { recursive: true });
+    fs.writeFileSync(path.join(dX1, 'run.json'), JSON.stringify({ cwd: sharedL }));
+    fs.writeFileSync(path.join(dX1, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x1' }));
+    linkResult(cidL, { assignmentId: xL, runId: `run_${xL}_01` }, { cwd: tempL, repoRoot: tempL });
+
+    // unlinked run 02 in distinct dir cxL
+    const dX2 = path.join(tempL, '.fgos', 'assignments', xL, 'runs', '02');
+    fs.mkdirSync(dX2, { recursive: true });
+    fs.writeFileSync(path.join(dX2, 'run.json'), JSON.stringify({ cwd: cxL }));
+    fs.writeFileSync(path.join(dX2, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x2' }));
+
+    // yL in sharedL
+    const dYL = path.join(tempL, '.fgos', 'assignments', yL, 'runs', '01');
+    fs.mkdirSync(dYL, { recursive: true });
+    fs.writeFileSync(path.join(dYL, 'run.json'), JSON.stringify({ cwd: sharedL }));
+    fs.writeFileSync(path.join(dYL, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidL, { assignmentId: yL, runId: `run_${yL}_01` }, { cwd: tempL, repoRoot: tempL });
+
+    // Store: refuses accepted disposition because linked run 01 is in shared cwd
+    assert.throws(
+      () => recordDriverDisposition(cidL, { targetRef: yL, disposition: 'accepted', rationale: 'case L', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempL, repoRoot: tempL }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+    );
+
+    // Close door: refuses close with recheck-required caveat
+    assert.throws(
+      () => closeSessionByQuorum(cidL, {}, { cwd: tempL, repoRoot: tempL }),
+      (err) => err instanceof CoordinationError && err.category === 'refusal' && /recheck-required/.test(err.message),
+    );
+
+    // Show projection: reports both nodes caveated
+    const shL = showCoordinationUseCase({ cwd: tempL, repoRoot: tempL }, { id: cidL });
+    assert.equal(shL.dag.nodes.every((n) => n.caveated === true), true);
+  }
+
+  // Case R: attempt 01 distinct, attempt 02 shared and linked -> store and close refuse
+  {
+    const cidR = 'probe-f02-case-R';
+    const tempR = mkTempDir('fgos-case-r-');
+    writeFixture(tempR);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidR,
+        objective: 'Case R parity',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempR, repoRoot: tempR },
+    );
+    const sharedR = path.join(tempR, 'shared');
+    const cxR = path.join(tempR, 'cx');
+    fs.mkdirSync(sharedR, { recursive: true });
+    fs.mkdirSync(cxR, { recursive: true });
+
+    const xR = createSessionAssignment({ coordinationId: cidR, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempR, repoRoot: tempR }).assignmentId;
+    const yR = createSessionAssignment({ coordinationId: cidR, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempR, repoRoot: tempR }).assignmentId;
+
+    const dX1 = path.join(tempR, '.fgos', 'assignments', xR, 'runs', '01');
+    fs.mkdirSync(dX1, { recursive: true });
+    fs.writeFileSync(path.join(dX1, 'run.json'), JSON.stringify({ cwd: cxR }));
+    fs.writeFileSync(path.join(dX1, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x1' }));
+
+    const dX2 = path.join(tempR, '.fgos', 'assignments', xR, 'runs', '02');
+    fs.mkdirSync(dX2, { recursive: true });
+    fs.writeFileSync(path.join(dX2, 'run.json'), JSON.stringify({ cwd: sharedR }));
+    fs.writeFileSync(path.join(dX2, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x2' }));
+    linkResult(cidR, { assignmentId: xR, runId: `run_${xR}_02` }, { cwd: tempR, repoRoot: tempR });
+
+    const dYR = path.join(tempR, '.fgos', 'assignments', yR, 'runs', '01');
+    fs.mkdirSync(dYR, { recursive: true });
+    fs.writeFileSync(path.join(dYR, 'run.json'), JSON.stringify({ cwd: sharedR }));
+    fs.writeFileSync(path.join(dYR, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidR, { assignmentId: yR, runId: `run_${yR}_01` }, { cwd: tempR, repoRoot: tempR });
+
+    assert.throws(
+      () => recordDriverDisposition(cidR, { targetRef: yR, disposition: 'accepted', rationale: 'case R', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempR, repoRoot: tempR }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+    );
+    assert.throws(
+      () => closeSessionByQuorum(cidR, {}, { cwd: tempR, repoRoot: tempR }),
+      (err) => err instanceof CoordinationError && err.category === 'refusal',
+    );
+  }
+
+  // Case N: unpadded attempt numbering beyond 9 ('9' vs '10') sorts numerically
+  {
+    const cidN = 'probe-f02-case-N';
+    const tempN = mkTempDir('fgos-case-n-');
+    writeFixture(tempN);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidN,
+        objective: 'Case N parity',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempN, repoRoot: tempN },
+    );
+    const sharedN = path.join(tempN, 'shared');
+    const cxN = path.join(tempN, 'cx');
+    fs.mkdirSync(sharedN, { recursive: true });
+    fs.mkdirSync(cxN, { recursive: true });
+
+    const xN = createSessionAssignment({ coordinationId: cidN, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempN, repoRoot: tempN }).assignmentId;
+    const yN = createSessionAssignment({ coordinationId: cidN, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempN, repoRoot: tempN }).assignmentId;
+
+    const dX9 = path.join(tempN, '.fgos', 'assignments', xN, 'runs', '9');
+    fs.mkdirSync(dX9, { recursive: true });
+    fs.writeFileSync(path.join(dX9, 'run.json'), JSON.stringify({ cwd: cxN }));
+    fs.writeFileSync(path.join(dX9, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x9' }));
+
+    const dX10 = path.join(tempN, '.fgos', 'assignments', xN, 'runs', '10');
+    fs.mkdirSync(dX10, { recursive: true });
+    fs.writeFileSync(path.join(dX10, 'run.json'), JSON.stringify({ cwd: sharedN }));
+    fs.writeFileSync(path.join(dX10, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x10' }));
+    linkResult(cidN, { assignmentId: xN, runId: `run_${xN}_10` }, { cwd: tempN, repoRoot: tempN });
+
+    const dYN = path.join(tempN, '.fgos', 'assignments', yN, 'runs', '01');
+    fs.mkdirSync(dYN, { recursive: true });
+    fs.writeFileSync(path.join(dYN, 'run.json'), JSON.stringify({ cwd: sharedN }));
+    fs.writeFileSync(path.join(dYN, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidN, { assignmentId: yN, runId: `run_${yN}_01` }, { cwd: tempN, repoRoot: tempN });
+
+    assert.throws(
+      () => recordDriverDisposition(cidN, { targetRef: yN, disposition: 'accepted', rationale: 'case N', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempN, repoRoot: tempN }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+    );
+  }
+
+  // Subcase 6: Target missing run evidence fails closed; sibling with valid run accepted cleanly
+  {
+    const cidM = 'probe-f02-target-missing-run';
+    const tempM = mkTempDir('fgos-missing-run-');
+    writeFixture(tempM);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidM,
+        objective: 'Target missing run',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempM, repoRoot: tempM },
+    );
+    const cyM = path.join(tempM, 'cy');
+    fs.mkdirSync(cyM, { recursive: true });
+
+    const xM = createSessionAssignment({ coordinationId: cidM, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempM, repoRoot: tempM }).assignmentId;
+    const yM = createSessionAssignment({ coordinationId: cidM, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempM, repoRoot: tempM }).assignmentId;
+
+    const dYM = path.join(tempM, '.fgos', 'assignments', yM, 'runs', '01');
+    fs.mkdirSync(dYM, { recursive: true });
+    fs.writeFileSync(path.join(dYM, 'run.json'), JSON.stringify({ cwd: cyM }));
+    fs.writeFileSync(path.join(dYM, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidM, { assignmentId: yM, runId: `run_${yM}_01` }, { cwd: tempM, repoRoot: tempM });
+
+    // Target xM has NO run evidence -> accept must be refused
+    assert.throws(
+      () => recordDriverDisposition(cidM, { targetRef: xM, disposition: 'accepted', rationale: 'missing run', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempM, repoRoot: tempM }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /has no run evidence/.test(err.message),
+    );
+
+    // Sibling yM with valid run in cyM is accepted cleanly without false caveat from fallback
+    const rY = recordDriverDisposition(cidM, { targetRef: yM, disposition: 'accepted', rationale: 'valid sibling', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempM, repoRoot: tempM });
+    assert.equal(rY.appended, true);
+
+    // Sibling running in repo root (= fallback cwd shared with unisolated peer node) fails closed with caveat refusal
+    const cidMRoot = 'probe-f02-sibling-repo-root';
+    const tempMRoot = mkTempDir('fgos-sibling-root-');
+    writeFixture(tempMRoot);
+    openDeclaredProtocolSession({ coordinationId: cidMRoot, objective: 'Sibling root', writerId: WRITER_ID, definitionId: DEFINITION_ID, schemaVersion: SCHEMA_VERSION_3, dagDeclaration: decl }, { cwd: tempMRoot, repoRoot: tempMRoot });
+    const xMR = createSessionAssignment({ coordinationId: cidMRoot, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempMRoot, repoRoot: tempMRoot }).assignmentId;
+    const yMR = createSessionAssignment({ coordinationId: cidMRoot, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempMRoot, repoRoot: tempMRoot }).assignmentId;
+    const dYMR = path.join(tempMRoot, '.fgos', 'assignments', yMR, 'runs', '01');
+    fs.mkdirSync(dYMR, { recursive: true });
+    fs.writeFileSync(path.join(dYMR, 'run.json'), JSON.stringify({ cwd: tempMRoot }));
+    fs.writeFileSync(path.join(dYMR, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'y' }));
+    linkResult(cidMRoot, { assignmentId: yMR, runId: `run_${yMR}_01` }, { cwd: tempMRoot, repoRoot: tempMRoot });
+    assert.throws(
+      () => recordDriverDisposition(cidMRoot, { targetRef: yMR, disposition: 'accepted', rationale: 'sibling at root', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempMRoot, repoRoot: tempMRoot }),
+      (err) => err instanceof CoordinationError && err.category === 'validation' && /cannot record .* disposition on caveated evidence/.test(err.message),
+      'sibling running in shared fallback cwd with concurrent unisolated node must fail closed with caveat refusal',
+    );
+  }
+
+  // Subcase 7: Corrupt sibling run.json fails closed with corrupt-log
+  {
+    const cidC = 'probe-f02-corrupt-sibling';
+    const tempC = mkTempDir('fgos-corrupt-sibling-');
+    writeFixture(tempC);
+    openDeclaredProtocolSession(
+      {
+        coordinationId: cidC,
+        objective: 'Corrupt sibling',
+        writerId: WRITER_ID,
+        definitionId: DEFINITION_ID,
+        schemaVersion: SCHEMA_VERSION_3,
+        dagDeclaration: decl,
+      },
+      { cwd: tempC, repoRoot: tempC },
+    );
+    const cxC = path.join(tempC, 'cx');
+    fs.mkdirSync(cxC, { recursive: true });
+
+    const xC = createSessionAssignment({ coordinationId: cidC, taskKey: 'tx', contract: { objective: 'x', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'doer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-A' }, { cwd: tempC, repoRoot: tempC }).assignmentId;
+    const yC = createSessionAssignment({ coordinationId: cidC, taskKey: 'ty', contract: { objective: 'y', contextRefs: [], constraints: [], expectedOutputs: ['agent-result.json'], mutation: 'read-only', evidence: { required: 'reported' }, role: 'reviewer', budget: { timeoutMs: 10000, maxRuns: 1 } }, caller: { writerId: WRITER_ID }, dagNodeId: 'node-B' }, { cwd: tempC, repoRoot: tempC }).assignmentId;
+
+    const dXC = path.join(tempC, '.fgos', 'assignments', xC, 'runs', '01');
+    fs.mkdirSync(dXC, { recursive: true });
+    fs.writeFileSync(path.join(dXC, 'run.json'), JSON.stringify({ cwd: cxC }));
+    fs.writeFileSync(path.join(dXC, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'x' }));
+    linkResult(cidC, { assignmentId: xC, runId: `run_${xC}_01` }, { cwd: tempC, repoRoot: tempC });
+
+    const dYC = path.join(tempC, '.fgos', 'assignments', yC, 'runs', '01');
+    fs.mkdirSync(dYC, { recursive: true });
+    fs.writeFileSync(path.join(dYC, 'run.json'), '{CORRUPT');
+
+    assert.throws(
+      () => recordDriverDisposition(cidC, { targetRef: xC, disposition: 'accepted', rationale: 'corrupt sibling test', evidenceRefs: [], authorizedBy: { type: 'driver', id: WRITER_ID } }, { cwd: tempC, repoRoot: tempC }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log',
+      'store must throw corrupt-log when sibling run.json is corrupt',
+    );
+
+    assert.throws(
+      () => showCoordinationUseCase({ cwd: tempC, repoRoot: tempC }, { id: cidC }),
+      (err) => err instanceof CoordinationError && err.category === 'corrupt-log',
+      'show must throw corrupt-log when sibling run.json is corrupt',
+    );
+  }
 });
 
 // --------------------------------------------------------------------------
@@ -769,7 +1051,75 @@ test('DAG probes: F03 scheduler outcome matrix (concurrency-cap deferral & retry
   assert.equal(scheduledResults.find((s) => s.as === 'step-b').outcome, 'settled');
   assert.equal(scheduledResults.find((s) => s.as === 'step-c').outcome, 'settled');
 
-  // Subcase 2: Non-concurrency-cap validation failure is refused, NOT deferred, and blocks descendants
+  // Subcase 2: Concurrency-cap deferral descendants taxonomy (I11R-04)
+  // When step-b is deferred on concurrency-cap, step-c (depends on b) and step-d (depends on a and b)
+  // must be marked "blocked" with blockedBy naming step-b, NOT "deferred".
+  const capDecl = {
+    nodes: [
+      { id: 'node-step-a', displayLabel: 'step-a', dependsOn: [] },
+      { id: 'node-step-b', displayLabel: 'step-b', dependsOn: [] },
+      { id: 'node-step-c', displayLabel: 'step-c', dependsOn: ['node-step-b'] },
+      { id: 'node-step-d', displayLabel: 'step-d', dependsOn: ['node-step-a', 'node-step-b'] },
+    ],
+  };
+  const capSteps = [{ as: 'step-a' }, { as: 'step-b' }, { as: 'step-c' }, { as: 'step-d' }];
+  const capResults = await scheduleDagSteps({
+    steps: capSteps,
+    declaration: capDecl,
+    execute: async (step) => {
+      if (step.as === 'step-a') return { authoritativeSettled: true, settled: true };
+      if (step.as === 'step-b') throw new CoordinationError('validation', 'Worker slot full', 'concurrency-cap');
+      return { authoritativeSettled: true, settled: true };
+    },
+  });
+
+  const bCap = capResults.find((s) => s.as === 'step-b');
+  assert.equal(bCap.outcome, 'deferred');
+  assert.equal(bCap.error?.code, 'concurrency-cap');
+
+  const cCap = capResults.find((s) => s.as === 'step-c');
+  assert.equal(cCap.outcome, 'blocked');
+  assert.deepEqual(cCap.blockedBy, ['step-b']);
+  assert.notEqual(cCap.outcome, 'deferred');
+
+  const dCap = capResults.find((s) => s.as === 'step-d');
+  assert.equal(dCap.outcome, 'blocked');
+  assert.deepEqual(dCap.blockedBy, ['step-b']);
+  assert.notEqual(dCap.outcome, 'deferred');
+
+  // Verify that NO step with outcome === 'deferred' carries a non-cap error code
+  for (const s of capResults) {
+    if (s.outcome === 'deferred') {
+      assert.equal(s.error?.code, 'concurrency-cap');
+    }
+  }
+
+  // Subcase 3: Missing / unlinked evidence produces materialized outcome without explicit schedulerOutcome (I11R-03 / M3a regression lock)
+  // Calling scheduleDagSteps with an execute returning { authoritativeSettled: false } WITHOUT schedulerOutcome
+  // MUST resolve outcome to 'materialized', NOT 'deferred' (kills mutation M3a).
+  const unlinkedResults = await scheduleDagSteps({
+    steps: rawSteps,
+    declaration: decl,
+    execute: async (step) => {
+      if (step.as === 'step-a') {
+        return { authoritativeSettled: false }; // Note: NO explicit schedulerOutcome provided!
+      }
+      if (step.as === 'step-b') {
+        return { authoritativeSettled: true, settled: true };
+      }
+      if (step.as === 'step-c') {
+        return { authoritativeSettled: true, settled: true };
+      }
+    },
+  });
+  const stepAUnlinked = unlinkedResults.find((s) => s.as === 'step-a');
+  assert.equal(stepAUnlinked.outcome, 'materialized', 'unsettled step without explicit outcome must default to materialized');
+  assert.notEqual(stepAUnlinked.outcome, 'deferred', 'mutation M3a regression lock: unsettled step must NOT default to deferred');
+
+  const stepCUnlinked = unlinkedResults.find((s) => s.as === 'step-c');
+  assert.equal(stepCUnlinked.outcome, 'settled');
+
+  // Subcase 4: Non-concurrency-cap validation failure is refused, NOT deferred, and blocks descendants
   const refusalResults = await scheduleDagSteps({
     steps: rawSteps,
     declaration: decl,
@@ -793,24 +1143,20 @@ test('DAG probes: F03 scheduler outcome matrix (concurrency-cap deferral & retry
   const stepCBlocked = refusalResults.find((s) => s.as === 'step-c');
   assert.equal(stepCBlocked.outcome, 'blocked', 'descendant of refused step must be blocked');
 
-  // Subcase 3: Missing / unlinked evidence produces materialized outcome, not deferred
-  const unlinkedResults = await scheduleDagSteps({
-    steps: rawSteps,
-    declaration: decl,
-    execute: async (step) => {
-      if (step.as === 'step-a') {
-        return { authoritativeSettled: false, schedulerOutcome: 'materialized' };
-      }
-      if (step.as === 'step-b') {
+  // Subcase 5: Non-validation error throws immediately
+  await assert.rejects(
+    scheduleDagSteps({
+      steps: rawSteps,
+      declaration: decl,
+      execute: async (step) => {
+        if (step.as === 'step-b') throw new Error('catastrophic process failure');
         return { authoritativeSettled: true, settled: true };
-      }
-    },
-  });
-  const stepAUnlinked = unlinkedResults.find((s) => s.as === 'step-a');
-  assert.equal(stepAUnlinked.outcome, 'materialized');
-  assert.notEqual(stepAUnlinked.outcome, 'deferred');
+      },
+    }),
+    (err) => err.message === 'catastrophic process failure',
+  );
 
-  // Subcase 4: Cold resume parity across show and run
+  // Subcase 6: Cold resume parity across show and run
   const tempDir = mkTempDir();
   writeFixture(tempDir);
   const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig: fakeExecutor(tempDir) };

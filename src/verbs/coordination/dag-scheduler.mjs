@@ -1,47 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
 import { CoordinationError } from '../../runner/coordination/schema.mjs';
-
-/**
- * Resolves the canonical working directory for a DAG node.
- * Checks node semantics (canonicalCwd / cwd), existing assignment runs on disk,
- * and falls back to defaultCwd or process.cwd().
- *
- * @param {object} node
- * @param {Array<object>} [nodeAssignments=[]]
- * @param {string} [fgosDir=null]
- * @param {string} [defaultCwd=null]
- * @returns {string}
- */
-export function resolveNodeCwd(node, nodeAssignments = [], fgosDir = null, defaultCwd = null) {
-  if (typeof node?.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
-    return path.resolve(node.semantics.canonicalCwd);
-  }
-  if (typeof node?.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
-    return path.resolve(node.semantics.cwd);
-  }
-  if (fgosDir && Array.isArray(nodeAssignments)) {
-    for (const asgn of [...nodeAssignments].reverse()) {
-      const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
-      if (fs.existsSync(runsDir)) {
-        try {
-          const attempts = fs.readdirSync(runsDir).sort().reverse();
-          for (const attempt of attempts) {
-            const runJsonPath = path.join(runsDir, attempt, 'run.json');
-            if (fs.existsSync(runJsonPath)) {
-              const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-              if (typeof run.cwd === 'string' && run.cwd.trim() !== '') {
-                return path.resolve(run.cwd);
-              }
-            }
-          }
-        } catch {}
-      }
-    }
-  }
-  return path.resolve(defaultCwd ?? process.cwd());
-}
+export { resolveNodeCwd } from '../../runner/coordination/dag-declaration.mjs';
 
 function outcomeFor(error) {
   if ((error instanceof CoordinationError || error instanceof StoreError) && error.category === 'validation') {
@@ -155,12 +114,12 @@ export async function scheduleDagSteps({ steps, declaration, execute, initialSta
     const state = states.get(step.as);
     if (state.outcome === 'pending') {
       const node = nodeByLabel.get(step.as);
-      const depLabels = (node?.dependsOn ?? []).map((id) => id.slice('node-'.length));
+      const depLabels = (node?.dependsOn ?? []).map((id) => {
+        const depNode = declaration?.nodes?.find((n) => n.id === id);
+        return depNode?.displayLabel ?? (id.startsWith('node-') ? id.slice('node-'.length) : id);
+      });
       const unsettledDeps = depLabels.filter((label) => states.get(label)?.outcome !== 'settled');
-      const allUnsettledAreDeferred = unsettledDeps.length > 0 && unsettledDeps.every((label) => states.get(label)?.outcome === 'deferred');
-      if (allUnsettledAreDeferred) {
-        state.outcome = 'deferred';
-      } else if (unsettledDeps.length > 0) {
+      if (unsettledDeps.length > 0) {
         state.outcome = 'blocked';
         state.blockedBy = unsettledDeps;
       }

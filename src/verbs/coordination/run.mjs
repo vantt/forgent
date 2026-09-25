@@ -714,7 +714,13 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       const nodeCwds = new Map();
       for (const node of dagDeclaration.nodes) {
         const nodeAssignments = replayed.assignments.filter((entry) => entry.dagNodeId === node.id);
-        nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
+        nodeCwds.set(
+          node.id,
+          resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
+            events: replayed.events,
+            results: replayed.results,
+          }),
+        );
       }
       dagCaveats = computeDagSharedCwdCaveats({
         declaredNodes: dagDeclaration.nodes,
@@ -822,6 +828,24 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           return stepResult;
         },
       });
+      const replayedAfter = resumeSession(manifest.coordinationId, engineOpts);
+      const { fgosDir: postFgosDir } = resolveSessionPaths(manifest.coordinationId, engineOpts);
+      const postNodeCwds = new Map();
+      for (const node of dagDeclaration.nodes) {
+        const nodeAssignments = replayedAfter.assignments.filter((entry) => entry.dagNodeId === node.id);
+        postNodeCwds.set(
+          node.id,
+          resolveNodeCwd(node, nodeAssignments, postFgosDir, ctx.cwd ?? engineOpts.cwd, {
+            events: replayedAfter.events,
+            results: replayedAfter.results,
+          }),
+        );
+      }
+      dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes: dagDeclaration.nodes,
+        getNodeCwd: (id) => postNodeCwds.get(id),
+      });
+
       const resultsByLabel = new Map(stepResults.map((result) => [result.as, result]));
       for (const state of scheduled) {
         const result = resultsByLabel.get(state.as) ?? state.result ?? { as: state.as, type: request.steps[state.index].type };

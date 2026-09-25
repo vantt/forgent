@@ -2,6 +2,9 @@
 // scheduler state: it is the durable request identity from which replay can
 // derive facts using the pre-existing Assignment/Run/session evidence.
 import { createHash } from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { CoordinationError } from './schema.mjs';
 
 export const DAG_DECLARATION_VERSION = '1';
 
@@ -186,4 +189,144 @@ export function computeDagSharedCwdCaveats({ declaredNodes, getNodeCwd }) {
     }
   }
   return caveats;
+}
+
+/**
+ * Resolves the canonical working directory for a DAG node.
+ * Checks node semantics (canonicalCwd / cwd), existing assignment runs on disk
+ * (prioritizing the authoritative result-linked run, then numerically latest attempt),
+ * and falls back to defaultCwd or null.
+ *
+ * @param {object} node
+ * @param {Array<object|string>|object} [arg2=[]] - nodeAssignments or options object
+ * @param {string} [arg3=null] - fgosDir
+ * @param {string} [arg4=null] - defaultCwd
+ * @param {object} [arg5={}] - extra options: { events, results, linkedRunMap }
+ * @returns {string|null}
+ */
+export function resolveNodeCwd(node, arg2 = [], arg3 = null, arg4 = null, arg5 = {}) {
+  let nodeAssignments = [];
+  let fgosDir = null;
+  let defaultCwd = null;
+  let events = null;
+  let results = null;
+  let linkedRunMap = null;
+
+  if (Array.isArray(arg2)) {
+    nodeAssignments = arg2;
+    fgosDir = arg3;
+    defaultCwd = arg4;
+    if (arg5 && typeof arg5 === 'object') {
+      events = arg5.events ?? null;
+      results = arg5.results ?? null;
+      linkedRunMap = arg5.linkedRunMap ?? null;
+    }
+  } else if (arg2 && typeof arg2 === 'object') {
+    nodeAssignments = arg2.nodeAssignments ?? [];
+    fgosDir = arg2.fgosDir ?? null;
+    defaultCwd = arg2.defaultCwd ?? null;
+    events = arg2.events ?? null;
+    results = arg2.results ?? null;
+    linkedRunMap = arg2.linkedRunMap ?? null;
+  }
+
+  if (typeof node?.semantics?.canonicalCwd === 'string' && node.semantics.canonicalCwd.trim() !== '') {
+    return path.resolve(node.semantics.canonicalCwd);
+  }
+  if (typeof node?.semantics?.cwd === 'string' && node.semantics.cwd.trim() !== '') {
+    return path.resolve(node.semantics.cwd);
+  }
+
+  const asgnIds = (Array.isArray(nodeAssignments) ? nodeAssignments : [])
+    .map((a) => (typeof a === 'string' ? a : a?.assignmentId || a?.id))
+    .filter(Boolean);
+
+  if (fgosDir && asgnIds.length > 0) {
+    for (const asgnId of [...asgnIds].reverse()) {
+      let linkedRunId = null;
+      if (linkedRunMap && typeof linkedRunMap.get === 'function') {
+        linkedRunId = linkedRunMap.get(asgnId);
+      }
+      if (!linkedRunId && Array.isArray(results)) {
+        for (let i = results.length - 1; i >= 0; i--) {
+          if (results[i].assignmentId === asgnId && results[i].runId) {
+            linkedRunId = results[i].runId;
+            break;
+          }
+        }
+      }
+      if (!linkedRunId && Array.isArray(events)) {
+        for (let i = events.length - 1; i >= 0; i--) {
+          const ev = events[i];
+          if (ev.type === 'result-linked' && ev.payload?.assignmentId === asgnId && ev.payload?.runId) {
+            linkedRunId = ev.payload.runId;
+            break;
+          }
+        }
+      }
+
+      if (linkedRunId) {
+        const prefix = `run_${asgnId}_`;
+        const attempt = linkedRunId.startsWith(prefix) ? linkedRunId.slice(prefix.length) : linkedRunId;
+        const runJsonPath = path.join(fgosDir, 'assignments', asgnId, 'runs', attempt, 'run.json');
+        if (fs.existsSync(runJsonPath)) {
+          let run;
+          try {
+            run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+          } catch (err) {
+            throw new CoordinationError(
+              'corrupt-log',
+              `corrupt run.json for assignment "${asgnId}" attempt "${attempt}": ${err.message}`,
+            );
+          }
+          if (typeof run?.cwd === 'string' && run.cwd.trim() !== '') {
+            return path.resolve(run.cwd);
+          }
+        }
+      } else {
+        const runsDir = path.join(fgosDir, 'assignments', asgnId, 'runs');
+        if (fs.existsSync(runsDir)) {
+          let attempts;
+          try {
+            attempts = fs.readdirSync(runsDir);
+          } catch (err) {
+            throw new CoordinationError(
+              'corrupt-log',
+              `failed to read runs directory for assignment "${asgnId}": ${err.message}`,
+            );
+          }
+          attempts.sort((a, b) => {
+            const numA = Number(a);
+            const numB = Number(b);
+            if (Number.isFinite(numA) && Number.isFinite(numB)) {
+              return numA - numB;
+            }
+            return String(a).localeCompare(String(b));
+          });
+          for (const attempt of attempts.reverse()) {
+            const runJsonPath = path.join(runsDir, attempt, 'run.json');
+            if (fs.existsSync(runJsonPath)) {
+              let run;
+              try {
+                run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
+              } catch (err) {
+                throw new CoordinationError(
+                  'corrupt-log',
+                  `corrupt run.json for assignment "${asgnId}" attempt "${attempt}": ${err.message}`,
+                );
+              }
+              if (typeof run?.cwd === 'string' && run.cwd.trim() !== '') {
+                return path.resolve(run.cwd);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (defaultCwd) {
+    return path.resolve(defaultCwd);
+  }
+  return null;
 }

@@ -120,7 +120,7 @@ import {
   evaluateVisibilityWindowState,
   classifySessionQuorum as pureClassifySessionQuorum,
 } from './legality-facts.mjs';
-import { computeDagSharedCwdCaveats } from './dag-declaration.mjs';
+import { computeDagSharedCwdCaveats, resolveNodeCwd } from './dag-declaration.mjs';
 
 export function loadDefinitionForSession(manifest, opts) {
   if (manifest.schemaVersion === '3') {
@@ -3452,26 +3452,13 @@ export function closeSessionByQuorumLocked(coordinationId, { dissentingActorIds 
     const nodeCwds = new Map();
     for (const node of replayed.dag.declaration.nodes) {
       const nodeAssignments = (replayed.assignments ?? []).filter((entry) => entry.dagNodeId === node.id);
-      let cwd = node.semantics?.canonicalCwd || node.semantics?.cwd;
-      if (!cwd && fgosDir) {
-        for (const asgn of nodeAssignments) {
-          const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
-          if (fs.existsSync(runsDir)) {
-            try {
-              const attempts = fs.readdirSync(runsDir);
-              for (const attempt of attempts) {
-                const runJsonPath = path.join(runsDir, attempt, 'run.json');
-                if (fs.existsSync(runJsonPath)) {
-                  const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-                  if (run.cwd) { cwd = run.cwd; break; }
-                }
-              }
-            } catch {}
-          }
-          if (cwd) break;
-        }
-      }
-      nodeCwds.set(node.id, path.resolve(cwd ?? opts.cwd ?? process.cwd()));
+      nodeCwds.set(
+        node.id,
+        resolveNodeCwd(node, nodeAssignments, fgosDir, opts.cwd ?? process.cwd(), {
+          events: replayed.events,
+          results: replayed.results,
+        }),
+      );
     }
     const dagCaveats = computeDagSharedCwdCaveats({
       declaredNodes: replayed.dag.declaration.nodes,

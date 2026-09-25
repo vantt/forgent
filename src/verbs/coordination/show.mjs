@@ -351,7 +351,13 @@ export function showCoordinationUseCase(ctx, { id }) {
       const nodeCwds = new Map();
       for (const node of declaredNodes) {
         const nodeAssignments = coordinationState.assignments.filter((a) => a.dagNodeId === node.id);
-        nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
+        nodeCwds.set(
+          node.id,
+          resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
+            events: coordinationState.events,
+            results: coordinationState.results,
+          }),
+        );
       }
 
       const settledAssignmentIds = getAuthoritativeSettledAssignmentIds(coordinationState.events);

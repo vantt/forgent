@@ -14,12 +14,12 @@ import { executeUnderActionPrecondition } from '../../runner/coordination/action
 import { computeDagSharedCwdCaveats } from '../../runner/coordination/dag-declaration.mjs';
 import { resolveNodeCwd } from './dag-scheduler.mjs';
 
-function checkDagCloseCaveats(dagDeclaration, assignments, fgosDir, defaultCwd) {
+function checkDagCloseCaveats(dagDeclaration, assignments, fgosDir, defaultCwd, extra = {}) {
   if (!dagDeclaration?.nodes) return null;
   const nodeCwds = new Map();
   for (const node of dagDeclaration.nodes) {
     const nodeAssignments = (assignments ?? []).filter((entry) => entry.dagNodeId === node.id);
-    nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, defaultCwd));
+    nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, defaultCwd, extra));
   }
   const dagCaveats = computeDagSharedCwdCaveats({
     declaredNodes: dagDeclaration.nodes,
@@ -87,7 +87,7 @@ export async function executeCoordinationCloseKernel(ctx, request, options = {})
         const aggregations = replayed?.aggregations ?? [];
         let closed = false;
         let closeRefusalReason = null;
-        const dagCaveatReason = checkDagCloseCaveats(replayed?.dag?.declaration, replayed?.assignments, paths?.fgosDir, engineOpts.cwd);
+        const dagCaveatReason = checkDagCloseCaveats(replayed?.dag?.declaration, replayed?.assignments, paths?.fgosDir, engineOpts.cwd, { events: replayed?.events, results: replayed?.results });
         if (dagCaveatReason) {
           closeRefusalReason = dagCaveatReason;
         } else {
@@ -140,7 +140,7 @@ export async function executeCoordinationCloseKernel(ctx, request, options = {})
     subject: 'a session close',
   });
 
-  const dagCaveatReason = checkDagCloseCaveats(dag?.declaration, assignments, fgosDir, engineOpts.cwd);
+  const dagCaveatReason = checkDagCloseCaveats(dag?.declaration, assignments, fgosDir, engineOpts.cwd, { events: replayed.events, results: replayed.results });
   if (dagCaveatReason) {
     closeRefusalReason = dagCaveatReason;
   } else {
