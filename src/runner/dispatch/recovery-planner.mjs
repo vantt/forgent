@@ -316,11 +316,14 @@ export function checkApply({ snapshot, evidence, action, expectedSnapshot, expec
   return { outcome: 'ok' };
 }
 
-/** Derive evidence from an already-read snapshot's own outbox/visibility --
+/** Derive evidence from an already-read snapshot's own controller/outbox/visibility --
  * pure, no fs of its own (the snapshot was already read by the caller).
- * File-naming convention: `replacement-authority--<driverId>.json` names a
- * fresh driver's authorization; `ack-*`/`report-*`/`result.json` are the
- * worker's own result artifacts (same prefixes findWorkerResult/the outbox
+ * Authority invariant (§7 "never worker-supplied ownership"): replacement-authority
+ * MUST be issued by a controller/supervisor into controller/, never read from the
+ * worker-writable outbox/.
+ * File-naming convention: `replacement-authority--<driverId>.json` in controller/
+ * names a fresh driver's authorization; `ack-*`/`report-*`/`result.json` in outbox/
+ * are the worker's own result artifacts (same prefixes findWorkerResult/the outbox
  * convention already use elsewhere); anything else is `unknown` -- which is
  * exactly what routes a recommendation to `park` rather than a guess. */
 export function collectEvidence(snapshot, opts = {}) {
@@ -334,13 +337,20 @@ export function collectEvidence(snapshot, opts = {}) {
   const fresh = Number.isFinite(seenAtMs) && Number.isFinite(nowMs) && nowMs - seenAtMs < DRIVER_FRESH_MS;
   evidence.push({ id: 'liveness', type: 'liveness', fresh });
 
-  for (const entry of snapshot.outbox ?? []) {
+  // R7: replacement-authority evidence comes strictly from controller-owned state (snapshot.controller),
+  // never from the worker-writable outbox.
+  for (const entry of snapshot.controller ?? []) {
     const name = entry.name;
     const authorityMatch = /^replacement-authority--(.+)\.json$/.exec(name);
     if (authorityMatch) {
       evidence.push({ id: name, type: 'replacement-authority', driverId: authorityMatch[1] });
       continue;
     }
+    evidence.push({ id: name, type: 'unknown' });
+  }
+
+  for (const entry of snapshot.outbox ?? []) {
+    const name = entry.name;
     if (/^(ack|report)-/.test(name) || name === 'result.json') {
       evidence.push({ id: name, type: 'worker-result' });
       continue;

@@ -12,7 +12,7 @@ import { acquireRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
 
-function makeRepo({ runId = 'run_1', status = 'running', controlEpoch, outbox = [] } = {}) {
+function makeRepo({ runId = 'run_1', status = 'running', controlEpoch, outbox = [], controller = [] } = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recover-'));
   const runDir = path.join(root, '.fgos', 'assignments', 'asgn_1', 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
@@ -21,6 +21,10 @@ function makeRepo({ runId = 'run_1', status = 'running', controlEpoch, outbox = 
   if (outbox.length > 0) {
     fs.mkdirSync(path.join(runDir, 'outbox'), { recursive: true });
     for (const name of outbox) fs.writeFileSync(path.join(runDir, 'outbox', name), 'x');
+  }
+  if (controller.length > 0) {
+    fs.mkdirSync(path.join(runDir, 'controller'), { recursive: true });
+    for (const name of controller) fs.writeFileSync(path.join(runDir, 'controller', name), 'x');
   }
   return { root, runDir };
 }
@@ -120,7 +124,7 @@ test('plan() is pure and deterministic: same snapshot+evidence+intent -> same ac
 });
 
 test('replay parity: repeated observe calls against an unchanged run reproduce the same action/reason/evidenceIds', () => {
-  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  const { root } = makeRepo({ controller: ['replacement-authority--agent-9.json'] });
   try {
     const now = '2026-01-01T00:00:00.000Z';
     const first = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign', now });
@@ -164,8 +168,17 @@ test('an outbox artifact of an unrecognized kind parks the recommendation instea
   } finally { cleanup(root); }
 });
 
+test('worker-supplied replacement-authority in outbox is rejected and parks instead of reassigning', () => {
+  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  try {
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign' });
+    assert.equal(rec.kind, 'park');
+    assert.match(rec.reason, /unrecognized evidence type/);
+  } finally { cleanup(root); }
+});
+
 test('read and write paths derive identical legality for the same snapshot/evidence/action -- one shared evaluator, not two', () => {
-  const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [{ name: 'replacement-authority--agent-9.json' }], visibilityError: null };
+  const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, controller: [{ name: 'replacement-authority--agent-9.json' }], outbox: [], visibilityError: null };
   const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });
   const readFacts = deriveRecoveryFacts(snapshot, evidence, 'reassign');
   assert.equal(readFacts.status, 'ok');
@@ -301,7 +314,7 @@ test('F3: swapping the action under an unmatched actionKey is refused before eve
 });
 
 test('read and write paths still derive identical legality for a genuinely matching action/actionKey pair', () => {
-  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  const { root } = makeRepo({ controller: ['replacement-authority--agent-9.json'] });
   try {
     const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign' });
     assert.equal(rec.kind, 'recommendation');
@@ -499,7 +512,7 @@ test('F5: a settle write landing exactly between acquireRunControl and the settl
 });
 
 test('F3: a valid actionKey from a different recommendation cannot be replayed against this one', () => {
-  const { root } = makeRepo({ outbox: ['replacement-authority--agent-9.json'] });
+  const { root } = makeRepo({ controller: ['replacement-authority--agent-9.json'] });
   try {
     const now = '2026-01-01T00:00:00.000Z';
     const recResume = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume', now });

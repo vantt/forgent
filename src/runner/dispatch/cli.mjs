@@ -703,6 +703,11 @@ export async function executeExecutorCli(
   const capabilityLabel = purpose ?? (resolvedExecutor?.for?.join(',') || '(none declared)');
 
   const mechanism = decideExecutorDispatchMechanism(cfg, executorId, { hasLiveTaskAccess });
+  // R7 (L8): In-process handback is a return value, not an invocation.
+  // The fgOS Dispatch CLI runs as an external command-line process and does not own or hold
+  // the live caller agent session, Task tool, or MCP client of the calling harness. Returning
+  // mechanism='in-process' hands control and metadata (agentType, prompt, attestation) back to
+  // the caller so the calling session can execute the task in-process using its own native capabilities.
   if (mechanism === 'in-process') {
     const agentType = resolvedExecutor?.agentType;
     const stageSkill = executorIdArg;

@@ -523,11 +523,13 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
         try { pInfo = opts.herdrClient.paneProcessInfo(paneId); } catch {}
       }
       const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+      const gwSessionId = opts.gatewaySessionId || opts.herdrClient?.gatewaySessionId || process.env.HERDR_GATEWAY_SESSION_ID || null;
       const resourceIncarnation = pInfo ? computeHerdrResourceIncarnation({
         paneId,
         shellPid: pInfo.shellPid || null,
         workerPid: workerProc?.pid || null,
         foregroundPgid: pInfo.foregroundPgid || null,
+        gatewaySessionId: gwSessionId,
         processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
       }) : null;
       return {
@@ -541,6 +543,7 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
       try {
         const pInfo = opts.herdrClient.paneProcessInfo(paneId);
         const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+        const gwSessionId = opts.gatewaySessionId || opts.herdrClient?.gatewaySessionId || process.env.HERDR_GATEWAY_SESSION_ID || null;
         return {
           status: workerProc ? 'present' : 'absent',
           resourceIncarnation: computeHerdrResourceIncarnation({
@@ -548,6 +551,7 @@ export async function reconcileHerdrSpawnRun(runDir, opts = {}) {
             shellPid: pInfo.shellPid || null,
             workerPid: workerProc?.pid || null,
             foregroundPgid: pInfo.foregroundPgid || null,
+            gatewaySessionId: gwSessionId,
             processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
           }),
         };
