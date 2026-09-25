@@ -92,9 +92,9 @@ The independent review (asgn_pi_lead_phase01_review_fix_op_003) accepted five ta
 ## Verification Summary
 
 All verification gates passed:
-1. Focused ratchet test suite: 27/27 passed in 280ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`), including root-aware case-safe classification, calendar date validation, explicit expiry boundary, and anti-spoof fail-closed edit containment.
+1. Focused ratchet test suite: 28/28 passed in 280ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`), including root-aware case-safe classification, exact case-sensitive generated projection matching, calendar date validation, explicit expiry boundary, and anti-spoof fail-closed edit containment.
 2. Focused shipped path inventory test suite: 8/8 passed in 180ms (`test/scripts/generate-shipped-path-inventory.test.mjs`), including deterministic referenceKind/existenceStatus/sourceRole/resolutionStatus classification, nonexistent example non-target detection, and platform-foundations generated-mirror classification.
-   Combined focused suites: 35/35 passed in 280ms.
+   Combined focused suites: 36/36 passed in 280ms.
 3. Ratchet self-check: clean on repository (994 files checked, 1 accounted edit, 0 unaccounted edits, 0 unreviewed new files).
 4. Deterministic regeneration comparisons: verified identical JSON output for ratchet baseline and shipped-path inventory (byte-identical `cmp` against checked-in files).
 5. Historical knowledge-registry plan and all 12 phase files verified byte-identical (all 13 passed sha256sum).

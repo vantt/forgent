@@ -86,7 +86,7 @@ export function classifyFile(relPath) {
   const lower = norm.toLowerCase();
 
   if (norm.startsWith('docs/specs/') || norm === 'docs/specs') {
-    if (EXPLICIT_GENERATED_PROJECTIONS.has(norm) || EXPLICIT_GENERATED_PROJECTIONS.has(lower)) {
+    if (EXPLICIT_GENERATED_PROJECTIONS.has(norm)) {
       return 'generated';
     }
     return 'maintained-authority';

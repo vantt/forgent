@@ -74,9 +74,10 @@ test('class/scope: properly classifies markdown authority, retained sources, and
   assert.equal(classifyFile('docs/specs/spoof.txt'), 'maintained-authority');
   assert.equal(classifyFile('docs/specs/spoof.yml'), 'maintained-authority');
   assert.equal(classifyFile('docs/specs/SPOOF.MD'), 'maintained-authority');
-  // Except explicitly enumerated generated projections
+  // Except explicitly enumerated generated projections (exact, case-sensitive)
   assert.equal(classifyFile('docs/specs/platform-foundations.md'), 'generated');
-  assert.equal(classifyFile('docs/specs/platform-foundations.MD'), 'generated');
+  assert.equal(classifyFile('docs/specs/platform-foundations.MD'), 'maintained-authority');
+  assert.equal(classifyFile('docs/specs/PLATFORM-FOUNDATIONS.md'), 'maintained-authority');
 
   // Under docs/architect: Markdown is case-insensitive prose, non-md can be history-evidence
   assert.equal(classifyFile('docs/architect/proposals/p1.MD'), 'retained-source');
@@ -1093,6 +1094,49 @@ test('root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypass
       assert.equal(f.type, 'unreviewed-new-file');
       assert.match(f.message, /class: maintained-authority/);
     }
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('exact generated projection matching: docs/specs/platform-foundations.MD and PLATFORM-FOUNDATIONS.md classify as maintained-authority and are refused as unreviewed new files (F1 residual)', () => {
+  assert.equal(classifyFile('docs/specs/platform-foundations.md'), 'generated');
+  assert.equal(classifyFile('docs/specs/platform-foundations.MD'), 'maintained-authority');
+  assert.equal(classifyFile('docs/specs/PLATFORM-FOUNDATIONS.md'), 'maintained-authority');
+
+  const tmp = mkTmpDir('exact-gen-alias-test-');
+  try {
+    const rootSpecs = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootSpecs, { recursive: true });
+    fs.writeFileSync(path.join(rootSpecs, 'platform-foundations.md'), '# Law\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+    assert.equal(baseline.files['docs/specs/platform-foundations.md'].fileClass, 'generated');
+
+    // Add case aliases of generated projection
+    fs.writeFileSync(path.join(rootSpecs, 'platform-foundations.MD'), '# Injected new law L99\n');
+    fs.writeFileSync(path.join(rootSpecs, 'PLATFORM-FOUNDATIONS.md'), '# Injected new law L100\n');
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false, 'Case aliases of generated projection must not bypass ratchet');
+    assert.equal(result.findings.length, 2);
+
+    const alias1 = result.findings.find((f) => f.path === 'docs/specs/platform-foundations.MD');
+    const alias2 = result.findings.find((f) => f.path === 'docs/specs/PLATFORM-FOUNDATIONS.md');
+
+    assert.ok(alias1, 'Must have finding for platform-foundations.MD');
+    assert.equal(alias1.type, 'unreviewed-new-file');
+    assert.match(alias1.message, /class: maintained-authority/);
+
+    assert.ok(alias2, 'Must have finding for PLATFORM-FOUNDATIONS.md');
+    assert.equal(alias2.type, 'unreviewed-new-file');
+    assert.match(alias2.message, /class: maintained-authority/);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
