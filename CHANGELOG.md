@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Changed**: Dispatch boundary simplification & architectural hardening (Phase 09 / Unit I12):
+  - Moved `fanoutBatchExecutorCli` from dispatch CLI to Work Driver layer (`src/runner/fanout-batch.mjs`), ensuring dispatch core (`src/runner/dispatch/**`) contains zero references to Work lifecycle mutation (`pick`, `return`, `claim`) or event log appending (`appendEvent`).
+  - Extracted Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) from dispatch core into `src/runner/dispatch/operation-choice.mjs` with backward-compatible re-exports.
+  - Split `assignment-runner.mjs` into dedicated `src/runner/dispatch/settlement.mjs` (unified single settlement pipeline replacing duplicated branches) and `src/runner/dispatch/reconcile-cli-spawn.mjs`.
+  - Consolidated Confinement Authority preparation into `assessAndPrepare` in `src/runner/dispatch/confinement/authority.mjs`, replacing heuristic argv parsing with driver claims and isolating proof utilities in leaf module `src/runner/dispatch/proof-helpers.mjs`.
+  - Extracted Herdr S2 proof layer into `src/runner/dispatch/herdr-reconcile.mjs` and unified terminal outcome receipt publication into `publishHerdrCompletionReceipt`.
+  - Unified claim schema and result path in `src/runner/dispatch/brief.mjs`, passed `effectiveContract`, added Linux kernel `MAX_ARG_STRLEN` size hint guard for CLI-spawn arguments, and removed unused `prepareDispatch`.
+  - Strictly enforced controller directory ownership for `replacement-authority` in `src/runner/dispatch/recovery-planner.mjs`, populated `gatewaySessionId` on Herdr rounds, and clarified in-process handback return semantics.
+  - Stamped `contract: 'dispatch-run.legacy'` on legacy dispatch run openings and clarified launcher ownership.
+  - Cached falsification probe attestations by fingerprint with 1-hour TTL in `src/runner/dispatch/confinement/attestation-store.mjs` and memoized `allRuns` per verb call via `withRunsCache` in `src/runner/dispatch/runtime-inspection.mjs`.
 - **Added**: `fgos return --to blocked` (with optional `--reason "<text>"`) and `--blocked` flag: allows settling an active claim directly into `blocked` with friction and outcome recorded, used by Work Driver fanout batch recovery (`src/runner/fanout-batch.mjs`) when executor execution throws or fails.
 - **Fixed**: in DAG coordination sessions (`fgos coordination run`/`show`), a node linked in `events.jsonl` without valid on-disk `RunResult` evidence previously allowed downstream nodes to be scheduled and masked missing/corrupt results under `materialized`. `run` and `show` now fail closed with `readLinkedRunResultFromDisk`, requiring authoritative on-disk evidence (`result.json`) matching the v2 contract, and project `refused` with reason `corrupt-evidence` when artifacts are missing, truncated, or contract-corrupt.
 - **Changed**: `fgos dispatch execute <id>` now fails closed with exit code 1 (`DispatchError('executor-not-found')`) when an unregistered executor is explicitly nominated, aligning with `fgos dispatch decide` (previously fell back silently to the global executor with exit 0).

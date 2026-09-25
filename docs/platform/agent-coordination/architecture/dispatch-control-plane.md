@@ -347,6 +347,6 @@ target-state sections are reconciled with implementation.
 
 | Layer | Modules | Responsibilities & Boundaries |
 | --- | --- | --- |
-| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `operation-choice.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `operation-choice.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
 | Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
 | Audit Seam | `src/runner/dispatch-log.mjs` | Audit event logging (`logExecutorDispatch`) isolated from dispatch core. |

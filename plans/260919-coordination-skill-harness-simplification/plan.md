@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 READY
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 CANDIDATE READY FOR REVIEW
 Created: 2026-09-19
-Last Updated: 2026-09-25
+Last Updated: 2026-09-26
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -928,7 +928,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I12 — refactor dispatch boundaries in small reversible Phase 09 cells
   capability: code:refactor
   depends-on: I11 approved
-  status: READY (dependency Unit I11 VERIFIED at main@7d7dc2750f9fb80716a7cffae03d67605629cf9a)
+  status: CANDIDATE READY FOR REVIEW (R1-R9 implemented in 9 atomic cells; candidates pass all focused & full suites)
   stop: behavior or test projection differs from the I11 baseline
 - unit: I13 — verify import graph, compatibility, performance, and full suite
   capability: code:test
