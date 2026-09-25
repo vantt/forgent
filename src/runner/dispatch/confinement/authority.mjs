@@ -9,7 +9,14 @@ import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
-import { saveAttestationRecord, savePlanRecord, assertAttestationStoreIsolated, verifyAttestationStoreIsolation } from "./attestation-store.mjs";
+import {
+  saveAttestationRecord,
+  savePlanRecord,
+  assertAttestationStoreIsolated,
+  verifyAttestationStoreIsolation,
+  loadProbeCacheRecord,
+  saveProbeCacheRecord,
+} from "./attestation-store.mjs";
 import {
   loadMachineBackendRegistry,
   createBackendRegistrySnapshot,
@@ -136,15 +143,33 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     return { passed: false, message: `no falsification probe profile for backend type "${backendInstance.type}"` };
   }
   const executable = backendInstance.config?.executable || "bwrap";
+  const fingerprint = computeProbeFingerprint({
+    policy: request.requirement.policy,
+    driverVersion: driver.version,
+    backendConfig: backendInstance.config || {},
+    bwrapExecutable: executable,
+  });
+
+  const cached = loadProbeCacheRecord(fingerprint, request?.context);
+  if (cached) {
+    return {
+      ...cached,
+      fingerprint,
+    };
+  }
+
   const result = runAllConfinementProbes({ bwrapBin: executable });
+  if (result.passed) {
+    try {
+      saveProbeCacheRecord(fingerprint, result, request?.context);
+    } catch {
+      // Best-effort cache save
+    }
+  }
+
   return {
     ...result,
-    fingerprint: computeProbeFingerprint({
-      policy: request.requirement.policy,
-      driverVersion: driver.version,
-      backendConfig: backendInstance.config || {},
-      bwrapExecutable: executable,
-    }),
+    fingerprint,
   };
 }
 

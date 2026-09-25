@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { inspectDispatchRuntime, findCoordinationSessionOwningAssignment, isWithinDir } from './runtime-inspection.mjs';
+import { inspectDispatchRuntime, findCoordinationSessionOwningAssignment, isWithinDir, clearAllRunsCache, withRunsCache } from './runtime-inspection.mjs';
 // visibility-session.mjs's own import graph is fs/path + worker-artifacts.mjs
 // (also fs/path only) -- no adapter/process-control, so importing its
 // RUN_STATUSES vocabulary here does not widen this module's excluded-import
@@ -261,28 +261,30 @@ function holder(lock) {
   return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
 }
 
-export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000 } = {}) {
-  if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
-    return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)' };
-  }
-  if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
-  if (action === 'clear-assignment-claim') return planClearAssignmentClaim(root, { assignmentId, now, ttlMs });
-  if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
-  const proposedAction = canonicalAction(root, action, cwd);
-  if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
-  const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
-  if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
-  if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
-  const proof = cwdLockHolder(lock);
-  if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
-  if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
-  // No `controlEpoch` field here: the real production record
-  // ({pid, ts}, see lockFile's doc comment) never carries one, and the
-  // full-byte `digest` below already detects any successor rewrite of this
-  // exact file -- an inert, always-null field would add nothing a real
-  // writer could ever populate.
-  const snapshot = { digest: digest({ raw }), resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
-  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
+export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {
+  return withRunsCache(runsCache, () => {
+    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
+      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)' };
+    }
+    if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
+    if (action === 'clear-assignment-claim') return planClearAssignmentClaim(root, { assignmentId, now, ttlMs });
+    if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
+    const proposedAction = canonicalAction(root, action, cwd);
+    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
+    const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
+    if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
+    if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
+    const proof = cwdLockHolder(lock);
+    if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
+    if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
+    // No `controlEpoch` field here: the real production record
+    // ({pid, ts}, see lockFile's doc comment) never carries one, and the
+    // full-byte `digest` below already detects any successor rewrite of this
+    // exact file -- an inert, always-null field would add nothing a real
+    // writer could ever populate.
+    const snapshot = { digest: digest({ raw }), resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
+    return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
+  });
 }
 
 // collect-result links/collects an already-written, already-valid result.json
@@ -591,6 +593,7 @@ function applyCollectResult(root, plan, { now }) {
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, resultCollectedAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
 }
@@ -633,6 +636,7 @@ function applyClearAssignmentClaim(root, plan, { now }) {
       // same spirit as clear-cwd-lock's own unlink-ENOENT tolerance below.
     }
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
 }
@@ -698,21 +702,23 @@ function applyRepairProjection(root, plan, { now }) {
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, status: SETTLED_STATUS, settledAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
 }
 
-export function applyReconciliation(root, plan, { now = new Date().toISOString() } = {}) {
-  if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
-  if (plan?.proposedAction?.kind === 'clear-assignment-claim') return applyClearAssignmentClaim(root, plan, { now });
-  if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
-  const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
-  if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
-  // Do this before looking up a prior record: a replay must not turn a
-  // caller-controlled path/action-key combination into an authorization.
-  if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
-  return withLocalLock(root, () => {
-    const prior = records(root).find((r) => r.actionKey === plan.actionKey);
+export function applyReconciliation(root, plan, { now = new Date().toISOString(), runsCache = null } = {}) {
+  return withRunsCache(runsCache, () => {
+    if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
+    if (plan?.proposedAction?.kind === 'clear-assignment-claim') return applyClearAssignmentClaim(root, plan, { now });
+    if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
+    const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
+    if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+    // Do this before looking up a prior record: a replay must not turn a
+    // caller-controlled path/action-key combination into an authorization.
+    if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
+    return withLocalLock(root, () => {
+      const prior = records(root).find((r) => r.actionKey === plan.actionKey);
     if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
     if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
     const fresh = planReconciliation(root, { action: canonical.kind, cwd: canonical.cwd, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
@@ -766,6 +772,8 @@ export function applyReconciliation(root, plan, { now = new Date().toISOString()
       // same spirit as tryAcquireOnce's own unlink-ENOENT tolerance.
     }
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
+  });
   });
 }
