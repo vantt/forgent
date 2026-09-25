@@ -67,19 +67,21 @@ cross-component contracts were modified.
 ## Verification Summary
 
 All verification gates passed:
-1. Focused ratchet test suite: 16/16 passed in 1020ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`).
-2. Focused shipped path inventory test suite: 4/4 passed (`test/scripts/generate-shipped-path-inventory.test.mjs`). Combined run: 20/20 passed in 344ms.
+1. Focused ratchet test suite: 17/17 passed in 205ms (`test/scripts/check-legacy-docs-ratchet.test.mjs`), including canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute path rejection (R2), and deterministic in-process socket / explicit `t.skip` non-regular file tests (R4).
+2. Focused shipped path inventory test suite: 5/5 passed in 153ms (`test/scripts/generate-shipped-path-inventory.test.mjs`), including negative glued-token checks (`src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, `GLUED_TOKEN_REGEX`, `/mjs[a-z]/`) and synthetic fenced prose / multiline command fixtures (R1). Combined run: 22/22 passed in 202ms.
 3. Ratchet self-check: clean on repository (994 files checked, 1 accounted edit, 0 unaccounted edits, 0 unreviewed new files).
-4. Deterministic regeneration comparisons: verified identical JSON output for ratchet baseline and shipped-path inventory.
+4. Deterministic regeneration comparisons: verified identical JSON output for ratchet baseline and shipped-path inventory (byte-identical `cmp` against checked-in files).
 5. Historical knowledge-registry plan and all 12 phase files verified byte-identical (all 13 passed sha256sum).
-6. Documentation checks and relative link verification passed: 12 changed Markdown files checked, all relative links exist; 42/42 docs & citation tests passed; ownership lint passed.
+6. Documentation checks and relative link verification passed: all changed Markdown files checked, all relative links exist.
 7. Git diff --check clean.
-8. Full suite (FULL_TEST): `FGOS_FULL_SUITE_QUEUE=off npm test` executed in foreground, exited 0; 7743 tests, 7667 passed, 0 failed, 8 skipped, 68 todo, duration 380630ms.
+8. Full suite (FULL_TEST): `npm test` executed in foreground, exited 0; 7745 tests, 7669 passed, 0 failed, 8 skipped, 68 todo, duration 332786ms.
 
 ## Review Boundary and Commit Records
 
 - Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`)
 - Phase 01 Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
+- Phase 01 Evidence commit: `b143b4c66abfc2af2fe24b88920e65943c0e9aad`
+- Phase 01 Remediation commit (R1-R4): `6be0d6f3458bfca223ea4e17e3f6db06a6c085b3`
 - Review range: `documentation-authority-phase-00-20260925..HEAD`
 - Non-empty range commits verified.
 

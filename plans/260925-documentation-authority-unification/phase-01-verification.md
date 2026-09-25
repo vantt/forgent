@@ -26,9 +26,9 @@ The cell branch is confirmed and isolated from main.
 node --test test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/generate-shipped-path-inventory.test.mjs
 ```
 
-Outcome: exit 0; 20 tests, 20 pass, 0 fail (344ms).
-- `check-legacy-docs-ratchet.test.mjs`: 16/16 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, dotfile refusal, non-regular entry refusal, symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, CLI execution, live self-check).
-- `generate-shipped-path-inventory.test.mjs`: 4/4 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, deterministic inventory generation with zero unclassified paths, CLI output).
+Outcome: exit 0; 22 tests, 22 pass, 0 fail (202ms).
+- `check-legacy-docs-ratchet.test.mjs`: 17/17 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, CLI execution, live self-check).
+- `generate-shipped-path-inventory.test.mjs`: 5/5 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, CLI output).
 
 ## 3. Live Ratchet Self-Check and Regeneration Comparison
 
@@ -155,13 +155,13 @@ GitNexus Code Intelligence checks:
 ## 8. Full Suite (FULL_TEST)
 
 ```bash
-FGOS_FULL_SUITE_QUEUE=off npm test 2>&1 | tee /tmp/full-suite.log
+npm test
 ```
 
-Outcome: exit 0; duration 380630ms (~6.3 minutes).
-Test execution receipt captured in `/tmp/full-suite.log`:
-- Tests: 7743 total across 27 suites.
-- Passed: 7667.
+Outcome: exit 0; duration 332786ms (~5.5 minutes).
+Test execution receipt:
+- Tests: 7745 total across 27 suites.
+- Passed: 7669.
 - Failed: 0.
 - Cancelled: 0.
 - Skipped: 8.
@@ -171,6 +171,8 @@ Test execution receipt captured in `/tmp/full-suite.log`:
 
 - Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`)
 - Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
+- Evidence commit: `b143b4c66abfc2af2fe24b88920e65943c0e9aad`
+- Remediation commit (R1-R4): `6be0d6f3458bfca223ea4e17e3f6db06a6c085b3`
 - Review range: `documentation-authority-phase-00-20260925..HEAD`
 - Phase 01 completed.
 - Residual blockers: Phases 02–09 remain unauthorized and require separate human authorization before commencement.
