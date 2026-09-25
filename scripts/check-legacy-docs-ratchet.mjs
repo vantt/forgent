@@ -45,33 +45,66 @@ export function normalizePosix(p) {
 }
 
 /**
- * Classifies a legacy root file by its nature/extension.
+ * Validates whether a string is a real ISO calendar date in YYYY-MM-DD format.
+ * Rejects impossible dates (e.g. 2026-02-30, 2026-13-40, 2026-02-29 on non-leap years).
+ */
+export function isValidIsoCalendarDate(str) {
+  if (typeof str !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return false;
+  }
+  const [yearStr, monthStr, dayStr] = str.split('-');
+  const year = parseInt(yearStr, 10);
+  const month = parseInt(monthStr, 10);
+  const day = parseInt(dayStr, 10);
+  if (month < 1 || month > 12) return false;
+  const d = new Date(Date.UTC(year, month - 1, day));
+  return (
+    d.getUTCFullYear() === year &&
+    d.getUTCMonth() === month - 1 &&
+    d.getUTCDate() === day
+  );
+}
+
+export const EXPLICIT_GENERATED_PROJECTIONS = new Set([
+  'docs/specs/platform-foundations.md',
+]);
+
+/**
+ * Classifies a legacy root file by its root, nature, and extension.
  * Deterministically recognizes curated/generated projections alongside
  * maintained authority, retained sources, and history/evidence.
+ *
+ * Rules (F1):
+ * - Under docs/specs: every file is maintained authority by default regardless
+ *   of extension or case, except explicitly enumerated generated projections.
+ *   Non-authority is never inferred merely from arbitrary extensions (.txt, .yml, .MD).
+ * - Under docs/architect: Markdown case-insensitively (.md) is maintained or
+ *   retained prose, while non-Markdown proof payloads (e.g. proof.json) can be history-evidence.
  */
 export function classifyFile(relPath) {
   const norm = normalizePosix(relPath);
-  if (!norm.endsWith('.md')) {
-    return 'history-evidence';
+  const lower = norm.toLowerCase();
+
+  if (norm.startsWith('docs/specs/') || norm === 'docs/specs') {
+    if (EXPLICIT_GENERATED_PROJECTIONS.has(norm) || EXPLICIT_GENERATED_PROJECTIONS.has(lower)) {
+      return 'generated';
+    }
+    return 'maintained-authority';
   }
-  // Curated/spec projection of platform operating laws
-  if (norm === 'docs/specs/platform-foundations.md') {
-    return 'generated';
-  }
-  if (norm.startsWith('docs/architect/')) {
-    if (norm.includes('/contracts/') || norm.includes('/vocabulary/')) {
+
+  if (norm.startsWith('docs/architect/') || norm === 'docs/architect') {
+    if (lower.endsWith('.md')) {
+      if (norm.includes('/proposals/') || norm.includes('/roadmap/')) {
+        return 'retained-source';
+      }
       return 'maintained-authority';
     }
-    if (norm.includes('/proposals/') || norm.includes('/roadmap/')) {
-      return 'retained-source';
-    }
-    return 'maintained-authority';
+    return 'history-evidence';
   }
-  if (norm.startsWith('docs/specs/')) {
-    return 'maintained-authority';
-  }
+
   return 'history-evidence';
 }
+
 
 /**
  * Computes sha256 digest string for a buffer or string.
@@ -206,8 +239,8 @@ export function validateExceptionsSchema(exceptions) {
     if (typeof item.owner !== 'string' || item.owner.trim().length === 0) {
       throw new Error(`Malformed exceptions: exception at index ${idx} missing owner`);
     }
-    if (typeof item.reviewedAt !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(item.reviewedAt)) {
-      throw new Error(`Malformed exceptions: exception at index ${idx} missing or invalid reviewedAt (expected YYYY-MM-DD)`);
+    if (typeof item.reviewedAt !== 'string' || !isValidIsoCalendarDate(item.reviewedAt)) {
+      throw new Error(`Malformed exceptions: exception at index ${idx} missing or invalid reviewedAt (expected valid ISO calendar date YYYY-MM-DD)`);
     }
     const hasExpiry = typeof item.expiry === 'string' && item.expiry.trim().length > 0;
     const hasRevisitTrigger = typeof item.revisitTrigger === 'string' && item.revisitTrigger.trim().length > 0;
@@ -216,9 +249,9 @@ export function validateExceptionsSchema(exceptions) {
         `Malformed exceptions: exception at index ${idx} requires at least one lifecycle control ('expiry' or 'revisitTrigger')`
       );
     }
-    if (hasExpiry && !/^\d{4}-\d{2}-\d{2}$/.test(item.expiry)) {
+    if (hasExpiry && !isValidIsoCalendarDate(item.expiry)) {
       throw new Error(
-        `Malformed exceptions: exception at index ${idx} has invalid expiry format: "${item.expiry}" (expected YYYY-MM-DD)`
+        `Malformed exceptions: exception at index ${idx} has invalid expiry format or impossible calendar date: "${item.expiry}" (expected valid ISO calendar date YYYY-MM-DD)`
       );
     }
     if (typeof item.expectedDigest !== 'string' || !/^[0-9a-f]{64}$/.test(item.expectedDigest)) {
@@ -451,8 +484,11 @@ export function checkRatchet({
   }
 
   // Check for expired exceptions
+  // Expiry boundary definition (F4): An exception expires on its expiry date.
+  // For any check date today >= exc.expiry, the exception is considered expired
+  // (expired-exception) and no longer active. An exception is active only when today < exc.expiry.
   for (const exc of exceptions.exceptions) {
-    if (exc.expiry && exc.expiry < today) {
+    if (exc.expiry && exc.expiry <= today) {
       findings.push({
         type: 'expired-exception',
         path: exc.path,
@@ -540,7 +576,11 @@ export function checkRatchet({
 
       // Check digest
       if (baseEntry.digest !== current.digest) {
-        if (isMaintainedProseClass(baseEntry.fileClass)) {
+        // Fail-closed against baseline spoofing: if either the baseline entry
+        // OR the live classification is maintained prose, enforce maintained controls
+        const isMaintained = isMaintainedProseClass(baseEntry.fileClass) || isMaintainedProseClass(classified);
+
+        if (isMaintained) {
           if (exception && exception.kind === 'allowed-edit' && exception.expectedDigest === current.digest) {
             accountedEditsCount++;
             usedExceptions.add(canonicalizeExceptionPath(exception.path));
@@ -558,7 +598,7 @@ export function checkRatchet({
               message: `${relPath}: maintained file (class: ${baseEntry.fileClass}) modified under legacy root without reviewed exception in exceptions ledger (baseline ${baseEntry.digest}, current ${current.digest}).`,
             });
           }
-        } else if (NON_AUTHORITY_PAYLOAD_CLASSES.has(baseEntry.fileClass)) {
+        } else if (NON_AUTHORITY_PAYLOAD_CLASSES.has(baseEntry.fileClass) && NON_AUTHORITY_PAYLOAD_CLASSES.has(classified)) {
           // Non-authority payload (generated projection or history-evidence): permitted without exception
           if (exception && exception.kind === 'allowed-edit' && exception.expectedDigest === current.digest) {
             accountedEditsCount++;

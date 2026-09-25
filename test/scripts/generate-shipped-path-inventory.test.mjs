@@ -408,6 +408,14 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
   assert.equal(staleAttr.resolutionStatus, 'stale-retired');
   assert.equal(staleAttr.isSafeRewriteTarget, false);
 
+  // F3: Curated generated projection of platform operating laws
+  const genMirrorAttr = classifyPathAttributes('docs/specs/platform-foundations.md', { repoRoot: REPO_ROOT, scope: 'repository-local-contract' });
+  assert.equal(genMirrorAttr.referenceKind, 'generated-mirror');
+  assert.equal(genMirrorAttr.existenceStatus, 'exists');
+  assert.equal(genMirrorAttr.sourceRole, 'generated-projection-non-authority');
+  assert.equal(genMirrorAttr.resolutionStatus, 'resolved');
+  assert.equal(genMirrorAttr.isSafeRewriteTarget, false);
+
   // Consumer-project contract
   const configAttr = classifyPathAttributes('.fgos/config.json', { repoRoot: REPO_ROOT, scope: 'consumer-project-contract' });
   assert.equal(configAttr.isSafeRewriteTarget, false);

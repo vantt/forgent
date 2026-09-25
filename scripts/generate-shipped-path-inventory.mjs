@@ -270,6 +270,17 @@ export const KNOWN_STALE_OR_DEAD = new Set([
   'docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md',
 ]);
 
+export const KNOWN_CONSUMER_PATTERNS = new Set([
+  '.claude/worktrees',
+  '.fgos/assignments',
+  '.fgos/coordination/sessions',
+  '.fgos/coordination/sessions/code-panel',
+  '.fgos/events.lock',
+  '.fgos/installation/bin/fgos',
+  '.fgos/logs',
+  '.fgos/main-checkout.lock',
+]);
+
 /**
  * Classifies secondary attributes of a referenced path:
  * referenceKind, existenceStatus, sourceRole, resolutionStatus, and isSafeRewriteTarget.
@@ -277,7 +288,8 @@ export const KNOWN_STALE_OR_DEAD = new Set([
 export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scope = 'repository-local-contract' } = {}) {
   const norm = normalizePosix(relPath);
   const exists = fs.existsSync(path.resolve(repoRoot, norm));
-  const existenceStatus = exists ? 'exists' : 'nonexistent';
+  const isConsumerPattern = KNOWN_CONSUMER_PATTERNS.has(norm);
+  const existenceStatus = (exists && !isConsumerPattern) ? 'exists' : 'nonexistent';
 
   let referenceKind;
   let sourceRole;
@@ -291,6 +303,10 @@ export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scop
     referenceKind = 'example-or-placeholder';
     sourceRole = 'illustrative-example';
     resolutionStatus = 'example-not-target';
+  } else if (isConsumerPattern) {
+    referenceKind = 'example-or-placeholder';
+    sourceRole = 'consumer-workspace-pattern';
+    resolutionStatus = 'pattern-placeholder';
   } else if (!exists) {
     if (
       norm.startsWith('.fgos/') ||
@@ -313,7 +329,12 @@ export function classifyPathAttributes(relPath, { repoRoot = process.cwd(), scop
     }
   } else {
     // Exists on disk
-    if (norm.startsWith('plugins/fgOS/skills/') || norm.startsWith('.fgos/instructions/effective/')) {
+    if (norm === 'docs/specs/platform-foundations.md') {
+      // Explicit generated projection of platform operating laws; non-authority mirror (F3)
+      referenceKind = 'generated-mirror';
+      sourceRole = 'generated-projection-non-authority';
+      resolutionStatus = 'resolved';
+    } else if (norm.startsWith('plugins/fgOS/skills/') || norm.startsWith('.fgos/instructions/effective/')) {
       referenceKind = 'generated-mirror';
       sourceRole = 'generated-mirror-entry';
       resolutionStatus = 'resolved';

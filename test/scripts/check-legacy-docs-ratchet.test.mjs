@@ -68,6 +68,20 @@ test('class/scope: properly classifies markdown authority, retained sources, and
   assert.equal(classifyFile('docs/architect/agent-coordination/proposals/p1.md'), 'retained-source');
   assert.equal(classifyFile('docs/architect/agent-coordination/proof.json'), 'history-evidence');
   assert.equal(classifyFile('docs/architect/agent-coordination/chart.png'), 'history-evidence');
+
+  // F1: Root-aware and case-safe under docs/specs:
+  // Every file under docs/specs is maintained authority regardless of extension or case
+  assert.equal(classifyFile('docs/specs/spoof.txt'), 'maintained-authority');
+  assert.equal(classifyFile('docs/specs/spoof.yml'), 'maintained-authority');
+  assert.equal(classifyFile('docs/specs/SPOOF.MD'), 'maintained-authority');
+  // Except explicitly enumerated generated projections
+  assert.equal(classifyFile('docs/specs/platform-foundations.md'), 'generated');
+  assert.equal(classifyFile('docs/specs/platform-foundations.MD'), 'generated');
+
+  // Under docs/architect: Markdown is case-insensitive prose, non-md can be history-evidence
+  assert.equal(classifyFile('docs/architect/proposals/p1.MD'), 'retained-source');
+  assert.equal(classifyFile('docs/architect/contracts/session.MD'), 'maintained-authority');
+  assert.equal(classifyFile('docs/architect/cell-01/proof.json'), 'history-evidence');
 });
 
 test('new maintained file: unreviewed new file under legacy root is refused with unreviewed-new-file', () => {
@@ -335,6 +349,18 @@ test('malformed exception: schema validator rejects invalid exception objects', 
     /missing or invalid reviewedAt/
   );
 
+  // F4: Reject impossible calendar dates for reviewedAt
+  for (const badDate of ['2026-02-30', '2026-13-40', '2026-04-31']) {
+    assert.throws(
+      () =>
+        validateExceptionsSchema({
+          version: 1,
+          exceptions: [{ path: 'foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', owner: 'o', reviewedAt: badDate, revisitTrigger: 't', expectedDigest: 'a'.repeat(64) }],
+        }),
+      /missing or invalid reviewedAt/
+    );
+  }
+
   // Missing lifecycle control (neither expiry nor revisitTrigger)
   assert.throws(
     () =>
@@ -345,7 +371,7 @@ test('malformed exception: schema validator rejects invalid exception objects', 
     /requires at least one lifecycle control/
   );
 
-  // Invalid expiry format
+  // Invalid expiry format or impossible date
   assert.throws(
     () =>
       validateExceptionsSchema({
@@ -353,6 +379,26 @@ test('malformed exception: schema validator rejects invalid exception objects', 
         exceptions: [{ path: 'foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', owner: 'o', reviewedAt: '2026-09-25', expiry: 'not-a-date', expectedDigest: 'a'.repeat(64) }],
       }),
     /invalid expiry format/
+  );
+
+  // F4: Reject impossible calendar dates for expiry
+  for (const badExpiry of ['2026-02-29', '2026-13-01', '2026-04-31', '2026-13-40']) {
+    assert.throws(
+      () =>
+        validateExceptionsSchema({
+          version: 1,
+          exceptions: [{ path: 'foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', owner: 'o', reviewedAt: '2026-09-25', expiry: badExpiry, expectedDigest: 'a'.repeat(64) }],
+        }),
+      /invalid expiry format/
+    );
+  }
+
+  // F4: Valid leap year calendar date (2024-02-29) passes
+  assert.doesNotThrow(() =>
+    validateExceptionsSchema({
+      version: 1,
+      exceptions: [{ path: 'foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', owner: 'o', reviewedAt: '2024-02-29', expiry: '2024-02-29', expectedDigest: 'a'.repeat(64) }],
+    })
   );
 
   // R2: reject duplicate exceptions across ./ and repeated-slash forms
@@ -748,6 +794,11 @@ test('policy-aware: permits new and edited history-evidence payloads without exc
     fs.writeFileSync(path.join(rootB, 'chart.png'), 'fake-png-binary-data');
     fs.writeFileSync(path.join(rootB, 'report.json'), '{"report": "ok"}');
 
+    // 3. Nested non-markdown proof payloads under docs/architect (F1)
+    const proofDir = path.join(rootB, 'cell-01');
+    fs.mkdirSync(proofDir, { recursive: true });
+    fs.writeFileSync(path.join(proofDir, 'proof.json'), '{"proof": 1}');
+
     const result = checkRatchet({
       repoRoot: tmp,
       baseline,
@@ -757,6 +808,16 @@ test('policy-aware: permits new and edited history-evidence payloads without exc
 
     assert.equal(result.clean, true, 'New and edited history-evidence payloads must not fail ratchet');
     assert.equal(result.findings.length, 0);
+
+    // Edit proof.json
+    fs.writeFileSync(path.join(proofDir, 'proof.json'), '{"proof": 2, "updated": true}');
+    const resultAfterEdit = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/architect'],
+    });
+    assert.equal(resultAfterEdit.clean, true, 'Edited proof.json must not fail ratchet');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -857,6 +918,18 @@ test('safety: detects and refuses class spoofing attempts in baseline', () => {
     const finding = result.findings.find((f) => f.type === 'file-class-mismatch');
     assert.ok(finding, 'Must detect file-class-mismatch');
     assert.match(finding.message, /file class mismatch \(baseline: history-evidence, classified: maintained-authority\)/);
+
+    // Editing a spoofed baseline entry must also fail closed with unaccounted-edit
+    fs.writeFileSync(fileA, '# Authority spec edited by attacker\n');
+    const result2 = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+    assert.equal(result2.clean, false, 'Editing a spoofed entry must fail closed');
+    assert.ok(result2.findings.some((f) => f.type === 'file-class-mismatch'));
+    assert.ok(result2.findings.some((f) => f.type === 'unaccounted-edit'));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -988,6 +1061,104 @@ test('unused exceptions: exceptions with no matching on-disk edit or new file ar
     assert.equal(unusedFindings.length, 2, 'Must report 2 unused-exception findings');
     assert.match(unusedFindings[0].message, /exception in ledger is unused/);
     assert.match(unusedFindings[1].message, /exception in ledger is unused/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('root-aware and case-safe: blocks docs/specs/*.txt, *.yml, *.MD from bypassing ratchet (F1)', () => {
+  const tmp = mkTmpDir('root-aware-case-test-');
+  try {
+    const rootSpecs = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootSpecs, { recursive: true });
+    fs.writeFileSync(path.join(rootSpecs, 'existing.md'), '# Initial\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    // Add .txt, .yml, .MD under docs/specs/
+    fs.writeFileSync(path.join(rootSpecs, 'spoof.txt'), 'text payload\n');
+    fs.writeFileSync(path.join(rootSpecs, 'spoof.yml'), 'yaml: payload\n');
+    fs.writeFileSync(path.join(rootSpecs, 'SPOOF.MD'), '# Upper case md\n');
+
+    const result = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: { version: 1, exceptions: [] },
+      roots: ['docs/specs'],
+    });
+
+    assert.equal(result.clean, false, 'Non-.md and uppercase .MD under docs/specs must not bypass ratchet');
+    assert.equal(result.findings.length, 3);
+    for (const f of result.findings) {
+      assert.equal(f.type, 'unreviewed-new-file');
+      assert.match(f.message, /class: maintained-authority/);
+    }
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('expiry boundary: explicitly tests active vs expired on expiry date (F4)', () => {
+  const tmp = mkTmpDir('exp-boundary-test-');
+  try {
+    const rootSpecs = path.join(tmp, 'docs/specs');
+    fs.mkdirSync(rootSpecs, { recursive: true });
+    const target = path.join(rootSpecs, 'spec.md');
+    fs.writeFileSync(target, 'Initial\n');
+
+    const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
+
+    fs.writeFileSync(target, 'Modified\n');
+    const digest = computeSha256(fs.readFileSync(target));
+
+    const makeExceptions = (expiryDate) => ({
+      version: 1,
+      exceptions: [
+        {
+          path: 'docs/specs/spec.md',
+          kind: 'allowed-edit',
+          rationale: 'Testing boundary',
+          approvedBy: 'Lead',
+          owner: 'lead-dev',
+          expectedDigest: digest,
+          reviewedAt: '2026-08-01',
+          expiry: expiryDate,
+        },
+      ],
+    });
+
+    // Case 1: today < expiry (e.g. today 2026-08-14, expiry 2026-08-15) -> ACTIVE (clean: true)
+    const resultBefore = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: makeExceptions('2026-08-15'),
+      roots: ['docs/specs'],
+      today: '2026-08-14',
+    });
+    assert.equal(resultBefore.clean, true, 'Exception must be active when today < expiry');
+    assert.equal(resultBefore.findings.length, 0);
+
+    // Case 2: today === expiry (e.g. today 2026-08-15, expiry 2026-08-15) -> EXPIRED (clean: false)
+    const resultOn = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: makeExceptions('2026-08-15'),
+      roots: ['docs/specs'],
+      today: '2026-08-15',
+    });
+    assert.equal(resultOn.clean, false, 'Exception must expire on its expiry date (today >= expiry)');
+    assert.ok(resultOn.findings.some((f) => f.type === 'expired-exception'));
+
+    // Case 3: today > expiry (e.g. today 2026-08-16, expiry 2026-08-15) -> EXPIRED (clean: false)
+    const resultAfter = checkRatchet({
+      repoRoot: tmp,
+      baseline,
+      exceptions: makeExceptions('2026-08-15'),
+      roots: ['docs/specs'],
+      today: '2026-08-16',
+    });
+    assert.equal(resultAfter.clean, false, 'Exception must remain expired when today > expiry');
+    assert.ok(resultAfter.findings.some((f) => f.type === 'expired-exception'));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

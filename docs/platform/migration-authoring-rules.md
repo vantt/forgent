@@ -44,13 +44,18 @@ and blocks the atomic cutover gate.
 
 The legacy platform roots (`docs/specs` and `docs/architect`) are frozen against unreviewed growth:
 
-1. **No New Files Under Legacy Roots:**
-   Creating any new maintained file under `docs/specs` or `docs/architect` is rejected by the
-   ratchet (`scripts/check-legacy-docs-ratchet.mjs`). New maintained platform documentation belongs
-   under `docs/platform/**`.
-2. **Unaccounted Edits Are Refused:**
-   Modifying any existing baselined file under `docs/specs` or `docs/architect` without an entry
-   in `scripts/check-legacy-docs-ratchet.exceptions.json` fails the ratchet.
+1. **No New Maintained Files Under Legacy Roots:**
+   Creating any new maintained prose file (`maintained-authority` or `retained-source`) under `docs/specs`
+   or `docs/architect` is rejected by the ratchet (`scripts/check-legacy-docs-ratchet.mjs`). New maintained
+   platform documentation belongs under `docs/platform/**`. Non-authority payloads (such as non-Markdown test
+   evidence payloads under `docs/architect` or explicitly enumerated generated projections) are exempt from
+   this restriction.
+2. **Unaccounted Edits to Maintained Prose Are Refused:**
+   Modifying any existing baselined maintained prose file (`maintained-authority` or `retained-source`) under
+   `docs/specs` or `docs/architect` without an entry in `scripts/check-legacy-docs-ratchet.exceptions.json` fails
+   the ratchet. Edits to policy-aware non-authority payloads (`generated` projections and non-prose `history-evidence`
+   payloads under `docs/architect`) do not require exceptions, whereas maintained documentation remains strictly
+   frozen and requires an approved exception.
 3. **Reviewed Exception Criteria:**
    An exception is permitted only for:
    - Verified stale standing route corrections (such as updating invalid references in reading maps).
@@ -64,9 +69,9 @@ The legacy platform roots (`docs/specs` and `docs/architect`) are frozen against
    - `approvedBy`: authorization reference (e.g. human approval or phase assignment ID).
    - `owner`: named owner or role responsible for the exception lifecycle.
    - `expectedDigest`: expected SHA-256 hex digest of the file after the change.
-   - `reviewedAt`: date of review in `YYYY-MM-DD` format.
+   - `reviewedAt`: date of review as a valid ISO calendar date in `YYYY-MM-DD` format.
    - Lifecycle controls (at least one required):
-     - `expiry`: ISO date (`YYYY-MM-DD`) after which the exception is rejected as expired.
+     - `expiry`: valid ISO calendar date (`YYYY-MM-DD`) on or after which the exception is rejected as expired (`checkDate >= expiry`).
      - `revisitTrigger`: concrete milestone or event triggering review (e.g. Phase 08 cutover).
 
 ## 3. Authoring New Platform Documentation
