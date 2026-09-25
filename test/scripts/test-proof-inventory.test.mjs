@@ -93,7 +93,7 @@ test('inventoryRunInitSites classifies every site in an injected multi-file corp
   };
   const entries = inventoryRunInitSites(['test/cli/fgos-a.test.mjs', 'test/cli/fgos-b.test.mjs', 'test/cli/fgos-missing.test.mjs'], {
     readFile: (abs) => {
-      const rel = Object.keys(files).find((f) => abs.endsWith(f));
+      const rel = Object.keys(files).find((f) => abs.replaceAll('\\', '/').endsWith(f));
       if (!rel) throw new Error('ENOENT');
       return files[rel];
     },

@@ -29,8 +29,12 @@ test('listLedgerArtifacts keeps only non-expired compare-ledger-*/nightly-ledger
   assert.deepEqual(kept.map((a) => a.id), [1, 2]);
 });
 
-test('downloadLedgerJson returns the parsed file inside the artifact zip, or null when the file/zip is unusable', () => {
-  const realDir = fs.mkdtempSync(path.join(os.tmpdir(), 'promote-report-fixture-'));
+test('downloadLedgerJson returns the parsed file inside the artifact zip, or null when the file/zip is unusable', (t) => {
+  if (process.platform === 'win32') {
+    t.skip('zip/unzip CLI commands not installed on Windows runner');
+    return;
+  }
+  const realDir = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'promote-report-fixture-')));
   try {
     fs.writeFileSync(path.join(realDir, 'ledger.json'), JSON.stringify({ plan: { matchedRules: [] }, caseResults: {} }));
     execFileSync('zip', ['-q', 'fixture.zip', 'ledger.json'], { cwd: realDir });

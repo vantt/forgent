@@ -41,7 +41,7 @@ test('dispatch inspect --provider-capacity reports redacted global account state
       },
     },
   }, null, 2));
-  const answer = run(['dispatch', 'inspect', '--provider-capacity'], { env: { ...process.env, HOME: home } });
+  const answer = run(['dispatch', 'inspect', '--provider-capacity'], { env: { ...process.env, HOME: home, USERPROFILE: home } });
   assert.equal(answer.status, 0, answer.stderr);
   const data = JSON.parse(answer.stdout).data;
   const account = data.providers['openai-codex'].accounts.tetnu;

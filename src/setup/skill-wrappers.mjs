@@ -75,7 +75,12 @@ function hasWindowsTrailingDotOrSpace(segment) {
 function atomicCopyFileSync(sourcePath, targetPath) {
   const tmpPath = `${targetPath}.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
   fs.copyFileSync(sourcePath, tmpPath);
-  fs.renameSync(tmpPath, targetPath);
+  try {
+    fs.renameSync(tmpPath, targetPath);
+  } catch (err) {
+    try { fs.unlinkSync(tmpPath); } catch {}
+    throw err;
+  }
 }
 
 // `readdirSync` on a directory another process is concurrently writing into
@@ -119,10 +124,11 @@ export function generateWrapperContent(sourceContent, sourceRelativePath) {
   if (!frontmatter) {
     throw new Error('generateWrapperContent: source has no YAML frontmatter block (---...---) to copy');
   }
+  const relPath = sourceRelativePath.replaceAll('\\', '/');
   return (
     `${frontmatter}\n` +
     `${GENERATED_WRAPPER_MARKER}\n` +
-    `The real skill content lives at \`${sourceRelativePath}\`, this project's own canonical skill source.\n` +
+    `The real skill content lives at \`${relPath}\`, this project's own canonical skill source.\n` +
     'Read that file and follow it directly.\n'
   );
 }
@@ -170,7 +176,7 @@ export function generateAllSkillWrappers(agentsSkillsRoot, claudeSkillsRoot) {
       const sourceContent = fs.readFileSync(sourcePath, 'utf8');
       const wrapperDir = path.join(claudeSkillsRoot, entry.name);
       const wrapperPath = path.join(wrapperDir, 'SKILL.md');
-      const sourceRelativePath = path.relative(wrapperDir, sourcePath);
+      const sourceRelativePath = path.relative(wrapperDir, sourcePath).replaceAll('\\', '/');
       fs.mkdirSync(wrapperDir, { recursive: true });
       fs.writeFileSync(wrapperPath, generateWrapperContent(sourceContent, sourceRelativePath));
       written.push(wrapperPath);
@@ -545,7 +551,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
       const skillFile = path.join(skillDir, 'SKILL.md');
       if (!fs.existsSync(skillFile)) continue;
 
-      const relPath = path.relative(projectRoot, skillDir);
+      const relPath = path.relative(projectRoot, skillDir).replaceAll('\\', '/');
       if (!nameToSources.has(entry.name)) {
         nameToSources.set(entry.name, []);
       }
@@ -562,7 +568,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         authority: 'core',
         domain: null,
         canonicalDir: relPath,
-        skillFilePath: path.relative(projectRoot, skillFile),
+        skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\', '/'),
         frontmatter,
         userInvocable,
         intentId,
@@ -585,7 +591,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
         const skillFile = path.join(skillDir, 'SKILL.md');
         if (!fs.existsSync(skillFile)) continue;
 
-        const relPath = path.relative(projectRoot, skillDir);
+        const relPath = path.relative(projectRoot, skillDir).replaceAll('\\', '/');
         if (!nameToSources.has(entry.name)) {
           nameToSources.set(entry.name, []);
         }
@@ -602,7 +608,7 @@ export function discoverCanonicalSkills(projectRoot, { checkDuplicates = true } 
           authority: 'domain',
           domain: domainEntry.name,
           canonicalDir: relPath,
-          skillFilePath: path.relative(projectRoot, skillFile),
+          skillFilePath: path.relative(projectRoot, skillFile).replaceAll('\\', '/'),
           frontmatter,
           userInvocable,
           intentId,
@@ -771,7 +777,7 @@ export function discoverSharedFragments(projectRoot, { checkCollisions = true } 
         if (entry.isDirectory()) {
           walk(fullPath, entryRel);
         } else {
-          const projectRelPath = path.relative(projectRoot, fullPath);
+          const projectRelPath = path.relative(projectRoot, fullPath).replaceAll('\\', '/');
           const collisionKey = windowsPathCollisionKey(entryRel);
           if (!pathToSources.has(collisionKey)) {
             pathToSources.set(collisionKey, { relPath: entryRel, sources: [] });

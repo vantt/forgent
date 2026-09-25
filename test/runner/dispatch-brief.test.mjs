@@ -1,18 +1,19 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import os from 'node:os';
 import path from 'node:path';
 import { briefPaths, renderBrief, renderPointer } from '../../src/runner/dispatch/brief.mjs';
 
-const RUN_DIR = '/tmp/assignments/a1/runs/01';
+const RUN_DIR = path.join(os.tmpdir(), 'assignments', 'a1', 'runs', '01');
 
 test('every path a worker is given is absolute -- its cwd is its own worktree', () => {
   const p = briefPaths(RUN_DIR, 1);
   for (const value of Object.values(p)) {
     assert.ok(path.isAbsolute(value), `${value} must be absolute`);
   }
-  assert.equal(p.ackPath, `${RUN_DIR}/outbox/ack-1.json`);
-  assert.equal(p.resultPath, `${RUN_DIR}/outbox/result-1.json`);
-  assert.equal(p.briefPath, `${RUN_DIR}/brief-1.md`);
+  assert.equal(p.ackPath, path.join(RUN_DIR, 'outbox', 'ack-1.json'));
+  assert.equal(p.resultPath, path.join(RUN_DIR, 'outbox', 'result-1.json'));
+  assert.equal(p.briefPath, path.join(RUN_DIR, 'brief-1.md'));
 });
 
 test('the round number is in every filename, so a stale report cannot pass for a current one', () => {
@@ -48,5 +49,5 @@ test('the brief never mentions an fgOS command -- a worker is not expected to kn
 test('the pointer is one line and names the brief', () => {
   const pointer = renderPointer({ runDir: RUN_DIR, round: 3 });
   assert.ok(!pointer.includes('\n'));
-  assert.ok(pointer.includes(`${RUN_DIR}/brief-3.md`));
+  assert.ok(pointer.includes(path.join(RUN_DIR, 'brief-3.md')));
 });

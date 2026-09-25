@@ -4375,8 +4375,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // manager" scope tsk-4iv-2's own SPIKE locked (npm-only), never
         // widened here to actually support pnpm/yarn removal.
         let npmRootG = null;
+        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
         try {
-          npmRootG = execFileSync('npm', ['root', '-g'], { encoding: 'utf8' }).trim();
+          npmRootG = execFileSync(npmCmd, ['root', '-g'], { encoding: 'utf8', shell: process.platform === 'win32' }).trim();
         } catch {
           npmRootG = null;
         }
@@ -4391,7 +4392,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           };
         } else {
           try {
-            const output = execFileSync('npm', ['uninstall', '-g', 'forgent'], { encoding: 'utf8' });
+            const output = execFileSync(npmCmd, ['uninstall', '-g', 'forgent'], { encoding: 'utf8', shell: process.platform === 'win32' });
             packageRemoval = { attempted: true, outcome: 'removed', output };
           } catch (err) {
             packageRemoval = {
@@ -4475,9 +4476,14 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       {
         const id = 'mirror-sync-diff';
         const description = 'Verify skill wrappers across .claude/skills and plugins/fgOS/skills are in sync with source';
-        const buildRes = spawnSync('npm', ['run', 'build:skills'], { cwd: repoRoot, encoding: 'utf8' });
+        const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+        const buildRes = spawnSync(npmCmd, ['run', 'build:skills'], {
+          cwd: repoRoot,
+          encoding: 'utf8',
+          shell: process.platform === 'win32',
+        });
         if (buildRes.status !== 0) {
-          const msg = (buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
+          const msg = (buildRes.error?.message || buildRes.stderr || buildRes.stdout || 'npm run build:skills failed').trim();
           checks.push({ id, description, passed: false, message: msg });
         } else {
           const diffRes = spawnSync('git', ['diff', '--exit-code', '--', '.claude/skills', 'plugins/fgOS/skills'], { cwd: repoRoot, encoding: 'utf8' });

@@ -63,7 +63,10 @@ test('public inspect use-case import graph cannot reach mutation/recovery/proces
   // 0)`, used only by `reclaimDeadLeases`/`rankProviderAccounts`, neither
   // reachable from `inspect.mjs`). Same identical-file, different-export
   // carve-out as the reconciliation-import-graph test's own proven leaf.
-  const isProvenLeaf = (file) => file.endsWith('/run-result.mjs') || file.endsWith('/global-config.mjs') || file.endsWith('/provider-capacity.mjs');
+  const isProvenLeaf = (file) => {
+    const f = file.replaceAll('\\', '/');
+    return f.endsWith('/run-result.mjs') || f.endsWith('/global-config.mjs') || f.endsWith('/provider-capacity.mjs');
+  };
   function walk(file) {
     if (seen.has(file)) return;
     seen.add(file);

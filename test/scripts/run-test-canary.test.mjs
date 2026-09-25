@@ -340,11 +340,11 @@ test('the script itself, spawned for real, runs a green canary then the real ful
   const root = tmpFixtureRoot();
   const f = write(root, 'ok.test.mjs');
   write(root, 'other.test.mjs');
-  const scriptPath = fileURLToPath(new URL('../../scripts/run-test-canary.mjs', import.meta.url));
+  const scriptUrl = new URL('../../scripts/run-test-canary.mjs', import.meta.url).href;
   const driver = path.join(root, 'drive.mjs');
   fs.writeFileSync(
     driver,
-    `import { runCanary } from ${JSON.stringify(scriptPath)};\n` +
+    `import { runCanary } from ${JSON.stringify(scriptUrl)};\n` +
       `const result = runCanary({ rawArgs: [${JSON.stringify(f)}], testRoot: ${JSON.stringify(root)}, cwd: ${JSON.stringify(root)}, stdio: 'ignore' });\n` +
       'console.log(JSON.stringify(result));\n' +
       'process.exitCode = result.status;\n',

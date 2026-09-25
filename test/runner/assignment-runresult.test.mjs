@@ -1222,7 +1222,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     execFileSync('git', ['add', '.'], { cwd, stdio: 'ignore' });
     execFileSync('git', ['commit', '-m', 'worker commit before hang'], { cwd, stdio: 'ignore' });
     process.stderr.write('Simulated hang after commit\\n');
-    execFileSync('sleep', ['5']);
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10000);
     `,
   );
 
@@ -1238,7 +1238,7 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
     modelPolicies: {
       claude: { standard: 'test-model' },
     },
-    timeoutMs: 300,
+    timeoutMs: process.platform === 'win32' ? 3000 : 300,
   };
 
   const assignment = buildAssignment({

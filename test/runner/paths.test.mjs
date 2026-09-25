@@ -46,7 +46,10 @@ test('resolveRepoRoot default mode git-resolves the true top-level from a subdir
 
   const root = resolveRepoRoot(subDir);
 
-  assert.equal(fs.realpathSync(root), fs.realpathSync(repo));
+  assert.equal(
+    fs.realpathSync.native ? fs.realpathSync.native(root) : fs.realpathSync(root),
+    fs.realpathSync.native ? fs.realpathSync.native(repo) : fs.realpathSync(repo),
+  );
   fs.rmSync(repo, { recursive: true, force: true });
 });
 
@@ -57,7 +60,7 @@ test('resolveRepoRoot default mode throws (validation) outside a git repository'
 });
 
 test('fgosDirFromRoot joins .fgos onto an already-resolved root', () => {
-  const root = '/some/repo/root';
+  const root = path.resolve('/some/repo/root');
   assert.equal(fgosDirFromRoot(root), path.join(root, '.fgos'));
 });
 
@@ -67,7 +70,7 @@ test('fgosDirFromRoot matches session.mjs\'s prior inline computation exactly (p
 });
 
 test('resolveFgosDir(cwd, { strict: true }) matches bin/fgos.mjs\'s prior dataDir() computation exactly', () => {
-  const cwd = '/an/example/cwd';
+  const cwd = path.resolve('/an/example/cwd');
   assert.equal(resolveFgosDir(cwd, { strict: true }), path.join(cwd, '.fgos'));
 });
 

@@ -271,7 +271,7 @@ test('relatedFilesForRule dedupes directTests + boundaryTests and returns [] for
 
 // --- Integration: a real mutant, real detached git worktree, real spawns --
 
-test('integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree', async () => {
+test('integration: a real mutant (m-edit-1) is applied and classified inside a real detached git worktree', { skip: process.platform === 'win32' }, async () => {
   const { mutants } = await import('../test-ownership-mutants.mjs');
   const { MANIFEST } = await import('../test-ownership.mjs');
   const mutant = mutants.find((m) => m.id === 'm-edit-1');

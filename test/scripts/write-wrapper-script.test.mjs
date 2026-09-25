@@ -24,8 +24,10 @@ test('writeWrapperScript creates executable file with exact command byte-for-byt
     assert.equal(content, `#!/bin/sh\nset -eu\n${cmd}\n`);
 
     const stat = fs.statSync(filePath);
-    // Check executable bit for user (0o100)
-    assert.ok((stat.mode & 0o100) !== 0, 'file should be executable by user');
+    // Check executable bit for user (0o100) (POSIX only)
+    if (process.platform !== 'win32') {
+      assert.ok((stat.mode & 0o100) !== 0, 'file should be executable by user');
+    }
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

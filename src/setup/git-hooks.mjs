@@ -59,7 +59,18 @@ function resolveRepoRoot(cwd) {
 function resolvesToGithooks(cwd, value) {
   if (value === '') return false;
   const repoRoot = resolveRepoRoot(cwd);
-  return path.resolve(repoRoot, value) === path.resolve(repoRoot, '.githooks');
+  const p1 = path.resolve(repoRoot, value);
+  const p2 = path.resolve(repoRoot, '.githooks');
+  if (p1 === p2) return true;
+  if (process.platform === 'win32') {
+    if (p1.toLowerCase() === p2.toLowerCase()) return true;
+    try {
+      return fs.realpathSync.native(p1).toLowerCase() === fs.realpathSync.native(p2).toLowerCase();
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
 
 /**

@@ -35,7 +35,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
 function tmpRepoRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-relation-'));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decision-relation-')));
 }
 
 function run(cwd, args) {
@@ -103,19 +103,19 @@ test('decisionTextLooksLikeSupersession: false for an ordinary new decision', ()
 // --- collectWideSourceFiles / findWideCitationFindings (pure) ---
 
 test('collectWideSourceFiles: returns [] for roots that do not exist, never throws', () => {
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-empty-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-empty-')));
   assert.deepEqual(collectWideSourceFiles(cwd), []);
 });
 
 test('collectWideSourceFiles: finds .md files under docs/, excludes node_modules and .git', () => {
-  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-'));
+  const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-')));
   fs.mkdirSync(path.join(cwd, 'docs', 'specs'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'specs', 'example.md'), 'cites OLDID here\n');
   fs.mkdirSync(path.join(cwd, 'docs', 'node_modules'), { recursive: true });
   fs.writeFileSync(path.join(cwd, 'docs', 'node_modules', 'skip-me.md'), 'cites OLDID here\n');
   const sources = collectWideSourceFiles(cwd);
   const files = sources.map((s) => s.file);
-  assert.ok(files.includes(path.join('docs', 'specs', 'example.md')));
+  assert.ok(files.includes('docs/specs/example.md'));
   assert.ok(!files.some((f) => f.includes('node_modules')));
 });
 
@@ -163,7 +163,7 @@ test(
   'collectWideSourceFiles: default roots reach .agents/skills, a stale ' +
     'citation there is no longer invisible (tsk-12v)',
   () => {
-    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-skills-'));
+    const cwd = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wide-sweep-skills-')));
     fs.mkdirSync(path.join(cwd, '.agents', 'skills', 'sample-skill'), { recursive: true });
     fs.writeFileSync(
       path.join(cwd, '.agents', 'skills', 'sample-skill', 'SKILL.md'),

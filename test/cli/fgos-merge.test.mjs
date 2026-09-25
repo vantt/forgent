@@ -1234,7 +1234,7 @@ test('sync-root outcome guard catches merge-failed-unclassified and records unha
 test('sync-root outcome guard catches lock-lost-mid-merge and records unhandled-outcome friction (tsk-3df)', () => {
   const cwd = initGitCwdMainFast();
 
-  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock');
+  const lockPath = path.join(cwd, '.fgos', 'main-checkout.lock').replaceAll('\\', '/');
   const lockOverwriter = `node -e "require('fs').writeFileSync('${lockPath}', JSON.stringify({pid: 999999, ts: Date.now()}))"`;
 
   makeDriftedRoot(cwd, 'sync-root-lock-lost', { verify: lockOverwriter });

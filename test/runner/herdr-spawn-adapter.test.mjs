@@ -22,6 +22,11 @@ const AGY_HERDR_SKIP =
     ? false
     : 'set FGOS_RUN_LIVE_AGY_HERDR=1 with herdr and agy on PATH to run the live agy-herdr proof';
 
+const WIN32_MOCK_HERDR_SKIP =
+  process.platform === 'win32'
+    ? 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract'
+    : false;
+
 test('herdr-spawn adapter rejects invocation missing interactiveMode', async () => {
   const herdrSpawn = EXECUTOR_ADAPTERS['herdr-spawn'];
   await assert.rejects(
@@ -241,7 +246,7 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('the prompt travels as a file and only a one-line pointer is ever typed', async () => {
+test('the prompt travels as a file and only a one-line pointer is ever typed', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-brief-file-'));
   const mock = createMockHerdr(tmpDir);
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT });
@@ -260,7 +265,7 @@ test('the prompt travels as a file and only a one-line pointer is ever typed', a
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('an anchor pane id lands the split in the caller batch tab instead of leaving it implicit', async () => {
+test('an anchor pane id lands the split in the caller batch tab instead of leaving it implicit', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-anchor-pane-'));
   const mock = createMockHerdr(tmpDir);
   await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:p1' });
@@ -271,7 +276,7 @@ test('an anchor pane id lands the split in the caller batch tab instead of leavi
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a standalone dispatch with no anchor pane keeps the old implicit-focus split', async () => {
+test('a standalone dispatch with no anchor pane keeps the old implicit-focus split', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-anchor-pane-'));
   const mock = createMockHerdr(tmpDir);
   const savedEnv = process.env.FGOS_HERDR_ANCHOR_PANE;
@@ -289,7 +294,7 @@ test('a standalone dispatch with no anchor pane keeps the old implicit-focus spl
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE, never a CLI flag', async () => {
+test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE, never a CLI flag', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   // The generic dispatch CLI (`cli.mjs`'s `execute` subcommand) has no
   // "--anchor-pane" flag on purpose -- "pane" is herdr's own vocabulary, and
   // the adapter-agnostic surface must not have to know it. This is the door
@@ -312,7 +317,7 @@ test('a cross-process caller groups its batch by setting FGOS_HERDR_ANCHOR_PANE,
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a dispatchBatchKey opens its tab once and every round of the batch splits into it', async () => {
+test('a dispatchBatchKey opens its tab once and every round of the batch splits into it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   // Two separate rounds of one batch -- each gets its own run directory (a
   // real coordination round always does), sharing only the mock herdr
   // backend and the batch key. The registry itself is module-level state in
@@ -338,7 +343,7 @@ test('a dispatchBatchKey opens its tab once and every round of the batch splits 
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
 
-test('two different batch keys never share a tab, even from the same process', async () => {
+test('two different batch keys never share a tab, even from the same process', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const rootDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-two-batches-'));
   const dirA = fs.mkdtempSync(path.join(rootDir, 'a-'));
   const dirB = fs.mkdtempSync(path.join(rootDir, 'b-'));
@@ -354,7 +359,7 @@ test('two different batch keys never share a tab, even from the same process', a
   fs.rmSync(rootDir, { recursive: true, force: true });
 });
 
-test('a dead anchor pane retries unanchored instead of failing the round', async () => {
+test('a dead anchor pane retries unanchored instead of failing the round', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-dead-anchor-'));
   const mock = createMockHerdr(tmpDir, { deadAnchorPane: 'w9:gone' });
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', anchorPaneId: 'w9:gone' });
@@ -370,7 +375,7 @@ test('a dead anchor pane retries unanchored instead of failing the round', async
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('dispatchBatchKey survives the real executeExecutorCli door, not just a direct adapter call', async () => {
+test('dispatchBatchKey survives the real executeExecutorCli door, not just a direct adapter call', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   // The other batch-key tests call EXECUTOR_ADAPTERS['herdr-spawn'] directly,
   // skipping cli.mjs's own object-literal hop and assignment-runner.mjs's --
   // exactly the two places `dispatchBatchKey` is named in a literal and
@@ -423,7 +428,7 @@ test('dispatchBatchKey survives the real executeExecutorCli door, not just a dir
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('startup goes through agent start and never types a command into a shell', async () => {
+test('startup goes through agent start and never types a command into a shell', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-agent-start-'));
   const mock = createMockHerdr(tmpDir);
   await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
@@ -450,7 +455,7 @@ test('startup goes through agent start and never types a command into a shell', 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('completion is the worker result file, never an agent status', async () => {
+test('completion is the worker result file, never an agent status', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-receipt-'));
   // An agent that reports `working` forever still completes, because what
   // completes it is a file the worker wrote.
@@ -464,7 +469,7 @@ test('completion is the worker result file, never an agent status', async () => 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a round fast enough to skip the acknowledgement still completes', async () => {
+test('a round fast enough to skip the acknowledgement still completes', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-result-only-'));
   const mock = createMockHerdr(tmpDir, { worker: 'result-only' });
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
@@ -475,7 +480,7 @@ test('a round fast enough to skip the acknowledgement still completes', async ()
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('an agent that never becomes ready fails by that name and leaves its pane open', async () => {
+test('an agent that never becomes ready fails by that name and leaves its pane open', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-not-ready-'));
   const mock = createMockHerdr(tmpDir, { startError: 'agent_not_ready' });
 
@@ -496,7 +501,7 @@ test('an agent that never becomes ready fails by that name and leaves its pane o
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces via the door and removes it on teardown', async () => {
+test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces via the door and removes it on teardown', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-agy-trust-'));
   const mock = createMockHerdr(tmpDir, {});
   const settingsPath = path.join(tmpDir, 'agy-settings.json');
@@ -530,7 +535,7 @@ test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces vi
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('R6: a bare submit timeout with no result yet does not fail the round -- it resends and settles once the retry lands', async () => {
+test('R6: a bare submit timeout with no result yet does not fail the round -- it resends and settles once the retry lands', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-submit-timeout-'));
   // Attempt 1 times out at the transport layer before the mock worker ever
   // writes anything; only attempt 2 (the resend `pollForOutcome` fires after
@@ -545,7 +550,7 @@ test('R6: a bare submit timeout with no result yet does not fail the round -- it
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a brief that stalls on submission is reported as a stall, not as a timeout', async () => {
+test('a brief that stalls on submission is reported as a stall, not as a timeout', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-stalled-'));
   const mock = createMockHerdr(tmpDir, { promptError: 'agent_prompt_stalled' });
 
@@ -561,7 +566,7 @@ test('a brief that stalls on submission is reported as a stall, not as a timeout
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a blocked agent is reported as blocked, with the line that is on its screen', async () => {
+test('a blocked agent is reported as blocked, with the line that is on its screen', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-blocked-'));
   const mock = createMockHerdr(tmpDir, {
     promptError: 'agent_blocked',
@@ -581,7 +586,7 @@ test('a blocked agent is reported as blocked, with the line that is on its scree
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a working agent is never interrupted with a second copy of its own brief', async () => {
+test('a working agent is never interrupted with a second copy of its own brief', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-resend-'));
   const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['working'] });
 
@@ -602,7 +607,7 @@ test('a working agent is never interrupted with a second copy of its own brief',
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a brief that landed nowhere is offered again once the agent is back at rest', async () => {
+test('a brief that landed nowhere is offered again once the agent is back at rest', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-resend-'));
   // `done`, not `idle`: a --no-focus pane settles there because a CLI read
   // never marks it seen, and the ready gate has to accept it.
@@ -616,7 +621,7 @@ test('a brief that landed nowhere is offered again once the agent is back at res
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('inline delivery types the brief itself, and is a declared choice rather than the default', async () => {
+test('inline delivery types the brief itself, and is a declared choice rather than the default', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-inline-'));
   const mock = createMockHerdr(tmpDir);
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: MULTILINE_PROMPT, promptDelivery: 'inline' });
@@ -629,7 +634,7 @@ test('inline delivery types the brief itself, and is a declared choice rather th
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('the exit sequence asks the agent to leave, waits for the pane to be its own again, then closes it', async () => {
+test('the exit sequence asks the agent to leave, waits for the pane to be its own again, then closes it', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-exit-'));
   const mock = createMockHerdr(tmpDir);
   await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
@@ -647,7 +652,7 @@ test('the exit sequence asks the agent to leave, waits for the pane to be its ow
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('an agent that leaves the pane without writing a result is reported dead, and its pane is kept', async () => {
+test('an agent that leaves the pane without writing a result is reported dead, and its pane is kept', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-died-'));
   // The pane still exists and still lists its own shell -- what is gone is the
   // agent process. A live pane is not a live agent.
@@ -670,7 +675,7 @@ test('an agent that leaves the pane without writing a result is reported dead, a
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a stale worker whose screen names a provider limit is paused, not timed out', async () => {
+test('a stale worker whose screen names a provider limit is paused, not timed out', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-paused-'));
   const mock = createMockHerdr(tmpDir, {
     worker: 'silent',
@@ -691,7 +696,7 @@ test('a stale worker whose screen names a provider limit is paused, not timed ou
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a stale worker with an ordinary screen is an idle timeout that still quotes the screen', async () => {
+test('a stale worker with an ordinary screen is an idle timeout that still quotes the screen', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-idle-'));
   const mock = createMockHerdr(tmpDir, {
     worker: 'silent',
@@ -711,7 +716,7 @@ test('a stale worker with an ordinary screen is an idle timeout that still quote
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('a settled round reports its outcome so the confidence ladder does not overwrite it with a guess', async () => {
+test('a settled round reports its outcome so the confidence ladder does not overwrite it with a guess', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-outcome-'));
   const mock = createMockHerdr(tmpDir);
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
@@ -778,7 +783,7 @@ test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode exec
 // Live-proof matrix, fake side. Each of these encodes a question the live
 // runs also ask, so a regression shows up here first and cheaply.
 
-test('a premature idle can never end a round -- only the worker result file does', async () => {
+test('a premature idle can never end a round -- only the worker result file does', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-startup-race-'));
   // The exact shape that produced two silent false successes in production:
   // the agent reports idle from the very first poll, before it has done
@@ -805,7 +810,7 @@ test('a premature idle can never end a round -- only the worker result file does
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('re-briefing has a hard cap -- a brief that never lands twice is a broken transport, not a slow one', async () => {
+test('re-briefing has a hard cap -- a brief that never lands twice is a broken transport, not a slow one', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-resend-cap-'));
   const mock = createMockHerdr(tmpDir, { worker: 'silent', statuses: ['done'] });
 
@@ -829,7 +834,7 @@ test('re-briefing has a hard cap -- a brief that never lands twice is a broken t
 // adapter really use it, and does it refuse rather than pretend when it
 // cannot".
 
-test('an executor that declares no confinement keeps exactly the old behaviour', async () => {
+test('an executor that declares no confinement keeps exactly the old behaviour', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-unconfined-'));
   const mock = createMockHerdr(tmpDir);
   const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
@@ -845,7 +850,7 @@ test('an executor that declares no confinement keeps exactly the old behaviour',
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-test('confinement that cannot be established is refused, never quietly downgraded', async () => {
+test('confinement that cannot be established is refused, never quietly downgraded', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-confine-refuse-'));
   const mock = createMockHerdr(tmpDir);
 
@@ -913,7 +918,7 @@ test('a config can no longer name the session a worker lands in', () => {
 });
 
 
-test('a run directory that already holds this round\'s result is refused, not settled on', async () => {
+test('a run directory that already holds this round\'s result is refused, not settled on', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-stale-result-'));
   const mock = createMockHerdr(tmpDir);
   const runDir = path.join(tmpDir, 'run');
@@ -962,7 +967,7 @@ test('the round and the adapters that call it never import each other', () => {
   assert.ok(new DispatchError('worker-timeout', 'x') instanceof Error);
 });
 
-test('ownWorktree is enforced, not merely declared', () => {
+test('ownWorktree is enforced, not merely declared', { skip: WIN32_MOCK_HERDR_SKIP }, () => {
   // It was the third leg of the "bypass requires full confinement" invariant
   // and the only one nothing checked at runtime, which made that refusal
   // partly ceremonial: a profile could declare bypass plus full confinement,
@@ -993,7 +998,7 @@ test('ownWorktree is enforced, not merely declared', () => {
   ).finally(() => fs.rmSync(tmpDir, { recursive: true, force: true }));
 });
 
-test('a dispatch that really is in its own worktree passes the same check', async () => {
+test('a dispatch that really is in its own worktree passes the same check', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-ownwt-ok-'));
   const worktree = path.join(tmpDir, 'wt');
   fs.mkdirSync(worktree, { recursive: true });
@@ -1014,7 +1019,7 @@ test('a dispatch that really is in its own worktree passes the same check', asyn
   }
 });
 
-test('a herdr that stops answering does not turn a live round into an idle timeout', async () => {
+test('a herdr that stops answering does not turn a live round into an idle timeout', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   // The scenario this closes: `agent get` fails for longer than the idle
   // window while the worker is perfectly alive. Every failed read used to
   // leave agentState 'unknown', which is not 'working', so the idle clock ran

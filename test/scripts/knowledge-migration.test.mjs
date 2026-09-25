@@ -301,7 +301,9 @@ test('knowledge-migration - dry-run reports conservation errors for duplicate so
 test('knowledge-migration - apply moves a source path containing shell metacharacters correctly (execFileSync, not a shell string)', () => {
   const { tmpDir, fgosDir } = setupGitRepoWithStore();
   try {
-    const weirdOldPath = 'docs/how-to/weird"quote;semi$(x).md';
+    const weirdOldPath = process.platform === 'win32'
+      ? 'docs/how-to/weird;semi$(x).md'
+      : 'docs/how-to/weird"quote;semi$(x).md';
     registerTopicStore(fgosDir, { topicId: 't1', purposeSlug: 'worktree-reclaim' });
     registerDocStore(fgosDir, { docId: 't1:guide', topicId: 't1', role: 'guide', currentPath: weirdOldPath, docLifecycle: 'active' });
 
@@ -559,7 +561,7 @@ test('knowledge-migration - a frontmatter-write failure leaves the source file a
     try {
       assert.throws(() => {
         runKnowledgeMigration(tmpDir, { dryRun: false });
-      }, /EACCES/);
+      }, /EACCES|EPERM/);
 
       const newFile = path.join(tmpDir, 'docs/knowledge/worktree-reclaim/guide.md');
       assert.equal(fs.existsSync(oldFile), true, 'source file must still exist at its old path');

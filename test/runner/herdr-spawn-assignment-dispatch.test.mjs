@@ -182,7 +182,7 @@ function assertReachedHerdrSeam(result, repoDir) {
   return { runDir, command, receipt };
 }
 
-test('executeAssignment dispatches a herdr-spawn executor (flat adapter shape) through the real herdr seam', async () => {
+test('executeAssignment dispatches a herdr-spawn executor (flat adapter shape) through the real herdr seam', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const repoDir = mkTempDir();
   try {
     const mock = createMockHerdr(repoDir);
@@ -201,7 +201,7 @@ test('executeAssignment dispatches a herdr-spawn executor (flat adapter shape) t
   }
 });
 
-test('executeAssignment dispatches a herdr-spawn executor (invocations[] shape) through the real herdr seam', async () => {
+test('executeAssignment dispatches a herdr-spawn executor (invocations[] shape) through the real herdr seam', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const repoDir = mkTempDir();
   try {
     const mock = createMockHerdr(repoDir);
@@ -223,7 +223,7 @@ test('executeAssignment dispatches a herdr-spawn executor (invocations[] shape) 
   }
 });
 
-test('a genuine, untampered herdr-spawn receipt is accepted -- workerCommandDigest agrees with Authority\'s own prepared-invocation digest', async () => {
+test('a genuine, untampered herdr-spawn receipt is accepted -- workerCommandDigest agrees with Authority\'s own prepared-invocation digest', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper -- production spawns a real herdr.exe on Windows with shell:false, which this test-only wrapper cannot emulate without weakening that deliberate no-shell contract' }, async () => {
   const repoDir = mkTempDir();
   try {
     const mock = createMockHerdr(repoDir);

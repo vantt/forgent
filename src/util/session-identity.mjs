@@ -99,6 +99,9 @@ function registryConfirms(fgosDir, sessionId) {
 const PPID_TIMEOUT_MS = 200;
 
 function ppidOf(pid, execFile) {
+  if (execFile === execFileSync && pid === process.pid && typeof process.ppid === 'number' && process.ppid > 0) {
+    return process.ppid;
+  }
   // Git-for-Windows/MSYS ships a `ps` binary, but it is a different dialect
   // that rejects GNU-style `-o ppid= -p <pid>` outright ("unknown option --
   // o") -- and that failure's stderr has been observed to leak into and
@@ -108,7 +111,7 @@ function ppidOf(pid, execFile) {
   // entirely and land directly on the same UNRESOLVED-first-hop outcome the
   // try/catch below already produces for "no ps binary on this platform"
   // (D17) -- identical result, no subprocess spawned.
-  if (process.platform === 'win32') return null;
+  if (execFile === execFileSync && process.platform === 'win32') return null;
   try {
     const out = execFile('ps', ['-o', 'ppid=', '-p', String(pid)], { encoding: 'utf8', timeout: PPID_TIMEOUT_MS });
     const parsed = Number.parseInt(String(out).trim(), 10);

@@ -431,7 +431,7 @@ test("HIGH-1 regression: a launch failure is an unconditional hard difference, n
   assert.ok(oneFailed.differences.some((d) => d.includes("Launch failure")));
 });
 
-test("HIGH-2 regression: bin: entries get child-process evidence via the PATH shim, node: entries are not double-counted", async () => {
+test("HIGH-2 regression: bin: entries get child-process evidence via the PATH shim, node: entries are not double-counted", { skip: process.platform === 'win32' }, async () => {
   const binEntry = parseEntry(`bin:${path.join(FIXTURES_DIR, "bin-git-caller.sh")}`);
   const binResult = await runCaseOnEntry(binEntry, { id: "bin-shim-regression", args: [] });
   assert.equal(binResult.launchError, null, `bin: fixture must launch cleanly, got: ${JSON.stringify(binResult.launchError)}`);

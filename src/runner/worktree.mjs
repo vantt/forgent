@@ -365,7 +365,7 @@ export function findCheckoutPath(porcelainOutput, branch) {
     if (line.startsWith('worktree ')) {
       currentPath = line.slice('worktree '.length).trim();
     } else if (line.startsWith('branch ')) {
-      if (line.slice('branch '.length).trim() === ref) return currentPath;
+      if (line.slice('branch '.length).trim() === ref) return realpathOrSelf(currentPath);
     } else if (line === '') {
       currentPath = null;
     }

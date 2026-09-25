@@ -861,12 +861,12 @@ test('Finding 3 regression test: read-only assignment committing a new file leav
     import fs from 'node:fs';
     import path from 'node:path';
     import { execSync } from 'node:child_process';
-    fs.writeFileSync('${newFilePath}', 'committed new file');
+    fs.writeFileSync(${JSON.stringify(newFilePath)}, 'committed new file');
     try {
-      const out = execSync('git config user.email "test@example.com" && git config user.name "Test" && git add new-from-readonly.txt && git commit -m "added file from readonly"', { cwd: '${tempDir}' });
-      fs.writeFileSync(path.join('${tempDir}', 'exec-out.log'), out.toString());
+      const out = execSync('git config user.email "test@example.com" && git config user.name "Test" && git add new-from-readonly.txt && git commit -m "added file from readonly"', { cwd: ${JSON.stringify(tempDir)} });
+      fs.writeFileSync(path.join(${JSON.stringify(tempDir)}, 'exec-out.log'), out.toString());
     } catch (err) {
-      fs.writeFileSync(path.join('${tempDir}', 'exec-error.log'), (err.stderr ? err.stderr.toString() : '') + (err.stack || String(err)));
+      fs.writeFileSync(path.join(${JSON.stringify(tempDir)}, 'exec-error.log'), (err.stderr ? err.stderr.toString() : '') + (err.stack || String(err)));
     }
 
     const prompt = process.argv.slice(2).join(' ');

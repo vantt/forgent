@@ -2,6 +2,7 @@
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
+import { pathToFileURL } from 'node:url';
 import {
   ADD_BAD_FLAG_CASES,
   DEFAULT_TTL_MS,
@@ -381,7 +382,13 @@ test('approve of a legacy item with a passing verify closes it to done — legac
 
 test('approve catches transitionWork CAS conflict when item becomes blocked before failure block write, returning structured result (AC4)', () => {
   const cwd = tmpCwd();
-  const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-blocked-item", to: "blocked", expectedStatus: "awaiting-approval", reason: "concurrent-block", role: "system" }); process.exit(1);'`;
+  const scriptPath = path.join(cwd, 'verify-cas.mjs');
+  const storeUrl = pathToFileURL(path.join(REAL_REPO_ROOT, 'src', 'state', 'store.mjs')).href;
+  fs.writeFileSync(scriptPath, `import { moveWork } from ${JSON.stringify(storeUrl)};
+moveWork(".fgos", { id: "cas-blocked-item", to: "blocked", expectedStatus: "awaiting-approval", reason: "concurrent-block", role: "system" });
+process.exit(1);
+`);
+  const verifyCmd = 'node verify-cas.mjs';
   addOk(cwd, 'cas-blocked-item', { verify: verifyCmd });
   run(cwd, ['move', 'cas-blocked-item', '--to', 'doing']);
   run(cwd, ['move', 'cas-blocked-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup"]);
@@ -398,7 +405,13 @@ test('approve catches transitionWork CAS conflict when item becomes blocked befo
 
 test('approve CAS conflict returns fresh actual status from store on event-regression replay / stale status (AC5)', () => {
   const cwd = tmpCwd();
-  const verifyCmd = `node --input-type=module -e 'import { moveWork } from "${REAL_REPO_ROOT}/src/state/store.mjs"; moveWork(".fgos", { id: "cas-todo-item", to: "todo", expectedStatus: "awaiting-approval", reason: "concurrent-todo", role: "system" }); process.exit(1);'`;
+  const scriptPath = path.join(cwd, 'verify-cas.mjs');
+  const storeUrl = pathToFileURL(path.join(REAL_REPO_ROOT, 'src', 'state', 'store.mjs')).href;
+  fs.writeFileSync(scriptPath, `import { moveWork } from ${JSON.stringify(storeUrl)};
+moveWork(".fgos", { id: "cas-todo-item", to: "todo", expectedStatus: "awaiting-approval", reason: "concurrent-todo", role: "system" });
+process.exit(1);
+`);
+  const verifyCmd = 'node verify-cas.mjs';
   addOk(cwd, 'cas-todo-item', { verify: verifyCmd });
   run(cwd, ['move', 'cas-todo-item', '--to', 'doing']);
   run(cwd, ['move', 'cas-todo-item', '--to', 'awaiting-approval', '--skip-return-guard', "test fixture setup"]);

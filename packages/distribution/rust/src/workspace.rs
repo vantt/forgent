@@ -51,7 +51,15 @@ pub fn resolve_workspace_root(start_dir: &Path) -> Result<PathBuf, WorkspaceErro
     let root = common_dir.parent().ok_or(WorkspaceError::NoParentDir)?;
 
     let canonical = std::fs::canonicalize(root)?;
-    Ok(canonical)
+    let clean = {
+        let s = canonical.to_string_lossy();
+        if let Some(stripped) = s.strip_prefix(r"\\?\") {
+            PathBuf::from(stripped)
+        } else {
+            canonical
+        }
+    };
+    Ok(clean)
 }
 
 /// Computes `workspaceId` as the first 16 hex chars of `sha256(realpath(workspace root))`.

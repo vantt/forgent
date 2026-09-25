@@ -286,15 +286,18 @@ test('plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a proj
   const homeDir = mkTempDir();
   const originalPath = process.env.PATH;
   const originalHome = process.env.HOME;
+  const originalUserProfile = process.env.USERPROFILE;
   process.env.PATH = '';
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   try {
     const result = pluginSkillCliReachableCheck()(dir);
     assert.equal(result.passed, false);
     assert.match(result.message, /no bin\/fgos\.mjs at .* and no global fgos install on PATH/);
   } finally {
     process.env.PATH = originalPath;
-    process.env.HOME = originalHome;
+    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
+    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
   }
 });
 
@@ -379,7 +382,9 @@ function gatewayTokenConfiguredFix() {
 test('gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts', () => {
   const homeDir = mkTempDir();
   const originalHome = process.env.HOME;
+  const originalUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   try {
     const before = gatewayTokenConfiguredCheck()();
     assert.equal(before.passed, false);
@@ -396,14 +401,17 @@ test('gateway-token-configured check fails when HOME has no gateway.token, and f
     const after = gatewayTokenConfiguredCheck()();
     assert.equal(after.passed, true);
   } finally {
-    process.env.HOME = originalHome;
+    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
+    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
   }
 });
 
 test('gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it', () => {
   const homeDir = mkTempDir();
   const originalHome = process.env.HOME;
+  const originalUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   try {
     fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
     fs.writeFileSync(
@@ -415,7 +423,8 @@ test('gateway-token-configured fix is idempotent — an existing token is never 
     const written = JSON.parse(fs.readFileSync(path.join(homeDir, '.fgos', 'config.json'), 'utf8'));
     assert.equal(written.gateway.token, 'already-set-token');
   } finally {
-    process.env.HOME = originalHome;
+    if (originalHome === undefined) delete process.env.HOME; else process.env.HOME = originalHome;
+    if (originalUserProfile === undefined) delete process.env.USERPROFILE; else process.env.USERPROFILE = originalUserProfile;
   }
 });
 

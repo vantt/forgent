@@ -79,6 +79,10 @@ function buildPathShim(shimDir, spyLogPath) {
     ].join("\n");
     const shimPath = path.join(shimDir, name);
     fs.writeFileSync(shimPath, shimScript, { mode: 0o755 });
+    if (process.platform === "win32") {
+      const cmdPath = path.join(shimDir, `${name}.cmd`);
+      fs.writeFileSync(cmdPath, `@sh "${shimPath.replace(/\\/g, "/")}" %*\r\n`);
+    }
   }
   return shimDir;
 }
@@ -103,7 +107,19 @@ export function parseEntry(entrySpec, repoRoot = REPO_ROOT) {
     };
   } else if (entrySpec.startsWith("bin:")) {
     const targetPath = entrySpec.slice(4);
-    const resolvedPath = path.isAbsolute(targetPath) ? targetPath : path.resolve(repoRoot, targetPath);
+    let resolvedPath = path.isAbsolute(targetPath) ? targetPath : path.resolve(repoRoot, targetPath);
+    if (process.platform === "win32" && !resolvedPath.endsWith(".exe") && fs.existsSync(resolvedPath + ".exe")) {
+      resolvedPath += ".exe";
+    }
+    if (process.platform === "win32" && resolvedPath.endsWith(".sh")) {
+      return {
+        type: "bin",
+        executable: "sh",
+        target: resolvedPath,
+        argsPrefix: [resolvedPath.replace(/\\/g, "/")],
+        spec: entrySpec,
+      };
+    }
     return {
       type: "bin",
       executable: resolvedPath,
@@ -236,7 +252,10 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
     // parsing when the checkout lives under a path containing a space --
     // the preload then never loads and child-process evidence becomes
     // vacuously empty instead of erroring.
-    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${SPY_PATH}"`;
+    // On Windows, backslashes in NODE_OPTIONS are treated as escape characters;
+    // normalize to forward slashes so Node.js resolves the path correctly.
+    const normalizedSpyPath = SPY_PATH.replaceAll("\\", "/");
+    env.NODE_OPTIONS = (env.NODE_OPTIONS ? env.NODE_OPTIONS + " " : "") + `--require "${normalizedSpyPath}"`;
   }
   // PATH shim: the only child-process evidence mechanism a bin: (compiled) entry
   // can get, and a second net for node: entries too (see header comment).
@@ -247,7 +266,7 @@ export async function runCaseOnEntry(entry, testCase, options = {}) {
   env.FGOS_HARNESS_SHIMMED_COMMANDS = PATH_SHIM_COMMANDS.join(",");
 
   const spawnCmd = entry.executable;
-  const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(testCase.args ?? [])];
+  const spawnArgs = entry.type === "node" ? [entry.target, ...(testCase.args ?? [])] : [...(entry.argsPrefix ?? []), ...(testCase.args ?? [])];
 
   const startTimeIso = new Date().toISOString();
   const t0 = performance.now();
@@ -717,7 +736,7 @@ async function runMultiStepIsolatedWrite(entryA, entryB, testCase, options = {})
       // which risks new flakiness under the same time pressure that produced
       // the original regex bug -- content-identity proof for this specific
       // case is deferred, not silently dropped.
-      return list.map(entry => entry.path.replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
+      return list.map(entry => entry.path.replaceAll('\\', '/').replace(/\.fgos\/events\/[^/]+\.jsonl$/, ".fgos/events/<EVENT_LOG>.jsonl")).sort();
     }
 
     const normCreatedA = normalizeCreatedFiles(deltaA.created);

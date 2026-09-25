@@ -31,7 +31,7 @@ const noLog = () => {};
 // codepath fail here even though the real forgent/repo (whose default branch
 // really is "main") is unaffected.
 function initTempRepo() {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loop-test-repo-'));
+  const repoRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-loop-test-repo-')));
   execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -42,7 +42,7 @@ function initTempRepo() {
 }
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 function seedItem(dir, overrides = {}) {
@@ -2760,7 +2760,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
     import fs from 'node:fs';
     import path from 'node:path';
     const cwd = process.cwd();
-    fs.writeFileSync('${cwdCheckLog}', cwd);
+    fs.writeFileSync(${JSON.stringify(cwdCheckLog)}, cwd);
 
     const runsDir = path.join(cwd, '.fgos', 'assignments');
     if (fs.existsSync(runsDir)) {

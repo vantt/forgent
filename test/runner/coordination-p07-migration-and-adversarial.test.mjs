@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 
 import { openSession, createSessionAssignment, readManifest, readSessionEvents, resolveSessionPaths, recordRunRetry, linkResult, recordDriverDisposition } from '../../src/runner/coordination/store.mjs';
@@ -37,7 +37,8 @@ const DEFINITION_ID = 'test.coordination-protocol.master-loop-driver-steps';
 const WRITER_ID = 'master-coordinator-1';
 
 function mkTempDir(prefix = 'fgos-p07-') {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
 }
 
 let oldSrcDir;
@@ -50,7 +51,7 @@ function extractOldSrc() {
     maxBuffer: 80 * 1024 * 1024,
   });
   assert.equal(archived.status, 0, `git archive ${TRACK_BASE} failed: ${archived.stderr}`);
-  const extracted = spawnSync('tar', ['-xf', '-', '-C', dest], { input: archived.stdout, cwd: dest });
+  const extracted = spawnSync('tar', ['-xf', '-'], { input: archived.stdout, cwd: dest });
   assert.equal(extracted.status, 0, `tar extract of ${TRACK_BASE} src/ failed: ${extracted.stderr}`);
   oldSrcDir = dest;
   return dest;
@@ -63,8 +64,8 @@ after(() => {
 function runOldBinary(sessionCwd, coordinationId, action) {
   const oldSrc = extractOldSrc();
   const probe = path.join(os.tmpdir(), `fgos-p07-probe-${process.pid}-${createHash('sha1').update(`${coordinationId}:${action}:${Math.random()}`).digest('hex').slice(0, 12)}.mjs`);
-  const replayUrl = path.join(oldSrc, 'src/runner/coordination/replay.mjs');
-  const storeUrl = path.join(oldSrc, 'src/runner/coordination/store.mjs');
+  const replayUrl = pathToFileURL(path.join(oldSrc, 'src/runner/coordination/replay.mjs')).href;
+  const storeUrl = pathToFileURL(path.join(oldSrc, 'src/runner/coordination/store.mjs')).href;
   fs.writeFileSync(
     probe,
     `import { replaySession } from ${JSON.stringify(replayUrl)};

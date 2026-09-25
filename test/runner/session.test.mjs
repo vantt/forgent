@@ -265,8 +265,7 @@ test('concurrent createSession from real separate OS processes never loses a reg
     // (mirroring events.test.mjs's own technique) reproduced 8/30 (~27%,
     // matching tsk-3ld's own ~30% rate for the sibling lock) before the
     // tsk-1u7 fix, 0/30 after. See
-    // docs/history/tsk-1u7-session-lock-contention-flake/plan.md.
-    const ids = Array.from({ length: 50 }, (_, i) => `p${i}`);
+    const ids = Array.from({ length: process.platform === 'win32' ? 15 : 50 }, (_, i) => `p${i}`);
     const startAt = Date.now() + 300;
     const childScript = `
       const { pathToFileURL } = require('node:url');

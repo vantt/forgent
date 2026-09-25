@@ -46,7 +46,7 @@ const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const NO_CLAUDE_ENV = { ...process.env, FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary' };
 
 function mkTemp(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 function checkById(id) {
@@ -88,11 +88,18 @@ function writeEnduserManifest(tmp, entries) {
 
 function withHome(homeDir, fn) {
   const prevHome = process.env.HOME;
+  const prevUserProfile = process.env.USERPROFILE;
   process.env.HOME = homeDir;
+  process.env.USERPROFILE = homeDir;
   try {
     return fn();
   } finally {
     process.env.HOME = prevHome;
+    if (prevUserProfile !== undefined) {
+      process.env.USERPROFILE = prevUserProfile;
+    } else {
+      delete process.env.USERPROFILE;
+    }
   }
 }
 

@@ -261,12 +261,12 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
       fs.linkSync(tmpPath, lockPath);
       created = true;
     } catch (err) {
-      if (err.code !== 'EEXIST') throw err;
+      if (err.code !== 'EEXIST' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
     } finally {
       try {
         fs.unlinkSync(tmpPath);
       } catch (err) {
-        if (err.code !== 'ENOENT') throw err;
+        if (err.code !== 'ENOENT' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
       }
     }
     if (created) {
@@ -277,7 +277,7 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
           try {
             fs.unlinkSync(lockPath);
           } catch (err) {
-            if (err.code !== 'ENOENT') throw err;
+            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
           }
         },
       };
@@ -287,7 +287,7 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
     try {
       raw = fs.readFileSync(lockPath, 'utf8');
     } catch (err) {
-      if (err.code === 'ENOENT') continue; // holder released in between — retry the create
+      if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') continue; // holder released in between — retry the create
       throw err;
     }
     const holderPid = parseInt(raw.trim(), 10);
@@ -306,7 +306,7 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
     try {
       current = fs.readFileSync(lockPath, 'utf8');
     } catch (err) {
-      if (err.code === 'ENOENT') {
+      if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') {
         // someone else already cleaned it — same yield, nothing deleted
         return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };
       }
@@ -320,7 +320,7 @@ export function acquireRunnerLock(dir, { pid = process.pid } = {}) {
     try {
       fs.unlinkSync(lockPath); // stale — dead holder; clean…
     } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
+      if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
     }
     // …and yield: never wx-create on the path this call just deleted.
     return { acquired: false, holderPid: null, reclaimedStale: true, lockPath };

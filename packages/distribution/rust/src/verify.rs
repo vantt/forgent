@@ -266,7 +266,16 @@ pub fn verify_legacy_node(
         });
     }
 
-    Ok(real_path)
+    let real_path_clean = {
+        let s = real_path.to_string_lossy();
+        if let Some(stripped) = s.strip_prefix(r"\\?\") {
+            std::path::PathBuf::from(stripped)
+        } else {
+            real_path
+        }
+    };
+
+    Ok(real_path_clean)
 }
 
 /// Verifies a release tree end-to-end:

@@ -77,12 +77,17 @@ import { createWorktree } from '../../src/runner/worktree.mjs';
 // `fgos-researching`'s RESEARCH.md, a separate, already-built mechanism,
 // never a silent regression.
 
+function mkNativeTempDir(prefix) {
+  const p = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p);
+}
+
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-decompose-test-'));
+  return mkNativeTempDir('fgos-decompose-test-');
 }
 
 function tmpStoreDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-decompose-'));
+  return mkNativeTempDir('fgos-resolve-decompose-');
 }
 
 function sampleWork(overrides = {}) {
@@ -1261,7 +1266,7 @@ test('resolvePlan real caller-supplied pass-through path still prefers gates[id]
 // sibling directory. ---
 
 function initTempGitRepoWithStore() {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-repo-'));
+  const repoRoot = mkNativeTempDir('fgos-resolve-content-root-repo-');
   execFileSync('git', ['init', '-q'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -1276,7 +1281,7 @@ function initTempGitRepoWithStore() {
 test('resolveContentRoot finds a real plan.md via process.cwd() when neither the state root nor any worktree hold it', () => {
   const { storeDir } = initTempGitRepoWithStore();
 
-  const contentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-cwd-'));
+  const contentDir = mkNativeTempDir('fgos-resolve-content-root-cwd-');
   const featureDir = path.join(contentDir, 'feature');
   fs.mkdirSync(featureDir, { recursive: true });
   fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
@@ -1296,7 +1301,7 @@ test('resolveContentRoot finds a real plan.md via process.cwd() when neither the
 test('resolvePlan skips (advances via trust signal) when plan.md is only reachable via process.cwd() (D1 branch 1, real end-to-end)', () => {
   const { storeDir } = initTempGitRepoWithStore();
 
-  const contentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-cwd-e2e-'));
+  const contentDir = mkNativeTempDir('fgos-resolve-content-root-cwd-e2e-');
   const featureDir = path.join(contentDir, 'feature');
   fs.mkdirSync(featureDir, { recursive: true });
   fs.writeFileSync(path.join(featureDir, 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
@@ -1319,7 +1324,7 @@ test('resolvePlan skips (advances via trust signal) when plan.md is only reachab
 test('resolveContentRoot finds a real committed plan.md via git worktree list when cwd does not hold it (D1 branch 2, crash-recovery case)', () => {
   const { repoRoot, storeDir } = initTempGitRepoWithStore();
 
-  const worktreeBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-wt-'));
+  const worktreeBase = mkNativeTempDir('fgos-resolve-content-root-wt-');
   const { path: worktreePath } = createWorktree(repoRoot, 'item-x', { worktreeDir: worktreeBase });
   const featureDir = path.join(worktreePath, 'feature');
   fs.mkdirSync(featureDir, { recursive: true });
@@ -1327,7 +1332,7 @@ test('resolveContentRoot finds a real committed plan.md via git worktree list wh
   execFileSync('git', ['add', 'feature'], { cwd: worktreePath });
   execFileSync('git', ['commit', '-q', '-m', 'plan: item-x'], { cwd: worktreePath });
 
-  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-elsewhere-'));
+  const elsewhere = mkNativeTempDir('fgos-resolve-content-root-elsewhere-');
   const originalCwd = process.cwd();
   process.chdir(elsewhere);
   let resolved;
@@ -1343,7 +1348,7 @@ test('resolveContentRoot finds a real committed plan.md via git worktree list wh
 test('resolvePlan skips when plan.md is only reachable via a real registered worktree (D1 branch 2, real end-to-end)', () => {
   const { repoRoot, storeDir } = initTempGitRepoWithStore();
 
-  const worktreeBase = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-wt-e2e-'));
+  const worktreeBase = mkNativeTempDir('fgos-resolve-content-root-wt-e2e-');
   const { path: worktreePath } = createWorktree(repoRoot, 'item-x', { worktreeDir: worktreeBase });
   const featureDir = path.join(worktreePath, 'feature');
   fs.mkdirSync(featureDir, { recursive: true });
@@ -1354,7 +1359,7 @@ test('resolvePlan skips when plan.md is only reachable via a real registered wor
   addWork(storeDir, sampleWork({ docsRef: 'feature' }));
   recordGateApprove(storeDir, { id: 'item-x', gate: 'planApprove', actor: 'human', verify: 'npm test -- worktree-hit' });
 
-  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-elsewhere-e2e-'));
+  const elsewhere = mkNativeTempDir('fgos-resolve-content-root-elsewhere-e2e-');
   const originalCwd = process.cwd();
   process.chdir(elsewhere);
   let result;
@@ -1372,7 +1377,7 @@ test('resolveContentRoot falls back to stateRoot when neither cwd nor any regist
   fs.mkdirSync(path.join(repoRoot, 'feature'), { recursive: true });
   fs.writeFileSync(path.join(repoRoot, 'feature', 'plan.md'), 'mode = **tiny** (1 file, direct task).\n');
 
-  const elsewhere = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-resolve-content-root-fallback-'));
+  const elsewhere = mkNativeTempDir('fgos-resolve-content-root-fallback-');
   const originalCwd = process.cwd();
   process.chdir(elsewhere);
   let resolved;

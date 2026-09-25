@@ -2379,7 +2379,7 @@ function claudeCommand() {
 
 function claudeBinaryAvailable() {
   try {
-    execFileSync(claudeCommand(), ['--version'], { encoding: 'utf8' });
+    execFileSync(claudeCommand(), ['--version'], { encoding: 'utf8', shell: process.platform === 'win32' });
     return true;
   } catch {
     return false;
@@ -2393,7 +2393,7 @@ function claudeBinaryAvailable() {
 // checks already use for a subprocess that could not be trusted.
 function claudePluginJson(args) {
   try {
-    const stdout = execFileSync(claudeCommand(), args, { encoding: 'utf8' });
+    const stdout = execFileSync(claudeCommand(), args, { encoding: 'utf8', shell: process.platform === 'win32' });
     const parsed = JSON.parse(stdout);
     return Array.isArray(parsed) ? parsed : null;
   } catch {
@@ -2447,7 +2447,7 @@ function fixClaudePluginMarketplace() {
   const marketplaces = claudePluginJson(['plugin', 'marketplace', 'list', '--json']) ?? [];
   if (!marketplaces.some((m) => m?.name === CLAUDE_PLUGIN_MARKETPLACE_NAME)) {
     try {
-      execFileSync(claudeCommand(), ['plugin', 'marketplace', 'add', CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE], { encoding: 'utf8' });
+      execFileSync(claudeCommand(), ['plugin', 'marketplace', 'add', CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE], { encoding: 'utf8', shell: process.platform === 'win32' });
     } catch (err) {
       return { changed, message: `"claude plugin marketplace add ${CLAUDE_PLUGIN_MARKETPLACE_GITHUB_SOURCE}" failed: ${err.message}` };
     }
@@ -2459,7 +2459,7 @@ function fixClaudePluginMarketplace() {
   if (!fgosPluginEnabled(plugins)) {
     const pluginRef = `fgOS@${CLAUDE_PLUGIN_MARKETPLACE_NAME}`;
     try {
-      execFileSync(claudeCommand(), ['plugin', 'install', pluginRef], { encoding: 'utf8' });
+      execFileSync(claudeCommand(), ['plugin', 'install', pluginRef], { encoding: 'utf8', shell: process.platform === 'win32' });
     } catch (err) {
       return { changed, message: `"claude plugin install ${pluginRef}" failed: ${err.message}` };
     }

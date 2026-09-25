@@ -8,8 +8,8 @@ use crate::canonical::canonicalize_manifest_files;
 use crate::lock::check_main_checkout_lock;
 use crate::manifest::{read_manifest_from_dir, ReleaseManifest};
 use crate::store::{
-    list_releases, now_millis, resolve_machine_release_store_root, stage_release,
-    ReleaseStatusEntry, StageOutcome,
+    list_releases, now_millis, quarantine_dir_path, release_dir_path,
+    resolve_machine_release_store_root, stage_release, ReleaseStatusEntry, StageOutcome,
 };
 use crate::verify::{recompute_artifact_digest, verify_legacy_node, verify_release_files};
 use crate::workspace::{
@@ -28,11 +28,14 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
 [ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos"
+if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
+  entry="${entry}.exe"
+fi
 [ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
 exec "$entry" "$@"
 "#;
@@ -44,11 +47,14 @@ set -eu
 self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 activation="$self_dir/../activation.json"
 [ -f "$activation" ] || { echo "fgos: no active runtime -- run fgctl init" >&2; exit 3; }
-status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+status=$(sed -n 's/^[[:space:]]*"status"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r')
 [ "$status" = "ready" ] || { echo "fgos: active runtime is not ready ($status) -- run fgctl repair" >&2; exit 3; }
-release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1)
+release_path=$(sed -n 's/^[[:space:]]*"releasePath"[[:space:]]*:[[:space:]]*"\(.*\)"[,]*$/\1/p' "$activation" | head -n1 | tr -d '\r' | tr '\\' '/' | tr -s '/')
 [ -n "$release_path" ] || { echo "fgos: activation.json missing releasePath -- run fgctl repair" >&2; exit 3; }
 entry="$release_path/bin/fgos-runner"
+if [ ! -x "$entry" ] && [ -x "${entry}.exe" ]; then
+  entry="${entry}.exe"
+fi
 [ -x "$entry" ] || { echo "fgos: active release entry not found: $entry -- run fgctl repair" >&2; exit 3; }
 exec "$entry" "$@"
 "#;
@@ -637,7 +643,15 @@ pub fn run_tail(
 
     for cmd_args in commands {
         let cmd_name = cmd_args.join(" ");
-        let mut cmd = Command::new(shim_path);
+        let mut cmd = if cfg!(windows) {
+            let mut c = Command::new("sh");
+            let p_str = shim_path.to_string_lossy();
+            let clean = p_str.trim_start_matches(r"\\?\").replace('\\', "/");
+            c.arg(clean);
+            c
+        } else {
+            Command::new(shim_path)
+        };
         cmd.args(&cmd_args).current_dir(workspace_root);
 
         let output = match cmd.output() {
@@ -694,7 +708,7 @@ fn mark_transaction_status(tx_path: &Path, status: &str) -> std::io::Result<()> 
 /// exactly this "falsely ready" state behind, and status alone cannot tell
 /// the difference from a genuinely healthy binding.
 fn is_release_staged(store_root: &Path, digest: &str) -> bool {
-    store_root.join("releases").join(digest).exists()
+    release_dir_path(store_root, digest).exists()
 }
 
 /// Executes `fgctl init [--from <source>]` for the current or specified workspace.
@@ -784,7 +798,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 )));
             }
 
-            let dir = store_root.join("releases").join(&staged_digest);
+            let dir = release_dir_path(&store_root, &staged_digest);
             (staged_digest, dir)
         }
         (Some(pin), None) => {
@@ -812,7 +826,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 }
             }
 
-            let dir = store_root.join("releases").join(pin_digest);
+            let dir = release_dir_path(&store_root, pin_digest);
             if !dir.exists() {
                 let quarantine_note = current_activation
                     .as_ref()
@@ -856,7 +870,7 @@ pub fn init_workspace(start_dir: &Path, from_source: Option<&Path>) -> Result<()
                 StageOutcome::Staged { artifact_digest } => artifact_digest,
                 StageOutcome::NoOp { artifact_digest } => artifact_digest,
             };
-            let dir = store_root.join("releases").join(&staged_digest);
+            let dir = release_dir_path(&store_root, &staged_digest);
             (staged_digest, dir)
         }
         (None, None) => {
@@ -1002,6 +1016,14 @@ pub fn publish_and_tail(args: PublishArgs<'_>) -> Result<(), InitError> {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&shim_fgos, std::fs::Permissions::from_mode(0o755));
         let _ = std::fs::set_permissions(&shim_runner, std::fs::Permissions::from_mode(0o755));
+    }
+
+    #[cfg(windows)]
+    {
+        let shim_fgos_cmd = bin_dir.join("fgos.cmd");
+        let shim_runner_cmd = bin_dir.join("fgos-runner.cmd");
+        let _ = std::fs::write(&shim_fgos_cmd, "@sh \"%~dp0fgos\" %*\r\n");
+        let _ = std::fs::write(&shim_runner_cmd, "@sh \"%~dp0fgos-runner\" %*\r\n");
     }
 
     // Write root.json
@@ -1218,7 +1240,7 @@ pub fn upgrade_workspace(start_dir: &Path, from_source: &Path) -> Result<(), Ini
         StageOutcome::NoOp { artifact_digest } => artifact_digest,
     };
 
-    let candidate_dir = store_root.join("releases").join(&staged_digest);
+    let candidate_dir = release_dir_path(&store_root, &staged_digest);
     let manifest = read_manifest_from_dir(&candidate_dir).map_err(|e| {
         InitError::Custom(format!(
             "failed to read manifest from {}: {}",
@@ -1334,7 +1356,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
     let is_self_verify = current_activation.previous_artifact_digest.is_none();
     let (target_digest, candidate_dir) =
         if let Some(ref prev_digest) = current_activation.previous_artifact_digest {
-            let dir = store_root.join("releases").join(prev_digest);
+            let dir = release_dir_path(&store_root, prev_digest);
             if !dir.exists() {
                 return Err(InitError::Custom(format!(
                     "cannot repair: previous release {} not found in release store",
@@ -1344,7 +1366,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
             (prev_digest.clone(), dir)
         } else {
             let active_digest = &current_activation.artifact_digest;
-            let dir = store_root.join("releases").join(active_digest);
+            let dir = release_dir_path(&store_root, active_digest);
             if !dir.exists() {
                 return Err(InitError::Custom(format!(
                     "cannot repair: active release {} not found in release store",
@@ -1390,9 +1412,7 @@ pub fn repair_workspace(start_dir: &Path) -> Result<(), InitError> {
         Ok(m) => m,
         Err(err_msg) if is_self_verify => {
             let timestamp = now_millis();
-            let quarantine_dir = store_root
-                .join("quarantine")
-                .join(format!("{}-{}", target_digest, timestamp));
+            let quarantine_dir = quarantine_dir_path(&store_root, &target_digest, timestamp);
             std::fs::create_dir_all(store_root.join("quarantine"))?;
             if candidate_dir.exists() {
                 let _ = std::fs::rename(&candidate_dir, &quarantine_dir);
@@ -1482,7 +1502,7 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
     };
 
     let active_digest = current_activation.artifact_digest.clone();
-    let release_dir = store_root.join("releases").join(&active_digest);
+    let release_dir = release_dir_path(&store_root, &active_digest);
 
     let verify_result = (|| -> Result<(), String> {
         if !release_dir.exists() {
@@ -1513,9 +1533,7 @@ pub fn verify_workspace(start_dir: &Path) -> Result<(), InitError> {
         Err(err_msg) => {
             // Mismatch: move release directory to quarantine/<digest>-<timestamp>/
             let timestamp = now_millis();
-            let quarantine_dir = store_root
-                .join("quarantine")
-                .join(format!("{}-{}", active_digest, timestamp));
+            let quarantine_dir = quarantine_dir_path(&store_root, &active_digest, timestamp);
             std::fs::create_dir_all(store_root.join("quarantine"))?;
             if release_dir.exists() {
                 let _ = std::fs::rename(&release_dir, &quarantine_dir);

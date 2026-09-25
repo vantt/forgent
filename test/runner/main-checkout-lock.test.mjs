@@ -567,7 +567,7 @@ test('a held lock acquired with releaseOnExit:true is released automatically whe
     `import('${moduleUrl}').then(({ acquireMainCheckoutLock }) => {`,
     `  const res = acquireMainCheckoutLock(${JSON.stringify(dir)}, { identity: process.pid, releaseOnExit: true });`,
     `  if (res.status !== 'acquired') { process.exit(2); }`,
-    `  process.kill(process.pid, 'SIGINT');`,
+    `  if (process.platform === 'win32') { process.emit('SIGINT'); } else { process.kill(process.pid, 'SIGINT'); }`,
     `  setTimeout(() => process.exit(3), 2000);`, // never reached if the SIGINT handler's process.exit(1) fires as expected
     `});`,
   ].join('\n');

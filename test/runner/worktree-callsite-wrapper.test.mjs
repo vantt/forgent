@@ -17,7 +17,7 @@ import {
 // (forgent itself), mirroring worktree.test.mjs's own convention.
 
 function initTempRepo() {
-  const repoRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-repo-'));
+  const repoRoot = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-repo-')));
   execFileSync('git', ['init', '-q'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repoRoot });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: repoRoot });
@@ -28,7 +28,7 @@ function initTempRepo() {
 }
 
 function mkWorktreeDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-dir-'));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-worktree-wrapper-test-dir-')));
 }
 
 // --- claim-isolate -----------------------------------------------------
@@ -118,8 +118,9 @@ test('withMergeEphemeralWorktree never touches a separate, kept-open checkout of
   // The kept-open checkout is completely untouched: still on disk, still
   // registered in `git worktree list`, still readable.
   assert.ok(fs.existsSync(keptPath), 'kept-open worktree directory must survive the merge');
-  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' });
-  assert.match(listing, new RegExp(`worktree ${keptPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+  const listing = execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: repoRoot, encoding: 'utf8' }).replaceAll('\\', '/');
+  const normalizedKeptPath = keptPath.replaceAll('\\', '/');
+  assert.match(listing, new RegExp(`worktree ${normalizedKeptPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
 
   // The merge's own commit landed on the real branch (fast-forwarded), not
   // just on the disposable ephemeral checkout.
@@ -144,7 +145,7 @@ test('createDispatchWorktree is a passthrough to createWorktree (worktreeDir/bas
 
   assert.equal(wt.branch, 'fgw/leaf-item');
   assert.ok(fs.existsSync(path.join(wt.path, 'seed.txt')));
-  assert.equal(fs.readFileSync(path.join(wt.path, 'seed.txt'), 'utf8'), 'seed on root\n');
+  assert.equal(fs.readFileSync(path.join(wt.path, 'seed.txt'), 'utf8').replaceAll('\r\n', '\n'), 'seed on root\n');
 });
 
 test('removeDispatchWorktree removes a real checkout silently (no log call)', () => {

@@ -20,6 +20,8 @@ const __dirname = path.dirname(__filename);
 const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
 const FGOS_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgos');
 
+const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
+
 let releaseDirA = null;
 let digestA = null;
 let releaseDirB = null;
@@ -35,6 +37,14 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
     },
     encoding: 'utf8',
   });
+}
+
+function runShim(shimPath, args, opts = {}) {
+  if (process.platform === 'win32') {
+    const clean = shimPath.replace(/^\\\\\?\\/, '').replace(/\\/g, '/');
+    return spawnSync('sh', [clean, ...args], opts);
+  }
+  return spawnSync(shimPath, args, opts);
 }
 
 function runFgos(args, { cwd, stateHome, env = {} } = {}) {
@@ -171,7 +181,7 @@ test('R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest wit
 
     // Old release directory under releases/ is retained (Retention decision)
     const storeRoot = stateHome;
-    const oldReleaseDir = path.join(storeRoot, 'releases', digestA);
+    const oldReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
     assert.ok(fs.existsSync(oldReleaseDir), 'Previous release directory must be retained under releases/');
 
     // Step 5: fgctl repair rolls back to previousArtifactDigest (A)
@@ -211,7 +221,7 @@ test('R4, R5, R6: Corrupting one byte in active release triggers quarantine and 
 
     // Corrupt one byte in active staged release file
     const storeRoot = stateHome;
-    const stagedFile = path.join(storeRoot, 'releases', digestA, 'bin', 'fgos');
+    const stagedFile = path.join(storeRoot, 'releases', releaseDirName(digestA), 'bin', 'fgos');
     assert.ok(fs.existsSync(stagedFile), `Staged file must exist at ${stagedFile}`);
     fs.appendFileSync(stagedFile, 'TAMPER');
 
@@ -220,15 +230,15 @@ test('R4, R5, R6: Corrupting one byte in active release triggers quarantine and 
     assert.notEqual(verifyTampered.status, 0, 'fgctl verify must fail when file is tampered');
 
     // Releases dir for digestA must be gone, and moved to quarantine/
-    const originalReleaseDir = path.join(storeRoot, 'releases', digestA);
+    const originalReleaseDir = path.join(storeRoot, 'releases', releaseDirName(digestA));
     assert.ok(!fs.existsSync(originalReleaseDir), 'Release dir must be moved out of releases/');
 
     const quarantineDir = path.join(storeRoot, 'quarantine');
     assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist');
     const quarantinedEntries = fs.readdirSync(quarantineDir);
     assert.ok(
-      quarantinedEntries.some((e) => e.startsWith(digestA)),
-      `quarantine must contain entry starting with ${digestA}`
+      quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
+      `quarantine must contain entry starting with ${releaseDirName(digestA)}`
     );
 
     // activation.json status is "quarantined"
@@ -250,7 +260,7 @@ test('R4, R5, R6: Corrupting one byte in active release triggers quarantine and 
 
     // Runtime reader treats quarantined as missing binding / fails closed
     const shimPath = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const shimRes = spawnSync(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
+    const shimRes = runShim(shimPath, ['version'], { cwd: projDir, encoding: 'utf8' });
     assert.notEqual(shimRes.status, 0, 'shim execution must fail closed when runtime is quarantined');
     assert.match(shimRes.stderr, /quarantined/);
   } finally {
@@ -365,7 +375,7 @@ test('Reviewer M1: a quarantined workspace recovers via fgctl init --from (docum
     assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
 
     // Tamper and quarantine via verify (same repro as the R4/R5/R6 test above).
-    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
     fs.appendFileSync(stagedFile, 'TAMPER');
     assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
 
@@ -387,7 +397,7 @@ test('Reviewer M1: a quarantined workspace recovers via fgctl init --from (docum
     const recovered = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
     assert.equal(recovered.status, 'ready', 'status must return to ready after recovery');
     assert.equal(recovered.artifactDigest, digestA);
-    assert.ok(fs.existsSync(path.join(stateHome, 'releases', digestA)), 'digestA must be staged again under releases/');
+    assert.ok(fs.existsSync(path.join(stateHome, 'releases', releaseDirName(digestA))), 'digestA must be staged again under releases/');
   } finally {
     fs.rmSync(projDir, { recursive: true, force: true });
     fs.rmSync(stateHome, { recursive: true, force: true });
@@ -405,7 +415,7 @@ test('Reviewer M2: upgrading away from a quarantined activation chains previousA
 
     assert.equal(runFgctl(['init', '--from', releaseDirA], { cwd: projDir, stateHome }).status, 0);
 
-    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
     fs.appendFileSync(stagedFile, 'TAMPER');
     assert.notEqual(runFgctl(['verify'], { cwd: projDir, stateHome }).status, 0);
 
@@ -426,7 +436,7 @@ test('Reviewer M2: upgrading away from a quarantined activation chains previousA
     assert.notEqual(afterUpgrade.previousArtifactDigest, digestA);
     if (afterUpgrade.previousArtifactDigest !== null) {
       assert.ok(
-        fs.existsSync(path.join(stateHome, 'releases', afterUpgrade.previousArtifactDigest)),
+        fs.existsSync(path.join(stateHome, 'releases', releaseDirName(afterUpgrade.previousArtifactDigest))),
         'previousArtifactDigest, if set, must name a release directory that still genuinely exists'
       );
     }
@@ -479,20 +489,20 @@ test('Red-team MEDIUM: repair of a tampered active release (no previousArtifactD
     // `fgctl repair` (previousArtifactDigest null) must independently detect
     // and quarantine it, not merely refuse and leave a known-bad payload
     // sitting under releases/<digest>/.
-    const stagedFile = path.join(stateHome, 'releases', digestA, 'bin', 'fgos');
+    const stagedFile = path.join(stateHome, 'releases', releaseDirName(digestA), 'bin', 'fgos');
     fs.appendFileSync(stagedFile, 'TAMPER');
 
     const repairRes = runFgctl(['repair'], { cwd: projDir, stateHome });
     assert.notEqual(repairRes.status, 0, 'repair of a tampered active release must fail');
 
-    const releaseDir = path.join(stateHome, 'releases', digestA);
+    const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
     assert.ok(!fs.existsSync(releaseDir), 'tampered release must be moved out of releases/ by repair, not left in place');
 
     const quarantineDir = path.join(stateHome, 'quarantine');
     assert.ok(fs.existsSync(quarantineDir), 'quarantine dir must exist after a failed repair');
     const quarantinedEntries = fs.readdirSync(quarantineDir);
     assert.ok(
-      quarantinedEntries.some((e) => e.startsWith(digestA)),
+      quarantinedEntries.some((e) => e.startsWith(releaseDirName(digestA))),
       `quarantine must contain an entry for ${digestA} after repair fails`
     );
 
@@ -520,8 +530,8 @@ test('Red-team MEDIUM: a "falsely ready" binding (release moved but status never
     // the release directory to quarantine/ but is killed before it
     // publishes status: "quarantined" -- activation.json still (falsely)
     // reads "ready" for a digest whose release directory no longer exists.
-    const releaseDir = path.join(stateHome, 'releases', digestA);
-    const quarantineDir = path.join(stateHome, 'quarantine', `${digestA}-simulated-crash`);
+    const releaseDir = path.join(stateHome, 'releases', releaseDirName(digestA));
+    const quarantineDir = path.join(stateHome, 'quarantine', `${releaseDirName(digestA)}-simulated-crash`);
     fs.mkdirSync(path.dirname(quarantineDir), { recursive: true });
     fs.renameSync(releaseDir, quarantineDir);
 
@@ -751,7 +761,7 @@ test('P7: Upgrade candidate local tail failure leaves workspace in diagnosable s
 
     // Workspace is diagnosable
     const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: projDir,
       env: { ...process.env, FGOS_STATE_HOME: stateHome },
       encoding: 'utf8',
@@ -834,7 +844,7 @@ test('P7: Repair local tail failure leaves workspace in diagnosable state with r
 
     // Workspace is diagnosable
     const shimFgos = path.join(projDir, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: projDir,
       env: { ...process.env, FGOS_STATE_HOME: stateHome },
       encoding: 'utf8',

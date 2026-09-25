@@ -190,7 +190,7 @@ export function classifyProfiledTest({ name, file }, { repoRoot = REPO_ROOT } = 
 export function inventoryProfiledTests(topTests, { repoRoot = REPO_ROOT } = {}) {
   return topTests.map((t) => {
     const cls = classifyProfiledTest(t, { repoRoot });
-    const relFile = path.relative(repoRoot, t.file);
+    const relFile = path.relative(repoRoot, t.file).replaceAll('\\', '/');
     return {
       testId: `${relFile}::${t.name}`,
       file: relFile,
@@ -219,7 +219,7 @@ export function inventoryProfiledTests(topTests, { repoRoot = REPO_ROOT } = {}) 
  */
 export function inventoryProfiledFiles(topFiles, { repoRoot = REPO_ROOT } = {}) {
   return topFiles.map((f) => {
-    const relFile = path.relative(repoRoot, f.file);
+    const relFile = path.relative(repoRoot, f.file).replaceAll('\\', '/');
     const dir = dirBucket(f.file, repoRoot);
     const rule = DIR_RULES.find((r) => r.test(dir));
     return {

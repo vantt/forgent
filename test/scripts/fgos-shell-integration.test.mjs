@@ -6,6 +6,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+if (process.platform === 'win32') {
+  test('POSIX shell integration is unsupported on Windows', { skip: 'POSIX shell integration (bash/zsh) is only supported on POSIX platforms' }, () => {});
+} else {
+
 const scriptPath = fileURLToPath(new URL('../../scripts/fgos-shell-integration.sh', import.meta.url));
 
 function mkTempDir(prefix) {
@@ -441,3 +445,4 @@ test('fgos falls back to bin/fgos.mjs when .fgos/installation/bin/fgos is a syml
   fs.rmSync(outsideDir, { recursive: true, force: true });
 });
 
+}

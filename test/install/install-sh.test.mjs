@@ -29,7 +29,7 @@ function runInstallScript(env) {
   });
 }
 
-describe('install.sh e2e installer suite', () => {
+describe('install.sh e2e installer suite', { skip: process.platform === 'win32' ? 'install.sh is a POSIX-only shell installer' : false }, () => {
   const version = 'v1.0.0';
   const target = 'x86_64-unknown-linux-gnu';
   const tarballName = `fgctl-${version}-${target}.tar.gz`;

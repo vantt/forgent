@@ -104,7 +104,7 @@ test('runGoalCheck output captures both stdout and stderr', async () => {
 
 test('runGoalCheck output is captured even on a failing verify (exit nonzero)', async () => {
   const cwd = mkTempDir();
-  const result = await runGoalCheck(makeItem('echo failure-detail 1>&2; exit 3'), cwd);
+  const result = await runGoalCheck(makeItem('echo failure-detail 1>&2 && exit 3'), cwd);
   assert.equal(result.passed, false);
   assert.equal(result.status, 3);
   assert.match(result.output, /failure-detail/);
@@ -224,11 +224,11 @@ test('runInvariantChecks returns the first failing command and stops there', asy
   const cwd = mkTempDir();
   const marker = path.join(cwd, 'third-ran.txt');
   const result = await runInvariantChecks(
-    ['exit 0', 'echo boom 1>&2; exit 4', `touch ${JSON.stringify(marker)}`],
+    ['exit 0', 'echo boom 1>&2 && exit 4', `touch ${JSON.stringify(marker)}`],
     cwd,
   );
   assert.equal(result.passed, false);
-  assert.equal(result.command, 'echo boom 1>&2; exit 4');
+  assert.equal(result.command, 'echo boom 1>&2 && exit 4');
   assert.equal(result.status, 4);
   assert.match(result.output, /boom/);
   assert.equal(fs.existsSync(marker), false, 'commands after the first failure must not run');

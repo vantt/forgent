@@ -390,7 +390,7 @@ export function checkVectors({
     for (const filename of genFiles) {
       if (!diskFiles.includes(filename)) continue;
       const diskPath = path.join(dir, filename);
-      const diskContent = fs.readFileSync(diskPath, "utf8");
+      const diskContent = fs.readFileSync(diskPath, "utf8").replace(/\r\n/g, "\n");
       const expectedContent = JSON.stringify(generatedMap.get(filename), null, 2) + "\n";
 
       if (diskContent !== expectedContent) {

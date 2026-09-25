@@ -199,7 +199,14 @@ pub fn execute_legacy_cli(
     let started_at = SystemTime::now();
 
     let payload_path = match resolve_payload_path() {
-        Ok(path) => path,
+        Ok(path) => {
+            let s = path.to_string_lossy();
+            if let Some(stripped) = s.strip_prefix(r"\\?\") {
+                PathBuf::from(stripped)
+            } else {
+                path
+            }
+        }
         Err(err) => {
             eprintln!("fgos: error: {}", err);
             let completed_at = SystemTime::now();

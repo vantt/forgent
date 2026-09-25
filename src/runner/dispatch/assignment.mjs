@@ -392,8 +392,8 @@ function buildDeclaredAssignment({
   if (work) {
     if (work.docsRef && derivedContextRefs.length === 0) {
       derivedContextRefs.push(work.docsRef);
-      derivedContextRefs.push(path.join(work.docsRef, 'plan.md'));
-      derivedContextRefs.push(path.join(work.docsRef, 'CONTEXT.md'));
+      derivedContextRefs.push(path.posix.join(work.docsRef, 'plan.md'));
+      derivedContextRefs.push(path.posix.join(work.docsRef, 'CONTEXT.md'));
     }
     if (Array.isArray(work.refs)) {
       for (const r of work.refs) {
@@ -707,7 +707,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   // requires stage/operation and refuses a missing taskSpec), so this is a
   // value-preserving no-op for them.
   const taskSpecRelPath = assignment.taskSpec
-    ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options)
+    ? resolveTaskSpecPath(assignment.domain, assignment.taskSpec, options).replaceAll('\\', '/')
     : null;
 
   // Phase 02 (executor-policy-dispatch-seams, design.md §3.4 PromptEnvelope):

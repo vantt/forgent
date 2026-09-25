@@ -20,7 +20,7 @@ test('package.json has no prepare script and exposes setup:hooks running install
 });
 
 function mkTempDir(prefix) {
-  return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
+  return fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), prefix)));
 }
 
 // --- installGitHooks: function form, real git checkout -------------------

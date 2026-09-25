@@ -211,11 +211,11 @@ test('the script itself, spawned as a real process against a tiny fixture tree w
   const root = tmpFixtureRoot();
   write(root, 'ok.test.mjs', "import { test } from 'node:test';\nimport assert from 'node:assert/strict';\ntest('ok', () => assert.ok(true));\n");
 
-  const scriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
+  const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
   const driver = path.join(root, 'drive.mjs');
   fs.writeFileSync(
     driver,
-    `import { runTests } from ${JSON.stringify(scriptPath)};\n` +
+    `import { runTests } from ${JSON.stringify(scriptUrl)};\n` +
       `const { status } = runTests({ root: ${JSON.stringify(root)}, cwd: ${JSON.stringify(root)}, stdio: 'ignore' });\n` +
       'process.exitCode = status;\n',
   );
@@ -226,11 +226,11 @@ test('the script itself, spawned as a real process against a tiny fixture tree w
 
 test('the script itself, spawned for real, refuses (non-zero, no crash) over an empty tree', () => {
   const root = tmpFixtureRoot();
-  const scriptPath = fileURLToPath(new URL('../../scripts/run-tests.mjs', import.meta.url));
+  const scriptUrl = new URL('../../scripts/run-tests.mjs', import.meta.url).href;
   const driver = path.join(root, 'drive.mjs');
   fs.writeFileSync(
     driver,
-    `import { runTests } from ${JSON.stringify(scriptPath)};\n` +
+    `import { runTests } from ${JSON.stringify(scriptUrl)};\n` +
       `const { status, message } = runTests({ root: ${JSON.stringify(path.join(root, 'empty'))}, stdio: 'ignore' });\n` +
       'if (message) console.error(message);\n' +
       'process.exitCode = status;\n',

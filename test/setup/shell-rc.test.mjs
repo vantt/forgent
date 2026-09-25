@@ -14,7 +14,7 @@ test('detectRcFiles returns only rc files that actually exist', () => {
   const homeDir = mkTempDir('shell-rc-detect-');
   fs.writeFileSync(path.join(homeDir, '.bashrc'), '');
 
-  const found = detectRcFiles(homeDir);
+  const found = detectRcFiles(homeDir, 'linux');
 
   assert.deepEqual(found, [path.join(homeDir, '.bashrc')]);
   fs.rmSync(homeDir, { recursive: true, force: true });
@@ -25,7 +25,7 @@ test('detectRcFiles returns both when bash and zsh rc files exist', () => {
   fs.writeFileSync(path.join(homeDir, '.bashrc'), '');
   fs.writeFileSync(path.join(homeDir, '.zshrc'), '');
 
-  const found = detectRcFiles(homeDir);
+  const found = detectRcFiles(homeDir, 'linux');
 
   assert.deepEqual(found, [path.join(homeDir, '.bashrc'), path.join(homeDir, '.zshrc')]);
   fs.rmSync(homeDir, { recursive: true, force: true });

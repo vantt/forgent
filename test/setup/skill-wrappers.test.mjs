@@ -256,6 +256,7 @@ function listFilesRecursiveSorted(dir) {
   const out = [];
   const walk = (d, rel) => {
     for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (/\.tmp-\d+/.test(entry.name)) continue;
       const relPath = rel ? `${rel}/${entry.name}` : entry.name;
       if (entry.isDirectory()) walk(path.join(d, entry.name), relPath);
       else out.push(relPath);
@@ -1074,7 +1075,7 @@ test('discoverSharedFragments rejects Unicode-normalized and Windows-normalized 
   );
 });
 
-test('discoverSharedFragments rejects backslash shared fragment names before Windows aliasing can occur', () => {
+test('discoverSharedFragments rejects backslash shared fragment names before Windows aliasing can occur', { skip: process.platform === 'win32' ? 'NTFS does not allow backslashes in filenames' : false }, () => {
   const root = mkTempDir('shared-backslash-alias-src-');
   const coreShared = path.join(root, 'core', 'skills', '_shared');
   fs.mkdirSync(coreShared, { recursive: true });

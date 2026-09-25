@@ -20,6 +20,8 @@ const __dirname = path.dirname(__filename);
 
 const FGCTL_BIN = releaseBinaryPath(path.resolve(REPO_ROOT, 'target', 'release'), 'fgctl');
 
+const releaseDirName = (digest) => (process.platform === 'win32' ? digest.replace(':', '-') : digest);
+
 let fixtureReleaseDir = null;
 let fixtureDigest = null;
 
@@ -33,6 +35,14 @@ function runFgctl(args, { cwd, stateHome, env = {} } = {}) {
     },
     encoding: 'utf8',
   });
+}
+
+function runShim(shimPath, args, opts = {}) {
+  if (process.platform === 'win32') {
+    const clean = shimPath.replace(/^\\\\\?\\/, '').replace(/\\/g, '/');
+    return spawnSync('sh', [clean, ...args], opts);
+  }
+  return spawnSync(shimPath, args, opts);
 }
 
 before(() => {
@@ -79,17 +89,19 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.ok(fs.existsSync(shimFgos), 'bin/fgos shim must exist');
     assert.ok(fs.existsSync(shimRunner), 'bin/fgos-runner shim must exist');
 
-    const fgosStat = fs.statSync(shimFgos);
-    const runnerStat = fs.statSync(shimRunner);
-    assert.ok((fgosStat.mode & 0o111) !== 0, 'bin/fgos must have executable bit set');
-    assert.ok((runnerStat.mode & 0o111) !== 0, 'bin/fgos-runner must have executable bit set');
+    if (process.platform !== 'win32') {
+      const fgosStat = fs.statSync(shimFgos);
+      const runnerStat = fs.statSync(shimRunner);
+      assert.ok((fgosStat.mode & 0o111) !== 0, 'bin/fgos must have executable bit set');
+      assert.ok((runnerStat.mode & 0o111) !== 0, 'bin/fgos-runner must have executable bit set');
+    }
 
     // 4. root.json exists and contains required fields
     const rootJsonPath = path.join(tempProj, '.fgos', 'installation', 'root.json');
     assert.ok(fs.existsSync(rootJsonPath), 'root.json must exist');
     const rootJson = JSON.parse(fs.readFileSync(rootJsonPath, 'utf8'));
     assert.equal(rootJson.schemaVersion, 1);
-    assert.equal(rootJson.repositoryRoot, fs.realpathSync(tempProj));
+    assert.equal(rootJson.repositoryRoot, fs.realpathSync.native ? fs.realpathSync.native(tempProj) : fs.realpathSync(tempProj));
     assert.equal(rootJson.machineReleaseStore, tempState);
     assert.equal(rootJson.workspaceId.length, 16);
     assert.equal(rootJson.workStateId, rootJson.workspaceId);
@@ -130,7 +142,7 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.ok(statuses.includes('complete'));
 
     // 8. version --runtime-json through the shim reports R10 fields with host: "rust"
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
@@ -140,20 +152,20 @@ test('R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.
     assert.equal(versionEnv.contract, 'fgos.v1');
     assert.equal(versionEnv.data.host, 'rust');
     assert.equal(versionEnv.data.artifactDigest, activation.artifactDigest);
-    assert.equal(versionEnv.data.projectRoot, fs.realpathSync(tempProj));
+    assert.equal(path.normalize(versionEnv.data.projectRoot), path.normalize(fs.realpathSync.native(tempProj)));
     assert.equal(versionEnv.data.workspaceId, rootJson.workspaceId);
     assert.equal(versionEnv.data.workStateId, rootJson.workStateId);
     assert.equal(
-      versionEnv.data.workHistoryRoot,
-      path.join(fs.realpathSync(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId)
+      path.normalize(versionEnv.data.workHistoryRoot),
+      path.normalize(path.join(fs.realpathSync.native(tempProj), '.fgos', 'local', 'work-state', rootJson.workStateId))
     );
-    assert.equal(versionEnv.data.machineReleaseStore, tempState);
+    assert.equal(path.normalize(versionEnv.data.machineReleaseStore), path.normalize(tempState));
     assert.equal(versionEnv.data.schemaVersion, 1);
     assert.ok(versionEnv.data.components?.legacyNode, 'components.legacyNode must be present');
     assert.equal(versionEnv.data.components.legacyNode.entry, 'bin/fgos.mjs');
 
     // 9. ready --json through the shim matches node bin/fgos.mjs ready --json
-    const shimReadyRes = spawnSync(shimFgos, ['ready', '--json'], {
+    const shimReadyRes = runShim(shimFgos, ['ready', '--json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',
@@ -606,7 +618,7 @@ test('Item 5: Staged release whose manifest.json digest mismatches pin is refuse
     assert.equal(stageRes.status, 0);
 
     // Tamper with manifest in staged release dir
-    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const stagedManifestPath = path.join(tempState, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
     manifest.artifactDigest = 'sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
     fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
@@ -658,7 +670,7 @@ test('Item 5 (widened): a tampered staged release is refused on the pin+matching
     // so only init's own post-match digest assertion can catch this.
     const stageRes = runFgctl(['stage', '--from', fixtureReleaseDir], { stateHome: tempState });
     assert.equal(stageRes.status, 0);
-    const stagedManifestPath = path.join(tempState, 'releases', fixtureDigest, 'manifest.json');
+    const stagedManifestPath = path.join(tempState, 'releases', releaseDirName(fixtureDigest), 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(stagedManifestPath, 'utf8'));
     manifest.artifactDigest = 'sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
     fs.writeFileSync(stagedManifestPath, JSON.stringify(manifest, null, 2));
@@ -879,12 +891,13 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     // into whatever cwd it is run from.
     fs.cpSync(fixtureReleaseDir, hostileReleaseDir, { recursive: true });
     const sentinel = path.join(outsideDir, 'pwned');
+    const sentinelPosix = sentinel.replaceAll('\\', '/');
     const hostileBin = path.join(hostileReleaseDir, 'bin', 'fgos');
     fs.writeFileSync(
       hostileBin,
       [
         '#!/bin/sh',
-        `printf executed > "${sentinel}"`,
+        `printf executed > "${sentinelPosix}"`,
         'printf executed > "$PWD/AGENTS.md"',
         `printf '{"contract":"fgos.v1","data":{"host":"rust","artifactDigest":"%s"}}\\n' "\${FGOS_CANDIDATE_ARTIFACT_DIGEST:-none}"`,
         'exit 0',
@@ -893,11 +906,14 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
       { mode: 0o755 }
     );
     fs.chmodSync(hostileBin, 0o755);
+    if (process.platform === 'win32') {
+      fs.copyFileSync(hostileBin, path.join(hostileReleaseDir, 'bin', 'fgos.exe'));
+    }
 
     const manifestPath = path.join(hostileReleaseDir, 'manifest.json');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     for (const f of manifest.files) {
-      if (f.path === 'bin/fgos') {
+      if (f.path === 'bin/fgos' || f.path === 'bin/fgos.exe') {
         f.digest = hashFile(hostileBin);
       }
     }
@@ -908,10 +924,15 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     // Control: the hostile entry really does write its sentinel when run,
     // so a missing sentinel below proves fgctl never ran it -- not that the
     // script is broken.
-    const control = spawnSync(hostileBin, ['version', '--runtime-json'], {
-      cwd: hostileReleaseDir,
-      encoding: 'utf8',
-    });
+    const control = process.platform === 'win32'
+      ? spawnSync('sh', [hostileBin, 'version', '--runtime-json'], {
+          cwd: hostileReleaseDir,
+          encoding: 'utf8',
+        })
+      : spawnSync(hostileBin, ['version', '--runtime-json'], {
+          cwd: hostileReleaseDir,
+          encoding: 'utf8',
+        });
     assert.equal(control.status, 0, `hostile control run must exit 0: ${control.stderr}`);
     assert.equal(fs.readFileSync(sentinel, 'utf8'), 'executed');
     fs.unlinkSync(sentinel);
@@ -936,12 +957,12 @@ test('P7 (red-team HIGH): a hostile candidate that passes every static preflight
     assert.doesNotMatch(res.stderr, /preflight failed/i, 'the hostile candidate is statically well-formed and must pass preflight');
 
     // The candidate was staged (its tree is a valid release) ...
-    assert.ok(fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'manifest.json')));
+    assert.ok(fs.existsSync(path.join(tempState, 'releases', releaseDirName(manifest.artifactDigest), 'manifest.json')));
     // ... but never executed: no sentinel outside the release tree, no
     // host-visible file in the candidate dir, the staged copy, or the project.
     assert.ok(!fs.existsSync(sentinel), 'preflight executed candidate bin/fgos (sentinel written outside release tree)');
     assert.ok(!fs.existsSync(path.join(hostileReleaseDir, 'AGENTS.md')), 'candidate wrote into its own source tree');
-    assert.ok(!fs.existsSync(path.join(tempState, 'releases', manifest.artifactDigest, 'AGENTS.md')), 'candidate wrote into the staged release');
+    assert.ok(!fs.existsSync(path.join(tempState, 'releases', releaseDirName(manifest.artifactDigest), 'AGENTS.md')), 'candidate wrote into the staged release');
     assert.ok(!fs.existsSync(path.join(tempProj, 'AGENTS.md')), 'candidate wrote into the project');
     assert.ok(!fs.existsSync(path.join(installDir, 'activation.json')), 'no activation may be published');
     assert.ok(!fs.existsSync(path.join(tempProj, '.fgos', 'distribution.json')), 'no pin may be written');
@@ -1067,7 +1088,7 @@ test('P7: Local runtime tail failure leaves workspace in diagnosable state with 
 
     // 3. Workspace is left in diagnosable state: version --runtime-json works through shim
     const shimFgos = path.join(tempProj, '.fgos', 'installation', 'bin', 'fgos');
-    const versionRes = spawnSync(shimFgos, ['version', '--runtime-json'], {
+    const versionRes = runShim(shimFgos, ['version', '--runtime-json'], {
       cwd: tempProj,
       env: { ...process.env, FGOS_STATE_HOME: tempState, HOME: tempHome },
       encoding: 'utf8',

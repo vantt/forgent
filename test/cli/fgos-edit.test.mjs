@@ -281,7 +281,7 @@ test('edit --verify-from-children generates a jq command listing all direct chil
   assert.match(verify, /delivered/);
   assert.match(verify, /retrospective/);
   assert.match(verify, /cleanup/);
-  assert.match(verify, /"done"/);
+  assert.match(verify, /\\?"done\\?"/);
   assert.ok(verify.includes(`--dir ${cwd}`), `expected --dir "${cwd}" (main checkout, not the worktree) in: ${verify}`);
   assert.ok(!verify.includes(worktreePath), `verify must not bake in the worktree's own path: ${verify}`);
 });

@@ -291,7 +291,7 @@ export const DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC = 3600; // 3600 seconds (1
  * discovered file. Returns 0 if `logPath` does not exist. */
 function getUncommittedEventCountForFile(logPath, repoRoot) {
   if (!fs.existsSync(logPath)) return 0;
-  const relPath = path.relative(repoRoot, logPath) || ".fgos/events.jsonl";
+  const relPath = (path.relative(repoRoot, logPath) || ".fgos/events.jsonl").replaceAll("\\", "/");
   let diskLines = 0;
   try {
     const rawDisk = fs.readFileSync(logPath, "utf8");
@@ -404,10 +404,10 @@ export function runOpportunisticMainCheckoutChecks(
     const eventsDirPath = path.join(fgosDir, "events");
     const pathspecs = [];
     if (fs.existsSync(logPath)) {
-      pathspecs.push(path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl");
+      pathspecs.push((path.relative(realRepoRoot, logPath) || ".fgos/events.jsonl").replaceAll("\\", "/"));
     }
     if (fs.existsSync(eventsDirPath)) {
-      pathspecs.push(path.relative(realRepoRoot, eventsDirPath));
+      pathspecs.push(path.relative(realRepoRoot, eventsDirPath).replaceAll("\\", "/"));
     }
     if (pathspecs.length > 0) {
       const statusOut = execFileSync("git", ["status", "--porcelain", "--", ...pathspecs], {

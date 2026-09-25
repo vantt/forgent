@@ -22,6 +22,7 @@
 // mirroring the production install layout -- the e2e test copies this file
 // alongside copies of those same two dependency files into a disposable
 // temp repo, preserving the same relative nesting.
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
@@ -92,8 +93,17 @@ function refuse(message) {
 // no STR65 guard below has anything real to protect there. The
 // staged-`.fgos/`-deletion guard is the one exception -- see
 // stagedFgosDeletions below.
+function normalizeFsPath(p) {
+  if (!p) return '';
+  try {
+    return (fs.realpathSync.native ? fs.realpathSync.native(p) : fs.realpathSync(p)).toLowerCase().replaceAll('\\', '/');
+  } catch {
+    return path.resolve(p).toLowerCase().replaceAll('\\', '/');
+  }
+}
+
 function hookRunsAtHome(repoRoot, actualToplevel) {
-  return actualToplevel === repoRoot;
+  return normalizeFsPath(actualToplevel) === normalizeFsPath(repoRoot);
 }
 
 // STAGED-FGOS-DELETION (tsk-56u): refuses any commit that stages a

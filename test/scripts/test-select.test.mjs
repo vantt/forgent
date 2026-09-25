@@ -507,7 +507,7 @@ test('runSelected: an all-matched change set runs runSelectedTests with exactly 
     },
   });
   assert.equal(result.decision, 'related');
-  assert.ok(captured.some((a) => a.endsWith('/a.test.mjs') || a === 'test/a.test.mjs'));
+  assert.ok(captured.some((a) => a.replaceAll('\\', '/').endsWith('/a.test.mjs') || a.replaceAll('\\', '/') === 'test/a.test.mjs'));
   assert.ok(!captured.some((a) => a.endsWith('unrelated.test.mjs')), 'the unrelated file must not be selected');
 });
 

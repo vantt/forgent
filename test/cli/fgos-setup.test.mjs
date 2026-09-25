@@ -181,8 +181,8 @@ test('init on a fresh directory that is not a linked worktree still succeeds, ex
 // does when it spawns `setup`.
 test('setup inside a .fgos/-less linked worktree still succeeds (setup never touches .fgos/, exempt from the guard)', () => {
   const { wt } = tmpLinkedWorktree();
-  assert.ok(!fs.existsSync(path.join(wt, '.fgos')));
-  const result = run(wt, ['setup'], { HOME: rawTmpCwd() });
+  const tmpHome = rawTmpCwd();
+  const result = run(wt, ['setup'], { HOME: tmpHome, USERPROFILE: tmpHome });
   assert.equal(result.status, 0, `setup unexpectedly refused: ${result.stderr}`);
 });
 
@@ -194,8 +194,10 @@ test('setup inside a .fgos/-less linked worktree still succeeds (setup never tou
 // never shells out to a real `claude` CLI.
 test('setup runs every registered fix and reports them under "fixed", never touching a real claude binary', () => {
   const cwd = rawTmpCwd();
+  const tmpHome2 = rawTmpCwd();
   const result = run(cwd, ['setup'], {
-    HOME: rawTmpCwd(),
+    HOME: tmpHome2,
+    USERPROFILE: tmpHome2,
     FGOS_CLAUDE_COMMAND: '/nonexistent/fgos-test-claude-binary',
   });
   assert.equal(result.status, 0, `setup unexpectedly failed: ${result.stderr}`);

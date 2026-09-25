@@ -103,12 +103,12 @@ function tryAcquireLockOnce(lockPath, pid) {
     fs.linkSync(tmpPath, lockPath);
     return { acquired: true };
   } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
+    if (err.code !== 'EEXIST' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
   } finally {
     try {
       fs.unlinkSync(tmpPath);
     } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
+      if (err.code !== 'ENOENT' && !(process.platform === 'win32' && (err.code === 'EPERM' || err.code === 'EBUSY'))) throw err;
     }
   }
 
@@ -116,7 +116,7 @@ function tryAcquireLockOnce(lockPath, pid) {
   try {
     raw = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null }; // released in between — retry create
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null }; // released in between — retry create
     throw err;
   }
   const holderPid = parseInt(raw.trim(), 10);
@@ -132,7 +132,7 @@ function tryAcquireLockOnce(lockPath, pid) {
   try {
     current = fs.readFileSync(lockPath, 'utf8');
   } catch (err) {
-    if (err.code === 'ENOENT') return { acquired: false, holderPid: null };
+    if (err.code === 'ENOENT' || err.code === 'EPERM' || err.code === 'EBUSY') return { acquired: false, holderPid: null };
     throw err;
   }
   if (current !== raw) {
@@ -142,7 +142,7 @@ function tryAcquireLockOnce(lockPath, pid) {
   try {
     fs.unlinkSync(lockPath);
   } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
+    if (err.code !== 'ENOENT' && err.code !== 'EPERM' && err.code !== 'EBUSY') throw err;
   }
   return { acquired: false, holderPid: null }; // cleaned and yield; next attempt creates
 }
@@ -163,7 +163,7 @@ export function acquireGatewayLock(fgosDir, { timeoutMs = 120000, retryMs = 100 
           try {
             fs.unlinkSync(lockPath);
           } catch (err) {
-            if (err.code !== 'ENOENT') throw err;
+            if (err.code !== 'ENOENT' && err.code !== 'EPERM') throw err;
           }
         },
       };

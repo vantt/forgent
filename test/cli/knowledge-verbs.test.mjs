@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { execSync } from 'node:child_process';
+import { execSync, execFileSync } from 'node:child_process';
 import { initStore, rebuild, StoreError } from '../../src/state/store.mjs';
 
 function setupGitRepoWithStore() {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-verbs-test-'));
+  const tmpDir = fs.realpathSync.native(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-verbs-test-')));
   execSync('git init', { cwd: tmpDir, stdio: 'ignore' });
   execSync('git config user.name "Test"', { cwd: tmpDir, stdio: 'ignore' });
   execSync('git config user.email "test@example.com"', { cwd: tmpDir, stdio: 'ignore' });
@@ -39,7 +39,7 @@ test('knowledge-verbs - topic register, rename, split, merge, retire', async () 
 
     // 3. topic split
     const intoJson = JSON.stringify([{ topicId: 't2', purposeSlug: 'worktree-reclaim' }, { topicId: 't3', purposeSlug: 'worktree-clean' }]);
-    execSync(`node "${fgosBin}" topic split t1 --into '${intoJson}'`, { cwd: tmpDir });
+    execFileSync(process.execPath, [fgosBin, 'topic', 'split', 't1', '--into', intoJson], { cwd: tmpDir });
     view = rebuild(fgosDir);
     assert.equal(view.topics.t1.status, 'retired');
     assert.equal(view.topics.t2.status, 'active');
@@ -74,7 +74,7 @@ test('knowledge-verbs - doc verbs resolve by (topicId, role) after topic split, 
       { topicId: 't2', purposeSlug: 'worktree-reclaim', rolesToMove: ['guide'] },
       { topicId: 't3', purposeSlug: 'worktree-cleanup' },
     ]);
-    execSync(`node "${fgosBin}" topic split t1 --into '${intoJson}'`, { cwd: tmpDir });
+    execFileSync(process.execPath, [fgosBin, 'topic', 'split', 't1', '--into', intoJson], { cwd: tmpDir });
 
     let view = rebuild(fgosDir);
     assert.equal(view.docs['t1:guide'].topicId, 't2');

@@ -248,7 +248,11 @@ function makeFakeGitFailingRevParseFor(branch) {
   return dir;
 }
 
-test('tsk-2cl: a commit whose branch tip becomes unreadable (rev-parse fails) is refused, not silently allowed through', () => {
+test('tsk-2cl: a commit whose branch tip becomes unreadable (rev-parse fails) is refused, not silently allowed through', (t) => {
+  if (process.platform === 'win32') {
+    t.skip('Fake git symlink wrapper requires POSIX git-core exec path');
+    return;
+  }
   const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
 
   // Establish a real lastSynced reflog entry first, same precondition
@@ -268,7 +272,11 @@ test('tsk-2cl: a commit whose branch tip becomes unreadable (rev-parse fails) is
   }
 });
 
-test('tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression guard on the fake-git harness itself)', () => {
+test('tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression guard on the fake-git harness itself)', (t) => {
+  if (process.platform === 'win32') {
+    t.skip('Fake git symlink wrapper requires POSIX git-core exec path');
+    return;
+  }
   const { worktreeRoot } = initSharedAbsoluteHooksPathFixture();
   const first = commitAsSession(worktreeRoot, {});
   assert.equal(first.status, 0, `setup: first worktree commit must succeed -- got: ${first.stderr}`);

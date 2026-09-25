@@ -60,7 +60,42 @@ pub fn is_pid_alive(pid: i32) -> bool {
     }
 }
 
-#[cfg(not(unix))]
+#[cfg(windows)]
+pub fn is_pid_alive(pid: i32) -> bool {
+    if pid <= 0 {
+        return false;
+    }
+    extern "system" {
+        fn OpenProcess(
+            dw_desired_access: u32,
+            b_inherit_handle: i32,
+            dw_process_id: u32,
+        ) -> *mut std::ffi::c_void;
+        fn CloseHandle(h_object: *mut std::ffi::c_void) -> i32;
+        fn WaitForSingleObject(h_handle: *mut std::ffi::c_void, dw_milliseconds: u32) -> u32;
+    }
+    const PROCESS_QUERY_LIMITED_INFORMATION: u32 = 0x1000;
+    const SYNCHRONIZE: u32 = 0x00100000;
+    const WAIT_TIMEOUT: u32 = 258;
+
+    unsafe {
+        let handle = OpenProcess(
+            PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE,
+            0,
+            pid as u32,
+        );
+        if handle.is_null() {
+            let err = std::io::Error::last_os_error();
+            // ERROR_ACCESS_DENIED (5) means the process exists under another user -- still alive.
+            return err.raw_os_error() == Some(5);
+        }
+        let wait_res = WaitForSingleObject(handle, 0);
+        CloseHandle(handle);
+        wait_res == WAIT_TIMEOUT
+    }
+}
+
+#[cfg(not(any(unix, windows)))]
 pub fn is_pid_alive(_pid: i32) -> bool {
     true
 }
