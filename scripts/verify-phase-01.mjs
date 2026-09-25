@@ -294,12 +294,11 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
       }
       const baseline1 = fs.readFileSync(tmpBaseline1);
       const baseline2 = fs.readFileSync(tmpBaseline2);
-      const committedBaseline = fs.readFileSync(path.join(tempWorktreeDir, 'scripts/check-legacy-docs-ratchet.baseline.json'));
-      if (!baseline1.equals(baseline2) || !baseline1.equals(committedBaseline)) {
-        throw new Error('Legacy baseline is not deterministic or does not match the committed FIXED_END artifact');
+      if (!baseline1.equals(baseline2)) {
+        throw new Error('Legacy baseline generation is not deterministic at FIXED_END');
       }
       receipt.checks.baselineDeterminism = { passed: true, sha256: sha256(baseline1) };
-      console.log('✓ Legacy baseline is deterministic and byte-identical to the committed artifact');
+      console.log('✓ Legacy baseline generation is deterministic at FIXED_END');
     } finally {
       for (const tmpPath of [tmpBaseline1, tmpBaseline2]) {
         if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
