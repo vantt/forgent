@@ -26,9 +26,9 @@ The cell branch is confirmed and isolated from main.
 node --test test/scripts/check-legacy-docs-ratchet.test.mjs test/scripts/generate-shipped-path-inventory.test.mjs
 ```
 
-Outcome: exit 0; 22 tests, 22 pass, 0 fail (202ms).
+Outcome: exit 0; 23 tests, 23 pass, 0 fail (202ms).
 - `check-legacy-docs-ratchet.test.mjs`: 17/17 passed (deterministic generation, class/scope classification, unreviewed new file refusal, accounted edit acceptance, unaccounted edit refusal, unexpected deletion refusal, malformed baseline validation, malformed exceptions validation, canonicalizeExceptionPath, lexical duplicate rejection across `./` and repeated-slash forms, traversal/absolute rejection [R2], dotfile refusal, deterministic in-process socket / explicit `t.skip` non-regular entry refusal [R4], symlink identity enforcement, symlink target change refusal, tree escape refusal, generated spec projection classification, CLI execution, live self-check).
-- `generate-shipped-path-inventory.test.mjs`: 5/5 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, CLI output).
+- `generate-shipped-path-inventory.test.mjs`: 6/6 passed (contract scope classification with mixed contract modeling, core/ path extraction and wrapped-path non-truncation, fenced prose and multiline command handling without glued fake tokens [R1], table-driven path grammar / negative glued tokens / positive counterexamples [R1 residual], deterministic inventory generation with zero unclassified paths and exact/generalized negative checks for `src/foo.mjscapability`, `src/runner/dispatch.mjsexecute`, and `GLUED_TOKEN_REGEX`, CLI output).
 
 ## 3. Live Ratchet Self-Check and Regeneration Comparison
 
