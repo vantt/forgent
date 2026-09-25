@@ -11,7 +11,7 @@
   - Evaluated Candidate SHA: `132d377794ee02da702ff12d91cfa1c1545bb275`
   - Re-Verification Report Reference: `ad293ba7d1dd7362dfde937cc006662a8153a74b:plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-post-integration-reverification-report.md`
 - **Capability**: `code:implement`
-- **Verdict**: **READY FOR INDEPENDENT REVIEW**
+- **Verdict**: **INTEGRATED & VERIFIED** (candidate `132d3777` + docs tip `ac19f6d1` fast-forward landed onto `main`; acceptance gate verified at `main@ac19f6d1`)
 
 ---
 
@@ -173,10 +173,10 @@ Result: **6 passed / 0 failed (458 ms)**. Mutation-sensitive: removing canonical
 
 ## 7. Cross-Plan Accounting
 
-- **Unit I08**: `REQUEST CHANGES pending remediation re-review/re-verification` (RV-01 blocker resolved by candidate `132d3777`, pending independent re-review and formal re-verification; NOT marked VERIFIED).
-- **Unit I08b**: `integrated, RV-01 follow-up remediation candidate pending review`.
-- **Unit I10**: `integrated and verified at main@605d26fe`, carried through synchronized main `26a1038e`.
-- **Unit I11**: **BLOCKED** (remains blocked until I08 remediation is reviewed, integrated, and re-verification reaches APPROVE; NOT marked READY).
+- **Unit I08**: **VERIFIED at main@ac19f6d1** (RV-01 blocker and RV-02 baseline defect resolved by candidate `132d3777` + docs tip `ac19f6d1`; acceptance gate re-verification complete: full suite run 3 exit 0 [7647 pass, 0 fail], 10/10 isolated coord pass, 10/10 isolated dispatch pass, 60/60 parallel load pass; timing instability recorded as LOW debt).
+- **Unit I08b**: `integrated at main@ba8f6a9d` (candidate merge `98f501be`, candidate `d4e052a6`, post-landing verified; followed by RV-01/RV-02 remediation candidate `132d3777` integrated on `main@ac19f6d1`).
+- **Unit I10**: `integrated and verified at main@605d26fe, carried forward` through synchronized main `26a1038e` and `main@ac19f6d1`.
+- **Unit I11**: **READY, not yet opened** (dependencies I03, I05, I08, and I10 satisfied; pending official Track Manager checkpoint signoff).
 - **Follow-up Finding N10**: unchanged, reserved for future adapter/vendor disentanglement.
 
 ---

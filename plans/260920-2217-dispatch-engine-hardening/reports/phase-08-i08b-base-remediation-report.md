@@ -211,5 +211,4 @@ Created dedicated automated regression test suite:
   - Comprehensive Root Suite (`test/runner/dispatch.test.mjs`): 387/387 PASS.
   - Affected Matrix (53 files): 1456/1457 PASS (1 skipped by design).
   - Full Repository Test Suite (`npm test`): 7603/7603 PASS (8 skipped, 65 todo, exit code 0).
-  - Candidate Regressions: Exactly 0.
-- **Unblock Progression**: Unit I08b integration candidate verified on branch (c6262fb1). Unit I08 is pending post-integration re-verification once I08b lands on main. Subsequent Unit I11 remains blocked pending I08 re-verification and I10 integration.
+- **Unblock Progression**: Unit I08b integrated at `main@ba8f6a9d`. Follow-up governance defects RV-01/RV-02 remediated in candidate `132d3777` + docs tip `ac19f6d1`. Unit I08 acceptance gate is **VERIFIED at main@ac19f6d1** (full suite exit 0, 80/80 stress pass). Unit I10 is **integrated and verified at main@605d26fe, carried forward**. Unit **I11 is READY, not yet opened** (pending official Track Manager checkpoint signoff).

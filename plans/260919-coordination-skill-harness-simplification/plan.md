@@ -1,8 +1,8 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea` (evaluated candidate `439a1fb0`, synchronized `6a638752` and `261ed7ea`, post-merge verification complete: 178/178 focused pass, affected dispatch/herdr pass); Unit I08 pending post-integration re-verification; Unit I08b integrated at `main@ba8f6a9d` (candidate merge `98f501be`, candidate `c6262fb1`, post-landing verified); Unit I10 ready for final independent review for integration (evaluated candidate `e516e975`, synchronized with `main@ba8f6a9d`); Unit I11 BLOCKED (pending I08 re-verification and I10 integration)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 READY (dependencies satisfied), pending official Track Manager checkpoint signoff
 Created: 2026-09-19
-Last Updated: 2026-09-24
+Last Updated: 2026-09-25
 Mode: high-risk
 Primary assessment:
 `plans/reports/coordination-skill-harness-architecture-audit-260919-report.md`
@@ -846,12 +846,20 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I08 — verify dispatch governance, CLI, doctor, and performance gates
   capability: code:test
   depends-on: I06 and I07
-  status: blocked on base defects F4/F5 (remediation unit required)
-  stop-condition: triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)
+  status: VERIFIED at main@ac19f6d1
+  stop-condition: CLEARED (base defects F4/F5 remediated in I08b; RV-01/RV-02 remediated in candidate 132d3777 + docs tip ac19f6d1)
   branch: `coordination-skill-harness-i08-dispatch-verification`
   worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i08-dispatch-verification`
   base-sha: `6f3fb9038fd66cd9943972a321eed2ba98587fab`
-  verification: 178/178 focused pass; 9/9 governance tests pass; affected matrix (55 files): 1455 pass, 0 fail, 1 skip
+  remediation-shas: `ba8f6a9dca8c84ba1561ab5802e2c89a2010446c` (I08b base remediation) + `132d377794ee02da702ff12d91cfa1c1545bb275` (RV-01/RV-02 governance fix) + `ac19f6d1e868c53b2bc59a2c9642ee0e37e7eb08` (docs/accounting tip)
+  acceptance-gate-reverification:
+    - full-repository-suite: Run 3 reached exit code 0 (7647 pass, 0 fail, 8 skipped, 68 todo; duration 364s). Runs 1 and 2 encountered load-sensitive concurrency timing contention (dispatch test line 5904 and fan-out rejection delay threshold 3637ms vs 2500ms limit), classified as timing instability (LOW debt).
+    - isolated-stress-testing: 10/10 pass on coordination-phase2-concurrency.test.mjs (160/160 pass, 0 fail); 10/10 pass on dispatch.test.mjs (3870/3870 pass, 0 fail).
+    - parallel-load-stress-testing: 10/10 iterations pass with 6 suites running concurrently (60/60 suite executions exit 0, 0 fail).
+    - baseline-comparison: verified on exact base 26a1038e worktree (dispatch.test.mjs exit 0, 387 pass; coordination-phase2-concurrency.test.mjs exit 0, 16 pass).
+    - evidence-inventory: 85 logs total on disk (83 manifest-hashed verification logs on ac19f6d1 + 2 baseline comparison logs on 26a1038e) in scratch/i08-reverification/.
+    - durable-artifacts: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-acceptance-gate-reverification-manifest.json` and `phase-08-i08-acceptance-gate-reverification-summary.md`.
+    - known-low-follow-up-debts: Set<string> canonicalization in checkProviderDisallowed helper, PlacementPolicy shadow gate raw providerModel comparison, test cleanup finally blocks, N10 adapter selection disentanglement.
   benchmark: 40 trials, median 38ms, p95 47ms vs baseline 46ms (threshold <= 146ms; pass)
   measurement-artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
   report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
@@ -887,14 +895,14 @@ Executor/provider/model/tier selection remains an execution-time decision.
   blast-radius: CRITICAL (189 symbols, 35 processes; GitNexus index degraded/stale per REV-14)
   rev05-policy: locked (shared-cwd read-only DAG caveat cannot be discharged in original session; original session must be cancelled; recheck runs in separate session; no adjudication event/lifecycle/store added)
   queued-for-i10-i11: I09-REV-12 (deferred outcome taxonomy), I09-REV-13 (disposition on caveated findings), I09-REV-14 (GitNexus index refresh), cwd helper consolidation
-  next-dependency-gate: I10 dependency gate SATISFIED (Unit I10 candidate ready for independent review, not integrated; production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; ready for review)
+  next-dependency-gate: I10 dependency gate SATISFIED (Unit I10 integrated and verified at main@605d26fe, carried forward through main@26a1038e and main@ac19f6d1; production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; Unit I10 VERIFIED)
   verification: 14 targeted suites (538 tests pass / 0 fail: 3 skill contract, 51 schema, 35 replay, 47 store, 43 hard budgets, 7 headless adapter, 16 migration/adversarial, 16 chain, 20 recovery, 86 run driver steps, 73 session engine / cli / declared-vs-agent-led, 16 master loop, 13 architecture manifest, 112 setup/checks); git diff --check clean
   report: plans/260919-coordination-skill-harness-simplification/reports/phase-03c-i09-dag-forward-port-implementation.md
   stop: port requires an alternate engine/store or weakens action/driver authority
 - unit: I10 — test DAG migration, cold resume, concurrency, and corrupt evidence
   capability: code:test
   depends-on: I09 (SATISFIED)
-  status: ready for final independent review for integration (synchronized with main@ba8f6a9d)
+  status: integrated and verified at main@605d26fe (carried through main@26a1038e and main@ac19f6d1)
   branch: `coordination-skill-harness-i10-dag-verification`
   implementation-base: `c386e9f30b1ac60d78675f688e8d10146f5e8949` (descendant containing 1ca4023c and 60132825)
   production-fix-commit: `3c49cf4205060fea998abfb2e9ef5df7b816a252`
@@ -903,7 +911,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
   pre-i08b-synchronized-sha: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (merges `origin/main@4ad0b8ca` into evaluated candidate `27ffb376`)
   i08b-candidate-baseline-sha: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be`)
   post-i08b-synchronized-candidate-sha: `949887407919ca8581cb7e800ef9142eba91c90b` (exact evaluated tip `e516e9750b81eb12b2db7fdff9280b8ee00d3abc`)
-  integrated-sha: (pending merge into main)
+  integrated-sha: `605d26fea5a67f61c7d40214f17b16eb09264b3f`
   verification: 41 tests across 5 test suites (38 passed, 3 todo, 0 failed; 10 matrix, 9 cold-resume, 9 concurrency, 9 corrupt evidence, 4 deferred findings probes); 538/538 pass across 16-suite focused matrix; coordination-wide suites: 1040 pass, 3 todo, 0 fail; dependency matrix: 37 pass, root dispatch 387 pass; full suite: 7775 pass, 3 todo, 0 fail (exit code 0); candidate regressions = 0
   deferred-findings: I09-REV-12 (OPEN, queued for I11: unlinked/retried node on resume uses deferred outcome taxonomy without concurrency-cap error), I09-REV-13 (OPEN, queued for I11: store-level recordDriverDisposition accepts caveated findings), store-scan (OPEN: manifest.assignmentRefs scan without dagNodeId filtering causes cross-node cwd attribution), replay-evidence-unification (OPEN, Track Manager ghi nhận dời việc thống nhất replaySession().dag.settled sang I11: replaySession dag.nodes[].settled is an event-log-only projection, while run and show execution doors inspect on-disk RunResult validity via readLinkedRunResultFromDisk)
   resolved-findings: F1 (RESOLVED: missing/corrupt RunResult on disk fails closed; sets settled: false and blocks descendant admission; verified live in test 8)
@@ -912,7 +920,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I11 — independently review combined Phase 2/3/dispatch/DAG runtime
   capability: code:review
   depends-on: I03, I05, I08, and I10
-  status: BLOCKED (pending I08 and I10)
+  status: READY (dependencies I03, I05, I08, and I10 satisfied), not yet opened
   stop: any contract/authority/atomicity/replay blocker remains
 - unit: I12 — refactor dispatch boundaries in small reversible Phase 09 cells
   capability: code:refactor
