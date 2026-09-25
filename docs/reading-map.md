@@ -11,7 +11,7 @@ Writer type: Human + agent coauthor
 Canonical for: Documentation entry routing
 Use this when: You need to decide which fgOS docs to read first
 Do not use this for: Documentation governance or complete file inventory
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-25
 Related:
 - `docs/doc-governance.md`
 - `docs/platform/README.md`
@@ -99,9 +99,9 @@ surface; it is evidence, not a promotion or migration switchboard.
 The full-horizon design is
 [documentation-system-unification.md](platform/proposals/documentation-system-unification.md).
 The proposed near-term authority migration is
-[plan.md](../plans/260925-documentation-authority-unification/plan.md). Only
-Phase 00 has been authorized; its existence does not authorize Phase 01 or any
-migration/cutover phase.
+[plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase
+00 is completed; Phases 01–09 remain unauthorized, and this plan's existence
+does not authorize migration or cutover.
 
 ## 4. Related Files
 

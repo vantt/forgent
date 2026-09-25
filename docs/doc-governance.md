@@ -11,7 +11,7 @@ Writer type: Human + agent coauthor
 Canonical for: fgOS documentation governance
 Use this when: Creating, reviewing, moving, or promoting maintained documentation
 Do not use this for: Current product behavior or implementation detail
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-25
 Related:
 - `docs/reading-map.md`
 - `docs/platform/README.md`

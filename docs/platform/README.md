@@ -11,7 +11,7 @@ Writer type: Human + agent coauthor
 Canonical for: Platform documentation entry and area registry
 Use this when: You need to understand or change fgOS platform behavior or design
 Do not use this for: User-facing task guidance or generated indexes
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-25
 Related:
 - `docs/doc-governance.md`
 - `docs/reading-map.md`
@@ -54,7 +54,7 @@ Target area docs live at `docs/platform/<area>/`.
 |---|---|---|
 | Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |
 | Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |
-| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phase 00 truth reset is authorized, Phases 01–09 are not |
+| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phase 00 truth reset is completed, Phases 01–09 remain unauthorized |
 | Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |
 | Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 

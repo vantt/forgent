@@ -5,8 +5,8 @@
 > path, ngày review, độ chi tiết, hoặc riêng metadata `Canonical:`. Bảng
 > kiểm chứng Phase 00 sống tại
 > `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`;
-> bảng đó không promote, migrate hay retire source nào. Chỉ Phase 00 đã được
-> authorize; Phase 01–09 vẫn chưa được phép chạy.
+> bảng đó không promote, migrate hay retire source nào. Phase 00 đã hoàn tất;
+> Phase 01–09 vẫn chưa được authorize.
 
 - `docs/platform-foundations.md` — văn bản gốc 8 luật nền platform (L1–L8); spec: docs/specs/platform-foundations.md
 - `docs/backlog.md` — product backlog (PBI rows, scribing-owned)

@@ -21,7 +21,7 @@ metadata field:
    owns every claim in the area.
 5. Surface an undeclared conflict. Do not choose by newest timestamp.
 
-Status vocabulary in this snapshot:
+Authority-status vocabulary in this snapshot:
 
 - `promoted`: the target portal owns current navigation for its declared scope and
   explicitly routes any retained source.
@@ -31,52 +31,58 @@ Status vocabulary in this snapshot:
 - `conflicted`: live declarations assign competing owners without a resolving
   scope rule. No unresolved `conflicted` row remained after the routing correction
   in this Phase 00 change; future evidence may re-open one.
+- `non-authority`: the artifact is generated, retained source, guidance, audit,
+  history, or evidence and does not own a maintained platform claim.
+
+`fileClass` is a separate physical/semantic classification. This snapshot uses
+`maintained-authority`, `generated`, `history-evidence`, and `retained-source`;
+a row may contain more than one class when an area route spans several files.
 
 ## 2. Area Routes
 
-| Area / surface | Status | Explicit current route | Live evidence checked |
-|---|---|---|---|
-| Platform laws | candidate | Enter at `docs/platform/platform-foundations.md`; read the complete binding wording, rationale, sources, and thresholds in `docs/platform-foundations.md`; use `docs/specs/platform-foundations.md` as its curated/spec projection. | The target anchor §§1–3 explicitly retains both owners; the root file says it is the full source retained during migration. |
-| Platform vision and work lifecycle | candidate | Enter at `docs/platform/vision.md`; use `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` for retained original direction and locked mission/priority wording. | Target vision metadata says “Yes, after review”; both root files identify their target entry and retained role. |
-| Whole-system architecture and component boundaries | candidate | Use `docs/architecture-map.md` for the full current architecture map; enter component-boundary work at `docs/platform/component-boundary.md`, then follow its current detailed sources under `docs/architect/component-boundary/`. | Both target anchors explicitly name the root/architect documents as current detailed or full legacy sources. |
-| System overview | legacy-current | `docs/specs/system-overview.md`, then the owning area routes in this table. | Its live Area Map and Shared Entities sections remain the only consolidated current cross-area spec. |
-| Work state / work lifecycle engine | legacy-current | `docs/specs/work-state.md`; use `docs/io-contract.md` for the CLI/runner I/O contract and `docs/work-item-lifecycle-vision.md` only for retained direction. | `docs/specs/reading-map.md` routes state modules to the work-state spec; no `docs/platform/work-state/` portal exists. |
-| Runner / dispatch / merge lifecycle | legacy-current | `docs/specs/runner.md`, plus `docs/routing-handoff-contract.md` for agent-to-agent handoff and the promoted Agent Coordination route for coordination-only claims. | `docs/specs/reading-map.md` maps runner sources to the runner spec; no `docs/platform/runner/` portal exists. |
-| Packaging-distribution | promoted | `docs/platform/packaging-distribution/README.md`, then its target vision/spec/contracts and implementation-alignment map; consult `docs/specs/distribution.md`, `docs/distribution-vision.md`, and `docs/architect/packaging-distribution/**` only in the roles the portal assigns. | Portal §§2–3 and §9 define the order and say the platform area is the active navigation surface. |
-| Host invocation routing | promoted | `docs/platform/host-invocation-routing/README.md`, then its target docs; retained `docs/architect/host-invocation-routing/**` remains legacy/current only where the portal or target inventory has not redirected/drained it. | Portal §§2, 3, and 8 state partial route migration and retained-source behavior. |
-| Agent coordination | promoted | `docs/platform/agent-coordination/README.md` owns navigation and migration status; its Status Summary chooses target indexes/summaries, while exact accepted contracts, schemas, ADRs, and proof remain under the portal-linked `docs/architect/agent-coordination/**` or `docs/specs/runner.md` until explicitly superseded. | Portal metadata limits its own scope; Read First and Status Summary explicitly route detailed authority. |
-| Agent confinement | legacy-current | `docs/specs/confinement-authority.md`, then `src/runner/dispatch/confinement/**` and linked tests for implementation proof. | `docs/specs/reading-map.md` names this spec/source pair; no target area portal exists. |
-| Claude plugin surface | legacy-current | `docs/specs/fgos-plugin.md`, then `plugins/fgOS/**`. | `docs/specs/system-overview.md` and `docs/specs/reading-map.md` identify this spec and implementation. |
-| Herdr gateway and web dashboard | legacy-current | `docs/specs/herdr-web-dashboard.md` for dashboard behavior, `docs/specs/runner.md` for runner/gateway integration, and `docs/operator-runbook-herdr-cockpit.md` for operations. | The detailed reading map names the dashboard source and spec; no target area portal exists. |
-| End-user authoring, index, and knowledge registry | legacy-current | Treat as the distinct user/end-user corpus: `docs/specs/enduser-docs-authoring.md`, `docs/specs/enduser-docs-index.md`, generated `docs/doc-registry.{md,json}`, and registry-backed `docs/knowledge/**`. Do not treat it as platform authority. | Governance separates `user/`, `knowledge/`, and platform topology; live `fgos knowledge status --json` reports the registry state. |
-| Decision citation drift | legacy-current | `docs/specs/decision-citation-drift.md`, `scripts/check-decision-citation-drift.mjs`, and its tests. | The detailed reading map names this exact source/spec/test route. |
-| Distillery / reference learning | legacy-current | `docs/specs/distillery.md` for current bounded behavior and `.agents/skills/distill/SKILL.md` for the portable operating surface. | The system overview marks the spec partial and separately records the skill-spec gap. |
-| Skills and domainization | legacy-current | `domains/<domain>/AGENTS.md`, canonical domain/core skill sources, and `docs/architect/domainization/README.md`; generated mirrors are projections, not authority. | `docs/platform/README.md` routes the area to domain/skill trees; the detailed map labels wrappers/mirrors and domainization sources. |
-| UI specification | legacy-current | `docs/ui-spec/**`; use the relevant implementation/spec owner for behavior outside visual/UI contracts. | `docs/platform/README.md` routes `ui-spec` to this existing root; no target area portal exists. |
-| Coexistence | legacy-current | `docs/coexistence.md`. | The root document identifies itself as the living execution doctrine; no promoted target claims it. |
-| Documentation system | legacy-current | `docs/doc-governance.md` governs docs and `docs/reading-map.md` routes readers. `docs/platform/proposals/documentation-system-unification.md` is long-horizon, non-canonical architecture; this plan is the proposed H1 program, with only Phase 00 authorized. | The governance and reading-map headers say Accepted/current; the proposal header says canonical for nothing until accepted. |
+| Area / surface | authorityStatus | fileClass | Explicit current route | Live evidence checked |
+|---|---|---|---|---|
+| Platform laws | candidate | maintained-authority + retained-source + generated | Enter at `docs/platform/platform-foundations.md`; read the complete binding wording, rationale, sources, and thresholds in `docs/platform-foundations.md`; use `docs/specs/platform-foundations.md` as its curated/spec projection. | The target anchor §§1–3 explicitly retains both owners; the root file says it is the full source retained during migration. |
+| Platform vision and work lifecycle | candidate | maintained-authority + retained-source | Enter at `docs/platform/vision.md`; use `docs/work-item-lifecycle-vision.md` and `docs/platform-foundations.md` for retained original direction and locked mission/priority wording. | Target vision metadata says “Yes, after review”; both root files identify their target entry and retained role. |
+| Whole-system architecture and component boundaries | candidate | maintained-authority + retained-source | Use `docs/architecture-map.md` for the full current architecture map; enter component-boundary work at `docs/platform/component-boundary.md`, then follow its current detailed sources under `docs/architect/component-boundary/`. | Both target anchors explicitly name the root/architect documents as current detailed or full legacy sources. |
+| System overview | legacy-current | maintained-authority | `docs/specs/system-overview.md`, then the owning area routes in this table. | Its live Area Map and Shared Entities sections remain the only consolidated current cross-area spec. |
+| Work state / work lifecycle engine | legacy-current | maintained-authority + retained-source | `docs/specs/work-state.md`; use `docs/io-contract.md` for the CLI/runner I/O contract and `docs/work-item-lifecycle-vision.md` only for retained direction. | `docs/specs/reading-map.md` routes state modules to the work-state spec; no `docs/platform/work-state/` portal exists. |
+| Runner / dispatch / merge lifecycle | legacy-current | maintained-authority | `docs/specs/runner.md`, plus `docs/routing-handoff-contract.md` for agent-to-agent handoff and the promoted Agent Coordination route for coordination-only claims. | `docs/specs/reading-map.md` maps runner sources to the runner spec; no `docs/platform/runner/` portal exists. |
+| Packaging-distribution | promoted | maintained-authority + retained-source | `docs/platform/packaging-distribution/README.md`, then its target vision/spec/contracts and implementation-alignment map; consult `docs/specs/distribution.md`, `docs/distribution-vision.md`, and `docs/architect/packaging-distribution/**` only in the roles the portal assigns. | Portal §§2–3 and §9 define the order and say the platform area is the active navigation surface. |
+| Host invocation routing | promoted | maintained-authority + retained-source | `docs/platform/host-invocation-routing/README.md`, then its target docs; retained `docs/architect/host-invocation-routing/**` remains legacy/current only where the portal or target inventory has not redirected/drained it. | Portal §§2, 3, and 8 state partial route migration and retained-source behavior. |
+| Agent coordination | promoted | maintained-authority + history-evidence | `docs/platform/agent-coordination/README.md` owns navigation and migration status; its Status Summary chooses target indexes/summaries, while exact accepted contracts, schemas, ADRs, and proof remain under the portal-linked `docs/architect/agent-coordination/**` or `docs/specs/runner.md` until explicitly superseded. | Portal metadata limits its own scope; Read First and Status Summary explicitly route detailed authority. |
+| Agent confinement | legacy-current | maintained-authority | `docs/specs/confinement-authority.md`, then `src/runner/dispatch/confinement/**` and linked tests for implementation proof. | `docs/specs/reading-map.md` names this spec/source pair; no target area portal exists. |
+| Claude plugin surface | legacy-current | maintained-authority | `docs/specs/fgos-plugin.md`, then `plugins/fgOS/**`. | `docs/specs/system-overview.md` and `docs/specs/reading-map.md` identify this spec and implementation. |
+| Herdr gateway and web dashboard | legacy-current | maintained-authority | `docs/specs/herdr-web-dashboard.md` for dashboard behavior, `docs/specs/runner.md` for runner/gateway integration, and `docs/operator-runbook-herdr-cockpit.md` for operations. | The detailed reading map names the dashboard source and spec; no target area portal exists. |
+| End-user authoring, index, and knowledge registry | non-authority | maintained-authority (user profile) + generated | Treat as the distinct user/end-user corpus: `docs/specs/enduser-docs-authoring.md`, `docs/specs/enduser-docs-index.md`, generated `docs/doc-registry.{md,json}`, and registry-backed `docs/knowledge/**`. Do not treat it as platform authority. | Governance separates `user/`, `knowledge/`, and platform topology; live `fgos knowledge status --json` reports the registry state. |
+| Decision citation drift | legacy-current | maintained-authority | `docs/specs/decision-citation-drift.md`, `scripts/check-decision-citation-drift.mjs`, and its tests. | The detailed reading map names this exact source/spec/test route. |
+| Distillery / reference learning | legacy-current | maintained-authority | `docs/specs/distillery.md` for current bounded behavior and `.agents/skills/distill/SKILL.md` for the portable operating surface. | The system overview marks the spec partial and separately records the skill-spec gap. |
+| Skills and domainization | legacy-current | maintained-authority + generated | `domains/<domain>/AGENTS.md`, canonical domain/core skill sources, and `docs/architect/domainization/README.md`; generated mirrors are projections, not authority. | `docs/platform/README.md` routes the area to domain/skill trees; the detailed map labels wrappers/mirrors and domainization sources. |
+| UI specification | legacy-current | maintained-authority | `docs/ui-spec/**`; use the relevant implementation/spec owner for behavior outside visual/UI contracts. | `docs/platform/README.md` routes `ui-spec` to this existing root; no target area portal exists. |
+| Coexistence | legacy-current | maintained-authority | `docs/coexistence.md`. | The root document identifies itself as the living execution doctrine; no promoted target claims it. |
+| Documentation system | legacy-current | maintained-authority + retained-source | `docs/doc-governance.md` governs docs and `docs/reading-map.md` routes readers. `docs/platform/proposals/documentation-system-unification.md` is long-horizon, non-canonical architecture; this plan is the proposed H1 program. Phase 00 is completed; Phases 01–09 remain unauthorized. | The governance and reading-map headers say Accepted/current; the proposal header says canonical for nothing until accepted. |
 
 ## 3. Root Document Routes
 
-| Root document | Status | Current role / route |
-|---|---|---|
-| `docs/README.md` | legacy-current | Accepted top-level documentation entry. |
-| `docs/architecture-map.md` | legacy-current | Full current architecture map; target `docs/platform/architecture-map.md` is a compact candidate entry. |
-| `docs/backlog.md` | legacy-current | Generated backlog projection from its declared event-sourced PBI records; never hand-edit. |
-| `docs/coexistence.md` | legacy-current | Living coexistence doctrine. |
-| `docs/distribution-vision.md` | promoted | Retained source/history only; current navigation is the Packaging-Distribution portal. |
-| `docs/doc-governance.md` | legacy-current | Accepted documentation-governance authority. |
-| `docs/doc-registry.md` | legacy-current | Generated end-user knowledge projection, not platform claim authority. |
-| `docs/id-systems-audit.md` | legacy-current | Final audit/evidence for the named identifier decisions; not a general current-area portal. |
-| `docs/io-contract.md` | legacy-current | Current CLI/runner I/O contract until a target contract explicitly supersedes it. |
-| `docs/operator-runbook-herdr-cockpit.md` | legacy-current | Current operator guide; it does not own runner or coordination truth. |
-| `docs/platform-foundations.md` | legacy-current | Complete locked-law source. The target foundation file is an entry/summary only. |
-| `docs/reading-map.md` | legacy-current | Accepted reader-routing authority during transition. |
-| `docs/routing-handoff-contract.md` | legacy-current | Current runner handoff contract. |
-| `docs/work-item-lifecycle-vision.md` | legacy-current | Retained vision source; current navigation starts at `docs/platform/vision.md`. |
+| Root document | authorityStatus | fileClass | Current role / route |
+|---|---|---|---|
+| `docs/README.md` | legacy-current | maintained-authority | Accepted top-level documentation entry. |
+| `docs/architecture-map.md` | legacy-current | maintained-authority | Full current architecture map; target `docs/platform/architecture-map.md` is a compact candidate entry. |
+| `docs/backlog.md` | non-authority | generated | Backlog projection from its declared event-sourced PBI records; never hand-edit. |
+| `docs/coexistence.md` | legacy-current | maintained-authority | Living coexistence doctrine. |
+| `docs/distribution-vision.md` | non-authority | retained-source | Historical wording and rationale only; current authority/navigation is the promoted Packaging-Distribution portal. |
+| `docs/doc-governance.md` | legacy-current | maintained-authority | Accepted documentation-governance authority. |
+| `docs/doc-registry.md` | non-authority | generated | End-user knowledge projection; does not own a platform claim. |
+| `docs/id-systems-audit.md` | non-authority | history-evidence | Final audit/evidence for the named identifier decisions; not a current-area owner. |
+| `docs/io-contract.md` | legacy-current | maintained-authority | Current CLI/runner I/O contract until a target contract explicitly supersedes it. |
+| `docs/operator-runbook-herdr-cockpit.md` | legacy-current | maintained-authority | Current operator procedure; it does not own runner or coordination truth. |
+| `docs/platform-foundations.md` | legacy-current | maintained-authority | Complete locked-law source. The target foundation file is an entry/summary only. |
+| `docs/reading-map.md` | legacy-current | maintained-authority | Accepted reader-routing authority during transition. |
+| `docs/routing-handoff-contract.md` | legacy-current | maintained-authority | Current runner handoff contract. |
+| `docs/work-item-lifecycle-vision.md` | non-authority | retained-source | Original direction and unresolved questions; current navigation starts at `docs/platform/vision.md`. |
 
-`docs/doc-registry.md` and `docs/backlog.md` are included because they are root
-Markdown surfaces, but their generated status means they do not establish new
+Generated, retained-source, and history-evidence rows remain listed because they
+are root Markdown surfaces and routing inputs, not because they establish
 platform-documentation authority.
 
 ## 4. Always-Loaded Bypasses
@@ -143,4 +149,4 @@ inventory remains a blocking requirement before any evidence move or deletion.
 
 This map performs no source promotion, migration, deletion, legacy redirect,
 claim conservation, alias implementation, ratchet, or consumer rewrite. Those
-remain Phase 01–09 work and are unauthorized by the Phase 00 authorization.
+remain Phase 01–09 work and are unauthorized. Phase 00 itself is completed.

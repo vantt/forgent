@@ -238,7 +238,7 @@ permission to execute it.
 
 | Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
 |---|---|---|---|---|
-| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Commit `a725d4788`; execution record, authority map, correction note, two independent reviews |
+| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..HEAD`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
 | 01 | `not-started`, `not-authorized` | None | Phase 00 complete; requires separate authorization | Switchboard, vocabulary, baseline, ratchet, and shipped-path inventory do not exist yet |
 | 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
 | 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
@@ -251,7 +251,10 @@ permission to execute it.
 
 ### Phase 00 — Correct planning and routing semantics
 
-**Status:** `completed` — gate passed in commit `a725d4788`; no later-phase authority implied.
+**Status:** `completed` — review and merge the complete range `ac19f6d1e..HEAD`,
+not `a725d4788` alone. The range includes the implementation commit
+`a725d4788`, status commit `0c38df980`, and the Phase 00 review-follow-up at
+HEAD. No later-phase authority is implied.
 **Mode:** planning/documentation only
 **Purpose:** Ensure every artifact tells the truth about what is historical,
 active, canonical, candidate, or preserved future intent.
@@ -265,7 +268,8 @@ Deliverables:
 - update the platform intent ledger with future engine commitments and source/
   evidence pointers;
 - produce a verified current-authority table per area and root document with
-  `promoted`, `candidate`, `legacy-current`, or `conflicted` status;
+  separate `authorityStatus` and `fileClass` dimensions; authority status is
+  `promoted`, `candidate`, `legacy-current`, `conflicted`, or `non-authority`;
 - resolve the contradiction between accepted `docs/doc-governance.md` §13,
   `docs/reading-map.md`, `docs/specs/reading-map.md`, and portal declarations;
 - identify every always-loaded pointer that bypasses the transitional route;
@@ -288,6 +292,8 @@ Phase 00 evidence:
 
 - isolated-worktree execution record and input digests:
   `phase-00-execution-record.md`;
+- reproducible commands, exit codes, and summaries:
+  `phase-00-verification.md`;
 - verified area/root routing map:
   `current-authority-map-2026-09-25.md`;
 - historical-registry current-state correction:
@@ -744,6 +750,7 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - Historical registry implementation: `plans/260825-1841-knowledge-registry/`
 - Historical registry current-state correction: `plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`
 - Phase 00 execution record: `plans/260925-documentation-authority-unification/phase-00-execution-record.md`
+- Phase 00 verification: `plans/260925-documentation-authority-unification/phase-00-verification.md`
 - Verified Phase 00 authority map: `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`
 - Independent review prompt: `plans/260925-documentation-authority-unification/independent-frontier-review-prompt.md`
 - First independent review: `plans/260925-documentation-authority-unification/independent-frontier-review-2026-09-25.md`

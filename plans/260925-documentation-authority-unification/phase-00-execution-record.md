@@ -6,6 +6,7 @@ Authorization: Direct human request, 2026-09-25
 Branch: plan/260925-documentation-authority-unification
 Worktree: /home/vantt/projects/forgentX-phase00-documentation-authority-unification
 Base: ac19f6d1e868c53b2bc59a2c9642ee0e37e7eb08
+Review unit: ac19f6d1e..HEAD (entire Phase 00 branch range, not a725d4788 alone)
 Initial worktree state: clean
 Main checkout: reference/read-only; pre-existing dirty state left untouched
 ```
@@ -72,5 +73,15 @@ cee0c5fed2436a558c1d9d04f660fd39d63d86a28ebaa12d021f7b3d63c3afbe  docs/platform/
   findings; registry-specific drift also existed and is recorded in the
   authority map/correction note.
 
-Final checks and the Phase 00 commit are reported by the implementing session;
-this record does not claim later-phase readiness.
+## Verification And Review Unit
+
+Reproducible commands, exit codes, summaries, precondition repairs, and scope
+checks are recorded in [phase-00-verification.md](phase-00-verification.md).
+
+Review and merge the complete range `ac19f6d1e..HEAD`. It includes the Phase 00
+implementation commit `a725d4788`, the detailed-status commit `0c38df980`, and
+the review-follow-up commit at HEAD. Reviewing `a725d4788` alone omits the
+settled phase status and review corrections.
+
+This record does not claim later-phase readiness. Phases 01–09 remain
+unauthorized.
