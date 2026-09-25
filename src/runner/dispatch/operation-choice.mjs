@@ -15,7 +15,11 @@ import {
   DEFAULT_DOMAIN,
   resolveDomainName,
   operationsForStage,
+  DOMAINS,
+  skillForStage,
 } from '../../state/workflow-stage-graphs.mjs';
+import { DEFAULTS } from '../../state/work.mjs';
+import { selectTemplate, renderTemplate } from '../prompt-templates.mjs';
 import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
@@ -2283,4 +2287,238 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     canAdvanceEdge: false,
     stop: true,
   };
+}
+
+/**
+ * Executor identifier for a work item's executing-stage dispatch (D3,
+ * tsk-62v): the skill name executing-stage resolves to for the item's
+ * domain — the same `skillForStage`/`DOMAINS` formula `buildPrompt` already
+ * applies internally to build its own `skillPath`.
+ *
+ * Boundary Note (R2 / Phase 09):
+ * Moved to operation-choice.mjs (Work Driver compatibility) to remove
+ * workflow/stage/skill lookup from dispatch core.
+ *
+ * `stage` defaults to `stage ?? work?.stage ?? 'executing'`.
+ */
+export function executorIdForWork(work, stage) {
+  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  return skillForStage(domainObj, targetStage);
+}
+
+/**
+ * Resolve the effective capability identity and anchor details for an invocation.
+ *
+ * Boundary Note (R2 / Phase 09):
+ * Moved to operation-choice.mjs (Work Driver compatibility) to remove
+ * workflow/stage/skill lookup from dispatch core.
+ */
+export function resolveCapabilityIdentityDetails({
+  cfg,
+  work,
+  stage,
+  executorId,
+  resolvedExecutor,
+  purpose,
+} = {}) {
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+
+  function resolveAlias(name) {
+    if (!name || typeof name !== 'string') return name;
+    if (capabilities[name]) return name;
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {
+        return capName;
+      }
+    }
+    return name;
+  }
+
+  const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()
+    ? resolveAlias(purpose.trim())
+    : null;
+
+  const domain = resolveDomainName(work?.domain);
+  const domainObj = DOMAINS[domain];
+  const targetStage = stage ?? work?.stage ?? 'executing';
+  const stageSkill = skillForStage(domainObj, targetStage) ?? (typeof executorId === 'string' ? executorId : null);
+
+  const candidateSet = new Set();
+
+  // Curated mapping: executing / fgos-coding-implement -> code:implement for coding domain
+  if (domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement')) {
+    candidateSet.add('code:implement');
+  }
+
+  // Step mapping: e.g. executing -> Execute -> execute
+  const step = domainObj?.stepMap?.[targetStage];
+  if (step && typeof step === 'string') {
+    candidateSet.add(step.toLowerCase());
+  }
+
+  // Domain-folded stage name itself (e.g. discovery, exploring, planning, validating, executing)
+  if (targetStage && typeof targetStage === 'string') {
+    candidateSet.add(targetStage);
+  }
+
+  // Stage skill name itself (e.g. fgos-coding-implement, fgos-coding-planning)
+  if (stageSkill && typeof stageSkill === 'string') {
+    candidateSet.add(stageSkill);
+  }
+
+  // Work properties (kind, role)
+  if (work?.kind && typeof work.kind === 'string') {
+    candidateSet.add(work.kind);
+  }
+  if (work?.role && typeof work.role === 'string') {
+    candidateSet.add(work.role);
+    if (work.role === 'advisor') candidateSet.add('advise');
+    if (work.role === 'reviewer') candidateSet.add('code:review');
+  }
+
+  // Executor declared capabilities (`for: [...]`)
+  if (Array.isArray(resolvedExecutor?.for)) {
+    for (const f of resolvedExecutor.for) {
+      if (typeof f === 'string' && f.trim()) {
+        candidateSet.add(f.trim());
+      }
+    }
+  }
+
+  // Capabilities in config that `prefer` this executor
+  if (executorId || resolvedExecutor) {
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
+        candidateSet.add(capName);
+      }
+    }
+  }
+
+  // Executor ID itself
+  if (executorId && typeof executorId === 'string') {
+    candidateSet.add(executorId);
+  }
+
+  // Normalize all candidates through aliases
+  const normalizedCandidates = Array.from(candidateSet)
+    .map((c) => resolveAlias(c))
+    .filter(Boolean);
+
+  // An explicitly requested purpose remains the dispatched capability.  The
+  // other candidates still matter: if that generic purpose has no policy,
+  // they retain the concrete capability from which confinement can inherit.
+  let capability = explicitPurpose;
+  if (!capability && normalizedCandidates.length === 0) {
+    capability = stageSkill ?? executorId ?? '(unknown-capability)';
+  }
+
+  // Order-independent resolution rule:
+  // 1. Any candidate with required confinement (confinement.mode === 'required') wins!
+  const requiredCandidates = normalizedCandidates.filter(
+    (c) => capabilities[c]?.confinement?.mode === 'required',
+  );
+  if (!capability && requiredCandidates.length > 0) {
+    requiredCandidates.sort();
+    capability = requiredCandidates[0];
+  }
+
+  // 2. Any candidate with configured confinement wins next
+  const configuredConfinementCandidates = normalizedCandidates.filter(
+    (c) => Boolean(capabilities[c]?.confinement),
+  );
+  if (!capability && configuredConfinementCandidates.length > 0) {
+    configuredConfinementCandidates.sort();
+    capability = configuredConfinementCandidates[0];
+  }
+
+  // 3. Prefer curated 'code:implement' if coding executing
+  if (!capability && domain === DEFAULT_DOMAIN && (targetStage === 'executing' || stageSkill === 'fgos-coding-implement') && normalizedCandidates.includes('code:implement')) {
+    capability = 'code:implement';
+  }
+
+  // 4. Prefer registered capabilities in cfg.capabilities
+  const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
+  if (!capability && registeredCandidates.length > 0) {
+    registeredCandidates.sort();
+    capability = registeredCandidates[0];
+  }
+
+  // 5. Fallback: sorted candidates first.
+  if (!capability) {
+    normalizedCandidates.sort();
+    capability = normalizedCandidates[0];
+  }
+
+  // Preserve the actual configured capability that a generic selected
+  // identity came from.  `buildConfinementRequest` only uses this when the
+  // selected capability and stage skill have no policy of their own.
+  const policyAnchors = normalizedCandidates
+    .filter((candidate) => candidate !== capability && capabilities[candidate]?.confinement);
+  const requiredAnchors = policyAnchors.filter(
+    (candidate) => capabilities[candidate]?.confinement?.mode === 'required',
+  ).sort();
+  const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
+
+  return { capability, anchorCapability };
+}
+
+export function resolveCapabilityIdentity(args = {}) {
+  return resolveCapabilityIdentityDetails(args).capability;
+}
+
+/**
+ * Build the worker prompt from a work item's own fields (title/kind/refs/
+ * verify, per D3) — the five framing sections are a fixed contract (tests
+ * pin their presence): Goal, Description, Worktree boundary, Expected
+ * proof, and Constraints (the D3 "never call fgos yourself" rule).
+ *
+ * Boundary Note (R2 / Phase 09):
+ * Moved to operation-choice.mjs (Work Driver compatibility) to remove
+ * workflow/stage/skill lookup from dispatch core.
+ *
+ * `stage` (tsk-5mj D1/D6/D7): which of the item's own domain stages this
+ * dispatch is FOR — defaults to `'executing'`.
+ */
+export function buildPrompt(work, feedback, stage = 'executing') {
+  const refs = Array.isArray(work.refs) && work.refs.length ? work.refs.join(', ') : '(none)';
+
+  let feedbackSection = '';
+  const answer = feedback && typeof feedback.answer === 'string' && feedback.answer.trim() ? feedback.answer : null;
+  const reason = feedback && typeof feedback.reason === 'string' && feedback.reason.trim() ? feedback.reason : null;
+  if (answer || reason) {
+    const lines = [];
+    if (answer) lines.push(`Human answer (binding decision):\n${answer}`);
+    if (reason) lines.push(`Latest human rejection/park reason (fix THIS before anything else):\n${reason}`);
+    feedbackSection = `\n# Human feedback\n${lines.join('\n\n')}\n`;
+  }
+  const description = work.description ?? '(không có)';
+
+  const action = typeof work.action === 'string' && work.action.trim() ? work.action : '(không có)';
+  const readFirst =
+    Array.isArray(work.footprint) && work.footprint.length ? work.footprint.join(', ') : '(không có)';
+  const docsRefPointer =
+    typeof work.docsRef === 'string' && work.docsRef.trim()
+      ? `${work.docsRef.replace(/\/+$/, '')}/plan.md and .../CONTEXT.md (if present) — the locked decisions and chosen approach for this item`
+      : '(none)';
+
+  const domainName = resolveDomainName(work.domain);
+  const domainObj = DOMAINS[domainName];
+  const skillName = skillForStage(domainObj, stage);
+  const skillPath = `.claude/skills/${skillName}/SKILL.md`;
+
+  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain, stage });
+  return renderTemplate(templateName, {
+    title: work.title,
+    kind: work.kind,
+    description,
+    feedbackSection,
+    action,
+    readFirst,
+    docsRefPointer,
+    refs,
+    verify: work.verify,
+    domain: domainName,
+    skillPath,
+  });
 }

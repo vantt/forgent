@@ -282,7 +282,7 @@ Forbidden dependencies for all eight:
 
 - no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
 - no event store append (`appendEvent`): audit dispatch logging is isolated to `src/runner/dispatch-log.mjs` outside dispatch core;
-- no workflow/stage/task/skill lookup;
+- no workflow/stage/task/skill lookup: dispatch core (`resolve.mjs`, `prepare.mjs`) contains zero direct `workflow-stage-graphs` imports (verified by boundary test); Work Driver compatibility lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) are housed in `operation-choice.mjs`;
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
 - no RunResult confidence decision (owned by the Run Result Evaluator);

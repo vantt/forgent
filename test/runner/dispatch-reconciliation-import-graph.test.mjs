@@ -166,3 +166,10 @@ test('boundary test: src/runner/dispatch/** does not reference pick/return verbs
 
   assert.deepEqual(violations, [], `src/runner/dispatch/** must not reference 'pick', 'return', or appendEvent:\n${violations.join('\n')}`);
 });
+
+test('boundary test: dispatch core (resolve.mjs, prepare.mjs) does not import workflow-stage-graphs directly (R2)', () => {
+  const resolveSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/resolve.mjs'), 'utf8');
+  const prepareSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/prepare.mjs'), 'utf8');
+  assert.doesNotMatch(resolveSource, /workflow-stage-graphs\.mjs/);
+  assert.doesNotMatch(prepareSource, /workflow-stage-graphs\.mjs/);
+});
