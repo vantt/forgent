@@ -12,10 +12,10 @@
     ".fgos/instructions/effective"
   ],
   "scannedFilesCount": 248,
-  "totalUniquePathsCount": 189,
+  "totalUniquePathsCount": 183,
   "summary": {
-    "consumerProjectContractsCount": 70,
-    "repositoryLocalContractsCount": 112,
+    "consumerProjectContractsCount": 69,
+    "repositoryLocalContractsCount": 107,
     "mixedRepositoryLocalAndConsumerCount": 7,
     "unclassifiedCount": 0,
     "mixedCount": 7
@@ -586,17 +586,6 @@
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
     },
     {
-      "path": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli",
-      "occurrencesCount": 3,
-      "referencedIn": [
-        ".agents/skills/_shared/executor-dispatch-fallback.md",
-        "core/skills/_shared/executor-dispatch-fallback.md",
-        "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md"
-      ],
-      "contractScope": "repository-local-contract",
-      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-    },
-    {
       "path": "docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md",
       "occurrencesCount": 6,
       "referencedIn": [
@@ -612,11 +601,13 @@
     },
     {
       "path": "docs/distillery",
-      "occurrencesCount": 7,
+      "occurrencesCount": 9,
       "referencedIn": [
+        ".agents/skills/distill/SKILL.md",
         ".agents/skills/distill/references/consult-protocol.md",
         ".agents/skills/distill/references/extract-rules.md",
         ".agents/skills/distill/scripts/distill.mjs",
+        "core/skills/distill/SKILL.md",
         "core/skills/distill/references/consult-protocol.md",
         "core/skills/distill/references/extract-rules.md",
         "core/skills/distill/scripts/distill.mjs",
@@ -693,10 +684,8 @@
     },
     {
       "path": "docs/distillery/taxonomy.txt",
-      "occurrencesCount": 3,
+      "occurrencesCount": 1,
       "referencedIn": [
-        ".agents/skills/distill/SKILL.md",
-        "core/skills/distill/SKILL.md",
         "core/task-specs/distill.md"
       ],
       "contractScope": "consumer-project-contract",
@@ -738,7 +727,7 @@
     },
     {
       "path": "docs/history",
-      "occurrencesCount": 55,
+      "occurrencesCount": 53,
       "referencedIn": [
         ".agents/skills/_shared/citation-format.md",
         ".agents/skills/fgos-coding-discovering/SKILL.md",
@@ -776,8 +765,6 @@
         "domains/coding/task-specs/lock-decisions.md",
         "domains/coding/task-specs/shape-plan.md",
         "plugins/fgOS/skills/_shared/citation-format.md",
-        "plugins/fgOS/skills/cleanup-loop/SKILL.md",
-        "plugins/fgOS/skills/cleanup-next/SKILL.md",
         "plugins/fgOS/skills/coding-shape-distill/SKILL.md",
         "plugins/fgOS/skills/coding-shape/SKILL.md",
         "plugins/fgOS/skills/fgos-coding-discovering/SKILL.md",
@@ -852,24 +839,6 @@
       "occurrencesCount": 1,
       "referencedIn": [
         "domains/coding/AGENTS.md"
-      ],
-      "contractScope": "repository-local-contract",
-      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-    },
-    {
-      "path": "docs/history/discover-decompose-skill",
-      "occurrencesCount": 1,
-      "referencedIn": [
-        "plugins/fgOS/skills/plan/SKILL.md"
-      ],
-      "contractScope": "repository-local-contract",
-      "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
-    },
-    {
-      "path": "docs/history/discover-decompose-skill-wrapper-verdict-routing",
-      "occurrencesCount": 1,
-      "referencedIn": [
-        "plugins/fgOS/skills/discover/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
       "rationale": "Internal fgOS platform specification, architecture, decision history, or governance"
@@ -1015,8 +984,9 @@
     },
     {
       "path": "docs/history/retro-next-shared-driving/CONTEXT.md",
-      "occurrencesCount": 1,
+      "occurrencesCount": 2,
       "referencedIn": [
+        "plugins/fgOS/skills/cleanup-next/SKILL.md",
         "plugins/fgOS/skills/retro-next/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
@@ -1132,23 +1102,15 @@
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
     },
     {
-      "path": "docs/how-to/preserve",
-      "occurrencesCount": 3,
-      "referencedIn": [
-        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
-        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
-      ],
-      "contractScope": "consumer-project-contract",
-      "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
-    },
-    {
       "path": "docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md",
-      "occurrencesCount": 3,
+      "occurrencesCount": 6,
       "referencedIn": [
         ".agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
         "domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
-        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md"
+        "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md",
+        "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md"
       ],
       "contractScope": "consumer-project-contract",
       "rationale": "Diataxis end-user knowledge quadrants and tag index authored in consumer projects"
@@ -1562,22 +1524,14 @@
     },
     {
       "path": "src/foo.mjs",
-      "occurrencesCount": 3,
-      "referencedIn": [
-        ".agents/skills/fgos-code-panel/SKILL.md",
-        "domains/coding/skills/fgos-code-panel/SKILL.md",
-        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
-      ],
-      "contractScope": "repository-local-contract",
-      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
-    },
-    {
-      "path": "src/foo.mjscapability",
-      "occurrencesCount": 3,
+      "occurrencesCount": 6,
       "referencedIn": [
         ".agents/skills/_shared/planning-capability-awareness.md",
+        ".agents/skills/fgos-code-panel/SKILL.md",
         "core/skills/_shared/planning-capability-awareness.md",
-        "plugins/fgOS/skills/_shared/planning-capability-awareness.md"
+        "domains/coding/skills/fgos-code-panel/SKILL.md",
+        "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+        "plugins/fgOS/skills/fgos-code-panel/SKILL.md"
       ],
       "contractScope": "repository-local-contract",
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
@@ -1720,7 +1674,7 @@
     },
     {
       "path": "src/runner/dispatch.mjs",
-      "occurrencesCount": 24,
+      "occurrencesCount": 27,
       "referencedIn": [
         ".agents/skills/_shared/capability-catalog.md",
         ".agents/skills/_shared/executor-dispatch-fallback.md",
@@ -1728,6 +1682,7 @@
         ".agents/skills/fgos-architecture-panel/SKILL.md",
         ".agents/skills/fgos-capability-dispatching/SKILL.md",
         ".agents/skills/fgos-coding-implement/SKILL.md",
+        ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
         ".agents/skills/fgos-fanout/SKILL.md",
         ".agents/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
         "core/skills/_shared/capability-catalog.md",
@@ -1738,25 +1693,16 @@
         "core/skills/fgos-fanout/SKILL.md",
         "core/skills/fgos-fanout/references/wave-dispatch-mechanics.md",
         "domains/coding/skills/fgos-coding-implement/SKILL.md",
+        "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
         "plugins/fgOS/skills/_shared/capability-catalog.md",
         "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
         "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
         "plugins/fgOS/skills/fgos-architecture-panel/SKILL.md",
         "plugins/fgOS/skills/fgos-capability-dispatching/SKILL.md",
         "plugins/fgOS/skills/fgos-coding-implement/SKILL.md",
+        "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md",
         "plugins/fgOS/skills/fgos-fanout/SKILL.md",
         "plugins/fgOS/skills/fgos-fanout/references/wave-dispatch-mechanics.md"
-      ],
-      "contractScope": "repository-local-contract",
-      "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"
-    },
-    {
-      "path": "src/runner/dispatch.mjsexecute",
-      "occurrencesCount": 3,
-      "referencedIn": [
-        ".agents/skills/fgos-coding-implement/references/implement-and-collaboration.md",
-        "domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md",
-        "plugins/fgOS/skills/fgos-coding-implement/references/implement-and-collaboration.md"
       ],
       "contractScope": "repository-local-contract",
       "rationale": "Internal fgOS implementation code, CLI binaries, tests, or scripts"

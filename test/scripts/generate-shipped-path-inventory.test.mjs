@@ -11,6 +11,9 @@ import {
   extractPathReferences,
   generateInventory,
   generateMarkdownReport,
+  normalizeContent,
+  GLUED_TOKEN_REGEX,
+  PATH_REGEX,
 } from '../../scripts/generate-shipped-path-inventory.mjs';
 
 const SCRIPT_PATH = fileURLToPath(
@@ -85,6 +88,68 @@ test('extractPathReferences: extracts core/ conventions and avoids truncated jun
   }
 });
 
+test('extractPathReferences: handles fenced prose and multiline commands without gluing fake tokens (R1)', () => {
+  const tmp = mkTmpDir();
+  try {
+    const fileA = path.join(tmp, 'fenced-and-commands.md');
+    fs.writeFileSync(
+      fileA,
+      [
+        '# Fenced prose fixture',
+        '```text',
+        '- unit: apply the fix to src/foo.mjs',
+        '  capability: code:implement',
+        '- unit: independent review of the fix',
+        '  capability: code:review',
+        '```',
+        '',
+        '# Inline command wrapped across lines without backslash',
+        'Run via `node src/runner/dispatch.mjs',
+        '  execute <executorId> --prompt "..."`',
+        '',
+        '# Command wrapped with backslash',
+        'Or run `node src/runner/dispatch.mjs \\',
+        '  execute <executorId>`',
+        '',
+        '# Fenced bash block with backslash',
+        '```bash',
+        'node src/runner/dispatch.mjs \\',
+        '  execute <executorId>',
+        '```',
+        '',
+        '# Path wrapped with slash',
+        'See `docs/history/merge-standardization/',
+        'CONTEXT.md` for context.',
+        '',
+        '# Malicious/glued token should be rejected',
+        'Invalid glued token: `src/foo.mjscapability` must be rejected.',
+        'Another glued token: `src/runner/dispatch.mjsexecute` must be rejected.',
+      ].join('\n')
+    );
+
+    const items = extractPathReferences(tmp, ['fenced-and-commands.md']);
+    const paths = items.map((i) => i.path);
+
+    // Assert clean paths are extracted
+    assert.ok(paths.includes('src/foo.mjs'), 'Must extract clean src/foo.mjs from fenced block');
+    assert.ok(paths.includes('src/runner/dispatch.mjs'), 'Must extract clean src/runner/dispatch.mjs');
+    assert.ok(
+      paths.includes('docs/history/merge-standardization/CONTEXT.md'),
+      'Must extract slash-wrapped docs/history/merge-standardization/CONTEXT.md'
+    );
+
+    // Negative assertions: glued tokens must NEVER be extracted
+    assert.ok(!paths.includes('src/foo.mjscapability'), 'Must NOT extract src/foo.mjscapability');
+    assert.ok(!paths.includes('src/runner/dispatch.mjsexecute'), 'Must NOT extract src/runner/dispatch.mjsexecute');
+    assert.ok(
+      !paths.some((p) => GLUED_TOKEN_REGEX.test(p)),
+      'Extracted paths must not contain glued characters after known extensions'
+    );
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('deterministic generation: generating inventory twice produces identical results', () => {
   const inv1 = generateInventory(REPO_ROOT);
   const inv2 = generateInventory(REPO_ROOT);
@@ -100,6 +165,22 @@ test('deterministic generation: generating inventory twice produces identical re
   assert.ok(corePaths.length >= 10, 'Inventory must extract core/ conventions');
   assert.ok(inv1.summary.mixedRepositoryLocalAndConsumerCount > 0, 'Must model mixed contracts explicitly');
   assert.equal(inv1.summary.unclassifiedCount, 0, 'Zero unclassified paths should remain');
+
+  // Negative tests against repository inventory: exact and generalized glued token checks (R1)
+  const paths = inv1.items.map((i) => i.path);
+  assert.ok(!paths.includes('src/foo.mjscapability'), 'Repository inventory must NOT contain src/foo.mjscapability');
+  assert.ok(
+    !paths.includes('src/runner/dispatch.mjsexecute'),
+    'Repository inventory must NOT contain src/runner/dispatch.mjsexecute'
+  );
+  assert.ok(paths.includes('src/foo.mjs'), 'Repository inventory MUST contain clean src/foo.mjs');
+  assert.ok(paths.includes('src/runner/dispatch.mjs'), 'Repository inventory MUST contain clean src/runner/dispatch.mjs');
+
+  const gluedPaths = inv1.items.filter((i) => GLUED_TOKEN_REGEX.test(i.path));
+  assert.deepEqual(gluedPaths, [], 'Repository inventory must have 0 glued-token paths matching GLUED_TOKEN_REGEX');
+
+  const mjsGlued = inv1.items.filter((i) => /\.mjs[a-zA-Z]/.test(i.path));
+  assert.deepEqual(mjsGlued, [], 'Repository inventory must have 0 paths matching /mjs[a-z]/');
 });
 
 test('CLI: outputs JSON and Markdown files correctly', () => {

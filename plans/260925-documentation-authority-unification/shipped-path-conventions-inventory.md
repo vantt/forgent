@@ -27,9 +27,9 @@ must **never** inadvertently alter or break path contracts that consumer project
 
 - **Surfaces Scanned:** core, domains, plugins/fgOS, .agents/skills, .fgos/instructions/effective
 - **Total Shipped Files Scanned:** 248
-- **Total Unique Referenced Paths:** 189
-- **Consumer-Project Contracts:** 70
-- **Repository-Local Contracts:** 112
+- **Total Unique Referenced Paths:** 183
+- **Consumer-Project Contracts:** 69
+- **Repository-Local Contracts:** 107
 - **Mixed Repository-Local and Consumer Contracts:** 7
 - **Unclassified Paths:** 0
 
@@ -79,14 +79,14 @@ These paths represent conventions expected to exist or be created in user/consum
 | `core/skills/_shared/private-cell-worktree.md` | 3 | .agents/skills/fgos-code-panel/SKILL.md, domains/coding/skills/fgos-code-panel/SKILL.md (+1 more) | Canonical core skill definitions and shared fragments shipped for harness/workspace operation |
 | `core/skills/fgos-group-thinking/SKILL.md` | 3 | .agents/skills/fgos-architecture-panel/SKILL.md, core/skills/fgos-architecture-panel/SKILL.md (+1 more) | Canonical core skill definitions and shared fragments shipped for harness/workspace operation |
 | `core/skills/fgos-panel/SKILL.md` | 3 | .agents/skills/fgos-code-panel/SKILL.md, domains/coding/skills/fgos-code-panel/SKILL.md (+1 more) | Canonical core skill definitions and shared fragments shipped for harness/workspace operation |
-| `docs/distillery` | 7 | .agents/skills/distill/references/consult-protocol.md, .agents/skills/distill/references/extract-rules.md (+5 more) | Project-local reference-learning distillery area |
+| `docs/distillery` | 9 | .agents/skills/distill/SKILL.md, .agents/skills/distill/references/consult-protocol.md (+7 more) | Project-local reference-learning distillery area |
 | `docs/distillery/comparison-matrix.md` | 1 | core/task-specs/distill.md | Project-local reference-learning distillery area |
 | `docs/distillery/deep-dives` | 5 | .agents/skills/distill/SKILL.md, .agents/skills/distill/references/deep-dive-protocol.md (+3 more) | Project-local reference-learning distillery area |
 | `docs/distillery/porting-log.md` | 3 | .agents/skills/distill/scripts/migrate-porting-state-backfill.mjs, core/skills/distill/scripts/migrate-porting-state-backfill.mjs (+1 more) | Project-local reference-learning distillery area |
 | `docs/distillery/sources` | 3 | .agents/skills/distill/references/consult-protocol.md, core/skills/distill/references/consult-protocol.md (+1 more) | Project-local reference-learning distillery area |
 | `docs/distillery/state` | 4 | .agents/skills/distill/scripts/distill.mjs, .agents/skills/distill/scripts/migrate-porting-state-backfill.mjs (+2 more) | Project-local reference-learning distillery area |
 | `docs/distillery/state/porting` | 2 | .agents/skills/distill/scripts/migrate-porting-state-backfill.mjs, core/skills/distill/scripts/migrate-porting-state-backfill.mjs | Project-local reference-learning distillery area |
-| `docs/distillery/taxonomy.txt` | 3 | .agents/skills/distill/SKILL.md, core/skills/distill/SKILL.md (+1 more) | Project-local reference-learning distillery area |
+| `docs/distillery/taxonomy.txt` | 1 | core/task-specs/distill.md | Project-local reference-learning distillery area |
 | `docs/enduser-docs-index.json` | 5 | .agents/skills/fgos-indexing/SKILL.md, core/skills/fgos-indexing/SKILL.md (+3 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/explanation` | 3 | .agents/skills/fgos-indexing/SKILL.md, core/skills/fgos-indexing/SKILL.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/explanation/why-merge-loop-recurses-into-loop-not-ck-loop.md` | 2 | plugins/fgOS/skills/cleanup-loop/SKILL.md, plugins/fgOS/skills/retro-loop/SKILL.md | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
@@ -94,8 +94,7 @@ These paths represent conventions expected to exist or be created in user/consum
 | `docs/how-to/author-a-plan-loop-track.md` | 6 | .agents/skills/fgos-code-panel/SKILL.md, .agents/skills/fgos-plan-loop/SKILL.md (+4 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/how-to/diagnose-a-verify-fail-post-merge-block-on-approve.md` | 3 | .agents/skills/_shared/catchup-self-recovery.md, core/skills/_shared/catchup-self-recovery.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/how-to/fix-fgos-write-rejected-merge-block.md` | 1 | domains/coding/AGENTS.md | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
-| `docs/how-to/preserve` | 3 | .agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md, domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
-| `docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md` | 3 | .agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md, domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
+| `docs/how-to/preserve-shell-escapes-when-transcribing-a-verify-command.md` | 6 | .agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md, .agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md (+4 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/how-to/resolve-an-events-jsonl-merge-conflict.md` | 1 | domains/coding/AGENTS.md | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/how-to/run-a-coordination-session.md` | 3 | .agents/skills/fgos-plan-loop/SKILL.md, core/skills/fgos-plan-loop/SKILL.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
 | `docs/how-to/use-fgos-architecture-panel.md` | 3 | .agents/skills/fgos-architecture-panel/SKILL.md, core/skills/fgos-architecture-panel/SKILL.md (+1 more) | Diataxis end-user knowledge quadrants and tag index authored in consumer projects |
@@ -127,16 +126,13 @@ These paths are internal to fgOS itself and will be safely transformed during un
 | `docs/backlog.md` | 3 | .agents/skills/_shared/citation-format.md, core/skills/_shared/citation-format.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/decisions` | 3 | .agents/skills/_shared/citation-format.md, core/skills/_shared/citation-format.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/decisions/0021-wire-main-checkout-hook-qua-doctor-setup.md` | 3 | .agents/skills/fgos-unlock/SKILL.md, core/skills/fgos-unlock/SKILL.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
-| `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli` | 3 | .agents/skills/_shared/executor-dispatch-fallback.md, core/skills/_shared/executor-dispatch-fallback.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/decisions/0026-vision-orchestrator-roottask-capacity-native-vs-cli-spawn.md` | 6 | .agents/skills/_shared/executor-dispatch-fallback.md, .agents/skills/fgos-clarifying/SKILL.md (+4 more) | Internal fgOS platform specification, architecture, decision history, or governance |
-| `docs/history` | 55 | .agents/skills/_shared/citation-format.md, .agents/skills/fgos-coding-discovering/SKILL.md (+53 more) | Internal fgOS platform specification, architecture, decision history, or governance |
+| `docs/history` | 53 | .agents/skills/_shared/citation-format.md, .agents/skills/fgos-coding-discovering/SKILL.md (+51 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/agent-coordination-foundation/plan.md` | 9 | .agents/skills/_shared/capability-catalog.md, .agents/skills/_shared/executor-dispatch-fallback.md (+7 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/agent-executor-generalized-capacity-helper/CONTEXT.md` | 3 | .agents/skills/_shared/executor-dispatch-fallback.md, core/skills/_shared/executor-dispatch-fallback.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/claude-named-executor/RESEARCH.md` | 3 | .agents/skills/_shared/coding-worker-contract.md, core/skills/_shared/coding-worker-contract.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/coding-planning-validating-gate-redesign/CONTEXT.md` | 1 | plugins/fgOS/skills/cook/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/commit-time-fgos-deletion-guard` | 1 | domains/coding/AGENTS.md | Internal fgOS platform specification, architecture, decision history, or governance |
-| `docs/history/discover-decompose-skill` | 1 | plugins/fgOS/skills/plan/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
-| `docs/history/discover-decompose-skill-wrapper-verdict-routing` | 1 | plugins/fgOS/skills/discover/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/discover-decompose-skill-wrapper-verdict-routing/CONTEXT.md` | 3 | plugins/fgOS/skills/discover-next/SKILL.md, plugins/fgOS/skills/discover/SKILL.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/discover-stage-graph-and-skill-layering/DISCUSSION.md` | 3 | .agents/skills/fgos-coding-discovering/SKILL.md, domains/coding/skills/fgos-coding-discovering/SKILL.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md` | 3 | .agents/skills/_shared/coding-worker-contract.md, core/skills/_shared/coding-worker-contract.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
@@ -150,7 +146,7 @@ These paths are internal to fgOS itself and will be safely transformed during un
 | `docs/history/merge-standardization/CONTEXT.md` | 1 | plugins/fgOS/skills/merge-next/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/orchestrator-worker-slots/DISCUSSION.md` | 2 | plugins/fgOS/skills/terminal/SKILL.md, plugins/fgOS/skills/terminal/rename.sh | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/pi-executor-runtime-capacity/RESEARCH.md` | 3 | .agents/skills/_shared/coding-worker-contract.md, core/skills/_shared/coding-worker-contract.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
-| `docs/history/retro-next-shared-driving/CONTEXT.md` | 1 | plugins/fgOS/skills/retro-next/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
+| `docs/history/retro-next-shared-driving/CONTEXT.md` | 2 | plugins/fgOS/skills/cleanup-next/SKILL.md, plugins/fgOS/skills/retro-next/SKILL.md | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/self-contained-id-references/CONTEXT.md` | 3 | .agents/skills/_shared/citation-format.md, core/skills/_shared/citation-format.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/self-contained-id-references/DISCUSSION.md` | 3 | .agents/skills/_shared/citation-format.md, core/skills/_shared/citation-format.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
 | `docs/history/tsk-5gd/RESEARCH.md` | 3 | .agents/skills/_shared/coding-worker-contract.md, core/skills/_shared/coding-worker-contract.md (+1 more) | Internal fgOS platform specification, architecture, decision history, or governance |
@@ -174,8 +170,7 @@ These paths are internal to fgOS itself and will be safely transformed during un
 | `src/auth.mjs` | 3 | .agents/skills/fgos-code-panel/SKILL.md, domains/coding/skills/fgos-code-panel/SKILL.md (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/cli/command-registry.mjs` | 1 | plugins/fgOS/skills/merge-next/SKILL.md | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/evolve/iron-law.mjs` | 3 | .agents/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md, domains/coding/skills/fgos-coding-implement/references/verify-commit-and-iron-law.md (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
-| `src/foo.mjs` | 3 | .agents/skills/fgos-code-panel/SKILL.md, domains/coding/skills/fgos-code-panel/SKILL.md (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
-| `src/foo.mjscapability` | 3 | .agents/skills/_shared/planning-capability-awareness.md, core/skills/_shared/planning-capability-awareness.md (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
+| `src/foo.mjs` | 6 | .agents/skills/_shared/planning-capability-awareness.md, .agents/skills/fgos-code-panel/SKILL.md (+4 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/intake` | 4 | .agents/skills/fgos-routing/SKILL.md, core/skills/fgos-routing/SKILL.md (+2 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/intake/classify.mjs` | 1 | plugins/fgOS/skills/submit/SKILL.md | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/intake/discovery.mjs` | 1 | plugins/fgOS/skills/discover/SKILL.md | Internal fgOS implementation code, CLI binaries, tests, or scripts |
@@ -189,8 +184,7 @@ These paths are internal to fgOS itself and will be safely transformed during un
 | `src/runner/definitions/protocol-loader.mjs` | 3 | core/coordination-protocols/declared-consult.yaml, core/coordination-protocols/group-cognition-framework.yaml (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/runner/definitions/schema.mjs` | 5 | core/coordination-protocols/architecture-advisory-panel-v1.yaml, core/coordination-protocols/declared-consult.yaml (+3 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/runner/deliberation/schema.mjs` | 1 | core/coordination-protocols/architecture-advisory-panel-v1.yaml | Internal fgOS implementation code, CLI binaries, tests, or scripts |
-| `src/runner/dispatch.mjs` | 24 | .agents/skills/_shared/capability-catalog.md, .agents/skills/_shared/executor-dispatch-fallback.md (+22 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
-| `src/runner/dispatch.mjsexecute` | 3 | .agents/skills/fgos-coding-implement/references/implement-and-collaboration.md, domains/coding/skills/fgos-coding-implement/references/implement-and-collaboration.md (+1 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
+| `src/runner/dispatch.mjs` | 27 | .agents/skills/_shared/capability-catalog.md, .agents/skills/_shared/executor-dispatch-fallback.md (+25 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/runner/dispatch/assignment-policy.mjs` | 1 | core/coordination-protocols/standalone-master-coordination-loop.yaml | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/runner/dispatch/assignment.mjs` | 4 | .agents/skills/fgos-architecture-panel/SKILL.md, core/skills/fgos-architecture-panel/SKILL.md (+2 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |
 | `src/runner/dispatch/resolve.mjs` | 6 | .agents/skills/_shared/capability-catalog.md, .agents/skills/fgos-architecture-panel/SKILL.md (+4 more) | Internal fgOS implementation code, CLI binaries, tests, or scripts |

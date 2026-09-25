@@ -17,7 +17,8 @@ export const SHIPPED_SURFACE_DIRS = [
   '.fgos/instructions/effective'
 ];
 
-const PATH_REGEX = /(?:^|[\s"'`(\[<])((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]+(?:\.md|\.json|\.mjs|\.yaml|\.txt|\.sh|\.lock|\.jsonl)?)/g;
+export const PATH_REGEX = /(?:^|[\s"'`(\[<])((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]+(?:\.md|\.json|\.mjs|\.yaml|\.txt|\.sh|\.lock|\.jsonl)?)/g;
+export const GLUED_TOKEN_REGEX = /(?:\.mjs|\.jsonl|\.yaml|\.yml|\.txt|\.sh|\.lock|\.md|\.json(?!l))[a-zA-Z]/;
 
 export function normalizePosix(p) {
   return p.split(path.sep).join('/');
@@ -206,15 +207,56 @@ export function scanSurfaceFiles(repoRoot, dirs = SHIPPED_SURFACE_DIRS) {
   return filePaths;
 }
 
+/**
+ * Normalizes markdown/source content prior to path extraction:
+ * - Distinguishes fenced code blocks (``` or ~~~) from inline code / prose.
+ * - Inside fenced code blocks, preserves line breaks so lines of code/prose are never
+ *   glued together; handles multiline command backslash continuations (\\\r?\n\s* -> ' ').
+ * - Inside inline code spans (`...`), joins wrapped paths that ended with a hyphen or slash,
+ *   handles multiline backslash continuations, and converts remaining line breaks to spaces
+ *   (per CommonMark spec, line breaks inside inline code represent whitespace, preventing
+ *   subcommands from gluing onto filenames).
+ * - Inside prose outside code spans, joins lines where a path was wrapped across a line break
+ *   with a trailing hyphen or slash.
+ */
+export function normalizeContent(raw) {
+  // Split by code fences (``` or ~~~)
+  const parts = raw.split(/(^ {0,3}(?:```|~~~)[^\n]*\n[\s\S]*?\n {0,3}(?:```|~~~)\s*$)/m);
+  return parts
+    .map((part, idx) => {
+      // Odd index is a fenced code block
+      if (idx % 2 === 1) {
+        // In fenced blocks, handle multiline command backslash continuations only; keep newlines intact
+        return part.replace(/\\\r?\n\s*/g, ' ');
+      }
+      // In prose/inline blocks:
+      // Process inline code spans: `...`
+      let prose = part.replace(/(?<!`)(`{1,2})(?!`)([\s\S]*?)(?<!`)\1(?!`)/g, (_, fence, code) => {
+        // Hyphen or slash line wrap inside code span: e.g. "foo-\n  bar" -> "foo-bar"
+        let clean = code.replace(/([-\/])\r?\n\s*/g, '$1');
+        // Backslash line continuation
+        clean = clean.replace(/\\\r?\n\s*/g, ' ');
+        // All other line breaks inside inline code become spaces (CommonMark spec)
+        clean = clean.replace(/\r?\n\s*/g, ' ');
+        return fence + clean + fence;
+      });
+      // In prose text outside inline backticks, also rejoin lines that wrap with a hyphen or slash in a path:
+      prose = prose.replace(
+        /((?:core|docs|\.fgos|domains|\.agents|\.claude|plugins|src|bin|scripts|test)\/[a-zA-Z0-9_\.\/-]*[-\/])\r?\n\s*([a-zA-Z0-9_\.\/-]+)/g,
+        '$1$2'
+      );
+      return prose;
+    })
+    .join('');
+}
+
 export function extractPathReferences(repoRoot, surfaceFiles) {
   const pathMap = new Map();
 
   for (const fileRel of surfaceFiles) {
     const full = path.resolve(repoRoot, fileRel);
-    let content = fs.readFileSync(full, 'utf8');
-
-    // Rejoin wrapped code spans across line breaks to prevent truncated junk
-    content = content.replace(/`([^`]+)`/g, (_, code) => '`' + code.replace(/\r?\n\s*/g, '') + '`');
+    const raw = fs.readFileSync(full, 'utf8');
+    const content = normalizeContent(raw);
 
     for (const match of content.matchAll(PATH_REGEX)) {
       let candidate = match[1].trim();
@@ -223,6 +265,9 @@ export function extractPathReferences(repoRoot, surfaceFiles) {
       // Strip trailing hyphen or slash from truncation
       candidate = candidate.replace(/[-\/]+$/, '');
       if (candidate.length === 0) continue;
+
+      // Reject glued tokens (e.g. .mjscapability, .mjsexecute, .mdfoo)
+      if (GLUED_TOKEN_REGEX.test(candidate)) continue;
 
       // Skip invalid single-segment roots or truncated fragments (must contain at least root/item)
       const norm = normalizePosix(candidate);

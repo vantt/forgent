@@ -5,11 +5,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import net from 'node:net';
 import {
   generateBaseline,
   checkRatchet,
   validateBaselineSchema,
   validateExceptionsSchema,
+  canonicalizeExceptionPath,
   classifyFile,
   computeSha256,
   scanFiles,
@@ -291,6 +293,73 @@ test('malformed exception: schema validator rejects invalid exception objects', 
       }),
     /valid 64-char hex expectedDigest/
   );
+  // R2: reject duplicate exceptions across ./ and repeated-slash forms
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [
+          { path: 'docs/specs/foo.md', kind: 'allowed-edit', rationale: 'r1', approvedBy: 'a', expectedDigest: 'a'.repeat(64) },
+          { path: 'docs/specs/./foo.md', kind: 'allowed-edit', rationale: 'r2', approvedBy: 'b', expectedDigest: 'b'.repeat(64) },
+        ],
+      }),
+    /duplicate exception/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [
+          { path: 'docs/specs/foo.md', kind: 'allowed-edit', rationale: 'r1', approvedBy: 'a', expectedDigest: 'a'.repeat(64) },
+          { path: 'docs/specs//foo.md', kind: 'allowed-edit', rationale: 'r2', approvedBy: 'b', expectedDigest: 'b'.repeat(64) },
+        ],
+      }),
+    /duplicate exception/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [
+          { path: 'docs/specs/foo.md', kind: 'allowed-edit', rationale: 'r1', approvedBy: 'a', expectedDigest: 'a'.repeat(64) },
+          { path: './docs/specs/foo.md', kind: 'allowed-edit', rationale: 'r2', approvedBy: 'b', expectedDigest: 'b'.repeat(64) },
+        ],
+      }),
+    /duplicate exception/
+  );
+  // R2: reject traversal and absolute paths
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [{ path: '/docs/specs/foo.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', expectedDigest: 'a'.repeat(64) }],
+      }),
+    /Absolute paths are forbidden/
+  );
+  assert.throws(
+    () =>
+      validateExceptionsSchema({
+        version: 1,
+        exceptions: [{ path: 'docs/specs/../../escape.md', kind: 'allowed-edit', rationale: 'r', approvedBy: 'a', expectedDigest: 'a'.repeat(64) }],
+      }),
+    /Path traversal is forbidden/
+  );
+});
+
+test('canonicalizeExceptionPath: canonicalizes posix relative paths and rejects absolute/traversal paths (R2)', () => {
+  assert.equal(canonicalizeExceptionPath('docs/specs/foo.md'), 'docs/specs/foo.md');
+  assert.equal(canonicalizeExceptionPath('./docs/specs/foo.md'), 'docs/specs/foo.md');
+  assert.equal(canonicalizeExceptionPath('docs/specs/./foo.md'), 'docs/specs/foo.md');
+  assert.equal(canonicalizeExceptionPath('docs/specs//foo.md'), 'docs/specs/foo.md');
+  assert.equal(canonicalizeExceptionPath('docs/specs///sub//bar.md'), 'docs/specs/sub/bar.md');
+  assert.equal(canonicalizeExceptionPath('docs\\specs\\foo.md'), 'docs/specs/foo.md');
+  assert.equal(canonicalizeExceptionPath('docs/specs/foo.md/'), 'docs/specs/foo.md');
+
+  assert.throws(() => canonicalizeExceptionPath(''), /Exception path must be a non-empty string/);
+  assert.throws(() => canonicalizeExceptionPath('   '), /Exception path must be a non-empty string/);
+  assert.throws(() => canonicalizeExceptionPath('/docs/specs/foo.md'), /Absolute paths are forbidden/);
+  assert.throws(() => canonicalizeExceptionPath('../escape.md'), /Path traversal is forbidden/);
+  assert.throws(() => canonicalizeExceptionPath('docs/specs/../../escape.md'), /Path traversal is forbidden/);
 });
 
 test('dotfiles: unreviewed dotfile under legacy root is detected and refused', () => {
@@ -321,7 +390,7 @@ test('dotfiles: unreviewed dotfile under legacy root is detected and refused', (
   }
 });
 
-test('non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry', () => {
+test('non-regular entries: FIFOs and sockets under legacy roots are refused as forbidden-entry (R4)', (t) => {
   const tmp = mkTmpDir();
   try {
     const rootA = path.join(tmp, 'docs/specs');
@@ -330,21 +399,53 @@ test('non-regular entries: FIFOs and sockets under legacy roots are refused as f
 
     const baseline = generateBaseline({ repoRoot: tmp, roots: ['docs/specs'] });
 
+    // 1. Deterministic socket test (Node.js net.createServer without external binaries)
+    const socketPath = path.join(rootA, 'test.sock');
+    let server;
+    let socketCreated = false;
+    try {
+      server = net.createServer();
+      server.listen(socketPath);
+      socketCreated = fs.existsSync(socketPath) && fs.statSync(socketPath).isSocket();
+    } catch {
+      // Platform doesn't support unix sockets
+    }
+
+    if (socketCreated) {
+      const sockResult = checkRatchet({
+        repoRoot: tmp,
+        baseline,
+        exceptions: { version: 1, exceptions: [] },
+        roots: ['docs/specs'],
+      });
+      assert.equal(sockResult.clean, false);
+      const sockFinding = sockResult.findings.find((f) => f.path.includes('test.sock'));
+      assert.ok(sockFinding, 'Must detect socket');
+      assert.equal(sockFinding.type, 'forbidden-entry');
+      assert.match(sockFinding.message, /socket/);
+      server.close();
+      fs.rmSync(socketPath, { force: true });
+    }
+
+    // 2. FIFO test (with explicit t.skip if mkfifo is unavailable, never silently passing)
     const pipePath = path.join(rootA, 'test.fifo');
     const mkfifoRes = spawnSync('mkfifo', [pipePath]);
     if (mkfifoRes.status === 0 && fs.existsSync(pipePath)) {
-      const result = checkRatchet({
+      const fifoResult = checkRatchet({
         repoRoot: tmp,
         baseline,
         exceptions: { version: 1, exceptions: [] },
         roots: ['docs/specs'],
       });
 
-      assert.equal(result.clean, false);
-      const finding = result.findings.find((f) => f.path.includes('test.fifo'));
-      assert.ok(finding, 'Must detect FIFO');
-      assert.equal(finding.type, 'forbidden-entry');
-      assert.match(finding.message, /fifo/);
+      assert.equal(fifoResult.clean, false);
+      const fifoFinding = fifoResult.findings.find((f) => f.path.includes('test.fifo'));
+      assert.ok(fifoFinding, 'Must detect FIFO');
+      assert.equal(fifoFinding.type, 'forbidden-entry');
+      assert.match(fifoFinding.message, /fifo/);
+      fs.rmSync(pipePath, { force: true });
+    } else if (!socketCreated) {
+      t.skip('Both mkfifo and unix domain sockets are unavailable on this platform');
     }
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });

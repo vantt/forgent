@@ -103,11 +103,51 @@ export function validateBaselineSchema(baseline) {
 }
 
 /**
+ * Canonicalizes an exception path lexically within repo-relative POSIX syntax (R2).
+ * Rejects:
+ * - Empty strings
+ * - Absolute paths (POSIX leading slash or Windows drive letter)
+ * - Traversal sequences (.. that escape repo root or appear in path)
+ * Canonicalizes:
+ * - Backslashes to forward slashes
+ * - Redundant ./ and repeated slashes //
+ * - Strips leading ./ and trailing /
+ */
+export function canonicalizeExceptionPath(rawPath) {
+  if (typeof rawPath !== 'string' || rawPath.trim().length === 0) {
+    throw new Error('Exception path must be a non-empty string');
+  }
+  const posix = rawPath.replace(/\\/g, '/');
+
+  if (posix.startsWith('/') || path.isAbsolute(rawPath) || path.win32.isAbsolute(rawPath)) {
+    throw new Error(`Absolute paths are forbidden in exceptions: "${rawPath}"`);
+  }
+
+  if (posix.split('/').includes('..')) {
+    throw new Error(`Path traversal is forbidden in exceptions: "${rawPath}"`);
+  }
+
+  const normalized = path.posix.normalize(posix);
+
+  if (normalized === '..' || normalized.startsWith('../')) {
+    throw new Error(`Path traversal is forbidden in exceptions: "${rawPath}"`);
+  }
+
+  const clean = normalized.replace(/^\.\//, '').replace(/\/+$/, '');
+  if (!clean || clean === '.') {
+    throw new Error(`Invalid exception path: "${rawPath}"`);
+  }
+
+  return clean;
+}
+
+/**
  * Validates exceptions schema. Throws Error if malformed.
  * Enforces:
  * - only 'allowed-new-file' and 'allowed-edit' (deletions are forbidden by authoring rules)
- * - unique paths (duplicate exceptions forbidden)
+ * - unique paths across canonical POSIX forms (duplicate exceptions forbidden)
  * - non-empty rationale, approvedBy, and valid 64-hex expectedDigest
+ * - rejects absolute paths and path traversal (R2)
  */
 export function validateExceptionsSchema(exceptions) {
   if (!exceptions || typeof exceptions !== 'object') {
@@ -128,11 +168,16 @@ export function validateExceptionsSchema(exceptions) {
     if (typeof item.path !== 'string' || item.path.length === 0) {
       throw new Error(`Malformed exceptions: exception at index ${idx} missing path`);
     }
-    const normPath = normalizePosix(item.path);
-    if (seenPaths.has(normPath)) {
-      throw new Error(`Malformed exceptions: duplicate exception for path "${item.path}"`);
+    let canonicalPath;
+    try {
+      canonicalPath = canonicalizeExceptionPath(item.path);
+    } catch (err) {
+      throw new Error(`Malformed exceptions: exception at index ${idx} has invalid path: ${err.message}`);
     }
-    seenPaths.add(normPath);
+    if (seenPaths.has(canonicalPath)) {
+      throw new Error(`Malformed exceptions: duplicate exception for path "${item.path}" (canonical: "${canonicalPath}")`);
+    }
+    seenPaths.add(canonicalPath);
     if (!VALID_KINDS.has(item.kind)) {
       throw new Error(
         `Malformed exceptions: exception at index ${idx} has invalid kind: ${item.kind} (deletions are strictly forbidden during migration)`
@@ -372,10 +417,10 @@ export function checkRatchet({
     }
   }
 
-  // Index exceptions by path
+  // Index exceptions by canonical path
   const exceptionsByPath = new Map();
   for (const exc of exceptions.exceptions) {
-    exceptionsByPath.set(normalizePosix(exc.path), exc);
+    exceptionsByPath.set(canonicalizeExceptionPath(exc.path), exc);
   }
 
   let accountedEditsCount = 0;
