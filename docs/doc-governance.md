@@ -14,6 +14,8 @@ Do not use this for: Current product behavior or implementation detail
 Last reviewed: 2026-09-25
 Related:
 - `docs/reading-map.md`
+- `docs/transitional-switchboard.md`
+- `docs/platform/migration-authoring-rules.md`
 - `docs/platform/README.md`
 - `docs/architect/documentation-system-design.md`
 ```
@@ -451,10 +453,13 @@ promotion is per-area or repository-wide; transformation order alone never
 changes authority.
 
 Until a newer program is explicitly accepted, each area portal's current-source
-mapping controls. A target marked partial/candidate does not outrank that map,
-and readers must surface conflicts rather than infer authority from path or date.
-Any redirect/stub must be explicitly read-only and temporary. The proposed
-repository-wide normalization and alias-based retirement model is documented in
+mapping controls, operationalized through [transitional-switchboard.md](transitional-switchboard.md).
+Authors during migration must follow [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md)
+(one claim, one canonical owner, never dual-author prose, ratchet enforcement on legacy roots).
+A target marked partial/candidate does not outrank that map, and readers must surface
+conflicts rather than infer authority from path or date. Any redirect/stub must be
+explicitly read-only and temporary. The proposed repository-wide normalization and
+alias-based retirement model is documented in
 `platform/proposals/documentation-system-unification.md` and is not active merely
 because its plan exists.
 
@@ -464,5 +469,7 @@ because its plan exists.
 |---|---|
 | documentation portal | [README.md](README.md) |
 | reader routing | [reading-map.md](reading-map.md) |
+| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |
+| migration authoring rules | [platform/migration-authoring-rules.md](platform/migration-authoring-rules.md) |
 | platform portal | [platform/README.md](platform/README.md) |
 | source design discussion | [architect/documentation-system-design.md](architect/documentation-system-design.md) |

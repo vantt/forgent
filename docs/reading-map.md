@@ -14,6 +14,7 @@ Do not use this for: Documentation governance or complete file inventory
 Last reviewed: 2026-09-25
 Related:
 - `docs/doc-governance.md`
+- `docs/transitional-switchboard.md`
 - `docs/platform/README.md`
 - `docs/specs/reading-map.md`
 ```
@@ -27,6 +28,7 @@ migration.
 | Need | Read |
 |---|---|
 | Understand documentation rules | [doc-governance.md](doc-governance.md) |
+| Resolve authority during transition | [transitional-switchboard.md](transitional-switchboard.md) |
 | Understand platform-wide docs | [platform/README.md](platform/README.md) |
 | Understand packaging, install, activation, setup, and doctor | [platform/packaging-distribution/README.md](platform/packaging-distribution/README.md) |
 | Understand current legacy source map | [specs/reading-map.md](specs/reading-map.md) |
@@ -91,16 +93,18 @@ platform/area portal and surface any conflict. A target document marked partial
 or candidate does not outrank a declared legacy/current source merely because it
 lives under `docs/platform/**`.
 
+The operative transitional authority switchboard is
+[transitional-switchboard.md](transitional-switchboard.md).
 The verified Phase 00 snapshot is
 [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md).
 It records the explicit current route for every known area and root Markdown
-surface; it is evidence, not a promotion or migration switchboard.
+surface; the switchboard operationalizes that route.
 
 The full-horizon design is
 [documentation-system-unification.md](platform/proposals/documentation-system-unification.md).
 The proposed near-term authority migration is
 [plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase
-00 is completed; Phases 01–09 remain unauthorized, and this plan's existence
+00 and Phase 01 are completed; Phases 02–09 remain unauthorized, and this plan's existence
 does not authorize migration or cutover.
 
 ## 4. Related Files
@@ -108,6 +112,7 @@ does not authorize migration or cutover.
 | Relationship | File |
 |---|---|
 | governs documentation system | [doc-governance.md](doc-governance.md) |
+| operative transitional switchboard | [transitional-switchboard.md](transitional-switchboard.md) |
 | platform portal | [platform/README.md](platform/README.md) |
 | legacy/current detailed source map | [specs/reading-map.md](specs/reading-map.md) |
 | verified transitional authority snapshot | [current-authority-map-2026-09-25.md](../plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md) |

@@ -1,11 +1,11 @@
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: Proposed — Phase 00 authorized and completed on its isolated branch; Phases 01–09 are not authorized
+Plan status: In-progress (Phase 00 and Phase 01 authorized and completed on isolated cell/branch; Phases 02–09 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Historical foundation: plans/260825-1841-knowledge-registry/
-Execution authority: Phase 00 only, by direct human request on 2026-09-25; no authority for Phases 01–09
+Execution authority: Phase 00 and Phase 01 only, by direct human request on 2026-09-25; no authority for Phases 02–09
 Risk: Critical documentation migration
 ```
 
@@ -239,8 +239,8 @@ permission to execute it.
 | Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
 |---|---|---|---|---|
 | 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
-| 01 | `not-started`, `not-authorized` | None | Phase 00 complete; requires separate authorization | Switchboard, vocabulary, baseline, ratchet, and shipped-path inventory do not exist yet |
-| 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
+| 01 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_op_001) | Gate passed; containment active | Operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records |
+| 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 completion review and separate Phase 02 authorization | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
 | 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
 | 04 | `not-started`, `not-authorized` | None | Blocked by Phase 03 | Neither pilot has begun; no candidate transformation is authorized |
 | 05 | `not-started`, `not-authorized` | None | Blocked by Phase 04 | No area-wide candidate corpus exists |
@@ -307,32 +307,39 @@ cutover, and it does not authorize any later phase.
 
 ### Phase 01 — Contain further divergence
 
-**Status:** `not-started`, `not-authorized` — Phase 00 is complete, but no Phase 01 execution approval exists.
+**Status:** `completed` — Phase 01 deliverables implemented and verified on branch
+`documentation-authority-unification--phase-01`; review unit is `documentation-authority-phase-00-20260925..HEAD`.
+Phases 02–09 remain unauthorized.
 **Mode:** plan branch
 **Purpose:** Stop the two systems drifting farther apart while migration runs.
 
 Deliverables:
 
 - one switchboard route, backed by the Phase 00 authority table, through which
-  repository-local readers resolve current owners without guessing;
-- a preliminary claim-kind and source-disposition vocabulary;
-- a baseline list of files and source digests under legacy roots;
+  repository-local readers resolve current owners without guessing (`docs/transitional-switchboard.md`, `transitional-switchboard.json`);
+- a preliminary claim-kind and source-disposition vocabulary (`claim-and-disposition-vocabulary.json`, `claim-and-disposition-vocabulary.md`);
+- a baseline list of files and source digests under legacy roots (`scripts/check-legacy-docs-ratchet.baseline.json`);
 - a ratchet refusing unreviewed new maintained files **and unaccounted edits**
-  under legacy roots;
+  under legacy roots (`scripts/check-legacy-docs-ratchet.mjs`, `scripts/check-legacy-docs-ratchet.exceptions.json`, `test/scripts/check-legacy-docs-ratchet.test.mjs`);
 - authoring guidance for changes during migration: update the current owner once,
-  then record candidate-target impact in the ledger; never dual-author prose;
+  then record candidate-target impact in the ledger; never dual-author prose (`docs/platform/migration-authoring-rules.md`);
 - immediate correction of stale standing routes that point to known-invalid
-  skill/path facts;
+  skill/path facts (updated `docs/specs/reading-map.md` and `docs/reading-map.md`);
 - a separate inventory of path conventions shipped through `core/skills`,
   `domains/**`, generated instructions, and plugins so repository migration does
-  not silently redefine consumer-project contracts.
+  not silently redefine consumer-project contracts (`shipped-path-conventions-inventory.json`, `shipped-path-conventions-inventory.md`).
 
-This phase must not falsely declare `docs/platform/**` fully canonical.
+This phase does not declare `docs/platform/**` fully canonical.
 
 Gate:
 
 - no writer has to guess between legacy and target;
 - no new legacy maintained file can appear without a recorded exception.
+
+Phase 01 evidence:
+
+- execution record: `phase-01-execution-record.md`;
+- reproducible verification: `phase-01-verification.md`.
 
 ### Phase 02 — Build repository-wide inventory and conservation ledger
 
@@ -756,3 +763,12 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - First independent review: `plans/260925-documentation-authority-unification/independent-frontier-review-2026-09-25.md`
 - Frontier re-review: `plans/260925-documentation-authority-unification/independent-frontier-rereview-2026-09-25.md`
 - OKF learning source: `docs/distillery/sources/okf.md`
+- Phase 01 execution record: `plans/260925-documentation-authority-unification/phase-01-execution-record.md`
+- Phase 01 verification: `plans/260925-documentation-authority-unification/phase-01-verification.md`
+- Operative transitional switchboard: `docs/transitional-switchboard.md` and `plans/260925-documentation-authority-unification/transitional-switchboard.json`
+- Claim and disposition vocabulary: `plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json` and `plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md`
+- Legacy root baseline: `scripts/check-legacy-docs-ratchet.baseline.json`
+- Legacy root exceptions: `scripts/check-legacy-docs-ratchet.exceptions.json`
+- Legacy ratchet script: `scripts/check-legacy-docs-ratchet.mjs`
+- Migration authoring rules: `docs/platform/migration-authoring-rules.md`
+- Shipped path conventions inventory: `plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json` and `plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.md`

@@ -1,0 +1,211 @@
+{
+  "$schema": "https://forgent.dev/schemas/claim-and-disposition-vocabulary.v1.json",
+  "version": 1,
+  "generatedAt": "2026-09-25T00:00:00.000Z",
+  "phase": "01",
+  "description": "Preliminary machine-readable claim-kind vocabulary and complete plan-§6 source-disposition vocabulary for documentation authority unification",
+  "provenance": "plans/260925-documentation-authority-unification/plan.md §6.1, §6.2, §6.3",
+  "sourceDispositions": [
+    {
+      "id": "promote",
+      "definition": "Source content moves into the target docs/platform/** structure as the sole maintained canonical authority.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": true,
+      "allowedFileClasses": ["maintained-authority"]
+    },
+    {
+      "id": "move",
+      "definition": "Source file moves directly to target structure with minimal structural rewrite, becoming the canonical owner.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": true,
+      "allowedFileClasses": ["maintained-authority"]
+    },
+    {
+      "id": "merge",
+      "definition": "Content from multiple sources is combined into a single canonical target document.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": true,
+      "allowedFileClasses": ["maintained-authority"]
+    },
+    {
+      "id": "split",
+      "definition": "Source is partitioned into multiple target documents, with complete claim-level tracking for every section and block.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": true,
+      "allowedFileClasses": ["maintained-authority"]
+    },
+    {
+      "id": "extract",
+      "definition": "Specific claims, contracts, or sections are extracted from a larger file into a dedicated target document.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": true,
+      "allowedFileClasses": ["maintained-authority"]
+    },
+    {
+      "id": "redirect",
+      "definition": "Source is replaced with an explicit read-only pointer or stub referencing the canonical target; retains no substantive claims.",
+      "requiresTargetOwner": true,
+      "requiresRationale": false,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "retained-source"]
+    },
+    {
+      "id": "retain-as-evidence",
+      "definition": "Source is preserved as immutable historical evidence, test fixture, or audit receipt; never serves as default reading authority.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["history-evidence"]
+    },
+    {
+      "id": "regenerate-from-source",
+      "definition": "File is a machine-readable derived projection generated automatically from underlying source truth, code, or events.",
+      "requiresTargetOwner": false,
+      "requiresRationale": false,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["generated"]
+    },
+    {
+      "id": "reclassify-out-of-platform-scope",
+      "definition": "File belongs to a distinct non-platform corpus (e.g., user-facing knowledge docs, domains, or tutorials) and is governed outside platform authority.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "retained-source", "history-evidence"]
+    },
+    {
+      "id": "supersede",
+      "definition": "Source or claim has been explicitly superseded by a newer approved decision or architecture, and is retired.",
+      "requiresTargetOwner": true,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "retained-source"]
+    },
+    {
+      "id": "archive-with-reason",
+      "definition": "Source is retired and relocated to history/archive with an explicit, durable justification recorded in the ledger.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["history-evidence", "retained-source"]
+    },
+    {
+      "id": "delete-as-duplicate",
+      "definition": "Source is an unneeded exact or semantic duplicate of another document and will be safely removed at cutover without alias.",
+      "requiresTargetOwner": true,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "history-evidence"]
+    },
+    {
+      "id": "delete-as-obsolete",
+      "definition": "Source is completely obsolete and retains zero evidentiary, contractual, or historical value; deleted at cutover.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "history-evidence"]
+    },
+    {
+      "id": "defer-with-owner",
+      "definition": "Source or claim is deliberately deferred to a named future phase or engine, with a named owner and revisit trigger.",
+      "requiresTargetOwner": true,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["retained-source", "history-evidence"]
+    },
+    {
+      "id": "reject-with-rationale",
+      "definition": "Source proposal or candidate design was evaluated and formally rejected with durable rationale.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["history-evidence"]
+    },
+    {
+      "id": "unknown-blocking",
+      "definition": "Source status, claims, or consumers are unresolved; blocks cutover until audited and assigned a definitive disposition.",
+      "requiresTargetOwner": false,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "allowedFileClasses": ["maintained-authority", "retained-source", "history-evidence", "generated"]
+    }
+  ],
+  "dispositionConstraints": [
+    "copied-is-forbidden",
+    "permanent-keep-legacy-is-forbidden-for-maintained-authority",
+    "one-file-level-disposition-per-source"
+  ],
+  "claimKinds": [
+    {
+      "id": "normative-law",
+      "description": "Immutable platform axioms, operating laws (L1–L8), and constitutional rules.",
+      "canonicalDocumentTypes": ["Vision", "Platform Foundations"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "contract",
+      "description": "Normative schema, protocol, interface invariant, boundary obligation, or handoff rule.",
+      "canonicalDocumentTypes": ["Contract"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "specification",
+      "description": "Observable current behavior, state model, operations, shared entities, and lifecycle transitions.",
+      "canonicalDocumentTypes": ["Spec"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "architecture",
+      "description": "System or component topology, design rationale, boundary definition, and trade-off analysis.",
+      "canonicalDocumentTypes": ["Architecture"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "decision",
+      "description": "Architectural or product choice, problem statement, options evaluated, rationale, and supersession links.",
+      "canonicalDocumentTypes": ["Decision"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "vision",
+      "description": "High-level mission, long-horizon intended direction, scope, and explicit non-scope.",
+      "canonicalDocumentTypes": ["Vision"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "intent",
+      "description": "Preserved design intent across simplified implementation slices, must-not-preclude constraints, and revisit triggers.",
+      "canonicalDocumentTypes": ["Intent preservation ledger"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "procedure",
+      "description": "Supported operator procedure, runbook, or maintenance instructions.",
+      "canonicalDocumentTypes": ["Guide / runbook"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "verification",
+      "description": "Empirical proof, test suite receipt, benchmark output, or verification record supporting a claim.",
+      "canonicalDocumentTypes": ["Verification"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "historical-context",
+      "description": "Provenance, historical milestone, retrospective observation, or retired context.",
+      "canonicalDocumentTypes": ["History", "Knowledge"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    },
+    {
+      "id": "navigation",
+      "description": "Area portal, subcomponent map, reading map, or index routing readers to canonical documents.",
+      "canonicalDocumentTypes": ["Area portal", "Subcomponent portal", "Reading map"],
+      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+    }
+  ]
+}
