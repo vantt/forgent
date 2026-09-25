@@ -61,7 +61,7 @@ import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
-import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import {
   resolveVerifiedRedirectExecutor,
   resolveVerifiedAssignmentModel,
@@ -1793,11 +1793,16 @@ export async function executeAssignment(assignment, opts = {}) {
   // changed anything -- a value-preserving no-op for every unredirected
   // dispatch.
   if (resolvedExecutorId !== defaultExecutorId) {
-    if (opts.options?.disallowedProviders?.includes(effectivePolicy.providerModel)) {
-      throw new RunnerConfigError(`governance gate rejected provider "${effectivePolicy.providerModel}": disallowed egress (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+    const redirectGov = checkProviderDisallowed(opts.options?.disallowedProviders, effectivePolicy.providerModel);
+    if (redirectGov.disallowed) {
+      throw new RunnerConfigError(`governance gate rejected provider "${redirectGov.canonicalProvider}": disallowed egress (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`, {
+        code: 'governance.disallowed-provider',
+      });
     }
     if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
-      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`);
+      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`, {
+        code: 'governance.disallowed-executor',
+      });
     }
     const targetEntry = cfg?.executors?.[resolvedExecutorId];
     if (targetEntry && redirectResult?.crossProvider && targetEntry.allowCrossProvider !== true) {

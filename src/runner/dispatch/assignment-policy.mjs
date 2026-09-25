@@ -27,6 +27,7 @@ import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES } from '
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
 import { resolveVerifiedAssignmentModel } from './placement-policy.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
+import { checkProviderDisallowed } from './provider-adapter.mjs';
 
 export const TIER_STRENGTH = Object.freeze({
   nano: 1,
@@ -523,8 +524,9 @@ export function resolveAssignmentDispatchPolicy({
   // executor-id-keyed counterpart, for governance configs that need to
   // block one specific registered executor entry even when its declared
   // provider family is otherwise trusted)
-  if (options.disallowedProviders && options.disallowedProviders.includes(resolvedProvider)) {
-    throw new RunnerConfigError(`governance gate rejected provider "${resolvedProvider}": disallowed egress`, {
+  const providerGov = checkProviderDisallowed(options.disallowedProviders, resolvedProvider);
+  if (providerGov.disallowed) {
+    throw new RunnerConfigError(`governance gate rejected provider "${providerGov.canonicalProvider}": disallowed egress`, {
       code: 'governance.disallowed-provider',
     });
   }
@@ -533,7 +535,7 @@ export function resolveAssignmentDispatchPolicy({
       code: 'governance.disallowed-executor',
     });
   }
-  const governanceSource = { scope: 'governance', id: resolvedProvider };
+  const governanceSource = { scope: 'governance', id: providerGov.canonicalProvider };
 
   const effectivePolicy = {
     role: assignment.role,

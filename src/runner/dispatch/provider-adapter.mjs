@@ -92,6 +92,7 @@ export function normalizeProviderFamily(providerFamily, command) {
     if (norm === 'openai-codex' || norm === 'openai' || norm === 'codex') return 'openai-codex';
     if (norm === 'gemini' || norm === 'agy') return 'gemini';
     if (norm === 'claude') return 'claude';
+    if (norm === 'deepseek') return 'deepseek';
     if (norm === 'pi') return 'pi';
     return norm;
   }
@@ -100,8 +101,69 @@ export function normalizeProviderFamily(providerFamily, command) {
   if (cmd === 'codex') return 'openai-codex';
   if (cmd === 'agy') return 'gemini';
   if (cmd === 'claude') return 'claude';
+  if (cmd === 'glm') return 'z-ai';
   if (cmd === 'pi') return 'pi';
   return cmd || 'unknown';
+}
+
+/**
+ * Normalizes a list of disallowed providers to a Set of canonical provider family names.
+ * Skips empty or non-string entries.
+ *
+ * @param {string[]|Iterable<string>} [disallowedProviders]
+ * @returns {Set<string>}
+ */
+export function normalizeDisallowedProviders(disallowedProviders) {
+  const normalized = new Set();
+  if (!disallowedProviders) return normalized;
+  const list = Array.isArray(disallowedProviders) || disallowedProviders instanceof Set
+    ? disallowedProviders
+    : (typeof disallowedProviders[Symbol.iterator] === 'function' ? disallowedProviders : []);
+  for (const entry of list) {
+    if (typeof entry === 'string' && entry.trim()) {
+      const canonical = normalizeProviderFamily(entry);
+      if (canonical && canonical !== 'unknown') {
+        normalized.add(canonical);
+      }
+    }
+  }
+  return normalized;
+}
+
+/**
+ * Evaluates whether candidateProvider is disallowed under disallowedProviders governance.
+ * Normalizes both the deny-list entries and the candidate provider family into the
+ * single canonical provider vocabulary.
+ *
+ * @param {string[]|Set<string>} [disallowedProviders]
+ * @param {string} [candidateProvider]
+ * @param {string} [candidateCommand]
+ * @returns {{ disallowed: boolean, canonicalProvider: string }}
+ */
+export function checkProviderDisallowed(disallowedProviders, candidateProvider, candidateCommand) {
+  const canonicalProvider = normalizeProviderFamily(candidateProvider, candidateCommand);
+  if (!disallowedProviders || !canonicalProvider || canonicalProvider === 'unknown') {
+    return { disallowed: false, canonicalProvider };
+  }
+  const denySet = disallowedProviders instanceof Set
+    ? disallowedProviders
+    : normalizeDisallowedProviders(disallowedProviders);
+  return {
+    disallowed: denySet.has(canonicalProvider),
+    canonicalProvider,
+  };
+}
+
+/**
+ * Boolean convenience helper for checkProviderDisallowed.
+ *
+ * @param {string[]|Set<string>} [disallowedProviders]
+ * @param {string} [candidateProvider]
+ * @param {string} [candidateCommand]
+ * @returns {boolean}
+ */
+export function isProviderDisallowed(disallowedProviders, candidateProvider, candidateCommand) {
+  return checkProviderDisallowed(disallowedProviders, candidateProvider, candidateCommand).disallowed;
 }
 
 /**
