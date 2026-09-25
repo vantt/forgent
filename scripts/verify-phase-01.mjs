@@ -281,44 +281,73 @@ export function runPhase01Verification(options, repoRoot = REPO_ROOT) {
     }
     console.log('✓ Live ratchet self-check clean');
 
+    const baselineNonce = `${process.pid}-${Date.now()}`;
+    const tmpBaseline1 = path.join(os.tmpdir(), `legacy-baseline1-${baselineNonce}.json`);
+    const tmpBaseline2 = path.join(os.tmpdir(), `legacy-baseline2-${baselineNonce}.json`);
+    try {
+      for (const outputPath of [tmpBaseline1, tmpBaseline2]) {
+        execFileSync(
+          process.execPath,
+          ['scripts/check-legacy-docs-ratchet.mjs', '--write-baseline', '--baseline', outputPath],
+          { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] }
+        );
+      }
+      const baseline1 = fs.readFileSync(tmpBaseline1);
+      const baseline2 = fs.readFileSync(tmpBaseline2);
+      const committedBaseline = fs.readFileSync(path.join(tempWorktreeDir, 'scripts/check-legacy-docs-ratchet.baseline.json'));
+      if (!baseline1.equals(baseline2) || !baseline1.equals(committedBaseline)) {
+        throw new Error('Legacy baseline is not deterministic or does not match the committed FIXED_END artifact');
+      }
+      receipt.checks.baselineDeterminism = { passed: true, sha256: sha256(baseline1) };
+      console.log('✓ Legacy baseline is deterministic and byte-identical to the committed artifact');
+    } finally {
+      for (const tmpPath of [tmpBaseline1, tmpBaseline2]) {
+        if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+      }
+    }
+
     // Deterministic inventory generation (MUST explicitly pass fixedEndSha)
-    const tmpInv1 = path.join(os.tmpdir(), `inv1-${Date.now()}.json`);
-    const tmpInv2 = path.join(os.tmpdir(), `inv2-${Date.now()}.json`);
+    const nonce = `${process.pid}-${Date.now()}`;
+    const tmpInv1 = path.join(os.tmpdir(), `inv1-${nonce}.json`);
+    const tmpInv2 = path.join(os.tmpdir(), `inv2-${nonce}.json`);
+    const tmpMd1 = path.join(os.tmpdir(), `inv1-${nonce}.md`);
+    const tmpMd2 = path.join(os.tmpdir(), `inv2-${nonce}.md`);
     try {
       execFileSync(
         process.execPath,
-        ['scripts/generate-shipped-path-inventory.mjs', '--commit', fixedEndSha, '--json-out', tmpInv1],
+        ['scripts/generate-shipped-path-inventory.mjs', '--commit', fixedEndSha, '--json-out', tmpInv1, '--md-out', tmpMd1],
         { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] }
       );
       execFileSync(
         process.execPath,
-        ['scripts/generate-shipped-path-inventory.mjs', '--commit', fixedEndSha, '--json-out', tmpInv2],
+        ['scripts/generate-shipped-path-inventory.mjs', '--commit', fixedEndSha, '--json-out', tmpInv2, '--md-out', tmpMd2],
         { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] }
       );
 
-      const buf1 = fs.readFileSync(tmpInv1);
-      const buf2 = fs.readFileSync(tmpInv2);
-      if (!buf1.equals(buf2)) {
-        throw new Error('Deterministic inventory check failed: consecutive runs produced different bytes');
+      const json1 = fs.readFileSync(tmpInv1);
+      const json2 = fs.readFileSync(tmpInv2);
+      const md1 = fs.readFileSync(tmpMd1);
+      const md2 = fs.readFileSync(tmpMd2);
+      if (!json1.equals(json2) || !md1.equals(md2)) {
+        throw new Error('Deterministic inventory check failed: consecutive JSON/Markdown runs produced different bytes');
       }
 
-      // Assert tmpInv1 matches committed inventory in worktree
-      const committedInvPath = path.join(
-        tempWorktreeDir,
-        'plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json'
-      );
-      const committedBuf = fs.readFileSync(committedInvPath);
-      if (!buf1.equals(committedBuf)) {
-        throw new Error('Committed shipped-path-conventions-inventory.json does not match freshly generated inventory for FIXED_END');
+      const inventoryDir = path.join(tempWorktreeDir, 'plans/260925-documentation-authority-unification');
+      const committedJson = fs.readFileSync(path.join(inventoryDir, 'shipped-path-conventions-inventory.json'));
+      const committedMd = fs.readFileSync(path.join(inventoryDir, 'shipped-path-conventions-inventory.md'));
+      if (!json1.equals(committedJson) || !md1.equals(committedMd)) {
+        throw new Error('Committed shipped-path-conventions inventory JSON/Markdown do not match freshly generated artifacts for FIXED_END');
       }
-      console.log('✓ Shipped inventory generation is deterministic and byte-identical to committed file');
+      console.log('✓ Shipped inventory JSON/Markdown are deterministic and byte-identical to committed artifacts');
       receipt.checks.inventoryDeterminism = {
         passed: true,
-        inventorySha256: sha256(buf1),
+        jsonSha256: sha256(json1),
+        markdownSha256: sha256(md1),
       };
     } finally {
-      if (fs.existsSync(tmpInv1)) fs.unlinkSync(tmpInv1);
-      if (fs.existsSync(tmpInv2)) fs.unlinkSync(tmpInv2);
+      for (const tmpPath of [tmpInv1, tmpInv2, tmpMd1, tmpMd2]) {
+        if (fs.existsSync(tmpPath)) fs.unlinkSync(tmpPath);
+      }
     }
 
     // 7. Check 3: Affected tests (docs tests, decision citation drift, ownership lint)

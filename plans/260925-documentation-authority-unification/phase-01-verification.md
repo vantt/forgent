@@ -63,11 +63,14 @@ node scripts/check-legacy-docs-ratchet.mjs --write-baseline --baseline /tmp/base
 node scripts/check-legacy-docs-ratchet.mjs --write-baseline --baseline /tmp/base2.json
 cmp /tmp/base1.json /tmp/base2.json
 
-node scripts/generate-shipped-path-inventory.mjs --commit "$FIXED_END" --json-out /tmp/inv1.json
-node scripts/generate-shipped-path-inventory.mjs --commit "$FIXED_END" --json-out /tmp/inv2.json
+node scripts/generate-shipped-path-inventory.mjs --commit "$FIXED_END" --json-out /tmp/inv1.json --md-out /tmp/inv1.md
+node scripts/generate-shipped-path-inventory.mjs --commit "$FIXED_END" --json-out /tmp/inv2.json --md-out /tmp/inv2.md
 cmp /tmp/inv1.json /tmp/inv2.json
+cmp /tmp/inv1.md /tmp/inv2.md
+cmp /tmp/inv1.json plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json
+cmp /tmp/inv1.md plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.md
 ```
-Outcome: exit 0; byte-for-byte identical output for both baseline and inventory. Newly generated inventory matches committed `shipped-path-conventions-inventory.json` byte-identically.
+Outcome: exit 0; byte-for-byte identical output for the baseline and both inventory artifacts. Newly generated JSON and Markdown inventory artifacts match their committed counterparts byte-identically.
 
 ## 4. Documentation, Citation, and Ownership Checks (AFFECTED_TESTS)
 
