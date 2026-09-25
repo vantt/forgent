@@ -71,3 +71,32 @@ haven't even been attributed to test files yet, only 61 of the ~524 total
 failures have a named home here). It may need to split into 3-5 smaller
 phases once Phase 00's fresh categorization lands — treat the counts and
 scope here as a starting hypothesis, not a commitment.
+
+## Resolution & Findings
+
+- **Status**: COMPLETED & VERIFIED.
+- **Root Causes Confirmed**:
+  1. **Empty JSON Output / Process Premature Exit**: Subprocesses exited before emitting expected JSON payloads due to:
+     - Verbatim UNC paths (`\\?\...`) passed through `apps/fgos/src/legacy_exec.rs` to Node.js scripts.
+     - Windows user home resolution: Windows sets `USERPROFILE` rather than `HOME`, causing setup directory resolution (`src/setup/dir-resolution.mjs`) to return undefined in isolated environments.
+     - Process liveness checks in `packages/distribution/rust/src/lock.rs` using Unix-only signals (`kill(pid, 0)`).
+  2. **Regex Mismatches (`/Iron Law/`, `/explicitly forbidden/`)**:
+     - Path formatting differences: Refusal messages embedded Windows backslashes (`\`) and drive letters (`D:\...`) while regexes expected POSIX forward slashes (`/...`).
+     - Line ending differences: Windows subprocess stdout emitted CRLF (`\r\n`), tripping multiline regex anchors (`^` and `$`).
+  3. **Test Fixtures & Script Harnesses**:
+     - Shell scripts with POSIX-specific constructs run via `exec` instead of cross-platform Node / batch runners.
+- **Fixes Applied**:
+  - `apps/fgos/src/legacy_exec.rs` & `packages/distribution/rust/src/verify.rs`:
+    - Normalized UNC paths to standard Win32 paths before spawning Node.js.
+  - `packages/distribution/rust/src/lock.rs`:
+    - Implemented Win32 `OpenProcess` / `GetExitCodeProcess` for accurate process liveness checks on Windows.
+  - `src/runner/github-adapter.mjs`, `src/util/session-identity.mjs`:
+    - Handled `USERPROFILE` fallback and Windows process identity.
+  - Test suites (`test/setup/*`, `test/runner/*`, `test/cli/*`):
+    - Normalized path separators in test assertions (`pathsEqual` / `path.normalize`).
+    - Handled CRLF in regex matchers and string comparisons.
+    - Updated test harness helpers (`test/setup/helpers/setup-checks-harness.mjs`, `test/rust-host/harness.mjs`).
+- **CI Verification**:
+  - Commits: `f0b9a3466`, `06b4ad197`, `a59e00eeb`.
+  - Confirmed regex and JSON parse failures dropped to 0 on Windows CI.
+

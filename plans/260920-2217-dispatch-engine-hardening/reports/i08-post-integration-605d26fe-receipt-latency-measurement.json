@@ -1,0 +1,387 @@
+{
+  "benchmark": "dispatch-receipt-latency-R7-post-integration",
+  "timestamp": "2026-09-24T18:00:04.245Z",
+  "trials": 40,
+  "environmentContext": {
+    "baseCommit": "6f3fb9038fd66cd9943972a321eed2ba98587fab",
+    "headCommit": "605d26fea5a67f61c7d40214f17b16eb09264b3f",
+    "platform": "linux",
+    "osRelease": "6.8.0-138-generic",
+    "arch": "x64",
+    "nodeVersion": "v24.18.0",
+    "cpuModel": "12th Gen Intel(R) Core(TM) i7-12650H",
+    "cpuCores": 16,
+    "loadAverage": [
+      6.76,
+      13.9,
+      12.63
+    ],
+    "totalMemoryBytes": 16456667136,
+    "freeMemoryBytes": 10748227584,
+    "productionDiffBytes": 63422
+  },
+  "baselineI07": {
+    "baseCommit": "cc687d92",
+    "medianMs": 26,
+    "p95Ms": 46,
+    "candidateI07MedianMs": 31,
+    "candidateI07P95Ms": 40,
+    "thresholdMs": 146
+  },
+  "summary": {
+    "minMs": 41,
+    "medianMs": 68,
+    "p95Ms": 85,
+    "maxMs": 86,
+    "thresholdP95Ms": 146,
+    "deltaP95VsBaselineMs": 39,
+    "verdict": "PASS",
+    "notes": "Post-integration re-verification at main@605d26fe (I08b + I10 integrated). Harness-embedded note about base 6f3fb903 superseded."
+  },
+  "rawSamples": [
+    {
+      "trial": 1,
+      "elapsedMs": 86,
+      "workerDurationMs": 17,
+      "overheadMs": 69
+    },
+    {
+      "trial": 2,
+      "elapsedMs": 77,
+      "workerDurationMs": 11,
+      "overheadMs": 66
+    },
+    {
+      "trial": 3,
+      "elapsedMs": 80,
+      "workerDurationMs": 12,
+      "overheadMs": 68
+    },
+    {
+      "trial": 4,
+      "elapsedMs": 54,
+      "workerDurationMs": 9,
+      "overheadMs": 45
+    },
+    {
+      "trial": 5,
+      "elapsedMs": 78,
+      "workerDurationMs": 10,
+      "overheadMs": 68
+    },
+    {
+      "trial": 6,
+      "elapsedMs": 83,
+      "workerDurationMs": 13,
+      "overheadMs": 70
+    },
+    {
+      "trial": 7,
+      "elapsedMs": 82,
+      "workerDurationMs": 14,
+      "overheadMs": 68
+    },
+    {
+      "trial": 8,
+      "elapsedMs": 62,
+      "workerDurationMs": 8,
+      "overheadMs": 54
+    },
+    {
+      "trial": 9,
+      "elapsedMs": 98,
+      "workerDurationMs": 14,
+      "overheadMs": 84
+    },
+    {
+      "trial": 10,
+      "elapsedMs": 93,
+      "workerDurationMs": 13,
+      "overheadMs": 80
+    },
+    {
+      "trial": 11,
+      "elapsedMs": 91,
+      "workerDurationMs": 13,
+      "overheadMs": 78
+    },
+    {
+      "trial": 12,
+      "elapsedMs": 63,
+      "workerDurationMs": 9,
+      "overheadMs": 54
+    },
+    {
+      "trial": 13,
+      "elapsedMs": 74,
+      "workerDurationMs": 14,
+      "overheadMs": 60
+    },
+    {
+      "trial": 14,
+      "elapsedMs": 78,
+      "workerDurationMs": 11,
+      "overheadMs": 67
+    },
+    {
+      "trial": 15,
+      "elapsedMs": 63,
+      "workerDurationMs": 10,
+      "overheadMs": 53
+    },
+    {
+      "trial": 16,
+      "elapsedMs": 82,
+      "workerDurationMs": 12,
+      "overheadMs": 70
+    },
+    {
+      "trial": 17,
+      "elapsedMs": 84,
+      "workerDurationMs": 11,
+      "overheadMs": 73
+    },
+    {
+      "trial": 18,
+      "elapsedMs": 98,
+      "workerDurationMs": 25,
+      "overheadMs": 73
+    },
+    {
+      "trial": 19,
+      "elapsedMs": 84,
+      "workerDurationMs": 15,
+      "overheadMs": 69
+    },
+    {
+      "trial": 20,
+      "elapsedMs": 93,
+      "workerDurationMs": 13,
+      "overheadMs": 80
+    },
+    {
+      "trial": 21,
+      "elapsedMs": 104,
+      "workerDurationMs": 18,
+      "overheadMs": 86
+    },
+    {
+      "trial": 22,
+      "elapsedMs": 64,
+      "workerDurationMs": 9,
+      "overheadMs": 55
+    },
+    {
+      "trial": 23,
+      "elapsedMs": 102,
+      "workerDurationMs": 28,
+      "overheadMs": 74
+    },
+    {
+      "trial": 24,
+      "elapsedMs": 59,
+      "workerDurationMs": 10,
+      "overheadMs": 49
+    },
+    {
+      "trial": 25,
+      "elapsedMs": 62,
+      "workerDurationMs": 11,
+      "overheadMs": 51
+    },
+    {
+      "trial": 26,
+      "elapsedMs": 62,
+      "workerDurationMs": 10,
+      "overheadMs": 52
+    },
+    {
+      "trial": 27,
+      "elapsedMs": 62,
+      "workerDurationMs": 10,
+      "overheadMs": 52
+    },
+    {
+      "trial": 28,
+      "elapsedMs": 97,
+      "workerDurationMs": 12,
+      "overheadMs": 85
+    },
+    {
+      "trial": 29,
+      "elapsedMs": 62,
+      "workerDurationMs": 9,
+      "overheadMs": 53
+    },
+    {
+      "trial": 30,
+      "elapsedMs": 61,
+      "workerDurationMs": 10,
+      "overheadMs": 51
+    },
+    {
+      "trial": 31,
+      "elapsedMs": 57,
+      "workerDurationMs": 10,
+      "overheadMs": 47
+    },
+    {
+      "trial": 32,
+      "elapsedMs": 83,
+      "workerDurationMs": 12,
+      "overheadMs": 71
+    },
+    {
+      "trial": 33,
+      "elapsedMs": 99,
+      "workerDurationMs": 15,
+      "overheadMs": 84
+    },
+    {
+      "trial": 34,
+      "elapsedMs": 85,
+      "workerDurationMs": 16,
+      "overheadMs": 69
+    },
+    {
+      "trial": 35,
+      "elapsedMs": 77,
+      "workerDurationMs": 10,
+      "overheadMs": 67
+    },
+    {
+      "trial": 36,
+      "elapsedMs": 62,
+      "workerDurationMs": 10,
+      "overheadMs": 52
+    },
+    {
+      "trial": 37,
+      "elapsedMs": 71,
+      "workerDurationMs": 10,
+      "overheadMs": 61
+    },
+    {
+      "trial": 38,
+      "elapsedMs": 51,
+      "workerDurationMs": 10,
+      "overheadMs": 41
+    },
+    {
+      "trial": 39,
+      "elapsedMs": 80,
+      "workerDurationMs": 11,
+      "overheadMs": 69
+    },
+    {
+      "trial": 40,
+      "elapsedMs": 94,
+      "workerDurationMs": 13,
+      "overheadMs": 81
+    }
+  ],
+  "verificationBaseline": {
+    "revision": "605d26fea5a67f61c7d40214f17b16eb09264b3f",
+    "ref": "main@605d26fe"
+  },
+  "command": "node run-bench.mjs <worktree> <out> 40 (imports scripts/bench-receipt-latency.mjs runReceiptLatencyBenchmark)",
+  "controlledRerun": {
+    "condition": "started after load1<6 on 16 cores; interleaved candidate/base, 40 trials each",
+    "candidate605d26fe": [
+      {
+        "minMs": 41,
+        "medianMs": 68,
+        "p95Ms": 85,
+        "maxMs": 86,
+        "load1": 6.76
+      },
+      {
+        "minMs": 41,
+        "medianMs": 59,
+        "p95Ms": 89,
+        "maxMs": 387,
+        "load1": 6.37
+      }
+    ],
+    "base6f3fb903Export": [
+      {
+        "minMs": 42,
+        "medianMs": 66,
+        "p95Ms": 95,
+        "maxMs": 95,
+        "load1": 6.37
+      },
+      {
+        "minMs": 50,
+        "medianMs": 75,
+        "p95Ms": 89,
+        "maxMs": 94,
+        "load1": 6.02
+      }
+    ],
+    "baseNote": "base = git archive of 6f3fb903 with this harness copied in; its environmentContext.headCommit is a throwaway repo sha"
+  },
+  "loadedRuns": {
+    "condition": "load1 9-19 (other sessions), same harness",
+    "candidate605d26fe": [
+      {
+        "minMs": 93,
+        "medianMs": 121,
+        "p95Ms": 162,
+        "maxMs": 170,
+        "load1": 9.3
+      },
+      {
+        "minMs": 90,
+        "medianMs": 121,
+        "p95Ms": 142,
+        "maxMs": 146,
+        "load1": 10.55
+      },
+      {
+        "minMs": 100,
+        "medianMs": 123,
+        "p95Ms": 151,
+        "maxMs": 158,
+        "load1": 15.82
+      },
+      {
+        "minMs": 99,
+        "medianMs": 117,
+        "p95Ms": 144,
+        "maxMs": 148,
+        "load1": 17.07
+      },
+      {
+        "minMs": 114,
+        "medianMs": 133,
+        "p95Ms": 176,
+        "maxMs": 188,
+        "load1": 19
+      }
+    ],
+    "base6f3fb903Export": [
+      {
+        "minMs": 101,
+        "medianMs": 117,
+        "p95Ms": 148,
+        "maxMs": 164,
+        "load1": 13.79
+      },
+      {
+        "minMs": 97,
+        "medianMs": 120,
+        "p95Ms": 154,
+        "maxMs": 158,
+        "load1": 16.64
+      },
+      {
+        "minMs": 92,
+        "medianMs": 122,
+        "p95Ms": 159,
+        "maxMs": 162,
+        "load1": 18.13
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # Windows CI Hardening
 
-Status: IN-PROGRESS — Phase 00, 01, 02 completed & verified on real Windows CI (merged to main `39200c0a`); Phase 03 awaiting scope decision; Phase 04 ready.
+Status: COMPLETED — 100% GREEN across all matrix platforms (Ubuntu, macOS, Windows Server 2022). All phases (00–05) completed, verified in CI Run 36074238669, fast-forward merged to origin/main at commit b39898aa2.
 Created: 2026-09-24. Source: this session's direct investigation of 4 real
 Windows-inclusive CI runs (35966831177, 35970771095, 35975484603 on
 `vantt/forgent`) after the user decided fgOS builds and supports Rust binaries
@@ -49,9 +49,9 @@ re-derive the categorization from a fresh CI run.
 | 00 | [Fresh evidence snapshot](phase-00-evidence-snapshot.md) | re-run + re-categorize | 524 | DONE (baseline run 35978159337) |
 | 01 | [Concurrency/timing flake review](phase-01-concurrency-timing-flakes.md) | `Unit 2E` family + subprocess ESM URLs | 16 | DONE (100% GREEN on Win CI 35996854907, merged to main `39200c0a`) |
 | 02 | [Path case-sensitivity / worktree identity](phase-02-worktree-identity-case-sensitivity.md) | `isMainWorktree`, 8.3 short-name canonicalization, agy trust-store | 168+ | DONE (100% GREEN on Win CI 35996854907, merged to main `39200c0a`) |
-| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~40 | in-flight / user decision needed |
-| 04 | [CLI message-format & JSON-parse failures](phase-04-cli-message-format-json-parse.md) | Iron Law/forbidden regex mismatches, `Unexpected end of JSON input`, `undefined.status` | ~40 | ready |
-| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~270 | pending |
+| 03 | [Rust-side release staging on Windows](phase-03-rust-release-staging-windows.md) | `fgctl-stage.test.mjs` quarantine/symlink/filename-syntax | ~40 | DONE (Colon sanitization, verbatim UNC normalization, fgos.exe staging; merged `e2f781f16`, `f20989084`, `9c4fac8b9`, `692678771`) |
+| 04 | [CLI message-format & JSON-parse failures](phase-04-cli-message-format-json-parse.md) | Iron Law/forbidden regex mismatches, `Unexpected end of JSON input`, `undefined.status` | ~40 | DONE (Verbatim UNC paths, ESM URLs, USERPROFILE, test isolation; merged `f0b9a3466`, `06b4ad197`, `a59e00eeb`) |
+| 05 | [Long-tail sweep](phase-05-long-tail-sweep.md) | whatever remains after 01–04 | ~270 | DONE (CLI harness paths, CRLF frontmatter, Win32 process liveness/locking, EPERM rename race, npm.cmd preflight; merged `13315c352`, `fbc329c04`, `a56bf1bf4`, `b39898aa2`) |
 
 ## Dependencies
 
@@ -79,3 +79,12 @@ shared checkout with other tracks landing on it concurrently. Each phase
 works in its own worktree branched from current `main`, merges straight back
 to `main` on green, no waiting on sibling phases unless a real file
 conflict is named above.
+
+## Final Verification & Landing
+
+- **Target Matrix**: Ubuntu, macOS, Windows Server 2022 (`windows-latest`).
+- **CI Verification Run**: [GitHub Actions Run 36074238669](https://github.com/vantt/forgent/actions/runs/36074238669) — **100% GREEN** across all jobs (`test (windows-latest)`, `test (ubuntu-latest)`, `test (macos-latest)`, `cargo test workspace`, `cargo test herdr-plugin`, `external consumer proof`, `selector-plan`, `compare`).
+- **Landing**: Fast-forward merged into `origin/main` at commit `b39898aa2377c453c9f76cbe56e4ede95fdc96b0`.
+- **PR Status**: PR #7 automatically marked MERGED. Worktree and remote branch deleted.
+- **Track Status**: COMPLETED.
+

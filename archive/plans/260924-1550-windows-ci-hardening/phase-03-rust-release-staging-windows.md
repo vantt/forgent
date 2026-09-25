@@ -88,3 +88,26 @@ which cannot be done locally in this repo's current dev environment (Linux
 only, confirmed this session). Every fix here needs a real Windows CI round
 trip to verify — budget for several iterations, same as this session needed
 3 real CI runs to land the JS-side fixes.
+
+## Resolution & Findings
+
+- **Status**: COMPLETED & VERIFIED.
+- **Root Causes Confirmed**:
+  1. **Illegal Filename Characters (Colons)**: The "filename syntax incorrect" (`ERROR_INVALID_NAME`) error was caused by ISO timestamps containing colons (`:`) in quarantine and release directory names (e.g. `2026-09-24T21:50:43Z`). On Windows NTFS, `:` is reserved for Alternate Data Streams and strictly forbidden in filenames.
+  2. **Verbatim UNC Path Incompatibility**: Rust's `std::fs::canonicalize` returns verbatim UNC paths (`\\?\C:\...`). While native Win32 APIs accept these, MSYS/Git-Bash `sh.exe` chokes on the `\\?\` prefix when executing shims or shell scripts.
+  3. **Missing Windows Binary Staging**: Distribution build script did not stage `fgos.exe` alongside `fgctl.exe` on Windows.
+  4. **Harness `NODE_OPTIONS`**: `harness.mjs` set `NODE_OPTIONS` using un-normalized Windows backslash paths, causing Node option parsing errors in child processes.
+- **Fixes Applied**:
+  - `packages/distribution/rust/src/store.rs` & `packages/distribution/rust/src/init.rs`:
+    - Sanitized `:` to `_` in release and quarantine folder names on Windows (`e2f781f16`, `f20989084`).
+    - Stripped `\\?\` verbatim prefixes before passing paths to shell invocations and shims (`692678771`).
+    - Supported Windows shim execution via `sh` in `run_tail` and `.cmd` wrapper shims (`9c4fac8b9`).
+  - `scripts/build-rust-distribution.mjs`:
+    - Added Windows target staging for `fgos.exe` (`692678771`).
+  - `test/rust-host/`:
+    - Normalized `NODE_OPTIONS` path in `test/rust-host/harness.mjs` (`f20989084`, `692678771`).
+    - Updated test fixtures in `fgctl-stage.test.mjs`, `fgctl-init.test.mjs`, `fgctl-upgrade.test.mjs`, and `release-tree.test.mjs`.
+- **CI Verification**:
+  - All Rust host tests (`test/rust-host/*.test.mjs`) pass 100% on `windows-latest`.
+  - Commits: `e2f781f16`, `f20989084`, `9c4fac8b9`, `692678771`.
+
