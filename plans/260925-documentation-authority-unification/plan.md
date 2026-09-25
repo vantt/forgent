@@ -232,8 +232,26 @@ consume.
 
 ## 7. Program Phases
 
+Status snapshot: 2026-09-25. `not-started` means no deliverable mutation from
+that phase has begun; `not-authorized` means the dependency graph alone is not
+permission to execute it.
+
+| Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
+|---|---|---|---|---|
+| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Commit `a725d4788`; execution record, authority map, correction note, two independent reviews |
+| 01 | `not-started`, `not-authorized` | None | Phase 00 complete; requires separate authorization | Switchboard, vocabulary, baseline, ratchet, and shipped-path inventory do not exist yet |
+| 02 | `not-started`, `not-authorized` | None | Blocked by Phase 01 | Full file/claim inventory and dynamic/glob evidence-consumer audit remain open |
+| 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
+| 04 | `not-started`, `not-authorized` | None | Blocked by Phase 03 | Neither pilot has begun; no candidate transformation is authorized |
+| 05 | `not-started`, `not-authorized` | None | Blocked by Phase 04 | No area-wide candidate corpus exists |
+| 06 | `not-started`, `not-authorized` | None | Blocked by Phase 05 | Cross-area and fresh-reader review cannot begin before complete candidates |
+| 07 | `not-started`, `not-authorized` | None | Blocked by Phase 06 | Always-loaded, shipped, generated, test, and prompt bypasses remain intentionally unchanged |
+| 08 | `not-started`, `not-authorized` | None | Blocked by Phase 07 and explicit cutover approval | No promotion, migration, deletion, alias activation, or legacy retirement has occurred |
+| 09 | `not-started`, `not-authorized` | None | Follow-on only after verified Phase 08 cutover | Maintenance MVP remains a handoff, not current work |
+
 ### Phase 00 — Correct planning and routing semantics
 
+**Status:** `completed` — gate passed in commit `a725d4788`; no later-phase authority implied.
 **Mode:** planning/documentation only
 **Purpose:** Ensure every artifact tells the truth about what is historical,
 active, canonical, candidate, or preserved future intent.
@@ -283,6 +301,7 @@ cutover, and it does not authorize any later phase.
 
 ### Phase 01 — Contain further divergence
 
+**Status:** `not-started`, `not-authorized` — Phase 00 is complete, but no Phase 01 execution approval exists.
 **Mode:** plan branch
 **Purpose:** Stop the two systems drifting farther apart while migration runs.
 
@@ -311,6 +330,7 @@ Gate:
 
 ### Phase 02 — Build repository-wide inventory and conservation ledger
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 01.
 **Mode:** read-only inventory, followed by reviewed ledger writes
 **Purpose:** Account for the real corpus before deciding migration mechanics.
 
@@ -352,6 +372,7 @@ Gate:
 
 ### Phase 03 — Freeze the minimum constitution and migration method
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 02.
 **Mode:** plan branch
 **Purpose:** Turn inventory evidence into a small, testable migration contract.
 
@@ -380,6 +401,7 @@ Gate:
 
 ### Phase 04 — Dual pilot: re-audit plus unmigrated mixed area
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 03.
 **Mode:** isolated worktrees, candidate/review only
 **Purpose:** Falsify both conservation and transformation before applying them
 globally.
@@ -414,6 +436,7 @@ Gate:
 
 ### Phase 05 — Transform all platform areas as candidate material
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 04.
 **Mode:** isolated worktrees per non-overlapping target, merged to plan branch
 **Purpose:** Build the complete target corpus without creating a second live
 system.
@@ -440,6 +463,7 @@ Gate:
 
 ### Phase 06 — Cross-area integrity and fresh-reader review
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 05.
 **Mode:** plan branch, review only except fixes
 **Purpose:** Catch errors that per-area migration cannot see.
 
@@ -463,6 +487,7 @@ Gate:
 
 ### Phase 07 — Eliminate switchboard bypasses and prepare consumers
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 06.
 **Mode:** plan branch
 **Purpose:** Ensure cutover changes behavior, not only files. Generic consumers
 should already use the Phase 01 switchboard; this phase rewrites remaining direct
@@ -489,6 +514,7 @@ Gate:
 
 ### Phase 08 — Atomic platform-authority cutover
 
+**Status:** `not-started`, `not-authorized`, blocked by Phase 07 and a separate explicit cutover approval.
 **Mode:** dedicated cutover worktree; serialized mutation
 **Purpose:** Promote one system and physically retire the competing system in one
 reviewable integration change.
@@ -536,6 +562,7 @@ Gate:
 
 ### Phase 09 — Post-cutover maintenance MVP
 
+**Status:** `not-started`, `not-authorized`, blocked by a verified Phase 08 cutover and follow-on authorization.
 **Mode:** follow-on plan may begin only after cutover
 **Purpose:** Prevent recurrence with the smallest useful maintenance system.
 
