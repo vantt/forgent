@@ -170,6 +170,7 @@ Test execution receipt captured in `/tmp/full-suite.log`:
 ## 9. Review Boundary and Residual Blockers
 
 - Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`)
+- Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
 - Review range: `documentation-authority-phase-00-20260925..HEAD`
 - Phase 01 completed.
 - Residual blockers: Phases 02–09 remain unauthorized and require separate human authorization before commencement.

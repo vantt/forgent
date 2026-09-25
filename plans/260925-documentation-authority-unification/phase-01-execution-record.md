@@ -76,4 +76,11 @@ All verification gates passed:
 7. Git diff --check clean.
 8. Full suite (FULL_TEST): `FGOS_FULL_SUITE_QUEUE=off npm test` executed in foreground, exited 0; 7743 tests, 7667 passed, 0 failed, 8 skipped, 68 todo, duration 380630ms.
 
+## Review Boundary and Commit Records
+
+- Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`)
+- Phase 01 Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
+- Review range: `documentation-authority-phase-00-20260925..HEAD`
+- Non-empty range commits verified.
+
 Phases 02–09 remain unauthorized and unstarted.
