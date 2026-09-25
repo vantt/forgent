@@ -21,8 +21,9 @@ import { DEFAULTS } from '../../state/work.mjs';
 import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
-import { listWork, resolveWriterLogPath, StoreError } from '../../state/store.mjs';
-import { appendEvent } from '../../state/events.mjs';
+import { listWork, StoreError } from '../../state/store.mjs';
+import { logExecutorDispatch } from '../dispatch-log.mjs';
+import { fanoutBatchExecutorCli } from '../fanout-batch.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
@@ -493,56 +494,8 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   );
 }
 
-/**
- * Record one `executor.dispatch` audit line for an IN-SESSION executor
- * call (a live skill's own gather dispatch, tsk-2ie5/tsk-2c1) — the async
- * claim/dispatch cycle's own `executor.dispatch` event (`loop.mjs`) only
- * ever fires from inside a work item's own claim; this is the sibling
- * entry point for a call that has no claim of its own to attach to. Same
- * event `type` and `provider`/`command` shape (D9, `tsk-5td`) so a
- * downstream reader never needs a second vocabulary — `baseCommit`/
- * `headRef` are always `null`: no worktree-dispatch attestation applies to
- * an in-session call (`captureDispatchAttestation` is never invoked here).
- * Writes into THIS writer's own open file under `.fgos/events/`
- * (`resolveWriterLogPath`, TA-D2/TA-D12) — never straight to the frozen
- * baseline `events.jsonl` — so a concurrent in-session gather branch from
- * another writer never contends for the same physical file. `appendEvent`
- * still acquires the shared `events.lock` internally (`withEventsLock`,
- * `src/state/events.mjs`) — no extra locking needed here even when
- * multiple gather branches log concurrently.
- */
-// P4 observability (docs/history/agent-coordination-foundation/plan.md):
-// `capability`/`mechanism`/`tier`/`fallbackReason` are additive, optional
-// fields -- every existing caller that omits them keeps writing the exact
-// same payload shape it always has (null, same as baseCommit/headRef were
-// before any caller supplied them). Never required, never validated
-// against the capability catalog here -- this is a log line, not a gate.
-export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, governance, plan, capability, mechanism, tier, fallbackReason, outcome }) {
-  const gov = governance ?? plan?.governance ?? null;
-  return appendEvent(resolveWriterLogPath(fgosDir), {
-    type: 'executor.dispatch',
-    payload: {
-      id,
-      executorId,
-      provider,
-      command,
-      model,
-      baseCommit: null,
-      headRef: null,
-      governance: gov,
-      capability: capability ?? null,
-      mechanism: mechanism ?? null,
-      tier: tier ?? null,
-      fallbackReason: fallbackReason ?? null,
-      // classifyDispatchConfidence (src/report/dispatch-confidence.mjs)
-      // already reads payload.outcome as its highest-confidence
-      // ('reported') source when present and not 'unsignaled' -- this is
-      // the write side completing that already-designed read path, not a
-      // new classification concept.
-      outcome: outcome ?? null,
-    },
-  });
-}
+// Re-exported from ../dispatch-log.mjs (R1 / M10 boundary simplification)
+export { logExecutorDispatch };
 
 function captureHeadSha(cwd) {
   try {
@@ -1261,155 +1214,8 @@ export async function decideExecutorCli(
   return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;
 }
 
-/**
- * `fanout-batch <id,id,...>` subcommand (fanout-execute-consolidation):
- * Consolidates the out-of-process dispatch chain (pick -> execute -> return)
- * and worker slot-checking/trimming into a single fast, testable call for fgos-fanout.
- */
-export async function fanoutBatchExecutorCli(
-  candidateIdsArg = [],
-  { cwd = process.cwd(), repoRoot, hasLiveTaskAccess = false } = {},
-) {
-  const candidateIds = Array.isArray(candidateIdsArg)
-    ? candidateIdsArg
-    : String(candidateIdsArg).split(',').map((s) => s.trim()).filter(Boolean);
-
-  const root = repoRoot ?? resolveMainCheckoutRoot(cwd) ?? resolveRepoRoot(cwd);
-  const fgosDir = fgosDirFromRoot(root);
-  const cfg = ensureRunnerConfigForDir(root);
-
-  const ceiling = readSharedConfigOrEmpty(root)?.workerSlots?.ceiling;
-  const slotsView = listWork(fgosDir);
-  const room = hasWorkerSlotRoom(slotsView, { ceiling, batchSize: candidateIds.length });
-
-  if (!room.allowed) {
-    return { fired: [], mechanismChanged: [], unavailable: [], deferred: [...candidateIds], slotsFull: true };
-  }
-
-  const freeSlots = room.free !== null && room.free !== undefined ? Math.max(0, room.free) : candidateIds.length;
-  const batchToRun = candidateIds.slice(0, freeSlots);
-  const deferred = candidateIds.slice(freeSlots);
-
-  const fired = [];
-  const mechanismChanged = [];
-  const unavailable = [];
-
-  const results = await Promise.allSettled(
-    batchToRun.map(async (candidateId) => {
-      const workItem = slotsView.work[candidateId];
-      if (!workItem) {
-        return { kind: 'unavailable', entry: { id: candidateId, reason: 'not-found' } };
-      }
-
-      const { mechanism, executorId } = compileDispatchPlan(cfg, {
-        work: candidateId,
-        workItem,
-        hasLiveTaskAccess,
-      });
-
-      if (mechanism === 'in-process') {
-        return { kind: 'mechanismChanged', entry: { id: candidateId, mechanism, executorId } };
-      }
-      if (mechanism === 'unavailable') {
-        return { kind: 'unavailable', entry: { id: candidateId, executorId } };
-      }
-
-      try {
-        // `--dir` must be the repo ROOT here, never `fgosDir` -- `dataDir()`
-        // (bin/fgos.mjs) always derives `.fgos` from `--dir` itself
-        // (`fgosDirFromRoot`), so passing an already-`.fgos` path doubles the
-        // suffix into a nonexistent `<root>/.fgos/.fgos`.
-        const execFgos = (args, options) => {
-          if (BIN_FGOS_PATH.endsWith('.mjs')) {
-            return execFileSync(process.execPath, [BIN_FGOS_PATH, ...args], options);
-          }
-          return execFileSync(BIN_FGOS_PATH, args, options);
-        };
-        const pickStdout = execFgos(['pick', candidateId, '--dir', root], {
-          encoding: 'utf8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-        // Every fgos.mjs verb response is wrapped in the fgos.v1 envelope
-        // (`wrapEnvelope`, unconditional) -- the real path lives at
-        // `data.worktree.path`, never a bare `.worktreePath`/`.path`.
-        const picked = JSON.parse(pickStdout);
-        const wtPath = picked.data?.worktree?.path || cwd;
-
-        const execRes = await executeExecutorCli(executorId, {
-          // Bug found running tsk-397's own fanout batches (2026-08-20): this
-          // call omitted `prompt` entirely, so `executeExecutorCli` fell back
-          // to its own default `prompt = ''` and every out-of-process executor
-          // (agy) received a literal empty prompt — no edits, no commit, then
-          // `return` below failed with "branch has not advanced". `spawnWorker`
-          // (this same file, above) already builds the work item's own prompt
-          // via `buildPrompt` before dispatching; this out-of-process path
-          // needs the identical prompt, built the identical way (no feedback,
-          // default 'executing' stage — the same defaults `spawnWorker` uses
-          // when its own `opts.feedback`/`opts.stage` are omitted).
-          prompt: buildPrompt(workItem),
-          cwd: wtPath,
-          repoRoot: root,
-          hasLiveTaskAccess,
-          // D20/D22 (review finding H1, tsk-397): lets executeExecutorCli
-          // resolve a real agentType via resolveAgentTypeForWork, same as
-          // spawnWorker already does.
-          work: workItem,
-        });
-
-        const returnArgs = ['return', candidateId, '--dir', root];
-        if (execRes && execRes.verifiedSha) {
-          returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
-        }
-        execFgos(returnArgs, {
-          cwd: wtPath,
-          encoding: 'utf8',
-          stdio: ['ignore', 'pipe', 'pipe'],
-        });
-
-        return {
-          kind: 'fired',
-          entry: {
-            id: candidateId,
-            status: execRes.status ?? 0,
-            signal: execRes.signal ?? null,
-            errorClass: execRes.errorClass ?? null,
-          },
-        };
-      } catch (err) {
-        return {
-          kind: 'fired',
-          entry: {
-            id: candidateId,
-            status: 1,
-            errorClass: err.errorClass || 'error',
-            error: err.message,
-          },
-        };
-      }
-    }),
-  );
-
-  for (let i = 0; i < results.length; i++) {
-    const res = results[i];
-    if (res.status === 'fulfilled') {
-      const { kind, entry } = res.value;
-      if (kind === 'fired') fired.push(entry);
-      else if (kind === 'mechanismChanged') mechanismChanged.push(entry);
-      else if (kind === 'unavailable') unavailable.push(entry);
-    } else {
-      const candidateId = batchToRun[i];
-      const err = res.reason;
-      fired.push({
-        id: candidateId,
-        status: 1,
-        errorClass: err?.errorClass || 'error',
-        error: err?.message || String(err),
-      });
-    }
-  }
-
-  return { fired, mechanismChanged, unavailable, deferred };
-}
+// Re-exported from ../fanout-batch.mjs (R1 / M10 boundary simplification)
+export { fanoutBatchExecutorCli };
 
 /**
  * Guard against --repo-root being passed without --cwd when process.cwd() resolves

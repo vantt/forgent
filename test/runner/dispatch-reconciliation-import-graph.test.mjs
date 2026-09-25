@@ -131,3 +131,38 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
   ].map((p) => path.join(root, p)).sort();
   assert.deepEqual([...seen].sort(), expected);
 });
+
+test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {
+  const dispatchDir = path.join(root, 'src/runner/dispatch');
+  const forbiddenPattern = /['"]pick['"]|['"]return['"]|\bappendEvent\b/;
+
+  function getFiles(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const files = [];
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...getFiles(fullPath));
+      } else if (entry.isFile() && (entry.name.endsWith('.mjs') || entry.name.endsWith('.js'))) {
+        files.push(fullPath);
+      }
+    }
+    return files;
+  }
+
+  const files = getFiles(dispatchDir);
+  assert.ok(files.length > 5, `expected at least 5 dispatch files, found ${files.length}`);
+
+  const violations = [];
+  for (const file of files) {
+    const content = fs.readFileSync(file, 'utf8');
+    const lines = content.split('\n');
+    lines.forEach((line, idx) => {
+      if (forbiddenPattern.test(line)) {
+        violations.push(`${path.relative(root, file)}:${idx + 1}: ${line.trim()}`);
+      }
+    });
+  }
+
+  assert.deepEqual(violations, [], `src/runner/dispatch/** must not reference 'pick', 'return', or appendEvent:\n${violations.join('\n')}`);
+});

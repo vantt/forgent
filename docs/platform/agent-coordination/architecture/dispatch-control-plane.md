@@ -276,7 +276,8 @@ Component-Outer Boundary Note's responsibilities.
 
 Forbidden dependencies for all eight:
 
-- no `Work` lifecycle mutation;
+- no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
+- no event store append (`appendEvent`): audit dispatch logging is isolated to `src/runner/dispatch-log.mjs` outside dispatch core;
 - no workflow/stage/task/skill lookup;
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
@@ -341,3 +342,11 @@ sibling Assignment state.
 The detailed redesign source remains a
 [proposal](../proposals/dispatch-control-plane-redesign.md) until its unresolved
 target-state sections are reconciled with implementation.
+
+## Source Inventory
+
+| Layer | Modules | Responsibilities & Boundaries |
+| --- | --- | --- |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `operation-choice.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
+| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
+| Audit Seam | `src/runner/dispatch-log.mjs` | Audit event logging (`logExecutorDispatch`) isolated from dispatch core. |

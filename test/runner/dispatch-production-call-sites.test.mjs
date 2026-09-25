@@ -14,7 +14,13 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
+import { addWork, listWork } from '../../src/state/store.mjs';
+import {
+  openDeclaredProtocolSession,
+  dispatchDeclaredOperation,
+} from '../../src/runner/coordination/session-engine.mjs';
 
 const WORKER_SESSION = 'fgos-worker';
 
@@ -564,6 +570,134 @@ test('http adapter routes through executeThroughConfinement and returns result w
     assert.equal(res.attestation.outcome, 'unknown');
   } finally {
     server.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> return and recovers with return --to blocked on execution failure (R1)', async () => {
+  const root = fixtureRepo();
+  const fgosDir = path.join(root, '.fgos');
+
+  // Script that succeeds and commits
+  const okScript = path.join(root, 'ok-executor.mjs');
+  fs.writeFileSync(
+    okScript,
+    `
+    import { execFileSync } from 'node:child_process';
+    execFileSync('git', ['commit', '--allow-empty', '-m', 'worker work done'], { stdio: 'ignore' });
+    process.exit(0);
+    `,
+  );
+
+  // Script that fails with an exit code
+  const failScript = path.join(root, 'fail-executor.mjs');
+  fs.writeFileSync(
+    failScript,
+    `
+    console.error('fatal executor failure');
+    process.exit(1);
+    `,
+  );
+
+  const cfg = JSON.parse(fs.readFileSync(path.join(fgosDir, 'config.json'), 'utf8'));
+  cfg.runner.executors['worker-ok'] = {
+    kind: 'agent',
+    command: process.execPath,
+    args: [okScript],
+    allowCrossProvider: true,
+  };
+  cfg.runner.executors['worker-fail'] = {
+    kind: 'agent',
+    command: process.execPath,
+    args: [failScript],
+    allowCrossProvider: true,
+  };
+  cfg.runner.capabilities['fgos-coding-planning'] = { prefer: 'worker-ok' };
+  cfg.runner.capabilities[IMPLEMENT_CAPABILITY] = { prefer: 'worker-fail' };
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(cfg, null, 2));
+
+  addWork(fgosDir, {
+    id: 'cand-ok',
+    title: 'Candidate OK',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'planning',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
+  });
+
+  addWork(fgosDir, {
+    id: 'cand-fail',
+    title: 'Candidate Fail',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
+  });
+
+  try {
+    const result = await fanoutBatchExecutorCli(['cand-ok', 'cand-fail'], { repoRoot: root, cwd: root });
+
+    assert.equal(result.fired.length, 2);
+    const okFired = result.fired.find((e) => e.id === 'cand-ok');
+    assert.equal(okFired?.status, 0);
+
+    const failFired = result.fired.find((e) => e.id === 'cand-fail');
+    assert.equal(failFired?.status, 1);
+
+    // Verify real store state
+    const view = listWork(fgosDir);
+    assert.equal(view.work['cand-ok'].status, 'awaiting-approval');
+    assert.equal(view.work['cand-fail'].status, 'blocked', 'failed executor must be settled to blocked rather than lingering in doing');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('dispatchDeclaredOperation routes to adapter in production coordination flow (R1)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper' }, async () => {
+  const root = fixtureRepo();
+  const mock = mockHerdr(root);
+  const DEFINITION_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
+
+  try {
+    await openDeclaredProtocolSession(
+      {
+        definitionId: DEFINITION_ID,
+        coordinationId: 'coord-prod-test',
+        objective: 'Test coordination dispatch down to adapter',
+        writerId: 'coord-driver',
+      },
+      { cwd: root, repoRoot: root },
+    );
+
+    const cfg = loadRunnerConfigFromDir(root);
+    // Explicitly prefer herdr-worker for doer actor
+    cfg.actors = { doer: { prefer: 'herdr-worker' } };
+
+    const res = await withMockHerdr(path.join(root, 'herdr'), () => dispatchDeclaredOperation(
+      'coord-prod-test',
+      {
+        operationId: 'produce-candidate',
+        targetActorId: 'doer',
+        objective: 'Produce candidate through mock adapter',
+        expectedOutputs: ['agent-result.json (status, summary)'],
+        writerId: 'coord-driver',
+        cliPolicy: { preferExecutor: 'herdr-worker' },
+      },
+      { cwd: root, repoRoot: root, runnerConfig: cfg },
+    ));
+
+    assert.ok(res, 'coordination dispatch returned a result');
+    const calls = mock.calls();
+    assert.ok(calls.some((c) => c[0] === 'workspace' || c[0] === 'pane'), 'mock herdr adapter was invoked by dispatchDeclaredOperation');
+  } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });

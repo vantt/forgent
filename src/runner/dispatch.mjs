@@ -66,11 +66,12 @@ export {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
   spawnWorker,
-  logExecutorDispatch,
   executeExecutorCli,
   decideExecutorCli,
-  fanoutBatchExecutorCli,
 } from './dispatch/cli.mjs';
+
+export { logExecutorDispatch } from './dispatch-log.mjs';
+export { fanoutBatchExecutorCli } from './fanout-batch.mjs';
 
 export {
   createAssignmentId,
