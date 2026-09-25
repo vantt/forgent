@@ -155,13 +155,18 @@ GitNexus Code Intelligence checks:
 ## 8. Full Suite (FULL_TEST)
 
 ```bash
-npm test
+echo "TEST_START: $(date --iso-8601=seconds)" && npm test 2>&1 | tee /tmp/phase01-final-full-suite.log; TEST_EXIT=${PIPESTATUS[0]}; echo "TEST_END: $(date --iso-8601=seconds)"; echo "TEST_EXIT: $TEST_EXIT"; sha256sum /tmp/phase01-final-full-suite.log
 ```
 
-Outcome: exit 0; duration 332786ms (~5.5 minutes).
-Test execution receipt:
-- Tests: 7745 total across 27 suites.
-- Passed: 7669.
+Execution timing & receipt:
+- Command: `npm test 2>&1 | tee /tmp/phase01-final-full-suite.log`
+- Start: `2026-09-25T17:44:55+07:00`
+- End: `2026-09-25T17:50:29+07:00`
+- Outcome: exit code 0; duration 332332ms (~5.5 minutes).
+- Retained observable log path: `/tmp/phase01-final-full-suite.log`
+- Retained log SHA-256: `23f3573a2f2cfde3e1391b35dbdc87d8c6f0dfc1053afa0ef6852f462a5e4b54`
+- Tests: 7746 total across 27 suites.
+- Passed: 7670.
 - Failed: 0.
 - Cancelled: 0.
 - Skipped: 8.
@@ -169,10 +174,12 @@ Test execution receipt:
 
 ## 9. Review Boundary and Residual Blockers
 
-- Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`)
+- Base: `38a337ecb31dc97b78aca012eba0da89c003a927` (tag: `documentation-authority-phase-00-20260925`; annotated tag object `cdbae3b9ebcf2b54c9ed726576fe0374e8cdcc77`)
 - Implementation commit: `2b2ee26d1394add8beb0e81fcaa00260cab5b3c9`
 - Evidence commit: `b143b4c66abfc2af2fe24b88920e65943c0e9aad`
-- Remediation commit (R1-R4): `6be0d6f3458bfca223ea4e17e3f6db06a6c085b3`
+- Remediation commit (R1-R4): `6be0d6f34ffbc48aafea1956e571335294159faa`
+- Remediation evidence commit: `7f398bb5b5f94292a3b437a0079ffe647d994400`
+- Residual remediation commit (R1/R3 residuals): `92b0a7e6ed28fd4f616b231d4583fd5c0ae637e8`
 - Review range: `documentation-authority-phase-00-20260925..HEAD`
 - Phase 01 completed.
 - Residual blockers: Phases 02–09 remain unauthorized and require separate human authorization before commencement.
