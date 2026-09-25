@@ -60,6 +60,8 @@
     "src/runner/dispatch/provider-adapter.mjs": "infra",
     "src/runner/dispatch/provider-capacity.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
+    "src/runner/dispatch/settlement.mjs": "infra",
+    "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
     "src/runner/dispatch/cli.mjs": "infra",
     "src/runner/dispatch/operation-choice.mjs": "use-case",
     "src/runner/dispatch/cli-spawn-supervisor.mjs": "infra",

@@ -4,7 +4,8 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
-import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../transport.mjs";
+import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
+import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";

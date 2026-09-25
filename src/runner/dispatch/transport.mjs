@@ -60,6 +60,10 @@ import {
   EXECUTOR_ADAPTERS,
   registerExecutorAdapter,
   getAdapterMetadata,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
+  currentDispatchDepth,
+  resolveExecutorEnv,
 } from './adapters.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
@@ -73,23 +77,11 @@ export {
   EXECUTOR_ADAPTERS,
   registerExecutorAdapter,
   getAdapterMetadata,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
+  currentDispatchDepth,
+  resolveExecutorEnv,
 };
-
-/** Env var a spawned child reads to know its own nested-dispatch depth,
- * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
- * child that never dispatches further never reads it, so this is inert
- * for the overwhelming majority of executors. */
-export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
-
-/** Hard cap on nested out-of-process dispatch depth (user decision: no
- * observed grandchild-dispatch incident yet, capped anticipatorily). */
-export const MAX_DISPATCH_DEPTH = 3;
-
-export function currentDispatchDepth() {
-  const raw = process.env[DISPATCH_DEPTH_ENV];
-  const n = raw ? Number(raw) : 0;
-  return Number.isFinite(n) && n >= 0 ? n : 0;
-}
 
 export function resolveHerdrBin(optsHerdrBin) {
   return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
@@ -153,17 +145,6 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
     baseCommit: readGit(['rev-parse', 'HEAD']),
     headRef: readGit(['symbolic-ref', '--short', '-q', 'HEAD']), // null on detached HEAD, never a throw
   };
-}
-
-export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
-  if (!rawEnv || typeof rawEnv !== 'object') return {};
-  const resolved = {};
-  for (const [k, v] of Object.entries(rawEnv)) {
-    if (typeof v === 'string') {
-      resolved[k] = v.replace(/\$\{([^}]+)\}/g, (_, varName) => baseEnv[varName] ?? '');
-    }
-  }
-  return resolved;
 }
 
 export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId } = {}) {
