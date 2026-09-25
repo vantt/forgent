@@ -1,46 +1,49 @@
-# Phase 03D / Unit I11 Runtime Remediation Report (Round 2)
+# Phase 03D / Unit I11 Runtime Remediation Report (Round 3)
 
-**Date:** 2026-09-25  
-**Unit:** I11 (Remediation Round 2)
-**Track:** `coordination-skill-harness-simplification`  
-**Capability:** `code:implement`  
-**Baseline commit:** `main@585d5ad1febc8067caad61b9d8953cf2002a750e`  
-**Worktree:** `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i11-remediation`  
-**Branch:** `coordination-skill-harness-i11-remediation`  
-**Candidate Code SHA:** `46896eb9de353b4fa88132995e4dfa5766eabdfc`
+**Date:** 2026-09-25
+**Unit:** I11 (Remediation Round 3)
+**Track:** `coordination-skill-harness-simplification`
+**Capability:** `code:implement`
+**Baseline commit:** `main@585d5ad1febc8067caad61b9d8953cf2002a750e`
+**Worktree:** `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i11-remediation`
+**Branch:** `coordination-skill-harness-i11-remediation`
+**Round 1 Candidate Code SHA:** `15e3c423851b9b55502c38b248a313b146ae1a8a` (docs tip `2927ed7a83d47ad04838634563a6e35ebcc7fe4b`)
+**Round 2 Candidate Code SHA:** `46896eb9de353b4fa88132995e4dfa5766eabdfc` (docs tip `e4fe98b847e4dae33cf08da478c005d0cc0c8970`)
+**Round 3 Candidate Code SHA:** `9cf843b6fbb786923992f9deb2f70deb447620a2`
 **Final Verdict:** `READY FOR INDEPENDENT RE-REVIEW`
 
 ---
 
 ## 1. Executive Summary
 
-This Round 2 remediation addresses all findings raised in the Unit I11 re-review (`REQUEST CHANGES` on candidate `15e3c423`):
+This Round 3 remediation resolves the approval-blocking finding (I11R2-01) and regression lock gap (I11R2-03) from the Unit I11 Round 2 re-review (`REQUEST CHANGES` on candidate `46896eb9`):
 
-1. **I11R-01 (F01 - HIGH) — Invert Caveat Gate to Explicit Allow-List**:
-   - **Finding**: The prior gate only checked exact strings `accepted`, `accept`, `cell-closed`. Any case variant (`Accepted`, `ACCEPTED`), whitespace (` accepted `), or semantic synonym (`approved`, `resolved`, `partially-accepted`, `cell-close`) bypassed the gate and appended disposition events on caveated sessions.
-   - **Remediation**: In `src/runner/coordination/store.mjs`, inverted the check to an explicit allow-list `NON_ACCEPTING_DISPOSITIONS = new Set(['rejected', 'reject', 'deferred', 'defer', 'recheck-required'])`. The disposition string is normalized via `trim().toLowerCase()`. Any disposition outside this allow-list is treated as having acceptance meaning and is strictly refused on caveated evidence under the held lock before any event mutation occurs (0 events appended). Idempotent replay of previously-recorded dispositions continues to succeed with `{ appended: false }`, but replaying with changed evidence fails closed with validation error.
-
-2. **I11R-02 (F02 - HIGH) — Single Authoritative CWD Resolver & Target Run Evidence**:
-   - **Finding**: Store, run, show, and close used divergent cwd resolution logic. Cwd was chosen by directory listing of attempts rather than the authoritative result-linked run. A target node lacking run evidence could be accepted due to fallback to `opts.cwd`.
+1. **I11R2-01 (F02 - HIGH, Approval-Blocking) — Fail Closed on Missing/Invalid Linked `run.json`**:
+   - **Finding**: In Round 2, `resolveNodeCwd` in `src/runner/coordination/dag-declaration.mjs` fell back to `defaultCwd` when a linked run did not have `run.json` or lacked a string `cwd`. When a linked `run.json` was deleted on a caveated session, store permitted clean acceptance, show reported `caveated=false`, and close bypassed caveat adjudication. Missing evidence silently converted into clean success.
    - **Remediation**:
-     - Centralized canonical cwd resolution into `resolveNodeCwd` in `src/runner/coordination/dag-declaration.mjs`, re-exported by `src/verbs/coordination/dag-scheduler.mjs` and used uniformly by `store.mjs`, `close.mjs`, `show.mjs`, `session-engine.mjs`, and `run.mjs`.
-     - In `resolveNodeCwd`, matching assignments are inspected for result-linked runs first (`result-linked.runId` in `events` or `results`), reading the linked attempt's `run.json`. Corrupt `run.json` fails closed with a typed `CoordinationError('corrupt-log')`.
-     - When unlinked, directory attempts in `runs/` are sorted numerically (`Number(a) - Number(b)`), handling unpadded directory names (e.g. `'9'` vs `'10'`), and scanned in reverse order.
-     - In `store.mjs`, if a disposition has acceptance meaning and targets an assignment, it validates that authoritative run evidence exists (linked run or readable disk run). If absent, it throws `CoordinationError('validation', ... has no run evidence ...)`.
-     - Fallback across all gates consistently defaults to `opts.cwd ?? process.cwd()`.
+     - In `src/runner/coordination/dag-declaration.mjs` (`resolveNodeCwd`):
+       - If a run is linked via `result-linked` event or result entry:
+         - If the run directory does not exist on disk, throws `CoordinationError('dangling-ref', ...)`.
+         - If `run.json` is missing, contains malformed JSON, or contains a non-string or empty `cwd`, throws `CoordinationError('corrupt-log', ...)`.
+       - For unlinked disk attempts:
+         - If `run.json` exists on disk but has a non-string or empty `cwd`, throws `CoordinationError('corrupt-log', ...)`.
+       - Added event tracking for `run-retried` events: retried runs invalidate prior `result-linked` pointers so retried nodes do not resolve against stale linked runs.
+     - In `src/verbs/coordination/show.mjs`:
+       - Run results are validated via `isAssignmentSettledWithEvidence` before caveat resolution so corrupt `result.json` throws `corrupt-log` directly.
+       - Catches `dangling-ref` (e.g. ghost run events without disk presence) and sets node cwd to `null` without catching or suppressing `corrupt-log`.
+     - In `src/verbs/coordination/run.mjs`:
+       - Pre-schedule and post-schedule caveat resolutions catch `dangling-ref` and set node cwd to `null` without swallowing `corrupt-log`.
+     - Across store, show, and close: missing or invalid linked `run.json` strictly fails closed with `corrupt-log`.
 
-3. **I11R-03 / I11R-04 (F03 - HIGH/MEDIUM) — Scheduler Outcome Reservation & M3a Regression Lock**:
-   - **Finding**: Re-review noted that restoring fallback `?? 'deferred'` in `dag-scheduler.mjs` left all 59 tests green (missing regression lock, mutation M3a survived). Additionally, descendants of a concurrency-cap deferred node were being marked `deferred` even though they did not experience concurrency-cap errors, violating proposal §4: *"No other error is deferred"*.
+2. **I11R2-03 (F02 - LOW, Regression Lock) — Numeric Attempt Sort Lock**:
+   - **Finding**: Mutation M2d (lexicographically sorting attempts) survived because existing fixtures used single-digit attempts.
    - **Remediation**:
-     - In `src/verbs/coordination/dag-scheduler.mjs`, pending steps whose dependencies did not settle are unconditionally marked `blocked` with `blockedBy = [unsettledDepNodeLabels]`, never `deferred`.
-     - Missing or unlinked evidence without an explicit `schedulerOutcome` defaults to `'materialized'`, not `'deferred'`.
-     - In `docs/platform/agent-coordination/proposals/dag-request-scheduler.md` §4.1, documented `materialized` in the outcome vocabulary (`settled | refused | blocked | deferred | materialized`).
-     - Added probe 6 subcase 3 which explicitly asserts that unsettled step results without `schedulerOutcome` default to `materialized`. When fallback `?? 'deferred'` is restored, probe 6 fails with a strict equality assertion error (mutation M3a killed).
+     - Added Probe 5 Subcase 9 asserting that unlinked attempt resolution sorts numerically (`Number(a) - Number(b)`), testing attempts `9` and `10` where lexicographical sorting (`"10" < "9"`) would select attempt `9` instead of `10`.
+     - Confirmed mutation M2d (reverting to `sort()`) fails with an `AssertionError`.
 
-4. **I11R-05 — Accounting & Tracking Hygiene**:
-   - Tracking plans updated to state "REMEDIATION ROUND 2 READY FOR INDEPENDENT RE-REVIEW" (removing "resolved" claims).
-   - Candidate code SHA `46896eb9de353b4fa88132995e4dfa5766eabdfc` and docs tip SHA recorded.
-   - Removed duplicate `assertDispositionRefOwnedBySession` call loop in `store.mjs`.
+3. **I11R2-04 — Accounting & Hygiene**:
+   - Updated tracking plans (`plan.md`, `plans/260917-cold-resumable-coordination-dag/plan.md`, `plans/260920-2217-dispatch-engine-hardening/plan.md`) with Round 3 candidate SHA `9cf843b6fbb786923992f9deb2f70deb447620a2` and Round 2 docs tip SHA `e4fe98b847e4dae33cf08da478c005d0cc0c8970`.
+   - Verified `git diff --check` passes cleanly (no trailing whitespace).
    - Unit I12 remains strictly `BLOCKED`.
 
 ---
@@ -51,8 +54,8 @@ This Round 2 remediation addresses all findings raised in the Unit I11 re-review
 - **Main Checkout Protection**: Main checkout `/home/vantt/projects/forgentX` was left untouched: zero file edits, no staging, no stashes, no reset, and no commits performed on main.
 - **Isolated Worktree**: All development, testing, and commits performed strictly within worktree `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-i11-remediation` on branch `coordination-skill-harness-i11-remediation`.
 - **Atomic Two-Commit Structure**:
-  1. Commit 1 (Code & Tests): `46896eb9de353b4fa88132995e4dfa5766eabdfc`
-  2. Commit 2 (Docs & Plans): tracked immediately following this report.
+  1. Commit 1 (Code & Tests): `9cf843b6fbb786923992f9deb2f70deb447620a2`
+  2. Commit 2 (Docs & Plans): `docs(coordination): record Unit I11 round 3 remediation and update tracking plans`
 
 ---
 
@@ -62,38 +65,34 @@ This Round 2 remediation addresses all findings raised in the Unit I11 re-review
 - **Manual Impact Analysis**:
   - `resolveNodeCwd` (`src/runner/coordination/dag-declaration.mjs`):
     - Callers: `store.mjs`, `dag-scheduler.mjs`, `close.mjs`, `show.mjs`, `session-engine.mjs`, `run.mjs`.
-    - Impact: All callers now share identical logic for finding node cwd: prioritizing linked run, numeric sorting of attempts, and fail-closed handling of corrupt `run.json`.
-  - `recordDriverDispositionLocked` (`src/runner/coordination/store.mjs`):
-    - Callers: CLI `fgos coordination disposition`, session engine.
-    - Impact: Any disposition with acceptance semantics is subject to the caveat adjudicability gate. Targets without run evidence fail closed.
-  - `scheduleDagSteps` (`src/verbs/coordination/dag-scheduler.mjs`):
-    - Callers: `run.mjs`.
-    - Impact: Steps blocked by deferred predecessors correctly receive `blocked` (with `blockedBy`), preserving §4 invariant.
+    - Impact: All callers fail closed when a linked run lacks `run.json` or string `cwd`. Ghost runs without disk directories raise `dangling-ref`, which CLI verbs handle safely while preserving `corrupt-log` failures.
+  - `showCoordinationSession` (`src/verbs/coordination/show.mjs`):
+    - Validates `RunResult` payload integrity upfront so corrupt `result.json` produces clear `corrupt-log` errors.
 
 ---
 
 ## 4. Verification & Mutation Proofs
 
 ### 4.1 Mutation Proofs
-- **M1 (Disable F01 Allow-List Gate)**: Reverting the allow-list gate causes Probe 2 to fail on case variants, whitespace variants, and synonym variants (`Accepted`, `APPROVED`, etc.). -> **RED**
-- **M2 (Remove dagNodeId Filtering in F02)**: Removing `dagNodeId` filtering causes Probe 5 to fail across reversed manifest order, Case L, Case R, and sibling isolation subcases. -> **RED**
+- **Silent Fallback Mutation (I11R2-01)**: Reverting fail-closed behavior to silent fallback on missing `run.json` causes Probe 5 Subcase 8 to fail (`Missing expected exception: store must throw corrupt-log when linked run.json is deleted`). -> **RED**
+- **M2d Lexicographical Sort Mutation (I11R2-03)**: Changing `.sort((a, b) => Number(a) - Number(b))` to `.sort()` causes Probe 5 Subcase 9 to fail (`AssertionError: unlinked attempt resolution must sort numerically (10 > 9)`). -> **RED**
+- **M1 (Disable F01 Allow-List Gate)**: Reverting the allow-list gate causes Probe 2 to fail on casing, whitespace, and synonym variants. -> **RED**
+- **M2 (Remove dagNodeId Filtering in F02)**: Removing `dagNodeId` filtering causes Probe 5 to fail across reversed manifest order and sibling isolation subcases. -> **RED**
 - **M3a (Restore Fallback `?? 'deferred'` in F03)**: Restoring fallback `?? 'deferred'` causes Probe 6 subcase 3 to fail (`assert.strictEqual(result.outcome, 'materialized')`). -> **RED**
 
 ### 4.2 Test Suite Matrix
 - **Deferred Probes (`test/runner/coordination-dag-deferred-probes.test.mjs`)**:
   - **6 passed / 0 fail / 0 todo**
-  - Probe 1: Unlinked node outcome taxonomy & projection parity (`materialized`).
-  - Probe 2: F01 allow-list gate refuses all 11 accepting casing/whitespace/synonym variants; 0 events appended; `rejected` allowed; idempotent replay ok; tampering fails closed.
-  - Probe 3: Caveated session cannot close or discharge caveat.
-  - Probe 4: Distinct node cwds allow disposition without false positive caveats.
-  - Probe 5: F02 node cwd attribution matrix: reversed manifest order, Case L (linked attempt 01 in shared cwd, unlinked 02 in distinct cwd), Case R, Case N (unpadded '9' vs '10'), target missing run refused, sibling at repo root fails closed with caveat refusal, corrupt sibling `run.json` throws `corrupt-log` at store and show.
-  - Probe 6: F03 outcome matrix: concurrency-cap deferral & retry, descendant `blocked` with `blockedBy`, missing/unlinked evidence defaults to `materialized` (killing M3a), non-validation error throws.
-- **Driver Steps Suite (`test/verbs/coordination-run-driver-steps.test.mjs`)**:
-  - **86 passed / 0 fail / 0 todo**
-- **Focused DAG Suite**:
-  - 6 files, **43 passed / 0 fail / 0 todo**
-- **Coordination Suite**:
-  - **771 passed / 0 fail / 0 todo**
+  - Subcase 8 verifies missing/corrupt linked `run.json` throws `corrupt-log` across store, show, and close.
+  - Subcase 9 locks numeric sorting for unlinked attempts (`10 > 9`).
+- **Focused DAG Suite** (6 files):
+  - **59 passed / 0 fail / 0 todo**
+- **Core Coordination Suite** (`store`, `replay`, `session-engine`, `run-driver-steps`):
+  - **191 passed / 0 fail / 0 todo**
+- **Coordination-Wide Suite**:
+  - **1045 passed / 0 fail / 0 todo**
+- **Timing Debt Suite** (3 runs):
+  - **30 passed / 0 fail / 0 todo**
 - **Full Suite (`npm test`)**:
   - **7652 passed / 0 failed / 8 skipped / 65 todo** (Exit code: 0)
 
@@ -101,7 +100,7 @@ This Round 2 remediation addresses all findings raised in the Unit I11 re-review
 
 ## 5. Dependent Units & Next Actions
 
-- **Unit I11**: Remediation Round 2 complete and verified across all matrices. Status transitioned to **READY FOR INDEPENDENT RE-REVIEW**.
+- **Unit I11**: Remediation Round 3 complete and verified across all matrices. Status transitioned to **READY FOR INDEPENDENT RE-REVIEW**.
   - *Per track policy, Unit I11 is NOT self-declared VERIFIED or APPROVED.*
 - **Unit I12**: Remains strictly **BLOCKED** awaiting independent review approval of Unit I11.
-- Candidate branch `coordination-skill-harness-i11-remediation` (code SHA `46896eb9de353b4fa88132995e4dfa5766eabdfc`) is handed off for independent re-review.
+- Candidate branch `coordination-skill-harness-i11-remediation` (code SHA `9cf843b6fbb786923992f9deb2f70deb447620a2`) is handed off for independent re-review.

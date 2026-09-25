@@ -142,4 +142,4 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Follow-up finding `I09-REV-15` (candidate test timing regression in `coordination-r5-hard-budgets.test.mjs`) resolved and verified on current main baseline.
   - 14 focused suites pass (538 passed / 0 failed, `git diff --check` clean).
   - Unit **I10 status: INTEGRATED AND VERIFIED at main@605d26fe** (carried through `main@26a1038e` and `main@ac19f6d1`).
-  - Unit **I11 status: REMEDIATION ROUND 2 READY FOR INDEPENDENT RE-REVIEW** (candidate SHA `46896eb9de353b4fa88132995e4dfa5766eabdfc`; round 2 addresses I11R-01/F01, I11R-02/F02, I11R-03/F03; I11 not self-declared verified; Unit I12 remains strictly BLOCKED).
+  - Unit **I11 status: REMEDIATION ROUND 3 READY FOR INDEPENDENT RE-REVIEW** (round 2 candidate `46896eb9de353b4fa88132995e4dfa5766eabdfc`, docs tip `e4fe98b847e4dae33cf08da478c005d0cc0c8970`; round 3 candidate SHA `9cf843b6fbb786923992f9deb2f70deb447620a2`; remediates I11R2-01 missing/invalid linked run.json and locks M2d numeric attempt sort; full suite 7652 pass exit 0; I11 not self-declared verified; Unit I12 remains strictly BLOCKED).
