@@ -11,26 +11,35 @@ import crypto from 'node:crypto';
 import child_process from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-// --- Canonical JSON and Digests -------------------------------------------
+// --- Canonical JSON, Digests, Fsynced Publication and Command Envelopes ---
+// Re-exported from leaf proof-helpers.mjs (Phase 09 R4) for backward compatibility.
+import {
+  canonicalJson,
+  computeSha256Digest,
+  publishImmutableProof,
+  publishMutableProjection,
+  publishSecretSideFile,
+  consumeSecretSideFile,
+  readSecretSideFile,
+  updateCommandEnvelope,
+  commitCommandOutcome,
+  patchCommandRecord,
+  readCommandState,
+} from './proof-helpers.mjs';
 
-export function canonicalJson(value) {
-  if (value === null || typeof value !== 'object') {
-    return JSON.stringify(value);
-  }
-  if (Array.isArray(value)) {
-    return '[' + value.map((elem) => canonicalJson(elem)).join(',') + ']';
-  }
-  const keys = Object.keys(value).sort();
-  const entries = keys
-    .filter((k) => value[k] !== undefined)
-    .map((k) => JSON.stringify(k) + ':' + canonicalJson(value[k]));
-  return '{' + entries.join(',') + '}';
-}
-
-export function computeSha256Digest(value) {
-  const serialized = typeof value === 'string' ? value : canonicalJson(value);
-  return `sha256:${crypto.createHash('sha256').update(serialized).digest('hex')}`;
-}
+export {
+  canonicalJson,
+  computeSha256Digest,
+  publishImmutableProof,
+  publishMutableProjection,
+  publishSecretSideFile,
+  consumeSecretSideFile,
+  readSecretSideFile,
+  updateCommandEnvelope,
+  commitCommandOutcome,
+  patchCommandRecord,
+  readCommandState,
+};
 
 // --- Host, Boot, Process Info --------------------------------------------
 
@@ -77,98 +86,6 @@ function isBoundProcessAlive(bound) {
   if (!bound.processStartTime) return true;
   const liveStartTime = getProcessStartTime(bound.pid);
   return !liveStartTime || liveStartTime === bound.processStartTime;
-}
-
-// --- Fsynced Publication Helpers ------------------------------------------
-
-function fsyncDirBestEffort(dir) {
-  let fd;
-  try {
-    fd = fs.openSync(dir, 'r');
-    fs.fsyncSync(fd);
-  } catch {
-  } finally {
-    if (fd !== undefined) {
-      try { fs.closeSync(fd); } catch {}
-    }
-  }
-}
-
-export function publishImmutableProof(targetPath, record) {
-  const dir = path.dirname(targetPath);
-  fs.mkdirSync(dir, { recursive: true });
-  const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  try {
-    fs.linkSync(tmpPath, targetPath);
-  } catch (err) {
-    try { fs.unlinkSync(tmpPath); } catch {}
-    if (err.code === 'EEXIST') {
-      return false;
-    }
-    throw err;
-  }
-  try { fs.unlinkSync(tmpPath); } catch {}
-  fsyncDirBestEffort(dir);
-  return true;
-}
-
-export function publishMutableProjection(targetPath, record) {
-  const dir = path.dirname(targetPath);
-  fs.mkdirSync(dir, { recursive: true });
-  const content = typeof record === 'string' ? record : `${JSON.stringify(record, null, 2)}\n`;
-  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-  const fd = fs.openSync(tmpPath, 'w');
-  try {
-    fs.writeSync(fd, content);
-    fs.fsyncSync(fd);
-  } finally {
-    fs.closeSync(fd);
-  }
-  fs.renameSync(tmpPath, targetPath);
-  fsyncDirBestEffort(dir);
-}
-
-// H11: secrets (a worker's real spawn environment) never belong in an
-// envelope/prepared-invocation record persisted alongside evidence -- those
-// records are kept indefinitely and are readable by any tool that can read
-// the run directory. This side file holds the one thing that legitimately
-// needs the real values: the actual env a real spawn requires. Mode 0600,
-// parent dir 0700 (best-effort on platforms without POSIX modes), and the
-// caller (the supervisor, immediately after it reads this to spawn) is
-// responsible for unlinking it -- it is never linked to via a digest the
-// way `publishImmutableProof`'s targets are, and it is never meant to
-// outlive the spawn it was written for.
-export function publishSecretSideFile(targetPath, record) {
-  const dir = path.dirname(targetPath);
-  fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  try { fs.chmodSync(dir, 0o700); } catch {}
-  const content = typeof record === 'string' ? record : JSON.stringify(record);
-  fs.writeFileSync(targetPath, content, { mode: 0o600 });
-  try { fs.chmodSync(targetPath, 0o600); } catch {}
-}
-
-/** Read then immediately delete a secret side file -- "the supervisor reads
- * it then unlinks it". Returns `null` (never throws) when the file is
- * already gone or unreadable, so a caller can fall back to whatever env the
- * envelope itself carries. */
-export function consumeSecretSideFile(targetPath) {
-  let parsed = null;
-  try {
-    parsed = JSON.parse(fs.readFileSync(targetPath, 'utf8'));
-  } catch {
-    return null;
-  } finally {
-    try { fs.unlinkSync(targetPath); } catch {}
-  }
-  return parsed;
 }
 
 // --- Immutable Proof Publication and Collision Errors ---------------------
@@ -1006,124 +923,6 @@ export function commitCommandPending({
 
   publishMutableProjection(commandPath, commandState);
   return commandState;
-}
-
-export function updateCommandEnvelope({
-  runDir,
-  launchCommandId,
-  controlEpoch,
-  controlToken,
-  envelopeDigest,
-}) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) {
-    throw new Error(`Command state file "${commandPath}" does not exist.`);
-  }
-  const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  const controlTokenDigest = computeSha256Digest(controlToken);
-  if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
-    throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
-  }
-  if (existing.state !== 'pending') {
-    throw new Error(`Cannot update envelope on command with state "${existing.state}".`);
-  }
-
-  const updated = {
-    ...existing,
-    envelopeDigest,
-  };
-  publishMutableProjection(commandPath, updated);
-  return updated;
-}
-
-export function commitCommandOutcome({
-  runDir,
-  launchCommandId,
-  controlEpoch,
-  controlToken,
-  outcome,
-  state = 'reconciled',
-  receiptDigest = null,
-  bindingDigest = null,
-  // Phase 03 R5: a terminal commit (settleRound's own "reconciled" write)
-  // sometimes also needs to land paneId/agentSession/resourceIncarnation in
-  // the SAME write as the outcome, rather than as a second, separately
-  // CAS-checked call. Merged before the named fields below so `state`/
-  // `outcome`/the digest fields always win on overlap -- this never lets a
-  // patch silently redefine what a "commit" itself means.
-  patch = {},
-}) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) {
-    throw new Error(`Command state file "${commandPath}" does not exist.`);
-  }
-  const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  // A caller with no live control context at all (controlToken === undefined
-  // -- a passive/read-mostly reconcile, or a direct call outside the
-  // assignment-owned launch path that never threaded one) has nothing to
-  // fence against and nothing to be stale relative to: the CAS check exists
-  // to stop a SUPERSEDED controller from winning a write, which presupposes
-  // the caller once held a real one. Skipped only in that specific case;
-  // any caller that DOES pass a controlToken (right or wrong) still gets
-  // the full check below, unchanged.
-  if (controlToken !== undefined) {
-    const controlTokenDigest = computeSha256Digest(controlToken);
-    if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
-      throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
-    }
-  }
-
-  const updated = {
-    ...existing,
-    ...patch,
-    state,
-    outcome,
-    receiptDigest: receiptDigest ?? existing.receiptDigest,
-    bindingDigest: bindingDigest ?? existing.bindingDigest,
-  };
-  publishMutableProjection(commandPath, updated);
-  return updated;
-}
-
-/**
- * H13: the same controlEpoch/controlToken CAS check `commitCommandOutcome`
- * applies, for a write that must NOT itself commit a terminal state/outcome
- * -- persisting paneId/agentSession/resourceIncarnation onto a command
- * record that is genuinely still pending (herdr-round.mjs's pre-launch and
- * pre-prompt writes). Before this existed, those writes went straight
- * through `publishMutableProjection` with no epoch/token check at all: a
- * controller whose epoch had already been superseded (a newer attempt for
- * the same Run has since taken over) could still silently overwrite the
- * CURRENT controller's own command record -- the exact class of
- * cross-controller clobber `commitCommandOutcome` exists to prevent for a
- * terminal write, just never extended to an interim one.
- */
-export function patchCommandRecord({ runDir, launchCommandId, controlEpoch, controlToken, patch }) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) {
-    throw new Error(`Command state file "${commandPath}" does not exist.`);
-  }
-  const existing = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  // Same no-live-context exemption as commitCommandOutcome above.
-  if (controlToken !== undefined) {
-    const controlTokenDigest = computeSha256Digest(controlToken);
-    if (existing.controlEpoch !== controlEpoch || existing.controlTokenDigest !== controlTokenDigest) {
-      throw new Error(`Control token/epoch mismatch for command "${launchCommandId}".`);
-    }
-  }
-  const updated = { ...existing, ...patch };
-  publishMutableProjection(commandPath, updated);
-  return updated;
-}
-
-export function readCommandState(runDir, launchCommandId) {
-  const commandPath = path.join(runDir, 'controller', 'commands', `${launchCommandId}.json`);
-  if (!fs.existsSync(commandPath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-  } catch {
-    return null;
-  }
 }
 
 // --- Reconciliation V1 ----------------------------------------------------

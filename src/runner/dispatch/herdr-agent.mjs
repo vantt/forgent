@@ -53,17 +53,9 @@ export class HerdrError extends Error {
  * not a limit anything has -- it simply never bit, because every name measured
  * in testing was short. The first dispatch of a real capability produced
  * `fgos-fgos-coding-implement-<ts>` at 35 characters and herdr refused it. */
-export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
-  const cleaned = String(raw ?? '')
-    .toLowerCase()
-    .replace(/[^a-z0-9_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-  if (cleaned.length <= maxLength) return cleaned || 'fgos-agent';
-  const hashLen = Math.min(8, Math.floor(maxLength / 2));
-  const hash = createHash('sha1').update(cleaned).digest('hex').slice(0, hashLen);
-  const head = maxLength - hashLen;
-  return `${cleaned.slice(0, head)}${hash}`;
-}
+import { normalizeAgentName } from './proof-helpers.mjs';
+export { normalizeAgentName };
+
 
 function defaultRun(bin, args, { cwd, env, timeoutMs }) {
   try {
