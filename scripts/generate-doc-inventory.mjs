@@ -124,20 +124,28 @@ function makeClaimBaseId({ sourceId, unitKind, textDigest, title, claimKind, sta
   return `claim_${stableHash([sourceId, unitKind, textDigest, slugText(title), claimKind, status].join('\n'), 24)}`;
 }
 
-export function loadIdentityRegistry(commitSha, repoRoot) {
+function buildUnitIdentityDigest(unit) {
+  return sha256(`${unit.unitKind}\n${unit.textDigest}`);
+}
+
+function readIdentityRegistryPath(registryPath, repoRoot = process.cwd()) {
+  if (!registryPath || typeof registryPath !== 'string') throw new Error('--identity-registry <path> is required for inventory generation (explicit pinned registry; no fallback)');
+  const resolved = path.isAbsolute(registryPath) ? registryPath : path.resolve(repoRoot, registryPath);
+  let raw;
+  try { raw = fs.readFileSync(resolved); }
+  catch (err) { throw new Error(`Unable to read identity registry ${registryPath}: ${err.message}`); }
   try {
-    return JSON.parse(readBlobAtCommit(commitSha, IDENTITY_REGISTRY_PATH, repoRoot));
-  } catch {
-    const workingPath = path.resolve(repoRoot, IDENTITY_REGISTRY_PATH);
-    if (fs.existsSync(workingPath)) return JSON.parse(fs.readFileSync(workingPath, 'utf8'));
-    return { version: 1, documents: [], units: [] };
-  }
+    const registry = JSON.parse(raw.toString('utf8'));
+    registry._binding = { path: normalizePosix(path.relative(repoRoot, resolved) || resolved), bytes: raw.length, sha256: sha256Bytes(raw) };
+    return registry;
+  } catch (err) { throw new Error(`Unable to parse identity registry ${registryPath}: ${err.message}`); }
 }
 
 export function buildIdentityRegistryIndex(registry = {}) {
   const docByPath = new Map();
   const docConflictsByPath = new Map();
   const unitsByDigest = new Map();
+  const unitsByFingerprint = new Map();
   for (const doc of registry.documents || []) {
     if (!doc?.path || !doc?.sourceId) continue;
     const p = normalizePosix(doc.path);
@@ -146,11 +154,17 @@ export function buildIdentityRegistryIndex(registry = {}) {
   }
   for (const unit of registry.units || []) {
     if (!unit?.unitDigest || !unit?.claimId) continue;
+    const normalized = { ...unit, sourcePath: unit.sourcePath ? normalizePosix(unit.sourcePath) : null };
     const arr = unitsByDigest.get(unit.unitDigest) || [];
-    arr.push({ ...unit, sourcePath: unit.sourcePath ? normalizePosix(unit.sourcePath) : null });
+    arr.push(normalized);
     unitsByDigest.set(unit.unitDigest, arr);
+    if (unit.identityFingerprint) {
+      const fpArr = unitsByFingerprint.get(unit.identityFingerprint) || [];
+      fpArr.push(normalized);
+      unitsByFingerprint.set(unit.identityFingerprint, fpArr);
+    }
   }
-  return { docByPath, docConflictsByPath, unitsByDigest };
+  return { docByPath, docConflictsByPath, unitsByDigest, unitsByFingerprint };
 }
 
 function explicitIdentityGapId(prefix, seed, len = 24) {
@@ -164,18 +178,22 @@ function resolveRegisteredSourceId(identityIndex, sourcePath) {
   return sourceId ? { sourceId, identityStatus: 'carried-forward' } : { sourceId: null, identityStatus: 'missing-source-registry-gap' };
 }
 
-function resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath = null, sourceAnchor = null) {
+function resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath = null, sourceAnchor = null, identityFingerprint = null) {
   const p = sourcePath ? normalizePosix(sourcePath) : null;
-  const matches = identityIndex?.unitsByDigest?.get(unitDigest) || [];
-  const pathMatches = p ? matches.filter((m) => normalizePosix(m.sourcePath || '') === p) : matches;
-  const anchorMatches = sourceAnchor ? pathMatches.filter((m) => m.sourceAnchor === sourceAnchor) : pathMatches;
-  const bestMatches = anchorMatches.length > 0 ? anchorMatches : pathMatches;
-  const pathIds = [...new Set(bestMatches.map((m) => m.claimId).filter(Boolean))];
-  if (pathIds.length === 1) return { claimId: pathIds[0], identityStatus: 'carried-forward' };
-  if (pathIds.length > 1) return { claimId: null, identityStatus: 'ambiguous-registry-gap' };
-  const claimIds = [...new Set(matches.map((m) => m.claimId).filter(Boolean))];
-  if (claimIds.length > 0) return { claimId: null, identityStatus: 'ambiguous-registry-gap' };
-  return { claimId: null, identityStatus: 'missing-registry-gap' };
+  const matchSets = [];
+  if (identityFingerprint) matchSets.push(identityIndex?.unitsByFingerprint?.get(identityFingerprint) || []);
+  matchSets.push(identityIndex?.unitsByDigest?.get(unitDigest) || []);
+  let sawAmbiguous = false;
+  for (const matches of matchSets) {
+    if (matches.length === 0) continue;
+    const pathMatches = p ? matches.filter((m) => normalizePosix(m.sourcePath || '') === p) : matches;
+    const pathIds = [...new Set(pathMatches.map((m) => m.claimId).filter(Boolean))];
+    if (pathIds.length === 1) return { claimId: pathIds[0], identityStatus: 'carried-forward' };
+    if (pathIds.length > 1) { sawAmbiguous = true; continue; }
+    const claimIds = [...new Set(matches.map((m) => m.claimId).filter(Boolean))];
+    if (claimIds.length > 0) sawAmbiguous = true;
+  }
+  return { claimId: null, identityStatus: sawAmbiguous ? 'ambiguous-registry-gap' : 'missing-registry-gap' };
 }
 
 /** Builds exact-route and longest-prefix lookup from the Phase 01 switchboard. */
@@ -534,6 +552,24 @@ export function extractMarkdownConservationUnits(content) {
     }
   }
   flushUnheaded(lines.length);
+
+  const headingIndexes = units.map((u, idx) => u.unitKind === 'heading' ? idx : -1).filter((idx) => idx >= 0);
+  for (let hIdx = 0; hIdx < headingIndexes.length; hIdx += 1) {
+    const idx = headingIndexes[hIdx];
+    const unit = units[idx];
+    const nextHeading = headingIndexes[hIdx + 1] != null ? units[headingIndexes[hIdx + 1]] : null;
+    const sectionEnd = nextHeading ? nextHeading.startLine - 1 : lines.length;
+    const payload = lines.slice(unit.startLine, sectionEnd).join('\n').trim();
+    const following = units[idx + 1] && units[idx + 1].unitKind !== 'heading' ? units[idx + 1].textDigest : '';
+    const sectionPayloadDigest = sha256(payload);
+    unit.sectionPayloadDigest = sectionPayloadDigest;
+    unit.followingBlockDigest = following || null;
+    unit.textDigest = sha256(`heading\n${unit.level}\n${unit.title}\n${sectionPayloadDigest}\n${following || ''}`);
+    unit.identityFingerprint = sha256(`heading\n${unit.level}\n${slugText(unit.title)}\n${sectionPayloadDigest}\n${following || ''}`);
+  }
+  for (const unit of units) {
+    if (!unit.identityFingerprint) unit.identityFingerprint = sha256(`${unit.unitKind}\n${unit.textDigest}`);
+  }
   return units;
 }
 
@@ -547,6 +583,7 @@ export function extractMixedFileConservationUnit(relPath, content) {
     startLine: 1,
     endLine: content.split(/\r?\n/).length,
     textDigest: sha256(content),
+    identityFingerprint: sha256(`file-block\n${sha256(content)}`),
     sample: content.slice(0, 180),
   }];
 }
@@ -680,6 +717,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
   }
   const consumersByPath = new Map(normalizedTargets.map((p) => [p, []]));
   const scanGaps = [];
+  const unresolvedConsumerEdges = [];
   const allEntries = parseLsTreeLong(execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
     cwd: repoRoot,
     encoding: 'utf8',
@@ -692,6 +730,82 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
 
   function add(target, file, lineNo, kind, extra = {}) {
     addUnique(consumersByPath, target, { path: file, line: lineNo, kind, ...extra });
+  }
+
+  function addUnresolved(file, lineNo, kind, pattern, extra = {}) {
+    unresolvedConsumerEdges.push({
+      edgeId: `consumer_unresolved_${stableHash(`${file}\n${lineNo || ''}\n${kind}\n${pattern}`, 24)}`,
+      path: file,
+      line: lineNo,
+      kind,
+      unresolvedDynamicPattern: pattern,
+      targetPath: pattern,
+      identityStatus: 'unresolved-dynamic-pattern',
+      ...extra,
+    });
+  }
+
+  function lineNumberAt(content, offset) {
+    return content.slice(0, offset).split(/\r?\n/).length;
+  }
+
+  function parseCallArguments(src) {
+    const args = [];
+    let idx = 0;
+    while (idx < src.length) {
+      while (idx < src.length && /[\s,]/.test(src[idx])) idx += 1;
+      const quote = src[idx];
+      if (quote === '"' || quote === "'" || quote === '`') {
+        let end = idx + 1;
+        let dynamicTemplate = false;
+        while (end < src.length) {
+          if (src[end] === '\\') { end += 2; continue; }
+          if (quote === '`' && src[end] === '$' && src[end + 1] === '{') dynamicTemplate = true;
+          if (src[end] === quote) break;
+          end += 1;
+        }
+        args.push({ literal: !dynamicTemplate, value: src.slice(idx + 1, end) });
+        idx = end + 1;
+      } else {
+        let end = idx;
+        while (end < src.length && src[end] !== ',') end += 1;
+        const value = src.slice(idx, end).trim();
+        if (value) args.push({ literal: false, value });
+        idx = end + 1;
+      }
+    }
+    return args;
+  }
+
+  function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {
+    const segs = args.map((arg, idx) => {
+      if (newUrl && idx === 1 && /^import\.meta\.url$/.test(arg.value)) return '';
+      if (!arg.literal) return '**';
+      return arg.value;
+    }).filter((v) => v !== '');
+    if (segs.length === 0) return null;
+    const raw = normalizePosix(path.posix.join(...segs));
+    const pattern = raw.includes('**') ? raw : raw;
+    return normalizeDocTarget(pattern, sourceFile) || pattern;
+  }
+
+  function scanDynamicCalls(content, file) {
+    const callRe = /(?:path\.(?:join|resolve)|new\s+URL)\s*\(([\s\S]*?)\)/g;
+    let m;
+    while ((m = callRe.exec(content)) !== null) {
+      const args = parseCallArguments(m[1]);
+      if (args.length === 0) continue;
+      const isNewUrl = m[0].startsWith('new');
+      const pattern = dynamicPatternFromArgs(args, file, isNewUrl);
+      if (!pattern || !/^(docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos|AGENTS\.md|CLAUDE\.md)(\/|$)/.test(pattern)) continue;
+      const lineNo = lineNumberAt(content, m.index);
+      if (pattern.includes('**')) {
+        addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget: m[0].replace(/\s+/g, ' ').slice(0, 240) });
+        continue;
+      }
+      if (targetSet.has(pattern)) add(pattern, file, lineNo, 'dynamic', { resolvedTarget: pattern });
+      for (const target of normalizedTargets) if (target.startsWith(pattern + '/')) add(target, file, lineNo, 'dynamic', { dynamicPrefix: pattern, unresolvedDynamic: true });
+    }
   }
 
   for (const file of allPaths) {
@@ -708,6 +822,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
       scanGaps.push({ type: 'consumer-scan-unreadable', path: file, message: `${file}: unable to read blob: ${err.message}` });
       continue;
     }
+    scanDynamicCalls(content, file);
     const lines = content.split(/\r?\n/);
     for (let i = 0; i < lines.length; i += 1) {
       const line = lines[i];
@@ -725,17 +840,6 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
         if (token.includes('*')) {
           const re = globToRegExp(token);
           for (const target of normalizedTargets) if (re.test(target)) add(target, file, lineNo, 'glob', { rawTarget: link.raw, resolvedTarget: token });
-        }
-      }
-
-      const joinMatch = line.match(/path\.(?:join|resolve)\(([^)]*)\)/);
-      if (joinMatch) {
-        const parts = [...joinMatch[1].matchAll(/['"]([^'"]+)['"]/g)].map((part) => part[1]);
-        const prefix = normalizePosix(parts.filter((part) => !/[${}*<>]/.test(part)).join('/'));
-        if (prefix) {
-          for (const target of normalizedTargets) {
-            if (target === prefix || target.startsWith(prefix + '/')) add(target, file, lineNo, 'dynamic', { dynamicPrefix: prefix, unresolvedDynamic: !parts.some((part) => /\.[A-Za-z0-9]+$/.test(part)) });
-          }
         }
       }
 
@@ -779,6 +883,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
   })).sort((a, b) => a.ref.localeCompare(b.ref));
   Object.defineProperty(consumersByPath, 'scanGaps', { value: scanGaps, enumerable: false });
   Object.defineProperty(consumersByPath, 'immutableRefEdges', { value: immutableRefEdges, enumerable: false });
+  Object.defineProperty(consumersByPath, 'unresolvedConsumerEdges', { value: [...new Map(unresolvedConsumerEdges.map((e) => [e.edgeId, e])).values()].sort((a, b) => a.path.localeCompare(b.path) || String(a.line || '').localeCompare(String(b.line || ''))), enumerable: false });
   return consumersByPath;
 }
 
@@ -814,14 +919,16 @@ export function buildInventoryRow(relPath, { content, sourceDigest: providedSour
 
   const claims = units.map((u) => {
     const kind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
-    const unitDigest = sha256(`${u.unitKind}\n${u.textDigest}\n${kind}\n${claimStatus}`);
-    const resolvedIdentity = resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath, u.anchor);
-    const hasIdentityGap = resolvedSourceIdentity.identityStatus !== 'carried-forward' || resolvedIdentity.identityStatus !== 'carried-forward';
-    const baseClaimId = resolvedIdentity.claimId || explicitIdentityGapId('claim', `${sourcePath}\n${unitDigest}`);
-    const duplicateOrdinal = baseIdCounts.get(baseClaimId) || 0;
-    baseIdCounts.set(baseClaimId, duplicateOrdinal + 1);
-    const claimId = duplicateOrdinal === 0 ? baseClaimId : `${baseClaimId}_dup_${stableHash(`${u.anchor}\n${duplicateOrdinal}`, 8)}`;
-    const relations = duplicateOrdinal === 0 ? [] : [{ type: 'same-source-identical-content-duplicate', claimId: baseClaimId, duplicateOrdinal }];
+    const unitDigest = buildUnitIdentityDigest(u);
+    const resolvedIdentity = resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath, u.anchor, u.identityFingerprint);
+    const duplicateOrdinal = resolvedIdentity.claimId ? (baseIdCounts.get(resolvedIdentity.claimId) || 0) : 0;
+    if (resolvedIdentity.claimId) baseIdCounts.set(resolvedIdentity.claimId, duplicateOrdinal + 1);
+    const duplicateCarriedForward = resolvedIdentity.identityStatus === 'carried-forward' && duplicateOrdinal > 0;
+    const identityStatus = duplicateCarriedForward ? 'ambiguous-duplicate-registry-gap' : resolvedIdentity.identityStatus;
+    const hasIdentityGap = resolvedSourceIdentity.identityStatus !== 'carried-forward' || identityStatus !== 'carried-forward';
+    const baseClaimId = !hasIdentityGap ? resolvedIdentity.claimId : explicitIdentityGapId('claim', `${sourcePath}\n${unitDigest}\n${u.identityFingerprint || ''}\n${u.anchor}`);
+    const claimId = baseClaimId;
+    const relations = duplicateCarriedForward ? [{ type: 'same-source-indistinguishable-duplicate-blocker', claimId: resolvedIdentity.claimId, duplicateOrdinal }] : [];
     const unitRefs = extractRefs(`${u.title || ''}\n${u.sample || ''}`);
     const unitLinks = extractLinks(u.sample || '', sourcePath).map((l) => l.raw);
     return {
@@ -832,7 +939,8 @@ export function buildInventoryRow(relPath, { content, sourceDigest: providedSour
       sourceDigest,
       sourceUnitDigest: u.textDigest,
       identityUnitDigest: unitDigest,
-      identityStatus: hasIdentityGap ? (resolvedSourceIdentity.identityStatus === 'carried-forward' ? resolvedIdentity.identityStatus : resolvedSourceIdentity.identityStatus) : 'carried-forward',
+      identityFingerprint: u.identityFingerprint || unitDigest,
+      identityStatus: hasIdentityGap ? (resolvedSourceIdentity.identityStatus === 'carried-forward' ? identityStatus : resolvedSourceIdentity.identityStatus) : 'carried-forward',
       sourceLocation: { start: u.startLine, end: u.endLine },
       targetOwner: hasIdentityGap ? null : proposedClaimOwner,
       targetAnchor: !hasIdentityGap && proposedClaimOwner === sourcePath ? u.anchor : null,
@@ -974,6 +1082,51 @@ export function buildSemanticConflictGroups(items) {
     .sort((a, b) => a.key.localeCompare(b.key));
 }
 
+export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options = {}) {
+  const registryPath = options.identityRegistryPath;
+  const sourcePath = normalizePosix(options.sourcePath || '');
+  const toSourcePath = normalizePosix(options.toSourcePath || sourcePath);
+  if (!sourcePath) throw new Error('--source-path <path> is required for identity carry-forward');
+  const registry = readIdentityRegistryPath(registryPath, repoRoot);
+  const commitSha = resolveCommitSha(options.commit || registry.commit, repoRoot);
+  const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
+  const entryOut = execFileSync('git', ['ls-tree', '-l', commitSha, toSourcePath], { cwd: repoRoot, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  const entry = parseLsTreeLong(entryOut)[0];
+  if (!entry) throw new Error(`${toSourcePath}: not found at ${commitSha}`);
+  const blob = readBlobBufferAtCommit(commitSha, toSourcePath, repoRoot);
+  const content = decodeUtf8(blob);
+  const documentType = toSourcePath.toLowerCase().endsWith('.md') ? extractDocumentType(content) : null;
+  const classification = classifyDocPath(toSourcePath, switchboardIndex);
+  const units = toSourcePath.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(toSourcePath, content);
+  const oldUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') === sourcePath);
+  const oldByFingerprint = new Map(oldUnits.filter((u) => u.identityFingerprint).map((u) => [u.identityFingerprint, u]));
+  const oldByDigest = new Map(oldUnits.map((u) => [u.unitDigest, u]));
+  const remaining = [...oldUnits];
+  const newUnitRows = units.map((u, idx) => {
+    const claimKind = inferClaimKindFromPathAndText(toSourcePath, u.sample || u.title, documentType);
+    const unitDigest = buildUnitIdentityDigest(u);
+    let previous = oldByFingerprint.get(u.identityFingerprint) || oldByDigest.get(unitDigest) || remaining[idx] || null;
+    if (previous) remaining.splice(remaining.indexOf(previous), 1);
+    return {
+      ...(previous || {}),
+      sourcePath: toSourcePath,
+      unitDigest,
+      identityFingerprint: u.identityFingerprint || unitDigest,
+      claimId: previous?.claimId || randomOpaqueId('claim'),
+      sourceAnchor: u.anchor,
+      unitKind: u.unitKind,
+      sourceUnitDigest: u.textDigest,
+      claimKind,
+      status: previous?.status || deriveClaimStatus(classification),
+    };
+  });
+  const documents = (registry.documents || []).filter((d) => normalizePosix(d.path || '') !== sourcePath && normalizePosix(d.path || '') !== toSourcePath);
+  const oldDoc = (registry.documents || []).find((d) => normalizePosix(d.path || '') === sourcePath || normalizePosix(d.path || '') === toSourcePath);
+  documents.push({ ...(oldDoc || {}), path: toSourcePath, sourceId: oldDoc?.sourceId || randomOpaqueId('src'), sourceDigest: sha256Bytes(blob), blobSha: entry.blobSha });
+  const otherUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') !== sourcePath && normalizePosix(u.sourcePath || '') !== toSourcePath);
+  return { ...registry, commit: commitSha, documents: documents.sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path))), units: [...otherUnits, ...newUnitRows].sort((a, b) => normalizePosix(a.sourcePath).localeCompare(normalizePosix(b.sourcePath)) || String(a.sourceAnchor || '').localeCompare(String(b.sourceAnchor || ''))) };
+}
+
 export function bootstrapIdentityRegistry(repoRoot = process.cwd(), options = {}) {
   const commit = options.commit;
   if (!commit || typeof commit !== 'string' || commit.trim() === '') throw new Error('Explicit commit/treeish is required for identity registry bootstrap');
@@ -996,10 +1149,11 @@ export function bootstrapIdentityRegistry(repoRoot = process.cwd(), options = {}
     documents.push({ path: sourcePath, sourceId, sourceDigest, blobSha: f.blobSha });
     for (const u of conservationUnits) {
       const claimKind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
-      const unitDigest = sha256(`${u.unitKind}\n${u.textDigest}\n${claimKind}\n${claimStatus}`);
+      const unitDigest = buildUnitIdentityDigest(u);
       units.push({
         sourcePath,
         unitDigest,
+        identityFingerprint: u.identityFingerprint || unitDigest,
         claimId: randomOpaqueId('claim'),
         sourceAnchor: u.anchor,
         unitKind: u.unitKind,
@@ -1026,7 +1180,9 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   if (!commit || typeof commit !== 'string' || commit.trim() === '') throw new Error('Explicit commit/treeish is required for inventory generation (fail closed; cannot default to HEAD or working tree)');
   const commitSha = resolveCommitSha(commit, repoRoot);
   const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
-  const identityIndex = buildIdentityRegistryIndex(loadIdentityRegistry(commitSha, repoRoot));
+  const identityRegistry = readIdentityRegistryPath(options.identityRegistryPath, repoRoot);
+  if (identityRegistry.commit !== commitSha) throw new Error(`identity registry commit ${identityRegistry.commit || '<missing>'} does not match generation commit ${commitSha}`);
+  const identityIndex = buildIdentityRegistryIndex(identityRegistry);
   const shippedIndex = buildShippedContractIndex(loadShippedPathInventory(commitSha, repoRoot));
   const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
   const paths = files.map((f) => normalizePosix(f.path));
@@ -1050,6 +1206,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   const consumersByPath = collectConsumers(repoRoot, commitSha, paths, shippedIndex, { targetRefs, blobContentsByPath });
   const scanGaps = consumersByPath.scanGaps || [];
   const immutableRefEdges = consumersByPath.immutableRefEdges || [];
+  const unresolvedConsumerEdges = consumersByPath.unresolvedConsumerEdges || [];
   const blobShaCounts = new Map();
   const items = [];
 
@@ -1171,6 +1328,13 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     phase: '02',
     description: 'Repository-wide documentation inventory and conservation ledger (Phase 02 file-level and claim-level accounting)',
     commit: commitSha,
+    identityRegistry: {
+      path: identityRegistry._binding?.path || null,
+      bytes: identityRegistry._binding?.bytes || null,
+      sha256: identityRegistry._binding?.sha256 || null,
+      documents: Array.isArray(identityRegistry.documents) ? identityRegistry.documents.length : null,
+      units: Array.isArray(identityRegistry.units) ? identityRegistry.units.length : null,
+    },
     scanRoots: SCAN_ROOTS,
     additionalRootFiles: ADDITIONAL_ROOT_FILES,
     summary,
@@ -1179,7 +1343,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     scanGaps,
     immutableRefEdges,
     claimLedger,
-    consumerEdges,
+    consumerEdges: [...consumerEdges, ...unresolvedConsumerEdges],
     inboundLinkEdges: [...inboundLinkEdges.reduce((m, e) => m.set(e.targetPath, (m.get(e.targetPath) || []).concat(e.edgeId)), new Map()).entries()]
       .map(([targetPath, edgeIds]) => ({ targetPath, edgeIds }))
       .sort((a, b) => a.targetPath.localeCompare(b.targetPath)),
@@ -1251,6 +1415,20 @@ export function runCli(argv, cwd = process.cwd()) {
   const mdOutIdx = argv.indexOf('--md-out');
   const jsonOut = jsonOutIdx >= 0 ? path.resolve(cwd, argv[jsonOutIdx + 1]) : null;
   const mdOut = mdOutIdx >= 0 ? path.resolve(cwd, argv[mdOutIdx + 1]) : null;
+  if (argv.includes('--carry-forward-identity-registry')) {
+    const identityIdx = argv.indexOf('--identity-registry');
+    const identityRegistryPath = identityIdx >= 0 ? argv[identityIdx + 1] : null;
+    const sourceIdx = argv.indexOf('--source-path');
+    const toIdx = argv.indexOf('--to-source-path');
+    if (!jsonOut) { console.error('Error: --carry-forward-identity-registry requires --json-out <path>'); return 1; }
+    try {
+      const registry = carryForwardIdentityRegistry(cwd, { commit, identityRegistryPath, sourcePath: sourceIdx >= 0 ? argv[sourceIdx + 1] : null, toSourcePath: toIdx >= 0 ? argv[toIdx + 1] : null });
+      fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+      fs.writeFileSync(jsonOut, JSON.stringify(registry, null, 2) + '\n');
+      console.log(`generate-doc-inventory: wrote carried-forward identity registry to ${path.relative(cwd, jsonOut)} (${registry.documents.length} documents, ${registry.units.length} units)`);
+      return 0;
+    } catch (err) { console.error(`Error: ${err.message}`); return 1; }
+  }
   if (argv.includes('--bootstrap-identity-registry')) {
     if (!jsonOut) { console.error('Error: --bootstrap-identity-registry requires --json-out <path>'); return 1; }
     try {
@@ -1261,8 +1439,10 @@ export function runCli(argv, cwd = process.cwd()) {
       return 0;
     } catch (err) { console.error(`Error: ${err.message}`); return 1; }
   }
+  const identityIdx = argv.indexOf('--identity-registry');
+  const identityRegistryPath = identityIdx >= 0 ? argv[identityIdx + 1] : null;
   let inventory;
-  try { inventory = generateInventory(cwd, { commit }); } catch (err) { console.error(`Error: ${err.message}`); return 1; }
+  try { inventory = generateInventory(cwd, { commit, identityRegistryPath }); } catch (err) { console.error(`Error: ${err.message}`); return 1; }
   if (jsonOut) { fs.mkdirSync(path.dirname(jsonOut), { recursive: true }); writeShardedJsonArtifact(jsonOut, inventory); console.log(`generate-doc-inventory: wrote sharded JSON inventory manifest to ${path.relative(cwd, jsonOut)}`); }
   if (mdOut) { fs.mkdirSync(path.dirname(mdOut), { recursive: true }); fs.writeFileSync(mdOut, generateMarkdownReport(inventory)); console.log(`generate-doc-inventory: wrote Markdown report to ${path.relative(cwd, mdOut)}`); }
   if (!jsonOut && !mdOut) console.log(JSON.stringify(inventory, null, 2));

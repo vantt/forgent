@@ -25,8 +25,8 @@ BASE=<phase-01-commit> FIXED_END=<phase-02-commit> \
 reviewed. The runner creates a detached clean worktree exactly at `FIXED_END`,
 asserts HEAD and cleanliness before setup, provisions dependencies there with
 `npm ci` when a lockfile exists, regenerates `phase-02-doc-inventory.{json,md}`
-from `BASE` using the committed opaque identity registry, byte-compares the manifest, Markdown, and every shard to committed
-artifacts, validates registry commit/count/hash metadata, enforces the exact Phase 02 footprint allowlist, and emits a compact
+from `BASE` using the committed opaque identity registry through explicit `--identity-registry`, byte-compares the manifest, Markdown, and every shard to committed
+artifacts, validates registry commit/count/hash/path metadata, enforces exact registry document/unit equality plus stale-unit detection, enforces the exact Phase 02 footprint allowlist, and emits a compact
 machine-readable receipt.
 
 Local commands in a moving checkout are useful only as development diagnostics;
@@ -51,13 +51,19 @@ Focused remediation checks in the moving worktree (not full-suite, not authorita
 ```bash
 node --test test/scripts/generate-doc-inventory.test.mjs
 node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-01-20260926 \
+  --identity-registry plans/260925-documentation-authority-unification/phase-02-identity-registry.json \
   --json-out plans/260925-documentation-authority-unification/phase-02-doc-inventory.json \
   --md-out plans/260925-documentation-authority-unification/phase-02-doc-inventory.md
 # fresh regeneration to temp files, cmp against committed artifacts: byte-identical
-node scripts/check-doc-inventory-gates.mjs
+node scripts/check-doc-inventory-gates.mjs \
+  --identity-registry plans/260925-documentation-authority-unification/phase-02-identity-registry.json
 ```
 
-Results: focused tests passed (58/58), deterministic regeneration passed, gate checker passed in 8.5s with explicit open findings only: 1054 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,454 bytes with SHA-256 `c50920736c11d87d21958a6d5e89caa76b9c684794c3a9b09696783e63ed4dea`; all 11 shards are under 25 MB; Markdown SHA-256 is `c9c48e76ba546e8eec3873f8a20db822dd8d4a3396f35e2730cf74e029d85237`; identity registry is 43,883,041 bytes with SHA-256 `e896d91e7c60995fb08c68df17ea7606b1459d09e0e0d875346492fbf770ddda` and covers 4,305 documents / 85,772 units.
+Results after remediation E: focused tests passed (59/59), deterministic regeneration passed, gate checker passed with explicit open findings only: 1054 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,455 bytes with SHA-256 `2bd0345230d1249794aea40c2369eed0e0080d4cea5e9666aa490aba2e685e90`; all 11 shards are under 25 MB; Markdown SHA-256 is `65433755d45107d19ee12646f1b0436163e1d35df990dc61d712d4668c211ba7`; identity registry is 52,202,925 bytes with SHA-256 `e20adba3f40a1c52d5eecbc8f7a685225783a371fe14f3205ccefba25ca7c9b8` and covers 4,305 documents / 85,772 units.
+
+Remediation E specifically verified: claim lookup keys exclude `claimKind`/`status`/classification, reclassification with unchanged text preserves IDs, duplicate-titled sections carry semantic fingerprints rather than ordinal anchors, indistinguishable duplicates surface explicit ambiguity blockers, path-join/new-URL dynamic consumers emit standalone unresolved patterns, normal generation fails closed without a pinned registry, and stale registry units are detected.
+
+Authoritative skip-full-suite verification passed for the remediation commit before final record-only amend: 64 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks passed. Full suite was intentionally skipped per remediation instruction.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 

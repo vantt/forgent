@@ -359,7 +359,7 @@ consumer kinds (literal/dynamic/glob/fixture/executable-proof/shipped-contract),
 immutable event/decision refs, local-vs-shipped contract scope, exact duplicates, semantic conflicts, and
 exactly one proposed owner for each retained claim row. The gate checker independently recomputes the
 in-scope file set and validates structure/vocabulary/claim-owner constraints. Local Phase 02 verification
-passed; unresolved gaps/conflicts are explicit findings and still block promotion. Phase 03–09 remain
+passed; unresolved gaps/conflicts are explicit findings and still block promotion. Phase 02 remediation E pins identity-registry input explicitly (`--identity-registry`), records registry path/bytes/SHA-256/count binding in inventory metadata, treats unresolved dynamic consumer patterns such as `docs/**/README.md` as standalone unresolved consumer edges, and requires reviewed carry-forward writer use for path moves or unit-map changes. Phase 03–09 remain
 unauthorized and untouched, and no migration/promotion/deletion/cutover has occurred.
 **Mode:** read-only inventory, followed by reviewed ledger writes
 **Purpose:** Account for the real corpus before deciding migration mechanics.
@@ -389,7 +389,10 @@ Special rules:
   path references and 566 such payloads; inventory must still detect dynamic,
   glob-based, test-fixture, and executable-proof consumers before relocation;
 - current implementation is evidence, not automatic authority;
-- missing current behavior documentation is recorded as a gap, not invented.
+- missing current behavior documentation is recorded as a gap, not invented;
+- unit coverage independently verifies source blobs/counts/digests but intentionally shares the Phase 02 frozen extraction algorithm; it must not be overclaimed as an independent semantic parser;
+- `targetOwner` on an area portal is a proposed area-level destination only; final claim anchors and complete partitioning are deferred to a later authorized phase;
+- file moves require the reviewed carry-forward writer so persisted opaque IDs are moved deliberately instead of reminted or inferred.
 
 Gate:
 

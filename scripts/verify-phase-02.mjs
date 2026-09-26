@@ -210,6 +210,7 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       runOrThrow(process.execPath, [
         'scripts/generate-doc-inventory.mjs',
         '--commit', baseSha,
+        '--identity-registry', PHASE02_IDENTITY_REGISTRY,
         '--json-out', tmpJson,
         '--md-out', tmpMd,
       ], { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
@@ -246,6 +247,7 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       'scripts/check-doc-inventory-gates.mjs',
       '--inventory', PHASE02_JSON,
       '--vocabulary', PHASE02_VOCAB,
+      '--identity-registry', PHASE02_IDENTITY_REGISTRY,
       '--json',
     ], { cwd: tempWorktreeDir, encoding: 'utf8' });
     const gateJson = JSON.parse(gate.stdout);

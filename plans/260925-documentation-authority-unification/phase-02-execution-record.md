@@ -46,22 +46,23 @@ The checker passes structurally while reporting the expected open findings as no
 - exact duplicate-content groups: 818
 - semantic-conflict groups: 151
 - claim ledger rows / registry units: 85,772
-- consumer edges: 167,026
+- consumer edges: 152,607 (broad unresolved dynamic patterns are standalone unresolved edges, not fanned out to every matching file)
 - identity registry documents: 4,305
 
 Artifact sizes and hashes after sharding:
 
 | Artifact | Size | SHA-256 |
 |---|---:|---|
-| `phase-02-doc-inventory.json` manifest | 2,454 bytes | `c50920736c11d87d21958a6d5e89caa76b9c684794c3a9b09696783e63ed4dea` |
+| `phase-02-doc-inventory.json` manifest | 2,455 bytes | `2bd0345230d1249794aea40c2369eed0e0080d4cea5e9666aa490aba2e685e90` |
 | `phase-02-doc-inventory.parts/` | 11 parts, each under 25 MB | see manifest |
-| `phase-02-doc-inventory.md` | 682 KiB (698,784 bytes) | `c9c48e76ba546e8eec3873f8a20db822dd8d4a3396f35e2730cf74e029d85237` |
-| `phase-02-identity-registry.json` | 42 MiB (43,883,041 bytes) | `e896d91e7c60995fb08c68df17ea7606b1459d09e0e0d875346492fbf770ddda` |
+| `phase-02-doc-inventory.md` | 682 KiB (698,784 bytes) | `65433755d45107d19ee12646f1b0436163e1d35df990dc61d712d4668c211ba7` |
+| `phase-02-identity-registry.json` | 50 MiB (52,202,925 bytes) | `e20adba3f40a1c52d5eecbc8f7a685225783a371fe14f3205ccefba25ca7c9b8` |
 
 These findings are not resolved in Phase 02. They block promotion and feed later authorized phases.
 
 Verification summary:
 
+- remediation E added explicit-pinned registry input to the generator, registry binding metadata, reviewed carry-forward writer mode, semantic duplicate-heading fingerprints, standalone unresolved dynamic consumer edges, and exact/stale registry checks;
 - authoritative runner added at `scripts/verify-phase-02.mjs` and made the only Phase 02 verification door;
 - the runner requires explicit `BASE` and `FIXED_END`, creates a detached clean worktree exactly at `FIXED_END`, asserts HEAD/cleanliness before setup, provisions via `npm ci` when a lockfile exists, regenerates inventory from immutable `BASE` using the committed registry, byte-compares the manifest, Markdown, and every shard, validates registry commit/count/hash metadata, runs the Phase 02 gate/check suite, enforces an exact Phase 02 diff allowlist, builds Rust release binaries inside the detached worktree before full-suite mode (never symlinking mutable caller output), and emits a compact machine-readable receipt with hashes/sizes/counts/test totals;
 - after registry remediation and immutable-base regeneration from Phase 01 base `f0c76c5e590339d9c815038539ff1f4a072c64e4`, authoritative full verification passed at `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`): 58 focused tests, 46 docs/citation/ownership tests, clean detached Rust release build, and full suite 7,819 total / 7,743 passed / 0 failed / 8 skipped / 68 todo; full-suite log SHA-256 `4bea1d4bea6e4858678640fc88a91b2222dcc82a278f5198e77e639f32763d5c` and verifier receipt log SHA-256 `d2597b9fa1fc710e43e77ef788671f2cf0540db9ab8ca1cfb831492d7b3db2a7`;

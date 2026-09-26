@@ -28,6 +28,8 @@ import {
   parseLsTreeLong,
   generateInventory,
   buildIdentityRegistryIndex,
+  bootstrapIdentityRegistry,
+  carryForwardIdentityRegistry,
 } from '../../scripts/generate-doc-inventory.mjs';
 import {
   validateStructure,
@@ -35,6 +37,7 @@ import {
   validateCommitBlobIntegrity,
   validateSourceUnitCoverage,
   deriveValidTargetOwnersFromSwitchboard,
+  validateIdentityRegistry,
 } from '../../scripts/check-doc-inventory-gates.mjs';
 import {
   writeShardedJsonArtifact,
@@ -344,7 +347,9 @@ test('generateInventory: exact duplicate files share semantic claim ids with exp
     execFileSync('git', ['add', '.'], { cwd: tmp });
     execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
     const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
-    const inventory = generateInventory(tmp, { commit });
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(bootstrapIdentityRegistry(tmp, { commit }), null, 2));
+    const inventory = generateInventory(tmp, { commit, identityRegistryPath: registryPath });
     const a = inventory.items.find((i) => i.path === 'docs/a.md');
     const b = inventory.items.find((i) => i.path === 'docs/b.md');
     assert.notDeepEqual(a.claimIds, b.claimIds);
@@ -359,12 +364,12 @@ test('generateInventory: exact duplicate files share semantic claim ids with exp
   }
 });
 
-test('buildInventoryRow: identical claim content inside one source gets explicit duplicate lineage instead of silent collision', () => {
+test('buildInventoryRow: identical claim content inside one source never silently collides', () => {
   const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
   const content = ['Repeated paragraph with enough detail to become a claim.', '', 'Repeated paragraph with enough detail to become a claim.'].join('\n');
   const row = buildInventoryRow('docs/repeated.md', { content, blobSha: 'f'.repeat(40), blobSize: content.length, switchboardIndex: index });
   assert.equal(new Set(row.claimIds).size, row.claimIds.length);
-  assert.equal(row.claims[1].relations.some((r) => r.type === 'same-source-identical-content-duplicate'), true);
+  assert.equal(row.claims.every((c) => c.identityStatus.includes('registry-gap') && c.disposition === 'unknown-blocking'), true);
 });
 
 test('extractMarkdownConservationUnits: emits headings and unheaded blocks for conservation', () => {
@@ -554,7 +559,7 @@ test('identity registry reuses unaffected claim ids when unrelated text is inser
     documents: [{ path: scaffold.path, sourceId: 'src_registry_opaque' }],
     units: scaffold.claims.map((c, idx) => ({ sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `claim_registry_opaque_${idx}` })),
   };
-  const changed = '# B\n\nAnother stable paragraph with enough detail.\n\nInserted unrelated paragraph with enough detail.\n\n# A\n\nStable paragraph with enough detail.';
+  const changed = '# B\n\nAnother stable paragraph with enough detail.\n\n# Inserted\n\nInserted unrelated paragraph with enough detail.\n\n# A\n\nStable paragraph with enough detail.';
   const second = buildInventoryRow('docs/platform/agent-coordination/README.md', { content: changed, blobSha: '2'.repeat(40), blobSize: changed.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
   const carried = second.claims.filter((c) => c.identityStatus === 'carried-forward').map((c) => c.claimId);
   assert.equal(carried.includes(registry.units.find((u) => u.sourceAnchor === 'a').claimId), true);
@@ -597,7 +602,7 @@ test('slugifyHeading: preserves underscores like GitHub anchors', () => {
   assert.equal(slugifyHeading('Foo_Bar Baz'), 'foo_bar-baz');
 });
 
-test('collectConsumers: path.join dynamic prefixes create honest dynamic edges', () => {
+test('collectConsumers: path.join dynamic prefixes create standalone unresolved dynamic edges', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-'));
   try {
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
@@ -613,7 +618,8 @@ test('collectConsumers: path.join dynamic prefixes create honest dynamic edges',
     const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const consumers = collectConsumers(tmp, commit, ['docs/specs/runner.md']);
     assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'events/evidence.jsonl'), true);
-    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'events/app.log' && e.kind === 'dynamic' && e.dynamicPrefix === 'docs/specs'), true);
+    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'events/app.log' && e.kind === 'dynamic'), false);
+    assert.equal(consumers.unresolvedConsumerEdges.some((e) => e.path === 'events/app.log' && e.kind === 'dynamic' && e.unresolvedDynamicPattern === 'docs/specs/**'), true);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -664,4 +670,95 @@ test('validateAgainstVocabulary: retained claim owner must be a real switchboard
   };
   const findings = validateAgainstVocabulary(inventory, vocabulary);
   assert.equal(findings.some((f) => f.type === 'retained-claim-owner-not-switchboard-backed' && f.message.includes('docs/fallback.md')), true);
+});
+
+test('identity registry unit lookup excludes claim kind, status, and classification changes', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = '# Durable\n\nStable payload with enough detail.';
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: '1'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const registry = {
+    documents: [{ path: scaffold.path, sourceId: 'src_stable' }],
+    units: scaffold.claims.map((c) => ({ sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, identityFingerprint: c.identityFingerprint, claimId: c.claimId, claimKind: 'different-kind', status: 'historical' })),
+  };
+  const row = buildInventoryRow(scaffold.path, { content, blobSha: '2'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  assert.equal(row.claims.every((c) => c.identityStatus === 'carried-forward'), true);
+  assert.deepEqual(row.claimIds, scaffold.claimIds);
+});
+
+test('repeated heading identity follows semantic fingerprint instead of ordinal anchor', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const original = ['# Same', '', 'Payload A with enough semantic detail.', '', '# Same', '', 'Payload B with enough semantic detail.'].join('\n');
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content: original, blobSha: '1'.repeat(40), blobSize: original.length, switchboardIndex: index });
+  const registry = { documents: [{ path: scaffold.path, sourceId: 'src_repeat' }], units: scaffold.claims.map((c) => ({ sourcePath: c.sourcePath, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, identityFingerprint: c.identityFingerprint, sourceUnitDigest: c.sourceUnitDigest, claimId: c.claimId })) };
+  const swapped = ['# Same', '', 'Payload B with enough semantic detail.', '', '# Inserted', '', 'New payload with enough semantic detail.', '', '# Same', '', 'Payload A with enough semantic detail.'].join('\n');
+  const row = buildInventoryRow(scaffold.path, { content: swapped, blobSha: '2'.repeat(40), blobSize: swapped.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  const carried = row.claims.filter((c) => c.identityStatus === 'carried-forward').map((c) => c.claimId);
+  for (const old of scaffold.claimIds) assert.equal(carried.includes(old), true);
+});
+
+test('indistinguishable repeated carried-forward units become explicit identity gaps', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = ['# Same', '', 'Identical payload with enough semantic detail.', '', '# Same', '', 'Identical payload with enough semantic detail.'].join('\n');
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: '1'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const firstHeading = scaffold.claims.find((c) => c.sourceAnchor === 'same');
+  const registry = { documents: [{ path: scaffold.path, sourceId: 'src_ambig' }], units: [{ sourcePath: scaffold.path, sourceAnchor: 'same', unitDigest: firstHeading.identityUnitDigest, identityFingerprint: firstHeading.identityFingerprint, sourceUnitDigest: firstHeading.sourceUnitDigest, claimId: 'claim_only_one_distinct' }] };
+  const row = buildInventoryRow(scaffold.path, { content, blobSha: '2'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  assert.equal(row.claims.some((c) => c.identityStatus === 'ambiguous-duplicate-registry-gap' && c.disposition === 'unknown-blocking'), true);
+  assert.equal(row.claims.some((c) => c.claimId.includes('_dup_')), false);
+});
+
+test('collectConsumers: dynamic segments anywhere and multiline new URL become unresolved patterns', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-new-url-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs/a'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/a/README.md'), '# A\n');
+    fs.writeFileSync(path.join(tmp, 'src/c.mjs'), ['path.join("docs", area, "README.md")', 'new URL(', '  "../docs/a/README.md",', '  import.meta.url', ')'].join('\n'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const consumers = collectConsumers(tmp, commit, ['docs/a/README.md']);
+    assert.equal(consumers.get('docs/a/README.md').some((e) => e.path === 'src/c.mjs' && e.kind === 'dynamic' && e.resolvedTarget === 'docs/a/README.md'), true);
+    assert.equal(consumers.unresolvedConsumerEdges.some((e) => e.unresolvedDynamicPattern === 'docs/**/README.md'), true);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('carryForwardIdentityRegistry moves one source without reminting unrelated opaque ids', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'docs/other'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
+    fs.writeFileSync(path.join(tmp, 'docs/other/b.md'), '# B\n\nOther payload with enough detail.\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
+    const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
+    fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
+    fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'move'], { cwd: tmp, stdio: 'ignore' });
+    const newCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const evolved = carryForwardIdentityRegistry(tmp, { commit: newCommit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' });
+    assert.equal(evolved.documents.find((d) => d.path === 'docs/new/a.md').sourceId, registry.documents.find((d) => d.path === 'docs/old/a.md').sourceId);
+    assert.equal(evolved.documents.find((d) => d.path === 'docs/other/b.md').sourceId, registry.documents.find((d) => d.path === 'docs/other/b.md').sourceId);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('validateIdentityRegistry detects exact equality and stale units', () => {
+  const inventory = { commit: 'c', items: [{ path: 'docs/x.md', sourceId: 'src_x' }], identityRegistry: { documents: 1, units: 1 }, claimLedger: [{ sourcePath: 'docs/x.md', sourceAnchor: 'x', sourceUnitDigest: 'digest', identityUnitDigest: 'unit', identityFingerprint: 'fp', claimId: 'claim_x', identityStatus: 'carried-forward' }] };
+  const registry = { commit: 'c', documents: [{ path: 'docs/x.md', sourceId: 'src_x' }], units: [{ sourcePath: 'docs/x.md', sourceAnchor: 'x', sourceUnitDigest: 'changed', unitDigest: 'unit', identityFingerprint: 'fp', claimId: 'claim_x' }, { sourcePath: 'docs/x.md', sourceAnchor: 'stale', sourceUnitDigest: 'stale', unitDigest: 'stale', claimId: 'claim_stale' }] };
+  const findings = validateIdentityRegistry(inventory, registry);
+  assert.equal(findings.some((f) => f.type === 'identity-registry-source-unit-digest-mismatch'), true);
+  assert.equal(findings.some((f) => f.type === 'identity-registry-stale-unit'), true);
 });

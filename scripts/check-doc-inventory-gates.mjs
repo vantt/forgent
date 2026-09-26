@@ -178,14 +178,17 @@ export function validateStructure(inventory) {
       if (!edge?.edgeId || edgesById.has(edge.edgeId)) findings.push({ type: 'consumer-edge-duplicate', message: `consumerEdges contains missing or duplicate edgeId ${edge?.edgeId || '<missing>'}` });
       if (edge?.edgeId) edgesById.set(edge.edgeId, edge);
     }
-    if (inventory.consumerEdges.length !== itemConsumerIds.length) findings.push({ type: 'consumer-edge-mismatch', message: `consumerEdges length (${inventory.consumerEdges.length}) does not match total item consumerEdgeIds (${itemConsumerIds.length})` });
+    const resolvedConsumerEdges = inventory.consumerEdges.filter((edge) => edge.identityStatus !== 'unresolved-dynamic-pattern');
+    if (resolvedConsumerEdges.length !== itemConsumerIds.length) findings.push({ type: 'consumer-edge-mismatch', message: `resolved consumerEdges length (${resolvedConsumerEdges.length}) does not match total item consumerEdgeIds (${itemConsumerIds.length})` });
     for (const { edgeId, path: itemPath } of itemConsumerIds) {
       const edge = edgesById.get(edgeId);
       if (!edge) findings.push({ type: 'consumer-edge-missing-id', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} not found exactly once in top-level consumerEdges` });
       else if (edge.targetPath && edge.targetPath !== itemPath) findings.push({ type: 'consumer-edge-target-mismatch', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} targets ${edge.targetPath}` });
     }
     for (const edge of inventory.consumerEdges) {
-      if ((edge.rawTarget || edge.resolvedTarget) && !edge.targetPath) findings.push({ type: 'consumer-link-edge-missing-target', message: `consumer edge ${edge.edgeId || '<missing>'}: resolved link edge must carry targetPath` });
+      if (edge.identityStatus === 'unresolved-dynamic-pattern') {
+        if (!edge.unresolvedDynamicPattern || !String(edge.unresolvedDynamicPattern).includes('**')) findings.push({ type: 'malformed-unresolved-consumer-edge', message: `consumer edge ${edge.edgeId || '<missing>'}: unresolved dynamic edge must carry a broad pattern` });
+      } else if ((edge.rawTarget || edge.resolvedTarget) && !edge.targetPath) findings.push({ type: 'consumer-link-edge-missing-target', message: `consumer edge ${edge.edgeId || '<missing>'}: resolved link edge must carry targetPath` });
     }
   }
 
@@ -364,6 +367,10 @@ export function validateIdentityRegistry(inventory, registry) {
   const findings = [];
   if (!registry || typeof registry !== 'object') return [{ type: 'missing-identity-registry', message: 'Phase 02 identity registry is required' }];
   if (registry.commit !== inventory.commit) findings.push({ type: 'identity-registry-commit-mismatch', message: `identity registry commit ${registry.commit || '<missing>'} does not match inventory commit ${inventory.commit}` });
+  if (inventory.identityRegistry) {
+    if (inventory.identityRegistry.documents !== (registry.documents || []).length) findings.push({ type: 'identity-registry-document-count-binding-mismatch', message: `inventory identityRegistry.documents ${inventory.identityRegistry.documents} does not match registry ${(registry.documents || []).length}` });
+    if (inventory.identityRegistry.units !== (registry.units || []).length) findings.push({ type: 'identity-registry-unit-count-binding-mismatch', message: `inventory identityRegistry.units ${inventory.identityRegistry.units} does not match registry ${(registry.units || []).length}` });
+  }
   const index = buildIdentityRegistryIndex(registry);
   const registryDocPaths = new Set((registry.documents || []).map((d) => normalizePosix(d.path || '')).filter(Boolean));
   const itemPaths = new Set((inventory.items || []).map((i) => i.path));
@@ -376,10 +383,25 @@ export function validateIdentityRegistry(inventory, registry) {
   for (const item of inventory.items || []) {
     if (!item.sourceId || index.docByPath.get(item.path) !== item.sourceId) findings.push({ type: 'identity-registry-source-id-mismatch', path: item.path, message: `${item.path}: item sourceId is not supplied by identity registry` });
   }
+  const claimKeys = new Set();
+  const ambiguousUnitKeys = new Set();
   for (const claim of inventory.claimLedger || []) {
+    if (String(claim.identityStatus || '') !== 'carried-forward') {
+      if (String(claim.identityStatus || '').includes('ambiguous') && claim.identityUnitDigest) ambiguousUnitKeys.add(`${claim.sourcePath}\n${claim.identityUnitDigest}`);
+      continue;
+    }
     const matches = (index.unitsByDigest.get(claim.identityUnitDigest) || []).filter((u) => normalizePosix(u.sourcePath || '') === claim.sourcePath && u.claimId === claim.claimId);
     if (matches.length !== 1) findings.push({ type: 'identity-registry-claim-id-mismatch', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} is not supplied exactly once by identity registry` });
-    if (String(claim.identityStatus || '') !== 'carried-forward') findings.push({ type: 'identity-gap-in-committed-inventory', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} has identityStatus ${claim.identityStatus}` });
+    const exact = matches[0];
+    if (exact && exact.sourceAnchor !== claim.sourceAnchor) findings.push({ type: 'identity-registry-source-anchor-mismatch', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} anchor ${claim.sourceAnchor} does not match registry ${exact.sourceAnchor}` });
+    if (exact && exact.sourceUnitDigest !== claim.sourceUnitDigest) findings.push({ type: 'identity-registry-source-unit-digest-mismatch', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} sourceUnitDigest does not match registry` });
+    if (exact && exact.identityFingerprint && claim.identityFingerprint && exact.identityFingerprint !== claim.identityFingerprint) findings.push({ type: 'identity-registry-fingerprint-mismatch', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} identityFingerprint does not match registry` });
+    claimKeys.add(`${claim.sourcePath}\n${claim.identityUnitDigest}\n${claim.claimId}`);
+  }
+  for (const unit of registry.units || []) {
+    const sourcePath = normalizePosix(unit.sourcePath || '');
+    const key = `${sourcePath}\n${unit.unitDigest}\n${unit.claimId}`;
+    if (!claimKeys.has(key) && !ambiguousUnitKeys.has(`${sourcePath}\n${unit.unitDigest}`)) findings.push({ type: 'identity-registry-stale-unit', path: sourcePath, message: `${unit.sourcePath || '<missing>'}: registry unit ${unit.claimId || '<missing>'} is not present exactly in inventory` });
   }
   return findings;
 }
