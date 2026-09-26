@@ -47,7 +47,7 @@ git merge-base --is-ancestor cfdaf4bc95d44a6132d03dfb635478b084e41b35 HEAD -> YE
 | Requirement | Commit SHA | Description |
 |---|---|---|
 | **R1** | `f4d6fb708` | Move `fanoutBatchExecutorCli` to Work Driver (`src/runner/fanout-batch.mjs`), isolate `logExecutorDispatch` (`src/runner/dispatch-log.mjs`), ensure `src/runner/dispatch/**` has zero references to `pick`, `return`, `claim`, or `appendEvent`. Register files in `docs/architecture-manifest.json`. |
-| **R2** | `33e5b6c04` | Relocate Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) from dispatch core into leaf compatibility module `src/runner/work-compat.mjs` at Work Driver layer (Option A). `resolve.mjs` and `prepare.mjs` re-export them as non-breaking compatibility aliases. All 13 strictly decoupled dispatch core modules contain zero `workflow-stage-graphs` imports. |
+| **R2** | `33e5b6c04` (initial) / `6362cfda3` (Option A) | Relocate Work/stage/skill lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) from dispatch core. Initially relocated to `operation-choice.mjs` (`33e5b6c04`), then extracted to dedicated leaf compatibility module `src/runner/work-compat.mjs` (registered as `infra` in architecture manifest) in `6362cfda3` per Track Manager Option A directive to eliminate import cycles. `resolve.mjs` and `prepare.mjs` re-export them for backward compatibility, consumed by pre-existing callers (`plan.mjs` for `compileDispatchPlan({work})` and `cli.mjs` for `spawnWorker`). Boundary test in `test/runner/dispatch-reconciliation-import-graph.test.mjs` locks core from importing Work lookups or `work-compat.mjs` (killing mutation ME). |
 | **R3** | `598e5b43b` | Split `assignment-runner.mjs` into dedicated `src/runner/dispatch/settlement.mjs` (unified single settlement pipeline replacing duplicated settlement code) and `src/runner/dispatch/reconcile-cli-spawn.mjs`. Relocate dispatch depth helpers to `adapters.mjs`. |
 | **R4** | `5b8a1b2a0` | Consolidate Confinement Authority preparation into unified `assessAndPrepare(request, opts)` in `src/runner/dispatch/confinement/authority.mjs`. Driver claims populate attestation directly (no argv parsing). Extract leaf proof helpers to `src/runner/dispatch/proof-helpers.mjs`, removing adapter imports from authority. |
 | **R5** | `91d9109f5` | Extract Herdr S2 proof layer (~530 lines) into `src/runner/dispatch/herdr-reconcile.mjs` ("infra" in architecture manifest). Unify terminal outcome receipt publication for both failed and settled runs into `publishHerdrCompletionReceipt`. |
@@ -69,7 +69,7 @@ git merge-base --is-ancestor cfdaf4bc95d44a6132d03dfb635478b084e41b35 HEAD -> YE
 
 ### 3.2 Key File Additions & Relocations
 
-- `src/runner/work-compat.mjs` (+274 lines, Work Driver Compatibility leaf module)
+- `src/runner/work-compat.mjs` (+274 lines, registered as "infra" in architecture manifest, leaf module housing Work Driver compatibility lookups with zero imports into dispatch core)
 - `src/runner/fanout-batch.mjs` (+187 lines, Work Driver layer)
 - `src/runner/dispatch-log.mjs` (+36 lines, Audit Seam)
 - `src/runner/dispatch/operation-choice.mjs` (+238 lines, Work Driver compatibility boundary)
@@ -252,14 +252,15 @@ Following the third independent re-review round (`REQUEST CHANGES` @ `903ccf11f`
    - Reverted `invocationCwd` mapping in `src/runner/dispatch/plan.mjs` and `src/runner/dispatch/resolve.mjs`. No new config schema or env var introduced.
    - Refactored test N1 in `test/runner/assignment-dispatch.test.mjs` to exercise the pre-existing authorized path (resumed fallback run with persisted plan carrying `invocation.cwd`). Verified that both M13 and M13b are killed.
 
-2. **R3-2 / R2 — Option A Implementation (Complete Decoupling of Work Lookups)**:
+2. **R3-2 / R2 — Option A Implementation (Decoupling of Work Lookups to Leaf Module)**:
    > [!IMPORTANT]
    > **Architectural Note on R2 Decoupling (Option A)**:
-   > In response to the Track Manager directive ("Làm luôn A. và khi báo cáo nhớ ghi thêm một lưu ý về thay đổi này"), Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, and `buildPrompt`) have been extracted completely out of dispatch core into a dedicated leaf compatibility module at the Work Driver layer: `src/runner/work-compat.mjs`.
+   > In response to the Track Manager directive ("Làm luôn A. và khi báo cáo nhớ ghi thêm một lưu ý về thay đổi này"), Work capability lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, and `buildPrompt`) have been extracted out of dispatch core into a dedicated leaf compatibility module: `src/runner/work-compat.mjs` (registered as `infra` in `docs/architecture-manifest.json`).
    >
    > Key architectural properties of `src/runner/work-compat.mjs`:
    > - **Zero Imports into Dispatch Core**: `work-compat.mjs` imports only kernel/infra state (`work.mjs`, `workflow-stage-graphs.mjs`, `prompt-templates.mjs`) and never imports anything from `src/runner/dispatch/`. This completely eliminates the 14-module import cycle (`operation-choice -> assignment-runner -> ...`) that previously motivated retaining lookups in `resolve.mjs`/`prepare.mjs`.
-   > - **Zero `workflow-stage-graphs` Imports in Decoupled Dispatch Core**: `src/runner/dispatch/resolve.mjs` and `prepare.mjs` removed all direct bodies and imports of `workflow-stage-graphs`. They re-export the helpers from `../work-compat.mjs` solely as non-breaking compatibility aliases. All 13 strictly decoupled dispatch core modules now have **strictly 0 imports** of `workflow-stage-graphs` (enforced by `test/runner/dispatch-reconciliation-import-graph.test.mjs`).
+   > - **Zero `workflow-stage-graphs` Imports in Decoupled Dispatch Core**: `src/runner/dispatch/resolve.mjs` and `prepare.mjs` removed all direct bodies and imports of `workflow-stage-graphs`. They re-export the helpers from `../work-compat.mjs` solely as non-breaking compatibility aliases. All 13 strictly decoupled dispatch core modules now have **strictly 0 imports** of `workflow-stage-graphs`.
+   > - **Pre-Existing Callers via Compatibility Re-Export**: `plan.mjs` (`compileDispatchPlan({work})`) and `cli.mjs` (`spawnWorker`) consume lookups via compatibility re-export from `resolve.mjs`/`prepare.mjs`, preserving existing external call contracts without introducing new cyclic dependencies.
    > - **Manifest & Layering Parity**: Registered in `docs/architecture-manifest.json` under `"infra"` layer, passing all `test/architecture.test.mjs` layer-ranking, domain-siloing, and file-parity assertions.
 
 3. **R3-2 / R4 — Track Manager Ratification**:
@@ -269,6 +270,28 @@ Following the third independent re-review round (`REQUEST CHANGES` @ `903ccf11f`
    - Replaced raw `fs.writeFileSync` on `effective-execution-contract.json` in `src/runner/dispatch/herdr-round.mjs` with atomic `publishMutableProjection`.
    - Replaced self-declared `APPROVE` verdict with `Candidate Status: CANDIDATE READY FOR REVIEW`.
    - F13/F14 remain tracked as non-blocking LOW debt.
+
+---
+
+### 5.6 Independent Re-Review Round 4 Remediation Summary
+
+Following the fourth independent re-review round (`REQUEST CHANGES` (minor) @ `6362cfda3`), all findings have been fully addressed:
+
+1. **F-R4-1 (MEDIUM) — Strict Core Boundary Lock & Mutation ME Killed**:
+   - `test/runner/dispatch-reconciliation-import-graph.test.mjs` was extended beyond whole-file text checks to perform static import/export clause analysis and identifier reference checks.
+   - Forbids all 13 strict-core modules from importing `work-compat.mjs`, except the authorized compatibility re-exporters (`resolve.mjs` and `prepare.mjs`).
+   - Forbids all 13 strict-core modules from importing any of the four Work lookup symbols (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) from ANY source (including `./resolve.mjs` or `./prepare.mjs` re-exports), except authorized allowlist: `plan.mjs` for `compileDispatchPlan({work})`, `resolve.mjs` for capability lookups, and `prepare.mjs` for `buildPrompt`.
+   - Forbids all identifier references to the four Work lookup symbols across the 10 completely decoupled core modules (`settlement.mjs`, `config.mjs`, `mechanism.mjs`, `transport.mjs`, `run-result.mjs`, `runtime-inspection.mjs`, `brief.mjs`, `proof-helpers.mjs`, `herdr-reconcile.mjs`, `recovery-planner.mjs`).
+   - Verifies `cli.mjs` does not import `work-compat.mjs` directly.
+   - **Mutation Proof**: Tested against Mutation ME (adding `import { executorIdForWork } from './resolve.mjs';` into `settlement.mjs`). The test immediately fails with `AssertionError: src/runner/dispatch/settlement.mjs statically imports/exports forbidden Work lookup symbol 'executorIdForWork' from './resolve.mjs' (R2 boundary violation / ME)`. Mutation ME is **killed**.
+
+2. **F-R4-2 (MEDIUM) — Restored Original R2/R4 Requirement Text & Precise Boundary Accounting**:
+   - In `plans/260920-2217-dispatch-engine-hardening/phase-09-boundary-simplification.md`, restored the exact original text for requirements R2 and R4, appending explicit Track Manager ratification notes.
+   - In `CHANGELOG.md`, `plans/260919-coordination-skill-harness-simplification/plan.md`, `docs/platform/agent-coordination/architecture/dispatch-control-plane.md`, and `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`, reworded claims to state accurately: no Work lookup implementation in dispatch core; `plan.mjs` (`compileDispatchPlan({work})`) and `cli.mjs` (`spawnWorker`) consume lookups via compatibility re-export to maintain call contract compatibility without cyclic imports.
+
+3. **LOW Findings Resolved**:
+   - Corrected R2 commit attribution in this report: R2 initial commit was `33e5b6c04`, followed by Option A extraction in `6362cfda3` and boundary lock in remediation round 4.
+   - Clarified that `src/runner/work-compat.mjs` is registered as `"infra"` in `architecture-manifest.json` as a leaf bridge module providing Work Driver compatibility lookups without importing dispatch core.
 
 ---
 

@@ -260,7 +260,7 @@ test('boundary test: src/runner/dispatch/** contains no lifecycle verb imports o
   }
 });
 
-test('boundary test: dispatch core modules do not import workflow-stage-graphs (R2)', () => {
+test('boundary test: dispatch core modules do not import workflow-stage-graphs, work-compat, or unauthorized Work lookups (R2 / ME)', () => {
   const strictDispatchCoreFiles = [
     'src/runner/dispatch/config.mjs',
     'src/runner/dispatch/mechanism.mjs',
@@ -277,14 +277,87 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs (
     'src/runner/dispatch/recovery-planner.mjs',
   ];
 
+  const WORK_LOOKUP_SYMBOLS = [
+    'executorIdForWork',
+    'resolveCapabilityIdentityDetails',
+    'resolveCapabilityIdentity',
+    'buildPrompt',
+  ];
+
+  const IMPORT_OR_EXPORT_RE = /(?:import|export)\s+(?:\{([^}]+)\}|(\*\s+as\s+\w+)|(\w+))\s+from\s+['"]([^'"]+)['"]/g;
+
   for (const rel of strictDispatchCoreFiles) {
     const filePath = path.join(root, rel);
     const content = fs.readFileSync(filePath, 'utf8');
+
+    // Rule 1: Zero direct workflow-stage-graphs imports or references across all strict dispatch core
     assert.equal(
       content.includes('workflow-stage-graphs'),
       false,
       `${rel} must not import or reference workflow-stage-graphs`,
     );
+
+    // Rule 2: Zero direct imports from work-compat.mjs, except documented compatibility re-exporters
+    const importsWorkCompat = /from\s+['"][^'"]*work-compat(?:\.mjs)?['"]/.test(content);
+    if (importsWorkCompat) {
+      assert.ok(
+        rel === 'src/runner/dispatch/resolve.mjs' || rel === 'src/runner/dispatch/prepare.mjs',
+        `${rel} must not import from work-compat.mjs (only resolve.mjs/prepare.mjs are authorized compatibility re-exporters)`,
+      );
+    }
+
+    // Rule 3: Strict enforcement of Work lookup symbols (R2 / mutation ME lock)
+    // Core modules must not import or re-export Work lookups except authorized allowlist
+    let m;
+    const re = new RegExp(IMPORT_OR_EXPORT_RE.source, 'g');
+    while ((m = re.exec(content)) !== null) {
+      const namedClause = m[1];
+      const defaultImport = m[3];
+      const sourceModule = m[4];
+
+      const names = [];
+      if (namedClause) {
+        names.push(...namedClause.split(',').map((s) => s.trim().split(/\s+as\s+/)[0]).filter(Boolean));
+      }
+      if (defaultImport) names.push(defaultImport);
+
+      for (const sym of WORK_LOOKUP_SYMBOLS) {
+        if (names.includes(sym)) {
+          // Allowlist verification:
+          // 1. plan.mjs is permitted to import executorIdForWork from ./resolve.mjs for compileDispatchPlan({work}) compatibility
+          if (rel === 'src/runner/dispatch/plan.mjs' && sym === 'executorIdForWork') {
+            continue;
+          }
+          // 2. resolve.mjs is permitted to re-export executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity from work-compat.mjs
+          if (rel === 'src/runner/dispatch/resolve.mjs' && sym !== 'buildPrompt') {
+            continue;
+          }
+          // 3. prepare.mjs is permitted to re-export buildPrompt from work-compat.mjs
+          if (rel === 'src/runner/dispatch/prepare.mjs' && sym === 'buildPrompt') {
+            continue;
+          }
+          assert.fail(
+            `${rel} statically imports/exports forbidden Work lookup symbol '${sym}' from '${sourceModule}' (R2 boundary violation / ME)`
+          );
+        }
+      }
+    }
+
+    // Rule 4: For the 10 completely decoupled core modules, forbid all identifier references to Work lookups
+    const completelyDecoupled = (
+      rel !== 'src/runner/dispatch/plan.mjs' &&
+      rel !== 'src/runner/dispatch/resolve.mjs' &&
+      rel !== 'src/runner/dispatch/prepare.mjs'
+    );
+    if (completelyDecoupled) {
+      for (const sym of WORK_LOOKUP_SYMBOLS) {
+        assert.equal(
+          new RegExp(`\\b${sym}\\b`).test(content),
+          false,
+          `${rel} contains forbidden reference to Work lookup symbol '${sym}' (R2 boundary violation / ME)`,
+        );
+      }
+    }
   }
 
   // Work Driver compatibility lookups (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt)
@@ -296,6 +369,10 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs (
 
   const workCompatSource = fs.readFileSync(path.join(root, 'src/runner/work-compat.mjs'), 'utf8');
   assert.equal(/(?:import|export)\s+.*from\s+['"]\.\/dispatch\//.test(workCompatSource), false, 'work-compat.mjs must not import dispatch core');
+
+  // Verify cli.mjs (dispatch CLI surface) uses documented allowlist and does not import work-compat directly
+  const cliSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/cli.mjs'), 'utf8');
+  assert.equal(/from\s+['"][^'"]*work-compat(?:\.mjs)?['"]/.test(cliSource), false, 'cli.mjs must not import work-compat directly');
 });
 
 
