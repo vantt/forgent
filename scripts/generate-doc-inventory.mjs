@@ -1424,7 +1424,7 @@ export function runCli(argv, cwd = process.cwd()) {
     try {
       const registry = carryForwardIdentityRegistry(cwd, { commit, identityRegistryPath, sourcePath: sourceIdx >= 0 ? argv[sourceIdx + 1] : null, toSourcePath: toIdx >= 0 ? argv[toIdx + 1] : null });
       fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
-      fs.writeFileSync(jsonOut, JSON.stringify(registry, null, 2) + '\n');
+      fs.writeFileSync(jsonOut, JSON.stringify(registry) + '\n');
       console.log(`generate-doc-inventory: wrote carried-forward identity registry to ${path.relative(cwd, jsonOut)} (${registry.documents.length} documents, ${registry.units.length} units)`);
       return 0;
     } catch (err) { console.error(`Error: ${err.message}`); return 1; }
@@ -1434,7 +1434,7 @@ export function runCli(argv, cwd = process.cwd()) {
     try {
       const registry = bootstrapIdentityRegistry(cwd, { commit });
       fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
-      fs.writeFileSync(jsonOut, JSON.stringify(registry, null, 2) + '\n');
+      fs.writeFileSync(jsonOut, JSON.stringify(registry) + '\n');
       console.log(`generate-doc-inventory: wrote identity registry to ${path.relative(cwd, jsonOut)} (${registry.documents.length} documents, ${registry.units.length} units)`);
       return 0;
     } catch (err) { console.error(`Error: ${err.message}`); return 1; }

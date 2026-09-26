@@ -53,10 +53,11 @@ Artifact sizes and hashes after sharding:
 
 | Artifact | Size | SHA-256 |
 |---|---:|---|
-| `phase-02-doc-inventory.json` manifest | 2,455 bytes | `2bd0345230d1249794aea40c2369eed0e0080d4cea5e9666aa490aba2e685e90` |
+| `phase-02-doc-inventory.json` manifest | 2,455 bytes | `6176a166b81f674be70900b9a0bfc7c7f858bb21c6ea9e149a7bbc5c621e3118` |
+| reassembled JSON payload | 220,457,717 bytes | `73be6fb69ccaabff09a93a6e4090756cad7f22e01df554876c1d42ee71b0361e` |
 | `phase-02-doc-inventory.parts/` | 11 parts, each under 25 MB | see manifest |
 | `phase-02-doc-inventory.md` | 682 KiB (698,784 bytes) | `65433755d45107d19ee12646f1b0436163e1d35df990dc61d712d4668c211ba7` |
-| `phase-02-identity-registry.json` | 50 MiB (52,202,925 bytes) | `e20adba3f40a1c52d5eecbc8f7a685225783a371fe14f3205ccefba25ca7c9b8` |
+| `phase-02-identity-registry.json` | 43 MiB (44,988,772 bytes) | `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` |
 
 These findings are not resolved in Phase 02. They block promotion and feed later authorized phases.
 

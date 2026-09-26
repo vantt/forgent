@@ -7,8 +7,8 @@
   "commit": "f0c76c5e590339d9c815038539ff1f4a072c64e4",
   "identityRegistry": {
     "path": "plans/260925-documentation-authority-unification/phase-02-identity-registry.json",
-    "bytes": 52202925,
-    "sha256": "e20adba3f40a1c52d5eecbc8f7a685225783a371fe14f3205ccefba25ca7c9b8",
+    "bytes": 44988772,
+    "sha256": "7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730",
     "documents": 4305,
     "units": 85772
   },

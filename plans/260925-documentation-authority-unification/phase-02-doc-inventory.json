@@ -6,14 +6,14 @@
   "reassembly": "ordered-concat-then-json-parse",
   "canonicalJson": "pretty-2-space-with-final-newline",
   "totalBytes": 220457717,
-  "sha256": "8ba9651eac0c9b240123f1f84c1eeb97d92ac420d196b133efa03b1e559e9734",
+  "sha256": "73be6fb69ccaabff09a93a6e4090756cad7f22e01df554876c1d42ee71b0361e",
   "partCount": 11,
   "maxPartBytes": 20971520,
   "parts": [
     {
       "path": "phase-02-doc-inventory.parts/part-0001.jsonl",
       "bytes": 20971516,
-      "sha256": "ba800fe63846d80be900d82f0a7f096fb14ecd25ecc3d361b17cfd6732bfa2fd"
+      "sha256": "40d084d0975d67f00cea37c47830db7b6e817979aca9c715297cbed8255f7462"
     },
     {
       "path": "phase-02-doc-inventory.parts/part-0002.jsonl",
