@@ -3,7 +3,7 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: remediation G focused/gate PASS in moving checkout; final immutable full verifier PENDING at the new candidate; independent re-review pending
+Status: remediation G candidate frozen for final immutable full verification; the receipt is recorded on the subsequent empty same-tree review-boundary commit; independent re-review pending
 Authoritative runner: scripts/verify-phase-02.mjs
 Result: Phase 02 artifacts are verified only by the immutable detached-worktree runner, not by commands run in a moving local checkout.
 ```
@@ -63,11 +63,11 @@ Results after remediation cell G: focused tests passed (71/71) for `test/scripts
 
 Remediation G specifically verified: false one-owner split proposals demote to `unknown-blocking` with null target owner/anchor; JS/TS dynamic parsing skips line/block comments and quoted call text, recurses into nested calls such as `path.join(path.resolve(root, "docs"), "specs", name)`, scans relevant Markdown fenced code but not Markdown prose, emits explicit unresolvedRoot standalone gaps for leading aliases such as `DOCS_DIR`, and collapses repeated `**`; carry-forward refuses existing destination registry entries and updates unit status from the new classification.
 
-Authoritative full verification is PENDING for the remediation G candidate by reviewer instruction; no full suite was run in this cell. The prior full receipt at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` remains historical evidence only and does not verify the current candidate.
+The remediation G candidate is frozen before the final immutable full run. To avoid a self-referential receipt commit, the authoritative result is recorded in the annotation of the subsequent empty review-boundary commit, whose tree must equal this candidate's tested tree. The prior full receipt at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` remains historical evidence only.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
-Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the remediation G candidate's final full verifier remains pending.
+Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; remediation G's authoritative result belongs to the subsequent empty same-tree boundary annotation.
 
 ## Last Local Evidence Before Runner Canonicalization
 
