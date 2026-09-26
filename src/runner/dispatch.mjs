@@ -33,7 +33,8 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides, executorIdForWork } from './dispatch/resolve.mjs';
+export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { executorIdForWork, buildPrompt, resolveCapabilityIdentityDetails, resolveCapabilityIdentity } from './work-compat.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
 
@@ -59,8 +60,6 @@ export {
 export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, resolveHerdrBin, DEFAULT_ADAPTER, DISPATCH_DEPTH_ENV, MAX_DISPATCH_DEPTH } from './dispatch/transport.mjs';
 
 export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
-
-export { buildPrompt } from './dispatch/prepare.mjs';
 
 export {
   resolveAgentTypeForTaskSpec,

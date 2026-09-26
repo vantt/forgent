@@ -930,8 +930,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
   depends-on: I11 approved
   status: CANDIDATE READY FOR REVIEW (R1-R9 implemented in 9 atomic cells; candidates pass all focused & full suites)
   track-manager-decisions:
-    r2-work-lookups: "ACCEPTED AS DOCUMENTED EXCEPTION — Work capability lookup helpers (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt) remain in resolve.mjs/prepare.mjs (and re-exported downward by operation-choice.mjs) to keep the import graph acyclic (Tarjan SCC <= 2). Strictly decoupled dispatch core modules (config.mjs, mechanism.mjs, transport.mjs, plan.mjs, settlement.mjs, run-result.mjs, confinement/*) contain zero workflow-stage-graphs imports."
-    r4-argv-parser: "ACCEPTED AS DEFENSIVE FALLBACK — Confinement authority's argv/bwrap parser is preserved as a fallback behind driver claims when driver claims are absent (as documented in CHANGELOG.md and docs)."
+    r2-work-lookups: "OPTION A RATIFIED & IMPLEMENTED — Decoupled Work capability lookup helpers (executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt) out of dispatch core into a dedicated leaf compatibility module at Work Driver layer (src/runner/work-compat.mjs) with zero imports into dispatch core, resolving the import cycle cleanly without requiring any structural exception. resolve.mjs and prepare.mjs re-export these helpers as non-breaking aliases without importing workflow-stage-graphs. All 13 decoupled dispatch core modules now have strictly 0 imports of workflow-stage-graphs (enforced by test/runner/dispatch-reconciliation-import-graph.test.mjs)."
+    r4-argv-parser: "ACCEPTED AS DEFENSIVE FALLBACK — Confinement authority's argv/bwrap parser is preserved as a defensive fallback behind driver claims when driver claims are absent (as documented in CHANGELOG.md and docs)."
   stop: behavior or test projection differs from the I11 baseline
 - unit: I13 — verify import graph, compatibility, performance, and full suite
   capability: code:test

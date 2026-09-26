@@ -7,7 +7,7 @@ import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { executeExecutorCli } from './dispatch/cli.mjs';
-import { buildPrompt } from './dispatch/prepare.mjs';
+import { buildPrompt } from './work-compat.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
 

@@ -260,12 +260,14 @@ test('boundary test: src/runner/dispatch/** contains no lifecycle verb imports o
   }
 });
 
-test('boundary test: dispatch core modules without documented lookup exceptions do not import workflow-stage-graphs (R2 / N2)', () => {
+test('boundary test: dispatch core modules do not import workflow-stage-graphs (R2)', () => {
   const strictDispatchCoreFiles = [
     'src/runner/dispatch/config.mjs',
     'src/runner/dispatch/mechanism.mjs',
     'src/runner/dispatch/transport.mjs',
     'src/runner/dispatch/plan.mjs',
+    'src/runner/dispatch/resolve.mjs',
+    'src/runner/dispatch/prepare.mjs',
     'src/runner/dispatch/settlement.mjs',
     'src/runner/dispatch/run-result.mjs',
     'src/runner/dispatch/runtime-inspection.mjs',
@@ -285,13 +287,15 @@ test('boundary test: dispatch core modules without documented lookup exceptions 
     );
   }
 
-  // Documented exception verification: resolve.mjs and prepare.mjs house
   // Work Driver compatibility lookups (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt)
-  // to avoid upward cyclic dependencies to operation-choice.mjs, and MUST NOT import operation-choice.
+  // are relocated to leaf module src/runner/work-compat.mjs, avoiding cyclic dependencies.
   const resolveSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/resolve.mjs'), 'utf8');
   const prepareSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/prepare.mjs'), 'utf8');
   assert.equal(resolveSource.includes('operation-choice'), false, 'resolve.mjs must not import operation-choice');
   assert.equal(prepareSource.includes('operation-choice'), false, 'prepare.mjs must not import operation-choice');
+
+  const workCompatSource = fs.readFileSync(path.join(root, 'src/runner/work-compat.mjs'), 'utf8');
+  assert.equal(/(?:import|export)\s+.*from\s+['"]\.\/dispatch\//.test(workCompatSource), false, 'work-compat.mjs must not import dispatch core');
 });
 
 

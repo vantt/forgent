@@ -47,7 +47,7 @@ git merge-base --is-ancestor cfdaf4bc95d44a6132d03dfb635478b084e41b35 HEAD -> YE
 | Requirement | Commit SHA | Description |
 |---|---|---|
 | **R1** | `f4d6fb708` | Move `fanoutBatchExecutorCli` to Work Driver (`src/runner/fanout-batch.mjs`), isolate `logExecutorDispatch` (`src/runner/dispatch-log.mjs`), ensure `src/runner/dispatch/**` has zero references to `pick`, `return`, `claim`, or `appendEvent`. Register files in `docs/architecture-manifest.json`. |
-| **R2** | `33e5b6c04` | Relocate Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) from dispatch core into `src/runner/dispatch/operation-choice.mjs` with backward-compatible re-exports. Dispatch core contains zero direct `workflow-stage-graphs` imports. |
+| **R2** | `33e5b6c04` | Relocate Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) from dispatch core into leaf compatibility module `src/runner/work-compat.mjs` at Work Driver layer (Option A). `resolve.mjs` and `prepare.mjs` re-export them as non-breaking compatibility aliases. All 13 strictly decoupled dispatch core modules contain zero `workflow-stage-graphs` imports. |
 | **R3** | `598e5b43b` | Split `assignment-runner.mjs` into dedicated `src/runner/dispatch/settlement.mjs` (unified single settlement pipeline replacing duplicated settlement code) and `src/runner/dispatch/reconcile-cli-spawn.mjs`. Relocate dispatch depth helpers to `adapters.mjs`. |
 | **R4** | `5b8a1b2a0` | Consolidate Confinement Authority preparation into unified `assessAndPrepare(request, opts)` in `src/runner/dispatch/confinement/authority.mjs`. Driver claims populate attestation directly (no argv parsing). Extract leaf proof helpers to `src/runner/dispatch/proof-helpers.mjs`, removing adapter imports from authority. |
 | **R5** | `91d9109f5` | Extract Herdr S2 proof layer (~530 lines) into `src/runner/dispatch/herdr-reconcile.mjs` ("infra" in architecture manifest). Unify terminal outcome receipt publication for both failed and settled runs into `publishHerdrCompletionReceipt`. |
@@ -64,11 +64,12 @@ git merge-base --is-ancestor cfdaf4bc95d44a6132d03dfb635478b084e41b35 HEAD -> YE
 ### 3.1 Total Diff Stat (`cfdaf4bc`..HEAD)
 
 ```txt
-42 files changed, 3634 insertions(+), 3174 deletions(-)
+43 files changed, 3910 insertions(+), 3174 deletions(-)
 ```
 
 ### 3.2 Key File Additions & Relocations
 
+- `src/runner/work-compat.mjs` (+274 lines, Work Driver Compatibility leaf module)
 - `src/runner/fanout-batch.mjs` (+187 lines, Work Driver layer)
 - `src/runner/dispatch-log.mjs` (+36 lines, Audit Seam)
 - `src/runner/dispatch/operation-choice.mjs` (+238 lines, Work Driver compatibility boundary)
@@ -243,7 +244,7 @@ Following the second independent re-review round (`REQUEST CHANGES (minor)` @ `8
 
 ---
 
-### 5.5 Independent Re-Review Round 3 Remediation Summary
+### 5.5 Independent Re-Review Round 3 Remediation Summary & Option A Implementation
 
 Following the third independent re-review round (`REQUEST CHANGES` @ `903ccf11f`), all findings have been addressed:
 
@@ -251,11 +252,21 @@ Following the third independent re-review round (`REQUEST CHANGES` @ `903ccf11f`
    - Reverted `invocationCwd` mapping in `src/runner/dispatch/plan.mjs` and `src/runner/dispatch/resolve.mjs`. No new config schema or env var introduced.
    - Refactored test N1 in `test/runner/assignment-dispatch.test.mjs` to exercise the pre-existing authorized path (resumed fallback run with persisted plan carrying `invocation.cwd`). Verified that both M13 and M13b are killed.
 
-2. **R3-2 — Track Manager Ratifications**:
-   - Ratified Track Manager decisions for R2 (Work lookup helper exception) and R4 (argv parser defensive fallback).
+2. **R3-2 / R2 — Option A Implementation (Complete Decoupling of Work Lookups)**:
+   > [!IMPORTANT]
+   > **Architectural Note on R2 Decoupling (Option A)**:
+   > In response to the Track Manager directive ("Làm luôn A. và khi báo cáo nhớ ghi thêm một lưu ý về thay đổi này"), Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, and `buildPrompt`) have been extracted completely out of dispatch core into a dedicated leaf compatibility module at the Work Driver layer: `src/runner/work-compat.mjs`.
+   >
+   > Key architectural properties of `src/runner/work-compat.mjs`:
+   > - **Zero Imports into Dispatch Core**: `work-compat.mjs` imports only kernel/infra state (`work.mjs`, `workflow-stage-graphs.mjs`, `prompt-templates.mjs`) and never imports anything from `src/runner/dispatch/`. This completely eliminates the 14-module import cycle (`operation-choice -> assignment-runner -> ...`) that previously motivated retaining lookups in `resolve.mjs`/`prepare.mjs`.
+   > - **Zero `workflow-stage-graphs` Imports in Decoupled Dispatch Core**: `src/runner/dispatch/resolve.mjs` and `prepare.mjs` removed all direct bodies and imports of `workflow-stage-graphs`. They re-export the helpers from `../work-compat.mjs` solely as non-breaking compatibility aliases. All 13 strictly decoupled dispatch core modules now have **strictly 0 imports** of `workflow-stage-graphs` (enforced by `test/runner/dispatch-reconciliation-import-graph.test.mjs`).
+   > - **Manifest & Layering Parity**: Registered in `docs/architecture-manifest.json` under `"infra"` layer, passing all `test/architecture.test.mjs` layer-ranking, domain-siloing, and file-parity assertions.
 
-3. **LOW Items**:
-   - Replaced raw `fs.writeFileSync` on `effective-execution-contract.json` in `src/runner/dispatch/herdr-round.mjs` with `publishMutableProjection`.
+3. **R3-2 / R4 — Track Manager Ratification**:
+   - Track Manager formally ratified retaining the argv/bwrap parser in `src/runner/dispatch/confinement/authority.mjs` as a defensive fallback behind driver claims when driver claims are absent (as documented in `CHANGELOG.md` and spec).
+
+4. **LOW Items**:
+   - Replaced raw `fs.writeFileSync` on `effective-execution-contract.json` in `src/runner/dispatch/herdr-round.mjs` with atomic `publishMutableProjection`.
    - Replaced self-declared `APPROVE` verdict with `Candidate Status: CANDIDATE READY FOR REVIEW`.
    - F13/F14 remain tracked as non-blocking LOW debt.
 
@@ -268,19 +279,18 @@ Following the third independent re-review round (`REQUEST CHANGES` @ `903ccf11f`
    - Clarified that Dispatch And Execution Engine strictly forbids Work lifecycle mutation, event append, and workflow lookups.
 
 2. **`docs/platform/agent-coordination/architecture/dispatch-control-plane.md` & `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`**:
-   - Updated `## Source Inventory` to register new modules: `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, and `proof-helpers.mjs`.
-   - Placed `operation-choice.mjs` into dedicated `Work Driver Compatibility` row.
-   - Documented explicit R2 exception permitting Work capability lookup helpers in `resolve.mjs` and `prepare.mjs` to keep import graph acyclic, and clarified strictly decoupled core modules.
+   - Updated `## Source Inventory` to register new modules: `src/runner/work-compat.mjs` as Work Driver Compatibility leaf module, along with `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, and `proof-helpers.mjs`.
+   - Updated forbidden dependency list item 3 to state that all 13 strictly decoupled dispatch core modules contain zero direct `workflow-stage-graphs` imports, with Work capability lookups relocated to `work-compat.mjs`.
 
 3. **`docs/architect/component-boundary/component-boundary-advisory.md`**:
    - §9 Hexagonal Architecture View: registered `OccupancyPort` under `Work Lifecycle Engine:`.
    - §12 Dispatch As A Replaceable System: documented separation of Work lifecycle mutation (`src/runner/fanout-batch.mjs`) and event logging (`src/runner/dispatch-log.mjs`).
 
 4. **`CHANGELOG.md`**:
-   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications, re-review findings remediation (N1–N6, R2-1, R2-2, R3-1), and mutation proof locks (M13–M18, M4b).
+   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications, Option A extraction to `src/runner/work-compat.mjs`, re-review findings remediation (N1–N6, R2-1, R2-2, R3-1), and mutation proof locks (M13–M18, M4b).
 
-5. **`plans/260919-coordination-skill-harness-simplification/plan.md`**:
-   - Recorded Track Manager decisions for R2 and R4 under Unit I12. Unit I13 remains untouched.
+5. **`plans/260919-coordination-skill-harness-simplification/plan.md` & `plans/260920-2217-dispatch-engine-hardening/phase-09-boundary-simplification.md`**:
+   - Recorded Option A implementation under R2 and Track Manager ratification under R4. Unit I13 remains untouched.
 
 ---
 
