@@ -3810,10 +3810,9 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
   const result = await executeAssignment(assignment, {
     cwd: cwdDir,
     repoRoot: cwdDir,
-    effectiveCwd: effectiveCwdDir,
-    compiledPlan: { cwd: effectiveCwdDir },
     runnerConfig: {
       executor: {
+        cwd: effectiveCwdDir,
         allowCrossProvider: true,
         command: process.execPath,
         args: [executorScript, '{prompt}'],

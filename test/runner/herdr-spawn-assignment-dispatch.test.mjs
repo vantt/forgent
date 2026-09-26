@@ -281,6 +281,13 @@ test('N3 lock: executeAssignment wires effectiveContract through to herdr-spawn 
     // 2. Must unify all result path references to outbox/result-1.json and have 0 occurrences of agent-result.json
     assert.equal(briefContent.includes('agent-result.json'), false, 'brief must not contain conflicting agent-result.json path');
     assert.match(briefContent, /2\. `[^`]*outbox[/\\]result-1\.json` -- a JSON object:/, 'When you finish must point to outbox/result-1.json');
+
+    // 3. Persisted effective-execution-contract.json on disk must also match outbox/result-1.json
+    const contractOnDiskPath = path.join(runDir, 'effective-execution-contract.json');
+    if (fs.existsSync(contractOnDiskPath)) {
+      const contractOnDisk = JSON.parse(fs.readFileSync(contractOnDiskPath, 'utf8'));
+      assert.match(contractOnDisk.resultClaim?.path ?? '', /outbox[/\\]result-1\.json/, 'persisted effective-execution-contract.json must match brief claim path');
+    }
   } finally {
     fs.rmSync(repoDir, { recursive: true, force: true });
   }

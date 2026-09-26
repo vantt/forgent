@@ -1462,7 +1462,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // `let`: see the Phase B note on `compiledPlan` above.
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
 
-  let effectiveCwd = opts.effectiveCwd ?? compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 

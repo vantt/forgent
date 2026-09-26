@@ -213,7 +213,33 @@ Following the second independent re-review (`REQUEST CHANGES` at `205d112e4`), a
 | **M16** | Omit `effectiveContract` from `herdr-spawn` production options | Asserted in `test/runner/herdr-spawn-assignment-dispatch.test.mjs` (brief must include execution contract). **KILLED** |
 | **M17** | Mismatched result path between brief prompt and outbox polling | Asserted in `test/runner/herdr-spawn-assignment-dispatch.test.mjs` (single unified path `outbox/result-1.json`). **KILLED** |
 | **M18** | Swallow `finalizeConfinementResources` error in `settleReceiptRunFromOutcome` | Asserted in `test/runner/assignment-dispatch.test.mjs` (throws and propagates). **KILLED** |
-| **M4b** | Dynamic `import(...)` into `authority.mjs` | Banned by AST & regex check in `test/runner/dispatch-confinement-authority.test.mjs`. **KILLED** |
+| **M4b** | Dynamic `import(...)` into `authority.mjs` | Banned by regex check with negative lookahead in `test/runner/dispatch-confinement-authority.test.mjs`. **KILLED** |
+
+### 5.4 Independent Re-Review Round 2 Remediation (R2-1, R2-2, Track Manager Decisions)
+
+Following the second independent re-review round (`REQUEST CHANGES (minor)` @ `8c025fa0f`), all remaining items have been resolved:
+
+1. **R2-1 — Removed production seam `opts.effectiveCwd`**:
+   - `opts.effectiveCwd` override removed from `src/runner/dispatch/assignment-runner.mjs`.
+   - Restored the strict plan-bound invariant: `effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd`.
+   - In `src/runner/dispatch/plan.mjs`, `compileDispatchPlan` maps `executor.cwd` (or `resolvedForDispatch.cwd`) to `compiledPlan.invocation.cwd`.
+   - In `test/runner/assignment-dispatch.test.mjs`, test N1 configures `runnerConfig.executor.cwd: effectiveCwdDir`, naturally driving the execution and settlement directory through the compiled plan without any test seams. M13 and M13b remain killed.
+
+2. **R2-2 — Documented precise module boundary in both control plane copies**:
+   - Updated both `docs/platform/agent-coordination/architecture/dispatch-control-plane.md` and `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`.
+   - Phrase accurately states: strictly decoupled dispatch core modules (`config.mjs`, `mechanism.mjs`, `transport.mjs`, `plan.mjs`, `settlement.mjs`, `run-result.mjs`, `confinement/*`) contain zero direct `workflow-stage-graphs` imports; outside of pre-existing assignment/CLI runners (`assignment.mjs`, `assignment-runner.mjs`, `cli.mjs`), `resolve.mjs` and `prepare.mjs` retain Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) as a documented exception re-exported by `operation-choice.mjs` to keep the dependency graph acyclic.
+
+3. **Track Manager Decisions Recorded**:
+   - Recorded in parent plan `plans/260919-coordination-skill-harness-simplification/plan.md` under `unit: I12` and in `plans/260920-2217-dispatch-engine-hardening/phase-09-boundary-simplification.md`:
+     - **R2**: Accepted architectural exception keeping Work capability lookups in `resolve.mjs`/`prepare.mjs` (downward re-export in `operation-choice.mjs`) to avoid introducing cyclic dependencies.
+     - **R4**: Accepted keeping argv/bwrap parser in `authority.mjs` as a defensive fallback behind driver claims.
+
+4. **M4b Conclusively Killed**:
+   - Fixed regex in `test/runner/dispatch-confinement-authority.test.mjs` using negative lookahead (`(?!\b(?:import|export)\b)[\s\S]*?`) and dedicated dynamic `\bimport\s*\(` matching. Confirmed killed (fails when dynamic import is injected into `authority.mjs`).
+
+5. **Persisted Execution Contract Parity**:
+   - In `src/runner/dispatch/herdr-round.mjs`, when `effectiveContract` is harmonized with `paths.resultPath` (`outbox/result-N.json`), `paths.effectiveExecutionContractPath` on disk is updated with the harmonized contract.
+   - Tested in `test/runner/herdr-spawn-assignment-dispatch.test.mjs`: asserts both `brief-1.md` and `effective-execution-contract.json` point to `outbox/result-1.json`.
 
 ---
 
@@ -226,17 +252,17 @@ Following the second independent re-review (`REQUEST CHANGES` at `205d112e4`), a
 2. **`docs/platform/agent-coordination/architecture/dispatch-control-plane.md` & `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`**:
    - Updated `## Source Inventory` to register new modules: `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, and `proof-helpers.mjs`.
    - Placed `operation-choice.mjs` into dedicated `Work Driver Compatibility` row.
-   - Documented explicit R2 exception permitting Work capability lookup helpers in `resolve.mjs` and `prepare.mjs` to keep import graph acyclic.
+   - Documented explicit R2 exception permitting Work capability lookup helpers in `resolve.mjs` and `prepare.mjs` to keep import graph acyclic, and clarified strictly decoupled core modules.
 
 3. **`docs/architect/component-boundary/component-boundary-advisory.md`**:
    - §9 Hexagonal Architecture View: registered `OccupancyPort` under `Work Lifecycle Engine:`.
    - §12 Dispatch As A Replaceable System: documented separation of Work lifecycle mutation (`src/runner/fanout-batch.mjs`) and event logging (`src/runner/dispatch-log.mjs`).
 
 4. **`CHANGELOG.md`**:
-   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications, re-review findings remediation (N1–N6), and mutation proof locks (M13–M18).
+   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications, re-review findings remediation (N1–N6, R2-1, R2-2), and mutation proof locks (M13–M18, M4b).
 
 5. **`plans/260919-coordination-skill-harness-simplification/plan.md`**:
-   - Advanced Unit I12 status to `CANDIDATE READY FOR REVIEW`. Unit I13 remains untouched.
+   - Recorded Track Manager decisions for R2 and R4 under Unit I12. Unit I13 remains untouched.
 
 ---
 
@@ -253,6 +279,6 @@ Following the second independent re-review (`REQUEST CHANGES` at `205d112e4`), a
 
 ## 8. Recommendation & Next Steps
 
-All independent review findings ($F_1$–$F_{15}$ and $N_1$–$N_6$) and survived mutations ($M_1$–$M_{18}$) have been fully remediated and locked with dedicated tests. All 9 discrete requirements ($R_1$–$R_9$) are cleanly satisfied with zero test failures and full architectural honesty.
+All independent review findings ($F_1$–$F_{15}$, $N_1$–$N_6$, $R2\text{-}1$, $R2\text{-}2$), survived mutations ($M_1$–$M_{18}$, $M_{4b}$), and Track Manager decisions have been fully remediated, verified, locked with dedicated tests, and documented. All 9 discrete requirements ($R_1$–$R_9$) are cleanly satisfied with zero test failures and full architectural honesty.
 
 **Final Unit I12 Verdict**: `APPROVE` (Remediated Candidate Ready).

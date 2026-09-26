@@ -1174,6 +1174,11 @@ export async function runHerdrRound(ctx) {
     effectiveContract,
   });
   fs.writeFileSync(paths.briefPath, briefText);
+  if (effectiveContract && fs.existsSync(paths.effectiveExecutionContractPath)) {
+    try {
+      fs.writeFileSync(paths.effectiveExecutionContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+    } catch {}
+  }
   round.note({ status: 'requested', agentName, round: roundNumber });
 
   const { workerHomePath, sessionEnv, confined, status } = await establishConfinement({

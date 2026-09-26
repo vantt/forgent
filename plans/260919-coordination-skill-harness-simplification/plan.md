@@ -929,6 +929,9 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: code:refactor
   depends-on: I11 approved
   status: CANDIDATE READY FOR REVIEW (R1-R9 implemented in 9 atomic cells; candidates pass all focused & full suites)
+  track-manager-decisions:
+    r2-work-lookups: "ACCEPTED AS DOCUMENTED EXCEPTION — Work capability lookup helpers (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt) remain in resolve.mjs/prepare.mjs (and re-exported downward by operation-choice.mjs) to keep the import graph acyclic (Tarjan SCC <= 2). Strictly decoupled dispatch core modules (config.mjs, mechanism.mjs, transport.mjs, plan.mjs, settlement.mjs, run-result.mjs, confinement/*) contain zero workflow-stage-graphs imports."
+    r4-argv-parser: "ACCEPTED AS DEFENSIVE FALLBACK — Confinement authority's argv/bwrap parser is preserved as a fallback behind driver claims when driver claims are absent (as documented in CHANGELOG.md and docs)."
   stop: behavior or test projection differs from the I11 baseline
 - unit: I13 — verify import graph, compatibility, performance, and full suite
   capability: code:test

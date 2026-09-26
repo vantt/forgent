@@ -1266,11 +1266,17 @@ test("M4 / M4b lock: authority.mjs contains 0 adapter layer imports (static or d
     "transport.mjs",
     "assignment-runner",
   ];
-  const importRegex = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]\)/g;
-  let m;
+  const importRegexes = [
+    /\bimport\s*\(\s*['"]([^'"]+)['"]\)/g,
+    /\b(?:import|export)\s+(?:(?!\b(?:import|export)\b)[\s\S])*?\bfrom\s*['"]([^'"]+)['"]/g,
+    /\bimport\s+['"]([^'"]+)['"]/g,
+  ];
   const importedModules = [];
-  while ((m = importRegex.exec(content)) !== null) {
-    importedModules.push(m[1] || m[2]);
+  for (const re of importRegexes) {
+    let m;
+    while ((m = re.exec(content)) !== null) {
+      importedModules.push(m[1]);
+    }
   }
   for (const imp of importedModules) {
     for (const forbidden of forbiddenAdapters) {
