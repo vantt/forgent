@@ -223,9 +223,14 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       '--json',
     ], { cwd: tempWorktreeDir, encoding: 'utf8' });
     const gateJson = JSON.parse(gate.stdout);
+    const open = gateJson.explicitOpenFindings || {};
     receipt.checks.inventoryGate = {
       passed: gateJson.clean === true,
-      explicitOpenFindings: gateJson.explicitOpenFindings || null,
+      explicitOpenFindingCounts: {
+        gaps: open.gapCount ?? null,
+        duplicateContentGroups: open.duplicateContentGroupCount ?? null,
+        semanticConflictGroups: open.semanticConflictGroupCount ?? null,
+      },
     };
     console.log('✓ Inventory gate checker passed');
 
