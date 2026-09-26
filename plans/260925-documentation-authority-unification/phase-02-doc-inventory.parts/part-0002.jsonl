@@ -1,68 +1,3 @@
-      "evidenceLinks": [],
-      "disposition": "merge",
-      "reviewStatus": "pending",
-      "sourceOccurrenceOrdinal": 0,
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
-          "role": "duplicate"
-        },
-        {
-          "sourceOccurrenceOrdinal": 2,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
-          "role": "duplicate"
-        },
-        {
-          "sourceOccurrenceOrdinal": 3,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_89141f3c58a809b46d5d4504",
-      "sourceId": "src_c0e7f571354ae00fe04d",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
-      "sourceAnchor": "mdview-separate-editor-screen-architectural-simplicity-assessment",
-      "sourceDigest": "a7eb874a9e28b45c74d7d7a276b9b428a1fb7c1d93f90290f1c1e9fc1de595f3",
-      "sourceLocation": {
-        "start": 1,
-        "end": 1
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": "mdview-separate-editor-screen-architectural-simplicity-assessment",
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-canonical",
-          "claimId": "claim_89141f3c58a809b46d5d4504",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
-          "sourceOccurrenceOrdinal": 0,
-          "blobSha": "f97a7f4f1fa11fd9fc4a1fb172eff4f5e8b04771"
-        },
-        {
-          "type": "duplicate-content-of",
-          "claimId": "claim_89141f3c58a809b46d5d4504",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
-          "sourceOccurrenceOrdinal": 1,
-          "blobSha": "f97a7f4f1fa11fd9fc4a1fb172eff4f5e8b04771"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "sourceOccurrenceOrdinal": 0,
-      "sourceOccurrences": [
-        {
           "sourceOccurrenceOrdinal": 0,
           "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
           "role": "canonical"
@@ -562103,3 +562038,88 @@
       "claimId": "claim_c90e1c7ef7fec131a9eb2aed",
       "sourceId": "src_349bf97e26824ad8bef5",
       "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
+      "sourceLocation": {
+        "start": 18,
+        "end": 31
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "historical",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_2b54a6d3143ec640e1b762b8",
+      "sourceId": "src_349bf97e26824ad8bef5",
+      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "sourceAnchor": "pinned-terms",
+      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
+      "sourceLocation": {
+        "start": 33,
+        "end": 33
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "historical",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_998704e25e4053bf8e86b7a2",
+      "sourceId": "src_349bf97e26824ad8bef5",
+      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
+      "sourceLocation": {
+        "start": 35,
+        "end": 42
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "historical",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_39d669c3fd6de97c3a663b2e",
+      "sourceId": "src_349bf97e26824ad8bef5",
+      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "sourceAnchor": "scout-evidence",
+      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
+      "sourceLocation": {
+        "start": 44,
+        "end": 44
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "historical",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "retain-as-evidence",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e81bc1c3a2676df5a6df63a8",
+      "sourceId": "src_349bf97e26824ad8bef5",
+      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
+      "sourceAnchor": "unheaded-block-5",

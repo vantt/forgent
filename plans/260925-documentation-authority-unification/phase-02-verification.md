@@ -57,9 +57,9 @@ node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-0
 node scripts/check-doc-inventory-gates.mjs
 ```
 
-Results: focused tests passed (51/51), deterministic regeneration passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 1,721 bytes; all 7 shards are under 25 MB; reassembled payload SHA-256 is `053b1fa219f564adbfda9e800b0f422748445f4eae1fa1b733dc46c79e92dcfc`; Markdown SHA-256 is `48465e6320062fa4857e12e6b011005a25d0b1e2a1176f7a4ed77934f7c14963`.
+Results: focused tests passed (51/51), deterministic regeneration passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 1,721 bytes with SHA-256 `be40f96c1582338ab2e4d7e4ab8f79414befee66de4eb5653d5f0c9b5684df1e`; all 7 shards are under 25 MB; reassembled payload SHA-256 is `b1126cbca7adc775d95d8ea991f84b2febe79afb30b234aef35b2e5795838fb3`; Markdown SHA-256 is `e1b016993124a64e1afb9bd83d7c96797bbc1e4d680045fab299db710de56859`.
 
-Authoritative skip-full-suite verifier passed after the remediation code/artifact commit and before this record-only hash refresh with `BASE=b3b63c68c6a4742e4e12eb8173f49693d8d29132`: `npm ci`, focused Phase 02 tests, shard/Markdown byte identity, inventory gate, legacy ratchet, docs/citation/ownership, changed-Markdown links, historical plan preservation, diff allowlist, and clean-after-checks all passed; full suite was intentionally skipped.
+The first post-sharding immutable-verifier attempt correctly failed because the committed artifacts had been generated from the moving remediation base rather than the immutable Phase 01 base. The artifacts above were regenerated from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`; a final immutable verifier run against the resulting committed boundary is required before independent re-review.
 
 No full suite was run in this remediation cell.
 

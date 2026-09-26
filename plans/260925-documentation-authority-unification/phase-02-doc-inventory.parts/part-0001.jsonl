@@ -4,7 +4,7 @@
   "generatedAt": "1970-01-01T00:00:00.000Z",
   "phase": "02",
   "description": "Repository-wide documentation inventory and conservation ledger (Phase 02 file-level and claim-level accounting)",
-  "commit": "b3b63c68c6a4742e4e12eb8173f49693d8d29132",
+  "commit": "f0c76c5e590339d9c815038539ff1f4a072c64e4",
   "scanRoots": [
     "docs"
   ],
@@ -47,16 +47,16 @@
     },
     "byConsumerKind": {
       "dynamic": 113,
-      "executable-proof": 1198,
-      "fixture": 61,
+      "executable-proof": 936,
+      "fixture": 59,
       "glob": 2376,
-      "literal": 3132,
+      "literal": 2301,
       "shipped-contract": 43
     },
     "gapCount": 1042,
     "duplicateContentGroupCount": 818,
     "semanticConflictGroupCount": 151,
-    "scanGapCount": 1,
+    "scanGapCount": 0,
     "headingTotalCount": 26105,
     "unheadedBlockTotalCount": 58490,
     "mixedFileBlockTotalCount": 1177,
@@ -7468,14 +7468,7 @@
       "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion."
     }
   ],
-  "scanGaps": [
-    {
-      "type": "consumer-scan-too-large",
-      "path": "plans/260925-documentation-authority-unification/phase-02-doc-inventory.json",
-      "blobSize": 99470703,
-      "message": "plans/260925-documentation-authority-unification/phase-02-doc-inventory.json: 99470703 bytes exceeds 20MB consumer scan limit"
-    }
-  ],
+  "scanGaps": [],
   "immutableRefEdges": [
     {
       "edgeId": "immutable_ref_b262753225def45b5ecfeaf5",
@@ -22376,11 +22369,9 @@
         "docs/specs/reading-map.md",
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
         "plans/260904-2329-group-thinking-plan-loop/reports/doer-260905-0245-p03-1-skill-authoring-report.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
         "scripts/check-legacy-docs-ratchet.baseline.json",
-        "src/verbs/coordination/schema.mjs",
-        "test/scripts/generate-doc-inventory.test.mjs"
+        "src/verbs/coordination/schema.mjs"
       ],
       "targetPaths": [
         "docs/architect/agent-coordination/contracts/coordination-session.md",
@@ -22443,7 +22434,6 @@
         "docs/platform/agent-coordination/decisions/README.md",
         "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
         "docs/platform/agent-coordination/subcomponents/README.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -22475,7 +22465,6 @@
         "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
         "docs/platform/agent-coordination/subcomponents/README.md",
         "docs/platform/agent-coordination/verification/implementation-alignment.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -22508,7 +22497,6 @@
         "docs/platform/agent-coordination/decisions/README.md",
         "docs/platform/agent-coordination/history/documentation-migration/source-inventory.md",
         "docs/specs/runner.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -22543,7 +22531,6 @@
         "docs/platform/agent-coordination/subcomponents/README.md",
         "docs/platform/agent-coordination/verification/implementation-alignment.md",
         "docs/platform/agent-coordination/verification/step-08-standalone-coordination/deferral-audit.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -22639,7 +22626,6 @@
         "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
         "plans/260904-2329-group-thinking-plan-loop/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/advisor-260831-1559-step07-strategy-revision-after-review-report.md",
         "scripts/check-legacy-docs-ratchet.baseline.json",
         "src/runner/coordination/schema.mjs",
@@ -22801,7 +22787,6 @@
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
         "plans/260915-code-implementation-track-policy/plan.md",
         "plans/260915-code-implementation-track-policy/reports/review-260915-0944-critical-design-review.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plugins/fgOS/skills/fgos-code-panel/SKILL.md",
         "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
         "scripts/check-legacy-docs-ratchet.baseline.json",
@@ -22942,7 +22927,6 @@
         "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1609-GH-08-P00.1-canonical-docs-redteam-report.md",
         "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json",
         "src/runner/coordination/replay.mjs",
         "src/runner/coordination/schema.mjs",
@@ -23089,7 +23073,6 @@
         "plans/260901-1542-step08-standalone-coordination/reports/redteam-260901-1640-GH-08-P00.1-h1l1-fix-recheck-report.md",
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1702-GH-08-P00.2-dispatch-policy-review-report.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json",
         "src/runner/definitions/protocol-loader.mjs",
         "src/runner/definitions/schema.mjs",
@@ -23192,7 +23175,6 @@
         "plans/260901-1542-step08-standalone-coordination/reports/reviewer-260901-1609-GH-08-P00.1-canonical-docs-review-report.md",
         "plans/260906-1831-dispatch-visibility-v0/phase-05-observe-surface-and-docs.md",
         "plans/260906-1831-dispatch-visibility-v0/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -23251,7 +23233,6 @@
         "docs/specs/runner.md",
         "plans/260906-1831-dispatch-visibility-v0/phase-05-observe-surface-and-docs.md",
         "plans/260914-dispatch-operability-evidence-attribution/architecture-panel/role-outputs/asgn_codex_lead_op_005-agent-report.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/from-implementer-to-architecture-reviewer-260907-2212-dispatch-visibility-v0-architecture-brief.md",
         "plans/reports/from-implementer-to-red-team-260907-1050-dispatch-visibility-v0-review-prompt.md",
         "plans/reports/from-red-team-to-implementer-260907-1312-dispatch-visibility-v0-review-report.md",
@@ -30973,7 +30954,6 @@
         "docs/platform/agent-coordination/verification/code-implementation-track-policy/p03.md",
         "plans/260915-code-implementation-track-policy/plan.md",
         "plans/260915-code-implementation-track-policy/reports/track-closeout.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -36551,7 +36531,6 @@
         "docs/history/tsk-4hj-stale-merge-head-misclassified-as-conflict/RESEARCH.md",
         "docs/history/tsk-50i7-merge-commit-stderr-swallowed/CONTEXT.md",
         "docs/history/tsk-60h-merge-conflict-catchup-playbook/RESEARCH.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/from-scan-team-to-product-owner-260808-1241-end-to-end-operating-ux-gap-analysis-report.md"
       ],
       "targetPaths": [
@@ -37460,7 +37439,6 @@
         "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md",
         "docs/platform/agent-coordination/verification/code-panel-multicell-facade/index.md",
         "docs/platform/agent-coordination/verification/code-panel-multicell-facade/p00.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "scripts/check-legacy-docs-ratchet.baseline.json"
       ],
       "targetPaths": [
@@ -38728,7 +38706,6 @@
         "docs/history/tsk-5k1/RESEARCH.md",
         "docs/history/tsk-oet/RESEARCH.md",
         "docs/history/tsk-oet/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/advisor-handoff-260825-1020-concurrent-write-isolation-report.md",
         "plans/reports/investigation-260821-1050-eventlog-loss-merge-speed-root-cause-report.md",
         "test/runner/loop.test.mjs"
@@ -39250,7 +39227,6 @@
         "plans/reports/review-r4-260824-tsk-3tp-confirmation-report.md",
         "scripts/check-decision-citation-drift.mjs",
         "scripts/check-decision-supersession.mjs",
-        "scripts/generate-doc-inventory.mjs",
         "src/report/decision-index.mjs",
         "src/state/retrospective-doors.mjs",
         "test/docs/decisions-corpus-retired.test.mjs",
@@ -39556,8 +39532,7 @@
       "sourcePaths": [
         ".fgos/state.json",
         "docs/history/tsk-1ne-editwork-scoped-validation/plan.md",
-        "docs/history/tsk-2l0-iron-law-check-commit-ordering/CONTEXT.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/history/tsk-2l0-iron-law-check-commit-ordering/CONTEXT.md"
       ],
       "targetPaths": [
         "docs/history/tsk-1ne-editwork-scoped-validation/plan.md",
@@ -44985,8 +44960,7 @@
       "sourcePaths": [
         ".fgos/state.json",
         "docs/history/tsk-1y6-1/iron-law-evidence.md",
-        "docs/history/tsk-2l0-iron-law-check-commit-ordering/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/history/tsk-2l0-iron-law-check-commit-ordering/plan.md"
       ],
       "targetPaths": [
         "docs/history/tsk-1y6-1/iron-law-evidence.md",
@@ -49381,7 +49355,6 @@
         "docs/history/skill-prose-cleanup/DISCUSSION.md",
         "docs/history/tsk-397-review-followups/RESEARCH.md",
         "docs/history/tsk-397-review-followups/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/architecture-brainstorm-260820-1457-postland-drift-consumer-report.md",
         "plans/reports/discussion-review-260819-2122-tsk397-boundary-report.md",
         "scripts/project-agents.mjs",
@@ -50006,7 +49979,6 @@
         "docs/knowledge/driftstatus-s-real-return-shape/drift-status-return-shape.md",
         "docs/knowledge/why-approve-blocks-closing-a-milestone-with-drifted-targets/why-approve-blocks-closing-a-milestone-with-drifted-targets.md",
         "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/root-cause-260812-2223-why-the-merge-audit-became-this-complex-report.md",
         "src/intake/plan-verdict-from-plan-md.mjs",
         "src/setup/registrations.mjs",
@@ -52046,8 +52018,7 @@
         "docs/explanation/wontfix-worktree-reclaim-startup-reap.md",
         "docs/history/tsk-3of/iron-law-evidence.md",
         "docs/history/tsk-3ofc-loop-descendant-dedup/CONTEXT.md",
-        "docs/history/wontfix-worktree-branch-reclaim/RESEARCH.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/history/wontfix-worktree-branch-reclaim/RESEARCH.md"
       ],
       "targetPaths": [
         "docs/doc-registry.json",
@@ -54326,8 +54297,7 @@
         "docs/history/discover-pool-deps-ready-filter/CONTEXT.md",
         "docs/history/tsk-3xog/plan.md",
         "docs/history/tsk-3yh-take-deps-resolved-status/CONTEXT.md",
-        "docs/history/tsk-3yh-take-deps-resolved-status/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/history/tsk-3yh-take-deps-resolved-status/plan.md"
       ],
       "targetPaths": [
         "docs/history/discover-pool-deps-ready-filter/CONTEXT.md",
@@ -55858,7 +55828,6 @@
         "docs/history/tsk-3yh-take-deps-resolved-status/plan.md",
         "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
         "docs/history/tsk-480-approve-movework-friction-guard/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "plans/reports/from-scan-team-to-product-owner-260808-1241-end-to-end-operating-ux-gap-analysis-report.md"
       ],
       "targetPaths": [
@@ -59555,7 +59524,6 @@
         ".fgos/state.json",
         "docs/history/tsk-4voj-iron-law-leaf-scope/plan.md",
         "docs/history/tsk-4voj/iron-law-evidence.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "src/runner/iron-law-gate.mjs",
         "src/verbs/merge/approve.mjs",
         "test/cli/fgos-approve-3.test.mjs"
@@ -60488,7 +60456,6 @@
         "docs/history/branch-content-mismatch-fgos-exclusion/iron-law-evidence.md",
         "docs/history/branch-content-mismatch-fgos-exclusion/plan.md",
         "docs/history/tsk-52p/iron-law-evidence.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "src/runner/merge.mjs",
         "test/runner/merge.test.mjs"
       ],
@@ -61406,8 +61373,7 @@
         ".fgos/state.json",
         "docs/doc-registry.json",
         "docs/explanation/skill-prose-cleanup-fgos-coding-planning.md",
-        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md"
       ],
       "targetPaths": [
         "docs/doc-registry.json",
@@ -61422,8 +61388,7 @@
         ".fgos/state.json",
         "docs/doc-registry.json",
         "docs/explanation/skill-prose-cleanup-fgos-coding-validating.md",
-        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md"
       ],
       "targetPaths": [
         "docs/doc-registry.json",
@@ -61438,8 +61403,7 @@
         ".fgos/state.json",
         "docs/doc-registry.json",
         "docs/explanation/skill-prose-cleanup-fgos-coding-implement.md",
-        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md"
       ],
       "targetPaths": [
         "docs/doc-registry.json",
@@ -61483,8 +61447,7 @@
         "docs/doc-registry.json",
         "docs/explanation/skill-prose-cleanup-design.md",
         "docs/explanation/skill-prose-cleanup-remaining-bare-citations.md",
-        "docs/explanation/skill-prose-cleanup-smoke-tests.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md"
+        "docs/explanation/skill-prose-cleanup-smoke-tests.md"
       ],
       "targetPaths": [
         "docs/doc-registry.json",
@@ -62331,7 +62294,6 @@
       "sourcePaths": [
         ".fgos/state.json",
         "docs/history/tsk-5e97-decompose-footprint-overlap-gate/plan.md",
-        "plans/260925-documentation-authority-unification/phase-02-doc-inventory.md",
         "src/intake/plan.mjs"
       ],
       "targetPaths": [
@@ -496548,3 +496510,68 @@
         }
       ],
       "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "sourceOccurrenceOrdinal": 0,
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
+          "role": "duplicate"
+        },
+        {
+          "sourceOccurrenceOrdinal": 2,
+          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-after.txt",
+          "role": "duplicate"
+        },
+        {
+          "sourceOccurrenceOrdinal": 3,
+          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/git-status-mdview-before.txt",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_89141f3c58a809b46d5d4504",
+      "sourceId": "src_c0e7f571354ae00fe04d",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
+      "sourceAnchor": "mdview-separate-editor-screen-architectural-simplicity-assessment",
+      "sourceDigest": "a7eb874a9e28b45c74d7d7a276b9b428a1fb7c1d93f90290f1c1e9fc1de595f3",
+      "sourceLocation": {
+        "start": 1,
+        "end": 1
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": "mdview-separate-editor-screen-architectural-simplicity-assessment",
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-canonical",
+          "claimId": "claim_89141f3c58a809b46d5d4504",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
+          "sourceOccurrenceOrdinal": 0,
+          "blobSha": "f97a7f4f1fa11fd9fc4a1fb172eff4f5e8b04771"
+        },
+        {
+          "type": "duplicate-content-of",
+          "claimId": "claim_89141f3c58a809b46d5d4504",
+          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/proofs/P05.2/r6-single-agent-baseline/agent-report-attempt-01.md",
+          "sourceOccurrenceOrdinal": 1,
+          "blobSha": "f97a7f4f1fa11fd9fc4a1fb172eff4f5e8b04771"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "sourceOccurrenceOrdinal": 0,
+      "sourceOccurrences": [
+        {

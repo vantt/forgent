@@ -43,16 +43,16 @@ The checker passes structurally while reporting the expected open findings as no
 - exact duplicate-content groups: 818
 - semantic-conflict groups: 151
 - unique claim ledger rows: 72,869 (exact duplicate payload occurrences now share semantic claim IDs)
-- consumer edges: 60,641
+- consumer edges: 56,188
 
 Artifact sizes and hashes after sharding:
 
 | Artifact | Size | SHA-256 |
 |---|---:|---|
-| `phase-02-doc-inventory.json` manifest | 1,721 bytes | `a62a6cfa28fa06dca0dc40c4efe55d80cab3aa9601f44368a3e0012073f462c5` |
-| reassembled JSON payload | 130,640,838 bytes | `053b1fa219f564adbfda9e800b0f422748445f4eae1fa1b733dc46c79e92dcfc` |
+| `phase-02-doc-inventory.json` manifest | 1,721 bytes | `be40f96c1582338ab2e4d7e4ab8f79414befee66de4eb5653d5f0c9b5684df1e` |
+| reassembled JSON payload | 127,975,234 bytes | `b1126cbca7adc775d95d8ea991f84b2febe79afb30b234aef35b2e5795838fb3` |
 | `phase-02-doc-inventory.parts/` | 7 parts, each under 25 MB | see manifest |
-| `phase-02-doc-inventory.md` | 677 KiB (693,489 bytes) | `48465e6320062fa4857e12e6b011005a25d0b1e2a1176f7a4ed77934f7c14963` |
+| `phase-02-doc-inventory.md` | 677 KiB (693,488 bytes) | `e1b016993124a64e1afb9bd83d7c96797bbc1e4d680045fab299db710de56859` |
 
 These findings are not resolved in Phase 02. They block promotion and feed later authorized phases.
 
@@ -60,7 +60,7 @@ Verification summary:
 
 - authoritative runner added at `scripts/verify-phase-02.mjs` and made the only Phase 02 verification door;
 - the runner requires explicit `BASE` and `FIXED_END`, creates a detached clean worktree exactly at `FIXED_END`, asserts HEAD/cleanliness before setup, provisions via `npm ci` when a lockfile exists, regenerates inventory from immutable `BASE`, byte-compares the manifest, Markdown, and every shard, runs the Phase 02 gate/check suite, enforces an exact Phase 02 diff allowlist, and emits a compact machine-readable receipt with hashes/sizes/counts/test totals;
-- authoritative skip-full-suite verifier passed on the committed remediation code/artifact tree (before this record-only hash refresh) against immutable base `b3b63c68c6a4742e4e12eb8173f49693d8d29132`;
+- the first post-sharding verifier attempt correctly rejected artifacts generated from the wrong moving remediation base; the artifacts recorded above were then regenerated from immutable Phase 01 base `f0c76c5e590339d9c815038539ff1f4a072c64e4` and must pass the final immutable verifier before review;
 - pre-runner historical diagnostics: focused inventory tests passed; generated JSON and Markdown matched a fresh immutable-tree regeneration byte-for-byte; inventory gate checker, legacy-doc ratchet, documentation/citation checks, ownership lint, and `git diff --check` passed; full suite exited 0: 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo; log SHA-256 `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`;
 - GitNexus impact was run before remediation edits for `buildInventoryRow`, `validateStructure`, `validateAgainstVocabulary`, and `generateInventory` (LOW); follow-up impact for `buildSwitchboardIndex`, `deriveAreaTargetOwner`, and `targetOwnerForDisposition` was also LOW. Independent review must still assess Phase 02 ledger-risk semantics, not just callgraph risk.
 

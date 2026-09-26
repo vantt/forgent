@@ -1,88 +1,3 @@
-      "sourceAnchor": "unheaded-block-3",
-      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
-      "sourceLocation": {
-        "start": 18,
-        "end": 31
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "decision",
-      "authorityKind": "non-authority",
-      "status": "historical",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "retain-as-evidence",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_2b54a6d3143ec640e1b762b8",
-      "sourceId": "src_349bf97e26824ad8bef5",
-      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
-      "sourceAnchor": "pinned-terms",
-      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
-      "sourceLocation": {
-        "start": 33,
-        "end": 33
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "decision",
-      "authorityKind": "non-authority",
-      "status": "historical",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "retain-as-evidence",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_998704e25e4053bf8e86b7a2",
-      "sourceId": "src_349bf97e26824ad8bef5",
-      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
-      "sourceAnchor": "unheaded-block-4",
-      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
-      "sourceLocation": {
-        "start": 35,
-        "end": 42
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "decision",
-      "authorityKind": "non-authority",
-      "status": "historical",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "retain-as-evidence",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_39d669c3fd6de97c3a663b2e",
-      "sourceId": "src_349bf97e26824ad8bef5",
-      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
-      "sourceAnchor": "scout-evidence",
-      "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
-      "sourceLocation": {
-        "start": 44,
-        "end": 44
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "decision",
-      "authorityKind": "non-authority",
-      "status": "historical",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "retain-as-evidence",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_e81bc1c3a2676df5a6df63a8",
-      "sourceId": "src_349bf97e26824ad8bef5",
-      "sourcePath": "docs/history/decision-code-check-enforcement/CONTEXT.md",
-      "sourceAnchor": "unheaded-block-5",
       "sourceDigest": "fa1f64cbc55187c61d94cdf721c47fec1dda0636dc687abd889ce91e18e97619",
       "sourceLocation": {
         "start": 46,
@@ -619762,3 +619677,71 @@
       "reviewStatus": "pending"
     },
     {
+      "claimId": "claim_eee552cb38a6e4053539e714",
+      "sourceId": "src_5ec9e0c2f8f87267cbbf",
+      "sourcePath": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "sourceAnchor": "mechanism-vs-policy",
+      "sourceDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "sourceLocation": {
+        "start": 111,
+        "end": 111
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_09e9f36a62d5560906595b08",
+      "sourceId": "src_5ec9e0c2f8f87267cbbf",
+      "sourcePath": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "sourceLocation": {
+        "start": 113,
+        "end": 115
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_baf4bc6f58542d328083513c",
+      "sourceId": "src_5ec9e0c2f8f87267cbbf",
+      "sourcePath": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "sourceAnchor": "unheaded-block-19",
+      "sourceDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
+      "sourceLocation": {
+        "start": 117,
+        "end": 121
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_662252d51d99814a50d394d5",
+      "sourceId": "src_5ec9e0c2f8f87267cbbf",
+      "sourcePath": "docs/knowledge/coding-domain-s-role-holder-axis-handoff-verb-task-spec-skil/why-coding-domain-has-a-role-holder-axis-and-task-spec-ontology.md",
+      "sourceAnchor": "gates-hard-only-when-the-side-effect-crosses-the-items-own-boundary",
+      "sourceDigest": "2ac43514ece2cb7b01dd76f311afe007803b67f010e837f7af43a0b88e2789fa",
