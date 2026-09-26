@@ -3,7 +3,7 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: final remediation local focused/gate PASS; authoritative skip-full-suite pending at committed SHA; final full pending
+Status: final remediation committed-SHA skip-full-suite PASS at `FIXED_END=7099165552d23bb7c2579f9270c379103facb2c4`; final full pending
 Authoritative runner: scripts/verify-phase-02.mjs
 Result: Phase 02 artifacts are verified only by the immutable detached-worktree runner, not by commands run in a moving local checkout.
 ```
@@ -63,11 +63,11 @@ Results after final remediation cell F: focused tests passed (61/61) for `test/s
 
 Remediation F specifically verified: carry-forward removes positional matching and refuses ambiguous duplicate/edited units; pure moves preserve source and claim IDs; balanced nested/multiline `path.join`/`path.resolve`/`new URL` consumer parsing emits standalone docs-rooted unresolved patterns such as `docs/specs/**` and `docs/**`; candidate single-owner proposals are demoted to `unknown-blocking` with null target owner; claim identity-gap blockers are included in summary/open findings/report; tied equal-prefix routes block like exact route conflicts.
 
-Authoritative skip-full-suite verification has not yet run for this cell because it needs the committed `FIXED_END` SHA. Final full verification is intentionally pending per remediation instruction.
+Authoritative skip-full-suite verification passed for current final remediation cell F at `FIXED_END=7099165552d23bb7c2579f9270c379103facb2c4` (tree `e57528b78d018fa88413f11ad1e71dc0c7459a89`): `npm ci`, 66 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate with 1360 total gap/blockers (1054 file/routing, 306 claim-identity), legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks passed. Full suite was intentionally skipped and remains pending per remediation instruction.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
-Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the current cell still requires a new committed-SHA skip verifier run, and the final full verifier remains pending.
+Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the current cell has a new committed-SHA skip verifier pass above, and the final full verifier remains pending.
 
 ## Last Local Evidence Before Runner Canonicalization
 
