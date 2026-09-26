@@ -3,7 +3,7 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: final remediation committed-SHA skip-full-suite PASS at `FIXED_END=011e9b75798c9d9b689aa825b795c313e1498579`; final full pending
+Status: final remediation immutable full PASS at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab`; independent re-review pending
 Authoritative runner: scripts/verify-phase-02.mjs
 Result: Phase 02 artifacts are verified only by the immutable detached-worktree runner, not by commands run in a moving local checkout.
 ```
@@ -63,7 +63,7 @@ Results after final remediation cell F: focused tests passed (61/61) for `test/s
 
 Remediation F specifically verified: carry-forward removes positional matching and refuses ambiguous duplicate/edited units; pure moves preserve source and claim IDs; balanced nested/multiline `path.join`/`path.resolve`/`new URL` consumer parsing emits standalone docs-rooted unresolved patterns such as `docs/specs/**` and `docs/**`; candidate single-owner proposals are demoted to `unknown-blocking` with null target owner; claim identity-gap blockers are included in summary/open findings/report; tied equal-prefix routes block like exact route conflicts.
 
-Authoritative skip-full-suite verification passed after the final docs commit at `FIXED_END=011e9b75798c9d9b689aa825b795c313e1498579` (tree `807a42d3445b0293d5854e82f99572ae89ac4b17`): `npm ci`, 66 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate with 1360 total gap/blockers (1054 file/routing, 306 claim-identity), legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks passed. Full suite was intentionally skipped and remains pending per remediation instruction.
+Authoritative full verification passed at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` (tree `9e94aa64b47e53df842b188a4d2afc34b1a68add`): `npm ci`, 66 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate with 1,360 total gap/blockers (1,054 file/routing, 306 claim-identity), legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, clean detached Rust release build, and clean-after-checks passed. Full suite: 7,827 total / 7,751 passed / 0 failed / 8 skipped / 68 todo; full-suite log SHA-256 `f07138addfb37af9f493d36f32f695f420b868c5601d318d5b0885ab83f280e0`; verifier receipt log SHA-256 `71af233eedbf6acfa4c7e054bfec467eafa8ac79f48bf6e4d512c246513380a4`.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
