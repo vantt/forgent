@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
+import { writeShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import {
   resolveCommitSha,
   readBlobAtCommit,
@@ -892,34 +893,41 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     const canonicalPath = group.paths[0];
     const canonical = itemByPath.get(canonicalPath);
     const canonicalClaimIds = canonical?.claimIds || [];
+    const sourceOccurrences = group.paths.map((p, idx) => ({ sourceOccurrenceOrdinal: idx, path: p, role: p === canonicalPath ? 'canonical' : 'duplicate' }));
     for (const [sourceOccurrenceOrdinal, duplicatePath] of group.paths.entries()) {
       const item = itemByPath.get(duplicatePath);
       if (!item) continue;
       const oldClaimIds = [...item.claimIds];
-      const oldClaimsById = item._claimsById;
       const rewrittenIds = [];
-      item.sourceOccurrences = group.paths.map((p, idx) => ({ sourceOccurrenceOrdinal: idx, path: p, role: p === canonicalPath ? 'canonical' : 'duplicate' }));
+      item.sourceOccurrences = sourceOccurrences;
       item._claimsById = new Map();
       for (const [idx, oldClaimId] of oldClaimIds.entries()) {
-        const claim = oldClaimsById?.get(oldClaimId) || item.claims?.[idx];
-        if (!claim) continue;
         const canonicalClaimId = canonicalClaimIds[idx] || oldClaimId;
-        if (duplicatePath !== canonicalPath) claim.claimId = `${oldClaimId}_srcdup_${stableHash(`${group.blobSha}\n${sourceOccurrenceOrdinal}\n${idx}`, 8)}`;
-        claim.sourceOccurrenceOrdinal = sourceOccurrenceOrdinal;
-        claim.relations.push({
-          type: duplicatePath === canonicalPath ? 'duplicate-content-canonical' : 'duplicate-content-of',
-          claimId: canonicalClaimId,
-          sourceOccurrenceOrdinal,
-          blobSha: group.blobSha,
-        });
-        rewrittenIds.push(claim.claimId);
-        item._claimsById.set(claim.claimId, claim);
+        const canonicalClaim = canonical?._claimsById?.get(canonicalClaimId);
+        const claim = canonicalClaim || item.claims?.[idx];
+        if (!claim) continue;
+        claim.claimId = canonicalClaimId;
+        claim.sourceOccurrenceOrdinal = 0;
+        claim.sourceOccurrences = sourceOccurrences;
+        claim.relations = claim.relations.filter((r) => !String(r.type || '').startsWith('duplicate-content-'));
+        for (const occurrence of sourceOccurrences) {
+          claim.relations.push({
+            type: occurrence.role === 'canonical' ? 'duplicate-content-canonical' : 'duplicate-content-of',
+            claimId: canonicalClaimId,
+            sourcePath: occurrence.path,
+            sourceOccurrenceOrdinal: occurrence.sourceOccurrenceOrdinal,
+            blobSha: group.blobSha,
+          });
+        }
+        rewrittenIds.push(canonicalClaimId);
+        item._claimsById.set(canonicalClaimId, claim);
       }
       item.claimIds = rewrittenIds;
       item.claimCount = rewrittenIds.length;
     }
   }
   const claimLedger = [];
+  const claimLedgerIds = new Set();
   const consumerEdges = [];
   const inboundLinkEdges = [];
   for (const item of items) {
@@ -934,7 +942,10 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     }
     for (const claimId of item.claimIds) {
       const claim = item._claimsById?.get(claimId);
-      if (claim) claimLedger.push(claim);
+      if (claim && !claimLedgerIds.has(claim.claimId)) {
+        claimLedger.push(claim);
+        claimLedgerIds.add(claim.claimId);
+      }
     }
     delete item._claimsById;
   }
@@ -1054,7 +1065,7 @@ export function runCli(argv, cwd = process.cwd()) {
   const mdOutIdx = argv.indexOf('--md-out');
   const jsonOut = jsonOutIdx >= 0 ? path.resolve(cwd, argv[jsonOutIdx + 1]) : null;
   const mdOut = mdOutIdx >= 0 ? path.resolve(cwd, argv[mdOutIdx + 1]) : null;
-  if (jsonOut) { fs.mkdirSync(path.dirname(jsonOut), { recursive: true }); fs.writeFileSync(jsonOut, JSON.stringify(inventory) + '\n'); console.log(`generate-doc-inventory: wrote JSON inventory to ${path.relative(cwd, jsonOut)}`); }
+  if (jsonOut) { fs.mkdirSync(path.dirname(jsonOut), { recursive: true }); writeShardedJsonArtifact(jsonOut, inventory); console.log(`generate-doc-inventory: wrote sharded JSON inventory manifest to ${path.relative(cwd, jsonOut)}`); }
   if (mdOut) { fs.mkdirSync(path.dirname(mdOut), { recursive: true }); fs.writeFileSync(mdOut, generateMarkdownReport(inventory)); console.log(`generate-doc-inventory: wrote Markdown report to ${path.relative(cwd, mdOut)}`); }
   if (!jsonOut && !mdOut) console.log(JSON.stringify(inventory, null, 2));
   return 0;

@@ -23,9 +23,11 @@ BASE=<phase-01-commit> FIXED_END=<phase-02-commit> \
 `BASE` is the immutable Phase 01/base commit used as the source tree for Phase
 02 inventory regeneration. `FIXED_END` is the immutable Phase 02 commit being
 reviewed. The runner creates a detached clean worktree exactly at `FIXED_END`,
-asserts HEAD and cleanliness before setup, provisions dependencies there,
-regenerates `phase-02-doc-inventory.{json,md}` from `BASE`, byte-compares them
-to the committed artifacts, and emits a machine-readable receipt.
+asserts HEAD and cleanliness before setup, provisions dependencies there with
+`npm ci` when a lockfile exists, regenerates `phase-02-doc-inventory.{json,md}`
+from `BASE`, byte-compares the manifest, Markdown, and every shard to committed
+artifacts, enforces the exact Phase 02 footprint allowlist, and emits a compact
+machine-readable receipt.
 
 Local commands in a moving checkout are useful only as development diagnostics;
 they are not authoritative Phase 02 verification evidence.
@@ -33,13 +35,13 @@ they are not authoritative Phase 02 verification evidence.
 ## Gates Covered By The Runner
 
 - focused Phase 02 tests;
-- Phase 02 inventory JSON + Markdown immutable-BASE regeneration and byte identity;
+- Phase 02 inventory manifest + every JSON shard + Markdown immutable-BASE regeneration and byte identity;
 - `scripts/check-doc-inventory-gates.mjs`;
 - legacy docs ratchet;
 - docs/citation/ownership checks;
 - changed-Markdown committed-tree link checks across `BASE..FIXED_END`;
 - historical knowledge-registry plan preservation checks where relevant;
-- `git diff --check` across `BASE..FIXED_END` and forbidden legacy/platform authority edit checks;
+- `git diff --check` across `BASE..FIXED_END` and exact allowed-footprint checks;
 - full `npm test` unless `--skip-full-suite` is passed.
 
 ## Review Remediation Local Evidence (Cell A)
@@ -55,7 +57,9 @@ node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-0
 node scripts/check-doc-inventory-gates.mjs
 ```
 
-Results: focused tests passed (37/37), generator byte identity passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. Artifact sizes remain below 100 MB per file: JSON 99,470,703 bytes; Markdown 693,489 bytes. SHA-256: JSON `e7cc51650ca55f8590880b2705af7ce9ee1342447d3832d69ffe17807b90f587`; Markdown `329fb921e6190603a548e2673dd79c4987389bfa37c9ffbaacb0c566515ea03e`.
+Results: focused tests passed (51/51), deterministic regeneration passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 1,721 bytes; all 7 shards are under 25 MB; reassembled payload SHA-256 is `053b1fa219f564adbfda9e800b0f422748445f4eae1fa1b733dc46c79e92dcfc`; Markdown SHA-256 is `48465e6320062fa4857e12e6b011005a25d0b1e2a1176f7a4ed77934f7c14963`.
+
+Authoritative skip-full-suite verifier passed after the remediation code/artifact commit and before this record-only hash refresh with `BASE=b3b63c68c6a4742e4e12eb8173f49693d8d29132`: `npm ci`, focused Phase 02 tests, shard/Markdown byte identity, inventory gate, legacy ratchet, docs/citation/ownership, changed-Markdown links, historical plan preservation, diff allowlist, and clean-after-checks all passed; full suite was intentionally skipped.
 
 No full suite was run in this remediation cell.
 

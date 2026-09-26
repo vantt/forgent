@@ -12,12 +12,28 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { HISTORICAL_PLAN_HASHES, verifyMarkdownLinks } from './verify-phase-01.mjs';
+import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
 export const PHASE02_JSON = `${PHASE_DIR}/phase-02-doc-inventory.json`;
+export const PHASE02_PART_DIR = `${PHASE_DIR}/phase-02-doc-inventory.parts`;
 export const PHASE02_MD = `${PHASE_DIR}/phase-02-doc-inventory.md`;
 export const PHASE02_VOCAB = `${PHASE_DIR}/claim-and-disposition-vocabulary.json`;
+export const PHASE02_ALLOWED_PATHS = new Set([
+  'CHANGELOG.md',
+  'scripts/doc-inventory-artifact.mjs',
+  'scripts/generate-doc-inventory.mjs',
+  'scripts/check-doc-inventory-gates.mjs',
+  'scripts/verify-phase-02.mjs',
+  'test/scripts/generate-doc-inventory.test.mjs',
+  'test/scripts/verify-phase-02.test.mjs',
+  `${PHASE_DIR}/plan.md`,
+  `${PHASE_DIR}/phase-02-verification.md`,
+  `${PHASE_DIR}/phase-02-execution-record.md`,
+  PHASE02_JSON,
+  PHASE02_MD,
+]);
 
 export function sha256(content) {
   return crypto.createHash('sha256').update(content).digest('hex');
@@ -92,7 +108,7 @@ function fileArtifact(filePath) {
 }
 
 function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return loadShardedJsonArtifact(filePath);
 }
 
 function byteCompare(actualPath, expectedPath, label) {
@@ -114,13 +130,11 @@ export function verifyForbiddenPhase02Diff(worktreeDir, baseSha, fixedEndSha, de
   const names = diffNames();
 
   const forbidden = names.filter((name) => {
-    if (name.startsWith('docs/specs/') && name !== 'docs/specs/reading-map.md') return true;
-    if (name.startsWith('docs/architect/')) return true;
-    if (name.startsWith('docs/platform/') && name !== 'docs/platform/migration-authoring-rules.md') return true;
-    return false;
+    if (name.startsWith(`${PHASE02_PART_DIR}/`)) return false;
+    return !PHASE02_ALLOWED_PATHS.has(name);
   });
   if (forbidden.length > 0) {
-    throw new Error(`Forbidden legacy/platform-authority edit(s) in Phase 02 diff:\n${forbidden.join('\n')}`);
+    throw new Error(`Forbidden unrelated edit(s) in Phase 02 remediation diff:\n${forbidden.join('\n')}`);
   }
   return { changedPathCount: names.length, changedPaths: names };
 }
@@ -166,13 +180,13 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
     receipt.checks.worktreeBinding = { passed: true, head };
     console.log('✓ Asserted clean detached worktree exactly at FIXED_END before setup');
 
-    console.log('\n[Setup] Provisioning dependencies in clean worktree (npm install)...');
-    runOrThrow('npm', ['install'], { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
-    const targetSrc = path.join(repoRoot, 'target');
-    const targetDest = path.join(tempWorktreeDir, 'target');
-    if (fs.existsSync(targetSrc) && !fs.existsSync(targetDest)) fs.symlinkSync(targetSrc, targetDest, 'dir');
-    receipt.checks.setup = { passed: true };
-    console.log('✓ Dependencies provisioned');
+    console.log('\n[Setup] Provisioning dependencies in clean worktree (npm ci when lockfile exists)...');
+    const npmArgs = fs.existsSync(path.join(tempWorktreeDir, 'package-lock.json')) ? ['ci'] : ['install'];
+    runOrThrow('npm', npmArgs, { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
+    const postSetupStatus = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    if (postSetupStatus) throw new Error(`Tracked files changed after dependency setup:\n${postSetupStatus}`);
+    receipt.checks.setup = { passed: true, command: `npm ${npmArgs.join(' ')}` };
+    console.log('✓ Dependencies provisioned without tracked-file changes');
 
     console.log('\n[Check 1/9] Running focused Phase 02 tests...');
     const focused = runOrThrow(process.execPath, [
@@ -187,8 +201,9 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
 
     console.log('\n[Check 2/9] Regenerating Phase 02 inventory from immutable BASE and byte-comparing committed artifacts...');
     const nonce = `${process.pid}-${Date.now()}`;
-    const tmpJson = path.join(os.tmpdir(), `phase02-inventory-${nonce}.json`);
-    const tmpMd = path.join(os.tmpdir(), `phase02-inventory-${nonce}.md`);
+    const tmpRoot = path.join(os.tmpdir(), `phase02-inventory-${nonce}`);
+    const tmpJson = path.join(tmpRoot, PHASE02_JSON);
+    const tmpMd = path.join(tmpRoot, PHASE02_MD);
     try {
       runOrThrow(process.execPath, [
         'scripts/generate-doc-inventory.mjs',
@@ -196,10 +211,13 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
         '--json-out', tmpJson,
         '--md-out', tmpMd,
       ], { cwd: tempWorktreeDir, stdio: ['pipe', 'pipe', 'pipe'] });
-      byteCompare(tmpJson, path.join(tempWorktreeDir, PHASE02_JSON), 'Regenerated Phase 02 JSON inventory');
+      byteCompare(tmpJson, path.join(tempWorktreeDir, PHASE02_JSON), 'Regenerated Phase 02 JSON manifest');
+      const manifest = JSON.parse(fs.readFileSync(tmpJson, 'utf8'));
+      for (const part of manifest.parts || []) byteCompare(path.join(path.dirname(tmpJson), part.path), path.join(tempWorktreeDir, PHASE_DIR, part.path), `Regenerated Phase 02 shard ${part.path}`);
       byteCompare(tmpMd, path.join(tempWorktreeDir, PHASE02_MD), 'Regenerated Phase 02 Markdown inventory');
       const inventory = readJson(tmpJson);
-      receipt.artifacts.phase02Json = { path: PHASE02_JSON, ...fileArtifact(tmpJson) };
+      receipt.artifacts.phase02JsonManifest = { path: PHASE02_JSON, ...fileArtifact(tmpJson) };
+      receipt.artifacts.phase02JsonShards = (manifest.parts || []).map((part) => ({ path: `${PHASE_DIR}/${part.path}`, bytes: part.bytes, sha256: part.sha256 }));
       receipt.artifacts.phase02Markdown = { path: PHASE02_MD, ...fileArtifact(tmpMd) };
       receipt.artifacts.counts = {
         scannedFiles: inventory.summary?.scannedFilesCount ?? null,
@@ -209,11 +227,11 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
         duplicateContentGroups: inventory.summary?.duplicateContentGroupCount ?? null,
         semanticConflictGroups: inventory.summary?.semanticConflictGroupCount ?? null,
       };
-      receipt.checks.inventoryByteIdentity = { passed: true, generatedFrom: baseSha };
+      receipt.checks.inventoryByteIdentity = { passed: true, generatedFrom: baseSha, shardCount: manifest.partCount };
     } finally {
-      for (const p of [tmpJson, tmpMd]) if (fs.existsSync(p)) fs.unlinkSync(p);
+      if (fs.existsSync(tmpRoot)) fs.rmSync(tmpRoot, { recursive: true, force: true });
     }
-    console.log('✓ Phase 02 JSON + Markdown artifacts are byte-identical to immutable-BASE regeneration');
+    console.log('✓ Phase 02 JSON manifest, every shard, and Markdown artifact are byte-identical to immutable-BASE regeneration');
 
     console.log('\n[Check 3/9] Running Phase 02 inventory gate checker...');
     const gate = runOrThrow(process.execPath, [
@@ -281,6 +299,10 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       receipt.checks.fullSuite = { skipped: true };
       console.log('\n[Check 9/9] Skipped full npm test suite (--skip-full-suite)');
     }
+
+    const finalStatus = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd: tempWorktreeDir, encoding: 'utf8' }).trim();
+    if (finalStatus) throw new Error(`Tracked files changed after verification checks:\n${finalStatus}`);
+    receipt.checks.cleanAfterChecks = { passed: true, ignoredGeneratedDepsAccountedFor: true };
 
     console.log('\n===============================================================');
     console.log(' ALL PHASE 02 VERIFICATION CHECKS PASSED CLEANLY');

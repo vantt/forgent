@@ -13,7 +13,7 @@ Related:
 
 - **Commit:** `b3b63c68c6a4742e4e12eb8173f49693d8d29132`
 - **Files scanned:** 4305
-- **Claim rows:** 85772
+- **Claim rows:** 72869
 - **Headings / unheaded blocks / mixed-file blocks:** 26105 / 58490 / 1177
 - **Gaps:** 1042
 - **Exact duplicate-content groups:** 818

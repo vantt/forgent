@@ -17,7 +17,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { normalizePosix } from './generate-shipped-path-inventory.mjs';
+import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
+import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
 import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong } from './generate-doc-inventory.mjs';
 
 /**
@@ -123,19 +124,34 @@ export function validateStructure(inventory) {
       }
     }
     for (const claim of inventory.claimLedger) {
-      if (/_srcdup_[0-9a-f]+$/.test(claim.claimId) && !claim.relations?.some((r) => Number.isInteger(r.sourceOccurrenceOrdinal))) {
-        findings.push({ type: 'path-dependent-duplicate-claim-id-risk', message: `claim ${claim.claimId}: duplicate occurrence ids must be backed by a path-independent sourceOccurrenceOrdinal relation` });
+      if (/_srcdup_[0-9a-f]+$/.test(claim.claimId)) {
+        findings.push({ type: 'path-dependent-duplicate-claim-id', message: `claim ${claim.claimId}: exact duplicate occurrences must share the path-independent canonical claimId and be covered by duplicate relations` });
       }
     }
-    if (inventory.claimLedger.length !== itemClaimIds.length) findings.push({ type: 'claim-ledger-mismatch', message: `claimLedger length (${inventory.claimLedger.length}) does not match total item claimIds (${itemClaimIds.length})` });
+    const uniqueItemClaimIds = new Set(itemClaimIds.map(({ claimId }) => claimId));
+    if (inventory.claimLedger.length !== uniqueItemClaimIds.size) findings.push({ type: 'claim-ledger-mismatch', message: `claimLedger length (${inventory.claimLedger.length}) does not match unique item claimIds (${uniqueItemClaimIds.size})` });
+    const refsByClaim = new Map();
+    for (const ref of itemClaimIds) refsByClaim.set(ref.claimId, (refsByClaim.get(ref.claimId) || []).concat(ref.path));
     for (const { claimId, path: itemPath } of itemClaimIds) {
       const claim = claimsById.get(claimId);
       if (!claim) findings.push({ type: 'claim-ledger-missing-id', path: itemPath, message: `${itemPath}: claimId ${claimId} not found exactly once in top-level claimLedger` });
       else {
         const item = itemsByPath.get(itemPath);
+        const occurrencePaths = new Set(Array.isArray(claim.sourceOccurrences) ? claim.sourceOccurrences.map((o) => o?.path).filter(Boolean) : [claim.sourcePath]);
+        const duplicateRelationPaths = new Set((claim.relations || []).filter((r) => String(r.type || '').startsWith('duplicate-content-')).map((r) => r.sourcePath).filter(Boolean));
+        const coveredByDuplicateRelation = duplicateRelationPaths.has(itemPath) && occurrencePaths.has(itemPath);
         if (claim.sourceId && claim.sourceId !== item?.sourceId) findings.push({ type: 'claim-source-id-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceId ${claim.sourceId}` });
-        if (claim.sourcePath !== itemPath) findings.push({ type: 'claim-source-path-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourcePath ${claim.sourcePath}` });
+        if (claim.sourcePath !== itemPath && !coveredByDuplicateRelation) findings.push({ type: 'claim-source-path-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourcePath ${claim.sourcePath} and no duplicate occurrence covering this path` });
         if (claim.sourceDigest !== item?.sourceDigest) findings.push({ type: 'claim-source-digest-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceDigest ${claim.sourceDigest}` });
+      }
+    }
+    for (const [claimId, paths] of refsByClaim.entries()) {
+      const uniquePaths = [...new Set(paths)];
+      if (uniquePaths.length <= 1) continue;
+      const claim = claimsById.get(claimId);
+      const covered = new Set((claim?.relations || []).filter((r) => String(r.type || '').startsWith('duplicate-content-')).map((r) => r.sourcePath).filter(Boolean));
+      for (const p of uniquePaths) {
+        if (!covered.has(p)) findings.push({ type: 'claim-shared-id-silent-collision', path: p, message: `${p}: shared claimId ${claimId} is not covered by an explicit duplicate relation for every referencing path` });
       }
     }
   }
@@ -248,10 +264,38 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
   return findings;
 }
 
+export function validateCommitBlobIntegrity(repoRoot, inventory) {
+  const findings = [];
+  if (!inventory?.commit) return findings;
+  const out = execFileSync('git', ['ls-tree', '-r', '-l', inventory.commit], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 60 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const treeByPath = new Map(parseLsTreeLong(out).map((entry) => [normalizePosix(entry.path), entry]));
+  for (const item of inventory.items || []) {
+    const entry = treeByPath.get(item.path);
+    if (!entry) {
+      findings.push({ type: 'source-blob-missing-from-commit', path: item.path, message: `${item.path}: not found in commit tree ${inventory.commit}` });
+      continue;
+    }
+    if (item.blobSha !== entry.blobSha) findings.push({ type: 'source-blob-sha-mismatch', path: item.path, message: `${item.path}: blobSha ${item.blobSha} does not match commit tree ${entry.blobSha}` });
+    if (typeof item.blobSize === 'number' && item.blobSize !== entry.size) findings.push({ type: 'source-blob-size-mismatch', path: item.path, message: `${item.path}: blobSize ${item.blobSize} does not match commit tree ${entry.size}` });
+    if (entry.size <= 20 * 1024 * 1024) {
+      const content = readBlobAtCommit(inventory.commit, item.path, repoRoot);
+      const digest = sha256Buffer(Buffer.from(content, 'utf8'));
+      if (item.sourceDigest !== digest) findings.push({ type: 'source-digest-mismatch', path: item.path, message: `${item.path}: sourceDigest ${item.sourceDigest} does not match commit blob content ${digest}` });
+    }
+  }
+  return findings;
+}
+
 export function checkInventory({ repoRoot, inventory, vocabulary }) {
   const fatalFindings = [
     ...validateStructure(inventory),
     ...validateAgainstVocabulary(inventory, vocabulary),
+    ...validateCommitBlobIntegrity(repoRoot, inventory),
   ];
 
   let coverageFindings = [];
@@ -296,7 +340,7 @@ function loadJson(filePath) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`File not found: ${filePath}`);
   }
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  return loadShardedJsonArtifact(filePath);
 }
 
 export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json';

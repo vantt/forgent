@@ -46,13 +46,28 @@ test('parseArgs rejects unknown flags instead of silently ignoring moving-worktr
   );
 });
 
-test('verifyForbiddenPhase02Diff rejects legacy authority edits', () => {
+test('verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard directory', () => {
+  const result = verifyForbiddenPhase02Diff('/repo', 'base', 'end', {
+    run() {},
+    diffNames() { return [
+      'scripts/doc-inventory-artifact.mjs',
+      'scripts/generate-doc-inventory.mjs',
+      'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json',
+      'plans/260925-documentation-authority-unification/phase-02-doc-inventory.parts/part-0001.jsonl',
+      'plans/260925-documentation-authority-unification/phase-02-doc-inventory.md',
+      'CHANGELOG.md',
+    ]; },
+  });
+  assert.equal(result.changedPathCount, 6);
+});
+
+test('verifyForbiddenPhase02Diff rejects unrelated edits', () => {
   const calls = [];
   assert.throws(
     () => verifyForbiddenPhase02Diff('/repo', 'base', 'end', {
       run(command, args) { calls.push([command, args]); },
       diffNames() { return ['docs/specs/runner.md', 'plans/260925-documentation-authority-unification/phase-02-verification.md']; },
     }),
-    /Forbidden legacy\/platform-authority edit/,
+    /Forbidden unrelated edit/,
   );
 });

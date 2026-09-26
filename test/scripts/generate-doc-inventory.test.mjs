@@ -26,11 +26,17 @@ import {
   extractRefs,
   collectConsumers,
   parseLsTreeLong,
+  generateInventory,
 } from '../../scripts/generate-doc-inventory.mjs';
 import {
   validateStructure,
   validateAgainstVocabulary,
+  validateCommitBlobIntegrity,
 } from '../../scripts/check-doc-inventory-gates.mjs';
+import {
+  writeShardedJsonArtifact,
+  loadShardedJsonArtifact,
+} from '../../scripts/doc-inventory-artifact.mjs';
 
 // A minimal fixture modeled on the real
 // plans/260925-documentation-authority-unification/transitional-switchboard.json
@@ -307,6 +313,34 @@ test('buildInventoryRow: source and claim ids are independent of source path for
   assert.deepEqual(a.claimIds, b.claimIds);
 });
 
+test('generateInventory: exact duplicate files share semantic claim ids with explicit occurrence coverage', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dups-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json'), JSON.stringify({ entries: [] }));
+    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    const content = '# Same\n\nPortable duplicate payload with enough detail.';
+    fs.writeFileSync(path.join(tmp, 'docs/a.md'), content);
+    fs.writeFileSync(path.join(tmp, 'docs/b.md'), content);
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const inventory = generateInventory(tmp, { commit });
+    const a = inventory.items.find((i) => i.path === 'docs/a.md');
+    const b = inventory.items.find((i) => i.path === 'docs/b.md');
+    assert.deepEqual(a.claimIds, b.claimIds);
+    assert.equal(new Set(inventory.claimLedger.map((c) => c.claimId)).size, inventory.claimLedger.length);
+    const claim = inventory.claimLedger.find((c) => c.claimId === a.claimIds[0]);
+    assert.deepEqual(new Set(claim.relations.map((r) => r.sourcePath)), new Set(['docs/a.md', 'docs/b.md']));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('buildInventoryRow: identical claim content inside one source gets explicit duplicate lineage instead of silent collision', () => {
   const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
   const content = ['Repeated paragraph with enough detail to become a claim.', '', 'Repeated paragraph with enough detail to become a claim.'].join('\n');
@@ -411,15 +445,87 @@ test('parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob en
   ]);
 });
 
+test('validateStructure: accepts shared duplicate claim ids only with explicit coverage and rejects silent collisions', () => {
+  const baseItem = { sourceId: 'src_same', sourceDigest: 'digest', area: 'A', authorityStatus: 'candidate', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'unknown-blocking', headings: [], claimIds: ['claim_same'], claimCount: 1, consumerEdgeIds: [], consumerEdgeCount: 0, consumerKinds: [], resolvedLinks: [], linkRecords: [] };
+  const covered = validateStructure({
+    items: [{ ...baseItem, path: 'docs/a.md' }, { ...baseItem, path: 'docs/b.md' }],
+    scanGaps: [],
+    claimLedger: [{ claimId: 'claim_same', sourceId: 'src_same', sourcePath: 'docs/a.md', sourceAnchor: 'x', sourceDigest: 'digest', sourceLocation: { start: 1, end: 1 }, targetOwner: null, targetAnchor: null, claimKind: 'navigation', authorityKind: 'candidate', status: 'future', disposition: 'unknown-blocking', reviewStatus: 'blocking', relations: [
+      { type: 'duplicate-content-canonical', sourcePath: 'docs/a.md' },
+      { type: 'duplicate-content-of', sourcePath: 'docs/b.md' },
+    ], sourceOccurrences: [{ path: 'docs/a.md' }, { path: 'docs/b.md' }], decisionRefs: [], evidenceLinks: [] }],
+    consumerEdges: [], inboundLinkEdges: [], immutableRefEdges: [], summary: { scannedFilesCount: 2 },
+  });
+  assert.equal(covered.some((f) => f.type === 'claim-shared-id-silent-collision' || f.type === 'claim-source-path-mismatch' || f.type === 'claim-ledger-mismatch'), false);
+
+  const silent = validateStructure({
+    items: [{ ...baseItem, path: 'docs/a.md' }, { ...baseItem, path: 'docs/b.md' }],
+    scanGaps: [],
+    claimLedger: [{ claimId: 'claim_same', sourceId: 'src_same', sourcePath: 'docs/a.md', sourceAnchor: 'x', sourceDigest: 'digest', sourceLocation: { start: 1, end: 1 }, targetOwner: null, targetAnchor: null, claimKind: 'navigation', authorityKind: 'candidate', status: 'future', disposition: 'unknown-blocking', reviewStatus: 'blocking', relations: [], decisionRefs: [], evidenceLinks: [] }],
+    consumerEdges: [], inboundLinkEdges: [], immutableRefEdges: [], summary: { scannedFilesCount: 2 },
+  });
+  assert.equal(silent.some((f) => f.type === 'claim-shared-id-silent-collision'), true);
+
+  const positional = validateStructure({
+    items: [{ ...baseItem, path: 'docs/a.md', claimIds: ['claim_same_srcdup_deadbeef'] }],
+    scanGaps: [],
+    claimLedger: [{ claimId: 'claim_same_srcdup_deadbeef', sourceId: 'src_same', sourcePath: 'docs/a.md', sourceAnchor: 'x', sourceDigest: 'digest', sourceLocation: { start: 1, end: 1 }, targetOwner: null, targetAnchor: null, claimKind: 'navigation', authorityKind: 'candidate', status: 'future', disposition: 'unknown-blocking', reviewStatus: 'blocking', relations: [{ type: 'duplicate-content-of', sourcePath: 'docs/a.md', sourceOccurrenceOrdinal: 1 }], decisionRefs: [], evidenceLinks: [] }],
+    consumerEdges: [], inboundLinkEdges: [], immutableRefEdges: [], summary: { scannedFilesCount: 1 },
+  });
+  assert.equal(positional.some((f) => f.type === 'path-dependent-duplicate-claim-id'), true);
+});
+
 test('validateStructure: rejects missing plan §6.2 fields and invalid claim status', () => {
   const findings = validateStructure({
     items: [{ path: 'docs/x.md', sourceId: 'src_a', sourceDigest: 'digest', area: 'A', authorityStatus: 'candidate', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'unknown-blocking', headings: [], claimIds: ['claim_a'], claimCount: 1, consumerEdgeIds: [], consumerEdgeCount: 0, consumerKinds: [] }],
     claimLedger: [{ claimId: 'claim_a', sourceId: 'src_a', sourcePath: 'docs/x.md', sourceAnchor: 'x', sourceDigest: 'digest', claimKind: 'navigation', authorityKind: 'candidate', status: 'future-or-current', disposition: 'unknown-blocking', reviewStatus: 'open-blocking', relations: [], decisionRefs: [] }],
     consumerEdges: [],
+    inboundLinkEdges: [],
+    immutableRefEdges: [],
+    scanGaps: [],
     summary: { scannedFilesCount: 1 },
   });
   assert.equal(findings.some((f) => f.type === 'malformed-claim' && f.message.includes('evidenceLinks')), true);
   assert.equal(findings.some((f) => f.type === 'invalid-claim-status'), true);
+});
+
+test('validateCommitBlobIntegrity: verifies sourceDigest and blobSha against commit tree', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-blob-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/x.md'), '# X\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const goodSha = execFileSync('git', ['rev-parse', `${commit}:docs/x.md`], { cwd: tmp, encoding: 'utf8' }).trim();
+    const findings = validateCommitBlobIntegrity(tmp, { commit, items: [{ path: 'docs/x.md', blobSha: '0'.repeat(40), blobSize: 4, sourceDigest: 'bad' }] });
+    assert.equal(findings.some((f) => f.type === 'source-blob-sha-mismatch' && f.message.includes(goodSha)), true);
+    assert.equal(findings.some((f) => f.type === 'source-digest-mismatch'), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('sharded inventory artifact loader verifies hashes, sizes, order, and extra parts', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-shards-'));
+  try {
+    const manifestPath = path.join(tmp, 'phase-02-doc-inventory.json');
+    writeShardedJsonArtifact(manifestPath, { z: [1, 2, 3], nested: { ok: true } }, { maxPartBytes: 20 });
+    assert.deepEqual(loadShardedJsonArtifact(manifestPath), { z: [1, 2, 3], nested: { ok: true } });
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    fs.appendFileSync(path.join(tmp, manifest.parts[0].path), 'tamper');
+    assert.throws(() => loadShardedJsonArtifact(manifestPath), /byte size mismatch|sha256 mismatch/);
+    fs.writeFileSync(path.join(tmp, manifest.parts[0].path), '{}\n');
+    assert.throws(() => loadShardedJsonArtifact(manifestPath), /byte size mismatch|sha256 mismatch/);
+    writeShardedJsonArtifact(manifestPath, { ok: true }, { maxPartBytes: 20 });
+    fs.writeFileSync(path.join(tmp, 'phase-02-doc-inventory.parts/extra.jsonl'), 'x');
+    assert.throws(() => loadShardedJsonArtifact(manifestPath), /unexpected extra shard/);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 test('validateAgainstVocabulary: retained claim owner must be a real switchboard-backed target owner', () => {
