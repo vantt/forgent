@@ -445,8 +445,18 @@ These influences do not replace fgOS authority and provenance rules.
 ## 13. Migration Rule
 
 Do not bulk-move old docs before classifying them by type, authority, lifecycle,
-and provenance. Migrate one area at a time, with redirect/stub pointers for
-important old paths.
+provenance, and claim ownership. Content may be transformed and reviewed one
+area at a time, but the authorized migration program must declare whether
+promotion is per-area or repository-wide; transformation order alone never
+changes authority.
+
+Until a newer program is explicitly accepted, each area portal's current-source
+mapping controls. A target marked partial/candidate does not outrank that map,
+and readers must surface conflicts rather than infer authority from path or date.
+Any redirect/stub must be explicitly read-only and temporary. The proposed
+repository-wide normalization and alias-based retirement model is documented in
+`platform/proposals/documentation-system-unification.md` and is not active merely
+because its plan exists.
 
 ## 14. Related Files
 

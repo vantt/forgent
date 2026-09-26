@@ -46,6 +46,7 @@ Target area docs live at `docs/platform/<area>/`.
 | [agent-coordination](agent-coordination/README.md) | [agent-coordination/README.md](agent-coordination/README.md), [../architect/agent-coordination/](../architect/agent-coordination/), runner coordination specs |
 | `skills` | domain and skill docs under [../../domains/](../../domains/), [../../.agents/skills/](../../.agents/skills/), [../../plugins/fgOS/skills/](../../plugins/fgOS/skills/) |
 | `ui-spec` | [../ui-spec/](../ui-spec/) |
+| `documentation-system` | Full-horizon proposal: [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md); proposed active H1 migration plan: `plans/260925-documentation-authority-unification/plan.md`; implemented end-user registry foundation: `plans/260825-1841-knowledge-registry/plan.md` |
 
 ## 3. Decision Surface
 
@@ -53,8 +54,9 @@ Target area docs live at `docs/platform/<area>/`.
 |---|---|---|
 | Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |
 | Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |
-| Open | Exact migration order for existing areas | Future migration plan |
-| Open | Final area list and naming | Future platform area registry update |
+| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; not authorized for execution |
+| Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |
+| Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 
 ## 4. How To Change Platform Docs
 
@@ -77,3 +79,6 @@ Target area docs live at `docs/platform/<area>/`.
 | defines durable laws | [platform-foundations.md](platform-foundations.md) |
 | maps architecture | [architecture-map.md](architecture-map.md) |
 | maps component boundaries | [component-boundary.md](component-boundary.md) |
+| preserves deferred documentation-system architecture | [intent-preservation-ledger.md](intent-preservation-ledger.md) |
+| proposes full documentation operating system | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) |
+| plans near-term authority unification | `plans/260925-documentation-authority-unification/plan.md` |
