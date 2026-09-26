@@ -3549,6 +3549,26 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // claim) reads null here — settleClaim's own legacy fallback handles
       // that case without a claimId.
       const activeClaim = readClaim(dir, id);
+      if (flags.to === 'blocked' || flags.blocked === true) {
+        const reason = flags.reason || 'executor-failed';
+        const { event } = settleClaim(dir, {
+          id,
+          claimId: activeClaim?.claimId,
+          finalStatus: 'blocked',
+          reason,
+          role: item.claimRole ?? 'session',
+        });
+        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: reason } });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: reason,
+          layer: 'executor',
+          attempts: 1,
+          detail: reason,
+        });
+        return { id, from: 'doing', to: 'blocked', source: 'return', reason, seq: event?.seq };
+      }
       // tsk-1zo: a verify never upgraded from its discovery/submit-stage
       // placeholder sentinel shells out as literal text (runGoalCheck ->
       // runCommand) and fails with a cryptic raw shell error ("<first

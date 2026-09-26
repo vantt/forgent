@@ -59,9 +59,9 @@ This table is a compact navigation surface, not a full replacement for the advis
 
 | Component | Current role | Current source |
 | --- | --- | --- |
-| Work Lifecycle Engine | Domain-agnostic work-unit lifecycle, status/stage, claim/return, human gates. | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |
+| Work Lifecycle Engine / Work Driver | Domain-agnostic work-unit lifecycle, status/stage, claim/return, human gates. Owns `fanoutBatchExecutorCli` (`src/runner/fanout-batch.mjs`), worker slots (`OccupancyPort`), and fail-safe claim settlement (`fgos return --to blocked`). | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |
 | Agent Coordination Engine | Domain-neutral collaboration runtime and coordination session lifecycle. | [../architect/agent-coordination/](../architect/agent-coordination/) |
-| Dispatch And Execution Engine | Governed execution of approved assignments. | [../architect/agent-coordination/architecture/dispatch-control-plane.md](../architect/agent-coordination/architecture/dispatch-control-plane.md) |
+| Dispatch And Execution Engine | Governed execution of approved assignments (`compileDispatchPlan`, `executeExecutorCli`). Strictly forbids Work lifecycle mutation (`pick`/`return`), event append, and direct workflow/stage/skill lookups in core. | [../architect/agent-coordination/architecture/dispatch-control-plane.md](../architect/agent-coordination/architecture/dispatch-control-plane.md) |
 | Run Result Evaluator | Evidence/confidence boundary for assignment run results. | [../architect/agent-coordination/architecture/evidence-and-results.md](../architect/agent-coordination/architecture/evidence-and-results.md) |
 | Domain Components And Extension Layer | Domain-specific behavior, workflows, skills, task specs, doctrine. | [../../domains/](../../domains/), [../architect/domainization/](../architect/domainization/) |
 | Host And Surface Layer | CLI/API/plugin/dashboard/Herdr surfaces into platform engines. | Host invocation and gateway docs |

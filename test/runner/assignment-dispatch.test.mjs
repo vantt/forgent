@@ -7,9 +7,8 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
@@ -279,17 +278,6 @@ test('executeAssignment rejects human-only assignment before spawning', async ()
     () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir }),
     (err) => err instanceof RunnerConfigError && /cannot execute human-only/i.test(err.message),
   );
-});
-
-test('prepareDispatch accepts an Assignment unit with assignmentId', () => {
-  const assignment = buildAssignment({
-    workId: 'tsk-prep-test',
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  const prepared = prepareDispatch(assignment);
-  assert.equal(prepared.unit.assignmentId, assignment.assignmentId);
 });
 
 test('compileDispatchPlan produces selector.type: "assignment" and resolves executor from assignment policy', () => {
@@ -3714,4 +3702,243 @@ test('committed config pins code-review Claude profiles to high effort only on r
   assert.equal(hasHighEffort(argsForInvocation('claude', 'claude-herdr-readonly')), true);
   assert.equal(argsForInvocation('claude', 'claude-cli').includes('--effort'), false);
   assert.equal(cfg.executors['glm'].invocations[0].args.includes('--effort'), false);
+});
+
+test('M12 lock: settlement evaluates changedFiles and classification in opts.cwd when opts.cwd !== effectiveCwd', async () => {
+  const tempDir = mkTempDir();
+  const cwdDir = path.join(tempDir, 'opts-cwd');
+  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
+  fs.mkdirSync(cwdDir, { recursive: true });
+  fs.mkdirSync(effectiveCwdDir, { recursive: true });
+
+  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(cwdDir, 'initial.txt'), 'init\n');
+  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: cwdDir, stdio: 'ignore' });
+
+  // Add dirty file in cwdDir
+  fs.writeFileSync(path.join(cwdDir, 'mutated-in-cwd.txt'), 'content\n');
+
+  const runDir = path.join(tempDir, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+
+  const outcome = await settleRunOutcome({
+    runDir,
+    runMeta: { runId: 'run_m12_01', assignmentId: 'asgn_m12' },
+    controlEpoch: 1,
+    controlToken,
+    exitCode: 0,
+    settledAt: new Date().toISOString(),
+    effectiveCwd: effectiveCwdDir,
+    gitBefore: null,
+    dirtyBefore: [],
+    opts: { cwd: cwdDir, repoRoot: cwdDir },
+  });
+
+  assert.ok(
+    outcome.runResult.evidence.changedFiles.includes('mutated-in-cwd.txt'),
+    'changedFiles must be evaluated in opts.cwd when opts.cwd !== effectiveCwd (M12 lock)',
+  );
+});
+
+test('N1 / M13 / M13b lock: executeAssignment captures both gitBefore/dirtyBefore and gitAfter/dirtyAfter in effectiveCwd when cwd !== effectiveCwd', async () => {
+  const tempDir = mkTempDir();
+  const cwdDir = path.join(tempDir, 'opts-cwd');
+  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
+  fs.mkdirSync(cwdDir, { recursive: true });
+  fs.mkdirSync(effectiveCwdDir, { recursive: true });
+
+  // Init git repo in cwdDir
+  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(cwdDir, 'cwd-file.txt'), 'cwd init\n');
+  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'cwd commit'], { cwd: cwdDir, stdio: 'ignore' });
+  const cwdHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: cwdDir, encoding: 'utf8' }).trim();
+
+  // Init git repo in effectiveCwdDir
+  execFileSync('git', ['init'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(effectiveCwdDir, 'eff-file.txt'), 'eff init\n');
+  execFileSync('git', ['add', '.'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'eff commit before'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  const effHeadBefore = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: effectiveCwdDir, encoding: 'utf8' }).trim();
+
+  // Worker script modifies effectiveCwdDir by creating a new file
+  const executorScript = path.join(tempDir, 'worker-script.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+import fs from 'node:fs';
+import path from 'node:path';
+const prompt = process.argv.slice(2).join(' ');
+const runDirMatch = /(?:Write structured JSON to|Claim path:)[ \t]+(\S+agent-result\.json)/.exec(prompt);
+let runDir = runDirMatch ? path.dirname(runDirMatch[1]) : null;
+if (!runDir) {
+  const asgnBase = path.join(${JSON.stringify(cwdDir)}, '.fgos', 'assignments');
+  if (fs.existsSync(asgnBase)) {
+    for (const d of fs.readdirSync(asgnBase)) {
+      const candidate = path.join(asgnBase, d, 'runs', '01');
+      if (fs.existsSync(candidate)) { runDir = candidate; break; }
+    }
+  }
+}
+if (!runDir) runDir = process.cwd();
+// Write dirty file into effectiveCwdDir
+const targetDir = ${JSON.stringify(effectiveCwdDir)};
+fs.writeFileSync(path.join(targetDir, 'worker-created.txt'), 'created by worker\\n');
+// Write agent-result.json
+fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+  status: 'done',
+  summary: 'Created worker file in effective cwd',
+}));
+fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\n');
+`,
+  );
+
+  const assignment = buildAssignment({
+    work: { id: 'tsk-n1-m13-test', status: 'todo', stage: 'executing', domain: 'coding' },
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const asgnDir = path.join(cwdDir, '.fgos', 'assignments', assignment.assignmentId);
+  const runDir = path.join(asgnDir, 'runs', '01');
+  const genDir = path.join(asgnDir, 'admission', 'generations');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(genDir, { recursive: true });
+
+  const persistedPlan = {
+    executorId: 'test-fallback',
+    policy: { executorPreference: ['test-fallback'] },
+    mechanism: 'out-of-process',
+    invocation: {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      protocol: 'prompt-stdout-v1',
+      cwd: effectiveCwdDir,
+    },
+  };
+
+  const runJson = {
+    contract: 'assignment-run.v2',
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    attempt: 1,
+    phase: 'admitted',
+    status: 'running',
+    executorId: 'test-fallback',
+    fallback: { resolved: 'test-fallback' },
+    dispatchPlanDigest: `sha256:${crypto.createHash('sha256').update(JSON.stringify(persistedPlan)).digest('hex')}`,
+    cwd: cwdDir,
+  };
+
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify(runJson, null, 2));
+  fs.writeFileSync(path.join(runDir, 'dispatch-plan.json'), JSON.stringify(persistedPlan, null, 2));
+
+  const admissionRecord = {
+    attempt: 1,
+    attemptStr: '01',
+    runId: `run_${assignment.assignmentId}_01`,
+    retryId: 'retry-n1-test',
+    predecessorRunId: null,
+    destination: 'dest-n1',
+    admissionPayloadDigest: 'digest-n1',
+    admittedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify(admissionRecord, null, 2));
+
+  const result = await executeAssignment(assignment, {
+    cwd: cwdDir,
+    repoRoot: cwdDir,
+    runnerConfig: {
+      executors: {
+        'test-fallback': {
+          adapter: 'cli-spawn',
+          allowCrossProvider: true,
+          command: process.execPath,
+          args: [executorScript, '{prompt}'],
+        },
+      },
+      executor: {
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+      models: { standard: 'test-model' },
+      timeoutMs: 10000,
+    },
+    retryId: 'retry-n1-test',
+    destination: 'dest-n1',
+    payloadDigest: 'digest-n1',
+  });
+
+  assert.equal(result.status, 'done');
+  // Evidence must reflect effectiveCwdDir, NOT cwdDir!
+  assert.equal(result.evidence.gitBefore, effHeadBefore, 'gitBefore must be captured from effectiveCwd');
+  assert.notEqual(result.evidence.gitBefore, cwdHead, 'gitBefore must NOT be from cwdDir');
+  assert.equal(result.evidence.gitAfter, effHeadBefore, 'gitAfter must be captured from effectiveCwd');
+  assert.notEqual(result.evidence.gitAfter, cwdHead, 'gitAfter must NOT be from cwdDir');
+  assert.ok(
+    result.evidence.changedFiles.includes('worker-created.txt'),
+    'changedFiles must capture files from effectiveCwd',
+  );
+
+  const evidenceJson = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.ok(
+    evidenceJson.dirtyAfter.includes('worker-created.txt'),
+    'dirtyAfter in evidence.json must capture files from effectiveCwd (kills M13 / M13b)',
+  );
+  assert.equal(evidenceJson.gitAfter, effHeadBefore);
+  assert.notEqual(evidenceJson.gitAfter, cwdHead);
+});
+
+test('N6 / M18 lock: settleReceiptRunFromOutcome propagates finalizeConfinementResources errors on receipt path', async () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+
+  const launchCommandId = 'lc-m18';
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+
+  // Set up descriptor in protected/confinement-finalization
+  const finDir = path.join(runDir, 'protected', 'confinement-finalization');
+  fs.mkdirSync(finDir, { recursive: true });
+  const descPath = path.join(finDir, `${launchCommandId}.json`);
+  fs.writeFileSync(descPath, JSON.stringify({ cleanupState: 'pending', resources: [] }));
+
+  // Make the directory unwritable so publishMutableProjection throws EACCES
+  fs.chmodSync(finDir, 0o555);
+
+  const command = { launchCommandId };
+  const receipt = {
+    contract: 'cli-spawn-receipt.v1',
+    completion: { kind: 'exited', exitCode: 0, settledAt: new Date().toISOString() },
+  };
+
+  try {
+    await assert.rejects(
+      () =>
+        settleReceiptRunFromOutcome(
+          runDir,
+          { runId: 'run-m18', assignmentId: 'asgn-m18' },
+          command,
+          { cwd: tempDir },
+          1,
+          controlToken,
+          receipt,
+        ),
+      (err) => {
+        assert.ok(err, 'finalize error must be propagated, never swallowed (M18 lock)');
+        return true;
+      },
+    );
+  } finally {
+    fs.chmodSync(finDir, 0o755);
+  }
 });

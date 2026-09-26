@@ -1846,3 +1846,6 @@ export async function runWatch(options = {}) {
     }
   }
 }
+
+// Work Driver layer fanout consolidation (R1 / M10 boundary simplification)
+export { fanoutBatchExecutorCli } from './fanout-batch.mjs';

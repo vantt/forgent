@@ -60,6 +60,10 @@ import {
   EXECUTOR_ADAPTERS,
   registerExecutorAdapter,
   getAdapterMetadata,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
+  currentDispatchDepth,
+  resolveExecutorEnv,
 } from './adapters.mjs';
 
 // Raised by every adapter here and by `herdr-round.mjs`; owned by neither, so
@@ -73,23 +77,11 @@ export {
   EXECUTOR_ADAPTERS,
   registerExecutorAdapter,
   getAdapterMetadata,
+  DISPATCH_DEPTH_ENV,
+  MAX_DISPATCH_DEPTH,
+  currentDispatchDepth,
+  resolveExecutorEnv,
 };
-
-/** Env var a spawned child reads to know its own nested-dispatch depth,
- * threaded by `cliSpawnAdapter` on every spawn (current depth + 1) — a
- * child that never dispatches further never reads it, so this is inert
- * for the overwhelming majority of executors. */
-export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
-
-/** Hard cap on nested out-of-process dispatch depth (user decision: no
- * observed grandchild-dispatch incident yet, capped anticipatorily). */
-export const MAX_DISPATCH_DEPTH = 3;
-
-export function currentDispatchDepth() {
-  const raw = process.env[DISPATCH_DEPTH_ENV];
-  const n = raw ? Number(raw) : 0;
-  return Number.isFinite(n) && n >= 0 ? n : 0;
-}
 
 export function resolveHerdrBin(optsHerdrBin) {
   return optsHerdrBin?.trim() || process.env.FGOS_HERDR_BIN?.trim() || 'herdr';
@@ -155,17 +147,6 @@ function captureDispatchAttestation(fgosDir, attestRoot) {
   };
 }
 
-export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
-  if (!rawEnv || typeof rawEnv !== 'object') return {};
-  const resolved = {};
-  for (const [k, v] of Object.entries(rawEnv)) {
-    if (typeof v === 'string') {
-      resolved[k] = v.replace(/\$\{([^}]+)\}/g, (_, varName) => baseEnv[varName] ?? '');
-    }
-  }
-  return resolved;
-}
-
 export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, fgosDir, attestRoot, contentCarries, resolvedAgentType, invocationId } = {}) {
   // Captured BEFORE resolveExecutorConfig, not after (D3) — cheap and
   // unconditional so the same call site works regardless of whether the
@@ -213,6 +194,14 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
     if (divergence) {
       process.stderr.write(
         `fgos: ProviderAdapter argv divergence (falling back to legacy) executor=${executorId ?? ''} legacyArgs=${JSON.stringify(divergence.legacyArgs)} renderedArgs=${JSON.stringify(divergence.renderedArgs)}\n`,
+      );
+    }
+  }
+  const MAX_ARG_STRLEN = 131072;
+  for (let i = 0; i < args.length; i++) {
+    if (typeof args[i] === 'string' && Buffer.byteLength(args[i]) > MAX_ARG_STRLEN) {
+      process.stderr.write(
+        `fgos: warning: executor argument at index ${i} exceeds Linux MAX_ARG_STRLEN 128 KiB (${Buffer.byteLength(args[i])} bytes); spawn may fail with E2BIG. Consider delivery via file-pointer.\n`,
       );
     }
   }
@@ -866,6 +855,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     controlEpoch: opts.controlEpoch ?? invocation.controlEpoch,
     controlToken: opts.controlToken ?? invocation.controlToken,
     preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
+    effectiveContract: opts.effectiveContract ?? invocation.effectiveContract ?? null,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',

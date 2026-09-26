@@ -84,13 +84,14 @@ function toRunLockExpectedEpoch(epoch) {
  * live on disk (the same reason `settledSignal` stores a path relative to
  * `runDir`, not `resultPath` itself). */
 function buildSnapshot(runDir) {
-  const { run, visibility, outbox, visibilityError = null } = readRunSnapshot(runDir);
+  const { run, visibility, outbox, controller = [], visibilityError = null } = readRunSnapshot(runDir);
   const controlEpoch = readRealControlEpoch(runDir);
   const settled = classifyRunOutcome(runDir, { liveness: 'unknown' });
   return {
     run,
     visibility,
     outbox,
+    controller,
     visibilityError,
     controlEpoch,
     settledSignal: { outcome: settled.outcome, resultPath: settled.resultPath ? path.relative(runDir, settled.resultPath) : null },

@@ -1203,3 +1203,44 @@ test('19. pre-placed receipt with different content fails supervisor publication
   const idempotentResult = publishAdapterReceipt(identicalPath, realReceipt);
   assert.equal(idempotentResult.digest, realReceiptDigest);
 });
+
+test('R6 / M7 lock: runSupervisor fails immediately with spawn-failed receipt when an argument exceeds MAX_ARG_STRLEN', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sup-maxarg-'));
+  const runDir = path.join(tmp, 'run');
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipt');
+  fs.mkdirSync(receiptsDir, { recursive: true });
+
+  const hugeArg = 'a'.repeat(131073);
+  const launchCommandId = 'cmd-oversized-1';
+  const envBody = {
+    contract: 'cli-spawn-launch-envelope.v1',
+    launchCommandId,
+    runId: 'run-oversized-1',
+    controlEpoch: 1,
+    controlToken: 'tok-oversized',
+    invocation: {
+      command: 'echo',
+      args: [hugeArg],
+      cwd: tmp,
+    },
+    limits: {
+      timeoutMs: 3000,
+    },
+  };
+  const envDigest = computeSha256Digest(envBody);
+  const envelope = { ...envBody, digest: envDigest };
+
+  const envDir = path.join(runDir, 'protected', 'launch-envelope');
+  fs.mkdirSync(envDir, { recursive: true });
+  const envPath = path.join(envDir, `${launchCommandId}.json`);
+  publishImmutableProof(envPath, envelope);
+
+  await runSupervisor(envPath);
+  const receipt = readAdapterReceipt(runDir, launchCommandId);
+  assert.ok(receipt);
+  assert.equal(receipt.outcome?.kind, 'spawn-failed');
+  assert.equal(receipt.outcome?.errorClass, 'worker-spawn-fail');
+  assert.match(receipt.outcome?.cause, /exceeds Linux MAX_ARG_STRLEN \(128 KiB/);
+
+  fs.rmSync(tmp, { recursive: true, force: true });
+});

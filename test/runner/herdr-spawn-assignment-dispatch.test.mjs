@@ -255,3 +255,40 @@ test('a genuine, untampered herdr-spawn receipt is accepted -- workerCommandDige
     fs.rmSync(repoDir, { recursive: true, force: true });
   }
 });
+
+test('N3 lock: executeAssignment wires effectiveContract through to herdr-spawn and renders single unified result path in brief-1.md', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper' }, async () => {
+  const repoDir = mkTempDir();
+  try {
+    const mock = createMockHerdr(repoDir);
+    const result = await dispatchHerdrAssignment(repoDir, mock, {
+      kind: 'agent',
+      command: 'agy',
+      args: ['-i', '{prompt}', '--mode', 'accept-edits'],
+      adapter: 'herdr-spawn',
+      allowCrossProvider: true,
+      interactiveMode: { exitCommand: '/exit', kind: 'agy' },
+    }, { workId: 'tsk-herdr-contract-wire' });
+
+    const { runDir } = assertReachedHerdrSeam(result, repoDir);
+    const briefPath = path.join(runDir, 'brief-1.md');
+    assert.ok(fs.existsSync(briefPath), 'brief-1.md must exist in runDir');
+    const briefContent = fs.readFileSync(briefPath, 'utf8');
+
+    // 1. Must contain the Execution contract section produced from effectiveContract
+    assert.match(briefContent, /## Execution contract/, 'brief must include execution contract header from effectiveContract');
+    assert.match(briefContent, /- Result claim path: [^\n]*outbox[/\\]result-1\.json/, 'contract result claim path must point to outbox/result-1.json');
+
+    // 2. Must unify all result path references to outbox/result-1.json and have 0 occurrences of agent-result.json
+    assert.equal(briefContent.includes('agent-result.json'), false, 'brief must not contain conflicting agent-result.json path');
+    assert.match(briefContent, /2\. `[^`]*outbox[/\\]result-1\.json` -- a JSON object:/, 'When you finish must point to outbox/result-1.json');
+
+    // 3. Persisted effective-execution-contract.json on disk must also match outbox/result-1.json
+    const contractOnDiskPath = path.join(runDir, 'effective-execution-contract.json');
+    if (fs.existsSync(contractOnDiskPath)) {
+      const contractOnDisk = JSON.parse(fs.readFileSync(contractOnDiskPath, 'utf8'));
+      assert.match(contractOnDisk.resultClaim?.path ?? '', /outbox[/\\]result-1\.json/, 'persisted effective-execution-contract.json must match brief claim path');
+    }
+  } finally {
+    fs.rmSync(repoDir, { recursive: true, force: true });
+  }
+});

@@ -33,7 +33,8 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides, executorIdForWork } from './dispatch/resolve.mjs';
+export { modelForTier, resolveExecutorIdForPurpose, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { executorIdForWork, buildPrompt, resolveCapabilityIdentityDetails, resolveCapabilityIdentity } from './work-compat.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
 
@@ -60,17 +61,16 @@ export { DispatchError, resolveExecutorCommand, resolveExecutorEnv, resolveHerdr
 
 export { executeThroughConfinement } from './dispatch/confinement/authority.mjs';
 
-export { buildPrompt } from './dispatch/prepare.mjs';
-
 export {
   resolveAgentTypeForTaskSpec,
   resolveAgentTypeForWork,
   spawnWorker,
-  logExecutorDispatch,
   executeExecutorCli,
   decideExecutorCli,
-  fanoutBatchExecutorCli,
 } from './dispatch/cli.mjs';
+
+export { logExecutorDispatch } from './dispatch-log.mjs';
+export { fanoutBatchExecutorCli } from './fanout-batch.mjs';
 
 export {
   createAssignmentId,
@@ -89,23 +89,77 @@ export {
   classifyRunEvidence,
 } from './dispatch/assignment-runner.mjs';
 
-export { runDispatchCli } from './dispatch/cli.mjs';
-
-import { runDispatchCli } from './dispatch/cli.mjs';
+import { runDispatchCli as runCoreDispatchCli } from './dispatch/cli.mjs';
+import { logExecutorDispatch } from './dispatch-log.mjs';
+import { fanoutBatchExecutorCli } from './fanout-batch.mjs';
+import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
+import { StoreError } from '../state/store.mjs';
 import { isMainModule } from '../../scripts/lib/is-main-module.mjs';
+
+/**
+ * Top-level CLI entry point for node src/runner/dispatch.mjs.
+ * Handles higher-level subcommands (log, fanout-batch) before delegating
+ * core dispatch subcommands (execute, decide, reconcile) to dispatch/cli.mjs.
+ */
+export async function runDispatchCli(argv = process.argv.slice(2), { returnResult = false } = {}) {
+  const [subcommand, ...afterSubcommand] = argv;
+  const executorId = afterSubcommand[0] && !afterSubcommand[0].startsWith('--') ? afterSubcommand[0] : undefined;
+  const rest = executorId ? afterSubcommand.slice(1) : afterSubcommand;
+  const flagValue = (name) => {
+    const i = rest.indexOf(name);
+    return i !== -1 ? rest[i + 1] : undefined;
+  };
+
+  if (subcommand === 'log') {
+    const id = flagValue('--id');
+    const provider = flagValue('--provider');
+    const command = flagValue('--command');
+    const model = flagValue('--model');
+    const capability = flagValue('--capability');
+    const mechanism = flagValue('--mechanism');
+    const tier = flagValue('--tier');
+    const fallbackReason = flagValue('--fallback-reason');
+    const outcome = flagValue('--outcome');
+    if (!id || !executorId || !provider || !command) {
+      const usageMsg =
+        'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>] [--capability <name>] [--mechanism <m>] [--tier <t>] [--fallback-reason <text>] [--outcome <status>]\n';
+      if (returnResult) throw new StoreError('validation', usageMsg.trim());
+      process.stderr.write(usageMsg);
+      process.exitCode = 1;
+    } else {
+      const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
+      const fgosDir = fgosDirFromRoot(root);
+      const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, capability, mechanism, tier, fallbackReason, outcome });
+      if (returnResult) return event;
+      process.stdout.write(`${JSON.stringify(event)}\n`);
+    }
+    return;
+  }
+
+  if (subcommand === 'fanout-batch') {
+    const candidateArg = executorId ?? flagValue('--candidates');
+    const candidateIds = candidateArg ? String(candidateArg).split(',').map((s) => s.trim()).filter(Boolean) : [];
+    try {
+      const result = await fanoutBatchExecutorCli(candidateIds, {
+        cwd: flagValue('--cwd') ?? flagValue('--dir'),
+        hasLiveTaskAccess: rest.includes('--has-live-task-access'),
+      });
+      if (returnResult) return result;
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+    } catch (err) {
+      if (returnResult) throw err;
+      process.stderr.write(`${err.message}\n`);
+      process.exitCode = 1;
+    }
+    return;
+  }
+
+  return runCoreDispatchCli(argv, { returnResult });
+}
 
 // CLI entry point — only runs when this file is executed directly (`node
 // src/runner/dispatch.mjs ...`), never on import (every existing caller
-// imports named exports, none execute this module as a script). The body
-// it calls now lives in dispatch/cli.mjs (`runDispatchCli`) — pure
-// relocation, no behavior change. The guard itself moved off a raw
-// `import.meta.url === \`file://${process.argv[1]}\`` comparison: that
-// never matches on Windows, on any OS when the resolved path has a space,
-// or when this file is invoked through a symlink (a wrapper bin, a
-// dev-checkout shell helper) -- each case makes the guard silently not
-// fire, so `node src/runner/dispatch.mjs decide ...` (the exact invocation
-// AGENTS.md's Dispatch section and a PreToolUse hook require) would exit 0
-// having done nothing instead of running.
+// imports named exports, none execute this module as a script).
 if (isMainModule(import.meta.url)) {
   runDispatchCli();
 }

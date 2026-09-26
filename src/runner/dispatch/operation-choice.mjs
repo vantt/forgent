@@ -15,9 +15,12 @@ import {
   DEFAULT_DOMAIN,
   resolveDomainName,
   operationsForStage,
+  DOMAINS,
+  skillForStage,
 } from '../../state/workflow-stage-graphs.mjs';
 import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
+import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from '../work-compat.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
 import { interpretRunResult } from './run-result.mjs';
@@ -2284,3 +2287,11 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
     stop: true,
   };
 }
+
+// Re-exported for backward compatibility from resolve.mjs and prepare.mjs
+export {
+  executorIdForWork,
+  resolveCapabilityIdentityDetails,
+  resolveCapabilityIdentity,
+  buildPrompt,
+};
