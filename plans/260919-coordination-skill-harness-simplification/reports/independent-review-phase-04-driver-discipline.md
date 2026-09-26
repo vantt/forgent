@@ -174,3 +174,13 @@ F9–F13 can ride with the same fix commit.
 - **Option C — accept A and amend the plan's Exit wording**, e.g. "facade ≥60%, combined load bounded at ≤3,300 and re-measured after Phase 5 amortization". This makes the rule explicit rather than an ad-hoc test constant.
 
 Reviewer recommendation: **C**. The split is architecturally right, and B would trade clarity for a number. The plan text, however, must say what is being counted.
+
+### Owner ruling on F4 (2026-09-27)
+
+The owner chose **Option C**. The doer must change the Phase 4 `### Exit` bullet in `plan.md` from "≥60% Lead instruction-token reduction" to an explicit rule:
+
+- the facade (`fgos-plan-loop/SKILL.md`) is at least 60% smaller than the Phase 0 baseline of 5,160 words;
+- the combined Lead load (facade + `coordination-driver.md` + `coding-cell-policy.md`) is at most 3,300 words;
+- the combined load is re-measured after Phase 5, once architecture-panel and panel also use the driver fragment.
+
+The test's `combined <= 3300` bound then enforces a plan rule and is no longer an ad-hoc constant. With this ruling F4 is closed as a finding. It still has to land together with R1/R2 before re-review.
