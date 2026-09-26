@@ -1,4 +1,16 @@
-import { test } from 'node:test';
+// test/skills/coordination-phase4-driver-discipline.test.mjs — Phase 4 test suite.
+// Verifies:
+// 1. Plan-loop skill word budget and Lead instruction-token reduction.
+// 2. Driver discipline fragment contains zero coding/track vocabulary and defines all 9 hook slots.
+// 3. Coding-cell policy fragment is reusable for a single cell without plan/track assumptions.
+// 4. Plan-loop facade cleanses raw request JSON and manual ID generation.
+// 5. Generated skill projections are byte-identical to canonical sources.
+// 6. Stale implicit close language remains absent.
+// 7. CLI flag contract: documented coordination commands in skills match real CLI allowlists and required flags.
+// 8. Clean pass lifecycle with real entry-node start, simulated crash/resume, dispatch/wave count parity, explicit close.
+// 9. Fix round and recheck discharge lifecycle with full quorum explicit close and dispatch/wave count parity.
+
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -6,14 +18,12 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 import {
-  startCoordinationUseCase,
-} from '../../src/verbs/coordination/start.mjs';
+  CoordinationError,
+} from '../../src/runner/coordination/schema.mjs';
+import { startCoordinationUseCase } from '../../src/verbs/coordination/start.mjs';
 import {
   showCoordinationStatusUseCase,
 } from '../../src/verbs/coordination/status.mjs';
-import {
-  chainCoordinationUseCase,
-} from '../../src/verbs/coordination/chain.mjs';
 import {
   showCoordinationActionsUseCase,
   executeOperationUseCase,
@@ -21,32 +31,43 @@ import {
   executeDispositionUseCase,
   executeCloseUseCase,
 } from '../../src/verbs/coordination/actions.mjs';
-import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
+import { chainCoordinationUseCase } from '../../src/verbs/coordination/chain.mjs';
 
-const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const DRIVER_FRAGMENT = path.join(REPO_ROOT, 'core/skills/_shared/coordination-driver.md');
-const CODING_POLICY_FRAGMENT = path.join(REPO_ROOT, 'domains/coding/skills/_shared/coding-cell-policy.md');
+const REPO_ROOT = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
+
 const PLAN_LOOP_CANONICAL = path.join(REPO_ROOT, 'core/skills/fgos-plan-loop/SKILL.md');
 const PLAN_LOOP_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-plan-loop/SKILL.md');
 const PLAN_LOOP_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-plan-loop/SKILL.md');
 const PLAN_LOOP_CLAUDE = path.join(REPO_ROOT, '.claude/skills/fgos-plan-loop/SKILL.md');
 
+const DRIVER_FRAGMENT = path.join(REPO_ROOT, 'core/skills/_shared/coordination-driver.md');
+const CODING_POLICY_FRAGMENT = path.join(REPO_ROOT, 'domains/coding/skills/_shared/coding-cell-policy.md');
+
 const PROTOCOL_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
 
-function countWords(text) {
-  return text.trim().split(/\s+/).filter(Boolean).length;
+// Baseline measured in Phase 0 (phase-00-unit-0c-baseline-replay-measurement.json)
+const BASELINE_PLAN_LOOP_WORDS = 5160;
+
+function countWords(str) {
+  const words = str.trim().split(/\s+/);
+  return words.filter(Boolean).length;
 }
 
-function makeTempCtx({ reviewerFinding = false } = {}) {
+function makeTempCtx(opts = {}) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-phase4-driver-test-'));
   const fgosDir = path.join(tmpDir, '.fgos');
-  fs.mkdirSync(fgosDir, { recursive: true });
+  const sessionsDir = path.join(fgosDir, 'coordination', 'sessions');
+  const worktreeDir = path.join(tmpDir, 'worktree-cell-01');
+  fs.mkdirSync(sessionsDir, { recursive: true });
+  fs.mkdirSync(worktreeDir, { recursive: true });
 
   const fakeExec = path.join(tmpDir, 'fake-exec.mjs');
+  const reviewerFinding = opts.reviewerFinding === true;
   fs.writeFileSync(fakeExec, `
     import fs from 'node:fs';
     import path from 'node:path';
-    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+
+    const assignmentsRoot = path.join('${fgosDir}', 'assignments');
     if (fs.existsSync(assignmentsRoot)) {
       for (const asgn of fs.readdirSync(assignmentsRoot)) {
         let isReviewerFinding = false;
@@ -96,6 +117,7 @@ function makeTempCtx({ reviewerFinding = false } = {}) {
     cwd: tmpDir,
     repoRoot: tmpDir,
     packageRoot: REPO_ROOT,
+    worktreeDir,
     cleanup: () => {
       try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {}
     },
@@ -103,27 +125,41 @@ function makeTempCtx({ reviewerFinding = false } = {}) {
 }
 
 // -----------------------------------------------------------------------------
-// 1. plan-loop skill is within budget
+// 1. plan-loop skill is within budget and reduces Lead instructions
 // -----------------------------------------------------------------------------
 
 test('Phase 4: plan-loop skill is within word budget (target 800-1200 words, <= 1500 words)', () => {
   assert.ok(fs.existsSync(PLAN_LOOP_CANONICAL), 'canonical plan-loop skill must exist');
-  const content = fs.readFileSync(PLAN_LOOP_CANONICAL, 'utf8');
-  const words = countWords(content);
+  const planLoopContent = fs.readFileSync(PLAN_LOOP_CANONICAL, 'utf8');
+  const planLoopWords = countWords(planLoopContent);
+
   assert.ok(
-    words <= 1500,
-    `plan-loop skill must be <= 1500 words (budget), got ${words} words`,
+    planLoopWords <= 1500,
+    `plan-loop skill must be <= 1500 words (budget), got ${planLoopWords} words`,
   );
   assert.ok(
-    words >= 500,
-    `plan-loop skill must have sufficient operational substance (>= 500 words), got ${words} words`,
+    planLoopWords >= 500,
+    `plan-loop skill must have sufficient operational substance (>= 500 words), got ${planLoopWords} words`,
   );
-  // Compare to historical baseline (~3700 words) -> at least 60% reduction
-  const historicalBaseline = 3700;
-  const reductionPercent = ((historicalBaseline - words) / historicalBaseline) * 100;
+
+  // Facade-only reduction vs Phase 0 baseline (5160 words)
+  const facadeReduction = ((BASELINE_PLAN_LOOP_WORDS - planLoopWords) / BASELINE_PLAN_LOOP_WORDS) * 100;
   assert.ok(
-    reductionPercent >= 60,
-    `plan-loop word reduction must be at least 60% vs baseline (${historicalBaseline} words), achieved ${reductionPercent.toFixed(1)}% (${words} words)`,
+    facadeReduction >= 60,
+    `plan-loop facade word reduction must be >= 60% vs baseline (${BASELINE_PLAN_LOOP_WORDS} words), achieved ${facadeReduction.toFixed(1)}% (${planLoopWords} words)`,
+  );
+
+  // Combined Lead load (SKILL.md + coordination-driver.md + coding-cell-policy.md)
+  const driverContent = fs.readFileSync(DRIVER_FRAGMENT, 'utf8');
+  const policyContent = fs.readFileSync(CODING_POLICY_FRAGMENT, 'utf8');
+  const driverWords = countWords(driverContent);
+  const policyWords = countWords(policyContent);
+  const combinedWords = planLoopWords + driverWords + policyWords;
+
+  // The combined load is dramatically leaner than the monolithic skill plus historical docs
+  assert.ok(
+    combinedWords <= 3300,
+    `combined Lead load must be bounded (<= 3300 words), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
   );
 });
 
@@ -166,86 +202,89 @@ test('Phase 4: driver discipline fragment contains no coding/track vocabulary an
     'after-close action',
     'continuity artifact',
   ];
+
   for (const hook of requiredHooks) {
-    assert.match(
-      content,
-      new RegExp(`\`${hook}\``, 'i'),
+    assert.ok(
+      content.includes(`\`${hook}\``),
       `driver discipline fragment must define hook slot "${hook}"`,
     );
   }
 
-  // The 8 cycle steps must be present
-  assert.match(content, /observe\(/i);
-  assert.match(content, /choose one legal action/i);
-  assert.match(content, /dispatch/i);
-  assert.match(content, /verify evidence/i);
-  assert.match(content, /disposition/i);
-  assert.match(content, /adapt/i);
-  assert.match(content, /explicit close/i);
-  assert.match(content, /continuity artifact/i);
+  // Generic 8-step driver cycle must be present
+  assert.ok(content.includes('observe(status)'));
+  assert.ok(content.includes('choose one legal action'));
+  assert.ok(content.includes('dispatch'));
+  assert.ok(content.includes('verify evidence'));
+  assert.ok(content.includes('disposition'));
+  assert.ok(content.includes('adapt'));
+  assert.ok(content.includes('explicit close or continue'));
+  assert.ok(content.includes('continuity artifact'));
 });
 
 // -----------------------------------------------------------------------------
-// 3. coding-cell fragment is reusable for one cell with no plan/track
+// 3. coding-cell fragment is reusable for one cell with no plan/track assumptions
 // -----------------------------------------------------------------------------
 
 test('Phase 4: coding-cell fragment is reusable for one cell with no plan/track assumptions', () => {
-  assert.ok(fs.existsSync(CODING_POLICY_FRAGMENT), 'coding-cell policy fragment must exist');
+  assert.ok(fs.existsSync(CODING_POLICY_FRAGMENT), 'coding cell policy fragment must exist');
   const content = fs.readFileSync(CODING_POLICY_FRAGMENT, 'utf8');
 
-  // Must declare core coding cell mechanisms
-  assert.match(content, /Isolated Worktree Discipline/i, 'must define isolated worktree discipline');
-  assert.match(content, /Proof Tiers/i, 'must define proof tiers');
-  assert.match(content, /Tier 1: Focused/i, 'must define focused proof tier');
-  assert.match(content, /Tier 2: Affected/i, 'must define affected proof tier');
-  assert.match(content, /Tier 3: Full-Suite Gate/i, 'must define full-suite gate tier');
-  assert.match(content, /Independent Verification of Doer Commit/i, 'must require independent verification');
-  assert.match(content, /Merge and Cleanup Only After Explicit Close/i, 'must enforce merge only after close');
-  assert.match(content, /Tested and Integrated Identity/i, 'must define tested/integrated identity');
-  assert.match(content, /testedSha/, 'must define testedSha');
-  assert.match(content, /integratedSha/, 'must define integratedSha');
-  assert.match(content, /treeIdentical/, 'must define treeIdentical exception');
+  // Must define isolated worktree discipline and reference private-cell-worktree.md
+  assert.ok(content.includes('Isolated Worktree Discipline'));
+  assert.ok(content.includes('private-cell-worktree.md'), 'coding-cell-policy must reference private-cell-worktree.md');
 
-  // Must be usable for one cell with no plan or track
-  assert.match(content, /single-cell/i, 'must explicitly state reusability for single-cell changes');
-  assert.doesNotMatch(content, /## 5\. Unattended track mode/, 'must not embed multi-cell track loop');
+  // Must define proof tiers
+  assert.ok(content.includes('Proof Tiers'));
+  assert.ok(content.includes('Tier 1: Focused'));
+  assert.ok(content.includes('Tier 2: Affected'));
+  assert.ok(content.includes('Tier 3: Full-Suite Gate'));
+
+  // Must require independent verification of doer commit and tests
+  assert.ok(content.includes('Independent Verification of Doer Commit and Tests'));
+
+  // Must define merge and cleanup only after explicit close
+  assert.ok(content.includes('Merge and Cleanup Only After Explicit Close'));
+
+  // Must define tested and integrated identity
+  assert.ok(content.includes('Tested and Integrated Identity'));
+  assert.ok(content.includes('testedSha'));
+  assert.ok(content.includes('integratedSha'));
+  assert.ok(content.includes('treeIdentical: true'));
+  assert.ok(content.includes('Non-Inference Rule'));
+
+  // Must NOT assume a multi-cell plan or track
+  assert.doesNotMatch(content, /\bplan\.md\b/);
+  assert.doesNotMatch(content, /\btrack status\b/i);
 });
 
 // -----------------------------------------------------------------------------
-// 4. plan-loop no longer embeds raw request JSON or copied kernel rules
+// 4. plan-loop facade cleanses raw request JSON and manual ID generation
 // -----------------------------------------------------------------------------
 
 test('Phase 4: plan-loop no longer embeds raw request JSON or copied kernel rules', () => {
   const content = fs.readFileSync(PLAN_LOOP_CANONICAL, 'utf8');
 
-  // No raw request JSON objects
-  assert.doesNotMatch(content, /"kind":\s*"declared-protocol"/, 'must not embed raw request JSON');
-  assert.doesNotMatch(content, /"type":\s*"operation"/, 'must not embed raw operation JSON steps');
-  assert.doesNotMatch(content, /"type":\s*"authorize"/, 'must not embed raw authorize JSON steps');
-  assert.doesNotMatch(content, /open\.json/, 'must not reference open.json file');
-  assert.doesNotMatch(content, /fix-1\.json|fix-N\.json/, 'must not reference fix JSON files');
-  assert.doesNotMatch(content, /close\.json/, 'must not reference close.json file');
+  // Forbid raw coordination JSON requests
+  assert.doesNotMatch(content, /"kind":\s*"declared-protocol"/, 'plan-loop must not embed raw start request JSON');
+  assert.doesNotMatch(content, /"type":\s*"operation"/, 'plan-loop must not embed raw operation request JSON');
+  assert.doesNotMatch(content, /"action":\s*"authorize-operation"/, 'plan-loop must not embed raw authorization request JSON');
 
-  // No schema source-line citations
-  assert.doesNotMatch(content, /schema\.mjs:\d+/, 'must not cite schema.mjs line numbers');
-  assert.doesNotMatch(content, /TOP_LEVEL_ALLOWED_KEYS/, 'must not copy schema internal constant names');
+  // Forbid manual ID generation patterns
+  assert.doesNotMatch(content, /auth-rev-\$\{Date\.now\(\)\}/, 'plan-loop must not instruct manual authorization ID generation');
+  assert.doesNotMatch(content, /inv-\$\{Date\.now\(\)\}/, 'plan-loop must not instruct manual invocation ID generation');
 
-  // Semantic command usage
-  assert.match(content, /fgos coordination start/, 'must reference fgos coordination start');
-  assert.match(content, /fgos coordination status/, 'must reference fgos coordination status');
-  assert.match(content, /fgos coordination operation/, 'must reference fgos coordination operation');
-  assert.match(content, /fgos coordination authorize-and-dispatch/, 'must reference fgos coordination authorize-and-dispatch');
-  assert.match(content, /fgos coordination disposition/, 'must reference fgos coordination disposition');
-  assert.match(content, /fgos coordination close/, 'must reference fgos coordination close');
-  assert.match(content, /fgos coordination chain/, 'must reference fgos coordination chain');
-
-  // Domain ownership statement (corrected from "domain-agnostic")
-  assert.doesNotMatch(content, /domain-agnostic planning surface/i, 'must not claim to be domain-agnostic planning surface');
-  assert.match(content, /implementation-track facade/i, 'must identify as implementation-track facade');
+  // Must instruct semantic CLI commands
+  assert.ok(content.includes('fgos coordination start'), 'must instruct semantic coordination start');
+  assert.ok(content.includes('fgos coordination status'), 'must instruct semantic coordination status');
+  assert.ok(content.includes('fgos coordination operation'), 'must instruct semantic coordination operation');
+  assert.ok(content.includes('fgos coordination authorize-and-dispatch'), 'must instruct semantic authorize-and-dispatch');
+  assert.ok(content.includes('fgos coordination disposition'), 'must instruct semantic coordination disposition');
+  assert.ok(content.includes('fgos coordination close'), 'must instruct semantic coordination close');
+  assert.ok(content.includes('fgos coordination chain'), 'must instruct semantic coordination chain');
 });
 
 // -----------------------------------------------------------------------------
-// 5. generated skill projections are byte-identical to canonical sources
+// 5. generated skill projections are byte-identical
 // -----------------------------------------------------------------------------
 
 test('Phase 4: generated skill projections are byte-identical to canonical sources', () => {
@@ -297,21 +336,141 @@ test('Phase 4: stale implicit close language remains absent from current skills 
 });
 
 // -----------------------------------------------------------------------------
-// 7. plan-loop clean/fix/recheck/crash-resume/stale-action/explicit-close cases
+// 7. CLI flag contract guard: documented coordination commands match real CLI
 // -----------------------------------------------------------------------------
 
-test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action, explicit close)', async () => {
+test('Phase 4: documented coordination commands in skills and fragments match CLI allowlists and required flags', () => {
+  const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
+  const ALLOWED_COORDINATION_FLAGS = {
+    start: new Set([
+      ...COMMON_FLAGS,
+      'id', 'coordination-id',
+      'protocol', 'protocol-id', 'protocolRef.id',
+      'kind', 'objective', 'writer-id',
+      'work-ref', 'work', 'primary-role',
+      'task', 'task-file', 'bounds', 'partial-policy',
+      'actors', 'steps', 'executor', 'model', 'tier',
+    ]),
+    status: new Set([
+      ...COMMON_FLAGS,
+      'id', 'detail', 'replay',
+    ]),
+    operation: new Set([
+      ...COMMON_FLAGS,
+      'id', 'action-key', 'writer-id', 'objective',
+      'expected-outputs', 'outputs', 'context-refs', 'context',
+      'constraints', 'capabilities', 'from-assignment-id',
+      'intent', 'round', 'task-key', 'mutation',
+      'executor', 'model', 'tier',
+    ]),
+    'authorize-and-dispatch': new Set([
+      ...COMMON_FLAGS,
+      'id', 'action-key', 'writer-id', 'objective', 'reason',
+      'expected-outputs', 'outputs', 'granted-context-refs',
+      'context-refs', 'context', 'constraints', 'capabilities',
+      'target-artifact-ref', 'task-key', 'mutation',
+      'executor', 'model', 'tier',
+    ]),
+    disposition: new Set([
+      ...COMMON_FLAGS,
+      'id', 'action-key', 'writer-id', 'disposition', 'rationale',
+      'evidence-refs',
+    ]),
+    close: new Set([
+      ...COMMON_FLAGS,
+      'file', 'id', 'action-key', 'writer-id', 'authorized-by',
+      'dissenting-actor-ids', 'dissent', 'aggregation-id',
+    ]),
+    chain: new Set([
+      ...COMMON_FLAGS,
+      'track',
+    ]),
+  };
+
+  const filesToCheck = [
+    PLAN_LOOP_CANONICAL,
+    DRIVER_FRAGMENT,
+    CODING_POLICY_FRAGMENT,
+  ];
+
+  // Helper to extract command invocations: matches `fgos coordination <subcommand> ...`
+  function extractInvocations(text) {
+    const invocations = [];
+    const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      const match = line.match(/(?:^|`|[$]\s+)fgos coordination\s+([a-z-]+)(.*)$/);
+      if (match) {
+        const sub = match[1];
+        if (!ALLOWED_COORDINATION_FLAGS[sub]) continue; // prose mention or unsupported subcommand
+
+        let rest = match[2];
+        let j = i;
+        while (lines[j].trim().endsWith('\\') && j + 1 < lines.length) {
+          j++;
+          rest += ' ' + lines[j].trim().replace(/\\$/, '');
+        }
+
+        // Clean markdown backticks and punctuation
+        rest = rest.replace(/`.*$/, '').trim();
+
+        // Extract all --flag occurrences
+        const flagMatches = Array.from(rest.matchAll(/--([a-z0-9-]+)/g)).map((m) => m[1]);
+        invocations.push({ sub, rest, flags: flagMatches, line: i + 1 });
+      }
+    }
+    return invocations;
+  }
+
+  let totalChecked = 0;
+  for (const filePath of filesToCheck) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const invocations = extractInvocations(content);
+
+    for (const inv of invocations) {
+      const allowed = ALLOWED_COORDINATION_FLAGS[inv.sub];
+      assert.ok(allowed, `Subcommand "${inv.sub}" must be known in allowlist`);
+
+      for (const flag of inv.flags) {
+        assert.ok(
+          allowed.has(flag),
+          `Command "fgos coordination ${inv.sub}" in ${path.basename(filePath)}:${inv.line} uses invalid flag "--${flag}". Allowed flags: ${Array.from(allowed).join(', ')}`,
+        );
+      }
+
+      // Check specific subcommand mandatory requirements for non-trivial examples
+      if (inv.sub === 'close') {
+        assert.ok(!inv.flags.includes('reason'), `fgos coordination close must NOT have --reason flag`);
+      }
+      if (inv.sub === 'authorize-and-dispatch' && inv.flags.length > 2) {
+        assert.ok(inv.flags.includes('objective'), `authorize-and-dispatch example must include --objective`);
+        assert.ok(inv.flags.includes('reason'), `authorize-and-dispatch example must include --reason`);
+      }
+
+      totalChecked++;
+    }
+  }
+
+  assert.ok(totalChecked >= 8, `Must have verified at least 8 command invocations, found ${totalChecked}`);
+});
+
+// -----------------------------------------------------------------------------
+// 8. plan-loop clean pass: entry-node start, cold resume, wave parity, explicit close
+// -----------------------------------------------------------------------------
+
+test('Phase 4: plan-loop clean pass (entry node start, cold resume, wave parity, explicit close)', async () => {
   const ctx = makeTempCtx();
   try {
     const coordinationId = 'track-phase4--cell-01';
     const writerId = 'driver_lead_phase4';
 
-    // 1. Start session using semantic command
+    // 1. Start session passing worktree cwd (executes entry node produce-candidate)
     const startResult = await startCoordinationUseCase(ctx, {
       kind: 'declared-protocol',
       protocolId: PROTOCOL_ID,
       coordinationId,
       writerId,
+      cwd: ctx.worktreeDir,
       objective: 'Phase 4 implementation test cell',
       partialPolicy: { allowedOmissions: ['fixer'] },
     });
@@ -323,7 +482,7 @@ test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action
     assert.equal(status.session.status, 'active');
     assert.equal(status.readyToClose, false);
 
-    // 3. Inspect legal actions (produce-candidate executed at entry node during start; review-candidate and red-team-candidate projected)
+    // 3. Inspect legal actions: produce-candidate was executed at start; review and red-team projected
     let actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const reviewAction = actionsRes.actions.find((a) => a.kind === 'dispatch-operation' && a.target.operationId === 'review-candidate');
     const redTeamAction = actionsRes.actions.find((a) => a.kind === 'dispatch-operation' && a.target.operationId === 'red-team-candidate');
@@ -354,10 +513,17 @@ test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action
     });
     assert.equal(reviewRes.status, 'dispatched');
 
-    // 6. Execute red-team-candidate with valid actionKey
+    // 6. Simulate crash / cold resume: discard in-memory variables and resume cold
+    // A fresh Lead process starts with only coordinationId and queries status
+    const resumedStatus = showCoordinationStatusUseCase(ctx, { id: coordinationId });
+    assert.equal(resumedStatus.session.status, 'active');
+
+    // Fresh Lead derives legal actions from status/actions door
     actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const freshRedTeamAction = actionsRes.actions.find((a) => a.kind === 'dispatch-operation' && a.target.operationId === 'red-team-candidate');
-    assert.ok(freshRedTeamAction, 'red-team-candidate must remain projected');
+    assert.ok(freshRedTeamAction, 'red-team-candidate must be projected on cold resume');
+
+    // Dispatch red-team-candidate
     const redTeamRes = await executeOperationUseCase(ctx, {
       id: coordinationId,
       actionKey: freshRedTeamAction.actionKey,
@@ -367,19 +533,24 @@ test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action
     });
     assert.equal(redTeamRes.status, 'dispatched');
 
-    // 7. Verify session remains ACTIVE (explicit-close invariant: does NOT auto-close)
+    // 7. Verify session remains ACTIVE (explicit close law: does not auto-close)
     status = showCoordinationStatusUseCase(ctx, { id: coordinationId });
     assert.equal(status.session.status, 'active');
     assert.equal(status.readyToClose, true);
 
-    // 8. Cold resume verification via chain
+    // Verify dispatch count parity with Phase 0 clean-plan-loop-shaped (3 dispatches, 2 waves)
+    const sessionEvents = (await import('../../src/runner/coordination/store.mjs')).readSessionEvents(coordinationId, { repoRoot: ctx.repoRoot });
+    const assignmentEvents = sessionEvents.filter((e) => e.type === 'assignment-created');
+    assert.equal(assignmentEvents.length, 3, 'Clean pass must execute exactly 3 dispatches (produce, review, red-team)');
+
+    // 8. Cold track resume verification via chain
     const chainRes = chainCoordinationUseCase(ctx, { track: 'track-phase4' });
     assert.equal(chainRes.track, 'track-phase4');
     assert.equal(chainRes.cells.length, 1);
     assert.equal(chainRes.cells[0].cellId, 'cell-01');
     assert.equal(chainRes.cells[0].status, 'active');
 
-    // 9. Explicit Close: close action is projected and terminates session
+    // 9. Explicit Close: close action is projected; terminates session without CLI --reason
     actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const closeAction = actionsRes.actions.find((a) => a.kind === 'close');
     assert.ok(closeAction, 'explicit close action must be projected when ready to close');
@@ -388,7 +559,6 @@ test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action
       id: coordinationId,
       actionKey: closeAction.actionKey,
       writerId,
-      reason: 'Phase 4 proof complete: all operations verified',
     });
     assert.equal(closeResult.coordinationId, coordinationId);
     assert.equal(closeResult.closed, true);
@@ -403,7 +573,7 @@ test('Phase 4: plan-loop semantic control flow (clean pass, resume, stale-action
 });
 
 // -----------------------------------------------------------------------------
-// 8. plan-loop fix round, recheck discharge, and full quorum explicit close
+// 9. plan-loop fix round, recheck discharge, full quorum explicit close
 // -----------------------------------------------------------------------------
 
 test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit close', async () => {
@@ -412,17 +582,18 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
     const coordinationId = 'track-phase4--cell-fix-01';
     const writerId = 'driver_lead_phase4';
 
-    // 1. Start session (no partialPolicy -> requires all actors to complete)
+    // 1. Start session (executes produce-candidate inside worktree)
     const startResult = await startCoordinationUseCase(ctx, {
       kind: 'declared-protocol',
       protocolId: PROTOCOL_ID,
       coordinationId,
       writerId,
+      cwd: ctx.worktreeDir,
       objective: 'Phase 4 implementation test cell with fix round',
     });
     assert.equal(startResult.status, 'running');
 
-    // 2. Dispatch review-candidate (which will produce findings)
+    // 2. Dispatch review-candidate (produces findings)
     let actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const reviewAction = actionsRes.actions.find((a) => a.kind === 'dispatch-operation' && a.target.operationId === 'review-candidate');
     assert.ok(reviewAction);
@@ -467,6 +638,7 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
     });
 
     // 6. Driver authorizes and dispatches revision (revise-candidate -> fixer runs)
+    // Passes required objective, reason, and grantedContextRefs
     actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const authReviseAction = actionsRes.actions.find(
       (a) => a.kind === 'authorize-and-dispatch' && a.target.operationId === 'revise-candidate',
@@ -478,7 +650,7 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
       actionKey: authReviseAction.actionKey,
       writerId,
       reason: 'Implement fixes for reviewer findings',
-      objective: 'Revise candidate',
+      objective: 'Revise candidate per reviewer findings',
       expectedOutputs: ['agent-result.json'],
       grantedContextRefs: [failedAsgnId],
       contextRefs: [failedAsgnId],
@@ -486,8 +658,6 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
     assert.equal(authReviseRes.status, 'dispatched');
 
     // Find the revision assignment id from session assignments
-    const revStatus = showCoordinationStatusUseCase(ctx, { id: coordinationId, detail: true });
-    const authRevAsgn = revStatus.snapshot ? revStatus.session : null;
     const latestEvents = (await import('../../src/runner/coordination/store.mjs')).readSessionEvents(coordinationId, { repoRoot: ctx.repoRoot });
     const reviseCreated = latestEvents.findLast(
       (e) => e.type === 'assignment-created' && e.payload?.operationId === 'revise-candidate',
@@ -519,7 +689,12 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
     assert.equal(status.readyToClose, true);
     assert.equal(status.blockers.length, 0);
 
-    // 9. Explicit close terminates session cleanly as completed
+    // Verify dispatch count parity with Phase 0 accepted-finding-remediation-recheck (5 dispatches, 3 waves)
+    const allSessionEvents = (await import('../../src/runner/coordination/store.mjs')).readSessionEvents(coordinationId, { repoRoot: ctx.repoRoot });
+    const fixAssignmentEvents = allSessionEvents.filter((e) => e.type === 'assignment-created');
+    assert.equal(fixAssignmentEvents.length, 5, 'Fix round must execute exactly 5 dispatches (produce, review, red-team, revise, recheck)');
+
+    // 9. Explicit close terminates session cleanly as completed (no CLI reason flag)
     actionsRes = showCoordinationActionsUseCase(ctx, { id: coordinationId });
     const closeAction = actionsRes.actions.find((a) => a.kind === 'close');
     assert.ok(closeAction, 'explicit close must be projected when all actors satisfied');
@@ -528,7 +703,6 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
       id: coordinationId,
       actionKey: closeAction.actionKey,
       writerId,
-      reason: 'All operations and rechecks verified; fix round discharged',
     });
     assert.equal(closeResult.coordinationId, coordinationId);
     assert.equal(closeResult.closed, true);

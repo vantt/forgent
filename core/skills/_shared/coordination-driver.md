@@ -61,7 +61,9 @@ When an inspection or advisory operation reports findings, the driver must recor
 - `accepted`: The finding is valid and requires corrective action or revision.
 - `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
 - `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
-Dispositions are recorded via `fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <value> --rationale <text>`.
+
+Dispositions are recorded via:
+`fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <value> --rationale <text>`
 
 ### Step 6: Adapt (Revise, Recheck, Retry, Ask Human)
 
@@ -75,12 +77,13 @@ Based on dispositions and evidence outcomes:
 
 - **Continue:** If further declared operations or authorized rechecks remain, cycle back to Step 1 (Observe).
 - **Explicit Close:** When all declared steps have settled, all findings are dispositioned, all required rechecks confirm resolution, and close prerequisites are satisfied, invoke:
-  `fgos coordination close --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --reason <summary>`
+  `fgos coordination close --id <coordinationId> --action-key <actionKey> --writer-id <writerId>`
+  *(Any closeout summary or rationale is recorded in the continuity artifact, not passed as a CLI flag.)*
 - **Explicit Close Law:** Explicit close is the sole normal close action. A session never terminates automatically merely because operations finished. Automated or implicit completion is strictly prohibited. Quorum and prerequisite checks fail closed.
 
 ### Step 8: Continuity Artifact
 
-Record the iteration summary, session identifier, verified commit/evidence identifiers, dispositions, and deferred items into the facade's designated continuity artifact before completing the turn.
+Record the iteration summary, session identifier, verified evidence identifiers, dispositions, and deferred items into the facade's designated continuity artifact before completing the turn.
 
 ---
 

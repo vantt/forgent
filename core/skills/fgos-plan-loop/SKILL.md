@@ -18,17 +18,18 @@ description: >-
 This facade builds directly on two shared doctrine layers:
 - **Generic Driver Discipline:** [`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify evidence -> disposition -> adapt -> explicit close -> continuity artifact`).
 - **Coding-Cell Policy:** [`../_shared/coding-cell-policy.md`](../_shared/coding-cell-policy.md) defines isolated worktree execution, proof tiers, independent commit/test verification, tested/integrated identity, and merge-after-close rules.
+*(Link convention: fragment paths resolve to canonical source trees in core/domains and project to sibling `_shared/` in `.agents/` and `plugins/`.)*
 
-All protocol execution lower into the CoordinationSession control plane (`actions.mjs`, `composers.mjs`) and the registered [`standalone-master-coordination-loop`](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml) FlowDefinition (`doer -> reviewer/red-team -> fixer -> rechecks`).
+All protocol execution lowers into the registered [`standalone-master-coordination-loop`](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml) FlowDefinition (`doer -> reviewer/red-team -> fixer -> rechecks`).
 
-For a standalone single-cell change without a plan or track, use `fgos-code-panel` (or `fgos-code-change`) instead.
+For a standalone single-cell change without a plan or track, use `fgos-code-panel` (future `fgos-code-change` in Phase 6) instead.
 
 ---
 
 ## Non-Goals
 
-- **No Work Lifecycle Involvement:** Never use `fgos pick/cook/submit`, claims, or Work items for tracks this skill drives. The session engine strictly rejects fields carrying Work lifecycle authority (`approve`, `merge`, `claim`, `workStatus`, `missionId`).
-- **No Git Merge Authority Inside Sessions:** A coordination session possesses zero git merge authority. Doer and Fixer operations commit inside the cell worktree branch, but merging into the target branch is strictly a driver action performed outside the session after explicit close.
+- **No Work Lifecycle Involvement:** Never use `fgos pick/cook/submit`, claims, or Work items for tracks this skill drives.
+- **No Git Merge Authority Inside Sessions:** A coordination session possesses zero git merge authority. Merging into the target branch is strictly a driver action performed outside the session after explicit close.
 - **No Secondary Track Ledger:** Track status is derived on demand from session event logs via `fgos coordination chain` and `plan.md`. No secondary ledger or database is created.
 
 ---
@@ -49,9 +50,9 @@ Capability tags (e.g. `code:implement`, `code:review`, `code:test`) signal decom
 | `open inputs` | Extracted from `plans/<track>/phase-NN-<name>.md` (objective, verification commands, actor requirements). |
 | `evidence verification` | Coding-cell policy: driver independently verifies git commit in worktree and executes the phase's focused tests. |
 | `disposition criteria` | Proof-gap findings (judging verification insufficient) cannot be deferred; must be `accepted` (escalating proof tier to full) or evidence-backed `rejected`. |
-| `adaptation bounds` | Maximum 3 fix rounds per cell. Unresolved proof gaps force full proof gate before close. |
+| `adaptation bounds` | Maximum 3 fix rounds per cell. Past the 3-round cap, remaining non-proof-gap findings are `deferred` and named in the trace; proof-gap findings escalate to human. |
 | `human-escalation triggers` | Unresolvable spec ambiguity with divergent readings, identical failure across two distinct approaches, or unresolvable merge conflict. Batch questions, non-blocking. |
-| `close criteria` | All required operations settled, all rechecks clean, caveat-free, checkpoint identity tuple recorded. |
+| `close criteria` | All required operations settled, all rechecks clean, caveat-free per driver discipline, checkpoint identity tuple recorded. |
 | `after-close action` | Coding-cell policy: merge `--no-ff` into track branch, clean worktree, append row to `plan.md` cell-status table. |
 | `continuity artifact` | `plan.md` cell-status table and cell trace (`docs/architect/agent-coordination/verification/<track>/<cell>.md` or `plans/<track>/reports/`). |
 
@@ -74,70 +75,85 @@ Session IDs use safe characters: letters, digits, hyphen, underscore (e.g. `cell
    ```sh
    git worktree add ../<track>-<cell-id> -b <track>--<cell-id> <base-branch>
    ```
-2. **Start Session:** Initialize the session via semantic command:
+2. **Start Session (runs entry node):**
+   `coordination start` on `standalone-master-coordination-loop` automatically resolves and executes the entry node (`produce`, operation: `produce-candidate`, actor: `doer`, mutating) during session initialization. Because the entry operation mutates code, `start` MUST pass `--cwd`:
    ```sh
    fgos coordination start \
      --kind declared-protocol \
      --protocol core.coordination-protocol.standalone-master-coordination-loop \
      --coordination-id "<track>--<cell-id>" \
      --writer-id "<driver-id>" \
+     --cwd "../<track>-<cell-id>" \
      --objective "<cell objective from phase file>"
    ```
-3. **Dispatch Initial Pass:**
-   Query `fgos coordination status <coordination-id>`. Dispatch initial operations:
-   - `produce-candidate`: mutating, passing `--cwd ../<track>-<cell-id>`
-   - `review-candidate` and `red-team-candidate`: read-only advisory operations
-   Execute each via `fgos coordination operation --id "<coordination-id>" --action-key "<actionKey>" ...`.
+3. **Dispatch Evaluation Pass:**
+   Query `fgos coordination status <track>--<cell-id>`.
+   `produce-candidate` has already executed. The next projected legal actions are the parallel primary evaluations:
+   `review-candidate` (actor: `reviewer`) and `red-team-candidate` (actor: `red-team`).
+   Dispatch each via:
+   ```sh
+   fgos coordination operation \
+     --id "<track>--<cell-id>" \
+     --action-key "<actionKey>" \
+     --writer-id "<driver-id>" \
+     --objective "Review candidate diff against requirements" \
+     --expected-outputs "agent-result.json"
+   ```
 
 ### 2. Read Results and Disposition Findings
 
 Inspect session status:
 ```sh
-fgos coordination status <coordination-id> --detail
+fgos coordination status <track>--<cell-id> --detail
 ```
-Independently inspect worker commits and test outputs in the worktree.
+Independently inspect worker commits and test outputs in the worktree per coding-cell policy.
 Record driver dispositions for each reported finding:
 ```sh
 fgos coordination disposition \
-  --id "<coordination-id>" \
+  --id "<track>--<cell-id>" \
   --action-key "<actionKey>" \
   --writer-id "<driver-id>" \
   --disposition "accepted" \
   --rationale "Reviewer HIGH-1 accepted; scheduled for fix-1."
 ```
-**Caveat Rule:** A finding with `sharedCwdCaveat` (`status: 'recheck-required'`, `verdict: 'non-attributable'`) is never valid sign-off evidence and blocks close. An uncaveated recheck is mandatory.
+Caveats block acceptance and close per driver discipline Step 4.
 
 ### 3. Authorize and Dispatch Fix Rounds
 
 When findings are accepted, execute a fix round (capped at 3 per cell):
 ```sh
-# Authorize and dispatch Fixer revision (mutating)
+# Authorize and dispatch Fixer revision (mutating, cwd required)
 fgos coordination authorize-and-dispatch \
-  --id "<coordination-id>" \
+  --id "<track>--<cell-id>" \
   --action-key "<actionKey>" \
   --writer-id "<driver-id>" \
   --cwd "../<track>-<cell-id>" \
-  --reason "Apply accepted Reviewer HIGH-1 finding."
+  --objective "Apply accepted Reviewer HIGH-1 finding to candidate." \
+  --reason "Apply accepted Reviewer HIGH-1 finding." \
+  --granted-context-refs "<failedAssignmentId>" \
+  --expected-outputs "agent-result.json"
 
 # Authorize and dispatch Reviewer and Red-Team rechecks
 fgos coordination authorize-and-dispatch \
-  --id "<coordination-id>" \
+  --id "<track>--<cell-id>" \
   --action-key "<actionKey>" \
   --writer-id "<driver-id>" \
-  --reason "Recheck revised candidate."
+  --objective "Recheck revised candidate against previously accepted finding." \
+  --reason "Recheck revised candidate." \
+  --granted-context-refs "<reviseAssignmentId>" \
+  --expected-outputs "agent-result.json"
 ```
 
 ### 4. Close a Cell
 
-1. **Verify Quorum and Prerequisites:** Confirm all required operations and rechecks are satisfied, no open proof gaps remain, and no node carries an active `sharedCwdCaveat` with `status: 'recheck-required'`.
-2. **Record Checkpoint Identity:** In the cell trace, record: `phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`, and `outcome`.
+1. **Verify Quorum and Prerequisites:** Confirm all required operations and rechecks are satisfied, no open proof gaps remain, and no node carries an active `sharedCwdCaveat` with `status: 'recheck-required'` (per driver discipline Step 4).
+2. **Record Checkpoint Identity:** In the cell trace, record the identity tuple (`testedSha`, `integratedSha`, `treeIdentical`, `outcome`) per coding-cell policy.
 3. **Execute Explicit Close:**
    ```sh
    fgos coordination close \
-     --id "<coordination-id>" \
+     --id "<track>--<cell-id>" \
      --action-key "<actionKey>" \
-     --writer-id "<driver-id>" \
-     --reason "All review and red-team checks clean; tests match baseline."
+     --writer-id "<driver-id>"
    ```
 4. **Post-Close Integration:** Outside the session, merge into the target branch and remove the worktree:
    ```sh
@@ -153,12 +169,12 @@ When executing a full multi-cell track unattended:
 
 0. **Baseline:** Run the track full proof command once before cell work begins. Record baseline failures in `plan.md` Execution Inputs. Known failures may shrink, never grow.
 1. **Track Iteration:** Loop until every phase in `plan.md` is marked `merged`:
-   - Query `fgos coordination chain <track> --json`. If `activeCell` is open, resume it. Else select the lowest unmerged phase.
+   - Query `fgos coordination chain <track> --json`. If `activeCell` is open, resume it. Else select lowest unmerged phase.
    - Set up cell worktree per coding-cell policy.
-   - Start session and dispatch initial operations (`produce`, `review`, `red-team`).
-   - Independently verify doer commit and execute phase focused test in the worktree.
+   - Start session (executes `produce-candidate` inside worktree) and dispatch evaluation pass (`review`, `red-team`).
+   - Independently verify doer commit and execute phase focused test in worktree.
    - Read status and disposition findings. Authorize fix rounds as needed (cap: 3).
    - Once rechecks pass cleanly, execute explicit close via `fgos coordination close`.
    - Merge cell branch into track branch (`git merge --no-ff`), drop worktree, and record row in `plan.md` cell-status table.
-   - If `testedSha !== integratedSha`, verify gate proof on `integratedSha` unless `treeIdentical: true` applies.
+   - Record checkpoint identity and verify `integratedSha` proof per coding-cell policy.
 2. **Track Completion:** Write `<plan dir>/reports/track-closeout.md` summarizing all merged cells, commits, and verified evidence.
