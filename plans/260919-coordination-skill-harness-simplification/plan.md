@@ -183,13 +183,17 @@ Deliver in this order:
    governance/operability completion, and cold-resumable DAG forward-port;
 4. combined authority/replay/concurrency verification, then dispatch boundary
    simplification;
-5. plan-loop as the first consumer;
-6. architecture-panel and generic panel/group-thinking surfaces;
-7. code-panel after the shared coding-cell boundary has been proved.
+5. the shared driver discipline, proved through plan-loop as the first
+   implementation-track consumer;
+6. architecture-panel and generic panel surfaces as the second, unlike
+   consumer of that same discipline;
+7. one coding facade (`fgos-code-change`) replacing plan-loop and code-panel
+   after the shared coding-cell boundary has been proved.
 
-Plan-loop is not assumed to be the universal core. The plan explicitly tests
-whether shared behavior belongs below it and keeps coding-only mechanics out of
-architecture advisory.
+Plan-loop is not the universal core and never becomes it. The generic loop is
+the driver discipline (see Architecture), a shared doctrine fragment every
+coordination facade loads; plan-loop is only its first consumer. Coding-only
+mechanics stay out of that discipline and out of architecture advisory.
 
 ## Locked architectural direction
 
@@ -277,6 +281,61 @@ fgos-panel / fgos-plan-loop / fgos-architecture-panel / fgos-code-panel
 The names above are illustrative until implementation impact analysis. The
 boundary is the commitment; exact module and symbol names are implementation
 details.
+
+### Layering above the control layer
+
+Decided 2026-09-26 (owner discussion; advisory record
+`plans/reports/architecture-advisory-260926-1322-phase4-loop-driver-layering-report.md`).
+The kernel, control layer, and protocols above are already correctly layered;
+the drift is in the skill layer, where four concerns were fused.
+
+```text
+Facades (skills: intent, unit selection, delivery)
+  fgos-panel (router) · fgos-architecture-panel · fgos-code-change
+        |                        |                      |
+        |                        |            coding-cell policy (domain: coding)
+        v                        v                      v
+Driver discipline — shared doctrine fragment, no code, no state:
+  observe(status) -> choose one legal action -> dispatch -> verify evidence
+  -> disposition -> adapt (revise / recheck / retry / ask human)
+  -> explicit close or continue -> continuity artifact
+        | reads action view                 | writes via semantic commands
+        v                                   v
+Coordination control layer -> CoordinationSession + FlowDefinition + Dispatch
+        ^
+Interaction protocols (declared FlowDefinition data, not a decision layer)
+```
+
+| Concern | Owner | Never owns |
+|---|---|---|
+| Legality, authority, mutation gating, evidence, quorum | kernel + control layer | judgment |
+| Interaction shape: roles, graph, activation, visibility/reveal windows, contribution types, dissent/ranking, reopen bounds | protocol (FlowDefinition) | which legal action to take, disposition, when to ask a person, when to close |
+| Loop judgment: which legal action, independent verification, disposition, revise/recheck/retry, human escalation batching, explicit close, cold resume from status + artifact | driver discipline fragment | domain vocabulary (`git`, worktree, merge, tests, phase, `plan.md`), any persisted state |
+| Unit selection, hook values, delivery | facade | restating kernel, protocol, or discipline rules |
+| Worktree, proof tiers, independent doer verification, merge after explicit close, tested/integrated identity | coding-cell policy (coding domain) | track/plan assumptions |
+
+The driver discipline names hook slots each facade fills: unit of iteration,
+open inputs, evidence verification, disposition criteria, adaptation bounds,
+human-escalation triggers, close criteria, after-close action, continuity
+artifact. It is generic only when two unlike facades (plan-loop, then
+architecture-panel) consume it unchanged.
+
+Naming decisions (owner, 2026-09-26):
+
+- `core.coordination-protocol.standalone-master-coordination-loop` is a
+  protocol for one work product: produce, independent review + red-team,
+  driver-authorized revise, recheck. Target id:
+  `core.coordination-protocol.produce-review-revise`. Renamed in Phase 7 only,
+  with the old id still loadable for existing session replay.
+- `fgos-plan-loop` and `fgos-code-panel` merge into one coding facade,
+  `fgos-code-change`, in the coding domain: a single change is a plan with one
+  cell. Plan mode is a reference file loaded only when the execution target is
+  a plan/track. Old skill names remain deprecated stubs until the Phase 7
+  compatibility window closes. (`fgos-code-implement` was rejected: it collides
+  with the Work-stage skill `fgos-coding-implement`.)
+- `fgos-group-thinking` is a protocol-pack gate, not a discussion skill; it is
+  folded into `fgos-panel` in Phase 5 while the gate itself stays in code.
+- "Panel" means advisory, never mutation; "change" means mutation.
 
 ## Phase 0 — Baseline, drift inventory, and contract reconciliation
 
@@ -666,21 +725,46 @@ The combined Phase 3C behavior and test results remain unchanged across the
 refactor, and dispatch core no longer owns Work-stage judgment or duplicated
 settlement/prompt mechanics.
 
-## Phase 4 — Rewrite plan-loop as the first consumer
+## Phase 4 — Extract the shared driver discipline and prove it through plan-loop
 
 ### Objective
 
 Prove the shared control layer on the most operationally demanding current
-consumer, while keeping coding-track mechanics in a plan-loop facade.
+consumer **and** separate the three concerns now fused in plan-loop:
 
-### Keep in plan-loop
+1. a domain-neutral driver discipline shared by every coordination facade;
+2. plan-driven track sequencing (choose the next cell, cell-status table as a
+   query, closeout), owned by the plan facade;
+3. coding-cell policy owned by the coding domain and reusable for a single
+   cell with no plan.
 
-- choosing the next plan cell;
-- interpreting plan/phase scope and verification requirements;
-- judging reviewer/red-team findings;
-- deciding whether to authorize a fix;
-- worktree/test/merge/cleanup policy;
-- explicit human escalation rules.
+Plan-loop is a facade over (1)+(3) plus its own (2); it is never the universal
+loop engine. No code, schema, persisted entity, or runtime is added for (1).
+Plan-loop keeps its name in this phase; the merge/rename into
+`fgos-code-change` happens once, in Phase 6.
+
+### Entry gate
+
+Unit I14 is integrated: a DAG-declared request no longer closes a session
+unless the request carries an explicit close. The driver discipline states
+"explicit close is the sole close action" with no exception (owner decision
+2026-09-26).
+
+### Work
+
+1. Author one driver-discipline fragment, canonical under
+   `core/skills/_shared/` (rendered through `npm run build:skills`, never hand
+   edited in `.agents/` or `plugins/`), distilled from plan-loop sections 2–5,
+   architecture-panel Driver Disposition / Fresh-Session Resume / Bounds, and
+   `master-coordinator.md`. It defines the cycle, its invariants, and the hook
+   slots listed under Architecture.
+2. Author one coding-cell policy fragment, owned by the coding domain:
+   isolated worktree, proof tiers, independent verification of the doer's real
+   commit and focused tests, merge and cleanup only after explicit close,
+   tested/integrated identity. No plan/track assumptions.
+3. Rewrite plan-loop as track sequencing plus hook values, loading 1 and 2.
+   Correct its "domain-agnostic" self-description: track sequencing is
+   domain-neutral, cell policy is coding.
 
 ### Remove from plan-loop
 
@@ -691,17 +775,8 @@ consumer, while keeping coding-track mechanics in a plan-loop facade.
 - copied quorum, visibility, recheck, and close rules;
 - repeated actor roster in each request;
 - generic recovery mechanics;
-- volatile executor/model/confinement history.
-
-### Harness boundary
-
-Create a plan-loop/coding-cell facade only for domain-specific mechanics:
-
-- validate/create/reuse an isolated worktree;
-- select cell inputs and verification tier;
-- call semantic coordination commands;
-- verify produced git/test evidence;
-- merge and clean up only under Lead authority after explicit close.
+- volatile executor/model/confinement history;
+- every rule now owned by the driver-discipline or coding-cell fragment.
 
 It must not create a second track ledger. Track status remains a query over
 sessions plus the plan artifact.
@@ -711,14 +786,20 @@ sessions plus the plan artifact.
 - skill within budget;
 - clean, fix/recheck, crash/resume, stale-action, and explicit-close cases pass;
 - Phase 0 plan-loop scenarios show at least 60% Lead instruction-token
-  reduction with no weaker evidence or extra dispatch wave.
+  reduction with no weaker evidence or extra dispatch wave;
+- the driver-discipline fragment contains no coding/track vocabulary (drift
+  test: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
+- the coding-cell fragment is usable for one cell with no plan or track
+  (walk-through against the current code-panel direct-mode scenario; the
+  code-panel rewrite itself stays Phase 6);
+- plan-loop restates no rule owned by either fragment.
 
 ## Phase 5 — Rewrite architecture-panel and generic panel surfaces
 
 ### Objective
 
-Prove the same control/template layer works for a structurally unlike,
-read-only, human-dialogue group-thinking consumer.
+Prove the same control/template layer **and the Phase 4 driver discipline**
+work for a structurally unlike, read-only, human-dialogue consumer.
 
 ### Work
 
@@ -732,9 +813,14 @@ read-only, human-dialogue group-thinking consumer.
 5. Make human-turn and bounded-reopen actions appear in the typed action view.
 6. Keep architecture judgment, turn classification, and disposition authority
    in the Lead/role packets—not in the action projector.
-7. Keep `fgos-panel` as natural-language preset routing and
-   `fgos-group-thinking` as the registered-protocol gate; neither duplicates
-   graph semantics.
+7. architecture-panel and the generic presets driven by `fgos-panel` load the
+   Phase 4 driver-discipline fragment and fill its hooks; they do not restate
+   it.
+8. Fold `fgos-group-thinking` into `fgos-panel`: `fgos-panel` stays the
+   natural-language preset router; the pack-membership gate stays in code
+   behind the public CLI. `fgos-group-thinking` remains a deprecated stub
+   until the Phase 7 compatibility window closes. Remove its stale
+   "always auto-closes / no close step" claim.
 
 ### Panel depth experiment
 
@@ -757,29 +843,42 @@ the full protocol through skill prose.
 - specialist/human-turn/reopen/close operate through public doors;
 - adversarial tests preserve premature-reveal, authority, dissent, and reopen
   caps;
-- at least 60% Lead instruction-token reduction without a quality regression.
+- at least 60% Lead instruction-token reduction without a quality regression;
+- architecture-panel and `fgos-panel` consume the driver-discipline fragment
+  **unchanged**; any required change edits the fragment and re-verifies
+  plan-loop (two-unlike-consumer proof, Vision V-012).
 
-## Phase 6 — Rewrite code-panel after the shared coding seam is proven
+## Phase 6 — Merge plan-loop and code-panel into `fgos-code-change`
 
 ### Objective
 
-Make code-panel a small single-change facade, reusing plan-loop's coding-cell
-mechanics only where the semantics are genuinely identical.
+Replace the two overlapping coding facades with one coding-domain facade,
+`fgos-code-change`: a single change is a plan with one cell. It loads the
+driver-discipline and coding-cell fragments; plan mode (cell selection,
+cell-status table, closeout) is a reference file loaded only when the
+execution target is a plan/phase path or a named track.
 
 ### Work
 
-- route planned multi-cell mode to plan-loop by reference;
-- use the shared coding-cell facade for direct single-cell mode;
-- retain code-panel-specific mode selection and proof policy only;
+- create `fgos-code-change` in the coding domain from the Phase 4 plan-loop
+  rewrite plus code-panel's single-change path;
+- replace code-panel's mode-selection rule set and recursive-dispatch guard
+  with one rule: plan mode only when a run/implement/resume verb targets a
+  plan/phase path or a uniquely resolvable track; otherwise one cell; ask one
+  question when ambiguous;
 - delete duplicated open/fix/close JSON, worktree recipe, roster, and recovery
   prose;
 - keep explicit implementation authority distinct from advisory
-  `coding-design-panel` routing.
+  `coding-design-panel` routing;
+- turn `fgos-plan-loop` and `fgos-code-panel` into deprecated stubs pointing
+  at `fgos-code-change` until the Phase 7 compatibility window closes.
 
 ### Exit
 
-Code-panel no longer contains a second copy of the plan-loop orchestration and
-does not capture advisory-only requests.
+- one coding facade, within budget; no second copy of loop orchestration;
+- single-change and multi-cell plan scenarios both pass through the same
+  skill, including crash/resume and explicit close;
+- advisory-only coding requests are not captured.
 
 ## Phase 7 — Contract, migration, distribution, and closeout
 
@@ -793,20 +892,29 @@ does not capture advisory-only requests.
    skill behavior.
 4. Register new installed assets/config with setup merge and doctor if Phase 3
    introduces them.
+4a. Rename `core.coordination-protocol.standalone-master-coordination-loop`
+   to `core.coordination-protocol.produce-review-revise`; the old id stays
+   loadable so every existing session replays identically. Reclassify the
+   `group-thinking` protocol pack as gated registered protocols (it also
+   holds non-discussion protocols) and decide its id. Remove the deprecated
+   `fgos-plan-loop`, `fgos-code-panel`, and `fgos-group-thinking` stubs when
+   the compatibility window closes.
 5. Add drift tests:
    - documented commands equal command registry;
    - runtime skills contain no raw request JSON;
    - semantic action kinds map to real kernel actions;
    - every referenced contract template resolves;
    - generated skill projections are byte-identical to canonical sources;
-   - stale auto-close language is absent from current sources.
+   - stale auto-close language is absent from current sources;
+   - facades restate no rule owned by the driver-discipline fragment, and
+     the fragment carries no domain vocabulary.
 6. Run focused coordination suites, protocol conformance suites, projection /
    packaging tests, replay corpus, and full `npm test`.
 7. Publish before/after performance and quality results.
 
 ### Exit
 
-A cold agent can operate plan-loop and architecture-panel from thin skills,
+A cold agent can operate `fgos-code-change` and architecture-panel from thin skills,
 typed status, and operation-local prompt packets. No required operational truth
 depends on copying a large JSON payload or remembering chat history.
 
@@ -995,12 +1103,25 @@ Executor/provider/model/tier selection remains an execution-time decision.
   depends-on: I12
   status: READY (Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`)
   stop: consumer behavior or full-suite baseline regresses
+- unit: I14 — remove automatic close from DAG-declared coordination requests
+  capability: code:implement
+  depends-on: I13
+  status: PROPOSED (owner decision 2026-09-26: explicit close has no exception)
+  scope: `runCoordinationUseCase` in `src/verbs/coordination/run.mjs` attempts
+    `closeSessionByQuorum` for any DAG-declared request with no partial outcome
+    or caveat, even without `request.close`/a `close` step; the non-DAG path
+    already closes only on explicit request. Align the DAG path with the
+    locked direction "Explicit close is the sole normal close action", keep
+    the caveat refusal reason reported, and update DAG tests/docs that expect
+    implicit close.
+  stop: legacy session replay changes, or any consumer depends on implicit DAG
+    close without an explicit-close replacement
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> Phase 4
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> Phase 4
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+
@@ -1027,6 +1148,8 @@ gate.
 | Template/project override becomes prompt injection | high | trust-tier/narrowing policy, immutable provenance, malicious override tests |
 | Stale DAG branch restores an obsolete execution/store seam | high | forward-port from clean baseline; semantic conflict resolution; no merge of conflicted worktree |
 | Dispatch provider/redirect policy diverges from Assignment provenance | high | one provider-family vocabulary, explicit cross-provider schema, combined dispatch-plan tests |
+| plan-loop becomes the de facto universal loop engine | high | driver-discipline fragment carries zero domain vocabulary; architecture-panel consumes it unchanged in Phase 5; one coding facade in Phase 6 instead of code-panel importing plan-loop |
+| Skill renames break existing callers or replay | medium | deprecated stubs for old skill names and old protocol id loadable until the Phase 7 compatibility window closes; replay corpus comparison |
 | Phase 09 refactor races ahead of active consumers | high | Phase 3C/I11 gate before any boundary move; behavior projection must remain identical |
 | Corrupt RunResult satisfies DAG/quorum/close | high | `interpretRunResult`-only acceptance plus corrupt-evidence replay and close-refusal tests |
 | Metrics unavailable from some providers | medium | prompt bytes and wall time are mandatory fallback denominators; unavailable token/cost is explicit |
