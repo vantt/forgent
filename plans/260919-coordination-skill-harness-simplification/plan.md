@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515` (approved candidate `1089eb347455c10164ec03ffbcbf54ae35cd2097`; reviewer Round 5 APPROVE; post-merge full suite 7677 pass / 0 fail with dev-checkout bin; candidate regressions = 0; environment note: active workspace installation release makes one R1 call-site test use stale `fgos`, classified as local activation/precondition, not source regression); Unit I13 READY
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 candidate verified (branch `coordination-skill-harness-i14-explicit-dag-close`; candidate `f857eaeab`; review APPROVE at `7d01a12e2`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; integration pending)
 Created: 2026-09-19
 Last Updated: 2026-09-26
 Mode: high-risk
@@ -1101,12 +1101,12 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I13 — verify import graph, compatibility, performance, and full suite
   capability: code:test
   depends-on: I12
-  status: READY (Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`)
+  status: VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`
   stop: consumer behavior or full-suite baseline regresses
 - unit: I14 — remove automatic close from DAG-declared coordination requests
   capability: code:implement
   depends-on: I13
-  status: PROPOSED (owner decision 2026-09-26: explicit close has no exception)
+  status: CANDIDATE_VERIFIED (branch `coordination-skill-harness-i14-explicit-dag-close`; candidate `f857eaeab`; review APPROVE at `7d01a12e2`; focused matrix 210 pass / 0 fail; full suite 7684 pass / 0 fail; integration pending)
   scope: `runCoordinationUseCase` in `src/verbs/coordination/run.mjs` attempts
     `closeSessionByQuorum` for any DAG-declared request with no partial outcome
     or caveat, even without `request.close`/a `close` step; the non-DAG path

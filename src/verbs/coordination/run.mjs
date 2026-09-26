@@ -913,9 +913,10 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
   const quorumBeforeClose = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;
+  const explicitCloseRequested = Boolean(request.close === true || (request.steps ?? []).some((s) => s.type === 'close'));
   const shouldAttemptClose = dagDeclaration
-    ? (!hasPartialDagOutcome && !hasDagCaveat)
-    : (request.close === true || (request.steps ?? []).some((s) => s.type === 'close'));
+    ? (explicitCloseRequested && !hasPartialDagOutcome && !hasDagCaveat)
+    : explicitCloseRequested;
 
   if (dagDeclaration && hasDagCaveat) {
     closeRefusalReason = 'recheck-required: concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats';
@@ -972,7 +973,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     status,
     closed,
     ...(hasDagCaveat ? { caveated: true } : {}),
-    closeAttempted: dagDeclaration ? (!hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
+    closeAttempted: dagDeclaration ? (explicitCloseRequested && !hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     ...(fanOutFailure !== null ? { fanOutFailure } : {}),
     quorum: finalQuorum,
