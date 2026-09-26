@@ -284,7 +284,17 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
     console.log('✓ Diff check and forbidden legacy edit checks passed');
 
     if (!skipFullSuite) {
-      console.log('\n[Check 9/9] Running full npm test suite...');
+      console.log('\n[Check 9/9] Building clean-worktree Rust release binaries, then running full npm test suite...');
+      const rustBuild = runOrThrow('cargo', ['build', '--release', '--workspace'], {
+        cwd: tempWorktreeDir,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        maxBuffer: 80 * 1024 * 1024,
+      });
+      receipt.checks.rustReleaseBuild = {
+        passed: true,
+        command: 'cargo build --release --workspace',
+        outputSha256: sha256(Buffer.from(`${rustBuild.stdout || ''}\n${rustBuild.stderr || ''}`)),
+      };
       const logPath = path.join(os.tmpdir(), `phase02-full-suite-${Date.now()}.log`);
       const startedAt = new Date().toISOString();
       const full = spawnSync('npm', ['test'], { cwd: tempWorktreeDir, encoding: 'utf8', maxBuffer: 80 * 1024 * 1024 });
