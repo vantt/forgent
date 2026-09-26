@@ -110,7 +110,7 @@ function fileArtifact(filePath) {
 }
 
 function readJson(filePath) {
-  return loadShardedJsonArtifact(filePath);
+  return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false });
 }
 
 function byteCompare(actualPath, expectedPath, label) {

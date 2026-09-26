@@ -439,10 +439,13 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
 }
 
 function loadJson(filePath) {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`File not found: ${filePath}`);
-  }
-  return loadShardedJsonArtifact(filePath);
+  if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
+  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function loadInventory(filePath) {
+  if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
+  return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false });
 }
 
 export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json';
@@ -465,7 +468,7 @@ export function runCli(argv, cwd = process.cwd()) {
   let vocabulary;
   let identityRegistry;
   try {
-    inventory = loadJson(inventoryPath);
+    inventory = loadInventory(inventoryPath);
     vocabulary = loadJson(vocabularyPath);
     identityRegistry = loadJson(identityRegistryPath);
   } catch (err) {
