@@ -95,15 +95,29 @@ export function validateStructure(inventory) {
     findings.push({ type: 'missing-claim-ledger', message: 'Inventory must include top-level claimLedger array' });
   } else {
     const claimsById = new Map();
+    const requiredClaimFields = ['claimId', 'sourceId', 'sourcePath', 'sourceAnchor', 'sourceDigest', 'targetOwner', 'targetAnchor', 'claimKind', 'authorityKind', 'status', 'relations', 'decisionRefs', 'evidenceLinks', 'disposition', 'reviewStatus'];
+    const statusEnum = new Set(['current', 'future', 'historical']);
     for (const claim of inventory.claimLedger) {
       if (!claim?.claimId || claimsById.has(claim.claimId)) findings.push({ type: 'claim-ledger-duplicate', message: `claimLedger contains missing or duplicate claimId ${claim?.claimId || '<missing>'}` });
       if (claim?.claimId) claimsById.set(claim.claimId, claim);
+      for (const field of requiredClaimFields) {
+        if (!(field in (claim || {}))) findings.push({ type: 'malformed-claim', message: `claim ${claim?.claimId || '<missing>'}: missing required plan §6.2 field ${field}` });
+      }
+      if (claim?.status && !statusEnum.has(claim.status)) findings.push({ type: 'invalid-claim-status', message: `claim ${claim.claimId}: status ${claim.status} is not one of current, future, historical` });
+      for (const arrayField of ['relations', 'decisionRefs', 'evidenceLinks']) {
+        if (claim && arrayField in claim && !Array.isArray(claim[arrayField])) findings.push({ type: 'malformed-claim', message: `claim ${claim.claimId || '<missing>'}: ${arrayField} must be an array` });
+      }
     }
     if (inventory.claimLedger.length !== itemClaimIds.length) findings.push({ type: 'claim-ledger-mismatch', message: `claimLedger length (${inventory.claimLedger.length}) does not match total item claimIds (${itemClaimIds.length})` });
     for (const { claimId, path: itemPath } of itemClaimIds) {
       const claim = claimsById.get(claimId);
       if (!claim) findings.push({ type: 'claim-ledger-missing-id', path: itemPath, message: `${itemPath}: claimId ${claimId} not found exactly once in top-level claimLedger` });
-      else if (claim.sourceId && claim.sourceId !== itemsByPath.get(itemPath)?.sourceId) findings.push({ type: 'claim-source-id-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceId ${claim.sourceId}` });
+      else {
+        const item = itemsByPath.get(itemPath);
+        if (claim.sourceId && claim.sourceId !== item?.sourceId) findings.push({ type: 'claim-source-id-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceId ${claim.sourceId}` });
+        if (claim.sourcePath !== itemPath) findings.push({ type: 'claim-source-path-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourcePath ${claim.sourcePath}` });
+        if (claim.sourceDigest !== item?.sourceDigest) findings.push({ type: 'claim-source-digest-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceDigest ${claim.sourceDigest}` });
+      }
     }
   }
 
@@ -120,7 +134,7 @@ export function validateStructure(inventory) {
     for (const { edgeId, path: itemPath } of itemConsumerIds) {
       const edge = edgesById.get(edgeId);
       if (!edge) findings.push({ type: 'consumer-edge-missing-id', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} not found exactly once in top-level consumerEdges` });
-      else if (edge.targetPath !== itemPath) findings.push({ type: 'consumer-edge-target-mismatch', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} targets ${edge.targetPath}` });
+      else if (edge.targetPath && edge.targetPath !== itemPath) findings.push({ type: 'consumer-edge-target-mismatch', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} targets ${edge.targetPath}` });
     }
   }
 
@@ -134,11 +148,12 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
   claimKinds.add('unclassified');
   const RECOGNIZED_FILE_CLASSES = new Set(['maintained-authority', 'retained-source', 'generated', 'history-evidence']);
   const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
+  const switchboardBackedTargetOwners = new Set((inventory.items || [])
+    .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource))
+    .map((item) => item.path));
   const claimsBySourcePath = new Map();
-  const itemBySourceId = new Map((inventory.items || []).map((item) => [item.sourceId, item]));
   for (const claim of inventory.claimLedger || []) {
-    const item = itemBySourceId.get(claim.sourceId);
-    const sourcePath = item?.path || claim.sourcePath;
+    const sourcePath = claim.sourcePath;
     claimsBySourcePath.set(sourcePath, (claimsBySourcePath.get(sourcePath) || []).concat(claim));
   }
 
@@ -170,10 +185,13 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
         findings.push({ type: 'malformed-claim', path: item.path, message: `${item.path}: claim row must be an object` });
         continue;
       }
-      for (const field of ['claimId', 'sourceId', 'sourceAnchor', 'claimKind', 'authorityKind', 'status', 'disposition']) {
+      for (const field of ['claimId', 'sourceId', 'sourcePath', 'sourceAnchor', 'sourceDigest', 'claimKind', 'authorityKind', 'status', 'disposition', 'reviewStatus']) {
         if (typeof claim[field] !== 'string' || claim[field].length === 0) {
           findings.push({ type: 'malformed-claim', path: item.path, message: `${item.path}: claim ${claim.claimId || '<unknown>'} missing ${field}` });
         }
+      }
+      if (!['current', 'future', 'historical'].includes(claim.status)) {
+        findings.push({ type: 'invalid-claim-status', path: item.path, message: `${item.path}: claim ${claim.claimId || '<unknown>'} status must be current, future, or historical` });
       }
       if (!claimKinds.has(claim.claimKind)) {
         findings.push({ type: 'unknown-claim-kind', path: item.path, message: `${item.path}: claim ${claim.claimId} claimKind "${claim.claimKind}" is not in vocabulary` });
@@ -182,9 +200,14 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
         findings.push({ type: 'malformed-claim-links', path: item.path, message: `${item.path}: claim ${claim.claimId} must carry relations array` });
       }
       if (RETAINED_CLAIM_DISPOSITIONS.has(claim.disposition)) {
-        const owners = [claim.proposedOwner].filter((v, idx, arr) => typeof v === 'string' && v.length > 0 && arr.indexOf(v) === idx);
+        const owners = [claim.targetOwner].filter((v, idx, arr) => typeof v === 'string' && v.length > 0 && arr.indexOf(v) === idx);
         if (owners.length !== 1) {
-          findings.push({ type: 'retained-claim-owner-count', path: item.path, message: `${item.path}: claim ${claim.claimId} must have exactly one credible proposed owner, found ${owners.length}` });
+          findings.push({ type: 'retained-claim-owner-count', path: item.path, message: `${item.path}: claim ${claim.claimId} must have exactly one targetOwner, found ${owners.length}` });
+        } else if (!switchboardBackedTargetOwners.has(owners[0])) {
+          findings.push({ type: 'retained-claim-owner-not-switchboard-backed', path: item.path, message: `${item.path}: claim ${claim.claimId} targetOwner ${owners[0]} is not a real switchboard-backed target owner` });
+        }
+        if (typeof claim.targetAnchor !== 'string' || claim.targetAnchor.length === 0) {
+          findings.push({ type: 'retained-claim-target-anchor-missing', path: item.path, message: `${item.path}: claim ${claim.claimId} must have targetAnchor for retained disposition ${claim.disposition}` });
         }
       }
     }

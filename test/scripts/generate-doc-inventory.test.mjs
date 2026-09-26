@@ -19,6 +19,10 @@ import {
   classifyConsumerKind,
   parseLsTreeLong,
 } from '../../scripts/generate-doc-inventory.mjs';
+import {
+  validateStructure,
+  validateAgainstVocabulary,
+} from '../../scripts/check-doc-inventory-gates.mjs';
 
 // A minimal fixture modeled on the real
 // plans/260925-documentation-authority-unification/transitional-switchboard.json
@@ -40,6 +44,8 @@ const FIXTURE_SWITCHBOARD = {
     {
       area: 'Agent coordination',
       authorityStatus: 'promoted',
+      entryPoint: 'docs/platform/agent-coordination/README.md',
+      canonicalRoutes: ['docs/platform/agent-coordination/README.md'],
       currentRoutes: [
         { scope: 'promoted-portal-navigation-and-status', route: 'docs/platform/agent-coordination/README.md', authorityStatus: 'promoted', role: 'Target portal owns navigation and status summary' },
         { scope: 'retained-contracts-schemas-and-proofs', route: 'docs/architect/agent-coordination/**', authorityStatus: 'legacy-current', role: 'Exact accepted contracts, schemas, ADRs, and verification remain until explicitly superseded' },
@@ -234,7 +240,8 @@ test('buildInventoryRow: end-to-end row for a promoted portal file requires a ta
   assert.equal(row.claimKind, 'navigation');
   assert.equal(row.headingCount, 1);
   assert.equal(row.claims.length >= 1, true);
-  assert.equal(row.claims[0].proposedOwner, 'docs/platform/agent-coordination/README.md');
+  assert.equal(row.claims[0].targetOwner, 'docs/platform/agent-coordination/README.md');
+  assert.equal(row.claims[0].status, 'current');
 });
 
 test('buildInventoryRow: end-to-end row for an unmapped gap requires a rationale and no target owner', () => {
@@ -244,6 +251,35 @@ test('buildInventoryRow: end-to-end row for an unmapped gap requires a rationale
   assert.equal(row.proposedDisposition, 'unknown-blocking');
   assert.equal(row.proposedTargetOwner, null);
   assert.equal(typeof row.proposedRationale, 'string');
+});
+
+test('buildInventoryRow: claim ledger rows carry every plan §6.2 field and enum status', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = '```txt\nDocument type: Area portal\n```\n\n# Agent Coordination\n';
+  const row = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: 'd'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const claim = row.claims[0];
+  for (const field of ['claimId', 'sourceId', 'sourcePath', 'sourceAnchor', 'sourceDigest', 'targetOwner', 'targetAnchor', 'claimKind', 'authorityKind', 'status', 'relations', 'decisionRefs', 'evidenceLinks', 'disposition', 'reviewStatus']) {
+    assert.equal(Object.hasOwn(claim, field), true, `missing ${field}`);
+  }
+  assert.match(claim.status, /^(current|future|historical)$/);
+  assert.equal(claim.sourcePath, 'docs/platform/agent-coordination/README.md');
+});
+
+test('buildInventoryRow: source and claim ids are independent of source path for identical non-duplicate content', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = '# Portable\n\nPortable text with enough detail.';
+  const a = buildInventoryRow('docs/unmapped-a.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const b = buildInventoryRow('docs/unmapped-b.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  assert.equal(a.sourceId, b.sourceId);
+  assert.deepEqual(a.claimIds, b.claimIds);
+});
+
+test('buildInventoryRow: identical claim content inside one source gets explicit duplicate lineage instead of silent collision', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = ['Repeated paragraph with enough detail to become a claim.', '', 'Repeated paragraph with enough detail to become a claim.'].join('\n');
+  const row = buildInventoryRow('docs/repeated.md', { content, blobSha: 'f'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  assert.equal(new Set(row.claimIds).size, row.claimIds.length);
+  assert.equal(row.claims[1].relations.some((r) => r.type === 'same-source-identical-content-duplicate'), true);
 });
 
 test('extractMarkdownConservationUnits: emits headings and unheaded blocks for conservation', () => {
@@ -276,11 +312,12 @@ test('classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and
   assert.equal(classifyConsumerKind('README.md', 'docs/specs/runner.md'), 'literal');
 });
 
-test('buildInventoryRow: retained platform claims get exactly one proposed owner', () => {
+test('buildInventoryRow: current source route is not automatically its own target owner', () => {
   const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
   const row = buildInventoryRow('docs/specs/runner.md', { content: '# Runner\n\nContract text with enough detail.', blobSha: 'c'.repeat(40), blobSize: 40, switchboardIndex: index });
-  assert.equal(row.proposedDisposition, 'merge');
-  assert.equal(row.claims.every((c) => c.proposedOwner === 'docs/specs/runner.md'), true);
+  assert.equal(row.proposedDisposition, 'unknown-blocking');
+  assert.equal(row.proposedTargetOwner, null);
+  assert.equal(row.claims.every((c) => c.targetOwner === null), true);
 });
 
 test('parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob entries', () => {
@@ -298,4 +335,34 @@ test('parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob en
     { path: 'docs/README.md', mode: '100644', blobSha: shaA, size: 123 },
     { path: 'docs/specs/runner.md', mode: '100644', blobSha: shaB, size: 45 },
   ]);
+});
+
+test('validateStructure: rejects missing plan §6.2 fields and invalid claim status', () => {
+  const findings = validateStructure({
+    items: [{ path: 'docs/x.md', sourceId: 'src_a', sourceDigest: 'digest', area: 'A', authorityStatus: 'candidate', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'unknown-blocking', headings: [], claimIds: ['claim_a'], claimCount: 1, consumerEdgeIds: [], consumerEdgeCount: 0, consumerKinds: [] }],
+    claimLedger: [{ claimId: 'claim_a', sourceId: 'src_a', sourcePath: 'docs/x.md', sourceAnchor: 'x', sourceDigest: 'digest', claimKind: 'navigation', authorityKind: 'candidate', status: 'future-or-current', disposition: 'unknown-blocking', reviewStatus: 'open-blocking', relations: [], decisionRefs: [] }],
+    consumerEdges: [],
+    summary: { scannedFilesCount: 1 },
+  });
+  assert.equal(findings.some((f) => f.type === 'malformed-claim' && f.message.includes('evidenceLinks')), true);
+  assert.equal(findings.some((f) => f.type === 'invalid-claim-status'), true);
+});
+
+test('validateAgainstVocabulary: retained claim owner must be a real switchboard-backed target owner', () => {
+  const vocabulary = {
+    sourceDispositions: [{ id: 'merge', requiresTargetOwner: true, allowedFileClasses: ['maintained-authority'] }],
+    claimKinds: [{ id: 'navigation' }],
+  };
+  const inventory = {
+    items: [
+      { path: 'docs/current.md', sourceId: 'src_a', sourceDigest: 'digest', area: 'A', authorityStatus: 'legacy-current', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'merge', proposedTargetOwner: 'docs/current.md', proposedRationale: null, switchboardSource: 'scopedRoute' },
+      { path: 'docs/fallback.md', sourceId: 'src_b', sourceDigest: 'digest2', area: 'A', authorityStatus: 'legacy-current', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'merge', proposedTargetOwner: 'docs/current.md', proposedRationale: null, switchboardSource: 'directory-heuristic' },
+    ],
+    claimLedger: [
+      { claimId: 'claim_ok', sourceId: 'src_a', sourcePath: 'docs/current.md', sourceAnchor: 'x', sourceDigest: 'digest', targetOwner: 'docs/current.md', targetAnchor: 'x', claimKind: 'navigation', authorityKind: 'legacy-current', status: 'current', relations: [], decisionRefs: [], evidenceLinks: [], disposition: 'merge', reviewStatus: 'pending-independent-review' },
+      { claimId: 'claim_bad', sourceId: 'src_b', sourcePath: 'docs/fallback.md', sourceAnchor: 'x', sourceDigest: 'digest2', targetOwner: 'docs/fallback.md', targetAnchor: 'x', claimKind: 'navigation', authorityKind: 'legacy-current', status: 'current', relations: [], decisionRefs: [], evidenceLinks: [], disposition: 'merge', reviewStatus: 'pending-independent-review' },
+    ],
+  };
+  const findings = validateAgainstVocabulary(inventory, vocabulary);
+  assert.equal(findings.some((f) => f.type === 'retained-claim-owner-not-switchboard-backed' && f.message.includes('docs/fallback.md')), true);
 });

@@ -42,6 +42,23 @@ they are not authoritative Phase 02 verification evidence.
 - `git diff --check` across `BASE..FIXED_END` and forbidden legacy/platform authority edit checks;
 - full `npm test` unless `--skip-full-suite` is passed.
 
+## Review Remediation Local Evidence (Cell A)
+
+Focused remediation checks in the moving worktree (not full-suite, not authoritative runner evidence):
+
+```bash
+node --test test/scripts/generate-doc-inventory.test.mjs
+node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-01-20260926 \
+  --json-out plans/260925-documentation-authority-unification/phase-02-doc-inventory.json \
+  --md-out plans/260925-documentation-authority-unification/phase-02-doc-inventory.md
+# fresh regeneration to temp files, cmp against committed artifacts: byte-identical
+node scripts/check-doc-inventory-gates.mjs
+```
+
+Results: focused tests passed (37/37), generator byte identity passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. Artifact sizes remain below 100 MB per file: JSON 99,470,703 bytes; Markdown 693,489 bytes. SHA-256: JSON `e7cc51650ca55f8590880b2705af7ce9ee1342447d3832d69ffe17807b90f587`; Markdown `329fb921e6190603a548e2673dd79c4987389bfa37c9ffbaacb0c566515ea03e`.
+
+No full suite was run in this remediation cell.
+
 ## Last Local Evidence Before Runner Canonicalization
 
 The pre-runner Phase 02 local evidence remains preserved as historical context:

@@ -55,11 +55,12 @@ Related:
 | Value | Count |
 |---|---:|
 | `retain-as-evidence` | 1703 |
-| `unknown-blocking` | 1043 |
-| `merge` | 998 |
+| `unknown-blocking` | 1045 |
+| `merge` | 682 |
 | `reclassify-out-of-platform-scope` | 548 |
-| `promote` | 6 |
+| `split` | 316 |
 | `regenerate-from-source` | 5 |
+| `promote` | 4 |
 | `defer-with-owner` | 2 |
 
 ### Consumer Kind
@@ -2094,505 +2095,505 @@ Related:
 
 ## Claim Ledger Sample (first 500 rows)
 
-| Claim | Source | Anchor | Kind | Disposition | Proposed owner |
+| Claim | Source | Anchor | Kind | Disposition | Target owner |
 |---|---|---|---|---|---|
-| `claim_fcbcb5f8f0a803b7a97499e9` | `undefined` | `forgent` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_b3768522ec846942dda5fb38` | `undefined` | `unheaded-block-1` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_1af556c735d3f6a2b6067102` | `undefined` | `unheaded-block-2` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_01f34bba02eb0b54c737c8c5` | `undefined` | `unheaded-block-3` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_8a91560497be8ba62334bd3f` | `undefined` | `product-priority-order-d-adr0030-docsspecsrunnermd` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_0c9411c2f3b6820672e7323b` | `undefined` | `unheaded-block-4` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_7c6529945db731bb8bdd5754` | `undefined` | `unheaded-block-5` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_a908c8e0d2b922a2519387a7` | `undefined` | `unheaded-block-6` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_f286d51c38bc291c61b1a352` | `undefined` | `ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_2d8dd60770fc483c1316fe7d` | `undefined` | `unheaded-block-7` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_9968904b0b0223505ae60fff` | `undefined` | `unheaded-block-8` | `vision` | `merge` | `AGENTS.md` |
-| `claim_a97a91d3332f0677539cd415` | `undefined` | `before-touching-code` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_8bf0229e542caa45ac7d8d37` | `undefined` | `unheaded-block-9` | `specification` | `merge` | `AGENTS.md` |
-| `claim_96cccd21dc02129c2c41a61e` | `undefined` | `definition-of-done-platform-foundations-l5` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_41f81f2ebf4d07aa74465697` | `undefined` | `unheaded-block-10` | `historical-context` | `merge` | `AGENTS.md` |
-| `claim_24846e3e496466de33a68a46` | `undefined` | `unheaded-block-11` | `specification` | `merge` | `AGENTS.md` |
-| `claim_2228ce6e7ed395e1ed094d1b` | `undefined` | `legacy-node-cli-ownership-boundary` | `contract` | `merge` | `AGENTS.md` |
-| `claim_1152c5b0d83029a95da9abed` | `undefined` | `unheaded-block-12` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_793d2c4a5d5a4379761c8683` | `undefined` | `installsetupdoctor-gate` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_0c069cc1aef1e56113028697` | `undefined` | `unheaded-block-13` | `vision` | `merge` | `AGENTS.md` |
-| `claim_99d22a9e209911e0268773c2` | `undefined` | `unheaded-block-14` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_d2bdabb559798cbbc18916ee` | `undefined` | `changing-a-locked-law` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_a5bb3ae39e22c654083cf6c1` | `undefined` | `unheaded-block-15` | `decision` | `merge` | `AGENTS.md` |
-| `claim_b0d8f06225b604ed150720cb` | `undefined` | `rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_e53c9c06933b8d69e9c13443` | `undefined` | `unheaded-block-16` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_b33498167a5d804173146a04` | `undefined` | `unheaded-block-17` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_ee3f5db75a3beb3f01c025df` | `undefined` | `dispatch-routing-work-to-a-executor` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_702aaf4e349de8388fbf314b` | `undefined` | `unheaded-block-18` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_c02e4aa5e898231fca586970` | `undefined` | `unheaded-block-19` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_15f7874dce192ebcf4be08d8` | `undefined` | `unheaded-block-20` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_0a19e67760d19becff7dd156` | `undefined` | `unheaded-block-21` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_fc05d71665f6b4aa4f896d03` | `undefined` | `unheaded-block-22` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_c8e219bf4bbe6cc4965f068e` | `undefined` | `unheaded-block-23` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_76123bc387ac2a5cf4a0ec47` | `undefined` | `unheaded-block-24` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_ae472202d9e9093d7cf7de85` | `undefined` | `unheaded-block-25` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_c987338f62910008b97c499e` | `undefined` | `starting-the-herdr-gateway-one-door-never-a-raw-process` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_aee95e8e73d9ba0b771fbdca` | `undefined` | `unheaded-block-26` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_29467f39d5b0de81deb5ff97` | `undefined` | `documentation-viewing-mdview` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_08eaaee2f7614c7bdd20c997` | `undefined` | `unheaded-block-27` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_1413cd0253c9f2a09ec032fb` | `undefined` | `using-mcp-preferred` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_11a850ee67973cd2a61fc9f8` | `undefined` | `unheaded-block-28` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_09efe326c997640911033d17` | `undefined` | `unheaded-block-29` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_818a19b156b65c85385abaec` | `undefined` | `unheaded-block-30` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_b1807130e18c6f9225ad9210` | `undefined` | `using-cli-fallback` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_96bcff283fa1d6e474faaa5c` | `undefined` | `unheaded-block-31` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_f552de537ca6de5511706f84` | `undefined` | `when-to-render` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_959b973d0a1e52b5aee8e3a4` | `undefined` | `unheaded-block-32` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_07ba90abef7a9e0716c367da` | `undefined` | `unheaded-block-33` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_3897ede4c47efb7176f399a1` | `undefined` | `gitnexus-code-intelligence` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_81c4c25685cd47cccd2335d9` | `undefined` | `unheaded-block-34` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_7bd68a52543755bce2ff1310` | `undefined` | `unheaded-block-35` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_5fa8fc4f5b23880b00f2ccf6` | `undefined` | `always-do` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_776699ab36c1b11723c8d13d` | `undefined` | `unheaded-block-36` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_53101cb76cc2d13c2905beb0` | `undefined` | `never-do` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_fe099f5eb95e96714694cd2d` | `undefined` | `unheaded-block-37` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_47a1d455d52810b6a33654e3` | `undefined` | `resources` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_1347695fcbd23cfa9f522761` | `undefined` | `unheaded-block-38` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_96b7052cd38bb4d83609ba25` | `undefined` | `cli` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_58291acf8eb92d59dfb8c016` | `undefined` | `unheaded-block-39` | `architecture` | `merge` | `AGENTS.md` |
-| `claim_878e43c2df206d38c076259a` | `undefined` | `unheaded-block-40` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_856bc74ac293e264c98023d1` | `undefined` | `fgos-effective-instructions` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_5986e5b0d9dd9821e1f62737` | `undefined` | `law` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_aba74d2b0fea3d99424db9c0` | `undefined` | `platform-operating-laws` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_a7b36791f86823851169f857` | `undefined` | `unheaded-block-41` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_d367fe713c3b2628c4aa9d8e` | `undefined` | `platform-operating-laws-1` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_705be4a7c5b572c53dd4e083` | `undefined` | `unheaded-block-42` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_95692f55bc75410a2d8b80ae` | `undefined` | `unheaded-block-43` | `specification` | `merge` | `AGENTS.md` |
-| `claim_56647922df17b8809da17d11` | `undefined` | `unheaded-block-44` | `verification` | `merge` | `AGENTS.md` |
-| `claim_11a7553771fcb29e24428e10` | `undefined` | `unheaded-block-45` | `unclassified` | `merge` | `AGENTS.md` |
-| `claim_1799b53bcfc3057af8a1c8a0` | `undefined` | `project-rules` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_ddf2c3f14d278d169e7919f9` | `undefined` | `unheaded-block-1` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_85f83d0816c6e51be1a2d7d6` | `undefined` | `impact-analysis-capability-gate` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_b89bc0b1a41139c149dd7b85` | `undefined` | `unheaded-block-2` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_c7c87b454c501c384384929c` | `undefined` | `unheaded-block-3` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_0a055b47e081a94c12655ef1` | `undefined` | `unheaded-block-4` | `verification` | `merge` | `CLAUDE.md` |
-| `claim_5d7b10f5fe93919609160f2a` | `undefined` | `unheaded-block-5` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_eecf178df68fd6586eaf8bb5` | `undefined` | `unheaded-block-6` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_cf665070569e1942b757d911` | `undefined` | `documentation-viewing-mdview` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_8d1f5b8884020c12eaaf3758` | `undefined` | `unheaded-block-7` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_d0aea399f807f9c3498b07cd` | `undefined` | `using-mcp-preferred` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_591a4a8a5b56638fa5da1f04` | `undefined` | `unheaded-block-8` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_18fc989f488ce783e6c448e3` | `undefined` | `unheaded-block-9` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_b1261d9361b862ea2479e0f6` | `undefined` | `unheaded-block-10` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_b627b66af3d667bc28949688` | `undefined` | `using-cli-fallback` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_e28eb0186bde44523ed8170b` | `undefined` | `unheaded-block-11` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_349b68b7bd2f7ae6aa3b2dce` | `undefined` | `when-to-render` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_90eaefc2dccdf05f19ffa03c` | `undefined` | `unheaded-block-12` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_9d00a6a920420e78bd27cdd0` | `undefined` | `unheaded-block-13` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_d94be1491edb1bb3f463bcce` | `undefined` | `gitnexus-code-intelligence` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_12b2336a92b2b6c30b9c06c1` | `undefined` | `unheaded-block-14` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_3ffc21b585b238561eda9d15` | `undefined` | `unheaded-block-15` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_50a5821f1f6f5b783f50a095` | `undefined` | `always-do` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_eebcd46fadbd864ffcb93da4` | `undefined` | `unheaded-block-16` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_73c39000f98df4575fa024a4` | `undefined` | `never-do` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_4dd3a082050662f97806c54a` | `undefined` | `unheaded-block-17` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_e5ba8ddbe262ccf841077da9` | `undefined` | `resources` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_89018f85f8c8f9066d4ebc48` | `undefined` | `unheaded-block-18` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_3a6ca2a56a5412dfeccc521f` | `undefined` | `cli` | `unclassified` | `merge` | `CLAUDE.md` |
-| `claim_397d462b78d3ffc7f966e216` | `undefined` | `unheaded-block-19` | `architecture` | `merge` | `CLAUDE.md` |
-| `claim_fbcdfa23b112cdf72f26ef30` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5c01bb44374af20396a732f5` | `undefined` | `coordination-recovery-planning-and-session-continuation` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8b7650a052f91c7c4b694af5` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fd42deb7708278c52cabe3d0` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_708be36c808964a89ccae864` | `undefined` | `1-meaning-and-boundary` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cc15cb868bc1940a0c5995b1` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c4d649daeb91cc761ab4fbab` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_55c510fc134a29f52a5637e6` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_58f06cc926acc7258e30fcc2` | `undefined` | `2-snapshot-contract` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_81cd6a2700561e347a3439bc` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_774cad515e116f2f70d2141b` | `undefined` | `unheaded-block-8` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5d35c8ccb30c82253a75c681` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e144c9644b06e9022a77c72f` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_04b5d7952d2ba9b99bba3419` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_366b0e8d140f0c41aacaf0fd` | `undefined` | `unheaded-block-12` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_dd763d9134cbc9b286cbca9f` | `undefined` | `3-typed-plan-and-priority` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fc1651efd148799e4fb63844` | `undefined` | `unheaded-block-13` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7c4b9951d18ac372d1b82d8f` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8c3a272163c17ff4d5a581f2` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_aa16b3e903ea03ee911e70bd` | `undefined` | `unheaded-block-16` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a5fd60a277992217089690f5` | `undefined` | `4-action-identity-and-apply` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3fc8ebca081ecb620e8bfbf0` | `undefined` | `unheaded-block-17` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_60174d0cfb845c9d421b42d5` | `undefined` | `unheaded-block-18` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5fd95808e02aea8ac9ccd633` | `undefined` | `unheaded-block-19` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d20c3fe2162aab9a30ad70a4` | `undefined` | `unheaded-block-20` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bf1eb111d834b808425dbd4f` | `undefined` | `5-protocol-transfer-declaration` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fc5e599568c6b17589c4dd71` | `undefined` | `unheaded-block-21` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c5d91c23cd20661251614e19` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c026db71f778d27b877b0e99` | `undefined` | `unheaded-block-23` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_39ba19e58591c485b63bee9e` | `undefined` | `unheaded-block-24` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4fe7db893deedc5e4b105d89` | `undefined` | `unheaded-block-25` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f0118c2987a7fe470ad48929` | `undefined` | `6-transfer-record-and-transaction` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0b67654b7a043570c3103910` | `undefined` | `unheaded-block-26` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6ac6fd00d0b5a747331ef6f6` | `undefined` | `unheaded-block-27` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cc9580bd74bec6c2c7864e28` | `undefined` | `unheaded-block-28` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ee0abcd8a8a675efd44cf62b` | `undefined` | `unheaded-block-29` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_afb8de446eabe0df5401a89f` | `undefined` | `unheaded-block-30` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e400b3195a40e6ab6bf9f018` | `undefined` | `unheaded-block-31` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f871bacc7c97b4328db689cd` | `undefined` | `unheaded-block-32` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_18d0212d1480c1a502a4f504` | `undefined` | `unheaded-block-33` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_84eea8da1771a30e09ca33bc` | `undefined` | `unheaded-block-34` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_053f2bdec3054eb98250b21a` | `undefined` | `7-crash-and-refusal-table` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_773261ce0b0908047995c840` | `undefined` | `unheaded-block-35` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8d007382c3f58e980b9eb0ff` | `undefined` | `unheaded-block-36` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c0a279d86deee246660c20f3` | `undefined` | `8-first-profile-and-future-scope` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_02e8aa6fdd2ad6920539bd69` | `undefined` | `unheaded-block-37` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_858c12b40ff7d95166965fa1` | `undefined` | `unheaded-block-38` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_746d389350a32202ad0e0572` | `undefined` | `unheaded-block-39` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6d080fdadf186ec814a26245` | `undefined` | `9-implementation-and-proof` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_46ef8872e657d528e61cd12c` | `undefined` | `unheaded-block-40` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cb35dd0d5678e918ad73308c` | `undefined` | `unheaded-block-41` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_22a5f23f521f21f1b95903ac` | `undefined` | `coordination-foundation-baseline` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3a58021b0e7e3f39f04d1f10` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_884519f279d799798f543e37` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_21cb1b4927bc09b08d516e2d` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_91273e9983ea3a8aac913a93` | `undefined` | `purpose` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_815564e3e34c4603e0c2f0d2` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cedf215beff7f53377beac22` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b8519eeaf198d92b855c4107` | `undefined` | `promotion-map` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_79281a074dc69820f3d121ae` | `undefined` | `unheaded-block-6` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_72559656534e74a67b164c4e` | `undefined` | `accepted-shape` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_879ee89c5628e50fda813982` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f1e80c3b026315861085c813` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b1080784c100c7e76f42b82d` | `undefined` | `accepted-invariants` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9052b28ed37bc93ac3111a0e` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d1cd4746e4f4f8b7d04d3bb3` | `undefined` | `delivered-surface` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a6cc43fb9b84ba53ca09717e` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8439f57f3373e2fb165f93e3` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5e4cddd0c102cf63839945c9` | `undefined` | `deliberately-not-promoted` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8f6539edcf837a9099f581ca` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7126189d7e290a7f951e5121` | `undefined` | `unheaded-block-13` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8819c5ce63a1e65769cdf8b8` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8031d8fb7e852ba64f6ab0d8` | `undefined` | `unheaded-block-15` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c9db4f7cd7581820962b6b95` | `undefined` | `reading-rule` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_941e81ae15b100ba3c8bf5d9` | `undefined` | `unheaded-block-16` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_547d5dd5d1bcec6c4e40d584` | `undefined` | `dispatch-control-plane` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_dcc8707ca0518bb92655995d` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6bb1b8639028a86622db0127` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ddf3de03a0360a079d4ebfc1` | `undefined` | `responsibility` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_359b9d2f744f80cbd6fa32df` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_be011f171919653d18a55fcd` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4a854d8bbf42ecaff604d02e` | `undefined` | `flow` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9e970a931d48c32c3df5815e` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8f65a7bb017b4b1322970f14` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2b980221803414a37be1b823` | `undefined` | `routing-identities` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_48d0b6361a885ceb613fad94` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7b9d3f105c34fbb8e4d3f8a9` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7945c3ed04cce5cdc65a6566` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a8b476b4b3cd07054b99bcc6` | `undefined` | `unheaded-block-10` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_541a7f4b64ec49de02072d31` | `undefined` | `unheaded-block-11` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9bc5abf3955673532d9f6db7` | `undefined` | `contracts` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d7897d18565e957444b07d50` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ab38322f75c985651c88a50e` | `undefined` | `dispatchrequest-outer-core` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_998822317be737106959ccde` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1721839ee98b0eed15fd772b` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3141232fd52c07e316dd76cd` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8cb4da10edc9554fe663381d` | `undefined` | `policypatch` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f9fb1b8e666b3c441caadb0d` | `undefined` | `unheaded-block-16` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_76f16e7d7238fad7a74d55e6` | `undefined` | `unheaded-block-17` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5438966837f10ed5899fa8e0` | `undefined` | `unheaded-block-18` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d7317a3187e43c3d2a70ecd8` | `undefined` | `unheaded-block-19` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7bb077d340c17c12f85b1d12` | `undefined` | `unheaded-block-20` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_791c2f44630e89ec2a146309` | `undefined` | `dispatchplan-core-runtime` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1386d132e9c90c61943c3e04` | `undefined` | `unheaded-block-21` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bf5a2aaf0e76bbacb11e7d41` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_813d6d04a646e4c9d5cb96a1` | `undefined` | `unheaded-block-23` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_54d6c6b38f5d829c119fd159` | `undefined` | `unheaded-block-24` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6ea5d8203c0c7c850f381795` | `undefined` | `unheaded-block-25` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7d6e1302c5c8d41f8e2e71da` | `undefined` | `unheaded-block-26` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c09cc1b2b3a4b4d976ad4fa4` | `undefined` | `executor-kinds` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_978eeba880a1de50a4add1e4` | `undefined` | `unheaded-block-27` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_361ef4ae2e3eed1f2e5270eb` | `undefined` | `component-internal-ownership` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6116b140cd085ff209d2632b` | `undefined` | `unheaded-block-28` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5ba7d65c7eedc6fda5871709` | `undefined` | `unheaded-block-29` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_77ca59ec0dda0a7d418cc037` | `undefined` | `unheaded-block-30` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5d3796f9b11a7f11477d7aee` | `undefined` | `unheaded-block-31` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4aef69e1627c782a5201fc6c` | `undefined` | `component-outer-boundary-note` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e34e996ad698ac55861f2a01` | `undefined` | `unheaded-block-32` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fe758986228bff790fc11e77` | `undefined` | `governance` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d1cea27ddde772ac6d5b2230` | `undefined` | `unheaded-block-33` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9612c38c0dc9f8a4a025b47f` | `undefined` | `separation-of-concerns` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_62ef10928a9b36f777b40b03` | `undefined` | `unheaded-block-34` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5d023b5be404e6c561aac26e` | `undefined` | `unheaded-block-35` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cb6a537567ef7d59987687ae` | `undefined` | `unheaded-block-36` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4f3554645b51a24beacec42a` | `undefined` | `evidence-and-result-architecture` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a446b4a15f81ff679b34fbaf` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cb49a50130f1a601284bdfa5` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9e37535261702f85a4812cb7` | `undefined` | `principle` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cbfc346d3cee2e51b5ed2d13` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7db02bc4070922d695bcc224` | `undefined` | `evidence-sources` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_63d2e8c0854bb57c4063c779` | `undefined` | `unheaded-block-4` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_21f9c39c4bbe92a37b8cd82a` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fa4e2a84efb217bec09b3ae7` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_24175a87d8704fd87ed2270d` | `undefined` | `confidence-boundaries` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_65dd09c2b933ba2ab0229ec0` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b5bb9dab976d36dc6cbbdf7c` | `undefined` | `aggregation` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5f52d85150f1e5144451ca47` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b4c8f9798372dd45ca91754b` | `undefined` | `visibility-boundary` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_90713ec2ed37e8743374cbdd` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e59329bca2da1b221602b264` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e6d3f4b954549e830e5f17cf` | `undefined` | `executor-fallback-and-effect-eligibility` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2ba2ad261add5ec1f4ea1613` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b292a01d8bb4ee6d12a8c1ed` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_732f4c40c064914108d776ed` | `undefined` | `1-responsibility-and-inputs` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c0e7ec9dab5040b8bf1e8929` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b0ba3f7c5e1ea811c0d6f647` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ac7ace4acb5c5e9216086d35` | `undefined` | `unheaded-block-6` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_05ba227eadacc4575deb79c2` | `undefined` | `2-production-ladder-semantics` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_27e9779ab046adad0f9c6cbd` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5a51b23dcb541f51a2f45ea5` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5a46d029ca9ee6332e4fd9e3` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_601a2ed804a401640a7827d9` | `undefined` | `3-coarse-matrix-mapping` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_476e657437388a83902e64cd` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e7908937c34163c712cf5180` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_07f41f99f06db644ebb7f48b` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ae1eaf4d82a951e0893d2070` | `undefined` | `4-one-attempt-history-explicit-caps` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9ddc4106719d078c86a9fef4` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d1908fea236cb13f29448d42` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_50aff86c68e4a9e07bdf31cc` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a1921ac3c70d4690ebb2646c` | `undefined` | `unheaded-block-16` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9ea0d5631e2ec871b3199faa` | `undefined` | `unheaded-block-17` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_22d7af58ab25f9e9eed2bd69` | `undefined` | `5-effectguaranteeport` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a3e37e143b439a77dbe9b8d6` | `undefined` | `unheaded-block-18` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_13942a433bcc8ec5e62fa4c5` | `undefined` | `unheaded-block-19` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_621422655a7683874c2b0da8` | `undefined` | `unheaded-block-20` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0b209d35c8c29204ab620dc9` | `undefined` | `unheaded-block-21` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7b3075e4989bf1580a34a8af` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1c064188607c89c88a87c255` | `undefined` | `6-resolver-output-and-apply` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6428045c737600cfac2299d6` | `undefined` | `unheaded-block-23` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e69e942cd63fa3723ea6ea8c` | `undefined` | `unheaded-block-24` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d43e33d42bc1e6fd82477faf` | `undefined` | `unheaded-block-25` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b2d402e504db7ca1d33e8afe` | `undefined` | `unheaded-block-26` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6c04c3eccee6e8723bfc4fa4` | `undefined` | `unheaded-block-27` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_601a94fa9dee9badc0398183` | `undefined` | `7-proof-rollout-and-future-work` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e57f5bd5381349dd580eef3a` | `undefined` | `unheaded-block-28` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_687b0caba61956a506570038` | `undefined` | `unheaded-block-29` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_09734786addb36b1285750db` | `undefined` | `unheaded-block-30` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ba9d8c767990a060a670c546` | `undefined` | `group-thinking-trigger-surface` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a467ad9798d69b5ba04bea70` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d614d7ae13914c7bf9563d9e` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8477fcf73b5220e8110ec6bb` | `undefined` | `decision` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3fd8b0d37e03afe3fa9e00dd` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2b865601f773c1ee06881b15` | `undefined` | `unheaded-block-4` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_35d6fc7729a1fece312cd9ec` | `undefined` | `baseline-ux-audit` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b9c9254ea83aa3e50a4544b4` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_256972680f2b868eacd0cae5` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c7dab5d5df3a0fb003706280` | `undefined` | `vocabulary-evaluation` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_575c2308cb8a214e6556c5a8` | `undefined` | `unheaded-block-7` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8381633f5301d63e2bd3b0d2` | `undefined` | `surface-taxonomy` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7a282e90c24ca3c49d0617d3` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_732415fa56dad3c4699942de` | `undefined` | `unheaded-block-9` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1d63d1fcd2e86dae81a12bde` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_617ccd484af0597bb02dc5bd` | `undefined` | `happy-path-routing` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a346d82098a30d9add6a462a` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9c49a936d2d52aa7470e7c10` | `undefined` | `clarification-rules` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9a7b0cda6832bc90a9bbdc4e` | `undefined` | `unheaded-block-12` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_017dbe3d6d34b292b7712004` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_14f2195ae1e1656ae508b3ac` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0b948edc26cbcff8e363c775` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_60e5a035cc81491a63279585` | `undefined` | `core-surface-boundary` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1f210897313f0af864c49381` | `undefined` | `core-owns` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_78b8c805ab51af906802b5e7` | `undefined` | `unheaded-block-16` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0677eda529c93e535402a743` | `undefined` | `surface-owns` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0e7748de8a3c826def653395` | `undefined` | `unheaded-block-17` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_95f45dc02f32ffc7b1b5f313` | `undefined` | `forbidden-coupling` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d98bd71df1c0699e13bd7314` | `undefined` | `unheaded-block-18` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ca82a5f45cb1777f29a2c018` | `undefined` | `entry-point-choice` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d1c7f3a722d9b3f291a68b08` | `undefined` | `unheaded-block-19` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_45b554a22ac3f3c7504ff97b` | `undefined` | `alternatives-considered` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3d4fe96fc251291e43696595` | `undefined` | `a-keep-only-fgos-group-thinking` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6a6ffc6a935cab2acf1b533d` | `undefined` | `unheaded-block-20` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d8e4c6ca3c257aa633ea71da` | `undefined` | `b-add-fgos-panel` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f88ce4d824037cd9e2d36f43` | `undefined` | `unheaded-block-21` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fe7ee2111df52793c31f5db8` | `undefined` | `c-rename-or-deprecate-the-existing-skills` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ff115af965506509999f89b4` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_49c978b75e2a8e864a62f853` | `undefined` | `coordination-protocol-model` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1d6ebfa38f293df537a40359` | `undefined` | `unheaded-block-1` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8b0517beb0c3672a2a96fb84` | `undefined` | `unheaded-block-2` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_459f21dc5e462805aa19eb74` | `undefined` | `planning-sources` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2b5cc22cd73b19c79847e0ee` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1783df3cc5676bb4fa609b5b` | `undefined` | `unheaded-block-4` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9cf9cfab0f8f186eb3c43a38` | `undefined` | `unheaded-block-5` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_66738b6236a5fa1fbfcfbca9` | `undefined` | `declared-model` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bc90a440e8b05dbf71912c24` | `undefined` | `unheaded-block-6` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_fb0724ba5c0c27cf1201aafc` | `undefined` | `unheaded-block-7` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7409e00efd25643c99d69141` | `undefined` | `responsibility-split` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a3e4462e58d0fa6680fcd48d` | `undefined` | `unheaded-block-8` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_882b3b43e8b4dc7d2265a4b2` | `undefined` | `unheaded-block-9` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f28670818ccae8536459408b` | `undefined` | `hard-and-soft-coordination` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ca0d68576d517a1472efe14a` | `undefined` | `unheaded-block-10` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1f195bda39d8461b36b3a322` | `undefined` | `unheaded-block-11` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3a98914722850f7de12b522c` | `undefined` | `unheaded-block-12` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_34ff009e879154ee4965d69f` | `undefined` | `unheaded-block-13` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_74736ba93ae1a7f303c835cf` | `undefined` | `compatibility` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f9f186b816c650a18af78c70` | `undefined` | `unheaded-block-14` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1924550cc8b82ba75d668d43` | `undefined` | `unheaded-block-15` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7843ddd1f64ef3ccfd0ecf29` | `undefined` | `unheaded-block-16` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7d1e3c4691856d3158aee056` | `undefined` | `standalone-coordination` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_be21d19400df95a74d9a015e` | `undefined` | `unheaded-block-17` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5de3c0f1d99c9e9468b81604` | `undefined` | `unheaded-block-18` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_873d103ec8aff2357084542d` | `undefined` | `domain-augmentation` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_43f65aea133d5055445af067` | `undefined` | `unheaded-block-19` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_afa990d8d2c6805aa6faf452` | `undefined` | `agent-coordination-architecture` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e4c85130c123b14478e33bb4` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e56cc2fc5c61613fa5ad8685` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6b83af0c33ed64847ba7c950` | `undefined` | `documents` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_12af132022ae9fc5c7692dc2` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c6004101fa10a6c37bca328d` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_35c772394c40ec60e13bb543` | `undefined` | `unheaded-block-5` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2924fe970ffe0f53dcc58a02` | `undefined` | `runtime-recovery-principles` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_883c8264dae706a115e9d053` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4f67240f620da6f40473357b` | `undefined` | `unheaded-block-7` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_680beddfe7d6c3e6c25cd4d1` | `undefined` | `unheaded-block-8` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7c1eef2fec8a345992a5477e` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_aab89de5529b9b64d6948387` | `undefined` | `runhandle-and-recovery-material` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5cd25c4fb1e6c210f5f6a679` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b211e51cb1a6c649b3540077` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_96e3020f9f5f3d897781b88a` | `undefined` | `1-identity-and-facts` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_096e14ba357e24176f4486c9` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_83f7729635fd315dce22f334` | `undefined` | `unheaded-block-5` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_dfb46c9886ff11e06a841dee` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cac3a397334c10a0163155c7` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3d54fd6659e8945e1892ff1e` | `undefined` | `2-state-transitions` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8cc42b896907fd7f7a61f465` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5dbae3697bb48c4c6a20c004` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b13fc01d60cb151023b7f737` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a0645198cbff9732a7a1fe13` | `undefined` | `3-ports-and-control-outcomes` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_492f5ec9909702af8b9d22ce` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ddd931e6a349fdb1438b3634` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_073f894cf99300fa7b3ee2c4` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c07b252c0dfd2f611d6db41b` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_74fbb0a4b4b096a3e00e662b` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a51b82d1024550d4ba27c561` | `undefined` | `unheaded-block-16` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6d4622c4e049c45b37563d8c` | `undefined` | `4-guard-sequence` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3ffb11c05754a92cd766cc04` | `undefined` | `unheaded-block-17` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_73aebeb1e6630af9daecbab7` | `undefined` | `unheaded-block-18` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bad22cd02ea0add20f24f825` | `undefined` | `unheaded-block-19` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_303d4ef6cc2c773ce5ece9f7` | `undefined` | `unheaded-block-20` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_765845828547d25cbb573919` | `undefined` | `unheaded-block-21` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7225eab0869f0de4c25769c0` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_54c651dbb91b040d03caeecd` | `undefined` | `5-recoverymaterialv1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_06506eb56d365fe9477b4971` | `undefined` | `unheaded-block-23` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_640381649689643376868483` | `undefined` | `unheaded-block-24` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_325135db05d7658920f0385f` | `undefined` | `unheaded-block-25` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_636f4c443d4a82db146b829d` | `undefined` | `unheaded-block-26` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_418a776b671321c4ef1b9e03` | `undefined` | `unheaded-block-27` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_60b11c452a0ffbf42ecb9bfb` | `undefined` | `6-persistence-and-supported-profile` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e84cb76cdf433d6012f15b09` | `undefined` | `unheaded-block-28` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_842921bef9b935316b1fce60` | `undefined` | `unheaded-block-29` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_07872f77028223df47cc14bd` | `undefined` | `unheaded-block-30` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2f200b969ad90560d356e051` | `undefined` | `unheaded-block-31` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9d65f659d97a2367650b5ff6` | `undefined` | `unheaded-block-32` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_878647c399343f5241878303` | `undefined` | `7-proof-and-deferred-scope` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8a99605838b41f2a916e13a9` | `undefined` | `unheaded-block-33` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d20a39634156f4bb5a39af25` | `undefined` | `assignment-execution-runtime-model` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_97963ca7d463c12791ab4914` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_43df4d6888ff1ecfe098d5b1` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_88b51c7d81050ce8bcd6b13d` | `undefined` | `execution-chain` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_04b8f1f718035bb851b8847e` | `undefined` | `unheaded-block-3` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_39fd9fefc5523e8dddc27ffa` | `undefined` | `invariants` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7f0a646dc394939d3acded7d` | `undefined` | `unheaded-block-4` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6ff32215617ef7a722c10131` | `undefined` | `failure-domains` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_035c9fe81fc9090cf0b31a66` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_793c9cb2876d472babf88541` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_131312fe44d483230ec2e740` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6b5583262d4972647e6d1d5b` | `undefined` | `storage` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_77614591fdb58c45e74c98ed` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_691587c31fe80fdadfdb3923` | `undefined` | `unheaded-block-9` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_43686ed440ebc11af09f1051` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_98794689afe63a34815d5bf2` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_185c3fed509a2717aab27a1b` | `undefined` | `runtime-recovery-and-work-continuity` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_25540f414f464d42779713ba` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_734b854eb9efbc0c62a43146` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ccd3eafc7643ccc576fab60c` | `undefined` | `1-scope-and-reading-order` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a46041aa31fb8714d147ae34` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_066f71251b3be5ba81716212` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bb2ac5f6476a00a7869a82a3` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e2ce05cbd406cc08bf1e6d91` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_25c613d2a9a980cbad1dbc06` | `undefined` | `2-identity-and-existing-reality` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7b1d913c5e9a4df3fb3d8532` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c8c4eca992b27017c6f3de45` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2a3ba822c4148ff1081603e6` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_eea51f025b2fc93842af8d31` | `undefined` | `3-ownership-and-dependencies` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5b0e7a43b42fa0dd7a9d55bb` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_498ca82906677d603a8775f5` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_382d2e8365c891b9b343d097` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bab83171fe7b6e028c7aa41d` | `undefined` | `4-recovery-choice` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c6e0c2752e3c7daa2d17a36e` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6e1147a4f72197253b96bf91` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5c497aaf406d35367fd2aa5c` | `undefined` | `5-arbitrary-interruption-is-not-a-checkpoint` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_17f2977f3577299da3c070ba` | `undefined` | `unheaded-block-16` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_18d29d0b4ebaaa417210d976` | `undefined` | `unheaded-block-17` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e8a30905bad42ea564f85bf5` | `undefined` | `unheaded-block-18` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f6da30faa68a96ef3b12749c` | `undefined` | `6-local-concurrency-and-durability` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e16116ac11a17f7dfdbe56e1` | `undefined` | `unheaded-block-19` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_eaf3303ff8284383b73e0e10` | `undefined` | `unheaded-block-20` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_33f1b57056ed912a6bbf0223` | `undefined` | `unheaded-block-21` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bc6f8515e09ab8fac0f53119` | `undefined` | `unheaded-block-22` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bbae3518d81275328147c59e` | `undefined` | `unheaded-block-23` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7619cb131500adc1c1b49aef` | `undefined` | `7-agent-facing-contract` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d56324ffcaaa43b45a349e64` | `undefined` | `unheaded-block-24` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9b03f7639cd0eea15e570a20` | `undefined` | `unheaded-block-25` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_673ec59a09074daeb6413c85` | `undefined` | `8-compatibility-and-rollout` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_df9e445f6281b6c89b051777` | `undefined` | `unheaded-block-26` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a799bc0416eab797ebc49adb` | `undefined` | `unheaded-block-27` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_09189662e9c97a13e8387b90` | `undefined` | `unheaded-block-28` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cb18d55160e90b2de009d6f3` | `undefined` | `9-implementation-slices-and-gates` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_169336e7e310a39aa6e987bc` | `undefined` | `unheaded-block-29` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_4954de9d79ee6a44b5fc736b` | `undefined` | `unheaded-block-30` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_25a51ea44e044505e9ad3e3d` | `undefined` | `10-proof-matrix` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d56a1bf23c91b072e4463299` | `undefined` | `unheaded-block-31` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8689e63e19a6f84993db17b7` | `undefined` | `unheaded-block-32` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ca7b6c13fbba76882cefb08f` | `undefined` | `11-review-finding-resolution-and-limits` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e856eb23cbf4d3abcd556054` | `undefined` | `unheaded-block-33` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2227e8e7738cf26b80918a75` | `undefined` | `unheaded-block-34` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_03023281df3c23126f0797bf` | `undefined` | `unheaded-block-35` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_bed457b65a1e4bf50d9d688b` | `undefined` | `unheaded-block-36` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d46bf16a2cb3aaffff837704` | `undefined` | `agent-coordination-system-context` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2ba2f3014151cf6f09a0aa00` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ab5cd5c1e372269263684ed7` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_13a37849b05be0031cf57675` | `undefined` | `purpose` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_97f3798d5f53191eb3215ee4` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c0e30b8b5e0038985cd1345f` | `undefined` | `unheaded-block-4` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_09ddeab71129eea751396c63` | `undefined` | `context` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_d81276be21d6b7c01ed566a6` | `undefined` | `unheaded-block-5` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3aabf531aee3fe6b6852d788` | `undefined` | `accepted-boundaries` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_e13dd5d3a1de8cd7f36704c4` | `undefined` | `unheaded-block-6` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_67109b4542175b5595a31254` | `undefined` | `runtime-profiles` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9b86a72636f38afd519a877c` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_76b9dabf2875945cd4a18f1b` | `undefined` | `unheaded-block-8` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_0e3e3edb0c7006fe42294d09` | `undefined` | `unheaded-block-9` | `decision` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6536789a74ffb4dcae3584e9` | `undefined` | `trust-boundaries` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2a73e5c4248c982feb6b6014` | `undefined` | `unheaded-block-10` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_3ac253bb0fe3f3c6eb0c54e3` | `undefined` | `visibility-and-herdr` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ca2960f388087fd18864a9bb` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_afbab1f4248a1760ed9d5d8f` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_9d5ce9aa7a4ec9a2eb0191c8` | `undefined` | `purpose` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_846c17bedceec80a70fbd780` | `undefined` | `unheaded-block-3` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c0285327a434fe1f3dce498c` | `undefined` | `invariant` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_c241f8b62993de4148326f31` | `undefined` | `unheaded-block-4` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_6db4ff08c55a780cdfc6f740` | `undefined` | `unheaded-block-5` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_444031eda03f3a5f8e346885` | `undefined` | `session-binding` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_61686db842c5d2254c468b97` | `undefined` | `unheaded-block-6` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_55f3977ad1f06c9c25aefc41` | `undefined` | `unheaded-block-7` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2a78e7e47e1429d6a6f8a892` | `undefined` | `unheaded-block-8` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ad59d208bfc173116e30bebe` | `undefined` | `observer-and-actor` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_1ea9039fc4581bb4a6124f17` | `undefined` | `unheaded-block-9` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2b25c9e5c284037eda3b1b3e` | `undefined` | `pane-retention` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_eb6800cf2263f16042b2543f` | `undefined` | `unheaded-block-10` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_7bff490c785b178fea3222dd` | `undefined` | `allowed-uses` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_ae7ee09ea8f0311173ab655d` | `undefined` | `unheaded-block-11` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8b3fb2de2e944496ef1deb8d` | `undefined` | `forbidden-inferences` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_b1909ef98cd09c451caa2299` | `undefined` | `unheaded-block-12` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_247a814359f1585f961f2fc6` | `undefined` | `stability-direction` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_cf4a87264281149ebbd6dcab` | `undefined` | `unheaded-block-13` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_8b25037dd86ff0704060c308` | `undefined` | `unheaded-block-14` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_2d8def8ff9b468e0ffb54689` | `undefined` | `unheaded-block-15` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_5ca3b82ca95a3d86d8ac610d` | `undefined` | `work-integration-boundaries` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_f3557c4aeda720750f9c6637` | `undefined` | `unheaded-block-1` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_a9bf4e0e151a36d7112529b0` | `undefined` | `unheaded-block-2` | `architecture` | `merge` | `docs/platform/agent-coordination/README.md` |
-| `claim_15fed42adf808e541e3be989` | `undefined` | `core-invariant` | `contract` | `merge` | `docs/platform/agent-coordination/README.md` |
+| `claim_afce41f860bfc88eb0fba72c` | `AGENTS.md` | `forgent` | `unclassified` | `unknown-blocking` |  |
+| `claim_cb48c1174879c0ef70e24c19` | `AGENTS.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
+| `claim_56b96ca0c3d70fd6edac6816` | `AGENTS.md` | `unheaded-block-2` | `unclassified` | `unknown-blocking` |  |
+| `claim_ab546c7a06c48cfe067e8c77` | `AGENTS.md` | `unheaded-block-3` | `unclassified` | `unknown-blocking` |  |
+| `claim_ec6720a0da090fc5881b5614` | `AGENTS.md` | `product-priority-order-d-adr0030-docsspecsrunnermd` | `unclassified` | `unknown-blocking` |  |
+| `claim_9438123c01b468b45bdf17c7` | `AGENTS.md` | `unheaded-block-4` | `unclassified` | `unknown-blocking` |  |
+| `claim_df6ca6a72dc1693cd94a36e0` | `AGENTS.md` | `unheaded-block-5` | `unclassified` | `unknown-blocking` |  |
+| `claim_c70e8683e039a4e33353696b` | `AGENTS.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
+| `claim_bc6145e1afd6dd765d2c57fd` | `AGENTS.md` | `ranh-giới-sứ-mệnh-d-adr0035-docsspecsplatform-foundationsmd` | `unclassified` | `unknown-blocking` |  |
+| `claim_e1b5d08d70f271d7f7dbc46f` | `AGENTS.md` | `unheaded-block-7` | `unclassified` | `unknown-blocking` |  |
+| `claim_f05581a9d68a759d9d1ff766` | `AGENTS.md` | `unheaded-block-8` | `vision` | `unknown-blocking` |  |
+| `claim_d464aa6eb09e218adc322155` | `AGENTS.md` | `before-touching-code` | `unclassified` | `unknown-blocking` |  |
+| `claim_b9694efb9cb185c87ea2bf41` | `AGENTS.md` | `unheaded-block-9` | `specification` | `unknown-blocking` |  |
+| `claim_834209921829501e17149cb6` | `AGENTS.md` | `definition-of-done-platform-foundations-l5` | `unclassified` | `unknown-blocking` |  |
+| `claim_bea19bdf1a379b61c19ca8ef` | `AGENTS.md` | `unheaded-block-10` | `historical-context` | `unknown-blocking` |  |
+| `claim_34f8212c5064f481c935dee9` | `AGENTS.md` | `unheaded-block-11` | `specification` | `unknown-blocking` |  |
+| `claim_eac43cceec3aae5ac184d476` | `AGENTS.md` | `legacy-node-cli-ownership-boundary` | `contract` | `unknown-blocking` |  |
+| `claim_7681af5b7e9016759da18d2a` | `AGENTS.md` | `unheaded-block-12` | `unclassified` | `unknown-blocking` |  |
+| `claim_7341954fe2dce1cc1dbec01d` | `AGENTS.md` | `installsetupdoctor-gate` | `unclassified` | `unknown-blocking` |  |
+| `claim_37d8cbc62338420cba9bc28e` | `AGENTS.md` | `unheaded-block-13` | `vision` | `unknown-blocking` |  |
+| `claim_9720eaa9c742fe86efd015ff` | `AGENTS.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
+| `claim_9d3af4c7f7667d68c28faa7b` | `AGENTS.md` | `changing-a-locked-law` | `unclassified` | `unknown-blocking` |  |
+| `claim_8c710c9a01706877fd92c91d` | `AGENTS.md` | `unheaded-block-15` | `decision` | `unknown-blocking` |  |
+| `claim_62208c707bf180afe70009ec` | `AGENTS.md` | `rul11-tùm-lum-không-phải-nặng-d-adr0036-docsspecsplatform-foundationsmd` | `unclassified` | `unknown-blocking` |  |
+| `claim_27b77b20cb45da35c2321df9` | `AGENTS.md` | `unheaded-block-16` | `unclassified` | `unknown-blocking` |  |
+| `claim_98ab065a20d7d2dcde7f3f25` | `AGENTS.md` | `unheaded-block-17` | `unclassified` | `unknown-blocking` |  |
+| `claim_1e6e5c04655cdc56ed004f64` | `AGENTS.md` | `dispatch-routing-work-to-a-executor` | `unclassified` | `unknown-blocking` |  |
+| `claim_a1a479832e0f8ef96e59c05d` | `AGENTS.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
+| `claim_ac4a8b01b1851d9cb1f5dca0` | `AGENTS.md` | `unheaded-block-19` | `unclassified` | `unknown-blocking` |  |
+| `claim_af43f6c639180bade09549f2` | `AGENTS.md` | `unheaded-block-20` | `unclassified` | `unknown-blocking` |  |
+| `claim_f6084a63a5f75cec1dcc7799` | `AGENTS.md` | `unheaded-block-21` | `unclassified` | `unknown-blocking` |  |
+| `claim_5c1d2a29f183b99bd5ba038d` | `AGENTS.md` | `unheaded-block-22` | `unclassified` | `unknown-blocking` |  |
+| `claim_c23ce13b90cfc25a905ac785` | `AGENTS.md` | `unheaded-block-23` | `unclassified` | `unknown-blocking` |  |
+| `claim_c447e99f7fe8aa2eb002245c` | `AGENTS.md` | `unheaded-block-24` | `unclassified` | `unknown-blocking` |  |
+| `claim_1b4a5b286bc3cede5f686fe6` | `AGENTS.md` | `unheaded-block-25` | `unclassified` | `unknown-blocking` |  |
+| `claim_20bd208b3cceebe4e956824e` | `AGENTS.md` | `starting-the-herdr-gateway-one-door-never-a-raw-process` | `unclassified` | `unknown-blocking` |  |
+| `claim_c1edad816f7bd1005e19d34e` | `AGENTS.md` | `unheaded-block-26` | `unclassified` | `unknown-blocking` |  |
+| `claim_f73b997458cf3b386547dc08` | `AGENTS.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
+| `claim_ea580fb50c743658e4a10b47` | `AGENTS.md` | `unheaded-block-27` | `unclassified` | `unknown-blocking` |  |
+| `claim_9d686cf7e93b23f1c1ff17b2` | `AGENTS.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
+| `claim_a8d12a0e515f5e77210ca8fe` | `AGENTS.md` | `unheaded-block-28` | `unclassified` | `unknown-blocking` |  |
+| `claim_f5773f8c00a7ef2517e36763` | `AGENTS.md` | `unheaded-block-29` | `unclassified` | `unknown-blocking` |  |
+| `claim_7bd38755b8ba1775d0aaef78` | `AGENTS.md` | `unheaded-block-30` | `unclassified` | `unknown-blocking` |  |
+| `claim_e2e1e2ed0411e74ec9872838` | `AGENTS.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
+| `claim_fb2ae133b012e3070bf237fd` | `AGENTS.md` | `unheaded-block-31` | `unclassified` | `unknown-blocking` |  |
+| `claim_803d960a101aee744a6a649f` | `AGENTS.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
+| `claim_94cc463187e0663682fd1d59` | `AGENTS.md` | `unheaded-block-32` | `unclassified` | `unknown-blocking` |  |
+| `claim_321dabdbed3dd10376df9361` | `AGENTS.md` | `unheaded-block-33` | `unclassified` | `unknown-blocking` |  |
+| `claim_6f1bd44e9336a9144f368136` | `AGENTS.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
+| `claim_7b6f81afebe133366f54e5db` | `AGENTS.md` | `unheaded-block-34` | `unclassified` | `unknown-blocking` |  |
+| `claim_15de6af4b1474448cac1382e` | `AGENTS.md` | `unheaded-block-35` | `unclassified` | `unknown-blocking` |  |
+| `claim_569e33451a3025a389e65dda` | `AGENTS.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
+| `claim_563b8ca62a1c42f1407a5109` | `AGENTS.md` | `unheaded-block-36` | `unclassified` | `unknown-blocking` |  |
+| `claim_cfe7251a3597f7359e25acb5` | `AGENTS.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
+| `claim_67a81c6fd3d4eeb3ec5baa5a` | `AGENTS.md` | `unheaded-block-37` | `unclassified` | `unknown-blocking` |  |
+| `claim_8fe5e9601e273964ff0c9041` | `AGENTS.md` | `resources` | `unclassified` | `unknown-blocking` |  |
+| `claim_04b5d3f8cb7204c73673f2f5` | `AGENTS.md` | `unheaded-block-38` | `unclassified` | `unknown-blocking` |  |
+| `claim_2d39572ef22f8a86a0768363` | `AGENTS.md` | `cli` | `unclassified` | `unknown-blocking` |  |
+| `claim_8297f6819ec0cb8877b2f82e` | `AGENTS.md` | `unheaded-block-39` | `architecture` | `unknown-blocking` |  |
+| `claim_8239083bdbf8ef4032b3c139` | `AGENTS.md` | `unheaded-block-40` | `unclassified` | `unknown-blocking` |  |
+| `claim_559ae481ffeb834078a79547` | `AGENTS.md` | `fgos-effective-instructions` | `unclassified` | `unknown-blocking` |  |
+| `claim_67c786ab783303e3836e281e` | `AGENTS.md` | `law` | `unclassified` | `unknown-blocking` |  |
+| `claim_a7ad319b164ec8c7ae9e8d26` | `AGENTS.md` | `platform-operating-laws` | `unclassified` | `unknown-blocking` |  |
+| `claim_bb6ad0656621f7f4f94af7a2` | `AGENTS.md` | `unheaded-block-41` | `unclassified` | `unknown-blocking` |  |
+| `claim_a7ad319b164ec8c7ae9e8d26_dup_ed5dae28` | `AGENTS.md` | `platform-operating-laws-1` | `unclassified` | `unknown-blocking` |  |
+| `claim_8684658765ce3246ff9b87dd` | `AGENTS.md` | `unheaded-block-42` | `unclassified` | `unknown-blocking` |  |
+| `claim_82390ebeac306d78821bdc27` | `AGENTS.md` | `unheaded-block-43` | `specification` | `unknown-blocking` |  |
+| `claim_50320b2a3ab1ddb16b60491f` | `AGENTS.md` | `unheaded-block-44` | `verification` | `unknown-blocking` |  |
+| `claim_58bdfd1d18a1e88b3172c3e6` | `AGENTS.md` | `unheaded-block-45` | `unclassified` | `unknown-blocking` |  |
+| `claim_526ee7be045655f671ac2b4c` | `CLAUDE.md` | `project-rules` | `unclassified` | `unknown-blocking` |  |
+| `claim_6fff39f9bc8f73b7235f1207` | `CLAUDE.md` | `unheaded-block-1` | `unclassified` | `unknown-blocking` |  |
+| `claim_092109a1dc47248ce788ec67` | `CLAUDE.md` | `impact-analysis-capability-gate` | `unclassified` | `unknown-blocking` |  |
+| `claim_69cb973f946de20a60ed36af` | `CLAUDE.md` | `unheaded-block-2` | `unclassified` | `unknown-blocking` |  |
+| `claim_1775096d7f46eb9e088bf74e` | `CLAUDE.md` | `unheaded-block-3` | `unclassified` | `unknown-blocking` |  |
+| `claim_710bf026cc8ff1d113b55ea3` | `CLAUDE.md` | `unheaded-block-4` | `verification` | `unknown-blocking` |  |
+| `claim_583b759edfd430d5f20fe33c` | `CLAUDE.md` | `unheaded-block-5` | `unclassified` | `unknown-blocking` |  |
+| `claim_4cf16212e502f4c6b2347eb2` | `CLAUDE.md` | `unheaded-block-6` | `unclassified` | `unknown-blocking` |  |
+| `claim_7a8a6a182ce022bdd1cc76ae` | `CLAUDE.md` | `documentation-viewing-mdview` | `unclassified` | `unknown-blocking` |  |
+| `claim_15591c4708163e0f3f36e3a5` | `CLAUDE.md` | `unheaded-block-7` | `unclassified` | `unknown-blocking` |  |
+| `claim_9bc69c6127bd5c7121f5267d` | `CLAUDE.md` | `using-mcp-preferred` | `unclassified` | `unknown-blocking` |  |
+| `claim_65fc91577452b41900fb8410` | `CLAUDE.md` | `unheaded-block-8` | `unclassified` | `unknown-blocking` |  |
+| `claim_549716cfd1564cd7cdf4e154` | `CLAUDE.md` | `unheaded-block-9` | `unclassified` | `unknown-blocking` |  |
+| `claim_392cdd5afd29dcb504b379db` | `CLAUDE.md` | `unheaded-block-10` | `unclassified` | `unknown-blocking` |  |
+| `claim_24b73dedaa7860da2adeb89a` | `CLAUDE.md` | `using-cli-fallback` | `unclassified` | `unknown-blocking` |  |
+| `claim_62d685b7c127a9f20a296047` | `CLAUDE.md` | `unheaded-block-11` | `unclassified` | `unknown-blocking` |  |
+| `claim_42729b74a4836277f5deb40b` | `CLAUDE.md` | `when-to-render` | `unclassified` | `unknown-blocking` |  |
+| `claim_6bce94f958a691f4eed02b4b` | `CLAUDE.md` | `unheaded-block-12` | `unclassified` | `unknown-blocking` |  |
+| `claim_38937c49bbce2fae5acd0516` | `CLAUDE.md` | `unheaded-block-13` | `unclassified` | `unknown-blocking` |  |
+| `claim_6f1e4f63203fd9c6aae50e2b` | `CLAUDE.md` | `gitnexus-code-intelligence` | `unclassified` | `unknown-blocking` |  |
+| `claim_2b5522d1adb068a3f091855e` | `CLAUDE.md` | `unheaded-block-14` | `unclassified` | `unknown-blocking` |  |
+| `claim_d588b2006bbc399498c80850` | `CLAUDE.md` | `unheaded-block-15` | `unclassified` | `unknown-blocking` |  |
+| `claim_69c1b70ed478ae8b57471a83` | `CLAUDE.md` | `always-do` | `unclassified` | `unknown-blocking` |  |
+| `claim_de6958714d5b4929cf1465b0` | `CLAUDE.md` | `unheaded-block-16` | `unclassified` | `unknown-blocking` |  |
+| `claim_ada9061af95ffd947db7c91a` | `CLAUDE.md` | `never-do` | `unclassified` | `unknown-blocking` |  |
+| `claim_40ed0f8de9d2edc5d4717f25` | `CLAUDE.md` | `unheaded-block-17` | `unclassified` | `unknown-blocking` |  |
+| `claim_fb473722118c2eb99b974c5f` | `CLAUDE.md` | `resources` | `unclassified` | `unknown-blocking` |  |
+| `claim_bdd572ef5d84652c2362522a` | `CLAUDE.md` | `unheaded-block-18` | `unclassified` | `unknown-blocking` |  |
+| `claim_1ac8ab169efa898e9eb4bf00` | `CLAUDE.md` | `cli` | `unclassified` | `unknown-blocking` |  |
+| `claim_b050c257f58ed9b360983033` | `CLAUDE.md` | `unheaded-block-19` | `architecture` | `unknown-blocking` |  |
+| `claim_771d454efabfe2f026efd52a` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2dee7b2a7ae0451b0b6bbc3f` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `coordination-recovery-planning-and-session-continuation` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a6214ed635c5d38dde63eb60` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0099ef414da43aa55b93f4da` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ab0196e8c4b41ff3f257924e` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `1-meaning-and-boundary` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_40f4add3bb72b053a216358c` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0853ded9981962ae38280227` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_04cdb6fba8051d9c515d48a2` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f41482496d0c7f90188aaede` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `2-snapshot-contract` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ab516f5c4c20a97e816d03a1` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9bedffa1ac4c59a64929e9ca` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-8` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a8b0bdff409907d652d0634c` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d464b27159f19f0811c30056` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_86b05f3ebccaa0b8751ec1df` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_07825d9eb8b46972404d76ad` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-12` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3af91883a3ec8a3fe6010088` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `3-typed-plan-and-priority` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a5dc085ead4f4556d0eb16e5` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-13` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cc69f104270a1f5fe24516f5` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_58b2fb5aa45783151ba6b894` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6d7216ab670ce19001fb2ce2` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-16` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b1fb652e013cbc916082f1a0` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `4-action-identity-and-apply` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d9a5bd638246e6a1cf6df029` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-17` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_81d898e295109e01d65481bc` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-18` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6499fb39bce25daaab27cc74` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-19` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c88c5f54a2c8deb146e3fd50` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-20` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_01a21868778ed2379edd382b` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `5-protocol-transfer-declaration` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f1d3e3bb314656bb50a06788` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-21` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5e8a269468422990029f7f96` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8317ada2faab8a69f5f21e57` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-23` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f1fb7b7c1b6a4c3314cdac4d` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-24` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f596a32c0b90ade5db94dca3` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-25` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7b66cdf9553bd8b437ade033` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `6-transfer-record-and-transaction` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_710334da08289efae3537b70` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-26` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b698072b0fa569bdad1d94e3` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-27` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2d351470a0323e55e1daf5fa` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-28` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1b83e6e27ff7a4c6b98299fe` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-29` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_03a0c6044f5c20625bfc4574` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-30` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cd513cc0f0417b5edfc07446` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-31` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e6b81f3854e457b60e20c855` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-32` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3f3fcee92e38253dfc3f7680` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-33` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3f1616bb3a8677ef6a00719e` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-34` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3332cd636014c5d305239b60` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `7-crash-and-refusal-table` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a3a8bacc336ab8242f7e5c04` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-35` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_105cebcecaa0dc39ea5ea217` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-36` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_314bf4af796128be6bbbe46d` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `8-first-profile-and-future-scope` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_eb6c6b7cb7f7b85e7531e60d` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-37` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_36b9728d450db14688751e23` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-38` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_78d35373b95a9d0ccaeafd0e` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-39` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ca2b8a1fbeb4a6285d3dae36` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `9-implementation-and-proof` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f68a507fcc7c3176c5db8ffd` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-40` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a976c1e5e14d93b1ab2e48dc` | `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` | `unheaded-block-41` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_02aa59efc5d43dc82478c96b` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `coordination-foundation-baseline` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_96b77ade57164fa383fd7b74` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8b603fa422948d2ed99e61ca` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9fa242562eb74203df65d9c9` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_465eaceff569f66ef648d6ab` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `purpose` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1fb010c60c26ccdead36eb4e` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ed4a053f89ca89da59ad4a89` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae2a405706c880788aa17d29` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `promotion-map` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_555acd7e868583f11dda448e` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-6` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f1df4a93c1955ed2ac1716de` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `accepted-shape` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2ba9628f386114b9033109ef` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_37cbbed78ed250cae6b441c6` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_409d94fc279d0d0ea2f93c7b` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `accepted-invariants` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3718ce7ea7e7c26f4d80ac88` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bd4b7a910752779e102622ed` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `delivered-surface` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_aed66b23a3485ff113541e8b` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae53e59a2b42159c0b492988` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2e36646a562cd1e54e91f22d` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `deliberately-not-promoted` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_04e6b20b7b61113b63c8630f` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9c0ce3359b7c5ea733c1bc55` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-13` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_132c8403f4bc5e339a7e5721` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e11c11239f59189b96c57565` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-15` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4bdf378d14624e343cb6f3e2` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `reading-rule` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_433c6b22aed4c806a1f7d494` | `docs/architect/agent-coordination/architecture/coordination-foundation-baseline.md` | `unheaded-block-16` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cce0038c4a08f96480c396d7` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `dispatch-control-plane` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a06cd4802dfad638acc7383c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2b123eb77e957f849d01da2c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5cd6906136946816478df43f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `responsibility` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ade804fe7cb351926e0c160e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_60a21847bafc1638bddf0f52` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae8aba30610731ba2968d073` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `flow` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8388427c92faf8b45ba214e3` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ed124bc5ce9e473298563017` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ff37981a4bd2e1ce10abd926` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `routing-identities` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3341fa6fd2c3f4002de29335` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7e3be3772be83b5443c1dad8` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e7dd59ce66db0d6ad08bb004` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fe203ba9aab5c9e0b0d29c0e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-10` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae3b9b5d26f29e766288626f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-11` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1bb73fad47455c5227f4a9ba` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `contracts` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_75b4146fdbd11a8c7f4c9e1e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d67fc1a9bf0eb434925ea175` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `dispatchrequest-outer-core` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d81015ccd1adf18ef3edccad` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cd88ae8f2854a86ade7787f2` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2c1f8b20f4db53e83b61599f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_de9d618c014e1ae0654e061c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `policypatch` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_882041217b5adee271d96054` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-16` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e3d1f02c083441e24ac8c858` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-17` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e4a9ca6f734496909dd0254e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-18` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_60b093fed500632bc0d10d4e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-19` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5467bff8686060218767b8d5` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-20` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5b72d28246fc140f24782cef` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `dispatchplan-core-runtime` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a045790bd791f47090ed6ccf` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-21` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fd3f8e46b5093676e6316c90` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_118e594b9546a68b09465794` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-23` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a56755363e9cb3bbda9c2fc8` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-24` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b42c6e569232a5c78caebfe4` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-25` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_dc4ff66d7b2b515736bfac5f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-26` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fa5b0d4ccb46d69bc6c9b0fc` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `executor-kinds` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0e62a6cdb90150315edf1f0e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-27` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8176a9d8ccd1ea1f2486e2ed` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `component-internal-ownership` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1b8ee888a2f30f42164907b2` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-28` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b58283a34e905cd474c54ab6` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-29` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_16bbcbb1ae869fedd6f4618c` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-30` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_99efc7848fb224a77b05fa57` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-31` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_76a30efef289015ec88de694` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `component-outer-boundary-note` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9876963efb42cdde49575165` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-32` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9ff54cf68b10529132eb3786` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `governance` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e554129daaf7dbe0b774b3c6` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-33` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_51c4bb7373fdf86666ab170e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `separation-of-concerns` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b269c2aa385ccb6ba9eafa55` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-34` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_58e12f49c652725986e010bc` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-35` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3af317aff7b8014199cc9f78` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-36` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_37ffb76e498f17f3aa40c587` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `evidence-and-result-architecture` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0475263ee4a9bae9a28b6b65` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c425b534b78223a131df0428` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fe6b7adbad47f2ffcb3ce06b` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `principle` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b0d45cb41937c67d7c5e901c` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bb704f830535d3fe8ac7b09c` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `evidence-sources` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4ce58d324096c3857c5c2ec2` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-4` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7604226c2e2555b44de37840` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ffbf0921c2fd1a12bbbce7c8` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_32681b53a5bf4d251ef9c8b0` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `confidence-boundaries` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_02eaf403b595e42a08338322` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c25959aed508746f5ebb42da` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `aggregation` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e067e5f1710ddce3470040b4` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ac79a78b6a4a281b9c885910` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `visibility-boundary` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5f5bae0b3ca63818359174a3` | `docs/architect/agent-coordination/architecture/evidence-and-results.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_25cec8d79ba8765b3eb0d0d2` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4b960dd90acf27a90690bf81` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `executor-fallback-and-effect-eligibility` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6a309085d640405d693c1e76` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e64e214c7472517ca71d97a6` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_311fb30cb2dfd78775b2516a` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `1-responsibility-and-inputs` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5b148c9d59c95ad4da08ac50` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c3474c8680255c59fcbd1c3b` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4fed693bd3b7184aac3c4ae1` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-6` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ef1642d120c074ba8eec6fe2` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `2-production-ladder-semantics` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f5ab969239d43c8fec1d65f4` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae1b3fe94c590243d94f04ca` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bf3e64a44a7e050315ac6101` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a7cb98b61d4199cf0f22c989` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `3-coarse-matrix-mapping` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3023954774d484d4325fcbec` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6316b558f46b05c118c28b4b` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4d4824b086413d12585eadc4` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9f5886616fef28cf6dd64e20` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `4-one-attempt-history-explicit-caps` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fca9ea4e744d22bb60831a25` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_189a8f7ecf9fd251fe8222af` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bdccb7a4d5069008ccc47c36` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_defd36637f812c44ae74b7f2` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-16` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fa70b28a684d0850042a478b` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-17` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2c9dcc9b1750afebdd21b76d` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `5-effectguaranteeport` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_eefa1741fdd8a53b5260dc1c` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-18` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5635b3ebfd1da9e20aeb492c` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-19` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a84b30da482540119e70e2ac` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-20` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_784f40b566fdd6e51539f770` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-21` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_874c73e69728cf60732bd29a` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_54f00b2aba30a9f43bc3f0e1` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `6-resolver-output-and-apply` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e32506fd4f1bd9143dff7bdc` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-23` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e35066b3caa4b59c31e4da51` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-24` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_eb45d45b7de7c53cbf21f934` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-25` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_76b9c3e86e29c7078d4cb79d` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-26` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0d61b3daf1578987f12fcce0` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-27` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b09959b3648fe41b6e0ced31` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `7-proof-rollout-and-future-work` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bfbe7d747a26b43521bd103e` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-28` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_179694a85c56ee3eabf9a514` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-29` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f7581f9d5da6e16568444a94` | `docs/architect/agent-coordination/architecture/executor-health-and-fallback.md` | `unheaded-block-30` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9fd38b93ec7b4685ae48abea` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `group-thinking-trigger-surface` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4b371466f2a4bcfb5fbf0a3e` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_35232c68bb22de50e3c68942` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5024eddc6b570abb5bc4f5bc` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `decision` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e97c9cf859519cbf3473da5a` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_33799a5b19cdad5ccbc4aa61` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-4` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e34da8a6ceb0e2197f58c63a` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `baseline-ux-audit` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5111ea2bcc036769e3349ea7` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7b7b4cc445f2227f22d75ba0` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8ad01e7850b7a4ecdb83d783` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `vocabulary-evaluation` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cc811c3674c02751cd947607` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-7` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fee8282d40deaacc7d290a54` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `surface-taxonomy` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_59c31aaab46d06c109a163ea` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9a0feab68ac0693a4fe643cd` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-9` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1fb490f57ceafd07fb7fe3a1` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_318d5581f0afd68656131213` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `happy-path-routing` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0e9cab6eb9d9b7250519da01` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6cff12c5fdb31e40b410d236` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `clarification-rules` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e9082d2f6e090ba0d1c0aaf6` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-12` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_19a812f819919b71083d2e12` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5ca3754a65540fcce71b2c34` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_84e67986bd3da961d549d8ed` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_86cc463559048504221c7778` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `core-surface-boundary` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3851eb866c3315ae48cca87a` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `core-owns` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1be1d5cd5b051c9f0d9e59c5` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-16` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ab46b087fb2d3562ebbe1def` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `surface-owns` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_346bd822fc507320c671b561` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-17` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6c7f09c11d656dbdacd30131` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `forbidden-coupling` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_59ed42a975b946f47be6f7b9` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-18` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_817242d3ba2c22e757140073` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `entry-point-choice` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_595a94609d1bf43da7c52fa8` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-19` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bb8d6c19b8e8877d8fae406d` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `alternatives-considered` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_51e6dafaa5f0da6043a108a1` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `a-keep-only-fgos-group-thinking` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b919429bf258646a1c3cfbec` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-20` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_df6a3e8c3d4e130fdfa14b0f` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `b-add-fgos-panel` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_46c9e0cc89ccec362e825f87` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-21` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a9469b2a2c9b839d6bc5d089` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `c-rename-or-deprecate-the-existing-skills` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e4abdea7a9b96d10aabc10ef` | `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e9c6fc4d2c6049bcb7d30266` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `coordination-protocol-model` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fdbd261207e616d6fd62be05` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-1` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0fae17e267ec6a96ee9b94f0` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-2` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_22508dd8784fac480e159945` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `planning-sources` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_51f9f071abfc33fe06e3be74` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_80db6ad80f552b7ea06b8c90` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-4` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3042e0c5039cec5dde794a98` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-5` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bb8264d6ae5b63bf65cca7fd` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `declared-model` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5de2ee7fa83c75468e5589fd` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-6` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0ee6f08fde680abae9312f1a` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-7` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_92d5b125afba79cd34bf0df0` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `responsibility-split` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d2c45adff10b79cf4c4a7b76` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-8` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_95e637daf7a1dea8b5ea4b5b` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-9` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b2a94112196a5c1628358083` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `hard-and-soft-coordination` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d36d7f9f802aa11b2ca13522` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-10` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9bebfdf45a82188b4c390bd3` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-11` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a49953ec761323da8e65351b` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-12` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_38bf6b680d4112cb5d990d50` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-13` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_341693ca14eff3ed9f0f7064` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `compatibility` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_95f11391711122c786da1fda` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-14` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_181b25c4fb69e53c7c28bad8` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-15` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0be41c2e18cb278d3be7ef4e` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-16` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0071c639c3211faa571efd08` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `standalone-coordination` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3bccb5bcd9db130033eba851` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-17` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_61f9f58aa12919f5002ce2a3` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-18` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_42ac950377bc4801adac751e` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `domain-augmentation` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c56743f292d327ccb482a525` | `docs/architect/agent-coordination/architecture/protocol-model.md` | `unheaded-block-19` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2e112166cfbee65abc7f3a5f` | `docs/architect/agent-coordination/architecture/README.md` | `agent-coordination-architecture` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8b4694ac39b39dbda6387bf4` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b3b4d63e268972c73de21fd8` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_bc8ab1c8a19e603a659c4502` | `docs/architect/agent-coordination/architecture/README.md` | `documents` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ffd931047685a216d494ed54` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_64319e73c800a7d2e82a5f31` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_88936b4a4750c3f7fd958021` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-5` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2e9f16a2969d88fd5a05339c` | `docs/architect/agent-coordination/architecture/README.md` | `runtime-recovery-principles` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d3a5d308a74491833f0333df` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_31f5d8b9fc61aac3c9c4429e` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-7` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0e04564e9e94d59794f43591` | `docs/architect/agent-coordination/architecture/README.md` | `unheaded-block-8` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8e1e5ab35bf06657c2fceac0` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cb499df15bc61f25abe34485` | `docs/architect/agent-coordination/architecture/run-handle.md` | `runhandle-and-recovery-material` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0c00b704d8a7048a8d9621c7` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ed2346333b50e1782f04f030` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a8dd6f85ff18e511862edee1` | `docs/architect/agent-coordination/architecture/run-handle.md` | `1-identity-and-facts` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a3996b263fe6540da79872d0` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0370751650ff4df4a41932e6` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-5` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_63002bd00431820476d92dcb` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_eb98c091e8721599f33dd1ad` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7244ba12ffff2fdbb3dd717b` | `docs/architect/agent-coordination/architecture/run-handle.md` | `2-state-transitions` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_308971b4ab80dafe2baa3cd8` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4c91d007a6f15ee78deb54c5` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c1f9a6a3bf5e0382eb505af3` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d1ba484e531ba5d7128169cc` | `docs/architect/agent-coordination/architecture/run-handle.md` | `3-ports-and-control-outcomes` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cdda0c04e1157cfc5b694a19` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_35413b11307a77916500774b` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_969128ae567c6fdad6fd3a96` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fda67eb47897927462bf9237` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_81a024942f1bd425d2d215bc` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0ba130b59f80e426d3e182d5` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-16` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d6c873d3e520f7cfa031c2f2` | `docs/architect/agent-coordination/architecture/run-handle.md` | `4-guard-sequence` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4a1b789f2633be5e4cc0c580` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-17` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f192a67d4f422a38a2cc17fb` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-18` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_87c1ad499510a11f3fe3288e` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-19` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_53f261454a70cd233c779d3d` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-20` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_58b16a77ef249e86f1dc80bc` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-21` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_56da454a17e02e38c8e159bb` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_850a63139623010877c7f109` | `docs/architect/agent-coordination/architecture/run-handle.md` | `5-recoverymaterialv1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_92b1c7ef629d9310d6f1070f` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-23` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_53b32c4b7336857649005760` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-24` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a4165be2e76c22b713039d9d` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-25` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_288983cc54078a8de60c646c` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-26` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6caa2f0bc8a12b3fec904431` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-27` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4fd559bc291d9ed030f783b5` | `docs/architect/agent-coordination/architecture/run-handle.md` | `6-persistence-and-supported-profile` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7423852b3667003c7d682683` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-28` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4f80724af52e9b3008501451` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-29` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0eec1a29e4e5665b98986ffe` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-30` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b7cb9c2d0528e2f9768d1a60` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-31` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b6a25d1df328e8c8d9c402b3` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-32` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0256bf1abf61280d9a543e87` | `docs/architect/agent-coordination/architecture/run-handle.md` | `7-proof-and-deferred-scope` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e237b6ed4acddb5d87b553dd` | `docs/architect/agent-coordination/architecture/run-handle.md` | `unheaded-block-33` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2cc2d37dee23e64a423be633` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `assignment-execution-runtime-model` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a45216e170cb29082b53e238` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0e6b86efabef7b4470be619a` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0106001c4aa052a1f3998ec1` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `execution-chain` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_26991d8424974ca0f8ee774c` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-3` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1441a7fbab3d13117e86e927` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `invariants` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b794c6b348df6a35fb0bda7e` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-4` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f29c7e987c421bc4b7c736ce` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `failure-domains` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1962e08ad0e2a3da13fec1ab` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ddc79bd99cbf35490c0bb7d7` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2ac5423bf53552abcfe67d2e` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_14f385fabb7649155ecdd18b` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `storage` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fc1a2605dfc001cdf210d42c` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_40bf0235a86c22006bd63867` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-9` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_567bd3c622ffe1e17e830e7d` | `docs/architect/agent-coordination/architecture/runtime-model.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_8a83f9526ef4c72dd4fdfa5c` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6d704db2259af2ee9e162515` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `runtime-recovery-and-work-continuity` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_eb5c2c9f883b5a5d130898e3` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4b62cd808f543ce238c95642` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c96e4b986312869b6a97477f` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `1-scope-and-reading-order` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_828faae1e9472520c04c86a8` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_44c5ee0ccd44f1622414dd69` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_955917b34d063a92a32cd830` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b0fc6b0b88240b82c7e30005` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b0b0e99dc40f09b3d118491d` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `2-identity-and-existing-reality` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_095dbf2447a450c352d4c978` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_abd92538ed743ba778f62911` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_039f47b0f0199f5f2e20cfea` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7f126e580fef4a3d8adfd5f6` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `3-ownership-and-dependencies` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0eeaeb7cb4f6ceb5d0a08c50` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9bb4c7fa06b605d87b1f8306` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a3a5cf3e477fbbb575f52764` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_fff8fb09b06e0e8377388f0d` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `4-recovery-choice` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_862c9798c24c49c0b857a272` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2bb243b82ac39d67a5bf2144` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_502b4de573fa8df173d21f1a` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `5-arbitrary-interruption-is-not-a-checkpoint` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3fafad4a8fdc10e47f54b1e1` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-16` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_196c41a6969a791949e09288` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-17` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_36ba6f53ed79fcfcc4f33b01` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-18` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1846c940cf4b82250ca547c1` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `6-local-concurrency-and-durability` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1263dad9c047a998a737d64f` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-19` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e786d816c6df90f2eaa7c3d2` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-20` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_36fa0611f520ed1a8ca11f73` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-21` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_19ed5441ad59c4da24cef04f` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-22` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ea417637e3abbcda1e5c1c20` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-23` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_20d1548095919708132d31ee` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `7-agent-facing-contract` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_3a8420dcd6dc8581eeb8676e` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-24` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1b0895710cafde9cdf858846` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-25` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1993571a901d6c7f09a9d538` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `8-compatibility-and-rollout` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_83292289a165cc442be9532d` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-26` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a988ddcc8b7b651e055f6bfe` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-27` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b08502c889eabb402a9491ff` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-28` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_849c60bce3a4e1808d90e60e` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `9-implementation-slices-and-gates` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c7121f55974f510b7e81fe20` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-29` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_6b1735519c5d0636be77123e` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-30` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_64cc86359a4acd08cb3dfb49` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `10-proof-matrix` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0efb306e6612253cc05555c2` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-31` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d869655bdf55960b1aa2a889` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-32` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a87b7a749536e89489300497` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `11-review-finding-resolution-and-limits` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cfbba2a38427ef5067c3475b` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-33` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ae6f587b1055e6c559c86c9b` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-34` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_77fba29922bb9ec5f7fff5ef` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-35` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_62e7d1dc0a826b83636104d4` | `docs/architect/agent-coordination/architecture/runtime-recovery-design.md` | `unheaded-block-36` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_ca1e32593fedd68661e1825a` | `docs/architect/agent-coordination/architecture/system-context.md` | `agent-coordination-system-context` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b481f2b013414714e2b4dacc` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2077b1826c0b177bae425873` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_df374f44f5422adb7b4d4225` | `docs/architect/agent-coordination/architecture/system-context.md` | `purpose` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9b46891023ff4e6e101bdcdd` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_650874ff272ddf72abeb61a4` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-4` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_918f22c40fd26b7763674d60` | `docs/architect/agent-coordination/architecture/system-context.md` | `context` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_240d121e8c99103d874b248e` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-5` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_a33718bd3c7ed247fffae35a` | `docs/architect/agent-coordination/architecture/system-context.md` | `accepted-boundaries` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5468e5c196b9282bb85dcf3d` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-6` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_cf06d81124c39c8ae0eddf97` | `docs/architect/agent-coordination/architecture/system-context.md` | `runtime-profiles` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_e7ee9831825db59fe59d1b78` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1f56ef02a8fe6f9f467752dd` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-8` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_47660770d133087f5eeea518` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-9` | `decision` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0e1ec4a58e3fdb317d0fa4df` | `docs/architect/agent-coordination/architecture/system-context.md` | `trust-boundaries` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9e5212c8ef856c1313dcaf11` | `docs/architect/agent-coordination/architecture/system-context.md` | `unheaded-block-10` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_490d49822ab2a99a30da7dde` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `visibility-and-herdr` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_551d7869104ed160b6137844` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_02923e72138434dcb79665a7` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_9fcb1ccca50e9b9915c43aac` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `purpose` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4222054c0a54e6d06f929cd5` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-3` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_0c4860ab8100878e8d1baa63` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `invariant` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_95256dee5228bc8816b796d3` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-4` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_b2836cc0c82ae6fbbb3652a6` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-5` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_44c1132f64f3ee803bc2b54f` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `session-binding` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_d39bcb370a22e153e130f48a` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-6` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_446c06ccd176e4d9af49b2d9` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-7` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_893bc634c2af9e908708f3aa` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-8` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_c85e6de3ab642742fbc229e6` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `observer-and-actor` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_94bade1ecefb21a09f178cc6` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-9` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_27f8dc0216c44fa94ec60c34` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `pane-retention` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_4982c8580e7b88615bf67794` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-10` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_224eda46422c528d33d79eb9` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `allowed-uses` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_7ff3987765823ba919d10c09` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-11` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2725782f802073de10a2c0c4` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `forbidden-inferences` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f6d654232db990edec06a108` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-12` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_425be5cb1aa5c367319916a1` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `stability-direction` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_96d0afdf14a9e82cd3c70981` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-13` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_28a3f8b0bc00988c7f097142` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-14` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_2e256566d61a829368e59791` | `docs/architect/agent-coordination/architecture/visibility-and-herdr.md` | `unheaded-block-15` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_1a612f6106274e049910c4b5` | `docs/architect/agent-coordination/architecture/work-integration.md` | `work-integration-boundaries` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_f1ce8aab19fdcfc9bda61d14` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-1` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_be018ca741ab30ae397da27f` | `docs/architect/agent-coordination/architecture/work-integration.md` | `unheaded-block-2` | `architecture` | `split` | `docs/platform/agent-coordination/README.md` |
+| `claim_5891e495aaef7677fea997cd` | `docs/architect/agent-coordination/architecture/work-integration.md` | `core-invariant` | `contract` | `split` | `docs/platform/agent-coordination/README.md` |

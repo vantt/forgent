@@ -30,7 +30,7 @@ The generator/checker/test implementation was completed beyond the earlier incom
 - consumer kinds: `literal`, `dynamic`, `glob`, `fixture`, `executable-proof`, and `shipped-contract`;
 - local-vs-shipped contract scope integrated from Phase 01's shipped-path inventory;
 - exact git-blob duplicate groups and normalized title/area semantic-conflict groups;
-- vocabulary-conformant proposed dispositions; unknown-blocking claims keep `proposedOwner: null`, while retained/promote/merge/defer rows require exactly one switchboard-derived credible owner;
+- vocabulary-conformant proposed dispositions; retained claim rows carry `targetOwner`/`targetAnchor`, unknown-blocking rows carry explicit null target fields, and retained owners must resolve to a real switchboard-backed target owner rather than a current-source fallback;
 - independent gate checker coverage recomputation from the commit tree plus structural/vocabulary/claim-owner validation;
 - focused unit tests for classifier, conservation units, consumer kinds, and owner constraints.
 
@@ -48,8 +48,8 @@ Artifact sizes and hashes after normalization:
 
 | Artifact | Size | SHA-256 |
 |---|---:|---|
-| `phase-02-doc-inventory.json` | 88 MiB (91,878,536 bytes) | `9a953025db6340d97c313a4b88864b5d6b1858899d87a4b5e39001ad550d16de` |
-| `phase-02-doc-inventory.md` | 653 KiB (668,014 bytes) | `8529afeb8025f96af8e731658edcd89386af6629116dc4f8df3bbbf104eed4bb` |
+| `phase-02-doc-inventory.json` | 95 MiB (99,470,703 bytes) | `e7cc51650ca55f8590880b2705af7ce9ee1342447d3832d69ffe17807b90f587` |
+| `phase-02-doc-inventory.md` | 677 KiB (693,489 bytes) | `329fb921e6190603a548e2673dd79c4987389bfa37c9ffbaacb0c566515ea03e` |
 
 These findings are not resolved in Phase 02. They block promotion and feed later authorized phases.
 
@@ -58,7 +58,7 @@ Verification summary:
 - authoritative runner added at `scripts/verify-phase-02.mjs` and made the only Phase 02 verification door;
 - the runner requires explicit `BASE` and `FIXED_END`, creates a detached clean worktree exactly at `FIXED_END`, asserts HEAD/cleanliness before setup, regenerates inventory from immutable `BASE`, byte-compares committed artifacts, runs the Phase 02 gate/check suite, and emits a machine-readable receipt with hashes/sizes/counts/test totals;
 - pre-runner historical diagnostics: focused inventory tests passed; generated JSON and Markdown matched a fresh immutable-tree regeneration byte-for-byte; inventory gate checker, legacy-doc ratchet, documentation/citation checks, ownership lint, and `git diff --check` passed; full suite exited 0: 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo; log SHA-256 `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`;
-- GitNexus aggregate change analysis reported HIGH risk (61 symbols, 6 flows); direct upstream impact for the two public generator/checker entry points was LOW with no affected process. Independent review must assess the aggregate HIGH result rather than treating the direct-symbol result as a waiver.
+- GitNexus impact was run before remediation edits for `buildInventoryRow`, `validateStructure`, `validateAgainstVocabulary`, and `generateInventory` (LOW); follow-up impact for `buildSwitchboardIndex`, `deriveAreaTargetOwner`, and `targetOwnerForDisposition` was also LOW. Independent review must still assess Phase 02 ledger-risk semantics, not just callgraph risk.
 
 ## Mutation Footprint
 

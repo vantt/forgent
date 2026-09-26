@@ -56,14 +56,34 @@ function firstPresent(...values) {
   return values.find((v) => typeof v === 'string' && v.length > 0) || null;
 }
 
+function concreteRoute(value) {
+  return typeof value === 'string' && value.length > 0 && !value.includes('<') ? value : null;
+}
+
 function deriveAreaTargetOwner(area) {
   return firstPresent(
-    area.entryPoint,
-    area.canonicalRoute,
-    Array.isArray(area.canonicalRoutes) ? area.canonicalRoutes[0] : null,
-    Array.isArray(area.currentRoutes) ? stripGlob(area.currentRoutes[0]?.route) : null,
-    `docs/platform/${areaSlug(area.area)}.md`,
+    concreteRoute(area.entryPoint),
+    concreteRoute(area.canonicalRoute),
+    Array.isArray(area.canonicalRoutes) ? concreteRoute(area.canonicalRoutes.find(concreteRoute)) : null,
   );
+}
+
+function hasSwitchboardBackedTarget(classification) {
+  return classification.switchboardSource === 'rootDocument' || Boolean(classification.bindingSource || classification.proposedTargetOwner);
+}
+
+function deriveClaimStatus(classification) {
+  if (classification.corpus === 'history-evidence') return 'historical';
+  if (classification.authorityStatus === 'promoted' || classification.authorityStatus === 'legacy-current') return 'current';
+  return 'future';
+}
+
+function makeSourceId(sourceDigest) {
+  return `src_${stableHash(`content\n${sourceDigest}`, 20)}`;
+}
+
+function makeClaimBaseId({ sourceId, unitKind, textDigest, title, claimKind, status }) {
+  return `claim_${stableHash([sourceId, unitKind, textDigest, slugText(title), claimKind, status].join('\n'), 24)}`;
 }
 
 /** Builds exact-route and longest-prefix lookup from the Phase 01 switchboard. */
@@ -97,7 +117,8 @@ export function buildSwitchboardIndex(switchboard) {
   }
 
   for (const area of switchboard.areas || []) {
-    const targetOwner = normalizePosix(deriveAreaTargetOwner(area));
+    const derivedTargetOwner = deriveAreaTargetOwner(area);
+    const targetOwner = derivedTargetOwner ? normalizePosix(derivedTargetOwner) : null;
     const routes = area.currentRoutes || area.scopedRoutes || [];
     for (const r of routes) {
       addRoute(r.route, {
@@ -203,7 +224,7 @@ export function classifyDocPath(relPath, switchboardIndex) {
       fileClass: 'maintained-authority',
       corpus: 'platform-authority',
       gap: false,
-      proposedTargetOwner: norm,
+      proposedTargetOwner: null,
       switchboardSource: 'always-loaded-instruction',
       role: 'Doctrine layer loaded every agent session (Phase 07 switchboard-bypass elimination target).',
     };
@@ -538,40 +559,57 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
 }
 
 export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchboardIndex, shippedContract = null, consumers = [] }) {
-  const classification = classifyDocPath(relPath, switchboardIndex);
-  const isMarkdown = relPath.toLowerCase().endsWith('.md');
+  const sourcePath = normalizePosix(relPath);
+  const classification = classifyDocPath(sourcePath, switchboardIndex);
+  const isMarkdown = sourcePath.toLowerCase().endsWith('.md');
   const documentType = isMarkdown ? extractDocumentType(content) : null;
   const claimKind = deriveClaimKind(documentType);
-  const units = isMarkdown ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(relPath, content);
+  const units = isMarkdown ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(sourcePath, content);
   const headings = units.filter((u) => u.unitKind === 'heading').map((u) => ({ level: u.level, text: u.title, anchor: u.anchor }));
-  const isPromotedCanonical = classification.authorityStatus === 'promoted' && normalizePosix(relPath).startsWith('docs/platform/');
-  const proposedDisposition = proposeDisposition({ ...classification, isPromotedCanonical });
+  const isPromotedCanonical = classification.authorityStatus === 'promoted' && sourcePath.startsWith('docs/platform/');
+  const initialDisposition = proposeDisposition({ ...classification, isPromotedCanonical });
+  const initialTargetOwner = targetOwnerForDisposition(initialDisposition, classification);
+  const uniqueClaimKinds = new Set(units.map((u) => inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType)));
+  const needsClaimLevelSplit = classification.fileClass === 'maintained-authority' && RETAINED_CLAIM_DISPOSITIONS.has(initialDisposition) && uniqueClaimKinds.size > 1;
+  const proposedDisposition = needsClaimLevelSplit ? 'split' : initialDisposition;
   const proposedTargetOwner = targetOwnerForDisposition(proposedDisposition, classification);
-  const disposition = DISPOSITIONS_REQUIRING_TARGET_OWNER.has(proposedDisposition) && !proposedTargetOwner ? 'unknown-blocking' : proposedDisposition;
+  const hasCredibleOwner = proposedTargetOwner && hasSwitchboardBackedTarget(classification);
+  const disposition = DISPOSITIONS_REQUIRING_TARGET_OWNER.has(proposedDisposition) && !hasCredibleOwner ? 'unknown-blocking' : proposedDisposition;
   const targetOwner = disposition === proposedDisposition ? proposedTargetOwner : null;
   const rationale = disposition === proposedDisposition ? proposeRationale(disposition, classification) : proposeRationale('unknown-blocking', classification);
   const links = extractLinks(content);
   const refs = extractRefs(content);
   const sourceDigest = sha256(content);
-  const sourceId = `src_${stableHash(normalizePosix(relPath), 20)}`;
+  const sourceId = makeSourceId(sourceDigest);
+  const claimStatus = deriveClaimStatus(classification);
   const proposedClaimOwner = RETAINED_CLAIM_DISPOSITIONS.has(disposition) ? targetOwner : null;
+  const claimDecisionRefs = refs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r));
+  const claimEvidenceLinks = links.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase()));
+  const baseIdCounts = new Map();
 
   const claims = units.map((u) => {
-    const kind = inferClaimKindFromPathAndText(relPath, u.sample || u.title, documentType);
+    const kind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
+    const baseClaimId = makeClaimBaseId({ sourceId, unitKind: u.unitKind, textDigest: u.textDigest, title: u.title, claimKind: kind, status: claimStatus });
+    const duplicateOrdinal = baseIdCounts.get(baseClaimId) || 0;
+    baseIdCounts.set(baseClaimId, duplicateOrdinal + 1);
+    const claimId = duplicateOrdinal === 0 ? baseClaimId : `${baseClaimId}_dup_${stableHash(`${u.anchor}\n${duplicateOrdinal}`, 8)}`;
+    const relations = duplicateOrdinal === 0 ? [] : [{ type: 'same-source-identical-content-duplicate', claimId: baseClaimId, duplicateOrdinal }];
     return {
-      claimId: `claim_${stableHash(`${relPath}\n${u.anchor}\n${u.textDigest}`, 24)}`,
+      claimId,
       sourceId,
+      sourcePath,
       sourceAnchor: u.anchor,
-      sourceLineStart: u.startLine,
-      sourceLineEnd: u.endLine,
-      unitKind: u.unitKind,
-      title: u.title,
+      sourceDigest,
+      targetOwner: proposedClaimOwner,
+      targetAnchor: proposedClaimOwner ? u.anchor : null,
       claimKind: kind,
       authorityKind: classification.authorityStatus,
-      status: classification.corpus === 'history-evidence' ? 'historical' : classification.authorityStatus === 'promoted' ? 'current' : 'future-or-current',
-      disposition,
-      proposedOwner: proposedClaimOwner,
-      relations: [],
+      status: claimStatus,
+      relations,
+      decisionRefs: claimDecisionRefs,
+      evidenceLinks: claimEvidenceLinks,
+      disposition: needsClaimLevelSplit && disposition === proposedDisposition ? 'split' : disposition,
+      reviewStatus: disposition === 'unknown-blocking' ? 'blocking' : 'pending',
     };
   });
 
@@ -699,6 +737,37 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     .filter(([, pathsForSha]) => pathsForSha.length > 1)
     .map(([sha, pathsForSha]) => ({ blobSha: sha, paths: [...pathsForSha].sort() }))
     .sort((a, b) => a.blobSha.localeCompare(b.blobSha));
+  const itemByPath = new Map(items.map((item) => [item.path, item]));
+  for (const group of duplicateContentGroups) {
+    const canonicalPath = group.paths[0];
+    const canonical = itemByPath.get(canonicalPath);
+    const canonicalClaimIds = canonical?.claimIds || [];
+    for (const duplicatePath of group.paths) {
+      const item = itemByPath.get(duplicatePath);
+      if (!item) continue;
+      const oldClaimIds = [...item.claimIds];
+      const oldClaimsById = item._claimsById;
+      const rewrittenIds = [];
+      item._claimsById = new Map();
+      for (const [idx, oldClaimId] of oldClaimIds.entries()) {
+        const claim = oldClaimsById?.get(oldClaimId) || item.claims?.[idx];
+        if (!claim) continue;
+        const canonicalClaimId = canonicalClaimIds[idx] || oldClaimId;
+        if (duplicatePath !== canonicalPath) claim.claimId = `${oldClaimId}_srcdup_${stableHash(duplicatePath, 8)}`;
+        claim.relations.push({
+          type: duplicatePath === canonicalPath ? 'duplicate-content-canonical' : 'duplicate-content-of',
+          claimId: canonicalClaimId,
+          sourceId: canonical?.sourceId || null,
+          sourcePath: canonicalPath,
+          blobSha: group.blobSha,
+        });
+        rewrittenIds.push(claim.claimId);
+        item._claimsById.set(claim.claimId, claim);
+      }
+      item.claimIds = rewrittenIds;
+      item.claimCount = rewrittenIds.length;
+    }
+  }
   const claimLedger = [];
   const consumerEdges = [];
   for (const item of items) {
@@ -706,7 +775,8 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     item.consumerEdgeIds = consumers.map((consumer) => `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}`, 24)}`);
     for (const consumer of consumers) {
       const edgeId = `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}`, 24)}`;
-      consumerEdges.push({ edgeId, targetPath: item.path, ...consumer });
+      const { line, ...consumerWithoutLine } = consumer;
+      consumerEdges.push({ edgeId, ...consumerWithoutLine });
     }
     for (const claimId of item.claimIds) {
       const claim = item._claimsById?.get(claimId);
@@ -804,9 +874,9 @@ export function generateMarkdownReport(inventory) {
   lines.push('');
   lines.push('## Claim Ledger Sample (first 500 rows)');
   lines.push('');
-  lines.push('| Claim | Source | Anchor | Kind | Disposition | Proposed owner |');
+  lines.push('| Claim | Source | Anchor | Kind | Disposition | Target owner |');
   lines.push('|---|---|---|---|---|---|');
-  for (const c of inventory.claimLedger.slice(0, 500)) lines.push(`| \`${c.claimId}\` | \`${c.sourcePath}\` | \`${c.sourceAnchor}\` | \`${c.claimKind}\` | \`${c.disposition}\` | ${c.proposedOwner ? `\`${c.proposedOwner}\`` : ''} |`);
+  for (const c of inventory.claimLedger.slice(0, 500)) lines.push(`| \`${c.claimId}\` | \`${c.sourcePath}\` | \`${c.sourceAnchor}\` | \`${c.claimKind}\` | \`${c.disposition}\` | ${c.targetOwner ? `\`${c.targetOwner}\`` : ''} |`);
   return lines.join('\n') + '\n';
 }
 
