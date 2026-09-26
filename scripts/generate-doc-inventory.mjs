@@ -10,7 +10,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { writeShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import {
@@ -23,6 +23,7 @@ import { classifyFile as classifyLegacyRootFile } from './check-legacy-docs-ratc
 export const SCAN_ROOTS = ['docs'];
 export const ADDITIONAL_ROOT_FILES = ['AGENTS.md', 'CLAUDE.md'];
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
+export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/phase-02-identity-registry.json`;
 
 function stableHash(input, len = 16) {
   return crypto.createHash('sha256').update(String(input)).digest('hex').slice(0, len);
@@ -30,6 +31,27 @@ function stableHash(input, len = 16) {
 
 function sha256(input) {
   return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+function sha256Bytes(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+function randomOpaqueId(prefix, bytes = 16) {
+  return `${prefix}_${crypto.randomBytes(bytes).toString('hex')}`;
+}
+
+function readBlobBufferAtCommit(commitSha, fileRel, repoRoot = process.cwd()) {
+  return execFileSync('git', ['show', `${commitSha}:${fileRel}`], {
+    cwd: repoRoot,
+    encoding: 'buffer',
+    maxBuffer: 20 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+}
+
+function decodeUtf8(buffer) {
+  return Buffer.isBuffer(buffer) ? buffer.toString('utf8') : String(buffer);
 }
 
 function slugText(text) {
@@ -46,8 +68,8 @@ export function githubSlugText(text) {
     .trim()
     .toLowerCase()
     .replace(/<[^>]*>/g, '')
-    .replace(/[`*_~]/g, '')
-    .replace(/[^\p{L}\p{N}\s -]/gu, '')
+    .replace(/[`*~]/g, '')
+    .replace(/[^\p{L}\p{N}_\s -]/gu, '')
     .trim()
     .replace(/\s+/g, '-');
 }
@@ -72,16 +94,20 @@ function concreteRoute(value) {
   return typeof value === 'string' && value.length > 0 && !value.includes('<') ? value : null;
 }
 
+function isTargetTopologyPath(value) {
+  return typeof value === 'string' && normalizePosix(value).startsWith('docs/platform/');
+}
+
 function deriveAreaTargetOwner(area) {
   return firstPresent(
-    concreteRoute(area.entryPoint),
-    concreteRoute(area.canonicalRoute),
-    Array.isArray(area.canonicalRoutes) ? concreteRoute(area.canonicalRoutes.find(concreteRoute)) : null,
+    isTargetTopologyPath(area.entryPoint) ? concreteRoute(area.entryPoint) : null,
+    isTargetTopologyPath(area.canonicalRoute) ? concreteRoute(area.canonicalRoute) : null,
+    Array.isArray(area.canonicalRoutes) ? concreteRoute(area.canonicalRoutes.find(isTargetTopologyPath)) : null,
   );
 }
 
 function hasSwitchboardBackedTarget(classification) {
-  return classification.switchboardSource === 'rootDocument' || Boolean(classification.bindingSource || classification.proposedTargetOwner);
+  return Boolean(classification.proposedTargetOwner && isTargetTopologyPath(classification.proposedTargetOwner) && ['scopedRoute', 'corpusRoot'].includes(classification.switchboardSource));
 }
 
 function deriveClaimStatus(classification) {
@@ -98,14 +124,79 @@ function makeClaimBaseId({ sourceId, unitKind, textDigest, title, claimKind, sta
   return `claim_${stableHash([sourceId, unitKind, textDigest, slugText(title), claimKind, status].join('\n'), 24)}`;
 }
 
+export function loadIdentityRegistry(commitSha, repoRoot) {
+  try {
+    return JSON.parse(readBlobAtCommit(commitSha, IDENTITY_REGISTRY_PATH, repoRoot));
+  } catch {
+    const workingPath = path.resolve(repoRoot, IDENTITY_REGISTRY_PATH);
+    if (fs.existsSync(workingPath)) return JSON.parse(fs.readFileSync(workingPath, 'utf8'));
+    return { version: 1, documents: [], units: [] };
+  }
+}
+
+export function buildIdentityRegistryIndex(registry = {}) {
+  const docByPath = new Map();
+  const docConflictsByPath = new Map();
+  const unitsByDigest = new Map();
+  for (const doc of registry.documents || []) {
+    if (!doc?.path || !doc?.sourceId) continue;
+    const p = normalizePosix(doc.path);
+    if (docByPath.has(p) && docByPath.get(p) !== doc.sourceId) docConflictsByPath.set(p, [...new Set([docByPath.get(p), doc.sourceId])]);
+    else docByPath.set(p, doc.sourceId);
+  }
+  for (const unit of registry.units || []) {
+    if (!unit?.unitDigest || !unit?.claimId) continue;
+    const arr = unitsByDigest.get(unit.unitDigest) || [];
+    arr.push({ ...unit, sourcePath: unit.sourcePath ? normalizePosix(unit.sourcePath) : null });
+    unitsByDigest.set(unit.unitDigest, arr);
+  }
+  return { docByPath, docConflictsByPath, unitsByDigest };
+}
+
+function explicitIdentityGapId(prefix, seed, len = 24) {
+  return `${prefix}_identity_gap_${stableHash(seed, len)}`;
+}
+
+function resolveRegisteredSourceId(identityIndex, sourcePath) {
+  const p = normalizePosix(sourcePath);
+  if (identityIndex?.docConflictsByPath?.has(p)) return { sourceId: null, identityStatus: 'ambiguous-source-registry-gap' };
+  const sourceId = identityIndex?.docByPath?.get(p) || null;
+  return sourceId ? { sourceId, identityStatus: 'carried-forward' } : { sourceId: null, identityStatus: 'missing-source-registry-gap' };
+}
+
+function resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath = null, sourceAnchor = null) {
+  const p = sourcePath ? normalizePosix(sourcePath) : null;
+  const matches = identityIndex?.unitsByDigest?.get(unitDigest) || [];
+  const pathMatches = p ? matches.filter((m) => normalizePosix(m.sourcePath || '') === p) : matches;
+  const anchorMatches = sourceAnchor ? pathMatches.filter((m) => m.sourceAnchor === sourceAnchor) : pathMatches;
+  const bestMatches = anchorMatches.length > 0 ? anchorMatches : pathMatches;
+  const pathIds = [...new Set(bestMatches.map((m) => m.claimId).filter(Boolean))];
+  if (pathIds.length === 1) return { claimId: pathIds[0], identityStatus: 'carried-forward' };
+  if (pathIds.length > 1) return { claimId: null, identityStatus: 'ambiguous-registry-gap' };
+  const claimIds = [...new Set(matches.map((m) => m.claimId).filter(Boolean))];
+  if (claimIds.length > 0) return { claimId: null, identityStatus: 'ambiguous-registry-gap' };
+  return { claimId: null, identityStatus: 'missing-registry-gap' };
+}
+
 /** Builds exact-route and longest-prefix lookup from the Phase 01 switchboard. */
 export function buildSwitchboardIndex(switchboard) {
   const exact = new Map();
   const prefixes = [];
+  const routeConflicts = new Map();
+
+  function addRouteConflict(route, existing, incoming) {
+    const norm = normalizePosix(route);
+    const arr = routeConflicts.get(norm) || [];
+    if (arr.length === 0 && existing) arr.push(existing);
+    arr.push(incoming);
+    routeConflicts.set(norm, arr);
+  }
 
   function addExact(pathStr, entry) {
     if (!pathStr || typeof pathStr !== 'string' || pathStr.includes('<')) return;
-    exact.set(normalizePosix(pathStr), entry);
+    const norm = normalizePosix(pathStr);
+    if (exact.has(norm)) addRouteConflict(norm, exact.get(norm), entry);
+    exact.set(norm, exact.get(norm) || entry);
   }
 
   function addRoute(routeStr, entry) {
@@ -159,11 +250,12 @@ export function buildSwitchboardIndex(switchboard) {
   }
 
   prefixes.sort((a, b) => b.prefix.length - a.prefix.length);
-  return { exact, prefixes };
+  return { exact, prefixes, routeConflicts };
 }
 
 export function lookupSwitchboard(index, relPath) {
   const norm = normalizePosix(relPath);
+  if (index.routeConflicts?.has(norm)) return { ...index.exact.get(norm), routeConflict: index.routeConflicts.get(norm) };
   if (index.exact.has(norm)) return index.exact.get(norm);
   for (const { prefix, entry } of index.prefixes) {
     if (norm === prefix || norm.startsWith(prefix + '/')) return entry;
@@ -248,8 +340,10 @@ export function classifyDocPath(relPath, switchboardIndex) {
       authorityStatus: sb.authorityStatus,
       fileClass: sb.fileClass || deriveFileClassFromAuthority(sb.authorityStatus, sb.role),
       corpus: deriveCorpusForSwitchboardEntry(sb, norm),
-      gap: false,
-      proposedTargetOwner: sb.proposedTargetOwner || null,
+      gap: Boolean(sb.routeConflict),
+      gapType: sb.routeConflict ? 'route-conflict' : null,
+      routeConflict: sb.routeConflict || null,
+      proposedTargetOwner: sb.routeConflict ? null : (sb.proposedTargetOwner || null),
       bindingSource: sb.bindingSource || null,
       switchboardSource: sb.switchboardSource,
       role: sb.role || null,
@@ -524,7 +618,7 @@ export function classifyConsumerKind(refFile, line = '') {
 }
 
 function isTextPath(p) {
-  return /\.(md|ts|tsx|js|mjs|cjs|py|rs|sh|json|yaml|yml|toml)$/i.test(p);
+  return /\.(md|ts|tsx|js|mjs|cjs|py|rs|sh|jsonl|json|yaml|yml|toml|txt|log)$/i.test(p);
 }
 
 function listCommitPaths(repoRoot, commitSha) {
@@ -607,7 +701,10 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
       continue;
     }
     let content;
-    try { content = readBlobAtCommit(commitSha, file, repoRoot); } catch (err) {
+    try {
+      const cached = options.blobContentsByPath?.get(file);
+      content = cached ? decodeUtf8(cached) : readBlobAtCommit(commitSha, file, repoRoot);
+    } catch (err) {
       scanGaps.push({ type: 'consumer-scan-unreadable', path: file, message: `${file}: unable to read blob: ${err.message}` });
       continue;
     }
@@ -628,6 +725,17 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
         if (token.includes('*')) {
           const re = globToRegExp(token);
           for (const target of normalizedTargets) if (re.test(target)) add(target, file, lineNo, 'glob', { rawTarget: link.raw, resolvedTarget: token });
+        }
+      }
+
+      const joinMatch = line.match(/path\.(?:join|resolve)\(([^)]*)\)/);
+      if (joinMatch) {
+        const parts = [...joinMatch[1].matchAll(/['"]([^'"]+)['"]/g)].map((part) => part[1]);
+        const prefix = normalizePosix(parts.filter((part) => !/[${}*<>]/.test(part)).join('/'));
+        if (prefix) {
+          for (const target of normalizedTargets) {
+            if (target === prefix || target.startsWith(prefix + '/')) add(target, file, lineNo, 'dynamic', { dynamicPrefix: prefix, unresolvedDynamic: !parts.some((part) => /\.[A-Za-z0-9]+$/.test(part)) });
+          }
         }
       }
 
@@ -674,7 +782,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
   return consumersByPath;
 }
 
-export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchboardIndex, shippedContract = null, consumers = [] }) {
+export function buildInventoryRow(relPath, { content, sourceDigest: providedSourceDigest = null, blobSha, blobSize, switchboardIndex, shippedContract = null, consumers = [], identityIndex = null }) {
   const sourcePath = normalizePosix(relPath);
   const classification = classifyDocPath(sourcePath, switchboardIndex);
   const isMarkdown = sourcePath.toLowerCase().endsWith('.md');
@@ -697,15 +805,19 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
   const links = linkRecords.map((l) => l.raw);
   const resolvedLinks = [...new Set(linkRecords.map((l) => l.targetPath).filter(Boolean))].sort();
   const refs = extractRefs(content);
-  const sourceDigest = sha256(content);
-  const sourceId = makeSourceId(sourceDigest);
+  const sourceDigest = providedSourceDigest || sha256(content);
+  const resolvedSourceIdentity = resolveRegisteredSourceId(identityIndex, sourcePath);
+  const sourceId = resolvedSourceIdentity.sourceId;
   const claimStatus = deriveClaimStatus(classification);
   const proposedClaimOwner = RETAINED_CLAIM_DISPOSITIONS.has(disposition) ? targetOwner : null;
   const baseIdCounts = new Map();
 
   const claims = units.map((u) => {
     const kind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
-    const baseClaimId = makeClaimBaseId({ sourceId, unitKind: u.unitKind, textDigest: u.textDigest, title: u.title, claimKind: kind, status: claimStatus });
+    const unitDigest = sha256(`${u.unitKind}\n${u.textDigest}\n${kind}\n${claimStatus}`);
+    const resolvedIdentity = resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath, u.anchor);
+    const hasIdentityGap = resolvedSourceIdentity.identityStatus !== 'carried-forward' || resolvedIdentity.identityStatus !== 'carried-forward';
+    const baseClaimId = resolvedIdentity.claimId || explicitIdentityGapId('claim', `${sourcePath}\n${unitDigest}`);
     const duplicateOrdinal = baseIdCounts.get(baseClaimId) || 0;
     baseIdCounts.set(baseClaimId, duplicateOrdinal + 1);
     const claimId = duplicateOrdinal === 0 ? baseClaimId : `${baseClaimId}_dup_${stableHash(`${u.anchor}\n${duplicateOrdinal}`, 8)}`;
@@ -718,17 +830,20 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
       sourcePath,
       sourceAnchor: u.anchor,
       sourceDigest,
+      sourceUnitDigest: u.textDigest,
+      identityUnitDigest: unitDigest,
+      identityStatus: hasIdentityGap ? (resolvedSourceIdentity.identityStatus === 'carried-forward' ? resolvedIdentity.identityStatus : resolvedSourceIdentity.identityStatus) : 'carried-forward',
       sourceLocation: { start: u.startLine, end: u.endLine },
-      targetOwner: proposedClaimOwner,
-      targetAnchor: proposedClaimOwner ? u.anchor : null,
+      targetOwner: hasIdentityGap ? null : proposedClaimOwner,
+      targetAnchor: !hasIdentityGap && proposedClaimOwner === sourcePath ? u.anchor : null,
       claimKind: kind,
       authorityKind: classification.authorityStatus,
       status: claimStatus,
       relations,
       decisionRefs: unitRefs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r)),
       evidenceLinks: unitLinks.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase())),
-      disposition: needsClaimLevelSplit && disposition === proposedDisposition ? 'split' : disposition,
-      reviewStatus: disposition === 'unknown-blocking' ? 'blocking' : 'pending',
+      disposition: hasIdentityGap ? 'unknown-blocking' : (needsClaimLevelSplit && disposition === proposedDisposition ? 'split' : disposition),
+      reviewStatus: disposition === 'unknown-blocking' || hasIdentityGap ? 'blocking' : 'pending',
     };
   });
 
@@ -737,6 +852,7 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
   const row = {
     path: normalizePosix(relPath),
     sourceId,
+    identityStatus: resolvedSourceIdentity.identityStatus,
     sourceDigest,
     blobSha,
     blobSize,
@@ -809,6 +925,37 @@ export function scanInScopeFiles(repoRoot, commitSha) {
   });
 }
 
+export function readCommitBlobMap(repoRoot, entries, options = {}) {
+  const maxSize = options.maxSize ?? 20 * 1024 * 1024;
+  const readable = entries.filter((e) => e?.blobSha && Number(e.size) <= maxSize);
+  if (readable.length === 0) return new Map();
+  const input = readable.map((e) => e.blobSha).join('\n') + '\n';
+  const result = spawnSync('git', ['cat-file', '--batch'], {
+    cwd: repoRoot,
+    input,
+    maxBuffer: Math.max(64 * 1024 * 1024, readable.reduce((n, e) => n + Number(e.size || 0), 0) + readable.length * 200),
+  });
+  if (result.status !== 0) throw new Error(`git cat-file --batch failed: ${decodeUtf8(result.stderr || Buffer.alloc(0)).trim()}`);
+  const bySha = new Map();
+  let offset = 0;
+  const stdout = result.stdout || Buffer.alloc(0);
+  for (const entry of readable) {
+    const nl = stdout.indexOf(0x0a, offset);
+    if (nl < 0) throw new Error(`git cat-file --batch truncated before ${entry.blobSha}`);
+    const header = stdout.slice(offset, nl).toString('utf8');
+    const [sha, type, sizeText] = header.split(' ');
+    const size = Number(sizeText);
+    if (sha !== entry.blobSha || type !== 'blob' || !Number.isFinite(size)) throw new Error(`git cat-file --batch unexpected header for ${entry.path}: ${header}`);
+    const start = nl + 1;
+    const end = start + size;
+    bySha.set(sha, Buffer.from(stdout.slice(start, end)));
+    offset = end + 1;
+  }
+  const byPath = new Map();
+  for (const entry of readable) byPath.set(normalizePosix(entry.path), bySha.get(entry.blobSha));
+  return byPath;
+}
+
 export function loadSwitchboard(commitSha, repoRoot) {
   const raw = readBlobAtCommit(commitSha, `${PHASE_DIR}/transitional-switchboard.json`, repoRoot);
   return JSON.parse(raw);
@@ -827,14 +974,69 @@ export function buildSemanticConflictGroups(items) {
     .sort((a, b) => a.key.localeCompare(b.key));
 }
 
+export function bootstrapIdentityRegistry(repoRoot = process.cwd(), options = {}) {
+  const commit = options.commit;
+  if (!commit || typeof commit !== 'string' || commit.trim() === '') throw new Error('Explicit commit/treeish is required for identity registry bootstrap');
+  const commitSha = resolveCommitSha(commit, repoRoot);
+  const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
+  const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
+  const blobContentsByPath = readCommitBlobMap(repoRoot, files);
+  const documents = [];
+  const units = [];
+  for (const f of files) {
+    const sourcePath = normalizePosix(f.path);
+    if (f.size > 20 * 1024 * 1024) throw new Error(`${sourcePath}: cannot bootstrap identity for >20MB blob without an explicit reviewed gap`);
+    const content = decodeUtf8(blobContentsByPath.get(sourcePath) || readBlobBufferAtCommit(commitSha, sourcePath, repoRoot));
+    const sourceDigest = sha256Bytes(blobContentsByPath.get(sourcePath) || Buffer.from(content));
+    const classification = classifyDocPath(sourcePath, switchboardIndex);
+    const documentType = sourcePath.toLowerCase().endsWith('.md') ? extractDocumentType(content) : null;
+    const claimStatus = deriveClaimStatus(classification);
+    const conservationUnits = sourcePath.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(sourcePath, content);
+    const sourceId = randomOpaqueId('src');
+    documents.push({ path: sourcePath, sourceId, sourceDigest, blobSha: f.blobSha });
+    for (const u of conservationUnits) {
+      const claimKind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
+      const unitDigest = sha256(`${u.unitKind}\n${u.textDigest}\n${claimKind}\n${claimStatus}`);
+      units.push({
+        sourcePath,
+        unitDigest,
+        claimId: randomOpaqueId('claim'),
+        sourceAnchor: u.anchor,
+        unitKind: u.unitKind,
+        sourceUnitDigest: u.textDigest,
+        claimKind,
+        status: claimStatus,
+      });
+    }
+  }
+  return {
+    $schema: 'https://forgent.dev/schemas/doc-inventory-identity-registry.v1.json',
+    version: 1,
+    phase: '02',
+    commit: commitSha,
+    generatedAt: new Date(0).toISOString(),
+    description: 'Opaque Phase 02 identity registry. Values are persisted random IDs; lookup keys preserve immutable-base path and conservation-unit digest only to carry identity across unrelated insertion/reorder. Missing or ambiguous entries are identity gaps, not a license to derive replacement IDs.',
+    documents,
+    units,
+  };
+}
+
 export function generateInventory(repoRoot = process.cwd(), options = {}) {
   const commit = options.commit;
   if (!commit || typeof commit !== 'string' || commit.trim() === '') throw new Error('Explicit commit/treeish is required for inventory generation (fail closed; cannot default to HEAD or working tree)');
   const commitSha = resolveCommitSha(commit, repoRoot);
   const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
+  const identityIndex = buildIdentityRegistryIndex(loadIdentityRegistry(commitSha, repoRoot));
   const shippedIndex = buildShippedContractIndex(loadShippedPathInventory(commitSha, repoRoot));
   const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
   const paths = files.map((f) => normalizePosix(f.path));
+  const allEntries = parseLsTreeLong(execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 60 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  }));
+  const blobContentsByPath = readCommitBlobMap(repoRoot, allEntries.filter((e) => isTextPath(normalizePosix(e.path)) || paths.includes(normalizePosix(e.path))));
   const targetRefs = new Map();
   for (const f of files) {
     const norm = normalizePosix(f.path);
@@ -842,10 +1044,10 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
       targetRefs.set(norm, []);
       continue;
     }
-    try { targetRefs.set(norm, extractRefs(readBlobAtCommit(commitSha, f.path, repoRoot))); }
+    try { targetRefs.set(norm, extractRefs(decodeUtf8(blobContentsByPath.get(norm) || readBlobBufferAtCommit(commitSha, f.path, repoRoot)))); }
     catch { targetRefs.set(norm, []); }
   }
-  const consumersByPath = collectConsumers(repoRoot, commitSha, paths, shippedIndex, { targetRefs });
+  const consumersByPath = collectConsumers(repoRoot, commitSha, paths, shippedIndex, { targetRefs, blobContentsByPath });
   const scanGaps = consumersByPath.scanGaps || [];
   const immutableRefEdges = consumersByPath.immutableRefEdges || [];
   const blobShaCounts = new Map();
@@ -859,6 +1061,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
         blobSha: f.blobSha,
         blobSize: f.size,
         switchboardIndex,
+        identityIndex,
         shippedContract: shippedIndex.get(norm) || null,
         consumers: consumersByPath.get(norm) || [],
       }));
@@ -867,16 +1070,24 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
       continue;
     }
     let content;
-    try { content = readBlobAtCommit(commitSha, f.path, repoRoot); }
+    let sourceDigest;
+    try {
+      const blobBuffer = blobContentsByPath.get(norm) || readBlobBufferAtCommit(commitSha, f.path, repoRoot);
+      sourceDigest = sha256Bytes(blobBuffer);
+      content = decodeUtf8(blobBuffer);
+    }
     catch (err) {
       content = `UNREAD INVENTORY GAP: ${norm} could not be read: ${err.message}`;
+      sourceDigest = sha256Bytes(Buffer.from(content));
       scanGaps.push({ type: 'inventory-blob-unreadable', path: norm, message: `${norm}: explicit inventory gap because blob could not be read: ${err.message}` });
     }
     const row = buildInventoryRow(norm, {
       content,
+      sourceDigest,
       blobSha: f.blobSha,
       blobSize: f.size,
       switchboardIndex,
+      identityIndex,
       shippedContract: shippedIndex.get(norm) || null,
       consumers: consumersByPath.get(norm) || [],
     });
@@ -890,40 +1101,17 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     .sort((a, b) => a.blobSha.localeCompare(b.blobSha));
   const itemByPath = new Map(items.map((item) => [item.path, item]));
   for (const group of duplicateContentGroups) {
-    const canonicalPath = group.paths[0];
-    const canonical = itemByPath.get(canonicalPath);
-    const canonicalClaimIds = canonical?.claimIds || [];
-    const sourceOccurrences = group.paths.map((p, idx) => ({ sourceOccurrenceOrdinal: idx, path: p, role: p === canonicalPath ? 'canonical' : 'duplicate' }));
-    for (const [sourceOccurrenceOrdinal, duplicatePath] of group.paths.entries()) {
+    const semanticClaimId = `semantic_${stableHash(group.blobSha, 24)}`;
+    const sourceOccurrences = group.paths.map((p, idx) => ({ sourceOccurrenceOrdinal: idx, path: p, role: idx === 0 ? 'canonical' : 'duplicate' }));
+    for (const duplicatePath of group.paths) {
       const item = itemByPath.get(duplicatePath);
       if (!item) continue;
-      const oldClaimIds = [...item.claimIds];
-      const rewrittenIds = [];
       item.sourceOccurrences = sourceOccurrences;
-      item._claimsById = new Map();
-      for (const [idx, oldClaimId] of oldClaimIds.entries()) {
-        const canonicalClaimId = canonicalClaimIds[idx] || oldClaimId;
-        const canonicalClaim = canonical?._claimsById?.get(canonicalClaimId);
-        const claim = canonicalClaim || item.claims?.[idx];
-        if (!claim) continue;
-        claim.claimId = canonicalClaimId;
-        claim.sourceOccurrenceOrdinal = 0;
+      for (const claim of item.claims || []) {
+        claim.semanticClaimId = semanticClaimId;
         claim.sourceOccurrences = sourceOccurrences;
-        claim.relations = claim.relations.filter((r) => !String(r.type || '').startsWith('duplicate-content-'));
-        for (const occurrence of sourceOccurrences) {
-          claim.relations.push({
-            type: occurrence.role === 'canonical' ? 'duplicate-content-canonical' : 'duplicate-content-of',
-            claimId: canonicalClaimId,
-            sourcePath: occurrence.path,
-            sourceOccurrenceOrdinal: occurrence.sourceOccurrenceOrdinal,
-            blobSha: group.blobSha,
-          });
-        }
-        rewrittenIds.push(canonicalClaimId);
-        item._claimsById.set(canonicalClaimId, claim);
+        claim.relations.push({ type: 'duplicate-content-member', semanticClaimId, sourcePath: duplicatePath, blobSha: group.blobSha });
       }
-      item.claimIds = rewrittenIds;
-      item.claimCount = rewrittenIds.length;
     }
   }
   const claimLedger = [];
@@ -1059,12 +1247,22 @@ export function runCli(argv, cwd = process.cwd()) {
     console.error('Error: --commit <commit-or-treeish> is required (fail closed; cannot default to HEAD or working tree)');
     return 1;
   }
-  let inventory;
-  try { inventory = generateInventory(cwd, { commit }); } catch (err) { console.error(`Error: ${err.message}`); return 1; }
   const jsonOutIdx = argv.indexOf('--json-out');
   const mdOutIdx = argv.indexOf('--md-out');
   const jsonOut = jsonOutIdx >= 0 ? path.resolve(cwd, argv[jsonOutIdx + 1]) : null;
   const mdOut = mdOutIdx >= 0 ? path.resolve(cwd, argv[mdOutIdx + 1]) : null;
+  if (argv.includes('--bootstrap-identity-registry')) {
+    if (!jsonOut) { console.error('Error: --bootstrap-identity-registry requires --json-out <path>'); return 1; }
+    try {
+      const registry = bootstrapIdentityRegistry(cwd, { commit });
+      fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+      fs.writeFileSync(jsonOut, JSON.stringify(registry, null, 2) + '\n');
+      console.log(`generate-doc-inventory: wrote identity registry to ${path.relative(cwd, jsonOut)} (${registry.documents.length} documents, ${registry.units.length} units)`);
+      return 0;
+    } catch (err) { console.error(`Error: ${err.message}`); return 1; }
+  }
+  let inventory;
+  try { inventory = generateInventory(cwd, { commit }); } catch (err) { console.error(`Error: ${err.message}`); return 1; }
   if (jsonOut) { fs.mkdirSync(path.dirname(jsonOut), { recursive: true }); writeShardedJsonArtifact(jsonOut, inventory); console.log(`generate-doc-inventory: wrote sharded JSON inventory manifest to ${path.relative(cwd, jsonOut)}`); }
   if (mdOut) { fs.mkdirSync(path.dirname(mdOut), { recursive: true }); fs.writeFileSync(mdOut, generateMarkdownReport(inventory)); console.log(`generate-doc-inventory: wrote Markdown report to ${path.relative(cwd, mdOut)}`); }
   if (!jsonOut && !mdOut) console.log(JSON.stringify(inventory, null, 2));

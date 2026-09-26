@@ -55,10 +55,11 @@ test('verifyForbiddenPhase02Diff allows exact Phase 02 footprint including shard
       'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json',
       'plans/260925-documentation-authority-unification/phase-02-doc-inventory.parts/part-0001.jsonl',
       'plans/260925-documentation-authority-unification/phase-02-doc-inventory.md',
+      'plans/260925-documentation-authority-unification/phase-02-identity-registry.json',
       'CHANGELOG.md',
     ]; },
   });
-  assert.equal(result.changedPathCount, 6);
+  assert.equal(result.changedPathCount, 7);
 });
 
 test('verifyForbiddenPhase02Diff rejects unrelated edits', () => {

@@ -25,8 +25,8 @@ BASE=<phase-01-commit> FIXED_END=<phase-02-commit> \
 reviewed. The runner creates a detached clean worktree exactly at `FIXED_END`,
 asserts HEAD and cleanliness before setup, provisions dependencies there with
 `npm ci` when a lockfile exists, regenerates `phase-02-doc-inventory.{json,md}`
-from `BASE`, byte-compares the manifest, Markdown, and every shard to committed
-artifacts, enforces the exact Phase 02 footprint allowlist, and emits a compact
+from `BASE` using the committed opaque identity registry, byte-compares the manifest, Markdown, and every shard to committed
+artifacts, validates registry commit/count/hash metadata, enforces the exact Phase 02 footprint allowlist, and emits a compact
 machine-readable receipt.
 
 Local commands in a moving checkout are useful only as development diagnostics;
@@ -57,11 +57,11 @@ node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-0
 node scripts/check-doc-inventory-gates.mjs
 ```
 
-Results: focused tests passed (51/51), deterministic regeneration passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 1,721 bytes with SHA-256 `be40f96c1582338ab2e4d7e4ab8f79414befee66de4eb5653d5f0c9b5684df1e`; all 7 shards are under 25 MB; reassembled payload SHA-256 is `b1126cbca7adc775d95d8ea991f84b2febe79afb30b234aef35b2e5795838fb3`; Markdown SHA-256 is `e1b016993124a64e1afb9bd83d7c96797bbc1e4d680045fab299db710de56859`.
+Results: focused tests passed (58/58), deterministic regeneration passed, gate checker passed in 8.5s with explicit open findings only: 1054 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,454 bytes with SHA-256 `c50920736c11d87d21958a6d5e89caa76b9c684794c3a9b09696783e63ed4dea`; all 11 shards are under 25 MB; Markdown SHA-256 is `c9c48e76ba546e8eec3873f8a20db822dd8d4a3396f35e2730cf74e029d85237`; identity registry is 43,883,041 bytes with SHA-256 `e896d91e7c60995fb08c68df17ea7606b1459d09e0e0d875346492fbf770ddda` and covers 4,305 documents / 85,772 units.
 
-The first post-sharding immutable-verifier attempt correctly failed because the committed artifacts had been generated from the moving remediation base rather than the immutable Phase 01 base. The artifacts above were regenerated from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`.
+A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
-The authoritative verifier then passed with `FIXED_END=e19b4c47cdd264f2e1d820b730697660cf723d5a` (tree `c3243e615942595b401da24c0c5d259c83860867`): `npm ci`, 51 focused tests, immutable-base manifest/shard/Markdown byte identity, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks all passed. This receipt intentionally skipped the full suite; the final review boundary still requires the verifier's full-suite mode.
+The authoritative verifier is expected to be invoked with the final immutable review commit as `FIXED_END`; the latest local skip-full-suite invocation passed all covered checks (`npm ci`, 58 focused tests, immutable-base manifest/shard/Markdown byte identity, identity-registry validation, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks) in about 29s. This receipt intentionally skipped the full suite; the final review boundary still requires the verifier's full-suite mode.
 
 ## Last Local Evidence Before Runner Canonicalization
 

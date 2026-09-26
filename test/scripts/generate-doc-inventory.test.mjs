@@ -27,11 +27,14 @@ import {
   collectConsumers,
   parseLsTreeLong,
   generateInventory,
+  buildIdentityRegistryIndex,
 } from '../../scripts/generate-doc-inventory.mjs';
 import {
   validateStructure,
   validateAgainstVocabulary,
   validateCommitBlobIntegrity,
+  validateSourceUnitCoverage,
+  deriveValidTargetOwnersFromSwitchboard,
 } from '../../scripts/check-doc-inventory-gates.mjs';
 import {
   writeShardedJsonArtifact,
@@ -272,7 +275,9 @@ test('proposeRationale: every disposition that requires one gets a non-empty str
 test('buildInventoryRow: end-to-end row for a promoted portal file requires a target owner and needs no rationale', () => {
   const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
   const content = '```txt\nDocument type: Area portal\n```\n\n# Agent Coordination\n';
-  const row = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: 'a'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: 'a'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const registry = { documents: [{ path: scaffold.path, sourceId: 'src_promoted_opaque' }], units: scaffold.claims.map((c, idx) => ({ sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `claim_promoted_opaque_${idx}` })) };
+  const row = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: 'a'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
   assert.equal(row.proposedDisposition, 'promote');
   assert.equal(row.proposedTargetOwner, 'docs/platform/agent-coordination/README.md');
   assert.equal(row.proposedRationale, null);
@@ -304,13 +309,23 @@ test('buildInventoryRow: claim ledger rows carry every plan §6.2 field and enum
   assert.equal(claim.sourcePath, 'docs/platform/agent-coordination/README.md');
 });
 
-test('buildInventoryRow: source and claim ids are independent of source path for identical non-duplicate content', () => {
+test('buildInventoryRow: source and claim ids come from path-scoped registry entries, not content fallback', () => {
   const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
   const content = '# Portable\n\nPortable text with enough detail.';
-  const a = buildInventoryRow('docs/unmapped-a.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index });
-  const b = buildInventoryRow('docs/unmapped-b.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index });
-  assert.equal(a.sourceId, b.sourceId);
-  assert.deepEqual(a.claimIds, b.claimIds);
+  const scaffold = buildInventoryRow('docs/unmapped-a.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const unitsFor = (sourcePath, sourceId, claimPrefix) => ({
+    documents: [{ path: sourcePath, sourceId }],
+    units: scaffold.claims.map((c, idx) => ({ sourcePath, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `${claimPrefix}_${idx}` })),
+  });
+  const registry = {
+    documents: [...unitsFor('docs/unmapped-a.md', 'src_a_opaque', 'claim_a').documents, ...unitsFor('docs/unmapped-b.md', 'src_b_opaque', 'claim_b').documents],
+    units: [...unitsFor('docs/unmapped-a.md', 'src_a_opaque', 'claim_a').units, ...unitsFor('docs/unmapped-b.md', 'src_b_opaque', 'claim_b').units],
+  };
+  const a = buildInventoryRow('docs/unmapped-a.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  const b = buildInventoryRow('docs/unmapped-b.md', { content, blobSha: 'e'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  assert.equal(a.sourceId, 'src_a_opaque');
+  assert.equal(b.sourceId, 'src_b_opaque');
+  assert.notDeepEqual(a.claimIds, b.claimIds);
 });
 
 test('generateInventory: exact duplicate files share semantic claim ids with explicit occurrence coverage', () => {
@@ -332,10 +347,13 @@ test('generateInventory: exact duplicate files share semantic claim ids with exp
     const inventory = generateInventory(tmp, { commit });
     const a = inventory.items.find((i) => i.path === 'docs/a.md');
     const b = inventory.items.find((i) => i.path === 'docs/b.md');
-    assert.deepEqual(a.claimIds, b.claimIds);
+    assert.notDeepEqual(a.claimIds, b.claimIds);
     assert.equal(new Set(inventory.claimLedger.map((c) => c.claimId)).size, inventory.claimLedger.length);
-    const claim = inventory.claimLedger.find((c) => c.claimId === a.claimIds[0]);
-    assert.deepEqual(new Set(claim.relations.map((r) => r.sourcePath)), new Set(['docs/a.md', 'docs/b.md']));
+    const claimA = inventory.claimLedger.find((c) => c.claimId === a.claimIds[0]);
+    const claimB = inventory.claimLedger.find((c) => c.claimId === b.claimIds[0]);
+    assert.equal(claimA.semanticClaimId, claimB.semanticClaimId);
+    assert.equal(claimA.relations.some((r) => r.type === 'duplicate-content-member' && r.sourcePath === 'docs/a.md'), true);
+    assert.equal(claimB.relations.some((r) => r.type === 'duplicate-content-member' && r.sourcePath === 'docs/b.md'), true);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -526,6 +544,107 @@ test('sharded inventory artifact loader verifies hashes, sizes, order, and extra
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+test('identity registry reuses unaffected claim ids when unrelated text is inserted and headings reorder', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const original = '# A\n\nStable paragraph with enough detail.\n\n# B\n\nAnother stable paragraph with enough detail.';
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content: original, blobSha: '1'.repeat(40), blobSize: original.length, switchboardIndex: index });
+  const registry = {
+    documents: [{ path: scaffold.path, sourceId: 'src_registry_opaque' }],
+    units: scaffold.claims.map((c, idx) => ({ sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `claim_registry_opaque_${idx}` })),
+  };
+  const changed = '# B\n\nAnother stable paragraph with enough detail.\n\nInserted unrelated paragraph with enough detail.\n\n# A\n\nStable paragraph with enough detail.';
+  const second = buildInventoryRow('docs/platform/agent-coordination/README.md', { content: changed, blobSha: '2'.repeat(40), blobSize: changed.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(registry) });
+  const carried = second.claims.filter((c) => c.identityStatus === 'carried-forward').map((c) => c.claimId);
+  assert.equal(carried.includes(registry.units.find((u) => u.sourceAnchor === 'a').claimId), true);
+  assert.equal(carried.includes(registry.units.find((u) => u.sourceAnchor === 'b').claimId), true);
+});
+
+test('missing or ambiguous identity registry entries become explicit blockers, never derived replacement ids', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = '# A\n\nStable paragraph with enough detail.';
+  const missing = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: '1'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex({ documents: [], units: [] }) });
+  assert.equal(missing.claims.every((c) => c.disposition === 'unknown-blocking' && c.identityStatus.includes('registry-gap')), true);
+  assert.equal(missing.claims.every((c) => c.targetOwner === null && c.claimId.includes('identity_gap')), true);
+
+  const scaffold = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: '1'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  const ambiguousRegistry = {
+    documents: [{ path: scaffold.path, sourceId: 'src_registry_opaque' }],
+    units: scaffold.claims.flatMap((c) => [
+      { sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `${c.sourceAnchor}_one` },
+      { sourcePath: scaffold.path, sourceAnchor: c.sourceAnchor, unitDigest: c.identityUnitDigest, claimId: `${c.sourceAnchor}_two` },
+    ]),
+  };
+  const ambiguous = buildInventoryRow(scaffold.path, { content, blobSha: '1'.repeat(40), blobSize: content.length, switchboardIndex: index, identityIndex: buildIdentityRegistryIndex(ambiguousRegistry) });
+  assert.equal(ambiguous.claims.every((c) => c.identityStatus === 'ambiguous-registry-gap' && c.disposition === 'unknown-blocking' && c.targetOwner === null), true);
+});
+
+test('buildSwitchboardIndex: duplicate exact routes become blocking route-conflict gaps instead of last-write-wins', () => {
+  const sw = { areas: [
+    { area: 'A', entryPoint: 'docs/platform/a.md', currentRoutes: [{ route: 'docs/platform-foundations.md', authorityStatus: 'legacy-current', role: 'A' }] },
+    { area: 'B', entryPoint: 'docs/platform/b.md', currentRoutes: [{ route: 'docs/platform-foundations.md', authorityStatus: 'legacy-current', role: 'B' }] },
+  ] };
+  const row = classifyDocPath('docs/platform-foundations.md', buildSwitchboardIndex(sw));
+  assert.equal(row.gap, true);
+  assert.equal(row.gapType, 'route-conflict');
+  const inv = buildInventoryRow('docs/platform-foundations.md', { content: '# Laws\n', blobSha: '3'.repeat(40), blobSize: 7, switchboardIndex: buildSwitchboardIndex(sw) });
+  assert.equal(inv.proposedDisposition, 'unknown-blocking');
+  assert.equal(inv.proposedTargetOwner, null);
+});
+
+test('slugifyHeading: preserves underscores like GitHub anchors', () => {
+  assert.equal(slugifyHeading('Foo_Bar Baz'), 'foo_bar-baz');
+});
+
+test('collectConsumers: path.join dynamic prefixes create honest dynamic edges', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs/specs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'events'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/specs/runner.md'), '# Runner\n');
+    fs.writeFileSync(path.join(tmp, 'events/evidence.jsonl'), '{"p":"docs/specs/runner.md"}\n');
+    fs.writeFileSync(path.join(tmp, 'events/app.log'), 'path.join("docs", "specs", name)\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const consumers = collectConsumers(tmp, commit, ['docs/specs/runner.md']);
+    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'events/evidence.jsonl'), true);
+    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'events/app.log' && e.kind === 'dynamic' && e.dynamicPrefix === 'docs/specs'), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('validateSourceUnitCoverage: detects dropped, duplicate, and digest-mismatched immutable source-unit coverage', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-coverage-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/x.md'), '# X\n\nBody paragraph with enough detail.\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const units = extractMarkdownConservationUnits('# X\n\nBody paragraph with enough detail.\n');
+    const baseClaim = (u, id) => ({ claimId: id, sourcePath: 'docs/x.md', sourceLocation: { start: u.startLine, end: u.endLine }, sourceUnitDigest: u.textDigest });
+    assert.equal(validateSourceUnitCoverage(tmp, { commit, items: [{ path: 'docs/x.md', claimIds: ['c1', 'c2'] }], claimLedger: [baseClaim(units[0], 'c1'), baseClaim(units[1], 'c2')] }).length, 0);
+    assert.equal(validateSourceUnitCoverage(tmp, { commit, items: [{ path: 'docs/x.md', claimIds: ['c1'] }], claimLedger: [baseClaim(units[0], 'c1')] }).some((f) => f.type === 'source-unit-dropped'), true);
+    assert.equal(validateSourceUnitCoverage(tmp, { commit, items: [{ path: 'docs/x.md', claimIds: ['c1', 'c1b', 'c2'] }], claimLedger: [baseClaim(units[0], 'c1'), baseClaim(units[0], 'c1b'), baseClaim(units[1], 'c2')] }).some((f) => f.type === 'source-unit-duplicate-coverage'), true);
+    assert.equal(validateSourceUnitCoverage(tmp, { commit, items: [{ path: 'docs/x.md', claimIds: ['c1', 'c2'] }], claimLedger: [{ ...baseClaim(units[0], 'c1'), sourceUnitDigest: 'bad' }, baseClaim(units[1], 'c2')] }).some((f) => f.type === 'source-unit-digest-mismatch'), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('deriveValidTargetOwnersFromSwitchboard reads target topology independently of inventory rows', () => {
+  const owners = deriveValidTargetOwnersFromSwitchboard(FIXTURE_SWITCHBOARD);
+  assert.equal(owners.has('docs/platform/agent-coordination/README.md'), true);
+  assert.equal(owners.has('docs/specs/runner.md'), false);
 });
 
 test('validateAgainstVocabulary: retained claim owner must be a real switchboard-backed target owner', () => {

@@ -19,7 +19,7 @@ import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
-import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong } from './generate-doc-inventory.mjs';
+import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex } from './generate-doc-inventory.mjs';
 
 /**
  * Independently recomputes the in-scope file count directly from the commit
@@ -122,6 +122,7 @@ export function validateStructure(inventory) {
       if (claim?.sourceLocation && (typeof claim.sourceLocation.start !== 'number' || typeof claim.sourceLocation.end !== 'number')) {
         findings.push({ type: 'malformed-claim-source-location', message: `claim ${claim.claimId || '<missing>'}: sourceLocation must identify the source line span; sourcePath remains the path field` });
       }
+      if (claim && !claim.sourceUnitDigest) findings.push({ type: 'malformed-claim', message: `claim ${claim.claimId || '<missing>'}: missing required conservation sourceUnitDigest` });
     }
     for (const claim of inventory.claimLedger) {
       if (/_srcdup_[0-9a-f]+$/.test(claim.claimId)) {
@@ -143,6 +144,7 @@ export function validateStructure(inventory) {
         if (claim.sourceId && claim.sourceId !== item?.sourceId) findings.push({ type: 'claim-source-id-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceId ${claim.sourceId}` });
         if (claim.sourcePath !== itemPath && !coveredByDuplicateRelation) findings.push({ type: 'claim-source-path-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourcePath ${claim.sourcePath} and no duplicate occurrence covering this path` });
         if (claim.sourceDigest !== item?.sourceDigest) findings.push({ type: 'claim-source-digest-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceDigest ${claim.sourceDigest}` });
+        if (claim.disposition === 'unknown-blocking' && claim.identityStatus === 'ambiguous-registry-gap' && (claim.targetOwner !== null || claim.targetAnchor !== null)) findings.push({ type: 'ambiguous-identity-gap-has-target', path: itemPath, message: `${itemPath}: ambiguous edited unit ${claimId} must not carry targetOwner/targetAnchor` });
       }
     }
     for (const [claimId, paths] of refsByClaim.entries()) {
@@ -190,15 +192,28 @@ export function validateStructure(inventory) {
   return findings;
 }
 
-export function validateAgainstVocabulary(inventory, vocabulary) {
+export function deriveValidTargetOwnersFromSwitchboard(switchboard) {
+  const owners = new Set();
+  for (const area of switchboard?.areas || []) {
+    for (const field of [area.entryPoint, area.canonicalRoute, ...(Array.isArray(area.canonicalRoutes) ? area.canonicalRoutes : [])]) {
+      if (typeof field === 'string' && field.startsWith('docs/platform/')) owners.add(field);
+    }
+  }
+  for (const rd of switchboard?.rootDocuments || []) {
+    if (rd?.authorityStatus === 'promoted' && typeof rd.path === 'string' && rd.path.startsWith('docs/platform/')) owners.add(rd.path);
+  }
+  return owners;
+}
+
+export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwners = null) {
   const findings = [];
   const dispositionsById = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
   claimKinds.add('unclassified');
   const RECOGNIZED_FILE_CLASSES = new Set(['maintained-authority', 'retained-source', 'generated', 'history-evidence']);
   const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
-  const switchboardBackedTargetOwners = new Set((inventory.items || [])
-    .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource))
+  const switchboardBackedTargetOwners = validTargetOwners || new Set((inventory.items || [])
+    .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource) && typeof item.path === 'string' && item.path.startsWith('docs/platform/'))
     .map((item) => item.path));
   const claimsBySourcePath = new Map();
   for (const claim of inventory.claimLedger || []) {
@@ -255,10 +270,61 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
         } else if (!switchboardBackedTargetOwners.has(owners[0])) {
           findings.push({ type: 'retained-claim-owner-not-switchboard-backed', path: item.path, message: `${item.path}: claim ${claim.claimId} targetOwner ${owners[0]} is not a real switchboard-backed target owner` });
         }
-        if (typeof claim.targetAnchor !== 'string' || claim.targetAnchor.length === 0) {
-          findings.push({ type: 'retained-claim-target-anchor-missing', path: item.path, message: `${item.path}: claim ${claim.claimId} must have targetAnchor for retained disposition ${claim.disposition}` });
+        if (claim.targetAnchor && claim.targetOwner !== claim.sourcePath) {
+          findings.push({ type: 'retained-claim-target-anchor-unverified-copy', path: item.path, message: `${item.path}: claim ${claim.claimId} copies targetAnchor ${claim.targetAnchor} onto different targetOwner ${claim.targetOwner} without target verification` });
         }
       }
+    }
+  }
+  return findings;
+}
+
+export function validateSourceUnitCoverage(repoRoot, inventory) {
+  const findings = [];
+  if (!inventory?.commit) return findings;
+  const claimsByPath = new Map();
+  const claimById = new Map((inventory.claimLedger || []).map((claim) => [claim.claimId, claim]));
+  for (const item of inventory.items || []) {
+    for (const claimId of item.claimIds || []) {
+      const claim = claimById.get(claimId);
+      if (claim) claimsByPath.set(item.path, (claimsByPath.get(item.path) || []).concat(claim));
+    }
+  }
+  const treeOut = execFileSync('git', ['ls-tree', '-r', '-l', inventory.commit], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 60 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const treeByPath = new Map(parseLsTreeLong(treeOut).map((entry) => [normalizePosix(entry.path), entry]));
+  const entries = (inventory.items || []).map((item) => treeByPath.get(item.path)).filter(Boolean);
+  const blobContentsByPath = readCommitBlobMap(repoRoot, entries);
+  for (const item of inventory.items || []) {
+    let content;
+    try {
+      const contentBytes = blobContentsByPath.get(item.path);
+      if (!contentBytes) continue;
+      content = contentBytes.toString('utf8');
+    } catch (err) {
+      continue;
+    }
+    const expectedUnits = item.path.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(item.path, content);
+    const expectedKeys = expectedUnits.map((u) => `${u.startLine}:${u.endLine}:${u.textDigest}`).sort();
+    const actualClaims = claimsByPath.get(item.path) || [];
+    const actualKeys = actualClaims.map((c) => `${c.sourceLocation?.start}:${c.sourceLocation?.end}:${c.sourceUnitDigest}`).sort();
+    const expectedCounts = new Map();
+    const actualCounts = new Map();
+    for (const key of expectedKeys) expectedCounts.set(key, (expectedCounts.get(key) || 0) + 1);
+    for (const key of actualKeys) actualCounts.set(key, (actualCounts.get(key) || 0) + 1);
+    for (const [key, count] of expectedCounts.entries()) {
+      const actual = actualCounts.get(key) || 0;
+      if (actual === 0) findings.push({ type: 'source-unit-dropped', path: item.path, message: `${item.path}: source unit ${key} was re-extracted from immutable blob but has no claim coverage` });
+      else if (actual < count) findings.push({ type: 'source-unit-under-covered', path: item.path, message: `${item.path}: source unit ${key} expected ${count} claim row(s), found ${actual}` });
+    }
+    for (const [key, count] of actualCounts.entries()) {
+      const expected = expectedCounts.get(key) || 0;
+      if (expected === 0) findings.push({ type: 'source-unit-digest-mismatch', path: item.path, message: `${item.path}: claim coverage ${key} does not match any re-extracted immutable source unit` });
+      else if (count > expected) findings.push({ type: 'source-unit-duplicate-coverage', path: item.path, message: `${item.path}: source unit ${key} has duplicate claim coverage (${count} > ${expected})` });
     }
   }
   return findings;
@@ -282,20 +348,49 @@ export function validateCommitBlobIntegrity(repoRoot, inventory) {
     }
     if (item.blobSha !== entry.blobSha) findings.push({ type: 'source-blob-sha-mismatch', path: item.path, message: `${item.path}: blobSha ${item.blobSha} does not match commit tree ${entry.blobSha}` });
     if (typeof item.blobSize === 'number' && item.blobSize !== entry.size) findings.push({ type: 'source-blob-size-mismatch', path: item.path, message: `${item.path}: blobSize ${item.blobSize} does not match commit tree ${entry.size}` });
-    if (entry.size <= 20 * 1024 * 1024) {
-      const content = readBlobAtCommit(inventory.commit, item.path, repoRoot);
-      const digest = sha256Buffer(Buffer.from(content, 'utf8'));
+  }
+  const blobContentsByPath = readCommitBlobMap(repoRoot, [...treeByPath.values()].filter((entry) => (inventory.items || []).some((item) => item.path === normalizePosix(entry.path))));
+  for (const item of inventory.items || []) {
+    const content = blobContentsByPath.get(item.path);
+    if (content) {
+      const digest = sha256Buffer(content);
       if (item.sourceDigest !== digest) findings.push({ type: 'source-digest-mismatch', path: item.path, message: `${item.path}: sourceDigest ${item.sourceDigest} does not match commit blob content ${digest}` });
     }
   }
   return findings;
 }
 
-export function checkInventory({ repoRoot, inventory, vocabulary }) {
+export function validateIdentityRegistry(inventory, registry) {
+  const findings = [];
+  if (!registry || typeof registry !== 'object') return [{ type: 'missing-identity-registry', message: 'Phase 02 identity registry is required' }];
+  if (registry.commit !== inventory.commit) findings.push({ type: 'identity-registry-commit-mismatch', message: `identity registry commit ${registry.commit || '<missing>'} does not match inventory commit ${inventory.commit}` });
+  const index = buildIdentityRegistryIndex(registry);
+  const registryDocPaths = new Set((registry.documents || []).map((d) => normalizePosix(d.path || '')).filter(Boolean));
+  const itemPaths = new Set((inventory.items || []).map((i) => i.path));
+  for (const p of itemPaths) {
+    if (!registryDocPaths.has(p)) findings.push({ type: 'identity-registry-missing-document', path: p, message: `${p}: missing document identity registry entry` });
+  }
+  for (const p of registryDocPaths) {
+    if (!itemPaths.has(p)) findings.push({ type: 'identity-registry-stale-document', path: p, message: `${p}: identity registry document is not in inventory` });
+  }
+  for (const item of inventory.items || []) {
+    if (!item.sourceId || index.docByPath.get(item.path) !== item.sourceId) findings.push({ type: 'identity-registry-source-id-mismatch', path: item.path, message: `${item.path}: item sourceId is not supplied by identity registry` });
+  }
+  for (const claim of inventory.claimLedger || []) {
+    const matches = (index.unitsByDigest.get(claim.identityUnitDigest) || []).filter((u) => normalizePosix(u.sourcePath || '') === claim.sourcePath && u.claimId === claim.claimId);
+    if (matches.length !== 1) findings.push({ type: 'identity-registry-claim-id-mismatch', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} is not supplied exactly once by identity registry` });
+    if (String(claim.identityStatus || '') !== 'carried-forward') findings.push({ type: 'identity-gap-in-committed-inventory', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} has identityStatus ${claim.identityStatus}` });
+  }
+  return findings;
+}
+
+export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null }) {
   const fatalFindings = [
     ...validateStructure(inventory),
-    ...validateAgainstVocabulary(inventory, vocabulary),
+    ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null),
     ...validateCommitBlobIntegrity(repoRoot, inventory),
+    ...validateSourceUnitCoverage(repoRoot, inventory),
+    ...validateIdentityRegistry(inventory, identityRegistry),
   ];
 
   let coverageFindings = [];
@@ -317,6 +412,9 @@ export function checkInventory({ repoRoot, inventory, vocabulary }) {
   }
 
   const gapItems = (inventory.items || []).filter((i) => i.gap);
+  const unknownBlockingItems = (inventory.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking');
+  const routingGapItems = unknownBlockingItems.filter((i) => i.gap || i.gapType === 'route-conflict');
+  const ownerBlockingItems = unknownBlockingItems.filter((i) => !routingGapItems.includes(i));
   const duplicateGroups = inventory.duplicateContentGroups || [];
   const semanticConflictGroups = inventory.semanticConflictGroups || [];
 
@@ -328,6 +426,10 @@ export function checkInventory({ repoRoot, inventory, vocabulary }) {
     explicitOpenFindings: {
       gapCount: gapItems.length,
       gapPaths: gapItems.map((i) => i.path),
+      unknownBlockingCount: unknownBlockingItems.length,
+      unknownBlockingRows: unknownBlockingItems.map((i) => ({ path: i.path, blockerKind: i.gapType === 'route-conflict' ? 'route-conflict' : (i.gap ? 'routing-gap' : 'missing-owner'), proposedTargetOwner: i.proposedTargetOwner || null })),
+      routingGapPaths: routingGapItems.map((i) => i.path),
+      missingOwnerPaths: ownerBlockingItems.map((i) => i.path),
       duplicateContentGroupCount: duplicateGroups.length,
       duplicateContentGroups: duplicateGroups,
       semanticConflictGroupCount: semanticConflictGroups.length,
@@ -345,22 +447,27 @@ function loadJson(filePath) {
 
 export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json';
 export const DEFAULT_VOCABULARY_PATH = 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json';
+export const DEFAULT_IDENTITY_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json';
 
 export function runCli(argv, cwd = process.cwd()) {
   const inventoryIdx = argv.indexOf('--inventory');
   const vocabIdx = argv.indexOf('--vocabulary');
   const repoRootIdx = argv.indexOf('--repo-root');
+  const identityIdx = argv.indexOf('--identity-registry');
 
   const inventoryPath = path.resolve(cwd, inventoryIdx >= 0 ? argv[inventoryIdx + 1] : DEFAULT_INVENTORY_PATH);
   const vocabularyPath = path.resolve(cwd, vocabIdx >= 0 ? argv[vocabIdx + 1] : DEFAULT_VOCABULARY_PATH);
+  const identityRegistryPath = path.resolve(cwd, identityIdx >= 0 ? argv[identityIdx + 1] : DEFAULT_IDENTITY_REGISTRY_PATH);
   const repoRoot = path.resolve(cwd, repoRootIdx >= 0 ? argv[repoRootIdx + 1] : cwd);
   const asJson = argv.includes('--json');
 
   let inventory;
   let vocabulary;
+  let identityRegistry;
   try {
     inventory = loadJson(inventoryPath);
     vocabulary = loadJson(vocabularyPath);
+    identityRegistry = loadJson(identityRegistryPath);
   } catch (err) {
     console.error(`check-doc-inventory-gates error loading input: ${err.message}`);
     return 1;
@@ -368,7 +475,7 @@ export function runCli(argv, cwd = process.cwd()) {
 
   let result;
   try {
-    result = checkInventory({ repoRoot, inventory, vocabulary });
+    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry });
   } catch (err) {
     console.error(`check-doc-inventory-gates evaluation error: ${err.message}`);
     return 1;

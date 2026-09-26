@@ -19,6 +19,7 @@ export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
 export const PHASE02_JSON = `${PHASE_DIR}/phase-02-doc-inventory.json`;
 export const PHASE02_PART_DIR = `${PHASE_DIR}/phase-02-doc-inventory.parts`;
 export const PHASE02_MD = `${PHASE_DIR}/phase-02-doc-inventory.md`;
+export const PHASE02_IDENTITY_REGISTRY = `${PHASE_DIR}/phase-02-identity-registry.json`;
 export const PHASE02_VOCAB = `${PHASE_DIR}/claim-and-disposition-vocabulary.json`;
 export const PHASE02_ALLOWED_PATHS = new Set([
   'CHANGELOG.md',
@@ -33,6 +34,7 @@ export const PHASE02_ALLOWED_PATHS = new Set([
   `${PHASE_DIR}/phase-02-execution-record.md`,
   PHASE02_JSON,
   PHASE02_MD,
+  PHASE02_IDENTITY_REGISTRY,
 ]);
 
 export function sha256(content) {
@@ -216,6 +218,12 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       for (const part of manifest.parts || []) byteCompare(path.join(path.dirname(tmpJson), part.path), path.join(tempWorktreeDir, PHASE_DIR, part.path), `Regenerated Phase 02 shard ${part.path}`);
       byteCompare(tmpMd, path.join(tempWorktreeDir, PHASE02_MD), 'Regenerated Phase 02 Markdown inventory');
       const inventory = readJson(tmpJson);
+      const identityRegistryPath = path.join(tempWorktreeDir, PHASE02_IDENTITY_REGISTRY);
+      const identityRegistry = JSON.parse(fs.readFileSync(identityRegistryPath, 'utf8'));
+      if (identityRegistry.commit !== baseSha) throw new Error(`Phase 02 identity registry commit ${identityRegistry.commit || '<missing>'} does not match immutable BASE ${baseSha}`);
+      if (!Array.isArray(identityRegistry.documents) || identityRegistry.documents.length !== inventory.summary.scannedFilesCount) throw new Error(`Phase 02 identity registry document count ${identityRegistry.documents?.length ?? '<missing>'} does not match inventory file count ${inventory.summary.scannedFilesCount}`);
+      if (!Array.isArray(identityRegistry.units) || identityRegistry.units.length < inventory.summary.claimCount) throw new Error(`Phase 02 identity registry unit count ${identityRegistry.units?.length ?? '<missing>'} is smaller than inventory claim count ${inventory.summary.claimCount}`);
+      receipt.artifacts.phase02IdentityRegistry = { path: PHASE02_IDENTITY_REGISTRY, ...fileArtifact(identityRegistryPath), documents: identityRegistry.documents.length, units: identityRegistry.units.length };
       receipt.artifacts.phase02JsonManifest = { path: PHASE02_JSON, ...fileArtifact(tmpJson) };
       receipt.artifacts.phase02JsonShards = (manifest.parts || []).map((part) => ({ path: `${PHASE_DIR}/${part.path}`, bytes: part.bytes, sha256: part.sha256 }));
       receipt.artifacts.phase02Markdown = { path: PHASE02_MD, ...fileArtifact(tmpMd) };
