@@ -187,7 +187,8 @@ export function validateStructure(inventory) {
     }
     for (const edge of inventory.consumerEdges) {
       if (edge.identityStatus === 'unresolved-dynamic-pattern') {
-        if (!edge.unresolvedDynamicPattern || !String(edge.unresolvedDynamicPattern).includes('**')) findings.push({ type: 'malformed-unresolved-consumer-edge', message: `consumer edge ${edge.edgeId || '<missing>'}: unresolved dynamic edge must carry a broad pattern` });
+        const explicitUnresolvedRoot = edge.unresolvedRoot && Array.isArray(edge.targetPaths) && edge.targetPaths.length === 0 && (edge.targetPath === null || edge.targetPath === undefined);
+        if (!edge.unresolvedDynamicPattern || (!String(edge.unresolvedDynamicPattern).includes('**') && !explicitUnresolvedRoot)) findings.push({ type: 'malformed-unresolved-consumer-edge', message: `consumer edge ${edge.edgeId || '<missing>'}: unresolved dynamic edge must carry a broad pattern or explicit unresolvedRoot with empty targetPaths` });
       } else if ((edge.rawTarget || edge.resolvedTarget) && !edge.targetPath) findings.push({ type: 'consumer-link-edge-missing-target', message: `consumer edge ${edge.edgeId || '<missing>'}: resolved link edge must carry targetPath` });
     }
   }

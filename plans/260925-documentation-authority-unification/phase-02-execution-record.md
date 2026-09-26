@@ -7,8 +7,8 @@ Role: doer
 Authorization: Direct human request, 2026-09-26 (Phase 02 only; Phases 03-09 remain unauthorized)
 Branch: plan/260925-documentation-authority-unification
 Immutable base: tag documentation-authority-phase-01-20260926 (target commit f0c76c5e590339d9c815038539ff1f4a072c64e4)
-Implementation HEAD before final remediation cell F: 9aa1c076f
-Status: final remediation immutable full verifier passed at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab`; independent re-review pending; no migration/cutover/merge/push/tag
+Implementation HEAD before remediation G: 90f36515a
+Status: remediation G candidate prepared from clean HEAD 90f36515a with focused/gate verification only; final immutable full verifier PENDING at the new candidate; independent re-review pending; no migration/cutover/merge/push/tag
 Authoritative verification: `scripts/verify-phase-02.mjs` only; moving-worktree local commands are historical diagnostics, not authoritative evidence.
 Checkout scope: this record only claims mutations in the assigned Phase 02 worktree; it does not assert the main checkout was untouched by unrelated dispatch infrastructure.
 ```
@@ -26,6 +26,7 @@ The generator/checker/test implementation was completed beyond the earlier incom
 
 - file-level accounting for `docs/**`, `AGENTS.md`, and `CLAUDE.md` from the immutable Phase 01 commit tree;
 - populated opaque identity registry entries for all 4,305 immutable-base sources and all 85,772 per-occurrence conservation units; normal generation carries IDs only from that registry, while missing/ambiguous source/unit entries become explicit identity blockers instead of silent content/path-derived replacements;
+- remediation G demotes false one-owner claim-kind splits to `unknown-blocking`/null target fields, leaving zero `split` file rows and zero `split` claim rows unless a future classifier proves at least two distinct concrete credible destination owners;
 - carry-forward registry mode consumes old units at most once via fingerprint/digest multimaps, preserves source/claim IDs only for uniquely matchable pure moves, and refuses ambiguous duplicates or edited/new unmatched units instead of positional guessing;
 - claim-level conservation rows for every Markdown heading, non-trivial unheaded prose block, and mixed/non-Markdown file block;
 - inbound/outbound links, source/evidence links, immutable event/work/decision refs, and normalized claim-ledger fields;
@@ -46,21 +47,21 @@ The checker passes structurally while reporting the expected open findings as no
 - file/routing gap rows: 1054
 - claim identity-gap blockers: 306
 - total explicit gap/blocker count: 1360
-- unknown-blocking file rows: 1092 (candidate single-owner proposals are demoted to unknown-blocking/null target until an authorized non-split owner disposition exists)
+- unknown-blocking file rows: 1382 (candidate single-owner proposals and false one-owner splits are demoted to unknown-blocking/null target until an authorized non-split owner or true multi-owner split exists)
 - exact duplicate-content groups: 818
 - semantic-conflict groups: 151
 - claim ledger rows / registry units: 85,772
-- consumer edges: 162,508 (broad unresolved dynamic patterns are standalone unresolved edges rooted at the first concrete repository/docs segment, not positional guesses)
+- consumer edges: 98,406 (broad unresolved dynamic patterns and unknown alias roots are standalone unresolved edges, not target fan-out guesses)
 - identity registry documents: 4,305
 
 Artifact sizes and hashes after sharding:
 
 | Artifact | Size | SHA-256 |
 |---|---:|---|
-| `phase-02-doc-inventory.json` manifest | 2,455 bytes | `e8b683c4e91dcb790031a4f143fc258e99901e6f4877dd1de81ec9290596b34b` |
-| reassembled JSON payload | 222,127,651 bytes | `45e083fe0b2f6f0e62152bf25075de53bc7b8a7c41e930491eeb4c7fedfdc404` |
-| `phase-02-doc-inventory.parts/` | 11 parts, each under 25 MB (max 20,971,518 bytes) | see manifest |
-| `phase-02-doc-inventory.md` | 740 KiB (757,960 bytes) | `d18603aacc1d3f0ae391df0454b765e93373d520ae5f5a6390bdf2607746829f` |
+| `phase-02-doc-inventory.json` manifest | 2,271 bytes | `42989ecef7a2e40e1091ae40d863b5b6df5a69f0d0a5c6153901e286a2dcb275` |
+| reassembled JSON payload | 195,208,999 bytes | `c570f8b37f50200c23897b241dc30b1dc579b6cb069c829325233345a02d7c73` |
+| `phase-02-doc-inventory.parts/` | 10 parts, each under 25 MB (max 20,971,514 bytes) | see manifest |
+| `phase-02-doc-inventory.md` | 727 KiB (744,708 bytes) | `c7c1bc636b590a23f8afc7b882572cca949bc3613dc611cb037e5094cfaf964f` |
 | `phase-02-identity-registry.json` | 43 MiB (44,988,772 bytes) | `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` |
 
 These findings are not resolved in Phase 02. They block promotion and feed later authorized phases.
@@ -70,7 +71,7 @@ Verification summary:
 - remediation E added explicit-pinned registry input to the generator, registry binding metadata, reviewed carry-forward writer mode, semantic duplicate-heading fingerprints, standalone unresolved dynamic consumer edges, and exact/stale registry checks;
 - authoritative runner added at `scripts/verify-phase-02.mjs` and made the only Phase 02 verification door;
 - the runner requires explicit `BASE` and `FIXED_END`, creates a detached clean worktree exactly at `FIXED_END`, asserts HEAD/cleanliness before setup, provisions via `npm ci` when a lockfile exists, regenerates inventory from immutable `BASE` using the committed registry, byte-compares the manifest, Markdown, and every shard, validates registry commit/count/hash metadata, runs the Phase 02 gate/check suite, enforces an exact Phase 02 diff allowlist, builds Rust release binaries inside the detached worktree before full-suite mode (never symlinking mutable caller output), and emits a compact machine-readable receipt with hashes/sizes/counts/test totals;
-- after final remediation cell F and immutable-base regeneration from Phase 01 base `f0c76c5e590339d9c815038539ff1f4a072c64e4`, authoritative full verification passed at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` (tree `9e94aa64b47e53df842b188a4d2afc34b1a68add`): 66 focused tests, 46 docs/citation/ownership tests, immutable-base byte identity, exact diff allowlist, clean detached Rust release build, clean-after-checks, and full suite 7,827 total / 7,751 passed / 0 failed / 8 skipped / 68 todo; full-suite log SHA-256 `f07138addfb37af9f493d36f32f695f420b868c5601d318d5b0885ab83f280e0`; verifier receipt log SHA-256 `71af233eedbf6acfa4c7e054bfec467eafa8ac79f48bf6e4d512c246513380a4`;
+- after remediation G and immutable-base regeneration from Phase 01 base `f0c76c5e590339d9c815038539ff1f4a072c64e4`, local focused/gate verification passed: 71 focused tests, deterministic regeneration, inventory gate with 1,360 total gap/blockers (1,054 file/routing, 306 claim-identity), zero split file rows, zero split claim rows, and dynamic target-item fan-out reduced to 128; authoritative full verification is PENDING by reviewer instruction (no full suite in this cell);
 - pre-runner historical diagnostics: focused inventory tests passed; generated JSON and Markdown matched a fresh immutable-tree regeneration byte-for-byte; inventory gate checker, legacy-doc ratchet, documentation/citation checks, ownership lint, and `git diff --check` passed; full suite exited 0: 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo; log SHA-256 `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`;
 - GitNexus impact was run before remediation edits for `buildInventoryRow`, `validateStructure`, `validateAgainstVocabulary`, and `generateInventory` (LOW); follow-up impact for `buildSwitchboardIndex`, `deriveAreaTargetOwner`, and `targetOwnerForDisposition` was also LOW. Independent review must still assess Phase 02 ledger-risk semantics, not just callgraph risk.
 

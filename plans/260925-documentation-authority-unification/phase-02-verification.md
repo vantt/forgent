@@ -3,7 +3,7 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: final remediation immutable full PASS at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab`; independent re-review pending
+Status: remediation G focused/gate PASS in moving checkout; final immutable full verifier PENDING at the new candidate; independent re-review pending
 Authoritative runner: scripts/verify-phase-02.mjs
 Result: Phase 02 artifacts are verified only by the immutable detached-worktree runner, not by commands run in a moving local checkout.
 ```
@@ -44,7 +44,7 @@ they are not authoritative Phase 02 verification evidence.
 - `git diff --check` across `BASE..FIXED_END` and exact allowed-footprint checks;
 - full `npm test` unless `--skip-full-suite` is passed.
 
-## Review Remediation Local Evidence (Cells A-F)
+## Review Remediation Local Evidence (Cells A-G)
 
 Focused remediation checks in the moving worktree (not full-suite, not authoritative runner evidence):
 
@@ -59,15 +59,15 @@ node scripts/check-doc-inventory-gates.mjs \
   --identity-registry plans/260925-documentation-authority-unification/phase-02-identity-registry.json
 ```
 
-Results after final remediation cell F: focused tests passed (61/61) for `test/scripts/generate-doc-inventory.test.mjs` and `test/scripts/check-doc-inventory-gates.test.mjs`; deterministic immutable-base regeneration completed; gate checker passed with explicit open findings only: 1054 file/routing gaps, 306 claim identity-gap blockers, 1360 total gap/blockers, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,455 bytes with SHA-256 `e8b683c4e91dcb790031a4f143fc258e99901e6f4877dd1de81ec9290596b34b`; all 11 shards are under 25 MB (max 20,971,518 bytes); reassembled payload SHA-256 is `45e083fe0b2f6f0e62152bf25075de53bc7b8a7c41e930491eeb4c7fedfdc404`; Markdown SHA-256 is `d18603aacc1d3f0ae391df0454b765e93373d520ae5f5a6390bdf2607746829f`; compact identity registry is unchanged at 44,988,772 bytes with SHA-256 `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` and covers 4,305 documents / 85,772 units.
+Results after remediation cell G: focused tests passed (71/71) for `test/scripts/generate-doc-inventory.test.mjs`, `test/scripts/check-doc-inventory-gates.test.mjs`, and `test/scripts/verify-phase-02.test.mjs`; deterministic immutable-base regeneration completed; gate checker passed with explicit open findings only: 1054 file/routing gaps, 306 claim identity-gap blockers, 1360 total gap/blockers, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,271 bytes with SHA-256 `42989ecef7a2e40e1091ae40d863b5b6df5a69f0d0a5c6153901e286a2dcb275`; all 10 shards are under 25 MB (max 20,971,514 bytes); reassembled payload SHA-256 is `c570f8b37f50200c23897b241dc30b1dc579b6cb069c829325233345a02d7c73`; Markdown is 744,708 bytes with SHA-256 `c7c1bc636b590a23f8afc7b882572cca949bc3613dc611cb037e5094cfaf964f`; compact identity registry is unchanged at 44,988,772 bytes with SHA-256 `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` and covers 4,305 documents / 85,772 units. Split dispositions are zero file rows and zero claim rows; dynamic consumer target-item fan-out is 128 items, with broad/alias dynamic expressions recorded as standalone unresolved edges.
 
-Remediation F specifically verified: carry-forward removes positional matching and refuses ambiguous duplicate/edited units; pure moves preserve source and claim IDs; balanced nested/multiline `path.join`/`path.resolve`/`new URL` consumer parsing emits standalone docs-rooted unresolved patterns such as `docs/specs/**` and `docs/**`; candidate single-owner proposals are demoted to `unknown-blocking` with null target owner; claim identity-gap blockers are included in summary/open findings/report; tied equal-prefix routes block like exact route conflicts.
+Remediation G specifically verified: false one-owner split proposals demote to `unknown-blocking` with null target owner/anchor; JS/TS dynamic parsing skips line/block comments and quoted call text, recurses into nested calls such as `path.join(path.resolve(root, "docs"), "specs", name)`, scans relevant Markdown fenced code but not Markdown prose, emits explicit unresolvedRoot standalone gaps for leading aliases such as `DOCS_DIR`, and collapses repeated `**`; carry-forward refuses existing destination registry entries and updates unit status from the new classification.
 
-Authoritative full verification passed at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` (tree `9e94aa64b47e53df842b188a4d2afc34b1a68add`): `npm ci`, 66 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate with 1,360 total gap/blockers (1,054 file/routing, 306 claim-identity), legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, clean detached Rust release build, and clean-after-checks passed. Full suite: 7,827 total / 7,751 passed / 0 failed / 8 skipped / 68 todo; full-suite log SHA-256 `f07138addfb37af9f493d36f32f695f420b868c5601d318d5b0885ab83f280e0`; verifier receipt log SHA-256 `71af233eedbf6acfa4c7e054bfec467eafa8ac79f48bf6e4d512c246513380a4`.
+Authoritative full verification is PENDING for the remediation G candidate by reviewer instruction; no full suite was run in this cell. The prior full receipt at `FIXED_END=0cd862471c8e306afe0a291264a9c0e5ba9e1fab` remains historical evidence only and does not verify the current candidate.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
-Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the current cell has a new committed-SHA skip verifier pass above, and the final full verifier remains pending.
+Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the remediation G candidate's final full verifier remains pending.
 
 ## Last Local Evidence Before Runner Canonicalization
 

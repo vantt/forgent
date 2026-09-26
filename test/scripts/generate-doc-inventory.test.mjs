@@ -451,6 +451,16 @@ test('buildInventoryRow: current source route is not automatically its own targe
   assert.equal(row.claims.every((c) => c.targetOwner === null), true);
 });
 
+test('buildInventoryRow: multi-claim-kind with only one concrete owner demotes instead of pretending split', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const content = ['# Agent coordination', '', 'Navigation map with enough detail.', '', '## Contract', '', 'CTR001 requires a durable contract with enough detail.'].join('\n');
+  const row = buildInventoryRow('docs/platform/agent-coordination/README.md', { content, blobSha: 'c'.repeat(40), blobSize: content.length, switchboardIndex: index });
+  assert.equal(row.proposedDisposition, 'unknown-blocking');
+  assert.equal(row.proposedTargetOwner, null);
+  assert.equal(row.claims.length >= 2, true);
+  assert.equal(row.claims.every((c) => c.disposition === 'unknown-blocking' && c.targetOwner === null && c.targetAnchor === null), true);
+});
+
 test('parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob entries', () => {
   const shaA = 'a'.repeat(40);
   const shaB = 'b'.repeat(40);
@@ -496,6 +506,19 @@ test('validateStructure: accepts shared duplicate claim ids only with explicit c
     consumerEdges: [], inboundLinkEdges: [], immutableRefEdges: [], summary: { scannedFilesCount: 1 },
   });
   assert.equal(positional.some((f) => f.type === 'path-dependent-duplicate-claim-id'), true);
+});
+
+test('validateStructure: accepts explicit unresolvedRoot dynamic consumer gaps without broad target fan-out', () => {
+  const findings = validateStructure({
+    items: [{ path: 'docs/x.md', sourceId: 'src_a', sourceDigest: 'digest', area: 'A', authorityStatus: 'candidate', fileClass: 'maintained-authority', corpus: 'platform-authority', proposedDisposition: 'unknown-blocking', headings: [], claimIds: [], claimCount: 0, consumerEdgeIds: [], consumerEdgeCount: 0, consumerKinds: [] }],
+    claimLedger: [],
+    consumerEdges: [{ edgeId: 'consumer_unresolved_alias', path: 'src/x.ts', line: 1, kind: 'dynamic', unresolvedDynamicPattern: 'DOCS_DIR/specs/runner.md', targetPath: null, targetPaths: [], unresolvedRoot: 'DOCS_DIR', identityStatus: 'unresolved-dynamic-pattern' }],
+    inboundLinkEdges: [],
+    immutableRefEdges: [],
+    scanGaps: [],
+    summary: { scannedFilesCount: 1 },
+  });
+  assert.equal(findings.some((f) => f.type === 'malformed-unresolved-consumer-edge'), false);
 });
 
 test('validateStructure: rejects missing plan §6.2 fields and invalid claim status', () => {
@@ -625,6 +648,46 @@ test('collectConsumers: path.join dynamic prefixes create standalone unresolved 
   }
 });
 
+test('collectConsumers: dynamic parser skips comments, quotes, and Markdown prose but scans fenced code', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-lexical-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs/specs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/specs/runner.md'), '# Runner\n');
+    fs.writeFileSync(path.join(tmp, 'src/c.ts'), [
+      '// path.join("docs", "specs", beforeCall)',
+      '/* path.join("docs", "specs", blockComment) */',
+      'const quoted = "path.join(\\"docs\\", \\"specs\\", quoteEffect)";',
+      'path.join(path.resolve(root, "docs"), "specs", name);',
+      'path.join(DOCS_DIR, "specs", "runner.md");',
+    ].join('\n'));
+    fs.writeFileSync(path.join(tmp, 'README.md'), [
+      '# Readme',
+      'Prose says path.join("docs", "specs", proseName) but is not code.',
+      '```js',
+      'path.join("docs", "specs", fencedName)',
+      '```',
+    ].join('\n'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const consumers = collectConsumers(tmp, commit, ['docs/specs/runner.md']);
+    const unresolved = consumers.unresolvedConsumerEdges;
+    assert.equal(unresolved.some((e) => e.rawTarget?.includes('beforeCall')), false);
+    assert.equal(unresolved.some((e) => e.rawTarget?.includes('blockComment')), false);
+    assert.equal(unresolved.some((e) => e.rawTarget?.includes('quoteEffect')), false);
+    assert.equal(unresolved.some((e) => e.path === 'src/c.ts' && e.rawTarget?.includes('path.resolve') && e.unresolvedDynamicPattern === 'docs/specs/**'), true);
+    assert.equal(unresolved.some((e) => e.path === 'README.md' && e.rawTarget?.includes('proseName')), false);
+    assert.equal(unresolved.some((e) => e.path === 'README.md' && e.rawTarget?.includes('fencedName') && e.unresolvedDynamicPattern === 'docs/specs/**'), true);
+    const alias = unresolved.find((e) => e.path === 'src/c.ts' && e.unresolvedRoot === 'DOCS_DIR');
+    assert.equal(alias?.targetPath, null);
+    assert.deepEqual(alias?.targetPaths, []);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
 test('validateSourceUnitCoverage: detects dropped, duplicate, and digest-mismatched immutable source-unit coverage', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-coverage-'));
   try {
@@ -707,7 +770,7 @@ test('indistinguishable repeated carried-forward units become explicit identity 
   assert.equal(row.claims.some((c) => c.claimId.includes('_dup_')), false);
 });
 
-test('collectConsumers: balanced dynamic parser keeps nested and multiline calls as docs-rooted unresolved patterns', () => {
+test('collectConsumers: dynamic parser keeps nested, multiple, multiline calls as docs-rooted unresolved patterns', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-new-url-'));
   try {
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
@@ -721,6 +784,9 @@ test('collectConsumers: balanced dynamic parser keeps nested and multiline calls
       'path.join(repoRoot, "docs", "specs", name)',
       'path.join(root(), "docs", x)',
       'path.join("docs", pick("a", nested("b", c)), "README.md")',
+      'path.join(path.resolve(root, "docs"), "specs", name)',
+      'path.join("docs", maybeOne)',
+      'path.resolve("docs", maybeTwo)',
       'new URL(',
       '  "../docs/a/README.md",',
       '  import.meta.url',
@@ -736,6 +802,7 @@ test('collectConsumers: balanced dynamic parser keeps nested and multiline calls
     assert.equal(patterns.has('docs/**/README.md'), true);
     assert.equal(patterns.has('docs/specs/**'), true);
     assert.equal(patterns.has('docs/**'), true);
+    assert.equal([...patterns].some((p) => p.includes('**/**')), false);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
@@ -782,6 +849,55 @@ test('carryForwardIdentityRegistry moves one source without reminting claim ids 
     assert.deepEqual(newMovedIds, oldMovedIds);
     assert.equal(evolved.documents.find((d) => d.path === 'docs/new/a.md').sourceId, registry.documents.find((d) => d.path === 'docs/old/a.md').sourceId);
     assert.equal(evolved.documents.find((d) => d.path === 'docs/other/b.md').sourceId, registry.documents.find((d) => d.path === 'docs/other/b.md').sourceId);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('carryForwardIdentityRegistry refuses existing destination registry entries', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-existing-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
+    fs.writeFileSync(path.join(tmp, 'docs/new/a.md'), '# Existing\n\nExisting payload with enough detail.\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const registry = bootstrapIdentityRegistry(tmp, { commit });
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry));
+    assert.throws(() => carryForwardIdentityRegistry(tmp, { commit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' }), /destination already exists|destination units already exist/);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('carryForwardIdentityRegistry updates carried unit status from new classification', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-status-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
+    const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
+    for (const unit of registry.units) if (unit.sourcePath === 'docs/old/a.md') unit.status = 'historical';
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry));
+    fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
+    fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'move'], { cwd: tmp, stdio: 'ignore' });
+    const newCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const evolved = carryForwardIdentityRegistry(tmp, { commit: newCommit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' });
+    assert.equal(evolved.units.filter((u) => u.sourcePath === 'docs/new/a.md').every((u) => u.status === 'future'), true);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 

@@ -740,7 +740,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
 
   function addUnresolved(file, lineNo, kind, pattern, extra = {}) {
     unresolvedConsumerEdges.push({
-      edgeId: `consumer_unresolved_${stableHash(`${file}\n${lineNo || ''}\n${kind}\n${pattern}`, 24)}`,
+      edgeId: `consumer_unresolved_${stableHash(`${file}\n${lineNo || ''}\n${kind}\n${pattern}\n${extra.rawTarget || ''}`, 24)}`,
       path: file,
       line: lineNo,
       kind,
@@ -760,7 +760,8 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
     let start = 0;
     let depth = 0;
     let quote = null;
-    let dynamicTemplate = false;
+    let lineComment = false;
+    let blockComment = false;
     function pushArg(end) {
       const raw = src.slice(start, end).trim();
       if (!raw) return;
@@ -770,13 +771,17 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
     }
     for (let idx = 0; idx < src.length; idx += 1) {
       const ch = src[idx];
+      const next = src[idx + 1];
+      if (lineComment) { if (ch === '\n') lineComment = false; continue; }
+      if (blockComment) { if (ch === '*' && next === '/') { blockComment = false; idx += 1; } continue; }
       if (quote) {
         if (ch === '\\') { idx += 1; continue; }
-        if (quote === '`' && ch === '$' && src[idx + 1] === '{') dynamicTemplate = true;
         if (ch === quote) quote = null;
         continue;
       }
-      if (ch === '"' || ch === "'" || ch === '`') { quote = ch; dynamicTemplate = false; continue; }
+      if (ch === '/' && next === '/') { lineComment = true; idx += 1; continue; }
+      if (ch === '/' && next === '*') { blockComment = true; idx += 1; continue; }
+      if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
       if (ch === '(' || ch === '[' || ch === '{') { depth += 1; continue; }
       if (ch === ')' || ch === ']' || ch === '}') { depth = Math.max(0, depth - 1); continue; }
       if (ch === ',' && depth === 0) {
@@ -792,13 +797,20 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
     const calls = [];
     const callees = ['path.join', 'path.resolve', 'new URL'];
     let quote = null;
+    let lineComment = false;
+    let blockComment = false;
     for (let idx = 0; idx < content.length; idx += 1) {
       const ch = content[idx];
+      const next = content[idx + 1];
+      if (lineComment) { if (ch === '\n') lineComment = false; continue; }
+      if (blockComment) { if (ch === '*' && next === '/') { blockComment = false; idx += 1; } continue; }
       if (quote) {
         if (ch === '\\') { idx += 1; continue; }
         if (ch === quote) quote = null;
         continue;
       }
+      if (ch === '/' && next === '/') { lineComment = true; idx += 1; continue; }
+      if (ch === '/' && next === '*') { blockComment = true; idx += 1; continue; }
       if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
       const callee = callees.find((c) => content.startsWith(c, idx));
       if (!callee) continue;
@@ -808,13 +820,20 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
       let depth = 1;
       let end = open + 1;
       let innerQuote = null;
+      let innerLineComment = false;
+      let innerBlockComment = false;
       for (; end < content.length; end += 1) {
         const c = content[end];
+        const n = content[end + 1];
+        if (innerLineComment) { if (c === '\n') innerLineComment = false; continue; }
+        if (innerBlockComment) { if (c === '*' && n === '/') { innerBlockComment = false; end += 1; } continue; }
         if (innerQuote) {
           if (c === '\\') { end += 1; continue; }
           if (c === innerQuote) innerQuote = null;
           continue;
         }
+        if (c === '/' && n === '/') { innerLineComment = true; end += 1; continue; }
+        if (c === '/' && n === '*') { innerBlockComment = true; end += 1; continue; }
         if (c === '"' || c === "'" || c === '`') { innerQuote = c; continue; }
         if (c === '(') depth += 1;
         else if (c === ')') {
@@ -823,43 +842,90 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
         }
       }
       if (depth === 0) calls.push({ callee, start: idx, end: end + 1, argsSource: content.slice(open + 1, end), raw: content.slice(idx, end + 1) });
-      idx = Math.max(idx, end);
     }
     return calls;
   }
 
+  function collapseGlobStars(pattern) {
+    const parts = normalizePosix(pattern).split('/');
+    const collapsed = [];
+    for (const part of parts) {
+      if (part === '**' && collapsed[collapsed.length - 1] === '**') continue;
+      collapsed.push(part);
+    }
+    return collapsed.join('/').replace(/\/\*\*(?=\/\*\*|$)/g, '/**');
+  }
+
   function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {
+    const roots = new Set(['docs', 'plans', 'scripts', 'src', 'test', 'core', 'domains', 'plugins', '.agents', '.fgos']);
     const rawSegs = args.map((arg, idx) => {
       if (newUrl && idx === 1 && /^import\.meta\.url$/.test(arg.value)) return '';
-      if (!arg.literal) return '**';
-      return arg.value;
+      if (arg.literal) return arg.value;
+      const nested = findDynamicCalls(arg.value).map((call) => dynamicPatternFromArgs(parseCallArguments(call.argsSource), sourceFile, call.callee === 'new URL')?.pattern).filter(Boolean);
+      if (nested.length === 1) return nested[0];
+      return '**';
     }).filter((v) => v !== '');
     if (rawSegs.length === 0) return null;
-    const roots = new Set(['docs', 'plans', 'scripts', 'src', 'test', 'core', 'domains', 'plugins', '.agents', '.fgos']);
-    let segs = rawSegs;
-    const rootIdx = rawSegs.findIndex((s) => roots.has(s));
-    if (rootIdx > 0) segs = rawSegs.slice(rootIdx);
-    let raw = normalizePosix(path.posix.join(...segs));
-    if (raw.includes('/**')) raw = raw.replace(/\/\*\*(?=\/\*\*|$)/g, '/**');
-    const pattern = normalizeDocTarget(raw, sourceFile) || raw;
-    if (pattern.includes('**')) return pattern.replace(/\/\*\*(?=\/\*\*|$)/g, '/**');
-    return pattern;
+    const rootIdx = rawSegs.findIndex((s) => roots.has(s) || [...roots].some((root) => s === root || s.startsWith(`${root}/`)));
+    if (rootIdx < 0) {
+      const raw = collapseGlobStars(path.posix.join(...rawSegs));
+      const normalized = collapseGlobStars(normalizeDocTarget(raw, sourceFile) || raw);
+      if (/^(docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)(\/|$)/.test(normalized)) return { pattern: normalized, unresolvedRoot: null };
+      return { pattern: raw, unresolvedRoot: args[0]?.value || rawSegs[0] || null };
+    }
+    const segs = rawSegs.slice(rootIdx);
+    let raw = collapseGlobStars(path.posix.join(...segs));
+    const pattern = collapseGlobStars(normalizeDocTarget(raw, sourceFile) || raw);
+    return { pattern, unresolvedRoot: null };
+  }
+
+  function markdownCodePayloads(content) {
+    const payloads = [];
+    const lines = content.split(/(\r?\n)/);
+    let offset = 0;
+    let fence = null;
+    let startOffset = 0;
+    let buf = '';
+    for (let i = 0; i < lines.length; i += 2) {
+      const line = lines[i] || '';
+      const newline = lines[i + 1] || '';
+      const open = line.match(/^\s*(`{3,}|~{3,})\s*([^`]*)/);
+      if (!fence && open) {
+        const lang = (open[2] || '').trim().toLowerCase();
+        fence = { marker: open[1][0], len: open[1].length, relevant: /^(js|javascript|ts|typescript|mjs|cjs|tsx|jsx|node)\b/.test(lang) };
+        startOffset = offset + line.length + newline.length;
+        buf = '';
+      } else if (fence && new RegExp(`^\\s*${fence.marker}{${fence.len},}\\s*$`).test(line)) {
+        if (fence.relevant) payloads.push({ content: buf, offset: startOffset });
+        fence = null;
+      } else if (fence) {
+        buf += line + newline;
+      }
+      offset += line.length + newline.length;
+    }
+    return payloads;
   }
 
   function scanDynamicCalls(content, file) {
-    for (const call of findDynamicCalls(content)) {
+    const payloads = file.toLowerCase().endsWith('.md') ? markdownCodePayloads(content) : [{ content, offset: 0 }];
+    for (const payload of payloads) for (const call of findDynamicCalls(payload.content)) {
       const args = parseCallArguments(call.argsSource);
       if (args.length === 0) continue;
       const isNewUrl = call.callee === 'new URL';
-      const pattern = dynamicPatternFromArgs(args, file, isNewUrl);
-      if (!pattern || !/^(docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos|AGENTS\.md|CLAUDE\.md)(\/|$)/.test(pattern)) continue;
-      const lineNo = lineNumberAt(content, call.start);
+      const derived = dynamicPatternFromArgs(args, file, isNewUrl);
+      if (!derived?.pattern) continue;
+      const pattern = derived.pattern;
+      const lineNo = lineNumberAt(content, payload.offset + call.start);
+      const rawTarget = call.raw.replace(/\s+/g, ' ').slice(0, 240);
+      if (!/^(docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos|AGENTS\.md|CLAUDE\.md)(\/|$)/.test(pattern)) {
+        if (derived.unresolvedRoot) addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget, unresolvedRoot: derived.unresolvedRoot, targetPath: null, targetPaths: [] });
+        continue;
+      }
       if (pattern.includes('**')) {
-        addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget: call.raw.replace(/\s+/g, ' ').slice(0, 240) });
+        addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget });
         continue;
       }
       if (targetSet.has(pattern)) add(pattern, file, lineNo, 'dynamic', { resolvedTarget: pattern });
-      for (const target of normalizedTargets) if (target.startsWith(pattern + '/')) add(target, file, lineNo, 'dynamic', { dynamicPrefix: pattern, unresolvedDynamic: true });
     }
   }
 
@@ -955,7 +1021,10 @@ export function buildInventoryRow(relPath, { content, sourceDigest: providedSour
   const initialTargetOwner = targetOwnerForDisposition(initialDisposition, classification);
   const uniqueClaimKinds = new Set(units.map((u) => inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType)));
   const needsClaimLevelSplit = classification.fileClass === 'maintained-authority' && RETAINED_CLAIM_DISPOSITIONS.has(initialDisposition) && uniqueClaimKinds.size > 1;
-  const proposedDisposition = needsClaimLevelSplit ? 'split' : initialDisposition;
+  const candidateSplitOwner = initialTargetOwner && hasSwitchboardBackedTarget(classification) ? initialTargetOwner : null;
+  const distinctConcreteSplitOwners = new Set(candidateSplitOwner ? [candidateSplitOwner] : []);
+  const hasTrueClaimLevelSplit = needsClaimLevelSplit && distinctConcreteSplitOwners.size >= 2;
+  const proposedDisposition = hasTrueClaimLevelSplit ? 'split' : (needsClaimLevelSplit ? 'unknown-blocking' : initialDisposition);
   const proposedTargetOwner = targetOwnerForDisposition(proposedDisposition, classification);
   const hasCredibleOwner = proposedTargetOwner && hasSwitchboardBackedTarget(classification);
   const disposition = DISPOSITIONS_REQUIRING_TARGET_OWNER.has(proposedDisposition) && !hasCredibleOwner ? 'unknown-blocking' : proposedDisposition;
@@ -1005,7 +1074,7 @@ export function buildInventoryRow(relPath, { content, sourceDigest: providedSour
       relations,
       decisionRefs: unitRefs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r)),
       evidenceLinks: unitLinks.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase())),
-      disposition: hasIdentityGap ? 'unknown-blocking' : (needsClaimLevelSplit && disposition === proposedDisposition ? 'split' : disposition),
+      disposition: hasIdentityGap ? 'unknown-blocking' : disposition,
       reviewStatus: disposition === 'unknown-blocking' || hasIdentityGap ? 'blocking' : 'pending',
     };
   });
@@ -1153,6 +1222,8 @@ export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options =
   const documentType = toSourcePath.toLowerCase().endsWith('.md') ? extractDocumentType(content) : null;
   const classification = classifyDocPath(toSourcePath, switchboardIndex);
   const units = toSourcePath.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(toSourcePath, content);
+  if (toSourcePath !== sourcePath && (registry.documents || []).some((d) => normalizePosix(d.path || '') === toSourcePath)) throw new Error(`${toSourcePath}: identity carry-forward refused because destination already exists in identity registry`);
+  if (toSourcePath !== sourcePath && (registry.units || []).some((u) => normalizePosix(u.sourcePath || '') === toSourcePath)) throw new Error(`${toSourcePath}: identity carry-forward refused because destination units already exist in identity registry`);
   const oldUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') === sourcePath);
   function multimap(rows, keyFn) {
     const map = new Map();
@@ -1195,7 +1266,7 @@ export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options =
       unitKind: u.unitKind,
       sourceUnitDigest: u.textDigest,
       claimKind,
-      status: previous.status || deriveClaimStatus(classification),
+      status: deriveClaimStatus(classification),
     };
   });
   const unconsumed = oldUnits.filter((u) => !consumed.has(u));
