@@ -50,7 +50,7 @@ Capability tags (e.g. `code:implement`, `code:review`, `code:test`) signal decom
 | `open inputs` | Extracted from `plans/<track>/phase-NN-<name>.md` (objective, verification commands, actor requirements). |
 | `evidence verification` | Coding-cell policy: driver independently verifies git commit in worktree and executes the phase's focused tests. |
 | `disposition criteria` | Proof-gap findings (judging verification insufficient) cannot be deferred; must be `accepted` (escalating proof tier to full) or evidence-backed `rejected`. |
-| `adaptation bounds` | Maximum 3 fix rounds per cell. Past the 3-round cap, remaining non-proof-gap findings are `deferred` and named in the trace; proof-gap findings escalate to human. |
+| `adaptation bounds` | Maximum 3 fix rounds per cell. Past the 3-round cap, remaining non-proof-gap findings are `deferred` and named in the trace; proof-gap findings force `accepted -> Proof: escalated-to-full` (full proof must pass before close, no human escalation). |
 | `human-escalation triggers` | Unresolvable spec ambiguity with divergent readings, identical failure across two distinct approaches, or unresolvable merge conflict. Batch questions, non-blocking. |
 | `close criteria` | All required operations settled, all rechecks clean, caveat-free per driver discipline, checkpoint identity tuple recorded. |
 | `after-close action` | Coding-cell policy: merge `--no-ff` into track branch, clean worktree, append row to `plan.md` cell-status table. |

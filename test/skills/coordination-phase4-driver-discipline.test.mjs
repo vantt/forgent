@@ -6,9 +6,9 @@
 // 4. Plan-loop facade cleanses raw request JSON and manual ID generation.
 // 5. Generated skill projections are byte-identical to canonical sources.
 // 6. Stale implicit close language remains absent.
-// 7. CLI flag contract: documented coordination commands in skills match real CLI allowlists and required flags.
-// 8. Clean pass lifecycle with real entry-node start, simulated crash/resume, dispatch/wave count parity, explicit close.
-// 9. Fix round and recheck discharge lifecycle with full quorum explicit close and dispatch/wave count parity.
+// 7. CLI flag contract: documented coordination commands in skills execute against real bin/fgos.mjs CLI with no unknown option or missing required flag errors.
+// 8. Clean pass lifecycle with real entry-node start, simulated crash/resume, dispatch count parity, explicit close.
+// 9. Fix round and recheck discharge lifecycle with full quorum explicit close and dispatch count parity.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 import {
   CoordinationError,
@@ -142,24 +143,26 @@ test('Phase 4: plan-loop skill is within word budget (target 800-1200 words, <= 
     `plan-loop skill must have sufficient operational substance (>= 500 words), got ${planLoopWords} words`,
   );
 
-  // Facade-only reduction vs Phase 0 baseline (5160 words)
+  // Facade-only reduction vs Phase 0 baseline (5160 words) per plan.md Phase 4 Exit (Option C):
+  // 1. Facade fgos-plan-loop/SKILL.md must be at least 60% smaller than Phase 0 baseline (5,160 words).
   const facadeReduction = ((BASELINE_PLAN_LOOP_WORDS - planLoopWords) / BASELINE_PLAN_LOOP_WORDS) * 100;
   assert.ok(
     facadeReduction >= 60,
     `plan-loop facade word reduction must be >= 60% vs baseline (${BASELINE_PLAN_LOOP_WORDS} words), achieved ${facadeReduction.toFixed(1)}% (${planLoopWords} words)`,
   );
 
-  // Combined Lead load (SKILL.md + coordination-driver.md + coding-cell-policy.md)
+  // Combined Lead load (SKILL.md + coordination-driver.md + coding-cell-policy.md) per plan.md Phase 4 Exit (Option C):
+  // 2. Combined load must be <= 3,300 words.
+  // 3. Combined load will be re-measured after Phase 5 once architecture-panel and panel also consume the driver fragment.
   const driverContent = fs.readFileSync(DRIVER_FRAGMENT, 'utf8');
   const policyContent = fs.readFileSync(CODING_POLICY_FRAGMENT, 'utf8');
   const driverWords = countWords(driverContent);
   const policyWords = countWords(policyContent);
   const combinedWords = planLoopWords + driverWords + policyWords;
 
-  // The combined load is dramatically leaner than the monolithic skill plus historical docs
   assert.ok(
     combinedWords <= 3300,
-    `combined Lead load must be bounded (<= 3300 words), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
+    `combined Lead load must be bounded (<= 3300 words per plan.md Phase 4 Exit Option C), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
   );
 });
 
@@ -339,126 +342,169 @@ test('Phase 4: stale implicit close language remains absent from current skills 
 // 7. CLI flag contract guard: documented coordination commands match real CLI
 // -----------------------------------------------------------------------------
 
-test('Phase 4: documented coordination commands in skills and fragments match CLI allowlists and required flags', () => {
-  const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
-  const ALLOWED_COORDINATION_FLAGS = {
-    start: new Set([
-      ...COMMON_FLAGS,
-      'id', 'coordination-id',
-      'protocol', 'protocol-id', 'protocolRef.id',
-      'kind', 'objective', 'writer-id',
-      'work-ref', 'work', 'primary-role',
-      'task', 'task-file', 'bounds', 'partial-policy',
-      'actors', 'steps', 'executor', 'model', 'tier',
-    ]),
-    status: new Set([
-      ...COMMON_FLAGS,
-      'id', 'detail', 'replay',
-    ]),
-    operation: new Set([
-      ...COMMON_FLAGS,
-      'id', 'action-key', 'writer-id', 'objective',
-      'expected-outputs', 'outputs', 'context-refs', 'context',
-      'constraints', 'capabilities', 'from-assignment-id',
-      'intent', 'round', 'task-key', 'mutation',
-      'executor', 'model', 'tier',
-    ]),
-    'authorize-and-dispatch': new Set([
-      ...COMMON_FLAGS,
-      'id', 'action-key', 'writer-id', 'objective', 'reason',
-      'expected-outputs', 'outputs', 'granted-context-refs',
-      'context-refs', 'context', 'constraints', 'capabilities',
-      'target-artifact-ref', 'task-key', 'mutation',
-      'executor', 'model', 'tier',
-    ]),
-    disposition: new Set([
-      ...COMMON_FLAGS,
-      'id', 'action-key', 'writer-id', 'disposition', 'rationale',
-      'evidence-refs',
-    ]),
-    close: new Set([
-      ...COMMON_FLAGS,
-      'file', 'id', 'action-key', 'writer-id', 'authorized-by',
-      'dissenting-actor-ids', 'dissent', 'aggregation-id',
-    ]),
-    chain: new Set([
-      ...COMMON_FLAGS,
-      'track',
-    ]),
-  };
-
+test('Phase 4: documented coordination commands in skills and fragments match real bin/fgos.mjs CLI execution', () => {
   const filesToCheck = [
     PLAN_LOOP_CANONICAL,
     DRIVER_FRAGMENT,
     CODING_POLICY_FRAGMENT,
   ];
 
-  // Helper to extract command invocations: matches `fgos coordination <subcommand> ...`
-  function extractInvocations(text) {
-    const invocations = [];
-    const lines = text.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      const match = line.match(/(?:^|`|[$]\s+)fgos coordination\s+([a-z-]+)(.*)$/);
-      if (match) {
-        const sub = match[1];
-        if (!ALLOWED_COORDINATION_FLAGS[sub]) continue; // prose mention or unsupported subcommand
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-phase4-cli-probe-'));
+  const dummyWt = path.join(tmpDir, 'dummy-worktree');
+  fs.mkdirSync(dummyWt, { recursive: true });
 
-        let rest = match[2];
-        let j = i;
-        while (lines[j].trim().endsWith('\\') && j + 1 < lines.length) {
-          j++;
-          rest += ' ' + lines[j].trim().replace(/\\$/, '');
+  function substitutePlaceholders(arg) {
+    return arg
+      .replaceAll('<track>--<cell-id>', 'nonexistent-probe-cell-01')
+      .replaceAll('<coordinationId>', 'nonexistent-probe-cell-01')
+      .replaceAll('<track>', 'test-track')
+      .replaceAll('<cell-id>', 'cell-01')
+      .replaceAll('<driver-id>', 'driver-probe')
+      .replaceAll('<writerId>', 'driver-probe')
+      .replaceAll('<actionKey>', 'sha256:0000000000000000000000000000000000000000000000000000000000000000')
+      .replaceAll('<failedAssignmentId>', 'asgn_failed_001')
+      .replaceAll('<reviseAssignmentId>', 'asgn_revise_001')
+      .replaceAll('<value>', 'accepted')
+      .replaceAll('<text>', 'Probe rationale text')
+      .replaceAll('<cell objective from phase file>', 'Probe cell objective')
+      .replaceAll('../<track>-<cell-id>', dummyWt)
+      .replaceAll('[--detail]', '--detail');
+  }
+
+  function parseArgs(line) {
+    const args = [];
+    let cur = '';
+    let inDouble = false;
+    let inSingle = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"' && !inSingle) {
+        inDouble = !inDouble;
+      } else if (c === "'" && !inDouble) {
+        inSingle = !inSingle;
+      } else if (/\s/.test(c) && !inDouble && !inSingle) {
+        if (cur) {
+          args.push(cur);
+          cur = '';
         }
-
-        // Clean markdown backticks and punctuation
-        rest = rest.replace(/`.*$/, '').trim();
-
-        // Extract all --flag occurrences
-        const flagMatches = Array.from(rest.matchAll(/--([a-z0-9-]+)/g)).map((m) => m[1]);
-        invocations.push({ sub, rest, flags: flagMatches, line: i + 1 });
+      } else {
+        cur += c;
       }
     }
-    return invocations;
+    if (cur) args.push(cur);
+    return args;
   }
 
-  let totalChecked = 0;
-  for (const filePath of filesToCheck) {
-    const content = fs.readFileSync(filePath, 'utf8');
-    const invocations = extractInvocations(content);
+  try {
+    let totalChecked = 0;
+    for (const filePath of filesToCheck) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const lines = content.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const match = line.match(/(?:^|`|[$]\s+)fgos coordination\s+([a-z-]+)(.*)$/);
+        if (match) {
+          const sub = match[1];
+          let rest = match[2];
+          let j = i;
+          while (lines[j].trim().endsWith('\\') && j + 1 < lines.length) {
+            j++;
+            rest += ' ' + lines[j].trim().replace(/\\$/, '');
+          }
+          rest = rest.replace(/`.*$/, '').trim();
+          rest = rest.replace(/^\\\s*/, '').trim();
 
-    for (const inv of invocations) {
-      const allowed = ALLOWED_COORDINATION_FLAGS[inv.sub];
-      assert.ok(allowed, `Subcommand "${inv.sub}" must be known in allowlist`);
+          // Skip bare prose mentions with no options/arguments
+          if (!rest) continue;
 
-      for (const flag of inv.flags) {
-        assert.ok(
-          allowed.has(flag),
-          `Command "fgos coordination ${inv.sub}" in ${path.basename(filePath)}:${inv.line} uses invalid flag "--${flag}". Allowed flags: ${Array.from(allowed).join(', ')}`,
-        );
+          const substituted = substitutePlaceholders(rest);
+          const args = parseArgs(substituted);
+
+          const fullArgs = [
+            path.join(REPO_ROOT, 'bin/fgos.mjs'),
+            'coordination',
+            sub,
+            ...args,
+            '--dir',
+            tmpDir,
+          ];
+
+          let out = '';
+          let errStr = '';
+          try {
+            out = execFileSync(process.execPath, fullArgs, { encoding: 'utf8', stdio: 'pipe' });
+          } catch (e) {
+            errStr = (e.stderr || '') + (e.stdout || '');
+          }
+
+          const combined = out + errStr;
+          assert.ok(
+            !combined.includes('unknown or unsupported option'),
+            `Command "fgos coordination ${sub}" in ${path.basename(filePath)}:${i + 1} triggered unknown option error: ${combined}`,
+          );
+          assert.ok(
+            !combined.includes('requires --'),
+            `Command "fgos coordination ${sub}" in ${path.basename(filePath)}:${i + 1} missing required option: ${combined}`,
+          );
+          totalChecked++;
+        }
       }
-
-      // Check specific subcommand mandatory requirements for non-trivial examples
-      if (inv.sub === 'close') {
-        assert.ok(!inv.flags.includes('reason'), `fgos coordination close must NOT have --reason flag`);
-      }
-      if (inv.sub === 'authorize-and-dispatch' && inv.flags.length > 2) {
-        assert.ok(inv.flags.includes('objective'), `authorize-and-dispatch example must include --objective`);
-        assert.ok(inv.flags.includes('reason'), `authorize-and-dispatch example must include --reason`);
-      }
-
-      totalChecked++;
     }
-  }
 
-  assert.ok(totalChecked >= 8, `Must have verified at least 8 command invocations, found ${totalChecked}`);
+    assert.ok(totalChecked >= 8, `Must have verified at least 8 command invocations, found ${totalChecked}`);
+
+    // Negative guard verification: prove that the real CLI actually catches invalid flags and missing required flags
+    // 1. Invalid option rejection (e.g. --reason on close)
+    let closeErr = '';
+    try {
+      execFileSync(process.execPath, [
+        path.join(REPO_ROOT, 'bin/fgos.mjs'),
+        'coordination',
+        'close',
+        '--id', 'nonexistent-probe-cell-01',
+        '--action-key', 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        '--writer-id', 'driver-probe',
+        '--reason', 'invalid-flag',
+        '--dir', tmpDir,
+      ], { encoding: 'utf8', stdio: 'pipe' });
+    } catch (e) {
+      closeErr = (e.stderr || '') + (e.stdout || '');
+    }
+    assert.ok(
+      closeErr.includes('unknown or unsupported option "--reason"'),
+      `CLI must reject --reason on close, got: ${closeErr}`,
+    );
+
+    // 2. Missing required option rejection (e.g. missing --objective on authorize-and-dispatch)
+    let authErr = '';
+    try {
+      execFileSync(process.execPath, [
+        path.join(REPO_ROOT, 'bin/fgos.mjs'),
+        'coordination',
+        'authorize-and-dispatch',
+        '--id', 'nonexistent-probe-cell-01',
+        '--action-key', 'sha256:0000000000000000000000000000000000000000000000000000000000000000',
+        '--writer-id', 'driver-probe',
+        '--reason', 'Valid reason',
+        '--dir', tmpDir,
+      ], { encoding: 'utf8', stdio: 'pipe' });
+    } catch (e) {
+      authErr = (e.stderr || '') + (e.stdout || '');
+    }
+    assert.ok(
+      authErr.includes('coordination authorize-and-dispatch requires --objective'),
+      `CLI must reject missing --objective on authorize-and-dispatch, got: ${authErr}`,
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
 
 // -----------------------------------------------------------------------------
-// 8. plan-loop clean pass: entry-node start, cold resume, wave parity, explicit close
+// 8. plan-loop clean pass: entry-node start, cold resume, dispatch count parity, explicit close
 // -----------------------------------------------------------------------------
 
-test('Phase 4: plan-loop clean pass (entry node start, cold resume, wave parity, explicit close)', async () => {
+test('Phase 4: plan-loop clean pass (entry node start, cold resume, dispatch count parity, explicit close)', async () => {
   const ctx = makeTempCtx();
   try {
     const coordinationId = 'track-phase4--cell-01';
@@ -538,7 +584,7 @@ test('Phase 4: plan-loop clean pass (entry node start, cold resume, wave parity,
     assert.equal(status.session.status, 'active');
     assert.equal(status.readyToClose, true);
 
-    // Verify dispatch count parity with Phase 0 clean-plan-loop-shaped (3 dispatches, 2 waves)
+    // Verify dispatch count parity with Phase 0 clean-plan-loop-shaped (3 dispatches)
     const sessionEvents = (await import('../../src/runner/coordination/store.mjs')).readSessionEvents(coordinationId, { repoRoot: ctx.repoRoot });
     const assignmentEvents = sessionEvents.filter((e) => e.type === 'assignment-created');
     assert.equal(assignmentEvents.length, 3, 'Clean pass must execute exactly 3 dispatches (produce, review, red-team)');
@@ -689,7 +735,7 @@ test('Phase 4: plan-loop fix round, recheck discharge, and full quorum explicit 
     assert.equal(status.readyToClose, true);
     assert.equal(status.blockers.length, 0);
 
-    // Verify dispatch count parity with Phase 0 accepted-finding-remediation-recheck (5 dispatches, 3 waves)
+    // Verify dispatch count parity with Phase 0 accepted-finding-remediation-recheck (5 dispatches)
     const allSessionEvents = (await import('../../src/runner/coordination/store.mjs')).readSessionEvents(coordinationId, { repoRoot: ctx.repoRoot });
     const fixAssignmentEvents = allSessionEvents.filter((e) => e.type === 'assignment-created');
     assert.equal(fixAssignmentEvents.length, 5, 'Fix round must execute exactly 5 dispatches (produce, review, red-team, revise, recheck)');

@@ -11,7 +11,7 @@ Every mutating coding coordination cell must execute inside its own dedicated gi
 1. **Main Checkout Protection:**
    The fgOS session engine strictly forbids mutating execution in the main checkout: any mutating dispatch where `--cwd` resolves to the repository root is hard-refused.
 2. **Canonical Lifecycle Procedure:**
-   The exact shell procedure for opening, branch reuse without `-b`, `$base` recording, objective-text branch guards, and cleanup is defined in [`_shared/private-cell-worktree.md`](../../../../core/skills/_shared/private-cell-worktree.md) (projected as sibling `_shared/private-cell-worktree.md`). Coding cells follow that procedure without variation:
+   The exact shell procedure for opening, branch reuse without `-b`, `$base` recording, objective-text branch guards, and cleanup is defined in [`private-cell-worktree.md`](private-cell-worktree.md). Coding cells follow that procedure without variation:
    - Worktree path: `../<prefix>-<slug>` (outside the main checkout directory).
    - Branch: `<prefix>--<slug>` (isolated branch derived from target base branch).
    - Dependency initialization: Run dependencies install (e.g. `npm ci`) inside the worktree so test commands execute reliably.

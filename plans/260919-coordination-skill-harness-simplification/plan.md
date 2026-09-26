@@ -789,10 +789,10 @@ sessions plus the plan artifact.
 
 ### Exit
 
-- skill within budget;
+- facade `fgos-plan-loop/SKILL.md` is at least 60% smaller than the Phase 0 baseline of 5,160 words;
+- combined Lead load (`facade + coordination-driver.md + coding-cell-policy.md`) is at most 3,300 words;
+- combined load is re-measured after Phase 5, once `architecture-panel` and `panel` also consume the driver fragment;
 - clean, fix/recheck, crash/resume, stale-action, and explicit-close cases pass;
-- Phase 0 plan-loop scenarios show at least 60% Lead instruction-token
-  reduction with no weaker evidence or extra dispatch wave;
 - the driver-discipline fragment contains no coding/track vocabulary (drift
   test: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
 - the coding-cell fragment is usable for one cell with no plan or track
