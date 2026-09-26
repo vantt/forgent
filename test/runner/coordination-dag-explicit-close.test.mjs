@@ -181,7 +181,7 @@ function dagRequest(overrides = {}) {
   };
 }
 
-test('Unit I14: DAG session with no explicit close does not auto-close upon full completion', async () => {
+test('DAG session with no explicit close does not auto-close upon full completion', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const coordinationId = 'dag-no-auto-close';
 
@@ -208,7 +208,7 @@ test('Unit I14: DAG session with no explicit close does not auto-close upon full
   assert.equal(result.dag.counts.settled, 2);
 });
 
-test('Unit I14: DAG session with explicit request.close: true closes cleanly when all nodes settle', async () => {
+test('DAG session with explicit request.close: true closes cleanly when all nodes settle', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const coordinationId = 'dag-explicit-close-flag';
 
@@ -227,7 +227,7 @@ test('Unit I14: DAG session with explicit request.close: true closes cleanly whe
   assert.ok(events.some((e) => e.type === 'session-completed'), 'session-completed event must exist');
 });
 
-test('Unit I14: DAG session left open can be subsequently closed explicitly via closeCoordinationUseCase', async () => {
+test('DAG session left open can be subsequently closed explicitly via closeCoordinationUseCase', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const coordinationId = 'dag-separate-close-door';
 
@@ -252,7 +252,7 @@ test('Unit I14: DAG session left open can be subsequently closed explicitly via 
   assert.equal(readManifest(coordinationId, { cwd: tempDir, repoRoot: tempDir }).status, 'completed');
 });
 
-test('Unit I14: DAG session with caveats reports caveat closeRefusalReason and does NOT close, with or without close: true', async () => {
+test('DAG session with caveats reports caveat closeRefusalReason and does NOT close, with or without close: true', async () => {
   const { tempDir, ctx } = publicDoorSetup();
 
   // Test 1: Caveated DAG without close: true
@@ -290,7 +290,7 @@ test('Unit I14: DAG session with caveats reports caveat closeRefusalReason and d
   assert.match(res2.closeRefusalReason, /recheck-required/);
 });
 
-test('Unit I14: DAG session with partial outcome (deferred) does not close even with close: true', async () => {
+test('DAG session with partial outcome (deferred) does not close even with close: true', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const coordinationId = 'dag-partial-outcome-no-close';
 
@@ -323,7 +323,7 @@ test('Unit I14: DAG session with partial outcome (deferred) does not close even 
   assert.equal(result.steps.find((s) => s.as === 'produce').schedulerOutcome, 'deferred');
 });
 
-test('Unit I14: Non-DAG requests maintain unchanged explicit-close semantics', async () => {
+test('Non-DAG requests maintain unchanged explicit-close semantics', async () => {
   const { tempDir, ctx } = publicDoorSetup();
 
   // Non-DAG without close: true -> does not close
@@ -382,7 +382,7 @@ test('Unit I14: Non-DAG requests maintain unchanged explicit-close semantics', a
   assert.equal(res3.status, 'completed');
 });
 
-test('Unit I14: Legacy session replay remains identical', async () => {
+test('Replay of unclosed DAG session stays active with no terminal event', async () => {
   const { tempDir, ctx } = publicDoorSetup();
   const coordinationId = 'dag-replay-test';
 
