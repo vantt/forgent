@@ -59,9 +59,9 @@ node scripts/check-doc-inventory-gates.mjs
 
 Results: focused tests passed (51/51), deterministic regeneration passed, gate checker passed with explicit open findings only: 1042 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 1,721 bytes with SHA-256 `be40f96c1582338ab2e4d7e4ab8f79414befee66de4eb5653d5f0c9b5684df1e`; all 7 shards are under 25 MB; reassembled payload SHA-256 is `b1126cbca7adc775d95d8ea991f84b2febe79afb30b234aef35b2e5795838fb3`; Markdown SHA-256 is `e1b016993124a64e1afb9bd83d7c96797bbc1e4d680045fab299db710de56859`.
 
-The first post-sharding immutable-verifier attempt correctly failed because the committed artifacts had been generated from the moving remediation base rather than the immutable Phase 01 base. The artifacts above were regenerated from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`; a final immutable verifier run against the resulting committed boundary is required before independent re-review.
+The first post-sharding immutable-verifier attempt correctly failed because the committed artifacts had been generated from the moving remediation base rather than the immutable Phase 01 base. The artifacts above were regenerated from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`.
 
-No full suite was run in this remediation cell.
+The authoritative verifier then passed with `FIXED_END=e19b4c47cdd264f2e1d820b730697660cf723d5a` (tree `c3243e615942595b401da24c0c5d259c83860867`): `npm ci`, 51 focused tests, immutable-base manifest/shard/Markdown byte identity, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks all passed. This receipt intentionally skipped the full suite; the final review boundary still requires the verifier's full-suite mode.
 
 ## Last Local Evidence Before Runner Canonicalization
 
