@@ -14,6 +14,9 @@ import {
   proposeDisposition,
   proposeRationale,
   buildInventoryRow,
+  extractMarkdownConservationUnits,
+  extractMixedFileConservationUnit,
+  classifyConsumerKind,
   parseLsTreeLong,
 } from '../../scripts/generate-doc-inventory.mjs';
 
@@ -206,9 +209,10 @@ test('proposeDisposition: history-evidence retains as evidence; generated regene
   assert.equal(proposeDisposition({ corpus: 'platform-authority', fileClass: 'generated', gap: false }), 'regenerate-from-source');
 });
 
-test('proposeDisposition: already-promoted docs/platform/** canonical route proposes promote; other maintained files defer-with-owner', () => {
+test('proposeDisposition: already-promoted docs/platform/** canonical route proposes promote; legacy maintained files merge', () => {
   assert.equal(proposeDisposition({ corpus: 'platform-authority', fileClass: 'maintained-authority', gap: false, isPromotedCanonical: true }), 'promote');
-  assert.equal(proposeDisposition({ corpus: 'platform-authority', fileClass: 'maintained-authority', gap: false, isPromotedCanonical: false }), 'defer-with-owner');
+  assert.equal(proposeDisposition({ corpus: 'platform-authority', authorityStatus: 'legacy-current', fileClass: 'maintained-authority', gap: false, isPromotedCanonical: false }), 'merge');
+  assert.equal(proposeDisposition({ corpus: 'platform-authority', fileClass: 'retained-source', gap: false, isPromotedCanonical: false }), 'defer-with-owner');
 });
 
 test('proposeRationale: every disposition that requires one gets a non-empty string; others get null', () => {
@@ -229,6 +233,8 @@ test('buildInventoryRow: end-to-end row for a promoted portal file requires a ta
   assert.equal(row.proposedRationale, null);
   assert.equal(row.claimKind, 'navigation');
   assert.equal(row.headingCount, 1);
+  assert.equal(row.claims.length >= 1, true);
+  assert.equal(row.claims[0].proposedOwner, 'docs/platform/agent-coordination/README.md');
 });
 
 test('buildInventoryRow: end-to-end row for an unmapped gap requires a rationale and no target owner', () => {
@@ -238,6 +244,43 @@ test('buildInventoryRow: end-to-end row for an unmapped gap requires a rationale
   assert.equal(row.proposedDisposition, 'unknown-blocking');
   assert.equal(row.proposedTargetOwner, null);
   assert.equal(typeof row.proposedRationale, 'string');
+});
+
+test('extractMarkdownConservationUnits: emits headings and unheaded blocks for conservation', () => {
+  const md = ['Intro paragraph with enough claim text to be conserved.', '', '# Title', '', 'Unheaded section prose with enough text to count.'].join('\n');
+  const units = extractMarkdownConservationUnits(md);
+  assert.deepEqual(units.map((u) => u.unitKind), ['unheaded-preamble', 'heading', 'unheaded-block']);
+  assert.equal(units[0].anchor, 'unheaded-block-1');
+});
+
+test('extractMarkdownConservationUnits: conserves fenced payloads without treating headings inside them as headings', () => {
+  const md = ['# Contract', '', '```yaml', '# schema comment', 'authority: legacy-current', '```'].join('\n');
+  const units = extractMarkdownConservationUnits(md);
+  assert.deepEqual(units.map((u) => u.unitKind), ['heading', 'unheaded-block']);
+  assert.equal(units[1].sample.includes('authority: legacy-current'), true);
+  assert.equal(units.some((u) => u.title === 'schema comment'), false);
+});
+
+test('extractMixedFileConservationUnit: non-Markdown payloads get a file-block claim unit', () => {
+  const units = extractMixedFileConservationUnit('docs/how-to/coordination-examples/request.json', '{"x":true}\n');
+  assert.equal(units.length, 1);
+  assert.equal(units[0].unitKind, 'file-block');
+  assert.equal(units[0].anchor, 'file-block');
+});
+
+test('classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and literal consumers', () => {
+  assert.equal(classifyConsumerKind('src/x.mjs', 'const p = `${root}/docs/specs/runner.md`;'), 'dynamic');
+  assert.equal(classifyConsumerKind('scripts/x.mjs', 'docs/architect/**'), 'glob');
+  assert.equal(classifyConsumerKind('test/fixtures/readme.md', 'docs/specs/runner.md'), 'fixture');
+  assert.equal(classifyConsumerKind('test/foo.test.mjs', 'assert.match(out, /docs/);'), 'executable-proof');
+  assert.equal(classifyConsumerKind('README.md', 'docs/specs/runner.md'), 'literal');
+});
+
+test('buildInventoryRow: retained platform claims get exactly one proposed owner', () => {
+  const index = buildSwitchboardIndex(FIXTURE_SWITCHBOARD);
+  const row = buildInventoryRow('docs/specs/runner.md', { content: '# Runner\n\nContract text with enough detail.', blobSha: 'c'.repeat(40), blobSize: 40, switchboardIndex: index });
+  assert.equal(row.proposedDisposition, 'merge');
+  assert.equal(row.claims.every((c) => c.proposedOwner === 'docs/specs/runner.md'), true);
 });
 
 test('parseLsTreeLong: parses `git ls-tree -r -l` output and ignores non-blob entries', () => {

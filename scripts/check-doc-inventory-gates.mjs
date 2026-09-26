@@ -75,6 +75,12 @@ export function validateStructure(inventory) {
         }
       }
     }
+    if (!Array.isArray(item.claimIds) || item.claimIds.length === 0 || item.claimCount !== item.claimIds.length) {
+      findings.push({ type: 'missing-claim-rows', path: item.path, message: `${item.path}: every file must emit claimIds plus matching claimCount` });
+    }
+    if (!Array.isArray(item.consumerEdgeIds) || typeof item.consumerEdgeCount !== 'number' || item.consumerEdgeCount !== item.consumerEdgeIds.length || !Array.isArray(item.consumerKinds)) {
+      findings.push({ type: 'missing-consumer-accounting', path: item.path, message: `${item.path}: consumer inventory must use consumerEdgeIds plus matching consumerEdgeCount and consumerKinds` });
+    }
   }
 
   if (typeof inventory.summary?.scannedFilesCount === 'number' && inventory.summary.scannedFilesCount !== inventory.items.length) {
@@ -83,6 +89,40 @@ export function validateStructure(inventory) {
       message: `summary.scannedFilesCount (${inventory.summary.scannedFilesCount}) does not match items.length (${inventory.items.length})`,
     });
   }
+  const itemsByPath = new Map((inventory.items || []).map((item) => [item.path, item]));
+  const itemClaimIds = (inventory.items || []).flatMap((item) => Array.isArray(item.claimIds) ? item.claimIds.map((claimId) => ({ claimId, path: item.path })) : []);
+  if (!Array.isArray(inventory.claimLedger)) {
+    findings.push({ type: 'missing-claim-ledger', message: 'Inventory must include top-level claimLedger array' });
+  } else {
+    const claimsById = new Map();
+    for (const claim of inventory.claimLedger) {
+      if (!claim?.claimId || claimsById.has(claim.claimId)) findings.push({ type: 'claim-ledger-duplicate', message: `claimLedger contains missing or duplicate claimId ${claim?.claimId || '<missing>'}` });
+      if (claim?.claimId) claimsById.set(claim.claimId, claim);
+    }
+    if (inventory.claimLedger.length !== itemClaimIds.length) findings.push({ type: 'claim-ledger-mismatch', message: `claimLedger length (${inventory.claimLedger.length}) does not match total item claimIds (${itemClaimIds.length})` });
+    for (const { claimId, path: itemPath } of itemClaimIds) {
+      const claim = claimsById.get(claimId);
+      if (!claim) findings.push({ type: 'claim-ledger-missing-id', path: itemPath, message: `${itemPath}: claimId ${claimId} not found exactly once in top-level claimLedger` });
+      else if (claim.sourceId && claim.sourceId !== itemsByPath.get(itemPath)?.sourceId) findings.push({ type: 'claim-source-id-mismatch', path: itemPath, message: `${itemPath}: claimId ${claimId} has sourceId ${claim.sourceId}` });
+    }
+  }
+
+  const itemConsumerIds = (inventory.items || []).flatMap((item) => Array.isArray(item.consumerEdgeIds) ? item.consumerEdgeIds.map((edgeId) => ({ edgeId, path: item.path })) : []);
+  if (!Array.isArray(inventory.consumerEdges)) {
+    findings.push({ type: 'missing-consumer-edges', message: 'Inventory must include top-level consumerEdges array' });
+  } else {
+    const edgesById = new Map();
+    for (const edge of inventory.consumerEdges) {
+      if (!edge?.edgeId || edgesById.has(edge.edgeId)) findings.push({ type: 'consumer-edge-duplicate', message: `consumerEdges contains missing or duplicate edgeId ${edge?.edgeId || '<missing>'}` });
+      if (edge?.edgeId) edgesById.set(edge.edgeId, edge);
+    }
+    if (inventory.consumerEdges.length !== itemConsumerIds.length) findings.push({ type: 'consumer-edge-mismatch', message: `consumerEdges length (${inventory.consumerEdges.length}) does not match total item consumerEdgeIds (${itemConsumerIds.length})` });
+    for (const { edgeId, path: itemPath } of itemConsumerIds) {
+      const edge = edgesById.get(edgeId);
+      if (!edge) findings.push({ type: 'consumer-edge-missing-id', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} not found exactly once in top-level consumerEdges` });
+      else if (edge.targetPath !== itemPath) findings.push({ type: 'consumer-edge-target-mismatch', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} targets ${edge.targetPath}` });
+    }
+  }
 
   return findings;
 }
@@ -90,7 +130,17 @@ export function validateStructure(inventory) {
 export function validateAgainstVocabulary(inventory, vocabulary) {
   const findings = [];
   const dispositionsById = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
+  const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
+  claimKinds.add('unclassified');
   const RECOGNIZED_FILE_CLASSES = new Set(['maintained-authority', 'retained-source', 'generated', 'history-evidence']);
+  const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
+  const claimsBySourcePath = new Map();
+  const itemBySourceId = new Map((inventory.items || []).map((item) => [item.sourceId, item]));
+  for (const claim of inventory.claimLedger || []) {
+    const item = itemBySourceId.get(claim.sourceId);
+    const sourcePath = item?.path || claim.sourcePath;
+    claimsBySourcePath.set(sourcePath, (claimsBySourcePath.get(sourcePath) || []).concat(claim));
+  }
 
   for (const item of inventory.items || []) {
     const disposition = dispositionsById.get(item.proposedDisposition);
@@ -114,6 +164,29 @@ export function validateAgainstVocabulary(inventory, vocabulary) {
         path: item.path,
         message: `${item.path}: fileClass "${item.fileClass}" is not allowed for disposition "${item.proposedDisposition}" (allowed: ${disposition.allowedFileClasses.join(', ')})`,
       });
+    }
+    for (const claim of claimsBySourcePath.get(item.path) || []) {
+      if (!claim || typeof claim !== 'object') {
+        findings.push({ type: 'malformed-claim', path: item.path, message: `${item.path}: claim row must be an object` });
+        continue;
+      }
+      for (const field of ['claimId', 'sourceId', 'sourceAnchor', 'claimKind', 'authorityKind', 'status', 'disposition']) {
+        if (typeof claim[field] !== 'string' || claim[field].length === 0) {
+          findings.push({ type: 'malformed-claim', path: item.path, message: `${item.path}: claim ${claim.claimId || '<unknown>'} missing ${field}` });
+        }
+      }
+      if (!claimKinds.has(claim.claimKind)) {
+        findings.push({ type: 'unknown-claim-kind', path: item.path, message: `${item.path}: claim ${claim.claimId} claimKind "${claim.claimKind}" is not in vocabulary` });
+      }
+      if (!Array.isArray(claim.relations)) {
+        findings.push({ type: 'malformed-claim-links', path: item.path, message: `${item.path}: claim ${claim.claimId} must carry relations array` });
+      }
+      if (RETAINED_CLAIM_DISPOSITIONS.has(claim.disposition)) {
+        const owners = [claim.proposedOwner].filter((v, idx, arr) => typeof v === 'string' && v.length > 0 && arr.indexOf(v) === idx);
+        if (owners.length !== 1) {
+          findings.push({ type: 'retained-claim-owner-count', path: item.path, message: `${item.path}: claim ${claim.claimId} must have exactly one credible proposed owner, found ${owners.length}` });
+        }
+      }
     }
   }
   return findings;
@@ -145,6 +218,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary }) {
 
   const gapItems = (inventory.items || []).filter((i) => i.gap);
   const duplicateGroups = inventory.duplicateContentGroups || [];
+  const semanticConflictGroups = inventory.semanticConflictGroups || [];
 
   const allFatal = [...fatalFindings, ...coverageFindings];
 
@@ -156,6 +230,8 @@ export function checkInventory({ repoRoot, inventory, vocabulary }) {
       gapPaths: gapItems.map((i) => i.path),
       duplicateContentGroupCount: duplicateGroups.length,
       duplicateContentGroups: duplicateGroups,
+      semanticConflictGroupCount: semanticConflictGroups.length,
+      semanticConflictGroups,
     },
   };
 }
@@ -214,7 +290,8 @@ export function runCli(argv, cwd = process.cwd()) {
   console.log(
     `check-doc-inventory-gates: structural and vocabulary gates pass. ` +
     `Explicit open findings (not blocking Phase 02, must be resolved before Phase 05): ` +
-    `${result.explicitOpenFindings.gapCount} gap(s), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s).`
+    `${result.explicitOpenFindings.gapCount} gap(s), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s), ` +
+    `${result.explicitOpenFindings.semanticConflictGroupCount} semantic-conflict group(s).`
   );
   return 0;
 }

@@ -3,72 +3,66 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: PENDING -- execution blocked in this worker session (see below); no Phase 02 gate is claimed met
-Result: authoring-only checks passed by manual trace (no test runner available); execution and
-  test-suite verification deferred to a session with unrestricted Bash access
+Status: LOCAL PASS; pending independent review
+Result: Phase 02 artifacts normalized under GitHub's 100MB file limit, generated twice, byte-compared, gate checked, focused tests passed, full npm test passed
 ```
 
-## 1. What Could Be Verified In This Session
+## Commands Run
 
-This session's Bash tool allowed only a narrow set of git plumbing commands (`git rev-parse`,
-`git cat-file`, `git tag -l`, `git ls-files`, `git grep`) plus `git add`/`git commit`; it refused
-`node`/`npm` execution and `git status`/`log`/`diff`/`show`/`ls-tree` (see
-`phase-02-execution-record.md` for the exact empirically-established boundary). GitNexus MCP tools
-(`detect_changes`, `impact`) were also permission-refused. Nothing that requires running code could be
-executed or independently confirmed by tooling in this session.
+```bash
+node --test test/scripts/generate-doc-inventory.test.mjs > /tmp/phase02-focused-test.log 2>&1
 
-What *was* verified:
+node scripts/generate-doc-inventory.mjs \
+  --commit documentation-authority-phase-01-20260926 \
+  --json-out /tmp/phase02-doc-inventory.a.json \
+  --md-out /tmp/phase02-doc-inventory.a.md > /tmp/phase02-generate-a.log 2>&1
+node scripts/generate-doc-inventory.mjs \
+  --commit documentation-authority-phase-01-20260926 \
+  --json-out /tmp/phase02-doc-inventory.b.json \
+  --md-out /tmp/phase02-doc-inventory.b.md > /tmp/phase02-generate-b.log 2>&1
+cmp /tmp/phase02-doc-inventory.a.json /tmp/phase02-doc-inventory.b.json
+cmp /tmp/phase02-doc-inventory.a.md /tmp/phase02-doc-inventory.b.md
+cp /tmp/phase02-doc-inventory.a.json plans/260925-documentation-authority-unification/phase-02-doc-inventory.json
+cp /tmp/phase02-doc-inventory.a.md plans/260925-documentation-authority-unification/phase-02-doc-inventory.md
+sha256sum plans/260925-documentation-authority-unification/phase-02-doc-inventory.json \
+  plans/260925-documentation-authority-unification/phase-02-doc-inventory.md > /tmp/phase02-artifact-sha256.log
 
-- **Phase 01 tag identity**: `git tag -l documentation-authority-phase-01-20260926` returns the tag;
-  `git rev-parse documentation-authority-phase-01-20260926` resolves to annotated tag object
-  `135957aec6e9939b7a1626d2942014c045620a40`; `git rev-parse documentation-authority-phase-01-20260926^{commit}`
-  resolves to `f0c76c5e590339d9c815038539ff1f4a072c64e4`, matching the plan's stated immutable base;
-  `git cat-file -p` on the tag shows tagger `Test <test@example.com>`, message "Documentation Authority
-  Unification Phase 01 complete", "Independent re-review: APPROVE", review range
-  `38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4`, tested/final tree
-  `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`, and "Phase 02 remains unauthorized" (as of that tag --
-  Phase 02 is separately authorized by direct human request on 2026-09-26, recorded in `plan.md`).
-- **Current HEAD identity**: `git rev-parse HEAD` returns `f0c76c5e590339d9c815038539ff1f4a072c64e4`,
-  identical to the Phase 01 tag's target commit, confirming no unexpected drift since the tag was cut.
-- **Real corpus scale** (via `git ls-files`, not fabricated): counts and structure recorded in
-  `phase-02-execution-record.md`.
-- **Manual trace of the generator/checker/test code** against representative real files read from this
-  repository (`docs/reading-map.md`'s `Document type: Reading map` frontmatter,
-  `docs/transitional-switchboard.md`'s and `transitional-switchboard.json`'s area/route shapes,
-  `docs/specs/runner.md`'s switchboard entry, the promoted `docs/platform/agent-coordination/README.md`
-  entry, `docs/architect/agent-coordination/**`'s glob-route entry, `docs/knowledge/**`'s non-authority
-  end-user-corpus entry, `docs/architect/proposals/**`'s unmapped-gap case) -- traced by hand line-by-line
-  against `scripts/generate-doc-inventory.mjs`'s classification, heading-extraction, and
-  disposition-proposal logic, and against `scripts/check-doc-inventory-gates.mjs`'s vocabulary-conformance
-  checks. Every traced case produced the expected, internally consistent result. This is evidence of
-  design correctness by inspection; it is **not** a substitute for actually running
-  `node --test test/scripts/generate-doc-inventory.test.mjs` and the generator itself.
+node scripts/check-doc-inventory-gates.mjs \
+  --inventory plans/260925-documentation-authority-unification/phase-02-doc-inventory.json \
+  --vocabulary plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json > /tmp/phase02-gate.log 2>&1
 
-## 2. What Remains To Be Verified (Blocking Phase 02 Gate Closure)
+node scripts/check-decision-citation-drift.mjs > /tmp/phase02-decision-citation-drift.log 2>&1
+node scripts/check-legacy-docs-ratchet.mjs > /tmp/phase02-legacy-ratchet.log 2>&1
+git diff --check > /tmp/phase02-diff-check.log 2>&1
+npm test > /tmp/phase02-npm-test.log 2>&1
+```
 
-None of the following has been executed in this session. A session or reviewer with unrestricted Bash
-access must run them (exact commands in `phase-02-execution-record.md`):
+## Results
 
-1. `node --test test/scripts/generate-doc-inventory.test.mjs` — must pass 0 failures.
-2. `node scripts/generate-doc-inventory.mjs --commit documentation-authority-phase-01-20260926 --json-out ... --md-out ...` — must complete without throwing, and its `summary.scannedFilesCount` must be independently plausible against the real corpus scale noted above.
-3. `node scripts/check-doc-inventory-gates.mjs --inventory ... --vocabulary ...` — must exit 0 (structural + vocabulary gates), while its reported `explicitOpenFindings` (gaps, duplicate-content groups) is expected to be nonzero and is not itself a failure (plan.md §7 Phase 02 Gate: conflicts must be explicit, not absent).
-4. `npm test` (full suite) — must remain green; this phase added no changes to any existing source module, only new `scripts/**`/`test/**` files, so no existing test's behavior should be affected, but this must be confirmed by an actual run, not assumed.
-5. `git diff --stat` / `git status --porcelain` against the working tree immediately before commit, to confirm the staged diff matches exactly the declared mutation footprint in `phase-02-execution-record.md` and nothing else changed.
-6. GitNexus `detect_changes()` (scope `staged`, from this worktree) once MCP tool permission is available, to confirm the diff's affected-symbol surface matches expectations (new, uncalled functions only).
+- Focused unit tests: 32 passed, 0 failed.
+- Inventory generation: completed twice; JSON + Markdown byte comparison passed.
+- Gate checker: passed structural/vocabulary/claim-owner gates.
+- Explicit non-fatal open findings: 1042 gaps, 818 exact duplicate-content groups, 151 semantic-conflict groups.
+- Ledger counts: 85,770 claim rows, 165,923 consumer edges, 4,305 file rows. Fenced Markdown payloads are conserved inside unheaded-content claim units rather than being skipped.
+- Artifact hashes: JSON `9a953025db6340d97c313a4b88864b5d6b1858899d87a4b5e39001ad550d16de`; Markdown `8529afeb8025f96af8e731658edcd89386af6629116dc4f8df3bbbf104eed4bb`.
+- Artifact sizes: JSON 91,878,536 bytes; Markdown 668,014 bytes.
+- Decision citation drift check: passed.
+- Legacy docs ratchet: passed.
+- `git diff --check`: passed.
+- Full suite: `npm test` exited 0; 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo. Diagnostic probe output remained non-fatal as designed.
+- Full-suite log SHA-256: `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`.
+- GitNexus change analysis: 61 symbols across 7 indexed source/record files, 6 affected flows, aggregate risk `high`; symbol-level upstream impact for `generateInventory` and `checkInventory` was `LOW` with no affected process. The aggregate HIGH result remains review-significant and is not waived by the symbol-level result.
 
-## 3. Forbidden-Action Checks (Manually Confirmed By Inspection)
+## Gate Mapping
 
-- No files under `docs/specs/**` or `docs/architect/**` were created, edited, or deleted by this phase.
-- No evidence payload was moved or relocated.
-- No file was added under `docs/platform/**` claiming universal canonical authority.
-- No Phase 03-09 deliverable was touched.
-- No merge to `main`, no push, no new tag was created.
-- `plan.md`'s edits in this phase are confined to: the top status block, the Phase table's rows for 00/01/02, the Phase 01 and Phase 02 narrative sections' status lines, and §14 Related Artifacts additions -- no other section was touched, and no locked law, decision ID, or prior phase's evidence file (`phase-01-execution-record.md`, `phase-01-verification.md`, and all Phase 00 evidence) was edited.
+| Phase 02 gate | Evidence |
+|---|---|
+| Every in-scope source accounted exactly once at file level | checker recomputes commit-tree file set and passed |
+| Heading/unheaded content block source-coverage floor | generator emits top-level `claimLedger`; checker validates every item has `claimIds`/`claimCount` |
+| Every retained claim has exactly one proposed owner | checker validates owner count for retained claim dispositions; `unknown-blocking` is an explicit blocker with null owner |
+| Root authorities, area directories, evidence payloads, shipped path conventions enumerated | inventory covers `docs/**`, `AGENTS.md`, `CLAUDE.md`, and integrates Phase 01 shipped-path contract scopes |
+| Unresolved conflicts explicit | generated gap/duplicate/semantic-conflict groups are committed and checker reports them |
 
-## 4. Proposed Immutable Review Range
+## Pending Review Boundary
 
-`documentation-authority-phase-01-20260926..<FIXED_END>`, where `<FIXED_END>` is the commit this phase's
-changes land on in this worktree. Per the Phase 01 precedent, tagging Phase 02 is out of scope for this
-session regardless (the human dispatch instruction for this phase explicitly forbids creating a Phase 02
-tag) and Phase 02 must remain pending independent review, not completed/approved, until a capable session
-executes Section 2's commands and an independent reviewer confirms the results.
+This verification is local doer evidence only. Phase 02 still requires independent review before any later phase can be treated as unblocked. Phases 03-09 remain unauthorized.

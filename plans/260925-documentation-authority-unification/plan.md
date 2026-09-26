@@ -1,7 +1,7 @@
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: In-progress (Phase 00 complete; Phase 01 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 02 authorized 2026-09-26 and in progress; Phases 03-09 unauthorized and deferred)
+Plan status: In-progress (Phase 00 complete; Phase 01 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 02 implemented and locally verified on 2026-09-26, pending independent review; Phases 03-09 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Historical foundation: plans/260825-1841-knowledge-registry/
@@ -240,7 +240,7 @@ permission to execute it.
 |---|---|---|---|---|
 | 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
 | 01 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_review_fix_op_001) | Gate passed; containment active | Review unit `38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4`; independent re-review verdict **APPROVE**; tagged `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, tested/final tree `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`); operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, policy-aware ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path conventions inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records; tag annotation records "Phase 02 remains unauthorized" as of that tag, superseded by this plan's Phase 02 authorization below |
-| 02 | `in-progress` | Authorized by direct human request on 2026-09-26 (Phase 02 doer assignment, isolated worktree) | Phase 01 gate passed; inventory/conservation work underway | Generator/checker/tests authored (`scripts/generate-doc-inventory.mjs`, `scripts/check-doc-inventory-gates.mjs`, `test/scripts/generate-doc-inventory.test.mjs`); this worker session's Bash tool was sandboxed to a narrow git-plumbing/add/commit allowlist (no `node`/`npm` execution, no `git status`/`log`/`diff`/`show`/`ls-tree`) -- the generated inventory artifact, its gate-checker run, and `npm test` have NOT been executed or verified in this session; see `phase-02-execution-record.md` and `phase-02-verification.md` for the exact blocker and the reproducible commands a capable session/reviewer must run before any Phase 02 gate can be claimed met |
+| 02 | `implemented-pending-independent-review` | Authorized by direct human request on 2026-09-26 (Phase 02 doer assignment, isolated worktree) | Phase 01 gate passed; Phase 02 local gate/checks passed; independent review still pending | Deterministic committed inventory + conservation ledger generated at `phase-02-doc-inventory.{json,md}`; gate checker passes with explicit open findings (1042 gaps, 818 exact duplicate groups, 151 semantic-conflict groups); focused tests, determinism proof, documentation/citation checks, and full `npm test` passed; see `phase-02-execution-record.md` and `phase-02-verification.md`. |
 | 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
 | 04 | `not-started`, `not-authorized` | None | Blocked by Phase 03 | Neither pilot has begun; no candidate transformation is authorized |
 | 05 | `not-started`, `not-authorized` | None | Blocked by Phase 04 | No area-wide candidate corpus exists |
@@ -347,22 +347,20 @@ Phase 01 evidence:
 
 ### Phase 02 — Build repository-wide inventory and conservation ledger
 
-**Status:** `in-progress` — authorized by direct human request on 2026-09-26 (Phase 02 doer assignment,
-isolated worktree `/home/vantt/projects/forgentX-phase00-documentation-authority-unification`, branch
+**Status:** `implemented-pending-independent-review` — authorized by direct human request on 2026-09-26
+(Phase 02 doer assignment, isolated worktree
+`/home/vantt/projects/forgentX-phase00-documentation-authority-unification`, branch
 `plan/260925-documentation-authority-unification`, immutable base tag
 `documentation-authority-phase-01-20260926` at `f0c76c5e590339d9c815038539ff1f4a072c64e4`). Phase 01 gate
-passed (see Phase 01 section above). Authored this session: `scripts/generate-doc-inventory.mjs`
-(repository-wide classifier against the Phase 01 switchboard plus directory heuristics, heading extraction
-for the source-coverage floor, plan-§6.1 disposition proposal), `scripts/check-doc-inventory-gates.mjs`
-(structural + vocabulary-conformance gate checker, independent file-count recomputation), and
-`test/scripts/generate-doc-inventory.test.mjs`. **Not yet done in this session:** actually running the
-generator against the immutable base commit, running the checker against its output, and running
-`npm test` — this worker session's Bash tool is sandboxed to a narrow allowlist (git plumbing
-read commands, `git add`, `git commit`; no `node`/`npm` execution, no `git status`/`log`/`diff`/`show`/
-`ls-tree`). See `phase-02-execution-record.md` and `phase-02-verification.md` for the exact boundary
-observed and the reproducible commands a session/reviewer with full Bash access must run next. No
-Phase 02 gate is claimed met by this session; Phase 03–09 remain unauthorized and untouched, and no
-migration/promotion/deletion/cutover has occurred.
+passed (see Phase 01 section above). Phase 02 now generates the deterministic repository-wide inventory
+and claim-level conservation ledger at `phase-02-doc-inventory.{json,md}`; the generator accounts for file
+classification, headings, unheaded prose blocks, mixed/non-Markdown file blocks, inbound/outbound links,
+consumer kinds (literal/dynamic/glob/fixture/executable-proof/shipped-contract), source/evidence links,
+immutable event/decision refs, local-vs-shipped contract scope, exact duplicates, semantic conflicts, and
+exactly one proposed owner for each retained claim row. The gate checker independently recomputes the
+in-scope file set and validates structure/vocabulary/claim-owner constraints. Local Phase 02 verification
+passed; unresolved gaps/conflicts are explicit findings and still block promotion. Phase 03–09 remain
+unauthorized and untouched, and no migration/promotion/deletion/cutover has occurred.
 **Mode:** read-only inventory, followed by reviewed ledger writes
 **Purpose:** Account for the real corpus before deciding migration mechanics.
 
